@@ -486,6 +486,21 @@ export interface GameEventMap {
   };
   'building:menu:opened': Record<string, never>;
   'building:menu:closed': Record<string, never>;
+  'building:needs_repair': {
+    buildingId: EntityId;
+    condition: number;
+    timestamp: number;
+  };
+  'building:critical_repair': {
+    buildingId: EntityId;
+    condition: number;
+    timestamp: number;
+  };
+  'building:collapse_imminent': {
+    buildingId: EntityId;
+    condition: number;
+    timestamp: number;
+  };
   'construction:started': {
     buildingId: EntityId;
     blueprintId: string;

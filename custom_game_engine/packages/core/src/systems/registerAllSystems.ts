@@ -44,6 +44,7 @@ import { AgentVisualsSystem } from './AgentVisualsSystem.js';
 // Agent Core
 import { AgentBrainSystem } from './AgentBrainSystem.js';
 import { MovementSystem } from './MovementSystem.js';
+import { StateMutatorSystem } from './StateMutatorSystem.js'; // Batched vector updates (priority 5)
 import { NeedsSystem } from './NeedsSystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
@@ -348,6 +349,11 @@ export function registerAllSystems(
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
 
+  // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
+  // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, etc.
+  const stateMutator = new StateMutatorSystem();
+  gameLoop.systemRegistry.register(stateMutator);
+
   // ============================================================================
   // RENDERING
   // ============================================================================
@@ -364,7 +370,9 @@ export function registerAllSystems(
   // ============================================================================
   // PLANTS
   // ============================================================================
+  // PlantSystem - Uses StateMutatorSystem for batched hydration/age/health updates
   const plantSystem = new PlantSystem(eventBus);
+  plantSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(plantSystem);
   gameLoop.systemRegistry.register(new PlantDiscoverySystem());
   gameLoop.systemRegistry.register(new PlantDiseaseSystem(eventBus));
@@ -374,7 +382,12 @@ export function registerAllSystems(
   // ANIMALS
   // ============================================================================
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
-  gameLoop.systemRegistry.register(new AnimalSystem(eventBus));
+
+  // AnimalSystem - Uses StateMutatorSystem for batched needs/age decay updates
+  const animalSystem = new AnimalSystem(eventBus);
+  animalSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(animalSystem);
+
   gameLoop.systemRegistry.register(new AnimalProductionSystem(eventBus));
   gameLoop.systemRegistry.register(new AnimalHousingSystem());
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
@@ -409,7 +422,12 @@ export function registerAllSystems(
   );
 
   gameLoop.systemRegistry.register(new MovementSystem());
-  gameLoop.systemRegistry.register(new NeedsSystem());
+
+  // NeedsSystem - Uses StateMutatorSystem for batched decay updates
+  const needsSystem = new NeedsSystem();
+  needsSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(needsSystem);
+
   gameLoop.systemRegistry.register(new MoodSystem());
   gameLoop.systemRegistry.register(new SleepSystem());
   gameLoop.systemRegistry.register(new SteeringSystem());
@@ -468,7 +486,12 @@ export function registerAllSystems(
   // BUILDING & CONSTRUCTION
   // ============================================================================
   gameLoop.systemRegistry.register(new BuildingSystem());
-  gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
+
+  // BuildingMaintenanceSystem - Uses StateMutatorSystem for batched condition decay
+  const buildingMaintenanceSystem = new BuildingMaintenanceSystem();
+  buildingMaintenanceSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(buildingMaintenanceSystem);
+
   gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
   gameLoop.systemRegistry.register(new ResourceGatheringSystem());
 

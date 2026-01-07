@@ -157,7 +157,7 @@ async function generateReferenceCharacter() {
   const artConfig = ART_STYLES[state.artStyle];
   const size = Math.floor((artConfig.baseSizes.min + artConfig.baseSizes.max) / 2);
 
-  const description = `${artConfig.description}, front-facing humanoid character, neutral pose, reference template`;
+  const description = `${artConfig.description}, simple basic human character for sprite composition reference, plain civilian humanoid, normal everyday person, standing front view, neutral pose, wearing simple plain tunic or basic clothing, no armor, no weapons, no accessories, no sci-fi elements, no fantasy armor, just a regular unadorned human figure`;
 
   const base64 = await generateImagePixflux(description, size, size);
 
@@ -201,24 +201,35 @@ function initializePartsList() {
   const artConfig = ART_STYLES[state.artStyle];
   const baseSize = Math.floor((artConfig.baseSizes.min + artConfig.baseSizes.max) / 2);
 
-  // Generate parts list based on art style
+  // Generate parts list for modular sprite composition system
+  // Each part is designed to be layered and combined with other parts
   state.parts = [
-    // Human heads (8)
-    { id: 'head_round_pale', category: 'head', description: `${artConfig.description}, human head, round face, pale skin, front view, neutral, no hair`, width: baseSize, height: baseSize, tags: ['round', 'pale'] },
-    { id: 'head_round_tan', category: 'head', description: `${artConfig.description}, human head, round face, tan skin, front view, smiling, no hair`, width: baseSize, height: baseSize, tags: ['round', 'tan'] },
-    { id: 'head_round_dark', category: 'head', description: `${artConfig.description}, human head, round face, dark brown skin, front view, serious, no hair`, width: baseSize, height: baseSize, tags: ['round', 'dark'] },
-    { id: 'head_square_pale', category: 'head', description: `${artConfig.description}, human head, square jaw, pale skin, front view, stern, no hair`, width: baseSize, height: baseSize, tags: ['square', 'pale'] },
-    { id: 'head_square_tan', category: 'head', description: `${artConfig.description}, human head, square jaw, tan skin, front view, confident, no hair`, width: baseSize, height: baseSize, tags: ['square', 'tan'] },
-    { id: 'head_oval_pale', category: 'head', description: `${artConfig.description}, human head, oval face, pale skin, front view, gentle smile, no hair`, width: baseSize, height: baseSize, tags: ['oval', 'pale'] },
-    { id: 'head_oval_dark', category: 'head', description: `${artConfig.description}, human head, oval face, dark skin, front view, wise, no hair`, width: baseSize, height: baseSize, tags: ['oval', 'dark'] },
-    { id: 'head_angular_pale', category: 'head', description: `${artConfig.description}, human head, angular face, pale skin, front view, intense, no hair`, width: baseSize, height: baseSize, tags: ['angular', 'pale'] },
+    // Human heads (8) - For sprite composition system
+    { id: 'head_round_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, pale skin tone, front-facing view, neutral expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'pale'] },
+    { id: 'head_round_tan', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, tan skin tone, front-facing view, smiling expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'tan'] },
+    { id: 'head_round_dark', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, dark brown skin tone, front-facing view, serious expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'dark'] },
+    { id: 'head_square_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, square jaw face shape, pale skin tone, front-facing view, stern expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['square', 'pale'] },
+    { id: 'head_square_tan', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, square jaw face shape, tan skin tone, front-facing view, confident expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['square', 'tan'] },
+    { id: 'head_oval_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, oval face shape, pale skin tone, front-facing view, gentle smile, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['oval', 'pale'] },
+    { id: 'head_oval_dark', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, oval face shape, dark skin tone, front-facing view, wise expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['oval', 'dark'] },
+    { id: 'head_angular_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, angular face shape, pale skin tone, front-facing view, intense expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['angular', 'pale'] },
 
-    // Human bodies (5)
-    { id: 'body_athletic', category: 'body', description: `${artConfig.description}, human body, athletic muscular build, arms and legs, standing, no head`, width: baseSize, height: Math.floor(baseSize * 1.5), tags: ['athletic'] },
-    { id: 'body_stocky', category: 'body', description: `${artConfig.description}, human body, stocky broad build, arms and legs, standing, no head`, width: baseSize, height: Math.floor(baseSize * 1.5), tags: ['stocky'] },
-    { id: 'body_thin', category: 'body', description: `${artConfig.description}, human body, thin lanky build, arms and legs, standing, no head`, width: baseSize, height: Math.floor(baseSize * 1.5), tags: ['thin'] },
-    { id: 'body_average', category: 'body', description: `${artConfig.description}, human body, average build, arms and legs, standing, no head`, width: baseSize, height: Math.floor(baseSize * 1.5), tags: ['average'] },
-    { id: 'body_heavy', category: 'body', description: `${artConfig.description}, human body, heavy-set build, arms and legs, standing, no head`, width: baseSize, height: Math.floor(baseSize * 1.5), tags: ['heavy'] },
+    // Torso/Body (5) - ONLY chest and waist, no arms or legs
+    { id: 'torso_athletic', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), athletic muscular build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['athletic'] },
+    { id: 'torso_stocky', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), stocky broad build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['stocky'] },
+    { id: 'torso_thin', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), thin lanky build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['thin'] },
+    { id: 'torso_average', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), average build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['average'] },
+    { id: 'torso_heavy', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), heavy-set build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['heavy'] },
+
+    // Arms (4) - Left and right, different poses
+    { id: 'arm_left_relaxed', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached left arm, relaxed pose hanging down, shoulder socket at top for torso attachment, hand at bottom, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'relaxed'] },
+    { id: 'arm_right_relaxed', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached right arm, relaxed pose hanging down, shoulder socket at top for torso attachment, hand at bottom, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'relaxed'] },
+    { id: 'arm_left_bent', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached left arm, bent at elbow pose, shoulder socket at top for torso attachment, hand pointing forward, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'bent'] },
+    { id: 'arm_right_bent', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached right arm, bent at elbow pose, shoulder socket at top for torso attachment, hand pointing forward, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'bent'] },
+
+    // Legs (2) - Standing pose
+    { id: 'legs_standing', category: 'legs', description: `${artConfig.description}, modular sprite part for composition system, ONLY a pair of human legs, standing pose, waist connection at top for torso attachment, feet at bottom, no torso, isolated lower body for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['standing'] },
+    { id: 'legs_walking', category: 'legs', description: `${artConfig.description}, modular sprite part for composition system, ONLY a pair of human legs, walking pose with one leg forward, waist connection at top for torso attachment, feet at bottom, no torso, isolated lower body for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['walking'] },
   ];
 
   // Initialize completion tracking

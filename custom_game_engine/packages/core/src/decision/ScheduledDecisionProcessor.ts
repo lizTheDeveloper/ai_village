@@ -21,6 +21,7 @@ import type { AgentComponent, AgentBehavior } from '../components/AgentComponent
 import { AutonomicSystem, type AutonomicResult } from './AutonomicSystem.js';
 import { getBehaviorPriority } from './BehaviorPriority.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
+import { LLMHistoryComponent, createLLMHistoryComponent, type LLMInteraction } from '../components/LLMHistoryComponent.js';
 
 // Import LLM types from local types file to avoid circular dependency with @ai-village/llm
 import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '../types/LLMTypes.js';
@@ -70,6 +71,7 @@ export class ScheduledDecisionProcessor {
   private autonomicSystem: AutonomicSystem;
   private llmDecisionQueue: LLMDecisionQueue;
   private pendingLayerSelection: Map<string, DecisionLayer> = new Map();
+  private pendingPrompts: Map<string, string> = new Map(); // Track prompts by entity ID
 
   constructor(scheduler: LLMScheduler, llmDecisionQueue: LLMDecisionQueue) {
     this.scheduler = scheduler;
@@ -143,6 +145,7 @@ export class ScheduledDecisionProcessor {
         ...current,
         behavior: parsed.behavior,
         behaviorState: parsed.behaviorState || {},
+        recentSpeech: parsed.speaking, // Set speech for bubble renderer
       }));
 
       return {
@@ -207,12 +210,25 @@ export class ScheduledDecisionProcessor {
       const layer = this.pendingLayerSelection.get(entity.id) || 'executor';
       this.pendingLayerSelection.delete(entity.id);
 
+      // Get the prompt that was sent
+      const prompt = this.pendingPrompts.get(entity.id) || '';
+      this.pendingPrompts.delete(entity.id);
+
       // Parse LLM response
       const parsed = this.parseLLMResponse(decision);
 
       if (!parsed) {
         console.warn(`[ScheduledDecisionProcessor] Failed to parse LLM response for ${entity.id}`);
+        // Record failed interaction
+        if (prompt) {
+          this.recordLLMInteraction(entity, layer, prompt, decision, false, 'Failed to parse response');
+        }
         return { changed: false, source: 'none' };
+      }
+
+      // Record successful interaction
+      if (prompt) {
+        this.recordLLMInteraction(entity, layer, prompt, decision, true);
       }
 
       // Apply decision to agent
@@ -220,6 +236,7 @@ export class ScheduledDecisionProcessor {
         ...current,
         behavior: parsed.behavior,
         behaviorState: parsed.behaviorState || {},
+        recentSpeech: parsed.speaking, // Set speech for bubble renderer
       }));
 
       return {
@@ -247,10 +264,14 @@ export class ScheduledDecisionProcessor {
     // Store which layer we're requesting (so we can label it when the response comes back)
     this.pendingLayerSelection.set(entity.id, layerSelection.layer);
 
+    // Store the prompt so we can record it with the response later
+    this.pendingPrompts.set(entity.id, prompt);
+
     // Request decision from queue (fire-and-forget, will be ready next tick)
     this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((error: Error) => {
       console.error(`[ScheduledDecisionProcessor] LLM decision failed for ${entity.id}:`, error);
       this.pendingLayerSelection.delete(entity.id);
+      this.pendingPrompts.delete(entity.id);
     });
 
     // Mark that we've invoked this layer (for cooldown tracking)
@@ -263,7 +284,7 @@ export class ScheduledDecisionProcessor {
   /**
    * Parse LLM response (JSON or legacy text format).
    */
-  private parseLLMResponse(response: string): { behavior: AgentBehavior; behaviorState?: Record<string, unknown> } | null {
+  private parseLLMResponse(response: string): { behavior: AgentBehavior; behaviorState?: Record<string, unknown>; speaking?: string } | null {
     // Try JSON parse first (structured format)
     try {
       const parsed = JSON.parse(response);
@@ -272,7 +293,11 @@ export class ScheduledDecisionProcessor {
       if (parsed.action && typeof parsed.action === 'object') {
         const action = parsed.action;
         const behavior = actionToBehavior(action);
-        return { behavior, behaviorState: {} };
+        return {
+          behavior,
+          behaviorState: {},
+          speaking: parsed.speaking // Extract speaking field
+        };
       }
 
       // Legacy format with action string - parse it
@@ -280,7 +305,11 @@ export class ScheduledDecisionProcessor {
         const action = parseAction(parsed.action);
         if (action) {
           const behavior = actionToBehavior(action);
-          return { behavior, behaviorState: {} };
+          return {
+            behavior,
+            behaviorState: {},
+            speaking: parsed.speaking // Extract speaking field
+          };
         }
       }
 
@@ -310,5 +339,59 @@ export class ScheduledDecisionProcessor {
    */
   processAutonomic(entity: EntityImpl): AutonomicResult | null {
     return this.autonomicSystem.check(entity);
+  }
+
+  /**
+   * Record an LLM interaction to the entity's history component
+   */
+  private recordLLMInteraction(
+    entity: EntityImpl,
+    layer: DecisionLayer,
+    prompt: string,
+    response: string,
+    success: boolean,
+    error?: string
+  ): void {
+    // Get or create llm_history component
+    let history = entity.getComponent('llm_history') as LLMHistoryComponent | undefined;
+    if (!history) {
+      history = createLLMHistoryComponent(entity.id);
+      entity.addComponent(history);
+    }
+
+    // Parse response to extract fields
+    let thinking: string | undefined;
+    let action: any;
+    let speaking: string | undefined;
+    let rawResponse: any;
+
+    try {
+      const parsed = JSON.parse(response);
+      rawResponse = parsed;
+      thinking = parsed.thinking;
+      action = parsed.action;
+      speaking = parsed.speaking;
+    } catch {
+      // Not JSON, store as raw
+      rawResponse = response;
+    }
+
+    // Create interaction record
+    const interaction: LLMInteraction = {
+      timestamp: Date.now(),
+      layer: layer === 'talker' || layer === 'executor' ? layer : 'executor', // Default to executor if not talker
+      prompt,
+      response: {
+        thinking,
+        action,
+        speaking,
+        rawResponse,
+      },
+      success,
+      error,
+    };
+
+    // Record the interaction
+    history.recordInteraction(interaction);
   }
 }

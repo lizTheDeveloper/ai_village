@@ -1,642 +1,1398 @@
-# @ai-village/renderer
+# Renderer Package - Graphics Rendering & UI System
 
-Real-time game rendering system for Multiverse: The End of Eternity. Renders the 2D top-down world using HTML5 Canvas with a clean separation between game state and visual presentation.
+> **For Language Models:** This README is optimized for LM understanding. Read this document completely before working with the rendering system to understand its architecture, interfaces, and usage patterns.
 
-## Architecture Overview
+## Overview
 
-The renderer follows a **clean separation of concerns**:
+The **Renderer Package** (`@ai-village/renderer`) implements the complete graphics rendering pipeline and UI system using HTML5 Canvas 2D with optional Three.js 3D rendering. It handles terrain, entities, sprites, particles, UI panels, and window management.
+
+**What it does:**
+- 2D canvas rendering of terrain tiles and entities with camera/viewport control
+- PixelLab sprite system with dynamic character generation and animation
+- UI panel system with 40+ game panels (AgentInfo, Resources, Crafting, etc.)
+- Window management with dragging, resizing, LRU auto-close, and persistence
+- Particle effects for visual feedback (dust clouds, sparks, etc.)
+- Health bars, speech bubbles, floating text, and combat indicators
+- Context menus with right-click actions for entities
+- Camera modes: top-down, side-view with parallax, 3D isometric
+- Input handling: mouse, keyboard, touch, drag-drop
+
+**Key files:**
+- `src/Renderer.ts` - Main 2D canvas renderer (2933 lines)
+- `src/Camera.ts` - Camera/viewport with multi-view support (518 lines)
+- `src/WindowManager.ts` - UI window management (1144 lines)
+- `src/sprites/` - PixelLab sprite system (8 directions, animations)
+- `src/panels/` - Specialized UI panel implementations
+- `src/ui/` - Reusable UI components (inventory, drag-drop, tooltips)
+
+---
+
+## Package Structure
 
 ```
-Game State (ECS) → Visual Systems → Renderer → Canvas
-     ↓                  ↓              ↓          ↓
-  Components    Compute Visual    Read Visual   Draw Pixels
-                 Properties       Properties
+packages/renderer/
+├── src/
+│   ├── Renderer.ts                # Main 2D canvas renderer
+│   ├── Renderer3D.ts              # Three.js 3D renderer (side-view)
+│   ├── Camera.ts                  # Camera/viewport control
+│   ├── ViewMode.ts                # View mode types (top-down, side-view)
+│   ├── SpriteRenderer.ts          # Sprite rendering utilities
+│   ├── InputHandler.ts            # Mouse/keyboard/touch input
+│   ├── KeyboardRegistry.ts        # Keyboard shortcut management
+│   │
+│   ├── sprites/
+│   │   ├── PixelLabSpriteLoader.ts      # Loads PixelLab sprites from API
+│   │   ├── PixelLabSpriteDefs.ts        # Sprite definitions (8 directions)
+│   │   ├── SpriteRegistry.ts            # Maps traits → sprite folders
+│   │   ├── SpriteCache.ts               # Sprite instance caching
+│   │   ├── SpriteService.ts             # High-level sprite API
+│   │   ├── SpriteCompositor.ts          # LPC sprite compositing (legacy)
+│   │   └── AnimalSpriteVariants.ts      # Animal sprite definitions
+│   │
+│   ├── WindowManager.ts           # Window management (drag, resize, LRU)
+│   ├── MenuBar.ts                 # Top menu bar UI
+│   ├── types/WindowTypes.ts       # Window/panel type definitions
+│   │
+│   ├── panels/
+│   │   ├── agent-info/            # Agent info panel sections
+│   │   │   ├── InfoSection.ts     # Identity, needs, stats
+│   │   │   ├── SkillsSection.ts   # Skill levels
+│   │   │   ├── InventorySection.ts # Inventory grid
+│   │   │   ├── MemoriesSection.ts # Episodic memories
+│   │   │   └── ContextSection.ts  # LLM context visualization
+│   │   └── magic/                 # Magic system UI
+│   │       ├── SkillTreePanel.ts  # Skill tree visualization
+│   │       ├── ParadigmTreeView.ts # Magic paradigm trees
+│   │       └── NodeTooltip.ts     # Skill node tooltips
+│   │
+│   ├── ui/
+│   │   ├── InventoryUI.ts         # Inventory grid component
+│   │   ├── DragDropSystem.ts      # Drag-drop for items/entities
+│   │   ├── ItemTooltip.ts         # Item hover tooltips
+│   │   ├── TabbedPanel.ts         # Tabbed panel component
+│   │   └── InventorySearch.ts     # Inventory search/filter
+│   │
+│   ├── context-menu/
+│   │   ├── ContextMenuManager.ts   # Context menu system
+│   │   ├── ContextMenuRenderer.ts  # Context menu rendering
+│   │   ├── ContextActionRegistry.ts # Action registration
+│   │   └── MenuContext.ts          # Menu context building
+│   │
+│   ├── divine/                    # God-mode UI components
+│   │   ├── DivineStatusBar.ts     # Divine power status
+│   │   ├── PrayerPanel.ts         # Prayer management
+│   │   ├── AngelManagementPanel.ts # Angel control
+│   │   └── SacredGeographyPanel.ts # Sacred site management
+│   │
+│   ├── text/                      # Text renderer (accessibility)
+│   │   ├── TextRenderer.ts        # 1D text-only renderer
+│   │   ├── SceneComposer.ts       # Scene → text description
+│   │   ├── EntityDescriber.ts     # Entity → text description
+│   │   └── VoiceModes.ts          # Narrative voice modes
+│   │
+│   ├── production/                # Production rendering
+│   │   ├── ProductionRenderer.ts   # High-quality sprite rendering
+│   │   ├── CombatAnimator.ts       # Combat animation system
+│   │   └── SoulSpriteRenderer.ts   # Soul visualization
+│   │
+│   ├── FloatingTextRenderer.ts    # Floating damage/XP numbers
+│   ├── SpeechBubbleRenderer.ts    # Agent speech bubbles
+│   ├── ParticleRenderer.ts        # Particle effects (dust, sparks)
+│   ├── HealthBarRenderer.ts       # Health bars above entities
+│   ├── ThreatIndicatorRenderer.ts # Combat threat indicators
+│   ├── GhostRenderer.ts           # Ghost/spirit visualization
+│   │
+│   ├── AgentInfoPanel.ts          # Agent details panel
+│   ├── AgentRosterPanel.ts        # Agent list panel
+│   ├── AnimalInfoPanel.ts         # Animal details panel
+│   ├── ResourcesPanel.ts          # Resource stockpile panel
+│   ├── CraftingStationPanel.ts    # Crafting UI
+│   ├── BuildingPlacementUI.ts     # Building placement mode
+│   ├── DevPanel.ts                # Developer tools panel
+│   ├── SettingsPanel.ts           # Game settings panel
+│   ├── MemoryPanel.ts             # Agent memory inspector
+│   ├── RelationshipsPanel.ts      # Relationship graph
+│   ├── NotificationsPanel.ts      # Notification feed
+│   ├── TimeControlsPanel.ts       # Pause/speed controls
+│   ├── UniverseManagerPanel.ts    # Universe/multiverse UI
+│   ├── GovernanceDashboardPanel.ts # City governance
+│   ├── EconomyPanel.ts            # Economic dashboard
+│   ├── MagicSystemsPanel.ts       # Magic system UI
+│   ├── SpellbookPanel.ts          # Spell management
+│   ├── DivinePowersPanel.ts       # Divine power UI
+│   ├── CombatHUDPanel.ts          # Combat HUD
+│   ├── CombatLogPanel.ts          # Combat log
+│   ├── ResearchLibraryPanel.ts    # Research tree
+│   ├── TechTreePanel.ts           # Technology tree
+│   ├── FarmManagementPanel.ts     # Farm management
+│   ├── ShopPanel.ts               # Shop/market UI
+│   ├── ChatPanel.ts               # Agent chat
+│   └── TextAdventurePanel.ts      # Text-mode interface
+│   │
+│   └── index.ts                   # Package exports
+├── package.json
+└── README.md                      # This file
 ```
 
-### Key Principles
+---
 
-1. **The renderer only reads, never writes** - It queries component data but never modifies game state
-2. **Visual properties are pre-computed** - Systems calculate size/opacity before rendering
-3. **Rendering is deterministic** - Same components always produce same visuals
-4. **No game logic in renderer** - Domain knowledge (growth stages, genetics) stays in game systems
+## Core Concepts
 
-## Core Components
+### 1. Rendering Pipeline
 
-### 1. Renderer (`Renderer.ts`)
+The renderer operates in a **multi-layered rendering pipeline**:
 
-The main rendering engine that draws the game world.
+```typescript
+// Rendering order (back to front)
+1. Terrain tiles (chunks)
+   ↓
+2. Resources (trees, rocks, plants)
+   ↓
+3. Buildings (floors, walls, roofs)
+   ↓
+4. Entities (agents, animals)
+   ↓
+5. Particles (dust, sparks)
+   ↓
+6. Overlays (health bars, speech bubbles, floating text)
+   ↓
+7. UI panels (windows, menus)
+```
 
-**Responsibilities:**
-- Camera positioning and viewport management
-- Entity rendering with parallax and layering
-- Sprite scaling and opacity application
-- UI overlay coordination
-
-**Does NOT:**
-- Modify game state
-- Contain domain logic about plants, animals, or agents
-- Calculate size from growth stages or genetics
-
-**Key Methods:**
+**Renderer.ts** orchestrates this pipeline:
 
 ```typescript
 class Renderer {
-  // Main render loop - called every frame
-  render(world: World, camera: Camera): void;
+  render(world: World, currentTime: number): void {
+    // 1. Clear canvas
+    this.clearScreen();
 
-  // Render a single entity with visual properties
-  private renderEntity(entity: Entity, camera: Camera): void;
+    // 2. Render terrain chunks (only visible chunks in viewport)
+    this.renderTerrain();
 
-  // Apply parallax for depth layers
-  private applyParallax(worldX: number, worldY: number, layer: RenderLayer): Point;
+    // 3. Render entities (sorted by Y position for depth)
+    this.renderEntities(world);
+
+    // 4. Render particles
+    this.particleRenderer.render(this.ctx, this.camera, currentTime);
+
+    // 5. Render overlays (health bars, speech, floating text)
+    this.renderOverlays(world);
+
+    // 6. UI panels rendered separately by WindowManager
+  }
 }
 ```
 
-**Rendering Pipeline:**
+### 2. Camera & Viewport System
+
+The **Camera** controls what portion of the world is visible:
 
 ```typescript
-// For each entity with renderable component:
-1. Get renderable component
-2. Read sizeMultiplier and alpha (pre-computed by visual systems)
-3. Apply camera transform and parallax
-4. Set canvas.globalAlpha = renderable.alpha
-5. Calculate scaledSize = baseSize * parallaxScale * sizeMultiplier
-6. Draw sprite at calculated position and size
-```
+class Camera {
+  // Camera position (world coordinates)
+  x: number;
+  y: number;
+  zoom: number; // 0.1 - 4.0
 
-### 2. Visual Systems (Game Logic Layer)
+  // View mode (affects rendering)
+  viewMode: ViewMode; // 'top-down' | 'side-view-west' | etc.
 
-Visual systems compute `sizeMultiplier` and `alpha` from game state **before rendering**. These run at priority 300, after growth systems but before rendering.
+  // Pan mode (controls movement constraints)
+  panMode: CameraPanMode; // 'free' | 'horizontal_only' | etc.
 
-#### PlantVisualsSystem
+  // Convert world coordinates to screen coordinates
+  worldToScreen(worldX: number, worldY: number): ScreenPosition;
 
-Computes visual properties for plants based on growth stage and genetics.
+  // Convert screen coordinates to world coordinates
+  screenToWorld(screenX: number, screenY: number): WorldPosition;
 
-**Location:** `packages/core/src/systems/PlantVisualsSystem.ts`
-
-**What it does:**
-- Maps plant stages to size multipliers (seed=0.2, mature=1.0, dead=0.7)
-- Applies genetic height variation when mature
-- Sets opacity based on stage (dying plants fade out)
-
-**Example:**
-```typescript
-// Seed stage plant
-renderable.sizeMultiplier = 0.2;  // 20% of full size
-renderable.alpha = 0.8;           // Slightly transparent
-
-// Mature plant with tall genetics
-renderable.sizeMultiplier = 1.0 * 1.5;  // 150% size (tall variant)
-renderable.alpha = 1.0;                  // Fully opaque
-
-// Dead plant
-renderable.sizeMultiplier = 0.7;  // Shriveled
-renderable.alpha = 0.3;           // Very transparent
-```
-
-**Stage Size Map:**
-| Stage | Size | Alpha | Meaning |
-|-------|------|-------|---------|
-| seed | 0.2 | 0.8 | Tiny, barely visible |
-| germinating | 0.3 | 0.85 | Starting to grow |
-| sprout | 0.4 | 0.9 | Young shoot |
-| vegetative | 0.7 | 1.0 | Growing rapidly |
-| flowering | 1.0 | 1.0 | Full size, blooming |
-| fruiting | 1.0 | 1.0 | Producing fruit |
-| mature | 1.0 | 1.0 | Fully grown |
-| seeding | 1.0 | 1.0 | Dropping seeds |
-| senescence | 0.9 | 0.7 | Aging, fading |
-| decay | 0.8 | 0.5 | Decomposing |
-| dead | 0.7 | 0.3 | Withered remains |
-
-#### AnimalVisualsSystem
-
-Computes visual properties for animals based on their size attribute.
-
-**Location:** `packages/core/src/systems/AnimalVisualsSystem.ts`
-
-**What it does:**
-- Reads `animal.size` field (0.5 to 2.0, default 1.0)
-- Sets `renderable.sizeMultiplier` directly from animal.size
-- Always sets alpha to 1.0 (animals don't fade)
-
-**Example:**
-```typescript
-// Small rabbit
-animal.size = 0.6;
-renderable.sizeMultiplier = 0.6;  // 60% size
-renderable.alpha = 1.0;
-
-// Large bear
-animal.size = 1.8;
-renderable.sizeMultiplier = 1.8;  // 180% size
-renderable.alpha = 1.0;
-```
-
-#### AgentVisualsSystem
-
-Computes visual properties for agents (NPCs/players).
-
-**Location:** `packages/core/src/systems/AgentVisualsSystem.ts`
-
-**What it does:**
-- Currently sets default size (1.0) for all agents
-- Always sets alpha to 1.0 (full opacity)
-- **Future:** Will calculate size from age (children smaller than adults)
-- **Future:** Will reduce alpha when injured/dying
-
-**Example:**
-```typescript
-// All agents currently render at default size
-renderable.sizeMultiplier = 1.0;
-renderable.alpha = 1.0;
-
-// Future: Child agent
-if (ageInYears < 12) {
-  renderable.sizeMultiplier = 0.7;  // Smaller than adults
-}
-
-// Future: Injured agent
-if (health < 20) {
-  renderable.alpha = 0.7;  // Fade when near death
+  // Check if world position is visible in viewport
+  isVisible(worldX: number, worldY: number): boolean;
 }
 ```
 
-### 3. RenderableComponent
+**View Modes:**
 
-The standardized component that all rendered entities have.
+- **Top-down:** Classic 2D overhead view (default)
+- **Side-view:** 2.5D side-scrolling with parallax backgrounds
+  - `side-view-west`: View from west (entities face east/west)
+  - `side-view-east`: View from east
+  - `side-view-north`: View from north
+  - `side-view-south`: View from south
 
-**Location:** `packages/core/src/components/RenderableComponent.ts`
+**Viewport culling:** Only entities/chunks within camera bounds are rendered:
 
-**Schema:**
 ```typescript
-interface RenderableComponent {
-  type: 'renderable';
-  spriteId: string;           // Sprite asset to render
-  layer: RenderLayer;         // Z-order (background/foreground/etc)
-  visible: boolean;           // Show/hide entity
-  animationState?: string;    // Current animation name
-  tint?: string;              // Color tint (hex color)
-
-  // Visual metadata (computed by visual systems)
-  sizeMultiplier?: number;    // Size scale (default: 1.0, range: 0.1-10.0)
-  alpha?: number;             // Opacity (default: 1.0, range: 0.0-1.0)
+// Check if entity is in viewport before rendering
+const pos = entity.getComponent<PositionComponent>('position');
+if (this.camera.isVisible(pos.x, pos.y)) {
+  this.renderEntity(entity);
 }
 ```
 
-**Version History:**
-- **v1:** Original schema without sizeMultiplier/alpha
-- **v2:** Added sizeMultiplier and alpha fields (migration auto-fills defaults)
+### 3. PixelLab Sprite System
 
-**Migration:**
+**PixelLab** is the sprite generation system that creates animated pixel art sprites on-demand:
+
 ```typescript
-// Old saves (v1) are automatically migrated to v2
-{
-  ...old,
-  sizeMultiplier: old.sizeMultiplier ?? 1.0,
-  alpha: old.alpha ?? 1.0,
+interface PixelLabSprite {
+  // Sprite organization
+  folderId: string;           // "human_male_black" or "cat_orange"
+
+  // 8-directional sprites
+  directions: {
+    south: HTMLImageElement;      // Facing down
+    south_west: HTMLImageElement;
+    west: HTMLImageElement;       // Facing left
+    north_west: HTMLImageElement;
+    north: HTMLImageElement;      // Facing up
+    north_east: HTMLImageElement;
+    east: HTMLImageElement;       // Facing right
+    south_east: HTMLImageElement;
+  };
+
+  // Animations for each direction
+  animations: {
+    [direction: string]: {
+      idle: HTMLImageElement[];      // Standing still
+      walk: HTMLImageElement[];      // Walking
+      run?: HTMLImageElement[];      // Running (optional)
+      attack?: HTMLImageElement[];   // Attacking (optional)
+    };
+  };
 }
 ```
 
-### 4. SpriteRenderer (`SpriteRenderer.ts`)
-
-Low-level sprite drawing utility.
-
-**Responsibilities:**
-- Loading sprite assets
-- Drawing sprites to canvas
-- Handling sprite animations
-- Managing sprite caching
-
-**Key Methods:**
+**Sprite loading workflow:**
 
 ```typescript
-class SpriteRenderer {
-  // Draw a sprite at a specific position and size
-  renderSprite(
-    spriteId: string,
-    x: number,
-    y: number,
-    size: number,  // Already includes sizeMultiplier
-    ctx: CanvasRenderingContext2D,
-    direction?: Direction,
-    animationState?: string
-  ): void;
+// 1. Map entity traits to sprite folder
+const traits: SpriteTraits = {
+  species: 'human',
+  gender: 'male',
+  hairColor: 'black',
+  skinTone: 'light',
+};
 
-  // Load sprite from asset path
-  loadSprite(spriteId: string): Promise<HTMLImageElement>;
+// 2. Find matching sprite (or closest match)
+const result = findSprite(traits);
+// Returns: { folderId: 'human_male_black', exactMatch: true }
+
+// 3. Load sprite from PixelLab API
+const loader = getPixelLabSpriteLoader();
+const sprite = await loader.loadSprite(result.folderId);
+
+// 4. Render sprite with direction/animation
+const direction = angleToPixelLabDirection(entity.velocity.angle);
+renderSprite(ctx, sprite, direction, 'walk', x, y);
+```
+
+**Sprite caching:** Sprites are cached by instance ID to avoid re-loading:
+
+```typescript
+// Cache sprite instance per entity
+this.entitySpriteInstances.set(entityId, instanceId);
+
+// Reuse cached instance
+const instanceId = this.entitySpriteInstances.get(entityId);
+if (instanceId) {
+  const instance = spriteCache.getInstance(instanceId);
 }
 ```
 
-**Note:** The metadata parameter was removed in 2026-01. SpriteRenderer now receives size already scaled by sizeMultiplier.
+### 4. Window Management System
 
-## Data Flow
-
-### Complete Rendering Pipeline
-
-```
-1. GAME STATE (ECS Components)
-   ↓
-   PlantComponent { stage: 'mature', genetics: { matureHeight: 1.5 } }
-   AnimalComponent { size: 0.8 }
-   AgentComponent { }
-
-2. VISUAL SYSTEMS (Priority 300)
-   ↓
-   PlantVisualsSystem.update():
-     - Reads plant.stage and plant.genetics
-     - Calculates sizeMultiplier = 1.0 * 1.5 = 1.5
-     - Calculates alpha = 1.0
-     - Writes to renderable.sizeMultiplier and renderable.alpha
-
-   AnimalVisualsSystem.update():
-     - Reads animal.size
-     - Writes renderable.sizeMultiplier = 0.8
-     - Writes renderable.alpha = 1.0
-
-   AgentVisualsSystem.update():
-     - Writes renderable.sizeMultiplier = 1.0
-     - Writes renderable.alpha = 1.0
-
-3. RENDERER (Every Frame)
-   ↓
-   For each entity:
-     - Reads renderable.sizeMultiplier (pre-computed)
-     - Reads renderable.alpha (pre-computed)
-     - Applies camera transform
-     - Sets canvas.globalAlpha = alpha
-     - Calculates finalSize = baseSize * parallaxScale * sizeMultiplier
-     - Calls SpriteRenderer.renderSprite()
-
-4. CANVAS OUTPUT
-   ↓
-   Pixels drawn to screen
-```
-
-### Example: Rendering a Mature Plant
+**WindowManager** manages all UI panels with dragging, resizing, and persistence:
 
 ```typescript
-// TICK 100: Plant grows to mature stage
-const plant = entity.getComponent('plant');
-plant.stage = 'mature';
-plant.genetics.matureHeight = 1.5;
+interface WindowConfig {
+  // Initial position/size
+  defaultX: number;
+  defaultY: number;
+  defaultWidth: number;
+  defaultHeight: number;
 
-// TICK 101: Visual system computes metadata
-PlantVisualsSystem.update():
-  const renderable = entity.getComponent('renderable');
-  renderable.sizeMultiplier = 1.0 * 1.5;  // Base size * genetic height
-  renderable.alpha = 1.0;                  // Fully opaque
+  // Constraints
+  minWidth?: number;
+  minHeight?: number;
+  resizable?: boolean;
+  draggable?: boolean;
 
-// TICK 101: Renderer draws the plant
-Renderer.renderEntity():
-  const renderable = entity.getComponent('renderable');
-  const sizeMultiplier = renderable.sizeMultiplier ?? 1.0;  // = 1.5
-  const alpha = renderable.alpha ?? 1.0;                     // = 1.0
+  // Behavior
+  startVisible?: boolean;
+  pinned?: boolean;           // Immune to LRU auto-close
+  layoutMode?: LayoutMode;    // 'normal' | 'modal' | 'fullscreen'
 
-  ctx.globalAlpha = alpha;  // No transparency
-  const scaledSize = baseSize * parallaxScale * sizeMultiplier;
-  // If baseSize = 32px, parallaxScale = 1.0:
-  // scaledSize = 32 * 1.0 * 1.5 = 48px
+  // Title bar customization
+  title: string;
+  showMinimizeButton?: boolean;
+  showCloseButton?: boolean;
+  customButtons?: TitleBarButton[];
+}
 
-  spriteRenderer.renderSprite(spriteId, x, y, scaledSize, ctx);
-```
+interface IWindowPanel {
+  // Required methods
+  render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void;
+  update?(world: World, deltaTime: number): void;
+  cleanup?(): void;
 
-## Render Layers
-
-Entities are drawn in layers for proper depth sorting:
-
-```typescript
-enum RenderLayer {
-  BACKGROUND = 0,     // Sky, far terrain
-  GROUND = 1,         // Soil, grass, floors
-  GROUND_DECOR = 2,   // Rocks, ground items
-  PLANTS = 3,         // Vegetation
-  OBJECTS = 4,        // Buildings, furniture
-  ENTITIES = 5,       // Agents, animals
-  EFFECTS = 6,        // Particles, magic
-  UI = 7,             // Health bars, labels
-  FOREGROUND = 8,     // Trees in front of entities
+  // Input handling
+  handleClick?(x: number, y: number, world?: World): void;
+  handleMouseMove?(x: number, y: number): void;
+  handleKeyPress?(key: string): void;
+  handleWheel?(deltaY: number, x: number, y: number): void;
 }
 ```
 
-**Parallax Effect:**
-- Background layers (0-2): Move slower than camera (depth illusion)
-- Entity layers (3-6): Move with camera
-- UI layers (7-8): Fixed to screen (no parallax)
+**Window lifecycle:**
 
-## Camera System
-
-The camera determines what portion of the world is visible.
-
-**Camera Transform:**
 ```typescript
-interface Camera {
+// 1. Register window
+windowManager.registerWindow('agent-info', agentInfoPanel, {
+  defaultX: 10, defaultY: 50,
+  defaultWidth: 300, defaultHeight: 400,
+  title: 'Agent Info',
+  resizable: true,
+  draggable: true,
+});
+
+// 2. Show window
+windowManager.showWindow('agent-info');
+
+// 3. Window automatically positioned to avoid overlap
+// 4. User can drag/resize/minimize
+// 5. LRU auto-close if too many windows open
+// 6. Layout persisted to localStorage
+```
+
+**LRU (Least Recently Used) auto-close:**
+
+When screen space is exhausted, unpinned windows are auto-closed based on last interaction time:
+
+```typescript
+// Pinned windows never auto-close
+windowManager.pinWindow('resources'); // Always visible
+
+// Unpinned windows close when space runs out
+windowManager.showWindow('agent-info'); // May be auto-closed
+```
+
+### 5. UI Panel System
+
+**40+ specialized panels** for different game systems:
+
+**Agent/Entity Panels:**
+- `AgentInfoPanel` - Agent details (stats, skills, inventory, memories)
+- `AgentRosterPanel` - List of all agents
+- `AnimalInfoPanel` - Animal details
+- `AnimalRosterPanel` - List of all animals
+- `PlantInfoPanel` - Plant growth status
+
+**Resource/Production Panels:**
+- `ResourcesPanel` - Stockpile inventory
+- `CraftingStationPanel` - Crafting recipes
+- `CraftingPanelUI` - Advanced crafting interface
+- `FarmManagementPanel` - Farm plots and crops
+- `ShopPanel` - Market/shop interface
+
+**City/Governance Panels:**
+- `GovernanceDashboardPanel` - City governance UI
+- `CityManagerPanel` - City management tools
+- `EconomyPanel` - Economic dashboard
+- `NetworkPanel` - City network visualization
+
+**Magic/Divine Panels:**
+- `MagicSystemsPanel` - Magic paradigm UI
+- `SpellbookPanel` - Spell management
+- `DivinePowersPanel` - Divine power UI
+- `PrayerPanel` - Prayer management (divine package)
+
+**Research/Tech Panels:**
+- `ResearchLibraryPanel` - Research tree
+- `TechTreePanel` - Technology tree
+
+**Combat Panels:**
+- `CombatHUDPanel` - Combat HUD overlay
+- `CombatLogPanel` - Combat event log
+- `CombatUnitPanel` - Unit stats in combat
+
+**Utility Panels:**
+- `MemoryPanel` - Agent memory inspector
+- `RelationshipsPanel` - Relationship graph
+- `NotificationsPanel` - Notification feed
+- `TimeControlsPanel` - Pause/speed controls
+- `SettingsPanel` - Game settings
+- `DevPanel` - Developer tools
+
+### 6. Particle Effects
+
+**ParticleRenderer** creates visual feedback effects:
+
+```typescript
+interface Particle {
   x: number;        // World position X
   y: number;        // World position Y
-  zoom: number;     // Zoom level (default 1.0)
-  viewport: {
-    width: number;  // Screen width
-    height: number; // Screen height
-  };
+  vx: number;       // Velocity X
+  vy: number;       // Velocity Y
+  color: string;    // RGBA color
+  size: number;     // Pixel radius
+  startTime: number;
+  lifetime: number; // Milliseconds
 }
 
-// Convert world coordinates to screen coordinates
-function worldToScreen(worldX: number, worldY: number, camera: Camera): Point {
-  return {
-    x: (worldX - camera.x) * camera.zoom + camera.viewport.width / 2,
-    y: (worldY - camera.y) * camera.zoom + camera.viewport.height / 2,
-  };
-}
-```
+class ParticleRenderer {
+  // Create dust cloud (for tilling, digging, construction)
+  createDustCloud(worldX: number, worldY: number, count: number = 8): void;
 
-**Culling:**
-The renderer only draws entities within the camera viewport (plus a small margin) for performance.
-
-## Why This Architecture?
-
-### Before (Ad-hoc Metadata)
-
-```typescript
-// ❌ BAD: Renderer had domain knowledge about plant stages
-function renderPlant(plant: PlantComponent) {
-  let size = 32;
-  let alpha = 1.0;
-
-  if (plant.stage === 'seed') size = 8;
-  else if (plant.stage === 'seedling') size = 16;
-  else if (plant.stage === 'mature' && plant.genetics) {
-    size = 32 * plant.genetics.matureHeight;
-  }
-
-  if (plant.stage === 'dead') alpha = 0.3;
-
-  drawSprite(plant.spriteId, x, y, size, alpha);
+  // Render all active particles
+  render(ctx: CanvasRenderingContext2D, camera: Camera, currentTime: number): void;
 }
 ```
 
-**Problems:**
-- Renderer knows about plant growth stages (domain leak)
-- Hard to add new entity types (each needs custom rendering logic)
-- Visual properties calculated on-demand (performance cost)
-- No separation of concerns
-
-### After (Visual Systems)
+**Usage:**
 
 ```typescript
-// ✅ GOOD: Domain logic in visual system
-class PlantVisualsSystem {
-  update(world, entities) {
-    for (const entity of entities) {
-      const plant = entity.getComponent('plant');
-      const renderable = entity.getComponent('renderable');
+// Emit dust particles when agent tills soil
+particleRenderer.createDustCloud(tileX, tileY, 12);
 
-      // Calculate visual properties from game state
-      renderable.sizeMultiplier = this.calculateSize(plant);
-      renderable.alpha = this.calculateAlpha(plant);
-    }
-  }
-}
+// Particles automatically fade out over lifetime
+particleRenderer.render(ctx, camera, performance.now());
+```
 
-// ✅ GOOD: Renderer just reads and applies
+### 7. Overlay Renderers
+
+**Specialized renderers for entity overlays:**
+
+**HealthBarRenderer:**
+```typescript
+// Render health bar above entity
+healthBarRenderer.render(ctx, entity, screenX, screenY);
+// Green bar that depletes as health decreases
+```
+
+**SpeechBubbleRenderer:**
+```typescript
+// Show agent speech
+speechBubbleRenderer.addSpeech(entityId, "Hello!", 3000); // 3 second duration
+speechBubbleRenderer.render(ctx, camera, world);
+```
+
+**FloatingTextRenderer:**
+```typescript
+// Show damage/XP numbers
+floatingTextRenderer.addText(worldX, worldY, "-15", 'red'); // Damage
+floatingTextRenderer.addText(worldX, worldY, "+50 XP", 'gold'); // XP gain
+floatingTextRenderer.render(ctx, camera, currentTime);
+```
+
+**ThreatIndicatorRenderer:**
+```typescript
+// Show threat indicators in combat
+threatIndicatorRenderer.render(ctx, camera, world);
+// Red circles around enemies, blue around allies
+```
+
+---
+
+## Renderer API
+
+### Renderer (Main Rendering Class)
+
+**Core 2D canvas renderer** that orchestrates the entire rendering pipeline.
+
+**Dependencies:** `ChunkManager`, `TerrainGenerator`, `Camera`
+
+**Update interval:** Every frame (requestAnimationFrame)
+
+**Key methods:**
+
+```typescript
 class Renderer {
-  renderEntity(entity) {
-    const renderable = entity.getComponent('renderable');
-    const size = baseSize * renderable.sizeMultiplier;
-    ctx.globalAlpha = renderable.alpha;
-    drawSprite(renderable.spriteId, x, y, size);
-  }
+  constructor(
+    canvas: HTMLCanvasElement,
+    chunkManager: ChunkManager,
+    terrainGenerator: TerrainGenerator
+  );
+
+  // Set the world to render
+  setWorld(world: World): void;
+
+  // Main render method (call every frame)
+  render(world: World, currentTime: number): void;
+
+  // Get camera instance
+  getCamera(): Camera;
+
+  // Sprite management
+  getPixelLabLoader(): PixelLabSpriteLoader;
+
+  // View toggles
+  showResourceAmounts: boolean;
+  showBuildingLabels: boolean;
+  showAgentNames: boolean;
+  showAgentTasks: boolean;
+  showCityBounds: boolean;
+  showTemperatureOverlay: boolean;
+
+  // Context menu integration
+  setContextMenuManager(manager: ContextMenuManager): void;
+
+  // Cleanup
+  cleanup(): void;
 }
 ```
 
-**Benefits:**
-- Renderer has no domain knowledge (clean separation)
-- Easy to add new entity types (just create a visual system)
-- Visual properties cached in components (computed once per tick)
-- Each system focuses on one concern
-
-### Why Items Don't Vary by Size
+**Rendering a frame:**
 
 ```typescript
-// T-shirt item has a size attribute (S, M, L)
-const tshirt = {
-  type: 'item',
-  itemType: 'clothing',
-  size: 'L',  // Large size
-};
+const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
+renderer.setWorld(world);
 
-// But it renders at default size
-const renderable = {
-  spriteId: 'tshirt',
-  sizeMultiplier: 1.0,  // Same size regardless of S/M/L
-  alpha: 1.0,
-};
+function gameLoop(currentTime: number) {
+  renderer.render(world, currentTime);
+  requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
 ```
 
-**Why:** Item size is a gameplay property (affects who can wear it), not a visual property. A large T-shirt and small T-shirt look the same in inventory - only their stats differ.
+### Camera
+
+**Controls viewport and view mode.**
+
+**Key methods:**
+
+```typescript
+class Camera {
+  // Position control
+  setPosition(x: number, y: number): void;
+  pan(dx: number, dy: number): void;
+  centerOn(worldX: number, worldY: number): void;
+
+  // Zoom control
+  setZoom(zoom: number): void;
+  zoomIn(factor?: number): void;
+  zoomOut(factor?: number): void;
+
+  // View mode
+  setViewMode(mode: ViewMode): void;
+  cycleViewMode(): void; // Cycle through view modes
+
+  // Pan mode (movement constraints)
+  setPanMode(mode: CameraPanMode): void;
+
+  // Coordinate conversion
+  worldToScreen(worldX: number, worldY: number): ScreenPosition;
+  screenToWorld(screenX: number, screenY: number): WorldPosition;
+
+  // Visibility checks
+  isVisible(worldX: number, worldY: number): boolean;
+  getVisibleChunks(): Chunk[];
+
+  // Bounds
+  getBounds(): { minX, minY, maxX, maxY };
+}
+```
+
+**Camera controls:**
+
+```typescript
+// Center camera on agent
+const agent = world.getEntity(agentId);
+const pos = agent.getComponent<PositionComponent>('position');
+camera.centerOn(pos.x, pos.y);
+
+// Zoom in/out
+camera.zoomIn(1.2);  // 20% zoom in
+camera.zoomOut(0.8); // 20% zoom out
+
+// Switch to side-view
+camera.setViewMode('side-view-west');
+
+// Lock camera to horizontal scrolling only
+camera.setPanMode('horizontal_only');
+```
+
+### WindowManager
+
+**Manages UI windows with dragging, resizing, and persistence.**
+
+**Key methods:**
+
+```typescript
+class WindowManager {
+  constructor(canvas: HTMLCanvasElement);
+
+  // Window registration
+  registerWindow(id: string, panel: IWindowPanel, config: WindowConfig): void;
+
+  // Window visibility
+  showWindow(id: string): void;
+  hideWindow(id: string): void;
+  toggleWindow(id: string): void;
+  isWindowVisible(id: string): boolean;
+
+  // Window state
+  pinWindow(id: string): void;
+  unpinWindow(id: string): void;
+  minimizeWindow(id: string): void;
+  maximizeWindow(id: string): void;
+
+  // Window focus
+  focusWindow(id: string): void;
+  bringToFront(id: string): void;
+
+  // Rendering
+  render(ctx: CanvasRenderingContext2D): void;
+
+  // Input handling
+  handleClick(x: number, y: number, world?: World): boolean;
+  handleMouseMove(x: number, y: number): void;
+  handleMouseDown(x: number, y: number): void;
+  handleMouseUp(): void;
+  handleWheel(deltaY: number, x: number, y: number): void;
+
+  // Layout persistence
+  saveLayout(): void;
+  loadLayout(): void;
+  clearLayout(): void;
+
+  // Canvas resize
+  handleCanvasResize(width: number, height: number): void;
+
+  // Cleanup
+  cleanup(): void;
+}
+```
+
+**Window management workflow:**
+
+```typescript
+const windowManager = new WindowManager(canvas);
+
+// Register panels
+windowManager.registerWindow('agent-info', agentInfoPanel, {
+  defaultX: 10, defaultY: 50,
+  defaultWidth: 300, defaultHeight: 400,
+  title: 'Agent Info',
+  resizable: true,
+});
+
+windowManager.registerWindow('resources', resourcesPanel, {
+  defaultX: 320, defaultY: 50,
+  defaultWidth: 250, defaultHeight: 300,
+  title: 'Resources',
+  pinned: true, // Never auto-close
+});
+
+// Show windows
+windowManager.showWindow('agent-info');
+windowManager.showWindow('resources');
+
+// Render windows (call every frame)
+windowManager.render(ctx);
+
+// Handle input (pass through from canvas)
+canvas.addEventListener('click', (e) => {
+  windowManager.handleClick(e.clientX, e.clientY, world);
+});
+```
+
+### Sprite System
+
+**PixelLab sprite loading and rendering.**
+
+**Key APIs:**
+
+```typescript
+// Get sprite loader singleton
+import { getPixelLabSpriteLoader } from '@ai-village/renderer';
+const loader = getPixelLabSpriteLoader();
+
+// Load sprite by folder ID
+const sprite = await loader.loadSprite('human_male_black');
+
+// Check if sprite is loaded
+const isLoaded = loader.isSpriteLoaded('human_male_black');
+
+// Get loaded sprite
+const sprite = loader.getLoadedSprite('human_male_black');
+
+// Find sprite by traits
+import { findSprite } from '@ai-village/renderer';
+const result = findSprite({
+  species: 'human',
+  gender: 'male',
+  hairColor: 'black',
+  skinTone: 'light',
+});
+// Returns: { folderId: 'human_male_black', exactMatch: true }
+
+// Render sprite
+import { renderSprite } from '@ai-village/renderer';
+renderSprite(
+  ctx,
+  sprite,
+  'south',      // Direction
+  'walk',       // Animation
+  screenX,
+  screenY,
+  frameIndex    // Current animation frame
+);
+
+// Convert angle to direction
+import { angleToPixelLabDirection } from '@ai-village/renderer';
+const direction = angleToPixelLabDirection(Math.PI / 4); // Returns 'north_east'
+```
+
+**Sprite loading workflow:**
+
+```typescript
+// 1. Get sprite loader
+const loader = getPixelLabSpriteLoader();
+
+// 2. Map entity to sprite folder
+const appearance = entity.getComponent<AppearanceComponent>('appearance');
+const result = findSprite({
+  species: appearance.species,
+  gender: appearance.gender,
+  hairColor: appearance.hairColor,
+  skinTone: appearance.skinTone,
+});
+
+// 3. Load sprite if not loaded
+if (!loader.isSpriteLoaded(result.folderId)) {
+  await loader.loadSprite(result.folderId);
+}
+
+// 4. Get sprite
+const sprite = loader.getLoadedSprite(result.folderId);
+
+// 5. Calculate direction from velocity
+const steering = entity.getComponent<SteeringComponent>('steering');
+const angle = Math.atan2(steering.velocity.y, steering.velocity.x);
+const direction = angleToPixelLabDirection(angle);
+
+// 6. Render sprite
+const isMoving = steering.velocity.x !== 0 || steering.velocity.y !== 0;
+const animation = isMoving ? 'walk' : 'idle';
+renderSprite(ctx, sprite, direction, animation, screenX, screenY);
+```
+
+---
+
+## Usage Examples
+
+### Example 1: Creating a Custom UI Panel
+
+```typescript
+import type { IWindowPanel } from '@ai-village/renderer';
+import type { World } from '@ai-village/core';
+
+class MyCustomPanel implements IWindowPanel {
+  private data: string = 'Hello World';
+
+  render(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    // Clear panel background
+    ctx.fillStyle = 'rgba(20, 20, 30, 0.95)';
+    ctx.fillRect(x, y, width, height);
+
+    // Draw content
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px monospace';
+    ctx.fillText(this.data, x + 10, y + 30);
+  }
+
+  update(world: World, deltaTime: number): void {
+    // Update panel state based on world
+    this.data = `Tick: ${world.tick}`;
+  }
+
+  handleClick(x: number, y: number, world?: World): void {
+    console.log(`Panel clicked at ${x}, ${y}`);
+  }
+
+  cleanup(): void {
+    // Clean up resources
+  }
+}
+
+// Register panel with window manager
+const panel = new MyCustomPanel();
+windowManager.registerWindow('my-panel', panel, {
+  defaultX: 10,
+  defaultY: 10,
+  defaultWidth: 200,
+  defaultHeight: 100,
+  title: 'My Panel',
+  resizable: true,
+});
+
+// Show panel
+windowManager.showWindow('my-panel');
+```
+
+### Example 2: Rendering Custom Entity Overlay
+
+```typescript
+import type { Camera } from '@ai-village/renderer';
+
+function renderCustomOverlay(
+  ctx: CanvasRenderingContext2D,
+  world: World,
+  camera: Camera
+): void {
+  // Query entities
+  const agents = world.query().with('agent').with('position').executeEntities();
+
+  for (const agent of agents) {
+    const pos = agent.getComponent<PositionComponent>('position');
+
+    // Check if in viewport
+    if (!camera.isVisible(pos.x, pos.y)) continue;
+
+    // Convert to screen coordinates
+    const screen = camera.worldToScreen(pos.x, pos.y);
+
+    // Draw custom indicator
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+    ctx.beginPath();
+    ctx.arc(screen.x, screen.y - 20, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Call in main render loop
+renderer.render(world, currentTime);
+renderCustomOverlay(ctx, world, camera);
+```
+
+### Example 3: Loading and Rendering PixelLab Sprite
+
+```typescript
+import {
+  getPixelLabSpriteLoader,
+  findSprite,
+  renderSprite,
+  angleToPixelLabDirection,
+} from '@ai-village/renderer';
+
+async function loadAndRenderAgentSprite(
+  ctx: CanvasRenderingContext2D,
+  entity: Entity,
+  screenX: number,
+  screenY: number
+): Promise<void> {
+  const loader = getPixelLabSpriteLoader();
+
+  // Get appearance
+  const appearance = entity.getComponent<AppearanceComponent>('appearance');
+
+  // Find matching sprite
+  const result = findSprite({
+    species: appearance.species,
+    gender: appearance.gender,
+    hairColor: appearance.hairColor,
+    skinTone: appearance.skinTone,
+  });
+
+  if (!result.exactMatch) {
+    console.warn(`No exact sprite match for ${appearance.species}`);
+  }
+
+  // Load sprite if needed
+  if (!loader.isSpriteLoaded(result.folderId)) {
+    await loader.loadSprite(result.folderId);
+  }
+
+  // Get sprite
+  const sprite = loader.getLoadedSprite(result.folderId);
+  if (!sprite) return;
+
+  // Calculate direction from movement
+  const steering = entity.getComponent<SteeringComponent>('steering');
+  const angle = Math.atan2(steering.velocity.y, steering.velocity.x);
+  const direction = angleToPixelLabDirection(angle);
+
+  // Determine animation
+  const speed = Math.sqrt(
+    steering.velocity.x ** 2 + steering.velocity.y ** 2
+  );
+  const animation = speed > 0.1 ? 'walk' : 'idle';
+
+  // Render sprite
+  renderSprite(ctx, sprite, direction, animation, screenX, screenY);
+}
+```
+
+### Example 4: Camera Controls with Keyboard
+
+```typescript
+import { Camera, CameraPanMode, ViewMode } from '@ai-village/renderer';
+
+const camera = new Camera(canvas.width, canvas.height);
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowUp':
+      camera.pan(0, -10);
+      break;
+    case 'ArrowDown':
+      camera.pan(0, 10);
+      break;
+    case 'ArrowLeft':
+      camera.pan(-10, 0);
+      break;
+    case 'ArrowRight':
+      camera.pan(10, 0);
+      break;
+    case '+':
+      camera.zoomIn(1.1);
+      break;
+    case '-':
+      camera.zoomOut(0.9);
+      break;
+    case 'v':
+      camera.cycleViewMode(); // Cycle through view modes
+      break;
+    case 'c':
+      // Center on selected agent
+      const selectedAgent = getSelectedAgent();
+      if (selectedAgent) {
+        const pos = selectedAgent.getComponent<PositionComponent>('position');
+        camera.centerOn(pos.x, pos.y);
+      }
+      break;
+  }
+});
+
+// Mouse wheel zoom
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (e.deltaY < 0) {
+    camera.zoomIn(1.1);
+  } else {
+    camera.zoomOut(0.9);
+  }
+});
+```
+
+### Example 5: Particle Effects on Action
+
+```typescript
+import { ParticleRenderer } from '@ai-village/renderer';
+
+const particleRenderer = new ParticleRenderer();
+
+// Emit particles when agent performs action
+world.on('action:till_soil', (data) => {
+  const { position } = data;
+
+  // Create dust cloud at tile position
+  particleRenderer.createDustCloud(
+    position.x,
+    position.y,
+    12 // particle count
+  );
+});
+
+world.on('action:mine', (data) => {
+  const { position } = data;
+
+  // Create larger dust cloud for mining
+  particleRenderer.createDustCloud(position.x, position.y, 20);
+});
+
+// Render particles every frame
+function render(currentTime: number) {
+  renderer.render(world, currentTime);
+  particleRenderer.render(ctx, camera, currentTime);
+}
+```
+
+---
+
+## Architecture & Data Flow
+
+### Rendering Execution Order
+
+```
+1. InputHandler (mouse/keyboard/touch)
+   ↓ Updates camera position/zoom
+2. Camera (viewport culling)
+   ↓ Calculates visible bounds
+3. Renderer.render()
+   ↓ Main rendering pipeline:
+   a. Clear canvas
+   b. Render terrain chunks (visible only)
+   c. Render entities (depth-sorted)
+   d. Render particles
+   e. Render overlays (health bars, speech, etc.)
+4. WindowManager.render()
+   ↓ Render UI panels
+5. ContextMenuRenderer (if open)
+   ↓ Render context menu
+```
+
+### Event Flow
+
+```
+User Input
+  ↓ 'click', 'mousemove', 'keydown'
+InputHandler
+  → Updates Camera (pan, zoom, view mode)
+  → Forwards to WindowManager (UI clicks)
+  → Forwards to ContextMenuManager (right-click)
+
+World Events
+  ↓ 'action:*', 'entity:*', 'plant:*'
+Renderer
+  → Emits particles (dust, sparks)
+  → Updates overlays (health bars, speech)
+  → Triggers animations (sprite state changes)
+```
+
+### Component → Rendering Mapping
+
+```
+Entity
+├── PositionComponent → Screen position (Camera.worldToScreen)
+├── RenderableComponent → Sprite selection
+├── AppearanceComponent → PixelLab sprite traits
+├── SteeringComponent → Movement direction/animation
+├── HealthComponent → Health bar overlay
+└── SpeechComponent → Speech bubble
+
+Agent/Animal
+├── IdentityComponent → Name label
+└── SkillsComponent → XP floating text
+
+Building
+├── BuildingComponent → Building sprite/tiles
+└── ConstructionComponent → Construction progress overlay
+
+Plant
+└── PlantComponent → Plant sprite/growth stage
+```
+
+---
 
 ## Performance Considerations
 
-### Optimizations
+**Optimization strategies:**
 
-1. **Visual Systems Run Once Per Tick** (Priority 300)
-   - Size/alpha computed once, cached in component
-   - Renderer reads cached values (no recalculation)
+1. **Viewport culling:** Only render entities/chunks in camera bounds
+2. **Sprite caching:** Sprites cached by instance ID, shared across entities
+3. **Chunk lazy loading:** Chunks only generated when visible
+4. **Entity depth sorting:** Entities sorted by Y position once per frame
+5. **Particle pooling:** Particles reused from pool instead of creating new objects
+6. **Canvas layer separation:** UI panels rendered on separate layer from game world
+7. **Dirty rectangle rendering:** Only redraw changed regions (future optimization)
 
-2. **Viewport Culling**
-   - Only entities in camera view are rendered
-   - Reduces draw calls significantly
+**Viewport culling:**
 
-3. **Sprite Caching**
-   - Sprites loaded once, reused for all instances
-   - No re-loading assets every frame
+```typescript
+// ❌ BAD: Render all entities
+for (const entity of entities) {
+  renderEntity(entity);
+}
 
-4. **Parallax Pre-calculation**
-   - Layer parallax factors computed at init
-   - Fast multiplication at render time
+// ✅ GOOD: Cull entities outside viewport
+for (const entity of entities) {
+  const pos = entity.getComponent<PositionComponent>('position');
+  if (!camera.isVisible(pos.x, pos.y)) continue; // Skip offscreen entities
+  renderEntity(entity);
+}
+```
 
-### Frame Budget
+**Sprite instance caching:**
 
-At 60 FPS, we have ~16ms per frame:
-- Visual systems: ~1-2ms (runs at 20 TPS, not every frame)
-- Entity rendering: ~8-10ms
-- UI rendering: ~2-3ms
-- Other systems: ~3-5ms
+```typescript
+// ❌ BAD: Load sprite every frame
+const sprite = await loader.loadSprite('human_male_black');
 
-## Adding New Entity Types
+// ✅ GOOD: Cache sprite instance per entity
+let instanceId = this.entitySpriteInstances.get(entityId);
+if (!instanceId) {
+  instanceId = await loader.loadSprite('human_male_black');
+  this.entitySpriteInstances.set(entityId, instanceId);
+}
+const sprite = loader.getLoadedSprite(instanceId);
+```
 
-To add rendering for a new entity type:
+**Chunk lazy loading:**
 
-1. **Add visual system** (if needed):
-   ```typescript
-   class NewEntityVisualsSystem implements System {
-     id = 'new_entity_visuals';
-     priority = 300;  // Run before rendering
-     requiredComponents = ['new_entity', 'renderable'] as const;
+```typescript
+// ❌ BAD: Generate all chunks at startup
+for (let chunkX = 0; chunkX < 100; chunkX++) {
+  for (let chunkY = 0; chunkY < 100; chunkY++) {
+    chunkManager.getOrCreateChunk(chunkX, chunkY);
+  }
+}
 
-     update(world: World, entities: readonly Entity[]) {
-       for (const entity of entities) {
-         const newEntity = entity.getComponent('new_entity');
-         const renderable = entity.getComponent('renderable');
+// ✅ GOOD: Generate chunks only when visible
+const visibleChunks = camera.getVisibleChunks();
+for (const chunkCoord of visibleChunks) {
+  chunkManager.getOrCreateChunk(chunkCoord.x, chunkCoord.y);
+}
+```
 
-         // Compute visual properties from game state
-         renderable.sizeMultiplier = calculateSize(newEntity);
-         renderable.alpha = calculateAlpha(newEntity);
-       }
-     }
-   }
-   ```
+**Entity depth sorting:**
 
-2. **Register system** in `registerAllSystems.ts`:
-   ```typescript
-   gameLoop.systemRegistry.register(new NewEntityVisualsSystem());
-   ```
+```typescript
+// Sort entities by Y position for correct depth rendering
+entities.sort((a, b) => {
+  const posA = a.getComponent<PositionComponent>('position');
+  const posB = b.getComponent<PositionComponent>('position');
+  return posA.y - posB.y; // Front-to-back rendering
+});
+```
 
-3. **Renderer automatically works** - no changes needed!
+---
+
+## Troubleshooting
+
+### Sprites not rendering
+
+**Check:**
+1. Sprite loaded? (`loader.isSpriteLoaded(folderId)`)
+2. Entity has `AppearanceComponent`? (`entity.hasComponent('appearance')`)
+3. Entity in viewport? (`camera.isVisible(pos.x, pos.y)`)
+4. Sprite folder ID valid? (`findSprite(traits)` returns valid result)
+5. PixelLab API accessible? (check network tab for 404s)
+
+**Debug:**
+```typescript
+const loader = getPixelLabSpriteLoader();
+const result = findSprite({ species: 'human', gender: 'male' });
+console.log('Sprite folder:', result.folderId);
+console.log('Sprite loaded:', loader.isSpriteLoaded(result.folderId));
+const sprite = loader.getLoadedSprite(result.folderId);
+console.log('Sprite directions:', sprite ? Object.keys(sprite.directions) : 'null');
+```
+
+### UI panels not responding to clicks
+
+**Check:**
+1. Window visible? (`windowManager.isWindowVisible(id)`)
+2. Window on top? (`windowManager.bringToFront(id)`)
+3. Click coordinates correct? (check canvas offset)
+4. Panel implements `handleClick`? (`panel.handleClick(x, y, world)`)
+5. Window manager receiving input? (`windowManager.handleClick(x, y, world)`)
+
+**Debug:**
+```typescript
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  console.log('Canvas click:', x, y);
+  const handled = windowManager.handleClick(x, y, world);
+  console.log('WindowManager handled:', handled);
+});
+```
+
+### Camera not following entity
+
+**Check:**
+1. Camera position set? (`camera.setPosition(x, y)`)
+2. Pan mode allows movement? (`camera.setPanMode('free')`)
+3. Entity position valid? (not NaN)
+4. `centerOn` called every frame? (call in update loop)
+
+**Debug:**
+```typescript
+const agent = world.getEntity(agentId);
+const pos = agent.getComponent<PositionComponent>('position');
+console.log('Agent position:', pos.x, pos.y);
+console.log('Camera position:', camera.x, camera.y);
+console.log('Pan mode:', camera.panMode);
+camera.centerOn(pos.x, pos.y);
+console.log('Camera after center:', camera.x, camera.y);
+```
+
+### Performance issues (low FPS)
+
+**Check:**
+1. Too many entities? (viewport culling enabled?)
+2. Sprite cache working? (check `entitySpriteInstances` map size)
+3. Chunk generation slow? (only generate visible chunks)
+4. Too many particles? (limit particle count)
+5. UI panels updating every frame? (throttle updates)
+
+**Debug:**
+```typescript
+console.time('render');
+renderer.render(world, currentTime);
+console.timeEnd('render');
+
+console.log('Entities rendered:', entitiesRendered);
+console.log('Chunks rendered:', chunksRendered);
+console.log('Sprite cache size:', entitySpriteInstances.size);
+console.log('Active particles:', particleRenderer.particles.length);
+```
+
+### Sprite animations not playing
+
+**Error:** Sprite stuck in one frame
+
+**Fix:** Ensure animation frame index updates each frame:
+
+```typescript
+// ❌ BAD: Static frame index
+renderSprite(ctx, sprite, direction, 'walk', x, y, 0);
+
+// ✅ GOOD: Update frame index based on time
+const frameIndex = Math.floor((currentTime / 100) % sprite.animations[direction].walk.length);
+renderSprite(ctx, sprite, direction, 'walk', x, y, frameIndex);
+```
+
+---
+
+## Integration with Other Systems
+
+### ECS Integration
+
+Renderer queries world for entities with rendering-relevant components:
+
+```typescript
+// Query entities with position and renderable components
+const entities = world.query()
+  .with('position')
+  .with('renderable')
+  .executeEntities();
+
+// Render each entity
+for (const entity of entities) {
+  const pos = entity.getComponent<PositionComponent>('position');
+  const renderable = entity.getComponent<RenderableComponent>('renderable');
+
+  if (camera.isVisible(pos.x, pos.y)) {
+    renderEntity(entity, pos, renderable);
+  }
+}
+```
+
+### Action System Integration
+
+Actions trigger visual feedback via events:
+
+```typescript
+// Action system emits event
+world.emit('action:harvest_plant', {
+  agentId: 'agent_123',
+  plantId: 'plant_456',
+  position: { x: 50, y: 50 },
+  harvested: 5,
+});
+
+// Renderer listens for event and shows feedback
+world.on('action:harvest_plant', (data) => {
+  // Show floating text
+  floatingTextRenderer.addText(
+    data.position.x,
+    data.position.y,
+    `+${data.harvested}`,
+    'green'
+  );
+
+  // Emit particles
+  particleRenderer.createDustCloud(data.position.x, data.position.y, 8);
+});
+```
+
+### Magic System Integration
+
+Magic system panels visualize paradigm state:
+
+```typescript
+// MagicSystemsPanel shows paradigm state
+import { MagicSystemsPanel } from '@ai-village/renderer';
+const magicPanel = new MagicSystemsPanel(world);
+
+// Panel queries magic state
+const magicState = world.query().with('magic_state').executeEntities()[0];
+const state = magicState?.getComponent<MagicStateComponent>('magic_state');
+
+// Render paradigm UI
+magicPanel.render(ctx, x, y, width, height);
+```
+
+---
 
 ## Testing
 
-### Unit Tests
+Run renderer tests:
 
-```typescript
-describe('PlantVisualsSystem', () => {
-  it('should set size multiplier based on plant stage', () => {
-    const plant = { stage: 'seed' };
-    const renderable = {};
-
-    system.update(world, [entity]);
-
-    expect(renderable.sizeMultiplier).toBe(0.2);  // Seed = 20% size
-  });
-
-  it('should apply genetic height when mature', () => {
-    const plant = {
-      stage: 'mature',
-      genetics: { matureHeight: 1.5 }
-    };
-    const renderable = {};
-
-    system.update(world, [entity]);
-
-    expect(renderable.sizeMultiplier).toBe(1.5);  // 1.0 * 1.5
-  });
-});
+```bash
+npm test -- Renderer.test.ts
+npm test -- Camera.test.ts
+npm test -- WindowManager.test.ts
+npm test -- PixelLabSpriteLoader.test.ts
 ```
 
-### Visual Testing
+**Key test files:**
+- `src/__tests__/RendererCleanup.test.ts` - Renderer cleanup
+- `src/__tests__/WindowManager.test.ts` - Window management
+- `src/__tests__/WindowDragging.integration.test.ts` - Dragging
+- `src/__tests__/WindowPersistence.integration.test.ts` - Persistence
+- `src/__tests__/ContextMenuIntegration.test.ts` - Context menus
+- `src/__tests__/DragDropSystem.test.ts` - Drag-drop
+- `src/__tests__/InventoryUI.integration.test.ts` - Inventory UI
 
-Use the game's debug tools:
-- **F3**: Toggle debug overlay (shows size multipliers)
-- **F4**: Toggle hitboxes (see actual render sizes)
-- **Console**: `game.world.query().with('renderable').executeEntities()`
+---
 
-## Debugging
+## Further Reading
 
-### Common Issues
+- **SYSTEMS_CATALOG.md** - Complete system reference
+- **COMPONENTS_REFERENCE.md** - All component types
+- **ARCHITECTURE_OVERVIEW.md** - Master architecture document
+- **PERFORMANCE.md** - Performance optimization guide
+- **PixelLab API** - `production/PixelLabAPI.ts` for sprite generation
 
-**Problem: Entities rendering too small/large**
-- Check `renderable.sizeMultiplier` value
-- Verify visual system is registered and running
-- Check plant/animal component values
+---
 
-**Problem: Entities invisible**
-- Check `renderable.visible` flag
-- Check `renderable.alpha` (might be 0.0)
-- Verify entity is in camera viewport
+## Summary for Language Models
 
-**Problem: Visual properties not updating**
-- Ensure visual system is registered at priority 300
-- Check system's `requiredComponents` array
-- Verify system is enabled
+**Before working with renderer:**
+1. Read this README completely
+2. Understand rendering pipeline (terrain → entities → particles → overlays → UI)
+3. Know camera/viewport system (culling, coordinate conversion)
+4. Understand PixelLab sprite system (8 directions, animations, caching)
+5. Know window management system (dragging, resizing, LRU, persistence)
 
-### Debug Commands
+**Common tasks:**
+- **Create UI panel:** Implement `IWindowPanel`, register with `WindowManager`
+- **Render entity overlay:** Query entities, convert to screen coords, draw on canvas
+- **Load sprite:** Use `findSprite()` + `getPixelLabSpriteLoader().loadSprite()`
+- **Add particle effect:** Call `particleRenderer.createDustCloud(x, y, count)`
+- **Control camera:** Use `camera.centerOn()`, `camera.setZoom()`, `camera.setViewMode()`
+- **Show floating text:** Call `floatingTextRenderer.addText(x, y, text, color)`
 
-```typescript
-// In browser console:
+**Critical rules:**
+- Always cull entities outside viewport (use `camera.isVisible()`)
+- Cache sprites by instance ID (don't reload every frame)
+- Sort entities by Y position for correct depth rendering
+- Use world coordinates for entities, screen coordinates for rendering
+- Handle cleanup in `IWindowPanel.cleanup()` (remove event listeners)
+- Never modify camera state from panels (panels are pure view)
 
-// Get all renderables
-const renderables = game.world.query().with('renderable').executeEntities();
+**Event-driven architecture:**
+- Listen to `action:*` events for visual feedback (particles, floating text)
+- Emit events when UI state changes (`window:opened`, `window:closed`)
+- Never bypass WindowManager for panel visibility (use `showWindow()/hideWindow()`)
+- Use camera events for viewport changes (`camera:moved`, `camera:zoomed`)
 
-// Check specific entity
-const entity = game.world.getEntity('some-id');
-const renderable = entity.getComponent('renderable');
-console.log('Size:', renderable.sizeMultiplier);
-console.log('Alpha:', renderable.alpha);
-
-// Find entities with custom size
-const scaled = renderables.filter(e => {
-  const r = e.getComponent('renderable');
-  return r.sizeMultiplier !== undefined && r.sizeMultiplier !== 1.0;
-});
-```
-
-## API Reference
-
-### Renderer
-
-```typescript
-class Renderer {
-  constructor(canvas: HTMLCanvasElement, world: World);
-
-  // Main render loop
-  render(world: World, camera: Camera): void;
-
-  // Clear canvas
-  clear(): void;
-
-  // Resize canvas
-  resize(width: number, height: number): void;
-}
-```
-
-### Visual Systems
-
-```typescript
-interface VisualSystem extends System {
-  id: string;
-  priority: 300;  // Always run at priority 300
-  requiredComponents: readonly string[];
-
-  update(world: World, entities: readonly Entity[], deltaTime: number): void;
-}
-```
-
-### RenderableComponent
-
-```typescript
-interface RenderableComponent extends Component {
-  type: 'renderable';
-  spriteId: string;
-  layer: RenderLayer;
-  visible: boolean;
-  animationState?: string;
-  tint?: string;
-  sizeMultiplier?: number;  // 0.1 to 10.0, default 1.0
-  alpha?: number;           // 0.0 to 1.0, default 1.0
-}
-```
-
-## Related Documentation
-
-- [Visual Metadata Standardization Spec](../../openspec/specs/rendering-system/visual-metadata-standardization.md)
-- [Production Rendering](./src/production/README.md) - High-quality rendering for TV/movies
-- [ECS Architecture](../../ARCHITECTURE_OVERVIEW.md)
-- [Systems Catalog](../../SYSTEMS_CATALOG.md)
-
-## Migration Notes
-
-### Upgrading from Pre-2026-01 Renderer
-
-If you have old code that passes metadata to `renderSprite`:
-
-```typescript
-// ❌ OLD: Passing metadata to renderer
-spriteRenderer.renderSprite(spriteId, x, y, size, ctx, direction, animationState, {
-  stage: plant.stage,
-});
-
-// ✅ NEW: Visual system computes size/alpha beforehand
-// No changes needed - visual systems handle it automatically
-spriteRenderer.renderSprite(spriteId, x, y, size, ctx, direction, animationState);
-```
-
-Component saves are automatically migrated from v1 to v2 on load.
+**Performance critical paths:**
+- Viewport culling (only render visible entities)
+- Sprite caching (avoid reloading sprites)
+- Chunk lazy loading (only generate visible chunks)
+- Entity depth sorting (once per frame, not per entity)
+- Particle pooling (reuse particle objects)

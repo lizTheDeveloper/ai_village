@@ -14,5 +14,7 @@
   ],
   "generated_at": "2026-01-05T11:06:58.000Z",
   "generation_method": "reference_workflow",
-  "notes": "South first, east with south ref, west flipped from east, others with south ref"
+  "notes": "South first, east with south ref, west flipped from east, others with south ref",
+  "description": "brown deer",
+  "category": "animal"
 }

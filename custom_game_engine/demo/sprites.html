@@ -279,6 +279,13 @@
         <select id="category-filter">
             <option value="">All Categories</option>
         </select>
+        <select id="artstyle-filter">
+            <option value="">All Art Styles</option>
+        </select>
+        <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px;">
+            <input type="checkbox" id="group-by-artstyle" style="cursor: pointer;">
+            Group by Art Style
+        </label>
         <span id="sprite-count" style="color: var(--text-secondary); font-size: 13px;">0 sprites</span>
     </div>
 
@@ -311,6 +318,16 @@
                     categoryFilter.appendChild(option);
                 });
 
+                // Populate art style filter
+                const artStyles = [...new Set(allSprites.map(s => s.artStyle || 'default'))].sort();
+                const artStyleFilter = document.getElementById('artstyle-filter');
+                artStyles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style.toUpperCase();
+                    artStyleFilter.appendChild(option);
+                });
+
                 renderSprites();
             } catch (err) {
                 document.getElementById('sprites-container').innerHTML =
@@ -321,13 +338,16 @@
         function filterSprites() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const categoryFilter = document.getElementById('category-filter').value;
+            const artStyleFilter = document.getElementById('artstyle-filter').value;
 
             filteredSprites = allSprites.filter(sprite => {
                 const matchesSearch = sprite.id.toLowerCase().includes(searchTerm) ||
                                     sprite.description.toLowerCase().includes(searchTerm);
                 const matchesCategory = !categoryFilter || sprite.category === categoryFilter;
+                const spriteArtStyle = sprite.artStyle || 'default';
+                const matchesArtStyle = !artStyleFilter || spriteArtStyle === artStyleFilter;
 
-                return matchesSearch && matchesCategory;
+                return matchesSearch && matchesCategory && matchesArtStyle;
             });
 
             renderSprites();
@@ -366,57 +386,87 @@
                 return;
             }
 
-            container.innerHTML = filteredSprites.map(sprite => {
-                // Initialize direction tracking
-                if (!(sprite.id in spriteDirections)) {
-                    spriteDirections[sprite.id] = 0; // Start with south
-                }
+            const groupByArtStyle = document.getElementById('group-by-artstyle').checked;
 
-                const currentDirection = DIRECTIONS[spriteDirections[sprite.id]];
-                const imagePath = `${API_BASE}/api/sprites/${sprite.id}/${currentDirection}.png`;
+            if (groupByArtStyle) {
+                // Group sprites by art style
+                const groups = {};
+                filteredSprites.forEach(sprite => {
+                    const artStyle = sprite.artStyle || 'default';
+                    if (!groups[artStyle]) {
+                        groups[artStyle] = [];
+                    }
+                    groups[artStyle].push(sprite);
+                });
 
-                const versionsHtml = sprite.versions.map((v, idx) => `
-                    <div class="version-item ${v.active ? 'active' : ''}">
-                        <span>${v.version}${v.active ? ' (active)' : ''}</span>
-                        <div class="version-controls">
-                            ${!v.active && idx > 0 ? `
-                                <button onclick="setActiveVersion('${sprite.baseId}', '${v.folderId}')">↑ Make Active</button>
-                            ` : ''}
+                // Render grouped sections
+                container.innerHTML = Object.keys(groups).sort().map(artStyle => {
+                    const sprites = groups[artStyle];
+                    return `
+                        <div style="grid-column: 1 / -1; margin-top: 20px; margin-bottom: 10px;">
+                            <h2 style="color: var(--accent-blue); font-size: 18px; font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid var(--border-color);">
+                                ${artStyle.toUpperCase()} (${sprites.length})
+                            </h2>
                         </div>
-                    </div>
-                `).join('');
+                        ${sprites.map(sprite => renderSpriteCard(sprite)).join('')}
+                    `;
+                }).join('');
+            } else {
+                // Render ungrouped
+                container.innerHTML = filteredSprites.map(sprite => renderSpriteCard(sprite)).join('');
+            }
+        }
 
-                return `
-                    <div class="sprite-card" id="sprite-${sprite.id}">
-                        <div class="sprite-preview">
-                            ${sprite.hasImage ? `
-                                <img src="${imagePath}" alt="${sprite.id}">
-                                <div class="direction-indicator">${currentDirection}</div>
-                                <div class="direction-controls">
-                                    <button class="direction-btn" onclick="changeDirection('${sprite.id}', -1)">◀</button>
-                                    <button class="direction-btn" onclick="changeDirection('${sprite.id}', 1)">▶</button>
-                                </div>
-                            ` : '<span style="color: var(--text-secondary);">No preview</span>'}
-                        </div>
-                        <div class="sprite-info">
-                            <div class="sprite-id">${sprite.id}</div>
-                            <div class="sprite-category">${sprite.category}</div>
-                            <div class="sprite-description">${sprite.description || 'No description'}</div>
-                        </div>
-                        ${sprite.versions.length > 1 ? `
-                            <div class="versions">
-                                <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">Versions (${sprite.versions.length})</div>
-                                ${versionsHtml}
-                            </div>
+        function renderSpriteCard(sprite) {
+            // Initialize direction tracking
+            if (!(sprite.id in spriteDirections)) {
+                spriteDirections[sprite.id] = 0; // Start with south
+            }
+
+            const currentDirection = DIRECTIONS[spriteDirections[sprite.id]];
+            const imagePath = `${API_BASE}/api/sprites/${sprite.id}/${currentDirection}.png`;
+
+            const versionsHtml = sprite.versions.map((v, idx) => `
+                <div class="version-item ${v.active ? 'active' : ''}">
+                    <span>${v.version}${v.active ? ' (active)' : ''}</span>
+                    <div class="version-controls">
+                        ${!v.active && idx > 0 ? `
+                            <button onclick="setActiveVersion('${sprite.baseId}', '${v.folderId}')">↑ Make Active</button>
                         ` : ''}
-                        <div class="sprite-actions">
-                            <button class="btn-regenerate" onclick="regenerateSprite('${sprite.id}', '${sprite.description}')">
-                                ✨ Regenerate
-                            </button>
-                        </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
+
+            return `
+                <div class="sprite-card" id="sprite-${sprite.id}">
+                    <div class="sprite-preview">
+                        ${sprite.hasImage ? `
+                            <img src="${imagePath}" alt="${sprite.id}">
+                            <div class="direction-indicator">${currentDirection}</div>
+                            <div class="direction-controls">
+                                <button class="direction-btn" onclick="changeDirection('${sprite.id}', -1)">◀</button>
+                                <button class="direction-btn" onclick="changeDirection('${sprite.id}', 1)">▶</button>
+                            </div>
+                        ` : '<span style="color: var(--text-secondary);">No preview</span>'}
+                    </div>
+                    <div class="sprite-info">
+                        <div class="sprite-id">${sprite.id}</div>
+                        <div class="sprite-category">${sprite.category}</div>
+                        <div class="sprite-description">${sprite.description || 'No description'}</div>
+                    </div>
+                    ${sprite.versions.length > 1 ? `
+                        <div class="versions">
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">Versions (${sprite.versions.length})</div>
+                            ${versionsHtml}
+                        </div>
+                    ` : ''}
+                    <div class="sprite-actions">
+                        <button class="btn-regenerate" onclick="regenerateSprite('${sprite.id}', '${sprite.description}')">
+                            ✨ Regenerate
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
         async function regenerateSprite(folderId, description) {
@@ -472,6 +522,8 @@
         // Event listeners
         document.getElementById('search-input').addEventListener('input', filterSprites);
         document.getElementById('category-filter').addEventListener('change', filterSprites);
+        document.getElementById('artstyle-filter').addEventListener('change', filterSprites);
+        document.getElementById('group-by-artstyle').addEventListener('change', renderSprites);
 
         // Load sprites on page load
         loadSprites();

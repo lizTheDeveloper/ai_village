@@ -13,6 +13,57 @@
 
 **Read these documents first** to understand the codebase architecture before making changes.
 
+## 📦 Package READMEs: System-Specific Documentation
+
+**IMPORTANT: Before working with any system/package, read its README.**
+
+Every system package has a dedicated README optimized for language model understanding:
+
+- **Location:** `custom_game_engine/packages/{package-name}/README.md`
+- **Purpose:** Explains how the system works, its interfaces, usage patterns, and integration points
+- **Audience:** Language models (and developers)
+
+**Complete Package READMEs:**
+
+**Core Systems:**
+- **[packages/core/README.md](./custom_game_engine/packages/core/README.md)** - ECS architecture (World, Entity, Component, System, EventBus)
+- **[packages/world/README.md](./custom_game_engine/packages/world/README.md)** - Terrain generation, chunk system, species registry
+- **[packages/persistence/README.md](./custom_game_engine/packages/persistence/README.md)** - Save/load, time travel, snapshots
+
+**Gameplay Systems:**
+- **[packages/botany/README.md](./custom_game_engine/packages/botany/README.md)** - Plant lifecycle, genetics, diseases, companion planting
+- **[packages/environment/README.md](./custom_game_engine/packages/environment/README.md)** - Weather, temperature, day/night, soil
+- **[packages/navigation/README.md](./custom_game_engine/packages/navigation/README.md)** - Pathfinding, steering, exploration
+- **[packages/reproduction/README.md](./custom_game_engine/packages/reproduction/README.md)** - Mating, genetics, pregnancy, family trees
+- **[packages/building-designer/README.md](./custom_game_engine/packages/building-designer/README.md)** - Voxel buildings, materials, feng shui
+
+**Advanced Systems:**
+- **[packages/divinity/README.md](./custom_game_engine/packages/divinity/README.md)** - Gods, worship, divine power, miracles
+- **[packages/magic/README.md](./custom_game_engine/packages/magic/README.md)** - 25+ magic paradigms, spellcasting, enchantments
+- **[packages/hierarchy-simulator/README.md](./custom_game_engine/packages/hierarchy-simulator/README.md)** - Multi-scale hierarchies, renormalization
+
+**AI & LLM:**
+- **[packages/llm/README.md](./custom_game_engine/packages/llm/README.md)** - LLM integration, prompt building, provider management
+- **[packages/introspection/README.md](./custom_game_engine/packages/introspection/README.md)** - Component schemas, mutations, self-awareness
+
+**Rendering & UI:**
+- **[packages/renderer/README.md](./custom_game_engine/packages/renderer/README.md)** - Graphics, sprites, 40+ UI panels, PixelLab integration
+- **[packages/deterministic-sprite-generator/README.md](./custom_game_engine/packages/deterministic-sprite-generator/README.md)** - Algorithmic sprite generation
+
+**Infrastructure:**
+- **[packages/metrics/README.md](./custom_game_engine/packages/metrics/README.md)** - Performance tracking, analytics
+- **[packages/metrics-dashboard/README.md](./custom_game_engine/packages/metrics-dashboard/README.md)** - Web dashboard, real-time visualization
+- **[packages/shared-worker/README.md](./custom_game_engine/packages/shared-worker/README.md)** - Multi-window architecture, path prediction
+
+**Demo & Examples:**
+- **[packages/city-simulator/README.md](./custom_game_engine/packages/city-simulator/README.md)** - Headless demo application, testing
+
+**Convention:**
+- Each README includes: Overview, Core Concepts, API Reference, Usage Examples, Architecture, Troubleshooting
+- Read the README completely before modifying the system
+- If a package lacks a README, create one following the template: **[custom_game_engine/README_TEMPLATE.md](./custom_game_engine/README_TEMPLATE.md)**
+- Use the botany README as a reference example for comprehensive documentation
+
 ## 📝 Session Devlogs
 
 **All session summaries go in `devlogs/`:**

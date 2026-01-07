@@ -88,33 +88,39 @@
 
 **Impact**: All 7 BeliefAttribution integration tests now passing
 
-### 4. PowerConsumption Test Setup Bugs (+4 tests, 8 still failing)
+### 4. PowerConsumption Test Setup Bugs (+12 tests - ALL PASSING)
 **Problem**: PowerConsumption.test.ts had multiple test setup bugs that prevented power grid tests from working
 
 **Root Causes**:
 1. Test added consumer power component to generator entity instead of consumer entity (line 32)
 2. Position components created manually as objects instead of using `createPositionComponent()`
 3. `addComponent()` called with wrong signature - passed 2 parameters (CT.Power, component) instead of 1 (component)
+4. First sed command only fixed `addComponent(CT.Power, variable)` but not `addComponent(CT.Power, createPowerProducer(...))`
 
-**Fixes**:
-- Fixed entity assignment bug: changed `(generator as EntityImpl).addComponent(consumerPower)` to `(consumer as EntityImpl).addComponent(consumerPower)`
+**Fixes (2 commits)**:
+
+**Commit 1**: Fixed entity assignment, positions, and some addComponent calls
+- Fixed entity assignment bug: `(consumer as EntityImpl).addComponent(consumerPower)`
 - Added import for `createPositionComponent`
 - Replaced all `{ type: 'position', version: 1, x: n, y: m }` with `createPositionComponent(n, m)`
-- Fixed all `addComponent(CT.Power, component)` calls to `addComponent(component)` (component type is embedded in component.type)
+- Fixed `addComponent(CT.Power, variable)` calls
+
+**Commit 2**: Fixed remaining addComponent calls with function calls
+- Fixed all `addComponent(CT.Power, createPowerProducer(...))` -> `addComponent(createPowerProducer(...))`
+- Used improved sed pattern to catch function call parameters: `sed 's/\.addComponent(CT\.Power, \(createPower[^)]*)\));/.addComponent(\1);/g'`
 
 **Files Modified**:
 - `packages/core/src/__tests__/PowerConsumption.test.ts`
 
-**Commit**: `fix: Correct PowerConsumption test setup bugs (+4 tests)`
+**Commits**:
+1. `fix: Correct PowerConsumption test setup bugs (+4 tests)`
+2. `fix: Complete PowerConsumption test fixes (+8 more tests, all 14 passing)`
 
-**Impact**: 4 tests now passing (12 failing -> 8 failing)
-- Basic power network creation tests now work
-- Still investigating 8 remaining failures related to isPowered state updates and brownout behavior
-
-**Remaining Issues**:
-- Consumers not being powered even when generators present
-- Some tests still showing empty networks
-- Priority system and efficiency updates not working as expected
+**Impact**: All 14 PowerConsumption tests now passing (0 failures, 1 skipped)
+- Power grid network creation working correctly ✅
+- isPowered state updates working correctly ✅
+- Brownout behavior (efficiency reduction) working correctly ✅
+- Priority-based power allocation working correctly ✅
 
 ## Total Tests Fixed: 20
 - Previous session: 9 tests (4 governance building + 5 AgentCombat)

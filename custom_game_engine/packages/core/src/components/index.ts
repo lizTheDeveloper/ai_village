@@ -22,6 +22,9 @@ export * from './ResourceComponent.js';
 export { createResourceComponent, type ResourceComponent } from './ResourceComponent.js';
 export * from './MemoryComponent.js';
 export { MemoryComponent } from './MemoryComponent.js';
+export * from './LLMHistoryComponent.js';
+export { LLMHistoryComponent, createLLMHistoryComponent } from './LLMHistoryComponent.js';
+export type { LLMInteraction, LLMLayer } from './LLMHistoryComponent.js';
 export * from './VisionComponent.js';
 export {
   createVisionComponent,

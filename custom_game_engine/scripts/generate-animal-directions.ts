@@ -98,10 +98,11 @@ async function generateWithReference(
 
   const response = await apiRequest('/generate-image-pixflux', 'POST', {
     description,
-    reference_image: {
+    init_image: {
       type: 'base64',
       base64: referenceBase64,
     },
+    init_image_strength: 300, // Medium influence from reference
     image_size: { height: size, width: size },
     no_background: true,
   });
@@ -209,6 +210,8 @@ async function main(): Promise<void> {
         JSON.stringify({
           id: animal.id,
           name: animal.name,
+          description: animal.name,  // API expects 'description' field
+          category: 'animal',         // API expects 'category' field
           size: animal.size,
           directions: ['south', 'southwest', 'west', 'northwest', 'north', 'northeast', 'east', 'southeast'],
           generated_at: new Date().toISOString(),

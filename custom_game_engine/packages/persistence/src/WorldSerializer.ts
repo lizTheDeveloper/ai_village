@@ -181,6 +181,9 @@ export class WorldSerializer {
 
       if (!component) continue;
 
+      // Skip llm_history component (in-memory only, not persisted)
+      if (type === 'llm_history') continue;
+
       try {
         const serialized = componentSerializerRegistry.serialize(component);
         components.push(serialized);

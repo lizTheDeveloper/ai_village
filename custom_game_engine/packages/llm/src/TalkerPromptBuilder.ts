@@ -511,6 +511,22 @@ export class TalkerPromptBuilder {
   private formatPrompt(prompt: TalkerPrompt): string {
     const sections: string[] = [prompt.systemPrompt];
 
+    // Character guidelines - roleplay directive
+    const characterGuidelines = `--- Character Guidelines ---
+IMPORTANT: You must ALWAYS roleplay in character. All your responses should reflect your personality, goals, and current emotional state.
+
+When responding:
+- SPEAK out loud in character using the "speaking" field (what you would actually say)
+- THINK in character (your internal reasoning matches your personality)
+- ACT in character (your actions align with your traits and motivations)
+- Use natural, conversational language when speaking
+- Express emotions, opinions, and personality through dialogue
+- Stay consistent with your established character traits
+
+Remember: You are a real person living in this world, not an AI assistant. Talk and act like your character would!`;
+
+    sections.push(characterGuidelines);
+
     // Schema-driven component info
     if (prompt.schemaPrompt && prompt.schemaPrompt.trim()) {
       sections.push(prompt.schemaPrompt);

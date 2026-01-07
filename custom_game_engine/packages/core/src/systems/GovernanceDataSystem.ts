@@ -37,13 +37,21 @@ export class GovernanceDataSystem implements System {
   private birthLog: BirthRecord[] = [];
   private isInitialized = false;
 
+  // Performance: Government data updates at midnight (once per game day)
+  private needsUpdate = true; // Update on first tick, then wait for day change events
+
   /**
-   * Initialize event listeners for death and birth tracking.
+   * Initialize event listeners for death/birth tracking and day change events.
    */
   public initialize(world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
+
+    // Listen for day change events from TimeSystem
+    eventBus.subscribe('time:day_changed', () => {
+      this.needsUpdate = true; // Flag for update at midnight
+    });
 
     // Listen for death events
     eventBus.subscribe('agent:starved', (event) => {
@@ -103,9 +111,31 @@ export class GovernanceDataSystem implements System {
 
   /**
    * Update all governance buildings with latest data.
-   * Performance: Single query for all agents, passed to all methods
+   * Performance:
+   * - Event-driven: Updates at midnight when TimeSystem emits 'time:day_changed'
+   * - Early exit if no governance buildings exist
+   * - Single query for all agents, passed to all methods
    */
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Performance: Only update when flagged by day change event
+    if (!this.needsUpdate) {
+      return;
+    }
+    this.needsUpdate = false; // Reset flag
+
+    // Performance: Early exit if no governance buildings exist
+    // Check all governance building types in a single pass
+    const hasAnyGovernanceBuilding =
+      world.query().with(CT.TownHall).executeEntities().length > 0 ||
+      world.query().with(CT.CensusBureau).executeEntities().length > 0 ||
+      world.query().with(CT.Warehouse).executeEntities().length > 0 ||
+      world.query().with(CT.WeatherStation).executeEntities().length > 0 ||
+      world.query().with(CT.HealthClinic).executeEntities().length > 0;
+
+    if (!hasAnyGovernanceBuilding) {
+      return;
+    }
+
     // Single query for identity agents (used by TownHalls and CensusBureaus)
     const agentsWithIdentity = world.query().with(CT.Identity).executeEntities();
 

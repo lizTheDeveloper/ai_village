@@ -65,6 +65,19 @@ export interface AgentDebugEntry {
   behaviorChanged?: boolean;
   previousBehavior?: string;
   thought?: string;
+
+  // LLM Interactions (for benchmarking)
+  llmInteraction?: {
+    timestamp: number;
+    layer: 'talker' | 'executor';
+    promptLength: number;
+    responseLength: number;
+    thinking?: string;
+    action?: any;
+    speaking?: string;
+    success: boolean;
+    error?: string;
+  };
 }
 
 export class AgentDebugLogger {
@@ -241,6 +254,27 @@ export class AgentDebugLogger {
         energy: needs.energy,
         health: needs.health,
       };
+    }
+
+    // LLM Interactions (for benchmarking)
+    const llmHistory = entity.getComponent('llm_history') as any;
+    if (llmHistory) {
+      const lastInteraction = llmHistory.getLastAnyInteraction?.();
+      if (lastInteraction) {
+        entry.llmInteraction = {
+          timestamp: lastInteraction.timestamp,
+          layer: lastInteraction.layer,
+          promptLength: lastInteraction.prompt?.length || 0,
+          responseLength: lastInteraction.response?.rawResponse
+            ? JSON.stringify(lastInteraction.response.rawResponse).length
+            : 0,
+          thinking: lastInteraction.response?.thinking,
+          action: lastInteraction.response?.action,
+          speaking: lastInteraction.response?.speaking,
+          success: lastInteraction.success,
+          error: lastInteraction.error,
+        };
+      }
     }
 
     // Add to batch buffer

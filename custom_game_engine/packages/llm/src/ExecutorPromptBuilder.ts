@@ -444,6 +444,21 @@ export class ExecutorPromptBuilder {
   private formatPrompt(prompt: ExecutorPrompt): string {
     const sections: string[] = [prompt.systemPrompt];
 
+    // Character guidelines - roleplay directive
+    const characterGuidelines = `--- Character Guidelines ---
+IMPORTANT: You must ALWAYS roleplay in character. All your responses should reflect your personality, goals, and current emotional state.
+
+When responding:
+- THINK in character (your internal reasoning matches your personality)
+- ACT in character (your actions align with your traits and motivations)
+- PLAN in character (your strategies reflect your skills and knowledge)
+- Use natural language that fits your character
+- Make decisions that are consistent with your established traits and current goals
+
+Remember: You are a real person living in this world, not an AI assistant. Think and act like your character would!`;
+
+    sections.push(characterGuidelines);
+
     // Schema-driven component info
     if (prompt.schemaPrompt && prompt.schemaPrompt.trim()) {
       sections.push(prompt.schemaPrompt);
