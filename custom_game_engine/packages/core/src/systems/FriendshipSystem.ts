@@ -58,10 +58,15 @@ export class FriendshipSystem implements System {
 
     const socialMemory = entity.getComponent<SocialMemoryComponent>(CT.SocialMemory);
 
+    // Initialize socialMemories if undefined (can happen after deserialization)
+    if (socialMemory && (!socialMemory.socialMemories || !(socialMemory as any)._socialMemories)) {
+      (socialMemory as any)._socialMemories = new Map();
+    }
+
     for (const [partnerId, relationship] of relationships.relationships) {
       // Already marked as friend?
       if (socialMemory) {
-        const memory = socialMemory.socialMemories.get(partnerId);
+        const memory = socialMemory.socialMemories?.get(partnerId);
         if (memory?.relationshipType === 'friend') continue;
       }
 

@@ -184,8 +184,13 @@ export class RelationshipConversationSystem implements System {
     const socialMemory = learner.getComponent<SocialMemoryComponent>(CT.SocialMemory);
     if (!socialMemory) return;
 
+    // Initialize socialMemories if undefined (can happen after deserialization)
+    if (!socialMemory.socialMemories || !(socialMemory as any)._socialMemories) {
+      (socialMemory as any)._socialMemories = new Map();
+    }
+
     // Check existing memory to avoid duplicates
-    const existingMemory = socialMemory.socialMemories.get(teacher.id);
+    const existingMemory = socialMemory.socialMemories?.get(teacher.id);
     const existingFacts = existingMemory?.knownFacts ?? [];
 
     // Add known facts about partner's interests
