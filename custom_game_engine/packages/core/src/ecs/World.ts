@@ -263,6 +263,9 @@ export interface WorldMutator extends World {
   /** Advance game tick */
   advanceTick(): void;
 
+  /** Set tick (only for deserialization/time travel) */
+  setTick(tick: Tick): void;
+
   /** Set feature flag */
   setFeature(feature: string, enabled: boolean): void;
 }
@@ -523,6 +526,15 @@ export class WorldImpl implements WorldMutator {
   advanceTick(): void {
     this._tick++;
     this._gameTime = this.calculateGameTime(this._tick);
+  }
+
+  /**
+   * Set tick to a specific value (only for deserialization/time travel).
+   * This also updates gameTime to match.
+   */
+  setTick(tick: Tick): void {
+    this._tick = tick;
+    this._gameTime = this.calculateGameTime(tick);
   }
 
   setFeature(feature: string, enabled: boolean): void {

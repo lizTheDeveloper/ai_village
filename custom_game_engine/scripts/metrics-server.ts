@@ -146,7 +146,7 @@ if (groqApiKey || cerebrasApiKey) {
   if (groqProvider) {
     poolConfig.groq = {
       provider: groqProvider,
-      maxConcurrent: 2,
+      maxConcurrent: 10, // Allow 10 concurrent requests to fully utilize 2000 RPM limit
       fallbackChain: cerebrasProvider ? ['cerebras'] : [],
     };
     llmProvidersConfigured.push('groq');
@@ -155,7 +155,7 @@ if (groqApiKey || cerebrasApiKey) {
   if (cerebrasProvider) {
     poolConfig.cerebras = {
       provider: cerebrasProvider,
-      maxConcurrent: 2,
+      maxConcurrent: 10, // Allow 10 concurrent requests to fully utilize 2000 RPM limit
       fallbackChain: groqProvider ? ['groq'] : [],
     };
     llmProvidersConfigured.push('cerebras');

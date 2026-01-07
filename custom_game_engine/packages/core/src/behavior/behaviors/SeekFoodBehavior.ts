@@ -265,10 +265,11 @@ export class SeekFoodBehavior extends BaseBehavior {
 
     // Restore hunger (0-1 scale)
     const newHunger = Math.min(1.0, needs.hunger + hungerRestored);
-    entity.updateComponent<NeedsComponent>(ComponentType.Needs, (current) => ({
-      ...current,
-      hunger: newHunger,
-    }));
+    entity.updateComponent<NeedsComponent>(ComponentType.Needs, (current) => {
+      const updated = current.clone();
+      updated.hunger = newHunger;
+      return updated;
+    });
 
     // Emit event
     world.eventBus.emit({
