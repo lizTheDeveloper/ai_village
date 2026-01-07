@@ -692,3 +692,7 @@ export * from './vr/index.js';
 export * from './microgenerators/types.js';
 export { GodCraftedQueue, godCraftedQueue } from './microgenerators/GodCraftedQueue.js';
 export { GodCraftedDiscoverySystem, type ChunkSpawnInfo } from './microgenerators/GodCraftedDiscoverySystem.js';
+
+// Botany module dependencies - Plant system constants and utilities
+export { PLANT_CONSTANTS } from './systems/constants/PlantConstants.js';
+export { BugReporter, type BugReport } from './utils/BugReporter.js';
