@@ -855,6 +855,15 @@ function createUIPanels(
     }));
   });
 
+  // Set up navigation target callback
+  agentInfoPanel.setOnNavigateTo((x: number, y: number) => {
+    // Convert tile coordinates to world pixels
+    const tileSize = renderer.tileSize;
+    const worldX = x * tileSize + tileSize / 2;
+    const worldY = y * tileSize + tileSize / 2;
+    renderer.camera.setPosition(worldX, worldY);
+  });
+
   const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
   const animalInfoPanel = new AnimalInfoPanel();

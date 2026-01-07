@@ -83,6 +83,8 @@ export class AgentInfoPanel implements IWindowPanel {
   // Priority reset callback
   private onResetPrioritiesCallback: ((entityId: string) => void) | null = null;
 
+  // Camera navigation callback
+  private onNavigateToCallback: ((x: number, y: number) => void) | null = null;
 
   getId(): string {
     return 'agent-info';
@@ -197,6 +199,14 @@ export class AgentInfoPanel implements IWindowPanel {
   }
 
   /**
+   * Set a callback for when user clicks on navigation target.
+   */
+  setOnNavigateTo(callback: (x: number, y: number) => void): void {
+    this.onNavigateToCallback = callback;
+    this.infoSection.setOnNavigateToTarget(callback);
+  }
+
+  /**
    * Handle click on the panel.
    */
   handleClick(clickX: number, clickY: number, panelX: number, panelY: number, width?: number): boolean {
@@ -225,6 +235,13 @@ export class AgentInfoPanel implements IWindowPanel {
         clickY <= resetBtn.y + resetBtn.height
       ) {
         this.onResetPrioritiesCallback(this.selectedEntityId);
+        return true;
+      }
+    }
+
+    // Check if click is on navigation target (info tab)
+    if (currentTab === 'info') {
+      if (this.infoSection.handleClick(clickX, clickY)) {
         return true;
       }
     }

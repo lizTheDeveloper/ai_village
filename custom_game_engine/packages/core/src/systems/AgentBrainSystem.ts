@@ -254,7 +254,9 @@ export class AgentBrainSystem implements System {
       if (agent.behavior === 'player_controlled') continue;
 
       // Check think interval
-      if (!this.shouldThink(agent, world.tick)) continue;
+      const shouldThink = this.shouldThink(agent, world.tick);
+      // console.log(`[AgentBrainSystem] Entity ${impl.id.substring(0, 8)}: tick=${world.tick}, lastThink=${agent.lastThinkTick}, shouldThink=${shouldThink}`);
+      if (!shouldThink) continue;
 
       // Update last think time
       this.updateThinkTime(impl, world.tick);
@@ -304,6 +306,7 @@ export class AgentBrainSystem implements System {
   ): { behavior: string; execute: boolean } {
     // Layer 1: Autonomic check
     const autonomicResult = this.decision.processAutonomic(entity);
+    // console.log(`[AgentBrainSystem] processDecision for ${entity.id.substring(0, 8)}: autonomicResult=${JSON.stringify(autonomicResult)}`);
 
     if (autonomicResult) {
       const temperature = entity.getComponent(CT.Temperature) as TemperatureComponent | undefined;

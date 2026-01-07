@@ -298,6 +298,9 @@ export class WorldImpl implements WorldMutator {
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
+  // Door location cache for fast lookups (updated when doors are built/destroyed)
+  private doorLocationsCache: Array<{ x: number; y: number }> | null = null;
+
   constructor(eventBus: EventBus, chunkManager?: ChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
     this._chunkManager = chunkManager;
@@ -699,6 +702,63 @@ export class WorldImpl implements WorldMutator {
       fertility: tile.fertility,
       moisture: tile.moisture,
     };
+  }
+
+  /**
+   * Get all door locations in the world (cached for performance).
+   * Cache is invalidated when invalidateDoorCache() is called.
+   * Systems should call this instead of scanning all tiles.
+   */
+  getDoorLocations(): ReadonlyArray<{ x: number; y: number }> {
+    if (this.doorLocationsCache === null) {
+      this.rebuildDoorCache();
+    }
+    return this.doorLocationsCache!;
+  }
+
+  /**
+   * Invalidate the door location cache.
+   * Call this when doors are built or destroyed.
+   * Next call to getDoorLocations() will rebuild the cache.
+   */
+  invalidateDoorCache(): void {
+    this.doorLocationsCache = null;
+  }
+
+  /**
+   * Rebuild the door location cache by scanning all tiles.
+   * This is expensive - only call when cache is invalidated.
+   */
+  private rebuildDoorCache(): void {
+    this.doorLocationsCache = [];
+
+    if (!this._chunkManager) {
+      return;
+    }
+
+    // Iterate through all chunks to find door tiles
+    // ChunkManager should have a method to iterate chunks
+    const chunkManager = this._chunkManager as any;
+    if (chunkManager.getAllChunks && typeof chunkManager.getAllChunks === 'function') {
+      const chunks = chunkManager.getAllChunks();
+      for (const chunk of chunks) {
+        if (!chunk.generated) continue;
+
+        // Scan all tiles in this chunk
+        const chunkSize = 16; // Standard chunk size
+        for (let localX = 0; localX < chunkSize; localX++) {
+          for (let localY = 0; localY < chunkSize; localY++) {
+            const worldX = chunk.x * chunkSize + localX;
+            const worldY = chunk.y * chunkSize + localY;
+            const tile = this.getTileAt(worldX, worldY);
+
+            if (tile?.door) {
+              this.doorLocationsCache.push({ x: worldX, y: worldY });
+            }
+          }
+        }
+      }
+    }
   }
 
   /**

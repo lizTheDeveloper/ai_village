@@ -44,7 +44,7 @@ export class DoorSystem implements System {
   /**
    * Performance: Cache agent positions for current tick to avoid repeated queries
    */
-  private cachedAgentPositions: Array<{ x: number; y: number }> | null = null;
+  private cachedAgentPositions: Array<{ x: number; y: number; id: string }> | null = null;
   private cachedAgentTick = -1;
 
   initialize(_world: World, eventBus: EventBus): void {
@@ -52,7 +52,7 @@ export class DoorSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const worldWithTiles = world as WorldWithTiles;
+    const worldWithTiles = world as WorldWithTiles & { getDoorLocations?: () => ReadonlyArray<{ x: number; y: number }> };
 
     // Skip if world doesn't support tile access
     if (typeof worldWithTiles.getTileAt !== 'function') {
@@ -67,7 +67,7 @@ export class DoorSystem implements System {
         const impl = agent as EntityImpl;
         const pos = impl.getComponent<PositionComponent>(CT.Position);
         if (pos) {
-          this.cachedAgentPositions.push({ x: pos.x, y: pos.y });
+          this.cachedAgentPositions.push({ x: pos.x, y: pos.y, id: agent.id });
         }
       }
       this.cachedAgentTick = world.tick;
@@ -76,56 +76,51 @@ export class DoorSystem implements System {
     // Process auto-closing of doors that have been open too long
     this.processAutoClose(worldWithTiles);
 
-    // Check for agents near doors and auto-open
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const position = impl.getComponent<PositionComponent>(CT.Position);
-
-      if (!position) continue;
-
-      // Check tiles around the agent for doors
-      this.checkForNearbyDoors(worldWithTiles, position.x, position.y, entity.id);
-    }
+    // Optimized approach: Get door locations from World's spatial index
+    // This is O(doors × agents) instead of O(agents × tile_radius²)
+    this.processDoorsWithNearbyAgents(worldWithTiles);
   }
 
   /**
-   * Check for doors near an agent and auto-open them.
+   * Process doors that have agents nearby - optimized approach.
+   * Uses World's door location cache instead of scanning tiles.
    */
-  private checkForNearbyDoors(
-    world: WorldWithTiles,
-    agentX: number,
-    agentY: number,
-    agentId: string
-  ): void {
-    // Check a small radius around the agent
-    const checkRadius = Math.ceil(DOOR_TRIGGER_DISTANCE);
+  private processDoorsWithNearbyAgents(world: WorldWithTiles & { getDoorLocations?: () => ReadonlyArray<{ x: number; y: number }> }): void {
+    if (!this.cachedAgentPositions) return;
+
+    // Get door locations from World's spatial index
+    const doorLocations = world.getDoorLocations?.() ?? [];
+    if (doorLocations.length === 0) return;
+
     const triggerDistanceSquared = DOOR_TRIGGER_DISTANCE * DOOR_TRIGGER_DISTANCE;
 
-    for (let dx = -checkRadius; dx <= checkRadius; dx++) {
-      for (let dy = -checkRadius; dy <= checkRadius; dy++) {
-        const tileX = Math.floor(agentX) + dx;
-        const tileY = Math.floor(agentY) + dy;
+    for (const doorLoc of doorLocations) {
+      const tile = world.getTileAt(doorLoc.x, doorLoc.y);
+      if (!tile?.door) continue;
 
-        // Calculate squared distance to tile center
-        const deltaX = tileX + 0.5 - agentX;
-        const deltaY = tileY + 0.5 - agentY;
-        const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+      // Only process completed doors that are closed
+      const progress = tile.door.constructionProgress ?? 100;
+      if (progress < 100) continue;
+      if (tile.door.state !== 'closed') continue;
 
-        if (distanceSquared > triggerDistanceSquared) continue;
+      // Check if any agent is near this door
+      const doorCenterX = doorLoc.x + 0.5;
+      const doorCenterY = doorLoc.y + 0.5;
 
-        const tile = world.getTileAt(tileX, tileY);
-        if (!tile?.door) continue;
+      for (const agentPos of this.cachedAgentPositions) {
+        const dx = doorCenterX - agentPos.x;
+        const dy = doorCenterY - agentPos.y;
+        const distanceSquared = dx * dx + dy * dy;
 
-        // Only process completed doors that are closed
-        const progress = tile.door.constructionProgress ?? 100;
-        if (progress < 100) continue;
-
-        if (tile.door.state === 'closed') {
-          this.openDoor(world, tileX, tileY, agentId);
+        if (distanceSquared <= triggerDistanceSquared) {
+          // Agent is near door - open it
+          this.openDoor(world, doorLoc.x, doorLoc.y, agentPos.id);
+          break; // Only need one agent to trigger door
         }
       }
     }
   }
+
 
   /**
    * Open a door at the specified position.

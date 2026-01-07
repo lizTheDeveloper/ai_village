@@ -15,6 +15,8 @@ import type { InventoryComponent } from '../../components/InventoryComponent.js'
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
+import type { MovementComponent } from '../../components/MovementComponent.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
 import { itemRegistry } from '../../items/index.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { eatFromStorage, eatFromPlant, type InteractionResult } from '../../services/InteractionAPI.js';
@@ -33,13 +35,14 @@ export class SeekFoodBehavior extends BaseBehavior {
   readonly name = 'seek_food' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
     const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
 
     // If no inventory or needs, can't eat - just wander
-    if (!inventory || !needs) {
+    if (!inventory || !needs || !agent) {
       this.switchTo(entity, 'wander', {});
-      return { complete: true, reason: 'No inventory or needs component' };
+      return { complete: true, reason: 'Missing required components' };
     }
 
     // Check if agent has food in inventory
@@ -98,8 +101,33 @@ export class SeekFoodBehavior extends BaseBehavior {
     }
 
     // No food sources found at all - wander to explore for food
-    this.switchTo(entity, 'wander', { seekingFood: true });
-    return { complete: false, reason: 'No food sources found, wandering' };
+
+    // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
+    // wander directly as part of seeking food (exploring to find food)
+    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
+    if (movement) {
+      // Get or initialize wander angle
+      let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
+      if (wanderAngle === undefined) {
+        wanderAngle = Math.random() * Math.PI * 2;
+      }
+
+      // Add small random jitter for natural exploration
+      wanderAngle += (Math.random() - 0.5) * (Math.PI / 18); // ~10 degrees
+
+      // Calculate velocity
+      const speed = movement.speed;
+      const velocityX = Math.cos(wanderAngle) * speed;
+      const velocityY = Math.sin(wanderAngle) * speed;
+
+      // Set velocity
+      this.setVelocity(entity, velocityX, velocityY);
+
+      // Save wander angle for next tick
+      this.updateState(entity, { wanderAngle });
+    }
+
+    return; // Continue seeking food (stay in seek_food behavior)
   }
 
   /**

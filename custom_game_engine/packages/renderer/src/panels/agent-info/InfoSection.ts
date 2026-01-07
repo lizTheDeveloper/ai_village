@@ -27,6 +27,8 @@ import { renderSprite } from '../../SpriteRenderer.js';
 export class InfoSection {
   private panelWidth = 360;
   private scrollOffset = 0;
+  private navigationTargetBounds: { x: number; y: number; width: number; height: number; targetX: number; targetY: number } | null = null;
+  private onNavigateToTarget: ((x: number, y: number) => void) | null = null;
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -42,6 +44,32 @@ export class InfoSection {
     } else {
       this.scrollOffset = Math.max(0, this.scrollOffset - 3);
     }
+  }
+
+  /**
+   * Set callback for when user clicks on navigation target.
+   */
+  setOnNavigateToTarget(callback: (x: number, y: number) => void): void {
+    this.onNavigateToTarget = callback;
+  }
+
+  /**
+   * Handle click on navigation target.
+   */
+  handleClick(clickX: number, clickY: number): boolean {
+    if (this.navigationTargetBounds && this.onNavigateToTarget) {
+      const bounds = this.navigationTargetBounds;
+      if (
+        clickX >= bounds.x &&
+        clickX <= bounds.x + bounds.width &&
+        clickY >= bounds.y &&
+        clickY <= bounds.y + bounds.height
+      ) {
+        this.onNavigateToTarget(bounds.targetX, bounds.targetY);
+        return true;
+      }
+    }
+    return false;
   }
 
   render(
@@ -207,6 +235,20 @@ export class InfoSection {
       ctx.fillStyle = '#FFAA00';
       ctx.fillText(`Behavior: ${behaviorLabel}`, x + padding, currentY);
       currentY += lineHeight;
+
+      // Navigation Target (if agent is moving toward something)
+      const navigationTarget = this.getNavigationTarget(entity, world);
+      if (navigationTarget) {
+        currentY = this.renderNavigationTarget(
+          ctx,
+          x,
+          currentY,
+          padding,
+          lineHeight,
+          navigationTarget,
+          position
+        );
+      }
 
       // Behavior Queue section - moved here for visibility
       if (agent.behaviorQueue && agent.behaviorQueue.length > 0) {
@@ -722,5 +764,189 @@ export class InfoSection {
 
     y += 5;
     return y;
+  }
+
+  /**
+   * Extract navigation target from entity's steering or action queue.
+   */
+  private getNavigationTarget(entity: any, world: any): { x: number; y: number; name: string; type: string } | null {
+    // Check steering component first
+    const steering = entity.components.get('steering');
+    if (steering?.target) {
+      // Try to find what entity this target belongs to
+      const targetInfo = this.findTargetEntityName(steering.target, world);
+      return {
+        x: steering.target.x,
+        y: steering.target.y,
+        name: targetInfo.name,
+        type: targetInfo.type,
+      };
+    }
+
+    // Check action queue for targetPos
+    const actionQueue = entity.components.get('action_queue');
+    if (actionQueue) {
+      let actions: any[] = [];
+
+      if (typeof actionQueue.peek === 'function') {
+        const current = actionQueue.peek();
+        if (current) actions = [current];
+      } else if (Array.isArray(actionQueue.queue)) {
+        actions = actionQueue.queue;
+      } else if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
+        actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
+      }
+
+      if (actions.length > 0) {
+        const currentAction = actions[0];
+        if (currentAction?.targetPos) {
+          const targetInfo = this.findTargetEntityName(currentAction.targetPos, world);
+          return {
+            x: currentAction.targetPos.x,
+            y: currentAction.targetPos.y,
+            name: targetInfo.name,
+            type: currentAction.type || targetInfo.type,
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Find entity at target position and return its name and type.
+   */
+  private findTargetEntityName(target: { x: number; y: number }, world: any): { name: string; type: string } {
+    if (!world || !world.entities) {
+      return { name: `(${target.x.toFixed(0)}, ${target.y.toFixed(0)})`, type: 'position' };
+    }
+
+    // Search for entities at or near the target position
+    for (const [_id, entity] of world.entities) {
+      const pos = entity.components.get('position');
+      if (!pos) continue;
+
+      const dx = Math.abs(pos.x - target.x);
+      const dy = Math.abs(pos.y - target.y);
+
+      // Check if entity is at target (within 1 tile)
+      if (dx < 1 && dy < 1) {
+        // Try to get entity name/type
+        const identity = entity.components.get('identity');
+        const building = entity.components.get('building');
+        const resource = entity.components.get('resource_node');
+
+        if (identity?.name) {
+          return { name: identity.name, type: 'agent' };
+        }
+        if (building) {
+          return { name: building.type || 'Building', type: 'building' };
+        }
+        if (resource) {
+          return { name: resource.resourceType || 'Resource', type: 'resource' };
+        }
+      }
+    }
+
+    return { name: `(${target.x.toFixed(0)}, ${target.y.toFixed(0)})`, type: 'position' };
+  }
+
+  /**
+   * Render navigation target display with icon, name, and direction.
+   */
+  private renderNavigationTarget(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    y: number,
+    padding: number,
+    lineHeight: number,
+    target: { x: number; y: number; name: string; type: string },
+    agentPos: PositionComponentData | undefined
+  ): number {
+    // Reset navigation target bounds
+    this.navigationTargetBounds = null;
+
+    if (!agentPos) return y;
+
+    // Calculate direction and distance
+    const dx = target.x - agentPos.x;
+    const dy = target.y - agentPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+
+    // Get direction arrow
+    const direction = this.getDirectionArrow(angle);
+
+    // Choose icon based on type
+    const icon = this.getTargetIcon(target.type);
+
+    // Render clickable target display
+    const startY = y;
+    const displayHeight = 18;
+
+    // Background highlight
+    ctx.fillStyle = 'rgba(0, 204, 255, 0.15)';
+    ctx.fillRect(panelX + padding, y - 12, this.panelWidth - padding * 2, displayHeight);
+
+    // Border
+    ctx.strokeStyle = 'rgba(0, 204, 255, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(panelX + padding, y - 12, this.panelWidth - padding * 2, displayHeight);
+
+    // Icon and direction
+    ctx.fillStyle = '#00CCFF';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText(`${icon} ${direction}`, panelX + padding + 5, y);
+
+    // Target name
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '12px monospace';
+    const targetName = target.name.length > 20 ? target.name.substring(0, 17) + '...' : target.name;
+    ctx.fillText(targetName, panelX + padding + 45, y);
+
+    // Distance
+    ctx.fillStyle = '#AAAAAA';
+    ctx.font = '11px monospace';
+    ctx.fillText(`${distance.toFixed(1)}t`, panelX + this.panelWidth - padding - 45, y);
+
+    // Store click bounds
+    this.navigationTargetBounds = {
+      x: panelX + padding,
+      y: startY - 12,
+      width: this.panelWidth - padding * 2,
+      height: displayHeight,
+      targetX: target.x,
+      targetY: target.y,
+    };
+
+    return y + lineHeight;
+  }
+
+  /**
+   * Get direction arrow based on angle.
+   */
+  private getDirectionArrow(angle: number): string {
+    // Convert angle to 8-direction arrow
+    const directions = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
+    const index = Math.round((angle + Math.PI) / (Math.PI / 4)) % 8;
+    return directions[index] || '→';
+  }
+
+  /**
+   * Get icon for target type.
+   */
+  private getTargetIcon(type: string): string {
+    switch (type) {
+      case 'agent':
+        return '👤';
+      case 'building':
+        return '🏠';
+      case 'resource':
+        return '🌲';
+      case 'position':
+      default:
+        return '📍';
+    }
   }
 }

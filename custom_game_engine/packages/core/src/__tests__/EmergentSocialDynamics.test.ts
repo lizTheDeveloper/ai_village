@@ -262,7 +262,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       world.eventBus.flush();
 
       const socialMemory = agent1.getComponent<SocialMemoryComponent>(CT.SocialMemory);
-      const memory = socialMemory!.memories.get(agent2.id);
+      const memory = socialMemory!.socialMemories.get(agent2.id);
 
       expect(memory).toBeDefined();
       expect(memory!.knownFacts.length).toBeGreaterThan(0);
@@ -303,7 +303,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       world.eventBus.flush();
 
       const socialMemory = agent1.getComponent<SocialMemoryComponent>(CT.SocialMemory);
-      const memory = socialMemory!.memories.get(agent2.id);
+      const memory = socialMemory!.socialMemories.get(agent2.id);
 
       const godsFact = memory!.knownFacts.find(f => f.value === 'the_gods');
       expect(godsFact!.confidence).toBeGreaterThan(0.7); // 0.7 + 0.1 = 0.8
@@ -365,7 +365,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       expect(friendshipFormed).toBe(true);
 
       const socialMemory = agent1.getComponent<SocialMemoryComponent>(CT.SocialMemory);
-      const memory = socialMemory!.memories.get(agent2.id);
+      const memory = socialMemory!.socialMemories.get(agent2.id);
 
       expect(memory).toBeDefined();
       expect(memory!.relationshipType).toBe('friend');

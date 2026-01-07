@@ -124,9 +124,44 @@ Extract loosely-coupled systems from `@ai-village/core` into standalone packages
 
 ## Current Progress
 
-- [ ] **@ai-village/environment** - Not started
-- [ ] **@ai-village/navigation** - Not started
-- [ ] **@ai-village/botany** - Not started
+- [x] **@ai-village/environment** - COMPLETE
+  - Created package structure (package.json, tsconfig.json)
+  - Systems: TimeSystem, WeatherSystem, TemperatureSystem, SoilSystem
+  - Package builds successfully in isolation
+
+- [x] **@ai-village/navigation** - COMPLETE
+  - Created package structure (package.json, tsconfig.json)
+  - Systems: MovementSystem, SteeringSystem, ExplorationSystem
+  - Package builds successfully in isolation
+
+- [x] **@ai-village/botany** - COMPLETE
+  - Created package structure (package.json, tsconfig.json)
+  - Systems: PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem
+  - Package builds successfully in isolation
+  - Added PLANT_CONSTANTS and BugReporter exports to core/index.ts
+
+- [ ] **Update core package imports** - PENDING
+  - Need to update registerAllSystems.ts to import from new packages
+  - Should add new packages to root tsconfig.json references
+
+---
+
+## Known Issues
+
+### Pre-existing Build Issue (Unrelated to Package Extraction)
+The monorepo has a circular dependency issue:
+- `@ai-village/core` imports from `@ai-village/llm`
+- Multiple packages reference core through tsconfig references
+- When dist folders are deleted, the build order cannot resolve
+
+This is a pre-existing issue that blocks full monorepo builds but does **not affect the new packages**. Each new package (environment, navigation, botany) builds successfully in isolation when core is already built.
+
+**Workaround**: Build packages in this order:
+1. introspection (no deps)
+2. llm (no deps)
+3. core (needs llm)
+4. environment, navigation, botany (need core)
+5. Other packages
 
 ---
 
@@ -135,3 +170,4 @@ Extract loosely-coupled systems from `@ai-village/core` into standalone packages
 - Keep backward compatibility by re-exporting from core initially
 - Systems maintain same priorities and execution order
 - Components keep same type names (lowercase_with_underscores)
+- Package pattern: import types from @ai-village/core, export systems
