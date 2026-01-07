@@ -48,7 +48,8 @@ export const BeliefSchema = autoRegister(
       summarize: (data: BeliefComponent) => {
         const beliefs = data.allBeliefs;
 
-        if (beliefs.length === 0) {
+        // Defensive: Handle missing or undefined allBeliefs
+        if (!beliefs || beliefs.length === 0) {
           return 'No strong beliefs formed yet.';
         }
 

@@ -255,7 +255,6 @@ export class AgentBrainSystem implements System {
 
       // Check think interval
       const shouldThink = this.shouldThink(agent, world.tick);
-      // console.log(`[AgentBrainSystem] Entity ${impl.id.substring(0, 8)}: tick=${world.tick}, lastThink=${agent.lastThinkTick}, shouldThink=${shouldThink}`);
       if (!shouldThink) continue;
 
       // Update last think time
@@ -282,6 +281,13 @@ export class AgentBrainSystem implements System {
    */
   private shouldThink(agent: AgentComponent, currentTick: number): boolean {
     const ticksSinceLastThink = currentTick - agent.lastThinkTick;
+
+    // Handle save/load case where lastThinkTick is in the future (world tick reset to 0)
+    // If negative, agent should think immediately
+    if (ticksSinceLastThink < 0) {
+      return true;
+    }
+
     return ticksSinceLastThink >= agent.thinkInterval;
   }
 

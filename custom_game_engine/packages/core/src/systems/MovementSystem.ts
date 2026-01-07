@@ -159,9 +159,6 @@ export class MovementSystem implements System {
       if (circadian && circadian.isSleeping) {
         // Force velocity to 0 while sleeping
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
-          console.log(
-            `[Movement] ${entity.id.slice(0, 8)} sleeping - clearing velocity (was ${movement.velocityX.toFixed(2)}, ${movement.velocityY.toFixed(2)})`
-          );
           impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
             ...current,
             velocityX: 0,
