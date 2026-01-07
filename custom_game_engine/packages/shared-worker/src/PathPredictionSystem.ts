@@ -33,15 +33,11 @@ interface DirtyForSyncComponent {
  * Priority: 50 (after movement systems, before rendering)
  */
 export class PathPredictionSystem implements System {
+  readonly id = 'path_prediction' as const;
   readonly priority = 50;
+  readonly requiredComponents = ['position'] as const;
 
-  execute(world: World): void {
-    // Get all entities with position and velocity
-    const entities = world
-      .query()
-      .with('position')
-      .executeEntities();
-
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
       this.updatePrediction(entity, world);
     }

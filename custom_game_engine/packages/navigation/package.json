@@ -1,0 +1,24 @@
+{
+  "name": "@ai-village/navigation",
+  "version": "0.1.0",
+  "description": "Navigation and movement systems for AI Village",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-village/core": "*"
+  },
+  "keywords": ["navigation", "movement", "steering", "exploration", "ecs"],
+  "license": "MIT"
+}
