@@ -147,6 +147,7 @@ export interface GameEventMap {
     from: string;
     to: string;
     reason?: string;
+    layer?: string; // Which LLM layer made this decision (autonomic, talker, executor)
   };
 
   // === Soil & Farming Events ===

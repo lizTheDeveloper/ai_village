@@ -26,7 +26,7 @@ async function testLLMFix() {
 
   const llmQueue = new LLMDecisionQueue(provider, 2);
   const scheduler = new LLMScheduler(llmQueue);
-  const scheduledProcessor = new ScheduledDecisionProcessor(scheduler);
+  const scheduledProcessor = new ScheduledDecisionProcessor(scheduler, llmQueue);
 
   // Create AgentBrainSystem with scheduler
   const brainSystem = new AgentBrainSystem(

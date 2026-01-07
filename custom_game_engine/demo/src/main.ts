@@ -700,9 +700,9 @@ async function registerAllSystems(
     const { ScheduledDecisionProcessor } = await import('@ai-village/core');
 
     scheduler = new LLMScheduler(llmQueue);
-    scheduledProcessor = new ScheduledDecisionProcessor(scheduler);
+    scheduledProcessor = new ScheduledDecisionProcessor(scheduler, llmQueue);
 
-    console.log('[Main] Created LLMScheduler with intelligent layer selection');
+    console.log('[Main] Created LLMScheduler with intelligent layer selection (queue+poll pattern)');
     console.log('[Main] Layer cooldowns - Autonomic: 1s, Talker: 5s, Executor: 10s');
   }
 

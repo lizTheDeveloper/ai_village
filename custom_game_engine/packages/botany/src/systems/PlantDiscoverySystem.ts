@@ -4,7 +4,6 @@ import type {
   ComponentType as CT,
   World,
   Entity,
-  PlantKnowledgeComponent,
   PlantSpecies,
   MedicinalProperties,
   MagicalProperties,
@@ -16,6 +15,7 @@ import type {
 import {
   ComponentType,
   EntityImpl,
+  PlantKnowledgeComponent,
 } from '@ai-village/core';
 
 /**

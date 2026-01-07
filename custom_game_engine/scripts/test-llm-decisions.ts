@@ -14,7 +14,7 @@ async function testLLMDecisions() {
   const world = new WorldImpl();
   const llmQueue = new LLMDecisionQueue();
   const scheduler = new LLMScheduler(llmQueue);
-  const scheduledProcessor = new ScheduledDecisionProcessor(scheduler);
+  const scheduledProcessor = new ScheduledDecisionProcessor(scheduler, llmQueue);
 
   // Create AgentBrainSystem with scheduler
   const brainSystem = new AgentBrainSystem(

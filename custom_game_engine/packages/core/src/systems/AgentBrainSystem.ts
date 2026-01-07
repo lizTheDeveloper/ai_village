@@ -385,50 +385,43 @@ export class AgentBrainSystem implements System {
       }
     }
 
-    // Layer 3: LLM or Scripted
-    if (this.useScheduler) {
-      // Use async scheduler (fire and forget - updates agent when LLM call completes)
-      (this.decision as ScheduledDecisionProcessor).processAsync(entity, world, agent).catch((error: unknown) => {
-        console.error(`[AgentBrainSystem] Async decision processing failed for ${entity.id}:`, error);
-      });
-    } else {
-      // Fallback to sync decision processor
-      const decisionResult = this.decision.process(
-        entity,
-        world,
-        agent,
-        this.getNearbyAgents.bind(this)
-      );
+    // Layer 3: LLM or Scripted (both use sync queue+poll pattern now)
+    const decisionResult = this.decision.process(
+      entity,
+      world,
+      agent,
+      this.getNearbyAgents.bind(this)
+    );
 
-      if (decisionResult.changed && decisionResult.behavior) {
-        const fromBehavior = agent.behavior;
-        const toBehavior = decisionResult.behavior;
+    if (decisionResult.changed && decisionResult.behavior) {
+      const fromBehavior = agent.behavior;
+      const toBehavior = decisionResult.behavior;
 
-        entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
-          ...current,
-          behavior: decisionResult.behavior!,
-          behaviorState: decisionResult.behaviorState ?? {},
-        }));
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        behavior: decisionResult.behavior!,
+        behaviorState: decisionResult.behaviorState ?? {},
+      }));
 
-        // Emit behavior:change event for metrics
-        if (fromBehavior !== toBehavior) {
-          world.eventBus.emit({
-            type: 'behavior:change',
-            source: entity.id,
-            data: {
-              agentId: entity.id,
-              from: fromBehavior,
-              to: toBehavior,
-              reason: 'decision',
-            },
-          });
-        }
-
-        return { behavior: decisionResult.behavior, execute: true };
+      // Emit behavior:change event for metrics
+      if (fromBehavior !== toBehavior) {
+        world.eventBus.emit({
+          type: 'behavior:change',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            from: fromBehavior,
+            to: toBehavior,
+            reason: 'decision',
+            layer: (decisionResult as any).layer || 'unknown',
+          },
+        });
       }
+
+      return { behavior: decisionResult.behavior, execute: true };
     }
 
-    // Continue current behavior (will be updated async when LLM decision completes)
+    // Continue current behavior
     return { behavior: agent.behavior, execute: true };
   }
 

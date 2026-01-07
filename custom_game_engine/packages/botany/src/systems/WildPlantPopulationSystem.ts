@@ -1,12 +1,19 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId, ComponentType } from '../types.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
-import { PlantComponent } from '../components/PlantComponent.js';
-import type { PlantSpecies } from '../types/PlantSpecies.js';
-import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import type {
+  System,
+  SystemId,
+  ComponentType,
+  World,
+  Entity,
+  PlantComponent,
+  PlantSpecies,
+  EventBus,
+} from '@ai-village/core';
+import {
+  ComponentType as CT,
+  EntityImpl,
+} from '@ai-village/core';
+
+type CoreEventBus = EventBus;
 
 /**
  * Ecology parameters for wild plant populations

@@ -250,7 +250,7 @@ export class ScheduledDecisionProcessor {
     this.pendingLayerSelection.set(entity.id, layerSelection.layer);
 
     // Request decision from queue (fire-and-forget, will be ready next tick)
-    this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((error: Error) => {
+    this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((error: Error) => {
       console.error(`[ScheduledDecisionProcessor] LLM decision failed for ${entity.id}:`, error);
       this.pendingLayerSelection.delete(entity.id);
     });
