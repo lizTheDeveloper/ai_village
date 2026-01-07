@@ -7,6 +7,8 @@ import { SleepSystem } from '../SleepSystem.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
+import { createVelocityComponent } from '../../components/VelocityComponent.js';
+import { SteeringComponent } from '../../components/SteeringComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 /**
@@ -32,22 +34,15 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     // Add Velocity component for SteeringSystem
-    agent.addComponent({
-      type: ComponentType.Velocity,
-      version: 1,
-      vx: 0,
-      vy: 0,
-    });
+    agent.addComponent(createVelocityComponent(0, 0));
 
     // Add Steering component (seek target)
-    agent.addComponent({
-      type: ComponentType.Steering,
-      version: 1,
+    agent.addComponent(new SteeringComponent({
       behavior: 'seek',
       maxSpeed: 2.0,
       maxForce: 1.0,
       target: { x: 20, y: 20 }, // Move toward (20, 20)
-    });
+    }));
 
     // Add Movement component for MovementSystem
     agent.addComponent(createMovementComponent(0, 0, 1.0));
@@ -58,10 +53,9 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     harness.registerSystem('SteeringSystem', steeringSystem);
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     // Apply steering to update velocity
-    steeringSystem.update(harness.world, entities, 1.0);
+    const steeringEntities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
+    steeringSystem.update(harness.world, steeringEntities, 1.0);
 
     const velocityAfterSteering = agent.getComponent(ComponentType.Velocity) as any;
 
@@ -81,7 +75,8 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const startY = initialPosition.y;
 
     // Apply movement (deltaTime = 1/60 for one tick)
-    movementSystem.update(harness.world, entities, 1/60);
+    const movementEntities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
+    movementSystem.update(harness.world, movementEntities, 1/60);
 
     const finalPosition = agent.getComponent(ComponentType.Position) as any;
 
@@ -106,13 +101,12 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementSystem = new MovementSystem();
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     const initialPosition = agent.getComponent(ComponentType.Position) as any;
     const startX = initialPosition.x;
     const startY = initialPosition.y;
 
     // Apply movement with fatigue penalty (deltaTime = 1/60 for one tick)
+    const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
     const finalPosition = agent.getComponent(ComponentType.Position) as any;
@@ -150,9 +144,8 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementSystem = new MovementSystem();
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     // Apply movement (deltaTime = 1/60 for one tick)
+    const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
     const movement = agent.getComponent(ComponentType.Movement) as any;
@@ -179,13 +172,12 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementSystem = new MovementSystem();
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     const initialPosition = agent.getComponent(ComponentType.Position) as any;
     const startX = initialPosition.x;
     const startY = initialPosition.y;
 
     // Try to move into obstacle (deltaTime = 1/60 for one tick)
+    const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
     const finalPosition = agent.getComponent(ComponentType.Position) as any;
@@ -204,28 +196,20 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     // Create agent with arrive behavior
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    agent.addComponent({
-      type: ComponentType.Velocity,
-      version: 1,
-      vx: 2.0,
-      vy: 0,
-    });
+    agent.addComponent(createVelocityComponent(2.0, 0));
 
-    agent.addComponent({
-      type: ComponentType.Steering,
-      version: 1,
+    agent.addComponent(new SteeringComponent({
       behavior: 'arrive',
       maxSpeed: 2.0,
       maxForce: 1.0,
       target: { x: 11, y: 10 }, // Very close target
-    });
+    }));
 
     const steeringSystem = new SteeringSystem();
     harness.registerSystem('SteeringSystem', steeringSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     // Apply steering
+    const entities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
     steeringSystem.update(harness.world, entities, 1.0);
 
     const velocity = agent.getComponent(ComponentType.Velocity) as any;
@@ -238,26 +222,19 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     // Create agent with wander behavior
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    agent.addComponent({
-      type: ComponentType.Velocity,
-      version: 1,
-      vx: 0,
-      vy: 0,
-    });
+    agent.addComponent(createVelocityComponent(0, 0));
 
-    agent.addComponent({
-      type: ComponentType.Steering,
-      version: 1,
+    agent.addComponent(new SteeringComponent({
       behavior: 'wander',
       maxSpeed: 1.0,
       maxForce: 0.5,
       wanderAngle: 0,
-    });
+    }));
 
     const steeringSystem = new SteeringSystem();
     harness.registerSystem('SteeringSystem', steeringSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
 
     // Apply steering multiple times
     for (let i = 0; i < 5; i++) {
@@ -275,16 +252,9 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     // Create agent with combined behavior
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    agent.addComponent({
-      type: ComponentType.Velocity,
-      version: 1,
-      vx: 1.0,
-      vy: 0,
-    });
+    agent.addComponent(createVelocityComponent(1.0, 0));
 
-    agent.addComponent({
-      type: ComponentType.Steering,
-      version: 1,
+    agent.addComponent(new SteeringComponent({
       behavior: 'combined',
       maxSpeed: 2.0,
       maxForce: 1.0,
@@ -293,7 +263,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
         { type: 'seek', weight: 1.0, target: { x: 20, y: 10 } },
         { type: 'obstacle_avoidance', weight: 2.0 },
       ],
-    });
+    }));
 
     // Create obstacle in path
     const obstacle = harness.createTestBuilding('shelter', { x: 15, y: 10 });
@@ -306,9 +276,8 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const steeringSystem = new SteeringSystem();
     harness.registerSystem('SteeringSystem', steeringSystem);
 
-    const entities = Array.from(harness.world.entities.values());
-
     // Apply steering
+    const entities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
     steeringSystem.update(harness.world, entities, 1.0);
 
     const velocity = agent.getComponent(ComponentType.Velocity) as any;

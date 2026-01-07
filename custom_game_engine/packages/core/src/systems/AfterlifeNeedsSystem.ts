@@ -21,6 +21,8 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Decay/recovery rates per game minute
 const BASE_COHERENCE_DECAY = 0.0001;      // Very slow - takes ~7000 game minutes to fade
@@ -34,31 +36,35 @@ export class AfterlifeNeedsSystem implements System {
   public readonly priority: number = 16;  // Right after NeedsSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
 
+  public readonly dependsOn = ['state_mutator'] as const;
+
+  private stateMutator: StateMutatorSystem | null = null;
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
+  private deltaCleanups = new Map<
+    string,
+    {
+      coherence?: () => void;
+      tether?: () => void;
+      solitude?: () => void;
+      peace?: () => void;
+    }
+  >();
+
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
+  }
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    if (!this.stateMutator) {
+      throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
+    }
+
     // Use SimulationScheduler to only process active entities
     const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
 
-    // Get current game tick for forgotten calculation
     const currentTick = world.tick;
-    let gameMinutesElapsed = 0;
-
-    // Get time component for day length calculation
-    const timeEntities = world.query().with('time').executeEntities();
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent<TimeComponent>('time');
-      if (timeComp) {
-        // Calculate game minutes elapsed
-        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
-        const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
-        gameMinutesElapsed = hoursElapsed * 60;
-      }
-    }
-
-    // Fallback if no time system
-    if (gameMinutesElapsed === 0) {
-      gameMinutesElapsed = deltaTime / 60;
-    }
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
@@ -73,69 +79,13 @@ export class AfterlifeNeedsSystem implements System {
       // Skip if already passed on or a shade
       if (afterlife.hasPassedOn || afterlife.isShade) continue;
 
-      // Apply time dilation from realm (underworld is 4x slower)
-      const adjustedMinutes = gameMinutesElapsed * realmLocation.timeDilation;
-
-      // ========================================================================
-      // Coherence Decay
-      // ========================================================================
-      let coherenceDecay = BASE_COHERENCE_DECAY * adjustedMinutes;
-
-      // Loneliness accelerates coherence decay
-      if (afterlife.solitude > 0.7) {
-        coherenceDecay *= 1.5;
-      }
-
-      // Being an ancestor kami slows decay (tended by worship)
-      if (afterlife.isAncestorKami) {
-        coherenceDecay *= 0.5;
-      }
-
-      afterlife.coherence = Math.max(0, afterlife.coherence - coherenceDecay);
-
-      // ========================================================================
-      // Tether Decay
-      // ========================================================================
-      let tetherDecay = BASE_TETHER_DECAY * adjustedMinutes;
-
-      // Check if forgotten (no remembrance in a while)
-      const ticksSinceRemembered = currentTick - afterlife.lastRememberedTick;
-      if (ticksSinceRemembered > FORGOTTEN_THRESHOLD_TICKS) {
-        tetherDecay *= 2;  // Forgotten souls fade faster
-      }
-
-      // Ancestor kami have stable tether (maintained by shrine)
-      if (afterlife.isAncestorKami) {
-        tetherDecay *= 0.25;
-      }
-
-      afterlife.tether = Math.max(0, afterlife.tether - tetherDecay);
-
-      // ========================================================================
-      // Solitude Increases
-      // ========================================================================
-      let solitudeIncrease = SOLITUDE_INCREASE * adjustedMinutes;
-
-      // Ancestor kami are less lonely (connected to family)
-      if (afterlife.isAncestorKami) {
-        solitudeIncrease *= 0.5;
-      }
-
-      afterlife.solitude = Math.min(1, afterlife.solitude + solitudeIncrease);
-
-      // ========================================================================
-      // Peace Changes
-      // ========================================================================
-      if (afterlife.unfinishedGoals.length === 0) {
-        // No unfinished business - peace slowly increases
-        afterlife.peace = Math.min(1, afterlife.peace + PEACE_GAIN * adjustedMinutes);
-      } else {
-        // Unfinished business - peace slowly decreases (restlessness)
-        afterlife.peace = Math.max(0, afterlife.peace - PEACE_GAIN * 0.5 * adjustedMinutes);
+      // Update afterlife need delta rates once per game minute
+      if (shouldUpdateDeltas) {
+        this.updateAfterlifeDeltas(entity, afterlife, realmLocation, currentTick);
       }
 
       // ========================================================================
-      // State Transitions
+      // State Transitions (discrete events - keep as direct mutations)
       // ========================================================================
 
       // Check for shade transformation
@@ -173,7 +123,7 @@ export class AfterlifeNeedsSystem implements System {
       afterlife.isRestless = afterlife.peace < 0.2 && !afterlife.isShade && !afterlife.hasPassedOn;
 
       // Emit restless event on transition
-      if (afterlife.isRestless && afterlife.peace === 0.2 - PEACE_GAIN * 0.5 * adjustedMinutes) {
+      if (afterlife.isRestless) {
         world.eventBus.emit({
           type: 'soul:became_restless',
           source: entity.id,
@@ -184,5 +134,151 @@ export class AfterlifeNeedsSystem implements System {
         });
       }
     }
+
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
+    }
+  }
+
+  /**
+   * Update afterlife need delta rates for a soul entity.
+   * Registers deltas with StateMutatorSystem for batched updates.
+   */
+  private updateAfterlifeDeltas(
+    entity: Entity,
+    afterlife: AfterlifeComponent,
+    realmLocation: RealmLocationComponent,
+    currentTick: number
+  ): void {
+    if (!this.stateMutator) {
+      throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
+    }
+
+    // Clean up old deltas
+    if (this.deltaCleanups.has(entity.id)) {
+      const cleanups = this.deltaCleanups.get(entity.id)!;
+      cleanups.coherence?.();
+      cleanups.tether?.();
+      cleanups.solitude?.();
+      cleanups.peace?.();
+    }
+
+    const cleanupFuncs: {
+      coherence?: () => void;
+      tether?: () => void;
+      solitude?: () => void;
+      peace?: () => void;
+    } = {};
+
+    // Apply time dilation from realm (underworld is 4x slower)
+    const timeDilation = realmLocation.timeDilation;
+
+    // ========================================================================
+    // Coherence Decay
+    // ========================================================================
+    let coherenceDecayRate = -BASE_COHERENCE_DECAY;
+
+    // Loneliness accelerates coherence decay
+    if (afterlife.solitude > 0.7) {
+      coherenceDecayRate *= 1.5;
+    }
+
+    // Being an ancestor kami slows decay (tended by worship)
+    if (afterlife.isAncestorKami) {
+      coherenceDecayRate *= 0.5;
+    }
+
+    // Apply time dilation
+    coherenceDecayRate *= timeDilation;
+
+    cleanupFuncs.coherence = this.stateMutator.registerDelta({
+      entityId: entity.id,
+      componentType: CT.Afterlife,
+      field: 'coherence',
+      deltaPerMinute: coherenceDecayRate,
+      min: 0,
+      max: 1,
+      source: 'afterlife_coherence_decay',
+    });
+
+    // ========================================================================
+    // Tether Decay
+    // ========================================================================
+    let tetherDecayRate = -BASE_TETHER_DECAY;
+
+    // Check if forgotten (no remembrance in a while)
+    const ticksSinceRemembered = currentTick - afterlife.lastRememberedTick;
+    if (ticksSinceRemembered > FORGOTTEN_THRESHOLD_TICKS) {
+      tetherDecayRate *= 2; // Forgotten souls fade faster
+    }
+
+    // Ancestor kami have stable tether (maintained by shrine)
+    if (afterlife.isAncestorKami) {
+      tetherDecayRate *= 0.25;
+    }
+
+    // Apply time dilation
+    tetherDecayRate *= timeDilation;
+
+    cleanupFuncs.tether = this.stateMutator.registerDelta({
+      entityId: entity.id,
+      componentType: CT.Afterlife,
+      field: 'tether',
+      deltaPerMinute: tetherDecayRate,
+      min: 0,
+      max: 1,
+      source: 'afterlife_tether_decay',
+    });
+
+    // ========================================================================
+    // Solitude Increases
+    // ========================================================================
+    let solitudeRate = SOLITUDE_INCREASE;
+
+    // Ancestor kami are less lonely (connected to family)
+    if (afterlife.isAncestorKami) {
+      solitudeRate *= 0.5;
+    }
+
+    // Apply time dilation
+    solitudeRate *= timeDilation;
+
+    cleanupFuncs.solitude = this.stateMutator.registerDelta({
+      entityId: entity.id,
+      componentType: CT.Afterlife,
+      field: 'solitude',
+      deltaPerMinute: solitudeRate,
+      min: 0,
+      max: 1,
+      source: 'afterlife_solitude_increase',
+    });
+
+    // ========================================================================
+    // Peace Changes
+    // ========================================================================
+    let peaceRate: number;
+
+    if (afterlife.unfinishedGoals.length === 0) {
+      // No unfinished business - peace slowly increases
+      peaceRate = PEACE_GAIN;
+    } else {
+      // Unfinished business - peace slowly decreases (restlessness)
+      peaceRate = -PEACE_GAIN * 0.5;
+    }
+
+    // Apply time dilation
+    peaceRate *= timeDilation;
+
+    cleanupFuncs.peace = this.stateMutator.registerDelta({
+      entityId: entity.id,
+      componentType: CT.Afterlife,
+      field: 'peace',
+      deltaPerMinute: peaceRate,
+      min: 0,
+      max: 1,
+      source: 'afterlife_peace_change',
+    });
+
+    this.deltaCleanups.set(entity.id, cleanupFuncs);
   }
 }

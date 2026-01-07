@@ -74,6 +74,7 @@ update(world, entities, deltaTime) {
 5. **TemperatureSystem** - Health damage from dangerous temperatures
 6. **BodySystem** - Blood loss/recovery and injury/part healing (nested deltas)
 7. **SleepSystem** - Sleep drive accumulation/depletion and energy recovery
+8. **AfterlifeNeedsSystem** - Spiritual needs decay for souls in the Underworld (coherence, tether, solitude, peace)
 
 ### Usage Guide
 

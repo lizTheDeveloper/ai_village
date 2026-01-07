@@ -255,8 +255,9 @@ export class LLMScheduler {
 
   /**
    * Check if a layer is ready to run for this agent (cooldown elapsed)
+   * Adjusts cooldowns based on conversation state for more natural engagement
    */
-  isLayerReady(agentId: string, layer: DecisionLayer): boolean {
+  isLayerReady(agentId: string, layer: DecisionLayer, agent?: Entity): boolean {
     const config = this.layerConfig[layer];
     if (!config.enabled) return false;
 
@@ -264,7 +265,26 @@ export class LLMScheduler {
     const lastInvocation = state.lastInvocation[layer] ?? 0;
     const elapsed = Date.now() - lastInvocation;
 
-    return elapsed >= config.cooldownMs;
+    // Get adjusted cooldown based on conversation state
+    let adjustedCooldown = config.cooldownMs;
+
+    if (agent) {
+      const conversationComp = agent.components.get('conversation') as ConversationComponent | undefined;
+      const isInConversation = conversationComp?.isActive && (conversationComp.partnerId !== null || conversationComp.participantIds.length > 0);
+
+      if (isInConversation) {
+        // In conversation: Reduce engagement frequency for both talker and executor
+        if (layer === 'talker') {
+          adjustedCooldown = 10000; // 10s (was 5s) - reduce talker engagement
+        } else if (layer === 'executor') {
+          adjustedCooldown = 20000; // 20s (was 10s) - reduce executor engagement even more
+        }
+      }
+      // When NOT in conversation, use default cooldowns (talker: 5s, executor: 10s)
+      // This means executor engages MORE frequently when not in conversation
+    }
+
+    return elapsed >= adjustedCooldown;
   }
 
   /**
@@ -296,8 +316,8 @@ export class LLMScheduler {
     this.metrics.layerSelections[selection.layer]++;
     this.metrics.totalUrgency[selection.layer] += selection.urgency;
 
-    // Check if selected layer is ready
-    if (!this.isLayerReady(agent.id, selection.layer)) {
+    // Check if selected layer is ready (pass agent for conversation-aware cooldowns)
+    if (!this.isLayerReady(agent.id, selection.layer, agent)) {
       const waitMs = this.getTimeUntilReady(agent.id, selection.layer);
 
       // Track metrics: cooldown hit

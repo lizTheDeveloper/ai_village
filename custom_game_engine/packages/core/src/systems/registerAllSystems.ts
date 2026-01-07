@@ -753,7 +753,10 @@ export function registerAllSystems(
   }
 
   // Afterlife systems (process souls in the Underworld)
-  gameLoop.systemRegistry.register(new AfterlifeNeedsSystem());
+  // AfterlifeNeedsSystem - Uses StateMutatorSystem for batched spiritual needs decay
+  const afterlifeNeedsSystem = new AfterlifeNeedsSystem();
+  afterlifeNeedsSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(afterlifeNeedsSystem);
   gameLoop.systemRegistry.register(new AncestorTransformationSystem());
   gameLoop.systemRegistry.register(new ReincarnationSystem());
   gameLoop.systemRegistry.register(new AfterlifeMemoryFadingSystem());

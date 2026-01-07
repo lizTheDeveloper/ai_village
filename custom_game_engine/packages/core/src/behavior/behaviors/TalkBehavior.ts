@@ -47,8 +47,7 @@ export class TalkBehavior extends BaseBehavior {
   readonly name = 'talk' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    // Disable steering system
-    this.disableSteering(entity);
+    // NOTE: We do NOT disable steering - agents will stay near conversation center via "arrive" behavior
 
     const conversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
     const relationship = entity.getComponent<RelationshipComponent>(ComponentType.Relationship);
@@ -108,12 +107,24 @@ export class TalkBehavior extends BaseBehavior {
 
         // Only start if partner is available (not already talking to someone else)
         if (partnerConversation && !isInConversation(partnerConversation)) {
-          // Start conversation for both agents
+          // Calculate conversation center (midpoint between the two agents) for spatial stickiness
+          const myPos = entity.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
+          const partnerPos = partner.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
+
+          let centerX: number | undefined;
+          let centerY: number | undefined;
+
+          if (myPos && partnerPos) {
+            centerX = (myPos.x + partnerPos.x) / 2;
+            centerY = (myPos.y + partnerPos.y) / 2;
+          }
+
+          // Start conversation for both agents with spatial center
           entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
-            startConversation(current, targetPartnerId, world.tick)
+            startConversation(current, targetPartnerId, world.tick, entity.id, centerX, centerY)
           );
           (partner as EntityImpl).updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
-            startConversation(current, entity.id, world.tick)
+            startConversation(current, entity.id, world.tick, partner.id, centerX, centerY)
           );
 
           // Enable interaction-triggered LLM for autonomic agents in conversation
@@ -203,8 +214,21 @@ export class TalkBehavior extends BaseBehavior {
       return { complete: true, reason: 'Partner no longer exists' };
     }
 
-    // Stop moving while talking
-    this.stopMovement(entity);
+    // Apply spatial stickiness: steer toward conversation center instead of stopping completely
+    if (activeConversation.conversationCenterX !== undefined && activeConversation.conversationCenterY !== undefined) {
+      entity.updateComponent(ComponentType.Steering, (current: any) => ({
+        ...current,
+        behavior: 'arrive',
+        target: {
+          x: activeConversation.conversationCenterX,
+          y: activeConversation.conversationCenterY,
+        },
+        arrivalRadius: 8, // Allow agents to move around within ~8 tiles of center
+      }));
+    } else {
+      // No conversation center set, stop moving (fallback for old conversations)
+      this.stopMovement(entity);
+    }
 
     // Update relationship (get to know each other better)
     if (relationship) {

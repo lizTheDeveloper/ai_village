@@ -77,6 +77,7 @@ const btnRegenerateReference = document.getElementById('btn-regenerate-reference
 const btnApproveReference = document.getElementById('btn-approve-reference') as HTMLButtonElement;
 const btnStartGeneration = document.getElementById('btn-start-generation') as HTMLButtonElement;
 const btnPauseGeneration = document.getElementById('btn-pause-generation') as HTMLButtonElement;
+const btnRegenerateCurrent = document.getElementById('btn-regenerate-current') as HTMLButtonElement;
 const btnExportSheet = document.getElementById('btn-export-sheet') as HTMLButtonElement;
 
 const referenceLoading = document.getElementById('reference-loading')!;
@@ -454,11 +455,24 @@ function initializePartsList() {
 
   state.parts = [
     // TORSO FIRST - This becomes the style reference for all other parts
-    { id: 'torso_average', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), average build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['average'] },
-    { id: 'torso_athletic', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), athletic muscular build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['athletic'] },
-    { id: 'torso_stocky', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), stocky broad build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['stocky'] },
-    { id: 'torso_thin', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), thin lanky build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['thin'] },
-    { id: 'torso_heavy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), heavy-set build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['heavy'] },
+    // Male torsos (5 builds)
+    { id: 'torso_male_average', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a male human torso (chest and waist area), average build, broad shoulders, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['male', 'average'] },
+    { id: 'torso_male_athletic', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a male human torso (chest and waist area), athletic muscular build, defined chest, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['male', 'athletic'] },
+    { id: 'torso_male_stocky', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a male human torso (chest and waist area), stocky broad build, wide shoulders, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['male', 'stocky'] },
+    { id: 'torso_male_thin', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a male human torso (chest and waist area), thin lanky build, narrow frame, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['male', 'thin'] },
+    { id: 'torso_male_heavy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a male human torso (chest and waist area), heavy-set build, broad frame, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['male', 'heavy'] },
+
+    // Female torsos (5 builds)
+    { id: 'torso_female_average', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a female human torso (chest and waist area), average build, feminine proportions, simple dress or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['female', 'average'] },
+    { id: 'torso_female_athletic', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a female human torso (chest and waist area), athletic toned build, fit proportions, simple dress or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['female', 'athletic'] },
+    { id: 'torso_female_curvy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a female human torso (chest and waist area), curvy build, feminine curves, simple dress or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['female', 'curvy'] },
+    { id: 'torso_female_thin', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a female human torso (chest and waist area), thin slender build, narrow frame, simple dress or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['female', 'thin'] },
+    { id: 'torso_female_heavy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY a female human torso (chest and waist area), heavy-set build, full figure, simple dress or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['female', 'heavy'] },
+
+    // Androgynous/Non-binary torsos (3 builds)
+    { id: 'torso_andro_average', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY an androgynous human torso (chest and waist area), average build, neutral proportions, simple tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['androgynous', 'average'] },
+    { id: 'torso_andro_thin', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY an androgynous human torso (chest and waist area), thin build, neutral proportions, simple tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['androgynous', 'thin'] },
+    { id: 'torso_andro_heavy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part, ONLY an androgynous human torso (chest and waist area), heavy build, neutral proportions, simple tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['androgynous', 'heavy'] },
 
     // Human heads (8) - Generated after torso for style matching
     { id: 'head_round_pale', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, round face shape, pale skin tone, front-facing view, neutral expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['round', 'pale'] },
@@ -566,7 +580,9 @@ btnStartGeneration.addEventListener('click', () => {
   state.isGenerating = true;
   state.isPaused = false;
   btnStartGeneration.style.display = 'none';
+  btnStartGeneration.textContent = '▶ Start Generation'; // Reset text
   btnPauseGeneration.style.display = 'inline-block';
+  btnRegenerateCurrent.style.display = 'none'; // Hide regenerate when continuing
 
   const resuming = state.currentPartIndex > 0;
   console.log(`[Sprite Wizard] Generation ${resuming ? 'resumed' : 'started'}`);
@@ -582,6 +598,53 @@ btnPauseGeneration.addEventListener('click', () => {
 
   currentPartName.textContent = 'Paused (current part will finish first)';
   console.log('[Sprite Wizard] Generation paused');
+});
+
+btnRegenerateCurrent.addEventListener('click', async () => {
+  // Regenerate the last completed part
+  if (state.currentPartIndex === 0) return;
+
+  const partIndex = state.currentPartIndex - 1;
+  const part = state.parts[partIndex];
+
+  btnRegenerateCurrent.textContent = '🔄 Regenerating...';
+  btnRegenerateCurrent.disabled = true;
+
+  try {
+    const referenceImage = getActiveReferenceImage();
+
+    const base64 = await generateImagePixflux(
+      part.description,
+      part.width,
+      part.height,
+      referenceImage
+    );
+
+    const version: PartVersion = {
+      imageData: `data:image/png;base64,${base64}`,
+      timestamp: Date.now(),
+      active: true,
+    };
+
+    // Replace the current version
+    const versions = state.completedParts.get(part.id) || [];
+    // Mark old versions as inactive
+    versions.forEach(v => v.active = false);
+    versions.push(version);
+    state.completedParts.set(part.id, versions);
+
+    // Update sprite sheet
+    updateSpriteSheet(part.id, version.imageData);
+
+    btnRegenerateCurrent.textContent = '🔄 Regenerate Current Part';
+    btnRegenerateCurrent.disabled = false;
+
+  } catch (error) {
+    console.error(`Failed to regenerate ${part.id}:`, error);
+    alert(`Failed to regenerate: ${error}`);
+    btnRegenerateCurrent.textContent = '🔄 Regenerate Current Part';
+    btnRegenerateCurrent.disabled = false;
+  }
 });
 
 async function generateNextPart() {
@@ -636,6 +699,19 @@ async function generateNextPart() {
     // Move to next part
     state.currentPartIndex++;
 
+    // Auto-pause after the first torso to let user review and regenerate if needed
+    if (state.currentPartIndex === 1) {
+      state.isPaused = true;
+      state.isGenerating = false;
+      btnStartGeneration.style.display = 'inline-block';
+      btnStartGeneration.textContent = '▶ Continue Generation';
+      btnPauseGeneration.style.display = 'none';
+      btnRegenerateCurrent.style.display = 'inline-block';
+      currentPartName.textContent = `First torso complete! Review style and regenerate if needed, then click Continue.`;
+      console.log('[Sprite Wizard] Auto-paused after first torso for review');
+      return;
+    }
+
     // Wait for rate limit (5 seconds)
     await new Promise(resolve => setTimeout(resolve, 5000));
 
@@ -655,9 +731,9 @@ async function generateNextPart() {
 function getActiveReferenceImage(): string | undefined {
   // Use first completed torso as the style reference
   // Torso is always generated first and sets the visual style for all other parts
-  const torsoAverage = state.completedParts.get('torso_average');
-  if (torsoAverage && torsoAverage.length > 0) {
-    const activeVersion = torsoAverage.find(v => v.active) || torsoAverage[torsoAverage.length - 1];
+  const torsoMaleAverage = state.completedParts.get('torso_male_average');
+  if (torsoMaleAverage && torsoMaleAverage.length > 0) {
+    const activeVersion = torsoMaleAverage.find(v => v.active) || torsoMaleAverage[torsoMaleAverage.length - 1];
     // Extract base64 from data URL
     return activeVersion.imageData.split(',')[1];
   }
