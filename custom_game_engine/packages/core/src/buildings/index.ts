@@ -63,7 +63,7 @@ export type {
   VoxelBuildingDefinition,
   BuildingFloor,
   BuildingCategory as VoxelBuildingCategory,
-} from '../../../building-designer/src/types.js';
+} from '@ai-village/building-designer';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type {

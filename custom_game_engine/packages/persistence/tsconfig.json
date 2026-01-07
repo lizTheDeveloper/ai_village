@@ -5,8 +5,10 @@
     "rootDir": "./src"
   },
   "include": ["src/**/*"],
+  "exclude": ["src/**/__tests__/**/*", "src/**/*.test.ts", "dist"],
   "references": [
     { "path": "../core" },
-    { "path": "../divinity" }
+    { "path": "../divinity" },
+    { "path": "../world" }
   ]
 }

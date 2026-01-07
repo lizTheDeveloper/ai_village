@@ -6,7 +6,7 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid input.
  */
 
-import type { BuildingFloor, Material, BuilderSpecies } from '../../../building-designer/src/types.js';
+import type { BuildingFloor, Material, BuilderSpecies } from '@ai-village/building-designer';
 import {
   SMALL_HOUSE,
   COZY_COTTAGE,

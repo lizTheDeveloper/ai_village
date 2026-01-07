@@ -12,7 +12,6 @@
     "src/**/*.bench.ts"
   ],
   "references": [
-    { "path": "../introspection" },
     { "path": "../building-designer" }
   ]
 }

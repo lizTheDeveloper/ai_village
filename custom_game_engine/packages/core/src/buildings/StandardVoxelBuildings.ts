@@ -11,7 +11,7 @@
  */
 
 import type { BuildingBlueprint } from './BuildingBlueprintRegistry.js';
-import type { BuildingFloor } from '../../../building-designer/src/types.js';
+import type { BuildingFloor } from '@ai-village/building-designer';
 
 // =============================================================================
 // RESIDENTIAL BUILDINGS

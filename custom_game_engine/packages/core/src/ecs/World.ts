@@ -21,7 +21,7 @@ import { PlacementValidator } from '../buildings/PlacementValidator.js';
 import { resetUsedNames } from '../components/IdentityComponent.js';
 import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
 import { SimulationScheduler } from './SimulationScheduler.js';
-import type { ChunkManager } from '@ai-village/world';
+// ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
 // Re-export for backwards compatibility
 export type { TerrainType, BiomeType };
@@ -284,7 +284,7 @@ export class WorldImpl implements WorldMutator {
    * Used by GameLoop to invalidate query cache.
    */
   private _archetypeVersion = 0;
-  private _chunkManager?: ChunkManager;
+  private _chunkManager?: IChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
   private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
@@ -301,7 +301,7 @@ export class WorldImpl implements WorldMutator {
   // Door location cache for fast lookups (updated when doors are built/destroyed)
   private doorLocationsCache: Array<{ x: number; y: number }> | null = null;
 
-  constructor(eventBus: EventBus, chunkManager?: ChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
+  constructor(eventBus: EventBus, chunkManager?: IChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
     this._chunkManager = chunkManager;
     this._systemRegistry = systemRegistry;
@@ -627,7 +627,7 @@ export class WorldImpl implements WorldMutator {
    * Set ChunkManager for tile access.
    * Called by game initialization after ChunkManager is created.
    */
-  setChunkManager(chunkManager: ChunkManager): void {
+  setChunkManager(chunkManager: IChunkManager): void {
     this._chunkManager = chunkManager;
   }
 
@@ -636,7 +636,7 @@ export class WorldImpl implements WorldMutator {
    * Returns the ChunkManager if set, otherwise undefined.
    * Used by WorldSerializer to serialize terrain data.
    */
-  getChunkManager(): ChunkManager | undefined {
+  getChunkManager(): IChunkManager | undefined {
     return this._chunkManager;
   }
 

@@ -2,8 +2,32 @@
  * Core persistence types - Schema versioning and serialization
  */
 
-import type { TerrainSnapshot } from '@ai-village/world';
 import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
+
+/**
+ * TerrainSnapshot interface - defined here to avoid circular dependency with world package.
+ * This must match the structure in @ai-village/world/chunks/types.ts
+ */
+export interface TerrainSnapshot {
+  $schema: 'https://aivillage.dev/schemas/terrain/v1';
+  $version: 1;
+  chunkSize: number;
+  generatedChunkCount: number;
+  chunkIndex: Array<{
+    key: string;
+    x: number;
+    y: number;
+    generated: boolean;
+    tileCount: number;
+    entityCount: number;
+    checksum: string;
+  }>;
+  chunks: Record<string, unknown>;
+  checksums: {
+    overall: string;
+    perChunk: Record<string, string>;
+  };
+}
 
 // ============================================================================
 // Base Versioning

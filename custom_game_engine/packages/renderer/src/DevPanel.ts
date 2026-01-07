@@ -1141,7 +1141,7 @@ export class DevPanel implements IWindowPanel {
     y = this.renderSectionHeader(ctx, width, y, 'LLM SCHEDULER');
 
     // Get agent name
-    const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
     const name = identity?.name || 'Unnamed';
 
     ctx.fillStyle = COLORS.textMuted;

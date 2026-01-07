@@ -128,7 +128,8 @@ export class WorldSerializer {
     if (snapshot.worldState.terrain) {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
+        // Cast to any to avoid type conflicts between core's IChunkManager and world's ChunkManager
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -261,8 +262,9 @@ export class WorldSerializer {
     const worldImpl = world as WorldImpl;
     const chunkManager = worldImpl.getChunkManager();
 
+    // Cast to any to avoid type conflicts between core's IChunkManager and world's ChunkManager
     const terrain = chunkManager
-      ? chunkSerializer.serializeChunks(chunkManager)
+      ? chunkSerializer.serializeChunks(chunkManager as any)
       : null;
 
     // Serialize zones using ZoneManager

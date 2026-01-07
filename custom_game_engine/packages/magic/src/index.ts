@@ -534,9 +534,8 @@ export {
   getPrayerEffectiveness,
 } from './skillTrees/DivineSkillTree.js';
 
-// Divine Power Types (from divinity package)
-export type { PowerTier } from '@ai-village/divinity';
-export { POWER_TIER_THRESHOLDS, BELIEF_GENERATION_RATES } from '@ai-village/divinity';
+// Divine Power Types - import directly from @ai-village/divinity
+// (Re-exports removed to avoid circular dependency)
 
 // Academic (Formal magical education)
 export {

@@ -139,48 +139,70 @@ export class AgentCombatSystem implements System {
       }
 
       if (conflict.state === 'initiated') {
+        // Validate inputs before starting combat
+        if (!conflict.cause) {
+          throw new Error('Combat cause is required');
+        }
+
+        if (!world.hasComponent(entity.id, 'combat_stats')) {
+          throw new Error('Attacker missing required component: combat_stats');
+        }
+
+        // Get defender
+        const defender = world.getEntity(conflict.target);
+        if (!defender) {
+          throw new Error('Combat target entity not found');
+        }
+
+        if (!world.hasComponent(defender.id, 'agent')) {
+          throw new Error('Combat target is not an agent');
+        }
+
+        if (!world.hasComponent(defender.id, 'combat_stats')) {
+          throw new Error('Defender missing required component: combat_stats');
+        }
+
         // Calculate combat duration and start fighting
         const duration = this.calculateCombatDuration(world, entity, conflict);
 
         // Calculate combat power for both combatants
-        const defender = world.getEntity(conflict.target);
-        if (defender) {
-          const attackerStats = world.getComponent<CombatStatsComponent>(entity.id, 'combat_stats');
-          const defenderStats = world.getComponent<CombatStatsComponent>(defender.id, 'combat_stats');
-          if (!attackerStats || !defenderStats) {
-            continue; // Skip if either combatant lacks combat stats
-          }
-          const { attackerPower, defenderPower, modifiers } = this.calculateCombatPower(
-            world,
-            entity,
-            defender,
-            attackerStats,
-            defenderStats,
-            conflict
-          );
+        const attackerStats = world.getComponent<CombatStatsComponent>(entity.id, 'combat_stats');
+        const defenderStats = world.getComponent<CombatStatsComponent>(defender.id, 'combat_stats');
+        if (!attackerStats || !defenderStats) {
+          // This should never happen after validation above, but keep for safety
+          continue;
+        }
 
-          const attackerImpl = entity as EntityImpl;
-          attackerImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
-            ...c,
-            state: 'fighting',
-            endTime: duration, // Store remaining ticks until combat ends
+        const { attackerPower, defenderPower, modifiers } = this.calculateCombatPower(
+          world,
+          entity,
+          defender,
+          attackerStats,
+          defenderStats,
+          conflict
+        );
+
+        const attackerImpl = entity as EntityImpl;
+        attackerImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+          ...c,
+          state: 'fighting',
+          endTime: duration, // Store remaining ticks until combat ends
+          attackerPower,
+          defenderPower,
+          modifiers,
+        }));
+
+        // Emit combat:started event
+        if (this.eventBus) {
+          this.eventBus.emit('combat:started', {
+            attackerId: entity.id,
+            defenderId: conflict.target,
+            cause: conflict.cause,
+            startTime: conflict.startTime,
+            duration,
             attackerPower,
             defenderPower,
-            modifiers,
-          }));
-
-          // Emit combat:started event
-          if (this.eventBus) {
-            this.eventBus.emit('combat:started', {
-              attackerId: entity.id,
-              defenderId: conflict.target,
-              cause: conflict.cause,
-              startTime: conflict.startTime,
-              duration,
-              attackerPower,
-              defenderPower,
-            });
-          }
+          });
         }
       } else if (conflict.state === 'fighting') {
         // Decrement remaining combat time
