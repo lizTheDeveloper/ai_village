@@ -665,9 +665,95 @@ If Playwright errors on navigation, close existing tabs first with `browser_clos
 
 ## Verification Before Completion
 
-1. **Run the build** - `npm run build` must pass
-2. **Check console errors** - Verify no runtime errors in browser
-3. **Test error paths** - Verify exceptions are thrown for invalid input
+**CRITICAL: Always verify your changes before marking work complete.**
+
+### 1. Run Tests
+
+Run the test suite and ensure all tests pass:
+
+```bash
+cd custom_game_engine
+npm test
+```
+
+**For specific package tests:**
+```bash
+cd custom_game_engine/packages/core
+npm test
+```
+
+**If tests fail:**
+- Fix the failing tests
+- DO NOT commit broken tests
+- DO NOT skip tests or mark work complete with failing tests
+
+### 2. Run the Build
+
+Ensure TypeScript compilation succeeds:
+
+```bash
+cd custom_game_engine
+npm run build
+```
+
+**Must pass without errors.** Build failures indicate type errors or missing dependencies.
+
+### 3. Validate in Browser
+
+**Start the game and verify in the browser:**
+
+```bash
+cd custom_game_engine && ./start.sh
+```
+
+**Check for console errors:**
+1. Open browser DevTools (F12)
+2. Check the Console tab for errors (red messages)
+3. Interact with your changes in the UI
+4. Verify no runtime errors or warnings appear
+
+**Test your specific changes:**
+- If you modified a system, verify it runs without errors
+- If you added UI, verify it renders correctly
+- If you changed behavior, verify the new behavior works
+
+**Common things to check:**
+- No red errors in console
+- No unhandled promise rejections
+- UI renders without visual glitches
+- Game simulation continues running (check TPS in metrics)
+- No infinite loops or performance issues
+
+### 4. Test Error Paths
+
+Verify your code handles errors gracefully:
+
+```typescript
+// ❌ BAD: Silent failures
+const data = getData() || defaultValue;
+
+// ✅ GOOD: Explicit error handling
+const data = getData();
+if (!data) {
+  throw new Error('Failed to get required data');
+}
+```
+
+**Test with invalid inputs:**
+- Pass `null`, `undefined`, `NaN` to your functions
+- Verify appropriate errors are thrown
+- Check edge cases (empty arrays, zero values, negative numbers)
+
+### Summary Checklist
+
+Before marking work complete:
+
+- [ ] `npm test` passes (all tests green)
+- [ ] `npm run build` passes (no TypeScript errors)
+- [ ] Game runs in browser without console errors
+- [ ] Your specific changes work as expected
+- [ ] Error paths throw appropriate exceptions
+- [ ] No performance regressions (check TPS/FPS)
 
 ## Debug Actions API
 
