@@ -812,3 +812,23 @@ export {
   SoulNameGenerator,
   soulNameGenerator,
 } from './SoulNameGenerator.js';
+
+// ============================================================================
+// Belief Attribution System
+// ============================================================================
+export {
+  // Types
+  type PerceivedPower,
+  type DeityPerceivedIdentity,
+  type MiracleWitnessResult,
+  type PrayerAnsweredResult,
+  type MisattributedEventResult,
+  type BeliefContribution,
+
+  // Functions
+  createInitialPerceivedIdentity,
+  processMiracleWitness,
+  processPrayerAnswered,
+  processMisattributedEvent,
+  calculateBeliefContribution,
+} from './BeliefAttributionTypes.js';
