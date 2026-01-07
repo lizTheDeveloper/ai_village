@@ -48,7 +48,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator with 100 kW, consumer with 50 kW
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       const consumer = world.createEntity();
       (consumer as EntityImpl).addComponent(createPositionComponent(0, 0));
@@ -68,7 +68,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator with 100 kW, two consumers with 30 kW each
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       const consumer1 = world.createEntity();
       (consumer1 as EntityImpl).addComponent(createPositionComponent(0, 0));
@@ -97,7 +97,7 @@ describe('Power Consumption System', () => {
       // Arrange: Create generator with 100 kW output
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       // Act: Run power grid system
       const entities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -130,11 +130,11 @@ describe('Power Consumption System', () => {
       // Arrange: Two generators with 50 kW each
       const generator1 = world.createEntity();
       (generator1 as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator1 as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50));
+      (generator1 as EntityImpl).addComponent(createPowerProducer('electrical', 50));
 
       const generator2 = world.createEntity();
       (generator2 as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator2 as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50));
+      (generator2 as EntityImpl).addComponent(createPowerProducer('electrical', 50));
 
       // Act: Run power grid system
       const entities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -151,7 +151,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator with 50 kW, consumer with 100 kW
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 50));
 
       const consumer = world.createEntity();
       (consumer as EntityImpl).addComponent(createPositionComponent(0, 0));
@@ -170,7 +170,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator with 50 kW, consumer with 100 kW
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 50));
 
       const consumer = world.createEntity();
       (consumer as EntityImpl).addComponent(createPositionComponent(0, 0));
@@ -211,7 +211,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator with 100 kW, critical consumer (50 kW), normal consumer (100 kW)
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       const criticalConsumer = world.createEntity();
       (criticalConsumer as EntityImpl).addComponent(createPositionComponent(0, 0));
@@ -241,7 +241,7 @@ describe('Power Consumption System', () => {
     it('should handle entities with missing components gracefully', () => {
       // Arrange: Entity with Power but no Position
       const entity = world.createEntity();
-      (entity as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (entity as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       // Act: Should not crash
       const entities = world.query().with(CT.Power).executeEntities();
@@ -274,11 +274,11 @@ describe('Power Consumption System', () => {
       // Arrange: Electrical generator and mechanical generator at same position
       const electricalGen = world.createEntity();
       (electricalGen as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (electricalGen as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (electricalGen as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       const mechanicalGen = world.createEntity();
       (mechanicalGen as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (mechanicalGen as EntityImpl).addComponent(CT.Power, createPowerProducer('mechanical', 50));
+      (mechanicalGen as EntityImpl).addComponent(createPowerProducer('mechanical', 50));
 
       // Act: Run power grid system
       const entities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -299,7 +299,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator at (0,0), consumer at (100,100) - too far apart
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100, 0)); // No connection range
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100, 0)); // No connection range
 
       const consumer = world.createEntity();
       (consumer as EntityImpl).addComponent(createPositionComponent(100, 100));
@@ -322,7 +322,7 @@ describe('Power Consumption System', () => {
       // Arrange: Generator -> Power Pole -> Consumer
       const generator = world.createEntity();
       (generator as EntityImpl).addComponent(createPositionComponent(0, 0));
-      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100));
+      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100));
 
       const powerPole = world.createEntity();
       (powerPole as EntityImpl).addComponent(createPositionComponent(0, 0));
