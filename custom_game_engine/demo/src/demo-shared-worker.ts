@@ -29,6 +29,16 @@ let tickCount = 0;
 console.log('[Demo] Connecting to Universe SharedWorker...');
 universeClient.connect();
 
+// Set viewport for spatial culling
+// Demo uses a fixed 800x600 viewport centered at (400, 300)
+universeClient.setViewport({
+  x: 400,
+  y: 300,
+  width: 800,
+  height: 600,
+  margin: 100,  // Extra margin for smooth scrolling
+});
+
 // Subscribe to state updates
 const unsubscribe = universeClient.subscribe((state: UniverseState) => {
   currentState = state;

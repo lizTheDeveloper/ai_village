@@ -46,4 +46,5 @@ export type {
   WorkerToWindowMessage,
   WindowToWorkerMessage,
   UniverseDatabase,
+  Viewport,
 } from './types.js';

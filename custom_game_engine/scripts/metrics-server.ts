@@ -3920,6 +3920,141 @@ Generated: ${formatTimestamp(now)}
   return output;
 }
 
+/**
+ * Generate scheduler metrics dashboard
+ */
+async function generateSchedulerDashboard(sessionId?: string): Promise<string> {
+  const gameClient = sessionId ? getGameClientForSession(sessionId) : getActiveGameClient();
+
+  if (!gameClient) {
+    return `
+================================================================================
+  LLM SCHEDULER DASHBOARD
+================================================================================
+
+No game client connected.
+${sessionId ? `Session: ${sessionId}` : 'Waiting for game session...'}
+
+Start a game to see scheduler metrics.
+
+================================================================================
+`;
+  }
+
+  let schedulerData: any;
+  try {
+    schedulerData = await sendQueryToGame(gameClient, 'scheduler');
+  } catch (err) {
+    return `
+================================================================================
+  LLM SCHEDULER DASHBOARD
+================================================================================
+
+Error querying scheduler: ${err instanceof Error ? err.message : 'Unknown error'}
+
+${sessionId ? `Session: ${sessionId}` : 'Unknown session'}
+
+================================================================================
+`;
+  }
+
+  const {
+    layerSelections = {},
+    cooldownHits = {},
+    totalRequests = 0,
+    successfulCalls = 0,
+    failedCalls = 0,
+    averageUrgency = {},
+    uptime = 0,
+    resetAt = Date.now()
+  } = schedulerData;
+
+  const totalSelections = (layerSelections.autonomic || 0) + (layerSelections.talker || 0) + (layerSelections.executor || 0);
+  const totalCooldownHits = (cooldownHits.autonomic || 0) + (cooldownHits.talker || 0) + (cooldownHits.executor || 0);
+  const successRate = totalRequests > 0 ? ((successfulCalls / totalRequests) * 100).toFixed(1) : '0.0';
+
+  const uptimeHours = Math.floor(uptime / 3600000);
+  const uptimeMinutes = Math.floor((uptime % 3600000) / 60000);
+  const uptimeSeconds = Math.floor((uptime % 60000) / 1000);
+
+  let output = `
+================================================================================
+  LLM SCHEDULER DASHBOARD
+================================================================================
+
+Session: ${sessionId || 'unknown'}
+Uptime: ${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s
+
+=== OVERVIEW ===
+
+Total Decision Requests:  ${totalRequests}
+Successful LLM Calls:     ${successfulCalls} (${successRate}%)
+Failed LLM Calls:         ${failedCalls}
+Cooldown Blocked:         ${totalCooldownHits}
+
+=== LAYER SELECTION DISTRIBUTION ===
+
+`;
+
+  const layers: Array<'autonomic' | 'talker' | 'executor'> = ['autonomic', 'talker', 'executor'];
+  for (const layer of layers) {
+    const count = layerSelections[layer] || 0;
+    const percentage = totalSelections > 0 ? ((count / totalSelections) * 100).toFixed(1) : '0.0';
+    const avgUrgency = averageUrgency[layer] || 0;
+    const cooldowns = cooldownHits[layer] || 0;
+    const cooldownRate = count > 0 ? ((cooldowns / count) * 100).toFixed(1) : '0.0';
+
+    // Bar chart visualization
+    const barLength = Math.floor((count / Math.max(totalSelections, 1)) * 40);
+    const bar = '█'.repeat(barLength) + '░'.repeat(40 - barLength);
+
+    output += `${layer.toUpperCase().padEnd(12)} │ ${bar} │ ${String(count).padStart(4)} (${percentage}%)\n`;
+    output += `${''.padEnd(12)} │ Avg Urgency: ${avgUrgency.toFixed(1)}/10\n`;
+    output += `${''.padEnd(12)} │ Cooldown Hits: ${cooldowns} (${cooldownRate}% blocked)\n\n`;
+  }
+
+  output += `
+=== PERFORMANCE METRICS ===
+
+Decision Success Rate:    ${successRate}%
+Average Urgency (All):    ${totalSelections > 0 ? ((Object.values(averageUrgency).reduce((a: number, b: number) => a + b, 0) as number) / 3).toFixed(1) : '0.0'}/10
+Total Cooldown Blocks:    ${totalCooldownHits}
+
+=== LAYER CONFIGURATIONS ===
+
+(This shows default cooldowns - actual values may vary by configuration)
+
+Autonomic:  1000ms cooldown   (High priority, fast reflexes)
+Talker:     5000ms cooldown   (Medium priority, social)
+Executor:   10000ms cooldown  (Low priority, strategic planning)
+
+=== INTERPRETATION ===
+
+Layer Distribution:
+- High autonomic %: Agents focusing on survival/immediate needs
+- High talker %: Active social interactions and conversations
+- High executor %: Strategic planning and task completion
+
+Cooldown Blocks:
+- High blocks: System is respecting rate limits (good)
+- Low blocks: Either low activity or cooldowns may be too permissive
+
+Success Rate:
+- High rate (>90%): LLM provider stable and responsive
+- Low rate (<70%): Investigate LLM errors or quota limits
+
+================================================================================
+
+API Endpoints:
+- Raw data:  curl http://localhost:${HTTP_PORT}/api/live/scheduler?session=${sessionId || 'latest'}
+- Dashboard: curl http://localhost:${HTTP_PORT}/dashboard/scheduler?session=${sessionId || 'latest'}
+
+================================================================================
+`;
+
+  return output;
+}
+
 console.log(`
 ====================================
   Metrics Streaming Server
@@ -4266,6 +4401,18 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     const metrics = getMetricsForRequest(url);
     res.end(generateAgentReport(metrics));
+    return;
+  }
+
+  if (pathname === '/dashboard/scheduler') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const sessionId = sessionParam === 'latest' ? getLatestSessionId() : sessionParam || undefined;
+
+    const dashboard = await generateSchedulerDashboard(sessionId);
+    res.end(dashboard);
     return;
   }
 

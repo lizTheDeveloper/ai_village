@@ -75,6 +75,14 @@ export interface AgentSpawnHandler {
   spawnVillage: (count: number, x: number, y: number) => string[];
 }
 
+/** LLM Scheduler interface for DevPanel integration */
+export interface LLMScheduler {
+  selectLayer(agent: any, world: any): { layer: string; reason: string; urgency: number };
+  isLayerReady(agentId: string, layer: string): boolean;
+  getTimeUntilReady(agentId: string, layer: string): number;
+  getLayerConfig(layer: string): { cooldownMs: number; priority: number; enabled: boolean };
+}
+
 interface ClickRegion {
   x: number;
   y: number;
@@ -396,6 +404,7 @@ export class DevPanel implements IWindowPanel {
   private actionLog: string[] = [];
   private world: World | null = null;
   private agentSpawnHandler: AgentSpawnHandler | null = null;
+  private scheduler: LLMScheduler | null = null;
 
   // Spawn location state (deprecated - use click-to-place)
   private spawnX = 50;
@@ -515,6 +524,13 @@ export class DevPanel implements IWindowPanel {
    */
   setAgentSpawnHandler(handler: AgentSpawnHandler): void {
     this.agentSpawnHandler = handler;
+  }
+
+  /**
+   * Set the LLM scheduler (called from main.ts)
+   */
+  setScheduler(scheduler: LLMScheduler | null): void {
+    this.scheduler = scheduler;
   }
 
   /**
@@ -1105,7 +1121,120 @@ export class DevPanel implements IWindowPanel {
       y += SIZES.buttonHeight + 4;
     }
 
+    // LLM Scheduler Info (if available and agent selected)
+    if (this.scheduler && this.selectedAgentId && this.world) {
+      const selectedAgent = this.world.getEntity(this.selectedAgentId);
+      if (selectedAgent) {
+        y = this.renderSchedulerInfo(ctx, width, y, selectedAgent);
+      }
+    }
+
     return y + SIZES.padding;
+  }
+
+  /**
+   * Render LLM scheduler information for the selected agent
+   */
+  private renderSchedulerInfo(ctx: CanvasRenderingContext2D, width: number, y: number, agent: any): number {
+    if (!this.scheduler || !this.world) return y;
+
+    y = this.renderSectionHeader(ctx, width, y, 'LLM SCHEDULER');
+
+    // Get agent name
+    const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+    const name = identity?.name || 'Unnamed';
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText(`Selected: ${name}`, SIZES.padding, y + 6);
+    y += 18;
+
+    // Get layer selection
+    const layerSelection = this.scheduler.selectLayer(agent, this.world);
+
+    // Current layer (what would be selected now)
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('Recommended Layer:', SIZES.padding, y + 6);
+    y += 14;
+
+    ctx.fillStyle = this.getLayerColor(layerSelection.layer);
+    ctx.font = '11px monospace';
+    ctx.fillText(`  ${layerSelection.layer.toUpperCase()}`, SIZES.padding, y + 6);
+    y += 14;
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '8px monospace';
+    ctx.fillText(`  ${layerSelection.reason}`, SIZES.padding, y + 6);
+    y += 12;
+
+    ctx.fillText(`  Urgency: ${layerSelection.urgency}/10`, SIZES.padding, y + 6);
+    y += 18;
+
+    // Layer cooldown status
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('Layer Cooldowns:', SIZES.padding, y + 6);
+    y += 14;
+
+    const layers: Array<'autonomic' | 'talker' | 'executor'> = ['autonomic', 'talker', 'executor'];
+    for (const layer of layers) {
+      const isReady = this.scheduler.isLayerReady(agent.id, layer);
+      const timeUntilReady = this.scheduler.getTimeUntilReady(agent.id, layer);
+      const config = this.scheduler.getLayerConfig(layer);
+
+      ctx.fillStyle = this.getLayerColor(layer);
+      ctx.font = '9px monospace';
+      ctx.fillText(`  ${layer}:`, SIZES.padding, y + 6);
+
+      if (isReady) {
+        ctx.fillStyle = COLORS.success;
+        ctx.fillText('READY', SIZES.padding + 90, y + 6);
+      } else {
+        ctx.fillStyle = COLORS.warning;
+        const secondsLeft = Math.ceil(timeUntilReady / 1000);
+        ctx.fillText(`${secondsLeft}s`, SIZES.padding + 90, y + 6);
+
+        // Draw cooldown bar
+        const barWidth = 60;
+        const barX = SIZES.padding + 130;
+        const barY = y + 2;
+        const barHeight = 8;
+
+        // Background
+        ctx.fillStyle = COLORS.sliderBg;
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+
+        // Progress
+        const progress = 1 - (timeUntilReady / config.cooldownMs);
+        ctx.fillStyle = this.getLayerColor(layer);
+        ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+      }
+
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '7px monospace';
+      ctx.fillText(`(${config.cooldownMs}ms)`, width - 70, y + 6);
+
+      y += 14;
+    }
+
+    return y + SIZES.padding;
+  }
+
+  /**
+   * Get color for layer display
+   */
+  private getLayerColor(layer: string): string {
+    switch (layer) {
+      case 'autonomic':
+        return '#FF6B6B'; // Red - urgent/reflexive
+      case 'talker':
+        return '#4ECDC4'; // Cyan - social
+      case 'executor':
+        return '#95E1D3'; // Green - planning
+      default:
+        return COLORS.text;
+    }
   }
 
   private renderWorldSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {

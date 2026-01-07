@@ -2778,12 +2778,8 @@ export class Renderer {
 
     // No target found
     if (targetX === undefined || targetY === undefined) {
-      console.log('[NavLine] No target found - has steering:', !!steering, 'steering.target:', !!steering?.target, 'has action_queue:', !!entity.getComponent('action_queue'));
       return;
     }
-
-    // Debug: Log when we're about to draw the line
-    console.log('[NavLine] Drawing navigation line to:', { x: targetX, y: targetY });
 
     const currentX = position.x * this.tileSize + (this.tileSize / 2);
     const currentY = position.y * this.tileSize + (this.tileSize / 2);

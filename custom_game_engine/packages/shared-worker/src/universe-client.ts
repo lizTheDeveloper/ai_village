@@ -11,6 +11,7 @@ import type {
   StateCallback,
   WorkerToWindowMessage,
   WindowToWorkerMessage,
+  Viewport,
 } from './types.js';
 
 /**
@@ -192,6 +193,25 @@ export class UniverseClient {
 
     const message: WindowToWorkerMessage = {
       type: 'resume',
+    };
+
+    this.port.postMessage(message);
+  }
+
+  /**
+   * Set viewport for spatial culling
+   *
+   * Only entities within the viewport (plus margin) will be synchronized.
+   * This significantly reduces network transfer for large worlds.
+   *
+   * @param viewport Viewport bounds (center x, y, width, height)
+   */
+  setViewport(viewport: Viewport): void {
+    if (!this.port) return;
+
+    const message: WindowToWorkerMessage = {
+      type: 'set-viewport',
+      viewport,
     };
 
     this.port.postMessage(message);

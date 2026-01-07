@@ -20,6 +20,7 @@ import type {
   WorkerToWindowMessage,
   WindowToWorkerMessage,
   SerializedWorld,
+  Viewport,
 } from './types.js';
 
 /**
@@ -132,23 +133,25 @@ class UniverseWorker {
 
   /**
    * Broadcast state to all connected windows
+   * Uses spatial culling - each window only receives entities in its viewport
    */
   private broadcast(): void {
     if (this.connections.size === 0) return;
-
-    const state = this.serializeState();
-
-    const message: WorkerToWindowMessage = {
-      type: 'tick',
-      tick: this.tick,
-      state,
-      timestamp: Date.now(),
-    };
 
     for (const [id, conn] of this.connections) {
       if (!conn.connected) continue;
 
       try {
+        // Serialize state for this connection's viewport
+        const state = this.serializeState(conn.viewport);
+
+        const message: WorkerToWindowMessage = {
+          type: 'tick',
+          tick: this.tick,
+          state,
+          timestamp: Date.now(),
+        };
+
         conn.port.postMessage(message);
         conn.lastActivity = Date.now();
       } catch (error) {
@@ -192,9 +195,11 @@ class UniverseWorker {
 
   /**
    * Serialize current state for transfer/storage
+   *
+   * @param viewport Optional viewport for spatial culling
    */
-  private serializeState(): UniverseState {
-    const world = this.serializeWorld();
+  private serializeState(viewport?: Viewport): UniverseState {
+    const world = this.serializeWorld(viewport);
 
     return {
       tick: this.tick,
@@ -209,13 +214,23 @@ class UniverseWorker {
 
   /**
    * Serialize world state
+   *
+   * @param viewport Optional viewport for spatial culling
    */
-  private serializeWorld(): SerializedWorld {
+  private serializeWorld(viewport?: Viewport): SerializedWorld {
     const entities: Record<string, Record<string, any>> = {};
 
-    // Serialize all entities
+    // Serialize entities (with optional spatial culling)
     const allEntities = this.gameLoop.world.getAllEntities();
     for (const entity of allEntities) {
+      // Spatial culling: skip entities outside viewport
+      if (viewport) {
+        const position = entity.getComponent('position');
+        if (position && !this.isInViewport(position, viewport)) {
+          continue;  // Skip entity outside viewport
+        }
+      }
+
       const components: Record<string, any> = {};
 
       for (const [type, component] of entity.getAllComponents()) {
@@ -372,6 +387,13 @@ class UniverseWorker {
         this.config.speedMultiplier = message.speed;
         console.log(`[UniverseWorker] Speed set to ${message.speed}x`);
         break;
+
+      case 'set-viewport':
+        conn.viewport = message.viewport;
+        if (this.config.debug) {
+          console.log(`[UniverseWorker] Connection ${connectionId} viewport: ${message.viewport.width}x${message.viewport.height} @ (${message.viewport.x}, ${message.viewport.y})`);
+        }
+        break;
     }
   }
 
@@ -427,6 +449,29 @@ class UniverseWorker {
     });
 
     console.log(`[UniverseWorker] Spawned agent "${name}" at (${x}, ${y})`);
+  }
+
+  /**
+   * Check if position is within viewport bounds
+   *
+   * @param position Entity position component
+   * @param viewport Viewport bounds
+   * @returns true if position is visible in viewport
+   */
+  private isInViewport(position: any, viewport: Viewport): boolean {
+    const margin = viewport.margin || 50;  // Default margin for smooth scrolling
+
+    const minX = viewport.x - viewport.width / 2 - margin;
+    const maxX = viewport.x + viewport.width / 2 + margin;
+    const minY = viewport.y - viewport.height / 2 - margin;
+    const maxY = viewport.y + viewport.height / 2 + margin;
+
+    return (
+      position.x >= minX &&
+      position.x <= maxX &&
+      position.y >= minY &&
+      position.y <= maxY
+    );
   }
 
   /**

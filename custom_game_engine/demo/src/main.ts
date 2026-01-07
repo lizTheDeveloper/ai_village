@@ -760,9 +760,13 @@ async function registerAllSystems(
       if (executorPromptBuilder) {
         liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
       }
-      // Wire up scheduler for metrics queries
+      // Wire up scheduler for metrics queries and DevPanel
       if (scheduler) {
         liveEntityAPI.setScheduler(scheduler);
+        // devPanel may not exist yet - it's created in setupWindowManager after registerAllSystems
+        if (devPanel) {
+          devPanel.setScheduler(scheduler);
+        }
       }
       liveEntityAPI.setAgentDebugManager(agentDebugManager);
       liveEntityAPI.attach(streamClient);

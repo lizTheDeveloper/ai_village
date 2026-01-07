@@ -124,6 +124,10 @@ export type WindowToWorkerMessage =
   | {
       type: 'set-speed';
       speed: number; // 0.5x, 1x, 2x, etc.
+    }
+  | {
+      type: 'set-viewport';
+      viewport: Viewport;
     };
 
 /**
@@ -157,6 +161,22 @@ export interface UniverseDatabase {
 }
 
 /**
+ * Viewport for spatial culling
+ */
+export interface Viewport {
+  /** Center X coordinate */
+  x: number;
+  /** Center Y coordinate */
+  y: number;
+  /** Viewport width */
+  width: number;
+  /** Viewport height */
+  height: number;
+  /** Margin beyond viewport (for smooth scrolling) */
+  margin?: number;
+}
+
+/**
  * Connection info tracked by worker
  */
 export interface ConnectionInfo {
@@ -165,6 +185,8 @@ export interface ConnectionInfo {
   subscribedDomains: Set<string>;
   connected: boolean;
   lastActivity: number;
+  /** Viewport for spatial culling (optional) */
+  viewport?: Viewport;
 }
 
 /**
