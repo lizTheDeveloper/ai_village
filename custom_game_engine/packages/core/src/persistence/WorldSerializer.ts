@@ -68,7 +68,7 @@ export class WorldSerializer {
 
       time: {
         universeId,
-        universeTick: '0',  // Will be set by MultiverseCoordinator
+        universeTick: world.tick.toString(),  // Persist actual tick for time continuity
         timeScale: 1.0,
         day: timeComponent?.day ?? 1,
         timeOfDay: timeComponent?.timeOfDay ?? 6,
@@ -143,7 +143,20 @@ export class WorldSerializer {
       zoneManager.deserializeZones(snapshot.worldState.zones);
     }
 
-    // TODO: Deserialize weather, buildings
+    // Restore tick state for time continuity
+    // This is critical: without this, world.tick resets to 0 but entities have old createdAt values,
+    // breaking all time-delta calculations (pregnancies, cooldowns, behavior states, caches)
+    const universeTick = parseInt(snapshot.time.universeTick || '0', 10);
+    if (!isNaN(universeTick) && universeTick > 0) {
+      worldImpl.setTick(universeTick);
+    }
+
+    // Emit world:loaded event for systems to invalidate their caches
+    worldImpl.eventBus.emit({
+      type: 'world:loaded',
+      source: 'world_serializer',
+      data: { tick: universeTick, entityCount: snapshot.entities.length },
+    });
 
   }
 
@@ -200,6 +213,7 @@ export class WorldSerializer {
       $schema: 'https://aivillage.dev/schemas/entity/v1',
       $version: 1,
       id: entity.id,
+      createdAt: entity.createdAt,  // Preserve creation tick for time-delta calculations
       components,
     };
   }
@@ -235,8 +249,9 @@ export class WorldSerializer {
     // Import Entity implementation
     const { EntityImpl } = await import('../ecs/Entity.js');
 
-    // Create entity with ID and createdAt (0 for now, will be set by world)
-    const entity = new EntityImpl(data.id, 0);
+    // Create entity with ID and restored createdAt (fallback to 0 for old saves without createdAt)
+    const createdAt = data.createdAt ?? 0;
+    const entity = new EntityImpl(data.id, createdAt);
 
     // Deserialize all components
     for (const componentData of data.components) {

@@ -32,12 +32,12 @@ export interface ProviderRateLimits {
 
 export const DEFAULT_RATE_LIMITS: ProviderRateLimits = {
   groq: {
-    requestsPerMinute: 2000, // 2000 requests per minute (user's actual limit)
-    burstSize: 100,
+    requestsPerMinute: 1000, // 1000 requests per minute per provider
+    burstSize: 50,
   },
   cerebras: {
-    requestsPerMinute: 2000, // 2000 requests per minute (user's actual limit)
-    burstSize: 100,
+    requestsPerMinute: 1000, // 1000 requests per minute per provider
+    burstSize: 50,
   },
   openai: {
     requestsPerMinute: 10, // Conservative estimate
@@ -82,35 +82,12 @@ export class CooldownCalculator {
    * @returns Cooldown in milliseconds
    */
   calculateCooldown(provider: string, apiKeyHash?: string): number {
-    // Get rate limit for this provider/API key
-    let rateLimit: RateLimitConfig | undefined;
-
-    if (apiKeyHash && this.rateLimits.customKeys.has(apiKeyHash)) {
-      rateLimit = this.rateLimits.customKeys.get(apiKeyHash);
-    } else {
-      rateLimit = this.rateLimits[provider as keyof Omit<ProviderRateLimits, 'customKeys'>];
-    }
-
-    if (!rateLimit) {
-      console.warn(`[CooldownCalculator] No rate limit for provider: ${provider}`);
-      return 5000; // Default 5s cooldown
-    }
-
-    // Count active games
-    const activeGames = this.sessionManager.getActiveSessionCount();
-
-    if (activeGames === 0) return 0; // No cooldown if no games
-
-    // Calculate per-game request rate
-    // Formula: cooldownMs = (60000ms / requestsPerMinute) * activeGames
-    const cooldownMs = (60000 / rateLimit.requestsPerMinute) * activeGames;
-
-    console.log(
-      `[CooldownCalculator] ${provider}: ${rateLimit.requestsPerMinute} RPM, ` +
-        `${activeGames} games → ${cooldownMs.toFixed(0)}ms cooldown per game`
-    );
-
-    return Math.ceil(cooldownMs);
+    // DISABLED: Per-session cooldowns are wrong for single-player games.
+    // The queue's maxConcurrent handles rate limiting properly.
+    // Multiple agents in the same session should NOT wait for each other.
+    // With 1000 RPM, agents should be able to make requests in parallel,
+    // limited only by the queue's maxConcurrent, not artificial session cooldowns.
+    return 0;
   }
 
   /**

@@ -26,6 +26,7 @@ export interface GameEventMap {
   // === World & Time Events ===
   'world:tick:start': { tick: number };
   'world:tick:end': { tick: number };
+  'world:loaded': { tick: number; entityCount: number };  // Emitted after world state is restored from save
   'world:time:hour': { hour: number; day: number };
   'world:time:day': { day: number; season: string };
   'world:time:season': { season: string; year: number };

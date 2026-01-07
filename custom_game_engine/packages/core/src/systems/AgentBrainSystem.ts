@@ -253,8 +253,8 @@ export class AgentBrainSystem implements System {
       // Skip AI processing when agent is player-controlled (Phase 16: Player Avatar System)
       if (agent.behavior === 'player_controlled') continue;
 
-      // Check think interval
-      const shouldThink = this.shouldThink(agent, world.tick);
+      // Check think interval with dynamic staggering
+      const shouldThink = this.shouldThink(impl, agent, world);
       if (!shouldThink) continue;
 
       // Update last think time
@@ -277,9 +277,18 @@ export class AgentBrainSystem implements System {
   }
 
   /**
-   * Check if agent should think this tick.
+   * Check if agent should think this tick with dynamic staggering.
+   *
+   * Agents are staggered based on their position in the agent list to distribute
+   * LLM requests evenly across time. With 5 agents and thinkInterval=20:
+   * - Agent 0: thinks at ticks 0, 20, 40... (offset 0)
+   * - Agent 1: thinks at ticks 4, 24, 44... (offset 4)
+   * - Agent 2: thinks at ticks 8, 28, 48... (offset 8)
+   * - Agent 3: thinks at ticks 12, 32, 52... (offset 12)
+   * - Agent 4: thinks at ticks 16, 36, 56... (offset 16)
    */
-  private shouldThink(agent: AgentComponent, currentTick: number): boolean {
+  private shouldThink(entity: EntityImpl, agent: AgentComponent, world: World): boolean {
+    const currentTick = world.tick;
     const ticksSinceLastThink = currentTick - agent.lastThinkTick;
 
     // Handle save/load case where lastThinkTick is in the future (world tick reset to 0)
@@ -288,7 +297,32 @@ export class AgentBrainSystem implements System {
       return true;
     }
 
-    return ticksSinceLastThink >= agent.thinkInterval;
+    // Dynamic staggering: distribute agents evenly across think interval
+    // This prevents all agents from thinking simultaneously
+    const allAgents = world.query().with(CT.Agent).executeEntities();
+    const agentCount = allAgents.length;
+
+    if (agentCount <= 1) {
+      // No staggering needed for single agent
+      return ticksSinceLastThink >= agent.thinkInterval;
+    }
+
+    // Find this agent's index in the list (stable ordering)
+    const agentIndex = allAgents.findIndex((a) => a.id === entity.id);
+    if (agentIndex === -1) {
+      // Agent not found (shouldn't happen), think immediately
+      return true;
+    }
+
+    // Calculate stagger offset: spread agents evenly across think interval
+    const staggerOffset = Math.floor((agentIndex * agent.thinkInterval) / agentCount);
+
+    // Check if enough time has passed since last think, accounting for stagger
+    // Agent should think when: (currentTick - staggerOffset) >= (lastThinkTick + thinkInterval)
+    const adjustedTick = currentTick - staggerOffset;
+    const nextThinkTick = agent.lastThinkTick + agent.thinkInterval;
+
+    return adjustedTick >= nextThinkTick;
   }
 
   /**

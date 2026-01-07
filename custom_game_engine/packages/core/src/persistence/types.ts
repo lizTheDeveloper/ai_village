@@ -51,6 +51,8 @@ export interface VersionedComponent extends Versioned {
 export interface VersionedEntity extends Versioned {
   $schema: 'https://aivillage.dev/schemas/entity/v1';
   id: string;
+  /** Tick when this entity was created (for time-delta calculations) */
+  createdAt?: number;
   components: VersionedComponent[];
 }
 

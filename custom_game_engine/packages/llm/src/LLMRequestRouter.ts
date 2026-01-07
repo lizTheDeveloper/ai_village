@@ -94,24 +94,24 @@ export class LLMRequestRouter {
     this.providerMappings.set('qwen/qwen3-32b', {
       provider: 'groq',
       queue: 'groq',
-      fallbackChain: ['cerebras'],
+      fallbackChain: [], // Temporarily disabled until Cerebras is configured
     });
     this.providerMappings.set('llama-3.3-70b-versatile', {
       provider: 'groq',
       queue: 'groq',
-      fallbackChain: ['cerebras'],
+      fallbackChain: [], // Temporarily disabled until Cerebras is configured
     });
 
-    // Cerebras models
+    // Cerebras models (will be enabled when API key is configured)
     this.providerMappings.set('llama-3.3-70b', {
       provider: 'cerebras',
       queue: 'cerebras',
-      fallbackChain: ['groq'],
+      fallbackChain: [], // Temporarily disabled
     });
     this.providerMappings.set('qwen-3-32b', {
       provider: 'cerebras',
       queue: 'cerebras',
-      fallbackChain: ['groq'],
+      fallbackChain: [], // Temporarily disabled
     });
 
     // OpenAI models
