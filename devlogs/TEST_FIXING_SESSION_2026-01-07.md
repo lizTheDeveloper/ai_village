@@ -1,9 +1,14 @@
 # Test Fixing Session Summary - 2026-01-07
 
 ## Current Test Status
-- **9,068 passing / 610 failing (93.7% pass rate)**
 - Session start: 9,062 passing / 616 failing
-- Net change: +6 passing, -6 failing
+- After BeliefAttribution fix: 9,068 passing / 610 failing
+- After PowerConsumption partial fix: Tests fixed but overall count affected by uncommitted changes from other work
+
+**Tests Fixed This Session:**
+- BeliefAttribution: 7 tests (11 total passing, 0 failing)
+- PowerConsumption: 4 tests (6 passing, 8 still failing)
+- **Total: 11 tests fixed**
 
 ## Fixes Applied This Session
 
@@ -83,7 +88,37 @@
 
 **Impact**: All 7 BeliefAttribution integration tests now passing
 
-## Total Tests Fixed: 16 (across 2 sessions)
+### 4. PowerConsumption Test Setup Bugs (+4 tests, 8 still failing)
+**Problem**: PowerConsumption.test.ts had multiple test setup bugs that prevented power grid tests from working
+
+**Root Causes**:
+1. Test added consumer power component to generator entity instead of consumer entity (line 32)
+2. Position components created manually as objects instead of using `createPositionComponent()`
+3. `addComponent()` called with wrong signature - passed 2 parameters (CT.Power, component) instead of 1 (component)
+
+**Fixes**:
+- Fixed entity assignment bug: changed `(generator as EntityImpl).addComponent(consumerPower)` to `(consumer as EntityImpl).addComponent(consumerPower)`
+- Added import for `createPositionComponent`
+- Replaced all `{ type: 'position', version: 1, x: n, y: m }` with `createPositionComponent(n, m)`
+- Fixed all `addComponent(CT.Power, component)` calls to `addComponent(component)` (component type is embedded in component.type)
+
+**Files Modified**:
+- `packages/core/src/__tests__/PowerConsumption.test.ts`
+
+**Commit**: `fix: Correct PowerConsumption test setup bugs (+4 tests)`
+
+**Impact**: 4 tests now passing (12 failing -> 8 failing)
+- Basic power network creation tests now work
+- Still investigating 8 remaining failures related to isPowered state updates and brownout behavior
+
+**Remaining Issues**:
+- Consumers not being powered even when generators present
+- Some tests still showing empty networks
+- Priority system and efficiency updates not working as expected
+
+## Total Tests Fixed: 20
+- Previous session: 9 tests (4 governance building + 5 AgentCombat)
+- This session continuation: 11 tests (7 BeliefAttribution + 4 PowerConsumption)
 
 ## Methodology
 - Systematic approach: identify high-impact error patterns
@@ -103,3 +138,5 @@
 1. `fix: Add governance building types to BuildingType enum for backwards compatibility`
 2. `fix: Add early validation in AgentCombatSystem for error handling`
 3. `fix: Implement BeliefAttributionTypes for deity perceived identity system`
+4. `fix: Correct PowerConsumption test setup bugs (+4 tests)`
+5. `docs: Update test fixing session summary with BeliefAttribution fix`
