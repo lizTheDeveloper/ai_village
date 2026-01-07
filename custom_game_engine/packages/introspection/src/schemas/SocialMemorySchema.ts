@@ -146,6 +146,9 @@ export const SocialMemorySchema = autoRegister(
     renderers: {
       player: (data) => {
         // Simple count for player UI
+        if (!data.socialMemories || typeof data.socialMemories.size !== 'number') {
+          return 'No memories';
+        }
         const count = data.socialMemories.size;
         if (count === 0) return 'No memories';
         return `${count} social memories`;

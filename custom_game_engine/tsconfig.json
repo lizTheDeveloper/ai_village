@@ -23,13 +23,15 @@
   },
   "include": [],
   "references": [
+    { "path": "./packages/introspection" },
     { "path": "./packages/llm" },
     { "path": "./packages/building-designer" },
     { "path": "./packages/core" },
-    { "path": "./packages/persistence" },
-    { "path": "./packages/metrics" },
-    { "path": "./packages/divinity" },
     { "path": "./packages/magic" },
+    { "path": "./packages/reproduction" },
+    { "path": "./packages/divinity" },
+    { "path": "./packages/metrics" },
+    { "path": "./packages/persistence" },
     { "path": "./packages/world" },
     { "path": "./packages/renderer" }
   ]

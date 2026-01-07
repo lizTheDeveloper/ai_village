@@ -134,6 +134,9 @@ export const RelationshipSchema = autoRegister(
     renderers: {
       player: (data) => {
         // Simple count for player UI
+        if (!data.relationships || typeof data.relationships.size !== 'number') {
+          return '0 relationships';
+        }
         return `${data.relationships.size} relationships`;
       },
     },

@@ -199,12 +199,15 @@ export class RelationshipConversationSystem implements System {
       const alreadyKnown = existingFacts.some(f => f.fact === `interested in ${topic}`);
 
       if (!alreadyKnown) {
-        socialMemory.learnAboutAgent({
-          agentId: teacher.id,
-          fact: `interested in ${topic}`,
-          confidence: 0.7,
-          source: 'conversation',
-        });
+        // Check if method exists (can be lost during deserialization)
+        if (typeof socialMemory.learnAboutAgent === 'function') {
+          socialMemory.learnAboutAgent({
+            agentId: teacher.id,
+            fact: `interested in ${topic}`,
+            confidence: 0.7,
+            source: 'conversation',
+          });
+        }
       }
     }
   }
