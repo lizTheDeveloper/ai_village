@@ -25,7 +25,7 @@ import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 // Import LLMScheduler from llm package
 // Note: This creates a dependency from @ai-village/core → @ai-village/llm
 // which is acceptable since LLM integration is optional
-import type { LLMScheduler, DecisionLayer } from '@ai-village/llm';
+import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '@ai-village/llm';
 
 /**
  * Decision result from ScheduledDecisionProcessor
@@ -70,10 +70,13 @@ export interface ScheduledDecisionResult {
 export class ScheduledDecisionProcessor {
   private scheduler: LLMScheduler;
   private autonomicSystem: AutonomicSystem;
+  private llmDecisionQueue: LLMDecisionQueue;
+  private pendingLayerSelection: Map<string, DecisionLayer> = new Map();
 
-  constructor(scheduler: LLMScheduler) {
+  constructor(scheduler: LLMScheduler, llmDecisionQueue: LLMDecisionQueue) {
     this.scheduler = scheduler;
     this.autonomicSystem = new AutonomicSystem();
+    this.llmDecisionQueue = llmDecisionQueue;
   }
 
   /**
@@ -159,12 +162,13 @@ export class ScheduledDecisionProcessor {
   }
 
   /**
-   * Process decision for an entity (synchronous version).
+   * Process decision for an entity (synchronous queue+poll pattern).
    *
-   * This is a compatibility method for systems that can't use async.
-   * It only checks autonomic layer and returns immediately if no autonomic override.
-   *
-   * For full scheduler functionality, use processAsync instead.
+   * Uses the queue+poll pattern like LLMDecisionProcessor:
+   * 1. Check autonomic layer first (synchronous, fast)
+   * 2. Poll for ready LLM decision from queue
+   * 3. If no ready decision, select layer and request new one (fire-and-forget)
+   * 4. Next tick will poll and get the result
    */
   process(
     entity: EntityImpl,
@@ -173,7 +177,7 @@ export class ScheduledDecisionProcessor {
   ): ScheduledDecisionResult {
     const currentPriority = getBehaviorPriority(agent.behavior);
 
-    // Only autonomic layer in sync mode
+    // Layer 1: Autonomic (highest priority, synchronous)
     const autonomicResult = this.autonomicSystem.check(entity);
     if (autonomicResult && autonomicResult.priority > currentPriority) {
       entity.updateComponent<AgentComponent>('agent', (current) => ({
@@ -192,6 +196,68 @@ export class ScheduledDecisionProcessor {
         reason: autonomicResult.reason,
       };
     }
+
+    // Layer 2 & 3: Poll for ready LLM decision
+    if (!agent.useLLM) {
+      return { changed: false, source: 'none' };
+    }
+
+    // Check if we have a ready decision (queue+poll pattern)
+    const decision = this.llmDecisionQueue.getDecision(entity.id);
+    if (decision) {
+      // Get the layer that made this decision (stored when we requested it)
+      const layer = this.pendingLayerSelection.get(entity.id) || 'executor';
+      this.pendingLayerSelection.delete(entity.id);
+
+      // Parse LLM response
+      const parsed = this.parseLLMResponse(decision);
+
+      if (!parsed) {
+        console.warn(`[ScheduledDecisionProcessor] Failed to parse LLM response for ${entity.id}`);
+        return { changed: false, source: 'none' };
+      }
+
+      // Apply decision to agent
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: parsed.behavior,
+        behaviorState: parsed.behaviorState || {},
+      }));
+
+      return {
+        changed: true,
+        behavior: parsed.behavior,
+        behaviorState: parsed.behaviorState || {},
+        source: layer as any,
+        layer: layer,
+        reason: `Decision from ${layer} layer`,
+      };
+    }
+
+    // No ready decision - request a new one if needed (fire-and-forget)
+    // Select which layer should handle this decision
+    const layerSelection = this.scheduler.selectLayer(entity as any, world);
+
+    // Check if layer is ready (cooldown)
+    if (!this.scheduler.isLayerReady(entity.id, layerSelection.layer)) {
+      return { changed: false, source: 'none' };
+    }
+
+    // Build prompt for selected layer
+    const prompt = this.scheduler.buildPrompt(layerSelection.layer, entity as any, world);
+
+    // Store which layer we're requesting (so we can label it when the response comes back)
+    this.pendingLayerSelection.set(entity.id, layerSelection.layer);
+
+    // Request decision from queue (fire-and-forget, will be ready next tick)
+    this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((error: Error) => {
+      console.error(`[ScheduledDecisionProcessor] LLM decision failed for ${entity.id}:`, error);
+      this.pendingLayerSelection.delete(entity.id);
+    });
+
+    // Mark that we've invoked this layer (for cooldown tracking)
+    const state = (this.scheduler as any).getAgentState(entity.id);
+    state.lastInvocation[layerSelection.layer] = Date.now();
 
     return { changed: false, source: 'none' };
   }
