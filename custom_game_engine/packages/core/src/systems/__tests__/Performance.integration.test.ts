@@ -7,10 +7,12 @@ import { NeedsSystem } from '../NeedsSystem.js';
 import { MovementSystem } from '../MovementSystem.js';
 import { PlantSystem } from '../PlantSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * Integration tests for Performance Monitoring
@@ -36,8 +38,13 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle single agent efficiently', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -53,13 +60,14 @@ describe('Performance Monitoring Integration', () => {
   }));
     agent.addComponent(createCircadianComponent());
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     const startTime = performance.now();
 
     // Single update
     aiSystem.update(harness.world, entities, 1.0);
     needsSystem.update(harness.world, entities, 1.0);
+    stateMutator.update(harness.world, entities, 1.0);
 
     const endTime = performance.now();
     const duration = endTime - startTime;
@@ -69,8 +77,13 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should scale to 10 agents', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -89,12 +102,13 @@ describe('Performance Monitoring Integration', () => {
       agent.addComponent(createCircadianComponent());
     }
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     const startTime = performance.now();
 
     aiSystem.update(harness.world, entities, 1.0);
     needsSystem.update(harness.world, entities, 1.0);
+    stateMutator.update(harness.world, entities, 1.0);
 
     const endTime = performance.now();
     const duration = endTime - startTime;
@@ -104,8 +118,13 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should maintain performance over multiple frames', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const timeSystem = new TimeSystem();
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('TimeSystem', timeSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -119,16 +138,18 @@ describe('Performance Monitoring Integration', () => {
     temperature: 1.0,
   }));
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     const frameTimings: number[] = [];
 
     // Run 100 frames
     for (let i = 0; i < 100; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       const startTime = performance.now();
 
       timeSystem.update(harness.world, entities, 1.0);
       needsSystem.update(harness.world, entities, 1.0);
+      stateMutator.update(harness.world, entities, 1.0);
 
       const endTime = performance.now();
       frameTimings.push(endTime - startTime);
@@ -144,7 +165,12 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should not leak memory over extended run', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -156,13 +182,15 @@ describe('Performance Monitoring Integration', () => {
     temperature: 1.0,
   }));
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     const startTime = performance.now();
 
     // Run many iterations
     for (let i = 0; i < 1000; i++) {
+      harness.world.setTick(harness.world.tick + 120); // Advance 6 game seconds
       needsSystem.update(harness.world, entities, 0.1);
+      stateMutator.update(harness.world, entities, 0.1);
     }
 
     const endTime = performance.now();
@@ -173,9 +201,14 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle mixed entity types efficiently', () => {
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const plantSystem = new PlantSystem(harness.world.eventBus);
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('PlantSystem', plantSystem);
@@ -199,13 +232,14 @@ describe('Performance Monitoring Integration', () => {
       harness.createTestAnimal('chicken', { x: i, y: 10 });
     }
 
-    const entities = Array.from(harness.world.entities.values());
+    const allEntities = harness.world.query().with(ComponentType.Position).executeEntities();
 
     const startTime = performance.now();
 
-    aiSystem.update(harness.world, entities, 1.0);
-    plantSystem.update(harness.world, entities, 1.0);
-    animalSystem.update(harness.world, entities, 1.0);
+    aiSystem.update(harness.world, allEntities, 1.0);
+    plantSystem.update(harness.world, allEntities, 1.0);
+    animalSystem.update(harness.world, allEntities, 1.0);
+    stateMutator.update(harness.world, allEntities, 1.0);
 
     const endTime = performance.now();
     const duration = endTime - startTime;
@@ -277,7 +311,12 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should system updates remain consistent', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -289,14 +328,16 @@ describe('Performance Monitoring Integration', () => {
     temperature: 1.0,
   }));
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     const timings: number[] = [];
 
     // Run 50 updates and measure variance
     for (let i = 0; i < 50; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       const startTime = performance.now();
       needsSystem.update(harness.world, entities, 1.0);
+      stateMutator.update(harness.world, entities, 1.0);
       const endTime = performance.now();
       timings.push(endTime - startTime);
     }
