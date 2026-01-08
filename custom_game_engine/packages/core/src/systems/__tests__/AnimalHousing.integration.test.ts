@@ -4,6 +4,7 @@ import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { AnimalHousingSystem } from '../AnimalHousingSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
 import { BuildingSystem } from '../BuildingSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 /**
@@ -107,7 +108,13 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
 
   it('should animals in housing receive housing effects', () => {
     const housingSystem = new AnimalHousingSystem();
+
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AnimalHousingSystem', housingSystem);
     harness.registerSystem('AnimalSystem', animalSystem);
@@ -146,6 +153,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     // Update systems
     housingSystem.update(harness.world, entities, 1.0);
     animalSystem.update(harness.world, entities, 1.0);
+    stateMutator.update(harness.world, entities, 1.0);
 
     // Animal should receive housing benefits
     const animalComp = animal.getComponent(ComponentType.Animal) as any;
