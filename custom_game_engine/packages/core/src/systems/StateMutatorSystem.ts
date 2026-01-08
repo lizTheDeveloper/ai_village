@@ -260,7 +260,12 @@ export class StateMutatorSystem implements System {
             }
           }
 
-          let newValue = currentValue + deltaChange;
+          // Use accumulated value if we've already processed a delta for this field
+          // This allows multiple systems to contribute deltas to the same field
+          const baseValue: number = updates[delta.field] !== undefined
+            ? (updates[delta.field] as number)
+            : (currentValue ?? 0);
+          let newValue = baseValue + deltaChange;
 
           // Apply min/max bounds
           if (delta.min !== undefined) {

@@ -106,15 +106,8 @@ export class ScriptedDecisionProcessor {
       }));
       return { changed: true, behavior: 'seek_food', behaviorState: {} };
     }
-    if (needs && !isHungry(needs) && currentBehavior === 'seek_food') {
-      // Switch back to wandering when satisfied
-      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-        ...current,
-        behavior: 'wander',
-        behaviorState: {},
-      }));
-      return { changed: true, behavior: 'wander', behaviorState: {} };
-    }
+    // NOTE: When seek_food completes, agent stays in seek_food until LLM changes it
+    // LLM will see agent is no longer hungry and decide the next action
     // PLANNED BUILD SYSTEM
     // If agent has planned builds, work toward them (gather resources or execute build)
     if (agent.plannedBuilds && agent.plannedBuilds.length > 0 && inventory) {
@@ -136,25 +129,14 @@ export class ScriptedDecisionProcessor {
       const result = this.checkResourceGathering(entity, world, inventory);
       if (result) return result;
     }
-    // Stop gathering when we have enough
-    if (currentBehavior === 'gather' && inventory) {
-      const result = this.checkGatheringComplete(entity, inventory);
-      if (result) return result;
-    }
+    // NOTE: Gathering completion is determined by LLM executor, not hard-coded thresholds
+    // Agent stays in 'gather' behavior until LLM explicitly changes it
     // Social behaviors when idle
     if ((currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') && Math.random() < 0.1) {
       const result = this.checkSocialBehavior(entity, world, getNearbyAgents);
       if (result) return result;
     }
-    // Stop following randomly
-    if (currentBehavior === 'follow_agent' && Math.random() < 0.05) {
-      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-        ...current,
-        behavior: 'wander',
-        behaviorState: {},
-      }));
-      return { changed: true, behavior: 'wander', behaviorState: {} };
-    }
+    // NOTE: Following continues until LLM explicitly changes behavior
     // Start conversation
     if ((currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') && Math.random() < 0.08) {
       const result = this.checkConversation(entity, world, getNearbyAgents);
@@ -291,26 +273,7 @@ export class ScriptedDecisionProcessor {
     }
     return result;
   }
-  /**
-   * Check if agent should stop gathering (has enough resources).
-   */
-  private checkGatheringComplete(
-    entity: EntityImpl,
-    inventory: InventoryComponent
-  ): ScriptedDecisionResult | null {
-    const hasWood = inventory.slots.some((s) => s.itemId === 'wood' && s.quantity >= 10);
-    const hasStone = inventory.slots.some((s) => s.itemId === 'stone' && s.quantity >= 10);
-    const hasFood = inventory.slots.some((s) => s.itemId === 'food' && s.quantity >= 5);
-    if (hasWood && hasStone && hasFood) {
-      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-        ...current,
-        behavior: 'wander',
-        behaviorState: {},
-      }));
-      return { changed: true, behavior: 'wander', behaviorState: {} };
-    }
-    return null;
-  }
+  // NOTE: checkGatheringComplete removed - gathering completion is determined by LLM executor, not hard-coded thresholds
   /**
    * Check if agent should follow another agent.
    */

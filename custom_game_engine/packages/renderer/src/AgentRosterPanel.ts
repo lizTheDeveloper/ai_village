@@ -10,6 +10,7 @@
 
 import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
+import { lookupSprite } from './sprites/SpriteService.js';
 import type { World } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
@@ -160,15 +161,37 @@ export class AgentRosterPanel implements IWindowPanel {
 
       if (identity && appearance) {
         const name = identity.name || 'Unknown';
-        let spriteFolder = appearance.spriteFolder || appearance.spriteFolderId || 'villager';
+
+        // Use spriteFolderId if already cached, otherwise look up from appearance traits
+        let spriteFolder: string;
+        if (appearance.spriteFolderId) {
+          spriteFolder = appearance.spriteFolderId;
+        } else {
+          // Look up sprite folder from appearance traits (same as Renderer does)
+          const traits = {
+            species: appearance.species || 'human',
+            gender: appearance.gender,
+            hairColor: appearance.hairColor,
+            skinTone: appearance.skinTone,
+          };
+          const spriteResult = lookupSprite(traits);
+          spriteFolder = spriteResult.folderId;
+        }
 
         // If this is an animal, use the variant system to get stable sprite ID
         if (ANIMAL_SPECIES.has(spriteFolder)) {
           spriteFolder = getAnimalSpriteVariant(entity.id, spriteFolder);
         }
 
-        if (!this.agents.has(entity.id)) {
+        // Add or update agent in roster
+        const existingAgent = this.agents.get(entity.id);
+        if (!existingAgent) {
           this.addAgent(entity.id, name, spriteFolder);
+        } else if (existingAgent.spriteFolder !== spriteFolder || existingAgent.name !== name) {
+          // Update if sprite or name changed
+          existingAgent.spriteFolder = spriteFolder;
+          existingAgent.name = name;
+          this.updateDOM();
         }
       }
     }

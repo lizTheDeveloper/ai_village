@@ -153,8 +153,11 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       return { behavior: 'idle', behaviorState };
     // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     case 'wander':
-    default:
       return { behavior: 'wander', behaviorState };
+    default:
+      // NO FALLBACK - if action type is not recognized, return null
+      // Agent will stay in current behavior until LLM explicitly changes it
+      return null;
   }
 }
 /**
@@ -239,8 +242,9 @@ function selectBehaviorFromPriorities(
           return { behavior: 'talk', behaviorState: { partnerId: targetAgent.id } };
         }
       }
-      // No one nearby, wander to find people
-      return { behavior: 'wander', behaviorState: {} };
+      // No one nearby - return null to keep current behavior
+      // Agent will stay in current behavior until LLM explicitly changes it
+      return null;
     }
     case 'gathering': {
       return { behavior: 'gather', behaviorState: { resourceType: 'wood' } };
@@ -262,7 +266,8 @@ function selectBehaviorFromPriorities(
     }
     // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     default:
-      return { behavior: 'wander', behaviorState: {} };
+      // NO FALLBACK - return null to keep current behavior
+      return null;
   }
 }
 

@@ -165,8 +165,9 @@ export class SleepSystem implements System {
     // Register sleep drive delta (accumulation or depletion)
     if (circadian.isSleeping) {
       // Sleeping: deplete sleep drive
-      // Rate: -17/hour → -1020/game minute (60 game minutes = 1 game hour)
-      const sleepDriveRatePerMinute = -17 * 60;
+      // Rate: -17/hour = -17/60 = -0.283 per game minute
+      // DIVIDE by 60, not multiply!
+      const sleepDriveRatePerMinute = -17 / 60;
 
       cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
         entityId: entity.id,
@@ -181,8 +182,9 @@ export class SleepSystem implements System {
       // Register energy recovery delta (only when sleeping)
       const sleepQuality = circadian.sleepQuality || 0.5;
       // Base recovery: 0.1 per game hour (10% energy per hour)
-      // Convert to per-game-minute: 0.1 * 60 = 6.0 per game minute
-      const energyRecoveryPerMinute = 0.1 * sleepQuality * 60;
+      // Convert to per-game-minute: 0.1 / 60 = 0.00167 per game minute
+      // DIVIDE by 60, not multiply!
+      const energyRecoveryPerMinute = 0.1 * sleepQuality / 60;
 
       cleanupFuncs.energyRecovery = this.stateMutator.registerDelta({
         entityId: entity.id,
@@ -195,7 +197,7 @@ export class SleepSystem implements System {
       });
     } else {
       // Awake: accumulate sleep drive
-      // Base rate: 5.5/hour → 330/game minute
+      // Base rate: 5.5/hour = 5.5/60 = 0.0917 per game minute
       let ratePerHour = 5.5;
 
       // Faster accumulation at night (biological circadian pressure)
@@ -211,7 +213,8 @@ export class SleepSystem implements System {
       }
 
       // Convert to per-game-minute (60 game minutes = 1 game hour)
-      const sleepDriveRatePerMinute = ratePerHour * 60;
+      // DIVIDE by 60, not multiply!
+      const sleepDriveRatePerMinute = ratePerHour / 60;
 
       cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
         entityId: entity.id,
@@ -350,22 +353,20 @@ export class SleepSystem implements System {
       return false;
     }
 
-    // Wake conditions (prioritize energy recovery):
-    // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.7 = 70%, 0.1 = 10%)
-    // 1. Energy fully restored (100%)
+    // Wake conditions (prioritize full energy recovery):
+    // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.1 = 10%)
+    // 1. Energy fully restored (100%) - primary wake condition
     const energyFull = needs.energy >= 1.0;
 
-    // 2. Urgent hunger (< 10%)
+    // 2. Urgent hunger (< 10%) - emergency wake
     const urgentNeed = needs.hunger < 0.1;
 
-    // 3. Energy sufficiently recovered (>= 70%) AND sleep drive depleted (< 10)
-    // This prevents premature waking when sleep drive depletes before energy recovers
-    const wellRestedAndSatisfied = needs.energy >= 0.7 && circadian.sleepDrive < 10;
-
-    // 4. Maximum sleep duration reached (12 hours - prevent oversleeping)
+    // 3. Maximum sleep duration reached (12 hours - prevent oversleeping)
     const maxSleepReached = hoursAsleep >= 12;
 
-    return energyFull || urgentNeed || wellRestedAndSatisfied || maxSleepReached;
+    // Note: Removed "wellRestedAndSatisfied" (70% energy + sleepDrive < 10) condition
+    // User requested agents wake at 100% energy, not 70%
+    return energyFull || urgentNeed || maxSleepReached;
   }
 
   /**

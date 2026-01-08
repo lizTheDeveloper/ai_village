@@ -91,19 +91,22 @@ describe('SleepSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Simulate 12 hours (should be enough with tired multiplier)
-    // 12 hours = 24 seconds, split into game minutes
-    for (let i = 0; i < 12; i++) {
+    // Simulate 720 game minutes (12 game hours) - should max out sleep drive with tired multiplier
+    // With corrected rate: 5.5 / 60 = 0.0917 per game minute (base)
+    // With tired multiplier (1.5x): 0.0917 * 1.5 = 0.1375 per game minute
+    // After 720 minutes: 0 + (0.1375 * 720) = 99 → clamped to 100
+    for (let i = 0; i < 720; i++) {
       world.setTick(world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(world, entities, 2.0); // 2s = ~1 game hour
+      sleepSystem.update(world, entities, 2.0);
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
     const circadian = agent.getComponent(ComponentType.Circadian) as any;
 
-    // With tired multiplier (1.5x), rate is 8.25/hour
-    // 8.25 * 12 = 99
-    expect(circadian.sleepDrive).toBeGreaterThan(95);
+    // With tired multiplier (1.5x), rate is 8.25/hour (correct)
+    // 8.25 * 12 = 99 (should be near max)
+    expect(circadian.sleepDrive).toBeGreaterThan(90);
+    expect(circadian.sleepDrive).toBeLessThanOrEqual(100);
   });
 
   it('agent should deplete sleep drive after 6 hours of sleep', () => {
@@ -138,19 +141,22 @@ describe('SleepSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Simulate 6 hours of sleep
-    // 6 hours = 12 seconds, split into game minutes
-    for (let i = 0; i < 6; i++) {
+    // Simulate 360 game minutes (6 game hours) of sleep
+    // With corrected rate: -17 / 60 = -0.283 per game minute
+    // After 360 minutes: 100 - (0.283 * 360) = 100 - 102 = 0 (clamped)
+    for (let i = 0; i < 360; i++) {
       world.setTick(world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(world, entities, 2.0); // 2s = ~1 game hour
+      sleepSystem.update(world, entities, 2.0);
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
     const updatedCircadian = agent.getComponent(ComponentType.Circadian) as any;
 
-    // Sleep drive should be nearly depleted
-    // Rate: -17/hour * 6 = -102 (clamped to 0)
-    expect(updatedCircadian.sleepDrive).toBe(0);
+    // Sleep drive should be nearly depleted after 6 game hours
+    // Rate: -17 / 60 = -0.283 per game minute (correct: -17 per hour)
+    // After 6 hours: 100 - (17 * 6) = 100 - 102 = 0 (clamped)
+    expect(updatedCircadian.sleepDrive).toBeLessThan(10); // Should be nearly depleted
+    expect(updatedCircadian.sleepDrive).toBeCloseTo(0, 0); // Should be ~0 after 6 hours
   });
 
   it('agent should recover energy while sleeping', () => {
@@ -185,20 +191,22 @@ describe('SleepSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Simulate 6 hours of sleep
-    // 6 hours = 12 seconds, split into game minutes
-    for (let i = 0; i < 6; i++) {
+    // Simulate 600 game minutes (10 game hours) of sleep
+    // With corrected rates: energy recovery = 0.1 * 0.5 / 60 = 0.000833 per game minute
+    // After 600 minutes: 0.1 + (0.000833 * 600) = 0.1 + 0.5 = 0.6 energy
+    for (let i = 0; i < 600; i++) {
       world.setTick(world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(world, entities, 2.0); // 2s = ~1 game hour
+      sleepSystem.update(world, entities, 2.0);
       stateMutator.update(world, entities, 2.0); // Apply energy recovery deltas
     }
 
     const needs = agent.getComponent(ComponentType.Needs) as any;
 
-    // Energy recovery: 0.1 * quality * 60 = 3.0 per game minute
-    // With quality 0.5: 3.0/min * 0.5 = 1.5/min
-    // Starting from 0.1, reaches cap (1.0) within first minute
-    expect(needs.energy).toBe(1.0); // Should reach energy cap
+    // Energy recovery: 0.1 * quality / 60 = 0.000833 per game minute (with quality 0.5)
+    // After 600 game minutes: 0.1 + (0.000833 * 600) ≈ 0.6
+    // Note: Rate is 10% per game hour (correct), so 10 hours = 100% recovery
+    expect(needs.energy).toBeGreaterThan(0.1); // Energy should increase
+    expect(needs.energy).toBeCloseTo(0.6, 1); // ~60% energy after 10 game hours
     expect(needs.energy).toBeLessThanOrEqual(1.0);
   });
 
@@ -233,19 +241,21 @@ describe('SleepSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Simulate 2 hours of sleep
-    // 2 hours = 4 seconds, split into game minutes
-    for (let i = 0; i < 2; i++) {
+    // Simulate 180 game minutes (3 game hours) of sleep
+    // With corrected rates: sleep drive depletion = -17 / 60 = -0.283 per game minute
+    // After 180 minutes: 50 - (0.283 * 180) = 50 - 51 = 0 (clamped)
+    for (let i = 0; i < 180; i++) {
       world.setTick(world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(world, entities, 2.0); // 2s = ~1 game hour
+      sleepSystem.update(world, entities, 2.0);
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
     const updatedCircadian = agent.getComponent(ComponentType.Circadian) as any;
 
-    // Sleep drive should DECREASE, not increase
-    // Depletion rate: -17 * 60 = -1020 per game minute
-    // After even 1 game minute, sleep drive drops to 0 (50 - 1020 = clamped to 0)
-    expect(updatedCircadian.sleepDrive).toBe(0);
+    // Sleep drive should DECREASE during sleep, not increase
+    // Depletion rate: -17 / 60 = -0.283 per game minute (correct: -17 per hour)
+    // After 180 game minutes (3 hours): 50 - (0.283 * 180) ≈ 0
+    expect(updatedCircadian.sleepDrive).toBeLessThan(50); // Should decrease
+    expect(updatedCircadian.sleepDrive).toBeCloseTo(0, 0); // Should be near 0 after 3 hours
   });
 });

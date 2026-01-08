@@ -320,20 +320,18 @@ export class ForcedSleepBehavior extends BaseBehavior {
     if (needs && circadian.isSleeping) {
       const hoursAsleep = circadian.sleepDurationHours;
 
-      // Wake conditions (same as SleepSystem.shouldWake):
-      // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.7 = 70%, etc.)
-      // 1. Energy fully restored
+      // Wake conditions (must match SleepSystem.shouldWake):
+      // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.1 = 10%)
+      // 1. Energy fully restored (100%) - primary wake condition
       const energyFull = needs.energy >= 1.0;
-      // 2. Urgent hunger
+      // 2. Urgent hunger (< 10%) - emergency wake
       const urgentNeed = needs.hunger < 0.1;
-      // 3. Well rested with depleted sleep drive
-      const wellRestedAndSatisfied = needs.energy >= 0.7 && circadian.sleepDrive < 10;
-      // 4. Maximum sleep duration (12 hours)
+      // 3. Maximum sleep duration (12 hours) - prevent oversleeping
       const maxSleepReached = hoursAsleep >= 12;
-      // 5. Minimum 4 hours passed with reasonable energy
-      const minimumMetWithEnergy = hoursAsleep >= 4 && needs.energy >= 0.5;
 
-      if (energyFull || urgentNeed || wellRestedAndSatisfied || maxSleepReached || minimumMetWithEnergy) {
+      // Note: Removed "wellRestedAndSatisfied" and "minimumMetWithEnergy" conditions
+      // User requested agents wake at 100% energy, not prematurely
+      if (energyFull || urgentNeed || maxSleepReached) {
         // Signal completion - SleepSystem will handle the actual wake transition
         return { complete: true, reason: 'Wake conditions met' };
       }

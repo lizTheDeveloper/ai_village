@@ -3641,6 +3641,10 @@ async function main() {
     // Create souls for the initial agents (displays modal before map loads)
     await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
 
+    // Populate the roster panels with initial agents
+    panels.agentRosterPanel.updateFromWorld(gameLoop.world);
+    panels.animalRosterPanel.updateFromWorld(gameLoop.world);
+
     // Hide the universe config screen now that all souls are created
     if (universeConfigScreen) {
       universeConfigScreen.hide();

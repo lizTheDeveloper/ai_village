@@ -179,8 +179,9 @@ function selectBehaviorFromPriorities(
         return { behavior: 'talk', behaviorState: { partnerId: targetAgent.id } };
       }
     }
-    // No one nearby, wander to find people
-    return { behavior: 'wander', behaviorState: {} };
+    // No one nearby - return null to keep current behavior
+    // Agent will stay in current behavior until LLM explicitly changes it
+    return null;
   }
 
   // For other priorities, let Executor handle them

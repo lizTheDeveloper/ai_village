@@ -172,11 +172,15 @@ export class LLMScheduler {
    *
    * Priority order:
    * 1. Critical needs → Autonomic (survival)
-   * 2. Active conversation → Talker (social)
+   * 2. Active conversation → Talker OR Executor (alternating for talk+act)
    * 3. Nearby agents → Talker (potential social interaction)
    * 4. No goals set → Talker (goal-setting)
    * 5. Task completion/idle → Executor (planning)
    * 6. Default → Autonomic (safety fallback)
+   *
+   * IMPORTANT: During conversations, agents need to both TALK and ACT.
+   * Talker handles social responses, Executor handles action execution.
+   * We alternate between them to allow natural conversation + productivity.
    */
   selectLayer(agent: Entity, world: World): LayerSelection {
     const needs = agent.components.get('needs') as NeedsComponent | undefined;
@@ -200,8 +204,50 @@ export class LLMScheduler {
       }
     }
 
-    // PRIORITY 2: Active conversation (social engagement)
-    if (conversation?.isActive || (vision?.heardSpeech && vision.heardSpeech.length > 0)) {
+    // PRIORITY 2: Active conversation - ALTERNATE between Talker and Executor
+    // This allows agents to both maintain conversation AND execute actions
+    const inConversation = conversation?.isActive || (vision?.heardSpeech && vision.heardSpeech.length > 0);
+    if (inConversation) {
+      const state = this.getAgentState(agent.id);
+      const lastTalker = state.lastInvocation.talker ?? 0;
+      const lastExecutor = state.lastInvocation.executor ?? 0;
+
+      // If agent is idle/wandering AND has goals, prefer executor to actually DO something
+      const isIdleOrWandering = !agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander';
+      const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
+        goals.goals.some((g) => !g.completed);
+
+      // Choose layer based on what's more needed:
+      // 1. If idle/wandering with goals → executor (so they can actually act)
+      // 2. If behavior is 'talk' → talker (continue conversation)
+      // 3. Otherwise alternate based on which ran more recently
+      if (isIdleOrWandering && hasActiveGoals) {
+        return {
+          layer: 'executor',
+          reason: 'In conversation but idle - needs action execution',
+          urgency: 7,
+        };
+      }
+
+      if (agentComp?.behavior === 'talk') {
+        return {
+          layer: 'talker',
+          reason: 'Active conversation (talking)',
+          urgency: 8,
+        };
+      }
+
+      // Alternate: if executor hasn't run in a while during conversation, give it a turn
+      // This ensures agents don't just keep talking without acting
+      const executorStale = (Date.now() - lastExecutor) > 15000; // 15s threshold
+      if (executorStale && hasActiveGoals) {
+        return {
+          layer: 'executor',
+          reason: 'In conversation - executor turn for action',
+          urgency: 7,
+        };
+      }
+
       return {
         layer: 'talker',
         reason: 'Active conversation or heard speech',
