@@ -152,8 +152,14 @@ describe('ConflictIntegration', () => {
         startTime: 0,
       });
 
-      // Run systems
-      await combatSystem.update(world, Array.from(world.entities.values()), 1); // Resolve combat
+      // Run systems - first update starts combat (initiated -> fighting)
+      await combatSystem.update(world, Array.from(world.entities.values()), 1);
+
+      // Combat needs at least 300 ticks to resolve (15 seconds minimum)
+      // deltaTime is in seconds, so 50 seconds = 1000 ticks (well past minimum 300)
+      await combatSystem.update(world, Array.from(world.entities.values()), 50);
+
+      // Run other systems after combat resolution
       injurySystem.update(world, Array.from(world.entities.values()), 1); // Apply injuries
       memorySystem.update(world, Array.from(world.entities.values()), 1); // Form memories
       needsSystem.update(world, Array.from(world.entities.values()), 1); // Update needs for injuries
