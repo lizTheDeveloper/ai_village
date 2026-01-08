@@ -45,7 +45,7 @@ export const IdentitySchema = autoRegister(
         default: 'human',
         description: 'Species type',
         displayName: 'Species',
-        visibility: { player: true, llm: true, agent: true, dev: true },
+        visibility: { player: true, llm: 'summarized', agent: true, dev: true },
         ui: { widget: 'dropdown', group: 'basic', order: 2 },
         mutable: false, // Can't change species
       },
@@ -57,7 +57,7 @@ export const IdentitySchema = autoRegister(
         range: [0, 10000] as const,
         description: 'Age in days',
         displayName: 'Age',
-        visibility: { player: true, llm: true, agent: true, dev: true },
+        visibility: { player: true, llm: 'summarized', agent: true, dev: true },
         ui: { widget: 'slider', group: 'basic', order: 3 },
         mutable: true,
       },
@@ -71,8 +71,14 @@ export const IdentitySchema = autoRegister(
 
     llm: {
       promptSection: 'identity',
-      summarize: (data) =>
-        `${data.name} (${data.species}, ${Math.floor(data.age / 365)} years old)`,
+      summarize: (data) => {
+        const name = data.name || 'Unknown';
+        const species = data.species || 'human';
+        const ageYears = typeof data.age === 'number' ? Math.floor(data.age / 365) : 0;
+        // For agents with age in years (20-35 range), display directly
+        const displayAge = ageYears > 0 ? ageYears : (data.age || 0);
+        return `${name} (${species}, ${displayAge} years old)`;
+      },
     },
 
     validate: (data): data is IdentityComponent => {

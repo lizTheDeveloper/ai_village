@@ -26,6 +26,7 @@ import type {
   ConversationComponent,
   VisionComponent,
   CircadianComponent,
+  GoalsComponent,
 } from '@ai-village/core';
 import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
@@ -172,14 +173,17 @@ export class LLMScheduler {
    * Priority order:
    * 1. Critical needs → Autonomic (survival)
    * 2. Active conversation → Talker (social)
-   * 3. Task completion/idle → Executor (planning)
-   * 4. Default → Autonomic (safety fallback)
+   * 3. Nearby agents → Talker (potential social interaction)
+   * 4. No goals set → Talker (goal-setting)
+   * 5. Task completion/idle → Executor (planning)
+   * 6. Default → Autonomic (safety fallback)
    */
   selectLayer(agent: Entity, world: World): LayerSelection {
     const needs = agent.components.get('needs') as NeedsComponent | undefined;
     const agentComp = agent.components.get('agent') as AgentComponent | undefined;
     const conversation = agent.components.get('conversation') as ConversationComponent | undefined;
     const vision = agent.components.get('vision') as VisionComponent | undefined;
+    const goals = agent.components.get('goals') as GoalsComponent | undefined;
 
     // PRIORITY 1: Critical needs (survival)
     if (needs) {
@@ -214,7 +218,17 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 4: Task completion (strategic planning needed)
+    // PRIORITY 4: No goals set (needs goal-setting via Talker)
+    // Check if agent has NO active goals - Talker is responsible for setting goals
+    if (!goals || !goals.goals || goals.goals.length === 0 || goals.getActiveGoalCount() === 0) {
+      return {
+        layer: 'talker',
+        reason: 'No goals set, needs goal-setting',
+        urgency: 5,
+      };
+    }
+
+    // PRIORITY 5: Task completion (strategic planning needed)
     if (agentComp?.behaviorCompleted) {
       return {
         layer: 'executor',
@@ -223,7 +237,7 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 5: Idle or wandering (planning needed)
+    // PRIORITY 6: Idle or wandering (planning needed)
     if (!agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander') {
       return {
         layer: 'executor',
@@ -232,7 +246,7 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 6: Low needs (opportunity for strategic planning)
+    // PRIORITY 7: Low needs (opportunity for strategic planning)
     if (needs) {
       const hunger = needs.hunger ?? 1;
       const energy = needs.energy ?? 1;

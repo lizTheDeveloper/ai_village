@@ -946,7 +946,7 @@ function setupWindowManager(
   panels: UIPanelsResult,
   keyboardRegistry: KeyboardRegistry,
   showNotification: (message: string, color?: string) => void
-): { windowManager: WindowManager; menuBar: MenuBar; controlsPanel: ControlsPanel } {
+): { windowManager: WindowManager; menuBar: MenuBar; controlsPanel: ControlsPanel; skillTreePanel: SkillTreePanel } {
   const windowManager = new WindowManager(canvas);
   const menuBar = new MenuBar(windowManager, canvas);
   menuBar.setRenderer(renderer);
@@ -1634,7 +1634,7 @@ function setupWindowManager(
     windowManager.handleCanvasResize(rect.width, rect.height);
   });
 
-  return { windowManager, menuBar, controlsPanel };
+  return { windowManager, menuBar, controlsPanel, skillTreePanel };
 }
 
 // ============================================================================
@@ -3428,7 +3428,7 @@ async function main() {
   }, 60000));
 
   // Setup window manager
-  const { windowManager, menuBar, controlsPanel } = setupWindowManager(
+  const { windowManager, menuBar, controlsPanel, skillTreePanel } = setupWindowManager(
     canvas, renderer, panels, keyboardRegistry, showNotification
   );
 

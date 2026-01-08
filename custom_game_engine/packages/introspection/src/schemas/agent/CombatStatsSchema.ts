@@ -203,7 +203,7 @@ export const CombatStatsSchema = autoRegister(
         displayName: 'Weapon',
         visibility: {
           player: true,
-          llm: true,
+          llm: 'summarized',  // Use summarize function to hide when empty
           agent: true,
           user: false,
           dev: true,
@@ -224,7 +224,7 @@ export const CombatStatsSchema = autoRegister(
         displayName: 'Armor',
         visibility: {
           player: true,
-          llm: true,
+          llm: 'summarized',  // Use summarize function to hide when empty
           agent: true,
           user: false,
           dev: true,

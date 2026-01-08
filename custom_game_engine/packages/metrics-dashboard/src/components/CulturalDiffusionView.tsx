@@ -17,11 +17,19 @@ import './CulturalDiffusionView.css';
 interface CulturalDiffusionViewProps {
   data?: CulturalData | null;
   loading?: boolean;
+  showCascades?: boolean;
+  showAdoption?: boolean;
+  showTransmissionRates?: boolean;
+  filterBehavior?: string;
 }
 
 export function CulturalDiffusionView({
   data: propData,
   loading: propLoading,
+  showCascades = false,
+  showAdoption = false,
+  showTransmissionRates = false,
+  filterBehavior,
 }: CulturalDiffusionViewProps) {
   const sankeyRef = useRef<SVGSVGElement>(null);
   const storeData = useMetricsStore((state) => state.culturalData);
@@ -116,11 +124,11 @@ export function CulturalDiffusionView({
   }
 
   if (!data.sankeyData || !data.sankeyData.nodes) {
-    throw new Error('CulturalDiffusionView requires data with sankeyData.nodes');
+    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.nodes</div>;
   }
 
   if (!data.sankeyData.links) {
-    throw new Error('CulturalDiffusionView requires data with sankeyData.links');
+    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.links</div>;
   }
 
   const adoptionData = data.adoptionCurves.craft || [];
@@ -173,7 +181,12 @@ export function CulturalDiffusionView({
         {data.influencers && data.influencers.length > 0 && (
           <div className="chart-card">
             <h3>Top Influencers</h3>
-            <div className="influencers-list">
+            {data.influencers[0] && (
+              <div className="top-influencer-badge" data-testid="top-influencer-badge">
+                Top: {data.influencers[0].name}
+              </div>
+            )}
+            <div className="influencers-list" data-testid="influencers-list">
               {data.influencers.map((influencer) => (
                 <div key={influencer.agentId} className="influencer-item">
                   <div className="influencer-name">{influencer.name}</div>
@@ -187,10 +200,10 @@ export function CulturalDiffusionView({
           </div>
         )}
 
-        {data.transmissionRates && (
+        {showTransmissionRates && data.transmissionRates && (
           <div className="chart-card">
             <h3>Transmission Rates</h3>
-            <div className="transmission-rates">
+            <div className="transmission-rates" data-testid="transmission-rates">
               {Object.entries(data.transmissionRates).map(([behavior, rate]) => (
                 <div key={behavior} className="rate-item">
                   <span className="behavior-name">{behavior}</span>
