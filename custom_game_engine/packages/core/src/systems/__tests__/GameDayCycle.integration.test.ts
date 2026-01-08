@@ -6,6 +6,7 @@ import { SleepSystem } from '../SleepSystem.js';
 import { NeedsSystem } from '../NeedsSystem.js';
 import { WeatherSystem } from '../WeatherSystem.js';
 import { TemperatureSystem } from '../TemperatureSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 
@@ -50,7 +51,12 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should agent sleep during night hours', () => {
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -66,17 +72,26 @@ describe('Complete Game Day Cycle Integration', () => {
     // Set to night time
     harness.setGameHour(22); // 10 PM
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Circadian component
+    const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
-    // Update sleep system
-    sleepSystem.update(harness.world, entities, 1.0);
+    // Update sleep system with proper tick advancement
+    harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+    sleepSystem.update(harness.world, sleepEntities, 60.0);
+    stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
 
     const circadian = agent.getComponent(ComponentType.Circadian);
     expect(circadian).toBeDefined();
   });
 
   it('should agent wake during day hours', () => {
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -94,11 +109,15 @@ describe('Complete Game Day Cycle Integration', () => {
     // Set to morning
     harness.setGameHour(8); // 8 AM
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Circadian component
+    const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
-    // Update sleep system multiple times
+    // Update sleep system multiple times with proper tick advancement
     for (let i = 0; i < 5; i++) {
-      sleepSystem.update(harness.world, entities, 1.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      sleepSystem.update(harness.world, sleepEntities, 60.0);
+      stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
     }
 
     // Agent should eventually wake up
@@ -106,7 +125,12 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should needs decay over time', () => {
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -120,14 +144,17 @@ describe('Complete Game Day Cycle Integration', () => {
 
     // Filter to only entities with needs component
     const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
     const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialHunger = initialNeeds.hunger;
     const initialEnergy = initialNeeds.energy;
 
-    // Simulate several hours
+    // Simulate several hours with proper tick advancement
     for (let i = 0; i < 10; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       needsSystem.update(harness.world, entitiesWithNeeds, 360.0); // 6 minutes per update
+      stateMutator.update(harness.world, allEntities, 360.0); // Apply deltas
     }
 
     const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
@@ -175,12 +202,19 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should multiple systems integrate over full day', () => {
-    const timeSystem = new TimeSystem();
-    const sleepSystem = new SleepSystem();
-    const needsSystem = new NeedsSystem();
+    // Create and wire StateMutatorSystem first (required for SleepSystem and NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const timeSystem = new TimeSystem();
     harness.registerSystem('TimeSystem', timeSystem);
+
+    const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
+
+    const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -197,12 +231,15 @@ describe('Complete Game Day Cycle Integration', () => {
     const timeEntities = harness.world.query().with(ComponentType.Time).executeEntities();
     const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
     const needsEntities = harness.world.query().with(ComponentType.Needs).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
-    // Simulate 12 hours
+    // Simulate 12 hours with proper tick advancement
     for (let hour = 0; hour < 12; hour++) {
-      timeSystem.update(harness.world, timeEntities, 2.0);
-      sleepSystem.update(harness.world, sleepEntities, 2.0);
-      needsSystem.update(harness.world, needsEntities, 2.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      timeSystem.update(harness.world, timeEntities, 60.0);
+      sleepSystem.update(harness.world, sleepEntities, 60.0);
+      needsSystem.update(harness.world, needsEntities, 60.0);
+      stateMutator.update(harness.world, allEntities, 60.0); // Apply all deltas
     }
 
     // All systems should have processed without errors
@@ -240,10 +277,16 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should temperature system affect health over time', () => {
-    const tempSystem = new TemperatureSystem(harness.world.eventBus);
-    const needsSystem = new NeedsSystem();
+    // Create and wire StateMutatorSystem (required for TemperatureSystem and NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const tempSystem = new TemperatureSystem(harness.world.eventBus);
+    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
+
+    const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -258,11 +301,14 @@ describe('Complete Game Day Cycle Integration', () => {
     // Filter entities for each system's required components
     const tempEntities = harness.world.query().with(ComponentType.Temperature).executeEntities();
     const needsEntities = harness.world.query().with(ComponentType.Needs).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
-    // Run systems over time
+    // Run systems over time with proper tick advancement
     for (let i = 0; i < 10; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       tempSystem.update(harness.world, tempEntities, 60.0);
       needsSystem.update(harness.world, needsEntities, 60.0);
+      stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
     }
 
     const needs = agent.getComponent(ComponentType.Needs) as any;
@@ -271,10 +317,15 @@ describe('Complete Game Day Cycle Integration', () => {
 
   it.skip('should full day cycle emit all expected events', () => {
     // SKIP: TimeSystem doesn't emit world:time:hour events (not implemented)
-    const timeSystem = new TimeSystem();
-    const sleepSystem = new SleepSystem();
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const timeSystem = new TimeSystem();
     harness.registerSystem('TimeSystem', timeSystem);
+
+    const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -289,12 +340,16 @@ describe('Complete Game Day Cycle Integration', () => {
 
     harness.clearEvents();
 
-    const entities = Array.from(harness.world.entities.values());
+    const timeEntities = harness.world.query().with(ComponentType.Time).executeEntities();
+    const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
+    const allEntities = Array.from(harness.world.entities.values());
 
-    // Simulate full day
+    // Simulate full day with proper tick advancement
     for (let hour = 0; hour < 24; hour++) {
-      timeSystem.update(harness.world, entities, 2.0);
-      sleepSystem.update(harness.world, entities, 2.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      timeSystem.update(harness.world, timeEntities, 60.0);
+      sleepSystem.update(harness.world, sleepEntities, 60.0);
+      stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
     }
 
     // Should have time-related events

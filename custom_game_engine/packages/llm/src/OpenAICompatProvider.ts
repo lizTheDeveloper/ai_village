@@ -435,6 +435,28 @@ Keep speech brief and natural.`
         speech = content.replace(/<think>[\s\S]*?<\/think>/, '').trim();
       }
 
+      // Check if speech content is JSON (e.g., from TalkerPromptBuilder asking for JSON output)
+      // If so, extract the 'speaking' field from it instead of using raw JSON as speech
+      try {
+        const jsonContent = JSON.parse(speech);
+        if (jsonContent && typeof jsonContent === 'object') {
+          // Extract speaking field if present
+          if (typeof jsonContent.speaking === 'string') {
+            speech = jsonContent.speaking;
+          }
+          // Extract thinking from JSON if not already set
+          if (!thinking && typeof jsonContent.thinking === 'string') {
+            thinking = jsonContent.thinking;
+          }
+          // Extract action from JSON if tool call didn't provide one
+          if (!action && jsonContent.action) {
+            action = jsonContent.action;
+          }
+        }
+      } catch {
+        // Not JSON, continue with text processing
+      }
+
       // Clean up speech - remove common prefixes that models add incorrectly
       speech = speech
         .replace(/^Content:\s*/i, '')           // Remove "Content: " prefix

@@ -825,6 +825,148 @@ export class TileConstructionSystem implements System {
     const tile = this.getWorldTile(world, x, y);
     return !!(tile?.wall || tile?.door || tile?.window);
   }
+
+  // ============================================================================
+  // INSTANT LAYOUT STAMPING
+  // For spawning completed buildings without construction process
+  // ============================================================================
+
+  /**
+   * Layout symbol definitions for parsing building layouts.
+   * Matches the symbols used in VoxelBuildingDefinition and BuildingBlueprint.
+   */
+  private static readonly LAYOUT_SYMBOLS = {
+    WALL: '#',
+    FLOOR: '.',
+    DOOR: 'D',
+    WINDOW: 'W',
+    ENTRANCE: 'E',  // Main entrance door
+    BED: 'B',
+    STORAGE: 'S',
+    TABLE: 'T',
+    COUNTER: 'C',
+    WORKSTATION: 'K',
+    STAIRS_UP: '^',
+    STAIRS_DOWN: 'v',
+    STAIRWELL: 'X',
+    PILLAR: 'P',
+    EMPTY: ' ',
+  };
+
+  /**
+   * Instantly stamp a building layout onto the world tiles.
+   * This bypasses the construction process and places all tiles immediately.
+   * Used for spawning completed buildings (NPC cities, dev tools, etc.)
+   *
+   * @param world - Game world
+   * @param layout - Array of strings defining the building layout
+   * @param originX - World X origin (top-left corner)
+   * @param originY - World Y origin (top-left corner)
+   * @param materials - Materials to use for walls/doors/floors
+   * @param buildingId - Optional building entity ID for tracking
+   * @returns Number of tiles placed
+   */
+  stampLayoutInstantly(
+    world: World,
+    layout: string[],
+    originX: number,
+    originY: number,
+    materials: { wall: WallMaterial; floor: string; door: DoorMaterial; window?: WindowMaterial },
+    buildingId?: string
+  ): number {
+    if (!layout || layout.length === 0) {
+      return 0; // No layout to stamp
+    }
+
+    let tilesPlaced = 0;
+    const { WALL, FLOOR, DOOR, WINDOW, ENTRANCE, BED, STORAGE, TABLE, COUNTER, WORKSTATION, PILLAR, EMPTY } = TileConstructionSystem.LAYOUT_SYMBOLS;
+
+    for (let row = 0; row < layout.length; row++) {
+      const line = layout[row];
+      if (!line) continue;
+
+      for (let col = 0; col < line.length; col++) {
+        const symbol = line[col];
+        if (!symbol || symbol === EMPTY) continue;
+
+        const worldX = originX + col;
+        const worldY = originY + row;
+        const worldTile = this.getWorldTile(world, worldX, worldY);
+
+        if (!worldTile) {
+          // Skip tiles outside loaded chunks
+          continue;
+        }
+
+        // Place tile based on symbol
+        switch (symbol) {
+          case WALL:
+          case PILLAR:
+            // Place wall tile
+            worldTile.wall = {
+              material: materials.wall,
+              condition: 100,
+              insulation: this.getWallInsulation(materials.wall),
+              constructedAt: world.tick,
+            };
+            tilesPlaced++;
+            break;
+
+          case DOOR:
+          case ENTRANCE:
+            // Place door tile
+            worldTile.door = {
+              material: materials.door,
+              state: 'closed',
+              constructedAt: world.tick,
+            };
+            // Also place floor under door
+            worldTile.floor = materials.floor;
+            tilesPlaced++;
+            break;
+
+          case WINDOW:
+            // Place window tile (in wall)
+            worldTile.window = {
+              material: materials.window ?? 'glass',
+              condition: 100,
+              lightsThrough: true,
+              constructedAt: world.tick,
+            };
+            tilesPlaced++;
+            break;
+
+          case FLOOR:
+          case BED:
+          case STORAGE:
+          case TABLE:
+          case COUNTER:
+          case WORKSTATION:
+            // Place floor tile (furniture is separate entities in this system)
+            worldTile.floor = materials.floor;
+            tilesPlaced++;
+            break;
+
+          // Stairs are just floor tiles for now
+          case '^':
+          case 'v':
+          case 'X':
+            worldTile.floor = materials.floor;
+            tilesPlaced++;
+            break;
+
+          default:
+            // Unknown symbol - skip but don't error (some layouts have custom symbols)
+            break;
+        }
+
+        // Mark tile as modified
+        this.markTileModified(world, worldX, worldY);
+      }
+    }
+
+    return tilesPlaced;
+  }
 }
 
 /**

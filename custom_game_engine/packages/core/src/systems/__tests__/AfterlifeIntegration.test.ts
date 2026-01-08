@@ -13,6 +13,7 @@ import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import type { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { AfterlifeNeedsSystem } from '../AfterlifeNeedsSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
@@ -23,11 +24,20 @@ import type { AfterlifeComponent } from '../../components/AfterlifeComponent.js'
 describe('Afterlife System Integration', () => {
   let world: World;
   let afterlifeSystem: AfterlifeNeedsSystem;
+  let stateMutator: StateMutatorSystem;
 
   beforeEach(() => {
     const harness = createMinimalWorld();
     world = harness.world;
+
+    // Create and register StateMutatorSystem
+    stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
+    // Create and register AfterlifeNeedsSystem
     afterlifeSystem = new AfterlifeNeedsSystem();
+    afterlifeSystem.setStateMutatorSystem(stateMutator);
+    harness.registerSystem('AfterlifeNeedsSystem', afterlifeSystem);
   });
 
   describe('soul enters underworld', () => {
@@ -125,9 +135,21 @@ describe('Afterlife System Integration', () => {
 
       const initialCoherence = afterlife.coherence;
 
-      // Advance time in underworld
+      // Advance time in underworld - need to run multiple updates
+      // First update: registers deltas
+      // Second update: applies deltas
       const oneGameMinute = 60;
+      const ticksPerMinute = 1200; // 20 TPS * 60 seconds
+
+      // First cycle: register deltas
+      world.setTick(world.tick + ticksPerMinute);
       afterlifeSystem.update(world, [entity], oneGameMinute);
+      stateMutator.update(world, [entity], oneGameMinute);
+
+      // Second cycle: apply deltas
+      world.setTick(world.tick + ticksPerMinute);
+      afterlifeSystem.update(world, [entity], oneGameMinute);
+      stateMutator.update(world, [entity], oneGameMinute);
 
       expect(afterlife.coherence).toBeLessThan(initialCoherence);
     });
@@ -156,9 +178,19 @@ describe('Afterlife System Integration', () => {
 
       expect(afterlife.isShade).toBe(false);
 
-      // Long time passes
-      const veryLongTime = 100000;
-      afterlifeSystem.update(world, [entity], veryLongTime);
+      // Long time passes - simulate many game minutes
+      // BASE_COHERENCE_DECAY = 0.0001 per minute
+      // Starting coherence = 0.15
+      // Need to decay by 0.05 to reach 0.1
+      // 0.05 / 0.0001 = 500 minutes needed
+      const chunkSize = 60; // 1 game minute
+      const numChunks = 600; // 600 game minutes
+
+      for (let i = 0; i < numChunks; i++) {
+        world.setTick(world.tick + 1200); // 1 game minute in ticks
+        afterlifeSystem.update(world, [entity], chunkSize);
+        stateMutator.update(world, [entity], chunkSize);
+      }
 
       // Should become shade
       expect(afterlife.coherence).toBeLessThan(0.1);
@@ -190,7 +222,10 @@ describe('Afterlife System Integration', () => {
 
       expect(afterlife.hasPassedOn).toBe(false);
 
-      afterlifeSystem.update(world, [entity], 1);
+      // Advance tick and update systems
+      world.setTick(world.tick + 1200); // 1 game minute
+      afterlifeSystem.update(world, [entity], 60);
+      stateMutator.update(world, [entity], 60);
 
       expect(afterlife.hasPassedOn).toBe(true);
     });
@@ -328,7 +363,9 @@ describe('Afterlife System Integration', () => {
 
       // Process afterlife needs
       const oneMinute = 60;
+      world.setTick(world.tick + 1200); // 1 game minute in ticks
       afterlifeSystem.update(world, souls, oneMinute);
+      stateMutator.update(world, souls, oneMinute);
 
       // Each should decay independently
       for (const soul of souls) {

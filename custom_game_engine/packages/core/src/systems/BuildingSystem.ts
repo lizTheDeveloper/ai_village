@@ -19,6 +19,9 @@ import { createWarehouseComponent } from '../components/WarehouseComponent.js';
 import { createWeatherStationComponent } from '../components/WeatherStationComponent.js';
 import { createHealthClinicComponent } from '../components/HealthClinicComponent.js';
 import { createUniversityComponent } from '../components/UniversityComponent.js';
+import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { getTileConstructionSystem } from './TileConstructionSystem.js';
+import type { WallMaterial, DoorMaterial, WindowMaterial } from '@ai-village/world';
 
 /**
  * BuildingSystem handles construction progress for buildings.
@@ -42,6 +45,12 @@ export class BuildingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
 
   private isInitialized = false;
+
+  /**
+   * Blueprint registry for looking up building definitions with layouts.
+   * Initialized lazily on first use.
+   */
+  private blueprintRegistry: BuildingBlueprintRegistry | null = null;
 
   /**
    * Base construction speed in progress points per second.
@@ -119,6 +128,65 @@ export class BuildingSystem implements System {
     });
 
     this.isInitialized = true;
+
+    // Initialize blueprint registry for layout lookups
+    this.blueprintRegistry = new BuildingBlueprintRegistry();
+    this.blueprintRegistry.registerDefaults();
+  }
+
+  /**
+   * Get the blueprint registry, initializing it if needed.
+   */
+  private getBlueprintRegistry(): BuildingBlueprintRegistry {
+    if (!this.blueprintRegistry) {
+      this.blueprintRegistry = new BuildingBlueprintRegistry();
+      this.blueprintRegistry.registerDefaults();
+    }
+    return this.blueprintRegistry;
+  }
+
+  /**
+   * Stamp a building's layout onto world tiles.
+   * Uses the blueprint's ASCII layout to create actual wall/door/floor tiles.
+   * Buildings without layouts (small items) are skipped.
+   */
+  private stampBuildingLayout(
+    world: World,
+    blueprintId: string,
+    position: { x: number; y: number },
+    buildingId: string
+  ): void {
+    // Try to get the blueprint from the registry
+    const registry = this.getBlueprintRegistry();
+    const blueprint = registry.tryGet(blueprintId);
+
+    // Skip if blueprint not found or has no layout (small items like workbenches)
+    if (!blueprint || !blueprint.layout || blueprint.layout.length === 0) {
+      return;
+    }
+
+    // Get materials from blueprint, with defaults
+    const materials = {
+      wall: (blueprint.materials?.wall || 'wood') as WallMaterial,
+      floor: blueprint.materials?.floor || 'wood',
+      door: (blueprint.materials?.door || 'wood') as DoorMaterial,
+      window: 'glass' as WindowMaterial,
+    };
+
+    // Get the TileConstructionSystem and stamp the layout
+    const tileSystem = getTileConstructionSystem();
+    const tilesPlaced = tileSystem.stampLayoutInstantly(
+      world,
+      blueprint.layout,
+      position.x,
+      position.y,
+      materials,
+      buildingId
+    );
+
+    if (tilesPlaced > 0) {
+      console.log(`[BuildingSystem] Stamped ${tilesPlaced} tiles for ${blueprint.name} at (${position.x}, ${position.y})`);
+    }
   }
 
   /**
@@ -409,6 +477,9 @@ export class BuildingSystem implements System {
     (entity as EntityImpl).addComponent(createPositionComponent(position.x, position.y));
     (entity as EntityImpl).addComponent(createRenderableComponent(blueprintId, 'building'));
 
+    // Stamp the building layout onto world tiles if the blueprint has one
+    // This creates actual wall/door/floor tiles from the ASCII layout
+    this.stampBuildingLayout(world, blueprintId, position, entity.id);
 
     // Emit construction:started event
     world.eventBus.emit({
