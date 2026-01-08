@@ -52,6 +52,7 @@ import {
   createUniverseConfig,
   // Tile-based buildings
   getTileBasedBlueprintRegistry,
+  getTileConstructionSystem,
   BuildingType,
   // Microgenerators - God-crafted content discovery
   GodCraftedDiscoverySystem,
@@ -3777,93 +3778,45 @@ async function main() {
         { x: 22, y: -2 },  // East-South
       ];
 
-      // Use the tile construction system to place houses
-      // (Houses will be placed as fully built structures)
-      for (const pos of housePositions) {
-        // Parse the VoxelBuildingDefinition layout (ground floor)
-        const tiles: any[] = [];
-        const furnitureItems: Array<{ x: number; y: number; symbol: string }> = [];
+      // Use the tile construction system to place houses with proper tile properties
+      const tileSystem = getTileConstructionSystem();
 
+      for (const pos of housePositions) {
+        // Use stampLayoutInstantly to place tiles with correct properties
+        const materials = {
+          wall: (houseBlueprint.materials?.wall || 'wood') as any,
+          floor: houseBlueprint.materials?.floor || 'wood',
+          door: (houseBlueprint.materials?.door || 'wood') as any,
+          window: 'glass' as any,
+        };
+
+        const tilesPlaced = tileSystem.stampLayoutInstantly(
+          gameLoop.world,
+          houseBlueprint.layout,
+          pos.x,
+          pos.y,
+          materials,
+          `initial_house_${pos.x}_${pos.y}`
+        );
+
+        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y}) with ${tilesPlaced} tiles`);
+
+        // Scan layout for furniture symbols and spawn them
         for (let row = 0; row < houseBlueprint.layout.length; row++) {
           for (let col = 0; col < houseBlueprint.layout[row].length; col++) {
             const symbol = houseBlueprint.layout[row][col];
-            if (symbol === ' ') continue; // Skip empty tiles
-
             const worldX = pos.x + col;
             const worldY = pos.y + row;
 
-            let tileType: 'wall' | 'floor' | 'door' | 'window' | null = null;
-            let materialId: string;
-
-            if (symbol === '#') {
-              tileType = 'wall';
-              materialId = houseBlueprint.materials.wall;
-            } else if (symbol === '.') {
-              tileType = 'floor';
-              materialId = houseBlueprint.materials.floor;
-            } else if (symbol === 'D') {
-              tileType = 'door';
-              materialId = houseBlueprint.materials.wall; // Door uses wall material
-            } else if (symbol === 'W') {
-              tileType = 'window';
-              materialId = 'glass';
-            } else if (symbol === 'B' || symbol === 'S' || symbol === 'T' || symbol === 'K' || symbol === 'C') {
-              // Furniture symbols - place floor tile first, then spawn furniture
-              tileType = 'floor';
-              materialId = houseBlueprint.materials.floor;
-              furnitureItems.push({ x: worldX, y: worldY, symbol });
-            } else {
-              continue;
-            }
-
-            if (tileType) {
-              tiles.push({ x: worldX, y: worldY, type: tileType, materialId });
+            if (symbol === 'B') {
+              // Bed
+              spawnBuilding(BuildingType.Bedroll, worldX, worldY);
+            } else if (symbol === 'S') {
+              // Storage chest
+              spawnBuilding(BuildingType.StorageChest, worldX, worldY);
             }
           }
         }
-
-        // Place tiles in the world
-        for (const tile of tiles) {
-          const chunk = chunkManager.getChunk(
-            Math.floor(tile.x / 16),
-            Math.floor(tile.y / 16)
-          );
-
-          const localX = tile.x - chunk.x * 16;
-          const localY = tile.y - chunk.y * 16;
-          const tileData = chunk.tiles[localY * 16 + localX];
-
-          if (tile.type === 'wall') {
-            tileData.wall = { material: tile.materialId, hp: 100, maxHp: 100 };
-          } else if (tile.type === 'floor') {
-            tileData.type = tile.materialId;
-          } else if (tile.type === 'door') {
-            tileData.door = { material: tile.materialId, hp: 50, maxHp: 50, open: false };
-          } else if (tile.type === 'window') {
-            tileData.window = { material: tile.materialId, hp: 30, maxHp: 30 };
-          }
-        }
-
-        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y}) with ${furnitureItems.length} furniture items`);
-
-        // Place furniture based on symbols in layout
-        for (const furniture of furnitureItems) {
-          if (furniture.symbol === 'B') {
-            // Bed
-            spawnBuilding(BuildingType.Bedroll, furniture.x, furniture.y);
-          } else if (furniture.symbol === 'S') {
-            // Storage chest
-            spawnBuilding(BuildingType.StorageChest, furniture.x, furniture.y);
-          } else if (furniture.symbol === 'T') {
-            // Table - could add a table building type later
-            console.log(`[WorldInit] Table at (${furniture.x}, ${furniture.y}) - not yet implemented`);
-          } else if (furniture.symbol === 'K') {
-            // Workstation - could add later
-            console.log(`[WorldInit] Workstation at (${furniture.x}, ${furniture.y}) - not yet implemented`);
-          }
-        }
-
-        console.log(`[WorldInit] Furnished house with ${furnitureItems.length} furniture items`);
       }
     }
 

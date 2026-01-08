@@ -34,6 +34,9 @@ import { createBuildingComponent } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { getTileConstructionSystem } from './TileConstructionSystem.js';
+import type { WallMaterial, DoorMaterial, WindowMaterial } from '@ai-village/world';
 
 /**
  * Building priorities for NPC city development.
@@ -96,9 +99,21 @@ export class CityBuildingGenerationSystem implements System {
   private eventBus: CoreEventBus;
   private lastCheckTick: number = 0;
   private readonly CHECK_INTERVAL = 600; // Every 30 seconds at 20 TPS
+  private blueprintRegistry: BuildingBlueprintRegistry | null = null;
 
   constructor(eventBus: CoreEventBus) {
     this.eventBus = eventBus;
+  }
+
+  /**
+   * Get the blueprint registry, initializing it if needed.
+   */
+  private getBlueprintRegistry(): BuildingBlueprintRegistry {
+    if (!this.blueprintRegistry) {
+      this.blueprintRegistry = new BuildingBlueprintRegistry();
+      this.blueprintRegistry.registerDefaults();
+    }
+    return this.blueprintRegistry;
   }
 
   /**
@@ -309,6 +324,9 @@ export class CityBuildingGenerationSystem implements System {
     (entity as EntityImpl).addComponent(createPositionComponent(position.x, position.y));
     (entity as EntityImpl).addComponent(createRenderableComponent(buildingType, 'building'));
 
+    // Stamp the building layout onto world tiles if the blueprint has one
+    this.stampBuildingLayout(world, buildingType, position, entity.id);
+
     // Emit events
     this.eventBus.emit({
       type: 'building:spawned',
@@ -334,5 +352,49 @@ export class CityBuildingGenerationSystem implements System {
       },
     });
 
+  }
+
+  /**
+   * Stamp a building's layout onto world tiles.
+   * Uses the blueprint's ASCII layout to create actual wall/door/floor tiles.
+   * Buildings without layouts (small items) are skipped.
+   */
+  private stampBuildingLayout(
+    world: World,
+    buildingType: string,
+    position: { x: number; y: number },
+    buildingId: string
+  ): void {
+    // Try to get the blueprint from the registry
+    const registry = this.getBlueprintRegistry();
+    const blueprint = registry.tryGet(buildingType);
+
+    // Skip if blueprint not found or has no layout (small items like workbenches)
+    if (!blueprint || !blueprint.layout || blueprint.layout.length === 0) {
+      return;
+    }
+
+    // Get materials from blueprint, with defaults
+    const materials = {
+      wall: (blueprint.materials?.wall || 'wood') as WallMaterial,
+      floor: blueprint.materials?.floor || 'wood',
+      door: (blueprint.materials?.door || 'wood') as DoorMaterial,
+      window: 'glass' as WindowMaterial,
+    };
+
+    // Get the TileConstructionSystem and stamp the layout
+    const tileSystem = getTileConstructionSystem();
+    const tilesPlaced = tileSystem.stampLayoutInstantly(
+      world,
+      blueprint.layout,
+      position.x,
+      position.y,
+      materials,
+      buildingId
+    );
+
+    if (tilesPlaced > 0) {
+      console.log(`[CityBuildingGen] Stamped ${tilesPlaced} tiles for ${blueprint.name} at (${position.x}, ${position.y})`);
+    }
   }
 }

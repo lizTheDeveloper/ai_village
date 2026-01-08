@@ -24,6 +24,7 @@ import {
   WEAPON_ITEMS,
 } from '../items/defaultItems.js';
 import { ResourceGatheringSystem } from '../systems/ResourceGatheringSystem.js';
+import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 
 describe('Mining & Metalworking System Integration Tests', () => {
@@ -266,8 +267,13 @@ describe('Mining & Metalworking System Integration Tests', () => {
 
   describe('Ore Deposits Do Not Regenerate', () => {
     it('should NOT regenerate ore deposits at midnight', () => {
+      // Create and wire up StateMutatorSystem (required dependency)
+      const stateMutator = new StateMutatorSystem();
+      harness.registerSystem('StateMutatorSystem', stateMutator);
+
       // Create a resource gathering system
       const resourceSystem = new ResourceGatheringSystem(harness.eventBus);
+      resourceSystem.setStateMutatorSystem(stateMutator);
       harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
       // Create an iron deposit with some ore harvested
@@ -284,9 +290,17 @@ describe('Mining & Metalworking System Integration Tests', () => {
         data: { day: 2 },
       });
 
+      // Query for entities with resource component
+      const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
+
+      // Advance tick to trigger StateMutatorSystem update (1200 ticks = 1 game minute)
+      harness.world.setTick(harness.world.tick + 1200);
+
       // Run the resource gathering system
-      const entities = Array.from(harness.world.entities.values());
-      resourceSystem.update(harness.world, entities, 1.0);
+      resourceSystem.update(harness.world, entities, 60.0);
+
+      // Run the state mutator system to apply deltas
+      stateMutator.update(harness.world, entities, 60.0);
 
       // Verify ore did NOT regenerate (regenerationRate = 0)
       const resource = deposit.getComponent(ComponentType.Resource) as any;

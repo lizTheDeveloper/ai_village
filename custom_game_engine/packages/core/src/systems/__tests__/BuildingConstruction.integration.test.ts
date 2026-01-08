@@ -3,6 +3,7 @@ import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHar
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { BuildingSystem } from '../BuildingSystem.js';
 import { ResourceGatheringSystem } from '../ResourceGatheringSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
 
@@ -139,16 +140,26 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       regenerationRate: 1.0, // 1 per second
     });
 
+    // Setup StateMutatorSystem
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const resourceSystem = new ResourceGatheringSystem();
+    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
 
     const initialResource = resource.getComponent(ComponentType.Resource) as any;
     const initialAmount = initialResource.amount;
 
-    // Wait 3 seconds
+    // Advance tick by 1200 ticks (1 game minute) to trigger delta update
+    harness.world.setTick(harness.world.tick + 1200);
     resourceSystem.update(harness.world, entities, 3.0);
+
+    // Advance more ticks to allow regeneration to apply
+    harness.world.setTick(harness.world.tick + 60);
+    stateMutator.update(harness.world, entities, 3.0); // Apply deltas
 
     const updatedResource = resource.getComponent(ComponentType.Resource) as any;
 
@@ -174,13 +185,23 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       regenerationRate: 5.0, // Fast regen
     });
 
+    // Setup StateMutatorSystem
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const resourceSystem = new ResourceGatheringSystem();
+    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
 
-    // Regenerate for a long time
+    // Advance tick by 1200 ticks (1 game minute) to trigger delta update
+    harness.world.setTick(harness.world.tick + 1200);
     resourceSystem.update(harness.world, entities, 10.0);
+
+    // Advance more ticks to allow regeneration to apply
+    harness.world.setTick(harness.world.tick + 200);
+    stateMutator.update(harness.world, entities, 10.0); // Apply deltas
 
     const updatedResource = resource.getComponent(ComponentType.Resource) as any;
 
@@ -205,15 +226,25 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       regenerationRate: 1.0,
     });
 
+    // Setup StateMutatorSystem
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const resourceSystem = new ResourceGatheringSystem();
+    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
     harness.clearEvents();
 
-    const entities = Array.from(harness.world.entities.values());
+    const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
 
-    // Regenerate to full
+    // Advance tick by 1200 ticks (1 game minute) to trigger delta update
+    harness.world.setTick(harness.world.tick + 1200);
     resourceSystem.update(harness.world, entities, 3.0);
+
+    // Advance more ticks to allow regeneration to apply
+    harness.world.setTick(harness.world.tick + 60);
+    stateMutator.update(harness.world, entities, 3.0); // Apply deltas
 
     const regenEvents = harness.getEmittedEvents('resource:regenerated');
 

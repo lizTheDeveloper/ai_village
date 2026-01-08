@@ -8,6 +8,7 @@ import { DeathTransitionSystem } from '../systems/DeathTransitionSystem';
 import { SkillSystem } from '../systems/SkillSystem';
 import { NeedsSystem } from '../systems/NeedsSystem';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem';
+import { StateMutatorSystem } from '../systems/StateMutatorSystem';
 import { EventBusImpl } from '../events/EventBus';
 
 /**
@@ -28,6 +29,7 @@ describe('ConflictIntegration', () => {
   let skillSystem: SkillSystem;
   let needsSystem: NeedsSystem;
   let memorySystem: MemoryFormationSystem;
+  let stateMutatorSystem: StateMutatorSystem;
   let mockLLM: any;
 
   beforeEach(() => {
@@ -47,6 +49,9 @@ describe('ConflictIntegration', () => {
       }),
     };
 
+    // Initialize StateMutatorSystem first (required by NeedsSystem)
+    stateMutatorSystem = new StateMutatorSystem();
+
     huntingSystem = new HuntingSystem(world.eventBus as EventBusImpl, mockLLM);
     predatorSystem = new PredatorAttackSystem(world.eventBus as EventBusImpl);
     combatSystem = new AgentCombatSystem(mockLLMObject, world.eventBus as EventBusImpl);
@@ -55,6 +60,9 @@ describe('ConflictIntegration', () => {
     skillSystem = new SkillSystem(world.eventBus as EventBusImpl);
     needsSystem = new NeedsSystem(world.eventBus as EventBusImpl);
     memorySystem = new MemoryFormationSystem(world.eventBus as EventBusImpl);
+
+    // Set StateMutatorSystem on NeedsSystem
+    needsSystem.setStateMutatorSystem(stateMutatorSystem);
   });
 
   describe('Full conflict flow', () => {
@@ -421,14 +429,14 @@ describe('ConflictIntegration', () => {
       const agent = world.createEntity();
       agent.addComponent('agent', { name: 'Agent' });
 
-      // Invalid injury type (should throw during system update when validated)
-      agent.addComponent('injury', {
-        injuryType: 'invalid',
-        severity: 'minor',
-        location: 'torso',
-      } as any);
-
-      expect(() => injurySystem.update(world, Array.from(world.entities.values()), 1)).toThrow('Invalid injury type');
+      // Invalid injury type (should throw during component creation)
+      expect(() => {
+        agent.addComponent('injury', {
+          injuryType: 'invalid',
+          severity: 'minor',
+          location: 'torso',
+        } as any);
+      }).toThrow('Invalid injury type');
     });
   });
 });

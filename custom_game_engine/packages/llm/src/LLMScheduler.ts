@@ -210,7 +210,9 @@ export class LLMScheduler {
     }
 
     // PRIORITY 3: Nearby agents (potential social interaction)
-    if (vision?.seenAgents && vision.seenAgents.length > 0) {
+    // BUT: Only trigger social if agent has a meaningful task - wandering/idle agents should get work first
+    const isIdleOrWandering = !agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander';
+    if (vision?.seenAgents && vision.seenAgents.length > 0 && !isIdleOrWandering) {
       return {
         layer: 'talker',
         reason: 'Nearby agents (potential social interaction)',
