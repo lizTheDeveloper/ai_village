@@ -151,7 +151,10 @@ describe('Afterlife System Integration', () => {
       afterlifeSystem.update(world, [entity], oneGameMinute);
       stateMutator.update(world, [entity], oneGameMinute);
 
-      expect(afterlife.coherence).toBeLessThan(initialCoherence);
+      // Note: StateMutatorSystem creates a new component object via updateComponent,
+      // so we must re-fetch to see updated values
+      const updated = (entity as any).getComponent('afterlife');
+      expect(updated.coherence).toBeLessThan(initialCoherence);
     });
 
     it('should eventually become shade with no interaction', () => {
@@ -192,9 +195,11 @@ describe('Afterlife System Integration', () => {
         stateMutator.update(world, [entity], chunkSize);
       }
 
-      // Should become shade
-      expect(afterlife.coherence).toBeLessThan(0.1);
-      expect(afterlife.isShade).toBe(true);
+      // Note: StateMutatorSystem creates a new component object via updateComponent,
+      // so we must re-fetch to see updated values
+      const updated = (entity as any).getComponent('afterlife');
+      expect(updated.coherence).toBeLessThan(0.1);
+      expect(updated.isShade).toBe(true);
     });
 
     it('should pass on when tether low and peace high', () => {
