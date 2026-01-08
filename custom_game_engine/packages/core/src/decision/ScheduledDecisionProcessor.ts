@@ -22,6 +22,8 @@ import { AutonomicSystem, type AutonomicResult } from './AutonomicSystem.js';
 import { getBehaviorPriority } from './BehaviorPriority.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 import { LLMHistoryComponent, createLLMHistoryComponent, type LLMInteraction } from '../components/LLMHistoryComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
+import type { GoalsComponent, PersonalGoal, GoalCategory } from '../components/GoalsComponent.js';
 
 // Import LLM types from local types file to avoid circular dependency with @ai-village/llm
 import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '../types/LLMTypes.js';
@@ -140,6 +142,11 @@ export class ScheduledDecisionProcessor {
         return { changed: false, source: 'none' };
       }
 
+      // Apply goal if present (from Talker layer)
+      if (parsed.goal && parsed.goal.description) {
+        this.applyGoalToEntity(entity, parsed.goal);
+      }
+
       // Apply decision to agent
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
@@ -231,6 +238,11 @@ export class ScheduledDecisionProcessor {
         this.recordLLMInteraction(entity, layer, prompt, decision, true);
       }
 
+      // Apply goal if present (from Talker layer)
+      if (parsed.goal && parsed.goal.description) {
+        this.applyGoalToEntity(entity, parsed.goal);
+      }
+
       // Apply decision to agent
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
@@ -283,11 +295,21 @@ export class ScheduledDecisionProcessor {
 
   /**
    * Parse LLM response (JSON or legacy text format).
+   * Also extracts goal from Talker responses.
    */
-  private parseLLMResponse(response: string): { behavior: AgentBehavior; behaviorState?: Record<string, unknown>; speaking?: string } | null {
+  private parseLLMResponse(response: string): { behavior: AgentBehavior; behaviorState?: Record<string, unknown>; speaking?: string; goal?: { type: string; description: string } } | null {
     // Try JSON parse first (structured format)
     try {
       const parsed = JSON.parse(response);
+
+      // Extract goal if present (from Talker responses)
+      let goal: { type: string; description: string } | undefined;
+      if (parsed.goal && typeof parsed.goal === 'object') {
+        goal = {
+          type: parsed.goal.type || 'personal',
+          description: parsed.goal.description || '',
+        };
+      }
 
       // New structured format with action object
       if (parsed.action && typeof parsed.action === 'object') {
@@ -296,7 +318,8 @@ export class ScheduledDecisionProcessor {
         return {
           behavior,
           behaviorState: {},
-          speaking: parsed.speaking // Extract speaking field
+          speaking: parsed.speaking,
+          goal,
         };
       }
 
@@ -308,9 +331,20 @@ export class ScheduledDecisionProcessor {
           return {
             behavior,
             behaviorState: {},
-            speaking: parsed.speaking // Extract speaking field
+            speaking: parsed.speaking,
+            goal,
           };
         }
+      }
+
+      // If we have a goal but no action, still return something
+      if (goal && goal.description) {
+        return {
+          behavior: 'idle' as AgentBehavior,
+          behaviorState: {},
+          speaking: parsed.speaking,
+          goal,
+        };
       }
 
       return null;
@@ -323,6 +357,65 @@ export class ScheduledDecisionProcessor {
       }
 
       return null;
+    }
+  }
+
+  /**
+   * Apply a goal to the entity's GoalsComponent.
+   * Creates the component if it doesn't exist.
+   */
+  private applyGoalToEntity(
+    entity: EntityImpl,
+    goal: { type: string; description: string }
+  ): void {
+    if (!goal.description) return;
+
+    // Get or create goals component
+    let goalsComp = entity.getComponent(ComponentType.Goals) as GoalsComponent | undefined;
+
+    if (!goalsComp) {
+      goalsComp = {
+        type: 'goals',
+        goals: [],
+        MAX_GOALS: 5,
+      } as unknown as GoalsComponent;
+      entity.addComponent(goalsComp);
+    }
+
+    // Map goal type to category
+    let category: GoalCategory;
+    switch (goal.type) {
+      case 'personal':
+        category = 'mastery';
+        break;
+      case 'medium_term':
+        category = 'creative';
+        break;
+      case 'group':
+        category = 'social';
+        break;
+      default:
+        category = 'mastery';
+    }
+
+    // Create the goal
+    const newGoal: PersonalGoal = {
+      id: `goal_${goal.type}_${Date.now()}`,
+      category,
+      description: goal.description,
+      motivation: `Set during ${goal.type} goal-setting`,
+      progress: 0,
+      milestones: [],
+      createdAt: Date.now(),
+      targetCompletionDays: goal.type === 'personal' ? 7 : goal.type === 'medium_term' ? 14 : 30,
+      completed: false,
+    };
+
+    // Add the goal (raw data check since it might not be a class instance)
+    const goalsArray = (goalsComp as any).goals as PersonalGoal[];
+    if (goalsArray.length < 5) {
+      goalsArray.push(newGoal);
+      console.log(`[ScheduledDecisionProcessor] Added goal for ${entity.id}: ${goal.description}`);
     }
   }
 

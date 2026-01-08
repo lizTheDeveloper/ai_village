@@ -19,6 +19,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { AgentComponent, AgentBehavior, StrategicPriorities } from '../components/AgentComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
+import type { GoalsComponent, PersonalGoal, GoalCategory } from '../components/GoalsComponent.js';
 
 /**
  * Talker LLM decision result
@@ -78,6 +79,65 @@ const DEFAULT_CONFIG: TalkerProcessorConfig = {
   introvertTalkCadenceSec: 120,  // Every 2 minutes
   conversationPriority: 8,       // High priority for active conversations
 };
+
+/**
+ * Add a goal to the entity's GoalsComponent.
+ * Creates the component if it doesn't exist.
+ * Maps goal type to category for proper classification.
+ */
+function addGoalToComponent(
+  entity: EntityImpl,
+  goalDescription: string,
+  goalType: 'personal' | 'medium_term' | 'group'
+): void {
+  // Get or create goals component
+  let goalsComp = entity.getComponent(ComponentType.Goals) as GoalsComponent | undefined;
+
+  if (!goalsComp) {
+    // Create goals component with basic structure
+    goalsComp = {
+      type: 'goals',
+      goals: [],
+      MAX_GOALS: 5,
+    } as unknown as GoalsComponent;
+    entity.addComponent(goalsComp);
+  }
+
+  // Map goal type to category
+  let category: GoalCategory;
+  switch (goalType) {
+    case 'personal':
+      category = 'mastery'; // Personal goals tend to be about self-improvement
+      break;
+    case 'medium_term':
+      category = 'creative'; // Medium-term often involves projects/creation
+      break;
+    case 'group':
+      category = 'social'; // Group goals are inherently social
+      break;
+    default:
+      category = 'mastery';
+  }
+
+  // Create the goal
+  const newGoal: PersonalGoal = {
+    id: `goal_${goalType}_${Date.now()}`,
+    category,
+    description: goalDescription,
+    motivation: `Set by Talker during ${goalType} goal-setting`,
+    progress: 0,
+    milestones: [],
+    createdAt: Date.now(),
+    targetCompletionDays: goalType === 'personal' ? 7 : goalType === 'medium_term' ? 14 : 30,
+    completed: false,
+  };
+
+  // Check if we can add more goals (raw data check since it might not be a class instance)
+  const goalsArray = (goalsComp as any).goals as PersonalGoal[];
+  if (goalsArray.length < 5) {
+    goalsArray.push(newGoal);
+  }
+}
 
 /**
  * Select a behavior based on strategic priorities.
@@ -331,6 +391,9 @@ export class TalkerLLMProcessor {
 
       // Set personal goal
       if (typedAction.type === 'set_personal_goal' && typedAction.goal) {
+        // Add to GoalsComponent so LLMScheduler can see it
+        addGoalToComponent(entity, typedAction.goal, 'personal');
+
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           personalGoal: typedAction.goal,
@@ -355,6 +418,9 @@ export class TalkerLLMProcessor {
 
       // Set medium-term goal
       if (typedAction.type === 'set_medium_term_goal' && typedAction.goal) {
+        // Add to GoalsComponent so LLMScheduler can see it
+        addGoalToComponent(entity, typedAction.goal, 'medium_term');
+
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           mediumTermGoal: typedAction.goal,
@@ -379,6 +445,9 @@ export class TalkerLLMProcessor {
 
       // Set group goal
       if (typedAction.type === 'set_group_goal' && typedAction.goal) {
+        // Add to GoalsComponent so LLMScheduler can see it
+        addGoalToComponent(entity, typedAction.goal, 'group');
+
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           groupGoal: typedAction.goal,

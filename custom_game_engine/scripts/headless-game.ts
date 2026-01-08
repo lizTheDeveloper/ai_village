@@ -8,6 +8,9 @@
  *   npx tsx scripts/headless-game.ts --session-id=my_session_123
  */
 
+// Load environment variables from .env file
+import 'dotenv/config';
+
 // Use relative imports to source files (same pattern as metrics-server.ts)
 import {
   GameLoop,
@@ -102,8 +105,11 @@ import {
   OpenAICompatProvider,
   LLMDecisionQueue,
   StructuredPromptBuilder,
+  LLMScheduler,
   type LLMProvider,
 } from '../packages/llm/src/index.js';
+
+import { ScheduledDecisionProcessor } from '../packages/core/src/decision/ScheduledDecisionProcessor.js';
 
 import {
   derivePrioritiesFromSkills,
@@ -239,8 +245,11 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(new IdleBehaviorSystem());
   gameLoop.systemRegistry.register(new GoalGenerationSystem(gameLoop.world.eventBus));
 
-  // AI system
-  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
+  // AI system - Using ScheduledDecisionProcessor with three-layer LLM architecture
+  // This enables intelligent layer selection: Autonomic (survival), Talker (goals/social), Executor (tasks)
+  const llmScheduler = new LLMScheduler(llmQueue);
+  const scheduledProcessor = new ScheduledDecisionProcessor(llmScheduler, llmQueue);
+  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder, undefined, scheduledProcessor));
 
   // Navigation & Exploration systems
   gameLoop.systemRegistry.register(new SocialGradientSystem());

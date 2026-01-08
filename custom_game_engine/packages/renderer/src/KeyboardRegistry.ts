@@ -8,6 +8,7 @@ export interface KeyboardShortcut {
   shift?: boolean;
   ctrl?: boolean;
   alt?: boolean;
+  meta?: boolean;
   description: string;
   category: string;
   handler: () => boolean | void; // Return true if handled
@@ -19,6 +20,7 @@ export interface KeyMap {
     shift?: boolean;
     ctrl?: boolean;
     alt?: boolean;
+    meta?: boolean;
   };
 }
 
@@ -57,17 +59,19 @@ export class KeyboardRegistry {
    * @param shiftKey Whether Shift was held
    * @param ctrlKey Whether Ctrl was held
    * @param altKey Whether Alt was held
+   * @param metaKey Whether Meta/Command was held
    * @returns True if a shortcut was handled
    */
-  handleKey(key: string, shiftKey: boolean, ctrlKey: boolean, altKey: boolean = false): boolean {
+  handleKey(key: string, shiftKey: boolean, ctrlKey: boolean, altKey: boolean = false, metaKey: boolean = false): boolean {
     for (const [_id, shortcut] of this.shortcuts) {
       // Check if this shortcut matches the key event
       const keyMatches = shortcut.key.toLowerCase() === key.toLowerCase();
       const shiftMatches = (shortcut.shift ?? false) === shiftKey;
       const ctrlMatches = (shortcut.ctrl ?? false) === ctrlKey;
       const altMatches = (shortcut.alt ?? false) === altKey;
+      const metaMatches = (shortcut.meta ?? false) === metaKey;
 
-      if (keyMatches && shiftMatches && ctrlMatches && altMatches) {
+      if (keyMatches && shiftMatches && ctrlMatches && altMatches && metaMatches) {
         const handled = shortcut.handler();
         if (handled === true || handled === undefined) {
           return true;
@@ -110,11 +114,12 @@ export class KeyboardRegistry {
   /**
    * Format a shortcut as a human-readable string.
    * @param shortcut Shortcut to format
-   * @returns Formatted string (e.g., "Shift+T", "Ctrl+S", "Escape")
+   * @returns Formatted string (e.g., "Shift+T", "Ctrl+S", "Escape", "⌘+V")
    */
   formatShortcut(shortcut: KeyboardShortcut): string {
     const parts: string[] = [];
 
+    if (shortcut.meta) parts.push('⌘');
     if (shortcut.ctrl) parts.push('Ctrl');
     if (shortcut.alt) parts.push('Alt');
     if (shortcut.shift) parts.push('Shift');
@@ -133,9 +138,10 @@ export class KeyboardRegistry {
    * @param shift Shift modifier
    * @param ctrl Ctrl modifier
    * @param alt Alt modifier
+   * @param meta Meta/Command modifier
    */
-  remap(actionId: string, key: string, shift = false, ctrl = false, alt = false): void {
-    this.keyMap[actionId] = { key, shift, ctrl, alt };
+  remap(actionId: string, key: string, shift = false, ctrl = false, alt = false, meta = false): void {
+    this.keyMap[actionId] = { key, shift, ctrl, alt, meta };
 
     // Update the shortcut if it exists
     const shortcut = this.shortcuts.get(actionId);
@@ -144,6 +150,7 @@ export class KeyboardRegistry {
       shortcut.shift = shift;
       shortcut.ctrl = ctrl;
       shortcut.alt = alt;
+      shortcut.meta = meta;
     }
   }
 
@@ -165,7 +172,7 @@ export class KeyboardRegistry {
 
         // Apply saved mappings to shortcuts
         for (const [actionId, mapping] of Object.entries(this.keyMap)) {
-          this.remap(actionId, mapping.key, mapping.shift, mapping.ctrl, mapping.alt);
+          this.remap(actionId, mapping.key, mapping.shift, mapping.ctrl, mapping.alt, mapping.meta);
         }
       } catch (e) {
         console.error('[KeyboardRegistry] Failed to load key mappings:', e);

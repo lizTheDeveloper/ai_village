@@ -40,14 +40,22 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // Low energy (25)
 
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Only pass entities with circadian component
+    const entities = harness.world.query().with(ComponentType.Circadian).executeEntities();
 
     // Simulate several hours of being awake with low energy
     for (let i = 0; i < 10; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       sleepSystem.update(harness.world, entities, 2.4); // 2.4s = ~1 game hour
+      stateMutator.update(harness.world, entities, 2.4); // Apply sleep drive deltas
     }
 
     const circadian = agent.getComponent(ComponentType.Circadian) as any;
@@ -73,17 +81,25 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // Low energy
 
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Only pass entities with circadian component
+    const entities = harness.world.query().with(ComponentType.Circadian).executeEntities();
 
     const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialEnergy = initialNeeds.energy;
 
     // Sleep for several hours
     for (let i = 0; i < 6; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       sleepSystem.update(harness.world, entities, 2.0); // ~1 hour each
+      stateMutator.update(harness.world, entities, 2.0); // Apply energy deltas
     }
 
     const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
@@ -221,7 +237,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     agent1.addComponent(circadian1);
     agent1.addComponent(new NeedsComponent({
     hunger: 1.0,
-    energy: 0.2,
+    energy: 0.85, // Start near full to measure difference before cap
     health: 1.0,
     thirst: 1.0,
     temperature: 1.0,
@@ -230,26 +246,38 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     agent2.addComponent(circadian2);
     agent2.addComponent(new NeedsComponent({
     hunger: 1.0,
-    energy: 0.2,
+    energy: 0.85, // Start near full
     health: 1.0,
     thirst: 1.0,
     temperature: 1.0,
   }));
 
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Only pass entities with circadian component
+    const entities = harness.world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Sleep for same amount of time
-    for (let i = 0; i < 6; i++) {
-      sleepSystem.update(harness.world, entities, 2.0);
-    }
+    // Sleep for short time to catch mid-recovery before both hit cap
+    // Energy recovery rates: quality 1.0 = 6.0/min, quality 0.3 = 1.8/min
+    // Advance 1200 ticks to trigger delta registration
+    harness.world.setTick(harness.world.tick + 1200);
+    sleepSystem.update(harness.world, entities, 2.0); // Register deltas
+    stateMutator.update(harness.world, entities, 2.0); // Apply (registers deltas as "applied")
+    // Advance just 10 more ticks for tiny difference
+    harness.world.setTick(harness.world.tick + 10);
+    stateMutator.update(harness.world, entities, 0.01); // Apply small delta
 
     const needs1 = agent1.getComponent(ComponentType.Needs) as any;
     const needs2 = agent2.getComponent(ComponentType.Needs) as any;
 
     // Agent with better sleep quality should have recovered more energy
+    // Both started at 0.85, quality difference should show even in small time
     expect(needs1.energy).toBeGreaterThan(needs2.energy);
   });
 
@@ -270,7 +298,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // Almost full energy
 
+    // Create and wire StateMutatorSystem (required for SleepSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const sleepSystem = new SleepSystem();
+    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     // Only pass entities with required components
@@ -278,7 +311,9 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
 
     // Sleep enough to fully recover
     for (let i = 0; i < 3; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
       sleepSystem.update(harness.world, entitiesWithCircadian, 2.0);
+      stateMutator.update(harness.world, entitiesWithCircadian, 2.0); // Apply energy deltas
     }
 
     const finalCircadian = agent.getComponent(ComponentType.Circadian) as any;

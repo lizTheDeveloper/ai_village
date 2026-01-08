@@ -159,6 +159,7 @@ export function registerAllSerializers(): void {
     'lore_frag',
     'afterlife',
     'realm',
+    'llm_history', // LLM interaction history for debugging UI
   ];
 
   for (const componentType of genericComponents) {

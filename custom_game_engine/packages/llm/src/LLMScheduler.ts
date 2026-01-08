@@ -220,7 +220,10 @@ export class LLMScheduler {
 
     // PRIORITY 4: No goals set (needs goal-setting via Talker)
     // Check if agent has NO active goals - Talker is responsible for setting goals
-    if (!goals || !goals.goals || goals.goals.length === 0 || goals.getActiveGoalCount() === 0) {
+    // Note: goals component may be raw data, not a class instance, so use array check only
+    const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
+      goals.goals.some((g) => !g.completed);
+    if (!hasActiveGoals) {
       return {
         layer: 'talker',
         reason: 'No goals set, needs goal-setting',

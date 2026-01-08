@@ -45,7 +45,7 @@ export enum ScrollDirection {
 // ============================================================================
 
 export interface InputHandlerCallbacks {
-  onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean) => boolean;
+  onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean, metaKey: boolean) => boolean;
   onMouseClick?: (screenX: number, screenY: number, button: number) => boolean;
   onMouseMove?: (screenX: number, screenY: number) => void;
   onWheel?: (screenX: number, screenY: number, deltaY: number) => boolean;
@@ -211,7 +211,7 @@ export class InputHandler {
     const handleKeyDown = (e: Event) => {
       const ke = e as KeyboardEvent;
       // Check if callback handles this key
-      if (this.callbacks.onKeyDown?.(ke.key, ke.shiftKey, ke.ctrlKey)) {
+      if (this.callbacks.onKeyDown?.(ke.key, ke.shiftKey, ke.ctrlKey, ke.metaKey)) {
         ke.preventDefault();
         return;
       }

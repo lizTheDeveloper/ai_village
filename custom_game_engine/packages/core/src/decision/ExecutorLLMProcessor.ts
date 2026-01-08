@@ -610,17 +610,19 @@ export class ExecutorLLMProcessor {
       }
     }
 
-    // Building limits
+    // Building limits - scaled for 5-10 agent villages
     const BUILDING_LIMITS: Record<string, number> = {
-      'workbench': 1,
-      'forge': 1,
-      'campfire': 2,
-      'well': 1,
-      'farm-shed': 1,
-      'storage-chest': 2,
-      'bed': 3,
-      'tent': 2,
-      'lean-to': 2,
+      'workbench': 2,
+      'forge': 2,
+      'campfire': 5,      // Warmth is important, multiple camps
+      'well': 2,
+      'farm-shed': 2,
+      'storage-chest': 15, // Storage always useful
+      'storage-box': 15,
+      'bed': 10,
+      'bedroll': 10,
+      'tent': 5,
+      'lean-to': 5,
     };
     const limit = BUILDING_LIMITS[buildingType] ?? 1;
 

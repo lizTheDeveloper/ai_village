@@ -2300,9 +2300,9 @@ function setupInputHandlers(
   } = uiContext;
 
   inputHandler.setCallbacks({
-    onKeyDown: (key, shiftKey, ctrlKey) => {
+    onKeyDown: (key, shiftKey, ctrlKey, metaKey) => {
       return handleKeyDown(
-        key, shiftKey, ctrlKey,
+        key, shiftKey, ctrlKey, metaKey,
         gameContext, uiContext
       );
     },
@@ -2336,6 +2336,7 @@ function handleKeyDown(
   key: string,
   shiftKey: boolean,
   ctrlKey: boolean,
+  metaKey: boolean,
   gameContext: GameContext,
   uiContext: UIContext
 ): boolean {
@@ -2345,8 +2346,8 @@ function handleKeyDown(
     placementUI, windowManager, keyboardRegistry
   } = uiContext;
 
-  // Check keyboard registry first
-  if (keyboardRegistry.handleKey(key, shiftKey, ctrlKey)) {
+  // Check keyboard registry first (passes metaKey to avoid intercepting system shortcuts like Cmd+V)
+  if (keyboardRegistry.handleKey(key, shiftKey, ctrlKey, false, metaKey)) {
     return true;
   }
 
