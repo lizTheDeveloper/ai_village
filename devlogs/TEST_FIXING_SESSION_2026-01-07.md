@@ -357,12 +357,62 @@ for (let i = 0; i < 10; i++) {
 - ✅ should housing cleanliness decay with occupants
 - ✅ should animal system throw on missing required fields
 
-## Total Tests Fixed: 63
+### 10. AnimalHusbandryCycle Integration Tests (+6 tests - ALL PASSING)
+**Problem**: AnimalHusbandryCycle.integration.test.ts used old AnimalSystem constructor signature and lacked StateMutatorSystem setup
+
+**Root Causes**:
+1. Tests created AnimalSystem with old constructor: `new AnimalSystem(harness.world.eventBus)`
+2. New AnimalSystem requires StateMutatorSystem to be wired via `setStateMutatorSystem()`
+3. Tests didn't advance world ticks or apply deltas
+4. Tests used unfiltered entity queries
+
+**Fixes Applied**:
+
+Applied same StateMutatorSystem pattern to all 6 failing tests:
+1. "should animal system process animal lifecycles" - 10 game minutes loop
+2. "should animals age through life stages" - 30 days (720 game hours) loop
+3. "should housing cleanliness affect animal health" - 20 game minutes loop
+4. "should animal death trigger replacement cycle" - Single tick advancement
+5. "should full husbandry cycle integrate all systems" - 5 days (120 game hours) multi-system integration
+6. "should animal needs decay and require care" - 20 game minutes loop
+
+**Pattern Applied**:
+```typescript
+// Create and wire StateMutatorSystem (required for AnimalSystem)
+const stateMutator = new StateMutatorSystem();
+harness.registerSystem('StateMutatorSystem', stateMutator);
+
+const animalSystem = new AnimalSystem();  // No eventBus parameter
+animalSystem.setStateMutatorSystem(stateMutator);
+harness.registerSystem('AnimalSystem', animalSystem);
+
+// Query entities with Animal component
+const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
+
+// Tick advancement and delta application loop
+for (let i = 0; i < iterations; i++) {
+  harness.world.setTick(harness.world.tick + 1200);
+  animalSystem.update(harness.world, entities, 60.0);
+  stateMutator.update(harness.world, entities, 60.0);
+}
+```
+
+**Files Modified**:
+- `packages/core/src/systems/__tests__/AnimalHusbandryCycle.integration.test.ts`
+
+**Commit**: `fix: AnimalHusbandryCycle integration tests - StateMutatorSystem setup (+6 tests)`
+
+**Impact**: All 12 tests in AnimalHusbandryCycle.integration.test.ts now passing (was 6/12)
+
+## Total Tests Fixed: 69
 - Session start (part 1): 9 tests (4 governance building + 5 AgentCombat)
 - Session continuation (part 2): 11 tests (7 BeliefAttribution + 4 PowerConsumption in first commit, +8 more PowerConsumption)
 - Session continuation (part 3): 12 tests (TimeSeriesView component interface)
 - Session continuation (part 4): 7 tests (MovementSteering integration - ALL PASSING)
 - Session continuation (part 5): 11 tests (CulturalDiffusionView interface - PARTIAL, 11 more need features)
+- Session continuation (part 6): 6 tests (NeedsSleepHealth integration - 6/7 passing, 1 architecture limitation)
+- Session continuation (part 7): 7 tests (AnimalComplete integration - ALL PASSING)
+- Session continuation (part 8): 6 tests (AnimalHusbandryCycle integration - ALL PASSING)
 
 ## Methodology
 - Systematic approach: identify high-impact error patterns
