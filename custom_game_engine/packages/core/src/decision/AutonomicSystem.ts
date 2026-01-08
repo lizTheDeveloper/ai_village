@@ -162,14 +162,8 @@ export class AutonomicSystem {
       };
     }
 
-    // Critical sleep drive: > 85 = forced micro-sleep (can fall asleep mid-action)
-    if (circadian && circadian.sleepDrive > 85) {
-      return {
-        behavior: 'forced_sleep',
-        priority: 100,
-        reason: `Critical sleep drive (sleepDrive: ${circadian.sleepDrive.toFixed(1)})`,
-      };
-    }
+    // Note: Removed sleepDrive-based triggers - sleep is now purely energy-based
+    // Energy decays while awake, and low energy triggers sleep
 
     // Dangerously cold/hot: seek warmth/shelter urgently (high priority survival need)
     if (temperature) {
@@ -214,22 +208,7 @@ export class AutonomicSystem {
       // }
     }
 
-    // Bedtime: If it's past bedtime AND moderate sleep drive, go to bed
-    // This makes agents go to bed at night based on their preferred sleep time
-    // Priority 70: higher than generic sleep drive but lower than critical needs
-    if (circadian && currentTimeOfDay !== undefined) {
-      const isPastBedtime =
-        currentTimeOfDay >= circadian.preferredSleepTime || currentTimeOfDay < 5;
-      const hasModeratesleepDrive = circadian.sleepDrive >= 50;
-
-      if (isPastBedtime && hasModeratesleepDrive) {
-        return {
-          behavior: 'seek_sleep',
-          priority: 70,
-          reason: `Bedtime (time: ${currentTimeOfDay.toFixed(1)}h, sleepDrive: ${circadian.sleepDrive.toFixed(1)})`,
-        };
-      }
-    }
+    // Note: Removed bedtime + sleepDrive trigger - sleep is purely energy-based now
 
     // Hunger critical threshold: 0.1 (10%) (very hungry, but can still function)
     // Only interrupt if NOT critically exhausted (energy > 0)
@@ -241,15 +220,7 @@ export class AutonomicSystem {
       };
     }
 
-    // High sleep drive: seek sleep only at high threshold (95+)
-    // This ensures agents only sleep when truly tired, not prematurely
-    if (circadian && circadian.sleepDrive >= 95) {
-      return {
-        behavior: 'seek_sleep',
-        priority: 30,
-        reason: `High sleep drive (sleepDrive: ${circadian.sleepDrive.toFixed(1)})`,
-      };
-    }
+    // Note: Removed high sleepDrive trigger - sleep is purely energy-based now
 
     // Moderate hunger: seek food (but not urgent enough to interrupt sleep)
     // TEMP: Lower threshold to 0.6 (60%) for testing berry gathering

@@ -148,10 +148,23 @@ export class ScheduledDecisionProcessor {
         this.applyGoalToEntity(entity, parsed.goal);
       }
 
-      // Apply decision to agent
+      // If no behavior change, just apply speech/goal updates without changing behavior
+      if (!parsed.behavior) {
+        // Only update speech if present
+        if (parsed.speaking) {
+          entity.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            recentSpeech: parsed.speaking,
+          }));
+        }
+        // Return unchanged - agent stays in current behavior
+        return { changed: false, source: 'none' };
+      }
+
+      // Apply decision to agent (with behavior change)
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
-        behavior: parsed.behavior,
+        behavior: parsed.behavior!,
         behaviorState: parsed.behaviorState || {},
         recentSpeech: parsed.speaking, // Set speech for bubble renderer
       }));
@@ -250,10 +263,23 @@ export class ScheduledDecisionProcessor {
         this.applyGoalToEntity(entity, parsed.goal);
       }
 
-      // Apply decision to agent
+      // If no behavior change, just apply speech/goal updates without changing behavior
+      if (!parsed.behavior) {
+        // Only update speech if present
+        if (parsed.speaking) {
+          entity.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            recentSpeech: parsed.speaking,
+          }));
+        }
+        // Return unchanged - agent stays in current behavior
+        return { changed: false, source: 'none' };
+      }
+
+      // Apply decision to agent (with behavior change)
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
-        behavior: parsed.behavior,
+        behavior: parsed.behavior!,
         behaviorState: parsed.behaviorState || {},
         recentSpeech: parsed.speaking, // Set speech for bubble renderer
       }));
@@ -303,8 +329,9 @@ export class ScheduledDecisionProcessor {
   /**
    * Parse LLM response (JSON or legacy text format).
    * Also extracts goal from Talker responses.
+   * Returns null if parsing fails. Behavior is optional - if omitted, agent stays in current behavior.
    */
-  private parseLLMResponse(response: string): { behavior: AgentBehavior; behaviorState?: Record<string, unknown>; speaking?: string; goal?: { type: string; description: string } } | null {
+  private parseLLMResponse(response: string): { behavior?: AgentBehavior; behaviorState?: Record<string, unknown>; speaking?: string; goal?: { type: string; description: string } } | null {
     // Try JSON parse first (structured format)
     try {
       const parsed = JSON.parse(response);
@@ -344,10 +371,11 @@ export class ScheduledDecisionProcessor {
         }
       }
 
-      // If we have a goal but no action, still return something
+      // If we have a goal but no action, apply goal but DON'T change behavior
+      // Agent stays in current behavior - LLM will decide action when ready
       if (goal && goal.description) {
         return {
-          behavior: 'idle' as AgentBehavior,
+          // NO behavior change - let agent stay in current behavior
           behaviorState: {},
           speaking: parsed.speaking,
           goal,

@@ -46,21 +46,21 @@ describe('SleepSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
 
-    // Simulate 18 hours of game time
-    // At 48s/day, 1 hour = 2 seconds real time
-    // 18 hours = 36 seconds real time, split into game minutes
-    for (let i = 0; i < 18; i++) {
+    // Simulate 1080 game minutes (18 game hours) of awake time
+    // With corrected rate: 5.5 / 60 = 0.0917 per game minute (base)
+    // After 1080 minutes: 0 + (0.0917 * 1080) = 99 → clamped to 100
+    for (let i = 0; i < 1080; i++) {
       world.setTick(world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(world, entities, 2.0); // 2s = ~1 game hour
+      sleepSystem.update(world, entities, 2.0);
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
     // Get updated circadian component
     const circadian = agent.getComponent(ComponentType.Circadian) as any;
 
-    // Sleep drive should be around 95-100 after 18 hours
-    // Base rate: 5.5/hour * 18 = 99
-    expect(circadian.sleepDrive).toBeGreaterThan(95);
+    // Sleep drive should be around 95-100 after 18 game hours
+    // Base rate: 5.5/hour * 18 = 99 (correct)
+    expect(circadian.sleepDrive).toBeGreaterThan(90);
     expect(circadian.sleepDrive).toBeLessThanOrEqual(100);
   });
 

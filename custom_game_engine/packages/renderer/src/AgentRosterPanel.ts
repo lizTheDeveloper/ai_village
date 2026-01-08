@@ -139,12 +139,15 @@ export class AgentRosterPanel implements IWindowPanel {
 
   /**
    * Mark an agent as recently interacted with
+   * @param skipRender - If true, don't trigger a DOM update (useful when called before setSelectedAgent)
    */
-  touchAgent(id: string): void {
+  touchAgent(id: string, skipRender: boolean = false): void {
     const agent = this.agents.get(id);
     if (agent) {
       agent.lastInteractionTime = Date.now();
-      this.updateDOM();
+      if (!skipRender) {
+        this.updateDOM();
+      }
     }
   }
 
@@ -228,10 +231,20 @@ export class AgentRosterPanel implements IWindowPanel {
     const showAllButton = agentCount >= 20;
     const maxVisible = showAllButton ? 9 : 20;
 
-    // Get agents sorted by last interaction time
-    const sortedAgents = Array.from(this.agents.values())
-      .sort((a, b) => b.lastInteractionTime - a.lastInteractionTime)
-      .slice(0, maxVisible);
+    // Get agents - use interaction time only for filtering (when >= 20 agents),
+    // but always display in stable order (by name) to prevent portraits from
+    // rearranging when clicked
+    let agentsToShow = Array.from(this.agents.values());
+
+    if (showAllButton) {
+      // Filter to most recently interacted agents
+      agentsToShow = agentsToShow
+        .sort((a, b) => b.lastInteractionTime - a.lastInteractionTime)
+        .slice(0, maxVisible);
+    }
+
+    // Sort by name for stable display order
+    const sortedAgents = agentsToShow.sort((a, b) => a.name.localeCompare(b.name));
 
     // Clear container
     this.rosterContainer.innerHTML = '';
@@ -296,7 +309,8 @@ export class AgentRosterPanel implements IWindowPanel {
 
     // Click to focus
     portrait.addEventListener('click', () => {
-      this.touchAgent(agent.id);
+      // Skip render on touchAgent since setSelectedAgent will trigger updateDOM
+      this.touchAgent(agent.id, true);
       this.setSelectedAgent(agent.id);
       if (this.onAgentClickCallback) {
         this.onAgentClickCallback(agent.id);
@@ -544,7 +558,8 @@ export class AgentRosterPanel implements IWindowPanel {
 
     // Click to focus and close modal
     card.addEventListener('click', () => {
-      this.touchAgent(agent.id);
+      // Skip render on touchAgent since setSelectedAgent will trigger updateDOM
+      this.touchAgent(agent.id, true);
       this.setSelectedAgent(agent.id);
       if (this.onAgentClickCallback) {
         this.onAgentClickCallback(agent.id);

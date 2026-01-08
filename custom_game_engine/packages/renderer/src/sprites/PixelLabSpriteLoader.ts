@@ -344,10 +344,17 @@ export class PixelLabSpriteLoader {
       instance.animState.frameIndex = 0;
       instance.animState.frameTime = 0;
 
-      // Check if animation exists, if not queue generation
+      // Check if animation exists, if not try to load it (may have been generated after initial load)
       const character = instance.character;
       if (!character.animations.has(animation) && animation !== 'idle') {
-        this.queueAnimationGeneration(character.id, animation);
+        // Try loading the animation from disk first (async, non-blocking)
+        // This catches animations that were generated after the character was first loaded
+        this.tryLoadAnimation(character, animation).then(loaded => {
+          if (!loaded) {
+            // Animation not on disk, queue generation
+            this.queueAnimationGeneration(character.id, animation);
+          }
+        });
       }
     }
     instance.animState.playing = play;
@@ -401,6 +408,71 @@ export class PixelLabSpriteLoader {
       'cast': 'casting spell with hands raised',
     };
     return descriptions[animationName] || animationName.replace(/-/g, ' ');
+  }
+
+  // Track which animations we're currently trying to load to avoid duplicate attempts
+  private loadingAnimations = new Set<string>();
+
+  /**
+   * Try to load an animation that may have been generated after the character was first loaded.
+   * This checks the disk for animation frames and adds them to the character if found.
+   */
+  async tryLoadAnimation(character: LoadedPixelLabCharacter, animName: string): Promise<boolean> {
+    // Already loaded?
+    if (character.animations.has(animName)) return true;
+
+    // Already trying to load?
+    const loadKey = `${character.id}:${animName}`;
+    if (this.loadingAnimations.has(loadKey)) return false;
+
+    this.loadingAnimations.add(loadKey);
+
+    try {
+      const folderPath = `${this.basePath}/${character.id}`;
+      const directionNames = character.directions === 8
+        ? PIXELLAB_DIRECTION_NAMES
+        : ['south', 'west', 'east', 'north'];
+
+      const animMap = new Map<string, HTMLImageElement[]>();
+      let foundAnyFrames = false;
+
+      for (const dirName of directionNames) {
+        const frames: HTMLImageElement[] = [];
+        let frameIndex = 0;
+
+        // Try loading frames until we hit a missing one
+        while (frameIndex < 20) { // Cap at 20 frames to avoid infinite loop
+          const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
+          try {
+            const img = await this.loadImage(framePath, character.id);
+            frames.push(img);
+            foundAnyFrames = true;
+            frameIndex++;
+          } catch {
+            break; // No more frames for this direction
+          }
+        }
+
+        if (frames.length > 0) {
+          animMap.set(dirName, frames);
+        }
+      }
+
+      if (foundAnyFrames && animMap.size > 0) {
+        character.animations.set(animName, animMap);
+        console.log(`[PixelLabLoader] Loaded ${animName} animation for ${character.id} (${animMap.size} directions)`);
+        // Clear generation request since we now have the animation
+        this.generationRequests.delete(`${character.id}:${animName}`);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.warn(`[PixelLabLoader] Failed to load ${animName} for ${character.id}:`, error);
+      return false;
+    } finally {
+      this.loadingAnimations.delete(loadKey);
+    }
   }
 
   /**

@@ -443,7 +443,8 @@ export class ScriptedDecisionProcessor {
     const partner = world.getEntity(conversation.partnerId);
     if (!partner) return null;
     const partnerImpl = partner as EntityImpl;
-    // End conversation for both
+    // End conversation for both - but DON'T force behavior change
+    // LLM will see conversation ended and decide what to do next
     entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) => ({
       ...current,
       isActive: false,
@@ -454,18 +455,8 @@ export class ScriptedDecisionProcessor {
       isActive: false,
       partnerId: null,
     }));
-    // Switch both back to wandering
-    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-      ...current,
-      behavior: 'wander',
-      behaviorState: {},
-    }));
-    partnerImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-      ...current,
-      behavior: 'wander',
-      behaviorState: {},
-    }));
-    return { changed: true, behavior: 'wander', behaviorState: {} };
+    // NOTE: Don't force behavior change - LLM decides next action
+    return { changed: false };
   }
   /**
    * Process planned builds - gather resources or execute build when ready.

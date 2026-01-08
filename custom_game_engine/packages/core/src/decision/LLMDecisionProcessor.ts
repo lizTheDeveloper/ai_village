@@ -66,8 +66,9 @@ interface ParsedAction {
 }
 /**
  * Convert a parsed action object to behavior + behaviorState
+ * Returns null if the action type is not recognized (no fallback - agent stays in current behavior)
  */
-function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior; behaviorState: Record<string, unknown> } {
+function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior; behaviorState: Record<string, unknown> } | null {
   const behaviorState: Record<string, unknown> = {};
   switch (action.type) {
     case 'gather':
@@ -863,8 +864,11 @@ export class LLMDecisionProcessor {
       // Single action object
       else if (typeof action === 'object' && action !== null && 'type' in action) {
         const converted = actionObjectToBehavior(action as ParsedAction);
-        behavior = converted.behavior;
-        behaviorState = converted.behaviorState;
+        if (converted) {
+          behavior = converted.behavior;
+          behaviorState = converted.behaviorState;
+        }
+        // If converted is null, behavior stays as current (no fallback)
       }
       // Simple string action - apply default behaviorState for behaviors that need it
       else if (typeof action === 'string') {
@@ -960,7 +964,10 @@ export class LLMDecisionProcessor {
     const queue: QueuedBehavior[] = [];
     for (const action of actions) {
       if (!action.type) continue;
-      const { behavior, behaviorState } = actionObjectToBehavior(action);
+      const converted = actionObjectToBehavior(action);
+      // Skip actions that couldn't be converted (unrecognized action types)
+      if (!converted) continue;
+      const { behavior, behaviorState } = converted;
       const label = generateBehaviorLabel(action);
       // For gather with amount, set up repeats based on typical gather rate
       // Each gather typically yields ~10 resources, so amount/10 = repeats
