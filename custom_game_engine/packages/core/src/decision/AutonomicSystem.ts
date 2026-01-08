@@ -208,7 +208,23 @@ export class AutonomicSystem {
       // }
     }
 
-    // Note: Removed bedtime + sleepDrive trigger - sleep is purely energy-based now
+    // Bedtime preference: If it's past preferred sleep time AND energy is reasonable,
+    // seeking bed becomes high-utility (but not forced). Agents naturally drift towards bed
+    // at their preferred sleep time, but other activities (conversations, gathering, combat)
+    // can continue if already in progress. Priority 70: can be interrupted by critical needs.
+    if (circadian && currentTimeOfDay !== undefined) {
+      const isPastBedtime =
+        currentTimeOfDay >= circadian.preferredSleepTime || currentTimeOfDay < 5;
+      const hasReasonableEnergy = needs.energy >= 0.15; // Not exhausted
+
+      if (isPastBedtime && hasReasonableEnergy) {
+        return {
+          behavior: 'seek_sleep',
+          priority: 70,
+          reason: `Bedtime (time: ${currentTimeOfDay.toFixed(1)}h, preferred: ${circadian.preferredSleepTime}h)`,
+        };
+      }
+    }
 
     // Hunger critical threshold: 0.1 (10%) (very hungry, but can still function)
     // Only interrupt if NOT critically exhausted (energy > 0)

@@ -429,9 +429,8 @@ export class PixelLabSpriteLoader {
 
     try {
       const folderPath = `${this.basePath}/${character.id}`;
-      const directionNames = character.directions === 8
-        ? PIXELLAB_DIRECTION_NAMES
-        : ['south', 'west', 'east', 'north'];
+      // Get direction names from the character's rotations (those are the directions we have)
+      const directionNames = Array.from(character.rotations.keys());
 
       const animMap = new Map<string, HTMLImageElement[]>();
       let foundAnyFrames = false;

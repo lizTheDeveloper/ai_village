@@ -7,6 +7,7 @@ import { TemperatureSystem } from '../TemperatureSystem.js';
 import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
+import { AutonomicSystem } from '../../decision/AutonomicSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 /**
@@ -28,40 +29,30 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     harness = createDawnWorld();
   });
 
-  it('should low energy increase sleep drive faster', () => {
+  it('should low energy trigger sleep behavior via AutonomicSystem', () => {
+    // NOTE: Sleep is now purely energy-based - no sleepDrive system
+    // Low energy directly triggers 'seek_sleep' behavior via AutonomicSystem
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     agent.addComponent(createCircadianComponent());
     agent.addComponent(new NeedsComponent({
-    hunger: 1.0,
-    energy: 0.25,
-    health: 1.0,
-    thirst: 1.0,
-    temperature: 1.0,
-  })); // Low energy (25)
+      hunger: 1.0,
+      energy: 0.1, // Low energy (10%) - should trigger seek_sleep
+      health: 1.0,
+      thirst: 1.0,
+      temperature: 1.0,
+    }));
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
-    const stateMutator = new StateMutatorSystem();
-    harness.registerSystem('StateMutatorSystem', stateMutator);
+    // Use AutonomicSystem to check sleep trigger
+    const autonomic = new AutonomicSystem();
 
-    const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
-    harness.registerSystem('SleepSystem', sleepSystem);
+    // Check autonomic override - low energy should trigger seek_sleep
+    const result = autonomic.check(agent, harness.world);
 
-    // Only pass entities with circadian component
-    const entities = harness.world.query().with(ComponentType.Circadian).executeEntities();
-
-    // Simulate several hours of being awake with low energy
-    for (let i = 0; i < 10; i++) {
-      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
-      sleepSystem.update(harness.world, entities, 2.4); // 2.4s = ~1 game hour
-      stateMutator.update(harness.world, entities, 2.4); // Apply sleep drive deltas
-    }
-
-    const circadian = agent.getComponent(ComponentType.Circadian) as any;
-
-    // Sleep drive should be high due to low energy
-    expect(circadian.sleepDrive).toBeGreaterThan(70);
+    // Low energy (< 0.15) should trigger seek_sleep behavior
+    expect(result).not.toBeNull();
+    expect(result?.behavior).toBe('seek_sleep');
+    expect(result?.priority).toBe(85);
   });
 
   it('should sleep recover energy in NeedsSystem', () => {
