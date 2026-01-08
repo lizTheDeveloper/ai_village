@@ -988,6 +988,9 @@ function setupMockSkillTrees() {
       },
     ],
     entryNodes: ['shinto_spirit_sense'],
+    connections: [
+      { from: 'shinto_spirit_sense', to: 'shinto_cleansing_ritual' }
+    ],
     categories: [
       {
         id: 'foundation',
@@ -1029,6 +1032,7 @@ function setupMockSkillTrees() {
       },
     ],
     entryNodes: ['allomancy_steel_push'],
+    connections: [],
     categories: [
       {
         id: 'foundation',
@@ -1058,6 +1062,7 @@ function setupMockSkillTrees() {
       },
     ],
     entryNodes: ['sympathy_heat_link'],
+    connections: [],
     categories: [
       {
         id: 'foundation',

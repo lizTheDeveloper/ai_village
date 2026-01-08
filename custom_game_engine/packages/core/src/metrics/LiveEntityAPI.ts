@@ -2059,4 +2059,105 @@ export class LiveEntityAPI {
       };
     }
   }
+
+  /**
+   * Get conversation history for an agent
+   * Returns the conversation component data with resolved participant names
+   */
+  private handleConversationQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    const conversation = entity.components.get('conversation') as {
+      partnerId?: string | null;
+      participantIds?: string[];
+      messages?: Array<{
+        speakerId: string;
+        message: string;
+        tick: number;
+      }>;
+      maxMessages?: number;
+      startedAt?: number;
+      lastMessageAt?: number;
+      isActive?: boolean;
+      socialFatigue?: number;
+      fatigueThreshold?: number;
+    } | undefined;
+
+    if (!conversation) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} does not have a conversation component`,
+      };
+    }
+
+    // Helper to resolve entity name
+    const resolveName = (entityId: string): string => {
+      const targetEntity = this.world.getEntity(entityId);
+      if (!targetEntity) return entityId;
+      const identity = targetEntity.components.get('identity') as { name?: string } | undefined;
+      return identity?.name || entityId;
+    };
+
+    // Get entity's own name
+    const identity = entity.components.get('identity') as { name?: string } | undefined;
+    const entityName = identity?.name || query.entityId;
+
+    // Resolve participant names
+    const participants = (conversation.participantIds || []).map(id => ({
+      id,
+      name: resolveName(id),
+    }));
+
+    // If we have a partnerId but no participantIds, include the partner
+    if (conversation.partnerId && participants.length === 0) {
+      participants.push({
+        id: conversation.partnerId,
+        name: resolveName(conversation.partnerId),
+      });
+    }
+
+    // Resolve speaker names in messages
+    const messages = (conversation.messages || []).map(msg => ({
+      speakerId: msg.speakerId,
+      speakerName: resolveName(msg.speakerId),
+      message: msg.message,
+      tick: msg.tick,
+    }));
+
+    return {
+      requestId: query.requestId,
+      success: true,
+      data: {
+        entityId: query.entityId,
+        entityName,
+        partnerId: conversation.partnerId,
+        partnerName: conversation.partnerId ? resolveName(conversation.partnerId) : null,
+        participants,
+        messages,
+        messageCount: messages.length,
+        maxMessages: conversation.maxMessages,
+        startedAt: conversation.startedAt,
+        lastMessageAt: conversation.lastMessageAt,
+        isActive: conversation.isActive ?? false,
+        socialFatigue: conversation.socialFatigue,
+        fatigueThreshold: conversation.fatigueThreshold,
+      },
+    };
+  }
 }

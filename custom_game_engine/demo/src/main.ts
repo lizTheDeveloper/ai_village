@@ -3135,7 +3135,7 @@ async function main() {
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
-  if (existingSaves.length > 0) {
+  if (existingSaves.length > 0 && !forceNewGame) {
     // Auto-load the most recent save
     const mostRecent = existingSaves[0]; // Saves are sorted by timestamp descending
 
