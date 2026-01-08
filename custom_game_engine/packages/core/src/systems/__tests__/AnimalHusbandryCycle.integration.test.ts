@@ -6,6 +6,7 @@ import { TamingSystem } from '../TamingSystem.js';
 import { AnimalHousingSystem } from '../AnimalHousingSystem.js';
 import { AnimalProductionSystem } from '../AnimalProductionSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 /**
@@ -29,20 +30,28 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should animal system process animal lifecycles', () => {
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
-    const timeSystem = new TimeSystem();
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
+
+    const timeSystem = new TimeSystem();
     harness.registerSystem('TimeSystem', timeSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    // Run systems
+    // Run systems with proper tick advancement
     for (let i = 0; i < 10; i++) {
-      timeSystem.update(harness.world, entities, 100.0);
-      animalSystem.update(harness.world, entities, 100.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      timeSystem.update(harness.world, entities, 60.0);
+      animalSystem.update(harness.world, entities, 60.0);
+      stateMutator.update(harness.world, entities, 60.0); // Apply deltas
     }
 
     // Animal should be processed
@@ -87,23 +96,31 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should animals age through life stages', () => {
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
-    const timeSystem = new TimeSystem();
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
+
+    const timeSystem = new TimeSystem();
     harness.registerSystem('TimeSystem', timeSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
 
     harness.clearEvents();
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    // Simulate aging over many days
+    // Simulate aging over many days (30 days = 43200 game minutes)
     for (let day = 0; day < 30; day++) {
       for (let hour = 0; hour < 24; hour++) {
-        timeSystem.update(harness.world, entities, 2.0);
-        animalSystem.update(harness.world, entities, 2.0);
+        harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+        timeSystem.update(harness.world, entities, 60.0);
+        animalSystem.update(harness.world, entities, 60.0);
+        stateMutator.update(harness.world, entities, 60.0); // Apply deltas
       }
     }
 
@@ -138,22 +155,30 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
 
   it('should housing cleanliness affect animal health', () => {
     const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
 
-    harness.registerSystem('AnimalHousingSystem', housingSystem);
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
+    harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
 
     harness.clearEvents();
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    // Run systems over time
+    // Run systems over time (20 game minutes)
     for (let i = 0; i < 20; i++) {
-      housingSystem.update(harness.world, entities, 50.0);
-      animalSystem.update(harness.world, entities, 50.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      housingSystem.update(harness.world, entities, 60.0);
+      animalSystem.update(harness.world, entities, 60.0);
+      stateMutator.update(harness.world, entities, 60.0); // Apply deltas
     }
 
     // Check for housing events
@@ -179,7 +204,12 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should animal death trigger replacement cycle', () => {
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -197,8 +227,11 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
       },
     });
 
-    const entities = Array.from(harness.world.entities.values());
-    animalSystem.update(harness.world, entities, 1.0);
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
+    harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+    animalSystem.update(harness.world, entities, 60.0);
+    stateMutator.update(harness.world, entities, 60.0); // Apply deltas
 
     // Check for death events
     const deathEvents = harness.getEmittedEvents('animal_died');
@@ -226,13 +259,19 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should full husbandry cycle integrate all systems', () => {
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
+    harness.registerSystem('AnimalSystem', animalSystem);
+
     const tamingSystem = new TamingSystem(harness.world.eventBus);
     const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
     const productionSystem = new AnimalProductionSystem(harness.world.eventBus);
     const timeSystem = new TimeSystem();
 
-    harness.registerSystem('AnimalSystem', animalSystem);
     harness.registerSystem('TamingSystem', tamingSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
     harness.registerSystem('AnimalProductionSystem', productionSystem);
@@ -242,16 +281,19 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     const agent = harness.createTestAgent({ x: 11, y: 11 });
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    // Simulate full husbandry cycle over multiple days
+    // Simulate full husbandry cycle over multiple days (5 days = 7200 game minutes)
     for (let day = 0; day < 5; day++) {
       for (let hour = 0; hour < 24; hour++) {
-        timeSystem.update(harness.world, entities, 2.0);
-        tamingSystem.update(harness.world, entities, 2.0);
-        animalSystem.update(harness.world, entities, 2.0);
-        housingSystem.update(harness.world, entities, 2.0);
-        productionSystem.update(harness.world, entities, 2.0);
+        harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+        timeSystem.update(harness.world, entities, 60.0);
+        tamingSystem.update(harness.world, entities, 60.0);
+        animalSystem.update(harness.world, entities, 60.0);
+        housingSystem.update(harness.world, entities, 60.0);
+        productionSystem.update(harness.world, entities, 60.0);
+        stateMutator.update(harness.world, entities, 60.0); // Apply deltas
       }
     }
 
@@ -261,16 +303,24 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should animal needs decay and require care', () => {
-    const animalSystem = new AnimalSystem(harness.world.eventBus);
+    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
+    const animalSystem = new AnimalSystem();
+    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
 
-    const entities = Array.from(harness.world.entities.values());
+    // Query entities with Animal component
+    const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    // Run animal system over time
+    // Run animal system over time (20 game minutes)
     for (let i = 0; i < 20; i++) {
-      animalSystem.update(harness.world, entities, 100.0);
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      animalSystem.update(harness.world, entities, 60.0);
+      stateMutator.update(harness.world, entities, 60.0); // Apply deltas
     }
 
     // Animal needs should be tracked

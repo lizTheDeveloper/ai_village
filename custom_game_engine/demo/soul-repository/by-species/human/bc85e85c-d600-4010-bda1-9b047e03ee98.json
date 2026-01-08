@@ -1,0 +1,18 @@
+{
+  "soulId": "bc85e85c-d600-4010-bda1-9b047e03ee98",
+  "agentId": "bc85e85c-d600-4010-bda1-9b047e03ee98",
+  "name": "Clay",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-08T09:32:07.618Z",
+  "soulBirthTick": 367,
+  "universeId": "unknown",
+  "version": 1
+}

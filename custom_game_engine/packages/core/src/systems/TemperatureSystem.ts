@@ -338,6 +338,7 @@ export class TemperatureSystem implements System {
    * Uses simple enclosure detection: if surrounded by walls on 3+ sides,
    * agent is considered "indoors" and gets insulation benefit.
    * PERFORMANCE: Uses cache to avoid repeated tile lookups (12 per entity per tick!)
+   * PERFORMANCE: Skips ungenerated chunks to avoid expensive terrain generation
    */
   private calculateTileBasedInsulation(
     world: WorldWithTiles,
@@ -350,6 +351,27 @@ export class TemperatureSystem implements System {
     // Check cache first (HUGE performance win - avoids 12 getTileAt calls per entity!)
     if (this.tileInsulationCache.has(cacheKey)) {
       return this.tileInsulationCache.get(cacheKey)!;
+    }
+
+    // Performance: Skip if chunk not generated to avoid expensive terrain generation
+    const worldWithChunks = world as unknown as {
+      getChunkManager?: () => {
+        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
+      } | undefined;
+    };
+    const chunkManager = typeof worldWithChunks.getChunkManager === 'function'
+      ? worldWithChunks.getChunkManager()
+      : undefined;
+    if (chunkManager) {
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(tileX / CHUNK_SIZE);
+      const chunkY = Math.floor(tileY / CHUNK_SIZE);
+      const chunk = chunkManager.getChunk(chunkX, chunkY);
+      if (!chunk?.generated) {
+        // Cache null result for ungenerated chunks
+        this.tileInsulationCache.set(cacheKey, null);
+        return null;
+      }
     }
 
     // Cache miss - calculate insulation and store result
