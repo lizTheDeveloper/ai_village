@@ -12,6 +12,7 @@ import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { CircadianComponent } from '../components/CircadianComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 
 /**
@@ -56,8 +57,23 @@ export class HearingProcessor {
 
   /**
    * Process hearing for an entity, collecting nearby speech.
+   * Sleeping agents cannot hear anything.
    */
   process(entity: EntityImpl, world: World): HearingResult {
+    // Sleeping agents cannot hear speech
+    const circadian = entity.getComponent<CircadianComponent>(ComponentType.Circadian);
+    if (circadian?.isSleeping) {
+      // Clear any existing heard speech when asleep
+      const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
+      if (vision && vision.heardSpeech && vision.heardSpeech.length > 0) {
+        entity.updateComponent<VisionComponent>(ComponentType.Vision, (current) => ({
+          ...current,
+          heardSpeech: [],
+        }));
+      }
+      return { heardSpeech: [] };
+    }
+
     const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
     if (!vision) {
       return { heardSpeech: [] };
@@ -81,6 +97,7 @@ export class HearingProcessor {
 
   /**
    * Collect speech from nearby agents within hearing range.
+   * Skips sleeping agents (they shouldn't be speaking).
    */
   private collectNearbySpeech(
     entity: EntityImpl,
@@ -98,6 +115,10 @@ export class HearingProcessor {
       const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
 
       if (!otherPos || !otherAgentComp) continue;
+
+      // Skip sleeping agents - they shouldn't be speaking
+      const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
+      if (otherCircadian?.isSleeping) continue;
 
       const distance = this.distance(position, otherPos);
 

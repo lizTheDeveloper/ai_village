@@ -52,6 +52,7 @@
  *   GET  /api/live/divinity?session=<id>    - Get divinity info (gods, belief, pantheons, etc.)
  *   GET  /api/live/research?session=<id>    - Get research info (discovered papers, in-progress, completed)
  *   GET  /api/live/scheduler?session=<id>   - Get LLM scheduler metrics (layer selection, cooldowns, success/failure)
+ *   GET  /api/live/conversation?id=<id>&session=<id> - Get conversation history for an agent
  *
  * LLM Queue API (server-side LLM with queuing and multi-game fair-share rate limiting):
  *   POST /api/llm/generate     - Generate LLM response (queued, rate-limited, fallback support)
@@ -5302,6 +5303,43 @@ Available agents:
 
     try {
       const result = await sendQueryToGame(gameClient, 'scheduler');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/conversation - Get conversation history for an agent
+  if (pathname === '/api/live/conversation') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const entityId = url.searchParams.get('id');
+    if (!entityId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing required parameter: id' }));
+      return;
+    }
+
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'conversation', entityId);
       res.end(JSON.stringify(result, null, 2));
     } catch (err) {
       res.statusCode = 500;

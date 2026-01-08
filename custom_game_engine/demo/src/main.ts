@@ -3089,6 +3089,13 @@ async function main() {
   const storage = new IndexedDBStorage('ai-village-saves');
   saveLoadService.setStorage(storage);
 
+  // Check for ?fresh=1 URL parameter to force a new game (skip loading saves)
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceNewGame = urlParams.get('fresh') === '1';
+  if (forceNewGame) {
+    console.log('[Demo] ?fresh=1 detected - forcing new game (ignoring saved checkpoints)');
+  }
+
   // Check for existing saves and auto-load the most recent one
   let existingSaves: any[] = [];
   try {

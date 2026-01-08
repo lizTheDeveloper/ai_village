@@ -8,6 +8,7 @@ import type { ConversationComponent } from '../components/ConversationComponent.
 import { isInConversation, endConversation, joinConversation } from '../components/ConversationComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { CircadianComponent } from '../components/CircadianComponent.js';
 import { updateCompositeSocial } from '../components/NeedsComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -39,6 +40,11 @@ export class CommunicationSystem implements System {
     // First pass: Check for agents who might want to join conversations based on personality
     for (const entity of entities) {
       const impl = entity as EntityImpl;
+
+      // Skip sleeping agents - they can't join conversations
+      const circadian = impl.getComponent<CircadianComponent>(CT.Circadian);
+      if (circadian?.isSleeping) continue;
+
       const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
 
       // Skip agents already in conversations

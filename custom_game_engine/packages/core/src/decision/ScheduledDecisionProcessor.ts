@@ -24,6 +24,7 @@ import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 import { LLMHistoryComponent, createLLMHistoryComponent, type LLMInteraction } from '../components/LLMHistoryComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { GoalsComponent, PersonalGoal, GoalCategory } from '../components/GoalsComponent.js';
+import type { CircadianComponent } from '../components/CircadianComponent.js';
 
 // Import LLM types from local types file to avoid circular dependency with @ai-village/llm
 import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '../types/LLMTypes.js';
@@ -183,6 +184,12 @@ export class ScheduledDecisionProcessor {
     world: World,
     agent: AgentComponent
   ): ScheduledDecisionResult {
+    // Skip LLM for sleeping agents - dreams are handled by a separate system
+    const circadian = entity.getComponent('circadian') as CircadianComponent | undefined;
+    if (circadian?.isSleeping) {
+      return { changed: false, source: 'none' };
+    }
+
     const currentPriority = getBehaviorPriority(agent.behavior);
 
     // Layer 1: Autonomic (highest priority, synchronous)

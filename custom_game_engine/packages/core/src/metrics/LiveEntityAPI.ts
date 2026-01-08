@@ -114,6 +114,8 @@ export class LiveEntityAPI {
         return this.handlePlantsQuery(query);
       case 'terrain':
         return this.handleTerrainQuery(query);
+      case 'conversation':
+        return this.handleConversationQuery(query);
       default:
         return {
           requestId: query.requestId,
