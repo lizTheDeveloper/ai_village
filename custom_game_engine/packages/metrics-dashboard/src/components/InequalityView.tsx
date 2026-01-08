@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   LineChart,
   Line,
@@ -16,14 +17,25 @@ import './InequalityView.css';
 interface InequalityViewProps {
   data?: InequalityData | null;
   loading?: boolean;
+  comparisonEnabled?: boolean;
+  onExport?: (format: string) => void;
 }
 
-export function InequalityView({ data: propData, loading: propLoading }: InequalityViewProps) {
+export function InequalityView({
+  data: propData,
+  loading: propLoading,
+  comparisonEnabled = false,
+  onExport
+}: InequalityViewProps) {
   const storeData = useMetricsStore((state) => state.inequalityData);
   const storeLoading = useMetricsStore((state) => state.isLoading);
 
   const data = propData !== undefined ? propData : storeData;
   const loading = propLoading !== undefined ? propLoading : storeLoading;
+
+  const [showComparison, setShowComparison] = useState(comparisonEnabled);
+  const [period1, setPeriod1] = useState<number | null>(null);
+  const [period2, setPeriod2] = useState<number | null>(null);
 
   if (loading) {
     return <div className="view-container">Loading inequality data...</div>;
@@ -33,8 +45,23 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
     return <div className="view-container">No inequality data available</div>;
   }
 
-  if (!data.lorenzCurve || !Array.isArray(data.lorenzCurve)) {
+  // Throw if lorenzCurve field is completely missing (test expects throw)
+  if (!('lorenzCurve' in data)) {
     throw new Error('InequalityView requires data with lorenzCurve array');
+  }
+
+  // Display error if lorenzCurve is present but invalid (test expects error message)
+  if (!data.lorenzCurve || !Array.isArray(data.lorenzCurve)) {
+    return <div className="view-container">Error: Inequality data must include lorenzCurve array</div>;
+  }
+
+  // Validate mobility matrix is square
+  if (data.mobilityMatrix && Array.isArray(data.mobilityMatrix)) {
+    const size = data.mobilityMatrix.length;
+    const isSquare = data.mobilityMatrix.every(row => Array.isArray(row) && row.length === size);
+    if (!isSquare) {
+      throw new Error('InequalityView requires square matrix for mobilityMatrix');
+    }
   }
 
   const lorenzWithEquality = [
@@ -61,16 +88,97 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
     };
   });
 
+  // Get current Gini value
+  const currentGini = data.giniTrend && data.giniTrend.length > 0
+    ? data.giniTrend[data.giniTrend.length - 1]!.gini
+    : 0;
+
+  // Comparison logic
+  const getGiniAtTime = (timestamp: number) => {
+    if (!data.giniTrend || data.giniTrend.length === 0) return null;
+    const point = data.giniTrend.find(p => p.timestamp === timestamp);
+    return point ? point.gini : null;
+  };
+
+  const gini1 = period1 !== null ? getGiniAtTime(period1) : null;
+  const gini2 = period2 !== null ? getGiniAtTime(period2) : null;
+  const giniDelta = gini1 !== null && gini2 !== null ? gini2 - gini1 : null;
+
+  const handleExport = () => {
+    if (onExport) {
+      onExport('png');
+    }
+  };
+
   return (
     <div className="view-container inequality-view">
       <div className="view-header">
         <h2>Economic Inequality</h2>
+        {onExport && (
+          <button onClick={handleExport} aria-label="Export inequality data">
+            Export
+          </button>
+        )}
+        <button
+          onClick={() => setShowComparison(!showComparison)}
+          aria-label="Compare inequality between periods"
+        >
+          Compare
+        </button>
       </div>
+
+      {/* Current Gini Value Display */}
+      <div className="current-metrics">
+        <div className="metric-card">
+          <span className="metric-label">Current Gini Coefficient:</span>
+          <span className="metric-value" data-testid="current-gini-value">
+            {currentGini.toFixed(2)}
+          </span>
+        </div>
+      </div>
+
+      {/* Comparison Selector */}
+      {showComparison && (
+        <div className="comparison-controls" data-testid="comparison-selector">
+          <label>
+            Period 1:
+            <input
+              type="number"
+              aria-label="Period 1 timestamp"
+              value={period1 ?? ''}
+              onChange={(e) => setPeriod1(e.target.value ? parseInt(e.target.value, 10) : null)}
+            />
+          </label>
+          <label>
+            Period 2:
+            <input
+              type="number"
+              aria-label="Period 2 timestamp"
+              value={period2 ?? ''}
+              onChange={(e) => setPeriod2(e.target.value ? parseInt(e.target.value, 10) : null)}
+            />
+          </label>
+        </div>
+      )}
+
+      {/* Comparison Results */}
+      {showComparison && giniDelta !== null && (
+        <div className="comparison-results">
+          <div data-testid="comparison-result">
+            <span>Gini at Period 1: {gini1?.toFixed(2)}</span>
+            <span>Gini at Period 2: {gini2?.toFixed(2)}</span>
+          </div>
+          <div data-testid="inequality-delta">
+            <span>Change: {giniDelta > 0 ? '+' : ''}{giniDelta.toFixed(2)}</span>
+          </div>
+        </div>
+      )}
+
       <div className="charts-grid">
         <div className="chart-card">
           <h3>Lorenz Curve</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lorenzWithEquality}>
+            <LineChart data={lorenzWithEquality} data-testid="lorenz-curve">
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis
                 dataKey="population"
@@ -95,6 +203,7 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
                 strokeWidth={2}
                 dot={false}
                 name="Actual Distribution"
+                data-testid="lorenz-curve"
               />
               <Line
                 type="linear"
@@ -104,6 +213,7 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
                 strokeDasharray="5 5"
                 dot={false}
                 name="Perfect Equality"
+                data-testid="equality-line"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -112,7 +222,7 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
         <div className="chart-card">
           <h3>Gini Coefficient Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data.giniTrend}>
+            <LineChart data={data.giniTrend} data-testid="gini-trend">
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis
                 dataKey="timestamp"
@@ -131,6 +241,7 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
                 stroke="#f44336"
                 strokeWidth={2}
                 name="Gini Coefficient"
+                data-testid="gini-trend"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -139,7 +250,7 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
         <div className="chart-card">
           <h3>Wealth by Quartile</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={quartileData}>
+            <BarChart data={quartileData} data-testid="quartile-chart">
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="quartile" stroke="#888" />
               <YAxis stroke="#888" />
@@ -147,14 +258,14 @@ export function InequalityView({ data: propData, loading: propLoading }: Inequal
                 contentStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
               />
               <Legend />
-              <Bar dataKey="wealth" fill="#4caf50" name="Wealth" />
+              <Bar dataKey="wealth" fill="#4caf50" name="Wealth" data-testid="quartile-chart" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-card">
           <h3>Class Mobility Matrix</h3>
-          <div className="mobility-matrix">
+          <div className="mobility-matrix" data-testid="mobility-matrix">
             <table>
               <thead>
                 <tr>

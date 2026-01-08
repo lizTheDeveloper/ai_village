@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey';
 import {
@@ -23,6 +23,18 @@ interface CulturalDiffusionViewProps {
   filterBehavior?: string;
 }
 
+interface CascadeNode {
+  agent: string;
+  timestamp: number;
+  children: CascadeNode[];
+}
+
+interface CascadeTree {
+  behavior: string;
+  root: string;
+  children: CascadeNode[];
+}
+
 export function CulturalDiffusionView({
   data: propData,
   loading: propLoading,
@@ -34,6 +46,9 @@ export function CulturalDiffusionView({
   const sankeyRef = useRef<SVGSVGElement>(null);
   const storeData = useMetricsStore((state) => state.culturalData);
   const storeLoading = useMetricsStore((state) => state.isLoading);
+  const [hoveredLink, setHoveredLink] = useState<number | null>(null);
+  const [expandedCascades, setExpandedCascades] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   const data = propData !== undefined ? propData : storeData;
   const loading = propLoading !== undefined ? propLoading : storeLoading;
@@ -43,77 +58,115 @@ export function CulturalDiffusionView({
       return;
     }
 
-    const svg = d3.select(sankeyRef.current);
-    svg.selectAll('*').remove();
+    try {
+      const svg = d3.select(sankeyRef.current);
+      svg.selectAll('*').remove();
 
-    const width = 800;
-    const height = 400;
-    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+      const width = 800;
+      const height = 400;
+      const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
-    const sankeyGenerator = sankey()
-      .nodeWidth(15)
-      .nodePadding(10)
-      .extent([
-        [margin.left, margin.top],
-        [width - margin.right, height - margin.bottom],
-      ]);
+      const sankeyGenerator = sankey()
+        .nodeWidth(15)
+        .nodePadding(10)
+        .extent([
+          [margin.left, margin.top],
+          [width - margin.right, height - margin.bottom],
+        ]);
 
-    const nodeMap = new Map();
-    data.sankeyData.nodes.forEach((node, i) => {
-      nodeMap.set(node.id, i);
-    });
+      const nodeMap = new Map();
+      data.sankeyData.nodes.forEach((node, i) => {
+        nodeMap.set(node.id, i);
+      });
 
-    const graph = {
-      nodes: data.sankeyData.nodes.map((n) => ({ ...n })),
-      links: data.sankeyData.links.map((l) => ({
-        source: nodeMap.get(l.source),
-        target: nodeMap.get(l.target),
-        value: l.value,
-      })),
-    };
+      const graph = {
+        nodes: data.sankeyData.nodes.map((n) => ({ ...n })),
+        links: data.sankeyData.links.map((l) => ({
+          source: nodeMap.get(l.source),
+          target: nodeMap.get(l.target),
+          value: l.value,
+        })),
+      };
 
-    const { nodes, links } = sankeyGenerator(graph as any);
+      const { nodes, links } = sankeyGenerator(graph as any);
 
-    const g = svg.append('g');
+      const g = svg.append('g');
 
-    g.append('g')
-      .selectAll('rect')
-      .data(nodes)
-      .join('rect')
-      .attr('x', (d: any) => d.x0)
-      .attr('y', (d: any) => d.y0)
-      .attr('height', (d: any) => d.y1 - d.y0)
-      .attr('width', (d: any) => d.x1 - d.x0)
-      .attr('fill', '#646cff')
-      .attr('stroke', '#fff');
+      g.append('g')
+        .selectAll('rect')
+        .data(nodes)
+        .join('rect')
+        .attr('x', (d: any) => d.x0)
+        .attr('y', (d: any) => d.y0)
+        .attr('height', (d: any) => d.y1 - d.y0)
+        .attr('width', (d: any) => d.x1 - d.x0)
+        .attr('fill', '#646cff')
+        .attr('stroke', '#fff');
 
-    g.append('g')
-      .selectAll('text')
-      .data(nodes)
-      .join('text')
-      .attr('x', (d: any) => (d.x0 + d.x1) / 2)
-      .attr('y', (d: any) => (d.y0 + d.y1) / 2)
-      .attr('dy', '0.35em')
-      .attr('text-anchor', 'middle')
-      .attr('fill', '#fff')
-      .attr('font-size', '10px')
-      .text((d: any) => d.name);
+      g.append('g')
+        .selectAll('text')
+        .data(nodes)
+        .join('text')
+        .attr('x', (d: any) => (d.x0 + d.x1) / 2)
+        .attr('y', (d: any) => (d.y0 + d.y1) / 2)
+        .attr('dy', '0.35em')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#fff')
+        .attr('font-size', '10px')
+        .text((d: any) => d.name);
 
-    g.append('g')
-      .attr('fill', 'none')
-      .selectAll('path')
-      .data(links)
-      .join('path')
-      .attr('d', sankeyLinkHorizontal())
-      .attr('stroke', (d: any) => {
-        const link = data.sankeyData.links.find(
-          (l) => nodeMap.get(l.source) === d.source.index && nodeMap.get(l.target) === d.target.index
-        );
-        return link?.behavior === 'craft' ? '#ff9800' : '#646cff';
-      })
-      .attr('stroke-width', (d: any) => Math.max(1, d.width))
-      .attr('opacity', 0.5);
+      g.append('g')
+        .attr('fill', 'none')
+        .selectAll('path')
+        .data(links)
+        .join('path')
+        .attr('d', sankeyLinkHorizontal())
+        .attr('data-testid', (_: any, i: number) => `sankey-link-${i}`)
+        .attr('stroke', (d: any) => {
+          const link = data.sankeyData.links.find(
+            (l) => nodeMap.get(l.source) === d.source.index && nodeMap.get(l.target) === d.target.index
+          );
+          return link?.behavior === 'craft' ? '#ff9800' : '#646cff';
+        })
+        .attr('stroke-width', (d: any) => Math.max(1, d.width))
+        .attr('opacity', 0.5)
+        .on('mouseenter', function(event: MouseEvent, d: any) {
+          const linkIndex = links.indexOf(d);
+          setHoveredLink(linkIndex);
+
+          // Show tooltip with behavior and value
+          const link = data.sankeyData.links.find(
+            (l) => nodeMap.get(l.source) === d.source.index && nodeMap.get(l.target) === d.target.index
+          );
+
+          d3.select(this.parentNode as Element)
+            .append('text')
+            .attr('class', 'link-tooltip')
+            .attr('x', (d.source.x1 + d.target.x0) / 2)
+            .attr('y', (d.y0 + d.y1) / 2)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#fff')
+            .text(`${link?.behavior || 'unknown'}: ${link?.value || 0}`);
+        })
+        .on('mouseleave', function() {
+          setHoveredLink(null);
+          d3.select(this.parentNode as Element).selectAll('.link-tooltip').remove();
+        });
+
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to render Sankey diagram');
+    }
   }, [data]);
+
+  // Validation with throwing errors (for tests)
+  if (!loading && data && (!data.sankeyData || !data.sankeyData.nodes)) {
+    throw new Error('CulturalDiffusionView requires data with sankeyData.nodes');
+  }
+
+  if (!loading && data && (!data.sankeyData || !data.sankeyData.links)) {
+    throw new Error('CulturalDiffusionView requires data with sankeyData.links');
+  }
 
   if (loading) {
     return <div className="view-container">Loading cultural diffusion data...</div>;
@@ -123,15 +176,50 @@ export function CulturalDiffusionView({
     return <div className="view-container">No cultural diffusion data available</div>;
   }
 
-  if (!data.sankeyData || !data.sankeyData.nodes) {
-    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.nodes</div>;
-  }
-
-  if (!data.sankeyData.links) {
-    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.links</div>;
+  if (error) {
+    return <div className="view-container">Error: {error}</div>;
   }
 
   const adoptionData = data.adoptionCurves.craft || [];
+
+  // Calculate adoption velocity (change in adopters over time)
+  const adoptionVelocity = adoptionData.length >= 2
+    ? (adoptionData[adoptionData.length - 1]!.adopters - adoptionData[0]!.adopters) /
+      (adoptionData[adoptionData.length - 1]!.timestamp - adoptionData[0]!.timestamp)
+    : 0;
+
+  const renderCascadeNode = (node: CascadeNode, depth: number = 0, isRoot: boolean = false): JSX.Element => {
+    const nodeKey = isRoot ? 'root' : node.agent;
+    const isExpanded = expandedCascades.has(nodeKey);
+    const hasChildren = node.children && node.children.length > 0;
+
+    return (
+      <div key={node.agent} style={{ marginLeft: `${depth * 20}px` }} data-testid="cascade-node">
+        {hasChildren && (
+          <button
+            aria-label={isExpanded ? 'Collapse' : 'Expand'}
+            onClick={() => {
+              const newExpanded = new Set(expandedCascades);
+              if (isExpanded) {
+                newExpanded.delete(nodeKey);
+              } else {
+                newExpanded.add(nodeKey);
+              }
+              setExpandedCascades(newExpanded);
+            }}
+          >
+            {isExpanded ? '−' : '+'}
+          </button>
+        )}
+        <span>{node.agent} ({node.timestamp})</span>
+        {isExpanded && hasChildren && (
+          <div>
+            {node.children.map((child) => renderCascadeNode(child, depth + 1, false))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="view-container cultural-view">
@@ -144,39 +232,126 @@ export function CulturalDiffusionView({
           <svg ref={sankeyRef} width={800} height={400} data-testid="sankey-diagram" />
         </div>
 
-        <div className="chart-card">
-          <h3>Adoption Curve</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={adoptionData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis
-                dataKey="timestamp"
-                stroke="#888"
-                tickFormatter={(value) => new Date(value).toLocaleTimeString()}
-              />
-              <YAxis stroke="#888" />
-              <Tooltip
-                contentStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
-                labelFormatter={(value) => new Date(value as number).toLocaleString()}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="adopters"
-                stroke="#646cff"
-                strokeWidth={2}
-                name="Adopters"
-              />
-              <Line
-                type="monotone"
-                dataKey="rate"
-                stroke="#4caf50"
-                strokeWidth={2}
-                name="Rate"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {showAdoption && (
+          <div className="chart-card">
+            <h3>Adoption Curve</h3>
+            <div data-testid="adoption-curves">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={adoptionData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis
+                    dataKey="timestamp"
+                    stroke="#888"
+                    tickFormatter={(value) => new Date(value).toLocaleTimeString()}
+                  />
+                  <YAxis stroke="#888" />
+                  <Tooltip
+                    contentStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
+                    labelFormatter={(value) => new Date(value as number).toLocaleString()}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="adopters"
+                    stroke="#646cff"
+                    strokeWidth={2}
+                    name="Adopters"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="rate"
+                    stroke="#4caf50"
+                    strokeWidth={2}
+                    name="Rate"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div data-testid="adoption-velocity" className="adoption-velocity">
+              Adoption Velocity: {adoptionVelocity.toFixed(4)} adopters/ms
+            </div>
+          </div>
+        )}
+
+        {!showAdoption && (
+          <div className="chart-card">
+            <h3>Adoption Curve</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={adoptionData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <XAxis
+                  dataKey="timestamp"
+                  stroke="#888"
+                  tickFormatter={(value) => new Date(value).toLocaleTimeString()}
+                />
+                <YAxis stroke="#888" />
+                <Tooltip
+                  contentStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
+                  labelFormatter={(value) => new Date(value as number).toLocaleString()}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="adopters"
+                  stroke="#646cff"
+                  strokeWidth={2}
+                  name="Adopters"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="#4caf50"
+                  strokeWidth={2}
+                  name="Rate"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {showCascades && data.cascadeTrees && data.cascadeTrees.length > 0 && (
+          <div className="chart-card">
+            <h3>Cascade Trees</h3>
+            <div data-testid="cascade-tree">
+              {data.cascadeTrees.map((cascade) => {
+                // Create a root node that wraps the cascade children
+                const rootNode: CascadeNode = {
+                  agent: cascade.root,
+                  timestamp: 0, // Root doesn't have a timestamp
+                  children: cascade.children,
+                };
+                const rootKey = 'root';
+                const isExpanded = expandedCascades.has(rootKey);
+
+                return (
+                  <div key={cascade.behavior} className="cascade-tree">
+                    <h4>{cascade.behavior}</h4>
+                    <div data-testid="cascade-node">
+                      {cascade.children.length > 0 && (
+                        <button
+                          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                          onClick={() => {
+                            const newExpanded = new Set(expandedCascades);
+                            if (isExpanded) {
+                              newExpanded.delete(rootKey);
+                            } else {
+                              newExpanded.add(rootKey);
+                            }
+                            setExpandedCascades(newExpanded);
+                          }}
+                        >
+                          {isExpanded ? '−' : '+'}
+                        </button>
+                      )}
+                      <strong>Root: {cascade.root}</strong>
+                    </div>
+                    {isExpanded && cascade.children.map((child) => renderCascadeNode(child, 1, false))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {data.influencers && data.influencers.length > 0 && (
           <div className="chart-card">

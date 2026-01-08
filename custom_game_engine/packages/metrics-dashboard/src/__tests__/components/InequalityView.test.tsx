@@ -3,16 +3,22 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { InequalityView } from '@/components/InequalityView';
 import { mockInequalityData } from '../mockData';
 
-// Mock D3
-vi.mock('d3', () => ({
-  select: vi.fn(() => ({
-    append: vi.fn(() => ({ attr: vi.fn(), style: vi.fn() })),
-    selectAll: vi.fn(() => ({ data: vi.fn(), enter: vi.fn(), append: vi.fn() })),
-  })),
-  scaleLinear: vi.fn(() => ({ domain: vi.fn(), range: vi.fn() })),
-  line: vi.fn(() => ({ x: vi.fn(), y: vi.fn() })),
-  axisBottom: vi.fn(),
-  axisLeft: vi.fn(),
+// Mock Recharts - preserve data-testid attributes
+vi.mock('recharts', () => ({
+  LineChart: ({ children, 'data-testid': testId }: any) => (
+    <div data-testid={testId}>{children}</div>
+  ),
+  BarChart: ({ children, 'data-testid': testId }: any) => (
+    <div data-testid={testId}>{children}</div>
+  ),
+  Line: ({ 'data-testid': testId }: any) => testId ? <div data-testid={testId} /> : <div />,
+  Bar: ({ 'data-testid': testId }: any) => testId ? <div data-testid={testId} /> : <div />,
+  XAxis: () => <div />,
+  YAxis: () => <div />,
+  CartesianGrid: () => <div />,
+  Tooltip: () => <div />,
+  Legend: () => <div />,
+  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
 }));
 
 describe('InequalityView Component', () => {

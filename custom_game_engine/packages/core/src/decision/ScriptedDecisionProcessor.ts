@@ -314,23 +314,25 @@ export class ScriptedDecisionProcessor {
     const targetConversation = targetImpl.getComponent<ConversationComponent>(ComponentType.Conversation);
     // Only start conversation if target is not already talking
     if (!targetConversation || isInConversation(targetConversation)) return null;
-    // Start conversation for both agents
+    // Start conversation for both agents (set up ConversationComponent)
     entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
       startConversation(current, targetAgent.id, world.tick)
     );
     targetImpl.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
       startConversation(current, entity.id, world.tick)
     );
-    // Switch both to talk behavior
+    // NOTE: DO NOT switch to 'talk' behavior
+    // Talking happens alongside current activity - agents can chat while working
+    // Only set conversationPartnerId in behaviorState so systems know they're chatting
     entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
-      behavior: 'talk',
-      behaviorState: { partnerId: targetAgent.id },
+      // Keep current behavior - don't change it
+      behaviorState: { ...current.behaviorState, conversationPartnerId: targetAgent.id },
     }));
     targetImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
-      behavior: 'talk',
-      behaviorState: { partnerId: entity.id },
+      // Keep current behavior - don't change it
+      behaviorState: { ...current.behaviorState, conversationPartnerId: entity.id },
     }));
     // Emit conversation started event
     world.eventBus.emit({
@@ -343,7 +345,8 @@ export class ScriptedDecisionProcessor {
         agent2: targetAgent.id,
       },
     });
-    return { changed: true, behavior: 'talk', behaviorState: { partnerId: targetAgent.id } };
+    // Return changed=false since we didn't change behavior - just set up conversation
+    return { changed: false };
   }
   /**
    * Check if agent should gather seeds from nearby plants.
@@ -753,18 +756,14 @@ export class ScriptedDecisionProcessor {
         }
       }
     }
-    // SOCIAL: talk, help
+    // SOCIAL: follow (NOTE: talk is NOT a behavior - talking happens alongside current activity)
     if (priorities.social) {
       const nearbyAgents = getNearbyAgents(entity, world, 15);
       if (nearbyAgents.length > 0) {
         const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
         if (targetAgent) {
-          candidates.push({
-            behavior: 'talk',
-            behaviorState: { partnerId: targetAgent.id },
-            category: 'social',
-            baseWeight: 0.7,
-          });
+          // NOTE: DO NOT add 'talk' behavior - talking happens via recentSpeech, not behavior switch
+          // Agents can chat while gathering, working, etc.
           candidates.push({
             behavior: 'follow_agent',
             behaviorState: { targetId: targetAgent.id },

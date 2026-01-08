@@ -89,9 +89,10 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       }
       return { behavior: 'craft', behaviorState };
     case 'talk':
-      // TalkBehavior expects partnerId, not targetId
-      behaviorState.partnerId = action.target || 'nearest';
-      return { behavior: 'talk', behaviorState };
+      // NOTE: Talk does NOT change behavior - talking happens alongside current activity
+      // Speech is set via recentSpeech component, not by switching to 'talk' behavior
+      // Return null so agent stays in current behavior
+      return null;
     case 'follow':
       behaviorState.targetId = action.target || 'nearest';
       return { behavior: 'follow_agent', behaviorState };
@@ -231,20 +232,9 @@ function selectBehaviorFromPriorities(
   // Select appropriate behavior for the highest priority category
   switch (highestCategory) {
     case 'social': {
-      // Try to find a nearby agent to talk to
-      const nearbyAgents = getNearbyAgents(entity, world, 15);
-      const availableAgents = nearbyAgents.filter(other => {
-        const otherConv = other.components.get(ComponentType.Conversation) as { isActive?: boolean } | undefined;
-        return !otherConv?.isActive;
-      });
-      if (availableAgents.length > 0) {
-        const targetAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
-        if (targetAgent) {
-          return { behavior: 'talk', behaviorState: { partnerId: targetAgent.id } };
-        }
-      }
-      // No one nearby - return null to keep current behavior
-      // Agent will stay in current behavior until LLM explicitly changes it
+      // Social priority does NOT change behavior
+      // Talking happens alongside current activity via recentSpeech
+      // Agent can chat while gathering, working, etc.
       return null;
     }
     case 'gathering': {

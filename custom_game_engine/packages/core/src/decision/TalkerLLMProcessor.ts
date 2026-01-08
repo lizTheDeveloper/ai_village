@@ -166,21 +166,12 @@ function selectBehaviorFromPriorities(
     return null;
   }
 
-  // For social priority, select talk behavior
+  // For social priority - DON'T change behavior
+  // Talking happens alongside current activity via recentSpeech, not as a separate behavior
+  // Agent can chat while gathering, working, etc.
   if (highestCategory === 'social') {
-    const nearbyAgents = getNearbyAgents(entity, world, 15);
-    const availableAgents = nearbyAgents.filter(other => {
-      const otherConv = other.components.get(ComponentType.Conversation) as { isActive?: boolean } | undefined;
-      return !otherConv?.isActive;
-    });
-    if (availableAgents.length > 0) {
-      const targetAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
-      if (targetAgent) {
-        return { behavior: 'talk', behaviorState: { partnerId: targetAgent.id } };
-      }
-    }
-    // No one nearby - return null to keep current behavior
-    // Agent will stay in current behavior until LLM explicitly changes it
+    // Return null - no behavior change needed
+    // Social interaction happens via speech output, not behavior switching
     return null;
   }
 
@@ -535,14 +526,18 @@ export class TalkerLLMProcessor {
       }
 
       // Handle social actions (talk, follow)
+      // NOTE: "talk" action sets speech WITHOUT changing behavior
+      // Agents can talk while doing other things (gathering, working, etc.)
       if (typedAction.type === 'talk') {
         const talkAction = typedAction as { type: string; target?: string };
         const partnerId = talkAction.target || 'nearest';
 
+        // Only update speech and conversation partner, NOT behavior
+        // Agent continues their current behavior while speaking
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
-          behavior: 'talk',
-          behaviorState: { partnerId },
+          // DO NOT change behavior - talking happens alongside current activity
+          behaviorState: { ...current.behaviorState, conversationPartnerId: partnerId },
           recentSpeech: speaking,
           lastThought: thinking,
         }));
@@ -553,16 +548,16 @@ export class TalkerLLMProcessor {
           data: {
             agentId: entity.id,
             decision: 'talk',
-            behavior: 'talk',
+            behavior: 'speak_while_working', // Log that we're speaking but not changing behavior
             reasoning: thinking,
             source: 'talker',
           },
         });
 
+        // Return changed=true for speech, but NO behavior change
         return {
           changed: true,
-          behavior: 'talk',
-          behaviorState: { partnerId },
+          // behavior intentionally omitted - don't change current behavior
           speaking,
           thinking,
           source: 'talker',

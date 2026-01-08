@@ -71,8 +71,9 @@ interface ParsedAction {
 
 /**
  * Convert a parsed action object to behavior + behaviorState
+ * Returns null for unrecognized actions - agent stays in current behavior
  */
-function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior; behaviorState: Record<string, unknown> } {
+function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior; behaviorState: Record<string, unknown> } | null {
   const behaviorState: Record<string, unknown> = {};
 
   switch (action.type) {
@@ -155,11 +156,17 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       return { behavior: 'trade', behaviorState };
 
     case 'idle':
+      // NOTE: 'idle' should rarely be explicitly requested
+      // Agents should stay in current behavior until LLM explicitly changes it
       return { behavior: 'idle', behaviorState };
 
     case 'wander':
-    default:
       return { behavior: 'wander', behaviorState };
+
+    default:
+      // NO FALLBACK - if action type is not recognized, return null
+      // Agent will stay in current behavior until LLM explicitly changes it
+      return null;
   }
 }
 
@@ -536,8 +543,11 @@ export class ExecutorLLMProcessor {
     // Single action object
     else if (typeof action === 'object' && action !== null && 'type' in action) {
       const converted = actionObjectToBehavior(action as ParsedAction);
-      behavior = converted.behavior;
-      behaviorState = converted.behaviorState;
+      if (converted) {
+        behavior = converted.behavior;
+        behaviorState = converted.behaviorState;
+      }
+      // If converted is null, behavior stays undefined and agent stays in current behavior
     }
     // Simple string action
     else if (typeof action === 'string') {
@@ -708,7 +718,11 @@ export class ExecutorLLMProcessor {
     for (const action of actions) {
       if (!action.type) continue;
 
-      const { behavior, behaviorState } = actionObjectToBehavior(action);
+      const converted = actionObjectToBehavior(action);
+      // Skip unrecognized actions - don't add them to queue
+      if (!converted) continue;
+
+      const { behavior, behaviorState } = converted;
       const label = generateBehaviorLabel(action);
 
       // For gather with amount, set up repeats based on typical gather rate
