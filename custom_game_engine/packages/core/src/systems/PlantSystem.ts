@@ -67,6 +67,9 @@ export class PlantSystem implements System {
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 3600; // 1 game hour at 20 TPS
 
+  // Track corrupted plants that have already been reported (report once, not every tick)
+  private reportedCorruptedPlants = new Set<string>();
+
   // Track cleanup functions for registered deltas
   private deltaCleanups = new Map<string, {
     hydration: () => void;
@@ -244,16 +247,20 @@ export class PlantSystem implements System {
       // Validate position exists on plant component
       // If missing, skip this plant (don't crash whole system)
       if (!plant.position) {
-        console.error(`[PlantSystem] Plant entity ${entity.id} missing required position field - skipping`);
-        BugReporter.reportCorruptedPlant({
-          entityId: entity.id,
-          reason: 'Missing position field',
-          plantData: {
-            speciesId: plant.speciesId,
-            stage: plant.stage,
-            health: plant.health
-          }
-        });
+        // Only report each corrupted plant once (not every tick)
+        if (!this.reportedCorruptedPlants.has(entity.id)) {
+          this.reportedCorruptedPlants.add(entity.id);
+          console.error(`[PlantSystem] Plant entity ${entity.id} missing required position field - skipping`);
+          BugReporter.reportCorruptedPlant({
+            entityId: entity.id,
+            reason: 'Missing position field',
+            plantData: {
+              speciesId: plant.speciesId,
+              stage: plant.stage,
+              health: plant.health
+            }
+          });
+        }
         continue;
       }
 
@@ -261,19 +268,23 @@ export class PlantSystem implements System {
       try {
         this.validatePlant(plant);
       } catch (error) {
-        console.error(`[PlantSystem] Plant entity ${entity.id} failed validation: ${error} - skipping`);
-        BugReporter.reportCorruptedPlant({
-          entityId: entity.id,
-          reason: `Validation failed: ${error}`,
-          plantData: {
-            speciesId: plant.speciesId,
-            stage: plant.stage,
-            health: plant.health,
-            hydration: plant.hydration,
-            nutrition: plant.nutrition,
-            position: plant.position
-          }
-        });
+        // Only report each corrupted plant once (not every tick)
+        if (!this.reportedCorruptedPlants.has(entity.id)) {
+          this.reportedCorruptedPlants.add(entity.id);
+          console.error(`[PlantSystem] Plant entity ${entity.id} failed validation: ${error} - skipping`);
+          BugReporter.reportCorruptedPlant({
+            entityId: entity.id,
+            reason: `Validation failed: ${error}`,
+            plantData: {
+              speciesId: plant.speciesId,
+              stage: plant.stage,
+              health: plant.health,
+              hydration: plant.hydration,
+              nutrition: plant.nutrition,
+              position: plant.position
+            }
+          });
+        }
         continue;
       }
 

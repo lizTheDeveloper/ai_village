@@ -3,13 +3,32 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { InequalityView } from '@/components/InequalityView';
 import { mockInequalityData } from '../mockData';
 
-// Mock Recharts - preserve data-testid attributes
+// Mock Recharts - preserve data-testid attributes and render data
 vi.mock('recharts', () => ({
-  LineChart: ({ children, 'data-testid': testId }: any) => (
-    <div data-testid={testId}>{children}</div>
+  LineChart: ({ children, data, 'data-testid': testId }: any) => (
+    <div data-testid={testId}>
+      {children}
+      {/* Render data for test assertions - hide to avoid duplicate text issues */}
+      {data && data.map((point: any, idx: number) => (
+        <div key={`line-${idx}`} style={{ display: 'none' }}>
+          {Object.entries(point).map(([key, val]: [string, any], vIdx: number) => (
+            <span key={`${key}-${vIdx}`}>{String(val)}</span>
+          ))}
+        </div>
+      ))}
+    </div>
   ),
-  BarChart: ({ children, 'data-testid': testId }: any) => (
-    <div data-testid={testId}>{children}</div>
+  BarChart: ({ children, data, 'data-testid': testId }: any) => (
+    <div data-testid={testId}>
+      {children}
+      {/* Render data values for test assertions */}
+      {data && data.map((point: any, idx: number) => (
+        <div key={`bar-${idx}`}>
+          {point.wealth && <span>{point.wealth}</span>}
+          {point.quartile && <span>{point.quartile}</span>}
+        </div>
+      ))}
+    </div>
   ),
   Line: ({ 'data-testid': testId }: any) => testId ? <div data-testid={testId} /> : <div />,
   Bar: ({ 'data-testid': testId }: any) => testId ? <div data-testid={testId} /> : <div />,

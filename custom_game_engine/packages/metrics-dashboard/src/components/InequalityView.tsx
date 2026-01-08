@@ -34,8 +34,21 @@ export function InequalityView({
   const loading = propLoading !== undefined ? propLoading : storeLoading;
 
   const [showComparison, setShowComparison] = useState(comparisonEnabled);
-  const [period1, setPeriod1] = useState<number | null>(null);
-  const [period2, setPeriod2] = useState<number | null>(null);
+
+  // Initialize periods with first and last timestamps if comparisonEnabled
+  const getDefaultPeriods = () => {
+    if (comparisonEnabled && data?.giniTrend && data.giniTrend.length >= 2) {
+      return {
+        period1: data.giniTrend[0]!.timestamp,
+        period2: data.giniTrend[data.giniTrend.length - 1]!.timestamp,
+      };
+    }
+    return { period1: null, period2: null };
+  };
+
+  const defaults = getDefaultPeriods();
+  const [period1, setPeriod1] = useState<number | null>(defaults.period1);
+  const [period2, setPeriod2] = useState<number | null>(defaults.period2);
 
   if (loading) {
     return <div className="view-container">Loading inequality data...</div>;
@@ -80,7 +93,7 @@ export function InequalityView({
   const mobilityData = data.mobilityMatrix.map((row, fromIdx) => {
     const quartiles = ['Bottom 25%', 'Lower 50%', 'Upper 50%', 'Top 25%'];
     return {
-      from: quartiles[fromIdx],
+      from: `From: ${quartiles[fromIdx]}`,
       'Bottom 25%': row[0],
       'Lower 50%': row[1],
       'Upper 50%': row[2],
@@ -203,7 +216,6 @@ export function InequalityView({
                 strokeWidth={2}
                 dot={false}
                 name="Actual Distribution"
-                data-testid="lorenz-curve"
               />
               <Line
                 type="linear"
@@ -241,7 +253,6 @@ export function InequalityView({
                 stroke="#f44336"
                 strokeWidth={2}
                 name="Gini Coefficient"
-                data-testid="gini-trend"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -258,7 +269,7 @@ export function InequalityView({
                 contentStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
               />
               <Legend />
-              <Bar dataKey="wealth" fill="#4caf50" name="Wealth" data-testid="quartile-chart" />
+              <Bar dataKey="wealth" fill="#4caf50" name="Wealth" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -270,10 +281,10 @@ export function InequalityView({
               <thead>
                 <tr>
                   <th>From \ To</th>
-                  <th>Bottom 25%</th>
-                  <th>Lower 50%</th>
-                  <th>Upper 50%</th>
-                  <th>Top 25%</th>
+                  <th>Q1 (Bottom)</th>
+                  <th>Q2 (Lower)</th>
+                  <th>Q3 (Upper)</th>
+                  <th>Q4 (Top)</th>
                 </tr>
               </thead>
               <tbody>

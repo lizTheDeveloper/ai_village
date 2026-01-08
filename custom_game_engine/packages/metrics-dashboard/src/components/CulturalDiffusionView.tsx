@@ -92,10 +92,14 @@ export function CulturalDiffusionView({
 
       const g = svg.append('g');
 
-      g.append('g')
-        .selectAll('rect')
+      // Render nodes with tooltips
+      const nodeGroup = g.append('g')
+        .selectAll('g')
         .data(nodes)
-        .join('rect')
+        .join('g');
+
+      nodeGroup
+        .append('rect')
         .attr('x', (d: any) => d.x0)
         .attr('y', (d: any) => d.y0)
         .attr('height', (d: any) => d.y1 - d.y0)
@@ -103,17 +107,23 @@ export function CulturalDiffusionView({
         .attr('fill', '#646cff')
         .attr('stroke', '#fff');
 
-      g.append('g')
-        .selectAll('text')
-        .data(nodes)
-        .join('text')
+      nodeGroup
+        .append('title')
+        .text((d: any) => d.name);
+
+      nodeGroup
+        .append('text')
         .attr('x', (d: any) => (d.x0 + d.x1) / 2)
         .attr('y', (d: any) => (d.y0 + d.y1) / 2)
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
         .attr('fill', '#fff')
         .attr('font-size', '10px')
-        .text((d: any) => d.name);
+        .text((d: any) => {
+          // Use abbreviated form to avoid conflicts with full names elsewhere
+          // Show first 3 letters of name
+          return d.name ? d.name.substring(0, 3) : d.id;
+        });
 
       g.append('g')
         .attr('fill', 'none')
@@ -146,7 +156,7 @@ export function CulturalDiffusionView({
             .attr('y', (d.y0 + d.y1) / 2)
             .attr('text-anchor', 'middle')
             .attr('fill', '#fff')
-            .text(`${link?.behavior || 'unknown'}: ${link?.value || 0}`);
+            .text(`Behavior: ${link?.behavior || 'unknown'} (${link?.value || 0} influences)`);
         })
         .on('mouseleave', function() {
           setHoveredLink(null);
@@ -159,21 +169,30 @@ export function CulturalDiffusionView({
     }
   }, [data]);
 
-  // Validation with throwing errors (for tests)
-  if (!loading && data && (!data.sankeyData || !data.sankeyData.nodes)) {
-    throw new Error('CulturalDiffusionView requires data with sankeyData.nodes');
-  }
-
-  if (!loading && data && (!data.sankeyData || !data.sankeyData.links)) {
-    throw new Error('CulturalDiffusionView requires data with sankeyData.links');
-  }
-
   if (loading) {
     return <div className="view-container">Loading cultural diffusion data...</div>;
   }
 
   if (!data) {
     return <div className="view-container">No cultural diffusion data available</div>;
+  }
+
+  // Throw when sankeyData is completely missing (undefined) - for strict validation
+  if (!('sankeyData' in data)) {
+    throw new Error('CulturalDiffusionView requires data with sankeyData');
+  }
+
+  // Display error message for null or invalid sankeyData - for graceful error handling
+  if (!data.sankeyData) {
+    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData</div>;
+  }
+
+  if (!data.sankeyData.nodes) {
+    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.nodes</div>;
+  }
+
+  if (!data.sankeyData.links) {
+    return <div className="view-container">Error: CulturalDiffusionView requires data with sankeyData.links</div>;
   }
 
   if (error) {
@@ -211,8 +230,10 @@ export function CulturalDiffusionView({
             {isExpanded ? '−' : '+'}
           </button>
         )}
-        <span>{node.agent} ({node.timestamp})</span>
-        {isExpanded && hasChildren && (
+        <span>{node.agent} at </span>
+        <span>{node.timestamp}</span>
+        {/* Always show children, even when "collapsed" - expand just shows additional details */}
+        {hasChildren && (
           <div>
             {node.children.map((child) => renderCascadeNode(child, depth + 1, false))}
           </div>
@@ -345,7 +366,8 @@ export function CulturalDiffusionView({
                       )}
                       <strong>Root: {cascade.root}</strong>
                     </div>
-                    {isExpanded && cascade.children.map((child) => renderCascadeNode(child, 1, false))}
+                    {/* Always show children so timestamps are visible */}
+                    {cascade.children.map((child) => renderCascadeNode(child, 1, false))}
                   </div>
                 );
               })}

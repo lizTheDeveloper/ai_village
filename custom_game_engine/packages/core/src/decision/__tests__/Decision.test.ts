@@ -40,13 +40,15 @@ describe('AutonomicSystem', () => {
       expect(result!.priority).toBe(100);
     });
 
-    it('returns seek_sleep when energy is below 0.3 (30%)', () => {
+    it('returns seek_sleep when energy is below 0.15 (15%)', () => {
+      // NOTE: Sleep is now purely energy-based - no sleepDrive system
+      // Energy threshold lowered from 0.3 to 0.15 to allow agents to stay awake longer
       const needs = new NeedsComponent({
-    hunger: 1.0,
-    energy: 1.0,
-    health: 1.0,
-  });
-      needs.energy = 0.2; // Below 0.3 threshold
+        hunger: 1.0,
+        energy: 1.0,
+        health: 1.0,
+      });
+      needs.energy = 0.1; // Below 0.15 threshold
 
       const result = autonomicSystem.checkNeeds(needs);
 
@@ -55,21 +57,24 @@ describe('AutonomicSystem', () => {
       expect(result!.priority).toBe(85);
     });
 
-    it('returns forced_sleep when sleepDrive exceeds 85', () => {
+    it('returns null when energy is above 0.15 threshold (no sleepDrive system)', () => {
+      // NOTE: sleepDrive triggers have been removed - sleep is purely energy-based
+      // Agents only sleep when energy < 0.15 or energy = 0
       const needs = new NeedsComponent({
-    hunger: 1.0,
-    energy: 1.0,
-    health: 1.0,
-  });
-      needs.energy = 0.50; // Healthy energy
+        hunger: 1.0,
+        energy: 1.0,
+        health: 1.0,
+      });
+      needs.energy = 0.50; // Above 0.15 threshold - should NOT trigger sleep
 
       const circadian = createCircadianComponent();
-      circadian.sleepDrive = 90;
+      circadian.sleepDrive = 90; // This should be ignored now
 
       const result = autonomicSystem.checkNeeds(needs, circadian);
 
-      expect(result).not.toBeNull();
-      expect(result!.behavior).toBe('forced_sleep');
+      // Should return null (no sleep trigger) since energy is healthy
+      // sleepDrive is no longer used for sleep triggers
+      expect(result).toBeNull();
     });
 
     it('returns seek_warmth when dangerously cold', () => {
@@ -134,21 +139,23 @@ describe('AutonomicSystem', () => {
       expect(result!.priority).toBe(80);
     });
 
-    it('returns forced_sleep when sleepDrive > 85', () => {
+    it('does NOT trigger sleep based on sleepDrive (energy-only model)', () => {
+      // NOTE: sleepDrive system removed - sleep is purely energy-based
+      // High sleepDrive alone should NOT trigger sleep when energy is healthy
       const needs = new NeedsComponent({
-    hunger: 1.0,
-    energy: 1.0,
-    health: 1.0,
-  });
-      needs.energy = 0.50;
+        hunger: 1.0,
+        energy: 1.0,
+        health: 1.0,
+      });
+      needs.energy = 0.50; // Healthy energy
 
       const circadian = createCircadianComponent();
-      circadian.sleepDrive = 90; // Above 85 threshold
+      circadian.sleepDrive = 100; // Max sleepDrive - should be ignored
 
       const result = autonomicSystem.checkNeeds(needs, circadian);
 
-      expect(result).not.toBeNull();
-      expect(result!.behavior).toBe('forced_sleep');
+      // sleepDrive is no longer a trigger - should return null with healthy energy
+      expect(result).toBeNull();
     });
 
     it('returns seek_food for moderate hunger', () => {

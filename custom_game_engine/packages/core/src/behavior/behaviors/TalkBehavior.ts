@@ -92,8 +92,7 @@ export class TalkBehavior extends BaseBehavior {
             }
             targetPartnerId = closest!.id;
           } else {
-            // No available partners found
-            this.switchTo(entity, 'wander', {});
+            // No available partners found - stay in current behavior, don't fall back to wander
             return { complete: true, reason: 'No available conversation partners' };
           }
         }
@@ -142,11 +141,12 @@ export class TalkBehavior extends BaseBehavior {
             return current;
           });
 
-          // Set partner to talk behavior too
+          // Set up conversation partner in behaviorState - but DO NOT change behavior
+          // Talk is not a mode that supersedes other modes - talking happens alongside doing things
           (partner as EntityImpl).updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
-            behavior: 'talk',
-            behaviorState: { partnerId: entity.id },
+            // DO NOT change behavior - keep current behavior
+            behaviorState: { ...current.behaviorState, conversationPartnerId: entity.id },
           }));
 
           // Emit conversation started event
@@ -161,29 +161,16 @@ export class TalkBehavior extends BaseBehavior {
             },
           });
 
-          // Emit behavior:change for partner
-          if (partnerAgent && partnerAgent.behavior !== 'talk') {
-            world.eventBus.emit({
-              type: 'behavior:change',
-              source: partner.id,
-              data: {
-                agentId: partner.id,
-                from: partnerAgent.behavior,
-                to: 'talk',
-                reason: 'conversation_initiated',
-              },
-            });
-          }
+          // NOTE: We no longer emit behavior:change for partner since we don't change their behavior
+          // Partner stays in their current behavior while conversation is active
 
           // Continue to conversation logic below
         } else {
-          // Partner is busy, switch to wandering
-          this.switchTo(entity, 'wander', {});
+          // Partner is busy - stay in current behavior, don't fall back to wander
           return { complete: true, reason: 'Partner unavailable for conversation' };
         }
       } else {
-        // Partner doesn't exist
-        this.switchTo(entity, 'wander', {});
+        // Partner doesn't exist - stay in current behavior, don't fall back to wander
         return { complete: true, reason: 'Partner not found' };
       }
     }
@@ -192,8 +179,7 @@ export class TalkBehavior extends BaseBehavior {
     const activeConversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
 
     if (!activeConversation || !isInConversation(activeConversation)) {
-      // Not in conversation and no partner to start with, switch to wandering
-      this.switchTo(entity, 'wander', {});
+      // Not in conversation and no partner to start with - stay in current behavior
       return { complete: true, reason: 'Not in conversation' };
     }
 
@@ -204,13 +190,12 @@ export class TalkBehavior extends BaseBehavior {
 
     const activePartner = world.getEntity(partnerId);
     if (!activePartner) {
-      // Partner no longer exists, end conversation
+      // Partner no longer exists, end conversation - stay in current behavior
       entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) => ({
         ...current,
         isActive: false,
         partnerId: null,
       }));
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Partner no longer exists' };
     }
 
