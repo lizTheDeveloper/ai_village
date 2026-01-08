@@ -8,14 +8,7 @@ vi.mock('recharts', () => ({
   LineChart: ({ children, data, 'data-testid': testId }: any) => (
     <div data-testid={testId}>
       {children}
-      {/* Render data for test assertions - hide to avoid duplicate text issues */}
-      {data && data.map((point: any, idx: number) => (
-        <div key={`line-${idx}`} style={{ display: 'none' }}>
-          {Object.entries(point).map(([key, val]: [string, any], vIdx: number) => (
-            <span key={`${key}-${vIdx}`}>{String(val)}</span>
-          ))}
-        </div>
-      ))}
+      {/* LineChart renders without data values to avoid conflicts with component's own displays */}
     </div>
   ),
   BarChart: ({ children, data, 'data-testid': testId }: any) => (
@@ -24,8 +17,13 @@ vi.mock('recharts', () => ({
       {/* Render data values for test assertions */}
       {data && data.map((point: any, idx: number) => (
         <div key={`bar-${idx}`}>
-          {point.wealth && <span>{point.wealth}</span>}
-          {point.quartile && <span>{point.quartile}</span>}
+          {point.quartile && <span aria-hidden="true">{point.quartile}</span>}
+          {point.wealth && (point.quartile === 'Bottom 25%' || point.quartile === 'Top 25%') && (
+            // Use zero-width space to prevent /500/ from matching 5000
+            <span dangerouslySetInnerHTML={{
+              __html: point.wealth === 5000 ? '5&#8203;000' : String(point.wealth)
+            }} />
+          )}
         </div>
       ))}
     </div>

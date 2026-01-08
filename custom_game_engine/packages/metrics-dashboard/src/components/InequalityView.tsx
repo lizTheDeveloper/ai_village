@@ -91,9 +91,9 @@ export function InequalityView({
   ];
 
   const mobilityData = data.mobilityMatrix.map((row, fromIdx) => {
-    const quartiles = ['Bottom 25%', 'Lower 50%', 'Upper 50%', 'Top 25%'];
+    const quartileLabels = ['Q1 (Bottom)', 'Q2 (Lower)', 'Q3 (Upper)', 'Q4 (Top)'];
     return {
-      from: `From: ${quartiles[fromIdx]}`,
+      from: quartileLabels[fromIdx],
       'Bottom 25%': row[0],
       'Lower 50%': row[1],
       'Upper 50%': row[2],
