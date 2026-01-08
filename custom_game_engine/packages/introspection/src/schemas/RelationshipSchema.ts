@@ -84,7 +84,7 @@ export const RelationshipSchema = autoRegister(
 
     llm: {
       promptSection: 'relationships',
-      summarize: (data) => {
+      summarize: (data, context) => {
         // Guard against undefined or missing relationships property
         if (!data.relationships || typeof data.relationships.values !== 'function') {
           return 'No relationships yet';
@@ -95,6 +95,9 @@ export const RelationshipSchema = autoRegister(
         if (relationships.length === 0) {
           return 'No relationships yet';
         }
+
+        // Create entity resolver - uses context if available, otherwise falls back to ID
+        const resolveName = context?.entityResolver || ((id: string) => id);
 
         // Sort by familiarity and get top 5
         const topRelationships = relationships
@@ -108,14 +111,14 @@ export const RelationshipSchema = autoRegister(
 
         if (friends.length > 0) {
           const friendNames = friends
-            .map((r) => `${r.targetId} (affinity: ${r.affinity}, trust: ${r.trust})`)
+            .map((r) => `${resolveName(r.targetId)} (affinity: ${r.affinity}, trust: ${r.trust})`)
             .join(', ');
           parts.push(`Friends: ${friendNames}`);
         }
 
         if (rivals.length > 0) {
           const rivalNames = rivals
-            .map((r) => `${r.targetId} (affinity: ${r.affinity})`)
+            .map((r) => `${resolveName(r.targetId)} (affinity: ${r.affinity})`)
             .join(', ');
           parts.push(`Rivals: ${rivalNames}`);
         }

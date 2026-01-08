@@ -187,7 +187,7 @@ export {
 export type { SkillsComponent } from './SkillsComponent.js';
 // Personal goals
 export * from './GoalsComponent.js';
-export { createGoalsComponent, formatGoalsForPrompt, type GoalsComponent } from './GoalsComponent.js';
+export { createGoalsComponent, formatGoalsForPrompt, formatGoalsSectionForPrompt, type GoalsComponent } from './GoalsComponent.js';
 // Equipment system (forward-compatibility)
 // NOTE: EquipmentSlotsComponent export commented out to avoid conflicts with EquipmentComponent
 // Files using EquipmentSlotsComponent should import it directly from './EquipmentSlotsComponent.js'

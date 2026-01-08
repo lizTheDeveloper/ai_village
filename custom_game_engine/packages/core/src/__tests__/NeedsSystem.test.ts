@@ -372,59 +372,62 @@ describe('NeedsSystem', () => {
   });
 
   describe('critical needs events', () => {
-    it('should emit need:critical event when hunger drops below 20', () => {
+    // NOTE: NeedsSystem only emits need:critical for ENERGY, not hunger.
+    // Hunger critical events come from GatherBehavior.ts.
+    it('should NOT emit need:critical for hunger from NeedsSystem (hunger critical is from GatherBehavior)', () => {
       const criticalHandler = vi.fn();
       world.eventBus.subscribe('need:critical', criticalHandler);
 
       const entity = world.createEntity();
       const needs = new NeedsComponent({
-    hunger: 0.201, // Just barely above 0.2 threshold
-    energy: 1.0,
-    health: 1.0,
-    thirst: 1.0,
-    temperature: 1.0,
-  }); // Just above threshold
-      (entity as any).addComponent(needs);
-
-      const entities = world.query().with(ComponentType.Needs).executeEntities();
-
-      // Simulate enough time to drop below 20% (0.2)
-      // With deltaTime=60, gameMinutesElapsed=1, decay=0.0008 per iteration
-      for (let i = 0; i < 10; i++) {
-        system.update(world, entities, 60.0); // 60s = 1 game minute
-      }
-
-      world.eventBus.flush();
-
-      // Should have emitted at least once when crossing threshold
-      const hungerCriticalCalls = criticalHandler.mock.calls.filter(
-        call => call[0].data.needType === 'hunger'
-      );
-      expect(hungerCriticalCalls.length).toBeGreaterThan(0);
-    });
-
-    it('should emit need:critical event when energy drops below 20', () => {
-      const criticalHandler = vi.fn();
-      world.eventBus.subscribe('need:critical', criticalHandler);
-
-      const entity = world.createEntity();
-      const needs = new NeedsComponent({
-        hunger: 1.0,
-        energy: 0.201, // Just barely above 0.2 threshold
+        hunger: 0.05, // Very low hunger
+        energy: 1.0,
         health: 1.0,
         thirst: 1.0,
         temperature: 1.0,
-      }); // Just above threshold
+      });
       (entity as any).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
-      // Simulate enough time to drop below 20% (0.2)
-      // With deltaTime=60, gameMinutesElapsed=1, decay=0.0008 per iteration
-      for (let i = 0; i < 10; i++) {
-        system.update(world, entities, 60.0); // 60s = 1 game minute
-      }
+      // Run the system
+      system.update(world, entities, 60.0);
+      world.eventBus.flush();
 
+      // NeedsSystem should NOT emit hunger critical events
+      const hungerCriticalCalls = criticalHandler.mock.calls.filter(
+        call => call[0].data.needType === 'hunger'
+      );
+      expect(hungerCriticalCalls.length).toBe(0);
+    });
+
+    it('should emit need:critical event when energy crosses below 10% threshold', () => {
+      const criticalHandler = vi.fn();
+      world.eventBus.subscribe('need:critical', criticalHandler);
+
+      const entity = world.createEntity();
+      // Start with energy ABOVE threshold
+      const needs = new NeedsComponent({
+        hunger: 1.0,
+        energy: 0.15, // Above 0.1 threshold
+        health: 1.0,
+        thirst: 1.0,
+        temperature: 1.0,
+      });
+      (entity as any).addComponent(needs);
+
+      const entities = world.query().with(ComponentType.Needs).executeEntities();
+
+      // First update - energy still above threshold, should not emit
+      system.update(world, entities, 60.0);
+      world.eventBus.flush();
+      expect(criticalHandler.mock.calls.length).toBe(0);
+
+      // Manually drop energy below threshold to simulate decay
+      needs.energy = 0.08;
+
+      // Second update - energy now below threshold, should emit
+      system.update(world, entities, 60.0);
       world.eventBus.flush();
 
       const energyCriticalCalls = criticalHandler.mock.calls.filter(
@@ -438,28 +441,33 @@ describe('NeedsSystem', () => {
       world.eventBus.subscribe('need:critical', criticalHandler);
 
       const entity = world.createEntity();
+      // Start above threshold, then drop below
       const needs = new NeedsComponent({
-    hunger: 0.25,
-    energy: 1.0,
-    health: 1.0,
-    thirst: 1.0,
-    temperature: 1.0,
-  });
+        hunger: 1.0,
+        energy: 0.15, // Above 0.1 threshold
+        health: 1.0,
+        thirst: 1.0,
+        temperature: 1.0,
+      });
       (entity as any).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
-      for (let i = 0; i < 100; i++) {
-        system.update(world, entities, 1.0);
-      }
-
+      // First update to establish "was" state
+      system.update(world, entities, 60.0);
       world.eventBus.flush();
 
-      if (criticalHandler.mock.calls.length > 0) {
-        const event = criticalHandler.mock.calls[0][0];
-        expect(event.data.survivalRelevance).toBeDefined();
-        expect(event.data.survivalRelevance).toBeGreaterThan(0);
-      }
+      // Drop below threshold
+      needs.energy = 0.05;
+
+      // Second update should emit critical event
+      system.update(world, entities, 60.0);
+      world.eventBus.flush();
+
+      expect(criticalHandler.mock.calls.length).toBeGreaterThan(0);
+      const event = criticalHandler.mock.calls[0][0];
+      expect(event.data.survivalRelevance).toBeDefined();
+      expect(event.data.survivalRelevance).toBeGreaterThan(0);
     });
   });
 

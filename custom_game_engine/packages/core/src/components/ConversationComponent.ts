@@ -18,6 +18,10 @@ export interface ConversationComponent extends Component {
   startedAt: Tick;
   lastMessageAt: Tick;
   isActive: boolean;
+
+  // Social fatigue tracking
+  socialFatigue: number; // 0-100, current fatigue level
+  fatigueThreshold: number; // When fatigue exceeds this, agent wants to leave
 }
 
 export function createConversationComponent(
@@ -35,6 +39,8 @@ export function createConversationComponent(
     startedAt: 0,
     lastMessageAt: 0,
     isActive: false,
+    socialFatigue: 0,
+    fatigueThreshold: 70, // Default threshold (will be adjusted by personality)
   };
 }
 
@@ -59,6 +65,7 @@ export function startConversation(
     startedAt: currentTick,
     lastMessageAt: currentTick,
     isActive: true,
+    socialFatigue: 0, // Reset fatigue when starting new conversation
   };
 }
 

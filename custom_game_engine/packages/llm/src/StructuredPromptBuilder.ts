@@ -87,7 +87,7 @@ export class StructuredPromptBuilder {
 
     // Phase 3: Schema-driven component rendering
     // Generate prompts for all schema'd components automatically
-    const schemaPrompt = this.buildSchemaPrompt(agent);
+    const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Role and personality (who you are)
     const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
@@ -216,10 +216,11 @@ export class StructuredPromptBuilder {
    * This integrates the introspection system's PromptRenderer to provide
    * automatic LLM context generation from component metadata.
    */
-  private buildSchemaPrompt(agent: Entity): string {
+  private buildSchemaPrompt(agent: Entity, world: World): string {
     // Use PromptRenderer to generate prompts for all schema'd components
     // This will skip components that don't have schemas registered
-    const schemaPrompt = PromptRenderer.renderEntity(agent as any);
+    // Pass world for entity name resolution in relationships, etc.
+    const schemaPrompt = PromptRenderer.renderEntity(agent as any, world);
 
     if (!schemaPrompt) {
       return '';

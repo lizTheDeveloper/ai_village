@@ -697,6 +697,13 @@ export interface GameEventMap {
     topic: string;
     conversationId?: string;
   };
+  /** Social fatigue threshold exceeded - agent wants to leave conversation */
+  'conversation:fatigue_threshold_exceeded': {
+    agentId: EntityId;
+    fatigue: number;
+    threshold: number;
+    extraversion: number;
+  };
   'information:shared': {
     from: EntityId;
     to: EntityId;

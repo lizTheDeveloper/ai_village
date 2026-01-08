@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
 import type { World } from '@ai-village/core/src/ecs/World.js';
 import type { Entity } from '@ai-village/core/src/ecs/Entity.js';
 import type { MagicSkillTree } from '@ai-village/core/src/magic/MagicSkillTree.js';
 import type { WindowManager } from '../../../WindowManager.js';
 import { SkillTreePanel } from '../SkillTreePanel.js';
+import { MagicSkillTreeRegistry } from '@ai-village/magic';
 
 /**
  * Tests for SkillTreePanel - Main Magic Skill Tree UI Panel
@@ -24,6 +25,11 @@ describe('SkillTreePanel', () => {
   let mockEntity: Entity;
   let mockWindowManager: WindowManager;
   let panel: SkillTreePanel;
+
+  // Register mock skill trees before all tests
+  beforeAll(() => {
+    setupMockSkillTrees();
+  });
 
   beforeEach(() => {
     // Reset state between tests
@@ -799,14 +805,31 @@ describe('SkillTreePanel', () => {
 // =============================================================================
 
 function createMockWorld(): World {
+  const eventBusEmit = vi.fn();
+  const unlockSkillNode = vi.fn((entityId, paradigmId, nodeId, xpCost) => {
+    // Simulate successful unlock - deduct XP
+    return true;
+  });
+  const evaluateNode = vi.fn((tree, nodeId, context) => {
+    // Return mock evaluation result
+    return {
+      nodeId,
+      isUnlocked: context.progress?.unlockedNodes?.includes(nodeId) ?? false,
+      isAvailable: true,
+      isVisible: true,
+      metConditions: [],
+      unmetConditions: [],
+    };
+  });
+
   return {
     getEventBus: vi.fn(() => ({
-      emit: vi.fn(),
+      emit: eventBusEmit,
       on: vi.fn(),
     })),
     getSkillTreeManager: vi.fn(() => ({
-      unlockSkillNode: vi.fn(),
-      evaluateNode: vi.fn(),
+      unlockSkillNode,
+      evaluateNode,
     })),
     getRegistry: vi.fn(() => ({
       getTree: vi.fn(),
@@ -886,14 +909,26 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     fillRect: vi.fn(),
     fillText: vi.fn(),
     strokeRect: vi.fn(),
+    strokeText: vi.fn(),
     beginPath: vi.fn(),
     moveTo: vi.fn(),
     lineTo: vi.fn(),
     stroke: vi.fn(),
+    arc: vi.fn(),
+    closePath: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    scale: vi.fn(),
+    measureText: vi.fn((text: string) => ({ width: text.length * 8 })), // Mock width based on text length
     _fillStyle: '#000000',
     _strokeStyle: '#000000',
     _fillStyleCalls: fillStyleCalls,
     _strokeStyleCalls: strokeStyleCalls,
+    font: '12px sans-serif',
+    textAlign: 'left',
+    textBaseline: 'top',
+    lineWidth: 1,
   };
 
   // Make fillStyle/strokeStyle act like properties with call tracking
@@ -914,4 +949,129 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
   });
 
   return mock as CanvasRenderingContext2D;
+}
+
+/**
+ * Setup mock skill trees in the registry for testing
+ */
+function setupMockSkillTrees() {
+  const registry = MagicSkillTreeRegistry.getInstance();
+
+  // Create mock Shinto tree
+  const shintoTree: MagicSkillTree = {
+    id: 'shinto_tree',
+    paradigmId: 'shinto',
+    name: 'Shinto Magic',
+    description: 'Spirit magic and kami worship',
+    nodes: [
+      {
+        id: 'shinto_spirit_sense',
+        name: 'Spirit Sense',
+        description: 'Sense nearby kami spirits',
+        category: 'foundation',
+        tier: 0,
+        xpCost: 100,
+        unlockConditions: [],
+        effects: [],
+      },
+      {
+        id: 'shinto_cleansing_ritual',
+        name: 'Cleansing Ritual',
+        description: 'Purify corrupted areas',
+        category: 'intermediate',
+        tier: 1,
+        xpCost: 100,
+        unlockConditions: [
+          { type: 'prerequisite_node', nodeId: 'shinto_spirit_sense' }
+        ],
+        effects: [],
+      },
+    ],
+    entryNodes: ['shinto_spirit_sense'],
+    categories: [
+      {
+        id: 'foundation',
+        name: 'Foundation',
+        description: 'Basic Shinto abilities',
+        displayOrder: 0,
+      },
+      {
+        id: 'intermediate',
+        name: 'Intermediate',
+        description: 'Advanced Shinto techniques',
+        displayOrder: 1,
+      },
+      {
+        id: 'mastery',
+        name: 'Mastery',
+        description: 'Master-level Shinto powers',
+        displayOrder: 2,
+      },
+    ],
+  };
+
+  // Create mock Allomancy tree
+  const allomancyTree: MagicSkillTree = {
+    id: 'allomancy_tree',
+    paradigmId: 'allomancy',
+    name: 'Allomancy',
+    description: 'Pushing and pulling on metals',
+    nodes: [
+      {
+        id: 'allomancy_steel_push',
+        name: 'Steel Push',
+        description: 'Push on metals',
+        category: 'foundation',
+        tier: 0,
+        xpCost: 100,
+        unlockConditions: [],
+        effects: [],
+      },
+    ],
+    entryNodes: ['allomancy_steel_push'],
+    categories: [
+      {
+        id: 'foundation',
+        name: 'Foundation',
+        description: 'Basic Allomancy',
+        displayOrder: 0,
+      },
+    ],
+  };
+
+  // Create mock Sympathy tree
+  const sympathyTree: MagicSkillTree = {
+    id: 'sympathy_tree',
+    paradigmId: 'sympathy',
+    name: 'Sympathy',
+    description: 'Binding energy between objects',
+    nodes: [
+      {
+        id: 'sympathy_heat_link',
+        name: 'Heat Link',
+        description: 'Transfer heat between objects',
+        category: 'foundation',
+        tier: 0,
+        xpCost: 100,
+        unlockConditions: [],
+        effects: [],
+      },
+    ],
+    entryNodes: ['sympathy_heat_link'],
+    categories: [
+      {
+        id: 'foundation',
+        name: 'Foundation',
+        description: 'Basic Sympathy',
+        displayOrder: 0,
+      },
+    ],
+  };
+
+  // Register trees
+  (registry as any).trees = new Map([
+    ['shinto', shintoTree],
+    ['allomancy', allomancyTree],
+    ['sympathy', sympathyTree],
+  ]);
 }

@@ -12,6 +12,7 @@
 
 import type { ComponentSchema, Component } from '../types/ComponentSchema.js';
 import type { FieldSchema } from '../types/FieldSchema.js';
+import type { SummarizeContext } from '../types/LLMConfig.js';
 import { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import { isVisibleToLLM, shouldSummarizeForLLM } from '../types/VisibilityTypes.js';
 
@@ -32,11 +33,23 @@ export class PromptRenderer {
    * Render all LLM-visible components for an entity
    *
    * @param entity - Entity with components map
+   * @param world - Optional world instance for entity resolution
    * @returns Formatted prompt string with all schema'd components
    */
-  static renderEntity(entity: { id: string; components: Map<string, any> }): string {
+  static renderEntity(entity: { id: string; components: Map<string, any> }, world?: any): string {
     let prompt = '';
     const sections: Array<{ priority: number; section: string; content: string }> = [];
+
+    // Build context for summarize functions
+    const context: SummarizeContext | undefined = world ? {
+      world,
+      entityResolver: (id: string) => {
+        const targetEntity = world.getEntity?.(id);
+        if (!targetEntity) return id;
+        const identity = targetEntity.components?.get('identity');
+        return identity?.name || id;
+      }
+    } : undefined;
 
     // Process each component that has a schema
     for (const [componentType, componentData] of entity.components.entries()) {
@@ -66,7 +79,7 @@ export class PromptRenderer {
       }
 
       // Generate prompt from schema
-      const content = this.renderComponent(componentData, schema);
+      const content = this.renderComponent(componentData, schema, context);
       if (content) {
         sections.push({
           priority: schema.llm?.priority ?? 100,
@@ -92,11 +105,13 @@ export class PromptRenderer {
    *
    * @param component - Component data object
    * @param schema - Component schema with field metadata
+   * @param context - Optional context for entity resolution
    * @returns Formatted prompt section for this component
    */
   static renderComponent<T extends Component>(
     component: T,
-    schema: ComponentSchema<T>
+    schema: ComponentSchema<T>,
+    context?: SummarizeContext
   ): string {
     // Use summarize function if provided and visibility is 'summarized'
     if (schema.llm?.summarize) {
@@ -106,7 +121,7 @@ export class PromptRenderer {
       );
 
       if (hasSummarizedField) {
-        const summary = schema.llm.summarize(component);
+        const summary = schema.llm.summarize(component, context);
         if (schema.llm.maxLength && summary.length > schema.llm.maxLength) {
           return summary.substring(0, schema.llm.maxLength) + '...';
         }
@@ -237,13 +252,16 @@ export class PromptRenderer {
         return value ? 'yes' : 'no';
 
       case 'number':
+        // Round to 2 decimal places for cleaner output
+        const rounded = Math.round(value * 100) / 100;
+
         // Format with range context if available
         if (field.range) {
           const [min, max] = field.range;
           const percentage = Math.round(((value - min) / (max - min)) * 100);
-          return `${value} (${percentage}%)`;
+          return `${rounded} (${percentage}%)`;
         }
-        return String(value);
+        return String(rounded);
 
       case 'enum':
         return String(value);
@@ -254,6 +272,10 @@ export class PromptRenderer {
 
           // Handle array of primitives
           if (field.itemType === 'string' || field.itemType === 'number' || field.itemType === 'boolean') {
+            // Round numbers to 2 decimal places
+            if (field.itemType === 'number') {
+              return value.map((v: number) => Math.round(v * 100) / 100).join(', ');
+            }
             return value.join(', ');
           }
 
@@ -279,7 +301,14 @@ export class PromptRenderer {
             return this.formatMapOfObjects(entries, field);
           }
 
-          return entries.map(([k, v]) => `${k}: ${v}`).join(', ');
+          // Round numeric values to 2 decimal places
+          return entries.map(([k, v]) => {
+            if (typeof v === 'number') {
+              const rounded = Math.round(v * 100) / 100;
+              return `${k}: ${rounded}`;
+            }
+            return `${k}: ${v}`;
+          }).join(', ');
         }
 
         // Handle plain objects as maps
@@ -293,7 +322,14 @@ export class PromptRenderer {
             return this.formatMapOfObjects(entries, field);
           }
 
-          return entries.map(([k, v]) => `${k}: ${v}`).join(', ');
+          // Round numeric values to 2 decimal places
+          return entries.map(([k, v]) => {
+            if (typeof v === 'number') {
+              const rounded = Math.round(v * 100) / 100;
+              return `${k}: ${rounded}`;
+            }
+            return `${k}: ${v}`;
+          }).join(', ');
         }
         return String(value);
 
@@ -356,6 +392,11 @@ export class PromptRenderer {
 
     const formatted = limited.map(([key, val]) => {
       if (typeof val !== 'object' || val === null) {
+        // Round numbers to 2 decimal places
+        if (typeof val === 'number') {
+          const rounded = Math.round(val * 100) / 100;
+          return `${key}: ${rounded}`;
+        }
         return `${key}: ${val}`;
       }
 
@@ -397,8 +438,10 @@ export class PromptRenderer {
 
     if ('targetId' in obj && 'affinity' in obj) {
       // Relationship
-      const affinity = obj.affinity > 0 ? `+${obj.affinity}` : obj.affinity;
-      const trust = obj.trust !== undefined ? `, trust ${obj.trust}` : '';
+      const roundedAffinity = Math.round(obj.affinity * 100) / 100;
+      const affinity = obj.affinity > 0 ? `+${roundedAffinity}` : roundedAffinity;
+      const roundedTrust = obj.trust !== undefined ? Math.round(obj.trust * 100) / 100 : undefined;
+      const trust = roundedTrust !== undefined ? `, trust ${roundedTrust}` : '';
       return `${obj.targetId} (affinity ${affinity}${trust})`;
     }
 
@@ -416,6 +459,11 @@ export class PromptRenderer {
     const parts = entries.map(([k, v]) => {
       if (typeof v === 'object' && v !== null) {
         return `${k}: {…}`;
+      }
+      // Round numbers to 2 decimal places
+      if (typeof v === 'number') {
+        const rounded = Math.round(v * 100) / 100;
+        return `${k}: ${rounded}`;
       }
       return `${k}: ${v}`;
     });

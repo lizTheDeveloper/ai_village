@@ -82,7 +82,6 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
         realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
       }
 
       // Assert: Power level should NOT increase (charging halted)
@@ -94,20 +93,20 @@ describe('Reality Anchor Power Integration', () => {
     it('should charge normally when isPowered=true', () => {
       // Arrange: Reality Anchor with sufficient power
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'charging';
       anchorComp.powerLevel = 0.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       // Add PowerComponent with 5 GW consumption
       const anchorPower = createPowerConsumer('electrical', 5_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Create generator with 10 GW output (surplus)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 10_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 10_000_000));
 
       // Act: Run power grid system, then Reality Anchor system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -119,7 +118,6 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
         realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
       }
 
       // Assert: Power level should have increased
@@ -132,15 +130,15 @@ describe('Reality Anchor Power Integration', () => {
       eventBus.on('reality_anchor:charging_interrupted', eventSpy);
 
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'charging';
       anchorComp.powerLevel = 0.5; // Mid-charge
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 5_000_000);
       anchorPower.isPowered = false; // Power just lost
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
       // Advance world to tick 20
@@ -148,7 +146,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Event should be emitted
       // This test will FAIL until RealityAnchorSystem emits this event
@@ -165,20 +162,22 @@ describe('Reality Anchor Power Integration', () => {
     it('should drain 50,000,000 kW when field is active', () => {
       // Arrange: Reality Anchor with active field
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       // Add PowerComponent with 50 GW consumption (active field rate)
-      const anchorPower = createPowerConsumer('electrical', 50_000_000, 'critical');
-      (anchor as EntityImpl).addComponent(anchorPower);
+      const anchorPower = createPowerConsumer('electrical', 50_000_000);
+      // @ts-expect-error - priority field doesn't exist yet
+      anchorPower.priority = 'critical';
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Create generator with 50 GW output
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 50_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50_000_000));
 
       // Act: Run power grid system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -194,17 +193,16 @@ describe('Reality Anchor Power Integration', () => {
     it('should collapse field when isPowered=false during active state', () => {
       // Arrange: Reality Anchor with active field but no power
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       // Add PowerComponent with insufficient power
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
       anchorPower.isPowered = false; // No power available
-      anchorPower.efficiency = 0; // Zero power
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
       // Advance world to tick 20
@@ -212,7 +210,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Field should collapse
       // This test will FAIL until RealityAnchorSystem checks isPowered at line 119
@@ -225,16 +222,15 @@ describe('Reality Anchor Power Integration', () => {
       eventBus.on('reality_anchor:power_loss', eventSpy);
 
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
       anchorPower.isPowered = false; // Power lost
-      anchorPower.efficiency = 0; // Zero power
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
       // Advance world to tick 20
@@ -242,10 +238,9 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
-      eventBus.flush(); // Flush event queue
 
       // Assert: Event should be emitted
+      // This test will FAIL until RealityAnchorSystem emits this event
       expect(eventSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'reality_anchor:power_loss',
@@ -260,17 +255,16 @@ describe('Reality Anchor Power Integration', () => {
       eventBus.on('reality_anchor:field_collapse', eventSpy);
 
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
       anchorComp.mortalizedGods.add('god_123'); // God in field
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
       anchorPower.isPowered = false;
-      anchorPower.efficiency = 0; // Zero power
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
       // Advance world to tick 20
@@ -278,10 +272,9 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
-      eventBus.flush(); // Flush event queue
 
       // Assert: Field collapse event emitted, gods restored
+      // This test will FAIL until RealityAnchorSystem emits this event
       expect(eventSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'reality_anchor:field_collapse',
@@ -294,19 +287,19 @@ describe('Reality Anchor Power Integration', () => {
     it('should maintain field when power is sufficient', () => {
       // Arrange: Reality Anchor with active field and sufficient power
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Create generator with 100 GW output (surplus)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 100_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 100_000_000));
 
       // Act: Run power grid system, then Reality Anchor system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -317,7 +310,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Field should remain active
       expect(anchorPower.isPowered).toBe(true);
@@ -329,22 +321,26 @@ describe('Reality Anchor Power Integration', () => {
     it.skip('should power Reality Anchor before normal consumers during shortage', () => {
       // Arrange: Generator with 50 GW, Reality Anchor (50 GW critical), normal consumer (10 GW)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 50_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 50_000_000));
 
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
-      const anchorPower = createPowerConsumer('electrical', 50_000_000, 'critical');
-      (anchor as EntityImpl).addComponent(anchorPower);
+      const anchorPower = createPowerConsumer('electrical', 50_000_000);
+      // @ts-expect-error - priority field doesn't exist yet
+      anchorPower.priority = 'critical';
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       const normalConsumer = world.createEntity();
-      (normalConsumer as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      const normalPower = createPowerConsumer('electrical', 10_000_000, 'normal');
-      (normalConsumer as EntityImpl).addComponent(normalPower);
+      (normalConsumer as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      const normalPower = createPowerConsumer('electrical', 10_000_000);
+      // @ts-expect-error - priority field doesn't exist yet
+      normalPower.priority = 'normal';
+      (normalConsumer as EntityImpl).addComponent(CT.Power, normalPower);
 
       // Act: Run power grid system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -361,19 +357,19 @@ describe('Reality Anchor Power Integration', () => {
     it('should fail gracefully when Reality Anchor has no power network connection', () => {
       // Arrange: Reality Anchor with no nearby generator or power pole
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 0, y: 0 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 0, y: 0 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'charging';
       anchorComp.powerLevel = 0.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 5_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Generator far away at (1000, 1000)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 1000, y: 1000 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 10_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 1000, y: 1000 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 10_000_000));
 
       // Act: Run power grid system, then Reality Anchor system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -384,7 +380,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Should have 2 separate networks, anchor not powered, not charging
       const networks = powerGridSystem.getNetworks();
@@ -396,18 +391,18 @@ describe('Reality Anchor Power Integration', () => {
     it('should handle Reality Anchor with wrong power type gracefully', () => {
       // Arrange: Reality Anchor expecting electrical, but only mechanical generator available
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'charging';
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 5_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Mechanical generator (incompatible)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('mechanical', 10_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('mechanical', 10_000_000));
 
       // Act: Run power grid system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -427,19 +422,19 @@ describe('Reality Anchor Power Integration', () => {
       eventBus.on('reality_anchor:power_insufficient', eventSpy);
 
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Generator with only 25 GW (50% of requirement)
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
-      (generator as EntityImpl).addComponent(createPowerProducer('electrical', 25_000_000));
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Power, createPowerProducer('electrical', 25_000_000));
 
       // Act: Run power grid system, then Reality Anchor system
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -450,9 +445,9 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Partial power warning emitted
+      // This test will FAIL until RealityAnchorSystem checks efficiency and emits warnings
       expect(anchorPower.efficiency).toBe(0.5);
       expect(eventSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -470,22 +465,22 @@ describe('Reality Anchor Power Integration', () => {
     it('should restore god divinity when field collapses from power loss', () => {
       // Arrange: Reality Anchor with god inside field
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'active';
       anchorComp.powerLevel = 1.0;
       anchorComp.mortalizedGods.add('supreme_creator_001');
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 50_000_000);
       anchorPower.isPowered = true;
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Generator that will "fail" mid-battle
       const generator = world.createEntity();
-      (generator as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (generator as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const generatorPower = createPowerProducer('electrical', 50_000_000);
-      (generator as EntityImpl).addComponent(generatorPower);
+      (generator as EntityImpl).addComponent(CT.Power, generatorPower);
 
       // Initially powered
       let powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
@@ -505,7 +500,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: Field collapsed, god restored to divinity
       expect(anchorPower.isPowered).toBe(false);
@@ -518,10 +512,10 @@ describe('Reality Anchor Power Integration', () => {
     it('should handle Reality Anchor without PowerComponent gracefully', () => {
       // Arrange: Reality Anchor without PowerComponent (invalid configuration)
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'charging';
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
       // No PowerComponent added!
 
       // Act: Should not crash
@@ -541,13 +535,13 @@ describe('Reality Anchor Power Integration', () => {
     it('should handle destroyed Reality Anchor gracefully', () => {
       // Arrange: Destroyed Reality Anchor
       const anchor = world.createEntity();
-      (anchor as EntityImpl).addComponent({ type: 'position', version: 1, x: 50, y: 50 });
+      (anchor as EntityImpl).addComponent(CT.Position, { type: 'position', version: 1, x: 50, y: 50 });
       const anchorComp = createRealityAnchor();
       anchorComp.status = 'destroyed';
-      (anchor as EntityImpl).addComponent(anchorComp);
+      (anchor as EntityImpl).addComponent(CT.RealityAnchor, anchorComp);
 
       const anchorPower = createPowerConsumer('electrical', 5_000_000);
-      (anchor as EntityImpl).addComponent(anchorPower);
+      (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Should not attempt to charge or drain power
       // Advance world to tick 20
@@ -555,7 +549,6 @@ describe('Reality Anchor Power Integration', () => {
         world.advanceTick();
       }
       realityAnchorSystem.update(world);
-      eventBus.flush(); // Flush event queue
 
       // Assert: No changes to power level, no power consumption
       expect(anchorComp.powerLevel).toBe(0);

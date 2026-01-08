@@ -125,6 +125,8 @@ import {
   createMagicSystemsPanelAdapter,
   SpellbookPanel,
   createSpellbookPanelAdapter,
+  SkillTreePanel,
+  createSkillTreePanelAdapter,
   DevPanel,
   createDevPanelAdapter,
   // Additional Divine panels
@@ -192,6 +194,7 @@ interface UIContext {
   menuBar: MenuBar;
   keyboardRegistry: KeyboardRegistry;
   hoverInfoPanel: UnifiedHoverInfoPanel;
+  skillTreePanel: SkillTreePanel;
 }
 
 // ============================================================================
@@ -1360,6 +1363,23 @@ function setupWindowManager(
     menuCategory: 'magic',
   });
 
+  // Skill Tree Panel
+  const skillTreePanel = new SkillTreePanel(windowManager);
+  const skillTreeAdapter = createSkillTreePanelAdapter(skillTreePanel);
+  windowManager.registerWindow('skill-tree', skillTreeAdapter, {
+    defaultX: 100,
+    defaultY: 50,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 600,
+    minHeight: 400,
+    showInWindowList: true,
+    menuCategory: 'magic',
+    keyboardShortcut: 'P', // P for Paradigm skill tree
+  });
+
   // Divine Powers Panel
   const divinePowersPanel = new DivinePowersPanel();
   const divinePowersAdapter = createDivinePowersPanelAdapter(divinePowersPanel);
@@ -2353,6 +2373,8 @@ function handleKeyDown(
     'd': 'divine-powers', 'D': 'divine-powers',
     'g': 'divine-chat', 'G': 'divine-chat',
     'a': 'divine-analytics', 'A': 'divine-analytics',
+    // Magic panels
+    'p': 'skill-tree', 'P': 'skill-tree',
   };
 
   if (windowShortcuts[key]) {
@@ -2584,7 +2606,7 @@ function handleMouseClick(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar, cityStatsWidget
+    placementUI, windowManager, menuBar, cityStatsWidget, skillTreePanel
   } = uiContext;
 
   // Left click - window management and menu bar
@@ -2655,6 +2677,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(entity);
         relationshipsPanel.setSelectedEntity(entity);
+        skillTreePanel.setSelectedEntity(entity);
         panels.agentRosterPanel.setSelectedAgent(entity.id);
         panels.animalRosterPanel.setSelectedAnimal(null);
         devPanel.setSelectedAgentId(entity.id);
@@ -2671,6 +2694,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        skillTreePanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(entity.id);
         devPanel.setSelectedAgentId(null);
@@ -2684,6 +2708,7 @@ function handleMouseClick(
         animalInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        skillTreePanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(null);
         devPanel.setSelectedAgentId(null);
@@ -2697,6 +2722,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        skillTreePanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(null);
         devPanel.setSelectedAgentId(null);
@@ -2712,6 +2738,7 @@ function handleMouseClick(
       plantInfoPanel.setSelectedEntity(null);
       memoryPanel.setSelectedEntity(null);
       relationshipsPanel.setSelectedEntity(null);
+      skillTreePanel.setSelectedEntity(null);
       panels.agentRosterPanel.setSelectedAgent(null);
       panels.animalRosterPanel.setSelectedAnimal(null);
       devPanel.setSelectedAgentId(null);
@@ -2737,7 +2764,8 @@ function setupDebugAPI(
   animalInfoPanel: AnimalInfoPanel,
   resourcesPanel: ResourcesPanel,
   devPanelInstance: DevPanel,
-  agentDebugManager: AgentDebugManager
+  agentDebugManager: AgentDebugManager,
+  skillTreePanel: SkillTreePanel
 ) {
   (window as any).game = {
     world: gameLoop.world,
@@ -2800,9 +2828,11 @@ function setupDebugAPI(
         const agent = gameLoop.world.getEntity(agentId);
         if (agent) {
           agentInfoPanel.setSelectedEntity(agent);
+          skillTreePanel.setSelectedEntity(agent);
         }
       } else {
         agentInfoPanel.setSelectedEntity(null);
+        skillTreePanel.setSelectedEntity(null);
       }
     },
 
@@ -3422,6 +3452,7 @@ async function main() {
     menuBar,
     keyboardRegistry,
     hoverInfoPanel: panels.hoverInfoPanel,
+    skillTreePanel,
   };
 
   // Build game context
@@ -3862,7 +3893,7 @@ async function main() {
   setupDebugAPI(
     gameLoop, renderer, placementUI, blueprintRegistry,
     panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel,
-    devPanel, agentDebugManager
+    devPanel, agentDebugManager, skillTreePanel
   );
 
   // Game loop already started before soul creation

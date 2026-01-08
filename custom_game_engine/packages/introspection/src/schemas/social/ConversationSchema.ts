@@ -179,10 +179,14 @@ export const ConversationSchema = autoRegister(
 
     llm: {
       promptSection: 'conversation',
-      summarize: (data) => {
+      summarize: (data, context) => {
         if (!data.isActive || !data.partnerId) {
           return 'Not in conversation';
         }
+
+        // Resolve partner name if context available
+        const resolveName = context?.entityResolver || ((id: string) => id);
+        const partnerName = resolveName(data.partnerId);
 
         const messageCount = data.messages.length;
         const duration = data.lastMessageAt - data.startedAt;
@@ -193,7 +197,7 @@ export const ConversationSchema = autoRegister(
           return `${speaker}: "${m.message}"`;
         }).join(' | ');
 
-        return `Talking with ${data.partnerId} (${messageCount} messages, ${duration} ticks) | Recent: ${recentMessages}`;
+        return `Talking with ${partnerName} (${messageCount} messages, ${duration} ticks) | Recent: ${recentMessages}`;
       },
       priority: 6,
     },

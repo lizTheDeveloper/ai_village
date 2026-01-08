@@ -82,6 +82,11 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
 
   // Priority Management - agent decides what to focus on
   { behavior: 'set_priorities', description: 'Set task priorities (gathering, building, farming, social)', alwaysAvailable: true, category: 'priority' },
+
+  // Goal Setting - Talker layer actions for setting goals
+  { behavior: 'set_personal_goal', description: 'Set a new personal goal', alwaysAvailable: true, category: 'priority' },
+  { behavior: 'set_medium_term_goal', description: 'Set a goal for the next few days', alwaysAvailable: true, category: 'priority' },
+  { behavior: 'set_group_goal', description: 'Propose a goal for the village', alwaysAvailable: false, category: 'priority' },
 ];
 
 /**

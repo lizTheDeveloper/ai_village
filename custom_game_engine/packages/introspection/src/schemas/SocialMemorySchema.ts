@@ -117,28 +117,29 @@ export const SocialMemorySchema = autoRegister(
           return `Brief encounters with ${memories.length} agents`;
         }
 
-        const summaries = significant.map((memory) => {
-          const sentimentStr =
-            memory.overallSentiment > 0.3
-              ? 'positive'
-              : memory.overallSentiment < -0.3
-              ? 'negative'
-              : 'neutral';
+        // Group by relationship type for cleaner summary
+        const byType = new Map<string, typeof significant>();
+        for (const memory of significant) {
+          const type = memory.relationshipType;
+          if (!byType.has(type)) {
+            byType.set(type, []);
+          }
+          byType.get(type)!.push(memory);
+        }
 
-          const trustStr =
-            memory.trust > 0.7
-              ? 'high trust'
-              : memory.trust < 0.3
-              ? 'low trust'
-              : 'moderate trust';
+        const summaries: string[] = [];
+        for (const [type, group] of byType) {
+          const count = group.length;
+          const avgSentiment = group.reduce((sum, m) => sum + m.overallSentiment, 0) / count;
+          const avgTrust = group.reduce((sum, m) => sum + m.trust, 0) / count;
 
-          const factsStr =
-            memory.knownFacts.length > 0 ? `, knows ${memory.knownFacts.length} facts` : '';
+          const sentimentStr = avgSentiment > 0.3 ? 'positive' : avgSentiment < -0.3 ? 'negative' : 'neutral';
+          const trustStr = avgTrust > 0.7 ? 'high trust' : avgTrust < 0.3 ? 'low trust' : 'moderate trust';
 
-          return `${memory.agentId}: ${memory.relationshipType} (${sentimentStr}, ${trustStr}${factsStr})`;
-        });
+          summaries.push(`${count} ${type}${count > 1 ? 's' : ''} (${sentimentStr}, ${trustStr})`);
+        }
 
-        return summaries.join(' | ');
+        return summaries.join(', ');
       },
       priority: 3, // Important for understanding social context
     },

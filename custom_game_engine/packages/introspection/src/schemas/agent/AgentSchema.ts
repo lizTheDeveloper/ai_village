@@ -112,8 +112,8 @@ export const AgentSchema = autoRegister(
         displayName: 'Last Thought',
         visibility: {
           player: true,  // Show agent's thoughts to player
-          llm: true,     // LLM context
-          agent: true,   // Agents can reflect on their thoughts
+          llm: false,    // NEVER show to LLM - causes metacognitive pollution
+          agent: false,  // Don't reflect on previous AI's chain-of-thought
           user: false,
           dev: true,
         },
@@ -214,8 +214,8 @@ export const AgentSchema = autoRegister(
       summarize: (data: AgentComponent) => {
         const parts: string[] = [];
 
-        // Current activity
-        parts.push(`Currently: ${data.behavior}`);
+        // Current activity (behavior)
+        parts.push(`Behavior: ${data.behavior}`);
 
         // Goals
         if (data.personalGoal) {
@@ -225,10 +225,8 @@ export const AgentSchema = autoRegister(
           parts.push(`Medium-term goal: ${data.mediumTermGoal}`);
         }
 
-        // Last thought
-        if (data.lastThought) {
-          parts.push(`Last thought: "${data.lastThought}"`);
-        }
+        // NOTE: lastThought is NOT included - it causes metacognitive pollution
+        // (previous AI's chain-of-thought leaking into next AI call)
 
         return parts.join('. ');
       },

@@ -663,6 +663,87 @@ curl "http://localhost:8766/dashboard/agent?id=UUID"      # Agent details
 
 If Playwright errors on navigation, close existing tabs first with `browser_close`.
 
+## Context Management: Use Sonnet Coder Subagents
+
+**IMPORTANT: Delegate coding tasks to Sonnet subagents to preserve context in the main conversation.**
+
+This codebase is large. Reading files, exploring systems, and implementing features can quickly consume context. Use the Task tool with `model: "sonnet"` to delegate focused coding work to subagents.
+
+### When to Use Coder Subagents
+
+**Delegate to Sonnet subagents for:**
+- Implementing features after the approach is clear
+- Writing tests for existing code
+- Refactoring with well-defined scope
+- Fixing bugs with known root causes
+- Adding components/systems following existing patterns
+
+**Keep in the main conversation:**
+- Initial exploration and architecture decisions
+- Clarifying requirements with the user
+- Complex multi-system coordination
+- Reviewing subagent work
+
+### How to Delegate
+
+```typescript
+// Use Task tool with model: "sonnet" for implementation work
+Task({
+  subagent_type: "general-purpose",
+  model: "sonnet",
+  description: "Implement feature X",
+  prompt: `
+    Implement [specific feature] in [specific file].
+
+    Requirements:
+    - [Requirement 1]
+    - [Requirement 2]
+
+    The file is located at: [path]
+    Follow the patterns in [reference file] for consistency.
+
+    After implementation, run tests: npm test
+    Report back: files changed, tests passing, any issues.
+  `
+})
+```
+
+### Best Practices
+
+1. **Be specific**: Give the subagent exact file paths, function names, and requirements
+2. **Include context**: Reference the relevant README, architecture doc, or existing patterns
+3. **Request verification**: Ask the subagent to run tests and report results
+4. **Parallel when possible**: Launch multiple independent coding tasks simultaneously
+5. **Review results**: Verify subagent work meets requirements before marking complete
+
+### Example Workflow
+
+```
+User: "Add a new CraftingSystem that lets agents craft items"
+
+Main conversation (Opus):
+1. Read packages/core/README.md to understand system patterns
+2. Explore existing systems for patterns (GatherBehavior, etc.)
+3. Plan the approach with user
+
+Delegate to Sonnet subagent:
+4. "Implement CraftingSystem following the pattern in GatherBehavior.
+    File: packages/core/src/systems/CraftingSystem.ts
+    Requirements: [specific requirements]
+    Run tests when done."
+
+Main conversation:
+5. Review subagent's implementation
+6. Coordinate any cross-system integration
+```
+
+### Why This Matters
+
+- **Preserves context**: Main conversation stays focused on high-level decisions
+- **Cost effective**: Sonnet handles straightforward coding at lower cost
+- **Parallel work**: Multiple subagents can work on independent tasks simultaneously
+- **Better results**: Subagents get fresh context focused on their specific task
+
 ## Verification Before Completion
 
 **CRITICAL: Always verify your changes before marking work complete.**

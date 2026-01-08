@@ -68,13 +68,24 @@ export class SkillTreePanel implements IWindowPanel {
     height: number,
     world?: World
   ): void {
-    if (!ctx || !this.selectedEntity || !world) {
-      this.renderEmptyState(ctx, x, y, width, height);
+    // Handle missing entity gracefully - this is a valid UI state (panel open but no selection)
+    if (!this.selectedEntity) {
+      this.renderNoSelectionState(ctx, x, y, width, height);
       return;
     }
 
+    if (!world) {
+      throw new Error('World is required for rendering');
+    }
+
     const magicComp = this.selectedEntity.getComponent('magic') as MagicComponent | undefined;
-    if (!magicComp || !magicComp.magicUser || magicComp.knownParadigmIds.length === 0) {
+    if (!magicComp) {
+      this.renderNoMagicState(ctx, x, y, width, height);
+      return;
+    }
+
+    // Render "No magic abilities" for entities without paradigms (not an error case)
+    if (!magicComp.magicUser || magicComp.knownParadigmIds.length === 0) {
       this.renderNoMagicState(ctx, x, y, width, height);
       return;
     }
@@ -87,26 +98,25 @@ export class SkillTreePanel implements IWindowPanel {
     // Check for new discoveries
     this.checkForNewDiscoveries(magicComp);
 
-    // Render tabs
-    const tabHeight = 30;
-    this.renderTabs(ctx, magicComp.knownParadigmIds, x, y, width, tabHeight);
+    // Render tabs (hide if only one paradigm)
+    const tabHeight = magicComp.knownParadigmIds.length > 1 ? 30 : 0;
+    if (tabHeight > 0) {
+      this.renderTabs(ctx, magicComp.knownParadigmIds, x, y, width, tabHeight);
+    }
 
     // Render tree
     if (!this.uiState.activeParadigmId) {
-      this.renderError(ctx, x, y + tabHeight, width, height - tabHeight, 'No active paradigm');
-      return;
+      throw new Error('No active paradigm set');
     }
 
     const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
     if (!tree) {
-      this.renderError(ctx, x, y + tabHeight, width, height - tabHeight, `No tree found for ${this.uiState.activeParadigmId}`);
-      return;
+      throw new Error(`Skill tree not found for paradigm: ${this.uiState.activeParadigmId}`);
     }
 
     const progress = this.getProgressForParadigm(magicComp, this.uiState.activeParadigmId);
     if (!progress) {
-      this.renderError(ctx, x, y + tabHeight, width, height - tabHeight, 'No progress data');
-      return;
+      throw new Error(`No progress data for paradigm: ${this.uiState.activeParadigmId}`);
     }
 
     const evaluationContext = this.buildEvaluationContext(world, this.selectedEntity, progress);
@@ -578,15 +588,15 @@ export class SkillTreePanel implements IWindowPanel {
     }
   }
 
-  private renderEmptyState(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {
+  private renderNoSelectionState(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(x, y, width, height);
 
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#888888';
     ctx.font = '16px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('No entity selected', x + width / 2, y + height / 2);
+    ctx.fillText('Select an agent to view magic skill tree', x + width / 2, y + height / 2);
   }
 
   private renderNoMagicState(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {

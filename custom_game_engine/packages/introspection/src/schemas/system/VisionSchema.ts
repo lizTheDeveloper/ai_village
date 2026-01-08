@@ -105,7 +105,7 @@ export const VisionSchema = autoRegister(
         displayName: 'Seen Agents',
         visibility: {
           player: false,
-          llm: true,  // LLM needs to know who's visible
+          llm: 'summarized',  // Only show via summarize() - prevents ID spam
           agent: true,
           user: false,
           dev: true,
@@ -124,7 +124,7 @@ export const VisionSchema = autoRegister(
         displayName: 'Seen Resources',
         visibility: {
           player: false,
-          llm: true,
+          llm: 'summarized',  // Only show via summarize() - prevents UUID spam
           agent: true,
           user: false,
           dev: true,
@@ -142,7 +142,7 @@ export const VisionSchema = autoRegister(
         displayName: 'Seen Buildings',
         visibility: {
           player: false,
-          llm: true,
+          llm: 'summarized',  // Only show via summarize() - prevents ID spam
           agent: true,
           user: false,
           dev: true,
@@ -161,7 +161,7 @@ export const VisionSchema = autoRegister(
         displayName: 'Heard Speech',
         visibility: {
           player: true,
-          llm: true,  // Important for conversation context
+          llm: 'summarized',  // Only show via summarize() - prevents raw object notation
           agent: true,
           user: false,
           dev: true,
@@ -196,9 +196,18 @@ export const VisionSchema = autoRegister(
           parts.push(`${data.seenBuildings.length} building(s)`);
         }
 
-        // Heard speech
+        // Heard speech - format actual text without exposing UUIDs
         if (data.heardSpeech.length > 0) {
-          parts.push(`Heard ${data.heardSpeech.length} speech(es)`);
+          const speechTexts = data.heardSpeech
+            .map(s => `"${s.text}"`)
+            .slice(0, 3)  // Limit to 3 most recent to avoid bloat
+            .join(', ');
+
+          const suffix = data.heardSpeech.length > 3
+            ? ` (+${data.heardSpeech.length - 3} more)`
+            : '';
+
+          parts.push(`Heard speech: ${speechTexts}${suffix}`);
         }
 
         if (parts.length === 0) {

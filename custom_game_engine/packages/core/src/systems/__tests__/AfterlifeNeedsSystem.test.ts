@@ -18,15 +18,61 @@ import { createAfterlifeComponent } from '../../components/AfterlifeComponent.js
 import { createRealmLocationComponent } from '../../components/RealmLocationComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
+import type { StateMutatorSystem } from '../StateMutatorSystem.js';
 
 describe('AfterlifeNeedsSystem', () => {
   let world: World;
   let system: AfterlifeNeedsSystem;
+  let mockStateMutator: StateMutatorSystem;
 
   beforeEach(() => {
     const harness = createMinimalWorld();
     world = harness.world;
     system = new AfterlifeNeedsSystem();
+
+    // Create mock StateMutatorSystem that stores deltas and provides manual application
+    const deltas: Array<{ entityId: string; componentType: string; field: string; deltaPerMinute: number; min: number; max: number }> = [];
+
+    mockStateMutator = {
+      registerDelta: (config: any) => {
+        // Remove old delta for same entity/component/field
+        const existingIndex = deltas.findIndex(d =>
+          d.entityId === config.entityId &&
+          d.componentType === config.componentType &&
+          d.field === config.field
+        );
+        if (existingIndex >= 0) deltas.splice(existingIndex, 1);
+
+        deltas.push(config);
+
+        // Return cleanup function
+        return () => {
+          const index = deltas.findIndex(d => d === config);
+          if (index >= 0) deltas.splice(index, 1);
+        };
+      },
+      clearEntityDeltas: () => { deltas.length = 0; },
+      applyDeltas: (ticksElapsed = 1200) => {
+        // Apply all registered deltas (1200 ticks = 1 game minute)
+        const gameMinutes = ticksElapsed / 1200;
+        for (const delta of deltas) {
+          const entity = world.getEntity(delta.entityId);
+          if (entity) {
+            const component = (entity as any).getComponent(delta.componentType);
+            if (component) {
+              const currentValue = component[delta.field];
+              const change = delta.deltaPerMinute * gameMinutes;
+              const newValue = Math.max(delta.min, Math.min(delta.max, currentValue + change));
+              component[delta.field] = newValue;
+            }
+          }
+        }
+      },
+      getInterpolatedValue: (entityId, componentType, field, currentValue) => currentValue,
+      getDebugInfo: () => ({ entityCount: 0, deltaCount: deltas.length, deltasBySource: new Map() }),
+    } as unknown as StateMutatorSystem;
+
+    system.setStateMutatorSystem(mockStateMutator);
   });
 
   describe('initialization', () => {
@@ -59,9 +105,15 @@ describe('AfterlifeNeedsSystem', () => {
       const initialCoherence = afterlife.coherence;
       expect(initialCoherence).toBe(1.0);
 
+      // Advance world tick to trigger delta registration (system updates once per game minute = 1200 ticks)
+      (world as any)._tick = 1200;
+
       // Simulate time passing (1 game minute = 60 real seconds at deltaTime)
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas (1 game minute = 1200 ticks)
+      mockStateMutator.applyDeltas(1200);
 
       // Coherence should decrease slightly
       expect(afterlife.coherence).toBeLessThan(initialCoherence);
@@ -89,9 +141,15 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialCoherence = afterlife.coherence;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = 1200;
+
       // Simulate time
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       const decayWithSolitude = initialCoherence - afterlife.coherence;
 
@@ -114,7 +172,13 @@ describe('AfterlifeNeedsSystem', () => {
 
       (world as any)._addEntity(entity2);
 
+      // Advance tick for second entity test too
+      (world as any)._tick = 1200;
+
       system.update(world, [entity2], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       const decayWithoutSolitude = 1.0 - afterlife2.coherence;
 
@@ -144,9 +208,21 @@ describe('AfterlifeNeedsSystem', () => {
 
       expect(afterlife.isShade).toBe(false);
 
-      // Enough time to decay below 0.1
-      const longTime = 10000;
-      system.update(world, [entity], longTime);
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = 1200;
+
+      // Simulate long time period to decay from 0.11 to <0.1
+      // BASE_COHERENCE_DECAY = 0.0001 per minute, so need ~100 game minutes
+      for (let i = 0; i < 100; i++) {
+        // Advance tick
+        (world as any)._tick += 1200;
+        // Update system first (registers deltas)
+        system.update(world, [entity], 60);
+        // Apply deltas (coherence decreases)
+        mockStateMutator.applyDeltas(1200);
+        // Update again to check state transitions with new coherence value
+        system.update(world, [entity], 60);
+      }
 
       expect(afterlife.coherence).toBeLessThan(0.1);
       expect(afterlife.isShade).toBe(true);
@@ -178,8 +254,14 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialTether = afterlife.tether;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = currentTick + 1200;
+
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       // Tether should decrease slightly
       expect(afterlife.tether).toBeLessThan(initialTether);
@@ -211,8 +293,14 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialTether = afterlife.tether;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = currentTick + 1200;
+
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       const decayWhenForgotten = initialTether - afterlife.tether;
 
@@ -236,7 +324,14 @@ describe('AfterlifeNeedsSystem', () => {
       (world as any)._addEntity(entity2);
 
       const initialTether2 = afterlife2.tether;
+
+      // Advance tick for second entity test too
+      (world as any)._tick = currentTick + 1200;
+
       system.update(world, [entity2], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       const decayWhenRemembered = initialTether2 - afterlife2.tether;
 
@@ -265,8 +360,14 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialSolitude = afterlife.solitude;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = 1200;
+
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       expect(afterlife.solitude).toBeGreaterThan(initialSolitude);
     });
@@ -318,8 +419,14 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialPeace = afterlife.peace;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = 1200;
+
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       expect(afterlife.peace).toBeGreaterThan(initialPeace);
     });
@@ -344,8 +451,14 @@ describe('AfterlifeNeedsSystem', () => {
 
       const initialPeace = afterlife.peace;
 
+      // Advance world tick to trigger delta registration
+      (world as any)._tick = 1200;
+
       const oneGameMinute = 60;
       system.update(world, [entity], oneGameMinute);
+
+      // Apply deltas
+      mockStateMutator.applyDeltas(1200);
 
       // Peace should decrease with unfinished business (restlessness)
       expect(afterlife.peace).toBeLessThan(initialPeace);

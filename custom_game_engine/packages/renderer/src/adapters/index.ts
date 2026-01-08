@@ -23,6 +23,7 @@ import type { ShopPanel } from '../ShopPanel.js';
 import type { TileInspectorPanel } from '../TileInspectorPanel.js';
 import type { MagicSystemsPanel } from '../MagicSystemsPanel.js';
 import type { SpellbookPanel } from '../SpellbookPanel.js';
+import type { SkillTreePanel } from '../panels/magic/SkillTreePanel.js';
 import type { DivinePowersPanel } from '../DivinePowersPanel.js';
 import type { DivineChatPanel } from '../DivineChatPanel.js';
 import type { VisionComposerPanel } from '../VisionComposerPanel.js';
@@ -684,6 +685,34 @@ export const SPELLBOOK_PANEL_CONFIG: PanelConfig<SpellbookPanel> = {
  */
 export function createSpellbookPanelAdapter(panel: SpellbookPanel): PanelAdapter<SpellbookPanel> {
   return new PanelAdapter(panel, SPELLBOOK_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for SkillTreePanel adapter.
+ * Pattern: Delegate visibility - panel implements IWindowPanel with isVisible/setVisible methods
+ */
+export const SKILL_TREE_PANEL_CONFIG: PanelConfig<SkillTreePanel> = {
+  id: 'skill-tree',
+  title: 'Magic Skill Tree',
+  defaultWidth: 800,
+  defaultHeight: 600,
+  menuCategory: 'magic',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, _x, _y, width, height, world);
+  },
+  // Note: handleClick requires world parameter, but adapter doesn't pass it
+  // This will be handled via direct panel access or event system
+};
+
+/**
+ * Factory function to create a SkillTreePanel adapter.
+ * @param panel - The SkillTreePanel instance to adapt
+ * @returns A configured PanelAdapter for the SkillTreePanel
+ */
+export function createSkillTreePanelAdapter(panel: SkillTreePanel): PanelAdapter<SkillTreePanel> {
+  return new PanelAdapter(panel, SKILL_TREE_PANEL_CONFIG);
 }
 
 /**

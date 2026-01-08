@@ -70,10 +70,25 @@ export const JournalSchema = autoRegister(
           return 'no journal entries';
         }
 
-        const totalEntries = data.entries.length;
+        // Filter for diversity: remove repetitive low-importance entries
+        const seen = new Set<string>();
+        const diverse = data.entries.filter(entry => {
+          // Get first 30 chars as fingerprint
+          const fingerprint = entry.text.substring(0, 30).toLowerCase().trim();
 
-        // Get most recent entries (last 3)
-        const recentEntries = data.entries.slice(-3).reverse();
+          // Skip repetitive entries like "My hunger became critically low" x15
+          if (seen.has(fingerprint)) {
+            return false;
+          }
+          seen.add(fingerprint);
+          return true;
+        });
+
+        const totalEntries = data.entries.length;
+        const uniqueCount = diverse.length;
+
+        // Get most recent diverse entries (last 3)
+        const recentEntries = diverse.slice(-3).reverse();
 
         const recentSummaries = recentEntries.map(entry => {
           const topics = entry.topics.length > 0 ? ` (${entry.topics.slice(0, 2).join(', ')})` : '';
@@ -81,7 +96,8 @@ export const JournalSchema = autoRegister(
           return `"${preview}"${topics}`;
         });
 
-        return `${totalEntries} journal entries | Recent: ${recentSummaries.join(' | ')}`;
+        const duplicateNote = totalEntries > uniqueCount ? ` (${totalEntries - uniqueCount} repetitive)` : '';
+        return `${uniqueCount} unique entries${duplicateNote} | Recent: ${recentSummaries.join(' | ')}`;
       },
     },
 

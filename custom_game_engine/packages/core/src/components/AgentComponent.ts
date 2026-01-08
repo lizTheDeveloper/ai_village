@@ -70,6 +70,10 @@ export type AgentBehavior =
   | 'research'
   // Self-management
   | 'set_priorities'
+  // Goal Setting (Talker layer)
+  | 'set_personal_goal'
+  | 'set_medium_term_goal'
+  | 'set_group_goal'
   // Player Control (Phase 16)
   | 'player_controlled';
 

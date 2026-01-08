@@ -25,6 +25,7 @@ import type {
   NeedsComponent,
   ConversationComponent,
   VisionComponent,
+  CircadianComponent,
 } from '@ai-village/core';
 import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
@@ -268,21 +269,19 @@ export class LLMScheduler {
     // Get adjusted cooldown based on conversation state
     let adjustedCooldown = config.cooldownMs;
 
-    if (agent) {
+    if (agent && layer === 'talker') {
       const conversationComp = agent.components.get('conversation') as ConversationComponent | undefined;
       const isInConversation = conversationComp?.isActive && (conversationComp.partnerId !== null || conversationComp.participantIds.length > 0);
 
       if (isInConversation) {
-        // In conversation: Reduce engagement frequency for both talker and executor
-        if (layer === 'talker') {
-          adjustedCooldown = 10000; // 10s (was 5s) - reduce talker engagement
-        } else if (layer === 'executor') {
-          adjustedCooldown = 20000; // 20s (was 10s) - reduce executor engagement even more
-        }
+        // In conversation: Talker runs FREQUENTLY to manage turn-taking and conversation flow
+        adjustedCooldown = 2000; // 2s (was 5s) - high engagement during conversation
+      } else {
+        // NOT in conversation: Talker runs RARELY, only to check if should start conversation
+        adjustedCooldown = 20000; // 20s (was 5s) - low engagement when not conversing (1:10 ratio)
       }
-      // When NOT in conversation, use default cooldowns (talker: 5s, executor: 10s)
-      // This means executor engages MORE frequently when not in conversation
     }
+    // Executor uses default cooldown regardless of conversation state (configurable at settings level)
 
     return elapsed >= adjustedCooldown;
   }
@@ -309,6 +308,12 @@ export class LLMScheduler {
     agent: Entity,
     world: World
   ): Promise<{ layer: DecisionLayer; response: string; reason: string } | null> {
+    // Skip LLM for sleeping agents - dreams are handled by a separate system
+    const circadian = agent.components.get('circadian') as CircadianComponent | undefined;
+    if (circadian?.isSleeping) {
+      return null;
+    }
+
     const selection = this.selectLayer(agent, world);
 
     // Track metrics: layer selection and urgency

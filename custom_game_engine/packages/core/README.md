@@ -75,6 +75,8 @@ update(world, entities, deltaTime) {
 6. **BodySystem** - Blood loss/recovery and injury/part healing (nested deltas)
 7. **SleepSystem** - Sleep drive accumulation/depletion and energy recovery
 8. **AfterlifeNeedsSystem** - Spiritual needs decay for souls in the Underworld (coherence, tether, solitude, peace)
+9. **AssemblyMachineSystem** - Automated crafting progress with power and speed modifiers
+10. **ResourceGatheringSystem** - Resource regeneration for 250k+ harvestable resources
 
 ### Usage Guide
 

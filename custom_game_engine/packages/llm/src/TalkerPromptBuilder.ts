@@ -33,11 +33,14 @@ import {
   type GoalsComponent,
   type RelationshipComponent,
   type Relationship,
+  type ResourceComponent,
   formatGoalsForPrompt,
+  formatGoalsSectionForPrompt,
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
 import { PromptRenderer } from '@ai-village/introspection';
+import { BEHAVIOR_DESCRIPTIONS } from './ActionDefinitions.js';
 
 /**
  * Talker prompt structure - focused on social and environmental awareness
@@ -47,7 +50,8 @@ export interface TalkerPrompt {
   schemaPrompt?: string;         // Auto-generated schema-driven component info
   socialContext: string;         // Conversations, relationships, nearby agents
   environmentContext: string;    // Vision, weather, temperature, needs, location
-  goals?: string;                // Personal and social goals
+  goals?: string;                // Personal and social goals (legacy format)
+  goalsSection?: string | null;  // Dedicated goals section with completion percentages
   memories: string;              // Recent social memories
   availableActions: string[];    // Talker-specific actions
   instruction: string;           // What to decide
@@ -59,6 +63,58 @@ export interface TalkerPrompt {
  * Follows StructuredPromptBuilder pattern but focused on social/environmental context.
  */
 export class TalkerPromptBuilder {
+  /**
+   * Socially-relevant component types for Talker.
+   * Only these components are rendered in the schema prompt.
+   *
+   * KEEP: Components that inform social decisions, personality, needs, goals
+   * EXCLUDE: Combat stats, navigation details, metadata that doesn't affect social behavior
+   */
+  private static readonly SOCIALLY_RELEVANT_COMPONENTS = new Set([
+    // Core identity and personality
+    'identity',
+    'personality',
+    'emotional_state',
+    'mood',
+
+    // Social components
+    'relationships',
+    'social_knowledge',
+    'conversation',
+    'social_memory',
+
+    // Memory and cognition (social context)
+    'memory',
+    'episodic_memory',
+    'semantic_memory',
+    'beliefs',
+
+    // Goals and motivations
+    'goals',
+
+    // Needs (affect mood and social behavior)
+    'needs',
+    'afterlife_needs',
+
+    // Inventory (what you have affects conversations)
+    'inventory',
+
+    // Skills (what you can do affects social standing)
+    'skills',
+
+    // Physical state (injuries/health affect behavior)
+    'health',
+    'physical_state',
+    'temperature', // Being cold affects mood
+
+    // Spiritual/cognitive state (if actively relevant)
+    'spiritual',
+    'soul',
+
+    // Journal/diary entries
+    'journal',
+  ]);
+
   /**
    * Build a complete Talker prompt for an agent.
    * Focuses on social awareness and conversation.
@@ -77,7 +133,7 @@ export class TalkerPromptBuilder {
     const relationships = agent.components.get('relationships') as RelationshipComponent | undefined;
 
     // Schema-driven component rendering
-    const schemaPrompt = this.buildSchemaPrompt(agent);
+    const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Who you are (personality, identity)
     const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
@@ -91,6 +147,7 @@ export class TalkerPromptBuilder {
     // Personal Goals: What you want (personal and social)
     const goals = agent.components.get('goals') as GoalsComponent | undefined;
     const goalsText = goals ? formatGoalsForPrompt(goals) : undefined;
+    const goalsSectionText = goals ? formatGoalsSectionForPrompt(goals) : null;
 
     // Memories: Recent social memories
     const memoriesText = this.buildSocialMemories(episodicMemory, world);
@@ -108,6 +165,7 @@ export class TalkerPromptBuilder {
       socialContext,
       environmentContext,
       goals: goalsText,
+      goalsSection: goalsSectionText,
       memories: memoriesText,
       availableActions: actions,
       instruction,
@@ -128,10 +186,27 @@ export class TalkerPromptBuilder {
 
   /**
    * Build schema-driven prompt sections.
-   * Auto-generates prompts for all schema'd components.
+   * Auto-generates prompts for socially-relevant schema'd components only.
+   *
+   * Filters out components irrelevant to social decisions (combat stats, navigation, metadata, etc.)
    */
-  private buildSchemaPrompt(agent: Entity): string {
-    const schemaPrompt = PromptRenderer.renderEntity(agent as any);
+  private buildSchemaPrompt(agent: Entity, world: World): string {
+    // Create a filtered entity with only socially-relevant components
+    const filteredComponents = new Map<string, any>();
+
+    for (const [componentType, componentData] of agent.components.entries()) {
+      if (TalkerPromptBuilder.SOCIALLY_RELEVANT_COMPONENTS.has(componentType)) {
+        filteredComponents.set(componentType, componentData);
+      }
+    }
+
+    // Create temporary filtered entity for rendering
+    const filteredEntity = {
+      id: agent.id,
+      components: filteredComponents
+    };
+
+    const schemaPrompt = PromptRenderer.renderEntity(filteredEntity as any, world);
 
     if (!schemaPrompt) {
       return '';
@@ -159,7 +234,21 @@ export class TalkerPromptBuilder {
       const partnerIdentity = partner?.components.get('identity') as IdentityComponent | undefined;
       const partnerName = partnerIdentity?.name || 'someone';
 
-      context += `\n🗣️ ACTIVE CONVERSATION with ${partnerName}\n`;
+      context += `\n[ACTIVE CONVERSATION] with ${partnerName}\n`;
+
+      // Social fatigue tracking
+      if (conversation.socialFatigue !== undefined && conversation.fatigueThreshold !== undefined) {
+        const fatiguePercent = Math.round((conversation.socialFatigue / 100) * 100);
+        const thresholdPercent = Math.round((conversation.fatigueThreshold / 100) * 100);
+
+        if (conversation.socialFatigue >= conversation.fatigueThreshold) {
+          context += `[SOCIAL FATIGUE: ${fatiguePercent}%] You're mentally exhausted from talking and need a break.\n`;
+        } else if (conversation.socialFatigue >= conversation.fatigueThreshold * 0.8) {
+          context += `[SOCIAL FATIGUE: ${fatiguePercent}%] You're getting tired of talking.\n`;
+        } else if (conversation.socialFatigue >= conversation.fatigueThreshold * 0.5) {
+          context += `[Social fatigue: ${fatiguePercent}%] The conversation is starting to drain you.\n`;
+        }
+      }
 
       // Show conversation history
       if (conversation.messages && conversation.messages.length > 0) {
@@ -228,16 +317,35 @@ export class TalkerPromptBuilder {
     if (vision?.heardSpeech && vision.heardSpeech.length > 0) {
       const speakerCount = vision.heardSpeech.length;
 
+      // Helper to format speaker with relationship context
+      const formatSpeaker = (speech: { speaker: string; text: string; speakerId?: string }): string => {
+        const speakerId = speech.speakerId;
+        if (!speakerId || !relationships?.relationships) {
+          return speech.speaker;
+        }
+        const rel = relationships.relationships.get(speakerId);
+        if (!rel) {
+          return `${speech.speaker} (stranger)`;
+        }
+        // affinity is -100 to 100
+        if (rel.affinity > 70) return `${speech.speaker} (close friend)`;
+        if (rel.affinity > 40) return `${speech.speaker} (friend)`;
+        if (rel.affinity > 10) return `${speech.speaker} (acquaintance)`;
+        if (rel.affinity < -40) return `${speech.speaker} (dislike)`;
+        if (rel.affinity < -10) return `${speech.speaker} (wary of)`;
+        return `${speech.speaker} (acquaintance)`;
+      };
+
       if (speakerCount === 1) {
         const firstSpeech = vision.heardSpeech[0];
         if (firstSpeech) {
           context += '\nWhat you hear:\n';
-          context += `- ${firstSpeech.speaker} says: "${firstSpeech.text}"\n`;
+          context += `- ${formatSpeaker(firstSpeech)} says: "${firstSpeech.text}"\n`;
         }
       } else {
         context += `\n--- GROUP CONVERSATION (${speakerCount} people talking nearby) ---\n`;
-        vision.heardSpeech.forEach((speech: { speaker: string; text: string }) => {
-          context += `${speech.speaker}: "${speech.text}"\n`;
+        vision.heardSpeech.forEach((speech: { speaker: string; text: string; speakerId?: string }) => {
+          context += `${formatSpeaker(speech)}: "${speech.text}"\n`;
         });
         context += `\nYou can join this conversation by choosing the 'talk' action.\n`;
       }
@@ -286,12 +394,21 @@ export class TalkerPromptBuilder {
 
     // Needs (how you feel)
     if (needs) {
+      // Critical needs first (for extraction to top of prompt)
+      if (needs.hunger !== undefined && needs.hunger < 0.2) {
+        context += '[CRITICAL] You are starving! You must eat immediately!\n';
+      }
+      if (needs.energy !== undefined && needs.energy < 0.2) {
+        context += '[CRITICAL] You are exhausted! You must rest immediately!\n';
+      }
+
+      // Regular needs
       const needsDesc: string[] = [];
 
-      if (needs.hunger !== undefined && needs.hunger < 0.3) {
+      if (needs.hunger !== undefined && needs.hunger >= 0.2 && needs.hunger < 0.3) {
         needsDesc.push('hungry');
       }
-      if (needs.energy !== undefined && needs.energy < 0.3) {
+      if (needs.energy !== undefined && needs.energy >= 0.2 && needs.energy < 0.3) {
         needsDesc.push('tired');
       }
       if (needs.socialDepth !== undefined && needs.socialDepth < 0.3) {
@@ -304,60 +421,50 @@ export class TalkerPromptBuilder {
     }
 
     // Temperature (environmental condition)
+    // NOTE: Critical cold warnings ([FREEZING], [COLD WARNING]) are already extracted
+    // to the top of the prompt via extractCriticalNeeds(). Only show comfortable state here.
     if (temperature) {
       const tempState = temperature.state;
-      if (tempState === 'dangerously_cold') {
-        context += '🥶 You are FREEZING! Find warmth immediately!\n';
-      } else if (tempState === 'cold') {
-        context += 'You are cold. You need to warm up.\n';
-      } else if (tempState === 'comfortable') {
+      if (tempState === 'comfortable') {
         context += 'The temperature is comfortable.\n';
       }
+      // 'cold' and 'dangerously_cold' are shown at the top as critical needs
     }
 
     // Vision (what you see) - HIGH-LEVEL AWARENESS ONLY
     // Talker sees WHAT is around, not detailed counts/locations
     // That's for Executor to worry about
     if (vision) {
-      const resourceTypes = new Set<string>();
-      const plantTypes = new Set<string>();
+      const hasResources = vision.seenResources && vision.seenResources.length > 0;
+      const hasPlants = vision.seenPlants && vision.seenPlants.length > 0;
 
-      // Resources in view - just note the types exist
-      if (vision.seenResources && vision.seenResources.length > 0) {
-        for (const resourceId of vision.seenResources) {
-          const resource = world.getEntity(resourceId);
-          if (!resource) continue;
+      // Show specific resource types (agents need to know what materials are available)
+      if (hasResources || hasPlants) {
+        const resourceTypes = new Set<string>();
 
-          const resourceComp = resource.components.get('resource') as any;
-          if (resourceComp?.resourceType) {
-            resourceTypes.add(resourceComp.resourceType);
-          }
+        if (vision.seenResources) {
+          vision.seenResources.forEach(entityId => {
+            const resource = world.getEntity(entityId);
+            const resourceComp = resource?.components.get('resource') as ResourceComponent | undefined;
+            if (resourceComp?.resourceType) {
+              resourceTypes.add(resourceComp.resourceType);
+            }
+          });
         }
-      }
 
-      // Plants in view - just note the types exist
-      if (vision.seenPlants && vision.seenPlants.length > 0) {
-        for (const plantId of vision.seenPlants) {
-          const plant = world.getEntity(plantId);
-          if (!plant) continue;
-
-          const plantComp = plant.components.get('plant') as any;
-          if (plantComp?.species) {
-            const speciesName = plantComp.species.replace(/-/g, ' ');
-            plantTypes.add(speciesName);
-          }
+        if (vision.seenPlants) {
+          vision.seenPlants.forEach(entityId => {
+            const plant = world.getEntity(entityId);
+            const plantComp = plant?.components.get('plant') as any;
+            if (plantComp?.speciesId) {
+              resourceTypes.add(plantComp.speciesId);
+            }
+          });
         }
-      }
 
-      // Simple awareness: just mention types, no counts
-      if (resourceTypes.size > 0) {
-        const resourceList = Array.from(resourceTypes).join(', ');
-        context += `You notice some ${resourceList} around.\n`;
-      }
-
-      if (plantTypes.size > 0) {
-        const plantList = Array.from(plantTypes).join(', ');
-        context += `You see some ${plantList} nearby.\n`;
+        if (resourceTypes.size > 0) {
+          context += `Materials around: ${Array.from(resourceTypes).join(', ')}\n`;
+        }
       }
 
       // Terrain description - general awareness
@@ -409,8 +516,17 @@ export class TalkerPromptBuilder {
   }
 
   /**
+   * Format action with description from BEHAVIOR_DESCRIPTIONS (single source of truth).
+   */
+  private formatAction(behavior: string): string {
+    const description = BEHAVIOR_DESCRIPTIONS.get(behavior) || behavior;
+    return `${behavior} - ${description}`;
+  }
+
+  /**
    * Get available Talker actions.
    * Only social tools: talk, follow_agent, call_meeting, attend_meeting, help
+   * Uses BEHAVIOR_DESCRIPTIONS as single source of truth for descriptions.
    */
   private getAvailableTalkerActions(
     conversation: ConversationComponent | undefined,
@@ -424,42 +540,39 @@ export class TalkerPromptBuilder {
     const hasHeardSpeech = vision?.heardSpeech && vision.heardSpeech.length > 0;
 
     if (hasNearbyAgents || hasHeardSpeech || conversation?.isActive) {
-      actions.push('talk - Have a conversation with someone nearby');
+      actions.push(this.formatAction('talk'));
     }
 
     // follow_agent - available if nearby agents
     if (hasNearbyAgents) {
-      actions.push('follow_agent - Follow someone');
+      actions.push(this.formatAction('follow_agent'));
     }
 
     // call_meeting - available if nearby agents
     if (hasNearbyAgents) {
-      actions.push('call_meeting - Call a meeting to discuss something');
+      actions.push(this.formatAction('call_meeting'));
     }
 
     // attend_meeting - available if there's an ongoing meeting
     // TODO: Check for ongoing meetings when meeting system is implemented
-    // actions.push('attend_meeting - Attend an ongoing meeting');
 
     // help - available if nearby agents
     if (hasNearbyAgents) {
-      actions.push('help - Help another agent with their task');
+      actions.push(this.formatAction('help'));
     }
 
-    // set_personal_goal - always available
-    actions.push('set_personal_goal - Set a new personal goal');
-
-    // set_medium_term_goal - always available
-    actions.push('set_medium_term_goal - Set a goal for the next few days');
+    // Goal-setting actions (always available)
+    actions.push(this.formatAction('set_personal_goal'));
+    actions.push(this.formatAction('set_medium_term_goal'));
 
     // set_group_goal - available if nearby agents
     if (hasNearbyAgents) {
-      actions.push('set_group_goal - Propose a goal for the village');
+      actions.push(this.formatAction('set_group_goal'));
     }
 
-    // wander/idle - fallback (always available)
-    actions.push('wander - Explore your surroundings casually');
-    actions.push('idle - Take a moment to think and rest');
+    // NOTE: wander/idle are AUTONOMIC fallback behaviors, NOT Talker decisions.
+    // If Talker has nothing social to do, it should set a goal or return no action.
+    // The autonomic layer will handle fallback to wander/idle.
 
     return actions;
   }
@@ -475,34 +588,72 @@ export class TalkerPromptBuilder {
     vision: VisionComponent | undefined,
     world: World
   ): string {
+    const criticalNeeds: string[] = [];
+
+    // Surface critical needs prominently
+    if (needs?.hunger !== undefined && needs.hunger < 0.2) {
+      criticalNeeds.push('you are starving');
+    }
+    if (needs?.energy !== undefined && needs.energy < 0.2) {
+      criticalNeeds.push('you are exhausted');
+    }
+
+    const criticalPrefix = criticalNeeds.length > 0
+      ? `CRITICAL: ${criticalNeeds.join(' and ')}. `
+      : '';
+
     // PRIORITY 1: Active conversation
     if (conversation?.isActive && conversation?.partnerId) {
       const partner = world.getEntity(conversation.partnerId);
       const partnerIdentity = partner?.components.get('identity') as IdentityComponent | undefined;
       const partnerName = partnerIdentity?.name || 'them';
 
-      return `You're in a conversation with ${partnerName}. Read the conversation history above and respond naturally. What do you want to say?`;
+      return `${criticalPrefix}You're in a conversation with ${partnerName}. Read the conversation history above and respond naturally. What do you want to say?`;
     }
 
     // PRIORITY 2: Heard speech (potential conversation)
     const hasHeardSpeech = vision?.heardSpeech && vision.heardSpeech.length > 0;
     if (hasHeardSpeech) {
-      return 'You hear someone speaking nearby. Do you want to respond or join the conversation? What will you do?';
+      return `${criticalPrefix}You hear someone speaking nearby. Do you want to respond or join the conversation? What will you do?`;
     }
 
     // PRIORITY 3: Social depth need critical (lonely)
     if (needs?.socialDepth !== undefined && needs.socialDepth < 0.3) {
-      return 'You feel very lonely. Consider finding someone to talk to or setting a social goal. What will you do?';
+      return `${criticalPrefix}You feel very lonely. Consider finding someone to talk to or setting a social goal. What will you do?`;
     }
 
     // PRIORITY 4: Extroverted personality + nearby agents
     const hasNearbyAgents = vision?.seenAgents && vision.seenAgents.length > 1;
     if (hasNearbyAgents && personality?.extraversion && personality.extraversion > 0.6) {
-      return 'You see people nearby and feel social. Do you want to talk to someone or set a new goal? What will you do?';
+      return `${criticalPrefix}You see people nearby and feel social. Do you want to talk to someone or set a new goal? What will you do?`;
     }
 
     // Default: general decision
-    return 'What would you like to do right now? You can talk to people, set goals, or explore.';
+    return `${criticalPrefix}What would you like to do right now? You can talk to people, set goals, or explore.`;
+  }
+
+  /**
+   * Extract critical needs from environment context for top-priority display.
+   * Parses warnings from environment context to put at the very top.
+   */
+  private extractCriticalNeeds(environmentContext: string): string | null {
+    const criticalLines: string[] = [];
+
+    // Extract critical warnings (freezing, cold, starving, exhausted)
+    const lines = environmentContext.split('\n');
+    for (const line of lines) {
+      if (line.includes('[FREEZING]') ||
+          line.includes('[COLD WARNING]') ||
+          line.includes('[CRITICAL]')) {
+        criticalLines.push(line.trim());
+      }
+    }
+
+    if (criticalLines.length === 0) {
+      return null;
+    }
+
+    return `!!! CRITICAL NEEDS !!!\n${criticalLines.join('\n')}\n!!! ACT IMMEDIATELY !!!`;
   }
 
   /**
@@ -510,42 +661,27 @@ export class TalkerPromptBuilder {
    * Follows StructuredPromptBuilder pattern.
    */
   private formatPrompt(prompt: TalkerPrompt): string {
-    const sections: string[] = [prompt.systemPrompt];
+    const sections: string[] = [];
+
+    // CRITICAL NEEDS FIRST - absolute top priority
+    const criticalNeeds = this.extractCriticalNeeds(prompt.environmentContext);
+    if (criticalNeeds) {
+      sections.push(criticalNeeds);
+    }
+
+    // Then identity and personality
+    sections.push(prompt.systemPrompt);
 
     // Character guidelines - roleplay directive
-    const characterGuidelines = `--- YOUR ROLE: THE SOCIAL & VERBAL PLANNING LAYER ---
-
-You are the SOCIAL BRAIN and GOAL-SETTER for this character. Your job is to:
-- TALK and socialize (have conversations, build relationships, express yourself)
-- SET HIGH-LEVEL GOALS (decide what you want to accomplish and why)
-- EXPRESS DESIRES ("I want to gather berries", "Let's build a farm")
-- Be SOCIALLY AWARE (notice people, feelings, vibes, relationships)
-- GENERAL AWARENESS of environment ("berries are around", "plants nearby")
-
-You are NOT responsible for:
-- Detailed resource tracking (you see "berries around", not "3 berries at x:10 y:20")
-- Task execution and tool calls (Executor handles "plan_build", "gather", etc.)
-- Multi-step planning (you say "gather 50 berries", Executor figures out how)
-- Resource management (Executor tracks counts, locations, and availability)
-
-COORDINATION WITH EXECUTOR:
-- YOU set the goal: "Gather at least 50 berries for winter storage"
-- EXECUTOR reads your goal and creates the plan: finds berries → gathers 50 → stores them
-- YOU provide the WHAT and WHY
-- EXECUTOR provides the detailed HOW
-
-When responding:
-- SPEAK out loud using the "speaking" field (express yourself verbally!)
-- SET GOALS using set_personal_goal, set_medium_term_goal, set_group_goal
-- Example goal: "Gather at least 50 berries for the village"
-- Example goal: "Plant a berry farm with 20 berry bushes in rows"
-- Talk about WHAT you want, not HOW to do it
-- Use natural, conversational language
-- Express emotions, opinions, and personality through dialogue
-
-Remember: You're the voice and vision-setter. Executor is the hands and planner. You dream it, Executor does it.`;
+    const characterGuidelines = `--- YOUR ROLE ---
+You are the social brain. You speak, set goals, notice people and vibes. Focus on WHAT you want and WHY. Talk naturally, be socially aware.`;
 
     sections.push(characterGuidelines);
+
+    // YOUR CURRENT GOALS - Prominent display early in prompt
+    if (prompt.goalsSection) {
+      sections.push(`--- YOUR CURRENT GOALS ---\n${prompt.goalsSection}`);
+    }
 
     // Schema-driven component info
     if (prompt.schemaPrompt && prompt.schemaPrompt.trim()) {
@@ -581,9 +717,25 @@ Remember: You're the voice and vision-setter. Executor is the hands and planner.
     sections.push(prompt.instruction);
 
     // Response format
-    const responseFormat = `RESPOND IN JSON ONLY. Use this exact format:
+    const responseFormat = `--- RESPONSE FORMAT ---
+
+CRITICAL: Output ONLY valid JSON. DO NOT include labels like "Action:", "Speaking:", or "Thoughts:".
+Start your response with { and end with }. NO extra text before or after the JSON.
+
+DO NOT start your speech with your name - the conversation already shows who's speaking.
+Speak naturally without announcing yourself (e.g., "Kestrel here" or "Clay speaking").
+
+Example of CORRECT response:
 {
-  "speaking": "what you say out loud (or empty string if silent)",
+  "speaking": "I think we should gather more wood before winter.",
+  "action": {
+    "type": "talk"
+  }
+}
+
+Use this exact format:
+{
+  "speaking": "what you say out loud (leave empty only if alone or deep in thought)",
   "action": {
     "type": "action_name",
     "target": "optional target like agent name"

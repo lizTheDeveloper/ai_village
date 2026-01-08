@@ -9,6 +9,7 @@ export * from './AnimationSystem.js';
 export * from './NeedsSystem.js';
 export * from './MemorySystem.js';
 export * from './CommunicationSystem.js';
+export * from './SocialFatigueSystem.js';
 export * from './BuildingSystem.js';
 export * from './ResourceGatheringSystem.js';
 export * from './TemperatureSystem.js';

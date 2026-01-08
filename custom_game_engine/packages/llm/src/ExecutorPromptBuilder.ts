@@ -36,6 +36,7 @@ import {
   type InventorySlot,
   type AgentComponent,
   formatGoalsForPrompt,
+  formatGoalsSectionForPrompt,
   getAvailableBuildings,
   getVillageInfo,
   getFoodStorageInfo,
@@ -53,7 +54,8 @@ export interface ExecutorPrompt {
   schemaPrompt?: string;          // Auto-generated schema-driven component info
   skills?: string;                // Skill levels (what you're good at)
   priorities?: string;            // Current strategic priorities
-  goals?: string;                 // Personal and strategic goals
+  goals?: string;                 // Personal and strategic goals (legacy format)
+  goalsSection?: string | null;   // Dedicated goals section with completion percentages
   villageStatus?: string;         // Village coordination context
   environment?: string;           // Detailed environmental data (resources, plants with counts)
   buildings: string;              // Available buildings to plan
@@ -84,7 +86,7 @@ export class ExecutorPromptBuilder {
     const agentComp = agent.components.get('agent') as AgentComponent | undefined;
 
     // Schema-driven component rendering
-    const schemaPrompt = this.buildSchemaPrompt(agent);
+    const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Who you are (personality, identity)
     const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
@@ -98,6 +100,7 @@ export class ExecutorPromptBuilder {
     // Goals: What you want to achieve
     const goals = agent.components.get('goals') as GoalsComponent | undefined;
     const goalsText = goals ? formatGoalsForPrompt(goals) : undefined;
+    const goalsSectionText = goals ? formatGoalsSectionForPrompt(goals) : null;
 
     // Village Status: Coordination context
     const villageStatus = this.buildVillageStatus(world, agent.id);
@@ -121,6 +124,7 @@ export class ExecutorPromptBuilder {
       skills: skillsText,
       priorities: prioritiesText,
       goals: goalsText,
+      goalsSection: goalsSectionText,
       villageStatus,
       environment,
       buildings: buildingsText,
@@ -145,8 +149,8 @@ export class ExecutorPromptBuilder {
    * Build schema-driven prompt sections.
    * Auto-generates prompts for all schema'd components.
    */
-  private buildSchemaPrompt(agent: Entity): string {
-    const schemaPrompt = PromptRenderer.renderEntity(agent as any);
+  private buildSchemaPrompt(agent: Entity, world: World): string {
+    const schemaPrompt = PromptRenderer.renderEntity(agent as any, world);
 
     if (!schemaPrompt) {
       return '';
@@ -236,8 +240,8 @@ export class ExecutorPromptBuilder {
       const identity = b.components.get('identity') as any;
       return {
         id: b.id,
-        name: buildingComp?.type || 'Unknown Building',
-        status: buildingComp?.state || 'complete',
+        name: buildingComp?.buildingType || 'Unknown Building',
+        status: buildingComp?.isComplete ? 'complete' : 'in-progress',
         purpose: identity?.name,
       };
     });
@@ -403,7 +407,7 @@ export class ExecutorPromptBuilder {
     for (const blueprint of buildings) {
       text += `- ${blueprint.name}: ${blueprint.description}\n`;
       if (blueprint.resourceCost && blueprint.resourceCost.length > 0) {
-        const costs = blueprint.resourceCost.map((rc: any) => `${rc.quantity} ${rc.resourceId}`).join(', ');
+        const costs = blueprint.resourceCost.map((rc: any) => `${rc.amountRequired} ${rc.resourceId}`).join(', ');
         text += `  Cost: ${costs}\n`;
       }
     }
@@ -569,6 +573,11 @@ Remember: Talker dreams it, you do it. You're the hands and planner, they're the
 
     sections.push(characterGuidelines);
 
+    // YOUR CURRENT GOALS - Prominent display early in prompt
+    if (prompt.goalsSection) {
+      sections.push(`--- YOUR CURRENT GOALS ---\n${prompt.goalsSection}`);
+    }
+
     // Schema-driven component info
     if (prompt.schemaPrompt && prompt.schemaPrompt.trim()) {
       sections.push(prompt.schemaPrompt);
@@ -584,7 +593,7 @@ Remember: Talker dreams it, you do it. You're the hands and planner, they're the
       sections.push(prompt.priorities);
     }
 
-    // Goals (what you want to achieve)
+    // Goals (legacy format - kept for backward compatibility but less prominent)
     if (prompt.goals && prompt.goals.trim()) {
       sections.push('Your Goals:\n' + prompt.goals);
     }

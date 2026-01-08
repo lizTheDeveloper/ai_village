@@ -140,15 +140,15 @@ export class GatherBehavior extends BaseBehavior {
     if (needs) {
       const hunger = needs.hunger;
 
-      // If critically hungry (< 30), force food gathering
-      if (hunger < 30) {
+      // NOTE: NeedsComponent uses 0-1 scale (0 = starving, 1 = full)
+      // If critically hungry (< 0.15), force food gathering and emit critical event
+      if (hunger < 0.15) {
         // Override any other gathering task - survival comes first
-        // Don't specify a type - this will make findGatherTarget prioritize ANY food
         preferredType = undefined;
         isStarvingMode = true;
 
-        // Emit critical need event for metrics tracking
-        if (hunger < 15) {
+        // Emit critical need event for metrics tracking (only at truly critical levels)
+        if (hunger < 0.05) {
           world.eventBus.emit({
             type: 'need:critical',
             source: entity.id,
@@ -162,8 +162,8 @@ export class GatherBehavior extends BaseBehavior {
           });
         }
       }
-      // If moderately hungry (< 50), prefer food but don't override critical tasks
-      else if (hunger < 50 && !agent.behaviorState?.returnToBuild) {
+      // If moderately hungry (< 0.30), prefer food but don't override critical tasks
+      else if (hunger < 0.30 && !agent.behaviorState?.returnToBuild) {
         preferredType = undefined;
         isStarvingMode = true;
       }

@@ -147,23 +147,7 @@ export class RealityAnchorSystem implements System {
       return;
     }
 
-    // Check power status
-    if (!powerComp.isPowered) {
-      // Power lost - field collapses
-      this.eventBus?.emit({
-        type: 'reality_anchor:power_loss',
-        source: anchorId,
-        data: {
-          message: 'Reality Anchor power loss: Field collapsing!',
-          efficiency: powerComp.efficiency,
-        },
-      } as any);
-
-      this.fieldCollapse(world, anchorId, anchor, 'Insufficient power');
-      return;
-    }
-
-    // Check for partial power (25-75% efficiency)
+    // Check for partial power (25-100% efficiency) - handle this first
     if (powerComp.efficiency < 1.0 && powerComp.efficiency >= 0.25) {
       this.eventBus?.emit({
         type: 'reality_anchor:power_insufficient',
@@ -193,6 +177,19 @@ export class RealityAnchorSystem implements System {
         anchor.isOverloading = false;
         anchor.overloadCountdown = undefined;
       }
+    } else if (powerComp.efficiency < 0.25) {
+      // Critical power loss - field collapses
+      this.eventBus?.emit({
+        type: 'reality_anchor:power_loss',
+        source: anchorId,
+        data: {
+          message: 'Reality Anchor power loss: Field collapsing!',
+          efficiency: powerComp.efficiency,
+        },
+      } as any);
+
+      this.fieldCollapse(world, anchorId, anchor, 'Insufficient power');
+      return;
     }
 
     // Power consumption tracked via PowerComponent

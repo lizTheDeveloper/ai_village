@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ResponseParser, BehaviorParseError } from '../ResponseParser';
 
 describe('ResponseParser', () => {
@@ -17,8 +17,25 @@ describe('ResponseParser', () => {
       expect(result).toEqual({
         thinking: 'I should explore to find food',
         speaking: 'Time to look around!',
+        action: 'explore',
+        parseQuality: 'strict'
+      });
+    });
+
+    it('should NOT log warnings for valid JSON parsing', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const response = JSON.stringify({
+        thinking: 'I should explore to find food',
+        speaking: 'Time to look around!',
         action: 'explore'
       });
+
+      parser.parseResponse(response);
+
+      // No warnings should be logged for strict parsing
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
     });
 
     it('should handle response with no speaking', () => {
@@ -32,6 +49,7 @@ describe('ResponseParser', () => {
 
       expect(result.speaking).toBe('');
       expect(result.action).toBe('explore');
+      expect(result.parseQuality).toBe('strict');
     });
 
     it('should parse all core valid actions', () => {
@@ -51,6 +69,7 @@ describe('ResponseParser', () => {
 
         const result = parser.parseResponse(response);
         expect(result.action).toBe(action);
+        expect(result.parseQuality).toBe('strict');
       }
     });
 
@@ -75,6 +94,23 @@ describe('ResponseParser', () => {
       expect(result.action).toBe('explore');
       expect(result.thinking).toBe(response);
       expect(result.speaking).toBe('');
+      expect(result.parseQuality).toBe('fallback');
+    });
+
+    it('should log warning when using fallback parsing', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const response = 'I think I should explore the area';
+
+      parser.parseResponse(response);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[ResponseParser] Falling back to fuzzy text extraction')
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[ResponseParser] Extracted action via keyword match: "explore"')
+      );
+
+      warnSpy.mockRestore();
     });
 
     it('should find action anywhere in text', () => {
@@ -84,6 +120,7 @@ describe('ResponseParser', () => {
 
       // seek_food is a synonym that maps to 'gather'
       expect(result.action).toBe('gather');
+      expect(result.parseQuality).toBe('fallback');
     });
 
     it('should throw on empty response', () => {
@@ -164,6 +201,7 @@ describe('ResponseParser', () => {
       expect(result.action).toBe('plan_build');
       expect(result.actionParams).toEqual({ building: 'workbench' });
       expect(result.thinking).toBe('Village needs a workbench');
+      expect(result.parseQuality).toBe('strict');
     });
 
     it('should parse set_priorities action', () => {
@@ -177,6 +215,7 @@ describe('ResponseParser', () => {
 
       expect(result.action).toBe('set_priorities');
       expect(result.actionParams).toEqual({ priorities: { building: 0.9, gathering: 0.3 } });
+      expect(result.parseQuality).toBe('strict');
     });
 
     it('should handle action object with synonym type', () => {
@@ -190,6 +229,7 @@ describe('ResponseParser', () => {
 
       expect(result.action).toBe('gather');  // harvest is a synonym for gather
       expect(result.actionParams).toEqual({ target: 'wood' });
+      expect(result.parseQuality).toBe('strict');
     });
 
     it('should throw on invalid action type in object', () => {
@@ -214,6 +254,7 @@ describe('ResponseParser', () => {
 
       expect(result.action).toBe('explore');
       expect(result.actionParams).toBeUndefined();
+      expect(result.parseQuality).toBe('strict');
     });
   });
 
@@ -222,30 +263,35 @@ describe('ResponseParser', () => {
       const response = 'I will seek_food in the forest';
       const result = parser.parseResponse(response);
       expect(result.action).toBe('gather');
+      expect(result.parseQuality).toBe('fallback');
     });
 
     it('should find gather as valid action', () => {
       const response = 'Time to gather resources';
       const result = parser.parseResponse(response);
       expect(result.action).toBe('gather'); // gather is a valid behavior, not a synonym
+      expect(result.parseQuality).toBe('fallback');
     });
 
     it('should map harvest to gather', () => {
       const response = 'I should harvest the crops';
       const result = parser.parseResponse(response);
       expect(result.action).toBe('gather');
+      expect(result.parseQuality).toBe('fallback');
     });
 
     it('should map stockpile to gather', () => {
       const response = 'I need to stockpile food';
       const result = parser.parseResponse(response);
       expect(result.action).toBe('gather');
+      expect(result.parseQuality).toBe('fallback');
     });
 
     it('should map construct to build', () => {
       const response = 'Let me construct a shelter';
       const result = parser.parseResponse(response);
       expect(result.action).toBe('build');
+      expect(result.parseQuality).toBe('fallback');
     });
   });
 });

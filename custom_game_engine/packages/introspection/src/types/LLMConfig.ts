@@ -5,6 +5,24 @@
  */
 
 /**
+ * Context passed to summarize functions
+ */
+export interface SummarizeContext {
+  /**
+   * World instance for entity lookup (optional)
+   * Allows resolving entity IDs to names
+   */
+  world?: any;
+
+  /**
+   * Custom entity resolver function (optional)
+   * Resolves entity IDs to human-readable names
+   * @example (id) => world.getEntity(id)?.getComponent('identity')?.name || id
+   */
+  entityResolver?: (id: string) => string;
+}
+
+/**
  * LLM-specific configuration for prompt generation
  *
  * Controls how this component appears in AI prompts
@@ -23,6 +41,7 @@ export interface LLMConfig<T = any> {
    * If not provided, fields are listed individually
    *
    * @param data - The component data to summarize
+   * @param context - Optional context (world, entity resolver)
    * @returns Human-readable summary text
    *
    * @example
@@ -30,8 +49,16 @@ export interface LLMConfig<T = any> {
    * summarize: (data) => `${data.name} (${data.species}, ${Math.floor(data.age / 365)} years old)`
    * // Output: "Alice (human, 25 years old)"
    * ```
+   *
+   * @example With entity resolution
+   * ```typescript
+   * summarize: (data, context) => {
+   *   const resolver = context?.entityResolver || ((id) => id);
+   *   return `Friends: ${data.friends.map(resolver).join(', ')}`;
+   * }
+   * ```
    */
-  summarize?: (data: T) => string;
+  summarize?: (data: T, context?: SummarizeContext) => string;
 
   /**
    * Priority in prompt (lower = earlier in prompt)

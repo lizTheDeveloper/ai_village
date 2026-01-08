@@ -49,6 +49,14 @@ export interface PersonalGoal {
   /** Progress toward goal (0-1.0) */
   progress: number;
 
+  /**
+   * Completion ratio estimated by the Executor (0.0 to 1.0)
+   * The Executor LLM should update this based on its assessment of progress
+   * toward the goal. This is displayed in prompts to help the agent track
+   * how close they are to completing their goals.
+   */
+  completion_ratio?: number;
+
   /** Milestones for this goal */
   milestones: GoalMilestone[];
 
@@ -242,25 +250,67 @@ export function addGoal(component: GoalsComponent, goal: PersonalGoal): void {
 }
 
 /**
- * Format goals for LLM prompt
+ * Format goals for LLM prompt (legacy, simple format).
+ * Returns empty string if no active goals (section will be omitted to save tokens).
+ * Uses completion_ratio if available (set by Executor), otherwise falls back to progress field.
  */
 export function formatGoalsForPrompt(goalsComponent: GoalsComponent): string {
   const goals = goalsComponent.goals;
 
   if (goals.length === 0) {
-    return 'No personal goals yet.';
+    return ''; // Empty = section omitted (saves tokens)
   }
 
   const activeGoals = goals.filter(g => !g.completed);
   if (activeGoals.length === 0) {
-    return 'All goals completed.';
+    return ''; // All completed = section omitted (saves tokens)
   }
 
   return activeGoals.map(goal => {
-    const progressPercent = Math.round(goal.progress * 100);
+    // Prefer completion_ratio (set by Executor) over progress
+    const completionValue = goal.completion_ratio !== undefined ? goal.completion_ratio : goal.progress;
+    const completionPercent = Math.round(completionValue * 100);
     const completedMilestones = goal.milestones.filter(m => m.completed).length;
     const totalMilestones = goal.milestones.length;
 
-    return `${goal.description} (${progressPercent}% complete, ${completedMilestones}/${totalMilestones} milestones)`;
+    return `${goal.description} (${completionPercent}% complete, ${completedMilestones}/${totalMilestones} milestones)`;
   }).join(', ');
+}
+
+/**
+ * Format goals as a dedicated section for prominent display in LLM prompts.
+ * Groups goals by type (personal, medium_term, group) and shows completion %.
+ * Returns null if no active goals.
+ */
+export function formatGoalsSectionForPrompt(goalsComponent: GoalsComponent): string | null {
+  const goals = goalsComponent.goals;
+
+  if (goals.length === 0) {
+    return null;
+  }
+
+  const activeGoals = goals.filter(g => !g.completed);
+  if (activeGoals.length === 0) {
+    return null;
+  }
+
+  // Note: The original GoalsComponent doesn't have a 'type' field yet
+  // We'll format all goals together for now, but structure it for future type support
+  const lines: string[] = [];
+
+  for (const goal of activeGoals) {
+    // Prefer completion_ratio (set by Executor) over progress
+    const completionValue = goal.completion_ratio !== undefined ? goal.completion_ratio : goal.progress;
+    const completionPercent = Math.round(completionValue * 100);
+
+    // Format: [Category] Description (completion%)
+    const categoryLabel = goal.category.charAt(0).toUpperCase() + goal.category.slice(1);
+    lines.push(`[${categoryLabel}] ${goal.description} (${completionPercent}% complete)`);
+  }
+
+  if (lines.length === 0) {
+    return 'No goals set yet - consider what you want to achieve';
+  }
+
+  return lines.join('\n');
 }

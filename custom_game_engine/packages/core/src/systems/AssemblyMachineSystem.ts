@@ -8,6 +8,7 @@ import type { AssemblyMachineComponent } from '../components/AssemblyMachineComp
 import type { MachineConnectionComponent, MachineSlot } from '../components/MachineConnectionComponent.js';
 import type { PowerComponent } from '../components/PowerComponent.js';
 import { calculateEffectiveSpeed } from '../components/AssemblyMachineComponent.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AssemblyMachineSystem - Auto-crafts recipes using machine inputs
@@ -25,7 +26,25 @@ export class AssemblyMachineSystem implements System {
   public readonly priority: number = 54; // After belt/power systems
   public readonly requiredComponents = [CT.AssemblyMachine, CT.MachineConnection] as const;
 
+  public readonly dependsOn = ['state_mutator'] as const;
+
+  private stateMutator: StateMutatorSystem | null = null;
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
+  private deltaCleanups = new Map<string, () => void>();
+
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
+  }
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    if (!this.stateMutator) {
+      throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
+    }
+
+    const currentTick = world.tick;
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+
     for (const entity of entities) {
       const machine = (entity as EntityImpl).getComponent<AssemblyMachineComponent>(CT.AssemblyMachine);
       const connection = (entity as EntityImpl).getComponent<MachineConnectionComponent>(CT.MachineConnection);
@@ -35,11 +54,21 @@ export class AssemblyMachineSystem implements System {
 
       // Skip if not powered
       if (power && !power.isPowered) {
+        // Clean up delta if machine becomes unpowered
+        if (this.deltaCleanups.has(entity.id)) {
+          this.deltaCleanups.get(entity.id)!();
+          this.deltaCleanups.delete(entity.id);
+        }
         continue;
       }
 
       // If no recipe set, agent needs to configure
       if (!machine.currentRecipe) {
+        // Clean up delta if recipe is unset
+        if (this.deltaCleanups.has(entity.id)) {
+          this.deltaCleanups.get(entity.id)!();
+          this.deltaCleanups.delete(entity.id);
+        }
         continue;
       }
 
@@ -60,16 +89,22 @@ export class AssemblyMachineSystem implements System {
       // Check if we have ingredients
       const hasIngredients = this.checkIngredients(recipe, connection.inputs);
       if (!hasIngredients) {
+        // Clean up delta if no ingredients
+        if (this.deltaCleanups.has(entity.id)) {
+          this.deltaCleanups.get(entity.id)!();
+          this.deltaCleanups.delete(entity.id);
+        }
         continue;
       }
 
-      // Apply power efficiency to speed
-      const efficiencyMod = power?.efficiency ?? 1.0;
-      const speedMod = calculateEffectiveSpeed(machine);
+      // Update progress delta rate once per game minute
+      if (shouldUpdateDeltas) {
+        this.updateProgressDelta(entity, machine, power, recipe);
+      }
 
-      // Calculate progress delta
-      const progressDelta = (deltaTime / recipe.craftingTime) * speedMod * efficiencyMod;
-      machine.progress += progressDelta * 100;
+      // ========================================================================
+      // Completion Check (discrete event - keep as direct mutation)
+      // ========================================================================
 
       // Check if crafting is complete
       if (machine.progress >= 100) {
@@ -88,6 +123,52 @@ export class AssemblyMachineSystem implements System {
         }
       }
     }
+
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
+    }
+  }
+
+  /**
+   * Update assembly machine progress delta rate.
+   * Registers delta with StateMutatorSystem for batched updates.
+   */
+  private updateProgressDelta(
+    entity: Entity,
+    machine: AssemblyMachineComponent,
+    power: PowerComponent | undefined,
+    recipe: any
+  ): void {
+    if (!this.stateMutator) {
+      throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
+    }
+
+    // Clean up old delta
+    if (this.deltaCleanups.has(entity.id)) {
+      this.deltaCleanups.get(entity.id)!();
+    }
+
+    // Apply power efficiency to speed
+    const efficiencyMod = power?.efficiency ?? 1.0;
+    const speedMod = calculateEffectiveSpeed(machine);
+
+    // Calculate progress rate per game minute
+    // Recipe crafting time is in seconds
+    // Progress is 0-100, so we multiply by 100
+    // Rate: (60 seconds per game minute / crafting time) * modifiers * 100
+    const progressRatePerMinute = (60 / recipe.craftingTime) * speedMod * efficiencyMod * 100;
+
+    const cleanup = this.stateMutator.registerDelta({
+      entityId: entity.id,
+      componentType: CT.AssemblyMachine,
+      field: 'progress',
+      deltaPerMinute: progressRatePerMinute,
+      min: 0,
+      max: 100,
+      source: 'assembly_machine_progress',
+    });
+
+    this.deltaCleanups.set(entity.id, cleanup);
   }
 
   /**

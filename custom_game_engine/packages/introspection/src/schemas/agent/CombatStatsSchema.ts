@@ -254,8 +254,10 @@ export const CombatStatsSchema = autoRegister(
         if (data.stealthSkill && data.stealthSkill > 0) skills.push(`stealth:${data.stealthSkill}`);
 
         const equipment: string[] = [];
-        if (data.weapon) equipment.push(`weapon:${data.weapon}`);
-        if (data.armor) equipment.push(`armor:${data.armor}`);
+        // Only include weapon if it exists and is not null or 'none'
+        if (data.weapon && data.weapon !== 'none') equipment.push(`weapon:${data.weapon}`);
+        // Only include armor if it exists and is not null or 'none'
+        if (data.armor && data.armor !== 'none') equipment.push(`armor:${data.armor}`);
 
         const parts: string[] = [];
         if (skills.length > 0) parts.push(skills.join(', '));

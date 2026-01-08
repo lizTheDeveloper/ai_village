@@ -500,11 +500,11 @@ export class MemoryFormationSystem implements System {
     }
 
     // PERFORMANCE FIX: Reduced "alwaysRememberEvents" to only truly critical events
-    // Removed frequent events: agent:harvested, resource:gathered, items:deposited
+    // Removed frequent events: agent:harvested, resource:gathered, items:deposited, need:critical
     // These will still be remembered if they meet importance thresholds below
+    // NOTE: need:critical removed - caused spam of identical "hunger low" entries
+    // Starvation day events go through importance filtering to avoid spam
     const alwaysRememberEvents = [
-      'need:critical',
-      'need:starvation_day',
       'agent:starved',
       'agent:collapsed',
       'storage:full',

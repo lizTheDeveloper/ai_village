@@ -295,7 +295,7 @@ export class MovementSystem implements System {
 
   /**
    * Check for hard collisions (buildings, water, steep elevation changes, and tile walls/doors) - these block movement completely
-   * Performance: Uses cached building positions
+   * Performance: Uses cached building positions, skips ungenerated chunks to avoid expensive terrain generation
    */
   private hasHardCollision(
     world: World,
@@ -312,7 +312,26 @@ export class MovementSystem implements System {
         door?: { state: 'open' | 'closed' | 'locked'; constructionProgress?: number };
         window?: { constructionProgress?: number };
       } | undefined;
+      getChunkManager?: () => {
+        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
+      } | undefined;
     };
+
+    // Performance: Skip tile checks for ungenerated chunks to avoid triggering expensive terrain generation
+    const chunkManager = typeof worldWithTerrain.getChunkManager === 'function'
+      ? worldWithTerrain.getChunkManager()
+      : undefined;
+    if (chunkManager) {
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(x / CHUNK_SIZE);
+      const chunkY = Math.floor(y / CHUNK_SIZE);
+      const chunk = chunkManager.getChunk(chunkX, chunkY);
+      if (!chunk?.generated) {
+        // Chunk not generated - skip tile collision checks (no invisible walls)
+        // Still check building collisions below
+        return this.checkBuildingCollision(world, x, y);
+      }
+    }
 
     // Check for water terrain (blocks land-based movement)
     if (typeof worldWithTerrain.getTerrainAt === 'function') {
@@ -378,6 +397,14 @@ export class MovementSystem implements System {
     }
 
     // Check for building collisions (legacy entity-based buildings)
+    return this.checkBuildingCollision(world, x, y);
+  }
+
+  /**
+   * Check only building collisions (legacy entity-based buildings)
+   * Used when chunk is not generated to avoid expensive tile checks
+   */
+  private checkBuildingCollision(world: World, x: number, y: number): boolean {
     const buildings = this.getBuildingCollisions(world);
 
     for (const building of buildings) {
@@ -387,9 +414,10 @@ export class MovementSystem implements System {
 
       const dx = building.x - x;
       const dy = building.y - y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      // Use squared distance to avoid sqrt
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < 0.5) {
+      if (distanceSquared < 0.25) { // 0.5 * 0.5 = 0.25
         return true;
       }
     }

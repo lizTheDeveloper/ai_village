@@ -62,6 +62,7 @@ import { BeliefGenerationSystem } from './BeliefGenerationSystem.js';
 
 // Social & Communication
 import { CommunicationSystem } from './CommunicationSystem.js';
+import { SocialFatigueSystem } from './SocialFatigueSystem.js';
 import { SocialGradientSystem } from './SocialGradientSystem.js';
 import { VerificationSystem } from './VerificationSystem.js';
 import { InterestsSystem } from './InterestsSystem.js';
@@ -457,6 +458,7 @@ export function registerAllSystems(
   // SOCIAL & COMMUNICATION
   // ============================================================================
   gameLoop.systemRegistry.register(new CommunicationSystem());
+  gameLoop.systemRegistry.register(new SocialFatigueSystem());
   gameLoop.systemRegistry.register(new SocialGradientSystem());
   gameLoop.systemRegistry.register(new VerificationSystem());
   gameLoop.systemRegistry.register(new InterestsSystem());
@@ -502,7 +504,10 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(buildingMaintenanceSystem);
 
   gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem());
+  // ResourceGatheringSystem - Uses StateMutatorSystem for batched resource regeneration
+  const resourceGatheringSystem = new ResourceGatheringSystem();
+  resourceGatheringSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(resourceGatheringSystem);
 
   // Tile-Based Voxel Building (Phase 3-4)
   gameLoop.systemRegistry.register(new TreeFellingSystem(eventBus));
@@ -522,7 +527,10 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PowerGridSystem());
   gameLoop.systemRegistry.register(new DirectConnectionSystem());
   gameLoop.systemRegistry.register(new BeltSystem());
-  gameLoop.systemRegistry.register(new AssemblyMachineSystem());
+  // AssemblyMachineSystem - Uses StateMutatorSystem for batched crafting progress
+  const assemblyMachineSystem = new AssemblyMachineSystem();
+  assemblyMachineSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(assemblyMachineSystem);
 
   // ============================================================================
   // ECONOMY & TRADE

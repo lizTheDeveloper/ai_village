@@ -6,16 +6,31 @@ import type { Component } from '../ecs/Component.js';
 export interface IdentityComponent extends Component {
   type: 'identity';
   name: string;
+  age: number;
+  species: 'human' | 'elf' | 'dwarf' | 'animal';
 }
 
 /**
- * Create an identity component with a given name.
+ * Create an identity component with a given name, species, and age.
  */
-export function createIdentityComponent(name: string): IdentityComponent {
+export function createIdentityComponent(
+  name: string,
+  species?: 'human' | 'elf' | 'dwarf' | 'animal',
+  age?: number
+): IdentityComponent {
+  // Validate and default species to 'human'
+  const validSpecies: Array<'human' | 'elf' | 'dwarf' | 'animal'> = ['human', 'elf', 'dwarf', 'animal'];
+  const finalSpecies = species && validSpecies.includes(species) ? species : 'human';
+
+  // Random age between 20-35 if not specified
+  const finalAge = age !== undefined ? age : Math.floor(Math.random() * 16) + 20;
+
   return {
     type: 'identity',
     version: 1,
     name,
+    species: finalSpecies,
+    age: finalAge,
   };
 }
 

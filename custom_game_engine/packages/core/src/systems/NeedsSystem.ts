@@ -48,6 +48,9 @@ export class NeedsSystem implements System {
   // Track cleanup functions for registered deltas
   private deltaCleanups = new Map<string, { hunger: () => void; energy: () => void }>();
 
+  // Track previous critical state for each entity to detect threshold crossings
+  private wasEnergyCritical = new Map<string, boolean>();
+
   // Reference to StateMutatorSystem (set via setStateMutatorSystem)
   private stateMutator: StateMutatorSystem | null = null;
 
@@ -196,9 +199,10 @@ export class NeedsSystem implements System {
       // Calculate which day of starvation we're on
       const daysAtZeroHunger = Math.floor(ticksAtZeroHunger / TICKS_PER_GAME_DAY);
 
-      // Check for energy critical (still uses 20% threshold)
-      const wasEnergyCritical = needs.energy < 0.2;
-      const isEnergyCritical = needs.energy < 0.2;
+      // Check for energy critical (lowered from 20% to 10% to reduce spam)
+      // Use tracked state to detect threshold crossings between ticks
+      const wasEnergyCritical = this.wasEnergyCritical.get(entity.id) ?? false;
+      const isEnergyCritical = needs.energy < 0.1;
 
       // Emit progressive starvation memories (days 1, 2, 3, 4)
       if (daysAtZeroHunger >= 1 && daysAtZeroHunger <= 4) {
@@ -230,7 +234,7 @@ export class NeedsSystem implements System {
         });
       }
 
-      // Emit energy critical event (once)
+      // Emit energy critical event (once when crossing threshold)
       if (!wasEnergyCritical && isEnergyCritical) {
         world.eventBus.emit({
           type: 'need:critical',
@@ -243,6 +247,9 @@ export class NeedsSystem implements System {
           },
         });
       }
+
+      // Track current critical state for next tick
+      this.wasEnergyCritical.set(entity.id, isEnergyCritical);
 
       // Check for death (starvation after 5 game days at 0% hunger)
       if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY) {

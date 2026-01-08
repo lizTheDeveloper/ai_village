@@ -45,6 +45,7 @@ export * from './CityManagerPanel.js';
 export * from './CityStatsWidget.js';
 export * from './MagicSystemsPanel.js';
 export * from './SpellbookPanel.js';
+export * from './panels/magic/SkillTreePanel.js';
 export * from './DivinePowersPanel.js';
 export * from './DivineChatPanel.js';
 export * from './VisionComposerPanel.js';
