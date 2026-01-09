@@ -38,6 +38,11 @@ export class AssemblyMachineSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Skip if no entities - empty list is valid edge case
+    if (entities.length === 0) {
+      return;
+    }
+
     if (!this.stateMutator) {
       throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
     }

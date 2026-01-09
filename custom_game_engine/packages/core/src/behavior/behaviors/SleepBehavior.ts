@@ -46,11 +46,9 @@ export class SeekSleepBehavior extends BaseBehavior {
     }
 
     // Already sleeping - SleepSystem handles wake conditions
-    // Transition to idle so agent isn't stuck in seek_sleep behavior
     if (circadian.isSleeping) {
       this.stopAllMovement(entity);
-      this.switchTo(entity, 'idle');
-      return { complete: true, reason: 'Already sleeping, transitioned to idle' };
+      return { complete: true, reason: 'sleep_complete' };
     }
 
     // First, check for assigned bed

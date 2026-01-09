@@ -796,12 +796,8 @@ export class ScriptedDecisionProcessor {
         category: 'rest',
         baseWeight: 0.5,
       });
-      candidates.push({
-        behavior: 'idle',
-        behaviorState: {},
-        category: 'rest',
-        baseWeight: 0.3,
-      });
+      // NOTE: Removed idle fallback - agents should stay in their current behavior
+      // until LLM explicitly changes it. Idle was causing agents to interrupt productive work.
     }
 
     // MAGIC: spell casting for magic users

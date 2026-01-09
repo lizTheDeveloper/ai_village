@@ -99,7 +99,7 @@ export class UpgradeBehavior extends BaseBehavior {
     const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     if (!agent || !position) {
-      return { complete: true, nextBehavior: 'idle', reason: 'missing_components' };
+      throw new Error(`[UpgradeBehavior] Agent ${entity.id} missing required components: agent=${!!agent}, position=${!!position}`);
     }
 
     switch (phase) {
@@ -110,7 +110,7 @@ export class UpgradeBehavior extends BaseBehavior {
       case 'upgrading':
         return this.handleUpgradingPhase(entity, position, world, currentTick);
       case 'complete':
-        return { complete: true, nextBehavior: 'wander', reason: 'upgrade_complete' };
+        return { complete: true, reason: 'upgrade_complete' };
     }
   }
 
@@ -130,7 +130,7 @@ export class UpgradeBehavior extends BaseBehavior {
         ...current,
         lastThought: 'No buildings ready for upgrade.',
       }));
-      return { complete: true, nextBehavior: 'wander', reason: 'no_upgradeable_buildings' };
+      return { complete: true, reason: 'no_upgradeable_buildings' };
     }
 
     // Store target and transition to moving
@@ -225,12 +225,12 @@ export class UpgradeBehavior extends BaseBehavior {
     // Get target building
     const building = world.getEntity(targetBuildingId);
     if (!building) {
-      return { complete: true, nextBehavior: 'wander', reason: 'building_not_found' };
+      return { complete: true, reason: 'building_not_found' };
     }
 
     const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
     if (!buildingComp) {
-      return { complete: true, nextBehavior: 'wander', reason: 'building_missing_component' };
+      return { complete: true, reason: 'building_missing_component' };
     }
 
     // Check distance
@@ -290,7 +290,7 @@ export class UpgradeBehavior extends BaseBehavior {
         },
       });
 
-      return { complete: true, nextBehavior: 'wander', reason: 'upgrade_complete' };
+      return { complete: true, reason: 'upgrade_complete' };
     }
 
     // Update progress thoughts periodically

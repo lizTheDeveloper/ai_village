@@ -3,13 +3,22 @@ import path from 'path';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
+    // Use node environment by default for better compatibility with file system tests
+    // Tests that need jsdom should specify it with @vitest-environment jsdom
+    environment: 'node',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
       '**/*.spec.ts', // Exclude spec files (future work)
+    ],
+    // Allow tests to specify their own environment via @vitest-environment comment
+    environmentMatchGlobs: [
+      // Renderer tests need jsdom for DOM APIs
+      ['packages/renderer/**/*.test.ts', 'jsdom'],
+      // Metrics dashboard tests need jsdom for React
+      ['packages/metrics-dashboard/**/*.test.ts', 'jsdom'],
     ],
   },
   resolve: {

@@ -107,7 +107,7 @@ export class PrayBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!spiritual || !agent) {
-      return { complete: true, nextBehavior: 'idle', reason: 'no_spiritual_component' };
+      throw new Error(`[PrayBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}`);
     }
 
     // Initialize prayer state
@@ -259,7 +259,6 @@ export class PrayBehavior extends BaseBehavior {
 
     return {
       complete: true,
-      nextBehavior: 'wander',
       reason: 'prayer_complete',
     };
   }

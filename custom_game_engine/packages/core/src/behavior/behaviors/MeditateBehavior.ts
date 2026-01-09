@@ -97,8 +97,7 @@ export class MeditateBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!spiritual || !agent) {
-      // Can't meditate without spiritual component
-      return { complete: true, nextBehavior: 'idle', reason: 'no_spiritual_component' };
+      throw new Error(`[MeditateBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}`);
     }
 
     // Initialize meditation state
@@ -297,7 +296,6 @@ export class MeditateBehavior extends BaseBehavior {
 
     return {
       complete: true,
-      nextBehavior: 'wander',
       reason: receivedVision ? 'vision_received' : 'meditation_complete',
     };
   }

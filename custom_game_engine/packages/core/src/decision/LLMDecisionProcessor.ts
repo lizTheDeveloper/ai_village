@@ -152,10 +152,11 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       // If action.type is 'trade', it should have a subtype or tradeType parameter
       return { behavior: 'trade', behaviorState };
     case 'idle':
-      return { behavior: 'idle', behaviorState };
-    // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     case 'wander':
-      return { behavior: 'wander', behaviorState };
+      // NO FALLBACK - idle/wander should not be explicitly set
+      // Agent stays in current behavior until LLM explicitly changes it
+      return null;
+    // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     default:
       // NO FALLBACK - if action type is not recognized, return null
       // Agent will stay in current behavior until LLM explicitly changes it
@@ -895,8 +896,9 @@ export class LLMDecisionProcessor {
             if (nearbyAgents.length > 0) {
               behaviorState.targetId = nearbyAgents[0]!.id;
             } else {
-              // No nearby agents, don't set follow behavior
-              behavior = 'wander';
+              // No nearby agents - cannot follow, return null to keep current behavior
+              // NO FALLBACK - if LLM requested follow but nobody is nearby, that's an error
+              behavior = null;
             }
           } else {
             behaviorState.targetId = targetId;

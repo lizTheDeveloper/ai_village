@@ -116,7 +116,7 @@ export class IdleBehaviorSystem implements System {
       }
     }
 
-    // Fallback (should never reach here)
-    return 'wander_aimlessly';
+    // Should never reach here - weighted random selection is exhaustive
+    throw new Error(`[IdleBehaviorSystem] Failed to select behavior from weighted selection (totalWeight: ${totalWeight})`)
   }
 }

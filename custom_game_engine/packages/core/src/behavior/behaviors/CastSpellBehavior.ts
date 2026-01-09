@@ -99,7 +99,6 @@ export class CastSpellBehavior extends BaseBehavior {
         return this.castSpell(entity, world, state, magic);
 
       case 'complete':
-        this.switchTo(entity, 'idle', {});
         return { complete: true, reason: state.error ?? 'Spell cast complete' };
     }
   }

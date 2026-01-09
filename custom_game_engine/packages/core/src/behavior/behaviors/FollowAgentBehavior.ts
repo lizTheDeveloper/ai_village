@@ -40,15 +40,13 @@ export class FollowAgentBehavior extends BaseBehavior {
 
     const targetId = agent.behaviorState?.targetId as string | undefined;
     if (!targetId) {
-      // No target, switch to wandering
-      this.switchTo(entity, 'wander', {});
+      // No target
       return { complete: true, reason: 'No target to follow' };
     }
 
     const targetEntity = world.getEntity(targetId);
     if (!targetEntity) {
-      // Target no longer exists, switch to wandering
-      this.switchTo(entity, 'wander', {});
+      // Target no longer exists
       return { complete: true, reason: 'Target no longer exists' };
     }
 

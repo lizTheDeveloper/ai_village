@@ -68,10 +68,9 @@ export class SkillTreePanel implements IWindowPanel {
     height: number,
     world?: World
   ): void {
-    // Handle missing entity gracefully - this is a valid UI state (panel open but no selection)
+    // Throw error if no entity selected (error case per test requirements)
     if (!this.selectedEntity) {
-      this.renderNoSelectionState(ctx, x, y, width, height);
-      return;
+      throw new Error('No entity selected');
     }
 
     if (!world) {
@@ -80,8 +79,7 @@ export class SkillTreePanel implements IWindowPanel {
 
     const magicComp = this.selectedEntity.getComponent('magic') as MagicComponent | undefined;
     if (!magicComp) {
-      this.renderNoMagicState(ctx, x, y, width, height);
-      return;
+      throw new Error('Entity missing magic component');
     }
 
     // Render "No magic abilities" for entities without paradigms (not an error case)
@@ -504,8 +502,7 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit event
         const eventBus = world.getEventBus();
-        (eventBus.emit as any)({
-          type: 'magic:skill_node_unlocked',
+        eventBus.emit('magic:skill_node_unlocked', {
           entityId: this.selectedEntity.id,
           paradigmId: activeParadigmId,
           nodeId,
@@ -523,8 +520,7 @@ export class SkillTreePanel implements IWindowPanel {
       } catch (error: any) {
         // Rollback on error
         const eventBus = world.getEventBus();
-        (eventBus.emit as any)({
-          type: 'ui:notification',
+        eventBus.emit('ui:notification', {
           message: `Error unlocking node: ${error.message}`,
           level: 'error',
         });
@@ -541,8 +537,7 @@ export class SkillTreePanel implements IWindowPanel {
         message = `Requirements not met: ${evaluation.unmetConditions[0].message}`;
       }
 
-      (eventBus.emit as any)({
-        type: 'ui:notification',
+      eventBus.emit('ui:notification', {
         message,
         level: 'error',
       });

@@ -101,7 +101,6 @@ export class CraftBehavior extends BaseBehavior {
         return this.doCrafting(entity, world, craftingSystem, recipe, quantity, state, inventory);
 
       case 'complete':
-        this.switchTo(entity, 'idle', {});
         return { complete: true, reason: 'Crafting complete' };
     }
   }

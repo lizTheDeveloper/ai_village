@@ -69,9 +69,8 @@ export class FleeToHomeBehavior extends BaseBehavior {
         },
       });
 
-      // Transition to idle (agent is now safe at home)
-      this.switchTo(entity, 'idle');
-      return { complete: true, reason: 'Reached home safely' };
+      // Behavior complete - agent is now safe at home
+      return { complete: true, reason: 'arrived_home' };
     }
 
     // Continue fleeing to home - return void to keep behavior active

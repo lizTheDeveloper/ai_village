@@ -255,31 +255,18 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 3: Nearby agents (potential social interaction)
-    // BUT: Only trigger social if agent has a meaningful task - wandering/idle agents should get work first
+    // PRIORITY 3: Idle or wandering → EXECUTOR (get a productive task!)
+    // This MUST come before the no-goals check, because Executor can assign tasks even without goals
     const isIdleOrWandering = !agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander';
-    if (vision?.seenAgents && vision.seenAgents.length > 0 && !isIdleOrWandering) {
+    if (isIdleOrWandering) {
       return {
-        layer: 'talker',
-        reason: 'Nearby agents (potential social interaction)',
-        urgency: 6,
+        layer: 'executor',
+        reason: 'Idle/wandering, needs productive task from Executor',
+        urgency: 7,
       };
     }
 
-    // PRIORITY 4: No goals set (needs goal-setting via Talker)
-    // Check if agent has NO active goals - Talker is responsible for setting goals
-    // Note: goals component may be raw data, not a class instance, so use array check only
-    const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
-      goals.goals.some((g) => !g.completed);
-    if (!hasActiveGoals) {
-      return {
-        layer: 'talker',
-        reason: 'No goals set, needs goal-setting',
-        urgency: 5,
-      };
-    }
-
-    // PRIORITY 5: Task completion (strategic planning needed)
+    // PRIORITY 4: Task completion (strategic planning needed)
     if (agentComp?.behaviorCompleted) {
       return {
         layer: 'executor',
@@ -288,11 +275,25 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 6: Idle or wandering (planning needed)
-    if (!agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander') {
+    // PRIORITY 5: Nearby agents (potential social interaction)
+    // Only trigger social if agent has a meaningful task already
+    if (vision?.seenAgents && vision.seenAgents.length > 0) {
       return {
-        layer: 'executor',
-        reason: 'Idle/wandering, needs strategic planning',
+        layer: 'talker',
+        reason: 'Nearby agents (potential social interaction)',
+        urgency: 6,
+      };
+    }
+
+    // PRIORITY 6: No goals set (needs goal-setting via Talker)
+    // Check if agent has NO active goals - Talker is responsible for setting goals
+    // Note: goals component may be raw data, not a class instance, so use array check only
+    const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
+      goals.goals.some((g) => !g.completed);
+    if (!hasActiveGoals) {
+      return {
+        layer: 'talker',
+        reason: 'No goals set, needs goal-setting',
         urgency: 5,
       };
     }

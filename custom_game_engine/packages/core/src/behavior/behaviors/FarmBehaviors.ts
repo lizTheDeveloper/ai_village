@@ -67,8 +67,7 @@ export class TillBehavior extends BaseBehavior {
     );
 
     if (!hasSeeds) {
-      // No seeds - switch back to wandering
-      this.switchTo(entity, 'wander', {});
+      // No seeds - stay in current behavior
       return { complete: true, reason: 'No seeds to plant' };
     }
 
@@ -76,7 +75,6 @@ export class TillBehavior extends BaseBehavior {
     const nearestGrassTile = this.findNearestTillableTile(world, position);
 
     if (!nearestGrassTile) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No tillable tiles found' };
     }
 
@@ -182,14 +180,12 @@ export class PlantBehavior extends BaseBehavior {
     // Get seed inventory and choose best seed to plant
     const seedInventory = this.getSeedInventory(inventory);
     if (seedInventory.length === 0) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No seeds to plant' };
     }
 
     // Choose best seed to plant (prioritizes food crops)
     const chosenSeed = this.chooseBestSeed(seedInventory);
     if (!chosenSeed) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Could not choose seed' };
     }
 
@@ -389,7 +385,6 @@ export class WaterBehavior extends BaseBehavior {
     const nearestDryPlant = this.findNearestDryPlant(world, position);
 
     if (!nearestDryPlant) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No plants need watering' };
     }
 
@@ -527,7 +522,6 @@ export class HarvestBehavior extends BaseBehavior {
     const nearestHarvestable = this.findNearestHarvestablePlant(world, position);
 
     if (!nearestHarvestable) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No harvestable plants' };
     }
 

@@ -63,7 +63,7 @@ export class AmuseSelfBehavior extends BaseBehavior {
     if (ticksAmusing > 300) {
       // Done amusing self
       this.complete(entity);
-      this.switchTo(entity, 'idle');
+      return { complete: true, reason: 'amusement_complete' };
     }
   }
 

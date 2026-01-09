@@ -85,7 +85,7 @@ export class GroupPrayBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!spiritual || !agent || !position) {
-      return { complete: true, nextBehavior: 'idle', reason: 'missing_components' };
+      throw new Error(`[GroupPrayBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}, position=${!!position}`);
     }
 
     switch (phase) {
@@ -94,7 +94,7 @@ export class GroupPrayBehavior extends BaseBehavior {
       case 'praying':
         return this.handlePrayingPhase(entity, spiritual, world, currentTick);
       case 'complete':
-        return { complete: true, nextBehavior: 'wander', reason: 'group_prayer_complete' };
+        return { complete: true, reason: 'group_prayer_complete' };
     }
   }
 
@@ -324,7 +324,6 @@ export class GroupPrayBehavior extends BaseBehavior {
 
     return {
       complete: true,
-      nextBehavior: 'wander',
       reason: 'group_prayer_complete',
     };
   }

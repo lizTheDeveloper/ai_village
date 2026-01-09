@@ -156,12 +156,10 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       return { behavior: 'trade', behaviorState };
 
     case 'idle':
-      // NOTE: 'idle' should rarely be explicitly requested
-      // Agents should stay in current behavior until LLM explicitly changes it
-      return { behavior: 'idle', behaviorState };
-
     case 'wander':
-      return { behavior: 'wander', behaviorState };
+      // NO FALLBACK - idle/wander should not be explicitly set
+      // Agent stays in current behavior until LLM explicitly changes it
+      return null;
 
     default:
       // NO FALLBACK - if action type is not recognized, return null

@@ -14,7 +14,7 @@ import { PowerGridSystem } from '../systems/PowerGridSystem.js';
 import { BeltSystem } from '../systems/BeltSystem.js';
 import { AssemblyMachineSystem } from '../systems/AssemblyMachineSystem.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
-import { createAssemblyMachine } from '../components/AssemblyMachineComponent.js';
+import { createAssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
 import { createMachineConnection } from '../components/MachineConnectionComponent.js';
 import { createPowerProducer, createPowerConsumer } from '../components/PowerComponent.js';
 import { createBeltComponent, addItemsToBelt, removeItemsFromBelt, canAcceptItems } from '../components/BeltComponent.js';
@@ -32,12 +32,15 @@ describe('Automation Edge Cases', () => {
     id: 'test_item',
     name: 'Test Item',
     category: 'Test',
+    description: 'A test item for automation edge case testing.',
     ingredients: [{ itemId: 'ingredient_a', quantity: 1 }],
     output: { itemId: 'product_b', quantity: 1 },
     craftingTime: 1.0,
-    requiredSkills: {},
-    requiredTools: [],
+    xpGain: 10,
     stationRequired: 'test_machine',
+    skillRequirements: [],
+    researchRequirements: [],
+    requiredTools: [],
   };
 
   beforeEach(() => {
@@ -92,20 +95,20 @@ describe('Automation Edge Cases', () => {
     });
 
     it('should handle disconnected power networks', () => {
-      // Network 1
+      // Network 1 - generator with connection range to reach consumer at distance 1
       const gen1 = world.createEntity() as EntityImpl;
       gen1.addComponent(createPositionComponent(0, 0));
-      gen1.addComponent(createPowerProducer('electrical', 1000));
+      gen1.addComponent(createPowerProducer('electrical', 1000, 2)); // Range 2 to connect
 
       const con1 = world.createEntity() as EntityImpl;
       con1.addComponent(createPositionComponent(1, 0));
       const power1 = createPowerConsumer('electrical', 500);
       con1.addComponent(power1);
 
-      // Network 2 (disconnected - 10 tiles away)
+      // Network 2 (disconnected - 20 tiles away)
       const gen2 = world.createEntity() as EntityImpl;
       gen2.addComponent(createPositionComponent(20, 20));
-      gen2.addComponent(createPowerProducer('electrical', 2000));
+      gen2.addComponent(createPowerProducer('electrical', 2000, 2)); // Range 2 to connect
 
       const con2 = world.createEntity() as EntityImpl;
       con2.addComponent(createPositionComponent(21, 20));
@@ -183,11 +186,11 @@ describe('Automation Edge Cases', () => {
     });
 
     it('should reject items exceeding capacity', () => {
-      const belt = createBeltComponent('east', 1); // Capacity 4
+      const belt = createBeltComponent('east', 1, 4); // Explicitly set capacity to 4
       addItemsToBelt(belt, 'iron_ore', 3);
 
       const canAccept = canAcceptItems(belt, 'iron_ore', 2);
-      expect(canAccept).toBe(false); // Would exceed capacity
+      expect(canAccept).toBe(false); // Would exceed capacity (3 + 2 = 5 > 4)
     });
 
     it('should handle belt transfer to non-existent target', () => {
@@ -211,7 +214,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'non_existent_recipe';
       machine.addComponent(assembly);
 
@@ -232,7 +235,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'test_item';
       machine.addComponent(assembly);
 
@@ -261,14 +264,17 @@ describe('Automation Edge Cases', () => {
         id: 'multi_input',
         name: 'Multi Input',
         category: 'Test',
+        description: 'A test recipe requiring multiple inputs.',
         ingredients: [
           { itemId: 'ingredient_a', quantity: 2 },
         ],
         output: { itemId: 'product_b', quantity: 1 },
         craftingTime: 1.0,
-        requiredSkills: {},
-        requiredTools: [],
+        xpGain: 10,
         stationRequired: 'test_machine',
+        skillRequirements: [],
+        researchRequirements: [],
+        requiredTools: [],
       };
 
       recipeRegistry.registerRecipe(MULTI_RECIPE);
@@ -276,7 +282,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'multi_input';
       machine.addComponent(assembly);
 
@@ -306,7 +312,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'test_item';
       assembly.speed = 1.0;
       machine.addComponent(assembly);
@@ -355,7 +361,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'test_item';
       machine.addComponent(assembly);
 
@@ -378,12 +384,15 @@ describe('Automation Edge Cases', () => {
         id: 'slow_craft',
         name: 'Slow Craft',
         category: 'Test',
+        description: 'A test recipe with very long crafting time.',
         ingredients: [{ itemId: 'ingredient_a', quantity: 1 }],
         output: { itemId: 'product_b', quantity: 1 },
         craftingTime: 100.0, // 100 seconds = 2000 ticks
-        requiredSkills: {},
-        requiredTools: [],
+        xpGain: 10,
         stationRequired: 'test_machine',
+        skillRequirements: [],
+        researchRequirements: [],
+        requiredTools: [],
       };
 
       recipeRegistry.registerRecipe(LONG_RECIPE);
@@ -391,7 +400,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'slow_craft';
       assembly.speed = 1.0;
       machine.addComponent(assembly);
@@ -431,7 +440,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'test_item';
       assembly.speed = 1.0;
       machine.addComponent(assembly);
@@ -459,7 +468,7 @@ describe('Automation Edge Cases', () => {
       const machine = world.createEntity() as EntityImpl;
       machine.addComponent(createPositionComponent(0, 0));
 
-      const assembly = createAssemblyMachine('test_machine', 1);
+      const assembly = createAssemblyMachineComponent('test_machine', { ingredientSlots: 1 });
       assembly.currentRecipe = 'test_item';
       assembly.speed = 1.0;
       machine.addComponent(assembly);

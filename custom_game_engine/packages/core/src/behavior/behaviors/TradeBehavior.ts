@@ -89,7 +89,6 @@ export class TradeBehavior extends BaseBehavior {
         return this.executeTrade(entity, world, state);
 
       case 'complete':
-        this.switchTo(entity, 'idle', {});
         return { complete: true, reason: 'Trade complete' };
     }
   }

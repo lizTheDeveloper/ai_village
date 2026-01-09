@@ -141,8 +141,7 @@ export class AttendMeetingBehavior extends BaseBehavior {
     // Get meeting caller ID from behavior state
     const meetingCallerId = agent.behaviorState.meetingCallerId as string;
     if (!meetingCallerId) {
-      // No meeting to attend, wander instead
-      this.switchTo(entity, 'wander', {});
+      // No meeting to attend
       return { complete: true, reason: 'No meeting to attend' };
     }
 
@@ -150,7 +149,6 @@ export class AttendMeetingBehavior extends BaseBehavior {
     const caller = world.getEntity(meetingCallerId);
     if (!caller) {
       // Caller doesn't exist anymore
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Meeting caller not found' };
     }
 
@@ -159,7 +157,6 @@ export class AttendMeetingBehavior extends BaseBehavior {
 
     if (!meeting || meeting.status === 'ended') {
       // Meeting doesn't exist or has ended
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Meeting ended' };
     }
 

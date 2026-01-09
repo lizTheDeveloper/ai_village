@@ -914,12 +914,14 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     moveTo: vi.fn(),
     lineTo: vi.fn(),
     stroke: vi.fn(),
+    fill: vi.fn(), // Add missing fill method
     arc: vi.fn(),
     closePath: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
     translate: vi.fn(),
     scale: vi.fn(),
+    setLineDash: vi.fn(), // Add missing setLineDash method
     measureText: vi.fn((text: string) => ({ width: text.length * 8 })), // Mock width based on text length
     _fillStyle: '#000000',
     _strokeStyle: '#000000',
@@ -1073,10 +1075,120 @@ function setupMockSkillTrees() {
     ],
   };
 
+  // Create mock mega_paradigm tree (for scroll/zoom test)
+  const megaParadigmTree: MagicSkillTree = {
+    id: 'mega_paradigm_tree',
+    paradigmId: 'mega_paradigm',
+    name: 'Mega Paradigm',
+    description: 'A paradigm with 50+ nodes',
+    nodes: Array.from({ length: 50 }, (_, i) => ({
+      id: `mega_node_${i}`,
+      name: `Node ${i}`,
+      description: `Description ${i}`,
+      category: 'foundation',
+      tier: Math.floor(i / 10),
+      xpCost: 100,
+      unlockConditions: i > 0 ? [{ type: 'prerequisite_node', nodeId: `mega_node_${i - 1}` }] : [],
+      effects: [],
+    })),
+    entryNodes: ['mega_node_0'],
+    connections: Array.from({ length: 49 }, (_, i) => ({
+      from: `mega_node_${i}`,
+      to: `mega_node_${i + 1}`,
+    })),
+    categories: [
+      {
+        id: 'foundation',
+        name: 'Foundation',
+        description: 'Basic abilities',
+        displayOrder: 0,
+      },
+    ],
+  };
+
+  // Create mock complex_paradigm tree (for tooltip scroll test)
+  const complexParadigmTree: MagicSkillTree = {
+    id: 'complex_paradigm_tree',
+    paradigmId: 'complex_paradigm',
+    name: 'Complex Paradigm',
+    description: 'A paradigm with complex unlock conditions',
+    nodes: [
+      {
+        id: 'complex_node_1',
+        name: 'Complex Node',
+        description: 'A node with many unlock conditions',
+        category: 'foundation',
+        tier: 0,
+        xpCost: 500,
+        unlockConditions: [
+          { type: 'prerequisite_node', nodeId: 'node_1' },
+          { type: 'prerequisite_node', nodeId: 'node_2' },
+          { type: 'prerequisite_node', nodeId: 'node_3' },
+          { type: 'prerequisite_node', nodeId: 'node_4' },
+          { type: 'prerequisite_node', nodeId: 'node_5' },
+          { type: 'prerequisite_node', nodeId: 'node_6' },
+          { type: 'prerequisite_node', nodeId: 'node_7' },
+          { type: 'prerequisite_node', nodeId: 'node_8' },
+          { type: 'prerequisite_node', nodeId: 'node_9' },
+          { type: 'prerequisite_node', nodeId: 'node_10' },
+          { type: 'xp_threshold', paradigmId: 'complex_paradigm', xpRequired: 1000 },
+          { type: 'attribute_threshold', attribute: 'intelligence', value: 50 },
+        ],
+        effects: [],
+      },
+    ],
+    entryNodes: ['complex_node_1'],
+    connections: [],
+    categories: [
+      {
+        id: 'foundation',
+        name: 'Foundation',
+        description: 'Complex abilities',
+        displayOrder: 0,
+      },
+    ],
+  };
+
+  // Create trees for paradigm_0 through paradigm_14 (for scrollable tab bar test)
+  const paradigmTrees: Map<string, MagicSkillTree> = new Map();
+  for (let i = 0; i < 15; i++) {
+    paradigmTrees.set(`paradigm_${i}`, {
+      id: `paradigm_${i}_tree`,
+      paradigmId: `paradigm_${i}`,
+      name: `Paradigm ${i}`,
+      description: `Test paradigm ${i}`,
+      nodes: [
+        {
+          id: `paradigm_${i}_node_1`,
+          name: `Node ${i}`,
+          description: `Description ${i}`,
+          category: 'foundation',
+          tier: 0,
+          xpCost: 100,
+          unlockConditions: [],
+          effects: [],
+        },
+      ],
+      entryNodes: [`paradigm_${i}_node_1`],
+      connections: [],
+      categories: [
+        {
+          id: 'foundation',
+          name: 'Foundation',
+          description: 'Basic abilities',
+          displayOrder: 0,
+        },
+      ],
+    });
+  }
+
   // Register trees
   (registry as any).trees = new Map([
     ['shinto', shintoTree],
     ['allomancy', allomancyTree],
     ['sympathy', sympathyTree],
+    ['mega_paradigm', megaParadigmTree],
+    ['complex_paradigm', complexParadigmTree],
+    ...Array.from(paradigmTrees.entries()),
   ]);
 }

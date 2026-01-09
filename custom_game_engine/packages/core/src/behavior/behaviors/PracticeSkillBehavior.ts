@@ -86,7 +86,7 @@ export class PracticeSkillBehavior extends BaseBehavior {
     if (ticksPracticing > 500) {
       // Done practicing
       this.complete(entity);
-      this.switchTo(entity, 'idle');
+      return { complete: true, reason: 'practice_complete' };
     }
   }
 

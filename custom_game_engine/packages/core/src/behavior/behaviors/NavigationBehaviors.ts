@@ -27,7 +27,6 @@ export class NavigateBehavior extends BaseBehavior {
 
     // Check if we have a target
     if (!agent.behaviorState || !agent.behaviorState.target) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No target specified' };
     }
 
@@ -72,7 +71,6 @@ export class ExploreFrontierBehavior extends BaseBehavior {
     // ExplorationSystem handles the heavy lifting based on agent behavior
     // The behavior just indicates we want frontier exploration mode
     if (!entity.hasComponent(CT.ExplorationState)) {
-      this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No exploration component' };
     }
     // ExplorationSystem will pick this up and set steering targets
@@ -89,7 +87,6 @@ export class ExploreSpiralBehavior extends BaseBehavior {
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
     // ExplorationSystem handles the heavy lifting based on agent behavior
     if (!entity.hasComponent(CT.ExplorationState)) {
-      this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No exploration component' };
     }
     // ExplorationSystem will pick this up and set steering targets
@@ -108,7 +105,6 @@ export class FollowGradientBehavior extends BaseBehavior {
 
     // Check if we have social gradient component
     if (!entity.hasComponent(CT.SocialGradient)) {
-      this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No social gradient component' };
     }
 

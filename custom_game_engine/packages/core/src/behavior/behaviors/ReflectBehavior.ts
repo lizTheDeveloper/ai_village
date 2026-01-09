@@ -69,7 +69,7 @@ export class ReflectBehavior extends BaseBehavior {
     if (ticksReflecting > 200) {
       // Reflection complete
       this.complete(entity);
-      this.switchTo(entity, 'idle');
+      return { complete: true, reason: 'reflection_complete' };
     }
   }
 

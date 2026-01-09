@@ -124,7 +124,6 @@ export class BuildBehavior extends BaseBehavior {
         },
       });
 
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No inventory component' };
     }
 
@@ -134,7 +133,6 @@ export class BuildBehavior extends BaseBehavior {
     const blueprint = worldWithBuilding.buildingRegistry?.tryGet(buildingType);
     if (!blueprint) {
       console.error(`[BuildBehavior] Unknown building type: ${buildingType}`);
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Unknown building type' };
     }
 
@@ -210,7 +208,6 @@ export class BuildBehavior extends BaseBehavior {
         },
       });
 
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No valid build spot' };
     }
 
@@ -252,7 +249,6 @@ export class BuildBehavior extends BaseBehavior {
         },
       });
 
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Construction failed' };
     }
   }
@@ -285,7 +281,6 @@ export class BuildBehavior extends BaseBehavior {
             },
           });
 
-          this.switchTo(entity, 'wander', {});
           return { complete: true, reason: 'Construction complete' };
         } else {
           // Still under construction - log progress periodically
@@ -299,7 +294,6 @@ export class BuildBehavior extends BaseBehavior {
     }
 
     // Building not found - it may have been destroyed or there was an error
-    this.switchTo(entity, 'wander', {});
     return { complete: true, reason: 'Building not found' };
   }
 
@@ -385,7 +379,6 @@ export class BuildBehavior extends BaseBehavior {
 
     if (!blueprint) {
       console.error(`[BuildBehavior] Unknown tile-based blueprint: ${blueprintId}`);
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Unknown blueprint' };
     }
 
@@ -407,7 +400,6 @@ export class BuildBehavior extends BaseBehavior {
         },
       });
 
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No valid build spot' };
     }
 

@@ -84,7 +84,6 @@ export class MaterialTransportBehavior extends BaseBehavior {
     const task = constructionSystem.getTask(state.taskId);
 
     if (!task || task.state !== 'in_progress') {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Task not found or not in progress' };
     }
 
@@ -122,7 +121,6 @@ export class MaterialTransportBehavior extends BaseBehavior {
   ): BehaviorResult | void {
     const tile = task.tiles[state.tileIndex];
     if (!tile) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Tile not found' };
     }
 
@@ -240,7 +238,6 @@ export class MaterialTransportBehavior extends BaseBehavior {
   ): BehaviorResult | void {
     const tile = task.tiles[state.tileIndex];
     if (!tile) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Tile not found' };
     }
 
@@ -273,7 +270,6 @@ export class MaterialTransportBehavior extends BaseBehavior {
   ): BehaviorResult | void {
     const tile = task.tiles[state.tileIndex];
     if (!tile) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Tile not found' };
     }
 
@@ -346,7 +342,6 @@ export class MaterialTransportBehavior extends BaseBehavior {
 
     // Task is done or nothing to do
     constructionSystem.unregisterBuilder(task.id, entity.id);
-    this.switchTo(entity, 'wander', {});
     return { complete: true, reason: 'Construction task complete' };
   }
 

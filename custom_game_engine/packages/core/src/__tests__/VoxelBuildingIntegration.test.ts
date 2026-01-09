@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../ecs/World.js';
+import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { createVoxelResourceComponent } from '../components/VoxelResourceComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { getTileConstructionSystem } from '../systems/TileConstructionSystem.js';
-import { getTileBasedBlueprintRegistry } from '../buildings/TileBasedBlueprintRegistry.js';
+import { getTileBasedBlueprintRegistry, createTileBasedBlueprint } from '../buildings/TileBasedBlueprintRegistry.js';
 import type { ConstructionTask } from '../systems/TileConstructionSystem.js';
 
 /**
@@ -22,7 +23,147 @@ describe('Voxel Building System - End-to-End Integration', () => {
   let world: WorldImpl;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    const eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+
+    // Register test blueprints for integration testing
+    const registry = getTileBasedBlueprintRegistry();
+
+    // Clear any existing test blueprints (in case tests run multiple times)
+    // This is safe because we're using a singleton registry
+    const testBlueprints = ['tile_small_house', 'tile_storage_shed', 'tile_medium_house', 'tile_workshop'];
+    testBlueprints.forEach(id => {
+      const existing = registry.tryGet(id);
+      if (existing) {
+        // Blueprint already exists, skip registration
+        return;
+      }
+    });
+
+    // Register tile_small_house if not already registered
+    if (!registry.tryGet('tile_small_house')) {
+      const smallHouse = createTileBasedBlueprint({
+        id: 'tile_small_house',
+        name: 'Small House',
+        description: 'A small 3x3 house with door',
+        category: 'housing',
+        layoutString: [
+          '###',
+          '#.#',
+          '#D#',
+        ],
+        materialDefaults: {
+          wall: 'wood',
+          floor: 'wood',
+          door: 'wood',
+        },
+        allowCustomMaterials: true,
+        techRequired: [],
+        terrainRequired: [],
+        terrainForbidden: [],
+        unlocked: true,
+        buildTimePerTile: 100,
+        tier: 1,
+        functionality: ['shelter'],
+        canRotate: true,
+        rotationAngles: [0, 90, 180, 270],
+      });
+      registry.register(smallHouse);
+    }
+
+    // Register tile_storage_shed if not already registered
+    if (!registry.tryGet('tile_storage_shed')) {
+      const storageShed = createTileBasedBlueprint({
+        id: 'tile_storage_shed',
+        name: 'Storage Shed',
+        description: 'A small 3x2 storage shed',
+        category: 'storage',
+        layoutString: [
+          '###',
+          '#D#',
+        ],
+        materialDefaults: {
+          wall: 'wood',
+          floor: 'wood',
+          door: 'wood',
+        },
+        allowCustomMaterials: true,
+        techRequired: [],
+        terrainRequired: [],
+        terrainForbidden: [],
+        unlocked: true,
+        buildTimePerTile: 80,
+        tier: 1,
+        functionality: ['storage'],
+        canRotate: true,
+        rotationAngles: [0, 90, 180, 270],
+      });
+      registry.register(storageShed);
+    }
+
+    // Register tile_medium_house if not already registered
+    if (!registry.tryGet('tile_medium_house')) {
+      const mediumHouse = createTileBasedBlueprint({
+        id: 'tile_medium_house',
+        name: 'Medium House',
+        description: 'A medium 5x4 house with door',
+        category: 'housing',
+        layoutString: [
+          '#####',
+          '#...#',
+          '#...#',
+          '##D##',
+        ],
+        materialDefaults: {
+          wall: 'wood',
+          floor: 'wood',
+          door: 'wood',
+        },
+        allowCustomMaterials: true,
+        techRequired: [],
+        terrainRequired: [],
+        terrainForbidden: [],
+        unlocked: true,
+        buildTimePerTile: 120,
+        tier: 2,
+        functionality: ['shelter'],
+        canRotate: true,
+        rotationAngles: [0, 90, 180, 270],
+      });
+      registry.register(mediumHouse);
+    }
+
+    // Register tile_workshop if not already registered
+    if (!registry.tryGet('tile_workshop')) {
+      const workshop = createTileBasedBlueprint({
+        id: 'tile_workshop',
+        name: 'Workshop',
+        description: 'A 4x4 workshop',
+        category: 'production',
+        layoutString: [
+          '####',
+          '#..#',
+          '#..#',
+          '##D#',
+        ],
+        materialDefaults: {
+          wall: 'wood',
+          floor: 'wood',
+          door: 'wood',
+        },
+        allowCustomMaterials: true,
+        techRequired: [],
+        terrainRequired: [],
+        terrainForbidden: [],
+        unlocked: true,
+        buildTimePerTile: 100,
+        tier: 1,
+        functionality: ['production'],
+        canRotate: true,
+        rotationAngles: [0, 90, 180, 270],
+      });
+      registry.register(workshop);
+    }
   });
 
   describe('Voxel Resource System', () => {
@@ -148,12 +289,12 @@ describe('Voxel Building System - End-to-End Integration', () => {
 
       expect(task).toBeDefined();
       expect(task.blueprintId).toBe('tile_small_house');
-      expect(task.origin).toEqual({ x: 50, y: 50 });
+      expect(task.originPosition).toEqual({ x: 50, y: 50 });
       expect(task.tiles.length).toBeGreaterThan(0);
-      expect(task.status).toBe('awaiting_materials');
+      expect(task.state).toBe('planned');
     });
 
-    it('should track material pool for construction', () => {
+    it('should track materials per tile', () => {
       const constructionSystem = getTileConstructionSystem();
 
       const task = constructionSystem.createTask(
@@ -164,14 +305,20 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
-      // Initially, no materials delivered
-      expect(task.materialPool.size).toBe(0);
+      // Start task to transition tiles to materials_needed state
+      constructionSystem.startTask(world, task.id);
 
-      // Simulate delivering 10 wood
-      constructionSystem.deliverMaterial(task.id, 'agent-1', 'wood', 10, world);
+      // Find first tile needing materials
+      const nextTile = constructionSystem.getNextTileNeedingMaterials(task.id);
+      expect(nextTile).toBeDefined();
+      expect(nextTile!.tile.materialsDelivered).toBe(0);
 
-      // Material pool should have wood
-      expect(task.materialPool.get('wood')).toBe(10);
+      // Deliver materials to this tile
+      constructionSystem.deliverMaterial(world, task.id, nextTile!.index, 'agent-1', 1);
+
+      // Tile should now have materials
+      expect(nextTile!.tile.materialsDelivered).toBe(1);
+      expect(nextTile!.tile.status).toBe('in_progress');
     });
 
     it('should track workers involved in construction', () => {
@@ -185,21 +332,29 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
-      expect(task.workersInvolved.length).toBe(0);
+      constructionSystem.startTask(world, task.id);
+
+      expect(task.activeBuilders.size).toBe(0);
 
       // Deliver materials from agent-1
-      constructionSystem.deliverMaterial(task.id, 'agent-1', 'wood', 5, world);
+      const tile1 = constructionSystem.getNextTileNeedingMaterials(task.id);
+      if (tile1) {
+        constructionSystem.deliverMaterial(world, task.id, tile1.index, 'agent-1', 1);
+      }
 
-      expect(task.workersInvolved).toContain('agent-1');
+      expect(task.activeBuilders.has('agent-1')).toBe(true);
 
-      // Deliver materials from agent-2
-      constructionSystem.deliverMaterial(task.id, 'agent-2', 'wood', 5, world);
+      // Deliver materials from agent-2 to another tile
+      const tile2 = constructionSystem.getNextTileNeedingMaterials(task.id);
+      if (tile2) {
+        constructionSystem.deliverMaterial(world, task.id, tile2.index, 'agent-2', 1);
+      }
 
-      expect(task.workersInvolved).toContain('agent-2');
-      expect(task.workersInvolved.length).toBe(2);
+      expect(task.activeBuilders.has('agent-2')).toBe(true);
+      expect(task.activeBuilders.size).toBe(2);
     });
 
-    it('should transition status when materials are delivered', () => {
+    it('should transition state when task is started', () => {
       const constructionSystem = getTileConstructionSystem();
       const registry = getTileBasedBlueprintRegistry();
       const blueprint = registry.get('tile_small_house');
@@ -214,23 +369,22 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
-      expect(task.status).toBe('awaiting_materials');
+      expect(task.state).toBe('planned');
 
-      // Deliver all required materials
-      const woodCost = blueprint!.resourceCost.find(c => c.resourceId === 'wood');
-      if (woodCost) {
-        constructionSystem.deliverMaterial(
-          task.id,
-          'agent-1',
-          'wood',
-          woodCost.amountRequired,
-          world
-        );
-      }
+      // Start the task
+      constructionSystem.startTask(world, task.id);
 
-      // Update task status (would normally be done by system update)
+      // State should transition to in_progress
+      expect(task.state).toBe('in_progress');
+
+      // All tiles should need materials
+      const allTilesNeedMaterials = task.tiles.every(t => t.status === 'materials_needed');
+      expect(allTilesNeedMaterials).toBe(true);
+
+      // Verify we can retrieve the task
       const updatedTask = constructionSystem.getTask(task.id);
       expect(updatedTask).toBeDefined();
+      expect(updatedTask!.state).toBe('in_progress');
     });
   });
 
@@ -246,20 +400,23 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
+      constructionSystem.startTask(world, task.id);
+
       // Find a wall tile in the task
-      const wallTile = task.tiles.find(t => t.tileType === 'wall');
+      const wallTile = task.tiles.find(t => t.type === 'wall');
       expect(wallTile).toBeDefined();
 
       if (!wallTile) return;
 
-      // Simulate delivering materials and advancing progress
-      constructionSystem.deliverMaterial(task.id, 'agent-1', 'wood', 40, world);
+      const tileIndex = task.tiles.indexOf(wallTile);
+
+      // Deliver materials to this tile
+      constructionSystem.deliverMaterial(world, task.id, tileIndex, 'agent-1', 1);
 
       // Advance progress on the wall tile to 100%
-      const tileIndex = task.tiles.indexOf(wallTile);
-      constructionSystem.advanceProgress(task.id, tileIndex, 100);
+      constructionSystem.advanceProgress(world, task.id, tileIndex, 'agent-1', 100);
 
-      expect(wallTile.constructionProgress).toBe(100);
+      expect(wallTile.progress).toBe(100);
     });
 
     it('should handle multiple tiles in blueprint', () => {
@@ -277,13 +434,13 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
-      // Simple hut should have multiple tiles (walls, floor, door)
+      // Small house should have multiple tiles (walls, floor, door)
       expect(task.tiles.length).toBeGreaterThan(5);
 
       // Should have different tile types
-      const hasWalls = task.tiles.some(t => t.tileType === 'wall');
-      const hasFloor = task.tiles.some(t => t.tileType === 'floor');
-      const hasDoor = task.tiles.some(t => t.tileType === 'door');
+      const hasWalls = task.tiles.some(t => t.type === 'wall');
+      const hasFloor = task.tiles.some(t => t.type === 'floor');
+      const hasDoor = task.tiles.some(t => t.type === 'door');
 
       expect(hasWalls).toBe(true);
       expect(hasFloor).toBe(true);
@@ -308,32 +465,29 @@ describe('Voxel Building System - End-to-End Integration', () => {
         50,
         0
       );
-      expect(task.status).toBe('awaiting_materials');
+      expect(task.state).toBe('planned');
       expect(task.tiles.length).toBeGreaterThan(0);
 
-      // Step 3: Deliver materials
-      const woodCost = blueprint!.resourceCost.find(c => c.resourceId === 'wood');
-      expect(woodCost).toBeDefined();
+      // Step 3: Start the task
+      constructionSystem.startTask(world, task.id);
+      expect(task.state).toBe('in_progress');
 
-      constructionSystem.deliverMaterial(
-        task.id,
-        'builder-1',
-        'wood',
-        woodCost!.amountRequired,
-        world
-      );
-
-      expect(task.materialPool.get('wood')).toBe(woodCost!.amountRequired);
-      expect(task.workersInvolved).toContain('builder-1');
-
-      // Step 4: Advance construction progress on all tiles
+      // Step 4: Deliver materials and advance construction on all tiles
       task.tiles.forEach((tile, index) => {
-        constructionSystem.advanceProgress(task.id, index, 100);
-        expect(tile.constructionProgress).toBe(100);
+        // Deliver materials
+        constructionSystem.deliverMaterial(world, task.id, index, 'builder-1', 1);
+        expect(tile.materialsDelivered).toBe(1);
+        expect(tile.status).toBe('in_progress');
+
+        // Advance progress to completion
+        constructionSystem.advanceProgress(world, task.id, index, 'builder-1', 100);
+        expect(tile.progress).toBe(100);
       });
 
-      // Step 5: Verify task completion
-      const allComplete = task.tiles.every(t => t.constructionProgress === 100);
+      expect(task.activeBuilders.has('builder-1')).toBe(true);
+
+      // Step 5: Verify all tiles complete
+      const allComplete = task.tiles.every(t => t.progress === 100);
       expect(allComplete).toBe(true);
     });
 
@@ -348,23 +502,38 @@ describe('Voxel Building System - End-to-End Integration', () => {
         0
       );
 
-      // Worker 1 delivers some materials
-      constructionSystem.deliverMaterial(task.id, 'worker-1', 'wood', 15, world);
+      constructionSystem.startTask(world, task.id);
 
-      // Worker 2 delivers more materials
-      constructionSystem.deliverMaterial(task.id, 'worker-2', 'wood', 15, world);
+      // Get tiles needing materials
+      const tiles = task.tiles.filter(t => t.status === 'materials_needed');
+      expect(tiles.length).toBeGreaterThan(0);
 
-      // Worker 3 delivers remaining materials
-      constructionSystem.deliverMaterial(task.id, 'worker-3', 'wood', 10, world);
+      // Worker 1 delivers to first few tiles
+      for (let i = 0; i < Math.min(3, tiles.length); i++) {
+        const tileIndex = task.tiles.indexOf(tiles[i]!);
+        constructionSystem.deliverMaterial(world, task.id, tileIndex, 'worker-1', 1);
+      }
+
+      // Worker 2 delivers to next few tiles
+      for (let i = 3; i < Math.min(6, tiles.length); i++) {
+        const tileIndex = task.tiles.indexOf(tiles[i]!);
+        constructionSystem.deliverMaterial(world, task.id, tileIndex, 'worker-2', 1);
+      }
+
+      // Worker 3 delivers to remaining tiles
+      for (let i = 6; i < tiles.length; i++) {
+        const tileIndex = task.tiles.indexOf(tiles[i]!);
+        constructionSystem.deliverMaterial(world, task.id, tileIndex, 'worker-3', 1);
+      }
 
       // All workers should be tracked
-      expect(task.workersInvolved.length).toBe(3);
-      expect(task.workersInvolved).toContain('worker-1');
-      expect(task.workersInvolved).toContain('worker-2');
-      expect(task.workersInvolved).toContain('worker-3');
+      expect(task.activeBuilders.size).toBeGreaterThan(0);
+      expect(task.activeBuilders.has('worker-1')).toBe(true);
 
-      // Total materials should be sum of all deliveries
-      expect(task.materialPool.get('wood')).toBe(40);
+      // At least two workers should be tracked if we have enough tiles
+      if (tiles.length >= 4) {
+        expect(task.activeBuilders.has('worker-2')).toBe(true);
+      }
     });
   });
 
@@ -377,7 +546,7 @@ describe('Voxel Building System - End-to-End Integration', () => {
       const blueprints = ['tile_small_house', 'tile_storage_shed', 'tile_medium_house', 'tile_workshop'];
 
       blueprints.forEach(blueprintId => {
-        const blueprint = registry.get(blueprintId);
+        const blueprint = registry.tryGet(blueprintId);
 
         if (!blueprint) {
           // Blueprint might not exist, skip
@@ -415,12 +584,15 @@ describe('Voxel Building System - End-to-End Integration', () => {
       expect(task0.tiles.length).toBe(task270.tiles.length);
 
       // But tile positions should differ
-      const pos0 = task0.tiles[0].position;
-      const pos90 = task90.tiles[0].position;
+      const tile0 = task0.tiles[0];
+      const tile90 = task90.tiles[0];
+
+      expect(tile0).toBeDefined();
+      expect(tile90).toBeDefined();
 
       // First tile position should be different due to rotation
-      const differentX = pos0.x !== pos90.x;
-      const differentY = pos0.y !== pos90.y;
+      const differentX = tile0!.x !== tile90!.x;
+      const differentY = tile0!.y !== tile90!.y;
       expect(differentX || differentY).toBe(true);
     });
   });

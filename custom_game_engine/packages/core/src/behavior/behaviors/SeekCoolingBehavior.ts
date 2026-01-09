@@ -48,15 +48,13 @@ export class SeekCoolingBehavior extends BaseBehavior {
     const temperature = entity.getComponent(ComponentType.Temperature) as any;
 
     if (!temperature) {
-      // No temperature component, switch to wandering
-      this.switchTo(entity, 'wander', {});
+      // No temperature component
       return { complete: true, reason: 'No temperature component' };
     }
 
     // Check if we're already cool enough
     if (temperature.state === 'comfortable' ||
         (temperature.state === 'hot' && temperature.currentTemp <= temperature.comfortMax + 1)) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Already cool enough' };
     }
 
@@ -320,8 +318,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
         }));
       }
     } else {
-      // No heat sources nearby, just wander
-      this.switchTo(entity, 'wander', {});
+      // No heat sources nearby, stop moving
+      this.stopMovement(entity);
     }
   }
 }

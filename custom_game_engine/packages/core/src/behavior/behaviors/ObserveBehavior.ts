@@ -51,7 +51,7 @@ export class ObserveBehavior extends BaseBehavior {
     if (ticksObserving > 400) {
       // Done observing
       this.complete(entity);
-      this.switchTo(entity, 'idle');
+      return { complete: true, reason: 'observation_complete' };
     }
   }
 

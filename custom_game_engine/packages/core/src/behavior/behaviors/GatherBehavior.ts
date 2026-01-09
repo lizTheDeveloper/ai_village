@@ -32,7 +32,6 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { addToInventoryWithQuality } from '../../components/InventoryComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory } from '../../components/SpatialMemoryComponent.js';
 import { recordGathered } from '../../components/GatheringStatsComponent.js';
-import { WanderBehavior } from './WanderBehavior.js';
 import { createSeedItemId, calculateGatheringQuality } from '../../items/index.js';
 import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { addSkillXP } from '../../components/SkillsComponent.js';
@@ -127,10 +126,8 @@ export class GatherBehavior extends BaseBehavior {
     this.disableSteering(entity);
 
     if (!inventory) {
-      // No inventory component, can't gather - execute wander logic without changing behavior
-      const wanderBehavior = new WanderBehavior();
-      wanderBehavior.execute(entity, world);
-      return;
+      // No inventory component - this is a configuration error, not a normal case
+      throw new Error(`[GatherBehavior] Agent ${entity.id} cannot gather: missing InventoryComponent`);
     }
 
     // STARVATION PREVENTION: Check hunger and override resource preference if starving
@@ -174,10 +171,8 @@ export class GatherBehavior extends BaseBehavior {
     const target = this.findGatherTarget(world, position, preferredType, inventory, isStarvingMode);
 
     if (!target) {
-      // No resources or seed-producing plants found, execute wander logic without changing behavior
-      const wanderBehavior = new WanderBehavior();
-      wanderBehavior.execute(entity, world);
-      return;
+      // No resources or seed-producing plants found - behavior complete, let system decide next action
+      return { complete: true, reason: 'no_resources_found' };
     }
 
     const targetPos = target.position;
@@ -192,9 +187,8 @@ export class GatherBehavior extends BaseBehavior {
       const workSpeedMultiplier = this.calculateWorkSpeed(entity);
 
       if (workSpeedMultiplier === 0) {
-        // Too exhausted to work
-        this.switchTo(entity, 'idle', {});
-        return { complete: false, reason: 'Too exhausted to work' };
+        // Too exhausted to work - return complete to let system decide next behavior
+        return { complete: true, reason: 'too_exhausted_to_work' };
       }
 
       if (target.type === 'resource') {

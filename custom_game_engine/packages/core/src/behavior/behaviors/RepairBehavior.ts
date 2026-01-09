@@ -64,7 +64,7 @@ export class RepairBehavior extends BaseBehavior {
     const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     if (!agent || !position) {
-      return { complete: true, nextBehavior: 'idle', reason: 'missing_components' };
+      throw new Error(`[RepairBehavior] Agent ${entity.id} missing required components: agent=${!!agent}, position=${!!position}`);
     }
 
     switch (phase) {
@@ -75,7 +75,7 @@ export class RepairBehavior extends BaseBehavior {
       case 'repairing':
         return this.handleRepairingPhase(entity, position, inventory, world, currentTick);
       case 'complete':
-        return { complete: true, nextBehavior: 'wander', reason: 'repair_complete' };
+        return { complete: true, reason: 'repair_complete' };
     }
   }
 
@@ -94,7 +94,7 @@ export class RepairBehavior extends BaseBehavior {
         ...current,
         lastThought: 'No buildings need repair.',
       }));
-      return { complete: true, nextBehavior: 'wander', reason: 'no_damaged_buildings' };
+      return { complete: true, reason: 'no_damaged_buildings' };
     }
 
     // Store target and transition to moving
@@ -191,18 +191,18 @@ export class RepairBehavior extends BaseBehavior {
         ...current,
         lastThought: 'Repair session complete.',
       }));
-      return { complete: true, nextBehavior: 'wander', reason: 'repair_timeout' };
+      return { complete: true, reason: 'repair_timeout' };
     }
 
     // Get target building
     const building = world.getEntity(targetBuildingId);
     if (!building) {
-      return { complete: true, nextBehavior: 'wander', reason: 'building_not_found' };
+      return { complete: true, reason: 'building_not_found' };
     }
 
     const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
     if (!buildingComp) {
-      return { complete: true, nextBehavior: 'wander', reason: 'building_missing_component' };
+      return { complete: true, reason: 'building_missing_component' };
     }
 
     // Check if repair is complete
@@ -223,7 +223,7 @@ export class RepairBehavior extends BaseBehavior {
         },
       });
 
-      return { complete: true, nextBehavior: 'wander', reason: 'repair_complete' };
+      return { complete: true, reason: 'repair_complete' };
     }
 
     // Check distance (may have moved)

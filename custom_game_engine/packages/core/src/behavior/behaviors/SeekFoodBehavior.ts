@@ -39,9 +39,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
 
-    // If no inventory or needs, can't eat - just wander
+    // If no inventory or needs, can't eat
     if (!inventory || !needs || !agent) {
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'Missing required components' };
     }
 
@@ -58,7 +57,6 @@ export class SeekFoodBehavior extends BaseBehavior {
         return;
       } else {
         // Hunger satisfied, behavior complete
-        this.switchTo(entity, 'wander', {});
         return { complete: true, reason: 'Hunger satisfied' };
       }
     }
@@ -72,7 +70,6 @@ export class SeekFoodBehavior extends BaseBehavior {
       // Check if still hungry
       const updatedNeeds = entity.getComponent<NeedsComponent>(ComponentType.Needs);
       if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-        this.switchTo(entity, 'wander', {});
         return { complete: true, reason: 'Hunger satisfied from plant' };
       }
       // Still hungry, continue (will try again next tick)
@@ -85,7 +82,6 @@ export class SeekFoodBehavior extends BaseBehavior {
       // Check if still hungry
       const updatedNeeds = entity.getComponent<NeedsComponent>(ComponentType.Needs);
       if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-        this.switchTo(entity, 'wander', {});
         return { complete: true, reason: 'Hunger satisfied from storage' };
       }
       // Still hungry, continue (will try again next tick)

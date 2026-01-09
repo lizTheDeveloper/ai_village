@@ -50,19 +50,20 @@ export class DepositItemsBehavior extends BaseBehavior {
     this.disableSteering(entity);
 
     if (!inventory) {
-      // No inventory, nothing to deposit - switch to wander
-      this.switchTo(entity, 'wander', {});
+      // No inventory, nothing to deposit
       return { complete: true, reason: 'No inventory component' };
     }
 
     // Check if we have items to deposit
     const hasItems = inventory.slots.some(slot => slot.itemId && slot.quantity > 0);
     if (!hasItems) {
-      // Restore previous behavior if stored, otherwise wander
+      // Restore previous behavior if stored, otherwise just complete
       const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
       const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
 
-      this.switchTo(entity, previousBehavior || 'wander', previousState || {});
+      if (previousBehavior) {
+        this.switchTo(entity, previousBehavior, previousState || {});
+      }
       return { complete: true, reason: 'No items to deposit' };
     }
 
@@ -93,7 +94,6 @@ export class DepositItemsBehavior extends BaseBehavior {
         data: { agentId: entity.id },
       });
 
-      this.switchTo(entity, 'wander', {});
       return { complete: true, reason: 'No storage buildings found' };
     }
 
@@ -281,7 +281,9 @@ export class DepositItemsBehavior extends BaseBehavior {
       // Remaining items can't be deposited (unknown types) - give up and return to previous behavior
       const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
       const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
-      this.switchTo(entity, previousBehavior || 'wander', previousState || {});
+      if (previousBehavior) {
+        this.switchTo(entity, previousBehavior, previousState || {});
+      }
       this.stopAllMovement(entity);
       return;
     }
@@ -297,8 +299,7 @@ export class DepositItemsBehavior extends BaseBehavior {
         },
       });
 
-      // Switch to wander since storage is full
-      this.switchTo(entity, 'wander', {});
+      // Storage is full
       this.stopAllMovement(entity);
     } else {
       // Deposited some but not all - need to find another storage
@@ -321,12 +322,20 @@ export class DepositItemsBehavior extends BaseBehavior {
     const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
     const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
 
-    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-      ...current,
-      behavior: previousBehavior || 'wander',
-      behaviorState: previousState || {},
-      behaviorCompleted: true, // Signal completion when inventory is empty
-    }));
+    if (previousBehavior) {
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+        ...current,
+        behavior: previousBehavior,
+        behaviorState: previousState || {},
+        behaviorCompleted: true, // Signal completion when inventory is empty
+      }));
+    } else {
+      // No previous behavior - just mark as completed
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+        ...current,
+        behaviorCompleted: true,
+      }));
+    }
 
     this.stopAllMovement(entity);
   }
