@@ -564,7 +564,7 @@ export function syncPrioritiesWithSkills(
  * @param tier - Agent thinking tier ('full' | 'reduced' | 'autonomic')
  */
 export function createAgentComponent(
-  behavior: AgentBehavior = 'wander',
+  behavior: AgentBehavior = 'gather',
   thinkInterval: number = 20, // Think once per second at 20 TPS
   useLLM: boolean = false, // Whether to use LLM for decisions
   thinkOffset: number = 0, // Initial offset to stagger agent thinking (prevents thundering herd)

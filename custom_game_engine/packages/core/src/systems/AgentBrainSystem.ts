@@ -464,7 +464,14 @@ export class AgentBrainSystem implements System {
       return { behavior: decisionResult.behavior, execute: true };
     }
 
-    // Continue current behavior
+    // Don't execute default/fallback behaviors (idle, wander, explore, rest)
+    // Agent will stand still, allowing next think cycle to schedule LLM decision
+    const defaultBehaviors = ['idle', 'wander', 'explore', 'explore_frontier', 'explore_spiral', 'rest'];
+    if (defaultBehaviors.includes(agent.behavior)) {
+      return { behavior: agent.behavior, execute: false };
+    }
+
+    // Continue current productive behavior
     return { behavior: agent.behavior, execute: true };
   }
 

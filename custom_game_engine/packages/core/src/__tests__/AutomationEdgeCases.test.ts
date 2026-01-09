@@ -13,9 +13,10 @@ import { ItemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 import { PowerGridSystem } from '../systems/PowerGridSystem.js';
 import { BeltSystem } from '../systems/BeltSystem.js';
 import { AssemblyMachineSystem } from '../systems/AssemblyMachineSystem.js';
+import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createAssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
-import { createMachineConnection } from '../components/MachineConnectionComponent.js';
+import { createMachineConnectionComponent } from '../components/MachineConnectionComponent.js';
 import { createPowerProducer, createPowerConsumer } from '../components/PowerComponent.js';
 import { createBeltComponent, addItemsToBelt, removeItemsFromBelt, canAcceptItems } from '../components/BeltComponent.js';
 import type { Recipe } from '../crafting/Recipe.js';
@@ -27,6 +28,7 @@ describe('Automation Edge Cases', () => {
   let powerSystem: PowerGridSystem;
   let beltSystem: BeltSystem;
   let assemblySystem: AssemblyMachineSystem;
+  let stateMutatorSystem: StateMutatorSystem;
 
   const TEST_RECIPE: Recipe = {
     id: 'test_item',
@@ -58,6 +60,10 @@ describe('Automation Edge Cases', () => {
     powerSystem = new PowerGridSystem();
     beltSystem = new BeltSystem();
     assemblySystem = new AssemblyMachineSystem();
+    stateMutatorSystem = new StateMutatorSystem();
+
+    // Wire up StateMutatorSystem dependency
+    assemblySystem.setStateMutatorSystem(stateMutatorSystem);
   });
 
   describe('Power Grid Edge Cases', () => {
@@ -239,7 +245,7 @@ describe('Automation Edge Cases', () => {
       assembly.currentRecipe = 'test_item';
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       // No ingredients provided
       connection.inputs[0]!.items = [];
       machine.addComponent(connection);
@@ -286,7 +292,7 @@ describe('Automation Edge Cases', () => {
       assembly.currentRecipe = 'multi_input';
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       // Only 1 ingredient, need 2
       connection.inputs[0]!.items = [
         { instanceId: 'ing1', definitionId: 'ingredient_a', quality: 50, condition: 100 },
@@ -317,7 +323,7 @@ describe('Automation Edge Cases', () => {
       assembly.speed = 1.0;
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       // Fill output to capacity initially
       const capacity = connection.outputs[0]!.capacity;
       connection.outputs[0]!.items = new Array(capacity).fill({
@@ -365,7 +371,7 @@ describe('Automation Edge Cases', () => {
       assembly.currentRecipe = 'test_item';
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       connection.inputs[0]!.items = [
         { instanceId: 'ing1', definitionId: 'ingredient_a', quality: 50, condition: 100 },
       ];
@@ -405,7 +411,7 @@ describe('Automation Edge Cases', () => {
       assembly.speed = 1.0;
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       connection.inputs[0]!.items = [
         { instanceId: 'ing1', definitionId: 'ingredient_a', quality: 50, condition: 100 },
       ];
@@ -445,7 +451,7 @@ describe('Automation Edge Cases', () => {
       assembly.speed = 1.0;
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       connection.inputs[0]!.items = [
         { instanceId: 'ing1', definitionId: 'ingredient_a', quality: 50, condition: 100 },
       ];
@@ -473,7 +479,7 @@ describe('Automation Edge Cases', () => {
       assembly.speed = 1.0;
       machine.addComponent(assembly);
 
-      const connection = createMachineConnection();
+      const connection = createMachineConnectionComponent();
       connection.inputs[0]!.items = [
         { instanceId: 'ing1', definitionId: 'ingredient_a', quality: 50, condition: 100 },
       ];

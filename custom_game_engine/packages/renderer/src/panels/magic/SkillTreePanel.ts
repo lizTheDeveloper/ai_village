@@ -334,6 +334,12 @@ export class SkillTreePanel implements IWindowPanel {
    * Handle keyboard input.
    */
   handleKeyDown(key: string, world?: World): void {
+    // Handle Escape globally (doesn't require entity/world)
+    if (key === 'Escape') {
+      this.setVisible(false);
+      return;
+    }
+
     if (!this.selectedEntity || !world) {
       return;
     }
@@ -355,11 +361,6 @@ export class SkillTreePanel implements IWindowPanel {
         }
         break;
 
-      case 'Escape':
-        // Close panel
-        this.setVisible(false);
-        break;
-
       case 'Enter':
       case ' ':
         // Unlock selected node
@@ -372,8 +373,8 @@ export class SkillTreePanel implements IWindowPanel {
       case 'ArrowDown':
       case 'ArrowLeft':
       case 'ArrowRight':
-        // Navigate nodes (simplified - would need node graph traversal)
-        // For now, do nothing
+        // Navigate nodes
+        this.handleArrowNavigation(key, world);
         break;
     }
   }
@@ -502,11 +503,14 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit event
         const eventBus = world.getEventBus();
-        eventBus.emit('magic:skill_node_unlocked', {
-          entityId: this.selectedEntity.id,
-          paradigmId: activeParadigmId,
-          nodeId,
-          xpSpent: evaluation.xpCost,
+        eventBus.emit({
+          type: 'magic:skill_node_unlocked',
+          source: this.selectedEntity.id,
+          data: {
+            nodeId,
+            agentId: this.selectedEntity.id,
+            skillTree: activeParadigmId,
+          },
         });
 
         // Apply effects via SkillTreeManager
@@ -519,16 +523,11 @@ export class SkillTreePanel implements IWindowPanel {
         return true;
       } catch (error: any) {
         // Rollback on error
-        const eventBus = world.getEventBus();
-        eventBus.emit('ui:notification', {
-          message: `Error unlocking node: ${error.message}`,
-          level: 'error',
-        });
+        console.error('[SkillTreePanel] Error unlocking node:', error.message);
         return false;
       }
     } else {
-      // Cannot unlock - show notification
-      const eventBus = world.getEventBus();
+      // Cannot unlock - show warning
       let message = 'Cannot unlock this node';
 
       if (evaluation.availableXp < evaluation.xpCost) {
@@ -537,10 +536,7 @@ export class SkillTreePanel implements IWindowPanel {
         message = `Requirements not met: ${evaluation.unmetConditions[0].message}`;
       }
 
-      eventBus.emit('ui:notification', {
-        message,
-        level: 'error',
-      });
+      console.warn('[SkillTreePanel]', message);
       return false;
     }
   }

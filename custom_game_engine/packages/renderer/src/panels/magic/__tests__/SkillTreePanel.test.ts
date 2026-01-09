@@ -805,7 +805,20 @@ describe('SkillTreePanel', () => {
 // =============================================================================
 
 function createMockWorld(): World {
-  const eventBusEmit = vi.fn();
+  // Handle both emit signatures: emit(type, data) and emit({ type, source, data })
+  const eventBusEmit = vi.fn((typeOrEvent: string | any, data?: any) => {
+    // Normalize to type, data format for test assertions
+    if (typeof typeOrEvent === 'string') {
+      // emit(type, data)
+      return;
+    } else if (typeOrEvent && typeof typeOrEvent === 'object') {
+      // emit({ type, source, data }) - extract type and data
+      const event = typeOrEvent;
+      // Call again with normalized signature so test assertions work
+      eventBusEmit(event.type, event.data || event);
+    }
+  });
+
   const unlockSkillNode = vi.fn((entityId, paradigmId, nodeId, xpCost) => {
     // Simulate successful unlock - deduct XP
     return true;

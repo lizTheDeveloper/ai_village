@@ -5,6 +5,9 @@
  * decisions. Based on needs.md spec - Tier 1 (survival) needs can interrupt
  * almost anything.
  *
+ * Removed: Boredom system (idle→wander→explore). Agents now force LLM calls
+ * when no behavior is assigned instead of defaulting to idle/wander.
+ *
  * Part of Phase 4 of the AISystem decomposition (work-order: ai-system-refactor)
  */
 
@@ -15,9 +18,6 @@ import type { TemperatureComponent } from '../components/TemperatureComponent.js
 import type { AgentBehavior, AgentComponent } from '../components/AgentComponent.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType } from '../types/ComponentType.js';
-
-/** Ticks of idleness before boredom triggers wander (~5 game minutes at 20 TPS) */
-const BOREDOM_THRESHOLD_TICKS = 100;
 
 /**
  * Result of autonomic check
@@ -78,49 +78,6 @@ export class AutonomicSystem {
     // First check survival needs
     const needsResult = this.checkNeeds(needs, circadian || undefined, temperature || undefined, currentTimeOfDay, agent || undefined);
     if (needsResult) return needsResult;
-
-    // Then check boredom (lower priority than survival)
-    if (agent && world) {
-      const boredomResult = this.checkBoredom(agent, world.tick);
-      if (boredomResult) return boredomResult;
-    }
-
-    return null;
-  }
-
-  /**
-   * Check if agent is bored from being idle or wandering too long.
-   * - Idle -> wander after BOREDOM_THRESHOLD_TICKS
-   * - Wander -> explore after 2x BOREDOM_THRESHOLD_TICKS (to break wander loops)
-   */
-  checkBoredom(agent: AgentComponent, currentTick: number): AutonomicResult | null {
-    // Check if agent is idle
-    if (agent.behavior === 'idle' && agent.idleStartTick !== undefined) {
-      const idleDuration = currentTick - agent.idleStartTick;
-      if (idleDuration >= BOREDOM_THRESHOLD_TICKS) {
-        return {
-          behavior: 'wander',
-          priority: 10, // Low priority - can be interrupted by any need
-          reason: `Bored (idle for ${idleDuration} ticks)`,
-        };
-      }
-    }
-
-    // Check if agent is stuck wandering too long (break the wander loop)
-    if (agent.behavior === 'wander') {
-      const wanderStartTick = agent.behaviorState?.wanderStartTick as number | undefined;
-      if (wanderStartTick !== undefined) {
-        const wanderDuration = currentTick - wanderStartTick;
-        // After wandering for 2x boredom threshold, switch to explore to find something useful
-        if (wanderDuration >= BOREDOM_THRESHOLD_TICKS * 2) {
-          return {
-            behavior: 'explore',
-            priority: 15, // Slightly higher than wander
-            reason: `Wandering too long (${wanderDuration} ticks), exploring for activities`,
-          };
-        }
-      }
-    }
 
     return null;
   }

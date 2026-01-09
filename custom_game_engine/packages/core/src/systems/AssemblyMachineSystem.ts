@@ -180,12 +180,14 @@ export class AssemblyMachineSystem implements System {
    * Check if all recipe ingredients are available
    */
   private checkIngredients(recipe: any, inputs: MachineSlot[]): boolean {
-    for (const ingredient of recipe.inputs) {
+    // Recipe interface uses 'ingredients' not 'inputs'
+    for (const ingredient of recipe.ingredients) {
       const totalAvailable = inputs.reduce((sum, slot) => {
         return sum + slot.items.filter(i => i.definitionId === ingredient.itemId).length;
       }, 0);
 
-      if (totalAvailable < ingredient.amount) {
+      // Recipe interface uses 'quantity' not 'amount'
+      if (totalAvailable < ingredient.quantity) {
         return false;
       }
     }
@@ -197,8 +199,9 @@ export class AssemblyMachineSystem implements System {
    * Consume ingredients from input slots
    */
   private consumeIngredients(recipe: any, inputs: MachineSlot[]): void {
-    for (const ingredient of recipe.inputs) {
-      let remaining = ingredient.amount;
+    // Recipe interface uses 'ingredients' not 'inputs'
+    for (const ingredient of recipe.ingredients) {
+      let remaining = ingredient.quantity; // Use 'quantity' not 'amount'
 
       for (const slot of inputs) {
         while (remaining > 0 && slot.items.length > 0) {
