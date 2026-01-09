@@ -98,6 +98,7 @@ import {
   registerDefaultMaterials,
   CourtshipSystem,
   ReproductionSystem,
+  StateMutatorSystem,
 } from '../packages/core/src/index.js';
 
 import {
@@ -218,7 +219,15 @@ async function registerAllSystems(
   // Core systems
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new WeatherSystem());
-  gameLoop.systemRegistry.register(new TemperatureSystem());
+
+  // StateMutatorSystem - Batched vector updates (required by many systems)
+  const stateMutator = new StateMutatorSystem();
+  gameLoop.systemRegistry.register(stateMutator);
+
+  // TemperatureSystem - Uses StateMutatorSystem
+  const temperatureSystem = new TemperatureSystem();
+  temperatureSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(temperatureSystem);
 
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
@@ -229,14 +238,17 @@ async function registerAllSystems(
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
 
-  // Plant system
+  // Plant system - Uses StateMutatorSystem
   const plantSystem = new PlantSystem(gameLoop.world.eventBus);
   plantSystem.setSpeciesLookup(getPlantSpecies);
+  plantSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(plantSystem);
 
   // Animal systems
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
-  gameLoop.systemRegistry.register(new AnimalSystem(gameLoop.world.eventBus));
+  const animalSystem = new AnimalSystem(gameLoop.world.eventBus);
+  animalSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(animalSystem);
   gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
   gameLoop.systemRegistry.register(wildAnimalSpawning);
@@ -258,8 +270,17 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(new SteeringSystem());
   gameLoop.systemRegistry.register(new VerificationSystem());
   gameLoop.systemRegistry.register(new CommunicationSystem());
-  gameLoop.systemRegistry.register(new NeedsSystem());
-  gameLoop.systemRegistry.register(new SleepSystem());
+
+  // NeedsSystem - Uses StateMutatorSystem for batched decay
+  const needsSystem = new NeedsSystem();
+  needsSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(needsSystem);
+
+  // SleepSystem - Uses StateMutatorSystem for batched sleep updates
+  const sleepSystem = new SleepSystem();
+  sleepSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(sleepSystem);
+
   gameLoop.systemRegistry.register(new TamingSystem());
   gameLoop.systemRegistry.register(new BuildingSystem());
 
