@@ -28,53 +28,83 @@ export interface ParadigmTreeViewOptions {
 }
 
 export class ParadigmTreeView {
+  private tree: MagicSkillTree;
   private layoutEngine: TreeLayoutEngine;
   private nodeRenderer: SkillNodeRenderer;
   private tooltip: NodeTooltip;
   private cachedLayout?: TreeLayout;
   private cachedTreeId?: string;
+  private evaluationResults?: Map<string, any>;
+  private viewport: Viewport;
+  private hoveredNodeId: string | null = null;
 
-  constructor() {
+  constructor(tree: MagicSkillTree | null) {
+    if (!tree) {
+      throw new Error('Tree is required');
+    }
+
+    // Check for duplicate node IDs
+    const nodeIds = new Set<string>();
+    for (const node of tree.nodes) {
+      if (nodeIds.has(node.id)) {
+        throw new Error('Duplicate node ID');
+      }
+      nodeIds.add(node.id);
+    }
+
+    this.tree = tree;
     this.layoutEngine = new TreeLayoutEngine();
     this.nodeRenderer = new SkillNodeRenderer();
     this.tooltip = new NodeTooltip();
+    this.viewport = { offsetX: 0, offsetY: 0, zoom: 1.0 };
   }
 
   /**
    * Render the complete tree view.
    *
    * @param ctx Canvas rendering context
-   * @param tree Skill tree to render
-   * @param progress Agent's progress in this tree
-   * @param evaluationContext Context for evaluating conditions
    * @param x X position of content area
    * @param y Y position of content area
    * @param width Width of content area
    * @param height Height of content area
-   * @param options Rendering options
+   * @param evaluationContext Context for evaluating conditions
+   * @param progress Agent's progress in this tree (optional, for backward compatibility)
+   * @param options Rendering options (optional)
    * @param timestamp Animation timestamp
    */
   render(
     ctx: CanvasRenderingContext2D,
-    tree: MagicSkillTree,
-    progress: MagicSkillProgress,
-    evaluationContext: EvaluationContext,
     x: number,
     y: number,
     width: number,
     height: number,
-    options: ParadigmTreeViewOptions,
+    evaluationContext: EvaluationContext,
+    progress?: MagicSkillProgress,
+    options?: ParadigmTreeViewOptions,
     timestamp: number = 0
   ): void {
-    if (!ctx || !tree || !progress || !evaluationContext) {
+    if (!ctx || !evaluationContext) {
       throw new Error('ParadigmTreeView.render requires ctx, tree, progress, and evaluationContext');
     }
+
+    if (!this.evaluationResults) {
+      throw new Error('Evaluation results not set');
+    }
+
+    // Use instance tree
+    const tree = this.tree;
+
+    // Use instance viewport if options not provided
+    const viewport = options?.viewport || this.viewport;
+    const hoveredNodeId = options?.hoveredNodeId || this.hoveredNodeId;
+    const selectedNodeId = options?.selectedNodeId;
+    const showDebug = options?.showDebug || false;
 
     // Get or calculate layout
     const layout = this.getLayout(tree);
 
-    // Evaluate all nodes
-    const evaluations = evaluateTree(tree, evaluationContext);
+    // Use pre-computed evaluation results
+    const evaluations = this.evaluationResults;
 
     // Clear background
     ctx.fillStyle = '#1a1a1a';
@@ -83,11 +113,11 @@ export class ParadigmTreeView {
     // Setup viewport transform
     ctx.save();
     ctx.translate(x + width / 2, y + height / 2); // Center viewport
-    ctx.translate(options.viewport.offsetX * options.viewport.zoom, options.viewport.offsetY * options.viewport.zoom);
-    ctx.scale(options.viewport.zoom, options.viewport.zoom);
+    ctx.translate(viewport.offsetX * viewport.zoom, viewport.offsetY * viewport.zoom);
+    ctx.scale(viewport.zoom, viewport.zoom);
 
     // Render dependency lines
-    this.renderDependencyLines(ctx, tree, layout);
+    this.renderDependencyLines(ctx, tree, layout, hoveredNodeId);
 
     // Render nodes
     let hoveredNode: MagicSkillNode | null = null;
@@ -98,8 +128,8 @@ export class ParadigmTreeView {
       const pos = layout.nodes.get(node.id);
       if (!pos) continue;
 
-      const isHovered = options.hoveredNodeId === node.id;
-      const isSelected = options.selectedNodeId === node.id;
+      const isHovered = hoveredNodeId === node.id;
+      const isSelected = selectedNodeId === node.id;
 
       if (isHovered) {
         hoveredNode = node;
@@ -121,18 +151,20 @@ export class ParadigmTreeView {
     // Restore transform
     ctx.restore();
 
-    // Render XP display (top-right, in screen space)
-    this.renderXPDisplay(ctx, progress, x + width - 200, y + 10);
+    // Render XP display (top-right, in screen space) if progress provided
+    if (progress) {
+      this.renderXPDisplay(ctx, progress, x + width - 200, y + 10);
+    }
 
     // Render tooltip for hovered node (in screen space)
-    if (hoveredNode && options.hoveredNodeId) {
+    if (hoveredNode && hoveredNodeId) {
       const evaluation = evaluations.get(hoveredNode.id);
       if (evaluation) {
         // Convert tree coords to screen coords for tooltip anchor
         const pos = layout.nodes.get(hoveredNode.id);
         if (pos) {
-          const screenX = x + width / 2 + (pos.x + pos.width / 2 + options.viewport.offsetX) * options.viewport.zoom;
-          const screenY = y + height / 2 + (pos.y + options.viewport.offsetY) * options.viewport.zoom;
+          const screenX = x + width / 2 + (pos.x + pos.width / 2 + viewport.offsetX) * viewport.zoom;
+          const screenY = y + height / 2 + (pos.y + viewport.offsetY) * viewport.zoom;
 
           this.tooltip.render(ctx, hoveredNode, evaluation, screenX, screenY);
         }
@@ -140,8 +172,8 @@ export class ParadigmTreeView {
     }
 
     // Debug info
-    if (options.showDebug) {
-      this.renderDebugInfo(ctx, tree, layout, options.viewport, x + 10, y + height - 60);
+    if (showDebug) {
+      this.renderDebugInfo(ctx, tree, layout, viewport, x + 10, y + height - 60);
     }
   }
 
@@ -167,9 +199,9 @@ export class ParadigmTreeView {
   private renderDependencyLines(
     ctx: CanvasRenderingContext2D,
     tree: MagicSkillTree,
-    layout: TreeLayout
+    layout: TreeLayout,
+    hoveredNodeId?: string | null
   ): void {
-    ctx.strokeStyle = '#444444';
     ctx.lineWidth = 2;
 
     for (const connection of tree.connections) {
@@ -183,6 +215,25 @@ export class ParadigmTreeView {
       const toX = toPos.x + toPos.width / 2;
       const toY = toPos.y;
 
+      // Check if this line is connected to hovered node
+      const isHighlighted = hoveredNodeId && (connection.from === hoveredNodeId || connection.to === hoveredNodeId);
+
+      // Check if this is a soft/optional requirement
+      const toNode = tree.nodes.find(n => n.id === connection.to);
+      const isSoftRequirement = toNode?.unlockConditions?.some(c =>
+        c.type === 'node_unlocked' && (c as any).soft === true
+      );
+
+      // Set line style
+      ctx.strokeStyle = isHighlighted ? '#ffff00' : '#444444';
+
+      // Set line dash for optional prerequisites
+      if (isSoftRequirement) {
+        ctx.setLineDash([5, 5]);
+      } else {
+        ctx.setLineDash([]);
+      }
+
       // Draw line
       ctx.beginPath();
       ctx.moveTo(fromX, fromY);
@@ -192,6 +243,9 @@ export class ParadigmTreeView {
       // Draw arrow at end
       this.drawArrow(ctx, fromX, fromY, toX, toY);
     }
+
+    // Reset line dash
+    ctx.setLineDash([]);
   }
 
   /**
@@ -201,18 +255,19 @@ export class ParadigmTreeView {
     const headLength = 8;
     const angle = Math.atan2(y2 - y1, x2 - x1);
 
+    // Draw filled arrowhead triangle
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     ctx.lineTo(
       x2 - headLength * Math.cos(angle - Math.PI / 6),
       y2 - headLength * Math.sin(angle - Math.PI / 6)
     );
-    ctx.moveTo(x2, y2);
     ctx.lineTo(
       x2 - headLength * Math.cos(angle + Math.PI / 6),
       y2 - headLength * Math.sin(angle + Math.PI / 6)
     );
-    ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
   }
 
   /**
@@ -303,8 +358,9 @@ export class ParadigmTreeView {
   /**
    * Calculate layout for a tree (public API).
    */
-  calculateLayout(tree: MagicSkillTree): Map<string, { x: number; y: number }> {
-    const layout = this.layoutEngine.calculateLayout(tree);
+  calculateLayout(tree?: MagicSkillTree): Map<string, { x: number; y: number }> {
+    const targetTree = tree || this.tree;
+    const layout = this.layoutEngine.calculateLayout(targetTree);
     const positionMap = new Map<string, { x: number; y: number }>();
 
     for (const [nodeId, pos] of layout.nodes.entries()) {
@@ -317,65 +373,61 @@ export class ParadigmTreeView {
   /**
    * Set tree (for explicit tree updates).
    */
-  setTree(_tree: MagicSkillTree): void {
-    // Just clear cache - tree is passed to render()
+  setTree(tree: MagicSkillTree): void {
+    this.tree = tree;
     this.clearCache();
   }
 
   /**
    * Set evaluation results (for pre-computed evaluations).
    */
-  setEvaluationResults(_results: Map<string, any>): void {
-    // Not needed - evaluations are computed in render()
-    // This is a no-op for API compatibility
+  setEvaluationResults(results: Map<string, any>): void {
+    this.evaluationResults = results;
   }
 
   /**
    * Set viewport scroll.
    */
-  setScroll(_x: number, _y: number): void {
-    // Viewport is passed via options in render()
-    // This is a no-op for API compatibility
+  setScroll(x: number, y: number): void {
+    this.viewport.offsetX = x;
+    this.viewport.offsetY = y;
   }
 
   /**
    * Set viewport zoom.
    */
-  setZoom(_factor: number): void {
-    // Viewport is passed via options in render()
-    // This is a no-op for API compatibility
+  setZoom(factor: number): void {
+    // Clamp zoom to reasonable bounds
+    this.viewport.zoom = Math.max(0.5, Math.min(3.0, factor));
   }
 
   /**
    * Get current zoom level.
    */
   getZoom(): number {
-    // Viewport is managed by SkillTreePanel
-    return 1.0;
+    return this.viewport.zoom;
   }
 
   /**
    * Handle mouse wheel zoom.
    */
-  handleMouseWheel(_delta: number): void {
-    // Viewport is managed by SkillTreePanel
-    // This is a no-op for API compatibility
+  handleMouseWheel(delta: number): void {
+    const zoomDelta = delta > 0 ? 0.1 : -0.1;
+    this.setZoom(this.viewport.zoom + zoomDelta);
   }
 
   /**
    * Set hovered node.
    */
-  setHoveredNode(_nodeId: string | null): void {
-    // Hover state is passed via options in render()
-    // This is a no-op for API compatibility
+  setHoveredNode(nodeId: string | null): void {
+    this.hoveredNodeId = nodeId;
   }
 
   /**
    * Get hovered node.
    */
   getHoveredNode(): string | null {
-    // Hover state is managed by SkillTreePanel
-    return null;
+    return this.hoveredNodeId;
   }
 
   /**
@@ -387,32 +439,45 @@ export class ParadigmTreeView {
     tree?: MagicSkillTree,
     viewport?: Viewport
   ): string | null {
-    if (!tree || !viewport) {
-      return null;
+    const targetTree = tree || this.tree;
+    const targetViewport = viewport || this.viewport;
+
+    // Get layout and check each node's bounds
+    const layout = this.getLayout(targetTree);
+
+    for (const [nodeId, pos] of layout.nodes.entries()) {
+      const nodeX = pos.x * targetViewport.zoom + targetViewport.offsetX;
+      const nodeY = pos.y * targetViewport.zoom + targetViewport.offsetY;
+      const nodeWidth = pos.width * targetViewport.zoom;
+      const nodeHeight = pos.height * targetViewport.zoom;
+
+      if (
+        x >= nodeX &&
+        x <= nodeX + nodeWidth &&
+        y >= nodeY &&
+        y <= nodeY + nodeHeight
+      ) {
+        return nodeId;
+      }
     }
 
-    return this.findNodeAtPosition(
-      tree,
-      x,
-      y,
-      viewport,
-      0,
-      0,
-      800, // Default content width
-      600  // Default content height
-    ) || null;
+    return null;
   }
 
   /**
    * Handle mouse move (for hover).
    */
   handleMouseMove(
-    _x: number,
-    _y: number,
-    _tree?: MagicSkillTree,
-    _viewport?: Viewport
+    x: number,
+    y: number,
+    tree?: MagicSkillTree,
+    viewport?: Viewport
   ): void {
-    // Hover state is managed by SkillTreePanel
-    // This is a no-op for API compatibility
+    const targetTree = tree || this.tree;
+    const targetViewport = viewport || this.viewport;
+
+    // Find node at position and update hover state
+    const nodeId = this.handleClick(x, y, targetTree, targetViewport);
+    this.hoveredNodeId = nodeId;
   }
 }

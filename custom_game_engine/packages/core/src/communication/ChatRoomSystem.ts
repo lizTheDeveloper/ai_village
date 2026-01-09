@@ -40,7 +40,16 @@ export class ChatRoomSystem implements System {
   /** Track known members per room for change detection */
   private knownMembers: Map<string, Set<string>> = new Map();
 
+  /** Track if we've initialized permanent rooms */
+  private initialized: boolean = false;
+
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Initialize permanent rooms on first update
+    if (!this.initialized) {
+      this.initializePermanentRooms(world);
+      this.initialized = true;
+    }
+
     // Update all criteria-based rooms
     for (const [roomId, entityId] of this.roomEntities) {
       const entity = world.getEntity(entityId);
@@ -75,6 +84,14 @@ export class ChatRoomSystem implements System {
   // ============================================================================
   // ROOM MANAGEMENT
   // ============================================================================
+
+  /**
+   * Initialize permanent/well-known rooms (called on first update)
+   */
+  private initializePermanentRooms(world: World): void {
+    // Auto-initialize divine chat room (permanent, criteria-based)
+    this.getOrCreateRoom(world, DIVINE_CHAT_CONFIG);
+  }
 
   /**
    * Get or create a chat room

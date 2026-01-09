@@ -117,9 +117,9 @@ export interface Viewport {
   /** Zoom level (1.0 = 100%) */
   zoom: number;
   /** Min zoom */
-  minZoom: number;
+  minZoom?: number;
   /** Max zoom */
-  maxZoom: number;
+  maxZoom?: number;
 }
 
 // ============================================================================

@@ -81,7 +81,7 @@ export class InfoSection {
     position: PositionComponentData | undefined,
     temperature: TemperatureComponentData | undefined,
     movement: MovementComponentData | undefined,
-    _inventory: InventoryComponentData | undefined,
+    inventory: InventoryComponentData | undefined,
     goals?: GoalsComponent,
     world?: any
   ): void {
@@ -418,6 +418,11 @@ export class InfoSection {
 
     currentY += 5;
 
+    // Inventory section
+    if (inventory) {
+      currentY = this.renderInventorySection(ctx, x, currentY, inventory, padding, lineHeight);
+    }
+
     // Temperature section
     if (temperature) {
       renderSeparator(ctx, x, currentY, this.panelWidth, padding);
@@ -483,6 +488,9 @@ export class InfoSection {
 
     // Restore canvas state
     ctx.restore();
+
+    // Restore default fill style for next render
+    ctx.fillStyle = '#FFFFFF';
   }
 
   /**
@@ -559,6 +567,107 @@ export class InfoSection {
     ctx.textAlign = 'left';
 
     return y + lineHeight;
+  }
+
+  /**
+   * Render inventory section with validation and capacity display.
+   */
+  private renderInventorySection(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    y: number,
+    inventory: InventoryComponentData,
+    padding: number,
+    lineHeight: number
+  ): number {
+    // Validate required fields (per CLAUDE.md - no silent fallbacks)
+    if (!('maxWeight' in inventory) || inventory.maxWeight === undefined) {
+      throw new Error("InventoryComponent missing required 'maxWeight' field");
+    }
+    if (!('maxSlots' in inventory) || inventory.maxSlots === undefined) {
+      throw new Error("InventoryComponent missing required 'maxSlots' field");
+    }
+    if (!('currentWeight' in inventory) || inventory.currentWeight === undefined) {
+      throw new Error("InventoryComponent missing required 'currentWeight' field");
+    }
+    if (!Array.isArray(inventory.slots)) {
+      throw new Error("InventoryComponent 'slots' must be an array");
+    }
+
+    // Divider
+    renderSeparator(ctx, panelX, y, this.panelWidth, padding);
+    y += 10;
+
+    // Section header
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('INVENTORY', panelX + padding, y);
+    y += lineHeight + 5;
+
+    // Resource icons
+    const resourceIcons: Record<string, string> = {
+      wood: '🪵',
+      stone: '🪨',
+      food: '🍎',
+      water: '💧',
+    };
+
+    // Count resources from slots
+    const resourceCounts: Record<string, number> = {};
+    let usedSlots = 0;
+
+    for (const slot of inventory.slots) {
+      if (slot.itemId && slot.quantity > 0) {
+        resourceCounts[slot.itemId] = (resourceCounts[slot.itemId] || 0) + slot.quantity;
+        usedSlots++;
+      }
+    }
+
+    // Check if empty
+    const isEmpty = usedSlots === 0;
+
+    if (isEmpty) {
+      // Empty state
+      ctx.fillStyle = '#888';
+      ctx.font = '12px monospace';
+      ctx.fillText('(empty)', panelX + padding, y);
+      y += lineHeight;
+    } else {
+      // Display resources with icons
+      ctx.font = '12px monospace';
+      for (const [itemId, quantity] of Object.entries(resourceCounts)) {
+        const icon = resourceIcons[itemId] || '📦';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(`${icon} ${itemId}: ${quantity}`, panelX + padding, y);
+        y += lineHeight;
+      }
+    }
+
+    y += 5;
+
+    // Capacity display with color warnings
+    const weightPercent = (inventory.currentWeight / inventory.maxWeight) * 100;
+    const slotsPercent = (usedSlots / inventory.maxSlots) * 100;
+    const maxPercent = Math.max(weightPercent, slotsPercent);
+
+    // Determine color based on capacity (per tests)
+    let capacityColor = '#FFFFFF'; // < 80%
+    if (maxPercent >= 100) {
+      capacityColor = '#FF0000'; // >= 100% red
+    } else if (maxPercent >= 80) {
+      capacityColor = '#FFFF00'; // >= 80% yellow
+    }
+
+    ctx.fillStyle = capacityColor;
+    ctx.font = '11px monospace';
+    ctx.fillText(
+      `Weight: ${inventory.currentWeight}/${inventory.maxWeight}  Slots: ${usedSlots}/${inventory.maxSlots}`,
+      panelX + padding,
+      y
+    );
+    y += lineHeight + 5;
+
+    return y;
   }
 
   private renderPlannedBuilds(
