@@ -373,8 +373,8 @@ export class SkillTreePanel implements IWindowPanel {
       case 'ArrowDown':
       case 'ArrowLeft':
       case 'ArrowRight':
-        // Navigate nodes
-        this.handleArrowNavigation(key, world);
+        // Navigate nodes - TODO: implement arrow navigation
+        // this.handleArrowNavigation(key, world);
         break;
     }
   }

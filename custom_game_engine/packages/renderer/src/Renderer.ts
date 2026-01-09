@@ -2183,6 +2183,57 @@ export class Renderer {
           this.ctx.stroke();
         }
 
+        // Render roof tiles (overlay on interior tiles)
+        const tileWithRoof = tile as typeof tile & {
+          roof?: { material: string; condition: number; constructionProgress?: number };
+        };
+        if (tileWithRoof.roof) {
+          const roof = tileWithRoof.roof;
+          const progress = roof.constructionProgress ?? 100;
+          const alpha = progress >= 100 ? 0.7 : 0.3 + (progress / 100) * 0.4;
+
+          // Material-based colors for roofs
+          const roofColors: Record<string, string> = {
+            thatch: '#C4A35A', // Golden straw
+            wood: '#8B6914', // Darker wood
+            tile: '#B85C38', // Terracotta
+            slate: '#4A5568', // Gray slate
+            metal: '#6B7280', // Metallic gray
+          };
+          const roofColor = roofColors[roof.material] ?? '#C4A35A';
+
+          // Draw roof with slight offset to show depth (rendering as if viewed from above)
+          // Draw a diagonal pattern to indicate roofing
+          this.ctx.fillStyle = `rgba(${parseInt(roofColor.slice(1, 3), 16)}, ${parseInt(roofColor.slice(3, 5), 16)}, ${parseInt(roofColor.slice(5, 7), 16)}, ${alpha})`;
+
+          // Draw roof as semi-transparent overlay with texture pattern
+          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+
+          // Add diagonal line pattern to indicate roof texture
+          this.ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+          this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.3);
+
+          // Draw diagonal lines for roof texture
+          const step = Math.max(3, tilePixelSize / 4);
+          for (let i = 0; i < tilePixelSize * 2; i += step) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(screen.x + i, screen.y);
+            this.ctx.lineTo(screen.x, screen.y + i);
+            this.ctx.stroke();
+          }
+
+          // Show construction progress if incomplete
+          if (progress < 100) {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            this.ctx.font = `${Math.max(8, this.camera.zoom * 6)}px sans-serif`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(`${Math.round(progress)}%`, screen.x + tilePixelSize / 2, screen.y + tilePixelSize / 2);
+            this.ctx.textAlign = 'left';
+            this.ctx.textBaseline = 'alphabetic';
+          }
+        }
+
         // Draw temperature overlay (debug feature)
         // Note: Temperature is not currently stored per-tile, but this allows for future expansion
         const tileWithTemp = tile as typeof tile & { temperature?: number };

@@ -25,6 +25,7 @@ import type { ResourceCost, SkillRequirement, BuildingCategory, BuildingFunction
 export type WallMaterial = 'wood' | 'stone' | 'mud_brick' | 'ice' | 'metal' | 'glass' | 'thatch';
 export type DoorMaterial = 'wood' | 'stone' | 'metal' | 'cloth';
 export type WindowMaterial = 'glass' | 'hide' | 'cloth';
+export type RoofMaterial = 'thatch' | 'wood' | 'tile' | 'slate' | 'metal';
 
 /**
  * Tile position in world coordinates.

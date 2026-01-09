@@ -21,6 +21,9 @@ export type DoorMaterial = 'wood' | 'stone' | 'metal' | 'cloth';
 /** Window materials */
 export type WindowMaterial = 'glass' | 'hide' | 'cloth';
 
+/** Roof materials */
+export type RoofMaterial = 'thatch' | 'wood' | 'tile' | 'slate' | 'metal';
+
 /**
  * Wall tile on a world tile.
  * Walls block movement and provide insulation.
@@ -91,6 +94,38 @@ export interface WindowTile {
 
   /** When constructed */
   constructedAt?: number;
+}
+
+/**
+ * Roof tile on a world tile.
+ * Roofs provide shelter and weather protection.
+ */
+export interface RoofTile {
+  /** Material type */
+  material: RoofMaterial;
+
+  /** Current health (0-100) */
+  condition: number;
+
+  /** Construction progress */
+  constructionProgress?: number;
+
+  /** Builder entity ID */
+  builderId?: string;
+
+  /** When constructed */
+  constructedAt?: number;
+}
+
+/**
+ * Create a roof tile.
+ */
+export function createRoofTile(material: RoofMaterial, tick?: number): RoofTile {
+  return {
+    material,
+    condition: 100,
+    constructedAt: tick,
+  };
 }
 
 /**
@@ -214,6 +249,12 @@ export interface Tile {
    * Windows are placed in walls, block movement but allow light.
    */
   window?: WindowTile;
+
+  /**
+   * Roof on this tile.
+   * Roofs provide shelter from weather and complete building enclosures.
+   */
+  roof?: RoofTile;
 
   // Soil management properties (Phase 9)
   /** Whether the tile has been tilled and can be planted */

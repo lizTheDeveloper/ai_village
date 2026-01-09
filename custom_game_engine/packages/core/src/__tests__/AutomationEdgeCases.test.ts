@@ -224,7 +224,7 @@ describe('Automation Edge Cases', () => {
       assembly.currentRecipe = 'non_existent_recipe';
       machine.addComponent(assembly);
 
-      machine.addComponent(createMachineConnection());
+      machine.addComponent(createMachineConnectionComponent());
       const power = createPowerConsumer('electrical', 100);
       power.isPowered = true;
       machine.addComponent(power);
@@ -346,21 +346,31 @@ describe('Automation Edge Cases', () => {
       // Run for enough time to complete one craft
       for (let i = 0; i < 25; i++) {
         assemblySystem.update(world, [machine], 0.05);
+        // Apply deltas via StateMutatorSystem each tick
+        stateMutatorSystem.update(world, [], 0.05);
       }
 
-      // Should be blocked at 100%
-      expect(assembly.progress).toBeGreaterThanOrEqual(100);
-      expect(connection.inputs[0]!.items.length).toBe(2); // Not consumed
+      // Get updated components
+      let updatedAssembly = machine.getComponent('assembly_machine' as any);
+      let updatedConnection = machine.getComponent('machine_connection' as any);
 
-      // Clear output space
-      connection.outputs[0]!.items = [];
+      // Should be blocked at 100%
+      expect(updatedAssembly!.progress).toBeGreaterThanOrEqual(100);
+      expect(updatedConnection!.inputs[0]!.items.length).toBe(2); // Not consumed
+
+      // Clear output space on the actual component
+      updatedConnection!.outputs[0]!.items = [];
 
       // Run one more tick
       assemblySystem.update(world, [machine], 0.05);
+      stateMutatorSystem.update(world, [], 0.05);
+
+      // Get components again
+      updatedConnection = machine.getComponent('machine_connection' as any);
 
       // Should have consumed ingredients and reset progress
       // (Might not be exactly 0 due to continued progress)
-      expect(connection.inputs[0]!.items.length).toBeLessThan(2);
+      expect(updatedConnection!.inputs[0]!.items.length).toBeLessThan(2);
     });
 
     it('should handle machine with no power component', () => {
@@ -425,11 +435,16 @@ describe('Automation Edge Cases', () => {
       // Run for 100 ticks (5 seconds)
       for (let i = 0; i < 100; i++) {
         assemblySystem.update(world, [machine], 0.05);
+        // Apply deltas via StateMutatorSystem each tick
+        stateMutatorSystem.update(world, [], 0.05);
       }
 
+      // Get the updated component from the entity
+      const updatedAssembly = machine.getComponent('assembly_machine' as any);
+
       // Should have made 5% progress (5s / 100s)
-      expect(assembly.progress).toBeGreaterThan(4);
-      expect(assembly.progress).toBeLessThan(6);
+      expect(updatedAssembly!.progress).toBeGreaterThan(4);
+      expect(updatedAssembly!.progress).toBeLessThan(6);
     });
   });
 
@@ -464,10 +479,15 @@ describe('Automation Edge Cases', () => {
 
       // Very small time step
       assemblySystem.update(world, [machine], 0.0001);
+      // Apply deltas via StateMutatorSystem
+      stateMutatorSystem.update(world, [], 0.0001);
+
+      // Get the updated component from the entity (not the initial reference)
+      const updatedAssembly = machine.getComponent('assembly_machine' as any);
 
       // Should still make tiny progress
-      expect(assembly.progress).toBeGreaterThan(0);
-      expect(assembly.progress).toBeLessThan(0.1);
+      expect(updatedAssembly!.progress).toBeGreaterThan(0);
+      expect(updatedAssembly!.progress).toBeLessThan(0.1);
     });
 
     it('should handle very large deltaTime', () => {
@@ -492,10 +512,16 @@ describe('Automation Edge Cases', () => {
 
       // Very large time step (10 seconds)
       assemblySystem.update(world, [machine], 10.0);
+      // Apply deltas via StateMutatorSystem
+      stateMutatorSystem.update(world, [], 10.0);
+
+      // Get the updated component from the entity
+      const updatedAssembly = machine.getComponent('assembly_machine' as any);
+      const updatedConnection = machine.getComponent('machine_connection' as any);
 
       // Should complete and produce output
-      expect(assembly.progress).toBeLessThanOrEqual(100);
-      expect(connection.outputs[0]!.items.length).toBeGreaterThan(0);
+      expect(updatedAssembly!.progress).toBeLessThanOrEqual(100);
+      expect(updatedConnection!.outputs[0]!.items.length).toBeGreaterThan(0);
     });
   });
 });

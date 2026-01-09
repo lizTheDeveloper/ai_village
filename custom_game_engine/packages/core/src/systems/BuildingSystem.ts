@@ -21,7 +21,7 @@ import { createHealthClinicComponent } from '../components/HealthClinicComponent
 import { createUniversityComponent } from '../components/UniversityComponent.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { getTileConstructionSystem } from './TileConstructionSystem.js';
-import type { WallMaterial, DoorMaterial, WindowMaterial } from '@ai-village/world';
+import type { WallMaterial, DoorMaterial, WindowMaterial, RoofMaterial } from '@ai-village/world';
 
 /**
  * BuildingSystem handles construction progress for buildings.
@@ -166,11 +166,15 @@ export class BuildingSystem implements System {
     }
 
     // Get materials from blueprint, with defaults
+    // Derive roof from wall material: wood/thatch walls -> thatch roof, stone -> tile roof, metal -> metal roof
+    const wallMaterial = (blueprint.materials?.wall || 'wood') as WallMaterial;
+    const roofMaterial = this.deriveRoofMaterial(wallMaterial);
     const materials = {
-      wall: (blueprint.materials?.wall || 'wood') as WallMaterial,
+      wall: wallMaterial,
       floor: blueprint.materials?.floor || 'wood',
       door: (blueprint.materials?.door || 'wood') as DoorMaterial,
       window: 'glass' as WindowMaterial,
+      roof: roofMaterial,
     };
 
     // Get the TileConstructionSystem and stamp the layout
@@ -186,6 +190,29 @@ export class BuildingSystem implements System {
 
     if (tilesPlaced > 0) {
       console.log(`[BuildingSystem] Stamped ${tilesPlaced} tiles for ${blueprint.name} at (${position.x}, ${position.y})`);
+    }
+  }
+
+  /**
+   * Derive appropriate roof material from wall material.
+   * Wood/thatch walls -> thatch roof, stone -> tile roof, metal -> metal roof
+   */
+  private deriveRoofMaterial(wallMaterial: WallMaterial): RoofMaterial {
+    switch (wallMaterial) {
+      case 'wood':
+      case 'thatch':
+        return 'thatch';
+      case 'stone':
+      case 'mud_brick':
+        return 'tile';
+      case 'metal':
+        return 'metal';
+      case 'ice':
+        return 'wood'; // Ice buildings use wood roofs
+      case 'glass':
+        return 'slate'; // Glass buildings use slate roofs
+      default:
+        return 'thatch';
     }
   }
 

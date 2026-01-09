@@ -21,6 +21,7 @@ import {
   type WallMaterial,
   type DoorMaterial,
   type WindowMaterial,
+  type RoofMaterial,
   getTileBasedBlueprintRegistry,
 } from '../buildings/TileBasedBlueprintRegistry.js';
 
@@ -44,6 +45,11 @@ interface Tile {
     constructedAt?: number;
   };
   floor?: string;
+  roof?: {
+    material: RoofMaterial;
+    condition: number;
+    constructedAt?: number;
+  };
 }
 
 /**
@@ -871,7 +877,7 @@ export class TileConstructionSystem implements System {
     layout: string[],
     originX: number,
     originY: number,
-    materials: { wall: WallMaterial; floor: string; door: DoorMaterial; window?: WindowMaterial },
+    materials: { wall: WallMaterial; floor: string; door: DoorMaterial; window?: WindowMaterial; roof?: RoofMaterial },
     buildingId?: string
   ): number {
     if (!layout || layout.length === 0) {
@@ -922,6 +928,14 @@ export class TileConstructionSystem implements System {
             };
             // Also place floor under door
             worldTile.floor = materials.floor;
+            // Place roof over door (interior entry point)
+            if (materials.roof) {
+              worldTile.roof = {
+                material: materials.roof,
+                condition: 100,
+                constructedAt: world.tick,
+              };
+            }
             tilesPlaced++;
             break;
 
@@ -944,6 +958,14 @@ export class TileConstructionSystem implements System {
           case WORKSTATION:
             // Place floor tile (furniture is separate entities in this system)
             worldTile.floor = materials.floor;
+            // Place roof on interior floor tiles
+            if (materials.roof) {
+              worldTile.roof = {
+                material: materials.roof,
+                condition: 100,
+                constructedAt: world.tick,
+              };
+            }
             tilesPlaced++;
             break;
 
@@ -952,6 +974,14 @@ export class TileConstructionSystem implements System {
           case 'v':
           case 'X':
             worldTile.floor = materials.floor;
+            // Place roof on stair tiles too (interior)
+            if (materials.roof) {
+              worldTile.roof = {
+                material: materials.roof,
+                condition: 100,
+                constructedAt: world.tick,
+              };
+            }
             tilesPlaced++;
             break;
 
