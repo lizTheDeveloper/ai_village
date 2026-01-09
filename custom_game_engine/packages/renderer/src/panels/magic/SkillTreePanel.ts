@@ -270,9 +270,11 @@ export class SkillTreePanel implements IWindowPanel {
    * Handle zoom.
    */
   handleZoom(factor: number): void {
+    const minZoom = this.uiState.viewport.minZoom ?? 0.5;
+    const maxZoom = this.uiState.viewport.maxZoom ?? 3.0;
     this.uiState.viewport.zoom = Math.max(
-      this.uiState.viewport.minZoom,
-      Math.min(this.uiState.viewport.maxZoom, this.uiState.viewport.zoom * factor)
+      minZoom,
+      Math.min(maxZoom, this.uiState.viewport.zoom * factor)
     );
   }
 
@@ -287,9 +289,11 @@ export class SkillTreePanel implements IWindowPanel {
    * Set zoom level.
    */
   setZoom(level: number): void {
+    const minZoom = this.uiState.viewport.minZoom ?? 0.5;
+    const maxZoom = this.uiState.viewport.maxZoom ?? 3.0;
     this.uiState.viewport.zoom = Math.max(
-      this.uiState.viewport.minZoom,
-      Math.min(this.uiState.viewport.maxZoom, level)
+      minZoom,
+      Math.min(maxZoom, level)
     );
   }
 

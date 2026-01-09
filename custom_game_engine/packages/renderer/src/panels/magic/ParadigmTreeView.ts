@@ -38,21 +38,26 @@ export class ParadigmTreeView {
   private viewport: Viewport;
   private hoveredNodeId: string | null = null;
 
-  constructor(tree: MagicSkillTree | null) {
-    if (!tree) {
-      throw new Error('Tree is required');
-    }
-
-    // Check for duplicate node IDs
-    const nodeIds = new Set<string>();
-    for (const node of tree.nodes) {
-      if (nodeIds.has(node.id)) {
-        throw new Error('Duplicate node ID');
+  constructor(tree?: MagicSkillTree | null) {
+    if (tree !== undefined && tree !== null) {
+      // Stateful mode with instance tree
+      // Check for duplicate node IDs
+      const nodeIds = new Set<string>();
+      for (const node of tree.nodes) {
+        if (nodeIds.has(node.id)) {
+          throw new Error('Duplicate node ID');
+        }
+        nodeIds.add(node.id);
       }
-      nodeIds.add(node.id);
+      this.tree = tree;
+    } else if (tree === null) {
+      // Explicitly null - throw error
+      throw new Error('Tree is required');
+    } else {
+      // Stateless mode - tree will be passed to render()
+      this.tree = null as any;
     }
 
-    this.tree = tree;
     this.layoutEngine = new TreeLayoutEngine();
     this.nodeRenderer = new SkillNodeRenderer();
     this.tooltip = new NodeTooltip();
@@ -62,37 +67,66 @@ export class ParadigmTreeView {
   /**
    * Render the complete tree view.
    *
-   * @param ctx Canvas rendering context
-   * @param x X position of content area
-   * @param y Y position of content area
-   * @param width Width of content area
-   * @param height Height of content area
-   * @param evaluationContext Context for evaluating conditions
-   * @param progress Agent's progress in this tree (optional, for backward compatibility)
-   * @param options Rendering options (optional)
-   * @param timestamp Animation timestamp
+   * Supports two call signatures:
+   * 1. Stateless: render(ctx, tree, progress, evaluationContext, x, y, width, height, options?, timestamp?)
+   * 2. Stateful: render(ctx, x, y, width, height, evaluationContext, progress?, options?, timestamp?)
    */
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    evaluationContext: EvaluationContext,
-    progress?: MagicSkillProgress,
-    options?: ParadigmTreeViewOptions,
-    timestamp: number = 0
+    arg2: MagicSkillTree | number,
+    arg3: MagicSkillProgress | number,
+    arg4: EvaluationContext | number,
+    arg5?: number,
+    arg6?: number | EvaluationContext,
+    arg7?: number | MagicSkillProgress,
+    arg8?: number | ParadigmTreeViewOptions,
+    arg9?: ParadigmTreeViewOptions | number,
+    arg10?: number
   ): void {
+    let tree: MagicSkillTree;
+    let progress: MagicSkillProgress | undefined;
+    let evaluationContext: EvaluationContext;
+    let x: number;
+    let y: number;
+    let width: number;
+    let height: number;
+    let options: ParadigmTreeViewOptions | undefined;
+    let timestamp: number;
+
+    // Detect which signature is being used
+    if (typeof arg2 === 'object' && 'nodes' in arg2) {
+      // Stateless mode: render(ctx, tree, progress, evaluationContext, x, y, width, height, options?, timestamp?)
+      tree = arg2;
+      progress = arg3 as MagicSkillProgress;
+      evaluationContext = arg4 as EvaluationContext;
+      x = arg5!;
+      y = arg6 as number;
+      width = arg7 as number;
+      height = arg8 as number;
+      options = arg9 as ParadigmTreeViewOptions | undefined;
+      timestamp = (arg10 as number) || 0;
+    } else {
+      // Stateful mode: render(ctx, x, y, width, height, evaluationContext, progress?, options?, timestamp?)
+      if (!this.tree) {
+        throw new Error('Tree must be set when using stateful API');
+      }
+      if (!this.evaluationResults) {
+        throw new Error('Evaluation results not set');
+      }
+      tree = this.tree;
+      x = arg2 as number;
+      y = arg3 as number;
+      width = arg4 as number;
+      height = arg5!;
+      evaluationContext = arg6 as EvaluationContext;
+      progress = arg7 as MagicSkillProgress | undefined;
+      options = arg8 as ParadigmTreeViewOptions | undefined;
+      timestamp = (arg9 as number) || 0;
+    }
+
     if (!ctx || !evaluationContext) {
       throw new Error('ParadigmTreeView.render requires ctx, tree, progress, and evaluationContext');
     }
-
-    if (!this.evaluationResults) {
-      throw new Error('Evaluation results not set');
-    }
-
-    // Use instance tree
-    const tree = this.tree;
 
     // Use instance viewport if options not provided
     const viewport = options?.viewport || this.viewport;
@@ -103,8 +137,15 @@ export class ParadigmTreeView {
     // Get or calculate layout
     const layout = this.getLayout(tree);
 
-    // Use pre-computed evaluation results
-    const evaluations = this.evaluationResults;
+    // Get evaluation results
+    let evaluations: Map<string, any>;
+    if (this.evaluationResults) {
+      // Use pre-computed results (stateful mode)
+      evaluations = this.evaluationResults;
+    } else {
+      // Compute on-the-fly (stateless mode)
+      evaluations = evaluateTree(tree, evaluationContext);
+    }
 
     // Clear background
     ctx.fillStyle = '#1a1a1a';
