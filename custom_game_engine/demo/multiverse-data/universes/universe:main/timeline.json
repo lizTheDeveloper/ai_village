@@ -513,7 +513,25 @@
       "fileSize": 1972479,
       "checksum": "6e01dde0",
       "filename": "1717.json.gz"
+    },
+    {
+      "tick": 6985,
+      "timestamp": 1768248949365,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2215699,
+      "checksum": "-25fe42d5",
+      "filename": "6985.json.gz"
+    },
+    {
+      "tick": 1319,
+      "timestamp": 1768255245939,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 2466341,
+      "checksum": "65ffe629",
+      "filename": "1319.json.gz"
     }
   ],
-  "lastUpdated": 1768210253673
+  "lastUpdated": 1768255245943
 }

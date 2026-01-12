@@ -493,6 +493,10 @@ export class ExecutorPromptBuilder {
     actions.push('set_medium_term_goal - Set a medium-term goal (next few days)');
     actions.push('sleep_until_queue_complete - Pause executor until all queued tasks finish');
 
+    // TASK CANCELLATION (always available for coordination)
+    actions.push('cancel_current_task - Stop current task and clear entire task queue (useful if someone else is doing it)');
+    actions.push('cancel_planned_build - Cancel a planned building by type (e.g., {"type": "cancel_planned_build", "building": "campfire"})');
+
     // BUILDING (plan_build is beginner-friendly, build requires skill)
     actions.push('plan_build - Plan and queue a building project (auto-gathers resources)');
     if (buildingSkill >= 1) {

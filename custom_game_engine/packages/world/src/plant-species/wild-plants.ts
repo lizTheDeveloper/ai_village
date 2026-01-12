@@ -543,4 +543,1451 @@ export const TREE: PlantSpecies = {
   },
 };
 
-export const WILD_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH, TREE];
+export const CLOVER: PlantSpecies = {
+  id: 'clover',
+  name: 'Clover',
+  category: 'herb',
+  biomes: ['plains', 'grassland'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.3,
+      conditions: { minHydration: 25, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 0.5,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 1.5,
+      conditions: { minHydration: 25 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '4-8' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.25,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.4,
+    yieldAmount: 0.7,
+    diseaseResistance: 70,
+    droughtTolerance: 65,
+    coldTolerance: 55,
+    flavorProfile: 40,
+    mutations: []
+  },
+
+  seedsPerPlant: 30,
+  seedDispersalRadius: 2,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [8, 25],
+  optimalMoistureRange: [35, 75],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 15,
+    environmental: {
+      soilEffects: {
+        nitrogenFixer: true,
+        fertilityOnDecay: 8
+      },
+      companionEffects: {
+        benefitsNearby: ['grass', 'wildflower', 'wheat']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'clover-seed',
+    sprout: 'clover-sprout',
+    vegetative: 'clover-vegetative',
+    flowering: 'clover-flowering',
+    fruiting: 'clover-fruiting',
+    mature: 'clover-mature',
+    seeding: 'clover-seeding',
+    withered: 'clover-withered'
+  }
+};
+
+export const SAGE: PlantSpecies = {
+  id: 'sage',
+  name: 'Sage',
+  category: 'herb',
+  biomes: ['plains', 'grassland'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.75,
+      conditions: { minHydration: 20, minTemperature: 12 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 20 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '5-10' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 3 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHealth: 60 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 2,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.8,
+    yieldAmount: 1.0,
+    diseaseResistance: 75,
+    droughtTolerance: 85,
+    coldTolerance: 50,
+    flavorProfile: 70,
+    mutations: []
+  },
+
+  seedsPerPlant: 20,
+  seedDispersalRadius: 3,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [15, 30],
+  optimalMoistureRange: [20, 60],
+  preferredSeasons: ['spring', 'summer'],
+
+  properties: {
+    medicinal: {
+      treats: ['inflammation', 'nausea'],
+      effectiveness: 0.5,
+      preparation: ['powder', 'tea'],
+      dosage: 'small',
+      toxicIfOverused: false
+    },
+    crafting: {
+      scent: {
+        profile: 'herbal, earthy, slightly peppery',
+        intensity: 0.8,
+        persistence: 8
+      }
+    },
+    environmental: {
+      companionEffects: {
+        repels: ['pest', 'moth']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'sage-seed',
+    sprout: 'sage-sprout',
+    vegetative: 'sage-vegetative',
+    flowering: 'sage-flowering',
+    fruiting: 'sage-fruiting',
+    mature: 'sage-mature',
+    seeding: 'sage-seeding',
+    withered: 'sage-withered'
+  }
+};
+
+export const YARROW: PlantSpecies = {
+  id: 'yarrow',
+  name: 'Yarrow',
+  category: 'herb',
+  biomes: ['plains', 'grassland'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.5,
+      conditions: { minHydration: 20, minTemperature: 10 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 20 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '10-20' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.75,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.0,
+    yieldAmount: 1.1,
+    diseaseResistance: 80,
+    droughtTolerance: 75,
+    coldTolerance: 65,
+    flavorProfile: 45,
+    mutations: []
+  },
+
+  seedsPerPlant: 40,
+  seedDispersalRadius: 2,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [12, 28],
+  optimalMoistureRange: [25, 70],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    medicinal: {
+      treats: ['wound', 'fever'],
+      effectiveness: 0.7,
+      preparation: ['poultice', 'tea'],
+      dosage: 'medium',
+      toxicIfOverused: false,
+      synergiesWith: ['sage']
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bee', 'butterfly', 'ladybug'],
+        benefitsNearby: ['tomato', 'berry-bush']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'yarrow-seed',
+    sprout: 'yarrow-sprout',
+    vegetative: 'yarrow-vegetative',
+    flowering: 'yarrow-flowering',
+    fruiting: 'yarrow-fruiting',
+    mature: 'yarrow-mature',
+    seeding: 'yarrow-seeding',
+    withered: 'yarrow-withered'
+  }
+};
+
+export const THISTLE: PlantSpecies = {
+  id: 'thistle',
+  name: 'Thistle',
+  category: 'herb',
+  biomes: ['plains', 'grassland'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.4,
+      conditions: { minHydration: 15, minTemperature: 5 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 0.75,
+      conditions: { minHydration: 10 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHydration: 10 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 15 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '3-7' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 0.75,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 4 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.75,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.3,
+    yieldAmount: 0.6,
+    diseaseResistance: 85,
+    droughtTolerance: 80,
+    coldTolerance: 70,
+    flavorProfile: 35,
+    mutations: []
+  },
+
+  seedsPerPlant: 60,
+  seedDispersalRadius: 4,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [5, 28],
+  optimalMoistureRange: [15, 65],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    medicinal: {
+      treats: ['illness'],
+      effectiveness: 0.4,
+      preparation: ['tincture'],
+      dosage: 'small',
+      toxicIfOverused: false
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bee', 'goldfinch'],
+        harmsNearby: ['grass', 'wildflower']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'thistle-seed',
+    sprout: 'thistle-sprout',
+    vegetative: 'thistle-vegetative',
+    flowering: 'thistle-flowering',
+    fruiting: 'thistle-fruiting',
+    mature: 'thistle-mature',
+    seeding: 'thistle-seeding',
+    withered: 'thistle-withered'
+  }
+};
+
+export const WILD_ONION: PlantSpecies = {
+  id: 'wild-onion',
+  name: 'Wild Onion',
+  category: 'herb',
+  biomes: ['plains', 'grassland'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.5,
+      conditions: { minHydration: 25, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHydration: 20, minNutrition: 20 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 25 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '4-8' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.25,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.0,
+    yieldAmount: 0.9,
+    diseaseResistance: 65,
+    droughtTolerance: 55,
+    coldTolerance: 60,
+    flavorProfile: 75,
+    mutations: []
+  },
+
+  seedsPerPlant: 15,
+  seedDispersalRadius: 2,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [10, 25],
+  optimalMoistureRange: [30, 70],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 20,
+    taste: {
+      sweet: 0.1,
+      bitter: 0.2,
+      sour: 0.0,
+      savory: 0.6,
+      spicy: 0.4,
+      aromatic: 0.7
+    },
+    medicinal: {
+      treats: ['cold'],
+      effectiveness: 0.3,
+      preparation: ['raw'],
+      dosage: 'medium',
+      toxicIfOverused: false
+    },
+    environmental: {
+      companionEffects: {
+        repels: ['pest', 'aphid'],
+        benefitsNearby: ['tomato', 'carrot']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'wild-onion-seed',
+    sprout: 'wild-onion-sprout',
+    vegetative: 'wild-onion-vegetative',
+    flowering: 'wild-onion-flowering',
+    fruiting: 'wild-onion-fruiting',
+    mature: 'wild-onion-mature',
+    seeding: 'wild-onion-seeding',
+    withered: 'wild-onion-withered'
+  }
+};
+
+export const FERN: PlantSpecies = {
+  id: 'fern',
+  name: 'Fern',
+  category: 'herb',
+  biomes: ['forest'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 1,
+      conditions: { minHydration: 35, minTemperature: 10 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1.5,
+      conditions: { minHydration: 30 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHydration: 30 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 3,
+      conditions: { minHydration: 30 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 30,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 15,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.9,
+    yieldAmount: 0.6,
+    diseaseResistance: 70,
+    droughtTolerance: 25,
+    coldTolerance: 55,
+    flavorProfile: 15,
+    mutations: []
+  },
+
+  seedsPerPlant: 100,
+  seedDispersalRadius: 2,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [12, 24],
+  optimalMoistureRange: [50, 90],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    environmental: {
+      aura: {
+        radius: 1,
+        effect: 'humidity',
+        magnitude: 0.3
+      },
+      companionEffects: {
+        benefitsNearby: ['moss', 'mushroom']
+      },
+      soilEffects: {
+        fertilityOnDecay: 6
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'fern-seed',
+    sprout: 'fern-sprout',
+    vegetative: 'fern-vegetative',
+    flowering: 'fern-vegetative',
+    fruiting: 'fern-vegetative',
+    mature: 'fern-mature',
+    seeding: 'fern-mature',
+    withered: 'fern-withered'
+  }
+};
+
+export const MUSHROOM: PlantSpecies = {
+  id: 'mushroom',
+  name: 'Mushroom',
+  category: 'fungus',
+  biomes: ['forest'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.5,
+      conditions: { minHydration: 40, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 2,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 3 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.25,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.6,
+    yieldAmount: 1.2,
+    diseaseResistance: 45,
+    droughtTolerance: 20,
+    coldTolerance: 60,
+    flavorProfile: 65,
+    mutations: []
+  },
+
+  seedsPerPlant: 200,
+  seedDispersalRadius: 3,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [10, 22],
+  optimalMoistureRange: [60, 95],
+  preferredSeasons: ['spring', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 18,
+    taste: {
+      sweet: 0.1,
+      bitter: 0.2,
+      sour: 0.0,
+      savory: 0.8,
+      spicy: 0.0,
+      aromatic: 0.6
+    },
+    environmental: {
+      companionEffects: {
+        benefitsNearby: ['tree', 'fern']
+      },
+      soilEffects: {
+        fertilityOnDecay: 10
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'mushroom-spore',
+    sprout: 'mushroom-sprout',
+    vegetative: 'mushroom-vegetative',
+    flowering: 'mushroom-vegetative',
+    fruiting: 'mushroom-vegetative',
+    mature: 'mushroom-mature',
+    seeding: 'mushroom-mature',
+    withered: 'mushroom-withered'
+  }
+};
+
+export const MOSS: PlantSpecies = {
+  id: 'moss',
+  name: 'Moss',
+  category: 'moss',
+  biomes: ['forest'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.25,
+      conditions: { minHydration: 40 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 0.5,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 2,
+      conditions: { minHydration: 35 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 15,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 1 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHealth: 40 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 10,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.25,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.6,
+    yieldAmount: 0.4,
+    diseaseResistance: 80,
+    droughtTolerance: 15,
+    coldTolerance: 75,
+    flavorProfile: 10,
+    mutations: []
+  },
+
+  seedsPerPlant: 500,
+  seedDispersalRadius: 1,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [5, 25],
+  optimalMoistureRange: [60, 100],
+  preferredSeasons: ['spring', 'summer', 'fall', 'winter'],
+
+  properties: {
+    environmental: {
+      aura: {
+        radius: 1,
+        effect: 'humidity',
+        magnitude: 0.4
+      },
+      companionEffects: {
+        benefitsNearby: ['fern', 'mushroom']
+      },
+      soilEffects: {
+        fertilityOnDecay: 4
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'moss-spore',
+    sprout: 'moss-sprout',
+    vegetative: 'moss-vegetative',
+    flowering: 'moss-vegetative',
+    fruiting: 'moss-vegetative',
+    mature: 'moss-mature',
+    seeding: 'moss-mature',
+    withered: 'moss-withered'
+  }
+};
+
+export const WILD_GARLIC: PlantSpecies = {
+  id: 'wild-garlic',
+  name: 'Wild Garlic',
+  category: 'herb',
+  biomes: ['forest'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.75,
+      conditions: { minHydration: 30, minTemperature: 5 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 25 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHydration: 25 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 30 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '5-10' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.25,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 1.1,
+    yieldAmount: 0.8,
+    diseaseResistance: 70,
+    droughtTolerance: 40,
+    coldTolerance: 70,
+    flavorProfile: 80,
+    mutations: []
+  },
+
+  seedsPerPlant: 20,
+  seedDispersalRadius: 2,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [8, 20],
+  optimalMoistureRange: [40, 80],
+  preferredSeasons: ['spring', 'summer'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 22,
+    taste: {
+      sweet: 0.0,
+      bitter: 0.2,
+      sour: 0.0,
+      savory: 0.7,
+      spicy: 0.5,
+      aromatic: 0.9
+    },
+    medicinal: {
+      treats: ['cold', 'infection'],
+      effectiveness: 0.4,
+      preparation: ['raw'],
+      dosage: 'medium',
+      toxicIfOverused: false
+    },
+    environmental: {
+      companionEffects: {
+        repels: ['pest', 'aphid', 'deer'],
+        benefitsNearby: ['berry-bush', 'tree']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'wild-garlic-seed',
+    sprout: 'wild-garlic-sprout',
+    vegetative: 'wild-garlic-vegetative',
+    flowering: 'wild-garlic-flowering',
+    fruiting: 'wild-garlic-fruiting',
+    mature: 'wild-garlic-mature',
+    seeding: 'wild-garlic-seeding',
+    withered: 'wild-garlic-withered'
+  }
+};
+
+export const OAK_TREE: PlantSpecies = {
+  id: 'oak-tree',
+  name: 'Oak Tree',
+  category: 'tree',
+  biomes: ['forest'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 3,
+      conditions: { minHydration: 25, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 7,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 15,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 50,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 365,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 6 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'mature',
+      baseDuration: 50,
+      conditions: { minHealth: 40 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 500,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 50,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 30,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.2,
+    yieldAmount: 2.5,
+    diseaseResistance: 85,
+    droughtTolerance: 65,
+    coldTolerance: 75,
+    flavorProfile: 15,
+    mutations: []
+  },
+
+  seedsPerPlant: 150,
+  seedDispersalRadius: 6,
+  requiresDormancy: true,
+
+  optimalTemperatureRange: [8, 28],
+  optimalMoistureRange: [30, 75],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    crafting: {
+      structural: {
+        hardness: 0.9,
+        flexibility: 0.1,
+        waterResistance: 0.7,
+        weight: 1.2
+      }
+    },
+    environmental: {
+      aura: {
+        radius: 4,
+        effect: 'shade',
+        magnitude: 0.8
+      },
+      companionEffects: {
+        benefitsNearby: ['mushroom', 'fern', 'moss'],
+        attracts: ['bird', 'squirrel', 'deer']
+      },
+      soilEffects: {
+        acidifying: true,
+        fertilityOnDecay: 20
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'oak-tree-seed',
+    sprout: 'oak-tree-sprout',
+    vegetative: 'oak-tree-vegetative',
+    flowering: 'oak-tree-flowering',
+    fruiting: 'oak-tree-fruiting',
+    mature: 'oak-tree',
+    seeding: 'oak-tree',
+    withered: 'oak-tree-withered'
+  },
+
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting',
+
+  heightRange: {
+    min: 6,
+    max: 15,
+  },
+};
+
+export const PINE_TREE: PlantSpecies = {
+  id: 'pine-tree',
+  name: 'Pine Tree',
+  category: 'tree',
+  biomes: ['forest'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 2.5,
+      conditions: { minHydration: 20, minTemperature: 5 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 6,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 12,
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 40,
+      conditions: { minHydration: 12 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 365,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 5 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'mature',
+      baseDuration: 40,
+      conditions: { minHealth: 35 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 600,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 40,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 30,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.4,
+    yieldAmount: 2.2,
+    diseaseResistance: 80,
+    droughtTolerance: 70,
+    coldTolerance: 85,
+    flavorProfile: 10,
+    mutations: []
+  },
+
+  seedsPerPlant: 120,
+  seedDispersalRadius: 5,
+  requiresDormancy: true,
+
+  optimalTemperatureRange: [2, 25],
+  optimalMoistureRange: [25, 70],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    crafting: {
+      structural: {
+        hardness: 0.6,
+        flexibility: 0.4,
+        waterResistance: 0.8,
+        weight: 0.8
+      },
+      scent: {
+        profile: 'fresh pine, resinous',
+        intensity: 0.7,
+        persistence: 6
+      }
+    },
+    environmental: {
+      aura: {
+        radius: 4,
+        effect: 'shade',
+        magnitude: 0.7
+      },
+      companionEffects: {
+        benefitsNearby: ['mushroom', 'moss'],
+        attracts: ['bird', 'squirrel']
+      },
+      soilEffects: {
+        acidifying: true,
+        fertilityOnDecay: 18
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'pine-tree-seed',
+    sprout: 'pine-tree-sprout',
+    vegetative: 'pine-tree-vegetative',
+    flowering: 'pine-tree-vegetative',
+    fruiting: 'pine-tree-vegetative',
+    mature: 'pine-tree',
+    seeding: 'pine-tree',
+    withered: 'pine-tree-withered'
+  },
+
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting',
+
+  heightRange: {
+    min: 8,
+    max: 18,
+  },
+};
+
+export const WILD_PLANTS = [
+  GRASS, WILDFLOWER, BERRY_BUSH, TREE,
+  CLOVER, SAGE, YARROW, THISTLE, WILD_ONION,
+  FERN, MUSHROOM, MOSS, WILD_GARLIC, OAK_TREE, PINE_TREE
+];

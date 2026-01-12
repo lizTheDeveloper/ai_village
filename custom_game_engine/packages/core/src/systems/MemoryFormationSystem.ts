@@ -145,6 +145,11 @@ export class MemoryFormationSystem implements System {
       'action:walk',
       'agent:emotion_peak',
       'test:event',
+      // Divine power events
+      'divine_power:whisper',
+      'divine_power:subtle_sign',
+      'divine_power:dream_hint',
+      'divine_power:clear_vision',
     ];
 
     for (const eventType of customEventTypes) {
@@ -292,6 +297,28 @@ export class MemoryFormationSystem implements System {
         this.pendingMemories.get(toId)!.push({
           eventType,
           data: { ...data, agentId: toId },
+        });
+        return;
+      }
+
+      // Handle divine power events - has 'targetId' instead of agentId
+      if (eventType.startsWith('divine_power:')) {
+        const targetId = (data as any).targetId;
+
+        if (!targetId) {
+          throw new Error(
+            `Invalid ${eventType} event - missing targetId field. ` +
+            `Event data: ${JSON.stringify(data)}`
+          );
+        }
+
+        // Create memory for the target (the one who received the divine power)
+        if (!this.pendingMemories.has(targetId)) {
+          this.pendingMemories.set(targetId, []);
+        }
+        this.pendingMemories.get(targetId)!.push({
+          eventType,
+          data: { ...data, agentId: targetId },
         });
         return;
       }
@@ -512,6 +539,11 @@ export class MemoryFormationSystem implements System {
       'information:shared',
       'agent:sleep_start',
       'test:event',
+      // Divine power events - always memorable
+      'divine_power:whisper',
+      'divine_power:subtle_sign',
+      'divine_power:dream_hint',
+      'divine_power:clear_vision',
     ];
 
     if (alwaysRememberEvents.includes(eventType)) {
@@ -751,6 +783,22 @@ export class MemoryFormationSystem implements System {
 
       case 'test:event':
         return ('summary' in data && data.summary) ? data.summary : 'Test event';
+
+      // Divine power events
+      case 'divine_power:whisper':
+        return `I felt a divine whisper: "${'message' in data && data.message ? data.message : 'You feel a presence watching over you.'}"`;
+
+      case 'divine_power:subtle_sign':
+        if ('signName' in data && 'signDescription' in data) {
+          return `I witnessed a divine sign: ${data.signName} - ${data.signDescription}`;
+        }
+        return 'I witnessed a subtle divine sign';
+
+      case 'divine_power:dream_hint':
+        return `I dreamed of divine imagery: "${'content' in data && data.content ? data.content : 'strange symbols and vague shapes'}"`;
+
+      case 'divine_power:clear_vision':
+        return `I received a clear vision from the divine: "${'visionContent' in data && data.visionContent ? data.visionContent : 'a vivid vision'}"`;
 
       default:
         return ('summary' in data && data.summary) ? data.summary : `Experienced ${eventType}`;

@@ -3906,12 +3906,15 @@ async function main() {
 
   // Wire up agent roster panel camera focusing
   panels.agentRosterPanel.setOnAgentClick((agentId: string) => {
+    // Properly select the agent (shows info panel, memory, relationships, etc.)
+    handleEntitySelectionById(agentId, gameLoop);
+
+    // Focus camera on the agent
     const entity = gameLoop.world.getEntity(agentId);
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos && renderer.camera) {
         renderer.camera.setPosition(pos.x, pos.y);
-        panels.agentRosterPanel.touchAgent(agentId);
       }
     }
   });
@@ -3923,13 +3926,15 @@ async function main() {
 
   // Wire up animal roster panel camera focusing
   panels.animalRosterPanel.setOnAnimalClick((animalId: string) => {
+    // Properly select the animal (shows info panel and hides other panels)
+    handleEntitySelectionById(animalId, gameLoop);
+
+    // Focus camera on the animal
     const entity = gameLoop.world.getEntity(animalId);
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos && renderer.camera) {
         renderer.camera.setPosition(pos.x, pos.y);
-        panels.animalRosterPanel.touchAnimal(animalId);
-        panels.animalInfoPanel.setSelectedEntity(entity);
       }
     }
   });

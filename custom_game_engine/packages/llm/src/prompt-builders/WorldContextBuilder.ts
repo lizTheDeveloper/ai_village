@@ -661,6 +661,7 @@ export class WorldContextBuilder {
 
   /**
    * Get information about nearby agents from vision.
+   * Shows detailed task information including what they're working on.
    */
   getSeenAgentsInfo(world: World, seenAgentIds: string[] | undefined): string | null {
     if (!world || !seenAgentIds || seenAgentIds.length === 0) {
@@ -674,30 +675,27 @@ export class WorldContextBuilder {
       if (!agent) continue;
 
       const identity = agent.components.get('identity') as IdentityComponent | undefined;
-      const agentComp = agent.components.get('agent') as (Component & { behavior?: string; recentSpeech?: string }) | undefined;
+      const agentComp = agent.components.get('agent') as (Component & {
+        behavior?: string;
+        behaviorState?: Record<string, unknown>;
+        behaviorQueue?: Array<{ behavior: string; behaviorState?: Record<string, unknown>; label?: string }>;
+        currentQueueIndex?: number;
+        plannedBuilds?: Array<{ buildingType: string; priority: string }>;
+        recentSpeech?: string;
+      }) | undefined;
 
       if (!identity) continue;
 
       const name = identity.name;
       let description = name;
 
-      if (agentComp?.behavior) {
-        const behavior = agentComp.behavior;
-        let action = '';
-        if (behavior === 'wander') action = 'wandering around';
-        else if (behavior === 'idle') action = 'resting';
-        else if (behavior === 'gather') action = 'gathering resources';
-        else if (behavior === 'seek_food') action = 'looking for food';
-        else if (behavior === 'talk') action = 'talking';
-        else if (behavior === 'follow_agent') action = 'following someone';
-        else if (behavior === 'build') action = 'building something';
-        else if (behavior === 'deposit_items') action = 'storing items';
-        else if (behavior === 'seek_sleep' || behavior === 'forced_sleep') action = 'sleeping';
-        else action = behavior.replace(/_/g, ' ');
-
-        description += ` (${action})`;
+      // Get detailed activity description
+      const activity = this.getAgentActivityDescription(agentComp);
+      if (activity) {
+        description += ` (${activity})`;
       }
 
+      // Add recent speech
       if (agentComp?.recentSpeech) {
         description += ` - said: "${agentComp.recentSpeech}"`;
       }
@@ -710,6 +708,117 @@ export class WorldContextBuilder {
     }
 
     return `- You see nearby: ${agentDescriptions.join(', ')}\n`;
+  }
+
+  /**
+   * Get detailed activity description for an agent.
+   * Shows current task, planned builds, and queue status.
+   */
+  private getAgentActivityDescription(agentComp: {
+    behavior?: string;
+    behaviorState?: Record<string, unknown>;
+    behaviorQueue?: Array<{ behavior: string; behaviorState?: Record<string, unknown>; label?: string }>;
+    currentQueueIndex?: number;
+    plannedBuilds?: Array<{ buildingType: string; priority: string }>;
+  } | undefined): string {
+    if (!agentComp?.behavior) {
+      return '';
+    }
+
+    const behavior = agentComp.behavior;
+    const state = agentComp.behaviorState || {};
+
+    // Check if there's a current queued task with a label
+    let taskLabel: string | undefined;
+    if (agentComp.behaviorQueue && agentComp.behaviorQueue.length > 0) {
+      const currentIndex = agentComp.currentQueueIndex ?? 0;
+      const currentTask = agentComp.behaviorQueue[currentIndex];
+      if (currentTask?.label) {
+        taskLabel = currentTask.label;
+      }
+    }
+
+    // If we have a task label from the queue, use it
+    if (taskLabel) {
+      return taskLabel;
+    }
+
+    // Otherwise, build description from behavior and state
+    let action = '';
+
+    if (behavior === 'wander') {
+      action = 'wandering around';
+    } else if (behavior === 'idle') {
+      action = 'resting';
+    } else if (behavior === 'gather' || behavior === 'pick') {
+      const resourceType = state.resourceType as string | undefined;
+      const targetAmount = state.targetAmount as number | undefined;
+      const forBuild = state.forBuild as string | undefined;
+      if (targetAmount && resourceType) {
+        action = `Gathering ${targetAmount} ${resourceType}`;
+      } else if (resourceType) {
+        action = `Gathering ${resourceType}`;
+      } else {
+        action = 'gathering resources';
+      }
+      if (forBuild) {
+        action += ` (for ${forBuild})`;
+      }
+    } else if (behavior === 'seek_food') {
+      action = 'looking for food';
+    } else if (behavior === 'talk') {
+      action = 'talking';
+    } else if (behavior === 'follow_agent') {
+      action = 'following someone';
+    } else if (behavior === 'build') {
+      const buildingType = state.buildingType as string | undefined;
+      if (buildingType) {
+        action = `Building ${buildingType}`;
+      } else {
+        action = 'building something';
+      }
+    } else if (behavior === 'plant') {
+      const seedType = state.seedType as string | undefined;
+      if (seedType) {
+        action = `Planting ${seedType}`;
+      } else {
+        action = 'planting seeds';
+      }
+    } else if (behavior === 'till') {
+      action = 'tilling soil';
+    } else if (behavior === 'water') {
+      action = 'watering plants';
+    } else if (behavior === 'deposit_items') {
+      action = 'storing items';
+    } else if (behavior === 'craft') {
+      const recipeId = state.recipeId as string | undefined;
+      if (recipeId) {
+        action = `Crafting ${recipeId}`;
+      } else {
+        action = 'crafting items';
+      }
+    } else if (behavior === 'seek_sleep' || behavior === 'forced_sleep') {
+      action = 'sleeping';
+    } else if (behavior === 'navigate') {
+      const reason = state.reason as string | undefined;
+      if (reason) {
+        action = reason;
+      } else {
+        action = 'traveling';
+      }
+    } else {
+      action = behavior.replace(/_/g, ' ');
+    }
+
+    // Add planned builds if any
+    if (agentComp.plannedBuilds && agentComp.plannedBuilds.length > 0) {
+      const builds = agentComp.plannedBuilds
+        .map(b => b.buildingType)
+        .join(', ');
+      action += ` | Plans to build: ${builds}`;
+    }
+
+    return action;
   }
 
   /**

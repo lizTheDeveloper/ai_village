@@ -12,6 +12,7 @@
 
 import type { World } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
+import { DivineParameterModal, type DivineParameterResult } from './DivineParameterModal.js';
 
 // ============================================================================
 // Types (would import from @ai-village/core in real implementation)
@@ -140,6 +141,9 @@ export class DivinePowersPanel implements IWindowPanel {
   // World reference for event emission and state reading
   private world?: World;
   private playerDeityId?: string;
+
+  // Parameter modal for divine powers
+  private parameterModal: DivineParameterModal = new DivineParameterModal();
 
   // Deity state (refreshed from World when available, fallback to mock data)
   private deityState: DeityState = {
@@ -826,8 +830,50 @@ export class DivinePowersPanel implements IWindowPanel {
       return;
     }
 
+    // Powers that require parameter input
+    const parametricPowers = ['whisper', 'dream_hint', 'clear_vision', 'subtle_sign'];
+
+    if (parametricPowers.includes(powerId)) {
+      // Show parameter modal
+      this.parameterModal.show({
+        powerType: powerId,
+        powerName: power.name,
+        deityId: this.playerDeityId,
+        availableTargets: this.deityState.believerList,
+        onConfirm: (params: DivineParameterResult) => {
+          this.executePowerWithParameters(powerId, power, params);
+        },
+        onCancel: () => {
+          // User cancelled, do nothing
+        },
+      });
+    } else {
+      // Powers without parameters can execute directly
+      this.executePowerWithParameters(powerId, power, {});
+    }
+  }
+
+  /**
+   * Execute a power with collected parameters
+   */
+  private executePowerWithParameters(
+    powerId: string,
+    power: DivinePower,
+    params: DivineParameterResult
+  ): void {
+    if (!this.world || !this.playerDeityId) return;
+
     // Set cooldown locally (will be enforced by backend too)
     this.cooldowns.set(powerId, Date.now() + power.cooldown * 50); // 50ms per tick
+
+    // Build params object
+    const eventParams: Record<string, any> = { ...params.params };
+    if (params.message) {
+      eventParams.message = params.message;
+    }
+    if (params.signType) {
+      eventParams.signType = params.signType;
+    }
 
     // Emit event to trigger the DivinePowerSystem backend
     this.world.eventBus.emit({
@@ -836,9 +882,8 @@ export class DivinePowersPanel implements IWindowPanel {
       data: {
         deityId: this.playerDeityId,
         powerType: powerId,
-        // targetId will need to be selected in a more complete UI
-        // For now, powers that need targets won't work without selection
-        params: {},
+        targetId: params.targetId,
+        params: eventParams,
       },
     });
   }

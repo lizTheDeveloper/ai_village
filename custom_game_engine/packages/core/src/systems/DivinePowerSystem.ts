@@ -233,6 +233,10 @@ export class DivinePowerSystem implements System {
         this._executeWhisper(world, deityComp, request, currentTick);
         break;
 
+      case 'subtle_sign':
+        this._executeSubtleSign(world, deityComp, request, currentTick);
+        break;
+
       case 'dream_hint':
         this._executeDreamHint(world, deityComp, request, currentTick);
         break;
@@ -337,18 +341,89 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'divine_power:whisper',
-        source: 'divine_power',
-        data: {
-          deityId: request.deityId,
-          targetId: request.targetId!,
-          message,
-          cost,
-        },
-      });
+    this.emitGeneric('divine_power:whisper', 'divine_power', {
+      deityId: request.deityId,
+      targetId: request.targetId!,
+      message,
+      cost,
+    });
+  }
+
+  /**
+   * Execute: Subtle Sign (8 belief) - Create a minor omen in the world
+   */
+  private _executeSubtleSign(
+    world: World,
+    deityComp: DeityComponent,
+    request: DivinePowerRequest,
+    currentTick: number
+  ): void {
+    const baseCost = 8;
+    const cost = this.getEffectiveCost(baseCost, 'subtle_sign', world);
+
+    if (!deityComp.spendBelief(cost)) {
+      throw new Error('Insufficient belief for subtle sign');
     }
+
+    if (!request.targetId) {
+      throw new Error('Subtle sign requires targetId');
+    }
+
+    const target = world.getEntity(request.targetId);
+    if (!target) {
+      throw new Error(`Target entity ${request.targetId} not found`);
+    }
+
+    const spiritual = target.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+    if (!spiritual) {
+      throw new Error(`Target ${request.targetId} has no spiritual component`);
+    }
+
+    // Get sign details from params
+    const signName = request.params?.signName ?? 'A subtle sign';
+    const signDescription = request.params?.signDescription ?? 'You notice a strange occurrence.';
+
+    // Create a vision with the sign
+    const vision: Vision = {
+      id: `vision_${Date.now()}_${Math.random()}`,
+      content: `${signName}: ${signDescription}`,
+      clarity: 0.4, // Subtle but noticeable
+      receivedAt: currentTick,
+      source: 'deity',
+    };
+
+    const updatedSpiritual = receiveVision(spiritual, vision);
+    (target as EntityImpl).addComponent(updatedSpiritual);
+
+    // Track sent vision
+    const agentComp = target.components.get(CT.Agent) as any;
+    const targetName = agentComp?.name ?? 'Unknown';
+    this._trackSentVision(
+      world,
+      request.deityId,
+      vision.id!,
+      request.targetId,
+      targetName,
+      vision.content,
+      'subtle_sign',
+      cost,
+      currentTick
+    );
+
+    // Answer prayer if this was in response to one
+    if (request.prayerId) {
+      this._answerPrayer(world, request.deityId, request.targetId, request.prayerId, 'sign');
+    }
+
+    // Emit event
+    this.emitGeneric('divine_power:subtle_sign', 'divine_power', {
+      deityId: request.deityId,
+      targetId: request.targetId!,
+      signType: request.params?.signType,
+      signName,
+      signDescription,
+      cost,
+    });
   }
 
   /**
@@ -416,18 +491,12 @@ export class DivinePowerSystem implements System {
       this._answerPrayer(world, request.deityId, request.targetId, request.prayerId, 'vision');
     }
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'divine_power:dream_hint',
-        source: 'divine_power',
-        data: {
-          deityId: request.deityId,
-          targetId: request.targetId!,
-          content: dreamContent,
-          cost,
-        },
-      });
-    }
+    this.emitGeneric('divine_power:dream_hint', 'divine_power', {
+      deityId: request.deityId,
+      targetId: request.targetId!,
+      content: dreamContent,
+      cost,
+    });
   }
 
   /**
@@ -496,18 +565,12 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'divine_power:clear_vision',
-        source: 'divine_power',
-        data: {
-          deityId: request.deityId,
-          targetId: request.targetId!,
-          visionContent,
-          cost,
-        },
-      });
-    }
+    this.emitGeneric('divine_power:clear_vision', 'divine_power', {
+      deityId: request.deityId,
+      targetId: request.targetId!,
+      visionContent,
+      cost,
+    });
   }
 
   /**
@@ -608,17 +671,11 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'divine_power:minor_miracle',
-        source: 'divine_power',
-        data: {
-          deityId: request.deityId,
-          miracleType,
-          cost: miracleResult.beliefSpent,
-        },
-      });
-    }
+    this.emitGeneric('divine_power:minor_miracle', 'divine_power', {
+      deityId: request.deityId,
+      miracleType,
+      cost: miracleResult.beliefSpent,
+    });
   }
 
   /**
@@ -686,18 +743,12 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'divine_power:bless_individual',
-        source: 'divine_power',
-        data: {
-          deityId: request.deityId,
-          targetId: request.targetId!,
-          blessingType: 'grace',
-          cost,
-        },
-      });
-    }
+    this.emitGeneric('divine_power:bless_individual', 'divine_power', {
+      deityId: request.deityId,
+      targetId: request.targetId!,
+      blessingType: 'grace',
+      cost,
+    });
   }
 
   // ========== Multiverse Crossing Powers ==========

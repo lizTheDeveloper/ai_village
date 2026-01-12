@@ -519,13 +519,23 @@ export class ExecutorLLMProcessor {
 
     // Handle plan_build action
     if (typeof action === 'object' && action !== null && !Array.isArray(action) && 'type' in action) {
-      const typedAction = action as { type: string };
+      const typedAction = action as { type: string; building?: string };
 
       if (typedAction.type === 'plan_build') {
         const buildResult = this.handlePlanBuild(entity, world, typedAction, speaking, thinking);
         if (buildResult) {
           return buildResult;
         }
+      }
+
+      // Handle cancel_current_task action
+      if (typedAction.type === 'cancel_current_task') {
+        return this.handleCancelCurrentTask(entity, world, speaking, thinking);
+      }
+
+      // Handle cancel_planned_build action
+      if (typedAction.type === 'cancel_planned_build') {
+        return this.handleCancelPlannedBuild(entity, world, typedAction.building, speaking, thinking);
       }
     }
 
@@ -698,6 +708,112 @@ export class ExecutorLLMProcessor {
         }
       }
     }
+
+    return {
+      changed: true,
+      speaking,
+      thinking,
+      source: 'executor',
+    };
+  }
+
+  /**
+   * Handle cancel_current_task action.
+   * Clears the current task and behavior queue, returning to idle.
+   */
+  private handleCancelCurrentTask(
+    entity: EntityImpl,
+    world: World,
+    speaking?: string,
+    thinking?: string
+  ): ExecutorDecisionResult {
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+      ...current,
+      behavior: 'idle',
+      behaviorState: {},
+      behaviorQueue: undefined,
+      currentQueueIndex: undefined,
+      queuePaused: undefined,
+      queueInterruptedBy: undefined,
+      recentSpeech: speaking,
+      lastThought: thinking,
+    }));
+
+    world.eventBus.emit({
+      type: 'llm:decision',
+      source: entity.id,
+      data: {
+        agentId: entity.id,
+        decision: 'cancel_current_task',
+        behavior: 'cancel_current_task',
+        reasoning: thinking,
+        source: 'executor',
+      },
+    });
+
+    return {
+      changed: true,
+      behavior: 'idle',
+      behaviorState: {},
+      speaking,
+      thinking,
+      source: 'executor',
+    };
+  }
+
+  /**
+   * Handle cancel_planned_build action.
+   * Removes a specific planned build by building type.
+   */
+  private handleCancelPlannedBuild(
+    entity: EntityImpl,
+    world: World,
+    buildingType: string | undefined,
+    speaking?: string,
+    thinking?: string
+  ): ExecutorDecisionResult {
+    if (!buildingType) {
+      // No building type specified - can't cancel
+      return { changed: false, source: 'executor' };
+    }
+
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    if (!agent?.plannedBuilds || agent.plannedBuilds.length === 0) {
+      // No planned builds to cancel
+      return { changed: false, source: 'executor' };
+    }
+
+    // Remove the planned build
+    const updatedBuilds = agent.plannedBuilds.filter(
+      (build) => build.buildingType !== buildingType
+    );
+
+    // Check if anything was actually removed
+    const wasRemoved = updatedBuilds.length < agent.plannedBuilds.length;
+
+    if (!wasRemoved) {
+      // Building type wasn't found in planned builds
+      return { changed: false, source: 'executor' };
+    }
+
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+      ...current,
+      plannedBuilds: updatedBuilds.length > 0 ? updatedBuilds : undefined,
+      recentSpeech: speaking,
+      lastThought: thinking,
+    }));
+
+    world.eventBus.emit({
+      type: 'llm:decision',
+      source: entity.id,
+      data: {
+        agentId: entity.id,
+        decision: 'cancel_planned_build',
+        behavior: 'cancel_planned_build',
+        reasoning: thinking,
+        source: 'executor',
+      },
+    });
 
     return {
       changed: true,

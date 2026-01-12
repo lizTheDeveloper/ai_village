@@ -158,20 +158,244 @@ export class TerrainGenerator {
         // Get placement value
         const placementValue = placementNoise.noise(worldX * 0.1, worldY * 0.1);
 
-        // Place trees in forests and grassy areas
-        if (tile.terrain === 'forest' && placementValue > -0.2) {
-          if (Math.random() > 0.2) {
-            // 80% chance for dense forests
-            // Random tree height: 1-4 tiles (taller in forests)
-            const treeHeight = 1 + Math.floor(Math.random() * 4);
-            createTree(world, worldX, worldY, treeHeight);
+        // === FOREST PLANT PLACEMENT (density-based) ===
+        if (tile.terrain === 'forest' || (tile.biome === 'forest' && tile.terrain === 'grass')) {
+          // Reconstruct forest density using same noise as generateTile
+          const regionalScale = 0.0005;
+          const detailScale = 0.005;
+
+          const densityNoise = this.elevationNoise.octaveNoise(
+            worldX * regionalScale * 0.8,
+            worldY * regionalScale * 0.8,
+            3,
+            0.6
+          );
+
+          const clearingNoise = this.moistureNoise.octaveNoise(
+            worldX * detailScale,
+            worldY * detailScale,
+            4,
+            0.5
+          );
+
+          let forestDensity: string;
+          if (clearingNoise < -0.4) {
+            forestDensity = 'clearing';
+          } else if (densityNoise > 0.3) {
+            forestDensity = 'dense';
+          } else if (densityNoise > 0.0) {
+            forestDensity = 'young';
+          } else if (densityNoise > -0.3) {
+            forestDensity = 'open';
+          } else {
+            forestDensity = 'edge';
           }
-        } else if (tile.terrain === 'grass' && placementValue > 0.1) {
-          if (Math.random() > 0.7) {
-            // 30% chance for scattered trees on grass
-            // Shorter trees on grass: 0-2 tiles
-            const treeHeight = Math.floor(Math.random() * 3);
-            createTree(world, worldX, worldY, treeHeight);
+
+          // Dense old-growth forest
+          if (forestDensity === 'dense' && placementValue > -0.3) {
+            // Trees - 80% chance
+            if (Math.random() > 0.2) {
+              const treeType = Math.random();
+              if (treeType < 0.6) {
+                // 60% oak trees (6-15 voxels)
+                const treeHeight = 6 + Math.floor(Math.random() * 10);
+                createTree(world, worldX, worldY, treeHeight);
+              } else if (treeType < 0.9) {
+                // 30% pine trees (8-18 voxels)
+                const treeHeight = 8 + Math.floor(Math.random() * 11);
+                createTree(world, worldX, worldY, treeHeight);
+              } else {
+                // 10% generic trees (4-12 voxels)
+                const treeHeight = 4 + Math.floor(Math.random() * 9);
+                createTree(world, worldX, worldY, treeHeight);
+              }
+            }
+            // Understory plants
+            else if (Math.random() < 0.5) {
+              // 50% chance for mushrooms
+              createLeafPile(world, worldX, worldY); // Placeholder - mushrooms not yet implemented
+            } else if (Math.random() < 0.4) {
+              // 40% chance for ferns
+              createLeafPile(world, worldX, worldY); // Placeholder - ferns not yet implemented
+            }
+            // Moss - 60% chance
+            if (Math.random() < 0.6) {
+              // Moss patch (not yet implemented, using leaf pile as placeholder)
+            }
+            // Leaf piles - 40% chance
+            if (Math.random() < 0.4) {
+              createLeafPile(world, worldX, worldY);
+            }
+          }
+          // Young forest
+          else if (forestDensity === 'young' && placementValue > -0.2) {
+            // Trees - 60% chance
+            if (Math.random() > 0.4) {
+              const treeType = Math.random();
+              if (treeType < 0.4) {
+                // 40% oak trees
+                const treeHeight = 6 + Math.floor(Math.random() * 10);
+                createTree(world, worldX, worldY, treeHeight);
+              } else if (treeType < 0.8) {
+                // 40% pine trees
+                const treeHeight = 8 + Math.floor(Math.random() * 11);
+                createTree(world, worldX, worldY, treeHeight);
+              } else {
+                // 20% generic trees
+                const treeHeight = 4 + Math.floor(Math.random() * 9);
+                createTree(world, worldX, worldY, treeHeight);
+              }
+            }
+            // Understory - 30% mushrooms, 30% ferns, 40% moss
+            else if (Math.random() < 0.3) {
+              createLeafPile(world, worldX, worldY); // Mushroom placeholder
+            }
+            // Leaf piles - 30% chance
+            if (Math.random() < 0.3) {
+              createLeafPile(world, worldX, worldY);
+            }
+          }
+          // Open woodland
+          else if (forestDensity === 'open' && placementValue > -0.1) {
+            // Trees - 30% chance
+            if (Math.random() > 0.7) {
+              const treeType = Math.random();
+              if (treeType < 0.3) {
+                // 30% oak trees
+                const treeHeight = 6 + Math.floor(Math.random() * 10);
+                createTree(world, worldX, worldY, treeHeight);
+              } else if (treeType < 0.6) {
+                // 30% pine trees
+                const treeHeight = 8 + Math.floor(Math.random() * 11);
+                createTree(world, worldX, worldY, treeHeight);
+              } else {
+                // 40% generic trees
+                const treeHeight = 4 + Math.floor(Math.random() * 9);
+                createTree(world, worldX, worldY, treeHeight);
+              }
+            }
+            // Understory - 20% mushrooms, 20% ferns, 30% moss
+            // Leaf piles - 20% chance
+            if (Math.random() < 0.2) {
+              createLeafPile(world, worldX, worldY);
+            }
+          }
+          // Forest clearings (meadow-like)
+          else if (forestDensity === 'clearing') {
+            // No trees, wildflowers and grass
+            if (Math.random() < 0.6) {
+              createFiberPlant(world, worldX, worldY); // Wildflower placeholder
+            }
+            // Grass - 40% chance
+            if (Math.random() < 0.4) {
+              createFiberPlant(world, worldX, worldY); // Grass placeholder
+            }
+            // Berry bushes - 20% chance
+            if (Math.random() < 0.2) {
+              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+            }
+          }
+          // Forest edge/ecotone
+          else if (forestDensity === 'edge' && placementValue > 0.0) {
+            // Trees - 10-20% chance
+            if (Math.random() > 0.85) {
+              const treeHeight = 4 + Math.floor(Math.random() * 9);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+          }
+        }
+        // === PLAINS PLANT PLACEMENT (meadow-based) ===
+        else if (tile.terrain === 'grass' || (tile.biome === 'plains' && tile.terrain === 'dirt')) {
+          // Reconstruct plains features using same noise as generateTile
+          const regionalScale = 0.0005;
+
+          const meadowNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale,
+            worldY * regionalScale,
+            3,
+            0.6
+          );
+
+          const outcroppingNoise = this.elevationNoise.octaveNoise(
+            worldX * regionalScale * 2,
+            worldY * regionalScale * 2,
+            2,
+            0.6
+          );
+
+          const isRockyPatch = outcroppingNoise > 0.35;
+          const isMeadowFlowery = !isRockyPatch && meadowNoise > 0.2;
+          const isMeadowGrassy = !isRockyPatch && meadowNoise <= 0.2;
+
+          // Rocky patches - hardy plants and rocks
+          if (isRockyPatch) {
+            // Grass - 50% chance
+            if (Math.random() < 0.5) {
+              createFiberPlant(world, worldX, worldY); // Grass placeholder
+            }
+            // Sage - 30% chance
+            if (Math.random() < 0.3) {
+              createFiberPlant(world, worldX, worldY); // Sage placeholder
+            }
+            // Yarrow - 20% chance
+            if (Math.random() < 0.2) {
+              createFiberPlant(world, worldX, worldY); // Yarrow placeholder
+            }
+            // Thistle - 40% chance
+            if (Math.random() < 0.4) {
+              createFiberPlant(world, worldX, worldY); // Thistle placeholder
+            }
+            // Rocks - higher density (10-15%)
+            if (placementValue < -0.2 && Math.random() < 0.12) {
+              createRock(world, worldX, worldY);
+            }
+          }
+          // Meadow patches (flower-rich)
+          else if (isMeadowFlowery && placementValue > -0.1) {
+            // Wildflowers - 60% chance
+            if (Math.random() < 0.6) {
+              createFiberPlant(world, worldX, worldY); // Wildflower placeholder
+            }
+            // Clover - 40% chance
+            if (Math.random() < 0.4) {
+              createFiberPlant(world, worldX, worldY); // Clover placeholder
+            }
+            // Yarrow - 20% chance
+            if (Math.random() < 0.2) {
+              createFiberPlant(world, worldX, worldY); // Yarrow placeholder
+            }
+            // Sage - 15% chance
+            if (Math.random() < 0.15) {
+              createFiberPlant(world, worldX, worldY); // Sage placeholder
+            }
+            // Grass - 30% chance
+            if (Math.random() < 0.3) {
+              createFiberPlant(world, worldX, worldY); // Grass placeholder
+            }
+          }
+          // Grassland (grass-heavy)
+          else if (isMeadowGrassy && placementValue > 0.0) {
+            // Grass - 70% chance
+            if (Math.random() < 0.7) {
+              createFiberPlant(world, worldX, worldY); // Grass placeholder
+            }
+            // Clover - 30% chance
+            if (Math.random() < 0.3) {
+              createFiberPlant(world, worldX, worldY); // Clover placeholder
+            }
+            // Wild onion - 10% chance
+            if (Math.random() < 0.1) {
+              createFiberPlant(world, worldX, worldY); // Wild onion placeholder
+            }
+            // Thistle - 10% chance
+            if (Math.random() < 0.1) {
+              createFiberPlant(world, worldX, worldY); // Thistle placeholder
+            }
+            // Scattered trees - 5% chance
+            if (placementValue > 0.3 && Math.random() < 0.05) {
+              const treeHeight = Math.floor(Math.random() * 3);
+              createTree(world, worldX, worldY, treeHeight);
+            }
           }
         }
 
@@ -316,22 +540,6 @@ export class TerrainGenerator {
           }
         }
 
-        // Place leaf piles in forests
-        if (tile.terrain === 'forest' && placementValue < -0.1) {
-          if (Math.random() > 0.7) {
-            // 30% chance for leaf piles in forests
-            createLeafPile(world, worldX, worldY);
-          }
-        }
-
-        // Place fiber plants in grass areas
-        if (tile.terrain === 'grass' && placementValue < 0.2) {
-          if (Math.random() > 0.85) {
-            // 15% chance for fiber plants in grass
-            createFiberPlant(world, worldX, worldY);
-          }
-        }
-
         // Place ore deposits in stone/mountain terrain
         // Use separate noise layers for each ore type to create natural veins
         if (tile.terrain === 'stone') {
@@ -462,6 +670,178 @@ export class TerrainGenerator {
       2,
       0.5
     );
+
+    // === FOREST DENSITY GRADIENTS ===
+    // Creates realistic forest structure: dense old-growth, young forest, sparse woodland, clearings.
+    //
+    // Forest types implemented:
+    // - DENSE OLD-GROWTH: 60-80% tree density, elevation boost +0.05
+    // - YOUNG FOREST: 40-50% tree density, standard elevation
+    // - OPEN WOODLAND: 20-30% tree density, slight elevation reduction -0.02
+    // - FOREST CLEARINGS: 0% trees (pure grass), meadow-like, elevation reduction -0.03
+    // - FOREST EDGE/ECOTONE: Transition zone to plains (10-20% trees)
+    //
+    // Density levels stored for plant placement later.
+    let forestDensity: string | null = null;
+
+    const isForestRegion = moisture > 0.2 && temperature > -0.2;
+
+    if (isForestRegion) {
+      // Multiple noise layers for forest density
+
+      // 1. Regional scale for forest density gradient
+      const densityNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 0.8,
+        worldY * regionalScale * 0.8,
+        3,
+        0.6
+      );
+
+      // 2. Detail scale for clearing placement
+      const clearingNoise = this.moistureNoise.octaveNoise(
+        worldX * detailScale,
+        worldY * detailScale,
+        4,
+        0.5
+      );
+
+      // 3. Edge detection (transition to plains)
+      const edgeNoise = this.temperatureNoise.octaveNoise(
+        worldX * regionalScale * 1.2,
+        worldY * regionalScale * 1.2,
+        2,
+        0.5
+      );
+
+      // Determine forest density level
+      if (clearingNoise < -0.4) {
+        // Forest clearing - no trees, meadow-like
+        forestDensity = 'clearing';
+        elevation = elevation - 0.03;
+      } else if (densityNoise > 0.3) {
+        // Dense old-growth forest
+        forestDensity = 'dense';
+        elevation = elevation + 0.05;
+      } else if (densityNoise > 0.0) {
+        // Young forest
+        forestDensity = 'young';
+        // Standard elevation, no change
+      } else if (densityNoise > -0.3) {
+        // Open woodland
+        forestDensity = 'open';
+        elevation = elevation - 0.02;
+      } else {
+        // Forest edge/ecotone
+        forestDensity = 'edge';
+        elevation = elevation - 0.01;
+      }
+
+      // Blend with moisture/temperature for realistic transitions
+      if (moisture < 0.3) {
+        // Drier forest areas tend to be more sparse
+        if (forestDensity === 'dense') forestDensity = 'young';
+        else if (forestDensity === 'young') forestDensity = 'open';
+      }
+    }
+
+    // === PLAINS GEOLOGICAL REALISM ===
+    // Simulates realistic plains terrain with rolling hills, meadows, and natural features.
+    //
+    // Features implemented:
+    // - ROLLING HILLS: Gentle undulations using ridged noise (±0.1 to 0.15 elevation change)
+    // - MEADOW PATCHES: Flower-rich vs grass-heavy areas using regional noise
+    // - ROCKY OUTCROPPINGS: Occasional small rock formations (10-15% of plains)
+    // - GENTLE VALLEYS: Shallow drainage patterns using moisture noise
+    // - ANCIENT STONE CIRCLES: Very rare (0.3% chance) landmark features
+    //
+    // Elevation modulation:
+    // - Hills add +0.05 to +0.15 elevation variation
+    // - Valleys reduce elevation by -0.03 to -0.05
+    // - Outcroppings add +0.02 to +0.04 local elevation
+    //
+    // Meadow types stored for plant placement:
+    // - meadow_flowery: High wildflower density
+    // - meadow_grassy: High grass density
+    // - meadow_rocky: Higher rock and hardy plant density
+    let plainsFeature: string | null = null;
+
+    const isPlainsRegion = elevation > -0.1 && elevation < 0.15 && moisture > -0.2;
+
+    if (isPlainsRegion) {
+      // Multiple noise layers for different geological features
+
+      // 1. Regional meadow differentiation (flower-rich vs grass-heavy areas)
+      const meadowNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale,
+        worldY * regionalScale,
+        3,
+        0.6
+      );
+
+      // 2. Detail scale for small rolling hills
+      const hillNoise = this.elevationNoise.octaveNoise(
+        worldX * detailScale * 0.8,
+        worldY * detailScale * 0.8,
+        4,
+        0.5
+      );
+
+      // 3. Continental scale for subtle regional variation
+      const regionalVariation = this.temperatureNoise.octaveNoise(
+        worldX * continentalScale * 3,
+        worldY * continentalScale * 3,
+        2,
+        0.5
+      );
+
+      // 4. Valley detection (shallow drainage patterns)
+      const valleyNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale * 1.5,
+        worldY * regionalScale * 1.5,
+        3,
+        0.55
+      );
+      const isValley = Math.abs(valleyNoise) < 0.1;
+
+      // 5. Rocky outcropping detection
+      const outcroppingNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 2,
+        worldY * regionalScale * 2,
+        2,
+        0.6
+      );
+      const isRockyPatch = outcroppingNoise > 0.35;
+
+      // Determine meadow type for plant placement
+      if (isRockyPatch) {
+        plainsFeature = 'meadow_rocky';
+      } else if (meadowNoise > 0.2) {
+        plainsFeature = 'meadow_flowery';
+      } else {
+        plainsFeature = 'meadow_grassy';
+      }
+
+      // Apply geological features
+
+      // Valleys - gentle depression
+      if (isValley) {
+        const valleyDepth = (0.1 - Math.abs(valleyNoise)) / 0.1; // 0-1
+        elevation = elevation - valleyDepth * 0.04;
+      }
+      // Rocky outcroppings - slight elevation increase
+      else if (isRockyPatch) {
+        const outcroppingHeight = (outcroppingNoise - 0.35) / 0.65; // 0-1
+        elevation = elevation + outcroppingHeight * 0.03;
+      }
+      // Rolling hills - gentle undulation
+      else {
+        const hillHeight = hillNoise * 0.12; // ±0.12 elevation change
+        elevation = elevation + hillHeight;
+
+        // Add subtle regional variation
+        elevation = elevation + regionalVariation * 0.05;
+      }
+    }
 
     // === DESERT GEOLOGICAL REALISM ===
     // Simulates realistic desert terrain formation through erosion and geological processes.
