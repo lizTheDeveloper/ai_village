@@ -13,6 +13,7 @@ import {
   type PersonalityComponent,
 } from '@ai-village/core';
 import type { BuildingComponent } from '@ai-village/core';
+import { promptCache } from '../PromptCacheManager.js';
 
 /**
  * Builds available actions and skill-aware instructions for agent prompts.
@@ -59,11 +60,22 @@ export class ActionBuilder {
     const animalHandlingSkill = skillLevels.animal_handling ?? 0;
     const medicineSkill = skillLevels.medicine ?? 0;
 
-    // PRIORITY hints
+    // PRIORITY hints - check for existing campfires to avoid building duplicates
+    const buildingCounts = promptCache.getBuildingCounts(world);
+    const campfireCount = buildingCounts.byType['campfire'] ?? 0;
+
     if (isCold && isTired) {
-      priority.push('URGENT! You need shelter - use plan_build for campfire or tent!');
+      if (campfireCount > 0) {
+        priority.push(`You need warmth and rest! The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to warm up!`);
+      } else {
+        priority.push('URGENT! You need shelter - use plan_build for campfire or tent!');
+      }
     } else if (isCold) {
-      priority.push('You\'re freezing! Use plan_build for campfire or tent!');
+      if (campfireCount > 0) {
+        priority.push(`You're cold! The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth!`);
+      } else {
+        priority.push('You\'re freezing! Use plan_build for campfire or tent!');
+      }
     } else if (isTired) {
       priority.push('You need rest! Use plan_build for bed or bedroll!');
     }

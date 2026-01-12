@@ -33,6 +33,7 @@ export interface SectionRenderContext {
  */
 export interface AgentComponentData {
   behavior: string;
+  behaviorState?: Record<string, unknown>;
   useLLM: boolean;
   customLLM?: {
     baseUrl?: string;

@@ -706,7 +706,8 @@ Keep speech brief and natural.`
         .replace(/^Message:\s*/i, '')           // Remove "Message: " prefix
         .replace(/^Tool call:.*$/gim, '')       // Remove any "Tool call: ..." lines
         .replace(/^Action:.*$/gim, '')          // Remove any "Action: ..." lines
-        .trim();
+        .trim()
+        .replace(/^["']|["']$/g, '');           // Remove surrounding quotes from speech
 
       // Format as JSON string for the parser
       const responseText = JSON.stringify({

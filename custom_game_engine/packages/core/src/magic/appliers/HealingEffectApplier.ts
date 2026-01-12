@@ -102,7 +102,7 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     const appliedValues: Record<string, number> = {};
 
     // NEW: Check if this is a HoT effect (overtime with duration)
-    if (effect.overtime && effect.duration && effect.duration > 0 && context.stateMutatorSystem) {
+    if (effect.overtime && effect.duration && effect.duration > 0) {
       // This is a heal-over-time effect - use StateMutatorSystem
       return this.applyHealOverTime(
         effect,
@@ -160,21 +160,18 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     baseHealing: number,
     context: EffectContext
   ): EffectApplicationResult {
+    // StateMutatorSystem is required for HoT effects - fail fast if not available
     if (!context.stateMutatorSystem) {
-      // Fallback: use legacy HoT processing if StateMutatorSystem not available
-      const appliedValues: Record<string, number> = {};
-      appliedValues.healingPerTick = totalHealing / (effect.duration ?? 1);
-      appliedValues.resourceType = this.resourceTypeToNumber(effect.resourceType);
       return {
-        success: true,
+        success: false,
         effectId: effect.id,
         targetId: target.id,
-        appliedValues,
+        appliedValues: {},
         resisted: false,
+        error: '[HealingEffectApplier] StateMutatorSystem not initialized. Cannot apply heal-over-time effects.',
         appliedAt: context.tick,
         casterId: caster.id,
         spellId: context.spell.id,
-        remainingDuration: effect.duration,
       };
     }
 
@@ -438,6 +435,7 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
 
   /**
    * Heal a specific resource.
+   * Note: amount and maxValue should be on the same scale (typically 0-100 in tests, 0-1 in production)
    */
   private healResource(
     needs: ExtendedNeedsComponent,

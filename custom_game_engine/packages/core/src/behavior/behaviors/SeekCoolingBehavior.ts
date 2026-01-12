@@ -312,26 +312,90 @@ export class SeekCoolingBehavior extends BaseBehavior {
       }
     }
 
+    // Minimum distance to travel before picking a new escape direction (in tiles)
+    const MIN_ESCAPE_DISTANCE = 8;
+
     if (heatSourceCount > 0) {
       // Normalize and apply movement
       const magnitude = Math.sqrt(totalAvoidanceX * totalAvoidanceX + totalAvoidanceY * totalAvoidanceY);
 
-      if (magnitude > 0) {
+      // Minimum magnitude threshold - if vectors mostly cancel out (e.g., equidistant from multiple fires),
+      // use persistent escape direction to break symmetry and prevent twitching in place
+      const MIN_MAGNITUDE_THRESHOLD = 0.5;
+
+      if (magnitude >= MIN_MAGNITUDE_THRESHOLD) {
+        // Clear direction - move that way and save it as escape direction
         const velocityX = (totalAvoidanceX / magnitude) * movement.speed;
         const velocityY = (totalAvoidanceY / magnitude) * movement.speed;
         this.setVelocity(entity, velocityX, velocityY);
+
+        // Save escape direction and starting position for distance-based persistence
+        this.updateState(entity, {
+          escapeAngle: Math.atan2(velocityY, velocityX),
+          escapeStartX: position.x,
+          escapeStartY: position.y
+        });
       } else {
-        // Standing exactly on heat source - pick a random direction to flee
-        const randomAngle = Math.random() * Math.PI * 2;
-        this.setVelocity(entity, Math.cos(randomAngle) * movement.speed, Math.sin(randomAngle) * movement.speed);
+        // Vectors cancelled out (equidistant from multiple heat sources)
+        // Use persistent escape direction or pick a new random one
+        const state = this.getState(entity);
+        let escapeAngle = state.escapeAngle as number | undefined;
+        const escapeStartX = state.escapeStartX as number | undefined;
+        const escapeStartY = state.escapeStartY as number | undefined;
+
+        // Calculate distance traveled since escape started
+        let distanceTraveled = 0;
+        if (escapeStartX !== undefined && escapeStartY !== undefined) {
+          distanceTraveled = this.distance(position, { x: escapeStartX, y: escapeStartY });
+        }
+
+        // Pick new direction if: no escape direction set, or traveled far enough
+        if (escapeAngle === undefined || distanceTraveled >= MIN_ESCAPE_DISTANCE) {
+          // Pick a new random escape direction
+          escapeAngle = Math.random() * Math.PI * 2;
+          this.updateState(entity, {
+            escapeAngle,
+            escapeStartX: position.x,
+            escapeStartY: position.y
+          });
+        }
+
+        // Move in the escape direction
+        this.setVelocity(entity,
+          Math.cos(escapeAngle) * movement.speed,
+          Math.sin(escapeAngle) * movement.speed
+        );
       }
     } else {
       // No heat sources detected but still hot - just move in a random direction
       // This handles cases where heat comes from non-building sources
       const temperature = entity.getComponent(ComponentType.Temperature) as any;
       if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
-        const randomAngle = Math.random() * Math.PI * 2;
-        this.setVelocity(entity, Math.cos(randomAngle) * movement.speed, Math.sin(randomAngle) * movement.speed);
+        // Use persistent escape direction here too
+        const state = this.getState(entity);
+        let escapeAngle = state.escapeAngle as number | undefined;
+        const escapeStartX = state.escapeStartX as number | undefined;
+        const escapeStartY = state.escapeStartY as number | undefined;
+
+        // Calculate distance traveled since escape started
+        let distanceTraveled = 0;
+        if (escapeStartX !== undefined && escapeStartY !== undefined) {
+          distanceTraveled = this.distance(position, { x: escapeStartX, y: escapeStartY });
+        }
+
+        if (escapeAngle === undefined || distanceTraveled >= MIN_ESCAPE_DISTANCE) {
+          escapeAngle = Math.random() * Math.PI * 2;
+          this.updateState(entity, {
+            escapeAngle,
+            escapeStartX: position.x,
+            escapeStartY: position.y
+          });
+        }
+
+        this.setVelocity(entity,
+          Math.cos(escapeAngle) * movement.speed,
+          Math.sin(escapeAngle) * movement.speed
+        );
       } else {
         // Actually cooled down, stop moving
         this.stopAllMovement(entity);

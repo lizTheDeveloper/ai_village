@@ -201,11 +201,109 @@ export class TerrainGenerator {
           }
         }
 
-        // Place rocks in desert biome (more common - deserts have scattered rocks)
+        // === DESERT ROCK PLACEMENT (geologically realistic) ===
         if (tile.biome === 'desert') {
-          if (Math.random() > 0.75) {
-            // 25% chance for rocks in desert
-            createRock(world, worldX, worldY);
+          // Recompute geological features for rock placement
+          const regionalScale = 0.0005;
+          const continentalScale = 0.000005;
+          const detailScale = 0.005;
+
+          // Mesa detection
+          const mesaNoise = this.elevationNoise.octaveNoise(
+            worldX * continentalScale * 4,
+            worldY * continentalScale * 4,
+            2,
+            0.7
+          );
+          const isMesaRegion = mesaNoise > 0.4;
+          const mesaEdgeNoise = this.elevationNoise.octaveNoise(
+            worldX * regionalScale * 3,
+            worldY * regionalScale * 3,
+            2,
+            0.5
+          );
+          const isMesaEdge = isMesaRegion && mesaEdgeNoise < -0.15;
+
+          // Arroyo detection
+          const arroyoNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale * 1.2,
+            worldY * regionalScale * 1.2,
+            4,
+            0.55
+          );
+          const isArroyo = Math.abs(arroyoNoise) < 0.08;
+          const isArroyoBank = Math.abs(arroyoNoise) > 0.06 && Math.abs(arroyoNoise) < 0.12;
+
+          // Canyon detection
+          const canyonNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale * 0.8,
+            worldY * regionalScale * 0.8,
+            3,
+            0.6
+          );
+          const isCanyon = Math.abs(canyonNoise) < 0.12;
+          const isCanyonWall = Math.abs(canyonNoise) > 0.10 && Math.abs(canyonNoise) < 0.18;
+
+          // Dune field detection
+          const duneNoise = this.temperatureNoise.octaveNoise(
+            worldX * regionalScale * 0.6,
+            worldY * regionalScale * 0.6,
+            3,
+            0.6
+          );
+          const isDuneField = duneNoise > 0.2 && !isMesaRegion;
+
+          // Rock placement based on geological features
+          // Priority order matches erosion patterns: mesa edges → canyon walls → arroyo banks → floors → outcrops → dunes
+
+          // 1. Mesa edges and buttes - dense rock walls (stratified cliffs)
+          if (isMesaEdge) {
+            if (Math.random() > 0.15) {
+              // 85% chance - forms continuous rock walls on mesa cliffs
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 1a. Rock spires/hoodoos on mesa tops (isolated erosion remnants)
+          else if (isMesaRegion && !isMesaEdge && placementValue > 0.4) {
+            if (Math.random() > 0.90) {
+              // 10% chance - tall rock spires rising from mesa surface
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 2. Canyon walls - stratified rock layers
+          else if (isCanyonWall) {
+            if (Math.random() > 0.20) {
+              // 80% chance - visible canyon walls
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 3. Arroyo banks - erosion debris
+          else if (isArroyoBank) {
+            if (Math.random() > 0.35) {
+              // 65% chance - rocks exposed by water erosion
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 4. Canyon/arroyo floors - scattered boulders
+          else if ((isCanyon || isArroyo) && placementValue < -0.1) {
+            if (Math.random() > 0.70) {
+              // 30% chance - fallen rocks and debris
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 5. Rocky desert outcroppings (not dunes)
+          else if (!isDuneField && placementValue < -0.25) {
+            if (Math.random() > 0.25) {
+              // 75% chance in outcrop zones - hoodoos and rock formations
+              createRock(world, worldX, worldY);
+            }
+          }
+          // 6. Dune fields - very rare rocks (mostly sandy)
+          else if (isDuneField && placementValue < -0.5) {
+            if (Math.random() > 0.92) {
+              // 8% chance - occasional exposed bedrock in dunes
+              createRock(world, worldX, worldY);
+            }
           }
         }
 
@@ -349,10 +447,8 @@ export class TerrainGenerator {
       elevation = elevation * (1 - ridgeStrength) + ridgedNoise * ridgeStrength;
     }
 
-    // Flatten spawn area - lerp toward 0 elevation
-    elevation = elevation * (1 - spawnFlatten * 0.8);
-
     // Moisture uses biome scale for climate zones (~20km patterns)
+    // NOTE: Calculated early because desert geological features need moisture/temperature
     const moisture = this.moistureNoise.octaveNoise(
       worldX * biomeScale,
       worldY * biomeScale,
@@ -367,7 +463,130 @@ export class TerrainGenerator {
       0.5
     );
 
+    // === DESERT GEOLOGICAL REALISM ===
+    // Simulates realistic desert terrain formation through erosion and geological processes.
+    //
+    // Features implemented:
+    // - MESAS: Flat-topped highlands formed by differential erosion of sedimentary layers
+    // - BUTTES: Isolated mesa remnants created by edge erosion
+    // - ARROYOS: Narrow dry riverbeds carved by ancient flash floods (deepest channels)
+    // - CANYONS: Wider erosion valleys from sustained water flow
+    // - DUNE FIELDS: Sandy desert areas with rolling wave patterns from wind erosion
+    // - ROCKY DESERT: Bedrock exposure with minimal sand cover
+    // - HOODOOS/SPIRES: Tall rock formations on mesa tops (erosion remnants)
+    //
+    // Geological priority (features applied in order):
+    // 1. Arroyos cut deepest (ancient water erosion)
+    // 2. Canyons cut through most terrain (sustained erosion)
+    // 3. Mesas create raised plateaus with flat tops
+    // 4. Dune fields add gentle rolling topography
+    // 5. Rocky desert maintains base elevation
+    //
+    // Rock placement follows natural erosion patterns:
+    // - Mesa cliff edges: 85% density (stratified walls)
+    // - Canyon walls: 80% density (exposed layers)
+    // - Arroyo banks: 65% density (erosion debris)
+    // - Channel floors: 30% density (fallen boulders)
+    // - Rocky outcrops: 75% density (bedrock formations)
+    // - Dune fields: 8% density (rare bedrock exposure)
+    //
+    const isDryAndHot = moisture < -0.3 && temperature > 0.2;
+
+    if (isDryAndHot && elevation > -0.1) {
+      // Multiple noise layers for different geological features
+
+      // 1. Mesa/plateau formation (large flat-topped highlands)
+      const mesaNoise = this.elevationNoise.octaveNoise(
+        worldX * continentalScale * 4,
+        worldY * continentalScale * 4,
+        2,
+        0.7
+      );
+      const isMesaRegion = mesaNoise > 0.4;
+
+      // 2. Arroyo (dry riverbed) - ancient water erosion channels
+      const arroyoNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale * 1.2,
+        worldY * regionalScale * 1.2,
+        4,
+        0.55
+      );
+      const isArroyo = Math.abs(arroyoNoise) < 0.08; // Very narrow channels
+
+      // 3. Dune field detection (sandy desert)
+      const duneNoise = this.temperatureNoise.octaveNoise(
+        worldX * regionalScale * 0.6,
+        worldY * regionalScale * 0.6,
+        3,
+        0.6
+      );
+      const isDuneField = duneNoise > 0.2 && !isMesaRegion;
+
+      // 4. Canyon/wash system (deeper erosion)
+      const canyonNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale * 0.8,
+        worldY * regionalScale * 0.8,
+        3,
+        0.6
+      );
+      const isCanyon = Math.abs(canyonNoise) < 0.12;
+
+      // Apply geological features in priority order
+
+      // Arroyos cut through everything (deepest erosion channels)
+      if (isArroyo) {
+        const arroyoDepth = (0.08 - Math.abs(arroyoNoise)) / 0.08; // 0-1
+        elevation = elevation - arroyoDepth * 0.5; // Deep cut channels
+      }
+      // Canyons cut through most terrain
+      else if (isCanyon) {
+        const canyonDepth = (0.12 - Math.abs(canyonNoise)) / 0.12; // 0-1
+        elevation = elevation - canyonDepth * 0.35;
+      }
+      // Mesa regions - raise elevation and flatten top
+      else if (isMesaRegion) {
+        const mesaHeight = (mesaNoise - 0.4) / 0.6; // 0-1, taller with higher noise
+        const mesaTop = 0.4 + mesaHeight * 0.4; // Flat top at 0.4-0.8 range
+
+        // Flatten the mesa top (reduce fractal detail on top)
+        const flattenFactor = mesaHeight * 0.7;
+        elevation = elevation * (1 - flattenFactor) + mesaTop * flattenFactor;
+
+        // Add some erosion at mesa edges
+        const edgeNoise = this.elevationNoise.octaveNoise(
+          worldX * regionalScale * 3,
+          worldY * regionalScale * 3,
+          2,
+          0.5
+        );
+        if (edgeNoise < -0.2) {
+          // Eroded edge - creates buttes and isolated formations
+          elevation = elevation - 0.2;
+        }
+      }
+      // Dune fields - add rolling wave patterns
+      else if (isDuneField) {
+        const duneWaves = this.temperatureNoise.octaveNoise(
+          worldX * detailScale * 2,
+          worldY * detailScale * 2,
+          3,
+          0.7
+        );
+        // Gentle rolling dunes - add small elevation variation
+        elevation = elevation + duneWaves * 0.15;
+      }
+      // Rocky desert (default) - keep base elevation with erosion
+      else {
+        // Slight erosion in rocky desert areas
+        elevation = elevation * 0.9;
+      }
+    }
+
+    // Flatten spawn area - lerp toward 0 elevation
+    elevation = elevation * (1 - spawnFlatten * 0.8);
+
     // Determine terrain and biome
+    // (moisture and temperature already calculated above for desert features)
     const { terrain, biome } = this.determineTerrainAndBiome(
       elevation,
       moisture,
@@ -517,7 +736,7 @@ export class TerrainGenerator {
       };
     }
 
-    // Desert
+    // Desert (with potential canyon terrain)
     if (moisture < -0.3 && temperature > 0.2) {
       return {
         terrain: 'sand',

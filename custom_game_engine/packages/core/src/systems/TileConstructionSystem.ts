@@ -915,6 +915,14 @@ export class TileConstructionSystem implements System {
               insulation: this.getWallInsulation(materials.wall),
               constructedAt: world.tick,
             };
+            // Place roof on wall tiles (walls support the roof)
+            if (materials.roof) {
+              worldTile.roof = {
+                material: materials.roof,
+                condition: 100,
+                constructedAt: world.tick,
+              };
+            }
             tilesPlaced++;
             break;
 
@@ -947,6 +955,14 @@ export class TileConstructionSystem implements System {
               lightsThrough: true,
               constructedAt: world.tick,
             };
+            // Place roof on window tiles (windows are in walls which support the roof)
+            if (materials.roof) {
+              worldTile.roof = {
+                material: materials.roof,
+                condition: 100,
+                constructedAt: world.tick,
+              };
+            }
             tilesPlaced++;
             break;
 

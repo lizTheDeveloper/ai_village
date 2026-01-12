@@ -567,9 +567,19 @@ export class ExecutorPromptBuilder {
       const isCold = needs?.temperature !== undefined && needs.temperature < 0.3;
       const isTired = needs?.energy !== undefined && needs.energy < 0.3;
 
+      // Check existing buildings to avoid suggesting duplicates
+      const buildingCounts = promptCache.getBuildingCounts(world);
+      const campfireCount = buildingCounts.byType['campfire'] ?? 0;
+
       if (isCold && isTired) {
+        if (campfireCount > 0) {
+          return `You are cold and tired. The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to warm up! Then consider rest. What will you do?`;
+        }
         return 'You are cold and tired. Consider using plan_build to create a campfire (warmth) or tent/bed (rest). What will you plan?';
       } else if (isCold) {
+        if (campfireCount > 0) {
+          return `You are cold. The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth! What will you do?`;
+        }
         return 'You are cold. Consider using plan_build to create a campfire or tent for warmth. What will you plan?';
       } else if (isTired) {
         return 'You are tired. Consider using plan_build to create a bed or bedroll for rest. What will you plan?';

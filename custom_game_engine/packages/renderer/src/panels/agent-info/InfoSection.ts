@@ -316,7 +316,7 @@ export class InfoSection {
 
     // Behavior
     if (agent) {
-      const behaviorLabel = agent.behavior.replace('_', ' ').toUpperCase();
+      const behaviorLabel = this.getBehaviorLabel(agent, world);
       ctx.fillStyle = '#FFAA00';
       ctx.fillText(`Behavior: ${behaviorLabel}`, x + padding, currentY);
       currentY += lineHeight;
@@ -335,10 +335,8 @@ export class InfoSection {
         );
       }
 
-      // Behavior Queue section - moved here for visibility
-      if (agent.behaviorQueue && agent.behaviorQueue.length > 0) {
-        currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
-      }
+      // Behavior Queue section - always show for visibility
+      currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
 
       const llmStatus = agent.useLLM ? 'Yes' : 'No';
       ctx.fillStyle = '#888';
@@ -954,15 +952,24 @@ export class InfoSection {
     padding: number,
     lineHeight: number
   ): number {
-    if (!agent.behaviorQueue || agent.behaviorQueue.length === 0) {
-      return y;
-    }
-
     renderSeparator(ctx, panelX, y, this.panelWidth, padding);
     y += 10;
 
     ctx.font = 'bold 12px monospace';
     ctx.fillStyle = '#FFD700';
+
+    const queueLength = agent.behaviorQueue?.length ?? 0;
+
+    if (queueLength === 0) {
+      // Show empty queue state
+      ctx.fillText('📋 Behavior Queue', panelX + padding, y);
+      y += lineHeight + 3;
+      ctx.fillStyle = '#888888';
+      ctx.font = '11px monospace';
+      ctx.fillText('(empty - agent using reactive behavior)', panelX + padding + 5, y);
+      y += lineHeight + 5;
+      return y;
+    }
 
     const queueStatus = agent.queuePaused
       ? '⏸️ PAUSED'
@@ -970,15 +977,15 @@ export class InfoSection {
         ? `⚠️ INTERRUPTED (${agent.queueInterruptedBy})`
         : '▶️ ACTIVE';
 
-    ctx.fillText(`Behavior Queue (${agent.behaviorQueue.length}) ${queueStatus}`, panelX + padding, y);
+    ctx.fillText(`📋 Behavior Queue (${queueLength}) ${queueStatus}`, panelX + padding, y);
     y += lineHeight + 5;
 
-    const maxItems = Math.min(5, agent.behaviorQueue.length);
+    const maxItems = Math.min(5, queueLength);
     const currentIndex = agent.currentQueueIndex ?? 0;
 
     ctx.font = '11px monospace';
     for (let i = 0; i < maxItems; i++) {
-      const queuedBehavior = agent.behaviorQueue[i];
+      const queuedBehavior = agent.behaviorQueue![i];
       if (!queuedBehavior) continue;
 
       const isCurrent = i === currentIndex;
@@ -1015,9 +1022,9 @@ export class InfoSection {
       y += 14;
     }
 
-    if (agent.behaviorQueue.length > maxItems) {
+    if (queueLength > maxItems) {
       ctx.fillStyle = '#888888';
-      ctx.fillText(`... and ${agent.behaviorQueue.length - maxItems} more`, panelX + padding + 5, y);
+      ctx.fillText(`... and ${queueLength - maxItems} more`, panelX + padding + 5, y);
       y += 14;
     }
 
@@ -1218,6 +1225,175 @@ export class InfoSection {
       case 'position':
       default:
         return '📍';
+    }
+  }
+
+  /**
+   * Get a contextual behavior label that includes target information.
+   */
+  private getBehaviorLabel(agent: AgentComponentData, world: any): string {
+    const behavior = agent.behavior;
+    const state = agent.behaviorState || {};
+
+    // Format the base behavior name
+    const baseName = behavior.replace(/_/g, ' ').toUpperCase();
+
+    switch (behavior) {
+      case 'follow':
+      case 'follow_agent': {
+        const targetId = state.targetId as string | undefined;
+        if (targetId && world?.entities) {
+          const target = world.entities.get(targetId);
+          const identity = target?.components.get('identity');
+          if (identity?.name) {
+            return `FOLLOW ${identity.name.toUpperCase()}`;
+          }
+        }
+        return 'FOLLOW (lost target)';
+      }
+
+      case 'build': {
+        const buildingType = state.buildingType as string | undefined;
+        if (buildingType) {
+          return `BUILD ${buildingType.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'craft': {
+        const recipeId = state.recipeId as string | undefined;
+        if (recipeId) {
+          return `CRAFT ${recipeId.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'gather': {
+        const resourceType = state.resourceType as string | undefined;
+        if (resourceType) {
+          return `GATHER ${resourceType.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'talk': {
+        const partnerId = state.partnerId as string | undefined;
+        if (partnerId && world?.entities) {
+          const partner = world.entities.get(partnerId);
+          const identity = partner?.components.get('identity');
+          if (identity?.name) {
+            return `TALK TO ${identity.name.toUpperCase()}`;
+          }
+        }
+        return baseName;
+      }
+
+      case 'cast_spell': {
+        const spellId = state.spellId as string | undefined;
+        if (spellId) {
+          return `CAST ${spellId.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'navigate': {
+        const target = state.target as { x: number; y: number } | undefined;
+        if (target) {
+          return `NAVIGATE TO (${Math.round(target.x)}, ${Math.round(target.y)})`;
+        }
+        return baseName;
+      }
+
+      case 'plant': {
+        const seedType = state.seedType as string | undefined;
+        if (seedType) {
+          return `PLANT ${seedType.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'water': {
+        return 'WATERING';
+      }
+
+      case 'farm': {
+        const farmTask = state.farmTask as string | undefined;
+        if (farmTask) {
+          return `FARM: ${farmTask.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return baseName;
+      }
+
+      case 'approach': {
+        const targetId = state.targetId as string | undefined;
+        if (targetId && world?.entities) {
+          const target = world.entities.get(targetId);
+          const identity = target?.components.get('identity');
+          if (identity?.name) {
+            return `APPROACH ${identity.name.toUpperCase()}`;
+          }
+        }
+        return baseName;
+      }
+
+      case 'observe': {
+        const targetId = state.targetId as string | undefined;
+        if (targetId && world?.entities) {
+          const target = world.entities.get(targetId);
+          const identity = target?.components.get('identity');
+          if (identity?.name) {
+            return `OBSERVE ${identity.name.toUpperCase()}`;
+          }
+        }
+        return baseName;
+      }
+
+      case 'trade': {
+        const partnerId = state.partnerId as string | undefined;
+        if (partnerId && world?.entities) {
+          const partner = world.entities.get(partnerId);
+          const identity = partner?.components.get('identity');
+          if (identity?.name) {
+            return `TRADE WITH ${identity.name.toUpperCase()}`;
+          }
+        }
+        return baseName;
+      }
+
+      case 'deposit_items': {
+        const buildingType = state.targetBuildingType as string | undefined;
+        if (buildingType) {
+          return `DEPOSIT TO ${buildingType.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return 'DEPOSIT ITEMS';
+      }
+
+      case 'material_transport': {
+        const phase = state.phase as string | undefined;
+        if (phase) {
+          return `TRANSPORT: ${phase.replace(/_/g, ' ').toUpperCase()}`;
+        }
+        return 'MATERIAL TRANSPORT';
+      }
+
+      case 'tame_animal': {
+        const targetId = state.targetId as string | undefined;
+        if (targetId && world?.entities) {
+          const target = world.entities.get(targetId);
+          const identity = target?.components.get('identity');
+          if (identity?.name) {
+            return `TAME ${identity.name.toUpperCase()}`;
+          }
+          const animal = target?.components.get('animal');
+          if (animal?.species) {
+            return `TAME ${animal.species.toUpperCase()}`;
+          }
+        }
+        return baseName;
+      }
+
+      default:
+        return baseName;
     }
   }
 }

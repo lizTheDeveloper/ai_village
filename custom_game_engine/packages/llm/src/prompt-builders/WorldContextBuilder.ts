@@ -19,6 +19,7 @@ import {
 } from '@ai-village/core';
 import type { BuildingComponent } from '@ai-village/core';
 import { HarmonyContextBuilder } from './HarmonyContextBuilder.js';
+import { promptCache } from '../PromptCacheManager.js';
 
 /**
  * Builds world context sections for agent prompts.
@@ -107,7 +108,7 @@ export class WorldContextBuilder {
 
     // Building recommendations based on needs
     if (needs || temperature) {
-      context += this.suggestBuildings(needs, temperature, inventory);
+      context += this.suggestBuildings(needs, temperature, inventory, world);
     }
 
     // Terrain features
@@ -547,7 +548,8 @@ export class WorldContextBuilder {
   suggestBuildings(
     needs: NeedsComponent | undefined,
     temperature: TemperatureComponent | undefined,
-    inventory: InventoryComponent | undefined
+    inventory: InventoryComponent | undefined,
+    world: World
   ): string {
     const suggestions: string[] = [];
 
@@ -561,9 +563,16 @@ export class WorldContextBuilder {
       });
     };
 
+    // Check existing buildings to avoid suggesting duplicates
+    const buildingCounts = promptCache.getBuildingCounts(world);
+    const campfireCount = buildingCounts.byType['campfire'] ?? 0;
+
     // Check if cold
     if (temperature?.state === 'cold' || temperature?.state === 'dangerously_cold') {
-      if (hasResources({ stone: 10, wood: 5 })) {
+      // Only suggest building campfire if none exist
+      if (campfireCount > 0) {
+        suggestions.push(`GO TO CAMPFIRE - the village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''}, use seek_warmth!`);
+      } else if (hasResources({ stone: 10, wood: 5 })) {
         suggestions.push('campfire (10 stone + 5 wood) - provides warmth in 3-tile radius');
       } else {
         suggestions.push('campfire (10 stone + 5 wood) - provides warmth [NEED: more resources]');

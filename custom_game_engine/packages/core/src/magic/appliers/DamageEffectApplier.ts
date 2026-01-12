@@ -154,8 +154,20 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     armorReduction: number,
     context: EffectContext
   ): EffectApplicationResult {
-    // StateMutatorSystem is required - no fallback
-    // (TypeScript ensures context.stateMutatorSystem is non-null)
+    // StateMutatorSystem is required for DoT effects - fail fast if not available
+    if (!context.stateMutatorSystem) {
+      return {
+        success: false,
+        effectId: effect.id,
+        targetId: target.id,
+        appliedValues: {},
+        resisted: false,
+        error: '[DamageEffectApplier] StateMutatorSystem not initialized. Cannot apply damage-over-time effects.',
+        appliedAt: context.tick,
+        casterId: caster.id,
+        spellId: context.spell.id,
+      };
+    }
 
     // Calculate damage per minute from total damage and duration
     const durationInTicks = effect.duration!;

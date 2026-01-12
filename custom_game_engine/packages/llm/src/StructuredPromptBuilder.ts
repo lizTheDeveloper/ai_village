@@ -157,8 +157,15 @@ export class StructuredPromptBuilder {
       const isTired = needs?.energy !== undefined && needs.energy < 0.3 && needs.energy >= 0.1; // ENERGY_LOW: 10-30%
 
       // STRONGEST PRIORITY: Agent has ALL required resources + urgent need
+      // Check if campfire already exists - don't build duplicates!
+      const buildingCounts = promptCache.getBuildingCounts(world);
+      const hasCampfire = (buildingCounts.byType['campfire'] ?? 0) > 0;
+
       if ((canBuildCampfire || canBuildTent) && isCold) {
-        if (canBuildCampfire && canBuildTent) {
+        if (hasCampfire) {
+          // Campfire exists - go to it instead of building another one!
+          instruction = `YOU ARE COLD! The village already has ${buildingCounts.byType['campfire']} campfire${buildingCounts.byType['campfire'] > 1 ? 's' : ''} - head to one and warm up! Use seek_warmth to find the nearest heat source.`;
+        } else if (canBuildCampfire && canBuildTent) {
           instruction = `YOU ARE COLD and you have materials for warmth! URGENT: build a campfire (10 stone + 5 wood) or tent (10 cloth + 5 wood) NOW to avoid freezing! What will you build?`;
         } else if (canBuildCampfire) {
           instruction = `YOU ARE COLD! You have materials for a campfire (10 stone + 5 wood). Build it NOW to avoid freezing! What will you build?`;
@@ -880,7 +887,7 @@ export class StructuredPromptBuilder {
 
     // Add building recommendations based on needs
     if (needs || temperature) {
-      context += this.suggestBuildings(needs, temperature, inventory);
+      context += this.suggestBuildings(needs, temperature, inventory, world);
     }
 
     // VILLAGE RESOURCES: Skilled agents as affordances
@@ -971,7 +978,8 @@ export class StructuredPromptBuilder {
   private suggestBuildings(
     needs: NeedsComponent | undefined,
     temperature: TemperatureComponent | undefined,
-    inventory: InventoryComponent | undefined
+    inventory: InventoryComponent | undefined,
+    world: World
   ): string {
     const suggestions: string[] = [];
 
@@ -986,9 +994,16 @@ export class StructuredPromptBuilder {
       });
     };
 
+    // Check existing buildings to avoid suggesting duplicates
+    const buildingCounts = promptCache.getBuildingCounts(world);
+    const hasCampfire = (buildingCounts.byType['campfire'] ?? 0) > 0;
+
     // Check if cold → suggest warmth buildings
     if (temperature?.state === 'cold' || temperature?.state === 'dangerously_cold') {
-      if (hasResources({ stone: 10, wood: 5 })) {
+      // Only suggest campfire if none exist - otherwise tell them to go to the existing one
+      if (hasCampfire) {
+        suggestions.push(`GO TO CAMPFIRE - the village has ${buildingCounts.byType['campfire']} campfire${buildingCounts.byType['campfire'] > 1 ? 's' : ''}, head to one to warm up!`);
+      } else if (hasResources({ stone: 10, wood: 5 })) {
         suggestions.push('campfire (10 stone + 5 wood) - provides warmth in 3-tile radius');
       } else {
         suggestions.push('campfire (10 stone + 5 wood) - provides warmth [NEED: more resources]');
@@ -1675,10 +1690,22 @@ export class StructuredPromptBuilder {
 
     // PRIORITY 1: Urgent building hints (when agent has pressing needs)
     // These are just hints - the actual action is plan_build (shown later)
+    // Check for existing campfires to avoid building duplicates
+    const actionBuildingCounts = promptCache.getBuildingCounts(_world);
+    const villageCampfireCount = actionBuildingCounts.byType['campfire'] ?? 0;
+
     if (isCold && isTired) {
-      priority.push('🏗️ URGENT! You need shelter - use plan_build for campfire or tent!');
+      if (villageCampfireCount > 0) {
+        priority.push(`🔥 You need warmth and rest! The village has ${villageCampfireCount} campfire${villageCampfireCount > 1 ? 's' : ''} - use seek_warmth to warm up, then rest!`);
+      } else {
+        priority.push('🏗️ URGENT! You need shelter - use plan_build for campfire or tent!');
+      }
     } else if (isCold) {
-      priority.push('🏗️ You\'re freezing! Use plan_build for campfire or tent!');
+      if (villageCampfireCount > 0) {
+        priority.push(`🔥 You're cold! The village has ${villageCampfireCount} campfire${villageCampfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth!`);
+      } else {
+        priority.push('🏗️ You\'re freezing! Use plan_build for campfire or tent!');
+      }
     } else if (isTired) {
       priority.push('🏗️ You need rest! Use plan_build for bed or bedroll!');
     }

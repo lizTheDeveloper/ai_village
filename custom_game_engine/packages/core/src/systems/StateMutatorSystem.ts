@@ -239,7 +239,17 @@ export class StateMutatorSystem implements System {
         const updates: Record<string, number> = {};
         const expiredDeltas: RegisteredDelta[] = [];
 
-        for (const delta of componentDeltas) {
+        // CRITICAL: Sort deltas to apply healing (positive) before damage (negative)
+        // This ensures healing can save entities from death when both occur simultaneously
+        const sortedDeltas = [...componentDeltas].sort((a, b) => {
+          // Positive (healing) comes before negative (damage)
+          if (a.deltaPerMinute > 0 && b.deltaPerMinute <= 0) return -1;
+          if (a.deltaPerMinute <= 0 && b.deltaPerMinute > 0) return 1;
+          // Within same category, maintain registration order
+          return 0;
+        });
+
+        for (const delta of sortedDeltas) {
           // Check for tick-based expiration
           if (delta.expiresAtTick !== undefined && currentTick >= delta.expiresAtTick) {
             expiredDeltas.push(delta);

@@ -103,8 +103,8 @@ export interface EffectContext {
   /** Active paradigm ID */
   paradigmId?: string;
 
-  /** StateMutatorSystem for gradual effect registration */
-  stateMutatorSystem: StateMutatorSystem;
+  /** StateMutatorSystem for gradual effect registration (required for DoT/HoT effects) */
+  stateMutatorSystem: StateMutatorSystem | null;
 }
 
 // ============================================================================
@@ -250,22 +250,9 @@ export class SpellEffectExecutor {
     // Determine if critical hit
     const isCrit = this.rollCrit(effect, casterMagic);
 
-    // Ensure StateMutatorSystem is initialized
-    if (!this.stateMutatorSystem) {
-      return {
-        success: false,
-        effectId,
-        targetId: target.id,
-        appliedValues: {},
-        resisted: false,
-        error: 'StateMutatorSystem not initialized. Call setStateMutatorSystem() first.',
-        appliedAt: tick,
-        casterId: caster.id,
-        spellId: spell.id,
-      };
-    }
-
     // Build context
+    // Note: stateMutatorSystem may be null if not initialized, but the appliers
+    // will fail fast with a clear error if they need it for DoT/HoT effects
     const context: EffectContext = {
       tick,
       spell,
