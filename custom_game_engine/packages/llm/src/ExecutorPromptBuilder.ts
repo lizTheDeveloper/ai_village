@@ -56,6 +56,7 @@ export interface ExecutorPrompt {
   priorities?: string;            // Current strategic priorities
   goals?: string;                 // Personal and strategic goals (legacy format)
   goalsSection?: string | null;   // Dedicated goals section with completion percentages
+  taskQueue?: string;             // Current queued tasks
   villageStatus?: string;         // Village coordination context
   environment?: string;           // Detailed environmental data (resources, plants with counts)
   buildings: string;              // Available buildings to plan
@@ -97,6 +98,9 @@ export class ExecutorPromptBuilder {
     // Priorities: What you're focusing on
     const prioritiesText = this.buildPrioritiesSection(agentComp);
 
+    // Task Queue: What's already queued
+    const taskQueueText = this.buildTaskQueueSection(agentComp);
+
     // Goals: What you want to achieve
     const goals = agent.components.get('goals') as GoalsComponent | undefined;
     const goalsText = goals ? formatGoalsForPrompt(goals) : undefined;
@@ -123,6 +127,7 @@ export class ExecutorPromptBuilder {
       schemaPrompt,
       skills: skillsText,
       priorities: prioritiesText,
+      taskQueue: taskQueueText,
       goals: goalsText,
       goalsSection: goalsSectionText,
       villageStatus,
@@ -217,6 +222,44 @@ export class ExecutorPromptBuilder {
     });
 
     return `Your Current Priorities:\nYou're focusing on ${priorityDescriptions.join(', ')} right now.\n`;
+  }
+
+  /**
+   * Build task queue section showing agent's queued tasks.
+   * Critical for Executor to see what's already queued and avoid thrashing.
+   */
+  private buildTaskQueueSection(agentComp: AgentComponent | undefined): string {
+    if (!agentComp?.behaviorQueue || agentComp.behaviorQueue.length === 0) {
+      return '';
+    }
+
+    let text = '--- Current Task Queue ---\n';
+
+    const currentIndex = agentComp.currentQueueIndex ?? 0;
+    const isPaused = agentComp.queuePaused ?? false;
+
+    if (isPaused) {
+      text += `[PAUSED by ${agentComp.queueInterruptedBy || 'autonomic'}] Queue will resume when needs are satisfied.\n`;
+    }
+
+    text += 'Queued tasks:\n';
+    agentComp.behaviorQueue.forEach((queued, index) => {
+      const isCurrent = index === currentIndex;
+      const status = isCurrent ? '[CURRENT]' : (index < currentIndex ? '[DONE]' : '[PENDING]');
+      const label = queued.label || queued.behavior;
+      const repeats = queued.repeats !== undefined
+        ? (queued.repeats === 0 ? ' (repeat forever)' : ` (repeat ${queued.repeats}x)`)
+        : '';
+      const currentRepeat = queued.currentRepeat !== undefined && queued.repeats !== undefined
+        ? ` [${queued.currentRepeat + 1}/${queued.repeats}]`
+        : '';
+
+      text += `  ${index + 1}. ${status} ${label}${repeats}${currentRepeat}\n`;
+    });
+
+    text += '\nYou can add more tasks to the queue, or use "sleep_until_queue_complete" to pause until all tasks finish.\n';
+
+    return text;
   }
 
   /**
@@ -442,9 +485,13 @@ export class ExecutorPromptBuilder {
     const combatSkill = skillLevels.combat ?? 0;
     const researchSkill = skillLevels.research ?? 0;
     const cookingSkill = skillLevels.cooking ?? 0;
+    const magicSkill = skillLevels.magic ?? 0;
 
-    // PRIORITY MANAGEMENT (always available)
+    // PRIORITY & GOAL MANAGEMENT (always available)
     actions.push('set_priorities - Set task priorities (gathering, building, farming, social)');
+    actions.push('set_personal_goal - Set a short-term personal goal for yourself');
+    actions.push('set_medium_term_goal - Set a medium-term goal (next few days)');
+    actions.push('sleep_until_queue_complete - Pause executor until all queued tasks finish');
 
     // BUILDING (plan_build is beginner-friendly, build requires skill)
     actions.push('plan_build - Plan and queue a building project (auto-gathers resources)');
@@ -490,9 +537,10 @@ export class ExecutorPromptBuilder {
       actions.push('initiate_combat - Challenge another agent to combat (lethal or non-lethal, requires combat skill level 1)');
     }
 
-    // FALLBACK
-    actions.push('wander - Explore your surroundings casually');
-    actions.push('idle - Take a moment to think and rest');
+    // MAGIC (requires magic skill)
+    if (magicSkill >= 1) {
+      actions.push('cast_spell - Cast a known spell on self, ally, or enemy (requires magic skill level 1)');
+    }
 
     return actions;
   }
@@ -593,6 +641,11 @@ Remember: Talker dreams it, you do it. You're the hands and planner, they're the
       sections.push(prompt.priorities);
     }
 
+    // Task Queue (what you've already queued)
+    if (prompt.taskQueue && prompt.taskQueue.trim()) {
+      sections.push(prompt.taskQueue);
+    }
+
     // Goals (legacy format - kept for backward compatibility but less prominent)
     if (prompt.goals && prompt.goals.trim()) {
       sections.push('Your Goals:\n' + prompt.goals);
@@ -621,25 +674,11 @@ Remember: Talker dreams it, you do it. You're the hands and planner, they're the
     // Instruction
     sections.push(prompt.instruction);
 
-    // Response format
-    const responseFormat = `RESPOND IN JSON ONLY. Use this exact format:
-{
-  "thinking": "your strategic reasoning about what to do (optional)",
-  "action": {
-    "type": "action_name",
-    "target": "optional target like 'wood' or building type",
-    "amount": optional_number,
-    "building": "building type for plan_build"
-  },
-  "priorities": {
-    "gathering": 0.0-1.0,
-    "building": 0.0-1.0,
-    "farming": 0.0-1.0,
-    "social": 0.0-1.0
-  } (optional - only if setting priorities)
-}`;
-
-    sections.push(responseFormat);
+    // Note: We DO NOT add "RESPOND IN JSON ONLY" here because:
+    // - Tool calling providers inject their own response format instructions
+    // - Asking for JSON conflicts with tool calling and confuses the LLM
+    // - The provider handles response format via tool definitions
+    // The actions are provided as tools and the LLM uses tool calls
 
     return sections.join('\n\n');
   }

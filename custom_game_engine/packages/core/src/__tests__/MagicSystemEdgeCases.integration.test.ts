@@ -354,10 +354,10 @@ describe('Magic System Edge Cases - Multi-Paradigm Practitioners', () => {
     expect(hasDivine).toBe(true);
     expect(hasPact).toBe(true);
 
+    // Verify that both conflicting paradigms are present
     // In production, this would be prevented or cause consequences
-    if (hasDivine && hasPact) {
-      expect(true).toBe(true); // Detected conflict
-    }
+    const hasConflict = hasDivine && hasPact;
+    expect(hasConflict).toBe(true);
   });
 
   it('should prevent paradigm switching during active casting', () => {

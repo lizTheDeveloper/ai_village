@@ -424,7 +424,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     effect: ControlEffect,
     caster: Entity,
     target: Entity,
-    _world: World,
+    world: World,
     context: EffectContext
   ): EffectApplicationResult {
     const result: EffectApplicationResult = {
@@ -457,6 +457,13 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
         controlState.stunned = true;
         result.appliedValues['stunned'] = 1;
         this.stopMovement(target);
+        // Create status_effects component if missing
+        if (!target.components.get('status_effects')) {
+          world.addComponent(target.id, { type: 'status_effects', isStunned: true } as any);
+        } else {
+          const statusEffects = target.components.get('status_effects') as any;
+          statusEffects.isStunned = true;
+        }
         break;
 
       case 'root':
@@ -488,7 +495,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
       case 'fear':
         controlState.feared = true;
         result.appliedValues['feared'] = 1;
-        this.applyFear(target, caster);
+        this.applyFear(target, caster, world);
         break;
 
       case 'sleep':
@@ -531,7 +538,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
         // Keep target fleeing
         const caster = world.getEntity(activeEffect.casterId);
         if (caster) {
-          this.applyFear(target, caster);
+          this.applyFear(target, caster, world);
         }
         break;
 
@@ -632,28 +639,31 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     }
   }
 
-  private applyFear(target: Entity, source: Entity): void {
+  private applyFear(target: Entity, source: Entity, world: World): void {
     const targetPos = target.components.get('position') as PositionComponent | undefined;
     const sourcePos = source.components.get('position') as PositionComponent | undefined;
     const velocity = target.components.get('velocity') as VelocityComponent | undefined;
-    const agent = target.components.get('agent') as AgentComponent | undefined;
 
-    if (!targetPos || !sourcePos || !velocity) return;
+    // Apply velocity change if position components exist
+    if (targetPos && sourcePos && velocity) {
+      // Flee away from source
+      const dx = targetPos.x - sourcePos.x;
+      const dy = targetPos.y - sourcePos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // Flee away from source
-    const dx = targetPos.x - sourcePos.x;
-    const dy = targetPos.y - sourcePos.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist > 0) {
-      const fleeSpeed = 2.0;
-      velocity.vx = (dx / dist) * fleeSpeed;
-      velocity.vy = (dy / dist) * fleeSpeed;
+      if (dist > 0) {
+        const fleeSpeed = 2.0;
+        velocity.vx = (dx / dist) * fleeSpeed;
+        velocity.vy = (dy / dist) * fleeSpeed;
+      }
     }
 
-    // Set behavior to flee if agent component exists
-    if (agent && 'currentBehavior' in agent) {
-      (agent as any).currentBehavior = 'flee';
+    // Always set behavior to flee - create component if missing
+    let behavior = target.components.get('behavior') as any;
+    if (!behavior) {
+      world.addComponent(target.id, { type: 'behavior', currentBehavior: 'flee' } as any);
+    } else {
+      behavior.currentBehavior = 'flee';
     }
   }
 }

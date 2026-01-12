@@ -55,9 +55,9 @@ describe('AgentAction', () => {
       expect(behavior).toBe('pick');
     });
 
-    it('should map gather action to pick behavior', () => {
+    it('should map gather action to gather behavior', () => {
       const behavior = actionToBehavior({ type: 'gather', targetId: 'nearest' });
-      expect(behavior).toBe('pick');
+      expect(behavior).toBe('gather');
     });
 
     it('should map forage action to seek_food behavior', () => {
@@ -65,9 +65,28 @@ describe('AgentAction', () => {
       expect(behavior).toBe('seek_food');
     });
 
-    it('should map eat action to eat behavior', () => {
+    it('should map eat action to seek_food behavior', () => {
+      // 'eat' action maps to 'seek_food' behavior which finds and eats food
       const behavior = actionToBehavior({ type: 'eat' });
-      expect(behavior).toBe('eat');
+      expect(behavior).toBe('seek_food');
+    });
+
+    it('should return undefined for idle action (fallback behavior)', () => {
+      // idle should not be explicitly set by LLM - agent stays in current behavior
+      const behavior = actionToBehavior({ type: 'idle' });
+      expect(behavior).toBeUndefined();
+    });
+
+    it('should return undefined for wander action (fallback behavior)', () => {
+      // wander should not be explicitly set by LLM - agent stays in current behavior
+      const behavior = actionToBehavior({ type: 'wander' });
+      expect(behavior).toBeUndefined();
+    });
+
+    it('should return undefined for unmapped action types', () => {
+      // Unknown actions should not default to idle - return undefined
+      const behavior = actionToBehavior({ type: 'unknown_action' as any });
+      expect(behavior).toBeUndefined();
     });
   });
 });

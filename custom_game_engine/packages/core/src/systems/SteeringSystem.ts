@@ -210,9 +210,10 @@ export class SteeringSystem implements System {
         // Check if position changed significantly (moved at least 0.5 tiles)
         const dx = position.x - tracker.lastPos.x;
         const dy = position.y - tracker.lastPos.y;
-        const moved = Math.sqrt(dx * dx + dy * dy);
+        const movedSquared = dx * dx + dy * dy;
+        const thresholdSquared = 0.5 * 0.5; // 0.25
 
-        if (moved > 0.5) {
+        if (movedSquared > thresholdSquared) {
           // Made progress, reset stuck timer
           tracker.lastPos = { x: position.x, y: position.y };
           tracker.stuckTime = now;

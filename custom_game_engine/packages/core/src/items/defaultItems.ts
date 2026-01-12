@@ -336,6 +336,15 @@ export const MATERIAL_ITEMS: ItemDefinition[] = [
     baseValue: 8,
     rarity: 'common',
   }),
+
+  defineItem('thatch', 'Thatch Bundle', 'material', {
+    weight: 0.8,
+    stackSize: 50,
+    isGatherable: false,
+    craftedFrom: [{ itemId: 'fiber', amount: 5 }],
+    baseValue: 6,
+    rarity: 'common',
+  }),
 ];
 
 /**

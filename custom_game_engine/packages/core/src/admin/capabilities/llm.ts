@@ -3,6 +3,48 @@
  */
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
+import * as http from 'http';
+
+/**
+ * Helper function to fetch data from the metrics server
+ */
+async function fetchFromMetricsServer(path: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'localhost',
+      port: 8766,
+      path,
+      method: 'GET',
+    };
+
+    const req = http.request(options, (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (error) {
+          reject(new Error(`Failed to parse JSON: ${error}`));
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    req.setTimeout(5000, () => {
+      req.destroy();
+      reject(new Error('Request timeout'));
+    });
+
+    req.end();
+  });
+}
 
 const llmCapability = defineCapability({
   id: 'llm',
@@ -23,7 +65,47 @@ const llmCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/llm/providers' };
+        try {
+          const stats = await fetchFromMetricsServer('/api/llm/stats');
+          return {
+            providers: stats.providers || [],
+            queues: stats.queues || {},
+            summary: {
+              totalProviders: (stats.providers || []).length,
+              totalRequests: stats.metrics?.totalRequests || 0,
+            }
+          };
+        } catch (error) {
+          return { error: `Failed to fetch provider data: ${error}` };
+        }
+      },
+      renderResult: (data: unknown) => {
+        const result = data as {
+          providers?: string[];
+          queues?: Record<string, any>;
+          summary?: { totalProviders: number; totalRequests: number };
+          error?: string;
+        };
+
+        if (result.error) {
+          return `Error: ${result.error}`;
+        }
+
+        let output = `LLM PROVIDERS\n\n`;
+        output += `Total Providers: ${result.summary?.totalProviders || 0}\n`;
+        output += `Total Requests: ${result.summary?.totalRequests || 0}\n\n`;
+
+        if (result.queues) {
+          for (const [provider, queueData] of Object.entries(result.queues)) {
+            output += `${provider.toUpperCase()}:\n`;
+            output += `  Queue Length: ${queueData.queueLength || 0}\n`;
+            output += `  Rate Limited: ${queueData.rateLimited ? 'YES' : 'NO'}\n`;
+            output += `  Wait Time: ${queueData.rateLimitWaitMs || 0}ms\n`;
+            output += `  Utilization: ${((queueData.semaphoreUtilization || 0) * 100).toFixed(1)}%\n\n`;
+          }
+        }
+
+        return output;
       },
     }),
 
@@ -34,7 +116,12 @@ const llmCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/llm/stats' };
+        try {
+          const stats = await fetchFromMetricsServer('/api/llm/stats');
+          return stats;
+        } catch (error) {
+          return { error: `Failed to fetch queue stats: ${error}` };
+        }
       },
     }),
 
@@ -52,7 +139,12 @@ const llmCapability = defineCapability({
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/llm/costs' };
+        try {
+          // TODO: Implement cost tracking API endpoint
+          return { message: 'Cost tracking coming soon - API endpoint needed' };
+        } catch (error) {
+          return { error: `Failed to fetch costs: ${error}` };
+        }
       },
     }),
 
@@ -63,7 +155,15 @@ const llmCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to LLMRequestRouter' };
+        try {
+          const stats = await fetchFromMetricsServer('/api/llm/stats');
+          return {
+            sessions: stats.sessions || {},
+            cooldowns: 'See LLM scheduler metrics in stats',
+          };
+        } catch (error) {
+          return { error: `Failed to fetch cooldowns: ${error}` };
+        }
       },
     }),
   ],

@@ -1,0 +1,25 @@
+{
+  "universeId": "universe:12f92693-d990-4fde-b36c-7bb9f0e68958",
+  "snapshots": [
+    {
+      "tick": 500,
+      "timestamp": 1768077197735,
+      "day": 5,
+      "type": "canonical",
+      "canonEvent": {
+        "type": "birth",
+        "title": "First Birth",
+        "description": "The first agent was born",
+        "day": 5,
+        "importance": 8,
+        "entities": [
+          "agent-1"
+        ]
+      },
+      "fileSize": 455,
+      "checksum": "-3f6c3096",
+      "filename": "canonical/birth_5_1768077197733.json.gz"
+    }
+  ],
+  "lastUpdated": 1768077197736
+}

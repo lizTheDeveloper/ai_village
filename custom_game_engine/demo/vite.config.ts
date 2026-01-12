@@ -1,9 +1,14 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 import fs from 'fs';
+import dotenv from 'dotenv';
 
 // Queue file path for pixellab daemon
 const QUEUE_FILE = path.resolve(__dirname, '../scripts/sprite-generation-queue.json');
+
+// Load environment variables from parent directory
+const envPath = path.resolve(__dirname, '../.env');
+const envConfig = dotenv.config({ path: envPath }).parsed || {};
 
 export default defineConfig({
   // Load .env files from parent directory (custom_game_engine/)
@@ -64,6 +69,62 @@ export default defineConfig({
             }
           } catch (error) {
             console.warn('[register-with-orchestrator] Could not register with orchestrator (orchestrator may not be running):', error instanceof Error ? error.message : String(error));
+          }
+        });
+      },
+    },
+    {
+      name: 'llm-availability-check',
+      configureServer(server) {
+        server.middlewares.use('/api/llm/check-availability', async (req, res, next) => {
+          if (req.method !== 'GET') {
+            next();
+            return;
+          }
+
+          const url = new URL(req.url || '', `http://${req.headers.host}`);
+          const baseUrl = url.searchParams.get('baseUrl');
+
+          if (!baseUrl) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ available: false, error: 'Missing baseUrl parameter' }));
+            return;
+          }
+
+          try {
+            // Determine API key based on provider URL
+            let apiKey = '';
+            if (baseUrl.includes('groq.com')) {
+              apiKey = envConfig.GROQ_API_KEY || process.env.GROQ_API_KEY || '';
+            } else if (baseUrl.includes('cerebras.ai')) {
+              apiKey = envConfig.CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
+            } else if (baseUrl.includes('api.openai.com')) {
+              apiKey = envConfig.OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+            }
+
+            const headers: Record<string, string> = {};
+            if (apiKey) {
+              headers['Authorization'] = `Bearer ${apiKey}`;
+            }
+
+            // Make server-side request (no CORS issues)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(`${baseUrl}/models`, {
+              method: 'GET',
+              headers,
+              signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ available: response.ok }));
+          } catch (error) {
+            console.error('[llm-availability-check] Error:', error);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ available: false, error: String(error) }));
           }
         });
       },
@@ -160,6 +221,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@ai-village/core': path.resolve(__dirname, '../packages/core/src/index.ts'),
+      '@ai-village/botany': path.resolve(__dirname, '../packages/botany/src/index.ts'),
       '@ai-village/persistence': path.resolve(__dirname, '../packages/persistence/src/index.ts'),
       '@ai-village/metrics': path.resolve(__dirname, '../packages/metrics/src/index.ts'),
       '@ai-village/reproduction': path.resolve(__dirname, '../packages/reproduction/src/index.ts'),

@@ -171,7 +171,28 @@ export class GatherBehavior extends BaseBehavior {
     const target = this.findGatherTarget(world, position, preferredType, inventory, isStarvingMode);
 
     if (!target) {
-      // No resources or seed-producing plants found - behavior complete, let system decide next action
+      // No resources or seed-producing plants found within GATHER_MAX_RANGE (50 units)
+      console.warn(`[GatherBehavior] Agent ${entity.id} completed gather: no resources found within ${GATHER_MAX_RANGE} units (preferredType: ${preferredType}, isStarvingMode: ${isStarvingMode}, position: ${position.x.toFixed(1)}, ${position.y.toFixed(1)})`);
+
+      // If we have a preferred type, clear it so the agent can try other resources
+      // This prevents getting stuck in a loop of "can't find stone -> ask LLM -> gather stone again -> can't find stone"
+      if (preferredType && !isStarvingMode) {
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+          ...current,
+          behaviorState: {
+            ...current.behaviorState,
+            resourceType: undefined, // Clear preferred type
+          },
+        }));
+        // Debug: Agent couldn't find preferred resource, falling back to any available
+        // console.log(`[GatherBehavior] Cleared preferredType (${preferredType}) - will try any available resource`);
+        // Don't complete yet - try again next tick with any resource type
+        return;
+      }
+
+      // CRITICAL: Signal behavior completion so decision processor can assign new behavior
+      // Without this, agent stays in 'gather' forever doing nothing
+      this.complete(entity);
       return { complete: true, reason: 'no_resources_found' };
     }
 
@@ -188,6 +209,9 @@ export class GatherBehavior extends BaseBehavior {
 
       if (workSpeedMultiplier === 0) {
         // Too exhausted to work - return complete to let system decide next behavior
+        console.warn(`[GatherBehavior] Agent ${entity.id} completed gather: too exhausted to work (energy: ${needs?.energy ?? 'N/A'})`);
+        // CRITICAL: Signal behavior completion so decision processor can assign new behavior
+        this.complete(entity);
         return { complete: true, reason: 'too_exhausted_to_work' };
       }
 

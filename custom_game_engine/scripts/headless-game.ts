@@ -30,7 +30,6 @@ import {
   TemperatureSystem,
   WeatherSystem,
   SoilSystem,
-  PlantSystem,
   PlantComponent,
   TimeSystem,
   SleepSystem,
@@ -100,6 +99,13 @@ import {
   ReproductionSystem,
   StateMutatorSystem,
 } from '../packages/core/src/index.js';
+
+import {
+  PlantSystem,
+  PlantDiscoverySystem,
+  PlantDiseaseSystem,
+  WildPlantPopulationSystem,
+} from '../packages/botany/src/index.js';
 
 import {
   OllamaProvider,
@@ -314,8 +320,10 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(researchSystem);
   registerDefaultResearch();
 
-  // Resource gathering
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem(gameLoop.world.eventBus));
+  // Resource gathering - Uses StateMutatorSystem for batched resource updates
+  const resourceGatheringSystem = new ResourceGatheringSystem();
+  resourceGatheringSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(resourceGatheringSystem);
 
   // Movement and memory
   gameLoop.systemRegistry.register(new MovementSystem());

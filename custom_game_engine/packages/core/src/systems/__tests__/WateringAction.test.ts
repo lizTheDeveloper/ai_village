@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
+import { SoilSystem } from '../SoilSystem.js';
 
 /**
  * Phase 9: Watering Action Tests
@@ -24,24 +25,77 @@ describe('Watering Action', () => {
 
   describe('Manual Watering', () => {
     it('should increase tile moisture when watered', () => {
-      // Create a tile with moisture = 30
-      // Water the tile
-      // Verify moisture increased (e.g., to 50)
-      expect(true).toBe(true); // Placeholder - will fail when implemented
+      const tile = {
+        terrain: 'dirt' as const,
+        fertility: 70,
+        moisture: 30,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 100,
+        composted: false,
+      };
+
+      const soilSystem = new SoilSystem();
+
+      soilSystem.waterTile(_world, tile, 5, 5);
+
+      // waterTile adds 20 moisture: 30 + 20 = 50
+      expect(tile.moisture).toBe(50);
     });
 
     it('should cap moisture at 100', () => {
-      // Create a tile with moisture = 95
-      // Water the tile (would add 20)
-      // Verify moisture is capped at 100
-      expect(true).toBe(true); // Placeholder
+      const tile = {
+        terrain: 'dirt' as const,
+        fertility: 70,
+        moisture: 95,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 100,
+        composted: false,
+      };
+
+      const soilSystem = new SoilSystem();
+
+      soilSystem.waterTile(_world, tile, 5, 5);
+
+      // Would be 95 + 20 = 115, but capped at 100
+      expect(tile.moisture).toBe(100);
     });
 
     it('should update lastWatered timestamp', () => {
-      // Create a tile with lastWatered = 0
-      // Water the tile at game time = 1000
-      // Verify lastWatered = 1000
-      expect(true).toBe(true); // Placeholder
+      const tile = {
+        terrain: 'dirt' as const,
+        fertility: 70,
+        moisture: 30,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 100,
+        composted: false,
+      };
+
+      // Set world tick to 1000
+      _world.setTick(1000);
+
+      const soilSystem = new SoilSystem();
+
+      soilSystem.waterTile(_world, tile, 5, 5);
+
+      expect(tile.lastWatered).toBe(1000);
     });
 
     it('should emit soil:watered event', () => {

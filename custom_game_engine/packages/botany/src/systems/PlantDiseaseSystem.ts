@@ -578,10 +578,10 @@ export class PlantDiseaseSystem implements System {
 
       const dx = otherPlant.position.x - plant.position.x;
       const dy = otherPlant.position.y - plant.position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      // Check if within companion radius (default 3 tiles)
-      if (distance <= 3 && pest.repelledBy.includes(otherPlant.speciesId)) {
+      // Check if within companion radius (default 3 tiles, squared = 9)
+      if (distanceSquared <= 9 && pest.repelledBy.includes(otherPlant.speciesId)) {
         return Math.random() < 0.6; // 60% chance to be repelled
       }
     }
@@ -620,9 +620,10 @@ export class PlantDiseaseSystem implements System {
         // Check distance
         const dx = targetPlant.position.x - plant.position.x;
         const dy = targetPlant.position.y - plant.position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
+        const spreadRadiusSquared = disease.spreadRadius * disease.spreadRadius;
 
-        if (distance > disease.spreadRadius) continue;
+        if (distanceSquared > spreadRadiusSquared) continue;
 
         // Check if already infected
         if (targetPlant.diseases.some(d => d.diseaseId === disease.id)) continue;
@@ -632,7 +633,8 @@ export class PlantDiseaseSystem implements System {
         const targetCategory = targetSpecies?.category ?? 'crop';
         if (!disease.susceptibleCategories.includes(targetCategory)) continue;
 
-        // Calculate spread chance
+        // Calculate spread chance (need actual distance for this)
+        const distance = Math.sqrt(distanceSquared);
         const resistanceFactor = 1 - (targetPlant.genetics.diseaseResistance / 100);
         const distanceFactor = 1 - (distance / disease.spreadRadius);
         const spreadChance = disease.spreadChance * resistanceFactor * distanceFactor;
@@ -698,9 +700,10 @@ export class PlantDiseaseSystem implements System {
         // Check distance
         const dx = targetPlant.position.x - plant.position.x;
         const dy = targetPlant.position.y - plant.position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
+        const migrationRadiusSquared = pest.migrationRadius * pest.migrationRadius;
 
-        if (distance > pest.migrationRadius) continue;
+        if (distanceSquared > migrationRadiusSquared) continue;
 
         // Check category
         const targetSpecies = this.speciesLookup?.(targetPlant.speciesId);

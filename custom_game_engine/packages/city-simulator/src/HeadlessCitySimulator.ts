@@ -28,11 +28,20 @@ import {
   CT,
   // Centralized system registration
   registerAllSystems as coreRegisterAllSystems,
+  type PlantSystemsConfig,
   registerDefaultMaterials,
   initializeDefaultRecipes,
   globalRecipeRegistry,
   registerDefaultResearch,
 } from '@ai-village/core';
+
+// Plant systems from @ai-village/botany (completes the extraction from core)
+import {
+  PlantSystem,
+  PlantDiscoverySystem,
+  PlantDiseaseSystem,
+  WildPlantPopulationSystem,
+} from '@ai-village/botany';
 
 import { createWanderingAgent, TerrainGenerator, ChunkManager } from '@ai-village/world';
 
@@ -170,6 +179,14 @@ export class HeadlessCitySimulator {
     // Generate session ID for metrics
     const gameSessionId = `headless_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+    // Plant systems from @ai-village/botany (completes package extraction)
+    const plantSystems: PlantSystemsConfig = {
+      PlantSystem,
+      PlantDiscoverySystem,
+      PlantDiseaseSystem,
+      WildPlantPopulationSystem,
+    };
+
     // Use centralized system registration - full game engine, headless
     const coreResult = coreRegisterAllSystems(this.gameLoop, {
       llmQueue: undefined,  // No LLM in headless mode
@@ -178,6 +195,7 @@ export class HeadlessCitySimulator {
       metricsServerUrl: 'ws://localhost:8765',
       enableMetrics: false,  // Disable metrics for performance
       enableAutoSave: false, // Disable auto-save
+      plantSystems,
     });
 
     console.log('[HeadlessSimulator] Registered full game systems (headless)');

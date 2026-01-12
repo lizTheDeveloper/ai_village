@@ -18,6 +18,8 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { DeityComponent, type DivineDomain } from '../components/DeityComponent.js';
+import { createTagsComponent } from '../components/TagsComponent.js';
+import { createIdentityComponent } from '../components/IdentityComponent.js';
 import type {
   DeityOrigin,
   PerceivedPersonality
@@ -550,6 +552,14 @@ export class DeityEmergenceSystem implements System {
 
     // Add component to entity
     (deityEntity as any).addComponent(deityComponent);
+
+    // Add identity component for chat system and UI display
+    const identityComponent = createIdentityComponent(identity.primaryName, 'deity');
+    (deityEntity as any).addComponent(identityComponent);
+
+    // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
+    const tagsComponent = createTagsComponent('deity');
+    (deityEntity as any).addComponent(tagsComponent);
 
     // Register AI deity for auto-approval of believer creations
     // AI gods automatically scrutinize and approve their believers' inventions

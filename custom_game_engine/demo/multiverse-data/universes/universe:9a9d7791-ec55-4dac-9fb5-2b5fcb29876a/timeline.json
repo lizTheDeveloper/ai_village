@@ -1,0 +1,672 @@
+{
+  "universeId": "universe:9a9d7791-ec55-4dac-9fb5-2b5fcb29876a",
+  "snapshots": [
+    {
+      "tick": 0,
+      "timestamp": 1768168377421,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030365,
+      "checksum": "-1087314e",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168377443,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-19d103b6",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168377451,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-3b81dbe1",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168377453,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "152b9bb1",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168380261,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "3a8a4919",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168380280,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-1926df3",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168380280,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "758ad381",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168380284,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-1e6c8713",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168380286,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-5b0ce1b3",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168381899,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "-36210246",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168383510,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "30848557",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168383518,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "4c4f44df",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168383524,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030409,
+      "checksum": "2912a231",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168383525,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030409,
+      "checksum": "5b8a20dd",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168386195,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-3891c01a",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168386205,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-7f743692",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168386206,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "2a285759",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168386207,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "79e2ffb7",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168386211,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-4859eb31",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168389167,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030401,
+      "checksum": "7e314236",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168389179,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030402,
+      "checksum": "-47323be0",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168389182,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "7b47f59c",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168389182,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-1b6ff84d",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168391343,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030400,
+      "checksum": "11419e91",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168392495,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "-674acc8d",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168392508,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "5b2d2483",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168392509,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "368e5d8b",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168404984,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030413,
+      "checksum": "5bc68198",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168405002,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030413,
+      "checksum": "-261dddbf",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168405012,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030413,
+      "checksum": "6295128c",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168405013,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030413,
+      "checksum": "52b3d31f",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168405016,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030413,
+      "checksum": "42b54a72",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168407507,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "4723ef96",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168407520,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-1b02f89a",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168407520,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "4f531d2e",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168407521,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-8eec7be",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168407539,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030408,
+      "checksum": "-47f92191",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168409826,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030403,
+      "checksum": "1243e458",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168409840,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "5e89af01",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168409848,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030411,
+      "checksum": "3bcd70c",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168409851,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030411,
+      "checksum": "7d419276",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168409852,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030411,
+      "checksum": "-119011e7",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168412904,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "3bc4d129",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168412919,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-3b469964",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168412921,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-23f90391",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168412922,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "6fc6e461",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168412925,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-1ae0134b",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168413970,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030403,
+      "checksum": "-237a4834",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168415653,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030403,
+      "checksum": "30a17f78",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168415666,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "15184ecc",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168415670,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-575053df",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168415671,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "43006da",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168418230,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "-379559fc",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168418235,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "604f44fb",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168418239,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-114958e3",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168418247,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-1cdf6f6e",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168421151,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "1a9076c4",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168421166,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-5011422",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168421170,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "67967644",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168421175,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-45e357ea",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168455311,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "3cad68a2",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168455327,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "-5b50c9cb",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168455330,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "160f5c04",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168455337,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "-747b4cbe",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168455341,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "72236000",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168502892,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030402,
+      "checksum": "796669eb",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168502913,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "c1e2a3e",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168502920,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "-7bda1793",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168502929,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "4151e891",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168560918,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "-2d26a0f3",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168562710,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "16c1a347",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168562722,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "-15ca77cb",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168562723,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "7ef5c380",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768168562728,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030410,
+      "checksum": "32acba1a",
+      "filename": "0.json.gz"
+    }
+  ],
+  "lastUpdated": 1768168562729
+}

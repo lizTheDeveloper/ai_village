@@ -1,0 +1,366 @@
+{
+  "universeId": "universe:main",
+  "snapshots": [
+    {
+      "tick": 0,
+      "timestamp": 1768197873074,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1934740,
+      "checksum": "regenerated",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 553,
+      "timestamp": 1768197874040,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1968794,
+      "checksum": "regenerated",
+      "filename": "553.json.gz"
+    },
+    {
+      "tick": 597,
+      "timestamp": 1768197875034,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1970051,
+      "checksum": "regenerated",
+      "filename": "597.json.gz"
+    },
+    {
+      "tick": 740,
+      "timestamp": 1768197876076,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1966998,
+      "checksum": "regenerated",
+      "filename": "740.json.gz"
+    },
+    {
+      "tick": 762,
+      "timestamp": 1768197876375,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 421031,
+      "checksum": "regenerated",
+      "filename": "762.json.gz"
+    },
+    {
+      "tick": 1109,
+      "timestamp": 1768197877409,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1977723,
+      "checksum": "regenerated",
+      "filename": "1109.json.gz"
+    },
+    {
+      "tick": 3555,
+      "timestamp": 1768197878671,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2524708,
+      "checksum": "regenerated",
+      "filename": "3555.json.gz"
+    },
+    {
+      "tick": 6488,
+      "timestamp": 1768197879670,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2004069,
+      "checksum": "regenerated",
+      "filename": "6488.json.gz"
+    },
+    {
+      "tick": 9001,
+      "timestamp": 1768197880699,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2038677,
+      "checksum": "regenerated",
+      "filename": "9001.json.gz"
+    },
+    {
+      "tick": 4126,
+      "timestamp": 1768198115395,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1985016,
+      "checksum": "-4f451bdb",
+      "filename": "4126.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198154790,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 361276,
+      "checksum": "-478de837",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198155813,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "3a8a4919",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198156853,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "5b8a20dd",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198157910,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030402,
+      "checksum": "-47323be0",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198158966,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030403,
+      "checksum": "-77150e9f",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198159981,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "-8eec7be",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198161051,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "3bc4d129",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198162138,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-575053df",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198163165,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "7f2f43f8",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198164179,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030403,
+      "checksum": "72236000",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198165242,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030407,
+      "checksum": "-15ca77cb",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198166318,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030411,
+      "checksum": "-28b52462",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198167391,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "-779837d0",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198168407,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030404,
+      "checksum": "6aa43c27",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198169484,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030405,
+      "checksum": "627912ee",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198170550,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030406,
+      "checksum": "265b2134",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198171580,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2030023,
+      "checksum": "444d481f",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198172612,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2029621,
+      "checksum": "7305b882",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 0,
+      "timestamp": 1768198173592,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1934740,
+      "checksum": "7c43589b",
+      "filename": "0.json.gz"
+    },
+    {
+      "tick": 553,
+      "timestamp": 1768198174594,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 1968794,
+      "checksum": "-53ad8ea7",
+      "filename": "553.json.gz"
+    },
+    {
+      "tick": 597,
+      "timestamp": 1768198175578,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 1970051,
+      "checksum": "-18804863",
+      "filename": "597.json.gz"
+    },
+    {
+      "tick": 740,
+      "timestamp": 1768198176550,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 1966998,
+      "checksum": "4e4681d",
+      "filename": "740.json.gz"
+    },
+    {
+      "tick": 762,
+      "timestamp": 1768198176863,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 421031,
+      "checksum": "-627b796e",
+      "filename": "762.json.gz"
+    },
+    {
+      "tick": 1109,
+      "timestamp": 1768198177834,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 1977723,
+      "checksum": "-5fa4ece7",
+      "filename": "1109.json.gz"
+    },
+    {
+      "tick": 3555,
+      "timestamp": 1768198179046,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2524708,
+      "checksum": "9df03f8",
+      "filename": "3555.json.gz"
+    },
+    {
+      "tick": 4126,
+      "timestamp": 1768198180476,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 1985016,
+      "checksum": "86d66e9",
+      "filename": "4126.json.gz"
+    },
+    {
+      "tick": 6488,
+      "timestamp": 1768198181421,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2004069,
+      "checksum": "-37066662",
+      "filename": "6488.json.gz"
+    },
+    {
+      "tick": 9001,
+      "timestamp": 1768198182419,
+      "day": 2,
+      "type": "manual",
+      "fileSize": 2038677,
+      "checksum": "484080c0",
+      "filename": "9001.json.gz"
+    },
+    {
+      "tick": 2167,
+      "timestamp": 1768198360543,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1973192,
+      "checksum": "127ca290",
+      "filename": "2167.json.gz"
+    },
+    {
+      "tick": 939,
+      "timestamp": 1768198791775,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1975770,
+      "checksum": "45dc8ebf",
+      "filename": "939.json.gz"
+    }
+  ],
+  "lastUpdated": 1768198791776
+}

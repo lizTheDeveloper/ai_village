@@ -23,12 +23,28 @@ import {
   getNeedBarColor,
 } from './renderUtils.js';
 import { renderSprite } from '../../SpriteRenderer.js';
+import { devActionsService } from '../../services/DevActionsService.js';
+
+/** Click region for interactive elements */
+interface ClickRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  action: 'need_up' | 'need_down' | 'nav_target';
+  needType?: string;
+  targetX?: number;
+  targetY?: number;
+}
 
 export class InfoSection {
   private panelWidth = 360;
   private scrollOffset = 0;
   private navigationTargetBounds: { x: number; y: number; width: number; height: number; targetX: number; targetY: number } | null = null;
   private onNavigateToTarget: ((x: number, y: number) => void) | null = null;
+  private clickRegions: ClickRegion[] = [];
+  private currentEntityId: string | null = null;
+  private devMode = true; // Show dev controls
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -54,9 +70,29 @@ export class InfoSection {
   }
 
   /**
-   * Handle click on navigation target.
+   * Set dev mode (shows/hides edit controls).
+   */
+  setDevMode(enabled: boolean): void {
+    this.devMode = enabled;
+  }
+
+  /**
+   * Handle click on navigation target or dev controls.
    */
   handleClick(clickX: number, clickY: number): boolean {
+    // Check click regions first (dev controls)
+    for (const region of this.clickRegions) {
+      if (
+        clickX >= region.x &&
+        clickX <= region.x + region.width &&
+        clickY >= region.y &&
+        clickY <= region.y + region.height
+      ) {
+        return this.executeAction(region);
+      }
+    }
+
+    // Then check navigation target
     if (this.navigationTargetBounds && this.onNavigateToTarget) {
       const bounds = this.navigationTargetBounds;
       if (
@@ -67,6 +103,51 @@ export class InfoSection {
       ) {
         this.onNavigateToTarget(bounds.targetX, bounds.targetY);
         return true;
+      }
+    }
+    return false;
+  }
+
+  private executeAction(region: ClickRegion): boolean {
+    if (!this.currentEntityId) return false;
+
+    switch (region.action) {
+      case 'need_up': {
+        if (!region.needType) return false;
+        const world = devActionsService.getWorld();
+        if (!world) return false;
+        const entity = world.getEntity(this.currentEntityId);
+        if (!entity) return false;
+        const needs = entity.components.get('needs') as Record<string, number> | undefined;
+        const currentValue = needs?.[region.needType] ?? 0.5;
+        const result = devActionsService.setNeed(
+          this.currentEntityId,
+          region.needType,
+          Math.min(1, currentValue + 0.1)
+        );
+        return result.success;
+      }
+      case 'need_down': {
+        if (!region.needType) return false;
+        const world = devActionsService.getWorld();
+        if (!world) return false;
+        const entity = world.getEntity(this.currentEntityId);
+        if (!entity) return false;
+        const needs = entity.components.get('needs') as Record<string, number> | undefined;
+        const currentValue = needs?.[region.needType] ?? 0.5;
+        const result = devActionsService.setNeed(
+          this.currentEntityId,
+          region.needType,
+          Math.max(0, currentValue - 0.1)
+        );
+        return result.success;
+      }
+      case 'nav_target': {
+        if (region.targetX !== undefined && region.targetY !== undefined && this.onNavigateToTarget) {
+          this.onNavigateToTarget(region.targetX, region.targetY);
+          return true;
+        }
+        return false;
       }
     }
     return false;
@@ -86,6 +167,10 @@ export class InfoSection {
     world?: any
   ): void {
     const { ctx, x, y, width, height, padding, lineHeight } = context;
+
+    // Clear click regions and store entity ID
+    this.clickRegions = [];
+    this.currentEntityId = entity?.id || null;
 
     // Save the context state for clipping
     ctx.save();
@@ -503,15 +588,22 @@ export class InfoSection {
     const spiritual = entity.components?.get('spiritual') as SpiritualComponent | undefined;
     if (!spiritual || !spiritual.believedDeity) return false;
 
-    // Find the player deity entity (has deity component with domain 'player' or tag 'player_god')
+    // Find the player deity entity
     let playerDeityId: string | null = null;
     if (typeof world.entities?.values === 'function') {
       for (const ent of world.entities.values()) {
-        // Check for player deity by deity component with player domain
         const deity = ent.components?.get('deity');
-        if (deity && (deity as any).domain === 'player') {
-          playerDeityId = ent.id;
-          break;
+        if (deity) {
+          // Primary check: controller === 'player' (matches DivinePowersPanel)
+          if ((deity as any).controller === 'player') {
+            playerDeityId = ent.id;
+            break;
+          }
+          // Fallback: domain === 'player'
+          if ((deity as any).domain === 'player') {
+            playerDeityId = ent.id;
+            break;
+          }
         }
         // Also check for supreme_creator as fallback
         if (ent.components?.has('supreme_creator')) {
@@ -536,7 +628,9 @@ export class InfoSection {
     padding: number,
     lineHeight: number
   ): number {
-    const barWidth = this.panelWidth - padding * 2 - 60;
+    // Adjust bar width based on dev mode (make room for buttons)
+    const buttonSpace = this.devMode ? 50 : 0;
+    const barWidth = this.panelWidth - padding * 2 - 60 - buttonSpace;
     const barHeight = 12;
     const barX = panelX + padding + 60;
     const barY = y - 9;
@@ -565,6 +659,62 @@ export class InfoSection {
     ctx.textAlign = 'center';
     ctx.fillText(`${displayValue.toFixed(0)}`, barX + barWidth / 2, barY + barHeight - 2);
     ctx.textAlign = 'left';
+
+    // Dev controls: [−] [+] buttons
+    if (this.devMode) {
+      const needType = label.toLowerCase();
+      const buttonWidth = 20;
+      const buttonHeight = 12;
+      const buttonY = barY;
+      const controlsX = barX + barWidth + 5;
+
+      // Down button [−]
+      if (value > 0) {
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.6)';
+        ctx.fillRect(controlsX, buttonY, buttonWidth, buttonHeight);
+        ctx.strokeStyle = '#FF6666';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(controlsX, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('−', controlsX + buttonWidth / 2, barY + buttonHeight - 2);
+        ctx.textAlign = 'left';
+
+        this.clickRegions.push({
+          x: controlsX,
+          y: buttonY,
+          width: buttonWidth,
+          height: buttonHeight,
+          action: 'need_down',
+          needType,
+        });
+      }
+
+      // Up button [+]
+      if (value < 1) {
+        const upX = controlsX + buttonWidth + 4;
+        ctx.fillStyle = 'rgba(100, 255, 100, 0.6)';
+        ctx.fillRect(upX, buttonY, buttonWidth, buttonHeight);
+        ctx.strokeStyle = '#66FF66';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(upX, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('+', upX + buttonWidth / 2, barY + buttonHeight - 2);
+        ctx.textAlign = 'left';
+
+        this.clickRegions.push({
+          x: upX,
+          y: buttonY,
+          width: buttonWidth,
+          height: buttonHeight,
+          action: 'need_up',
+          needType,
+        });
+      }
+    }
 
     return y + lineHeight;
   }

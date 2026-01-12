@@ -29,14 +29,20 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     effect: TransformEffect,
     caster: Entity,
     target: Entity,
-    _world: World,
+    world: World,
     context: EffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, any> = {};
 
+    // Create appearance component if missing (defensive programming)
+    let appearance = target.components.get('appearance') as any;
+    if (!appearance) {
+      appearance = { type: 'appearance', form: 'default', size: 1.0, material: 'flesh' };
+      world.addComponent(target.id, appearance);
+    }
+
     // Store original form for restoration
-    const appearance = target.components.get('appearance') as any;
-    if (appearance && !this.originalForms.has(target.id)) {
+    if (!this.originalForms.has(target.id)) {
       this.originalForms.set(target.id, { ...appearance });
     }
 
@@ -44,11 +50,13 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     switch (effect.transformType) {
       case 'form': {
         // Polymorph - change entity's form
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        targetAppearance.form = effect.targetState;
-
-        appliedValues.newForm = effect.targetState;
-        appliedValues.oldForm = this.originalForms.get(target.id)?.form || 'unknown';
+        // Support both 'targetState' and 'newForm' properties
+        const newForm = (effect as any).targetState || (effect as any).newForm;
+        if (newForm) {
+          appearance.form = newForm;
+          appliedValues.newForm = newForm;
+          appliedValues.oldForm = this.originalForms.get(target.id)?.form || 'unknown';
+        }
         break;
       }
 

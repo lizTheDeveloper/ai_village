@@ -1,6 +1,7 @@
 /**
  * SkillsSection - Renders the Skills tab content.
  * Shows agent skills with levels/XP and personality traits.
+ * Includes interactive controls for dev tools (level +/-, XP grants).
  */
 
 import type {
@@ -10,10 +11,22 @@ import type {
   PersonalityComponentData,
 } from './types.js';
 import { renderSeparator } from './renderUtils.js';
+import { devActionsService } from '../../services/DevActionsService.js';
+
+/** Click region for interactive elements */
+interface ClickRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  action: 'level_up' | 'level_down' | 'grant_xp';
+  skillId: string;
+}
 
 /** Skill display info. */
 const SKILL_INFO: Record<string, { name: string; icon: string }> = {
   building: { name: 'Building', icon: '🏗️' },
+  architecture: { name: 'Architecture', icon: '📐' },
   farming: { name: 'Farming', icon: '🌾' },
   gathering: { name: 'Gathering', icon: '🪓' },
   cooking: { name: 'Cooking', icon: '🍳' },
@@ -21,8 +34,11 @@ const SKILL_INFO: Record<string, { name: string; icon: string }> = {
   social: { name: 'Social', icon: '💬' },
   exploration: { name: 'Exploration', icon: '🧭' },
   combat: { name: 'Combat', icon: '⚔️' },
+  hunting: { name: 'Hunting', icon: '🏹' },
+  stealth: { name: 'Stealth', icon: '🥷' },
   animal_handling: { name: 'Animals', icon: '🐾' },
   medicine: { name: 'Medicine', icon: '💊' },
+  research: { name: 'Research', icon: '📚' },
 };
 
 /** Skill level names. */
@@ -64,6 +80,9 @@ const GAME_TRAITS: Array<{ key: keyof PersonalityComponentData; label: string }>
 export class SkillsSection {
   private panelWidth = 360;
   private scrollOffset = 0;
+  private clickRegions: ClickRegion[] = [];
+  private currentEntityId: string | null = null;
+  private devMode = true; // Show dev controls
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -81,13 +100,98 @@ export class SkillsSection {
     }
   }
 
+  /**
+   * Set dev mode (shows/hides edit controls).
+   */
+  setDevMode(enabled: boolean): void {
+    this.devMode = enabled;
+  }
+
+  /**
+   * Handle click events on the section.
+   * @param clickX - X coordinate relative to panel
+   * @param clickY - Y coordinate relative to panel
+   * @returns true if click was handled
+   */
+  handleClick(clickX: number, clickY: number): boolean {
+    if (!this.devMode || !this.currentEntityId) {
+      return false;
+    }
+
+    for (const region of this.clickRegions) {
+      if (
+        clickX >= region.x &&
+        clickX <= region.x + region.width &&
+        clickY >= region.y &&
+        clickY <= region.y + region.height
+      ) {
+        return this.executeAction(region);
+      }
+    }
+
+    return false;
+  }
+
+  private executeAction(region: ClickRegion): boolean {
+    if (!this.currentEntityId) return false;
+
+    switch (region.action) {
+      case 'level_up': {
+        const result = devActionsService.setSkillLevel(
+          this.currentEntityId,
+          region.skillId,
+          this.getSkillLevel(region.skillId) + 1
+        );
+        return result.success;
+      }
+      case 'level_down': {
+        const result = devActionsService.setSkillLevel(
+          this.currentEntityId,
+          region.skillId,
+          Math.max(0, this.getSkillLevel(region.skillId) - 1)
+        );
+        return result.success;
+      }
+      case 'grant_xp': {
+        const result = devActionsService.grantSkillXP(
+          this.currentEntityId,
+          region.skillId,
+          100
+        );
+        return result.success;
+      }
+    }
+
+    return false;
+  }
+
+  private getSkillLevel(skillId: string): number {
+    if (!this.currentEntityId) return 0;
+    const world = devActionsService.getWorld();
+    if (!world) return 0;
+
+    const entity = world.getEntity(this.currentEntityId);
+    if (!entity) return 0;
+
+    const skills = entity.components.get('skills') as {
+      levels?: Record<string, number>;
+    } | undefined;
+
+    return skills?.levels?.[skillId] || 0;
+  }
+
   render(
     context: SectionRenderContext,
     identity: IdentityComponent | undefined,
     skills: SkillsComponentData | undefined,
-    personality: PersonalityComponentData | undefined
+    personality: PersonalityComponentData | undefined,
+    entityId?: string
   ): void {
     const { ctx, x, y, width, height, padding, lineHeight } = context;
+
+    // Clear click regions for fresh render
+    this.clickRegions = [];
+    this.currentEntityId = entityId || null;
 
     // Save the context state for clipping
     ctx.save();
@@ -97,16 +201,30 @@ export class SkillsSection {
 
     let currentY = y + padding - this.scrollOffset;
 
-    // Header
+    // Header with dev indicator
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 16px monospace';
     ctx.fillText(identity?.name ?? 'Agent', x + padding, currentY + 12);
+
+    if (this.devMode) {
+      ctx.fillStyle = '#FF6666';
+      ctx.font = '10px monospace';
+      ctx.fillText('DEV', x + width - padding - 25, currentY + 12);
+    }
+
     currentY += 24;
 
     // Skills Section
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 14px monospace';
     ctx.fillText('Skills', x + padding, currentY);
+
+    if (this.devMode) {
+      ctx.fillStyle = '#888888';
+      ctx.font = '9px monospace';
+      ctx.fillText('(click to edit)', x + padding + 50, currentY);
+    }
+
     currentY += lineHeight + 5;
 
     if (skills) {
@@ -132,6 +250,7 @@ export class SkillsSection {
           ctx,
           x,
           currentY,
+          skillId,
           info.icon,
           info.name,
           level as 0 | 1 | 2 | 3 | 4 | 5,
@@ -210,6 +329,7 @@ export class SkillsSection {
     ctx: CanvasRenderingContext2D,
     panelX: number,
     y: number,
+    skillId: string,
     icon: string,
     name: string,
     level: 0 | 1 | 2 | 3 | 4 | 5,
@@ -220,7 +340,7 @@ export class SkillsSection {
     const levelName = SKILL_LEVEL_NAMES[level];
     const levelColor = this.getLevelColor(level);
 
-    // Line 1: Icon, skill name, level name, and affinity
+    // Line 1: Icon, skill name, level name, and controls
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '11px monospace';
     ctx.fillText(`${icon} ${name}`, panelX + padding, y);
@@ -231,12 +351,90 @@ export class SkillsSection {
     const levelX = panelX + padding + 95;
     ctx.fillText(levelName, levelX, y);
 
-    // Affinity indicator (if not default) - at end of line 1
-    if (affinity !== 1.0) {
-      const affinityText = affinity > 1.0 ? `+${((affinity - 1) * 100).toFixed(0)}%` : `${((affinity - 1) * 100).toFixed(0)}%`;
-      ctx.fillStyle = affinity > 1.0 ? '#88FF88' : '#FF8888';
+    // Dev controls: [−] [+] [+XP]
+    if (this.devMode) {
+      const controlsX = panelX + this.panelWidth - padding - 80;
+      const buttonWidth = 20;
+      const buttonHeight = 14;
+      const buttonY = y - 10;
+
+      // Level down button [−]
+      if (level > 0) {
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.6)';
+        ctx.fillRect(controlsX, buttonY, buttonWidth, buttonHeight);
+        ctx.strokeStyle = '#FF6666';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(controlsX, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('−', controlsX + buttonWidth / 2, y - 1);
+        ctx.textAlign = 'left';
+
+        this.clickRegions.push({
+          x: controlsX,
+          y: buttonY,
+          width: buttonWidth,
+          height: buttonHeight,
+          action: 'level_down',
+          skillId,
+        });
+      }
+
+      // Level up button [+]
+      if (level < 5) {
+        const upX = controlsX + buttonWidth + 4;
+        ctx.fillStyle = 'rgba(100, 255, 100, 0.6)';
+        ctx.fillRect(upX, buttonY, buttonWidth, buttonHeight);
+        ctx.strokeStyle = '#66FF66';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(upX, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('+', upX + buttonWidth / 2, y - 1);
+        ctx.textAlign = 'left';
+
+        this.clickRegions.push({
+          x: upX,
+          y: buttonY,
+          width: buttonWidth,
+          height: buttonHeight,
+          action: 'level_up',
+          skillId,
+        });
+      }
+
+      // Grant XP button [+XP]
+      const xpX = controlsX + (buttonWidth + 4) * 2;
+      const xpWidth = 30;
+      ctx.fillStyle = 'rgba(100, 150, 255, 0.6)';
+      ctx.fillRect(xpX, buttonY, xpWidth, buttonHeight);
+      ctx.strokeStyle = '#6699FF';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(xpX, buttonY, xpWidth, buttonHeight);
+      ctx.fillStyle = '#FFFFFF';
       ctx.font = '9px monospace';
-      ctx.fillText(affinityText, panelX + padding + 175, y);
+      ctx.textAlign = 'center';
+      ctx.fillText('+XP', xpX + xpWidth / 2, y - 2);
+      ctx.textAlign = 'left';
+
+      this.clickRegions.push({
+        x: xpX,
+        y: buttonY,
+        width: xpWidth,
+        height: buttonHeight,
+        action: 'grant_xp',
+        skillId,
+      });
+    } else {
+      // Affinity indicator (if not default) - at end of line 1
+      if (affinity !== 1.0) {
+        const affinityText = affinity > 1.0 ? `+${((affinity - 1) * 100).toFixed(0)}%` : `${((affinity - 1) * 100).toFixed(0)}%`;
+        ctx.fillStyle = affinity > 1.0 ? '#88FF88' : '#FF8888';
+        ctx.font = '9px monospace';
+        ctx.fillText(affinityText, panelX + padding + 175, y);
+      }
     }
 
     // Line 2: Progress bar with XP text

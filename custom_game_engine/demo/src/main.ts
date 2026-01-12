@@ -40,9 +40,12 @@ import {
   GovernanceDataSystem,
   // Auto-save & Time Travel
   checkpointNamingService,
+  snapshotDecayPolicy,
+  toSnapshotInfo,
   // Centralized system registration
   registerAllSystems as coreRegisterAllSystems,
   type SystemRegistrationResult as CoreSystemResult,
+  type PlantSystemsConfig,
   // Soul creation system
   SoulCreationSystem,
   createSoulLinkComponent,
@@ -59,9 +62,16 @@ import {
   // Agent debug logging
   AgentDebugManager,
 } from '@ai-village/core';
-import { saveLoadService, IndexedDBStorage } from '@ai-village/persistence';
+import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
+// Plant systems from @ai-village/botany (completes the extraction from core)
+import {
+  PlantSystem as BotanyPlantSystem,
+  PlantDiscoverySystem as BotanyPlantDiscoverySystem,
+  PlantDiseaseSystem as BotanyPlantDiseaseSystem,
+  WildPlantPopulationSystem as BotanyWildPlantPopulationSystem,
+} from '@ai-village/botany';
 import {
   Renderer,
   InputHandler,
@@ -112,6 +122,8 @@ import {
   GovernanceDashboardPanel,
   TimelinePanel,
   UniverseConfigScreen,
+  UniverseBrowserScreen,
+  type UniverseBrowserResult,
   SCENARIO_PRESETS,
   type UniverseConfig,
   createGovernanceDashboardPanelAdapter,
@@ -196,6 +208,7 @@ interface UIContext {
   keyboardRegistry: KeyboardRegistry;
   hoverInfoPanel: UnifiedHoverInfoPanel;
   skillTreePanel: SkillTreePanel;
+  divineChatPanel: DivineChatPanel;
 }
 
 // ============================================================================
@@ -677,6 +690,7 @@ interface SystemRegistrationResult {
   metricsSystem: MetricsCollectionSystem;
   promptBuilder: StructuredPromptBuilder | null;
   coreResult: CoreSystemResult;
+  chunkLoadingSystem?: CoreSystemResult['chunkLoadingSystem'];
 }
 
 async function registerAllSystems(
@@ -685,7 +699,9 @@ async function registerAllSystems(
   promptBuilder: StructuredPromptBuilder | null,
   agentDebugManager: AgentDebugManager,
   talkerPromptBuilder: TalkerPromptBuilder | null = null,
-  executorPromptBuilder: ExecutorPromptBuilder | null = null
+  executorPromptBuilder: ExecutorPromptBuilder | null = null,
+  chunkManager?: ChunkManager,
+  terrainGenerator?: TerrainGenerator
 ): Promise<SystemRegistrationResult> {
   // Register default materials and recipes before system registration
   const { registerDefaultMaterials } = await import('@ai-village/core');
@@ -711,6 +727,13 @@ async function registerAllSystems(
   }
 
   // Use centralized system registration from @ai-village/core
+  // Pass plant systems from @ai-village/botany (completes package extraction)
+  const plantSystems: PlantSystemsConfig = {
+    PlantSystem: BotanyPlantSystem,
+    PlantDiscoverySystem: BotanyPlantDiscoverySystem,
+    PlantDiseaseSystem: BotanyPlantDiseaseSystem,
+    WildPlantPopulationSystem: BotanyWildPlantPopulationSystem,
+  };
   const coreResult = coreRegisterAllSystems(gameLoop, {
     llmQueue: llmQueue || undefined,
     promptBuilder: promptBuilder || undefined,
@@ -719,6 +742,9 @@ async function registerAllSystems(
     metricsServerUrl: 'ws://localhost:8765',
     enableMetrics: true,
     enableAutoSave: true,
+    plantSystems,
+    chunkManager,
+    terrainGenerator,
   });
 
   // Set up plant species lookup (injected from @ai-village/world)
@@ -789,6 +815,7 @@ async function registerAllSystems(
     metricsSystem: metricsSystem!,
     promptBuilder,
     coreResult,
+    chunkLoadingSystem: coreResult.chunkLoadingSystem,
   };
 }
 
@@ -906,8 +933,7 @@ function createUIPanels(
   const tileInspectorPanel = new TileInspectorPanel(
     gameLoop.world.eventBus,
     renderer.getCamera(),
-    chunkManager,
-    terrainGenerator
+    chunkManager
   );
 
   // Create placeholder for controlsPanel - will be initialized after windowManager
@@ -947,7 +973,7 @@ function setupWindowManager(
   panels: UIPanelsResult,
   keyboardRegistry: KeyboardRegistry,
   showNotification: (message: string, color?: string) => void
-): { windowManager: WindowManager; menuBar: MenuBar; controlsPanel: ControlsPanel; skillTreePanel: SkillTreePanel } {
+): { windowManager: WindowManager; menuBar: MenuBar; controlsPanel: ControlsPanel; skillTreePanel: SkillTreePanel; divineChatPanel: DivineChatPanel } {
   const windowManager = new WindowManager(canvas);
   const menuBar = new MenuBar(windowManager, canvas);
   menuBar.setRenderer(renderer);
@@ -1635,7 +1661,7 @@ function setupWindowManager(
     windowManager.handleCanvasResize(rect.width, rect.height);
   });
 
-  return { windowManager, menuBar, controlsPanel, skillTreePanel };
+  return { windowManager, menuBar, controlsPanel, skillTreePanel, divineChatPanel };
 }
 
 // ============================================================================
@@ -2344,8 +2370,19 @@ function handleKeyDown(
   const { gameLoop, renderer, showNotification } = gameContext;
   const {
     agentInfoPanel, tileInspectorPanel, inventoryUI, craftingUI,
-    placementUI, windowManager, keyboardRegistry
+    placementUI, windowManager, keyboardRegistry, divineChatPanel
   } = uiContext;
+
+  // Check if divine chat panel is open and has input focus - forward keyboard events to it
+  const divineChatWindow = windowManager.getWindow('divine-chat');
+  if (divineChatWindow?.visible && divineChatPanel.isVisible() && divineChatPanel.isInputActive()) {
+    // Forward key to divine chat panel - it will handle typing when input is active
+    divineChatPanel.handleKeyPress(key);
+    // Only consume the key if it's a typing key (single char, Enter, Backspace) and not a system shortcut
+    if (!ctrlKey && !metaKey && (key.length === 1 || key === 'Enter' || key === 'Backspace')) {
+      return true;
+    }
+  }
 
   // Check keyboard registry first (passes metaKey to avoid intercepting system shortcuts like Cmd+V)
   if (keyboardRegistry.handleKey(key, shiftKey, ctrlKey, false, metaKey)) {
@@ -2596,6 +2633,84 @@ function handleKeyDown(
 // Module-level panels variable (assigned in main())
 let panels: UIPanelsResult = null as any;
 let devPanel: DevPanel = null as any;
+let windowManagerRef: WindowManager | null = null;
+
+/**
+ * Handle entity selection by ID (used by both 2D and 3D click handlers).
+ * This is called when an entity is selected via the 3D renderer callback.
+ */
+function handleEntitySelectionById(
+  entityId: string | null,
+  gameLoop: GameLoop
+): void {
+  if (!panels || !windowManagerRef) return;
+
+  const {
+    agentInfoPanel, animalInfoPanel, plantInfoPanel,
+    memoryPanel, relationshipsPanel, agentRosterPanel, animalRosterPanel
+  } = panels;
+
+  if (!entityId) {
+    // Deselect all
+    agentInfoPanel.setSelectedEntity(null);
+    animalInfoPanel.setSelectedEntity(null);
+    plantInfoPanel.setSelectedEntity(null);
+    memoryPanel.setSelectedEntity(null);
+    relationshipsPanel.setSelectedEntity(null);
+    agentRosterPanel.setSelectedAgent(null);
+    animalRosterPanel.setSelectedAnimal(null);
+    devPanel?.setSelectedAgentId(null);
+    windowManagerRef.hideWindow('agent-info');
+    windowManagerRef.hideWindow('animal-info');
+    windowManagerRef.hideWindow('plant-info');
+    return;
+  }
+
+  const entity = gameLoop.world.getEntity(entityId);
+  if (!entity) return;
+
+  const hasAgent = entity.components.has('agent');
+  const hasAnimal = entity.components.has('animal');
+  const hasPlant = entity.components.has('plant');
+
+  if (hasAgent) {
+    agentInfoPanel.setSelectedEntity(entity);
+    animalInfoPanel.setSelectedEntity(null);
+    plantInfoPanel.setSelectedEntity(null);
+    memoryPanel.setSelectedEntity(entity);
+    relationshipsPanel.setSelectedEntity(entity);
+    agentRosterPanel.setSelectedAgent(entity.id);
+    animalRosterPanel.setSelectedAnimal(null);
+    devPanel?.setSelectedAgentId(entity.id);
+    windowManagerRef.showWindow('agent-info');
+    windowManagerRef.hideWindow('animal-info');
+    windowManagerRef.hideWindow('plant-info');
+  } else if (hasAnimal) {
+    animalInfoPanel.setSelectedEntity(entity);
+    agentInfoPanel.setSelectedEntity(null);
+    plantInfoPanel.setSelectedEntity(null);
+    memoryPanel.setSelectedEntity(null);
+    relationshipsPanel.setSelectedEntity(null);
+    agentRosterPanel.setSelectedAgent(null);
+    animalRosterPanel.setSelectedAnimal(entity.id);
+    devPanel?.setSelectedAgentId(null);
+    windowManagerRef.showWindow('animal-info');
+    windowManagerRef.hideWindow('agent-info');
+    windowManagerRef.hideWindow('plant-info');
+  } else if (hasPlant) {
+    plantInfoPanel.setSelectedEntity(entity);
+    agentInfoPanel.setSelectedEntity(null);
+    animalInfoPanel.setSelectedEntity(null);
+    memoryPanel.setSelectedEntity(null);
+    relationshipsPanel.setSelectedEntity(null);
+    agentRosterPanel.setSelectedAgent(null);
+    animalRosterPanel.setSelectedAnimal(null);
+    devPanel?.setSelectedAgentId(null);
+    windowManagerRef.showWindow('plant-info');
+    windowManagerRef.hideWindow('agent-info');
+    windowManagerRef.hideWindow('animal-info');
+  }
+}
 
 function handleMouseClick(
   screenX: number,
@@ -2655,6 +2770,13 @@ function handleMouseClick(
 
   // Left click - select entities
   if (button === 0) {
+    // In 3D mode, forward click to 3D renderer for entity selection
+    if (renderer.is3DActive()) {
+      renderer.forward3DClick(screenX, screenY);
+      // 3D selection is handled via callback set up in main()
+      return true;
+    }
+
     const entity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
     if (entity) {
       const hasAgent = entity.components.has('agent');
@@ -2840,6 +2962,227 @@ function setupDebugAPI(
 
     getSelectedAgent: () => {
       return devPanelInstance.getSelectedAgentId();
+    },
+
+    // Migration API for syncing local saves to server
+    checkMigrationStatus: async () => {
+      const storage = saveLoadService.getStorageBackend();
+      return checkMigrationStatus(storage);
+    },
+
+    migrateLocalSaves: async (playerId?: string) => {
+      console.log('[Migration] === STARTING MIGRATION ===');
+      const storage = saveLoadService.getStorageBackend();
+      console.log('[Migration] Storage backend:', storage ? storage.constructor.name : 'NULL');
+      if (!storage) {
+        throw new Error('No storage backend configured');
+      }
+
+      // Get player ID from localStorage (same as what's used for server sync)
+      const storedPlayerId = localStorage.getItem('ai-village-player-id');
+      const pid = playerId || storedPlayerId || `player:${crypto.randomUUID()}`;
+      console.log(`[Migration] Using player ID: ${pid}`);
+
+      // List saves first to see what we have
+      const saves = await storage.list();
+      console.log(`[Migration] Found ${saves.length} saves in storage`);
+
+      // Load first save to check structure
+      if (saves.length > 0) {
+        const firstSave = await storage.load(saves[0].key);
+        console.log(`[Migration] First save key: ${saves[0].key}`);
+        console.log(`[Migration] First save universes:`, firstSave?.universes?.length || 0);
+        if (firstSave?.universes?.[0]) {
+          console.log(`[Migration] First universe ID:`, firstSave.universes[0].identity?.id);
+        }
+      }
+
+      console.log('[Migration] Calling migrateLocalSaves function...');
+      try {
+        const result = await migrateLocalSaves(storage, pid, {
+          onProgress: (progress) => {
+            console.log(`[Migration] Progress: ${progress.uploaded}/${progress.totalSaves} uploaded, ${progress.skipped} skipped, ${progress.failed} failed`);
+          },
+        });
+        console.log('[Migration] === MIGRATION COMPLETE ===', result);
+        return result;
+      } catch (error) {
+        console.error('[Migration] === MIGRATION ERROR ===', error);
+        throw error;
+      }
+    },
+
+    // Diagnostic migration - tests each step independently
+    diagnoseMigration: async () => {
+      console.log('[Diagnose] === STEP 1: Storage Backend ===');
+      const storage = saveLoadService.getStorageBackend();
+      if (!storage) {
+        console.error('[Diagnose] No storage backend!');
+        return;
+      }
+      console.log('[Diagnose] Storage:', storage.constructor.name);
+
+      console.log('[Diagnose] === STEP 2: List Saves ===');
+      const saves = await storage.list();
+      console.log('[Diagnose] Found', saves.length, 'saves');
+      if (saves.length === 0) {
+        console.log('[Diagnose] No saves to migrate');
+        return;
+      }
+
+      console.log('[Diagnose] === STEP 3: Load First Save ===');
+      const firstSave = await storage.load(saves[0].key);
+      console.log('[Diagnose] First save loaded:', !!firstSave);
+      if (!firstSave) {
+        console.error('[Diagnose] Failed to load first save');
+        return;
+      }
+      const universeId = firstSave.universes?.[0]?.identity?.id;
+      console.log('[Diagnose] Universe ID:', universeId);
+
+      console.log('[Diagnose] === STEP 4: Check Server ===');
+      const serverUrl = 'http://localhost:3001/api/multiverse/stats';
+      try {
+        const statsResp = await fetch(serverUrl);
+        const stats = await statsResp.json();
+        console.log('[Diagnose] Server stats:', stats);
+      } catch (e: any) {
+        console.error('[Diagnose] Server not available:', e.message);
+        return;
+      }
+
+      console.log('[Diagnose] === STEP 5: Check Universe on Server ===');
+      try {
+        const univResp = await fetch(`http://localhost:3001/api/universe/${universeId}`);
+        console.log('[Diagnose] Universe check status:', univResp.status);
+        if (univResp.status === 404) {
+          console.log('[Diagnose] Universe does not exist on server');
+        } else {
+          const univData = await univResp.json();
+          console.log('[Diagnose] Universe data:', univData);
+        }
+      } catch (e: any) {
+        console.error('[Diagnose] Failed to check universe:', e.message);
+      }
+
+      console.log('[Diagnose] === STEP 6: Test Snapshot Upload ===');
+      const playerId = localStorage.getItem('ai-village-player-id') || 'test-player';
+
+      // Try creating universe if it doesn't exist
+      console.log('[Diagnose] Creating test universe...');
+      try {
+        const createResp = await fetch('http://localhost:3001/api/universe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: universeId,
+            name: 'Migration Test Universe',
+            ownerId: playerId,
+            isPublic: true,
+          }),
+        });
+        console.log('[Diagnose] Create response status:', createResp.status);
+        const createData = await createResp.json();
+        console.log('[Diagnose] Create response:', createData);
+      } catch (e: any) {
+        console.error('[Diagnose] Failed to create universe:', e.message);
+      }
+
+      // Try uploading a snapshot
+      console.log('[Diagnose] Uploading snapshot...');
+      const tick = parseInt(firstSave.universes?.[0]?.time?.universeTick || '0', 10);
+      console.log('[Diagnose] Snapshot tick:', tick);
+      console.log('[Diagnose] Snapshot size:', JSON.stringify(firstSave).length, 'bytes');
+
+      try {
+        const uploadResp = await fetch(`http://localhost:3001/api/universe/${universeId}/snapshot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            snapshot: firstSave,
+            tick,
+            day: 1,
+            type: 'manual',
+          }),
+        });
+        console.log('[Diagnose] Upload response status:', uploadResp.status);
+        const uploadData = await uploadResp.text();
+        console.log('[Diagnose] Upload response:', uploadData.substring(0, 500));
+      } catch (e: any) {
+        console.error('[Diagnose] Failed to upload snapshot:', e.message);
+      }
+
+      console.log('[Diagnose] === COMPLETE ===');
+    },
+
+    // Analyze what's taking up space in saves
+    analyzeSaveSize: async () => {
+      console.log('[Analyze] === SAVE SIZE ANALYSIS ===');
+      const storage = saveLoadService.getStorageBackend();
+      if (!storage) {
+        console.error('[Analyze] No storage backend!');
+        return;
+      }
+
+      const saves = await storage.list();
+      if (saves.length === 0) {
+        console.log('[Analyze] No saves found');
+        return;
+      }
+
+      const save = await storage.load(saves[0].key);
+      if (!save) {
+        console.error('[Analyze] Could not load save');
+        return;
+      }
+
+      const universe = save.universes?.[0];
+      if (!universe) {
+        console.error('[Analyze] No universe in save');
+        return;
+      }
+
+      console.log('[Analyze] Total save size:', JSON.stringify(save).length, 'bytes');
+      console.log('[Analyze] Universe size:', JSON.stringify(universe).length, 'bytes');
+      console.log('[Analyze] Entity count:', universe.entities?.length || 0);
+
+      // Analyze by component type
+      const componentSizes: Record<string, { count: number; totalSize: number }> = {};
+      for (const entity of universe.entities || []) {
+        for (const component of entity.components || []) {
+          const type = component.type || 'unknown';
+          const size = JSON.stringify(component).length;
+          if (!componentSizes[type]) {
+            componentSizes[type] = { count: 0, totalSize: 0 };
+          }
+          componentSizes[type].count++;
+          componentSizes[type].totalSize += size;
+        }
+      }
+
+      // Sort by size
+      const sorted = Object.entries(componentSizes)
+        .sort((a, b) => b[1].totalSize - a[1].totalSize)
+        .slice(0, 20);
+
+      console.log('[Analyze] Top 20 components by size:');
+      for (const [type, info] of sorted) {
+        const kb = (info.totalSize / 1024).toFixed(1);
+        console.log(`  ${type}: ${info.count} instances, ${kb}KB total`);
+      }
+
+      // Check worldState
+      if (universe.worldState) {
+        console.log('[Analyze] WorldState size:', JSON.stringify(universe.worldState).length, 'bytes');
+        for (const [key, value] of Object.entries(universe.worldState)) {
+          const size = JSON.stringify(value).length;
+          if (size > 10000) {
+            console.log(`  ${key}: ${(size / 1024).toFixed(1)}KB`);
+          }
+        }
+      }
+
+      console.log('[Analyze] === END ===');
     },
   };
 
@@ -3053,19 +3396,75 @@ async function main() {
     }
   }
 
-  let timeoutId: number;
-  const isLLMAvailable = await Promise.race([
-    llmProvider.isAvailable().then(result => {
-      clearTimeout(timeoutId);
-      return result;
-    }),
-    new Promise<boolean>((resolve) => {
-      timeoutId = setTimeout(() => {
-        console.warn('[DEMO] LLM availability check timed out after 2s, assuming unavailable');
-        resolve(false);
-      }, 2000) as unknown as number;
-    })
-  ]);
+  // Check LLM availability with timeout
+  const checkAvailability = async (provider: LLMProvider): Promise<boolean> => {
+    let timeoutId: number;
+    return Promise.race([
+      provider.isAvailable().then(result => {
+        clearTimeout(timeoutId);
+        return result;
+      }),
+      new Promise<boolean>((resolve) => {
+        timeoutId = setTimeout(() => {
+          console.warn('[DEMO] LLM availability check timed out after 2s');
+          resolve(false);
+        }, 2000) as unknown as number;
+      })
+    ]);
+  };
+
+  let isLLMAvailable = await checkAvailability(llmProvider);
+
+  // If proxy mode failed, fall back to direct mode with configured API keys
+  if (!isLLMAvailable && useProxy) {
+    console.warn('[DEMO] Proxy server unavailable, falling back to direct LLM mode...');
+
+    // Try direct providers with env API keys
+    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
+    const cerebrasApiKey = import.meta.env.VITE_CEREBRAS_API_KEY || import.meta.env.CEREBRAS_API_KEY;
+
+    const directProviders: LLMProvider[] = [];
+
+    if (cerebrasApiKey) {
+      directProviders.push(new OpenAICompatProvider(
+        'qwen-3-32b',
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
+      ));
+    }
+    if (groqApiKey) {
+      directProviders.push(new OpenAICompatProvider(
+        'qwen/qwen3-32b',
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      ));
+    }
+
+    // Also try settings-based provider
+    if (directProviders.length === 0 && settings.llm.apiKey) {
+      directProviders.push(new OpenAICompatProvider(
+        settings.llm.model,
+        settings.llm.baseUrl,
+        settings.llm.apiKey
+      ));
+    }
+
+    if (directProviders.length > 0) {
+      llmProvider = directProviders.length > 1
+        ? new FallbackProvider(directProviders, {
+            retryAfterMs: 60000,
+            maxConsecutiveFailures: 3,
+            logFallbacks: true,
+          })
+        : directProviders[0];
+
+      isLLMAvailable = await checkAvailability(llmProvider);
+      if (isLLMAvailable) {
+        console.log('[DEMO] Direct LLM mode available, continuing with fallback provider');
+      }
+    }
+  }
+
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
   let talkerPromptBuilder: TalkerPromptBuilder | null = null;
@@ -3088,6 +3487,26 @@ async function main() {
   // Initialize storage backend for save/load system FIRST
   const storage = new IndexedDBStorage('ai-village-saves');
   saveLoadService.setStorage(storage);
+
+  // Enable server sync for multiverse persistence
+  // Get or create a persistent player ID
+  let playerId = localStorage.getItem('ai-village-player-id');
+  if (!playerId) {
+    playerId = `player:${crypto.randomUUID()}`;
+    localStorage.setItem('ai-village-player-id', playerId);
+    console.log('[Demo] Created new player ID:', playerId);
+  }
+
+  // Try to enable server sync (non-blocking - game works without server)
+  saveLoadService.enableServerSync(playerId).then(enabled => {
+    if (enabled) {
+      console.log('[Demo] Multiverse server sync enabled - saves will be uploaded to server');
+    } else {
+      console.log('[Demo] Multiverse server not available - saves are local only');
+    }
+  }).catch(error => {
+    console.warn('[Demo] Failed to enable server sync:', error);
+  });
 
   // Check for ?fresh=1 URL parameter to force a new game (skip loading saves)
   const urlParams = new URLSearchParams(window.location.search);
@@ -3135,31 +3554,91 @@ async function main() {
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
-  if (existingSaves.length > 0 && !forceNewGame) {
-    // Auto-load the most recent save
-    const mostRecent = existingSaves[0]; // Saves are sorted by timestamp descending
+  // Show Universe Browser Screen - the gateway to the multiverse
+  // This screen allows players to:
+  // - Create a new universe (leads to UniverseConfigScreen)
+  // - Load a local save
+  // - Browse and load from the multiverse server
+  const browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
+    const browserScreen = new UniverseBrowserScreen();
+    browserScreen.show((result) => {
+      browserScreen.hide();
+      resolve(result);
+    });
+  });
 
-    const result = await saveLoadService.load(mostRecent.key, gameLoop.world);
+  if (browserResult.action === 'create_new') {
+    // Show universe configuration screen for new universe
+    universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+      universeConfigScreen = new UniverseConfigScreen();
+      universeConfigScreen.show((config) => {
+        universeConfig = config;  // Store full config for scenario access
+        resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+      });
+    });
+  } else if (browserResult.action === 'load_local' && browserResult.saveKey) {
+    // Load a local save
+    const result = await saveLoadService.load(browserResult.saveKey, gameLoop.world);
     if (result.success) {
       loadedCheckpoint = true;
-      universeSelection = { type: 'load', checkpointKey: mostRecent.key };
+      universeSelection = { type: 'load', checkpointKey: browserResult.saveKey };
     } else {
       console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
       // Fall back to showing universe creation screen
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
         universeConfigScreen = new UniverseConfigScreen();
         universeConfigScreen.show((config) => {
-          universeConfig = config;  // Store full config for scenario access
+          universeConfig = config;
+          resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+        });
+      });
+    }
+  } else if (browserResult.action === 'load_server' && browserResult.universeId) {
+    // Load from multiverse server
+    // TODO: Implement server snapshot loading
+    // For now, fetch the snapshot and apply it to the world
+    try {
+      const API_BASE = 'http://localhost:3001/api';
+      const tick = browserResult.snapshotTick ?? 'latest';
+      const response = await fetch(`${API_BASE}/universe/${browserResult.universeId}/snapshot/${tick}`);
+      if (!response.ok) throw new Error('Failed to fetch snapshot from server');
+      const data = await response.json();
+
+      if (data.snapshot) {
+        // Apply the snapshot to the world
+        // The snapshot is a full SaveFile, so we can use the same load logic
+        const worldImpl = gameLoop.world as any;
+        worldImpl._entities.clear();
+
+        // Import worldSerializer for deserialization
+        const { worldSerializer } = await import('@ai-village/core');
+        for (const universeSnapshot of data.snapshot.universes || []) {
+          await worldSerializer.deserializeWorld(universeSnapshot, gameLoop.world);
+        }
+
+        loadedCheckpoint = true;
+        universeSelection = { type: 'load', checkpointKey: `server:${browserResult.universeId}:${tick}` };
+        console.log(`[Demo] Loaded universe ${browserResult.universeId} at tick ${tick} from server`);
+      } else {
+        throw new Error('No snapshot data in response');
+      }
+    } catch (error) {
+      console.error('[Demo] Failed to load from server:', error);
+      // Fall back to showing universe creation screen
+      universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+        universeConfigScreen = new UniverseConfigScreen();
+        universeConfigScreen.show((config) => {
+          universeConfig = config;
           resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
         });
       });
     }
   } else {
-    // No saves - show universe creation screen
+    // Fallback - shouldn't happen but just in case
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
-        universeConfig = config;  // Store full config for scenario access
+        universeConfig = config;
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
       });
     });
@@ -3199,7 +3678,9 @@ async function main() {
       promptBuilder,
       agentDebugManager,
       talkerPromptBuilder,
-      executorPromptBuilder
+      executorPromptBuilder,
+      chunkManager,
+      terrainGenerator
     );
   } else {
     // In SharedWorker mode, create minimal result for compatibility
@@ -3213,6 +3694,21 @@ async function main() {
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
+
+  // Initialize combat UI renderers
+  renderer.initCombatUI(gameLoop.world, gameLoop.world.eventBus);
+
+  // Set up viewport provider for ChunkLoadingSystem (visual mode)
+  // This allows the system to load chunks around the camera viewport
+  if (systemsResult.chunkLoadingSystem) {
+    systemsResult.chunkLoadingSystem.setViewportProvider(() => ({
+      x: renderer.getCamera().x,
+      y: renderer.getCamera().y,
+      width: canvas.width,
+      height: canvas.height,
+    }));
+    console.log('[Main] ChunkLoadingSystem viewport provider configured');
+  }
 
   // Apply render settings from saved settings
   renderer.set3DDrawDistance(settings.render.drawDistance3D);
@@ -3348,12 +3844,19 @@ async function main() {
     ? (universeConfigScreen as any).selectedSpectrumPreset ?? 'ai_village'
     : 'ai_village';
   const divinePreset = magicToDivinePresetMap[selectedMagicPreset] ?? 'balanced';
+  // Get universe name from config (set during universe creation) or use default
+  const universeName = universeConfig?.universeName || 'Main Universe';
+
   const divineConfig = createUniverseConfig(
     gameLoop.universeId,
-    'Main Universe',
+    universeName,
     divinePreset
   );
   (gameLoop.world as any).setDivineConfig(divineConfig);
+
+  // Store universe name on the world for save/checkpoint naming
+  (gameLoop.world as any)._universeName = universeName;
+  console.log(`[Main] Universe name: "${universeName}"`);
 
   // Create notification system
   const notificationEl = document.createElement('div');
@@ -3437,9 +3940,17 @@ async function main() {
   }, 60000));
 
   // Setup window manager
-  const { windowManager, menuBar, controlsPanel, skillTreePanel } = setupWindowManager(
+  const { windowManager, menuBar, controlsPanel, skillTreePanel, divineChatPanel } = setupWindowManager(
     canvas, renderer, panels, keyboardRegistry, showNotification
   );
+
+  // Store reference for 3D entity selection callback
+  windowManagerRef = windowManager;
+
+  // Set up 3D entity selection callback
+  renderer.setOnEntitySelected((entityId: string | null) => {
+    handleEntitySelectionById(entityId, gameLoop);
+  });
 
   // Build UI context
   const uiContext: UIContext = {
@@ -3462,6 +3973,7 @@ async function main() {
     keyboardRegistry,
     hoverInfoPanel: panels.hoverInfoPanel,
     skillTreePanel,
+    divineChatPanel,
   };
 
   // Build game context
@@ -3799,18 +4311,36 @@ async function main() {
           floor: houseBlueprint.materials?.floor || 'wood',
           door: (houseBlueprint.materials?.door || 'wood') as any,
           window: 'glass' as any,
+          roof: 'thatch' as any,  // Add roof material
         };
 
+        // Place ground floor
         const tilesPlaced = tileSystem.stampLayoutInstantly(
           gameLoop.world,
           houseBlueprint.layout,
           pos.x,
           pos.y,
           materials,
-          `initial_house_${pos.x}_${pos.y}`
+          `initial_house_${pos.x}_${pos.y}_floor0`
         );
 
-        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y}) with ${tilesPlaced} tiles`);
+        console.log(`[WorldInit] Placed house ground floor at (${pos.x}, ${pos.y}) with ${tilesPlaced} tiles`);
+
+        // Place upper floors/attics if they exist
+        if (houseBlueprint.floors && houseBlueprint.floors.length > 0) {
+          for (let floorIdx = 0; floorIdx < houseBlueprint.floors.length; floorIdx++) {
+            const floor = houseBlueprint.floors[floorIdx];
+            const upperTilesPlaced = tileSystem.stampLayoutInstantly(
+              gameLoop.world,
+              floor.layout,
+              pos.x,
+              pos.y,
+              materials,
+              `initial_house_${pos.x}_${pos.y}_floor${floor.level}`
+            );
+            console.log(`[WorldInit] Placed house floor ${floor.level} (${floor.name}) at (${pos.x}, ${pos.y}) with ${upperTilesPlaced} tiles`);
+          }
+        }
 
         // Scan layout for furniture symbols and spawn them
         for (let row = 0; row < houseBlueprint.layout.length; row++) {
@@ -3862,18 +4392,61 @@ async function main() {
   );
 
   // Game loop already started before soul creation
+
+  // Take initial snapshot for new universes so reloading returns to the same universe
+  if (!loadedCheckpoint) {
+    try {
+      const worldUniverseName = (gameLoop.world as any)._universeName || 'Universe';
+      const initialSaveName = `${worldUniverseName} - Genesis (Day 0)`;
+      await saveLoadService.save(gameLoop.world, {
+        name: initialSaveName,
+        type: 'canonical',  // Mark as canonical so it's never decayed
+      });
+      console.log(`[InitialSave] Created genesis snapshot: ${initialSaveName}`);
+    } catch (error) {
+      console.error('[InitialSave] Failed to create initial snapshot:', error);
+    }
+  }
+
   renderLoop();
 
-  // Set up periodic auto-saves every minute
-  const AUTOSAVE_INTERVAL_MS = 60000; // 1 minute
+  // Set up periodic auto-saves every 5 minutes (real time)
+  // Note: AutoSaveSystem also saves daily at midnight (game time) with canon events
+  const AUTOSAVE_INTERVAL_MS = 300000; // 5 minutes
   intervalIds.push(setInterval(async () => {
     try {
       const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
       const day = timeComp?.day || 0;
-      const tick = timeComp?.currentTick || 0;
+      const worldUniverseName = (gameLoop.world as any)._universeName || 'Universe';
 
-      const saveName = `autosave_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
-      await saveLoadService.save(gameLoop.world, { name: saveName });
+      // Include universe name for distinguishing saves across different universes
+      const saveName = `${worldUniverseName} - Autosave Day ${day}`;
+      await saveLoadService.save(gameLoop.world, {
+        name: saveName,
+        type: 'auto',
+      });
+
+      // Run snapshot decay to thin out old saves
+      // Progressive decay: Day 1 → every 2nd, Day 3 → every 4th, Day 5+ → midnight only
+      try {
+        const allSaves = await saveLoadService.listSaves();
+        const snapshots = allSaves.map(save => toSnapshotInfo(save.key, {
+          name: save.name,
+          createdAt: save.createdAt,
+          type: save.type as 'auto' | 'manual' | 'canonical' | undefined,
+        }));
+
+        const toDelete = snapshotDecayPolicy.getSnapshotsToDelete(snapshots, day);
+        for (const snapshot of toDelete) {
+          await saveLoadService.deleteSave(snapshot.key);
+        }
+
+        if (toDelete.length > 0) {
+          console.log(`[SnapshotDecay] Removed ${toDelete.length} old snapshots`);
+        }
+      } catch (decayError) {
+        console.error('[SnapshotDecay] Error during decay:', decayError);
+      }
     } catch (error) {
       console.error('[Demo] Auto-save error:', error);
     }

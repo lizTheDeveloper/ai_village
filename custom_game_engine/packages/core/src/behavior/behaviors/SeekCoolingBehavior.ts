@@ -49,12 +49,17 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
     if (!temperature) {
       // No temperature component
+      this.complete(entity);
       return { complete: true, reason: 'No temperature component' };
     }
 
-    // Check if we're already cool enough
-    if (temperature.state === 'comfortable' ||
-        (temperature.state === 'hot' && temperature.currentTemp <= temperature.comfortMax + 1)) {
+    // Disable steering so we can control velocity directly
+    this.disableSteering(entity);
+
+    // Only complete when actually comfortable - keep fleeing while hot
+    if (temperature.state === 'comfortable') {
+      this.stopAllMovement(entity);
+      this.complete(entity);
       return { complete: true, reason: 'Already cool enough' };
     }
 
@@ -70,9 +75,14 @@ export class SeekCoolingBehavior extends BaseBehavior {
     // Check if we're already in the cooling zone
     const inCoolingRange = this.isInCoolingRange(coolingSource, position);
 
-    if (inCoolingRange) {
-      // Stay in the cool area
-      this.stopMovement(entity);
+    if (inCoolingRange && temperature.state === 'comfortable') {
+      // Actually comfortable - stay in the cool area and complete
+      this.stopAllMovement(entity);
+      this.complete(entity);
+      return { complete: true, reason: 'Cooled down in cooling range' };
+    } else if (inCoolingRange) {
+      // In "cooling range" but still hot - the shade isn't enough, flee heat sources
+      this.fleeHeatSources(entity, world, position, movement);
     } else {
       // Move towards the cooling source
       const dx = coolingSource.position.x - position.x;
@@ -82,11 +92,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
-      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
-        ...current,
-        velocityX,
-        velocityY,
-      }));
+      this.setVelocity(entity, velocityX, velocityY);
     }
   }
 
@@ -289,13 +295,16 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       const distance = this.distance(position, buildingPos);
 
-      // If within heat radius, move away
-      if (distance <= buildingComp.heatRadius) {
+      // If within heat radius (or very close regardless), move away
+      // Use a minimum detection distance of 2 tiles even if heatRadius is smaller
+      const effectiveRadius = Math.max(buildingComp.heatRadius, 2);
+      if (distance <= effectiveRadius) {
         const dx = position.x - buildingPos.x;
         const dy = position.y - buildingPos.y;
 
         // Weight by inverse distance (closer = stronger push away)
-        const weight = 1 - (distance / buildingComp.heatRadius);
+        // Add 0.1 to avoid division issues when standing exactly on the source
+        const weight = 1 - (distance / (effectiveRadius + 0.1));
 
         totalAvoidanceX += dx * weight;
         totalAvoidanceY += dy * weight;
@@ -310,16 +319,23 @@ export class SeekCoolingBehavior extends BaseBehavior {
       if (magnitude > 0) {
         const velocityX = (totalAvoidanceX / magnitude) * movement.speed;
         const velocityY = (totalAvoidanceY / magnitude) * movement.speed;
-
-        entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
-          ...current,
-          velocityX,
-          velocityY,
-        }));
+        this.setVelocity(entity, velocityX, velocityY);
+      } else {
+        // Standing exactly on heat source - pick a random direction to flee
+        const randomAngle = Math.random() * Math.PI * 2;
+        this.setVelocity(entity, Math.cos(randomAngle) * movement.speed, Math.sin(randomAngle) * movement.speed);
       }
     } else {
-      // No heat sources nearby, stop moving
-      this.stopMovement(entity);
+      // No heat sources detected but still hot - just move in a random direction
+      // This handles cases where heat comes from non-building sources
+      const temperature = entity.getComponent(ComponentType.Temperature) as any;
+      if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
+        const randomAngle = Math.random() * Math.PI * 2;
+        this.setVelocity(entity, Math.cos(randomAngle) * movement.speed, Math.sin(randomAngle) * movement.speed);
+      } else {
+        // Actually cooled down, stop moving
+        this.stopAllMovement(entity);
+      }
     }
   }
 }

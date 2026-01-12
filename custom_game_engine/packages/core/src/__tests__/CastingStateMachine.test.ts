@@ -1,0 +1,654 @@
+/**
+ * CastingStateMachine.test.ts
+ * Comprehensive tests for the multi-tick spell casting state machine.
+ */
+
+import { describe, it, expect, beforeEach } from 'vitest';
+import { World } from '../World.js';
+import { MagicSystem } from '../systems/MagicSystem.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import { createMagicUserComponent } from '../components/MagicComponent.js';
+import type { MagicComponent } from '../components/MagicComponent.js';
+import { SpellRegistry } from '../magic/SpellRegistry.js';
+import { initializeMagicSystem } from '../magic/InitializeMagicSystem.js';
+import { costCalculatorRegistry } from '../magic/costs/CostCalculatorRegistry.js';
+
+describe('Multi-Tick Casting State Machine', () => {
+  let world: World;
+  let magicSystem: MagicSystem;
+  let spellRegistry: SpellRegistry;
+
+  /**
+   * Helper to create a minimal magic component and initialize resource pools properly.
+   * This ensures resource pools are set up correctly for the paradigm.
+   */
+  function createProperMagicComponent(paradigmId: string, maxMana: number = 100): MagicComponent {
+    // Create minimal component
+    const magic: MagicComponent = {
+      type: 'magic',
+      version: 1,
+      magicUser: true,
+      primarySource: 'arcane',
+      homeParadigmId: paradigmId,
+      knownParadigmIds: [paradigmId],
+      activeParadigmId: paradigmId,
+      paradigmState: {},
+      manaPools: [],  // Let initializeResourcePools handle this
+      resourcePools: {},  // Let initializeResourcePools handle this
+      knownSpells: [],
+      activeEffects: [],
+      techniqueProficiency: {},
+      formProficiency: {},
+      totalSpellsCast: 0,
+      totalMishaps: 0,
+      casting: false,
+    };
+
+    // Initialize resource pools properly
+    const calculator = costCalculatorRegistry.get(paradigmId);
+    if (calculator) {
+      calculator.initializeResourcePools(magic, {
+        maxOverrides: { mana: maxMana },
+        currentOverrides: { mana: maxMana },
+      });
+    }
+
+    return magic;
+  }
+
+  /**
+   * Helper to initialize resource pools on an existing entity with a magic component.
+   * This is used when the magic component is created via createMagicUserComponent().
+   */
+  function initializeResourcePools(entity: any, paradigmId: string, maxMana?: number): void {
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) {
+      throw new Error('Entity does not have a magic component');
+    }
+
+    // Get the cost calculator for this paradigm
+    const calculator = costCalculatorRegistry.get(paradigmId);
+    if (!calculator) {
+      throw new Error(`No cost calculator found for paradigm: ${paradigmId}`);
+    }
+
+    // Extract maxMana from manaPools if not provided
+    const manaMax = maxMana ?? magic.manaPools[0]?.maximum ?? 100;
+
+    // Initialize resource pools using the calculator with proper mana maximum
+    calculator.initializeResourcePools(magic, {
+      maxOverrides: { mana: manaMax },
+      currentOverrides: { mana: manaMax },
+    });
+
+    // For academic paradigm, ensure large enough stamina pool for epic rituals
+    // Academic cost calculator computes stamina cost proportional to cast time
+    // Epic rituals (72000 ticks) need ~43115 stamina, so set to 100000 for safety
+    if (paradigmId === 'academic' && magic.resourcePools?.stamina) {
+      magic.resourcePools.stamina.current = Math.max(magic.resourcePools.stamina.current, 100000);
+      magic.resourcePools.stamina.maximum = Math.max(magic.resourcePools.stamina.maximum, 100000);
+    }
+
+    entity.updateComponent(CT.Magic, () => magic);
+  }
+
+  beforeEach(() => {
+    // Clear the global spell registry instance before creating world
+    // @ts-expect-error Accessing private field for testing
+    SpellRegistry.instance = null;
+
+    // Create world and initialize systems
+    world = new World();
+    magicSystem = new MagicSystem();
+    // MagicSystem.initialize() calls initializeMagicSystem() internally
+    magicSystem.initialize(world, world.eventBus);
+
+    spellRegistry = SpellRegistry.getInstance();
+  });
+
+  describe('Instant Casts (castTime = 0)', () => {
+    it('should cast instant spells immediately', () => {
+      // Register instant spell
+      spellRegistry.register({
+        id: 'instant_fireball',
+        name: 'Instant Fireball',
+        technique: 'create',
+        form: 'fire',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 10,
+        castTime: 0, // Instant
+        range: 10,
+        effectId: 'damage_fire',
+      });
+
+      // Create caster
+      const caster = world.createEntity();
+      caster.addComponent({
+        type: 'position',
+        x: 0,
+        y: 0,
+      });
+      const magicComp = createProperMagicComponent('academic', 100);
+      magicComp.knownSpells = [{ spellId: 'instant_fireball', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(magicComp);
+
+      const magic = caster.getComponent<MagicComponent>(CT.Magic);
+      const initialMana = magic.resourcePools.mana?.current ?? magic.manaPools[0]?.current ?? 100;
+
+      // Cast instant spell
+      const result = magicSystem.castSpell(caster as any, world, 'instant_fireball');
+
+      expect(result).toBe(true);
+
+      // Should not be casting
+      const updatedMagic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(updatedMagic.casting).toBe(false);
+      expect(updatedMagic.castingState).toBeUndefined();
+
+      // Mana should be deducted immediately
+      const finalMana = updatedMagic.resourcePools.mana?.current ?? updatedMagic.manaPools[0]?.current ?? 0;
+      expect(finalMana).toBe(initialMana - 10);
+    });
+  });
+
+  describe('Quick Casts (1-20 ticks)', () => {
+    it('should complete a 5-tick spell after 5 ticks', () => {
+      // Register quick spell
+      spellRegistry.register({
+        id: 'quick_heal',
+        name: 'Quick Heal',
+        technique: 'create',
+        form: 'body',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 20,
+        castTime: 5, // 5 ticks (0.25 seconds at 20 TPS)
+        range: 10,
+        effectId: 'heal_minor',
+      });
+
+      // Create caster
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'quick_heal', proficiency: 50, timesCast: 0 }],
+      }));
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'quick_heal');
+      expect(result).toBe(true);
+
+      // Should be casting
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+      expect(magic.castingState).toBeDefined();
+      expect(magic.castingState?.progress).toBe(0);
+      expect(magic.castingState?.duration).toBe(5);
+
+      // Tick 1-4: Still casting
+      for (let i = 1; i <= 4; i++) {
+        world.advanceTick();
+        magicSystem.update(world, [caster], 0.05);
+        magic = caster.getComponent<MagicComponent>(CT.Magic);
+        expect(magic.casting).toBe(true);
+        expect(magic.castingState?.progress).toBe(i);
+      }
+
+      // Tick 5: Cast completes
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+      expect(magic.totalSpellsCast).toBe(1);
+    });
+  });
+
+  describe('Resource Depletion Interruption', () => {
+    it('should cancel cast if mana depleted mid-cast', () => {
+      // Register slow spell
+      spellRegistry.register({
+        id: 'slow_ritual',
+        name: 'Slow Ritual',
+        technique: 'create',
+        form: 'spirit',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 50,
+        castTime: 100, // Long cast
+        range: 10,
+        effectId: 'summon_spirit',
+      });
+
+      // Create caster with limited mana
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'slow_ritual', proficiency: 50, timesCast: 0 }],
+      }));
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'slow_ritual');
+      expect(result).toBe(true);
+
+      // Verify mana is locked
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.manaPools[0].locked).toBe(50);
+      expect(magic.manaPools[0].current).toBe(50); // 100 - 50 (locked)
+
+      // Drain mana below locked amount
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        manaPools: current.manaPools.map(pool => ({
+          ...pool,
+          current: 30, // Less than locked (50)
+        })),
+      }));
+
+      // Tick - should cancel
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+
+      // Cast should be cancelled
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+
+      // Resources should be restored
+      expect(magic.manaPools[0].locked).toBe(0);
+      expect(magic.manaPools[0].current).toBeCloseTo(80, 1); // 30 + 50 (restored), use floating-point tolerance
+    });
+  });
+
+  describe('Movement Interruption', () => {
+    it('should cancel cast if caster moves more than 1 tile', () => {
+      // Register channeled spell
+      spellRegistry.register({
+        id: 'channeled_beam',
+        name: 'Channeled Beam',
+        technique: 'destroy',
+        form: 'fire',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 30,
+        castTime: 20,
+        range: 15,
+        effectId: 'beam_damage',
+      });
+
+      // Create caster
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'channeled_beam', proficiency: 50, timesCast: 0 }],
+      }));
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'channeled_beam');
+      expect(result).toBe(true);
+
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+
+      // Move caster slightly (< 1 tile) - should NOT interrupt
+      caster.updateComponent(CT.Position, (pos: any) => ({ ...pos, x: 0.5, y: 0.5 }));
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true); // Still casting
+
+      // Move caster more than 1 tile - should interrupt
+      caster.updateComponent(CT.Position, (pos: any) => ({ ...pos, x: 2, y: 2 }));
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+
+      // Cast should be cancelled
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+
+      // Resources should be restored
+      expect(magic.manaPools[0].locked).toBe(0);
+    });
+  });
+
+  describe('Death Interruption', () => {
+    it('should cancel cast if caster dies', () => {
+      // Register spell
+      spellRegistry.register({
+        id: 'resurrection',
+        name: 'Resurrection',
+        technique: 'create',
+        form: 'body',
+        source: 'divine',
+        paradigmId: 'divine',
+        manaCost: 100,
+        castTime: 50,
+        range: 5,
+        effectId: 'resurrect',
+      });
+
+      // Create caster
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent({ type: 'needs', health: 100, hunger: 0, thirst: 0, energy: 100 });
+      caster.addComponent(createMagicUserComponent('divine', 200, 'divine'));
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'resurrection', proficiency: 50, timesCast: 0 }],
+        resourcePools: {
+          favor: { type: 'favor', current: 100, maximum: 100, regenRate: 0, locked: 0 },
+        },
+      }));
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'resurrection');
+      expect(result).toBe(true);
+
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+
+      // Caster takes lethal damage
+      caster.updateComponent(CT.Needs, (needs: any) => ({ ...needs, health: 0 }));
+
+      // Tick - should cancel
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+
+      // Cast should be cancelled
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+    });
+  });
+
+  describe('Target Loss Interruption', () => {
+    it('should cancel cast if target entity is destroyed', () => {
+      // Register targeted spell
+      spellRegistry.register({
+        id: 'targeted_curse',
+        name: 'Targeted Curse',
+        technique: 'destroy',
+        form: 'body',
+        source: 'void',
+        paradigmId: 'academic',
+        manaCost: 40,
+        castTime: 30,
+        range: 20,
+        effectId: 'curse_weakness',
+      });
+
+      // Create caster and target
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'targeted_curse', proficiency: 50, timesCast: 0 }],
+      }));
+
+      const target = world.createEntity();
+      target.addComponent({ type: 'position', x: 10, y: 10 });
+      target.addComponent({ type: 'needs', health: 100, hunger: 0, thirst: 0, energy: 100 });
+
+      // Start cast targeting entity
+      const result = magicSystem.castSpell(caster as any, world, 'targeted_curse', target.id);
+      expect(result).toBe(true);
+
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+      expect(magic.castingState?.targetEntityId).toBe(target.id);
+
+      // Destroy target entity
+      world.destroyEntity(target.id, 'test');
+
+      // Tick - should cancel
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+
+      // Cast should be cancelled
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+    });
+
+    it('should cancel cast if target dies', () => {
+      // Register healing spell
+      spellRegistry.register({
+        id: 'major_heal',
+        name: 'Major Heal',
+        technique: 'create',
+        form: 'body',
+        source: 'divine',
+        paradigmId: 'divine',
+        manaCost: 50,
+        castTime: 15,
+        range: 10,
+        effectId: 'heal_major',
+      });
+
+      // Create caster and target
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('divine', 100, 'divine'));
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'major_heal', proficiency: 50, timesCast: 0 }],
+        resourcePools: {
+          favor: { type: 'favor', current: 100, maximum: 100, regenRate: 0, locked: 0 },
+        },
+      }));
+
+      const target = world.createEntity();
+      target.addComponent({ type: 'position', x: 5, y: 5 });
+      target.addComponent({ type: 'needs', health: 30, hunger: 0, thirst: 0, energy: 100 });
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'major_heal', target.id);
+      expect(result).toBe(true);
+
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+
+      // Target dies before heal completes
+      target.updateComponent(CT.Needs, (needs: any) => ({ ...needs, health: 0 }));
+
+      // Tick - should cancel
+      world.advanceTick();
+      magicSystem.update(world, [caster], 0.05);
+
+      // Cast should be cancelled
+      magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+      expect(magic.castingState).toBeNull();
+    });
+  });
+
+  describe('Successful Multi-Tick Cast', () => {
+    it('should complete a 100-tick spell and apply effects', () => {
+      // Register long ritual
+      spellRegistry.register({
+        id: 'epic_ritual',
+        name: 'Epic Ritual',
+        technique: 'create',
+        form: 'spirit',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 80,
+        castTime: 100, // 5 seconds at 20 TPS
+        range: 0,
+        effectId: 'summon_elemental',
+      });
+
+      // Create caster
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 200, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'epic_ritual', proficiency: 50, timesCast: 0 }],
+      }));
+
+      // Start cast
+      const result = magicSystem.castSpell(caster as any, world, 'epic_ritual');
+      expect(result).toBe(true);
+
+      let magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+      expect(magic.manaPools[0].locked).toBe(80);
+
+      // Tick through entire cast
+      for (let i = 1; i <= 100; i++) {
+        world.advanceTick();
+        magicSystem.update(world, [caster], 0.05);
+
+        magic = caster.getComponent<MagicComponent>(CT.Magic);
+
+        if (i < 100) {
+          // Still casting
+          expect(magic.casting).toBe(true);
+          expect(magic.castingState?.progress).toBe(i);
+          expect(magic.castProgress).toBeCloseTo(i / 100, 2);
+        } else {
+          // Cast completed
+          expect(magic.casting).toBe(false);
+          expect(magic.castingState).toBeNull();
+          expect(magic.totalSpellsCast).toBe(1);
+          expect(magic.manaPools[0].locked).toBe(0);
+        }
+      }
+    });
+  });
+
+  describe('Multiple Simultaneous Casts', () => {
+    it('should handle multiple entities casting at once', () => {
+      // Register spell
+      spellRegistry.register({
+        id: 'group_spell',
+        name: 'Group Spell',
+        technique: 'create',
+        form: 'fire',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 25,
+        castTime: 10,
+        range: 10,
+        effectId: 'aoe_damage',
+      });
+
+      // Create 3 casters
+      const casters = [];
+      for (let i = 0; i < 3; i++) {
+        const caster = world.createEntity();
+        caster.addComponent({ type: 'position', x: i * 10, y: 0 });
+        caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+        initializeResourcePools(caster, 'academic');
+        caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+          ...current,
+          knownSpells: [{ spellId: 'group_spell', proficiency: 50, timesCast: 0 }],
+        }));
+        casters.push(caster);
+      }
+
+      // All start casting
+      for (const caster of casters) {
+        const result = magicSystem.castSpell(caster as any, world, 'group_spell');
+        expect(result).toBe(true);
+      }
+
+      // Verify all casting
+      for (const caster of casters) {
+        const magic = caster.getComponent<MagicComponent>(CT.Magic);
+        expect(magic.casting).toBe(true);
+      }
+
+      // Tick through cast
+      for (let i = 1; i <= 10; i++) {
+        world.advanceTick();
+        magicSystem.update(world, casters, 0.05);
+      }
+
+      // All should complete
+      for (const caster of casters) {
+        const magic = caster.getComponent<MagicComponent>(CT.Magic);
+        expect(magic.casting).toBe(false);
+        expect(magic.totalSpellsCast).toBe(1);
+      }
+    });
+  });
+
+  describe('Time Scale Support', () => {
+    it('should support instant (0 tick) casts', () => {
+      spellRegistry.register({
+        id: 'instant',
+        name: 'Instant',
+        technique: 'create',
+        form: 'fire',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 10,
+        castTime: 0,
+        range: 10,
+        effectId: 'instant_damage',
+      });
+
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 100, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'instant', proficiency: 50, timesCast: 0 }],
+      }));
+
+      const result = magicSystem.castSpell(caster as any, world, 'instant');
+      expect(result).toBe(true);
+
+      const magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(false);
+    });
+
+    it('should support epic rituals (72000+ ticks = 1 hour)', () => {
+      spellRegistry.register({
+        id: 'epic_ritual_hour',
+        name: 'Epic Hour Ritual',
+        technique: 'create',
+        form: 'time',
+        source: 'arcane',
+        paradigmId: 'academic',
+        manaCost: 200,
+        castTime: 72000, // 1 hour at 20 TPS
+        range: 0,
+        effectId: 'time_manipulation',
+      });
+
+      const caster = world.createEntity();
+      caster.addComponent({ type: 'position', x: 0, y: 0 });
+      caster.addComponent(createMagicUserComponent('arcane', 300, 'academic'));
+      initializeResourcePools(caster, 'academic');
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        knownSpells: [{ spellId: 'epic_ritual_hour', proficiency: 50, timesCast: 0 }],
+      }));
+
+      const result = magicSystem.castSpell(caster as any, world, 'epic_ritual_hour');
+      expect(result).toBe(true);
+
+      const magic = caster.getComponent<MagicComponent>(CT.Magic);
+      expect(magic.casting).toBe(true);
+      expect(magic.castingState?.duration).toBe(72000);
+    });
+  });
+});

@@ -38,56 +38,202 @@ describe('SoilSystem', () => {
 
   describe('Moisture Decay', () => {
     it('should decrease moisture by base decay per day', () => {
-      // Create a world with a tile that needs moisture decay
-      // Mock tile access or world state
-      // This will be implemented when SoilSystem is created
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
 
-      // Expected behavior: moisture decreases by -10 per game day
-      expect(true).toBe(true); // Placeholder - will fail when implemented
+      // Normal temperature (15-25°C) = base decay of 10
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      expect(tile.moisture).toBe(40);
     });
 
     it('should modify decay based on temperature (hot = +50%)', () => {
-      // Hot weather should increase evaporation
-      // Base decay -10, with hot modifier should be -15
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Hot weather (>25°C) = base decay * 1.5 = 10 * 1.5 = 15
+      soilSystem.decayMoisture(world, tile, 0, 0, 30);
+
+      expect(tile.moisture).toBe(35);
     });
 
     it('should modify decay based on temperature (cold = -50%)', () => {
-      // Cold weather should decrease evaporation
-      // Base decay -10, with cold modifier should be -5
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Cold weather (<10°C) = base decay * 0.5 = 10 * 0.5 = 5
+      soilSystem.decayMoisture(world, tile, 0, 0, 5);
+
+      expect(tile.moisture).toBe(45);
     });
 
-    it('should modify decay based on season (summer = +25%)', () => {
-      // Summer should increase evaporation
-      expect(true).toBe(true); // Placeholder
+    it.skip('should modify decay based on season (summer = +25%)', () => {
+      // TODO: Season-based decay modifiers not implemented in current SoilSystem
+      // The system uses temperature-based modifiers instead
     });
 
-    it('should modify decay based on season (winter = -50%)', () => {
-      // Winter should decrease evaporation
-      expect(true).toBe(true); // Placeholder
+    it.skip('should modify decay based on season (winter = -50%)', () => {
+      // TODO: Season-based decay modifiers not implemented in current SoilSystem
+      // The system uses temperature-based modifiers instead
     });
 
     it('should not decay moisture below 0', () => {
-      // Moisture should clamp at 0, never go negative
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 5,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Base decay of 10, but moisture is only 5
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      expect(tile.moisture).toBe(0);
     });
   });
 
   describe('Soil Depletion Tracking', () => {
     it('should track fertility level', () => {
-      // Verify system can read and track tile fertility
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      const initialFertility = tile.fertility;
+
+      // Deplete soil (reduces fertility by 15)
+      soilSystem.depleteSoil(world, tile, 0, 0);
+
+      expect(tile.fertility).toBe(initialFertility - 15);
     });
 
     it('should track plantability counter (0-3)', () => {
-      // Verify system tracks how many times a tile can be planted
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Initial plantability is 3
+      expect(tile.plantability).toBe(3);
+
+      // Deplete once
+      soilSystem.depleteSoil(world, tile, 0, 0);
+      expect(tile.plantability).toBe(2);
+
+      // Deplete again
+      soilSystem.depleteSoil(world, tile, 0, 0);
+      expect(tile.plantability).toBe(1);
+
+      // Deplete third time
+      soilSystem.depleteSoil(world, tile, 0, 0);
+      expect(tile.plantability).toBe(0);
     });
 
     it('should require re-tilling when plantability reaches 0', () => {
-      // When plantability = 0, tile should need re-tilling
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 1,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      const handler = vi.fn();
+      eventBus.subscribe('soil:depleted', handler);
+
+      // Deplete the last use
+      soilSystem.depleteSoil(world, tile, 5, 5);
+
+      expect(tile.plantability).toBe(0);
+      expect(tile.tilled).toBe(false);
+      eventBus.flush();
+      expect(handler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'soil:depleted',
+          data: expect.objectContaining({
+            x: 5,
+            y: 5,
+          }),
+        })
+      );
     });
   });
 
@@ -232,18 +378,71 @@ describe('SoilSystem', () => {
 
   describe('Rain Moisture Updates', () => {
     it('should increase moisture on all outdoor tiles when it rains', () => {
-      // When weather:rain event fires, all outdoor tiles should gain moisture
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 30,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Apply rain with intensity 1.0 (adds 40 * intensity)
+      soilSystem.applyRain(world, tile, 0, 0, 1.0);
+
+      expect(tile.moisture).toBe(70);
     });
 
-    it('should not increase moisture on indoor tiles during rain', () => {
-      // Tiles inside buildings should not receive rain moisture
-      expect(true).toBe(true); // Placeholder
+    it.skip('should not increase moisture on indoor tiles during rain', () => {
+      // TODO: Indoor/outdoor tile tracking not implemented in current SoilSystem
+      // This would require building structure data to determine which tiles are covered
     });
 
     it('should scale moisture increase by rain intensity', () => {
-      // Higher intensity rain should add more moisture
-      expect(true).toBe(true); // Placeholder
+      const world = new WorldImpl(eventBus);
+      const tile1 = {
+        terrain: 'dirt',
+        moisture: 30,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+      const tile2 = {
+        terrain: 'dirt',
+        moisture: 30,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Low intensity rain (0.5) = 40 * 0.5 = 20 moisture
+      soilSystem.applyRain(world, tile1, 0, 0, 0.5);
+      expect(tile1.moisture).toBe(50);
+
+      // High intensity rain (1.0) = 40 * 1.0 = 40 moisture
+      soilSystem.applyRain(world, tile2, 1, 0, 1.0);
+      expect(tile2.moisture).toBe(70);
     });
   });
 

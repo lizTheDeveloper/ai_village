@@ -692,6 +692,16 @@ function formatQueryData(queryId, data) {
       return formatLLMQueue(data);
     case 'game-server-status':
       return formatGameServerStatus(data);
+    case 'providers':
+      return formatLLMProviders(data);
+    case 'queue-stats':
+      return formatLLMQueueStats(data);
+    case 'session-cooldowns':
+      return formatSessionCooldowns(data);
+    case 'list-work-orders':
+      return formatWorkOrders(data);
+    case 'pipeline-status':
+      return formatPipelineStatus(data);
     default:
       // Default: pretty-print JSON
       return '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
@@ -920,6 +930,181 @@ function formatGameServerStatus(data) {
   }
 }
 
+// LLM Providers formatter
+function formatLLMProviders(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  let html = '<div style="display: flex; gap: 2rem; margin-bottom: 1rem;">';
+  html += '<div><strong>Total Providers:</strong> ' + (data.summary?.totalProviders || 0) + '</div>';
+  html += '<div><strong>Total Requests:</strong> ' + (data.summary?.totalRequests || 0) + '</div>';
+  html += '</div>';
+
+  if (data.queues) {
+    html += '<table class="data-table"><thead><tr>';
+    html += '<th>Provider</th><th>Queue</th><th>Rate Limited</th><th>Wait Time</th><th>Utilization</th>';
+    html += '</tr></thead><tbody>';
+
+    for (const [provider, queueData] of Object.entries(data.queues)) {
+      const rateLimited = queueData.rateLimited ? '🔴 YES' : '🟢 NO';
+      const utilization = ((queueData.semaphoreUtilization || 0) * 100).toFixed(1) + '%';
+
+      html += '<tr>';
+      html += '<td><strong>' + provider.toUpperCase() + '</strong></td>';
+      html += '<td>' + (queueData.queueLength || 0) + '</td>';
+      html += '<td>' + rateLimited + '</td>';
+      html += '<td>' + (queueData.rateLimitWaitMs || 0) + 'ms</td>';
+      html += '<td>' + utilization + '</td>';
+      html += '</tr>';
+    }
+
+    html += '</tbody></table>';
+  }
+
+  return html;
+}
+
+// LLM Queue Stats formatter
+function formatLLMQueueStats(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  let html = '';
+
+  // Provider summary
+  if (data.providers && data.providers.length > 0) {
+    html += '<div style="margin-bottom: 1rem;"><strong>Providers:</strong> ' + data.providers.join(', ') + '</div>';
+  }
+
+  // Session stats
+  if (data.sessions) {
+    html += '<div style="display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap;">';
+    html += '<div><strong>Total Sessions:</strong> ' + (data.sessions.totalSessions || 0) + '</div>';
+    html += '<div><strong>Avg Requests/Session:</strong> ' + (data.sessions.averageRequestsPerSession || 0) + '</div>';
+    html += '<div><strong>Oldest Session:</strong> ' + Math.floor((data.sessions.oldestSessionAge || 0) / 1000) + 's</div>';
+    html += '</div>';
+  }
+
+  // Metrics summary
+  if (data.metrics) {
+    const last5 = data.metrics.last5Minutes || {};
+    html += '<div style="margin-top: 1rem;">';
+    html += '<div style="font-size: 0.9rem; color: #00aa00; margin-bottom: 0.5rem;"><strong>Last 5 Minutes</strong></div>';
+    html += '<div style="display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem;">';
+    html += '<div>Requests: ' + (last5.totalRequests || 0) + '</div>';
+    html += '<div>Success: ' + (last5.successfulRequests || 0) + '</div>';
+    html += '<div>Failed: ' + (last5.failedRequests || 0) + '</div>';
+    html += '<div>Avg Wait: ' + (last5.avgWaitMs || 0) + 'ms</div>';
+    html += '<div>Requests/Min: ' + (last5.requestsPerMinute || 0).toFixed(1) + '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  return html;
+}
+
+// Session Cooldowns formatter
+function formatSessionCooldowns(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  let html = '';
+
+  if (data.sessions) {
+    html += '<div style="display: flex; gap: 2rem; margin-bottom: 1rem;">';
+    html += '<div><strong>Total Sessions:</strong> ' + (data.sessions.totalSessions || 0) + '</div>';
+    html += '<div><strong>Avg Requests/Session:</strong> ' + (data.sessions.averageRequestsPerSession || 0) + '</div>';
+    html += '</div>';
+  }
+
+  if (data.cooldowns) {
+    html += '<div style="color: #888; font-size: 0.85rem; margin-top: 0.5rem;">' + data.cooldowns + '</div>';
+  }
+
+  return html;
+}
+
+// Work Orders formatter
+function formatWorkOrders(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  const workOrders = data.workOrders || [];
+  const count = data.count || workOrders.length;
+
+  if (workOrders.length === 0) {
+    return '<div style="color: #888;">No work orders found</div>';
+  }
+
+  let html = '<div style="margin-bottom: 1rem;"><strong>' + count + '</strong> work orders available</div>';
+
+  // Display as a grid of clickable cards
+  html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; max-height: 300px; overflow-y: auto;">';
+
+  for (const wo of workOrders) {
+    html += '<div class="work-order-card" style="background: #1a1a1a; border: 1px solid #333; padding: 0.5rem; font-size: 0.85rem; cursor: pointer;" ';
+    html += 'data-work-order="' + wo + '" ';
+    html += 'title="Click to select for pipeline">';
+    html += wo;
+    html += '</div>';
+  }
+
+  html += '</div>';
+  html += '<div style="margin-top: 0.5rem; color: #888; font-size: 0.75rem;">💡 Click a work order to auto-fill it in "Start Claude Code Pipeline" below</div>';
+
+  return html;
+}
+
+// Pipeline Status formatter
+function formatPipelineStatus(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  const status = data.status || 'unknown';
+  const workOrder = data.workOrder;
+  const timestamp = data.timestamp;
+
+  let html = '<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">';
+
+  if (status === 'running') {
+    html += '<div style="font-size: 2rem;">🚀</div>';
+    html += '<div>';
+    html += '<div style="font-size: 1.2rem; color: #00ff00;"><strong>RUNNING</strong></div>';
+    if (workOrder) {
+      html += '<div style="color: #888; font-size: 0.85rem;">Work Order: <span style="color: #00ff00;">' + workOrder + '</span></div>';
+    }
+    if (timestamp) {
+      const elapsed = Math.floor((Date.now() - timestamp) / 1000);
+      html += '<div style="color: #888; font-size: 0.75rem;">Running for: ' + elapsed + 's</div>';
+    }
+    html += '</div>';
+  } else if (status === 'stopping') {
+    html += '<div style="font-size: 2rem;">⏸️</div>';
+    html += '<div>';
+    html += '<div style="font-size: 1.2rem; color: #ffaa00;"><strong>STOPPING</strong></div>';
+    html += '<div style="color: #888; font-size: 0.85rem;">Pipeline shutting down...</div>';
+    html += '</div>';
+  } else {
+    html += '<div style="font-size: 2rem;">💤</div>';
+    html += '<div>';
+    html += '<div style="font-size: 1.2rem; color: #888;"><strong>IDLE</strong></div>';
+    html += '<div style="color: #888; font-size: 0.85rem;">No pipeline currently running</div>';
+    if (workOrder) {
+      html += '<div style="color: #666; font-size: 0.75rem;">Last run: ' + workOrder + '</div>';
+    }
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  return html;
+}
+
 // Refresh all live data in a tab
 function refreshTabData(tabId) {
   const tabContent = document.getElementById('tab-' + tabId);
@@ -1067,6 +1252,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Global refresh button
   document.querySelectorAll('.refresh-btn').forEach(btn => {
     btn.addEventListener('click', () => refreshTabData(activeTab));
+  });
+
+  // Work order click-to-select handler (event delegation)
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('work-order-card')) {
+      const workOrderName = target.dataset.workOrder;
+      if (workOrderName) {
+        // Find the action input (not the query input)
+        const inputs = Array.from(document.querySelectorAll('input[name="workOrder"]'));
+        const actionInput = inputs.find(i => i.placeholder && i.placeholder.includes('from work orders'));
+        if (actionInput) {
+          actionInput.value = workOrderName;
+        }
+      }
+    }
   });
 
   // Set up periodic refresh

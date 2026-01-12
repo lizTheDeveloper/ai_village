@@ -54,10 +54,13 @@ describe('ResponseParser', () => {
 
     it('should parse all core valid actions', () => {
       // These are actual valid behaviors from ActionDefinitions
+      // NOTE: 'talk' is NOT a valid behavior - speaking happens via "speaking" field
       const actions = [
-        'pick', 'gather', 'talk', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
-        'build', 'plan_build', 'till', 'farm', 'plant', 'explore',
-        'tame_animal', 'house_animal', 'set_priorities'
+        'pick', 'gather', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'explore', 'research',
+        'tame_animal', 'house_animal', 'hunt', 'butcher', 'initiate_combat', 'cast_spell',
+        'set_priorities', 'set_personal_goal', 'set_medium_term_goal', 'set_group_goal',
+        'sleep_until_queue_complete'
       ];
 
       for (const action of actions) {
@@ -138,15 +141,17 @@ describe('ResponseParser', () => {
 
   describe('parseBehavior - Legacy API', () => {
     it('should extract just the action from structured response', () => {
+      // NOTE: 'talk' is NOT a valid behavior - speaking happens via the "speaking" field
+      // Using 'gather' instead as a representative action
       const response = JSON.stringify({
         thinking: 'test',
         speaking: 'hello',
-        action: 'talk'
+        action: 'gather'
       });
 
       const behavior = parser.parseBehavior(response);
 
-      expect(behavior).toBe('talk');
+      expect(behavior).toBe('gather');
     });
 
     it('should work with text response', () => {
@@ -161,10 +166,13 @@ describe('ResponseParser', () => {
   describe('isValidBehavior', () => {
     it('should validate core behaviors', () => {
       // These are actual valid behaviors from ActionDefinitions (not synonyms)
+      // NOTE: 'talk' is NOT a valid behavior - speaking happens via "speaking" field
       const validBehaviors = [
-        'pick', 'gather', 'talk', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
-        'build', 'plan_build', 'till', 'farm', 'plant', 'explore',
-        'tame_animal', 'house_animal', 'set_priorities'
+        'pick', 'gather', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'explore', 'research',
+        'tame_animal', 'house_animal', 'hunt', 'butcher', 'initiate_combat', 'cast_spell',
+        'set_priorities', 'set_personal_goal', 'set_medium_term_goal', 'set_group_goal',
+        'sleep_until_queue_complete'
       ];
 
       for (const behavior of validBehaviors) {
@@ -176,6 +184,8 @@ describe('ResponseParser', () => {
       expect(parser.isValidBehavior('invalid')).toBe(false);
       expect(parser.isValidBehavior('run')).toBe(false);
       expect(parser.isValidBehavior('')).toBe(false);
+      // 'talk' is NOT a valid behavior - speaking happens via "speaking" field
+      expect(parser.isValidBehavior('talk')).toBe(false);
     });
 
     it('should reject synonyms (they are not valid behaviors)', () => {

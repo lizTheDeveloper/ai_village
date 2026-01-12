@@ -40,6 +40,7 @@ import {
   PrioritiesSection,
   DevSection,
 } from './panels/agent-info/index.js';
+import { devActionsService } from './services/DevActionsService.js';
 
 const TAB_DEFINITIONS: Array<{ id: AgentInfoTab; label: string }> = [
   { id: 'info', label: 'Info' },
@@ -246,6 +247,13 @@ export class AgentInfoPanel implements IWindowPanel {
       }
     }
 
+    // Check for skill edit clicks (skills tab)
+    if (currentTab === 'skills') {
+      if (this.skillsSection.handleClick(clickX, clickY)) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -335,6 +343,9 @@ export class AgentInfoPanel implements IWindowPanel {
       return;
     }
 
+    // Set world on dev actions service for mutations
+    devActionsService.setWorld(world);
+
     // Draw panel background
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
     ctx.fillRect(x, y, width, height);
@@ -383,7 +394,7 @@ export class AgentInfoPanel implements IWindowPanel {
         break;
 
       case 'skills':
-        this.skillsSection.render(context, identity, skills, personality);
+        this.skillsSection.render(context, identity, skills, personality, this.selectedEntityId ?? undefined);
         break;
 
       case 'inventory':

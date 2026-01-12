@@ -1,58 +1,31 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { EventBus } from '@ai-village/core/events/EventBus';
-import { World } from '@ai-village/core/ecs/World';
+import { EventBusImpl } from '@ai-village/core/events/EventBus';
+import type { EventBus } from '@ai-village/core/events/EventBus';
+import { CombatHUDPanel } from '../CombatHUDPanel.js';
 
-// Mock the CombatHUDPanel - will be implemented
-class CombatHUDPanel {
-  private eventBus: EventBus;
-  private world: World;
-  private isVisible: boolean = false;
-  private activeConflicts: Array<{
-    id: string;
-    type: string;
-    participants: string[];
-  }> = [];
-
-  constructor(eventBus: EventBus, world: World) {
-    this.eventBus = eventBus;
-    this.world = world;
-  }
-
-  public getId(): string {
-    throw new Error('Not implemented');
-  }
-
-  public getTitle(): string {
-    throw new Error('Not implemented');
-  }
-
-  public render(): HTMLElement {
-    throw new Error('Not implemented');
-  }
-
-  public show(): void {
-    throw new Error('Not implemented');
-  }
-
-  public hide(): void {
-    throw new Error('Not implemented');
-  }
-
-  public cleanup(): void {
-    throw new Error('Not implemented');
-  }
-}
-
-// TODO: CombatHUDPanel not implemented - tests skipped
-describe.skip('CombatHUDPanel', () => {
+describe('CombatHUDPanel', () => {
   let eventBus: EventBus;
-  let world: World;
   let panel: CombatHUDPanel;
 
+  // Helper to emit and flush events
+  const emitConflictStarted = (bus: EventBus, data: any) => {
+    bus.emit({ type: 'conflict:started' as any, source: 'test', data });
+    bus.flush();
+  };
+
+  const emitConflictResolved = (bus: EventBus, data: any) => {
+    bus.emit({ type: 'conflict:resolved' as any, source: 'test', data });
+    bus.flush();
+  };
+
+  const emitCombatAttack = (bus: EventBus, data: any) => {
+    bus.emit({ type: 'combat:attack' as any, source: 'test', data });
+    bus.flush();
+  };
+
   beforeEach(() => {
-    eventBus = new EventBus();
-    world = new World();
-    panel = new CombatHUDPanel(eventBus, world);
+    eventBus = new EventBusImpl();
+    panel = new CombatHUDPanel(eventBus);
   });
 
   afterEach(() => {
@@ -61,102 +34,110 @@ describe.skip('CombatHUDPanel', () => {
 
   describe('REQ-COMBAT-001: Combat HUD Overlay', () => {
     it('should implement IWindowPanel interface', () => {
-      expect(() => panel.getId()).toThrow('Not implemented');
-      expect(() => panel.getTitle()).toThrow('Not implemented');
-      expect(() => panel.render()).toThrow('Not implemented');
+      expect(panel.getId()).toBe('combat-hud-panel');
+      expect(panel.getTitle()).toBe('Combat Status');
+      const element = panel.render();
+      expect(element).toBeInstanceOf(HTMLElement);
+      expect(element.id).toBe('combat-hud-panel');
     });
 
     it('should subscribe to conflict:started events on construction', () => {
       const handler = vi.fn();
-      const testBus = new EventBus();
-      testBus.on('conflict:started', handler);
+      const testBus = new EventBusImpl();
+      testBus.on('conflict:started' as any, handler);
 
-      testBus.emit('conflict:started', {
-        conflictId: 'test-conflict',
-        type: 'agent_combat',
-        participants: ['entity1', 'entity2'],
+      testBus.emit({
+        type: 'conflict:started' as any,
+        source: 'test',
+        data: {
+          conflictId: 'test-conflict',
+          type: 'agent_combat',
+          participants: ['entity1', 'entity2'],
+        },
       });
+
+      testBus.flush();
 
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({
-          conflictId: 'test-conflict',
-          type: 'agent_combat',
+          type: 'conflict:started',
+          data: expect.objectContaining({
+            conflictId: 'test-conflict',
+            type: 'agent_combat',
+          }),
         })
       );
     });
 
     it('should become visible when conflict starts', () => {
-      expect(() => {
-        eventBus.emit('conflict:started', {
-          conflictId: 'conflict1',
-          type: 'agent_combat',
-          participants: ['agent1', 'agent2'],
-        });
-        panel.show();
-      }).toThrow('Not implemented');
+      expect(panel.isVisible()).toBe(false);
+
+      emitConflictStarted(eventBus, {
+        conflictId: 'conflict1',
+        type: 'agent_combat',
+        participants: ['agent1', 'agent2'],
+      });
+
+      expect(panel.isVisible()).toBe(true);
     });
 
     it('should hide when all conflicts are resolved', () => {
-      expect(() => {
-        // Start conflict
-        eventBus.emit('conflict:started', {
-          conflictId: 'conflict1',
-          type: 'agent_combat',
-          participants: ['agent1', 'agent2'],
-        });
+      // Start conflict
+      emitConflictStarted(eventBus, {
+        conflictId: 'conflict1',
+        type: 'agent_combat',
+        participants: ['agent1', 'agent2'],
+      });
 
-        // Resolve conflict
-        eventBus.emit('conflict:resolved', {
-          conflictId: 'conflict1',
-          outcome: 'victory',
-        });
+      expect(panel.isVisible()).toBe(true);
 
-        panel.hide();
-      }).toThrow('Not implemented');
+      // Resolve conflict
+      emitConflictResolved(eventBus, {
+        conflictId: 'conflict1',
+        outcome: 'victory',
+      });
+
+      expect(panel.isVisible()).toBe(false);
     });
 
     it('should display multiple active conflicts', () => {
-      expect(() => {
-        eventBus.emit('conflict:started', {
-          conflictId: 'conflict1',
-          type: 'agent_combat',
-          participants: ['agent1', 'agent2'],
-        });
+      emitConflictStarted(eventBus, {
+        conflictId: 'conflict1',
+        type: 'agent_combat',
+        participants: ['agent1', 'agent2'],
+      });
 
-        eventBus.emit('conflict:started', {
-          conflictId: 'conflict2',
-          type: 'predator_attack',
-          participants: ['wolf1', 'agent3'],
-        });
+      emitConflictStarted(eventBus, {
+        conflictId: 'conflict2',
+        type: 'predator_attack',
+        participants: ['wolf1', 'agent3'],
+      });
 
-        const element = panel.render();
-        const conflictCount = element.querySelectorAll('.conflict-item').length;
-        expect(conflictCount).toBe(2);
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const conflictCount = element.querySelectorAll('.conflict-item').length;
+      expect(conflictCount).toBe(2);
     });
 
     it('should show threat level indicator with color coding', () => {
-      expect(() => {
-        eventBus.emit('conflict:started', {
-          conflictId: 'conflict1',
-          type: 'predator_attack',
-          participants: ['wolf1', 'agent1'],
-          threatLevel: 'high',
-        });
+      emitConflictStarted(eventBus, {
+        conflictId: 'conflict1',
+        type: 'predator_attack',
+        participants: ['wolf1', 'agent1'],
+        threatLevel: 'high',
+      });
 
-        const element = panel.render();
-        const threatIndicator = element.querySelector('.threat-level');
-        expect(threatIndicator?.classList.contains('threat-high')).toBe(true);
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const threatIndicator = element.querySelector('.threat-level');
+      expect(threatIndicator?.classList.contains('threat-high')).toBe(true);
     });
   });
 
   describe('Criterion 1: Combat HUD Activation', () => {
     it('should activate HUD when combat:started event is emitted', () => {
       const handler = vi.fn();
-      eventBus.on('conflict:started', handler);
+      eventBus.on('conflict:started' as any, handler);
 
-      eventBus.emit('conflict:started', {
+      emitConflictStarted(eventBus, {
         conflictId: 'test-1',
         type: 'agent_combat',
         participants: ['entity1', 'entity2'],
@@ -166,31 +147,28 @@ describe.skip('CombatHUDPanel', () => {
     });
 
     it('should display correct conflict type in HUD', () => {
-      expect(() => {
-        eventBus.emit('conflict:started', {
-          conflictId: 'pred-1',
-          type: 'predator_attack',
-          participants: ['wolf', 'villager'],
-        });
+      emitConflictStarted(eventBus, {
+        conflictId: 'pred-1',
+        type: 'predator_attack',
+        participants: ['wolf', 'villager'],
+      });
 
-        const element = panel.render();
-        const typeDisplay = element.querySelector('.conflict-type')?.textContent;
-        expect(typeDisplay).toContain('predator_attack');
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const typeDisplay = element.querySelector('.conflict-type')?.textContent;
+      expect(typeDisplay).toBeDefined();
+      expect(typeDisplay).toContain('predator_attack');
     });
 
     it('should list all participants in active conflict', () => {
-      expect(() => {
-        eventBus.emit('conflict:started', {
-          conflictId: 'combat-1',
-          type: 'agent_combat',
-          participants: ['warrior1', 'warrior2', 'warrior3'],
-        });
+      emitConflictStarted(eventBus, {
+        conflictId: 'combat-1',
+        type: 'agent_combat',
+        participants: ['warrior1', 'warrior2', 'warrior3'],
+      });
 
-        const element = panel.render();
-        const participants = element.querySelectorAll('.participant');
-        expect(participants.length).toBe(3);
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const participants = element.querySelectorAll('.participant');
+      expect(participants.length).toBe(3);
     });
   });
 
@@ -198,108 +176,146 @@ describe.skip('CombatHUDPanel', () => {
     it('should throw when EventBus is missing', () => {
       expect(() => {
         // @ts-expect-error Testing missing parameter
-        new CombatHUDPanel(null, world);
-      }).toThrow();
-    });
-
-    it('should throw when World is missing', () => {
-      expect(() => {
-        // @ts-expect-error Testing missing parameter
-        new CombatHUDPanel(eventBus, null);
-      }).toThrow();
+        new CombatHUDPanel(null);
+      }).toThrow('CombatHUDPanel requires EventBus parameter');
     });
 
     it('should throw when conflict event is missing required fields', () => {
-      expect(() => {
-        // @ts-expect-error Testing invalid event
-        eventBus.emit('conflict:started', {
-          conflictId: 'test',
-          // Missing type and participants
-        });
-      }).toThrow();
+      // EventBus catches errors in handlers, so we spy on console.error
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      emitConflictStarted(eventBus, {
+        conflictId: 'test',
+        // Missing type and participants
+      });
+
+      // Check that an error was logged
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error in event handler'),
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 
   describe('cleanup', () => {
     it('should unsubscribe from events on cleanup', () => {
-      const handler = vi.fn();
-      eventBus.on('conflict:started', handler);
-
-      panel.cleanup();
-
-      eventBus.emit('conflict:started', {
-        conflictId: 'test',
+      // Start with a conflict to verify panel is listening
+      emitConflictStarted(eventBus, {
+        conflictId: 'test1',
         type: 'agent_combat',
         participants: ['a', 'b'],
       });
 
-      // Handler should not be called after cleanup
-      // Note: This test assumes cleanup removes event listeners
-      // Implementation must verify this behavior
+      expect(panel.isVisible()).toBe(true);
+
+      // Cleanup should remove listeners
+      panel.cleanup();
+
+      // This should not affect the panel after cleanup
+      emitConflictStarted(eventBus, {
+        conflictId: 'test2',
+        type: 'agent_combat',
+        participants: ['c', 'd'],
+      });
+
+      // Panel visibility should remain unchanged after cleanup
+      expect(panel.isVisible()).toBe(true);
     });
   });
 
   describe('visual elements', () => {
     it('should render translucent overlay that does not obstruct gameplay', () => {
-      expect(() => {
-        const element = panel.render();
-        const opacity = window.getComputedStyle(element).opacity;
-        expect(parseFloat(opacity)).toBeLessThan(1);
-        expect(parseFloat(opacity)).toBeGreaterThan(0);
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      // Check the inline opacity style
+      expect(element.style.opacity).toBe('0.9');
+      const opacity = parseFloat(element.style.opacity);
+      expect(opacity).toBeLessThan(1);
+      expect(opacity).toBeGreaterThan(0);
     });
 
     it('should position HUD at top-center of screen', () => {
-      expect(() => {
-        const element = panel.render();
-        const style = window.getComputedStyle(element);
-        expect(style.position).toBe('absolute');
-        expect(style.top).toBe('0px');
-        expect(style.left).toContain('50%');
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      expect(element.style.position).toBe('absolute');
+      expect(element.style.top).toBe('0px');
+      expect(element.style.left).toBe('50%');
+      expect(element.style.transform).toContain('translateX(-50%)');
     });
 
     it('should display last 3 combat events in recent log', () => {
-      expect(() => {
-        // Emit multiple combat events
-        for (let i = 0; i < 5; i++) {
-          eventBus.emit('combat:attack', {
-            attackerId: `attacker${i}`,
-            defenderId: `defender${i}`,
-          });
-        }
+      // Emit multiple combat events
+      for (let i = 0; i < 5; i++) {
+        emitCombatAttack(eventBus, {
+          attackerId: `attacker${i}`,
+          defenderId: `defender${i}`,
+        });
+      }
 
-        const element = panel.render();
-        const logEntries = element.querySelectorAll('.recent-log-entry');
-        expect(logEntries.length).toBeLessThanOrEqual(3);
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const logEntries = element.querySelectorAll('.recent-log-entry');
+      expect(logEntries.length).toBeLessThanOrEqual(3);
+      expect(logEntries.length).toBe(3);
     });
   });
 
   describe('user interactions', () => {
-    it('should focus camera when threat is clicked', () => {
-      expect(() => {
-        const element = panel.render();
-        const threatItem = element.querySelector('.threat-item') as HTMLElement;
+    it('should focus camera when conflict is clicked', () => {
+      const handler = vi.fn();
+      eventBus.on('ui:entity:selected' as any, handler);
 
-        const clickEvent = new MouseEvent('click');
-        threatItem.dispatchEvent(clickEvent);
+      // Start a conflict first
+      emitConflictStarted(eventBus, {
+        conflictId: 'test-conflict',
+        type: 'agent_combat',
+        participants: ['entity1', 'entity2'],
+      });
 
-        // Should emit camera focus event or call camera service
-      }).toThrow('Not implemented');
+      const element = panel.render();
+      const conflictItem = element.querySelector('.conflict-item') as HTMLElement;
+      expect(conflictItem).not.toBeNull();
+
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      conflictItem.dispatchEvent(clickEvent);
+
+      // Flush events emitted by click handler
+      eventBus.flush();
+
+      // Should emit entity selection event
+      expect(handler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'ui:entity:selected',
+          data: expect.objectContaining({
+            entityId: 'entity1',
+          }),
+        })
+      );
     });
 
-    it('should show detailed threat info on hover', () => {
-      expect(() => {
-        const element = panel.render();
-        const threatItem = element.querySelector('.threat-item') as HTMLElement;
+    it('should change background on hover', () => {
+      // Start a conflict first
+      emitConflictStarted(eventBus, {
+        conflictId: 'test-conflict',
+        type: 'agent_combat',
+        participants: ['entity1', 'entity2'],
+      });
 
-        const hoverEvent = new MouseEvent('mouseenter');
-        threatItem.dispatchEvent(hoverEvent);
+      const element = panel.render();
+      const conflictItem = element.querySelector('.conflict-item') as HTMLElement;
+      expect(conflictItem).not.toBeNull();
 
-        const tooltip = element.querySelector('.threat-tooltip');
-        expect(tooltip).toBeDefined();
-      }).toThrow('Not implemented');
+      const initialBg = conflictItem.style.background;
+
+      const hoverEvent = new MouseEvent('mouseenter', { bubbles: true });
+      conflictItem.dispatchEvent(hoverEvent);
+
+      const hoverBg = conflictItem.style.background;
+      expect(hoverBg).not.toBe(initialBg);
+
+      const leaveEvent = new MouseEvent('mouseleave', { bubbles: true });
+      conflictItem.dispatchEvent(leaveEvent);
+
+      expect(conflictItem.style.background).toBe(initialBg);
     });
   });
 });

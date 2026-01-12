@@ -32,7 +32,8 @@ export type CanonEventType =
   | 'deity_emergence'
   | 'major_discovery'
   | 'war_event'
-  | 'cultural_milestone';
+  | 'cultural_milestone'
+  | 'day_milestone';
 
 export class CanonEventDetector {
   private canonEvents: CanonEvent[] = [];

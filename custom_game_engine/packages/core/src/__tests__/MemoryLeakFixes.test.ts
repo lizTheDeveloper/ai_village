@@ -222,19 +222,17 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
   });
 
   describe('Criterion 4: Cleanup Methods Exist', () => {
-    it('should throw when InputHandler is used without proper cleanup capability', async () => {
-      // This test verifies that InputHandler has a destroy() method
-      // We can't import InputHandler here (different package), but we can check
-      // that the renderer package exports a proper cleanup interface
-
-      // This is a placeholder - actual test will be in renderer package tests
-      // For now, verify that the requirement is documented
+    it.skip('should throw when InputHandler is used without proper cleanup capability', async () => {
+      // TODO: This test should be in packages/renderer/src/__tests__/InputHandler.test.ts
+      // Cross-package imports not allowed in vitest
+      // Requirement: InputHandler must have destroy() method that removes all event listeners
       expect(true).toBe(true);
     });
 
-    it('should throw when Renderer is used without proper cleanup capability', () => {
-      // Similar placeholder for Renderer destroy() method
-      // Actual implementation will be tested in renderer package
+    it.skip('should throw when Renderer is used without proper cleanup capability', () => {
+      // TODO: This test should be in packages/renderer/src/__tests__/Renderer.test.ts
+      // Cross-package imports not allowed in vitest
+      // Requirement: Renderer must have destroy() method that cleans up all resources
       expect(true).toBe(true);
     });
   });
@@ -365,12 +363,16 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
       }).toThrow();
     });
 
-    it('should throw when pruning fails', () => {
-      // Intentionally corrupt internal state to trigger pruning error
-      // This ensures errors propagate rather than being silently caught
+    it.skip('should throw when pruning fails', () => {
+      // TODO: Implement when pruning logic is in place
+      // Test should verify that pruning errors are not silently caught
+      // Requirement: No silent fallbacks - errors must propagate
 
-      // Note: Implementation should not catch and suppress errors during pruning
-      expect(true).toBe(true); // Placeholder - actual test depends on implementation
+      // Example approach:
+      // 1. Corrupt MetricsCollector internal state
+      // 2. Call a pruning method
+      // 3. Expect an error to be thrown (not caught silently)
+      expect(true).toBe(true);
     });
   });
 });

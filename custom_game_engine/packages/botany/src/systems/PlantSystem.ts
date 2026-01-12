@@ -9,6 +9,7 @@ import type {
   PlantSpecies,
   StageTransition,
   EventBus,
+  StateMutatorSystem,
 } from '@ai-village/core';
 import {
   ComponentType as CT,
@@ -42,10 +43,15 @@ interface Environment {
 /**
  * PlantSystem manages the plant lifecycle, stage transitions, health updates, and seed production
  *
+ * PERFORMANCE: Uses StateMutatorSystem for batched vector updates for gradual changes
+ * - Hydration decay, age increment, and health damage use batched deltas
+ * - Stage progress and event emission run at appropriate frequencies
+ *
  * Dependencies:
  * @see TimeSystem (priority 3) - Provides game time for plant growth, aging, and hourly updates
  * @see WeatherSystem (priority 5) - Provides weather events (rain, frost) affecting plant hydration and health
  * @see SoilSystem (priority 15) - Provides soil moisture and nutrient data affecting plant growth
+ * @see StateMutatorSystem (priority 5) - Handles batched hydration/age/health updates
  */
 export class PlantSystem implements System {
   public readonly id: SystemId = 'plant';
@@ -57,10 +63,29 @@ export class PlantSystem implements System {
    * @see TimeSystem - provides game time for plant aging and stage transitions
    * @see WeatherSystem - provides rain/frost events affecting plant hydration and health
    * @see SoilSystem - provides soil moisture and nutrient data for growth calculations
+   * @see StateMutatorSystem - handles batched hydration/age/health updates
    */
-  public readonly dependsOn = ['time', 'weather', 'soil'] as const;
+  public readonly dependsOn = ['time', 'weather', 'soil', 'state_mutator'] as const;
   private eventBus: CoreEventBus;
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
+
+  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
+  private stateMutator: StateMutatorSystem | null = null;
+
+  // Performance: Update delta rates once per game hour (3600 ticks)
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 3600; // 1 game hour at 20 TPS
+
+  // Track corrupted plants that have already been reported (report once, not every tick)
+  private reportedCorruptedPlants = new Set<string>();
+
+  // Track cleanup functions for registered deltas
+  private deltaCleanups = new Map<string, {
+    hydration: () => void;
+    age: () => void;
+    dehydrationDamage?: () => void;
+    malnutritionDamage?: () => void;
+  }>();
 
   // Event listeners storage
   private weatherRainIntensity: string | null = null;
@@ -76,9 +101,6 @@ export class PlantSystem implements System {
   private readonly HOUR_THRESHOLD = PLANT_CONSTANTS.HOUR_THRESHOLD; // Update plants once per day
   private lastUpdateLog: number = 0;
 
-  // Track corrupted plants that have already been reported (report once, not every tick)
-  private reportedCorruptedPlants = new Set<string>();
-
   // Track entity IDs for plants (to avoid using 'as any')
   private plantEntityIds: WeakMap<PlantComponent, string> = new WeakMap();
 
@@ -92,6 +114,14 @@ export class PlantSystem implements System {
    */
   public setSpeciesLookup(lookup: (id: string) => PlantSpecies): void {
     this.speciesLookup = lookup;
+  }
+
+  /**
+   * Set the StateMutatorSystem reference.
+   * Called by registerAllSystems during initialization.
+   */
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
   }
 
   /**
@@ -167,6 +197,9 @@ export class PlantSystem implements System {
 
     // Multiply deltaTime by interval to compensate for skipped ticks
     const effectiveDeltaTime = deltaTime * PlantSystem.UPDATE_INTERVAL;
+
+    // Get current tick for delta update timing
+    const currentTick = world.tick;
 
     // Clear companion planting cache at start of each update
     this.clearCompanionCache();
@@ -320,7 +353,13 @@ export class PlantSystem implements System {
         // Apply soil effects (every frame for immediate response)
         this.applySoilEffects(plant);
 
-        // Hourly updates - age and grow
+        // Update delta rates once per game hour (for continuous gradual changes)
+        const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+        if (shouldUpdateDeltas) {
+          this.updatePlantDeltas(plant, species, environment, entity.id);
+        }
+
+        // Hourly updates - stage progress and event emission
         if (shouldUpdate) {
           this.updatePlantHourly(plant, species, environment, world, entity.id, hoursToProcess);
         }
@@ -372,6 +411,12 @@ export class PlantSystem implements System {
       this.accumulatedTime = 0;
       this.dayStarted = false;
       this.daySkipCount = 0; // Reset day skip counter
+    }
+
+    // Mark delta rates as updated
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
     }
 
     // Always clear weather effects after processing
@@ -493,7 +538,103 @@ export class PlantSystem implements System {
   }
 
   /**
+   * Update plant deltas for continuous gradual changes
+   * Called once per game hour to update delta rates
+   */
+  private updatePlantDeltas(
+    plant: PlantComponent,
+    _species: PlantSpecies,
+    _environment: Environment,
+    entityId: string
+  ): void {
+    if (!this.stateMutator) {
+      throw new Error('[PlantSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
+    }
+
+    // Clean up old deltas if they exist
+    if (this.deltaCleanups.has(entityId)) {
+      const cleanups = this.deltaCleanups.get(entityId)!;
+      cleanups.hydration();
+      cleanups.age();
+      cleanups.dehydrationDamage?.();
+      cleanups.malnutritionDamage?.();
+    }
+
+    // Hydration decay (per game minute)
+    const hydrationDecayPerDay = applyGenetics(plant, 'hydrationDecay');
+    const hydrationDecayPerMinute = -(hydrationDecayPerDay / (24 * 60)); // Convert day to minutes
+
+    const hydrationCleanup = this.stateMutator.registerDelta({
+      entityId,
+      componentType: CT.Plant,
+      field: 'hydration',
+      deltaPerMinute: hydrationDecayPerMinute,
+      min: 0,
+      max: 100,
+      source: 'plant_hydration_decay',
+    });
+
+    // Age increment (per game minute)
+    // 1 game day = 1440 game minutes, age is in days
+    const ageIncreasePerMinute = 1 / 1440; // ~0.000694 days per minute
+
+    const ageCleanup = this.stateMutator.registerDelta({
+      entityId,
+      componentType: CT.Plant,
+      field: 'age',
+      deltaPerMinute: ageIncreasePerMinute,
+      min: 0,
+      source: 'plant_age',
+    });
+
+    // Health damage from critical conditions
+    let dehydrationCleanup: (() => void) | undefined;
+    let malnutritionCleanup: (() => void) | undefined;
+
+    // Dehydration damage (if hydration < 20)
+    if (plant.hydration < PLANT_CONSTANTS.HYDRATION_CRITICAL_THRESHOLD) {
+      // DEHYDRATION_DAMAGE_PER_DAY / 1440 minutes per day
+      const dehydrationDamagePerMinute = -(PLANT_CONSTANTS.DEHYDRATION_DAMAGE_PER_DAY / 1440);
+
+      dehydrationCleanup = this.stateMutator.registerDelta({
+        entityId,
+        componentType: CT.Plant,
+        field: 'health',
+        deltaPerMinute: dehydrationDamagePerMinute,
+        min: 0,
+        max: 100,
+        source: 'plant_dehydration_damage',
+      });
+    }
+
+    // Malnutrition damage (if nutrition < 30)
+    if (plant.nutrition < PLANT_CONSTANTS.NUTRITION_CRITICAL_THRESHOLD) {
+      // MALNUTRITION_DAMAGE_PER_DAY / 1440 minutes per day
+      const malnutritionDamagePerMinute = -(PLANT_CONSTANTS.MALNUTRITION_DAMAGE_PER_DAY / 1440);
+
+      malnutritionCleanup = this.stateMutator.registerDelta({
+        entityId,
+        componentType: CT.Plant,
+        field: 'health',
+        deltaPerMinute: malnutritionDamagePerMinute,
+        min: 0,
+        max: 100,
+        source: 'plant_malnutrition_damage',
+      });
+    }
+
+    // Store cleanup functions
+    this.deltaCleanups.set(entityId, {
+      hydration: hydrationCleanup,
+      age: ageCleanup,
+      dehydrationDamage: dehydrationCleanup,
+      malnutritionDamage: malnutritionCleanup,
+    });
+  }
+
+  /**
    * Hourly plant update - called every game hour
+   * Now focuses on stage progress and event emission (gradual changes handled by StateMutatorSystem)
    */
   private updatePlantHourly(
     plant: PlantComponent,
@@ -503,37 +644,23 @@ export class PlantSystem implements System {
     entityId: string,
     hoursElapsed: number
   ): void {
-    // Convert hours to fraction of a day
-    const daysElapsed = hoursElapsed / 24;
+    // Note: Age, hydration, and health damage are now handled by StateMutatorSystem
+    // This method focuses on stage progress and event emission
 
-    // Age the plant (in days)
-    plant.age += daysElapsed;
-
-    // Track health before damage
+    // Track health for event emission
     const previousHealth = plant.health;
     const healthChangeCauses: string[] = [];
 
-    // Update hydration (natural decay per hour)
-    const hydrationDecayPerDay = applyGenetics(plant, 'hydrationDecay');
-    const hydrationDecay = (hydrationDecayPerDay / 24) * hoursElapsed;
-    plant.hydration -= hydrationDecay;
-    plant.hydration = Math.max(0, plant.hydration);
-
-    // Update health based on needs (damage per hour)
+    // Check current critical conditions for event emission
     if (plant.hydration < PLANT_CONSTANTS.HYDRATION_CRITICAL_THRESHOLD) {
-      plant.health -= (PLANT_CONSTANTS.DEHYDRATION_DAMAGE_PER_DAY / 24) * hoursElapsed; // Dehydration damage
       healthChangeCauses.push(`dehydration (hydration=${plant.hydration.toFixed(0)})`);
     }
     if (plant.nutrition < PLANT_CONSTANTS.NUTRITION_CRITICAL_THRESHOLD) {
-      plant.health -= (PLANT_CONSTANTS.MALNUTRITION_DAMAGE_PER_DAY / 24) * hoursElapsed; // Malnutrition damage
       healthChangeCauses.push(`malnutrition (nutrition=${plant.nutrition.toFixed(0)})`);
     }
 
-    // Clamp health
-    plant.health = Math.max(0, Math.min(100, plant.health));
-
-    // Emit health warning if critical
-    if (plant.health < 50 && previousHealth !== plant.health) {
+    // Emit health warning if critical (even if health changed via StateMutatorSystem)
+    if (plant.health < 50 && plant.health !== previousHealth && healthChangeCauses.length > 0) {
       this.eventBus.emit({
         type: 'plant:healthChanged',
         source: 'plant-system',
@@ -1005,6 +1132,9 @@ export class PlantSystem implements System {
   /** Radius to check for companion plants (in tiles) */
   private static readonly COMPANION_RADIUS = PLANT_CONSTANTS.COMPANION_RADIUS;
 
+  /** Squared radius for distance checks (avoids Math.sqrt in hot path) */
+  private static readonly COMPANION_RADIUS_SQUARED = PlantSystem.COMPANION_RADIUS * PlantSystem.COMPANION_RADIUS;
+
   /** Bonus growth rate from beneficial companion */
   private static readonly COMPANION_BONUS = PLANT_CONSTANTS.COMPANION_BONUS;
 
@@ -1044,9 +1174,11 @@ export class PlantSystem implements System {
 
       const dx = plantComp.position.x - position.x;
       const dy = plantComp.position.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= PlantSystem.COMPANION_RADIUS && distance > 0) {
+      if (distanceSquared <= PlantSystem.COMPANION_RADIUS_SQUARED && distanceSquared > 0) {
+        // Only compute actual distance when needed (for distance falloff calculation)
+        const distance = Math.sqrt(distanceSquared);
         nearbyPlants.push({
           speciesId: plantComp.speciesId,
           distance

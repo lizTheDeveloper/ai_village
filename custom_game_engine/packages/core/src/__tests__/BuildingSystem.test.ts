@@ -186,6 +186,9 @@ describe('BuildingSystem', () => {
       const failHandler = vi.fn();
       world.eventBus.subscribe('building:placement:failed', failHandler);
 
+      // Spy on console.error to detect that an error was logged
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       world.eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
@@ -196,29 +199,39 @@ describe('BuildingSystem', () => {
         },
       });
 
-      // Event handler catches errors internally, so we check for console.error
-      // or error event. The system emits building:placement:failed on resource failure
-      // but throws on unknown type (which gets caught by EventBus.dispatchEvent)
+      // Event handler catches errors internally (per EventBus.dispatchEvent)
+      // System should either emit building:placement:failed OR log an error
       world.eventBus.flush();
-      // Error is logged to console by event dispatcher, not thrown to caller
-      expect(true).toBe(true);
+
+      // Verify that either the fail handler was called OR an error was logged
+      const errorWasHandled = failHandler.mock.calls.length > 0 || consoleErrorSpy.mock.calls.length > 0;
+      expect(errorWasHandled).toBe(true);
+
+      consoleErrorSpy.mockRestore();
     });
 
     it('should handle building completion event for non-existent entity gracefully', () => {
       // Event handlers catch errors internally (per EventBus.dispatchEvent)
       // So we verify the event can be processed without crashing the test
-      world.eventBus.emit({
-        type: 'building:complete',
-        source: 'test',
-        data: {
-          entityId: 'non-existent-entity',
-          buildingType: BuildingType.Workbench,
-        },
-      });
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      world.eventBus.flush();
-      // Error is logged to console by event dispatcher, not thrown to caller
-      expect(true).toBe(true);
+      expect(() => {
+        world.eventBus.emit({
+          type: 'building:complete',
+          source: 'test',
+          data: {
+            entityId: 'non-existent-entity',
+            buildingType: BuildingType.Workbench,
+          },
+        });
+
+        world.eventBus.flush();
+      }).not.toThrow(); // Should not crash
+
+      // Error should be logged to console
+      expect(consoleErrorSpy.mock.calls.length).toBeGreaterThan(0);
+
+      consoleErrorSpy.mockRestore();
     });
   });
 

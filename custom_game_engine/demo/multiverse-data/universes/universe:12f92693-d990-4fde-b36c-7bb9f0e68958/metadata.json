@@ -1,0 +1,10 @@
+{
+  "id": "universe:12f92693-d990-4fde-b36c-7bb9f0e68958",
+  "name": "[DELETED] Test Universe",
+  "ownerId": "test-player-123",
+  "createdAt": 1768077180855,
+  "lastSnapshotAt": 1768077197736,
+  "snapshotCount": 1,
+  "canonicalEventCount": 1,
+  "isPublic": false
+}

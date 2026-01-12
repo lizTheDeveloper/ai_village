@@ -58,7 +58,7 @@ describe('Resource Depletion Edge Cases', () => {
 
     // Simulate ticks - mana draining
     for (let i = 0; i < 60; i++) {
-      tickCast(castState);
+      tickCast(castState, caster);
       regenerateResources(caster, 1);
     }
 
@@ -575,20 +575,45 @@ function attemptCast(caster: MagicComponent, spell: ComposedSpell): any {
 }
 
 function beginCast(caster: MagicComponent, spell: ComposedSpell): any {
+  // Lock resources
+  const lockedCosts = [{ type: 'mana' as const, amount: spell.manaCost, source: 'spell_cost' }];
+  caster.resourcePools.mana.current -= spell.manaCost;
+  caster.resourcePools.mana.locked += spell.manaCost;
+
   return {
-    spell,
-    caster,
-    ticksElapsed: 0,
-    ticksTotal: spell.castTime,
+    spellId: spell.id,
+    casterId: 'test_caster',
+    startedAt: 0,
+    duration: spell.castTime,
+    progress: 0,
+    lockedResources: lockedCosts,
     failed: false,
+    completed: false,
   };
 }
 
-function tickCast(castState: any): void {
-  castState.ticksElapsed++;
-  if (castState.caster.resourcePools.mana.current <= 0) {
+function tickCast(castState: any, caster: MagicComponent): void {
+  // Don't tick if already failed or completed
+  if (castState.failed || castState.completed) return;
+
+  castState.progress++;
+
+  // Check if resources depleted below locked amount
+  if (caster.resourcePools.mana.current < caster.resourcePools.mana.locked) {
     castState.failed = true;
     castState.failureReason = 'resource_depleted_during_cast';
+
+    // Restore locked resources
+    caster.resourcePools.mana.current += caster.resourcePools.mana.locked;
+    caster.resourcePools.mana.locked = 0;
+    return;
+  }
+
+  // Check if cast completed
+  if (castState.progress >= castState.duration) {
+    castState.completed = true;
+    // Unlock resources (they've been consumed)
+    caster.resourcePools.mana.locked = 0;
   }
 }
 

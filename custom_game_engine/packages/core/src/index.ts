@@ -264,8 +264,65 @@ export * from './knowledge/index.js';
 export * from './research/index.js';
 export { UnlockQueryService } from './research/index.js';
 
-// Persistence layer - Moved to @ai-village/persistence package
-// Import from: import { saveLoadService, ... } from '@ai-village/persistence';
+// Persistence layer - Core persistence implementation
+export {
+  SaveLoadService,
+  saveLoadService,
+  type SaveOptions,
+  type LoadResult,
+  type CanonEvent,
+  type CanonEventType,
+} from './persistence/SaveLoadService.js';
+
+export { SaveStateManager } from './persistence/SaveStateManager.js';
+export type { SaveMetadata, SaveState, SaveListEntry } from './persistence/SaveStateManager.js';
+
+export { IndexedDBStorage } from './persistence/storage/IndexedDBStorage.js';
+export { MemoryStorage } from './persistence/storage/MemoryStorage.js';
+
+export { worldSerializer, WorldSerializer } from './persistence/WorldSerializer.js';
+export type { TimelineSnapshot } from './persistence/WorldSerializer.js';
+
+export { componentSerializerRegistry, BaseComponentSerializer } from './persistence/ComponentSerializerRegistry.js';
+export { migrationRegistry, MigrationRegistry } from './persistence/MigrationRegistry.js';
+
+export {
+  computeChecksum,
+  computeChecksumSync,
+  canonicalizeJSON,
+  serializeBigInt,
+  deserializeBigInt,
+  assertDefined,
+  assertType,
+  assertFiniteNumber,
+  assertOneOf,
+  generateContentID,
+  parseContentID,
+  getGameVersion,
+} from './persistence/utils.js';
+
+export type {
+  Versioned,
+  VersionedComponent,
+  VersionedEntity,
+  SaveFile,
+  SaveFileHeader,
+  SaveMetadata as PersistenceSaveMetadata,
+  MultiverseSnapshot,
+  MultiverseTime,
+  UniverseSnapshot,
+  UniverseTime,
+  WorldSnapshot,
+  StorageBackend,
+  StorageInfo,
+  Migration,
+  MigrationContext,
+  ComponentSerializer,
+} from './persistence/types.js';
+
+export { validateSaveFile, validateWorldState, InvariantViolationError } from './persistence/InvariantChecker.js';
+export { compress, decompress, formatBytes, getCompressionRatio } from './persistence/compression.js';
+export { MigrationError, SerializationError, ValidationError, ChecksumMismatchError } from './persistence/types.js';
 
 // Multiverse system - Multiple universes with independent time scales
 // Note: Explicit exports only to avoid esbuild module resolution issues

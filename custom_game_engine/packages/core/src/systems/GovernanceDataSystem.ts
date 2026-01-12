@@ -56,7 +56,11 @@ export class GovernanceDataSystem implements System {
     // Listen for death events
     eventBus.subscribe('agent:starved', (event) => {
       if (event.data) {
-        this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp || Date.now());
+        // Per CLAUDE.md: No silent fallbacks - require all fields
+        if (!event.timestamp) {
+          throw new Error(`Death event (agent:starved) for agent ${event.data.agentId} missing required 'timestamp' field`);
+        }
+        this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp);
       }
     });
 

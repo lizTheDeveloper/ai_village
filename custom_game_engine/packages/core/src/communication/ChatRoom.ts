@@ -253,7 +253,7 @@ export const DIVINE_CHAT_CONFIG: ChatRoomConfig = {
     criteria: 'tag:deity',
     members: [],
   },
-  activationThreshold: 2,
+  activationThreshold: 1, // Allow chat when any deity exists (e.g., Death)
   retention: 'permanent',
   description: 'Where gods discuss the fate of mortals',
   permissions: {

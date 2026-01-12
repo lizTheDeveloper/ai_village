@@ -341,8 +341,12 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Simulate time for production
     productionSystem.update(harness.world, entities, 86400.0); // 1 day
 
-    // Production system should process the animal
-    expect(true).toBe(true);
+    // Production system should process the animal without errors
+    // Verify animal still has correct properties after production update
+    const animalComp = animal.getComponent(ComponentType.Animal) as any;
+    expect(animalComp).toBeDefined();
+    expect(animalComp.lifeStage).toBe('adult');
+    expect(animalComp.isDomesticated).toBe(true);
   });
 
   it('should housing system track occupancy', () => {

@@ -14,7 +14,7 @@ import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/cor
 // TODO: Re-export these from core or import directly from source files
 // import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/world';
-import { DeityComponent } from '@ai-village/core';
+import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -201,6 +201,10 @@ export class LiveEntityAPI {
         return this.handleDebugListLogFiles(action);
       case 'find-agent-by-name':
         return this.handleFindAgentByName(action);
+      case 'trigger-hunt':
+        return this.handleTriggerHunt(action);
+      case 'trigger-combat':
+        return this.handleTriggerCombat(action);
       default:
         return {
           requestId: action.requestId,
@@ -942,6 +946,14 @@ export class LiveEntityAPI {
       const deityComponent = new DeityComponent(name, deityController);
       // Use WorldMutator's addComponent since Entity interface is read-only
       (this.world as any).addComponent(deityEntity.id, deityComponent);
+
+      // Add identity component for chat system and UI display
+      const identityComponent = createIdentityComponent(name, 'deity');
+      (this.world as any).addComponent(deityEntity.id, identityComponent);
+
+      // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
+      const tagsComponent = createTagsComponent('deity');
+      (this.world as any).addComponent(deityEntity.id, tagsComponent);
 
       return {
         requestId: action.requestId,
@@ -2389,6 +2401,223 @@ export class LiveEntityAPI {
       data: {
         count: results.length,
         agents: results,
+      },
+    };
+  }
+
+  /**
+   * Handle trigger-hunt action (dev action for testing hunting)
+   */
+  private handleTriggerHunt(action: ActionRequest): ActionResponse {
+    const { agentId, animalId } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!animalId || typeof animalId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid animalId parameter',
+      };
+    }
+
+    // Get hunter entity
+    const hunter = this.world.getEntity(agentId);
+    if (!hunter) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent not found: ${agentId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!hunter.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} is not an agent`,
+      };
+    }
+
+    // Get target animal
+    const animal = this.world.getEntity(animalId);
+    if (!animal) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Animal not found: ${animalId}`,
+      };
+    }
+
+    // Verify it's an animal
+    if (!animal.hasComponent('animal')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${animalId} is not an animal`,
+      };
+    }
+
+    // Check if hunter has combat_stats
+    if (!hunter.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent ${agentId} missing combat_stats component - cannot hunt`,
+      };
+    }
+
+    // Check if already in conflict
+    if (hunter.hasComponent('conflict')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent ${agentId} is already in a conflict`,
+      };
+    }
+
+    // Import createConflictComponent (needs to be at top of file but adding inline for now)
+    // Create conflict component with hunting type
+    const conflict = {
+      type: 'conflict' as const,
+      version: 1 as const,
+      conflictType: 'hunting' as const,
+      target: animalId,
+      state: 'initiated',
+      startTime: this.world.tick,
+    };
+
+    (hunter as any).addComponent(conflict);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        hunterId: agentId,
+        targetId: animalId,
+        message: 'Hunt initiated',
+      },
+    };
+  }
+
+  /**
+   * Handle trigger-combat action (dev action for testing combat)
+   */
+  private handleTriggerCombat(action: ActionRequest): ActionResponse {
+    const { attackerId, defenderId, cause = 'honor_duel', lethal = false } = action.params;
+
+    if (!attackerId || typeof attackerId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid attackerId parameter',
+      };
+    }
+
+    if (!defenderId || typeof defenderId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid defenderId parameter',
+      };
+    }
+
+    // Get attacker entity
+    const attacker = this.world.getEntity(attackerId);
+    if (!attacker) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker not found: ${attackerId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!attacker.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${attackerId} is not an agent`,
+      };
+    }
+
+    // Get defender entity
+    const defender = this.world.getEntity(defenderId);
+    if (!defender) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Defender not found: ${defenderId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!defender.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${defenderId} is not an agent`,
+      };
+    }
+
+    // Check if attacker has combat_stats
+    if (!attacker.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker ${attackerId} missing combat_stats component - cannot fight`,
+      };
+    }
+
+    // Check if defender has combat_stats
+    if (!defender.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Defender ${defenderId} missing combat_stats component - cannot fight`,
+      };
+    }
+
+    // Check if already in conflict
+    if (attacker.hasComponent('conflict')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker ${attackerId} is already in a conflict`,
+      };
+    }
+
+    // Create conflict component
+    const conflict = {
+      type: 'conflict' as const,
+      version: 1 as const,
+      conflictType: 'agent_combat' as const,
+      target: defenderId,
+      state: 'initiated',
+      startTime: this.world.tick,
+      cause: cause as string,
+      lethal: lethal as boolean,
+      surprise: false,
+    };
+
+    (attacker as any).addComponent(conflict);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        attackerId,
+        defenderId,
+        cause,
+        lethal,
+        message: 'Combat initiated',
       },
     };
   }

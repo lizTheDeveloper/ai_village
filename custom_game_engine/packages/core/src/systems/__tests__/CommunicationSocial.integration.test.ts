@@ -4,6 +4,7 @@ import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { CommunicationSystem } from '../CommunicationSystem.js';
 import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { TrustNetworkComponent } from '../../components/TrustNetworkComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * Integration tests for CommunicationSystem + Social Network
@@ -144,8 +145,12 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const entities = Array.from(harness.world.entities.values());
     commSystem.update(harness.world, entities, 1.0);
 
-    // Trust system should process the information sharing
-    expect(true).toBe(true);
+    // Trust system should process the information sharing without errors
+    // Verify trust networks still exist after information sharing
+    const trust1After = agent1.getComponent(ComponentType.TrustNetwork) as TrustNetworkComponent;
+    const trust2After = agent2.getComponent(ComponentType.TrustNetwork) as TrustNetworkComponent;
+    expect(trust1After).toBeDefined();
+    expect(trust2After).toBeDefined();
   });
 
   it('should conversation system handle multiple agents', () => {

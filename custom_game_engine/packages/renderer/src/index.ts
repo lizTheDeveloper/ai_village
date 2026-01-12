@@ -5,6 +5,7 @@
 export * from './ViewMode.js';
 export * from './Camera.js';
 export * from './Renderer.js';
+export * from './EntityPicker.js';
 export * from './InputHandler.js';
 export * from './KeyboardRegistry.js';
 export * from './SpriteRenderer.js';
@@ -23,6 +24,7 @@ export * from './TileInspectorPanel.js';
 export * from './PlantInfoPanel.js';
 export * from './ResourcesPanel.js';
 export * from './SettingsPanel.js';
+export * from './LLMSettingsPanel.js';
 export * from './CraftingStationPanel.js';
 export * from './MemoryPanel.js';
 export * from './RelationshipsPanel.js';
@@ -37,6 +39,8 @@ export * from './EconomyPanel.js';
 export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
 export * from './UniverseConfigScreen.js';
+export * from './UniverseBrowserScreen.js';
+export * from './MultiverseTimelineView.js';
 export * from './RemoteUniverseView.js';
 export * from './NetworkPanel.js';
 export * from './ChatPanel.js';
@@ -112,3 +116,6 @@ export * from './panels/agent-info/index.js';
 // Text Renderer (1D Renderer) - accessibility & narrative
 export * from './text/index.js';
 export * from './TextAdventurePanel.js';
+
+// Dev tools services
+export * from './services/index.js';

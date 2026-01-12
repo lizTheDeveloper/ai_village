@@ -407,6 +407,29 @@ export const FORCE_BLAST_EFFECT = createDamageEffect(
   }
 );
 
+/**
+ * Trogdor Fire Breath - BURNINATION!
+ * Natural breath weapon that burninates the countryside, the peasants, and their THATCHED-ROOF COTTAGES!
+ */
+export const TROGDOR_FIRE_BREATH = createDamageEffect(
+  'trogdor_fire_breath',
+  'Burnination',
+  'fire',
+  75,  // High base damage - he's THE Burninator
+  15,  // Range in tiles - cone of fire
+  {
+    description: 'TROGDOR burninates the countryside, the peasants, and their THATCHED-ROOF COTTAGES!',
+    targetType: 'cone',
+    canCrit: true,
+    critMultiplier: 3.0, // Epic burnination crits
+    ignoresArmor: true, // Fire goes through armor
+    penetration: 50,
+    form: 'fire',
+    technique: 'destroy',
+    tags: ['breath_weapon', 'burnination', 'legendary', 'natural_ability'],
+  }
+);
+
 // ============================================================================
 // Effect Registration
 // ============================================================================
@@ -423,6 +446,7 @@ export function registerBuiltInDamageEffects(): void {
   registry.register(LIGHTNING_BOLT_EFFECT);
   registry.register(ACID_SPLASH_EFFECT);
   registry.register(FORCE_BLAST_EFFECT);
+  registry.register(TROGDOR_FIRE_BREATH);
 }
 
 /**

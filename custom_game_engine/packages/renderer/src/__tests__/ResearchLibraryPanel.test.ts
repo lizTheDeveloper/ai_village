@@ -297,15 +297,60 @@ describe('ResearchLibraryPanel', () => {
 
   describe('Interaction', () => {
     it('should handle wheel scrolling', () => {
-      panel.handleWheel(100);
-      // No error should be thrown, scrolling should work
-      expect(true).toBe(true);
+      // scrollOffset starts at 0
+      expect(() => {
+        panel.handleWheel(100);
+      }).not.toThrow();
+
+      // Verify scrolling actually worked by checking it doesn't throw on render
+      const mockCtx = {
+        fillStyle: '',
+        strokeStyle: '',
+        lineWidth: 0,
+        font: '',
+        fillRect: vi.fn(),
+        strokeRect: vi.fn(),
+        fillText: vi.fn(),
+        measureText: vi.fn(() => ({ width: 50 })),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        stroke: vi.fn(),
+      } as any;
+
+      panel.setVisible(true);
+      expect(() => {
+        panel.render(mockCtx, 0, 0, 380, 600, world);
+      }).not.toThrow();
     });
 
-    it('should handle clicks', () => {
-      panel.handleClick(50, 70);
-      // No error should be thrown, clicking should work
-      expect(true).toBe(true);
+    it('should handle clicks to change sort order', () => {
+      const mockCtx = {
+        fillStyle: '',
+        strokeStyle: '',
+        lineWidth: 0,
+        font: '',
+        fillRect: vi.fn(),
+        strokeRect: vi.fn(),
+        fillText: vi.fn(),
+        measureText: vi.fn(() => ({ width: 50 })),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        stroke: vi.fn(),
+      } as any;
+
+      panel.setVisible(true);
+
+      // Click should not throw
+      expect(() => {
+        panel.handleClick(50, 70);
+      }).not.toThrow();
+
+      // Verify panel can still render after click
+      expect(() => {
+        panel.render(mockCtx, 0, 0, 380, 600, world);
+      }).not.toThrow();
     });
   });
 

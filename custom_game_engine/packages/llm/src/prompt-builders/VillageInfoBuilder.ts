@@ -249,6 +249,7 @@ export class VillageInfoBuilder {
       animal_handling: 'seems good with animals',
       medicine: 'seems knowledgeable about healing',
       research: 'seems curious and thoughtful',
+      magic: 'seems attuned to arcane energies',
     };
     return impressions[skillId] || 'seems skilled at something';
   }
@@ -272,6 +273,7 @@ export class VillageInfoBuilder {
       animal_handling: 'can tame and care for animals',
       medicine: 'can treat injuries and illnesses',
       research: 'can advance technology and discover new knowledge',
+      magic: 'can cast spells and work with arcane forces',
     };
     return examples[skillId] || '';
   }

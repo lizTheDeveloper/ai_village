@@ -15,6 +15,8 @@ import { spawnCity, getCityTemplates, type CitySpawnConfig } from '../city/CityS
 // Note: @ai-village/world imports are done via dynamic import in handleSpawnAgent
 // to break circular dependency: core -> world -> reproduction -> core
 import { DeityComponent } from '../components/DeityComponent.js';
+import { createTagsComponent } from '../components/TagsComponent.js';
+import { createIdentityComponent } from '../components/IdentityComponent.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -905,6 +907,14 @@ export class LiveEntityAPI {
       const deityComponent = new DeityComponent(name, deityController);
       // Use WorldMutator's addComponent since Entity interface is read-only
       (this.world as any).addComponent(deityEntity.id, deityComponent);
+
+      // Add identity component for chat system and UI display
+      const identityComponent = createIdentityComponent(name, 'deity');
+      (this.world as any).addComponent(deityEntity.id, identityComponent);
+
+      // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
+      const tagsComponent = createTagsComponent('deity');
+      (this.world as any).addComponent(deityEntity.id, tagsComponent);
 
       return {
         requestId: action.requestId,

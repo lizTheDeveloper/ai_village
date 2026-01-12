@@ -13,6 +13,19 @@ interface VerificationInfo {
 }
 import { RelationshipComponent, TrustNetworkComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
+import { devActionsService } from './services/DevActionsService.js';
+
+/**
+ * Click region for interactive relationship editing
+ */
+interface ClickRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  action: 'trust_up' | 'trust_down' | 'sentiment_up' | 'sentiment_down' | 'familiarity_up' | 'familiarity_down';
+  targetId: string;
+}
 
 /**
  * UI Panel displaying relationship information for the selected agent.
@@ -28,6 +41,10 @@ export class RelationshipsPanel implements IWindowPanel {
   private lineHeight = 16;
   private scrollOffset = 0;
   private maxScrollOffset = 0;
+
+  // Click regions for editing
+  private clickRegions: ClickRegion[] = [];
+  private devMode = true; // Enable dev editing mode
 
   /**
    * Set the currently selected agent entity.
@@ -82,9 +99,122 @@ export class RelationshipsPanel implements IWindowPanel {
   }
 
   /**
+   * Handle click events for relationship editing
+   */
+  handleClick(clickX: number, clickY: number): boolean {
+    if (!this.devMode || !this.selectedEntityId) {
+      return false;
+    }
+
+    // Adjust for scroll offset
+    const adjustedY = clickY + this.scrollOffset;
+
+    for (const region of this.clickRegions) {
+      if (
+        clickX >= region.x &&
+        clickX <= region.x + region.width &&
+        adjustedY >= region.y &&
+        adjustedY <= region.y + region.height
+      ) {
+        return this.executeAction(region);
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Execute the action for a clicked region
+   */
+  private executeAction(region: ClickRegion): boolean {
+    if (!this.selectedEntityId) return false;
+
+    const step = 0.1; // 10% increment
+
+    switch (region.action) {
+      case 'trust_up':
+        this.adjustSocialMemoryField(region.targetId, 'trust', step);
+        return true;
+
+      case 'trust_down':
+        this.adjustSocialMemoryField(region.targetId, 'trust', -step);
+        return true;
+
+      case 'sentiment_up':
+        this.adjustSocialMemoryField(region.targetId, 'overallSentiment', step);
+        return true;
+
+      case 'sentiment_down':
+        this.adjustSocialMemoryField(region.targetId, 'overallSentiment', -step);
+        return true;
+
+      case 'familiarity_up':
+        this.adjustFamiliarity(region.targetId, 10); // 10% increment
+        return true;
+
+      case 'familiarity_down':
+        this.adjustFamiliarity(region.targetId, -10);
+        return true;
+
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Adjust a field in social memory for a target agent
+   */
+  private adjustSocialMemoryField(targetId: string, field: string, delta: number): void {
+    const world = devActionsService.getWorld();
+    if (!world || !this.selectedEntityId) return;
+
+    const entity = world.getEntity(this.selectedEntityId);
+    if (!entity) return;
+
+    const socialMemory = entity.components.get('social_memory') as SocialMemoryComponent | undefined;
+    if (!socialMemory) return;
+
+    const socialMemories = socialMemory.socialMemories as Map<string, SocialMemory> | undefined;
+    if (!socialMemories) return;
+
+    const targetMemory = socialMemories.get(targetId);
+    if (!targetMemory) return;
+
+    // Adjust the field with clamping
+    if (field === 'trust') {
+      targetMemory.trust = Math.max(0, Math.min(1, targetMemory.trust + delta));
+    } else if (field === 'overallSentiment') {
+      targetMemory.overallSentiment = Math.max(-1, Math.min(1, targetMemory.overallSentiment + delta));
+    }
+  }
+
+  /**
+   * Adjust familiarity for a target agent
+   */
+  private adjustFamiliarity(targetId: string, delta: number): void {
+    const world = devActionsService.getWorld();
+    if (!world || !this.selectedEntityId) return;
+
+    const entity = world.getEntity(this.selectedEntityId);
+    if (!entity) return;
+
+    const relationship = entity.components.get('relationship') as RelationshipComponent | undefined;
+    if (!relationship) return;
+
+    const relationships = relationship.relationships;
+    const targetRel = relationships.get(targetId) as Relationship | undefined;
+    if (!targetRel) return;
+
+    targetRel.familiarity = Math.max(0, Math.min(100, targetRel.familiarity + delta));
+  }
+
+  /**
    * Render the relationships panel.
    */
   render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
+    // Clear click regions at the start of each render
+    this.clickRegions = [];
+
     if (!this.visible || !this.selectedEntityId) {
       return;
     }
@@ -93,6 +223,9 @@ export class RelationshipsPanel implements IWindowPanel {
       console.warn('[RelationshipsPanel] World not available');
       return;
     }
+
+    // Set world on devActionsService for mutations
+    devActionsService.setWorld(world);
 
     const selectedEntity = world.getEntity(this.selectedEntityId);
     if (!selectedEntity) {
@@ -167,11 +300,15 @@ export class RelationshipsPanel implements IWindowPanel {
     const helpY = y + this.panelHeight - 20;
     ctx.fillStyle = '#888888';
     ctx.font = '11px monospace';
-    ctx.fillText('Press R to close | Scroll for more', x + this.padding, helpY);
+    if (this.devMode) {
+      ctx.fillText('DEV MODE | Press R to close | Scroll', x + this.padding, helpY);
+    } else {
+      ctx.fillText('Press R to close | Scroll for more', x + this.padding, helpY);
+    }
   }
 
   /**
-   * Render the social memory section
+   * Render the social memory section with edit controls
    */
   private renderSocialMemorySection(
     ctx: CanvasRenderingContext2D,
@@ -186,6 +323,13 @@ export class RelationshipsPanel implements IWindowPanel {
     ctx.fillStyle = '#88FFCC';
     ctx.font = 'bold 14px monospace';
     ctx.fillText('👥 Social Memory', panelX + this.padding, y);
+
+    // Dev mode indicator
+    if (this.devMode) {
+      ctx.fillStyle = '#888888';
+      ctx.font = '9px monospace';
+      ctx.fillText('(click to edit)', panelX + this.padding + 125, y);
+    }
     y += this.lineHeight + 5;
 
     const socialMemories = socialMemory.socialMemories as Map<string, SocialMemory> | undefined;
@@ -210,7 +354,7 @@ export class RelationshipsPanel implements IWindowPanel {
   }
 
   /**
-   * Render a single social memory entry
+   * Render a single social memory entry with editing controls
    */
   private renderSocialMemoryEntry(
     ctx: CanvasRenderingContext2D,
@@ -234,17 +378,69 @@ export class RelationshipsPanel implements IWindowPanel {
     ctx.fillText(`${sentimentIcon} ${agentName}`, panelX + this.padding, y);
     y += this.lineHeight;
 
-    // Relationship type and stats
-    const trustPercent = Math.round(socialMem.trust * 100);
-    const sentimentPercent = Math.round((socialMem.overallSentiment + 1) * 50); // Convert -1..1 to 0..100
-
+    // Relationship type
     ctx.fillStyle = '#AAAAAA';
     ctx.font = '11px monospace';
-    ctx.fillText(
-      `Type: ${socialMem.relationshipType} | Trust: ${trustPercent}% | Sentiment: ${sentimentPercent}%`,
-      panelX + this.padding + 10,
-      y
-    );
+    ctx.fillText(`Type: ${socialMem.relationshipType}`, panelX + this.padding + 10, y);
+    y += this.lineHeight;
+
+    // Trust with edit buttons
+    const trustPercent = Math.round(socialMem.trust * 100);
+    const trustLabelX = panelX + this.padding + 10;
+    ctx.fillText(`Trust: ${trustPercent}%`, trustLabelX, y);
+
+    if (this.devMode) {
+      // Draw +/- buttons for trust
+      const trustBtnX = trustLabelX + 90;
+      this.renderEditButton(ctx, trustBtnX, y - 10, '-', '#FF8888');
+      this.clickRegions.push({
+        x: trustBtnX,
+        y: y - 10,
+        width: 16,
+        height: 14,
+        action: 'trust_down',
+        targetId: agentId,
+      });
+
+      this.renderEditButton(ctx, trustBtnX + 20, y - 10, '+', '#88FF88');
+      this.clickRegions.push({
+        x: trustBtnX + 20,
+        y: y - 10,
+        width: 16,
+        height: 14,
+        action: 'trust_up',
+        targetId: agentId,
+      });
+    }
+    y += this.lineHeight;
+
+    // Sentiment with edit buttons
+    const sentimentPercent = Math.round((socialMem.overallSentiment + 1) * 50); // Convert -1..1 to 0..100
+    ctx.fillText(`Sentiment: ${sentimentPercent}%`, trustLabelX, y);
+
+    if (this.devMode) {
+      // Draw +/- buttons for sentiment
+      const sentimentBtnX = trustLabelX + 110;
+      this.renderEditButton(ctx, sentimentBtnX, y - 10, '-', '#FF8888');
+      this.clickRegions.push({
+        x: sentimentBtnX,
+        y: y - 10,
+        width: 16,
+        height: 14,
+        action: 'sentiment_down',
+        targetId: agentId,
+      });
+
+      this.renderEditButton(ctx, sentimentBtnX + 20, y - 10, '+', '#88FF88');
+      this.clickRegions.push({
+        x: sentimentBtnX + 20,
+        y: y - 10,
+        width: 16,
+        height: 14,
+        action: 'sentiment_up',
+        targetId: agentId,
+      });
+    }
     y += this.lineHeight;
 
     // Interactions count
@@ -288,7 +484,29 @@ export class RelationshipsPanel implements IWindowPanel {
   }
 
   /**
-   * Render the relationship component section (familiarity)
+   * Render a small edit button
+   */
+  private renderEditButton(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    label: string,
+    color: string
+  ): void {
+    ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
+    ctx.fillRect(x, y, 16, 14);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, 16, 14);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + 8, y + 11);
+    ctx.textAlign = 'left';
+  }
+
+  /**
+   * Render the relationship component section (familiarity) with edit controls
    */
   private renderRelationshipSection(
     ctx: CanvasRenderingContext2D,
@@ -303,6 +521,13 @@ export class RelationshipsPanel implements IWindowPanel {
     ctx.fillStyle = '#FF88CC';
     ctx.font = 'bold 14px monospace';
     ctx.fillText('💕 Familiarity', panelX + this.padding, y);
+
+    // Dev mode indicator
+    if (this.devMode) {
+      ctx.fillStyle = '#888888';
+      ctx.font = '9px monospace';
+      ctx.fillText('(click to edit)', panelX + this.padding + 110, y);
+    }
     y += this.lineHeight + 5;
 
     const relationships = relationship.relationships;
@@ -346,9 +571,33 @@ export class RelationshipsPanel implements IWindowPanel {
         ctx.font = '10px monospace';
         ctx.fillText(`${rel.familiarity}%`, panelX + this.padding + 165, y);
 
-        // Show interaction count
-        ctx.fillStyle = '#777777';
-        ctx.fillText(`(${rel.interactionCount} interactions)`, panelX + this.padding + 200, y);
+        // Edit buttons for familiarity
+        if (this.devMode) {
+          const editBtnX = panelX + this.padding + 200;
+          this.renderEditButton(ctx, editBtnX, y - 10, '-', '#FF8888');
+          this.clickRegions.push({
+            x: editBtnX,
+            y: y - 10,
+            width: 16,
+            height: 14,
+            action: 'familiarity_down',
+            targetId: targetId,
+          });
+
+          this.renderEditButton(ctx, editBtnX + 20, y - 10, '+', '#88FF88');
+          this.clickRegions.push({
+            x: editBtnX + 20,
+            y: y - 10,
+            width: 16,
+            height: 14,
+            action: 'familiarity_up',
+            targetId: targetId,
+          });
+        } else {
+          // Show interaction count when not in dev mode
+          ctx.fillStyle = '#777777';
+          ctx.fillText(`(${rel.interactionCount} interactions)`, panelX + this.padding + 200, y);
+        }
 
         y += this.lineHeight + 2;
       }

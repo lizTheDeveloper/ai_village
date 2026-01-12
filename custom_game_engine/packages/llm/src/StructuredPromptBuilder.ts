@@ -24,6 +24,7 @@ import {
   type Relationship,
   type TopicId,
   type JealousyComponent,
+  ComponentType,
   getFoodStorageInfo,
   getVillageInfo,
   formatGoalsForPrompt,
@@ -1217,6 +1218,7 @@ export class StructuredPromptBuilder {
       animal_handling: 'seems good with animals',
       medicine: 'seems knowledgeable about healing',
       research: 'seems curious and thoughtful',
+      magic: 'seems attuned to arcane energies',
     };
     return impressions[skillId] || 'seems skilled at something';
   }
@@ -1240,6 +1242,7 @@ export class StructuredPromptBuilder {
       animal_handling: 'can tame and care for animals',
       medicine: 'can treat injuries and illnesses',
       research: 'can advance technology and discover new knowledge',
+      magic: 'can cast spells and work with arcane forces',
     };
     return examples[skillId] || '';
   }
@@ -1641,6 +1644,7 @@ export class StructuredPromptBuilder {
     const exploration: string[] = [];
     const knowledge: string[] = [];
     const priority: string[] = [];
+    const combat: string[] = [];
 
     // Get agent context for contextual actions
     const needs = entity?.components.get('needs') as NeedsComponent | undefined;
@@ -1667,6 +1671,7 @@ export class StructuredPromptBuilder {
     const animalHandlingSkill = skillLevels.animal_handling ?? 0;
     const medicineSkill = skillLevels.medicine ?? 0;
     const researchSkill = skillLevels.research ?? 0;
+    const combatSkill = skillLevels.combat ?? 0;
 
     // PRIORITY 1: Urgent building hints (when agent has pressing needs)
     // These are just hints - the actual action is plan_build (shown later)
@@ -1798,6 +1803,26 @@ export class StructuredPromptBuilder {
       social.push('heal - Heal an injured agent');
     }
 
+    // Combat & Hunting actions - Per progressive-skill-reveal-spec.md: requires combat skill 1+
+    if (combatSkill >= 1) {
+      // Hunt wild animals when visible
+      // Note: VisionComponent doesn't currently track animals separately, so we check for any wild animals in world
+      // TODO: Add seenAnimals to VisionComponent for proper visibility checking
+      const wildAnimals = _world.query().with(ComponentType.Animal).executeEntities();
+      const hasWildAnimals = wildAnimals.some(animal => {
+        const animalComp = animal.components.get('animal') as { wild: boolean } | undefined;
+        return animalComp?.wild === true;
+      });
+      if (hasWildAnimals) {
+        combat.push('hunt - Hunt a wild animal for meat and resources');
+      }
+
+      // Combat with other agents when visible
+      if (vision?.seenAgents && vision.seenAgents.length > 0) {
+        combat.push('initiate_combat - Challenge another agent to combat (lethal or non-lethal)');
+      }
+    }
+
     // Research action - Per progressive-skill-reveal-spec.md: requires research skill 1+
     if (researchSkill >= 1) {
       knowledge.push('research - Conduct research at a research building to advance technology');
@@ -1833,6 +1858,12 @@ export class StructuredPromptBuilder {
       actions.push('');
       actions.push('SOCIAL:');
       actions.push(...social.map(a => `  ${a}`));
+    }
+
+    if (combat.length > 0) {
+      actions.push('');
+      actions.push('COMBAT & HUNTING:');
+      actions.push(...combat.map(a => `  ${a}`));
     }
 
     if (exploration.length > 0) {
@@ -2125,27 +2156,11 @@ export class StructuredPromptBuilder {
     // The actual question
     sections.push(prompt.instruction);
 
-    // Response format instructions - must be JSON
-    // Note: No "thinking" field needed - model uses extended thinking internally
-    const responseFormat = `RESPOND IN JSON ONLY. Use this exact format:
-{
-  "speaking": "what you say out loud (or empty string if silent)",
-  "action": {
-    "type": "action_name",
-    "target": "optional target like 'wood' or agent name",
-    "amount": optional_number,
-    "building": "building type for plan_build"
-  }
-}
-
-Example responses:
-{"speaking": "", "action": {"type": "gather", "target": "wood", "amount": 20}}
-{"speaking": "Hey Haven!", "action": {"type": "talk", "target": "Haven"}}
-{"speaking": "", "action": {"type": "explore"}}
-{"speaking": "I'm going to build us a storage chest!", "action": {"type": "plan_build", "building": "storage-chest"}}
-{"speaking": "", "action": {"type": "plan_build", "building": "campfire"}}`;
-
-    sections.push(responseFormat);
+    // NOTE: We do NOT add JSON format instructions here.
+    // Tool calling providers inject their own response format via tool definitions.
+    // Adding "RESPOND IN JSON" conflicts with tool calling and causes the provider
+    // to fall back to text-only mode, bypassing structured tool responses.
+    // The LLM will use tool calls to specify actions, and speech comes via text output.
 
     return sections.join('\n\n');
   }

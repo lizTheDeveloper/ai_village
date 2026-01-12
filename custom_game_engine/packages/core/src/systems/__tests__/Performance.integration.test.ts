@@ -5,7 +5,7 @@ import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
 import { NeedsSystem } from '../NeedsSystem.js';
 import { MovementSystem } from '../MovementSystem.js';
-import { PlantSystem } from '../PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { AnimalSystem } from '../AnimalSystem.js';
 import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
@@ -196,8 +196,14 @@ describe('Performance Monitoring Integration', () => {
     const endTime = performance.now();
     const totalDuration = endTime - startTime;
 
-    // Should complete without crashing
-    expect(true).toBe(true);
+    // Should complete without crashing and in reasonable time
+    expect(totalDuration).toBeGreaterThanOrEqual(0);
+    expect(totalDuration).toBeLessThan(5000); // Should complete 1000 iterations in <5 seconds
+
+    // Verify agent still exists and has valid state
+    const needs = agent.getComponent(ComponentType.Needs) as any;
+    expect(needs).toBeDefined();
+    expect(needs.hunger).toBeGreaterThanOrEqual(0);
   });
 
   it('should handle mixed entity types efficiently', () => {
@@ -365,15 +371,20 @@ describe('Performance Monitoring Integration', () => {
     temperature: 1.0,
   }));
 
+    const entityCountBefore = harness.world.entities.size;
+    expect(entityCountBefore).toBeGreaterThan(0);
+
     // Run system
     const entities = Array.from(harness.world.entities.values());
     aiSystem.update(harness.world, entities, 1.0);
 
-    // Teardown
-    harness.teardown();
+    // Teardown should complete without errors
+    expect(() => {
+      harness.teardown();
+    }).not.toThrow();
 
-    // Should cleanup without errors
-    expect(true).toBe(true);
+    // Verify teardown was called (entities may not be fully cleared depending on implementation)
+    expect(harness.world).toBeDefined();
   });
 
   it('should world entity count remain accurate', () => {

@@ -440,6 +440,46 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     spawnBiomes: ['hills', 'mountains', 'grassland'],
     spawnDensity: 0.12,
   },
+
+  trogdor: {
+    id: 'trogdor',
+    name: 'Trogdor the Burninator',
+    category: 'wild',
+    temperament: 'aggressive',
+    diet: 'carnivore',
+    socialStructure: 'solitary',
+    activityPattern: 'diurnal',
+
+    canBeTamed: false, // TROGDOR CANNOT BE TAMED!
+    canBeRidden: false,
+    canBeWorking: false,
+    canBePet: false,
+
+    infantDuration: 0, // Trogdor was always Trogdor
+    juvenileDuration: 0,
+    adultDuration: 365 * 10000, // Basically immortal
+    maxAge: 365 * 10000,
+
+    baseSize: 3.5, // Big but not huge - he's a dragon-man
+    baseSpeed: 4.0, // Fast - gotta burninate quickly
+
+    hungerRate: 0.08, // Moderate - burninating works up an appetite
+    thirstRate: 0.04,
+    energyRate: 0.01,
+
+    tameDifficulty: 100, // Impossible
+
+    // Loves peasants and thatched-roof cottages!
+    preferredFood: ['peasant', 'meat', 'thatch', 'cottage'],
+
+    intelligence: 0.7, // Smart enough to know what to burninate
+
+    minComfortTemp: 0,
+    maxComfortTemp: 500, // FIRE doesn't bother him
+
+    spawnBiomes: ['countryside', 'plains', 'village', 'grassland'], // Where the peasants are
+    spawnDensity: 0.0001, // Legendary - extremely rare
+  },
 };
 
 /**

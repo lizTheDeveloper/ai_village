@@ -29,6 +29,7 @@ const STATION_REQUIREMENTS: Record<string, string | null> = {
   'fishing_rod': 'workbench',
   'watering_can': 'workbench',
   'plank': 'workbench',
+  'thatch': 'workbench',
 
   // Forge required (metal items)
   'iron_ingot': 'forge',

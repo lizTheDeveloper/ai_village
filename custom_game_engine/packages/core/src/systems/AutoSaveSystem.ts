@@ -18,8 +18,8 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
-import { saveLoadService } from '../persistence/SaveLoadService.js';
-import { canonEventDetector } from './CanonEventDetector.js';
+import { saveLoadService, type CanonEvent as ServerCanonEvent } from '../persistence/SaveLoadService.js';
+import { canonEventDetector, type CanonEvent as LocalCanonEvent } from './CanonEventDetector.js';
 import { checkpointRetentionPolicy } from './CheckpointRetentionPolicy.js';
 
 /** Time component shape for duck typing */
@@ -91,6 +91,20 @@ export class AutoSaveSystem implements System {
   }
 
   /**
+   * Convert a local canon event to the server format.
+   */
+  private toServerCanonEvent(event: LocalCanonEvent): ServerCanonEvent {
+    return {
+      type: event.type,
+      title: event.title,
+      description: event.description,
+      day: event.day,
+      importance: event.importance,
+      entities: event.entities,
+    };
+  }
+
+  /**
    * Create a checkpoint at midnight.
    */
   private async createCheckpoint(world: World, day: number): Promise<void> {
@@ -110,8 +124,21 @@ export class AutoSaveSystem implements System {
       // Get universe ID (based on magic laws)
       const universeId = `universe:${magicLawsHash}`;
 
-      // Generate checkpoint name (will be filled in by LLM later)
-      const checkpointName = `Day ${day}`;  // Temporary name
+      // Check for canon events on this day
+      const todaysCanonEvents = canonEventDetector.getEventsForDay(day);
+      const hasCanonEvent = todaysCanonEvents.length > 0;
+      const mostImportantEvent = hasCanonEvent
+        ? todaysCanonEvents.reduce((a, b) => a.importance > b.importance ? a : b)
+        : null;
+
+      // Get universe name from world (set by main.ts)
+      const universeName = (world as any)._universeName || 'Universe';
+
+      // Generate checkpoint name including universe name
+      // Use canon event title if available
+      const checkpointName = mostImportantEvent
+        ? `${universeName} - Day ${day}: ${mostImportantEvent.title}`
+        : `${universeName} - Day ${day}`;
 
       // Create checkpoint metadata
       const checkpoint: Checkpoint = {
@@ -124,11 +151,17 @@ export class AutoSaveSystem implements System {
         magicLawsHash,
       };
 
-      // Save the world state
+      // Save the world state with canon event info for server sync
       await saveLoadService.save(world, {
         name: checkpointName,
-        description: `Automatic checkpoint at day ${day}`,
+        description: hasCanonEvent
+          ? `Canonical checkpoint: ${mostImportantEvent!.description}`
+          : `Automatic checkpoint at day ${day}`,
         key,
+        type: hasCanonEvent ? 'canonical' : 'auto',
+        canonEvent: mostImportantEvent
+          ? this.toServerCanonEvent(mostImportantEvent)
+          : undefined,
       });
 
       // Add to checkpoints list

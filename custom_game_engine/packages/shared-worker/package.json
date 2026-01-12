@@ -25,6 +25,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@ai-village/botany": "*",
     "@ai-village/core": "*",
     "@ai-village/world": "*",
     "dexie": "^4.0.0"

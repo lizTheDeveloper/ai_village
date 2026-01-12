@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
+    "@ai-village/botany": "*",
     "@ai-village/persistence": "*",
     "@ai-village/metrics": "*",
     "@ai-village/renderer": "*",

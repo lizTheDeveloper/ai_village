@@ -122,7 +122,12 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const entities = Array.from(harness.world.entities.values());
 
     // Should process without consolidating
-    consolidationSystem.update(harness.world, entities, 1.0);
-    expect(true).toBe(true);
+    expect(() => {
+      consolidationSystem.update(harness.world, entities, 1.0);
+    }).not.toThrow();
+
+    // Verify agent is still awake
+    const updatedCircadian = agent.getComponent(ComponentType.Circadian);
+    expect((updatedCircadian as any).isSleeping).toBe(false);
   });
 });

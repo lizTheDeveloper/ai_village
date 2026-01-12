@@ -47,8 +47,12 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
       },
     });
 
-    // Memory formation system should queue this for processing
-    expect(true).toBe(true);
+    const entities = Array.from(harness.world.entities.values());
+    memoryFormation.update(harness.world, entities, 1.0);
+
+    // System should process event without throwing
+    const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory);
+    expect(episodicMemory).toBeDefined();
   });
 
   it('should memory decay over time', () => {
@@ -171,8 +175,9 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
     const entities = Array.from(harness.world.entities.values());
     memoryFormation.update(harness.world, entities, 1.0);
 
-    // System should have processed the event
-    expect(true).toBe(true);
+    // System should have processed the event without throwing
+    const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory);
+    expect(episodicMemory).toBeDefined();
   });
 
   it('should conversation events create memories for both participants', () => {
@@ -199,8 +204,9 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
     const entities = Array.from(harness.world.entities.values());
     memoryFormation.update(harness.world, entities, 1.0);
 
-    // Both agents should have memory queued
-    expect(true).toBe(true);
+    // Both agents should have episodic memory components
+    expect(agent1.getComponent(ComponentType.EpisodicMemory)).toBeDefined();
+    expect(agent2.getComponent(ComponentType.EpisodicMemory)).toBeDefined();
   });
 
   it('should memory formation throw on missing agentId (CLAUDE.md: no silent fallbacks)', () => {
@@ -306,7 +312,8 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
     const entities = Array.from(harness.world.entities.values());
     memoryFormation.update(harness.world, entities, 1.0);
 
-    // Critical survival event should be queued
-    expect(true).toBe(true);
+    // Critical survival event should be processed without errors
+    const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory);
+    expect(episodicMemory).toBeDefined();
   });
 });

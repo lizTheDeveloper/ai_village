@@ -74,6 +74,8 @@ export type AgentBehavior =
   | 'set_personal_goal'
   | 'set_medium_term_goal'
   | 'set_group_goal'
+  // Queue Management (Executor layer)
+  | 'sleep_until_queue_complete'
   // Player Control (Phase 16)
   | 'player_controlled';
 
@@ -308,6 +310,10 @@ export interface AgentComponent extends Component {
   // Idle/boredom tracking - agents start idle and wander when bored
   idleStartTick?: number; // Tick when agent became idle (undefined = not idle)
 
+  // Behavior timing instrumentation - tracks when behaviors change
+  behaviorChangedAt?: number; // Tick when behavior was last changed
+  previousBehavior?: AgentBehavior; // Previous behavior (for transition logging)
+
   // Strategic Priorities (LLM sets, scripted system uses)
   priorities?: StrategicPriorities; // Weights for automated behavior selection
 
@@ -321,6 +327,7 @@ export interface AgentComponent extends Component {
   queuePaused?: boolean; // Whether queue processing is paused
   queueInterruptedBy?: AgentBehavior; // Behavior that interrupted the queue
   behaviorCompleted?: boolean; // Set by behaviors when they complete
+  executorSleepUntilQueueComplete?: boolean; // Pause executor layer until queue completes
 
   // ============================================================================
   // Forward-Compatibility: Governance & Social Hierarchy (optional)

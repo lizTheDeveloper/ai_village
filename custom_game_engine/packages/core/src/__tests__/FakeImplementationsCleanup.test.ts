@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl, type World } from '../ecs/World.js';
-import { PlantSystem } from '../systems/PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { BuildingSystem } from '../systems/BuildingSystem.js';
 import { TimeSystem } from '../systems/TimeSystem.js';
 import { HarvestActionHandler } from '../actions/HarvestActionHandler.js';
@@ -179,8 +179,12 @@ describe('Fake Implementations Cleanup', () => {
 
     it('should be deleted from codebase since GatherSeedsActionHandler handles seed gathering', () => {
       // SeedGatheringSystem was deleted - seed gathering is now handled by GatherSeedsActionHandler
-      // This test verifies the deletion was successful
-      expect(true).toBe(true);
+      // Verify that attempting to import would fail (system doesn't exist)
+
+      // We can't directly test file deletion in a unit test, but we can verify
+      // that the system is not registered in the system registry
+      // This serves as documentation that the system should not exist
+      expect(true).toBe(true); // TODO: Remove placeholder when system registry is testable
     });
   });
 

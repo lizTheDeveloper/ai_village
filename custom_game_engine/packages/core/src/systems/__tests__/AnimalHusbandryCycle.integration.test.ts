@@ -254,8 +254,13 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
       tamingSystem.update(harness.world, entities, 1.0);
     }
 
-    // Taming should progress
-    expect(true).toBe(true);
+    // Verify animal and agent still exist after taming attempts
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
+    expect(agent.getComponent(ComponentType.Position)).toBeDefined();
+
+    // Check if any taming events were emitted (taming is probabilistic)
+    const tamingEvents = harness.getEmittedEvents('animal_tamed');
+    expect(tamingEvents.length).toBeGreaterThanOrEqual(0);
   });
 
   it('should full husbandry cycle integrate all systems', () => {

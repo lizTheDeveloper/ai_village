@@ -3,7 +3,11 @@
 **Phase:** 16
 **Created:** 2025-12-31
 **Spec Agent:** spec-agent-001
-**Status:** READY_FOR_IMPLEMENTATION
+**Status:** IMPLEMENTED
+
+> **2026-01-11 ROOT CAUSE FIX:** Actions `hunt` and `initiate_combat` were not appearing in LLM prompts because `StructuredPromptBuilder.ts` and `ActionBuilder.ts` lacked a combat category. Fixed by adding combat/hunting section that includes these actions when agent has combat skill ≥1. Dev actions `trigger-hunt` and `trigger-combat` also added for testing.
+
+> **2026-01-11 UI INTEGRATION:** Combat UI components (HealthBarRenderer, ThreatIndicatorRenderer) integrated into Renderer.ts via `initCombatUI()` method. Wired up in main.ts. HTML panels (CombatHUDPanel, StanceControls, CombatLogPanel, CombatUnitPanel) are fully implemented and exported, ready for WindowManager integration.
 
 ---
 

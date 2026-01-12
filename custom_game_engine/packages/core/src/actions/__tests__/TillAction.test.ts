@@ -1003,21 +1003,31 @@ describe('Tilling Action', () => {
     });
 
     it.skip('should reject tilling when agent is too far (distance > √2)', () => {
+      // TODO: Implement integration test with TillActionHandler once ActionHandler system is available
+      // This test requires:
+      // 1. Creating an agent entity with position (5, 5)
+      // 2. Creating a world with tiles
+      // 3. Creating a till action with targetPosition (8, 8)
+      // 4. Calling TillActionHandler.validate() and expecting valid: false
+      // 5. Verifying the reason mentions distance is too far
       const agentPos = { x: 5, y: 5 };
       const tilePos = { x: 8, y: 8 };
 
       expect(distance(agentPos, tilePos)).toBeGreaterThan(Math.sqrt(2));
-      // ActionHandler should reject this
-      expect(true).toBe(false); // Placeholder
     });
 
     it.skip('should allow tilling at same position as agent (distance = 0)', () => {
+      // TODO: Implement integration test with TillActionHandler once ActionHandler system is available
+      // This test requires:
+      // 1. Creating an agent entity with position (5, 5)
+      // 2. Creating a world with tiles
+      // 3. Creating a till action with targetPosition (5, 5)
+      // 4. Calling TillActionHandler.validate() and expecting valid: true
+      // 5. Agent should be able to till the tile they're standing on
       const agentPos = { x: 5, y: 5 };
       const tilePos = { x: 5, y: 5 };
 
       expect(distance(agentPos, tilePos)).toBe(0);
-      // ActionHandler should accept this (agent tilling tile they're standing on)
-      expect(true).toBe(false); // Placeholder
     });
   });
 });

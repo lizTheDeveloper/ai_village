@@ -255,6 +255,7 @@ export class StanceControls {
     const stance = stanceMap[e.key];
     if (stance) {
       e.preventDefault();
+      // setStance() will throw if entities lack conflict component - don't mask that error
       this.setStance(stance);
     }
   }

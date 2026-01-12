@@ -30,6 +30,8 @@ export * from './LLMRequestRouter';
 export * from './CostTracker';
 export * from './QueueMetricsCollector';
 export * from './ProviderModelDiscovery';
+export * from './ModelCapabilityDiscovery';
+export * from './ModelProfileRegistry';
 
 // Prompt builder classes (utility functions exported via StructuredPromptBuilder)
 export { WorldContextBuilder } from './prompt-builders/WorldContextBuilder';

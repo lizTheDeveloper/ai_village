@@ -33,6 +33,12 @@ import {
 import type { LLMDecisionQueue } from '@ai-village/llm';
 import type { StructuredPromptBuilder } from '@ai-village/llm';
 import { getPlantSpecies } from '@ai-village/world';
+import {
+  PlantSystem,
+  PlantDiscoverySystem,
+  PlantDiseaseSystem,
+  WildPlantPopulationSystem,
+} from '@ai-village/botany';
 
 export interface GameSetupConfig {
   /** Session ID for metrics and logging */
@@ -93,6 +99,12 @@ export async function setupGameSystems(
     metricsServerUrl: config.metricsServerUrl || 'ws://localhost:8765',
     enableMetrics: config.enableMetrics !== false,
     enableAutoSave: config.enableAutoSave !== false,
+    plantSystems: {
+      PlantSystem,
+      PlantDiscoverySystem,
+      PlantDiseaseSystem,
+      WildPlantPopulationSystem,
+    },
   });
 
   // 3. Set up plant species lookup (injected from world package)

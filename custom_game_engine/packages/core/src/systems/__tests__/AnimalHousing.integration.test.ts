@@ -177,8 +177,12 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     // Update housing system
     housingSystem.update(harness.world, entities, 1.0);
 
-    // System should skip incomplete buildings
-    expect(true).toBe(true);
+    // System should skip incomplete buildings for cleanliness updates
+    // but validateHousingAssignments still runs and clears invalid occupants
+    const building = coop.getComponent(ComponentType.Building) as any;
+    expect(building.isComplete).toBe(false);
+    // Occupants cleared because no actual animals with housingBuildingId exist
+    expect(building.currentOccupants).toEqual([]);
   });
 
   it('should empty housing not decay cleanliness', () => {
@@ -258,8 +262,10 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     // This tests the structure, actual decay happens daily
     housingSystem.update(harness.world, entities, 1.0);
 
-    // Housing system should process animals
-    expect(true).toBe(true);
+    // Housing system should process without errors - verify building still exists
+    const building = coop.getComponent(ComponentType.Building) as any;
+    expect(building).toBeDefined();
+    expect(building.cleanliness).toBeDefined();
   });
 
   it('should animals without housing ID not receive housing effects', () => {

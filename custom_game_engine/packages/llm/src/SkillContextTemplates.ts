@@ -380,5 +380,30 @@ You can cure the incurable and train physicians.`,
 - Pushing the boundaries of knowledge
 You can unlock transformative technologies and mentor future scholars.`,
   },
+
+  magic: {
+    0: null,
+    1: 'You sense the flow of arcane energies. Magic exists and can be learned through study and practice.',
+    2: `You understand magic basics:
+- Different paradigms of magic exist
+- Spells require mana and focus
+- Practice improves casting ability`,
+    3: `Your magical knowledge includes:
+- Multiple magic paradigms and their strengths
+- Efficient mana management
+- Combining spells for greater effect
+- Recognizing magical phenomena`,
+    4: `As a magic expert, you know:
+- Advanced spellcasting techniques
+- Creating custom spell combinations
+- Understanding magical theory
+- Teaching magic to others`,
+    5: `As a master mage, you possess:
+- Mastery over multiple paradigms
+- Ability to innovate new spells
+- Deep understanding of arcane theory
+- Teaching the next generation of mages
+You can reshape reality through arcane mastery.`,
+  },
 };
 

@@ -11,7 +11,7 @@ import type { AgentBehavior } from '@ai-village/core';
  * Skill requirement for Progressive Skill Reveal System.
  */
 export interface ActionSkillRequirement {
-  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine' | 'research';
+  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine' | 'research' | 'magic';
   level: 0 | 1 | 2 | 3 | 4 | 5;
 }
 
@@ -26,7 +26,7 @@ export interface ActionDefinition {
   /** Whether this action is always shown or contextually conditional */
   alwaysAvailable: boolean;
   /** Category for grouping */
-  category: 'movement' | 'social' | 'building' | 'farming' | 'gathering' | 'exploration' | 'survival' | 'animal' | 'priority' | 'knowledge';
+  category: 'movement' | 'social' | 'building' | 'farming' | 'gathering' | 'exploration' | 'survival' | 'animal' | 'priority' | 'knowledge' | 'meta' | 'magic';
   /** Skill requirement (optional - undefined means no skill required) */
   skillRequired?: ActionSkillRequirement;
 }
@@ -46,7 +46,8 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { behavior: 'gather', description: 'Stockpile resources - gather a specified amount and store in chest', alwaysAvailable: true, category: 'gathering' },
 
   // Social - agent decides WHO to interact with
-  { behavior: 'talk', description: 'Have a conversation', alwaysAvailable: false, category: 'social' },
+  // NOTE: 'talk' is NOT a behavior - speaking happens automatically via "speaking" field
+  // Agents speak to nearby agents without changing their behavior mode
   { behavior: 'follow_agent', description: 'Follow someone', alwaysAvailable: false, category: 'social' },
   { behavior: 'call_meeting', description: 'Call a meeting to discuss something', alwaysAvailable: false, category: 'social' },
   { behavior: 'attend_meeting', description: 'Attend an ongoing meeting', alwaysAvailable: false, category: 'social' },
@@ -80,6 +81,9 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   // Combat - agent initiates combat with another agent
   { behavior: 'initiate_combat', description: 'Challenge another agent to combat (lethal or non-lethal)', alwaysAvailable: false, category: 'social', skillRequired: { skill: 'combat', level: 1 } },
 
+  // Magic - agent decides to cast a spell
+  { behavior: 'cast_spell', description: 'Cast a known spell on self, ally, or enemy', alwaysAvailable: false, category: 'magic', skillRequired: { skill: 'magic', level: 1 } },
+
   // Priority Management - agent decides what to focus on
   { behavior: 'set_priorities', description: 'Set task priorities (gathering, building, farming, social)', alwaysAvailable: true, category: 'priority' },
 
@@ -87,6 +91,9 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { behavior: 'set_personal_goal', description: 'Set a new personal goal', alwaysAvailable: true, category: 'priority' },
   { behavior: 'set_medium_term_goal', description: 'Set a goal for the next few days', alwaysAvailable: true, category: 'priority' },
   { behavior: 'set_group_goal', description: 'Propose a goal for the village', alwaysAvailable: false, category: 'priority' },
+
+  // Queue Management - Executor layer actions for managing task queues
+  { behavior: 'sleep_until_queue_complete', description: 'Pause executor until all queued tasks complete', alwaysAvailable: true, category: 'meta' },
 ];
 
 /**
@@ -125,12 +132,8 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
 
   // NOTE: 'sleep', 'nap', 'rest' are NOT valid LLM actions - sleep is autonomic
 
-  // Talk synonyms
-  'speak': 'talk',
-  'chat': 'talk',
-  'converse': 'talk',
-  'greet': 'talk',
-  'say': 'talk',
+  // NOTE: 'talk' synonyms removed - speaking happens via the "speaking" field, not behavior change
+  // Agents continue their current behavior while speaking
 
   // Exploration synonyms - use dedicated explore behavior
   'search': 'explore',
@@ -190,5 +193,13 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   'study': 'research',
   'experiment': 'research',
   'analyze': 'research',
+
+  // Magic synonyms
+  'cast': 'cast_spell',
+  'spell': 'cast_spell',
+  'magic': 'cast_spell',
+  'enchant': 'cast_spell',
+  'conjure': 'cast_spell',
+  'invoke': 'cast_spell',
 };
 

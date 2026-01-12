@@ -43,7 +43,16 @@ import {
   registerDefaultMaterials,
   registerAllSystems,
   type SystemRegistrationResult,
+  type PlantSystemsConfig,
 } from '../packages/core/src/index.ts';
+
+// Plant systems from @ai-village/botany (completes the extraction from core)
+import {
+  PlantSystem,
+  PlantDiscoverySystem,
+  PlantDiseaseSystem,
+  WildPlantPopulationSystem,
+} from '../packages/botany/src/index.ts';
 
 import {
   OllamaProvider,
@@ -59,6 +68,8 @@ import {
   createLLMAgent,
   getPlantSpecies,
   getWildSpawnableSpecies,
+  ChunkManager,
+  TerrainGenerator,
 } from '../packages/world/src/index.ts';
 
 // ============================================================================
@@ -131,7 +142,9 @@ async function setupGameSystems(
   gameLoop: GameLoop,
   llmQueue: LLMDecisionQueue | null,
   promptBuilder: StructuredPromptBuilder | null,
-  sessionId: string
+  sessionId: string,
+  chunkManager: ChunkManager,
+  terrainGenerator: TerrainGenerator
 ): Promise<{
   soilSystem: SoilSystem;
   craftingSystem: CraftingSystem;
@@ -144,13 +157,23 @@ async function setupGameSystems(
   registerDefaultResearch();
 
   // Use centralized system registration
+  // Pass plant systems from @ai-village/botany (completes package extraction)
+  const plantSystems: PlantSystemsConfig = {
+    PlantSystem,
+    PlantDiscoverySystem,
+    PlantDiseaseSystem,
+    WildPlantPopulationSystem,
+  };
   const result = registerAllSystems(gameLoop, {
     llmQueue: llmQueue || undefined,
     promptBuilder: promptBuilder || undefined,
     gameSessionId: sessionId,
     metricsServerUrl: 'ws://localhost:8765',
     enableMetrics: true,
+    plantSystems,
     enableAutoSave: false, // Headless doesn't need auto-save
+    chunkManager,
+    terrainGenerator,
   });
 
   // Set up plant species lookup (injected from world package)
@@ -392,6 +415,12 @@ async function main() {
   // Note: registerShopBlueprints() is already called by registerDefaults()
   (baseGameLoop.world as any).buildingRegistry = blueprintRegistry;
 
+  // Create ChunkManager and TerrainGenerator for terrain handling
+  const terrainGenerator = new TerrainGenerator('headless-demo');
+  const chunkManager = new ChunkManager(3);
+  (baseGameLoop.world as any).setChunkManager(chunkManager);
+  (baseGameLoop.world as any).setTerrainGenerator(terrainGenerator);
+
   const worldEntity = new EntityImpl(createEntityId(), baseGameLoop.world.tick);
   worldEntity.addComponent(createTimeComponent(6, 600)); // Start at 6 AM, 600 ticks
   worldEntity.addComponent(createWeatherComponent('clear', 0, 120)); // Clear weather
@@ -400,7 +429,10 @@ async function main() {
   (baseGameLoop.world as any)._worldEntityId = worldEntity.id;
 
   console.log('[HeadlessGame] Registering systems...');
-  const { result } = await setupGameSystems(baseGameLoop, queue, promptBuilder, sessionId);
+  const { result } = await setupGameSystems(baseGameLoop, queue, promptBuilder, sessionId, chunkManager, terrainGenerator);
+
+  // ChunkLoadingSystem is now registered and will load chunks around agents automatically
+  // (No viewport provider set = headless mode)
   const wildAnimalSpawning = result.wildAnimalSpawning;
 
   console.log('[HeadlessGame] Creating entities...');

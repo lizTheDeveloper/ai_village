@@ -1,0 +1,15 @@
+{
+  "universeId": "universe:807a7c3b-80bb-4497-8fd5-9f076dfb319b",
+  "snapshots": [
+    {
+      "tick": 9001,
+      "timestamp": 1768172901625,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2038690,
+      "checksum": "-163342fc",
+      "filename": "9001.json.gz"
+    }
+  ],
+  "lastUpdated": 1768172901626
+}

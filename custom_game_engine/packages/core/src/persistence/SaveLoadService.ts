@@ -1,5 +1,9 @@
 /**
  * SaveLoadService - Main API for saving and loading game state
+ *
+ * Supports both local storage (IndexedDB) and server sync for multiverse persistence.
+ * When server sync is enabled, saves are uploaded to the multiverse server for
+ * cross-player universe access, time travel, and forking.
  */
 
 import type { World } from '../ecs/World.js';
@@ -14,6 +18,29 @@ import { computeChecksumSync, getGameVersion } from './utils.js';
 import { validateWorldState, validateSaveFile } from './InvariantChecker.js';
 import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 
+// Canon event types for multiverse server sync
+export type CanonEventType =
+  | 'death'
+  | 'birth'
+  | 'marriage'
+  | 'first_achievement'
+  | 'record_high'
+  | 'catastrophe'
+  | 'deity_emergence'
+  | 'major_discovery'
+  | 'war_event'
+  | 'cultural_milestone'
+  | 'day_milestone';
+
+export interface CanonEvent {
+  type: CanonEventType;
+  title: string;
+  description: string;
+  day: number;
+  importance: number;
+  entities?: string[];
+}
+
 export interface SaveOptions {
   /** Save name */
   name: string;
@@ -26,6 +53,15 @@ export interface SaveOptions {
 
   /** Storage key (auto-generated if not provided) */
   key?: string;
+
+  /** Whether to sync to multiverse server (default: true if server sync enabled) */
+  syncToServer?: boolean;
+
+  /** Type of save for server categorization */
+  type?: 'auto' | 'manual' | 'canonical';
+
+  /** Canon event that triggered this save (for canonical saves) */
+  canonEvent?: CanonEvent;
 }
 
 export interface LoadResult {
@@ -34,18 +70,177 @@ export interface LoadResult {
   error?: string;
 }
 
+// Inline MultiverseClient for server sync
+// (Avoids circular dependency with separate persistence package)
+class MultiverseClient {
+  private baseUrl: string;
+  private playerId: string | null = null;
+
+  constructor(baseUrl: string = 'http://localhost:3001/api') {
+    this.baseUrl = baseUrl;
+  }
+
+  setPlayerId(playerId: string): void {
+    this.playerId = playerId;
+  }
+
+  getPlayerId(): string | null {
+    return this.playerId;
+  }
+
+  async isAvailable(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseUrl}/multiverse/stats`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(2000),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  async registerPlayer(displayName?: string): Promise<void> {
+    if (!this.playerId) throw new Error('Player ID not set');
+    await fetch(`${this.baseUrl}/player`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: this.playerId, displayName: displayName ?? this.playerId }),
+    });
+  }
+
+  async getUniverse(universeId: string): Promise<unknown | null> {
+    const response = await fetch(`${this.baseUrl}/universe/${universeId}`);
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Failed to get universe');
+    const data = await response.json();
+    return data.universe;
+  }
+
+  async createUniverse(options: { name: string; isPublic?: boolean; id?: string }): Promise<{ id: string; name: string }> {
+    if (!this.playerId) throw new Error('Player ID not set');
+    const response = await fetch(`${this.baseUrl}/universe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: options.id, // Pass client's ID to keep them in sync
+        name: options.name,
+        ownerId: this.playerId,
+        isPublic: options.isPublic ?? false,
+      }),
+    });
+    if (!response.ok) throw new Error('Failed to create universe');
+    const data = await response.json();
+    return data.universe;
+  }
+
+  async uploadSnapshot(
+    universeId: string,
+    saveFile: SaveFile,
+    options?: { type?: 'auto' | 'manual' | 'canonical'; canonEvent?: CanonEvent }
+  ): Promise<{ tick: number; type: string }> {
+    const universeSnapshot = saveFile.universes[0];
+    if (!universeSnapshot) throw new Error('No universe snapshot');
+
+    const tick = parseInt(universeSnapshot.time.universeTick, 10);
+    const day = universeSnapshot.time.day;
+
+    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshot`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        snapshot: saveFile,
+        tick,
+        day,
+        type: options?.type ?? 'manual',
+        canonEvent: options?.canonEvent,
+      }),
+    });
+
+    if (!response.ok) throw new Error('Failed to upload snapshot');
+    const data = await response.json();
+    return data.entry;
+  }
+}
+
+const multiverseClient = new MultiverseClient();
+
 export class SaveLoadService {
   private storageBackend: StorageBackend | null = null;
   private playStartTime: number = Date.now();
   private totalPlayTime: number = 0;  // Accumulated across sessions
 
+  // Server sync configuration
+  private serverSyncEnabled: boolean = false;
+  private serverAvailable: boolean = false;
+  private lastServerCheck: number = 0;
+  private serverCheckInterval: number = 30000; // Check every 30 seconds
+
   constructor() {}
+
+  /**
+   * Enable server sync for multiverse persistence.
+   */
+  async enableServerSync(playerId: string): Promise<boolean> {
+    multiverseClient.setPlayerId(playerId);
+    this.serverAvailable = await multiverseClient.isAvailable();
+    this.lastServerCheck = Date.now();
+
+    if (this.serverAvailable) {
+      this.serverSyncEnabled = true;
+      try {
+        await multiverseClient.registerPlayer();
+        console.log(`[SaveLoad] Server sync enabled for player: ${playerId}`);
+      } catch (error) {
+        console.warn('[SaveLoad] Failed to register player:', error);
+      }
+      return true;
+    } else {
+      console.warn('[SaveLoad] Multiverse server not available');
+      this.serverSyncEnabled = false;
+      return false;
+    }
+  }
+
+  /**
+   * Disable server sync.
+   */
+  disableServerSync(): void {
+    this.serverSyncEnabled = false;
+  }
+
+  /**
+   * Check if server sync is enabled.
+   */
+  isServerSyncEnabled(): boolean {
+    return this.serverSyncEnabled;
+  }
+
+  /**
+   * Check if server is available (with caching).
+   */
+  private async checkServerAvailable(): Promise<boolean> {
+    const now = Date.now();
+    if (now - this.lastServerCheck < this.serverCheckInterval) {
+      return this.serverAvailable;
+    }
+    this.serverAvailable = await multiverseClient.isAvailable();
+    this.lastServerCheck = now;
+    return this.serverAvailable;
+  }
 
   /**
    * Set the storage backend to use.
    */
   setStorage(backend: StorageBackend): void {
     this.storageBackend = backend;
+  }
+
+  /**
+   * Get the current storage backend.
+   */
+  getStorageBackend(): StorageBackend | null {
+    return this.storageBackend;
   }
 
   /**
@@ -154,9 +349,49 @@ export class SaveLoadService {
     // Validate save file before writing to storage
     await validateSaveFile(saveFile);
 
-    // Save to storage
+    // Save to storage (local)
     await this.storageBackend.save(key, saveFile);
 
+    // Sync to multiverse server if enabled
+    const shouldSync = this.serverSyncEnabled &&
+      options.syncToServer !== false &&
+      await this.checkServerAvailable();
+
+    if (shouldSync) {
+      try {
+        // Ensure universe exists on server (create if not)
+        let serverUniverseId = universeId;
+        const existingUniverse = await multiverseClient.getUniverse(universeId);
+        if (!existingUniverse) {
+          // Pass client's ID to keep them in sync
+          const created = await multiverseClient.createUniverse({
+            name: universeName,
+            isPublic: true,
+            id: universeId,
+          });
+          serverUniverseId = created.id;
+          console.log(`[SaveLoad] Created universe on server: ${serverUniverseId}`);
+        }
+
+        // Upload snapshot to server using the server's universe ID
+        const snapshotEntry = await multiverseClient.uploadSnapshot(
+          serverUniverseId,
+          saveFile,
+          {
+            type: options.type ?? (options.canonEvent ? 'canonical' : 'manual'),
+            canonEvent: options.canonEvent,
+          }
+        );
+
+        console.log(
+          `[SaveLoad] Synced to server: tick ${snapshotEntry.tick}, ` +
+          `type ${snapshotEntry.type}${options.canonEvent ? `, event: ${options.canonEvent.title}` : ''}`
+        );
+      } catch (error) {
+        // Log but don't fail - local save succeeded
+        console.error('[SaveLoad] Failed to sync to server:', error);
+      }
+    }
   }
 
   /**

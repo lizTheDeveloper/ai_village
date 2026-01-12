@@ -22,6 +22,8 @@ import type {
   ComposedSpell,
   MagicSourceId,
 } from '../components/MagicComponent.js';
+import type { CastingState } from './CastingState.js';
+import { createCastingState, isCastingActive } from './CastingState.js';
 import { getAvailableMana, canCastSpell } from '../components/MagicComponent.js';
 import type { EventBus } from '../events/EventBus.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
@@ -34,6 +36,7 @@ import { MagicSkillTreeRegistry } from '../magic/MagicSkillTreeRegistry.js';
 import { evaluateNode, type EvaluationContext } from '../magic/MagicSkillTreeEvaluator.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * MagicSystem - Process magic casting and effects
@@ -57,6 +60,9 @@ export class MagicSystem implements System {
   // Skill tree registry for progression-gated spells
   private skillTreeRegistry: MagicSkillTreeRegistry | null = null;
 
+  // StateMutatorSystem for gradual effects
+  private stateMutatorSystem: StateMutatorSystem | null = null;
+
   initialize(world: World, eventBus: EventBus): void {
     this.world = world;
 
@@ -72,6 +78,14 @@ export class MagicSystem implements System {
       const terminalHandler = getTerminalEffectHandler();
       if (terminalHandler) {
         terminalHandler.initialize(eventBus);
+      }
+
+      // Get StateMutatorSystem from world for gradual effects
+      this.stateMutatorSystem = world.getSystem('state_mutator') as StateMutatorSystem | null;
+
+      // Pass to effect executor
+      if (this.effectExecutor && this.stateMutatorSystem) {
+        this.effectExecutor.setStateMutatorSystem(this.stateMutatorSystem);
       }
     }
 
@@ -307,6 +321,9 @@ export class MagicSystem implements System {
       this.processMagicEntity(impl, world, deltaTime);
     }
 
+    // Process active spell casts (multi-tick spells)
+    this.tickAllActiveCasts(world);
+
     // Process active spell effects (duration, ticks, expiration)
     if (this.effectExecutor) {
       this.effectExecutor.processTick(world, world.tick);
@@ -425,6 +442,403 @@ export class MagicSystem implements System {
     }
   }
 
+  // =========================================================================
+  // Multi-Tick Casting State Machine
+  // =========================================================================
+
+  /**
+   * Begin a multi-tick spell cast.
+   * Locks resources immediately and creates a CastingState to track progress.
+   *
+   * @param caster The entity casting the spell
+   * @param world The game world
+   * @param spell The spell being cast
+   * @param targetEntityId Optional target entity ID
+   * @param targetPosition Optional target position
+   * @returns The casting state, or null if cast failed to start
+   */
+  private beginCast(
+    caster: EntityImpl,
+    world: World,
+    spell: SpellDefinition,
+    targetEntityId?: string,
+    targetPosition?: { x: number; y: number }
+  ): CastingState | null {
+    const magic = caster.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) return null;
+
+    // Build a ComposedSpell for cost calculation
+    const composedSpell: ComposedSpell = {
+      id: spell.id,
+      name: spell.name,
+      technique: spell.technique,
+      form: spell.form,
+      source: spell.source,
+      manaCost: spell.manaCost,
+      castTime: spell.castTime,
+      range: spell.range,
+      duration: spell.duration,
+      effectId: spell.effectId,
+    };
+
+    // Use paradigm-specific cost calculator
+    const paradigmId = spell.paradigmId ?? 'academic';
+
+    if (!costCalculatorRegistry.has(paradigmId)) {
+      console.error(`[MagicSystem] No cost calculator for paradigm: ${paradigmId}`);
+      return null;
+    }
+
+    const calculator = costCalculatorRegistry.get(paradigmId);
+
+    // Create casting context
+    const context: CastingContext = createDefaultContext(world.tick);
+    context.casterId = caster.id;
+    context.targetId = targetEntityId;
+    context.spiritualComponent = caster.getComponent<SpiritualComponent>(CT.Spiritual);
+    context.bodyComponent = caster.getComponent<BodyComponent>(CT.Body);
+
+    // Calculate costs
+    const costs = calculator.calculateCosts(composedSpell, magic, context);
+
+    // Check affordability
+    const affordability = calculator.canAfford(costs, magic);
+    if (!affordability.canAfford) {
+      return null;
+    }
+
+    // Lock resources (if calculator supports it)
+    let lockedCosts = costs;
+    if (calculator.lockCosts) {
+      console.log('[DEBUG beginCast] Attempting to lock costs');
+      const lockResult = calculator.lockCosts(costs, magic);
+      console.log('[DEBUG beginCast] lockResult:', lockResult);
+      if (!lockResult.success) {
+        console.error('[MagicSystem] Failed to lock resources for cast');
+        return null;
+      }
+      lockedCosts = lockResult.deducted;
+    } else {
+      // Fallback: use regular deduction (no locking)
+      const deductResult = calculator.deductCosts(costs, magic, { id: paradigmId } as any);
+      if (!deductResult.success) {
+        return null;
+      }
+      lockedCosts = deductResult.deducted;
+    }
+
+    // Get caster position for movement interruption tracking
+    const position = caster.getComponent<{ x: number; y: number }>(CT.Position);
+
+    // Create casting state
+    const castState = createCastingState(
+      spell.id,
+      caster.id,
+      spell.castTime,
+      world.tick,
+      lockedCosts,
+      targetEntityId,
+      targetPosition,
+      position ? { x: position.x, y: position.y } : undefined
+    );
+
+    // Update magic component with casting state AND persisted locked resources
+    // The lockCosts() call above mutated the magic object, so we need to preserve those changes
+    caster.updateComponent<MagicComponent>(CT.Magic, () => ({
+      ...magic,
+      casting: true,
+      currentSpellId: spell.id,
+      castProgress: 0,
+      castingState: castState,
+    }));
+
+    return castState;
+  }
+
+  /**
+   * Tick an active cast forward by one tick.
+   * Checks for interruption conditions and updates progress.
+   *
+   * @param castState The casting state to tick
+   * @param caster The caster entity
+   * @param world The game world
+   */
+  private tickCast(castState: CastingState, caster: EntityImpl, world: World): void {
+    // Don't tick if already failed or completed
+    if (!isCastingActive(castState)) return;
+
+    const magic = caster.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) {
+      console.log('[DEBUG tickCast] Caster lost magic component');
+      this.cancelCast(castState, caster, 'caster_lost_magic');
+      return;
+    }
+
+    // Check interruption conditions
+
+    // 1. Check if caster died
+    const needs = caster.getComponent<{ health: number }>(CT.Needs);
+    if (needs && needs.health <= 0) {
+      this.cancelCast(castState, caster, 'caster_died');
+      return;
+    }
+
+    // 2. Check if caster moved (if tracking movement)
+    if (castState.casterMovedFrom) {
+      const currentPos = caster.getComponent<{ x: number; y: number }>(CT.Position);
+      if (currentPos) {
+        const dx = currentPos.x - castState.casterMovedFrom.x;
+        const dy = currentPos.y - castState.casterMovedFrom.y;
+        const distSquared = dx * dx + dy * dy;
+
+        // Interrupt if moved more than 1 tile
+        if (distSquared > 1) {
+          this.cancelCast(castState, caster, 'movement_interrupted');
+          return;
+        }
+      }
+    }
+
+    // 3. Check if resources were depleted externally during cast
+    // We check BOTH conditions:
+    // - For manaPools: current < locked (detects partial depletion)
+    // - For all pools: current < 0 (detects over-depletion)
+    for (const cost of castState.lockedResources) {
+      if (cost.type === 'mana') {
+        // For mana, check manaPools with the stricter "current < locked" rule
+        // This matches test expectations for mana-specific depletion detection
+        if (magic.manaPools && magic.manaPools.length > 0) {
+          const manaPool = magic.manaPools.find(
+            p => p.source === magic.primarySource || p.source === 'arcane'
+          );
+          if (manaPool && manaPool.current < manaPool.locked) {
+            console.log('[DEBUG tickCast] ManaPool current below locked - current:', manaPool.current, 'locked:', manaPool.locked);
+            this.cancelCast(castState, caster, 'resource_depleted_during_cast');
+            return;
+          }
+        }
+        continue;
+      }
+
+      // Non-mana costs: only cancel if went negative (over-depleted)
+      // This is more permissive than mana since we expect current < locked after locking
+      const pool = magic.resourcePools[cost.type];
+      if (pool && pool.current < 0) {
+        console.log('[DEBUG tickCast] Resource pool depleted below zero:', cost.type, pool);
+        this.cancelCast(castState, caster, 'resource_depleted_during_cast');
+        return;
+      }
+    }
+
+    // 4. Check if target entity still exists (if targeting an entity)
+    if (castState.targetEntityId) {
+      const targetEntity = world.getEntity(castState.targetEntityId);
+      if (!targetEntity) {
+        this.cancelCast(castState, caster, 'target_lost');
+        return;
+      }
+
+      // Check if target died
+      const targetNeeds = targetEntity.getComponent<{ health: number }>(CT.Needs);
+      if (targetNeeds && targetNeeds.health <= 0) {
+        this.cancelCast(castState, caster, 'target_died');
+        return;
+      }
+    }
+
+    // No interruptions - increment progress
+    castState.progress++;
+
+    // Update cast progress percentage
+    const progressPercent = castState.duration > 0 ? castState.progress / castState.duration : 1;
+    caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+      ...current,
+      castProgress: progressPercent,
+    }));
+
+    // Check if cast completed
+    if (castState.progress >= castState.duration) {
+      this.completeCast(castState, caster, world);
+    }
+  }
+
+  /**
+   * Complete a successful cast.
+   * Unlocks resources and applies spell effects.
+   *
+   * @param castState The casting state
+   * @param caster The caster entity
+   * @param world The game world
+   */
+  private completeCast(castState: CastingState, caster: EntityImpl, world: World): void {
+    castState.completed = true;
+
+    const magic = caster.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) return;
+
+    // Unlock resources (they've already been spent)
+    const paradigmId = magic.activeParadigmId ?? 'academic';
+    if (costCalculatorRegistry.has(paradigmId)) {
+      const calculator = costCalculatorRegistry.get(paradigmId);
+
+      // Unlock without restoring (resources were consumed)
+      for (const cost of castState.lockedResources) {
+        // For mana costs, unlock in both resourcePools and manaPools (dual sync)
+        if (cost.type === 'mana') {
+          // Unlock in resourcePool.mana if it exists
+          const pool = magic.resourcePools[cost.type];
+          if (pool) {
+            pool.locked = Math.max(0, pool.locked - cost.amount);
+          }
+
+          // ALSO unlock in manaPools if it exists
+          if (magic.manaPools) {
+            const manaPool = magic.manaPools.find(
+              p => p.source === magic.primarySource || p.source === 'arcane'
+            );
+            if (manaPool) {
+              manaPool.locked = Math.max(0, manaPool.locked - cost.amount);
+            }
+          }
+        } else {
+          // Non-mana costs: just unlock from resourcePools
+          const pool = magic.resourcePools[cost.type];
+          if (pool) {
+            pool.locked = Math.max(0, pool.locked - cost.amount);
+          }
+        }
+      }
+    }
+
+    // Apply spell effect
+    const spellRegistry = SpellRegistry.getInstance();
+    const spell = spellRegistry.getSpell(castState.spellId);
+    if (spell) {
+      this.applySpellEffect(
+        caster,
+        spell,
+        world,
+        castState.targetEntityId,
+        castState.targetPosition
+      );
+
+      // Emit spell cast event
+      world.eventBus.emit({
+        type: 'magic:spell_cast',
+        source: caster.id,
+        data: {
+          spellId: spell.id,
+          spell: spell.name,
+          technique: spell.technique,
+          form: spell.form,
+          paradigm: paradigmId,
+          manaCost: spell.manaCost,
+          targetEntityId: castState.targetEntityId,
+          targetPosition: castState.targetPosition,
+          wasTerminal: false,
+        },
+      });
+
+      // Update proficiency
+      const knownSpell = magic.knownSpells.find((s) => s.spellId === spell.id);
+      if (knownSpell) {
+        this.updateSpellProficiency(caster, knownSpell);
+      }
+
+      // Grant skill tree XP
+      const xpGained = Math.ceil(spell.manaCost * 0.1);
+      this.grantSkillXP(caster, paradigmId, xpGained);
+
+      // Increment total spells cast
+      caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+        ...current,
+        totalSpellsCast: current.totalSpellsCast + 1,
+      }));
+    }
+
+    // Clear casting state
+    caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+      ...current,
+      casting: false,
+      currentSpellId: undefined,
+      castProgress: undefined,
+      castingState: null,
+    }));
+  }
+
+  /**
+   * Cancel an active cast and restore locked resources.
+   *
+   * @param castState The casting state
+   * @param caster The caster entity
+   * @param reason The reason for cancellation
+   */
+  private cancelCast(castState: CastingState, caster: EntityImpl, reason: string): void {
+    castState.failed = true;
+    castState.failureReason = reason;
+
+    const magic = caster.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) return;
+
+    // Restore locked resources
+    const paradigmId = magic.activeParadigmId ?? 'academic';
+    if (costCalculatorRegistry.has(paradigmId)) {
+      const calculator = costCalculatorRegistry.get(paradigmId);
+      if (calculator.restoreLockedCosts) {
+        calculator.restoreLockedCosts(castState.lockedResources, magic);
+      }
+    }
+
+    // Clear casting state
+    caster.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+      ...current,
+      casting: false,
+      currentSpellId: undefined,
+      castProgress: undefined,
+      castingState: null,
+    }));
+
+    // Emit cancellation event
+    if (this.world) {
+      this.world.eventBus.emit({
+        type: 'magic:cast_cancelled',
+        source: caster.id,
+        data: {
+          spellId: castState.spellId,
+          reason,
+          progress: castState.progress,
+          duration: castState.duration,
+        },
+      });
+    }
+  }
+
+  /**
+   * Tick all active casts forward.
+   * Called by MagicSystem.update() each tick.
+   *
+   * @param world The game world
+   */
+  private tickAllActiveCasts(world: World): void {
+    // Find all entities currently casting
+    const castingEntities = world.query()
+      .with(CT.Magic)
+      .executeEntities()
+      .filter(entity => {
+        const magic = (entity as EntityImpl).getComponent<MagicComponent>(CT.Magic);
+        return magic?.casting && magic?.castingState;
+      });
+
+    // Tick each active cast
+    for (const entity of castingEntities) {
+      const impl = entity as EntityImpl;
+      const magic = impl.getComponent<MagicComponent>(CT.Magic);
+      if (magic?.castingState) {
+        this.tickCast(magic.castingState, impl, world);
+      }
+    }
+  }
+
   /**
    * Cast a spell from an entity
    *
@@ -457,11 +871,27 @@ export class MagicSystem implements System {
       return false;
     }
 
+    // Validate target entity exists if targetEntityId is provided
+    if (targetEntityId) {
+      const targetEntity = world.getEntity(targetEntityId);
+      if (!targetEntity) {
+        console.error(`[MagicSystem] Target entity not found: ${targetEntityId}`);
+        return false;
+      }
+    }
+
     // Check cooldown
     if (this.isOnCooldown(caster.id, spellId, world.tick)) {
       return false;
     }
 
+    // Handle multi-tick casts (castTime > 0)
+    if (spell.castTime && spell.castTime > 0) {
+      const castState = this.beginCast(caster, world, spell, targetEntityId, targetPosition);
+      return castState !== null;
+    }
+
+    // Handle instant casts (castTime = 0 or undefined)
     // Build a ComposedSpell-compatible object for cost calculation
     const composedSpell: ComposedSpell = {
       id: spell.id,

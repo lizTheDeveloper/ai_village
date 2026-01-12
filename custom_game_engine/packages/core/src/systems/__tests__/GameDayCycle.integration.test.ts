@@ -120,8 +120,10 @@ describe('Complete Game Day Cycle Integration', () => {
       stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
     }
 
-    // Agent should eventually wake up
-    expect(true).toBe(true);
+    // Agent should eventually wake up - verify circadian component exists and sleep state can be queried
+    const updatedCircadian = agent.getComponent(ComponentType.Circadian);
+    expect(updatedCircadian).toBeDefined();
+    expect((updatedCircadian as any).isSleeping).toBeDefined();
   });
 
   it('should needs decay over time', () => {

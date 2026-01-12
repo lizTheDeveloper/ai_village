@@ -31,7 +31,8 @@ export type SkillId =
   | 'stealth'
   | 'animal_handling'
   | 'medicine'
-  | 'research';
+  | 'research'
+  | 'magic';
 
 /**
  * Skill levels from untrained to master.
@@ -80,6 +81,7 @@ export const ALL_SKILL_IDS: readonly SkillId[] = [
   'animal_handling',
   'medicine',
   'research',
+  'magic',
 ] as const;
 
 /**
@@ -100,6 +102,7 @@ export const SKILL_ICONS: Record<SkillId, string> = {
   animal_handling: '🐾',
   medicine: '💊',
   research: '📚',
+  magic: '✨',
 };
 
 /**
@@ -120,6 +123,7 @@ export const SKILL_NAMES: Record<SkillId, string> = {
   animal_handling: 'Animal Handling',
   medicine: 'Medicine',
   research: 'Research',
+  magic: 'Magic',
 };
 
 /**
@@ -139,6 +143,7 @@ export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = {
   gathering: [],
   exploration: [],
   social: [],
+  magic: [], // Magic has no prerequisites
 
   // Tier 1 (require basic skills)
   farming: [{ skill: 'gathering', level: 1 }],
@@ -257,6 +262,7 @@ function createDefaultLevels(): Record<SkillId, SkillLevel> {
     animal_handling: 0,
     medicine: 0,
     research: 0,
+    magic: 0,
   };
 }
 
@@ -279,6 +285,7 @@ function createDefaultExperience(): Record<SkillId, number> {
     animal_handling: 0,
     medicine: 0,
     research: 0,
+    magic: 0,
   };
 }
 
@@ -301,6 +308,7 @@ function createDefaultAffinities(): Record<SkillId, number> {
     animal_handling: 1.0,
     medicine: 1.0,
     research: 1.0,
+    magic: 1.0,
   };
 }
 
@@ -368,6 +376,8 @@ export function generateAffinitiesFromPersonality(
     medicine: calculateAffinity([personality.agreeableness, personality.conscientiousness]),
     // Research: openness + conscientiousness - curiosity + dedication to learning
     research: calculateAffinity([personality.openness, personality.conscientiousness]),
+    // Magic: openness + conscientiousness - requires creativity and study
+    magic: calculateAffinity([personality.openness, personality.conscientiousness]),
   };
 }
 
@@ -893,6 +903,7 @@ export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = {
   hunting: ['tracking', 'archery', 'trapping', 'butchering'],
   stealth: ['sneaking', 'hiding', 'silent_movement', 'camouflage'],
   research: ['theory', 'experimentation', 'documentation', 'analysis'],
+  magic: ['evocation', 'enchantment', 'divination', 'transmutation'],
 };
 
 /**

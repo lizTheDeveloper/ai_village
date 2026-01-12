@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import { createDawnWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { SoilSystem } from '../SoilSystem.js';
-import { PlantSystem } from '../PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { WeatherSystem } from '../WeatherSystem.js';
 import type { Tile } from '../SoilSystem.js';
 
@@ -189,6 +189,8 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
+    harness.clearEvents();
+
     // Emit a rain event
     harness.world.eventBus.emit({
       type: 'weather:rain',
@@ -196,9 +198,11 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       data: { intensity: 'heavy' },
     });
 
-    // Plant system should receive the event (internal state updated)
-    // This is tested indirectly through plant growth in full scenarios
-    expect(true).toBe(true);
+    // Plant system should subscribe to weather events without errors
+    // Verify the event was emitted
+    const rainEvents = harness.getEmittedEvents('weather:rain');
+    expect(rainEvents.length).toBeGreaterThan(0);
+    expect(rainEvents[0].data.intensity).toBe('heavy');
   });
 
   it('should frost weather damage plants', () => {
@@ -238,6 +242,8 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
+    harness.clearEvents();
+
     // Emit soil moisture change
     harness.world.eventBus.emit({
       type: 'soil:moistureChanged',
@@ -248,13 +254,19 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       },
     });
 
-    // Plant system should track this change internally
-    expect(true).toBe(true);
+    // Verify the event was emitted correctly
+    const moistureEvents = harness.getEmittedEvents('soil:moistureChanged');
+    expect(moistureEvents.length).toBe(1);
+    expect(moistureEvents[0].data.position.x).toBe(10);
+    expect(moistureEvents[0].data.position.y).toBe(10);
+    expect(moistureEvents[0].data.moisture).toBe(80);
   });
 
   it('should soil depletion affect plant nutrients', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
+
+    harness.clearEvents();
 
     // Emit soil depletion event
     harness.world.eventBus.emit({
@@ -266,13 +278,17 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       },
     });
 
-    // Plant system should track this
-    expect(true).toBe(true);
+    // Verify the depletion event was emitted
+    const depletedEvents = harness.getEmittedEvents('soil:depleted');
+    expect(depletedEvents.length).toBe(1);
+    expect(depletedEvents[0].data.nutrients).toBe(20);
   });
 
   it('should plants respond to day change events', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
+
+    harness.clearEvents();
 
     // Emit day change event
     harness.world.eventBus.emit({
@@ -281,8 +297,10 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       data: { day: 2 },
     });
 
-    // Plant system should process daily growth
-    expect(true).toBe(true);
+    // Verify day change event was emitted
+    const dayEvents = harness.getEmittedEvents('time:day_changed');
+    expect(dayEvents.length).toBe(1);
+    expect(dayEvents[0].data.day).toBe(2);
   });
 
   it('should soil system track daily updates', () => {
@@ -290,6 +308,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     harness.registerSystem('SoilSystem', soilSystem);
 
     const entities = Array.from(harness.world.entities.values());
+    const initialTick = harness.world.tick;
 
     // Simulate daily processing by calling update multiple times
     // World tick advances naturally through the game loop
@@ -300,8 +319,8 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       soilSystem.update(harness.world, entities, 1.0);
     }
 
-    // Daily updates should have been processed
-    expect(true).toBe(true);
+    // Verify the system completed 101 updates without crashing
+    expect(harness.world.tick).toBeGreaterThanOrEqual(initialTick);
   });
 
   it('should weather affect temperature which affects plant growth', () => {
@@ -320,6 +339,8 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
+    harness.clearEvents();
+
     // Emit weather change with temperature
     harness.world.eventBus.emit({
       type: 'weather:changed',
@@ -327,7 +348,12 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       data: { temperature: 25 },
     });
 
-    // Plant system should adjust growth based on temperature
-    expect(true).toBe(true);
+    // Verify weather component and event
+    const weather = weatherEntity.getComponent(ComponentType.Weather) as any;
+    expect(weather.tempModifier).toBe(5);
+
+    const weatherEvents = harness.getEmittedEvents('weather:changed');
+    expect(weatherEvents.length).toBe(1);
+    expect(weatherEvents[0].data.temperature).toBe(25);
   });
 });

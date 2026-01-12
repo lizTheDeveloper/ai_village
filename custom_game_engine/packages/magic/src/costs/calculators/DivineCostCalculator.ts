@@ -102,8 +102,11 @@ export class DivineCostCalculator extends BaseCostCalculator {
 
     // High faith reduces favor costs, low faith increases them
     // Faith 0.0 = +50% cost, Faith 0.5 = neutral, Faith 1.0 = -30% cost
-    const faithModifier = 1.5 - (faithLevel * 0.8);
-    favorCost = Math.ceil(favorCost * faithModifier);
+    // Only apply faith modifier if spiritualComponent exists
+    if (spiritual) {
+      const faithModifier = 1.5 - (faithLevel * 0.8);
+      favorCost = Math.ceil(favorCost * faithModifier);
+    }
 
     // Recent prayer reduces costs (spiritual connection)
     if (spiritual && spiritual.lastPrayerTime !== undefined) {

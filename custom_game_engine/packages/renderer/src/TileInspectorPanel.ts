@@ -1,6 +1,6 @@
 import type { World, EventBus } from '@ai-village/core';
 import type { Camera } from './Camera.js';
-import type { Tile, ChunkManager, TerrainGenerator } from '@ai-village/world';
+import type { Tile, ChunkManager } from '@ai-village/world';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
@@ -19,7 +19,6 @@ export class TileInspectorPanel implements IWindowPanel {
   private eventBus: EventBus;
   private camera: Camera;
   private chunkManager: ChunkManager;
-  private terrainGenerator: TerrainGenerator;
   private scrollOffset = 0;
   private maxScrollOffset = 0;
   private contentHeight = 0;
@@ -60,11 +59,10 @@ export class TileInspectorPanel implements IWindowPanel {
     this.visible = visible;
   }
 
-  constructor(eventBus: EventBus, camera: Camera, chunkManager: ChunkManager, terrainGenerator: TerrainGenerator) {
+  constructor(eventBus: EventBus, camera: Camera, chunkManager: ChunkManager) {
     this.eventBus = eventBus;
     this.camera = camera;
     this.chunkManager = chunkManager;
-    this.terrainGenerator = terrainGenerator;
   }
 
   /**
@@ -691,11 +689,11 @@ export class TileInspectorPanel implements IWindowPanel {
       return null;
     }
 
-    // CRITICAL FIX: Generate chunk if not already generated
-    // Per CLAUDE.md: All tiles MUST have biome data before farming operations
-    // Chunks created on-demand need terrain generation to set biome data
+    // Don't generate terrain from UI - ChunkLoadingSystem handles that
+    // If chunk isn't generated yet, return null so we don't show unexplored tiles
     if (!chunk.generated) {
-      this.terrainGenerator.generateChunk(chunk, world as any);
+      console.warn(`[TileInspector] Chunk at (${chunkX}, ${chunkY}) not generated yet`);
+      return null;
     }
 
     // Get tile from chunk
@@ -706,7 +704,6 @@ export class TileInspectorPanel implements IWindowPanel {
       console.warn(`[TileInspector] No tile at local (${localX}, ${localY}) in chunk (${chunkX}, ${chunkY})`);
       return null;
     }
-
 
     return { tile, x: worldX, y: worldY };
   }

@@ -1076,6 +1076,106 @@ export {
   getEffectGenerator,
 } from './LLMEffectGenerator.js';
 
+// Phase 33: Safe LLM Effect Generation
+export type {
+  EffectGenerationRequest,
+  EffectGenerationResult,
+} from './generation/EffectGenerationService.js';
+
+export {
+  EffectGenerationService,
+} from './generation/EffectGenerationService.js';
+
+export type {
+  ValidationIssue,
+  ValidationResult,
+} from './validation/EffectValidationPipeline.js';
+
+export {
+  EffectValidationPipeline,
+} from './validation/EffectValidationPipeline.js';
+
+export type {
+  EvaluationScores,
+  EvaluationReport,
+} from './evaluation/EffectEvaluationService.js';
+
+export {
+  EffectEvaluationService,
+} from './evaluation/EffectEvaluationService.js';
+
+export type {
+  RejectedArtifactComponent,
+  CorruptedEffectComponent,
+  RejectionCategory,
+  CorruptionRealm,
+} from './artifacts/RejectedArtifactSystem.js';
+
+export {
+  RejectedArtifactSystem,
+} from './artifacts/RejectedArtifactSystem.js';
+
+export type {
+  BlessingThresholds,
+  BlessingDecision,
+} from './blessing/EffectBlessingService.js';
+
+export {
+  EffectBlessingService,
+  DEFAULT_THRESHOLDS,
+} from './blessing/EffectBlessingService.js';
+
+export type {
+  EffectDiscoveryRequest,
+  EffectDiscoveryResult,
+} from './integration/EffectDiscoveryIntegration.js';
+
+export {
+  EffectDiscoveryIntegration,
+} from './integration/EffectDiscoveryIntegration.js';
+
+// ============================================================================
+// Effect Expression & Interpreter (Phase 31-32)
+// ============================================================================
+
+export type {
+  // Expression types
+  Expression,
+  FunctionExpression,
+  BinaryExpression,
+  UnaryExpression,
+  FunctionName,
+  BinaryOp,
+  UnaryOp,
+  ExpressionContext,
+
+  // Effect types
+  EffectExpression,
+  TargetSelector,
+  TargetFilter,
+  EffectOperation,
+  DamageType,
+  LocationExpression,
+  DirectionExpression,
+  Condition,
+  EffectTiming,
+} from './EffectExpression.js';
+
+export type {
+  // Interpreter types
+  EffectContext,
+  EffectResult,
+  InterpreterOptions,
+} from './EffectInterpreter.js';
+
+export {
+  EffectInterpreter,
+} from './EffectInterpreter.js';
+
+export {
+  ExpressionEvaluator,
+} from './ExpressionEvaluator.js';
+
 // ============================================================================
 // Magic Cost System
 // ============================================================================

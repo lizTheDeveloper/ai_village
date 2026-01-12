@@ -615,6 +615,9 @@ export interface EffectApplicationResult {
 
   /** Spell that caused this effect */
   spellId: string;
+
+  /** Cleanup function for StateMutatorSystem deltas (for dispel support) */
+  cleanupFn?: () => void;
 }
 
 /** Active effect instance on an entity */

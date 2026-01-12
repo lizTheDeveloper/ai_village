@@ -1,5 +1,7 @@
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 import { LLMRequestFileLogger } from './LLMRequestFileLogger.js';
+import { modelProfileRegistry, ModelProfile } from './ModelProfileRegistry.js';
+import { modelCapabilityDiscovery, DiscoveredCapabilities } from './ModelCapabilityDiscovery.js';
 
 // Valid actions that can be extracted from text
 // const VALID_ACTIONS = [
@@ -24,6 +26,11 @@ export class OpenAICompatProvider implements LLMProvider {
   private readonly retryDelayMs = 1000;
   public customHeaders?: Record<string, string>; // Custom headers for per-agent config
 
+  // Model profile and capability discovery
+  private profile: ModelProfile | null = null;
+  private discoveredCapabilities: DiscoveredCapabilities | null = null;
+  private needsDiscovery: boolean = false;
+
   // Shared file logger instance for all providers
   private static fileLogger: LLMRequestFileLogger = new LLMRequestFileLogger();
 
@@ -35,15 +42,40 @@ export class OpenAICompatProvider implements LLMProvider {
     this.model = model;
     this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
     this.apiKey = apiKey;
+
+    // Load model profile
+    this.initializeProfile();
+  }
+
+  /**
+   * Initialize model profile from registry
+   */
+  private initializeProfile(): void {
+    // Get profile for this model
+    this.profile = modelProfileRegistry.getProfile(this.model);
+
+    // Check if this is an unknown model (will need capability discovery)
+    if (this.profile.name === 'Unknown Model') {
+      this.needsDiscovery = true;
+    }
   }
 
   /**
    * Update the provider configuration dynamically
    */
   configure(config: { model?: string; baseUrl?: string; apiKey?: string }): void {
+    const modelChanged = config.model && config.model !== this.model;
+
     if (config.model) this.model = config.model;
     if (config.baseUrl) this.baseUrl = config.baseUrl.replace(/\/$/, '');
     if (config.apiKey !== undefined) this.apiKey = config.apiKey;
+
+    // Reload profile if model changed
+    if (modelChanged) {
+      this.initializeProfile();
+      this.discoveredCapabilities = null; // Clear cached capabilities
+    }
+
     // console.log('[OpenAICompatProvider] Configured:', {
     //   model: this.model,
     //   baseUrl: this.baseUrl,
@@ -100,6 +132,51 @@ export class OpenAICompatProvider implements LLMProvider {
     throw lastError || new Error('Fetch failed after retries');
   }
 
+  /**
+   * Ensure capabilities are known (run discovery if needed)
+   */
+  private async ensureCapabilitiesKnown(): Promise<void> {
+    if (this.needsDiscovery && !this.discoveredCapabilities) {
+      console.log(`[OpenAICompatProvider] Unknown model "${this.model}", running capability discovery...`);
+      this.discoveredCapabilities = await modelCapabilityDiscovery.getOrDiscoverCapabilities(
+        this,
+        this.model
+      );
+      console.log(`[OpenAICompatProvider] Discovered capabilities:`, this.discoveredCapabilities);
+    }
+  }
+
+  /**
+   * Get model capabilities (from profile or discovery)
+   */
+  private getCapabilities(): {
+    supportsToolCalling: boolean;
+    supportsThinkTags: boolean;
+    thinkTagName: string;
+  } {
+    if (this.profile && this.profile.name !== 'Unknown Model') {
+      // Known model - use profile
+      return {
+        supportsToolCalling: this.profile.supportsToolCalling,
+        supportsThinkTags: this.profile.supportsThinkTags,
+        thinkTagName: this.profile.thinkTagName || 'think',
+      };
+    } else if (this.discoveredCapabilities) {
+      // Unknown model with discovered capabilities
+      return {
+        supportsToolCalling: this.discoveredCapabilities.supportsToolCalling,
+        supportsThinkTags: this.discoveredCapabilities.thinkingFormat === 'think_tags',
+        thinkTagName: this.discoveredCapabilities.thinkingTagName || 'think',
+      };
+    } else {
+      // Fallback defaults (conservative - assume standard behavior)
+      return {
+        supportsToolCalling: true,  // Most models support this
+        supportsThinkTags: false,   // Don't assume
+        thinkTagName: 'think',
+      };
+    }
+  }
 
   // /**
   //  * Extract action from text content when tool calling isn't used
@@ -141,15 +218,18 @@ export class OpenAICompatProvider implements LLMProvider {
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
     try {
-      // If the prompt already asks for JSON output, use text-based generation
-      // to avoid conflicting instructions (JSON format vs tool calling)
-      if (request.prompt.includes('RESPOND IN JSON') || request.prompt.includes('respond in JSON')) {
-        return this.generateWithoutTools(request);
-      }
+      // Ensure capabilities are known (runs discovery on first call for unknown models)
+      await this.ensureCapabilitiesKnown();
+
+      // NOTE: We always use tool calling now. The prompts should NOT include
+      // "RESPOND IN JSON" instructions - tool calling is the standard.
+      // If you see JSON format issues, fix the prompt builders, not here.
 
       // Define action tools - matches ActionDefinitions.ts
       // NOTE: Autonomic behaviors (wander, rest, idle) are NOT included
+      // NOTE: 'talk' is NOT a tool - speaking happens via the "speaking" field in responses
       const tools = [
+        // === GATHERING ===
         {
           type: 'function',
           function: {
@@ -179,11 +259,13 @@ export class OpenAICompatProvider implements LLMProvider {
             }
           }
         },
+
+        // === BUILDING ===
         {
           type: 'function',
           function: {
             name: 'build',
-            description: 'Construct a building (requires materials in inventory)',
+            description: 'Construct a building (requires building skill level 1 and materials in inventory)',
             parameters: {
               type: 'object',
               properties: {
@@ -207,39 +289,21 @@ export class OpenAICompatProvider implements LLMProvider {
             }
           }
         },
-        {
-          type: 'function',
-          function: {
-            name: 'talk',
-            description: 'Have a conversation with someone nearby',
-            parameters: {
-              type: 'object',
-              properties: {
-                target: { type: 'string', description: 'Name of agent to talk to, or "nearest"' }
-              },
-              required: []
-            }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'follow_agent',
-            description: 'Follow another agent',
-            parameters: {
-              type: 'object',
-              properties: {
-                target: { type: 'string', description: 'Name of agent to follow' }
-              },
-              required: []
-            }
-          }
-        },
+
+        // === FARMING ===
         {
           type: 'function',
           function: {
             name: 'till',
-            description: 'Prepare soil for planting',
+            description: 'Prepare soil for planting (requires farming skill level 1)',
+            parameters: { type: 'object', properties: {}, required: [] }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'farm',
+            description: 'Work on farming tasks (requires farming skill level 1)',
             parameters: { type: 'object', properties: {}, required: [] }
           }
         },
@@ -247,7 +311,7 @@ export class OpenAICompatProvider implements LLMProvider {
           type: 'function',
           function: {
             name: 'plant',
-            description: 'Plant seeds in tilled soil',
+            description: 'Plant seeds in tilled soil (requires farming skill level 1)',
             parameters: {
               type: 'object',
               properties: {
@@ -257,12 +321,138 @@ export class OpenAICompatProvider implements LLMProvider {
             }
           }
         },
+
+        // === EXPLORATION ===
         {
           type: 'function',
           function: {
-            name: 'deposit_items',
-            description: 'Store items in a storage building',
+            name: 'explore',
+            description: 'Systematically explore unknown areas to find new resources',
             parameters: { type: 'object', properties: {}, required: [] }
+          }
+        },
+
+        // === RESEARCH ===
+        {
+          type: 'function',
+          function: {
+            name: 'research',
+            description: 'Conduct research at a research building to unlock new technologies (requires research skill level 1)',
+            parameters: {
+              type: 'object',
+              properties: {
+                topic: { type: 'string', description: 'Research topic or technology to investigate' }
+              },
+              required: []
+            }
+          }
+        },
+
+        // === ANIMAL HANDLING ===
+        {
+          type: 'function',
+          function: {
+            name: 'tame_animal',
+            description: 'Approach and tame a wild animal (requires animal handling skill level 2)',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Type of animal to tame: chicken, cow, sheep, etc.' }
+              },
+              required: []
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'house_animal',
+            description: 'Lead a tamed animal to its housing (requires animal handling skill level 2)',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Animal to house' }
+              },
+              required: []
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'hunt',
+            description: 'Hunt a wild animal for meat and resources (requires combat skill level 1)',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Animal to hunt: deer, boar, rabbit, etc.' }
+              },
+              required: []
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'butcher',
+            description: 'Butcher a tame animal at butchering table (requires cooking skill level 1)',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Animal to butcher' }
+              },
+              required: []
+            }
+          }
+        },
+
+        // === COMBAT ===
+        {
+          type: 'function',
+          function: {
+            name: 'initiate_combat',
+            description: 'Challenge another agent to combat - lethal or non-lethal (requires combat skill level 1)',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to fight' },
+                lethal: { type: 'boolean', description: 'Whether combat is lethal (default: false)' }
+              },
+              required: ['target']
+            }
+          }
+        },
+
+        // === MAGIC ===
+        {
+          type: 'function',
+          function: {
+            name: 'cast_spell',
+            description: 'Cast a known spell on self, ally, or enemy (requires magic skill level 1)',
+            parameters: {
+              type: 'object',
+              properties: {
+                spell: { type: 'string', description: 'Name of the spell to cast' },
+                target: { type: 'string', description: 'Target of the spell (self, agent name, or enemy)' }
+              },
+              required: ['spell']
+            }
+          }
+        },
+
+        // === SOCIAL ===
+        {
+          type: 'function',
+          function: {
+            name: 'follow_agent',
+            description: 'Follow someone',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to follow' }
+              },
+              required: ['target']
+            }
           }
         },
         {
@@ -275,10 +465,34 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 topic: { type: 'string', description: 'What to discuss' }
               },
-              required: []
+              required: ['topic']
             }
           }
         },
+        {
+          type: 'function',
+          function: {
+            name: 'attend_meeting',
+            description: 'Attend an ongoing meeting',
+            parameters: { type: 'object', properties: {}, required: [] }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'help',
+            description: 'Help another agent with their task',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to help' }
+              },
+              required: ['target']
+            }
+          }
+        },
+
+        // === PRIORITY MANAGEMENT ===
         {
           type: 'function',
           function: {
@@ -294,6 +508,60 @@ export class OpenAICompatProvider implements LLMProvider {
               },
               required: []
             }
+          }
+        },
+
+        // === GOAL SETTING (Talker layer) ===
+        {
+          type: 'function',
+          function: {
+            name: 'set_personal_goal',
+            description: 'Set a new personal goal',
+            parameters: {
+              type: 'object',
+              properties: {
+                goal: { type: 'string', description: 'The goal to set' }
+              },
+              required: ['goal']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'set_medium_term_goal',
+            description: 'Set a goal for the next few days',
+            parameters: {
+              type: 'object',
+              properties: {
+                goal: { type: 'string', description: 'The medium-term goal to set' }
+              },
+              required: ['goal']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'set_group_goal',
+            description: 'Propose a goal for the village',
+            parameters: {
+              type: 'object',
+              properties: {
+                goal: { type: 'string', description: 'The group goal to propose' }
+              },
+              required: ['goal']
+            }
+          }
+        },
+
+        // === META ===
+        {
+          type: 'function',
+          function: {
+            name: 'sleep_until_queue_complete',
+            description: 'Pause executor until all queued tasks complete',
+            parameters: { type: 'object', properties: {}, required: [] }
           }
         }
       ];
@@ -313,24 +581,16 @@ export class OpenAICompatProvider implements LLMProvider {
       }
 
       // System message to instruct the model on response format
-      // Adjust thinking instructions based on model type
-      const isQwen = this.model.toLowerCase().includes('qwen');
-      const isLlama = this.model.toLowerCase().includes('llama');
-      const isDeepseek = this.model.toLowerCase().includes('deepseek');
+      // Use profile-based capabilities instead of hardcoded model checks
+      const caps = this.getCapabilities();
 
       let thinkingInstructions: string;
-      if (isQwen) {
-        // Qwen3 uses <think> tags for reasoning
-        thinkingInstructions = `First, reason about what to do inside <think>...</think> tags. This is your internal thought process - take your time to consider the situation.`;
-      } else if (isDeepseek) {
-        // DeepSeek also supports thinking tags
-        thinkingInstructions = `Use <think>...</think> tags to reason through what you should do before acting.`;
-      } else if (isLlama) {
-        // Llama models - just ask for brief reasoning
-        thinkingInstructions = `Briefly consider what you should do based on the situation.`;
+      if (caps.supportsThinkTags) {
+        const tagName = caps.thinkTagName;
+        thinkingInstructions = `First, reason about what to do inside <${tagName}>...</${tagName}> tags. This is your internal thought process - take your time to consider the situation.`;
       } else {
-        // Default - simple reasoning request
-        thinkingInstructions = `Think briefly about what action makes sense.`;
+        // Models without think tags - just ask for brief reasoning
+        thinkingInstructions = `Think briefly about what action makes sense given the situation.`;
       }
 
       const systemMessage = {
@@ -416,9 +676,9 @@ Keep speech brief and natural.`
         }
       }
 
-      // Extract thinking - different models use different formats
-      // Qwen3: uses message.reasoning field
-      // Other models: may use <think>...</think> tags in content
+      // Extract thinking and speech from response
+      // Format: <think>internal thoughts</think> spoken words out loud
+      // OR: Qwen/Groq returns thinking in message.reasoning field
       let thinking = '';
       let speech = content;
 
@@ -427,37 +687,18 @@ Keep speech brief and natural.`
         thinking = message.reasoning.trim();
       }
 
-      // Also check for <think> tags in content (fallback for models that use this format)
-      const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/);
+      // Check for thinking tags in content (use detected tag name)
+      const tagName = caps.thinkTagName;
+      const thinkRegex = new RegExp(`<${tagName}>([\\s\\S]*?)</${tagName}>`, 'i');
+      const thinkMatch = content.match(thinkRegex);
       if (thinkMatch) {
         thinking = thinkMatch[1].trim();
         // Speech is everything after the think tag
-        speech = content.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+        speech = content.replace(thinkRegex, '').trim();
       }
 
-      // Check if speech content is JSON (e.g., from TalkerPromptBuilder asking for JSON output)
-      // If so, extract the 'speaking' field from it instead of using raw JSON as speech
-      try {
-        const jsonContent = JSON.parse(speech);
-        if (jsonContent && typeof jsonContent === 'object') {
-          // Extract speaking field if present
-          if (typeof jsonContent.speaking === 'string') {
-            speech = jsonContent.speaking;
-          }
-          // Extract thinking from JSON if not already set
-          if (!thinking && typeof jsonContent.thinking === 'string') {
-            thinking = jsonContent.thinking;
-          }
-          // Extract action from JSON if tool call didn't provide one
-          if (!action && jsonContent.action) {
-            action = jsonContent.action;
-          }
-        }
-      } catch {
-        // Not JSON, continue with text processing
-      }
-
-      // Clean up speech - remove common prefixes that models add incorrectly
+      // Clean up speech - just the words they say out loud
+      // Remove any model artifacts or labels that shouldn't be spoken
       speech = speech
         .replace(/^Content:\s*/i, '')           // Remove "Content: " prefix
         .replace(/^Speaking:\s*/i, '')          // Remove "Speaking: " prefix
@@ -589,12 +830,12 @@ Keep speech brief and natural.`
       ];
     } else {
       // No JSON instructions in prompt - add our own system message
-      const isQwen = this.model.toLowerCase().includes('qwen');
-      const isDeepseek = this.model.toLowerCase().includes('deepseek');
+      const caps = this.getCapabilities();
 
       let thoughtFormat: string;
-      if (isQwen || isDeepseek) {
-        thoughtFormat = `<think>[your reasoning]</think>`;
+      if (caps.supportsThinkTags) {
+        const tagName = caps.thinkTagName;
+        thoughtFormat = `<${tagName}>[your reasoning]</${tagName}>`;
       } else {
         thoughtFormat = `Thought: [your reasoning]`;
       }
@@ -689,15 +930,23 @@ Be brief and natural.`
     }
 
     // Parse the structured text response
-    // Support both <think> tags (Qwen/DeepSeek) and "Thought:" prefix
+    // Support both thinking tags (using detected tag name) and "Thought:" prefix
+    const caps = this.getCapabilities();
     let thinking = '';
     let contentAfterThink = content;
 
-    const thinkTagMatch = content.match(/<think>([\s\S]*?)<\/think>/);
-    if (thinkTagMatch) {
-      thinking = thinkTagMatch[1].trim();
-      contentAfterThink = content.replace(/<think>[\s\S]*?<\/think>/, '').trim();
-    } else {
+    if (caps.supportsThinkTags) {
+      const tagName = caps.thinkTagName;
+      const thinkRegex = new RegExp(`<${tagName}>([\\s\\S]*?)</${tagName}>`, 'i');
+      const thinkTagMatch = content.match(thinkRegex);
+      if (thinkTagMatch) {
+        thinking = thinkTagMatch[1].trim();
+        contentAfterThink = content.replace(thinkRegex, '').trim();
+      }
+    }
+
+    // Fallback to "Thought:" prefix if no tags found
+    if (!thinking) {
       const thoughtMatch = content.match(/Thought:\s*(.+?)(?=\n|Speech:|Action:|$)/is);
       if (thoughtMatch) {
         thinking = thoughtMatch[1].trim();
@@ -766,16 +1015,28 @@ Be brief and natural.`
 
   async isAvailable(): Promise<boolean> {
     try {
-      // Try a simple models list request
+      // In browser environment, route through Vite proxy to avoid CORS
+      const isBrowser = typeof window !== 'undefined';
+      const checkUrl = isBrowser
+        ? `/api/llm/check-availability?baseUrl=${encodeURIComponent(this.baseUrl)}`
+        : `${this.baseUrl}/models`;
+
       const headers: Record<string, string> = {};
-      if (this.apiKey) {
+      if (!isBrowser && this.apiKey) {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
-      const response = await fetch(`${this.baseUrl}/models`, {
+      const response = await fetch(checkUrl, {
         method: 'GET',
         headers,
       });
+
+      if (isBrowser) {
+        // Proxy returns JSON with available: boolean
+        const data = await response.json();
+        return data.available === true;
+      }
+
       return response.ok;
     } catch {
       return false;

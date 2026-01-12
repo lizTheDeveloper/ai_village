@@ -102,6 +102,9 @@ export class TalkerPromptBuilder {
     // Skills (what you can do affects social standing)
     'skills',
 
+    // Magic (spells known, mana, cooldowns)
+    'magic',
+
     // Physical state (injuries/health affect behavior)
     'health',
     'physical_state',
@@ -156,7 +159,7 @@ export class TalkerPromptBuilder {
     const actions = this.getAvailableTalkerActions(conversation, vision, world);
 
     // Instruction: What to decide
-    const instruction = this.buildTalkerInstruction(conversation, needs, personality, vision, world);
+    const instruction = this.buildTalkerInstruction(agent, conversation, needs, personality, vision, world);
 
     // Combine into single prompt
     return this.formatPrompt({
@@ -347,7 +350,7 @@ export class TalkerPromptBuilder {
         vision.heardSpeech.forEach((speech: { speaker: string; text: string; speakerId?: string }) => {
           context += `${formatSpeaker(speech)}: "${speech.text}"\n`;
         });
-        context += `\nYou can join this conversation by choosing the 'talk' action.\n`;
+        context += `\nYou can respond in the "speaking" field while continuing your work.\n`;
       }
     }
 
@@ -525,7 +528,7 @@ export class TalkerPromptBuilder {
 
   /**
    * Get available Talker actions.
-   * Only social tools: talk, follow_agent, call_meeting, attend_meeting, help
+   * Primary focus: goal-setting. Speaking happens automatically near others.
    * Uses BEHAVIOR_DESCRIPTIONS as single source of truth for descriptions.
    */
   private getAvailableTalkerActions(
@@ -535,33 +538,9 @@ export class TalkerPromptBuilder {
   ): string[] {
     const actions: string[] = [];
 
-    // talk - available if nearby agents or in active conversation
     const hasNearbyAgents = vision?.seenAgents && vision.seenAgents.length > 1; // More than just self
-    const hasHeardSpeech = vision?.heardSpeech && vision.heardSpeech.length > 0;
 
-    if (hasNearbyAgents || hasHeardSpeech || conversation?.isActive) {
-      actions.push(this.formatAction('talk'));
-    }
-
-    // follow_agent - available if nearby agents
-    if (hasNearbyAgents) {
-      actions.push(this.formatAction('follow_agent'));
-    }
-
-    // call_meeting - available if nearby agents
-    if (hasNearbyAgents) {
-      actions.push(this.formatAction('call_meeting'));
-    }
-
-    // attend_meeting - available if there's an ongoing meeting
-    // TODO: Check for ongoing meetings when meeting system is implemented
-
-    // help - available if nearby agents
-    if (hasNearbyAgents) {
-      actions.push(this.formatAction('help'));
-    }
-
-    // Goal-setting actions (always available)
+    // Goal-setting actions (PRIMARY PURPOSE - always available)
     actions.push(this.formatAction('set_personal_goal'));
     actions.push(this.formatAction('set_medium_term_goal'));
 
@@ -570,9 +549,16 @@ export class TalkerPromptBuilder {
       actions.push(this.formatAction('set_group_goal'));
     }
 
+    // Social coordination (secondary - available if nearby agents)
+    if (hasNearbyAgents) {
+      actions.push(this.formatAction('follow_agent'));
+      actions.push(this.formatAction('call_meeting'));
+      actions.push(this.formatAction('help'));
+    }
+
+    // NOTE: 'talk' is NOT an action - speaking happens automatically when near others.
+    // Agents can speak in the "speaking" field without changing behavior.
     // NOTE: wander/idle are AUTONOMIC fallback behaviors, NOT Talker decisions.
-    // If Talker has nothing social to do, it should set a goal or return no action.
-    // The autonomic layer will handle fallback to wander/idle.
 
     return actions;
   }
@@ -580,8 +566,10 @@ export class TalkerPromptBuilder {
   /**
    * Build instruction for Talker.
    * Context-aware based on conversation state, personality, and needs.
+   * Primary focus: goal-setting. Speaking happens automatically.
    */
   private buildTalkerInstruction(
+    agent: Entity,
     conversation: ConversationComponent | undefined,
     needs: NeedsComponent | undefined,
     personality: PersonalityComponent | undefined,
@@ -602,34 +590,43 @@ export class TalkerPromptBuilder {
       ? `CRITICAL: ${criticalNeeds.join(' and ')}. `
       : '';
 
-    // PRIORITY 1: Active conversation
+    // PRIORITY 1: No goals - need to set some
+    // Note: We check this via the goalsSection passed to the prompt, but also check directly
+    const goals = agent.components.get('goals') as GoalsComponent | undefined;
+    const hasActiveGoals = goals?.goals && goals.goals.length > 0 && goals.goals.some((g) => !g.completed);
+
+    if (!hasActiveGoals) {
+      return `${criticalPrefix}You have no active goals! Set a personal goal to give yourself direction. What do you want to accomplish?`;
+    }
+
+    // PRIORITY 2: Active conversation - respond while working
     if (conversation?.isActive && conversation?.partnerId) {
       const partner = world.getEntity(conversation.partnerId);
       const partnerIdentity = partner?.components.get('identity') as IdentityComponent | undefined;
       const partnerName = partnerIdentity?.name || 'them';
 
-      return `${criticalPrefix}You're in a conversation with ${partnerName}. Read the conversation history above and respond naturally. What do you want to say?`;
+      return `${criticalPrefix}You're near ${partnerName}. You can speak to them in the "speaking" field. Do you want to set a new goal or continue with your current one?`;
     }
 
-    // PRIORITY 2: Heard speech (potential conversation)
+    // PRIORITY 3: Heard speech - can respond
     const hasHeardSpeech = vision?.heardSpeech && vision.heardSpeech.length > 0;
     if (hasHeardSpeech) {
-      return `${criticalPrefix}You hear someone speaking nearby. Do you want to respond or join the conversation? What will you do?`;
+      return `${criticalPrefix}You hear others talking. You can respond in the "speaking" field. Do you want to update your goals based on what you heard?`;
     }
 
-    // PRIORITY 3: Social depth need critical (lonely)
+    // PRIORITY 4: Lonely - consider social goal
     if (needs?.socialDepth !== undefined && needs.socialDepth < 0.3) {
-      return `${criticalPrefix}You feel very lonely. Consider finding someone to talk to or setting a social goal. What will you do?`;
+      return `${criticalPrefix}You feel lonely. Consider setting a social goal like finding a friend or calling a meeting.`;
     }
 
-    // PRIORITY 4: Extroverted personality + nearby agents
+    // PRIORITY 5: Nearby agents
     const hasNearbyAgents = vision?.seenAgents && vision.seenAgents.length > 1;
-    if (hasNearbyAgents && personality?.extraversion && personality.extraversion > 0.6) {
-      return `${criticalPrefix}You see people nearby and feel social. Do you want to talk to someone or set a new goal? What will you do?`;
+    if (hasNearbyAgents) {
+      return `${criticalPrefix}People are nearby. You can speak to them in the "speaking" field. Do you want to set or update any goals?`;
     }
 
-    // Default: general decision
-    return `${criticalPrefix}What would you like to do right now? You can talk to people, set goals, or explore.`;
+    // Default: focus on goals
+    return `${criticalPrefix}What goals do you want to pursue? Set a personal, medium-term, or group goal.`;
   }
 
   /**
@@ -674,7 +671,12 @@ export class TalkerPromptBuilder {
 
     // Character guidelines - roleplay directive
     const characterGuidelines = `--- YOUR ROLE ---
-You are the social brain. You speak, set goals, notice people and vibes. Focus on WHAT you want and WHY. Talk naturally, be socially aware.`;
+You are the GOAL-SETTING brain. Your job is to decide WHAT you want to accomplish and WHY.
+- Set goals: personal goals, medium-term goals, group goals
+- Speak your thoughts aloud when near others (but DON'T stop working to talk)
+- Notice people and social dynamics
+Speaking is automatic when near others - you don't need to choose "talk" as an action.
+Focus on setting meaningful goals that drive productive behavior.`;
 
     sections.push(characterGuidelines);
 
@@ -716,37 +718,19 @@ You are the social brain. You speak, set goals, notice people and vibes. Focus o
     // Instruction
     sections.push(prompt.instruction);
 
-    // Response format
-    const responseFormat = `--- RESPONSE FORMAT ---
-
-CRITICAL: Output ONLY valid JSON. DO NOT include labels like "Action:", "Speaking:", or "Thoughts:".
-Start your response with { and end with }. NO extra text before or after the JSON.
+    // Note: We DO NOT add JSON format instructions here because:
+    // - Tool calling providers inject their own response format instructions
+    // - Asking for JSON conflicts with tool calling and confuses the LLM
+    // - The provider handles response format via tool definitions
+    // Speaking/action are provided as tool parameters and the LLM uses tool calls
+    //
+    // Important instructions for speech quality (still needed):
+    const speechGuidelines = `--- SPEECH GUIDELINES ---
 
 DO NOT start your speech with your name - the conversation already shows who's speaking.
-Speak naturally without announcing yourself (e.g., "Kestrel here" or "Clay speaking").
+Speak naturally without announcing yourself (e.g., "Kestrel here" or "Clay speaking").`;
 
-Example of CORRECT response:
-{
-  "speaking": "I think we should gather more wood before winter.",
-  "action": {
-    "type": "talk"
-  }
-}
-
-Use this exact format:
-{
-  "speaking": "what you say out loud (leave empty only if alone or deep in thought)",
-  "action": {
-    "type": "action_name",
-    "target": "optional target like agent name"
-  },
-  "goal": {
-    "type": "personal" | "medium_term" | "group",
-    "description": "goal description (if setting a goal)"
-  }
-}`;
-
-    sections.push(responseFormat);
+    sections.push(speechGuidelines);
 
     return sections.join('\n\n');
   }

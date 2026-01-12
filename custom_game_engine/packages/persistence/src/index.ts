@@ -1,37 +1,36 @@
 /**
  * Persistence Layer - Public API
  *
- * Main entry point for saving/loading game state with support for:
- * - Forward-compatible migrations
- * - Multiple storage backends (IndexedDB, Memory)
- * - Multiverse snapshots with universe forking
- * - Component-level serialization
+ * This package re-exports persistence functionality from @ai-village/core
+ * to maintain backward compatibility.
+ *
+ * The canonical implementation lives in @ai-village/core/src/persistence/
  */
 
-// Main service exports
-export { SaveLoadService, saveLoadService } from './SaveLoadService.js';
-export type { SaveOptions, LoadResult } from './SaveLoadService.js';
-
-// Save state management (for dev tools: save/load/fork/rewind)
-export { SaveStateManager } from './SaveStateManager.js';
-export type { SaveMetadata as SaveStateMetadata, SaveState, SaveListEntry } from './SaveStateManager.js';
-
-// Storage backends
-export { IndexedDBStorage } from './storage/IndexedDBStorage.js';
-export { MemoryStorage } from './storage/MemoryStorage.js';
-
-// Serialization
-export { worldSerializer, WorldSerializer } from './WorldSerializer.js';
-export type { TimelineSnapshot } from './WorldSerializer.js';
-export { componentSerializerRegistry } from './ComponentSerializerRegistry.js';
-export type { ComponentSerializer } from './types.js';
-export { BaseComponentSerializer } from './ComponentSerializerRegistry.js';
-
-// Migrations
-export { migrationRegistry, MigrationRegistry } from './MigrationRegistry.js';
-
-// Utilities
+// Re-export everything from core's persistence exports
 export {
+  // Main service
+  SaveLoadService,
+  saveLoadService,
+
+  // Save state management
+  SaveStateManager,
+
+  // Storage backends
+  IndexedDBStorage,
+  MemoryStorage,
+
+  // Serialization
+  worldSerializer,
+  WorldSerializer,
+  componentSerializerRegistry,
+  BaseComponentSerializer,
+
+  // Migrations
+  migrationRegistry,
+  MigrationRegistry,
+
+  // Utilities
   computeChecksum,
   computeChecksumSync,
   canonicalizeJSON,
@@ -44,16 +43,48 @@ export {
   generateContentID,
   parseContentID,
   getGameVersion,
-} from './utils.js';
 
-// Type exports
+  // Validation
+  validateSaveFile,
+  validateWorldState,
+  InvariantViolationError,
+
+  // Compression
+  compress,
+  decompress,
+  formatBytes,
+  getCompressionRatio,
+
+  // Errors
+  MigrationError,
+  SerializationError,
+  ValidationError,
+  ChecksumMismatchError,
+} from '@ai-village/core';
+
+// Migration utilities
+export {
+  migrateLocalSaves,
+  checkMigrationStatus,
+} from './LocalSavesMigration.js';
+export type { MigrationProgress, MigrationOptions } from './LocalSavesMigration.js';
+
+// Type re-exports
 export type {
+  SaveOptions,
+  LoadResult,
+  CanonEvent,
+  CanonEventType,
+  SaveMetadata,
+  SaveState,
+  SaveListEntry,
+  TimelineSnapshot,
   Versioned,
   VersionedComponent,
   VersionedEntity,
   SaveFile,
   SaveFileHeader,
-  SaveMetadata,
+  PersistenceSaveMetadata,
   MultiverseSnapshot,
   MultiverseTime,
   UniverseSnapshot,
@@ -63,18 +94,5 @@ export type {
   StorageInfo,
   Migration,
   MigrationContext,
-} from './types.js';
-
-// Validation
-export { validateSaveFile, validateWorldState, InvariantViolationError } from './InvariantChecker.js';
-
-// Compression
-export { compress, decompress, formatBytes, getCompressionRatio } from './compression.js';
-
-// Error exports
-export {
-  MigrationError,
-  SerializationError,
-  ValidationError,
-  ChecksumMismatchError,
-} from './types.js';
+  ComponentSerializer,
+} from '@ai-village/core';

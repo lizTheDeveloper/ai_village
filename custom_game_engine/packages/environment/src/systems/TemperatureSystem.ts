@@ -304,9 +304,10 @@ export class TemperatureSystem implements System {
       if (buildingComp.interior && buildingComp.interiorRadius > 0) {
         const dx = position.x - buildingPos.x;
         const dy = position.y - buildingPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
+        const radiusSquared = buildingComp.interiorRadius * buildingComp.interiorRadius;
 
-        if (distance <= buildingComp.interiorRadius) {
+        if (distanceSquared <= radiusSquared) {
           // Agent is inside - apply insulation and base temperature
           // Only apply if building is complete
           if (buildingComp.isComplete) {
@@ -423,11 +424,16 @@ export class TemperatureSystem implements System {
 
   /**
    * Calculate heat bonus from nearby heat sources (campfires)
+   * CRITICAL: Capped to prevent stacking multiple heat sources from creating lethal temperatures
    */
   private calculateHeatSourceBonus(position: PositionComponent): number {
     // Use cached buildings (refreshed every N ticks, not every frame!)
     const buildings = this.buildingCache;
     let totalHeat = 0;
+
+    // Cap maximum heat contribution to prevent lethal stacking
+    // Single campfire at 10°C is fine, but 5 campfires would be 50°C (lethal)
+    const MAX_HEAT_CONTRIBUTION = 15; // Maximum total heat bonus from all sources
 
     for (const building of buildings) {
       const buildingPos = building.position;
@@ -437,17 +443,21 @@ export class TemperatureSystem implements System {
       if (buildingComp.providesHeat && buildingComp.heatRadius > 0 && buildingComp.isComplete) {
         const dx = position.x - buildingPos.x;
         const dy = position.y - buildingPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
+        const radiusSquared = buildingComp.heatRadius * buildingComp.heatRadius;
 
-        if (distance <= buildingComp.heatRadius) {
+        if (distanceSquared <= radiusSquared) {
           // Heat effect diminishes with distance: heatAmount * (1 - distance / radius)
+          // Note: We need actual distance here for interpolation, but only compute after squared check passes
+          const distance = Math.sqrt(distanceSquared);
           const heatEffect = buildingComp.heatAmount * (1 - distance / buildingComp.heatRadius);
           totalHeat += heatEffect;
         }
       }
     }
 
-    return totalHeat;
+    // Cap total heat to prevent lethal stacking
+    return Math.min(totalHeat, MAX_HEAT_CONTRIBUTION);
   }
 
   /**

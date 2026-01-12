@@ -8,8 +8,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MagicLawEnforcer } from '../MagicLawEnforcer.js';
 import { SpellCastingService } from '../SpellCastingService.js';
-import { costCalculatorRegistry } from '@ai-village/core';
-import { registerAllCostCalculators } from '@ai-village/core';
+import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';
+import { registerAllCostCalculators } from '../costs/index.js';
 import { getCoreParadigm } from '../CoreParadigms.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 import type { SpellDefinition } from '../SpellRegistry.js';

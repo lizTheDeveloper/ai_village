@@ -25,6 +25,7 @@ import type {
   EmergentPattern,
   Anomaly,
   Milestone,
+  CauseOfDeath,
 } from './types.js';
 
 /**
@@ -93,6 +94,9 @@ export class MetricsCollector {
   // Hot storage for time-based filtering
   private hotStorage: Map<string, AgentLifecycleMetrics> = new Map();
   private coldStorage: Map<string, AgentLifecycleMetrics> = new Map();
+
+  // Activity tracking for start/end timing (replaces dynamic properties)
+  private activityStartTimes: Map<string, Map<string, number>> = new Map();
 
   constructor(world: World) {
     if (!world) {
@@ -387,11 +391,33 @@ export class MetricsCollector {
    */
   private handleAgentBirth(event: Record<string, unknown>): void {
     const agentId = event.agentId as string;
+
+    // Validate required field exists
+    if (!event.initialStats || typeof event.initialStats !== 'object') {
+      throw new Error('agent:birth event missing required initialStats field');
+    }
+
+    const stats = event.initialStats as Record<string, unknown>;
+
+    // Validate structure
+    if (typeof stats.health !== 'number' ||
+        typeof stats.hunger !== 'number' ||
+        typeof stats.thirst !== 'number' ||
+        typeof stats.energy !== 'number') {
+      throw new Error(`Invalid initialStats structure: ${JSON.stringify(stats)}`);
+    }
+
     const metrics: AgentLifecycleMetrics = {
       birthTimestamp: event.timestamp as number,
       birthGeneration: event.generation as number,
       parents: event.parents as [string, string] | null,
-      initialStats: event.initialStats as any,
+      initialStats: {
+        health: stats.health,
+        hunger: stats.hunger,
+        thirst: stats.thirst,
+        energy: stats.energy,
+        intelligence: typeof stats.intelligence === 'number' ? stats.intelligence : undefined,
+      },
       childrenCount: 0,
       descendantsCount: 0,
       skillsLearned: [],
@@ -474,9 +500,46 @@ export class MetricsCollector {
     }
 
     metrics.deathTimestamp = event.timestamp as number;
-    metrics.causeOfDeath = event.causeOfDeath as any;
+
+    // Validate cause of death
+    const validCauses: CauseOfDeath[] = [
+      'hunger', 'thirst', 'hypothermia', 'heatstroke',
+      'old_age', 'injury', 'illness', 'attacked', 'accident'
+    ];
+
+    const causeOfDeath = event.causeOfDeath as string;
+    if (!validCauses.includes(causeOfDeath as CauseOfDeath)) {
+      throw new Error(`Invalid cause of death: ${causeOfDeath}. Valid values: ${validCauses.join(', ')}`);
+    }
+
+    metrics.causeOfDeath = causeOfDeath as CauseOfDeath;
     metrics.ageAtDeath = event.ageAtDeath as number;
-    metrics.finalStats = event.finalStats as any;
+
+    // Validate finalStats if present
+    if (event.finalStats) {
+      if (typeof event.finalStats !== 'object') {
+        throw new Error('finalStats must be an object');
+      }
+
+      const finalStats = event.finalStats as Record<string, unknown>;
+
+      // Validate structure
+      if (typeof finalStats.health !== 'number' ||
+          typeof finalStats.hunger !== 'number' ||
+          typeof finalStats.thirst !== 'number' ||
+          typeof finalStats.energy !== 'number') {
+        throw new Error(`Invalid finalStats structure: ${JSON.stringify(finalStats)}`);
+      }
+
+      metrics.finalStats = {
+        health: finalStats.health,
+        hunger: finalStats.hunger,
+        thirst: finalStats.thirst,
+        energy: finalStats.energy,
+        intelligence: typeof finalStats.intelligence === 'number' ? finalStats.intelligence : undefined,
+      };
+    }
+
     metrics.lifespan = metrics.deathTimestamp - metrics.birthTimestamp;
 
     this.sessionMetrics.totalDeaths++;
@@ -486,6 +549,7 @@ export class MetricsCollector {
     this.agentsWithRelationships.delete(agentId);
     this.behavioralMetrics.delete(agentId);
     this.needsMetrics.delete(agentId);
+    this.activityStartTimes.delete(agentId);
     delete this.spatialMetrics.agents[agentId];
   }
 
@@ -750,28 +814,34 @@ export class MetricsCollector {
     const metrics = this.getOrCreateBehavioralMetrics(agentId);
 
     if (event.type === 'activity:started') {
-      // Store start time for duration calculation
-      (metrics as any)[`_${activity}_start`] = timestamp;
+      // Store start time for duration calculation using dedicated Map
+      if (!this.activityStartTimes.has(agentId)) {
+        this.activityStartTimes.set(agentId, new Map());
+      }
+      this.activityStartTimes.get(agentId)!.set(activity, timestamp);
     } else if (event.type === 'activity:ended') {
-      const startTime = (metrics as any)[`_${activity}_start`];
-      if (startTime !== undefined) {
-        const duration = timestamp - startTime;
-        if (!metrics.activityBreakdown[activity]) {
-          metrics.activityBreakdown[activity] = 0;
-        }
-        metrics.activityBreakdown[activity] += duration;
-        delete (metrics as any)[`_${activity}_start`];
+      const agentActivities = this.activityStartTimes.get(agentId);
+      if (agentActivities) {
+        const startTime = agentActivities.get(activity);
+        if (startTime !== undefined) {
+          const duration = timestamp - startTime;
+          if (!metrics.activityBreakdown[activity]) {
+            metrics.activityBreakdown[activity] = 0;
+          }
+          metrics.activityBreakdown[activity] += duration;
+          agentActivities.delete(activity);
 
-        // Update efficiency score
-        const isProductive = activity !== 'idle';
-        if (isProductive) {
-          metrics.productiveTime += duration;
-        } else {
-          metrics.idleTime += duration;
-        }
-        const totalTime = metrics.productiveTime + metrics.idleTime;
-        if (totalTime > 0) {
-          metrics.efficiencyScore = metrics.productiveTime / totalTime;
+          // Update efficiency score
+          const isProductive = activity !== 'idle';
+          if (isProductive) {
+            metrics.productiveTime += duration;
+          } else {
+            metrics.idleTime += duration;
+          }
+          const totalTime = metrics.productiveTime + metrics.idleTime;
+          if (totalTime > 0) {
+            metrics.efficiencyScore = metrics.productiveTime / totalTime;
+          }
         }
       }
     }
@@ -881,7 +951,16 @@ export class MetricsCollector {
     } else if (event.type === 'session:ended') {
       this.sessionMetrics.endTime = event.timestamp as number;
       this.sessionMetrics.realTimeDuration = this.sessionMetrics.endTime - this.sessionMetrics.startTime;
-      this.sessionMetrics.gameEndReason = event.reason as any;
+
+      // Validate game end reason
+      const validReasons = ['manual_quit', 'extinction', 'victory_condition', 'crash'];
+      const reason = event.reason as string;
+
+      if (!validReasons.includes(reason)) {
+        throw new Error(`Invalid game end reason: ${reason}. Valid values: ${validReasons.join(', ')}`);
+      }
+
+      this.sessionMetrics.gameEndReason = reason as 'manual_quit' | 'extinction' | 'victory_condition' | 'crash';
     }
   }
 

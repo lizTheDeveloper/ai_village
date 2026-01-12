@@ -1,0 +1,10 @@
+{
+  "id": "universe:807a7c3b-80bb-4497-8fd5-9f076dfb319b",
+  "name": "Main Universe",
+  "ownerId": "player:2a52685a-03d4-4db0-85a2-3c9fc9355d06",
+  "createdAt": 1768172901040,
+  "lastSnapshotAt": 1768172901626,
+  "snapshotCount": 1,
+  "canonicalEventCount": 0,
+  "isPublic": true
+}

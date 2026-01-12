@@ -122,13 +122,30 @@ export class AutonomicSystem {
     // Note: Removed sleepDrive-based triggers - sleep is now purely energy-based
     // Energy decays while awake, and low energy triggers sleep
 
-    // Dangerously cold/hot: seek warmth/shelter urgently (high priority survival need)
+    // Dangerously cold/hot: seek warmth/cooling urgently (high priority survival need)
     if (temperature) {
+      // CRITICAL: Dangerously hot (e.g. standing in campfire) - immediate response
+      if (temperature.state === 'dangerously_hot') {
+        return {
+          behavior: 'seek_cooling',
+          priority: 90,
+          reason: `Dangerously hot (temp: ${temperature.currentTemp.toFixed(1)}°C)`,
+        };
+      }
       if (temperature.state === 'dangerously_cold') {
         return {
           behavior: 'seek_warmth',
           priority: 90,
           reason: `Dangerously cold (temp: ${temperature.currentTemp.toFixed(1)}°C)`,
+        };
+      }
+      // For 'hot' state, seek cooling if significantly above comfort max
+      // This prevents agents from gathering resources near campfires
+      if (temperature.state === 'hot' && temperature.currentTemp > temperature.comfortMax + 3) {
+        return {
+          behavior: 'seek_cooling',
+          priority: 35,
+          reason: `Hot (temp: ${temperature.currentTemp.toFixed(1)}°C)`,
         };
       }
       // For 'cold' state, only seek warmth if agent has been cold for a while

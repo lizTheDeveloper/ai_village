@@ -224,8 +224,18 @@ export class Renderer3D {
   private animationFrameId: number | null = null;
   private container: HTMLElement | null = null;
 
-  // Chunk management for independent chunk loading
-  private chunkManager: ChunkManager | null = null;
+  // Selection state
+  private selectedEntityId: string | null = null;
+  private haloMesh: THREE.Mesh | null = null;
+  private raycaster = new THREE.Raycaster();
+  private mouse = new THREE.Vector2();
+  private onEntitySelectedCallback: ((entityId: string | null) => void) | null = null;
+
+  // Event handler references for cleanup
+  private boundContextMenuHandler: ((e: MouseEvent) => void) | null = null;
+  private boundClickHandler: ((e: MouseEvent) => void) | null = null;
+
+  // TerrainGenerator reference (chunkManager removed - chunk loading now handled by ChunkLoadingSystem)
   private terrainGenerator: TerrainGenerator | null = null;
 
   constructor(
@@ -235,8 +245,7 @@ export class Renderer3D {
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
 
-    // Store chunk management references
-    if (chunkManager) this.chunkManager = chunkManager;
+    // Store terrain generator reference (chunkManager parameter kept for backwards compatibility but unused)
     if (terrainGenerator) this.terrainGenerator = terrainGenerator;
 
     // Create scene
@@ -338,22 +347,50 @@ export class Renderer3D {
   mount(container: HTMLElement): void {
     this.container = container;
     container.appendChild(this.renderer.domElement);
+
+    // Position 3D canvas behind 2D canvas (which has z-index 10 in 3D mode)
+    this.renderer.domElement.style.position = 'absolute';
+    this.renderer.domElement.style.top = '0';
+    this.renderer.domElement.style.left = '0';
+    this.renderer.domElement.style.zIndex = '5';
+
     this.resize();
 
-    // Add click listener to lock controls
-    container.addEventListener('click', () => {
+    // Right-click to lock controls for mouse navigation
+    this.boundContextMenuHandler = (e: MouseEvent) => {
       if (this.isActive) {
+        e.preventDefault();
         this.controls.lock();
       }
-    });
+    };
+    container.addEventListener('contextmenu', this.boundContextMenuHandler);
+
+    // Left-click to select entities
+    this.boundClickHandler = (e: MouseEvent) => {
+      if (this.isActive && !this.controls.isLocked) {
+        this.handleEntityClick(e);
+      }
+    };
+    container.addEventListener('click', this.boundClickHandler);
   }
 
   /**
    * Unmount the 3D renderer
    */
   unmount(): void {
-    if (this.container && this.renderer.domElement.parentElement === this.container) {
-      this.container.removeChild(this.renderer.domElement);
+    // Remove event listeners
+    if (this.container) {
+      if (this.boundContextMenuHandler) {
+        this.container.removeEventListener('contextmenu', this.boundContextMenuHandler);
+        this.boundContextMenuHandler = null;
+      }
+      if (this.boundClickHandler) {
+        this.container.removeEventListener('click', this.boundClickHandler);
+        this.boundClickHandler = null;
+      }
+      if (this.renderer.domElement.parentElement === this.container) {
+        this.container.removeChild(this.renderer.domElement);
+      }
     }
     this.container = null;
     this.controls.unlock();
@@ -450,6 +487,175 @@ export class Renderer3D {
     return this.config.renderRadius;
   }
 
+  /**
+   * Set callback for when an entity is selected
+   */
+  setOnEntitySelected(callback: (entityId: string | null) => void): void {
+    this.onEntitySelectedCallback = callback;
+  }
+
+  /**
+   * Get currently selected entity ID
+   */
+  getSelectedEntityId(): string | null {
+    return this.selectedEntityId;
+  }
+
+  /**
+   * Set selected entity (can be called externally to sync with 2D selection)
+   */
+  setSelectedEntity(entityId: string | null): void {
+    this.selectedEntityId = entityId;
+    this.updateHalo();
+  }
+
+  // ============================================================================
+  // ENTITY SELECTION
+  // ============================================================================
+
+  /**
+   * Handle external click forwarded from 2D canvas overlay.
+   * Used when windows don't consume the click in 3D mode.
+   */
+  handleExternalClick(clientX: number, clientY: number, canvasRect: DOMRect): void {
+    if (!this.isActive) return;
+
+    this.mouse.x = ((clientX - canvasRect.left) / canvasRect.width) * 2 - 1;
+    this.mouse.y = -((clientY - canvasRect.top) / canvasRect.height) * 2 + 1;
+
+    this.performEntityRaycast();
+  }
+
+  /**
+   * Handle left-click to select entities via raycasting
+   */
+  private handleEntityClick(event: MouseEvent): void {
+    if (!this.container) return;
+
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.performEntityRaycast();
+  }
+
+  /**
+   * Perform raycasting to find and select entities at current mouse position.
+   */
+  private performEntityRaycast(): void {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    // Collect all entity sprites to test
+    const sprites: THREE.Sprite[] = [];
+    const spriteToEntityId: Map<THREE.Sprite, string> = new Map();
+
+    for (const [entityId, data] of this.entitySprites) {
+      sprites.push(data.sprite);
+      spriteToEntityId.set(data.sprite, entityId);
+    }
+
+    // Also check animal sprites
+    for (const [entityId, data] of this.animalSprites) {
+      sprites.push(data.sprite);
+      spriteToEntityId.set(data.sprite, entityId);
+    }
+
+    const intersects = this.raycaster.intersectObjects(sprites);
+
+    if (intersects.length > 0 && intersects[0]) {
+      const hitSprite = intersects[0].object as THREE.Sprite;
+      const entityId = spriteToEntityId.get(hitSprite);
+      if (entityId) {
+        this.selectedEntityId = entityId;
+        this.updateHalo();
+        if (this.onEntitySelectedCallback) {
+          this.onEntitySelectedCallback(entityId);
+        }
+      }
+    } else {
+      // Clicked on nothing - deselect
+      this.selectedEntityId = null;
+      this.updateHalo();
+      if (this.onEntitySelectedCallback) {
+        this.onEntitySelectedCallback(null);
+      }
+    }
+  }
+
+  /**
+   * Create or update the halo indicator above selected entity
+   */
+  private updateHalo(): void {
+    // Remove existing halo if any
+    if (this.haloMesh) {
+      this.scene.remove(this.haloMesh);
+      this.haloMesh.geometry.dispose();
+      (this.haloMesh.material as THREE.Material).dispose();
+      this.haloMesh = null;
+    }
+
+    if (!this.selectedEntityId) return;
+
+    // Find the selected entity's position
+    let position: THREE.Vector3 | null = null;
+
+    const entityData = this.entitySprites.get(this.selectedEntityId);
+    if (entityData) {
+      position = entityData.sprite.position.clone();
+    } else {
+      const animalData = this.animalSprites.get(this.selectedEntityId);
+      if (animalData) {
+        position = animalData.sprite.position.clone();
+      }
+    }
+
+    if (!position) return;
+
+    // Create a torus (ring/halo) above the entity
+    const geometry = new THREE.TorusGeometry(0.6, 0.08, 8, 24);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffdd00,
+      transparent: true,
+      opacity: 0.9,
+    });
+    this.haloMesh = new THREE.Mesh(geometry, material);
+
+    // Position above the entity and rotate to be horizontal
+    this.haloMesh.position.set(position.x, position.y + 1.8, position.z);
+    this.haloMesh.rotation.x = Math.PI / 2;
+
+    this.scene.add(this.haloMesh);
+  }
+
+  /**
+   * Update halo position to follow selected entity (called in render loop)
+   */
+  private updateHaloPosition(): void {
+    if (!this.haloMesh || !this.selectedEntityId) return;
+
+    let position: THREE.Vector3 | null = null;
+
+    const entityData = this.entitySprites.get(this.selectedEntityId);
+    if (entityData) {
+      position = entityData.sprite.position.clone();
+    } else {
+      const animalData = this.animalSprites.get(this.selectedEntityId);
+      if (animalData) {
+        position = animalData.sprite.position.clone();
+      }
+    }
+
+    if (position) {
+      this.haloMesh.position.set(position.x, position.y + 1.8, position.z);
+      // Gentle rotation animation
+      this.haloMesh.rotation.z += 0.02;
+    } else {
+      // Entity no longer exists - remove halo
+      this.selectedEntityId = null;
+      this.updateHalo();
+    }
+  }
+
   // ============================================================================
   // TERRAIN RENDERING
   // ============================================================================
@@ -467,22 +673,6 @@ export class Renderer3D {
     this.builtTiles.clear();
   }
 
-  /**
-   * Request chunk loading based on 3D camera position.
-   * Uses a larger radius than 2D view since we have fog anyway.
-   */
-  private updateChunkLoading(): void {
-    if (!this.chunkManager) return;
-
-    // Get camera position in world coordinates
-    // In Three.js: X is X, Y is elevation, Z is world Y
-    const cameraTileX = this.camera.position.x;
-    const cameraTileY = this.camera.position.z;
-
-    // Request chunk loading around 3D camera position
-    // The ChunkManager will generate chunks if needed
-    this.chunkManager.updateLoadedChunks(cameraTileX, cameraTileY);
-  }
 
   /**
    * Update terrain around camera position
@@ -1585,9 +1775,6 @@ export class Renderer3D {
       // Update movement
       this.updateMovement(0.016);
 
-      // Request chunk loading based on 3D camera position
-      this.updateChunkLoading();
-
       // Update terrain around camera
       this.updateTerrain();
 
@@ -1611,6 +1798,9 @@ export class Renderer3D {
 
       // Update sprite directions
       this.updateDirectionalSprites();
+
+      // Update selection halo position
+      this.updateHaloPosition();
 
       // Render
       this.renderer.render(this.scene, this.camera);
@@ -1696,6 +1886,13 @@ export class Renderer3D {
     for (const data of this.plantSprites.values()) {
       data.sprite.material.dispose();
       data.texture.dispose();
+    }
+
+    // Dispose halo
+    if (this.haloMesh) {
+      this.haloMesh.geometry.dispose();
+      (this.haloMesh.material as THREE.Material).dispose();
+      this.haloMesh = null;
     }
 
     // Dispose renderer

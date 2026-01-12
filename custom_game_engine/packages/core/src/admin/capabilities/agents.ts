@@ -170,6 +170,43 @@ const agentsCapability = defineCapability({
         return { success: true, message: 'Delegate to /api/actions/trigger-behavior' };
       },
     }),
+
+    defineAction({
+      id: 'trigger-hunt',
+      name: 'Trigger Hunt',
+      description: 'Make an agent hunt a specific animal (dev action for testing hunting system)',
+      params: [
+        { name: 'agentId', type: 'entity-id', required: true, entityType: 'agent', description: 'Agent to initiate hunt' },
+        { name: 'animalId', type: 'entity-id', required: true, entityType: 'animal', description: 'Animal to hunt' },
+      ],
+      handler: async (params, gameClient, context) => {
+        return { success: true, message: 'Delegate to /api/actions/trigger-hunt' };
+      },
+    }),
+
+    defineAction({
+      id: 'trigger-combat',
+      name: 'Trigger Combat',
+      description: 'Make two agents fight each other (dev action for testing combat system)',
+      params: [
+        { name: 'attackerId', type: 'entity-id', required: true, entityType: 'agent', description: 'Attacking agent' },
+        { name: 'defenderId', type: 'entity-id', required: true, entityType: 'agent', description: 'Defending agent' },
+        { name: 'cause', type: 'select', required: false, default: 'honor_duel',
+          options: [
+            { value: 'honor_duel', label: 'Honor Duel' },
+            { value: 'defense', label: 'Self Defense' },
+            { value: 'jealousy_rival', label: 'Jealousy - Rival' },
+            { value: 'territory_dispute', label: 'Territory Dispute' },
+            { value: 'revenge', label: 'Revenge' },
+          ],
+          description: 'Reason for combat'
+        },
+        { name: 'lethal', type: 'boolean', required: false, default: false, description: 'Is combat lethal?' },
+      ],
+      handler: async (params, gameClient, context) => {
+        return { success: true, message: 'Delegate to /api/actions/trigger-combat' };
+      },
+    }),
   ],
 });
 

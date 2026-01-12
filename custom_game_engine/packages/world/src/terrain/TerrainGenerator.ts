@@ -193,10 +193,27 @@ export class TerrainGenerator {
           }
         }
 
-        // Also place rocks in sand/beach areas (new - for better resource distribution)
+        // Place rocks in sand/beach areas
         if (tile.terrain === 'sand' && placementValue < 0) {
           if (Math.random() > 0.9) {
             // 10% chance for rocks on beaches
+            createRock(world, worldX, worldY);
+          }
+        }
+
+        // Place rocks in desert biome (more common - deserts have scattered rocks)
+        if (tile.biome === 'desert') {
+          if (Math.random() > 0.75) {
+            // 25% chance for rocks in desert
+            createRock(world, worldX, worldY);
+          }
+        }
+
+        // Scatter some rocks near spawn point (within ~30 tiles of origin) for early game
+        const distFromOrigin = Math.sqrt(worldX * worldX + worldY * worldY);
+        if (distFromOrigin < 30 && tile.terrain === 'grass') {
+          if (Math.random() > 0.95) {
+            // 5% chance for rocks on grass near spawn
             createRock(world, worldX, worldY);
           }
         }

@@ -134,17 +134,16 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
-      // If using WebGL, should cleanup context
-      const context = canvas.getContext('webgl') || canvas.getContext('webgl2');
-
-      if (context && typeof (renderer as any).destroy === 'function') {
+      // Renderer uses 2D context, but has a 3D renderer instance that may be created
+      // The destroy() method should clean up the 3D renderer if it exists
+      expect(() => {
         (renderer as any).destroy();
+      }).not.toThrow();
 
-        // Verify cleanup was attempted
-        // Note: Actual WebGL cleanup verification is complex,
-        // but destroy() should handle it
-        expect(true).toBe(true);
-      }
+      // Verify renderer3D is cleaned up
+      expect((renderer as any).renderer3D).toBeNull();
+      expect((renderer as any).was3DActive).toBe(false);
+      expect((renderer as any).current3DWorld).toBeNull();
     });
   });
 

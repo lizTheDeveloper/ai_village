@@ -18,10 +18,12 @@ export * from './SoilSystem.js';
 export * from './TimeSystem.js';
 export * from './StateMutatorSystem.js'; // Batched vector updates for performance
 export * from './SleepSystem.js';
-export * from './PlantSystem.js';
-export * from './PlantDiscoverySystem.js';
-export * from './WildPlantPopulationSystem.js';
-export * from './PlantDiseaseSystem.js';
+// Plant systems have been moved to @ai-village/botany package
+// Import from '@ai-village/botany' instead:
+// - PlantSystem
+// - PlantDiscoverySystem
+// - WildPlantPopulationSystem
+// - PlantDiseaseSystem
 export * from './AnimalSystem.js';
 export * from './AnimalProductionSystem.js';
 export * from './TamingSystem.js';
@@ -155,6 +157,7 @@ export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
 export * from './CanonEventDetector.js';
 export * from './CheckpointRetentionPolicy.js';
+export * from './SnapshotDecayPolicy.js';
 export * from './CanonEventDescriptions.js';
 // Combat & Security Systems
 export * from './AgentCombatSystem.js';
@@ -214,6 +217,9 @@ export { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 export * from './CrossRealmPhoneSystem.js';
 export { CrossRealmPhoneSystem, createCrossRealmPhoneSystem } from './CrossRealmPhoneSystem.js';
 export type { CrossRealmPhoneSystemConfig } from './CrossRealmPhoneSystem.js';
+
+// Chunk Loading System - Terrain generation as ECS system
+export * from './ChunkLoadingSystem.js';
 
 // Centralized system registration
 export {

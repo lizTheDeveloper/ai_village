@@ -10,8 +10,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MagicLawEnforcer } from '../MagicLawEnforcer.js';
 import { SpellCastingService } from '../SpellCastingService.js';
-import { costCalculatorRegistry } from '@ai-village/core';
-import { registerAllCostCalculators } from '@ai-village/core';
+import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';
+import { registerAllCostCalculators } from '../costs/index.js';
 import { ACADEMIC_PARADIGM } from '../CoreParadigms.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 import type { SpellDefinition } from '../SpellRegistry.js';
@@ -92,6 +92,7 @@ describe('Cost System Integration', () => {
         activeEffects: [],
         techniqueProficiency: {},
         formProficiency: {},
+        paradigmState: {},
       };
 
       // Create a simple test spell
@@ -110,6 +111,16 @@ describe('Cost System Integration', () => {
 
     it('should use cost calculator to calculate costs', () => {
       const result = enforcer.validateSpell(spell, caster);
+
+      // Debug: Log result to see what's happening
+      if (result.costs.length === 0) {
+        console.log('Result:', JSON.stringify({
+          valid: result.valid,
+          errors: result.errors,
+          warnings: result.warnings,
+          costs: result.costs,
+        }, null, 2));
+      }
 
       // Should have calculated costs (mana + stamina for academic paradigm)
       expect(result.costs.length).toBeGreaterThan(0);

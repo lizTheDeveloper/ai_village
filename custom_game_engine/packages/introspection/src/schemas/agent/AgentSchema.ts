@@ -201,6 +201,192 @@ export const AgentSchema = autoRegister(
           order: 8,
         },
       },
+
+      // Behavior Queue System - exposed for dev tools
+      behaviorQueue: {
+        type: 'array',
+        itemType: 'object',
+        required: false,
+        description: 'Queue of behaviors to execute sequentially',
+        displayName: 'Behavior Queue',
+        visibility: {
+          player: true,  // Players can see queued actions
+          llm: true,     // LLM should know what's queued
+          agent: true,   // Agent knows their queue
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'json',
+          group: 'queue',
+          order: 10,
+        },
+        mutable: true,
+      },
+
+      currentQueueIndex: {
+        type: 'number',
+        required: false,
+        description: 'Index of currently executing queued behavior',
+        displayName: 'Queue Index',
+        visibility: {
+          player: false,
+          llm: false,
+          agent: false,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'number',
+          group: 'queue',
+          order: 11,
+        },
+      },
+
+      queuePaused: {
+        type: 'boolean',
+        required: false,
+        description: 'Whether queue processing is paused',
+        displayName: 'Queue Paused',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'checkbox',
+          group: 'queue',
+          order: 12,
+        },
+        mutable: true,
+      },
+
+      queueInterruptedBy: {
+        type: 'string',
+        required: false,
+        description: 'Behavior that interrupted the queue',
+        displayName: 'Interrupted By',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'text',
+          group: 'queue',
+          order: 13,
+        },
+      },
+
+      // Planned Builds
+      plannedBuilds: {
+        type: 'array',
+        itemType: 'object',
+        required: false,
+        description: 'Buildings the agent intends to construct',
+        displayName: 'Planned Builds',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'json',
+          group: 'planning',
+          order: 14,
+        },
+        mutable: true,
+      },
+
+      // Governance & Social Hierarchy
+      titles: {
+        type: 'array',
+        itemType: 'string',
+        required: false,
+        description: 'Noble/leadership titles this agent holds',
+        displayName: 'Titles',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'json',
+          group: 'governance',
+          order: 15,
+        },
+        mutable: true,
+      },
+
+      allegiance: {
+        type: 'string',
+        required: false,
+        description: 'Entity ID of noble/leader this agent serves',
+        displayName: 'Allegiance',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'text',
+          group: 'governance',
+          order: 16,
+        },
+        mutable: true,
+      },
+
+      guilds: {
+        type: 'array',
+        itemType: 'string',
+        required: false,
+        description: 'Guild memberships',
+        displayName: 'Guilds',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'json',
+          group: 'governance',
+          order: 17,
+        },
+        mutable: true,
+      },
+
+      activeMandates: {
+        type: 'array',
+        itemType: 'object',
+        required: false,
+        description: 'Active mandates this agent must fulfill',
+        displayName: 'Active Mandates',
+        visibility: {
+          player: true,
+          llm: true,
+          agent: true,
+          user: false,
+          dev: true,
+        },
+        ui: {
+          widget: 'json',
+          group: 'governance',
+          order: 18,
+        },
+        mutable: true,
+      },
     },
 
     ui: {

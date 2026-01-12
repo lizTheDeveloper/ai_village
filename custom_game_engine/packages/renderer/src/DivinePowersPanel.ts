@@ -30,6 +30,12 @@ interface DivinePower {
   targetType: 'self' | 'believer' | 'anyone' | 'location' | 'object' | 'group';
 }
 
+interface BelieverInfo {
+  id: string;
+  name: string;
+  faith: number;
+}
+
 interface DeityState {
   belief: number;
   beliefPerHour: number;
@@ -37,6 +43,7 @@ interface DeityState {
   totalEarned: number;
   totalSpent: number;
   believerCount: number;
+  believerList: BelieverInfo[];  // List of believers with names and faith
   angelCount: number;
   pendingPrayers: number;
   domains: Record<string, number>;
@@ -85,7 +92,7 @@ const SIZES = {
   lineHeight: 18,
   headerHeight: 36,
   beliefBarHeight: 40,
-  statsHeight: 60,
+  statsHeight: 140, // Increased to show believer list
   filterHeight: 28,
   powerRowHeight: 56,
   detailHeight: 120,
@@ -142,6 +149,7 @@ export class DivinePowersPanel implements IWindowPanel {
     totalEarned: 0,
     totalSpent: 0,
     believerCount: 0,
+    believerList: [],
     angelCount: 0,
     pendingPrayers: 0,
     domains: {},
@@ -173,10 +181,29 @@ export class DivinePowersPanel implements IWindowPanel {
         const ticksPerHour = 72000;
         const beliefPerTick = deityComp.belief?.beliefPerTick ?? 0;
 
-        // Count believers (Set has .size, not .length)
-        const believerCount = deityComp.believers instanceof Set
-          ? deityComp.believers.size
-          : (Array.isArray(deityComp.believers) ? deityComp.believers.length : 0);
+        // Count believers and get their info (Set has .size, not .length)
+        const believerIds: string[] = deityComp.believers instanceof Set
+          ? Array.from(deityComp.believers)
+          : (Array.isArray(deityComp.believers) ? deityComp.believers : []);
+
+        const believerCount = believerIds.length;
+
+        // Get believer names and faith levels
+        const believerList: BelieverInfo[] = [];
+        for (const believerId of believerIds) {
+          const believerEntity = world.entities.get(believerId);
+          if (believerEntity) {
+            const identity = believerEntity.components?.get('identity') as any;
+            const spiritual = believerEntity.components?.get('spiritual') as any;
+            believerList.push({
+              id: believerId,
+              name: identity?.name || 'Unknown',
+              faith: spiritual?.faith ?? 0,
+            });
+          }
+        }
+        // Sort by faith (highest first)
+        believerList.sort((a, b) => b.faith - a.faith);
 
         // Build domains from identity
         const domains: Record<string, number> = {};
@@ -196,6 +223,7 @@ export class DivinePowersPanel implements IWindowPanel {
           totalEarned: deityComp.belief?.totalBeliefEarned ?? 0,
           totalSpent: deityComp.belief?.totalBeliefSpent ?? 0,
           believerCount,
+          believerList,
           angelCount: 0, // TODO: Track angels separately
           pendingPrayers: deityComp.prayerQueue?.length ?? 0,
           domains,
@@ -219,6 +247,7 @@ export class DivinePowersPanel implements IWindowPanel {
       totalEarned: 0,
       totalSpent: 0,
       believerCount: 0,
+      believerList: [],
       angelCount: 0,
       pendingPrayers: 0,
       domains: {},
@@ -387,12 +416,12 @@ export class DivinePowersPanel implements IWindowPanel {
       }
     }
 
-    // Belief text
+    // Belief text - rounded to 1 decimal place
     ctx.fillStyle = COLORS.text;
     ctx.font = 'bold 11px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `BELIEF: ${Math.floor(this.deityState.belief)} (+${this.deityState.beliefPerHour}/hr)`,
+      `BELIEF: ${this.deityState.belief.toFixed(1)} (+${this.deityState.beliefPerHour.toFixed(1)}/hr)`,
       width / 2,
       y + 11
     );
@@ -411,7 +440,7 @@ export class DivinePowersPanel implements IWindowPanel {
     return y + SIZES.beliefBarHeight;
   }
 
-  private renderStats(ctx: CanvasRenderingContext2D, _width: number, y: number): number {
+  private renderStats(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = '10px monospace';
 
@@ -427,8 +456,42 @@ export class DivinePowersPanel implements IWindowPanel {
       x += ctx.measureText(stat).width + 20;
     }
 
+    // Show who is believing (believer names with faith levels)
+    y += 18;
+    if (this.deityState.believerList.length > 0) {
+      ctx.fillStyle = COLORS.belief;
+      ctx.fillText('Who believes:', SIZES.padding, y + 4);
+
+      y += 14;
+      ctx.font = '9px monospace';
+      const maxBelieversToShow = 5;
+      const displayBelievers = this.deityState.believerList.slice(0, maxBelieversToShow);
+
+      for (const believer of displayBelievers) {
+        // Faith bar
+        const faithPercent = Math.round(believer.faith * 100);
+        const faithColor = faithPercent >= 80 ? '#FFD700' : faithPercent >= 50 ? '#87CEEB' : '#888888';
+
+        ctx.fillStyle = faithColor;
+        ctx.fillText(`  ${believer.name} (${faithPercent}% faith)`, SIZES.padding, y + 4);
+        y += 12;
+      }
+
+      if (this.deityState.believerList.length > maxBelieversToShow) {
+        ctx.fillStyle = COLORS.textDim;
+        ctx.fillText(`  ...and ${this.deityState.believerList.length - maxBelieversToShow} more`, SIZES.padding, y + 4);
+        y += 12;
+      }
+
+      ctx.font = '10px monospace';
+    } else {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.fillText('No believers yet', SIZES.padding, y + 4);
+      y += 14;
+    }
+
     // Domains
-    y += 20;
+    y += 6;
     ctx.fillStyle = COLORS.textDim;
     ctx.fillText('Domains:', SIZES.padding, y + 4);
 

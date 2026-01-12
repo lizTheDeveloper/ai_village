@@ -37,6 +37,7 @@ const BEHAVIOR_PRIORITIES: Record<string, BehaviorPriorityConfig> = {
 
   // Danger level (80-99)
   seek_warmth: { base: 35, canBeInterrupted: true, interruptsOthers: true }, // Base is moderate, elevated by temperature
+  seek_cooling: { base: 35, canBeInterrupted: true, interruptsOthers: true }, // Base is moderate, elevated by temperature
   seek_food: { base: 40, canBeInterrupted: true, interruptsOthers: true },
   seek_water: { base: 38, canBeInterrupted: true, interruptsOthers: true },
   seek_shelter: { base: 36, canBeInterrupted: true, interruptsOthers: true },
@@ -91,8 +92,15 @@ export function getBehaviorPriority(
 
   // Context-aware adjustments
   if (behavior === 'seek_warmth' && temperature) {
-    // Check if dangerously cold/hot vs just uncomfortable
-    if (temperature.state === 'dangerously_cold' || temperature.state === 'dangerously_hot') {
+    // Elevate priority when dangerously cold
+    if (temperature.state === 'dangerously_cold') {
+      priority = 90;
+    }
+  }
+
+  if (behavior === 'seek_cooling' && temperature) {
+    // Elevate priority when dangerously hot (e.g., standing in campfire)
+    if (temperature.state === 'dangerously_hot') {
       priority = 90;
     }
   }

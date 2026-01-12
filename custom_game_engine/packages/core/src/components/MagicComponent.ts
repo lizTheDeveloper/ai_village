@@ -12,6 +12,7 @@
 
 import type { Component } from '../ecs/Component.js';
 import type { ParadigmAdaptation, MagicCostType } from '../magic/MagicParadigm.js';
+import type { CastingState } from '../systems/CastingState.js';
 
 // ============================================================================
 // Magic Source System
@@ -175,6 +176,9 @@ export interface MagicComponent extends Component {
 
   /** Cast progress (0-1) */
   castProgress?: number;
+
+  /** Active casting state (null if not casting) */
+  castingState?: CastingState | null;
 
   /** Magic source this entity is most attuned to */
   primarySource?: MagicSourceId;

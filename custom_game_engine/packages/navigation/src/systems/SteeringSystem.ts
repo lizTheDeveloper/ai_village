@@ -200,8 +200,8 @@ export class SteeringSystem implements System {
       y: steering.target.y - position.y,
     };
 
-    const distance = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
-    if (distance === 0) return { x: 0, y: 0 };
+    const distanceSquared = desired.x * desired.x + desired.y * desired.y;
+    if (distanceSquared === 0) return { x: 0, y: 0 };
 
     // Stuck detection: Check if agent is making progress toward target
     if (entityId) {
@@ -219,9 +219,9 @@ export class SteeringSystem implements System {
         // Check if position changed significantly (moved at least 0.5 tiles)
         const dx = position.x - tracker.lastPos.x;
         const dy = position.y - tracker.lastPos.y;
-        const moved = Math.sqrt(dx * dx + dy * dy);
+        const movedSquared = dx * dx + dy * dy;
 
-        if (moved > 0.5) {
+        if (movedSquared > 0.25) { // 0.5² = 0.25
           // Made progress, reset stuck timer
           tracker.lastPos = { x: position.x, y: position.y };
           tracker.stuckTime = now;
@@ -235,8 +235,9 @@ export class SteeringSystem implements System {
       }
     }
 
-    // Dead zone - prevent micro-adjustments when very close
-    if (distance < steering.deadZone) {
+    // Dead zone - prevent micro-adjustments when very close (use squared comparison)
+    const deadZoneSquared = steering.deadZone * steering.deadZone;
+    if (distanceSquared < deadZoneSquared) {
       // Within dead zone - apply proportional braking that decays velocity smoothly
       // Using velocity dampening instead of hard negative force to prevent oscillation
       // This returns a force that will zero velocity over ~2-3 frames
@@ -246,11 +247,15 @@ export class SteeringSystem implements System {
     // Check if already stopped and within tolerance (use squared comparison)
     const speedSquared = velocity.vx * velocity.vx + velocity.vy * velocity.vy;
     const arrivalTolerance = steering.arrivalTolerance ?? 1.0;
+    const arrivalToleranceSquared = arrivalTolerance * arrivalTolerance;
 
-    if (distance < arrivalTolerance && speedSquared < 0.01) { // 0.1 * 0.1 = 0.01
+    if (distanceSquared < arrivalToleranceSquared && speedSquared < 0.01) { // 0.1 * 0.1 = 0.01
       // Already stopped and close enough - apply gentle brake
       return { x: -velocity.vx, y: -velocity.vy };
     }
+
+    // Compute actual distance only when needed for normalization
+    const distance = Math.sqrt(distanceSquared);
 
     // Slow down within slowing radius
     const slowingRadius = steering.slowingRadius ?? 5.0;

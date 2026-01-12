@@ -113,7 +113,23 @@ function listWorkOrders(): { workOrders: string[], error?: string } {
 
     const entries = fs.readdirSync(WORK_ORDERS_PATH, { withFileTypes: true });
     const workOrders = entries
-      .filter(e => e.isDirectory() && !e.name.startsWith('_') && !e.name.startsWith('.'))
+      .filter(e => {
+        if (!e.isDirectory() || e.name.startsWith('_') || e.name.startsWith('.')) {
+          return false;
+        }
+
+        // Filter out completed work orders (those with completion marker files)
+        const workOrderPath = path.join(WORK_ORDERS_PATH, e.name);
+        const files = fs.readdirSync(workOrderPath);
+
+        // Check for completion markers (case-insensitive)
+        const hasCompletionMarker = files.some(f => {
+          const lower = f.toLowerCase();
+          return lower.includes('complete') && lower.endsWith('.md');
+        });
+
+        return !hasCompletionMarker;
+      })
       .map(e => e.name)
       .sort();
 

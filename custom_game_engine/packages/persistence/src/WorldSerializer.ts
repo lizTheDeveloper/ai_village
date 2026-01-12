@@ -241,6 +241,9 @@ export class WorldSerializer {
 
     // Deserialize all components
     for (const componentData of data.components) {
+      // Skip llm_history component (in-memory only, not persisted - may exist in old saves)
+      if (componentData.type === 'llm_history') continue;
+
       try {
         const component = componentSerializerRegistry.deserialize(componentData) as Component;
         (entity as any).addComponent(component);

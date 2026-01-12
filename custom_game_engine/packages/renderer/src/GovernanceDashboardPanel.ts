@@ -21,6 +21,17 @@ import type {
   AgentComponent,
 } from '@ai-village/core';
 
+interface IWorld {
+  query(): {
+    with(...components: string[]): {
+      executeEntities(): ReadonlyArray<{
+        readonly id: string;
+        getComponent(type: string): any;
+      }>;
+    };
+  };
+}
+
 interface PopulationWelfareData {
   healthy: number;
   struggling: number;
@@ -109,7 +120,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
     this.visible = visible;
   }
 
-  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: IWorld): void {
     const x = 0;
     const y = 0;
     const headerHeight = 30;
@@ -133,6 +144,13 @@ export class GovernanceDashboardPanel implements IWindowPanel {
     }
 
     currentY += headerHeight;
+
+    // Guard against missing world
+    if (!world) {
+      ctx.fillStyle = '#888888';
+      ctx.fillText('No world data available', x + this.padding, currentY);
+      return;
+    }
 
     // Check if Town Hall exists
     const hasTownHall = this.hasBuilding(world, 'town_hall');
@@ -272,7 +290,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render population section from Town Hall data.
    */
-  private renderPopulationSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderPopulationSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getPopulationWelfareData(world);
 
     // Section title
@@ -317,7 +335,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render demographics section from Census Bureau data.
    */
-  private renderDemographicsSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderDemographicsSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getDemographicsData(world);
 
     if (!data) {
@@ -381,7 +399,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render health section from Health Clinic data.
    */
-  private renderHealthSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderHealthSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getHealthData(world);
 
     if (!data) {
@@ -430,7 +448,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render resource sustainability section from Granary data.
    */
-  private renderResourceSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderResourceSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getResourceData(world);
 
     if (!data) {
@@ -479,7 +497,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render social stability section from Meeting Hall data.
    */
-  private renderSocialSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderSocialSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getSocialData(world);
 
     if (!data) {
@@ -523,7 +541,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render threat monitoring section from Watchtower + Weather Station data.
    */
-  private renderThreatSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderThreatSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getThreatData(world);
 
     if (!data) {
@@ -569,7 +587,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Render productivity section from Labor Guild data.
    */
-  private renderProductivitySection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
+  private renderProductivitySection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: IWorld): number {
     const data = this.getProductivityData(world);
 
     if (!data) {
@@ -612,7 +630,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Check if a specific building type exists and is complete.
    */
-  private hasBuilding(world: World, componentType: string): boolean {
+  private hasBuilding(world: IWorld, componentType: string): boolean {
     if (!world || typeof world.query !== 'function') {
       return false;
     }
@@ -634,7 +652,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get population welfare data from Town Hall.
    */
-  private getPopulationWelfareData(world: World): PopulationWelfareData {
+  private getPopulationWelfareData(world: IWorld): PopulationWelfareData {
     if (!world || typeof world.query !== 'function') {
       return { healthy: 0, struggling: 0, critical: 0, totalPopulation: 0 };
     }
@@ -677,7 +695,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get demographics data from Census Bureau.
    */
-  private getDemographicsData(world: World): DemographicsData | null {
+  private getDemographicsData(world: IWorld): DemographicsData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -711,7 +729,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get health data from Health Clinic.
    */
-  private getHealthData(world: World): HealthData | null {
+  private getHealthData(world: IWorld): HealthData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -742,7 +760,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get resource data from Granary + actual stockpiles.
    */
-  private getResourceData(world: World): ResourceData | null {
+  private getResourceData(world: IWorld): ResourceData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -804,7 +822,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get social stability data from Meeting Hall + relationships.
    */
-  private getSocialData(world: World): SocialData | null {
+  private getSocialData(world: IWorld): SocialData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -860,7 +878,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get threat monitoring data from Watchtower + Weather Station.
    */
-  private getThreatData(world: World): ThreatData | null {
+  private getThreatData(world: IWorld): ThreatData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -908,7 +926,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
   /**
    * Get productivity data from Labor Guild + agent states.
    */
-  private getProductivityData(world: World): ProductivityData | null {
+  private getProductivityData(world: IWorld): ProductivityData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }

@@ -27,6 +27,15 @@ import {
 } from './appliers/ControlEffectApplier.js';
 import { SummonEffectApplier } from './appliers/SummonEffectApplier.js';
 import { TransformEffectApplier } from './appliers/TransformEffectApplier.js';
+import { CreationEffectApplier } from './appliers/CreationEffectApplier.js';
+import { DispelEffectApplier } from './appliers/DispelEffectApplier.js';
+import { PerceptionEffectApplier } from './appliers/PerceptionEffectApplier.js';
+import { MentalEffectApplier } from './appliers/MentalEffectApplier.js';
+import { TemporalEffectApplier } from './appliers/TemporalEffectApplier.js';
+import { TeleportEffectApplier } from './appliers/TeleportEffectApplier.js';
+import { EnvironmentalEffectApplier } from './appliers/EnvironmentalEffectApplier.js';
+import { SoulEffectApplier } from './appliers/SoulEffectApplier.js';
+import { ParadigmEffectApplier } from './appliers/ParadigmEffectApplier.js';
 
 // ============================================================================
 // Damage Applier
@@ -215,7 +224,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     effect: ProtectionEffect,
     caster: Entity,
     target: Entity,
-    _world: World,
+    world: World,
     context: EffectContext
   ): EffectApplicationResult {
     const absorptionValue = context.scaledValues.get('absorption');
@@ -236,19 +245,15 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     const finalAbsorption = absorptionValue.value * context.powerMultiplier;
 
     // Apply shield/ward to target's magic component
-    const magic = target.components.get('magic') as any;
+    // Create magic component if it doesn't exist (defensive programming)
+    let magic = target.components.get('magic') as any;
     if (!magic) {
-      return {
-        success: false,
-        effectId: effect.id,
-        targetId: target.id,
-        appliedValues: {},
-        resisted: false,
-        error: 'Target has no magic component to receive protection',
-        appliedAt: context.tick,
-        casterId: caster.id,
-        spellId: context.spell.id,
+      magic = {
+        type: 'magic',
+        protectionShields: [],
+        activeEffects: [],
       };
+      world.addComponent(target.id, magic);
     }
 
     // Store protection shield data
@@ -352,12 +357,30 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
 export function registerStandardAppliers(): void {
   const executor = SpellEffectExecutor.getInstance();
 
-  executor.registerApplier(new DamageEffectApplier());
-  executor.registerApplier(new HealingEffectApplier());
-  executor.registerApplier(new ProtectionEffectApplier());
-  executor.registerApplier(new BuffEffectApplier());
-  executor.registerApplier(new DebuffEffectApplier());
-  executor.registerApplier(new ControlEffectApplier());
-  executor.registerApplier(new SummonEffectApplier());
-  executor.registerApplier(new TransformEffectApplier());
+  // Make idempotent - only register if not already registered
+  const appliers = [
+    new DamageEffectApplier(),
+    new HealingEffectApplier(),
+    new ProtectionEffectApplier(),
+    new BuffEffectApplier(),
+    new DebuffEffectApplier(),
+    new ControlEffectApplier(),
+    new SummonEffectApplier(),
+    new TransformEffectApplier(),
+    new CreationEffectApplier(),
+    DispelEffectApplier,
+    new PerceptionEffectApplier(),
+    MentalEffectApplier,
+    new TemporalEffectApplier(),
+    TeleportEffectApplier,
+    EnvironmentalEffectApplier,
+    new SoulEffectApplier(),
+    new ParadigmEffectApplier(),
+  ];
+
+  for (const applier of appliers) {
+    if (!executor.hasApplier(applier.category)) {
+      executor.registerApplier(applier as any);
+    }
+  }
 }

@@ -714,9 +714,9 @@ export class AgentCombatSystem implements System {
         if (pos) {
           const dx = pos.x - attackerPos.x;
           const dy = pos.y - attackerPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const distanceSquared = dx * dx + dy * dy;
 
-          if (distance < 20) {
+          if (distanceSquared < 20 * 20) {
             const agent = world.getComponent<AgentComponent>(entity.id, 'agent');
             witnesses.push({
               id: entity.id,
@@ -775,9 +775,9 @@ export class AgentCombatSystem implements System {
 
       const dx = pos.x - attackerPos.x;
       const dy = pos.y - attackerPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < 20) {
+      if (distanceSquared < 20 * 20) {
         const witnessImpl = witness as EntityImpl;
 
         // Judge the attacker based on cause

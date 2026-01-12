@@ -1,0 +1,144 @@
+==============================================================================
+QUICK FIX FOR CORRUPTED SOULS WITH <think> TAGS
+==============================================================================
+
+STEP 1: Make sure game is loaded
+---------------------------------
+Open http://localhost:3000/game.html in your browser
+Either load an existing save OR start a new game
+
+STEP 2: Open DevTools Console
+---------------------------------
+Press F12, go to Console tab
+
+STEP 3: Paste this ENTIRE block and press Enter
+---------------------------------
+
+(async function fixAllCorruptedSoulsNow() {
+  console.log('🔍 Finding corrupted souls in all saves...\n');
+
+  const dbRequest = indexedDB.open('ai-village-saves', 1);
+
+  dbRequest.onsuccess = async (event) => {
+    const db = event.target.result;
+    const tx = db.transaction('saves', 'readwrite');
+    const store = tx.objectStore('saves');
+    const getAllRequest = store.getAll();
+
+    getAllRequest.onsuccess = async () => {
+      const saves = getAllRequest.result;
+      console.log(`Found ${saves.length} saves\n`);
+
+      let totalCorrupted = 0;
+      let totalFixed = 0;
+
+      for (const save of saves) {
+        const key = save.key || save.metadata?.name || 'unknown';
+        console.log(`\n📦 ${key}`);
+
+        if (!save.data?.world?.entities) {
+          console.log('   ⚠️  No entities');
+          continue;
+        }
+
+        let fixedInSave = 0;
+        const corruptedNames = [];
+
+        for (const entity of save.data.world.entities) {
+          if (!entity.components?.soul_creation_event) continue;
+
+          const event = entity.components.soul_creation_event;
+          const name = entity.components?.soul_identity?.true_name || 'Unknown';
+          let wasCorrupted = false;
+
+          // Fix statements with <think> tags
+          if (event.creationDebate?.statements) {
+            for (const stmt of event.creationDebate.statements) {
+              if (stmt.statement?.includes('<think>')) {
+                stmt.statement = stmt.statement.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+                wasCorrupted = true;
+                fixedInSave++;
+              }
+            }
+          }
+
+          // Fix transcript thoughts
+          if (event.conversationTranscript) {
+            for (const ex of event.conversationTranscript) {
+              if (ex.thoughts) {
+                delete ex.thoughts;
+                wasCorrupted = true;
+                fixedInSave++;
+              }
+            }
+          }
+
+          if (wasCorrupted) {
+            corruptedNames.push(name);
+            totalCorrupted++;
+
+            // Mark as fixed
+            if (!entity.components.corruption_history) {
+              entity.components.corruption_history = { corruptions: [] };
+            }
+            entity.components.corruption_history.corruptions.push({
+              type: 'thinking_data_removed',
+              cleaned_at: Date.now(),
+              cleaner: 'quick_fix_script'
+            });
+          }
+        }
+
+        if (fixedInSave > 0) {
+          console.log(`   ⚠️  ${corruptedNames.length} corrupted: ${corruptedNames.join(', ')}`);
+          console.log(`   🔧 ${fixedInSave} fixes applied`);
+
+          // Save back
+          const putRequest = store.put(save);
+          putRequest.onsuccess = () => {
+            console.log(`   ✅ Saved!`);
+          };
+          totalFixed += fixedInSave;
+        } else {
+          console.log(`   ✅ Clean`);
+        }
+      }
+
+      console.log('\n' + '='.repeat(60));
+      console.log(`TOTAL: ${totalCorrupted} corrupted souls, ${totalFixed} fixes applied`);
+      console.log('='.repeat(60) + '\n');
+
+      if (totalFixed > 0) {
+        console.log('✅ All corrupted souls fixed and saved!\n');
+      } else {
+        console.log('✅ No corrupted souls found!\n');
+      }
+
+      db.close();
+    };
+
+    getAllRequest.onerror = () => {
+      console.error('❌ Failed to read saves');
+      db.close();
+    };
+  };
+
+  dbRequest.onerror = () => {
+    console.error('❌ Failed to open IndexedDB');
+  };
+})();
+
+---------------------------------
+END OF SCRIPT
+---------------------------------
+
+This will automatically:
+✅ Scan ALL saves in your IndexedDB
+✅ Find souls with <think> tags or thoughts fields
+✅ Strip the corrupted thinking data
+✅ Add corruption_history (Conservation of Game Matter)
+✅ Save everything back
+
+No manual steps needed - just paste and run!
+
+==============================================================================

@@ -19,7 +19,7 @@ import { MovementSystem } from '../systems/MovementSystem.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { DoorSystem } from '../systems/DoorSystem.js';
 import { AnimalSystem } from '../systems/AnimalSystem.js';
-import { PlantSystem } from '../systems/PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { SimulationScheduler } from '../ecs/SimulationScheduler.js';
 
 /**

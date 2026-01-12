@@ -70,7 +70,33 @@ export class UniverseConfigScreen {
   private container: HTMLElement;
   private selectedScenario: string = 'cooperative-survival';
   private customScenarioText: string = '';
-  private currentStep: 'magic' | 'scenario' | 'souls' = 'magic';  // Magic → scenario → souls
+  private currentStep: 'magic' | 'scenario' | 'naming' | 'souls' = 'magic';  // Magic → scenario → naming → souls
+  private universeName: string = '';
+  private fateSuffix: string = '';
+
+  // Poetic suffixes the Fates might add to universe names
+  private static readonly FATE_SUFFIXES = [
+    'of the Eternal Dawn',
+    'where Stars Remember',
+    'of Whispered Dreams',
+    'beneath the Silver Moon',
+    'of the Wandering Souls',
+    'where Time Dances',
+    'of the Sacred Flame',
+    'where Shadows Sing',
+    'of the Awakened Heart',
+    'beneath the Veil',
+    'of the First Light',
+    'where Rivers Meet',
+    'of the Bound Fates',
+    'where Mountains Dream',
+    'of the Endless Sky',
+    'beneath the Ancient Oak',
+    'of the Silent Watch',
+    'where Echoes Linger',
+    'of the Burning Path',
+    'where Hope Blooms',
+  ];
   private _onCreate: ((config: UniverseConfig) => void) | null = null;
   private pendingConfig: UniverseConfig | null = null;
 
@@ -133,26 +159,32 @@ export class UniverseConfigScreen {
 
     // Step indicator
     const stepIndicator = document.createElement('div');
-    stepIndicator.style.cssText = 'display: flex; gap: 20px; justify-content: center; margin-bottom: 20px;';
+    stepIndicator.style.cssText = 'display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;';
 
     const step1 = document.createElement('div');
-    step1.textContent = '1. Choose Magic System';
-    step1.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'magic' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'magic' ? '#fff' : '#888'};`;
+    step1.textContent = '1. Magic System';
+    step1.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'magic' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'magic' ? '#fff' : '#888'};`;
     step1.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
     const step2 = document.createElement('div');
-    step2.textContent = '2. Choose Your Story';
-    step2.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};`;
+    step2.textContent = '2. Your Story';
+    step2.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};`;
     step2.onclick = () => { this.currentStep = 'scenario'; this.render(); };
 
     const step3 = document.createElement('div');
-    step3.textContent = '3. Soul Ceremonies';
-    step3.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'souls' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'souls' ? '#fff' : '#888'};`;
-    step3.onclick = () => { if (this.pendingConfig) { this.currentStep = 'souls'; this.render(); } };
+    step3.textContent = '3. Name Your Universe';
+    step3.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'naming' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'naming' ? '#fff' : '#888'};`;
+    step3.onclick = () => { this.currentStep = 'naming'; this.render(); };
+
+    const step4 = document.createElement('div');
+    step4.textContent = '4. Soul Ceremonies';
+    step4.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'souls' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'souls' ? '#fff' : '#888'};`;
+    step4.onclick = () => { if (this.pendingConfig) { this.currentStep = 'souls'; this.render(); } };
 
     stepIndicator.appendChild(step1);
     stepIndicator.appendChild(step2);
     stepIndicator.appendChild(step3);
+    stepIndicator.appendChild(step4);
     this.container.appendChild(stepIndicator);
 
     const title = document.createElement('h1');
@@ -164,6 +196,8 @@ export class UniverseConfigScreen {
       this.renderMagicStep();
     } else if (this.currentStep === 'scenario') {
       this.renderScenarioStep();
+    } else if (this.currentStep === 'naming') {
+      this.renderNamingStep();
     } else {
       this.renderSoulsStep();
     }
@@ -213,15 +247,218 @@ export class UniverseConfigScreen {
     backButton.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
     const createButton = document.createElement('button');
-    createButton.textContent = 'Next: Soul Ceremonies';
+    createButton.textContent = 'Next: Name Your Universe';
     createButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
     createButton.onclick = () => {
+      this.currentStep = 'naming';
+      this.render();
+    };
+
+    buttonContainer.appendChild(backButton);
+    buttonContainer.appendChild(createButton);
+    this.container.appendChild(buttonContainer);
+  }
+
+  private renderNamingStep(): void {
+    const spectrum = this.getCurrentSpectrum();
+    const effects = resolveSpectrum(spectrum);
+    const presetInfo = this.getSpectrumPresetInfo(this.selectedSpectrumPreset);
+    const scenarioPreset = SCENARIO_PRESETS.find(s => s.id === this.selectedScenario);
+
+    // Summary of previous choices
+    const summary = document.createElement('div');
+    summary.style.cssText = 'display: flex; gap: 15px; max-width: 800px; margin-bottom: 30px;';
+
+    const magicSummary = document.createElement('div');
+    magicSummary.style.cssText = 'flex: 1; background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 12px;';
+    magicSummary.innerHTML = `
+      <div style="color: #4CAF50; font-size: 11px; margin-bottom: 3px;">MAGIC</div>
+      <div style="color: #fff; font-size: 14px;">${this.showAdvancedSpectrum ? 'Custom' : presetInfo.icon + ' ' + presetInfo.name}</div>
+    `;
+
+    const scenarioSummary = document.createElement('div');
+    scenarioSummary.style.cssText = 'flex: 1; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
+    scenarioSummary.innerHTML = `
+      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">STORY</div>
+      <div style="color: #fff; font-size: 14px;">${scenarioPreset?.name || 'Unknown'}</div>
+    `;
+
+    summary.appendChild(magicSummary);
+    summary.appendChild(scenarioSummary);
+    this.container.appendChild(summary);
+
+    // Title
+    const namingTitle = document.createElement('h2');
+    namingTitle.textContent = 'The Fates Weave Your Thread';
+    namingTitle.style.cssText = 'margin: 0 0 10px 0; font-size: 28px; color: #fff; text-align: center;';
+    this.container.appendChild(namingTitle);
+
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Give your universe a name, and the Three Fates shall add their blessing...';
+    subtitle.style.cssText = 'margin: 0 0 30px 0; font-size: 14px; text-align: center; color: #888; font-style: italic;';
+    this.container.appendChild(subtitle);
+
+    // Name input container
+    const inputContainer = document.createElement('div');
+    inputContainer.style.cssText = 'max-width: 600px; width: 100%; background: rgba(30, 30, 50, 0.8); border: 1px solid #3a3a5a; border-radius: 12px; padding: 30px;';
+
+    // Name input
+    const inputLabel = document.createElement('label');
+    inputLabel.textContent = 'Universe Name';
+    inputLabel.style.cssText = 'display: block; font-size: 14px; color: #aaa; margin-bottom: 10px;';
+    inputContainer.appendChild(inputLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Enter a name for your universe...';
+    nameInput.value = this.universeName;
+    nameInput.style.cssText = `
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      font-family: monospace;
+      background: #1a1a2e;
+      color: #fff;
+      border: 2px solid #4a4a6a;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    `;
+    nameInput.oninput = (e) => {
+      this.universeName = (e.target as HTMLInputElement).value;
+      this.updateFatePreview();
+    };
+    inputContainer.appendChild(nameInput);
+
+    // Fate suffix selector
+    const fateLabel = document.createElement('div');
+    fateLabel.textContent = 'The Fates Add:';
+    fateLabel.style.cssText = 'font-size: 14px; color: #aaa; margin-bottom: 10px;';
+    inputContainer.appendChild(fateLabel);
+
+    const fateContainer = document.createElement('div');
+    fateContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;';
+
+    // Generate a random selection of 6 fate suffixes for this session
+    const shuffled = [...UniverseConfigScreen.FATE_SUFFIXES].sort(() => Math.random() - 0.5);
+    const displaySuffixes = shuffled.slice(0, 6);
+
+    // Initialize fateSuffix if empty
+    if (!this.fateSuffix && displaySuffixes.length > 0) {
+      this.fateSuffix = displaySuffixes[0]!;
+    }
+
+    for (const suffix of displaySuffixes) {
+      const isSelected = this.fateSuffix === suffix;
+      const btn = document.createElement('button');
+      btn.textContent = suffix;
+      btn.style.cssText = `
+        padding: 8px 14px;
+        font-size: 12px;
+        font-family: monospace;
+        background: ${isSelected ? 'linear-gradient(135deg, #9c27b0 0%, #673ab7 100%)' : '#2a2a4a'};
+        color: ${isSelected ? '#fff' : '#aaa'};
+        border: 1px solid ${isSelected ? '#9c27b0' : '#3a3a5a'};
+        border-radius: 6px;
+        cursor: pointer;
+      `;
+      btn.onclick = () => {
+        this.fateSuffix = suffix;
+        this.render();
+      };
+      fateContainer.appendChild(btn);
+    }
+
+    // Reroll button
+    const rerollBtn = document.createElement('button');
+    rerollBtn.textContent = '🎲 Reroll';
+    rerollBtn.style.cssText = `
+      padding: 8px 14px;
+      font-size: 12px;
+      font-family: monospace;
+      background: #333;
+      color: #888;
+      border: 1px solid #555;
+      border-radius: 6px;
+      cursor: pointer;
+    `;
+    rerollBtn.onclick = () => {
+      // Force re-render to get new random suffixes
+      this.fateSuffix = '';
+      this.render();
+    };
+    fateContainer.appendChild(rerollBtn);
+
+    inputContainer.appendChild(fateContainer);
+
+    // Preview
+    const previewLabel = document.createElement('div');
+    previewLabel.textContent = 'Your Universe:';
+    previewLabel.style.cssText = 'font-size: 14px; color: #aaa; margin-bottom: 10px;';
+    inputContainer.appendChild(previewLabel);
+
+    const previewContainer = document.createElement('div');
+    previewContainer.id = 'fate-preview';
+    previewContainer.style.cssText = `
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(156, 39, 176, 0.2) 0%, rgba(103, 58, 183, 0.2) 100%);
+      border: 2px solid rgba(156, 39, 176, 0.5);
+      border-radius: 10px;
+      text-align: center;
+    `;
+
+    const fullName = this.universeName
+      ? `${this.universeName} ${this.fateSuffix}`
+      : `[Your Name] ${this.fateSuffix}`;
+
+    previewContainer.innerHTML = `
+      <div style="font-size: 22px; color: #fff; font-weight: bold; text-shadow: 0 0 15px rgba(156, 39, 176, 0.5);">
+        ${fullName}
+      </div>
+      <div style="font-size: 12px; color: #9c27b0; margin-top: 8px;">
+        ✨ Blessed by Clotho, Lachesis, and Atropos ✨
+      </div>
+    `;
+    inputContainer.appendChild(previewContainer);
+
+    this.container.appendChild(inputContainer);
+
+    // Buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = 'display: flex; gap: 20px; margin-top: 30px;';
+
+    const backButton = document.createElement('button');
+    backButton.textContent = 'Back to Story';
+    backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
+    backButton.onclick = () => { this.currentStep = 'scenario'; this.render(); };
+
+    const nextButton = document.createElement('button');
+    const hasName = this.universeName.trim().length > 0;
+    nextButton.textContent = 'Begin Soul Ceremonies';
+    nextButton.disabled = !hasName;
+    nextButton.style.cssText = `
+      padding: 15px 40px;
+      font-size: 18px;
+      font-family: monospace;
+      font-weight: bold;
+      background: ${hasName ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#333'};
+      color: ${hasName ? '#fff' : '#666'};
+      border: none;
+      border-radius: 8px;
+      cursor: ${hasName ? 'pointer' : 'not-allowed'};
+    `;
+    nextButton.onclick = () => {
+      if (!hasName) return;
+
       const firstParadigm = effects.enabledParadigms[0];
+      const fullUniverseName = `${this.universeName.trim()} ${this.fateSuffix}`;
+
       this.pendingConfig = {
         magicParadigmId: firstParadigm ?? null,
         magicSpectrum: spectrum,
         spectrumEffects: effects,
         scenarioPresetId: this.selectedScenario,
+        universeName: fullUniverseName,
         seed: Date.now(),
       };
       if (this.selectedScenario === 'custom') {
@@ -232,8 +469,26 @@ export class UniverseConfigScreen {
     };
 
     buttonContainer.appendChild(backButton);
-    buttonContainer.appendChild(createButton);
+    buttonContainer.appendChild(nextButton);
     this.container.appendChild(buttonContainer);
+  }
+
+  private updateFatePreview(): void {
+    const previewContainer = document.getElementById('fate-preview');
+    if (!previewContainer) return;
+
+    const fullName = this.universeName
+      ? `${this.universeName} ${this.fateSuffix}`
+      : `[Your Name] ${this.fateSuffix}`;
+
+    previewContainer.innerHTML = `
+      <div style="font-size: 22px; color: #fff; font-weight: bold; text-shadow: 0 0 15px rgba(156, 39, 176, 0.5);">
+        ${fullName}
+      </div>
+      <div style="font-size: 12px; color: #9c27b0; margin-top: 8px;">
+        ✨ Blessed by Clotho, Lachesis, and Atropos ✨
+      </div>
+    `;
   }
 
   private renderMagicStep(): void {

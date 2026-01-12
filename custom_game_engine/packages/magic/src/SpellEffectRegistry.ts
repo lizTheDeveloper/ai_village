@@ -70,6 +70,17 @@ export class SpellEffectRegistry {
     SpellEffectRegistry.instance = null;
   }
 
+  /**
+   * Clear all registered effects (for testing)
+   */
+  clear(): void {
+    this.effects.clear();
+    this.byCategory.clear();
+    this.byDamageType.clear();
+    this.byParadigm.clear();
+    this.byTag.clear();
+  }
+
   // ========== Registration ==========
 
   register(effect: SpellEffect): void {

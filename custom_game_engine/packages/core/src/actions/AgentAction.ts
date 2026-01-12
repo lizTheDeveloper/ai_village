@@ -53,6 +53,9 @@ export type AgentAction =
   | { type: 'set_medium_term_goal'; goal: string } // Set medium-term personal goal
   | { type: 'set_group_goal'; goal: string } // Set agent's view of group goal
 
+  // Queue management
+  | { type: 'sleep_until_queue_complete' } // Pause executor until task queue is empty
+
   // Rest
   | { type: 'idle' }
   | { type: 'rest' };
@@ -313,11 +316,30 @@ export function parseAction(response: string): AgentAction | null {
 // ============================================================================
 
 const VALID_ACTION_TYPES = new Set([
-  'move', 'wander', 'follow', 'talk', 'help',
-  'forage', 'pickup', 'eat', 'chop', 'mine', 'gather',
-  'build', 'construct', 'craft', 'trade', 'idle', 'rest',
-  'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds',
+  // Movement
+  'move', 'wander', 'idle', 'rest',
   'navigate', 'explore_frontier', 'explore_spiral', 'follow_gradient',
+  // Gathering
+  'pick', 'gather', 'forage', 'pickup', 'eat', 'chop', 'mine',
+  // Social
+  'follow', 'follow_agent', 'talk', 'help',
+  'call_meeting', 'attend_meeting', 'initiate_combat',
+  // Building
+  'build', 'construct', 'plan_build',
+  // Farming
+  'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds', 'farm',
+  // Exploration
+  'explore',
+  // Research
+  'research',
+  // Animal handling
+  'tame_animal', 'house_animal', 'hunt', 'butcher',
+  // Priority/Goal management
+  'set_priorities', 'set_personal_goal', 'set_medium_term_goal', 'set_group_goal',
+  // Queue management
+  'sleep_until_queue_complete',
+  // Other
+  'craft', 'trade',
 ]);
 
 /**
@@ -338,36 +360,90 @@ export function isValidAction(action: unknown): boolean {
 // ============================================================================
 
 const ACTION_TO_BEHAVIOR: Record<string, AgentBehavior> = {
+  // Movement
   wander: 'wander',
-  talk: 'talk',
-  follow: 'follow_agent',
-  eat: 'eat',
-  forage: 'seek_food',
-  pickup: 'seek_food',
-  chop: 'pick',
-  mine: 'pick',
-  gather: 'pick',
-  build: 'build',
-  construct: 'build',
-  craft: 'craft',
-  trade: 'idle', // Trade is instant
-  till: 'till',
-  water: 'farm',
-  fertilize: 'farm',
-  plant: 'farm',
-  harvest: 'harvest',
-  gather_seeds: 'gather_seeds',
   idle: 'idle',
   move: 'wander', // TODO: Implement proper pathfinding
   navigate: 'navigate',
   explore_frontier: 'explore_frontier',
   explore_spiral: 'explore_spiral',
   follow_gradient: 'follow_gradient',
+
+  // Gathering - pick is single item, gather is stockpile
+  pick: 'pick',
+  gather: 'gather', // Fixed: was incorrectly mapping to 'pick'
+  chop: 'pick',
+  mine: 'pick',
+  forage: 'seek_food',
+  pickup: 'seek_food',
+  eat: 'seek_food', // No 'eat' behavior - use seek_food which finds and eats
+
+  // Social
+  talk: 'talk',
+  follow: 'follow_agent',
+  follow_agent: 'follow_agent',
+  call_meeting: 'call_meeting',
+  attend_meeting: 'attend_meeting',
+  help: 'follow_agent', // No 'help' behavior - follow and assist
+  initiate_combat: 'initiate_combat',
+
+  // Building
+  build: 'build',
+  construct: 'build',
+  plan_build: 'build', // Maps to 'build' - BuildBehavior handles auto-resource-gathering
+
+  // Farming
+  till: 'till',
+  farm: 'farm',
+  water: 'water', // Water behavior is registered
+  fertilize: 'farm', // No fertilize behavior - use farm
+  plant: 'plant',
+  harvest: 'harvest', // Alias for gather
+  gather_seeds: 'gather_seeds', // Alias for gather
+
+  // Exploration
+  explore: 'explore', // Added: was missing, causing fallback to idle
+
+  // Research
+  research: 'research',
+
+  // Animal handling
+  tame_animal: 'tame_animal', // Registered in AgentBrainSystem
+  house_animal: 'house_animal', // Registered in AgentBrainSystem
+  hunt: 'hunt',
+  butcher: 'butcher',
+
+  // Priority/Goal management - instant actions, don't change behavior
+  set_priorities: 'idle',
+  set_personal_goal: 'idle',
+  set_medium_term_goal: 'idle',
+  set_group_goal: 'idle',
+
+  // Queue management - pause executor until queue completes
+  sleep_until_queue_complete: 'idle', // Executor pauses, queue continues
+
+  // Other
+  craft: 'craft',
+  trade: 'idle', // Trade is instant
 };
 
 /**
  * Convert action to behavior string (temporary bridge to old system).
+ *
+ * NOTE: Returns undefined for 'idle' and 'wander' to prevent the LLM from
+ * explicitly setting these fallback behaviors. Agent should stay in their
+ * current productive behavior until given a specific task.
  */
-export function actionToBehavior(action: AgentAction): AgentBehavior {
-  return ACTION_TO_BEHAVIOR[action.type] ?? 'idle';
+export function actionToBehavior(action: AgentAction): AgentBehavior | undefined {
+  const behavior = ACTION_TO_BEHAVIOR[action.type];
+
+  // Prevent LLM from explicitly setting idle/wander - these are fallback behaviors
+  // Agent should stay in current behavior if LLM doesn't specify a productive task
+  if (behavior === 'idle' || behavior === 'wander') {
+    return undefined;
+  }
+
+  // Don't default to 'idle' for unmapped actions - return undefined instead
+  // This prevents silent fallback to idle when LLM returns an unmapped action type
+  return behavior;
 }

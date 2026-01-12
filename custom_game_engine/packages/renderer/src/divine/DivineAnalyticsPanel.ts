@@ -109,6 +109,15 @@ export class DivineAnalyticsPanel implements IWindowPanel {
   ): void {
     ctx.save();
 
+    // Guard against uninitialized analytics data
+    if (!this.state.analytics?.faithTrends || !this.state.analytics?.prayerStats) {
+      ctx.fillStyle = DIVINE_COLORS.neutral;
+      ctx.font = '14px monospace';
+      ctx.fillText('Loading divine analytics...', this.padding, 30);
+      ctx.restore();
+      return;
+    }
+
     // Header with time range selector
     const headerHeight = this.renderHeaderControls(ctx, width);
 

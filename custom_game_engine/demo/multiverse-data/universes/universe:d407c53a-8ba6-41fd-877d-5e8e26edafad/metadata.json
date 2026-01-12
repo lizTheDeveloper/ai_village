@@ -1,0 +1,14 @@
+{
+  "id": "universe:d407c53a-8ba6-41fd-877d-5e8e26edafad",
+  "name": "[DELETED] Alternate Timeline",
+  "ownerId": "test-player-456",
+  "createdAt": 1768077207996,
+  "lastSnapshotAt": 1768077207999,
+  "snapshotCount": 2,
+  "canonicalEventCount": 0,
+  "isPublic": false,
+  "forkOf": {
+    "universeId": "universe:12f92693-d990-4fde-b36c-7bb9f0e68958",
+    "snapshotTick": 500
+  }
+}

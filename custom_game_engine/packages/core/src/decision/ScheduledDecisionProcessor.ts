@@ -263,6 +263,29 @@ export class ScheduledDecisionProcessor {
         this.applyGoalToEntity(entity, parsed.goal);
       }
 
+      // Handle sleep_until_queue_complete action (Executor layer meta-action)
+      // This is a meta-action that sets the executor sleep flag WITHOUT changing behavior
+      if (parsed.behavior && parsed.behavior === 'sleep_until_queue_complete') {
+        entity.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          executorSleepUntilQueueComplete: true,
+        }));
+        // Clear parsed.behavior so agent stays in current behavior
+        parsed.behavior = undefined;
+      }
+
+      // Handle goal-setting actions - these should NOT change behavior
+      // Agent continues current task while goal is set
+      if (parsed.behavior && (
+        parsed.behavior === 'set_personal_goal' ||
+        parsed.behavior === 'set_medium_term_goal' ||
+        parsed.behavior === 'set_group_goal' ||
+        parsed.behavior === 'set_priorities'
+      )) {
+        // Goal was already applied above, just clear behavior so agent stays in current task
+        parsed.behavior = undefined;
+      }
+
       // If no behavior change, just apply speech/goal updates without changing behavior
       if (!parsed.behavior) {
         // Only update speech if present
@@ -519,7 +542,41 @@ export class ScheduledDecisionProcessor {
       error,
     };
 
-    // Record the interaction
-    history.recordInteraction(interaction);
+    // Record the interaction by updating the component
+    // Check if component has methods (is a class instance) or is a plain object
+    if (!history || typeof history.getLastAnyInteraction !== 'function') {
+      // Component is missing or broken (plain object without methods)
+      // Recreate as proper class instance
+      const newHistory = createLLMHistoryComponent(entity.id);
+
+      // Preserve existing data if component exists
+      if (history) {
+        newHistory.lastTalkerInteraction = history.lastTalkerInteraction || null;
+        newHistory.lastExecutorInteraction = history.lastExecutorInteraction || null;
+      }
+
+      // Add new interaction
+      if (interaction.layer === 'talker') {
+        newHistory.lastTalkerInteraction = interaction;
+      } else {
+        newHistory.lastExecutorInteraction = interaction;
+      }
+
+      // Replace component with fixed version
+      if (history) {
+        entity.removeComponent('llm_history');
+      }
+      entity.addComponent(newHistory);
+    } else {
+      // Component is a proper class instance - mutate it directly
+      entity.updateComponent('llm_history', (current: any) => {
+        if (interaction.layer === 'talker') {
+          current.lastTalkerInteraction = interaction;
+        } else {
+          current.lastExecutorInteraction = interaction;
+        }
+        return current;  // Return the same instance, not a new object
+      });
+    }
   }
 }

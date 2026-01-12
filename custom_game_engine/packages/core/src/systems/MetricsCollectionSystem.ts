@@ -703,9 +703,12 @@ export class MetricsCollectionSystem implements System {
       const data = event.data;
       const entity = this.world.getEntity(data.entityId);
       if (entity?.hasComponent(CT.SoulIdentity)) {
-        const agentComp = entity.getComponent(CT.Agent) as any;
+        // Get name from identity component (not agent component)
+        const identityComp = entity.getComponent(CT.Identity) as { name?: string } | undefined;
+        const agentName = identityComp?.name ?? 'Unknown';
+
         this.canonRecorder.recordEvent('agent:died', this.world, {
-          description: `${agentComp?.name ?? 'Unknown'} died from ${data.cause}`,
+          description: `${agentName} died from ${data.cause}`,
           agentIds: [data.entityId],
           eventData: {
             cause: data.cause,
@@ -717,7 +720,7 @@ export class MetricsCollectionSystem implements System {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as any,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -734,10 +737,14 @@ export class MetricsCollectionSystem implements System {
       const agent1 = this.world.getEntity(data.agent1);
       const agent2 = this.world.getEntity(data.agent2);
       if (agent1?.hasComponent(CT.SoulIdentity) && agent2?.hasComponent(CT.SoulIdentity)) {
-        const agent1Comp = agent1.getComponent(CT.Agent) as any;
-        const agent2Comp = agent2.getComponent(CT.Agent) as any;
+        // Get names from identity components
+        const agent1Identity = agent1.getComponent(CT.Identity) as { name?: string } | undefined;
+        const agent2Identity = agent2.getComponent(CT.Identity) as { name?: string } | undefined;
+        const agent1Name = agent1Identity?.name ?? 'Unknown';
+        const agent2Name = agent2Identity?.name ?? 'Unknown';
+
         this.canonRecorder.recordEvent('union:formed', this.world, {
-          description: `${agent1Comp?.name ?? 'Unknown'} and ${agent2Comp?.name ?? 'Unknown'} formed a union`,
+          description: `${agent1Name} and ${agent2Name} formed a union`,
           agentIds: [data.agent1, data.agent2],
           eventData: {
             agent1: data.agent1,
@@ -749,7 +756,7 @@ export class MetricsCollectionSystem implements System {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as any,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -906,22 +913,47 @@ export class MetricsCollectionSystem implements System {
     const agents = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
 
     for (const agent of agents) {
-      const needs = agent.components.get(CT.Needs) as any;
-      if (needs) {
-        try {
-          this.collector.sampleMetrics(
-            agent.id,
-            {
-              hunger: needs.hunger ?? 50,
-              thirst: needs.thirst ?? 50,
-              energy: needs.energy ?? 50,
-              temperature: 20, // Would need temperature component
-              health: needs.health ?? 100,
-            },
-            Date.now()
-          );
-        } catch {
-          // Agent might not be in lifecycle yet
+      const needsComponent = agent.components.get(CT.Needs);
+
+      if (!needsComponent) {
+        continue; // Skip if no needs component
+      }
+
+      // Validate structure - cast to unknown first to avoid index signature error
+      const needs = needsComponent as unknown as Record<string, unknown>;
+
+      if (typeof needs.hunger !== 'number' ||
+          typeof needs.thirst !== 'number' ||
+          typeof needs.energy !== 'number' ||
+          typeof needs.health !== 'number') {
+        throw new Error(
+          `Invalid needs component for agent ${agent.id}: ` +
+          `Expected numbers for hunger/thirst/energy/health, got ` +
+          `${JSON.stringify({
+            hunger: typeof needs.hunger,
+            thirst: typeof needs.thirst,
+            energy: typeof needs.energy,
+            health: typeof needs.health
+          })}`
+        );
+      }
+
+      try {
+        this.collector.sampleMetrics(
+          agent.id,
+          {
+            hunger: needs.hunger,
+            thirst: needs.thirst,
+            energy: needs.energy,
+            temperature: 20, // TODO: Add temperature component
+            health: needs.health,
+          },
+          Date.now()
+        );
+      } catch (error) {
+        // Agent not in lifecycle yet - this is expected for newly spawned agents
+        if (error instanceof Error && !error.message.includes('non-existent agent')) {
+          throw error; // Re-throw unexpected errors
         }
       }
     }

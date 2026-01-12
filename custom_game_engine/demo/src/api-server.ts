@@ -1,7 +1,11 @@
 #!/usr/bin/env tsx
 /**
- * Alien Generator API Server
- * Runs on port 3001 to handle PixelLab API proxying and species persistence
+ * Multiverse API Server
+ * Runs on port 3001 to handle:
+ * - PixelLab API proxying and species persistence
+ * - Soul repository (eternal soul storage)
+ * - Universe snapshots and timeline management
+ * - Cross-player multiverse connections
  */
 
 import express from 'express';
@@ -12,6 +16,8 @@ import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { generateSprite, saveAlienSpecies, getAllAlienSpecies } from './alien-api.js';
 import { SoulRepositorySystem } from '../../packages/core/src/systems/SoulRepositorySystem.js';
+import { createUniverseApiRouter } from './universe-api.js';
+import { multiverseStorage } from './multiverse-storage.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +31,26 @@ const PORT = 3001;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increase limit for base64 images
+
+// Log all requests to /api/ for debugging
+app.use('/api', (req, res, next) => {
+  const bodySize = req.headers['content-length'] || 'unknown';
+  console.log(`[API] ${req.method} ${req.path} (body: ${bodySize} bytes)`);
+  next();
+});
+
+// Error handler for body parsing (e.g., payload too large, invalid JSON)
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err.type === 'entity.too.large') {
+    console.error(`[API] Request body too large: ${req.path} (${req.headers['content-length']} bytes)`);
+    return res.status(413).json({ error: 'Request body too large' });
+  }
+  if (err instanceof SyntaxError && 'body' in err) {
+    console.error(`[API] Invalid JSON in request: ${req.path}`);
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next(err);
+});
 
 // Initialize soul repository (server-side persistence)
 const soulRepository = new SoulRepositorySystem();
@@ -152,7 +178,23 @@ app.post('/api/generate-sprite', generateSprite);
 app.post('/api/save-alien-species', saveAlienSpecies);
 app.get('/api/alien-species', getAllAlienSpecies);
 
-app.listen(PORT, () => {
-  console.log(`[API Server] Running on port ${PORT}`);
-  console.log(`[API Server] Soul sprite generation available at /api/generate-soul-sprite`);
+// Universe/Multiverse API routes
+const universeRouter = createUniverseApiRouter();
+app.use('/api', universeRouter);
+
+// Start server
+async function startServer() {
+  // Initialize multiverse storage
+  await multiverseStorage.init();
+
+  app.listen(PORT, () => {
+    console.log(`[API Server] Running on port ${PORT}`);
+    console.log(`[API Server] Soul sprite generation available at /api/generate-soul-sprite`);
+    console.log(`[API Server] Multiverse API available at /api/universe, /api/universes, /api/passage, etc.`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error('[API Server] Failed to start:', error);
+  process.exit(1);
 });

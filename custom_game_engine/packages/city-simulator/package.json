@@ -9,7 +9,8 @@
     "preview": "vite preview --port 3032"
   },
   "dependencies": {
-    "@ai-village/core": "*"
+    "@ai-village/core": "*",
+    "@ai-village/botany": "*"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

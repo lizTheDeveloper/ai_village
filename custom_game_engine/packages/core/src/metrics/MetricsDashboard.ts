@@ -502,7 +502,7 @@ export class MetricsDashboard {
    * Dismiss an alert by ID
    */
   dismissAlert(alertId: string): void {
-    this.state.alerts = this.state.alerts.filter(a => (a as any).id !== alertId);
+    this.state.alerts = this.state.alerts.filter(a => a.id !== alertId);
   }
 
   /**

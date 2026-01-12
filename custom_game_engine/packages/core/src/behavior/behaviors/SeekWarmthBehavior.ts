@@ -31,12 +31,17 @@ export class SeekWarmthBehavior extends BaseBehavior {
 
     if (!temperature) {
       // No temperature component
+      this.complete(entity);
       return { complete: true, reason: 'No temperature component' };
     }
 
+    // Disable steering so we can control velocity directly
+    this.disableSteering(entity);
+
     // Check if we're already warm enough
-    if (temperature.state === 'comfortable' ||
-        (temperature.state === 'cold' && temperature.currentTemp >= temperature.comfortMin - 1)) {
+    if (temperature.state === 'comfortable') {
+      this.stopAllMovement(entity);
+      this.complete(entity);
       return { complete: true, reason: 'Already warm enough' };
     }
 
@@ -45,6 +50,7 @@ export class SeekWarmthBehavior extends BaseBehavior {
 
     if (!heatSource) {
       // No heat source found (maybe build a campfire?)
+      this.complete(entity);
       return { complete: true, reason: 'No heat source found' };
     }
 
@@ -56,9 +62,14 @@ export class SeekWarmthBehavior extends BaseBehavior {
     const inHeatRange = heatSourceComp.providesHeat && heatSource.distance <= heatSourceComp.heatRadius;
     const inWarmInterior = heatSourceComp.interior && heatSource.distance <= heatSourceComp.interiorRadius;
 
-    if (inHeatRange || inWarmInterior) {
-      // Stay near the heat source
-      this.stopMovement(entity);
+    if ((inHeatRange || inWarmInterior) && temperature.state === 'comfortable') {
+      // Warmed up - complete behavior
+      this.stopAllMovement(entity);
+      this.complete(entity);
+      return { complete: true, reason: 'Warmed up in heat range' };
+    } else if (inHeatRange || inWarmInterior) {
+      // In heat range but still cold - stay and wait to warm up
+      this.stopAllMovement(entity);
     } else {
       // Move towards the heat source
       const dx = heatSourcePos.x - position.x;
@@ -68,11 +79,7 @@ export class SeekWarmthBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
-      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
-        ...current,
-        velocityX,
-        velocityY,
-      }));
+      this.setVelocity(entity, velocityX, velocityY);
     }
   }
 

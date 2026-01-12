@@ -45,6 +45,7 @@ import {
 } from '../components/AgentComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 // Perception module
 import { PerceptionProcessor } from '../perception/index.js';
@@ -89,6 +90,8 @@ import {
   followGradientBehavior,
   materialTransportBehavior,
   tileBuildBehavior,
+  tameAnimalBehavior,
+  houseAnimalBehavior,
 } from '../behavior/behaviors/index.js';
 
 // Reporter-specific behaviors
@@ -120,6 +123,10 @@ export class AgentBrainSystem implements System {
   private decision: DecisionProcessor | ScheduledDecisionProcessor;
   private behaviors: BehaviorRegistry;
   private useScheduler: boolean = false;
+
+  // Performance: Cache agents query to avoid O(N²) in shouldThink()
+  private allAgentsCache: ReadonlyArray<Entity> = [];
+  private allAgentsCacheTick: number = -1;
 
   constructor(
     llmQueue?: LLMDecisionQueue,
@@ -176,6 +183,10 @@ export class AgentBrainSystem implements System {
     // Hunting behaviors
     this.behaviors.register('hunt', initiateHuntBehavior, { description: 'Hunt wild animals for food and resources' });
     this.behaviors.register('butcher', butcherBehavior, { description: 'Butcher tame animals for meat and resources' });
+
+    // Animal husbandry behaviors
+    this.behaviors.register('tame_animal', tameAnimalBehavior, { description: 'Approach and tame a wild animal' });
+    this.behaviors.register('house_animal', houseAnimalBehavior, { description: 'Lead a tamed animal to its housing' });
 
     // Farm behaviors
     this.behaviors.register('farm', farmBehavior, { description: 'Farm action state' });
@@ -253,6 +264,17 @@ export class AgentBrainSystem implements System {
       // Skip AI processing when agent is player-controlled (Phase 16: Player Avatar System)
       if (agent.behavior === 'player_controlled') continue;
 
+      // Skip AI processing for dead agents (health <= 0) - unless in afterlife
+      const needs = impl.getComponent<NeedsComponent>(CT.Needs);
+      if (needs && needs.health <= 0) {
+        // Check if they're in the afterlife - souls can still think
+        const afterlife = impl.getComponent<{ type: 'afterlife'; isShade?: boolean; hasPassedOn?: boolean }>('afterlife' as CT);
+        if (!afterlife) continue; // Not yet transitioned - skip
+        if (afterlife.isShade) continue; // Lost identity - can't think
+        if (afterlife.hasPassedOn) continue; // Gone - no more thinking
+        // Otherwise, afterlife soul can think
+      }
+
       // Check think interval with dynamic staggering
       const shouldThink = this.shouldThink(impl, agent, world);
       if (!shouldThink) continue;
@@ -299,7 +321,12 @@ export class AgentBrainSystem implements System {
 
     // Dynamic staggering: distribute agents evenly across think interval
     // This prevents all agents from thinking simultaneously
-    const allAgents = world.query().with(CT.Agent).executeEntities();
+    // Cache agents list once per tick to avoid O(N²) query-in-loop
+    if (world.tick !== this.allAgentsCacheTick) {
+      this.allAgentsCache = world.query().with(CT.Agent).executeEntities();
+      this.allAgentsCacheTick = world.tick;
+    }
+    const allAgents = this.allAgentsCache;
     const agentCount = allAgents.length;
 
     if (agentCount <= 1) {
@@ -353,39 +380,48 @@ export class AgentBrainSystem implements System {
       const needs = entity.getComponent(CT.Needs) as NeedsComponent | undefined;
       const currentPriority = getBehaviorPriority(agent.behavior, temperature, needs);
 
-      if (autonomicResult.priority > currentPriority) {
+      // Execute autonomic behavior if:
+      // 1. It has higher priority than current behavior, OR
+      // 2. Agent is already in the autonomic-required behavior (continue executing it)
+      const shouldExecuteAutonomic = autonomicResult.priority > currentPriority ||
+        agent.behavior === autonomicResult.behavior;
+
+      if (shouldExecuteAutonomic) {
         const fromBehavior = agent.behavior;
         const toBehavior = autonomicResult.behavior;
+        const isChangingBehavior = fromBehavior !== toBehavior;
 
-        // Handle queue interruption
-        if (hasBehaviorQueue(agent) && !agent.queuePaused) {
-          world.eventBus.emit({
-            type: 'agent:queue:interrupted',
-            source: entity.id,
-            data: {
-              agentId: entity.id,
-              reason: 'autonomic_override',
-              interruptedBy: autonomicResult.behavior,
-            },
-          });
+        // Only update agent component if actually changing behavior
+        // (avoids resetting behaviorState when continuing same behavior)
+        if (isChangingBehavior) {
+          // Handle queue interruption
+          if (hasBehaviorQueue(agent) && !agent.queuePaused) {
+            world.eventBus.emit({
+              type: 'agent:queue:interrupted',
+              source: entity.id,
+              data: {
+                agentId: entity.id,
+                reason: 'autonomic_override',
+                interruptedBy: autonomicResult.behavior,
+              },
+            });
 
-          entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
-            ...current,
-            behavior: autonomicResult.behavior,
-            behaviorState: {},
-            queuePaused: true,
-            queueInterruptedBy: autonomicResult.behavior,
-          }));
-        } else {
-          entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
-            ...current,
-            behavior: autonomicResult.behavior,
-            behaviorState: {},
-          }));
-        }
+            entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+              ...current,
+              behavior: autonomicResult.behavior,
+              behaviorState: {},
+              queuePaused: true,
+              queueInterruptedBy: autonomicResult.behavior,
+            }));
+          } else {
+            entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+              ...current,
+              behavior: autonomicResult.behavior,
+              behaviorState: {},
+            }));
+          }
 
-        // Emit behavior:change event for metrics
-        if (fromBehavior !== toBehavior) {
+          // Emit behavior:change event for metrics
           world.eventBus.emit({
             type: 'behavior:change',
             source: entity.id,
@@ -440,14 +476,32 @@ export class AgentBrainSystem implements System {
       const fromBehavior = agent.behavior;
       const toBehavior = decisionResult.behavior;
 
+      const currentTick = world.tick;
       entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         behavior: decisionResult.behavior!,
         behaviorState: decisionResult.behaviorState ?? {},
+        // Timing instrumentation
+        behaviorChangedAt: currentTick,
+        previousBehavior: current.behavior,
       }));
 
-      // Emit behavior:change event for metrics
+      // Emit behavior:change event for metrics with timing
       if (fromBehavior !== toBehavior) {
+        const previousChangedAt = agent.behaviorChangedAt;
+        const durationTicks = previousChangedAt ? currentTick - previousChangedAt : 0;
+        const durationSeconds = durationTicks / 20; // 20 TPS
+
+        // Get agent name for readable logging
+        const identity = entity.getComponent<IdentityComponent>(CT.Identity);
+        const agentName = identity?.name || entity.id.slice(0, 8);
+
+        // Log behavior transitions for validation
+        console.log(
+          `[BehaviorTiming] ${agentName}: ${fromBehavior} → ${toBehavior} ` +
+          `(held ${fromBehavior} for ${Math.round(durationSeconds * 10) / 10}s / ${durationTicks} ticks)`
+        );
+
         world.eventBus.emit({
           type: 'behavior:change',
           source: entity.id,
@@ -502,6 +556,11 @@ export class AgentBrainSystem implements System {
       entity.updateComponent<AgentComponent>(CT.Agent, () => updatedAgent);
 
       if (!hasBehaviorQueue(updatedAgent)) {
+        // Clear executor sleep flag when queue completes
+        entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+          ...current,
+          executorSleepUntilQueueComplete: undefined,
+        }));
         world.eventBus.emit({
           type: 'agent:queue:completed',
           source: entity.id,
@@ -518,6 +577,11 @@ export class AgentBrainSystem implements System {
       if (!hasBehaviorQueue(updatedAgent)) {
         // Queue is complete, clear it and emit event
         entity.updateComponent<AgentComponent>(CT.Agent, () => updatedAgent);
+        // Clear executor sleep flag when queue completes
+        entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+          ...current,
+          executorSleepUntilQueueComplete: undefined,
+        }));
         world.eventBus.emit({
           type: 'agent:queue:completed',
           source: entity.id,

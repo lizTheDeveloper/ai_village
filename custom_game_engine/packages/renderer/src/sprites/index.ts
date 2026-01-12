@@ -120,6 +120,9 @@ export type {
   LoadedPixelLabCharacter,
 } from './PixelLabSpriteLoader';
 
+// PixelLab Entity Renderer - High-level sprite rendering for entities
+export { PixelLabEntityRenderer } from './PixelLabEntityRenderer';
+
 // Sprite Cache - Persistent browser storage for sprites
 export {
   SpriteCache,

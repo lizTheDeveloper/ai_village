@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../ecs/index.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
-import { PlantSystem } from '../systems/PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem.js';
 import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';

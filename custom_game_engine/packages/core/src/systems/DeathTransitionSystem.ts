@@ -33,7 +33,7 @@ const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
 export class DeathTransitionSystem implements System {
   readonly id: SystemId = 'death_transition';
   readonly priority: number = 110;  // Run after needs/combat systems
-  readonly requiredComponents = ['needs', 'realm_location'] as const;
+  readonly requiredComponents = ['needs'] as const;  // Only require needs - realm_location is optional
 
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
@@ -49,9 +49,24 @@ export class DeathTransitionSystem implements System {
     // Check for newly dead entities
     for (const entity of entities) {
       const needs = entity.components.get('needs') as NeedsComponent | undefined;
-      const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
+      if (!needs) continue;
 
-      if (!needs || !realmLocation) continue;
+      // Get or create realm location - agents in mortal world may not have this yet
+      let realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
+      if (!realmLocation) {
+        // Create default realm location for mortal world entities
+        realmLocation = {
+          type: 'realm_location',
+          version: 1,
+          currentRealmId: 'mortal_world',
+          enteredAt: 0,
+          totalTimeInRealm: 0,
+          timeDilation: 1.0,
+          canExit: true,
+          transformations: [],
+        };
+        (entity as EntityImpl).addComponent(realmLocation);
+      }
 
       // Check if entity just died (health <= 0 and not already processed)
       const isDead = needs.health <= 0;

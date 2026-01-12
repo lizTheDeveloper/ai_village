@@ -204,55 +204,46 @@ export class LLMScheduler {
       }
     }
 
-    // PRIORITY 2: Active conversation - ALTERNATE between Talker and Executor
-    // This allows agents to both maintain conversation AND execute actions
-    const inConversation = conversation?.isActive || (vision?.heardSpeech && vision.heardSpeech.length > 0);
-    if (inConversation) {
-      const state = this.getAgentState(agent.id);
-      const lastTalker = state.lastInvocation.talker ?? 0;
-      const lastExecutor = state.lastInvocation.executor ?? 0;
-
-      // If agent is idle/wandering AND has goals, prefer executor to actually DO something
-      const isIdleOrWandering = !agentComp?.behavior || agentComp.behavior === 'idle' || agentComp.behavior === 'wander';
+    // PRIORITY 2: Active 1:1 conversation - need to respond
+    // NOTE: heardSpeech alone no longer forces Talker - agents can work while overhearing
+    // Only trigger Talker for active 1:1 conversations that need direct response
+    if (conversation?.isActive && conversation?.partnerId) {
+      // Agent is in active 1:1 conversation - check if they need to set goals
       const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
         goals.goals.some((g) => !g.completed);
 
-      // Choose layer based on what's more needed:
-      // 1. If idle/wandering with goals → executor (so they can actually act)
-      // 2. If behavior is 'talk' → talker (continue conversation)
-      // 3. Otherwise alternate based on which ran more recently
-      if (isIdleOrWandering && hasActiveGoals) {
-        return {
-          layer: 'executor',
-          reason: 'In conversation but idle - needs action execution',
-          urgency: 7,
-        };
-      }
-
-      if (agentComp?.behavior === 'talk') {
+      if (!hasActiveGoals) {
+        // No goals - Talker for goal-setting (even during conversation)
         return {
           layer: 'talker',
-          reason: 'Active conversation (talking)',
-          urgency: 8,
-        };
-      }
-
-      // Alternate: if executor hasn't run in a while during conversation, give it a turn
-      // This ensures agents don't just keep talking without acting
-      const executorStale = (Date.now() - lastExecutor) > 15000; // 15s threshold
-      if (executorStale && hasActiveGoals) {
-        return {
-          layer: 'executor',
-          reason: 'In conversation - executor turn for action',
+          reason: 'In conversation, no goals - needs goal-setting',
           urgency: 7,
         };
       }
 
+      // Has goals - Executor can handle work while in conversation
+      // Speaking happens via the "speaking" field, not behavior change
       return {
-        layer: 'talker',
-        reason: 'Active conversation or heard speech',
-        urgency: 8,
+        layer: 'executor',
+        reason: 'In conversation with goals - continue working',
+        urgency: 7,
       };
+    }
+
+    // CHECK: Executor sleeping until queue completes?
+    // If so, don't invoke Executor until queue is done
+    if (agentComp?.executorSleepUntilQueueComplete) {
+      const hasQueue = agentComp.behaviorQueue && agentComp.behaviorQueue.length > 0;
+      if (hasQueue) {
+        // Executor is sleeping, queue is still running
+        return {
+          layer: 'autonomic',
+          reason: 'Executor sleeping until queue completes',
+          urgency: 3,
+        };
+      }
+      // Queue is complete but flag is still set - should be cleared
+      // Fall through to normal logic
     }
 
     // PRIORITY 3: Idle or wandering → EXECUTOR (get a productive task!)
@@ -275,17 +266,11 @@ export class LLMScheduler {
       };
     }
 
-    // PRIORITY 5: Nearby agents (potential social interaction)
-    // Only trigger social if agent has a meaningful task already
-    if (vision?.seenAgents && vision.seenAgents.length > 0) {
-      return {
-        layer: 'talker',
-        reason: 'Nearby agents (potential social interaction)',
-        urgency: 6,
-      };
-    }
+    // NOTE: "Nearby agents" no longer triggers Talker automatically
+    // Agents work alongside others and speak via the "speaking" field
+    // Talker is only for goal-setting, not for forcing conversations
 
-    // PRIORITY 6: No goals set (needs goal-setting via Talker)
+    // PRIORITY 5: No goals set (needs goal-setting via Talker)
     // Check if agent has NO active goals - Talker is responsible for setting goals
     // Note: goals component may be raw data, not a class instance, so use array check only
     const hasActiveGoals = goals?.goals && goals.goals.length > 0 &&
@@ -322,7 +307,7 @@ export class LLMScheduler {
 
   /**
    * Check if a layer is ready to run for this agent (cooldown elapsed)
-   * Adjusts cooldowns based on conversation state for more natural engagement
+   * Adjusts cooldowns based on conversation state and personality (extroversion) for more natural engagement
    */
   isLayerReady(agentId: string, layer: DecisionLayer, agent?: Entity): boolean {
     const config = this.layerConfig[layer];
@@ -332,19 +317,26 @@ export class LLMScheduler {
     const lastInvocation = state.lastInvocation[layer] ?? 0;
     const elapsed = Date.now() - lastInvocation;
 
-    // Get adjusted cooldown based on conversation state
+    // Get adjusted cooldown based on conversation state and personality
     let adjustedCooldown = config.cooldownMs;
 
     if (agent && layer === 'talker') {
       const conversationComp = agent.components.get('conversation') as ConversationComponent | undefined;
+      const personalityComp = agent.components.get('personality') as any; // PersonalityComponent
       const isInConversation = conversationComp?.isActive && (conversationComp.partnerId !== null || conversationComp.participantIds.length > 0);
 
+      // Extroversion determines how frequently the Talker speaks
+      // extraversion: 0 = quiet/introspective, 1 = outgoing/social
+      const extroversion = personalityComp?.extraversion ?? 0.5;
+
       if (isInConversation) {
-        // In conversation: Talker runs FREQUENTLY to manage turn-taking and conversation flow
-        adjustedCooldown = 2000; // 2s (was 5s) - high engagement during conversation
+        // In conversation: scale from 500ms (very extroverted) to 10000ms (very introverted)
+        // Extroverted people respond quickly and frequently, introverts take longer pauses
+        adjustedCooldown = 500 + (1 - extroversion) * 9500; // 500-10000ms range
       } else {
-        // NOT in conversation: Talker runs RARELY, only to check if should start conversation
-        adjustedCooldown = 20000; // 20s (was 5s) - low engagement when not conversing (1:10 ratio)
+        // Not in conversation: scale from 5000ms (very extroverted) to 60000ms (very introverted)
+        // Extroverts initiate conversation frequently, introverts rarely speak up
+        adjustedCooldown = 5000 + (1 - extroversion) * 55000; // 5000-60000ms range
       }
     }
     // Executor uses default cooldown regardless of conversation state (configurable at settings level)
@@ -378,6 +370,26 @@ export class LLMScheduler {
     const circadian = agent.components.get('circadian') as CircadianComponent | undefined;
     if (circadian?.isSleeping) {
       return null;
+    }
+
+    // Skip LLM for dead agents - unless they've transitioned to afterlife
+    const needs = agent.components.get('needs') as NeedsComponent | undefined;
+    if (needs && needs.health <= 0) {
+      // Check if they're in the afterlife - souls can still think and speak
+      const afterlife = agent.components.get('afterlife') as { isShade?: boolean; hasPassedOn?: boolean } | undefined;
+      if (!afterlife) {
+        // Not yet transitioned - truly dying, skip LLM
+        return null;
+      }
+      // Shades have lost identity - can't think coherently
+      if (afterlife.isShade) {
+        return null;
+      }
+      // Passed on souls are gone - no more thinking
+      if (afterlife.hasPassedOn) {
+        return null;
+      }
+      // Otherwise, afterlife soul can speak
     }
 
     const selection = this.selectLayer(agent, world);

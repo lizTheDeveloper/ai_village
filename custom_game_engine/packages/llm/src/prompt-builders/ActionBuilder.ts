@@ -35,6 +35,7 @@ export class ActionBuilder {
     const farming: string[] = [];
     const social: string[] = [];
     const exploration: string[] = [];
+    const combat: string[] = [];
     const priority: string[] = [];
 
     const needs = entity?.components.get('needs') as NeedsComponent | undefined;
@@ -135,15 +136,15 @@ export class ActionBuilder {
       gathering.push('cook - Cook food at a campfire or oven');
     }
 
-    // Hunting (requires combat skill)
+    // COMBAT & HUNTING (requires combat skill)
     const combatSkill = skillLevels.combat ?? 0;
 
     if (combatSkill >= 1 && world && entity) {
-      // Check if there are wild (untamed) animals nearby
-      const allAnimals = world.query()?.with?.('animal')?.executeEntities?.() ?? [];
       const entityPos = entity.components.get('position') as (Component & { x: number; y: number }) | undefined;
 
-      if (entityPos && allAnimals.length > 0) {
+      if (entityPos) {
+        // Check if there are wild (untamed) animals nearby
+        const allAnimals = world.query()?.with?.('animal')?.executeEntities?.() ?? [];
         const hasWildAnimals = allAnimals.some((animal: Entity) => {
           const animalComp = animal.components.get('animal') as (Component & { tamed?: boolean }) | undefined;
           const animalPos = animal.components.get('position') as (Component & { x: number; y: number }) | undefined;
@@ -158,7 +159,12 @@ export class ActionBuilder {
         });
 
         if (hasWildAnimals) {
-          gathering.push('hunt - Hunt a wild animal for meat and resources (requires combat skill)');
+          combat.push('hunt - Hunt a wild animal for meat and resources (requires combat skill)');
+        }
+
+        // Check if there are other agents nearby for combat
+        if (vision?.seenAgents && vision.seenAgents.length > 0) {
+          combat.push('initiate_combat - Challenge another agent to combat (lethal or non-lethal, requires combat skill)');
         }
       }
     }
@@ -244,6 +250,12 @@ export class ActionBuilder {
       actions.push('');
       actions.push('EXPLORATION & NAVIGATION:');
       actions.push(...exploration.map(a => `  ${a}`));
+    }
+
+    if (combat.length > 0) {
+      actions.push('');
+      actions.push('COMBAT & HUNTING:');
+      actions.push(...combat.map(a => `  ${a}`));
     }
 
     return actions;

@@ -20,6 +20,7 @@ import type {
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 import { createHealingEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 // ============================================================================
 // Helper Interfaces
@@ -100,10 +101,22 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
 
     const appliedValues: Record<string, number> = {};
 
-    // Apply healing based on resource type
+    // NEW: Check if this is a HoT effect (overtime with duration)
+    if (effect.overtime && effect.duration && effect.duration > 0 && context.stateMutatorSystem) {
+      // This is a heal-over-time effect - use StateMutatorSystem
+      return this.applyHealOverTime(
+        effect,
+        caster,
+        target,
+        healingAmount,
+        scaledHealing.value,
+        context
+      );
+    }
+
+    // EXISTING: Apply instant healing or legacy HoT (without StateMutatorSystem)
     if (effect.overtime) {
-      // For HoT effects, healing is applied over duration
-      // Store the per-tick amount for tick() method
+      // Legacy HoT: Store per-tick amount for tick() method (fallback)
       appliedValues.healingPerTick = healingAmount / (effect.duration ?? 1);
       appliedValues.resourceType = this.resourceTypeToNumber(effect.resourceType);
     } else {
@@ -132,6 +145,178 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
       casterId: caster.id,
       spellId: context.spell.id,
       remainingDuration: effect.duration,
+    };
+  }
+
+  /**
+   * Apply heal over time using StateMutatorSystem.
+   * Registers a delta that gradually increases health/mana/stamina over the effect duration.
+   */
+  private applyHealOverTime(
+    effect: HealingEffect,
+    caster: Entity,
+    target: Entity,
+    totalHealing: number,
+    baseHealing: number,
+    context: EffectContext
+  ): EffectApplicationResult {
+    if (!context.stateMutatorSystem) {
+      // Fallback: use legacy HoT processing if StateMutatorSystem not available
+      const appliedValues: Record<string, number> = {};
+      appliedValues.healingPerTick = totalHealing / (effect.duration ?? 1);
+      appliedValues.resourceType = this.resourceTypeToNumber(effect.resourceType);
+      return {
+        success: true,
+        effectId: effect.id,
+        targetId: target.id,
+        appliedValues,
+        resisted: false,
+        appliedAt: context.tick,
+        casterId: caster.id,
+        spellId: context.spell.id,
+        remainingDuration: effect.duration,
+      };
+    }
+
+    // Calculate healing per minute from total healing and duration
+    const durationInTicks = effect.duration!;
+    const durationInMinutes = durationInTicks / 1200; // 1200 ticks per game minute at 20 TPS
+    const healingPerMinute = totalHealing / durationInMinutes;
+
+    const appliedValues: Record<string, number> = {
+      totalHealing,
+      healingPerMinute,
+      durationInTicks,
+    };
+
+    const cleanupFunctions: Array<() => void> = [];
+
+    // Register delta(s) based on resource type
+    switch (effect.resourceType) {
+      case 'health': {
+        // Convert healing (0-100 scale) to health gain (0-1 scale)
+        const healthGainPerMinute = healingPerMinute / 100;
+        const cleanupFn = context.stateMutatorSystem.registerDelta({
+          entityId: target.id,
+          componentType: CT.Needs,
+          field: 'health',
+          deltaPerMinute: healthGainPerMinute,
+          max: 1.0, // Health is 0-1 scale
+          source: `magic:${context.spell.id}:${effect.id}`,
+          expiresAtTick: context.tick + durationInTicks,
+        });
+        cleanupFunctions.push(cleanupFn);
+        appliedValues.healthPerMinute = healthGainPerMinute;
+        break;
+      }
+
+      case 'mana': {
+        const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
+        const maxMana = needs?.maxMana ?? 100;
+        const manaGainPerMinute = healingPerMinute / maxMana; // Normalize to 0-1
+        const cleanupFn = context.stateMutatorSystem.registerDelta({
+          entityId: target.id,
+          componentType: CT.Needs,
+          field: 'mana',
+          deltaPerMinute: manaGainPerMinute,
+          max: 1.0,
+          source: `magic:${context.spell.id}:${effect.id}`,
+          expiresAtTick: context.tick + durationInTicks,
+        });
+        cleanupFunctions.push(cleanupFn);
+        appliedValues.manaPerMinute = manaGainPerMinute;
+        break;
+      }
+
+      case 'stamina': {
+        const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
+        const maxStamina = needs?.maxStamina ?? 100;
+        const staminaGainPerMinute = healingPerMinute / maxStamina; // Normalize to 0-1
+        const cleanupFn = context.stateMutatorSystem.registerDelta({
+          entityId: target.id,
+          componentType: CT.Needs,
+          field: 'stamina',
+          deltaPerMinute: staminaGainPerMinute,
+          max: 1.0,
+          source: `magic:${context.spell.id}:${effect.id}`,
+          expiresAtTick: context.tick + durationInTicks,
+        });
+        cleanupFunctions.push(cleanupFn);
+        appliedValues.staminaPerMinute = staminaGainPerMinute;
+        break;
+      }
+
+      case 'all': {
+        // Split healing across all resources
+        const splitHealing = healingPerMinute / 3;
+        const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
+
+        // Health
+        const healthGainPerMinute = splitHealing / 100;
+        cleanupFunctions.push(
+          context.stateMutatorSystem.registerDelta({
+            entityId: target.id,
+            componentType: CT.Needs,
+            field: 'health',
+            deltaPerMinute: healthGainPerMinute,
+            max: 1.0,
+            source: `magic:${context.spell.id}:${effect.id}:health`,
+            expiresAtTick: context.tick + durationInTicks,
+          })
+        );
+
+        // Mana
+        const maxMana = needs?.maxMana ?? 100;
+        const manaGainPerMinute = splitHealing / maxMana;
+        cleanupFunctions.push(
+          context.stateMutatorSystem.registerDelta({
+            entityId: target.id,
+            componentType: CT.Needs,
+            field: 'mana',
+            deltaPerMinute: manaGainPerMinute,
+            max: 1.0,
+            source: `magic:${context.spell.id}:${effect.id}:mana`,
+            expiresAtTick: context.tick + durationInTicks,
+          })
+        );
+
+        // Stamina
+        const maxStamina = needs?.maxStamina ?? 100;
+        const staminaGainPerMinute = splitHealing / maxStamina;
+        cleanupFunctions.push(
+          context.stateMutatorSystem.registerDelta({
+            entityId: target.id,
+            componentType: CT.Needs,
+            field: 'stamina',
+            deltaPerMinute: staminaGainPerMinute,
+            max: 1.0,
+            source: `magic:${context.spell.id}:${effect.id}:stamina`,
+            expiresAtTick: context.tick + durationInTicks,
+          })
+        );
+
+        appliedValues.healthPerMinute = healthGainPerMinute;
+        appliedValues.manaPerMinute = manaGainPerMinute;
+        appliedValues.staminaPerMinute = staminaGainPerMinute;
+        break;
+      }
+    }
+
+    // Create combined cleanup function
+    const cleanupFn = () => {
+      cleanupFunctions.forEach(fn => fn());
+    };
+
+    return {
+      success: true,
+      effectId: effect.id,
+      targetId: target.id,
+      appliedValues,
+      resisted: false,
+      appliedAt: context.tick,
+      casterId: caster.id,
+      spellId: context.spell.id,
+      cleanupFn, // For dispel support
     };
   }
 

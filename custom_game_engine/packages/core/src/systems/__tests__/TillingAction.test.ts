@@ -393,16 +393,16 @@ describe('Tilling Action', () => {
       expect(action.position.y).toBe(15);
     });
 
-    it('should handle till action completion', () => {
-      // This will test that action is removed from queue after completion
+    it.skip('should handle till action completion', () => {
+      // TODO: This will test that action is removed from queue after completion
       // To be implemented in ActionHandler integration tests
-      expect(true).toBe(true); // Placeholder for ActionHandler test
+      expect(true).toBe(true);
     });
 
-    it('should handle till action errors gracefully', () => {
-      // This will test that errors don't crash the action handler
+    it.skip('should handle till action errors gracefully', () => {
+      // TODO: This will test that errors don't crash the action handler
       // To be implemented in ActionHandler integration tests
-      expect(true).toBe(true); // Placeholder for ActionHandler test
+      expect(true).toBe(true);
     });
   });
 

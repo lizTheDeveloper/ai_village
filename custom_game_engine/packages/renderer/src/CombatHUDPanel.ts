@@ -102,7 +102,9 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle conflict started event
    */
-  private handleConflictStarted(data: any): void {
+  private handleConflictStarted(event: any): void {
+    const data = event.data || event; // Support both GameEvent and legacy direct data
+
     if (!data.conflictId || !data.type) {
       throw new Error('conflict:started event missing required fields (conflictId, type)');
     }
@@ -133,7 +135,9 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle conflict resolved event
    */
-  private handleConflictResolved(data: any): void {
+  private handleConflictResolved(event: any): void {
+    const data = event.data || event; // Support both GameEvent and legacy direct data
+
     if (!data.conflictId) {
       return;
     }
@@ -156,7 +160,8 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle combat attack event
    */
-  private handleCombatAttack(data: any): void {
+  private handleCombatAttack(event: any): void {
+    const data = event.data || event; // Support both GameEvent and legacy direct data
     this.addRecentEvent(`${data.attackerId} attacks ${data.defenderId}`);
     this.updateUI();
   }

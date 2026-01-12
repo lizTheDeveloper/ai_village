@@ -8,6 +8,23 @@ import { TemperatureSystem } from '../TemperatureSystem.js';
 /**
  * Phase 9: Soil + Weather + Temperature Integration Tests
  *
+ * STATUS: PHASE 9 INTEGRATION NOT YET IMPLEMENTED
+ *
+ * Individual systems exist (SoilSystem, WeatherSystem, TemperatureSystem)
+ * with all required methods:
+ * - SoilSystem.applyRain(world, tile, x, y, intensity)
+ * - SoilSystem.applySnow(world, tile, x, y, intensity)
+ * - SoilSystem.decayMoisture(world, tile, x, y, temperature)
+ * - WeatherSystem emits weather:changed and weather:rain events
+ *
+ * MISSING: Event-based integration layer that:
+ * - Listens for weather:rain/weather:snow events
+ * - Calls SoilSystem methods on affected tiles
+ * - Applies temperature-based evaporation modifiers
+ * - Filters indoor vs outdoor tiles
+ *
+ * TODO: Implement integration layer (possibly in SoilSystem.init() or separate coordinator)
+ *
  * These tests verify that the SoilSystem correctly integrates with
  * WeatherSystem and TemperatureSystem for realistic moisture management.
  *
@@ -36,149 +53,80 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Rain → Soil Moisture', () => {
-    it('should increase soil moisture when rain event occurs', () => {
-      // Emit rain event
-      eventBus.emit({
-        type: 'weather:rain',
-        source: 'weatherSystem',
-        data: { intensity: 0.8 },
-      });
-      eventBus.flush();
-
-      // Verify SoilSystem received the event and would update tiles
-      // (Actual implementation will update world tiles)
-      expect(true).toBe(true); // Placeholder - will test real behavior when implemented
+    it.skip('should increase soil moisture when rain event occurs', () => {
+      // TODO: Implement event-based integration layer
+      // Currently SoilSystem has applyRain() method but doesn't subscribe to weather:rain events
     });
 
-    it('should increase moisture by +40 for standard rain', () => {
-      // Create a tile with 40 moisture
-      // Emit rain event
-      // Verify moisture increased to 80
-      expect(true).toBe(true); // Placeholder
+    it.skip('should increase moisture by +40 for standard rain', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should increase moisture by +20 for snow', () => {
-      // Create a tile with 50 moisture
-      // Emit snow event
-      // Verify moisture increased to 70
-      expect(true).toBe(true); // Placeholder
+    it.skip('should increase moisture by +20 for snow', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should cap moisture at 100 during heavy rain', () => {
-      // Create a tile with 90 moisture
-      // Emit heavy rain event (+40)
-      // Verify moisture capped at 100, not 130
-      expect(true).toBe(true); // Placeholder
+    it.skip('should cap moisture at 100 during heavy rain', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should NOT increase moisture on indoor tiles during rain', () => {
-      // Create an indoor tile (inside a building)
-      // Emit rain event
-      // Verify moisture did NOT increase
-      expect(true).toBe(true); // Placeholder
+    it.skip('should NOT increase moisture on indoor tiles during rain', () => {
+      // TODO: Implement event-based integration layer with indoor/outdoor filtering
     });
 
-    it('should scale rain moisture by intensity', () => {
-      // Emit rain with intensity 0.5 (should add +20 instead of +40)
-      // Verify moisture increase is proportional
-      expect(true).toBe(true); // Placeholder
+    it.skip('should scale rain moisture by intensity', () => {
+      // TODO: Implement event-based integration layer
     });
   });
 
   describe('Temperature → Evaporation Rate', () => {
-    it('should increase evaporation in hot temperatures', () => {
-      // Create tile with 60 moisture
-      // Set temperature to hot
-      // Process daily moisture decay
-      // Verify higher evaporation (more moisture lost)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should increase evaporation in hot temperatures', () => {
+      // TODO: Implement event-based integration layer that triggers daily moisture decay
     });
 
-    it('should decrease evaporation in cold temperatures', () => {
-      // Create tile with 60 moisture
-      // Set temperature to cold
-      // Process daily moisture decay
-      // Verify lower evaporation (less moisture lost)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should decrease evaporation in cold temperatures', () => {
+      // TODO: Implement event-based integration layer that triggers daily moisture decay
     });
 
-    it('should apply +50% evaporation modifier in hot weather', () => {
-      // Base decay: -10 moisture per day
-      // Hot modifier: +50% = -15 moisture per day
-      // Create tile with 60 moisture, hot temp
-      // Run daily decay
-      // Verify moisture is 45 (60 - 15)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should apply +50% evaporation modifier in hot weather', () => {
+      // TODO: Implement event-based integration layer that triggers daily moisture decay
     });
 
-    it('should apply -50% evaporation modifier in cold weather', () => {
-      // Base decay: -10 moisture per day
-      // Cold modifier: -50% = -5 moisture per day
-      // Create tile with 60 moisture, cold temp
-      // Run daily decay
-      // Verify moisture is 55 (60 - 5)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should apply -50% evaporation modifier in cold weather', () => {
+      // TODO: Implement event-based integration layer that triggers daily moisture decay
     });
   });
 
   describe('Season → Moisture Decay', () => {
-    it('should increase evaporation in summer (+25%)', () => {
-      // Create tile with 60 moisture
-      // Set season to summer
-      // Process daily decay
-      // Base -10, summer +25% = -12.5 moisture
-      expect(true).toBe(true); // Placeholder
+    it.skip('should increase evaporation in summer (+25%)', () => {
+      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
+      // Currently only temperature modifiers are implemented
     });
 
-    it('should decrease evaporation in winter (-50%)', () => {
-      // Create tile with 60 moisture
-      // Set season to winter
-      // Process daily decay
-      // Base -10, winter -50% = -5 moisture
-      expect(true).toBe(true); // Placeholder
+    it.skip('should decrease evaporation in winter (-50%)', () => {
+      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
     });
 
-    it('should apply normal evaporation in spring', () => {
-      // Spring should have no modifier
-      // Verify base -10 moisture decay
-      expect(true).toBe(true); // Placeholder
+    it.skip('should apply normal evaporation in spring', () => {
+      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
     });
 
-    it('should apply normal evaporation in fall', () => {
-      // Fall should have no modifier
-      // Verify base -10 moisture decay
-      expect(true).toBe(true); // Placeholder
+    it.skip('should apply normal evaporation in fall', () => {
+      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
     });
   });
 
   describe('Combined Weather + Temperature + Season', () => {
-    it('should handle hot summer day with high evaporation', () => {
-      // Temperature: Hot (+50%)
-      // Season: Summer (+25%)
-      // Base decay: -10
-      // Combined: -10 * 1.5 * 1.25 = -18.75 moisture
-      // Create tile with 60 moisture
-      // Run daily decay with hot + summer
-      // Verify moisture is ~41
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle hot summer day with high evaporation', () => {
+      // TODO: Implement event-based integration layer + seasonal modifiers
     });
 
-    it('should handle cold winter day with minimal evaporation', () => {
-      // Temperature: Cold (-50%)
-      // Season: Winter (-50%)
-      // Base decay: -10
-      // Combined: -10 * 0.5 * 0.5 = -2.5 moisture
-      // Create tile with 60 moisture
-      // Run daily decay
-      // Verify moisture is ~57.5
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle cold winter day with minimal evaporation', () => {
+      // TODO: Implement event-based integration layer + seasonal modifiers
     });
 
-    it('should handle rainy summer day (rain vs evaporation)', () => {
-      // Rain: +40 moisture
-      // Summer evaporation: -12.5 moisture (on next day)
-      // Net effect should still increase moisture on rainy day
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle rainy summer day (rain vs evaporation)', () => {
+      // TODO: Implement event-based integration layer
     });
   });
 
@@ -249,32 +197,23 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(handler).toHaveBeenCalled();
     });
 
-    it('should update all tiles on daily tick', () => {
-      // Emit time:dayStart
-      // Verify SoilSystem processes all tiles
-      // Each tile should have moisture decay applied
-      expect(true).toBe(true); // Placeholder
+    it.skip('should update all tiles on daily tick', () => {
+      // TODO: Implement event-based integration layer that triggers tile updates on time:dayStart
     });
 
-    it('should decrement fertilizer duration daily', () => {
-      // Create tile with fertilized=true, duration=100
-      // Emit time:dayStart
-      // Verify duration decreased to 99
-      expect(true).toBe(true); // Placeholder
+    it.skip('should decrement fertilizer duration daily', () => {
+      // TODO: Implement event-based integration layer
+      // Note: SoilSystem.tickFertilizer() exists but needs to be called from somewhere
     });
   });
 
   describe('Error Handling - Integration Points', () => {
-    it('should throw if weather system emits rain without intensity', () => {
-      // Emit rain event without intensity field
-      // Verify SoilSystem throws clear error
-      expect(true).toBe(true); // Placeholder
+    it.skip('should throw if weather system emits rain without intensity', () => {
+      // TODO: Implement event-based integration layer with proper validation
     });
 
-    it('should throw if temperature data is missing', () => {
-      // Attempt to calculate evaporation without temperature
-      // Verify clear error thrown
-      expect(true).toBe(true); // Placeholder
+    it.skip('should throw if temperature data is missing', () => {
+      // TODO: Implement event-based integration layer with proper validation
     });
 
     it('should NOT use fallback temperature if data missing', () => {
@@ -292,93 +231,59 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Building Coverage (Indoor vs Outdoor)', () => {
-    it('should identify tiles inside buildings as indoor', () => {
-      // Create a tile that's inside a building
-      // Verify it's marked as indoor/covered
-      expect(true).toBe(true); // Placeholder
+    it.skip('should identify tiles inside buildings as indoor', () => {
+      // TODO: Implement indoor/outdoor detection logic
+      // Requires integration with BuildingComponent or tile-based wall detection
     });
 
-    it('should NOT apply rain moisture to indoor tiles', () => {
-      // Create indoor tile with 40 moisture
-      // Emit rain event
-      // Verify indoor tile moisture stays at 40
-      expect(true).toBe(true); // Placeholder
+    it.skip('should NOT apply rain moisture to indoor tiles', () => {
+      // TODO: Implement event-based integration layer with indoor/outdoor filtering
     });
 
-    it('should still apply evaporation to indoor tiles (reduced)', () => {
-      // Indoor tiles should still lose some moisture (but less)
-      // Create indoor tile with 60 moisture
-      // Run daily decay
-      // Verify some evaporation occurred (but less than outdoor)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should still apply evaporation to indoor tiles (reduced)', () => {
+      // TODO: Implement indoor/outdoor modifiers for evaporation
     });
 
-    it('should apply rain moisture to outdoor tiles only', () => {
-      // Create 2 tiles: one indoor, one outdoor
-      // Both at 50 moisture
-      // Emit rain event
-      // Verify outdoor → 90, indoor → 50
-      expect(true).toBe(true); // Placeholder
+    it.skip('should apply rain moisture to outdoor tiles only', () => {
+      // TODO: Implement event-based integration layer with indoor/outdoor filtering
     });
   });
 
   describe('Edge Cases', () => {
-    it('should handle multiple rain events in one day', () => {
-      // Emit rain twice in rapid succession
-      // Verify moisture increases correctly (capped at 100)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle multiple rain events in one day', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should handle weather change from rain to clear', () => {
-      // Start with rain (moisture increasing)
-      // Change to clear weather
-      // Verify rain stops adding moisture
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle weather change from rain to clear', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should handle zero moisture tiles', () => {
-      // Create tile with 0 moisture
-      // Run evaporation
-      // Verify it doesn't go negative
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle zero moisture tiles', () => {
+      // TODO: Implement event-based integration layer
+      // Note: SoilSystem.decayMoisture() already clamps to 0, just needs to be called
     });
 
-    it('should handle fully saturated tiles (100 moisture)', () => {
-      // Create tile with 100 moisture
-      // Emit rain
-      // Verify it stays at 100, doesn't overflow
-      expect(true).toBe(true); // Placeholder
+    it.skip('should handle fully saturated tiles (100 moisture)', () => {
+      // TODO: Implement event-based integration layer
+      // Note: SoilSystem.applyRain() already clamps to 100, just needs to be called
     });
   });
 
   describe('Realistic Farming Scenarios', () => {
-    it('should require watering during dry spells', () => {
-      // Simulate 5 days of clear weather with no rain
-      // Verify soil moisture drops significantly
-      // Crops would need manual watering
-      expect(true).toBe(true); // Placeholder
+    it.skip('should require watering during dry spells', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should maintain moisture during rainy season', () => {
-      // Simulate 5 days of frequent rain
-      // Verify soil moisture stays high
-      // No manual watering needed
-      expect(true).toBe(true); // Placeholder
+    it.skip('should maintain moisture during rainy season', () => {
+      // TODO: Implement event-based integration layer
     });
 
-    it('should test drought conditions (hot + summer + no rain)', () => {
-      // Hot temperature + summer season + no rain
-      // Moisture should decrease rapidly
-      // Simulate 7 days
-      // Verify tile becomes very dry
-      expect(true).toBe(true); // Placeholder
+    it.skip('should test drought conditions (hot + summer + no rain)', () => {
+      // TODO: Implement event-based integration layer + seasonal modifiers
     });
 
-    it('should test waterlogged conditions (cold + winter + frequent rain)', () => {
-      // Cold temperature + winter + rain every day
-      // Moisture should stay near 100
-      // Could affect crop growth (future feature)
-      expect(true).toBe(true); // Placeholder
+    it.skip('should test waterlogged conditions (cold + winter + frequent rain)', () => {
+      // TODO: Implement event-based integration layer + seasonal modifiers
     });
   });
 });

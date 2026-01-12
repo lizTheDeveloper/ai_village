@@ -101,7 +101,7 @@ const SIZES = {
   headerHeight: 40,
   deityListHeight: 80,
   messageHeight: 60,
-  notificationHeight: 30,
+  notificationHeight: 36,  // Increased to allow for text wrapping
   inputHeight: 50,
   scrollbarWidth: 12,
   fontSize: 13,
@@ -128,6 +128,12 @@ export class DivineChatPanel implements IWindowPanel {
 
   // Chat state (refreshed from World)
   private chatRoomComponent: ChatRoomComponent | null = null;
+
+  // Track input area bounds for click detection
+  private inputBounds: { x: number; y: number; width: number; height: number } | null = null;
+
+  // Track last render bounds for click handling
+  private lastRenderBounds: { x: number; y: number; width: number; height: number } | null = null;
 
   /**
    * Refresh chat state from the World
@@ -244,31 +250,34 @@ export class DivineChatPanel implements IWindowPanel {
   /**
    * Main render method
    */
-  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
-    if (!this.visible) return;
+  render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, world?: any): void {
+    if (!this.visible) {
+      return;
+    }
 
     // Refresh state from world
     if (world) {
       this.refreshFromWorld(world);
     }
 
-    // Panel dimensions (right side of screen)
-    const panelWidth = Math.min(400, width * 0.3);
-    const panelHeight = height - 100;
-    const panelX = width - panelWidth - 20;
-    const panelY = 60;
+    // Use the provided window bounds - panel fills the window content area
+    const panelX = x;
+    const panelY = y;
+    const panelWidth = width;
+    const panelHeight = height;
+
+    // Store render bounds for click handling
+    this.lastRenderBounds = { x: panelX, y: panelY, width: panelWidth, height: panelHeight };
 
     this.visibleHeight = panelHeight;
     this.clickRegions = [];
+    this.inputBounds = null;
 
-    // Draw panel background
-    ctx.fillStyle = COLORS.background;
+    // Draw a visible background so we can see the panel
+    ctx.fillStyle = 'rgba(20, 20, 40, 0.95)';
     ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
 
-    ctx.strokeStyle = COLORS.border;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
-
+    // Background is handled by window frame, just draw content
     let currentY = panelY + SIZES.padding;
 
     // Draw header
@@ -287,12 +296,45 @@ export class DivineChatPanel implements IWindowPanel {
       ctx.fillStyle = COLORS.textMuted;
       ctx.font = `${SIZES.fontSize}px monospace`;
       ctx.fillText('No divine chat active', panelX + SIZES.padding, currentY + 20);
-      ctx.fillText('(2+ gods required)', panelX + SIZES.padding, currentY + 40);
+      ctx.fillText('(waiting for deities)', panelX + SIZES.padding, currentY + 40);
     }
 
-    // Draw input area (if player is a god)
-    if (this.playerDeityId && this.chatRoomComponent && this.chatRoomComponent.isActive) {
-      this.renderInput(ctx, panelX, panelY + panelHeight - SIZES.inputHeight - SIZES.padding, panelWidth);
+    // Draw input area - always show it but indicate status
+    const inputY = panelY + panelHeight - SIZES.inputHeight - SIZES.padding;
+
+    const canChat = this.playerDeityId && this.chatRoomComponent && this.chatRoomComponent.isActive;
+
+    if (canChat) {
+      this.renderInput(ctx, panelX, inputY, panelWidth);
+      // Store input bounds for click detection
+      this.inputBounds = {
+        x: panelX + SIZES.padding,
+        y: inputY,
+        width: panelWidth - SIZES.padding * 2,
+        height: SIZES.inputHeight
+      };
+    } else {
+      // Show disabled input with explanation
+      ctx.fillStyle = 'rgba(40, 40, 60, 0.8)';
+      ctx.fillRect(panelX + SIZES.padding, inputY, panelWidth - SIZES.padding * 2, SIZES.inputHeight);
+
+      ctx.strokeStyle = 'rgba(80, 80, 100, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(panelX + SIZES.padding, inputY, panelWidth - SIZES.padding * 2, SIZES.inputHeight);
+
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = `${SIZES.fontSize}px monospace`;
+
+      // Show specific reason why chat is disabled
+      let reason = 'Chat unavailable';
+      if (!this.playerDeityId) {
+        reason = 'You must be a deity to chat';
+      } else if (!this.chatRoomComponent) {
+        reason = 'No divine chat room exists';
+      } else if (!this.chatRoomComponent.isActive) {
+        reason = 'Chat inactive (waiting for gods)';
+      }
+      ctx.fillText(reason, panelX + SIZES.padding * 2, inputY + SIZES.inputHeight / 2 + 4);
     }
   }
 
@@ -326,7 +368,7 @@ export class DivineChatPanel implements IWindowPanel {
   /**
    * Render list of present deities
    */
-  private renderDeityList(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, world: World): number {
+  private renderDeityList(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, world: World): number {
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = `${SIZES.fontSize}px monospace`;
     ctx.fillText('Present:', x + SIZES.padding, y);
@@ -340,11 +382,18 @@ export class DivineChatPanel implements IWindowPanel {
       return { name, isPlayer };
     });
 
+    const maxNameWidth = width - SIZES.padding * 3 - SIZES.scrollbarWidth;
+
     for (let i = 0; i < deityNames.length; i++) {
       const { name, isPlayer } = deityNames[i]!;
       ctx.fillStyle = isPlayer ? COLORS.playerName : COLORS.deityName;
-      ctx.fillText(`• ${name}${isPlayer ? ' (You)' : ''}`, x + SIZES.padding * 2, y);
-      y += SIZES.lineHeight;
+      const displayName = `• ${name}${isPlayer ? ' (You)' : ''}`;
+      // Wrap text instead of truncating
+      const lines = this.wrapTextToLines(ctx, displayName, maxNameWidth);
+      for (const line of lines) {
+        ctx.fillText(line, x + SIZES.padding * 2, y);
+        y += SIZES.lineHeight;
+      }
     }
 
     return y + SIZES.padding;
@@ -408,40 +457,101 @@ export class DivineChatPanel implements IWindowPanel {
    * Render a single message
    */
   private renderMessage(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, message: ChatMessage): number {
+    const contentWidth = width - SIZES.padding * 2 - SIZES.scrollbarWidth;
+    const maxTextWidth = contentWidth - SIZES.padding * 2;
+
+    // Calculate heights for wrapped text
+    const isPlayer = message.senderId === this.playerDeityId;
+    ctx.font = `bold ${SIZES.nameSize}px monospace`;
+    const nameLines = this.wrapTextToLines(ctx, message.senderName, maxTextWidth);
+
+    ctx.font = `${SIZES.fontSize}px monospace`;
+    const contentLines = this.wrapTextToLines(ctx, message.content, maxTextWidth);
+
+    // Calculate total height needed
+    const nameHeight = nameLines.length * SIZES.lineHeight;
+    const contentHeight = contentLines.length * SIZES.lineHeight;
+    const totalHeight = Math.max(SIZES.messageHeight, nameHeight + contentHeight + SIZES.padding * 2);
+
     // Background
     ctx.fillStyle = COLORS.messageBg;
-    ctx.fillRect(x + SIZES.padding, y, width - SIZES.padding * 2 - SIZES.scrollbarWidth, SIZES.messageHeight);
+    ctx.fillRect(x + SIZES.padding, y, contentWidth, totalHeight);
 
-    // Sender name - check if sender is the player
-    const isPlayer = message.senderId === this.playerDeityId;
+    // Sender name with wrapping
     ctx.fillStyle = isPlayer ? COLORS.playerName : COLORS.deityName;
     ctx.font = `bold ${SIZES.nameSize}px monospace`;
-    ctx.fillText(message.senderName, x + SIZES.padding * 2, y + 18);
+    let textY = y + SIZES.lineHeight;
+    for (const line of nameLines) {
+      ctx.fillText(line, x + SIZES.padding * 2, textY);
+      textY += SIZES.lineHeight;
+    }
 
-    // Message content
+    // Message content with wrapping
     ctx.fillStyle = COLORS.text;
     ctx.font = `${SIZES.fontSize}px monospace`;
-    const maxWidth = width - SIZES.padding * 4 - SIZES.scrollbarWidth;
-    this.wrapText(ctx, message.content, x + SIZES.padding * 2, y + 36, maxWidth, SIZES.lineHeight);
+    for (const line of contentLines) {
+      ctx.fillText(line, x + SIZES.padding * 2, textY);
+      textY += SIZES.lineHeight;
+    }
 
-    return y + SIZES.messageHeight;
+    return y + totalHeight;
   }
 
   /**
    * Render a notification
    */
   private renderNotification(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, notification: ChatNotification): number {
+    // Notification text with wrapping
+    const text = this.formatNotification(notification);
+    ctx.font = `italic ${SIZES.fontSize}px monospace`;
+
+    const contentWidth = width - SIZES.padding * 2 - SIZES.scrollbarWidth;
+    const maxTextWidth = contentWidth - SIZES.padding * 2;
+
+    // Calculate wrapped lines to determine height
+    const lines = this.wrapTextToLines(ctx, text, maxTextWidth);
+    const notificationHeight = Math.max(SIZES.notificationHeight, lines.length * SIZES.lineHeight + SIZES.padding);
+
     // Background
     ctx.fillStyle = COLORS.notificationBg;
-    ctx.fillRect(x + SIZES.padding, y, width - SIZES.padding * 2 - SIZES.scrollbarWidth, SIZES.notificationHeight);
+    ctx.fillRect(x + SIZES.padding, y, contentWidth, notificationHeight);
 
-    // Notification text
-    const text = this.formatNotification(notification);
+    // Render wrapped text
     ctx.fillStyle = COLORS.textMuted;
-    ctx.font = `italic ${SIZES.fontSize}px monospace`;
-    ctx.fillText(text, x + SIZES.padding * 2, y + SIZES.notificationHeight / 2 + 4);
+    let textY = y + SIZES.lineHeight;
+    for (const line of lines) {
+      ctx.fillText(line, x + SIZES.padding * 2, textY);
+      textY += SIZES.lineHeight;
+    }
 
-    return y + SIZES.notificationHeight;
+    return y + notificationHeight;
+  }
+
+  /**
+   * Wrap text to fit within maxWidth, returning array of lines
+   */
+  private wrapTextToLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width > maxWidth && currentLine.length > 0) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
+
+    return lines.length > 0 ? lines : [''];
   }
 
   /**
@@ -469,17 +579,19 @@ export class DivineChatPanel implements IWindowPanel {
    */
   private renderInput(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): void {
     // Background
-    ctx.fillStyle = COLORS.inputBg;
+    ctx.fillStyle = this.inputActive ? 'rgba(30, 30, 50, 0.95)' : COLORS.inputBg;
     ctx.fillRect(x + SIZES.padding, y, width - SIZES.padding * 2, SIZES.inputHeight);
 
-    ctx.strokeStyle = COLORS.inputBorder;
-    ctx.lineWidth = 1;
+    // Border - highlight when active
+    ctx.strokeStyle = this.inputActive ? '#FFD700' : COLORS.inputBorder;
+    ctx.lineWidth = this.inputActive ? 2 : 1;
     ctx.strokeRect(x + SIZES.padding, y, width - SIZES.padding * 2, SIZES.inputHeight);
 
     // Placeholder or input text
     ctx.fillStyle = this.inputText ? COLORS.text : COLORS.textDim;
     ctx.font = `${SIZES.fontSize}px monospace`;
-    const text = this.inputText || 'Type a message...';
+    const placeholder = this.inputActive ? 'Type and press Enter to send...' : 'Click here to type...';
+    const text = this.inputText || placeholder;
     ctx.fillText(text, x + SIZES.padding * 2, y + SIZES.inputHeight / 2 + 4);
 
     // Cursor if active
@@ -487,6 +599,13 @@ export class DivineChatPanel implements IWindowPanel {
       const textWidth = ctx.measureText(this.inputText).width;
       ctx.fillStyle = COLORS.text;
       ctx.fillRect(x + SIZES.padding * 2 + textWidth + 2, y + 15, 2, 20);
+    }
+
+    // Help text when not active
+    if (!this.inputActive && !this.inputText) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = `${SIZES.fontSize - 2}px monospace`;
+      ctx.fillText('(press G to toggle chat)', x + SIZES.padding * 2, y + SIZES.inputHeight - 8);
     }
   }
 
@@ -529,19 +648,30 @@ export class DivineChatPanel implements IWindowPanel {
   }
 
   /**
-   * Handle mouse click
+   * Handle mouse click (x, y are in panel-local coordinates)
    */
-  handleClick(x: number, y: number, width: number, height: number): boolean {
+  handleClick(localX: number, localY: number, _width: number, _height: number): boolean {
     if (!this.visible) return false;
 
-    const panelWidth = Math.min(400, width * 0.3);
-    const panelHeight = height - 100;
-    const panelX = width - panelWidth - 20;
-    const panelY = 60;
+    // Use stored render bounds for accurate click detection
+    if (!this.lastRenderBounds) return false;
 
-    // Check if click is within panel
-    if (x < panelX || x > panelX + panelWidth || y < panelY || y > panelY + panelHeight) {
-      return false;
+    const bounds = this.lastRenderBounds;
+
+    // Convert to absolute coordinates (local coords are relative to panel origin)
+    const x = bounds.x + localX;
+    const y = bounds.y + localY;
+
+    // Check if click is on input area
+    if (this.inputBounds) {
+      if (x >= this.inputBounds.x && x <= this.inputBounds.x + this.inputBounds.width &&
+          y >= this.inputBounds.y && y <= this.inputBounds.y + this.inputBounds.height) {
+        this.inputActive = true;
+        return true;
+      } else {
+        // Clicked elsewhere in panel - deactivate input
+        this.inputActive = false;
+      }
     }
 
     // Check click regions
@@ -618,6 +748,13 @@ export class DivineChatPanel implements IWindowPanel {
     } as any);
 
     this.inputText = '';
+  }
+
+  /**
+   * Check if input is currently active (focused)
+   */
+  isInputActive(): boolean {
+    return this.inputActive;
   }
 
   /**

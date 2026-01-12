@@ -221,6 +221,30 @@ export interface ParadigmCostCalculator {
   ): DeductionResult;
 
   /**
+   * Lock resources for a multi-tick spell cast.
+   * Locked resources are deducted but can be restored if cast is interrupted.
+   *
+   * @param costs The costs to lock
+   * @param caster The caster's MagicComponent (will be mutated)
+   * @returns Result of locking including any errors
+   */
+  lockCosts?(
+    costs: SpellCost[],
+    _caster: MagicComponent
+  ): DeductionResult;
+
+  /**
+   * Restore locked resources after a failed/cancelled cast.
+   *
+   * @param costs The costs to restore
+   * @param caster The caster's MagicComponent (will be mutated)
+   */
+  restoreLockedCosts?(
+    costs: SpellCost[],
+    _caster: MagicComponent
+  ): void;
+
+  /**
    * Initialize resource pools when a caster joins this paradigm.
    *
    * @param caster The caster's MagicComponent (will be mutated)
@@ -488,5 +512,135 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
       regenRate,
       locked: 0,
     };
+  }
+
+  /**
+   * Lock resources for a multi-tick spell cast.
+   * Default implementation: deduct from current, add to locked.
+   */
+  lockCosts(costs: SpellCost[], caster: MagicComponent): DeductionResult {
+    const deducted: SpellCost[] = [];
+
+    for (const cost of costs) {
+      let pool = caster.resourcePools[cost.type];
+
+      // For mana costs, also check manaPools (legacy/dual support)
+      if (cost.type === 'mana') {
+        // If we have a resourcePool for mana, use it AND sync to manaPools
+        if (pool) {
+          const available = pool.current - pool.locked;
+          console.log('[DEBUG lockCosts] resourcePools.mana - available:', available, 'needed:', cost.amount);
+          if (available < cost.amount) {
+            console.log('[DEBUG lockCosts] Insufficient mana in resourcePools.mana');
+            return {
+              success: false,
+              deducted,
+              terminal: false,
+            };
+          }
+          pool.current -= cost.amount;
+          pool.locked += cost.amount;
+
+          // ALSO lock in manaPools if it exists (for dual compatibility)
+          if (caster.manaPools && caster.manaPools.length > 0) {
+            const manaPool = caster.manaPools.find(
+              p => p.source === caster.primarySource || p.source === 'arcane'
+            );
+            if (manaPool) {
+              manaPool.current -= cost.amount;
+              manaPool.locked += cost.amount;
+            }
+          }
+
+          deducted.push(cost);
+          continue;
+        }
+
+        // If no resourcePool.mana, try manaPools
+        if (caster.manaPools) {
+          const manaPool = caster.manaPools.find(
+            p => p.source === caster.primarySource || p.source === 'arcane'
+          );
+          if (manaPool) {
+            const available = manaPool.current - manaPool.locked;
+            if (available < cost.amount) {
+              return {
+                success: false,
+                deducted,
+                terminal: false,
+              };
+            }
+            manaPool.current -= cost.amount;
+            manaPool.locked += cost.amount;
+            deducted.push(cost);
+            continue;
+          }
+        }
+      }
+
+      if (!pool) {
+        // Can't lock from non-existent pool
+        return {
+          success: false,
+          deducted,
+          terminal: false,
+        };
+      }
+
+      // Check if we have enough available (not already locked)
+      const available = pool.current - pool.locked;
+      if (available < cost.amount) {
+        return {
+          success: false,
+          deducted,
+          terminal: false,
+        };
+      }
+
+      // Deduct from current and add to locked
+      pool.current -= cost.amount;
+      pool.locked += cost.amount;
+      deducted.push(cost);
+    }
+
+    return { success: true, deducted, terminal: false };
+  }
+
+  /**
+   * Restore locked resources after a failed/cancelled cast.
+   * Default implementation: restore current, reduce locked.
+   */
+  restoreLockedCosts(costs: SpellCost[], caster: MagicComponent): void {
+    for (const cost of costs) {
+      let pool = caster.resourcePools[cost.type];
+
+      // For mana costs, restore in both resourcePools and manaPools (dual sync)
+      if (cost.type === 'mana') {
+        // Restore in resourcePool.mana if it exists
+        if (pool) {
+          pool.current += cost.amount;
+          pool.locked = Math.max(0, pool.locked - cost.amount);
+        }
+
+        // ALSO restore in manaPools if it exists
+        if (caster.manaPools) {
+          const manaPool = caster.manaPools.find(
+            p => p.source === caster.primarySource || p.source === 'arcane'
+          );
+          if (manaPool) {
+            manaPool.current += cost.amount;
+            manaPool.locked = Math.max(0, manaPool.locked - cost.amount);
+          }
+        }
+
+        continue;
+      }
+
+      if (!pool) continue;
+
+      // Restore current and reduce locked
+      pool.current += cost.amount;
+      pool.locked = Math.max(0, pool.locked - cost.amount);
+    }
   }
 }

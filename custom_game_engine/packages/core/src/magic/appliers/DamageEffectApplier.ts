@@ -25,6 +25,7 @@ import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { EquipmentSlotsComponent } from '../../components/EquipmentSlotsComponent.js';
 import type { ArmorTrait } from '../../items/traits/ArmorTrait.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 // ============================================================================
 // DamageEffectApplier
@@ -93,7 +94,23 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     // Ensure damage is not negative
     finalDamage = Math.max(0, finalDamage);
 
-    // Apply damage to target
+    // NEW: Check if this is a DoT effect (has duration)
+    if (effect.duration && effect.duration > 0) {
+      // This is a damage-over-time effect - use StateMutatorSystem
+      return this.applyDamageOverTime(
+        effect,
+        caster,
+        target,
+        finalDamage,
+        scaledDamage.value,
+        effectiveResistance,
+        resistedDamage,
+        armorReduction,
+        context
+      );
+    }
+
+    // EXISTING: Instant damage (no duration)
     const damageApplied = this.applyDamageToTarget(target, finalDamage);
 
     // Handle on-hit effects
@@ -119,6 +136,67 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
       appliedAt: context.tick,
       casterId: caster.id,
       spellId: context.spell.id,
+    };
+  }
+
+  /**
+   * Apply damage over time using StateMutatorSystem.
+   * Registers a delta that gradually reduces health over the effect duration.
+   */
+  private applyDamageOverTime(
+    effect: DamageEffect,
+    caster: Entity,
+    target: Entity,
+    finalDamage: number,
+    baseDamage: number,
+    effectiveResistance: number,
+    resistedDamage: number,
+    armorReduction: number,
+    context: EffectContext
+  ): EffectApplicationResult {
+    // StateMutatorSystem is required - no fallback
+    // (TypeScript ensures context.stateMutatorSystem is non-null)
+
+    // Calculate damage per minute from total damage and duration
+    const durationInTicks = effect.duration!;
+    const durationInMinutes = durationInTicks / 1200; // 1200 ticks per game minute at 20 TPS
+    const damagePerMinute = finalDamage / durationInMinutes;
+
+    // Convert damage (0-100 scale) to health loss (0-1 scale)
+    const healthLossPerMinute = damagePerMinute / 100;
+
+    // Register delta with StateMutatorSystem
+    const cleanupFn = context.stateMutatorSystem.registerDelta({
+      entityId: target.id,
+      componentType: CT.Needs,
+      field: 'health',
+      deltaPerMinute: -healthLossPerMinute, // Negative for damage
+      min: 0, // Can't go below 0 health
+      source: `magic:${context.spell.id}:${effect.id}`,
+      expiresAtTick: context.tick + durationInTicks,
+    });
+
+    return {
+      success: true,
+      effectId: effect.id,
+      targetId: target.id,
+      appliedValues: {
+        baseDamage,
+        finalDamage, // Total damage that will be applied over duration
+        critMultiplier: context.isCrit ? (effect.critMultiplier ?? 2.0) : 1.0,
+        resistanceAmount: effectiveResistance,
+        resistedDamage,
+        armorReduction,
+        powerMultiplier: context.powerMultiplier,
+        damagePerMinute,
+        durationInTicks,
+      },
+      resisted: effectiveResistance > 0,
+      resistanceApplied: effectiveResistance,
+      appliedAt: context.tick,
+      casterId: caster.id,
+      spellId: context.spell.id,
+      cleanupFn, // Store cleanup function for dispel support
     };
   }
 

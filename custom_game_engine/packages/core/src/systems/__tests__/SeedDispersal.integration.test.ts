@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../../ecs/World.js';
-import { PlantSystem } from '../PlantSystem.js';
+import { PlantSystem } from '@ai-village/botany';
 import { PlantComponent } from '../../components/PlantComponent.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
@@ -146,8 +146,10 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       }
     } else {
       // No seeds dispersed (random position finding failed)
-      // This is OK - test passes as long as the structure would be correct
-      expect(true).toBe(true);
+      // Verify plant still exists and the dispersal attempt completed without crashing
+      expect(plant).toBeDefined();
+      expect(plant.stageProgress).toBe(1.0);
+      expect(plant.seedsProduced).toBe(5);
     }
   });
 
@@ -219,8 +221,10 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
         expect(seed.genetics.diseaseResistance).toBeDefined();
       }
     } else {
-      // No seeds dispersed - test passes
-      expect(true).toBe(true);
+      // No seeds dispersed - verify test setup was valid
+      expect(plant).toBeDefined();
+      expect(plant.genetics).toBeDefined();
+      expect(plant.stageProgress).toBe(1.0);
     }
   });
 
@@ -290,8 +294,10 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       }
     } else {
       // No seeds dispersed - random position finding failed (OK for random positioning)
-      // Test passes - the important thing is no crash occurred
-      expect(true).toBe(true);
+      // Verify the test setup was correct and no crash occurred
+      expect(plant).toBeDefined();
+      expect(plant.genetics).toBeDefined();
+      expect(plant.generation).toBe(2);
     }
   });
 
@@ -422,8 +428,10 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
         expect(seed.vigor).toBeGreaterThan(0);
       }
     } else {
-      // No seeds dispersed - test passes
-      expect(true).toBe(true);
+      // No seeds dispersed - verify system ran without errors
+      expect(plant).toBeDefined();
+      expect(plant.careQuality).toBe(90);
+      expect(plant.health).toBe(100);
     }
   });
 });

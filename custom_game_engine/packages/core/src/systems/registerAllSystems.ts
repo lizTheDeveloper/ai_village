@@ -16,11 +16,8 @@ import { WeatherSystem } from './WeatherSystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
 import { SoilSystem } from './SoilSystem.js';
 
-// Plants
-import { PlantSystem } from './PlantSystem.js';
-import { PlantDiscoverySystem } from './PlantDiscoverySystem.js';
-import { PlantDiseaseSystem } from './PlantDiseaseSystem.js';
-import { WildPlantPopulationSystem } from './WildPlantPopulationSystem.js';
+// Plants - Import from @ai-village/botany package and pass via config.plantSystems
+// Plant systems have been moved to @ai-village/botany
 import { PlantVisualsSystem } from './PlantVisualsSystem.js';
 
 // Animals
@@ -279,6 +276,9 @@ import { AutoSaveSystem } from './AutoSaveSystem.js';
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
 
+// Chunk Loading System
+import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
+
 /**
  * LLM-related types (passed from caller to avoid circular dependency)
  */
@@ -289,6 +289,21 @@ export interface LLMDependencies {
   promptBuilder?: unknown;
   /** Scheduled decision processor with LLMScheduler (from @ai-village/core) - NEW SCHEDULER-BASED APPROACH */
   scheduledProcessor?: unknown;
+}
+
+/**
+ * Plant system classes to use. Import from @ai-village/botany for the extracted versions.
+ * If not provided, falls back to the deprecated core versions.
+ */
+export interface PlantSystemsConfig {
+  /** PlantSystem class constructor */
+  PlantSystem: new (eventBus: any) => System & { setStateMutatorSystem(s: any): void };
+  /** PlantDiscoverySystem class constructor */
+  PlantDiscoverySystem: new () => System;
+  /** PlantDiseaseSystem class constructor */
+  PlantDiseaseSystem: new (eventBus: any) => System;
+  /** WildPlantPopulationSystem class constructor */
+  WildPlantPopulationSystem: new (eventBus: any) => System;
 }
 
 /**
@@ -303,6 +318,21 @@ export interface SystemRegistrationConfig extends LLMDependencies {
   enableMetrics?: boolean;
   /** Enable auto-save */
   enableAutoSave?: boolean;
+  /**
+   * Plant systems to use. REQUIRED - Import from @ai-village/botany:
+   * ```typescript
+   * import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } from '@ai-village/botany';
+   * registerAllSystems(gameLoop, {
+   *   plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem }
+   * });
+   * ```
+   * Throws an error at runtime if not provided.
+   */
+  plantSystems?: PlantSystemsConfig;
+  /** ChunkManager instance for terrain chunk loading (optional - if not provided, ChunkLoadingSystem won't be registered) */
+  chunkManager?: unknown;
+  /** TerrainGenerator instance for chunk generation (optional - if not provided, ChunkLoadingSystem won't be registered) */
+  terrainGenerator?: unknown;
 }
 
 /**
@@ -310,7 +340,8 @@ export interface SystemRegistrationConfig extends LLMDependencies {
  */
 export interface SystemRegistrationResult {
   soilSystem: SoilSystem;
-  plantSystem: PlantSystem;
+  /** PlantSystem instance (from @ai-village/botany or deprecated core version) */
+  plantSystem: System & { setStateMutatorSystem(s: any): void };
   wildAnimalSpawning: WildAnimalSpawningSystem;
   governanceDataSystem: GovernanceDataSystem;
   metricsSystem?: MetricsCollectionSystem;
@@ -319,6 +350,8 @@ export interface SystemRegistrationResult {
   divinePowerSystem: DivinePowerSystem;
   marketEventSystem: MarketEventSystem;
   realmManager: RealmManager;
+  /** ChunkLoadingSystem instance (if chunkManager and terrainGenerator were provided) */
+  chunkLoadingSystem?: ChunkLoadingSystem;
 }
 
 /**
@@ -331,7 +364,20 @@ export function registerAllSystems(
   gameLoop: GameLoop,
   config: SystemRegistrationConfig = {}
 ): SystemRegistrationResult {
-  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true } = config;
+  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true, plantSystems, chunkManager, terrainGenerator } = config;
+
+  // Plant systems must be provided from @ai-village/botany
+  if (!plantSystems) {
+    throw new Error(
+      'plantSystems config is required. Import plant systems from @ai-village/botany:\n' +
+      'import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } from "@ai-village/botany";\n' +
+      'registerAllSystems(gameLoop, { plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } });'
+    );
+  }
+  const PlantSystemClass = plantSystems.PlantSystem;
+  const PlantDiscoverySystemClass = plantSystems.PlantDiscoverySystem;
+  const PlantDiseaseSystemClass = plantSystems.PlantDiseaseSystem;
+  const WildPlantPopulationSystemClass = plantSystems.WildPlantPopulationSystem;
   const eventBus = gameLoop.world.eventBus;
 
   // Helper to register a system in disabled state (uses the system's actual id)
@@ -348,6 +394,18 @@ export function registerAllSystems(
 
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
+
+  // ============================================================================
+  // CHUNK LOADING (Terrain Generation)
+  // ============================================================================
+  // ChunkLoadingSystem - Handles chunk loading and terrain generation
+  // In visual mode: loads chunks around camera viewport
+  // In headless mode: loads chunks around agents
+  let chunkLoadingSystem: ChunkLoadingSystem | undefined;
+  if (chunkManager && terrainGenerator) {
+    chunkLoadingSystem = new ChunkLoadingSystem(chunkManager as any, terrainGenerator as any);
+    gameLoop.systemRegistry.register(chunkLoadingSystem);
+  }
 
   // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
   // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.
@@ -373,15 +431,15 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new AgentVisualsSystem());
 
   // ============================================================================
-  // PLANTS
+  // PLANTS (use @ai-village/botany systems if provided, otherwise deprecated core versions)
   // ============================================================================
   // PlantSystem - Uses StateMutatorSystem for batched hydration/age/health updates
-  const plantSystem = new PlantSystem(eventBus);
+  const plantSystem = new PlantSystemClass(eventBus);
   plantSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(plantSystem);
-  gameLoop.systemRegistry.register(new PlantDiscoverySystem());
-  gameLoop.systemRegistry.register(new PlantDiseaseSystem(eventBus));
-  gameLoop.systemRegistry.register(new WildPlantPopulationSystem(eventBus));
+  gameLoop.systemRegistry.register(new PlantDiscoverySystemClass());
+  gameLoop.systemRegistry.register(new PlantDiseaseSystemClass(eventBus));
+  gameLoop.systemRegistry.register(new WildPlantPopulationSystemClass(eventBus));
 
   // ============================================================================
   // ANIMALS
@@ -875,5 +933,6 @@ export function registerAllSystems(
     divinePowerSystem,
     marketEventSystem,
     realmManager,
+    chunkLoadingSystem,
   };
 }

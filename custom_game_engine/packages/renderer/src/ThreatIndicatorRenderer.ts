@@ -63,7 +63,8 @@ export class ThreatIndicatorRenderer {
   /**
    * Handle conflict started event
    */
-  private handleConflictStarted(data: any): void {
+  private handleConflictStarted(event: any): void {
+    const data = event.data || event;
     if (!data.conflictId || !data.participants || !data.type) {
       return;
     }
@@ -82,7 +83,8 @@ export class ThreatIndicatorRenderer {
   /**
    * Handle conflict resolved event
    */
-  private handleConflictResolved(data: any): void {
+  private handleConflictResolved(event: any): void {
+    const data = event.data || event;
     if (!data.conflictId) {
       return;
     }
@@ -93,7 +95,8 @@ export class ThreatIndicatorRenderer {
   /**
    * Handle entity death event
    */
-  private handleDeath(data: any): void {
+  private handleDeath(event: any): void {
+    const data = event.data || event;
     if (!data.entityId) {
       return;
     }

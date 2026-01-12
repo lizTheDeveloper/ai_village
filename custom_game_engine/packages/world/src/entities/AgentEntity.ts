@@ -47,13 +47,39 @@ import {
   // Realm system components
   createRealmLocationComponent,
   SpeciesComponent,
+  createParentingComponent,
 } from '@ai-village/core';
 // Reproduction system components
-import {
-  createSexualityComponent,
-  createCourtshipComponent,
-  createParentingComponent,
-} from '@ai-village/reproduction';
+// TODO: Re-enable after building reproduction package
+// import {
+//   createSexualityComponent,
+//   createCourtshipComponent,
+// } from '@ai-village/reproduction';
+
+// Temporary stubs with proper Component structure
+import { ComponentBase } from '@ai-village/core';
+
+class TempSexualityComponent extends ComponentBase {
+  public readonly type = 'sexuality' as const;
+  public activelySeeking: boolean = false;
+  public relationshipStyle: 'monogamous' | 'serially_monogamous' | 'polyamorous' | 'relationship_anarchist' | 'aromantic' | 'communal' | 'hive_structure' | 'no_preference' = 'no_preference';
+}
+
+class TempCourtshipComponent extends ComponentBase {
+  public readonly type = 'courtship' as const;
+}
+
+const createSexualityComponent = (options?: { relationshipStyle?: TempSexualityComponent['relationshipStyle'] }): TempSexualityComponent => {
+  const comp = new TempSexualityComponent();
+  if (options?.relationshipStyle) {
+    comp.relationshipStyle = options.relationshipStyle;
+  }
+  return comp;
+};
+
+const createCourtshipComponent = (_speciesId?: string): TempCourtshipComponent => {
+  return new TempCourtshipComponent();
+};
 
 /**
  * Determine the best vision profile based on agent skills.

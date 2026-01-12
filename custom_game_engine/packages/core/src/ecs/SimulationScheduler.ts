@@ -15,6 +15,15 @@
 import type { Entity } from './Entity.js';
 import type { World } from './World.js';
 import type { ComponentType } from '../types/ComponentType.js';
+import { NDimensionalSpatialGrid } from '../utils/NDimensionalSpatialGrid.js';
+import {
+  canPotentiallySee,
+  getEffectiveRange,
+  distanceSquaredND,
+  getCoordinates,
+} from '../utils/VisibilityUtils.js';
+import type { UniversePhysicsConfig } from '../config/UniversePhysicsConfig.js';
+import { STANDARD_3D_CONFIG } from '../config/UniversePhysicsConfig.js';
 
 /**
  * Simulation modes determine when an entity is updated
@@ -148,21 +157,39 @@ export function isAlwaysActive(entity: Entity): boolean {
  */
 export function isInSimulationRange(
   entity: Entity,
-  agentPositions: Array<{ x: number; y: number }>,
-  range: number = 15
+  agentPositions: Array<{ x: number; y: number; z?: number }>,
+  range: number = 15,
+  physicsConfig: UniversePhysicsConfig = STANDARD_3D_CONFIG
 ): boolean {
   // Get entity position
-  const position = entity.components.get('position') as { x: number; y: number } | undefined;
+  const position = entity.components.get('position') as
+    | { x: number; y: number; z?: number; w?: number; v?: number; u?: number }
+    | undefined;
   if (!position) return false;
 
-  // Check if within range of any agent (using squared distance to avoid sqrt)
-  const rangeSquared = range * range;
-  for (const agentPos of agentPositions) {
-    const dx = position.x - agentPos.x;
-    const dy = position.y - agentPos.y;
-    const distanceSquared = dx * dx + dy * dy;
+  const entityZ = position.z ?? 0;
 
-    if (distanceSquared <= rangeSquared) {
+  // Check if within range of any agent
+  for (const agentPos of agentPositions) {
+    const agentZ = agentPos.z ?? 0;
+
+    // Fast pre-filter: Check underground isolation (hard boundary at z=0)
+    if (physicsConfig.undergroundIsolation && !canPotentiallySee(agentZ, entityZ)) {
+      continue; // Different isolation layers, skip this agent
+    }
+
+    // Calculate effective range with horizon bonus for flying entities
+    const effectiveRange = getEffectiveRange(range, agentZ, physicsConfig.planetRadius);
+
+    // N-dimensional distance calculation
+    const agentCoords = getCoordinates(
+      { x: agentPos.x, y: agentPos.y, z: agentZ },
+      physicsConfig.spatialDimensions
+    );
+    const entityCoords = getCoordinates(position, physicsConfig.spatialDimensions);
+    const distanceSquared = distanceSquaredND(agentCoords, entityCoords);
+
+    if (distanceSquared <= effectiveRange * effectiveRange) {
       return true;
     }
   }
@@ -175,10 +202,33 @@ export function isInSimulationRange(
  */
 export class SimulationScheduler {
   /** Cache of agent positions for proximity checks */
-  private agentPositions: Array<{ x: number; y: number }> = [];
+  private agentPositions: Array<{ x: number; y: number; z?: number }> = [];
 
   /** Last update tick per entity (for frequency throttling) */
   private lastUpdateTick: Map<string, number> = new Map();
+
+  /** Feature flag for N-D spatial grid (can disable for debugging) */
+  private useNDSpatialGrid: boolean = true;
+
+  /** N-dimensional spatial grid for O(1) proximity queries */
+  private spatialGrid: NDimensionalSpatialGrid | null = null;
+
+  /** Universe physics configuration */
+  private physicsConfig: UniversePhysicsConfig = STANDARD_3D_CONFIG;
+
+  /**
+   * Configure universe physics for visibility calculations
+   */
+  setPhysicsConfig(config: UniversePhysicsConfig): void {
+    this.physicsConfig = config;
+    // Recreate spatial grid with new dimensions
+    if (this.useNDSpatialGrid) {
+      this.spatialGrid = new NDimensionalSpatialGrid(
+        config.spatialDimensions,
+        Math.max(...config.defaultVisibilityRange)
+      );
+    }
+  }
 
   /**
    * Update agent position cache
@@ -189,9 +239,27 @@ export class SimulationScheduler {
 
     const agents = world.query().with('agent' as ComponentType).with('position' as ComponentType).executeEntities();
     for (const agent of agents) {
-      const position = agent.components.get('position') as { x: number; y: number } | undefined;
+      const position = agent.components.get('position') as
+        | { x: number; y: number; z?: number }
+        | undefined;
       if (position) {
-        this.agentPositions.push({ x: position.x, y: position.y });
+        this.agentPositions.push({ x: position.x, y: position.y, z: position.z });
+      }
+    }
+
+    // Update spatial grid with current entity positions
+    if (this.useNDSpatialGrid && this.spatialGrid) {
+      this.spatialGrid.clear();
+
+      // Add all entities with positions to the spatial grid
+      for (const entity of world.entities.values()) {
+        const position = entity.components.get('position') as
+          | { x: number; y: number; z?: number; w?: number; v?: number; u?: number }
+          | undefined;
+        if (position) {
+          const coords = getCoordinates(position, this.physicsConfig.spatialDimensions);
+          this.spatialGrid.add(entity.id, coords);
+        }
       }
     }
   }
@@ -263,7 +331,7 @@ export class SimulationScheduler {
         return this.checkUpdateFrequency(entity.id, currentTick, updateFrequency);
       }
 
-      if (!isInSimulationRange(entity, this.agentPositions, range)) {
+      if (!isInSimulationRange(entity, this.agentPositions, range, this.physicsConfig)) {
         return false; // Off-screen, freeze simulation
       }
 
@@ -327,7 +395,7 @@ export class SimulationScheduler {
         }
 
         if (hasProximity) {
-          if (isInSimulationRange(entity, this.agentPositions)) {
+          if (isInSimulationRange(entity, this.agentPositions, 15, this.physicsConfig)) {
             proximityActiveCount++;
           } else {
             proximityFrozenCount++;

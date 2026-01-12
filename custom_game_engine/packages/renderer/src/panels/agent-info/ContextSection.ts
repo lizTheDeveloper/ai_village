@@ -309,6 +309,8 @@ export class ContextSection {
 
         if (!llmHistory) {
           content = '(No LLM history available - this agent has not made any LLM decisions yet)';
+        } else if (typeof llmHistory.getLastAnyInteraction !== 'function') {
+          content = '(LLM history component loaded but missing methods - try reloading the save)';
         } else {
           const lastInteraction = llmHistory.getLastAnyInteraction();
 
