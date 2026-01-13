@@ -298,7 +298,7 @@ function createInitialPlants(world: WorldMutator) {
 function createInitialAnimals(world: WorldMutator, spawning: WildAnimalSpawningSystem) {
   const animals = [
     { species: 'chicken', position: { x: 3, y: 2 } },
-    { species: 'sheep', position: { x: -4, y: 3 } },
+    { species: 'sheep_white', position: { x: -4, y: 3 } },
     { species: 'rabbit', position: { x: 5, y: -2 } },
   ];
   for (const a of animals) {

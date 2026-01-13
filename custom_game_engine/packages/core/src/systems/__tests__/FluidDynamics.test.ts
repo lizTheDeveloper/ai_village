@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
+import { World } from '../../World.js';
 import { FluidDynamicsSystem } from '../FluidDynamicsSystem.js';
 
 describe('FluidDynamicsSystem', () => {
@@ -14,7 +14,7 @@ describe('FluidDynamicsSystem', () => {
   it('should update once per game minute (1200 ticks)', () => {
     // Simulate 1199 ticks - should not update
     for (let i = 0; i < 1199; i++) {
-      world.tick = i;
+      world.setTick(i);
       system.update(world, [], 0.05);
     }
 
@@ -22,11 +22,11 @@ describe('FluidDynamicsSystem', () => {
     expect(debugInfo.tilesProcessedLastUpdate).toBe(0);
 
     // Tick 1200 - should update
-    world.tick = 1200;
+    world.setTick(1200);
     system.update(world, [], 0.05);
 
     // Next update at tick 2400
-    world.tick = 2399;
+    world.setTick(2399);
     system.update(world, [], 0.05);
     expect(system.getDebugInfo().lastUpdateTime).toBeGreaterThanOrEqual(0);
   });
@@ -62,7 +62,14 @@ describe('FluidDynamicsSystem', () => {
     const eventBus = world.eventBus;
     system.initialize(world, eventBus);
 
-    eventBus.publish('terrain:modified', { x: 15, y: 15, z: 0 });
+    eventBus.emit({
+      type: 'terrain:modified',
+      source: 'test',
+      data: { x: 15, y: 15, z: 0 },
+    });
+
+    // Flush events to trigger handlers
+    eventBus.flush();
 
     // Should now have original + new + 6 neighbors = at least 8 tiles
     expect(system.getDebugInfo().dirtyTileCount).toBeGreaterThanOrEqual(7);

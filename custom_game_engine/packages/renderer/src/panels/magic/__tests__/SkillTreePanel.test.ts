@@ -42,24 +42,30 @@ describe('SkillTreePanel', () => {
     // Mock ParadigmTreeView.findNodeAtPosition to return specific nodes for test coordinates
     vi.spyOn(ParadigmTreeView.prototype, 'findNodeAtPosition').mockImplementation((tree, x, y) => {
       // Map test coordinates to specific node IDs
-      // NOTE: handleClick subtracts tabHeight (30px) before calling this, so y=200 becomes y=170
-      // Tests use coordinates like (150, 100), (150, 200), etc. BEFORE tab adjustment
+      // NOTE: handleClick subtracts tabHeight before calling this
+      // - If 1 paradigm: tabHeight = 0, no subtraction (y=100 stays 100, y=200 stays 200)
+      // - If 2+ paradigms: tabHeight = 30, subtracts 30 (y=100 becomes 70, y=200 becomes 170)
+      // Tests use coordinates like (150, 100), (150, 200), etc.
       if (x >= 140 && x <= 160) {
-        // spirit_sense at adjusted y ~ 70 (original y ~ 100)
-        if (y >= 60 && y <= 80) return 'shinto_spirit_sense';
-        // cleansing_ritual at adjusted y ~ 170 (original y ~ 200)
-        if (y >= 160 && y <= 180) return 'shinto_cleansing_ritual';
+        // spirit_sense: handle both y=100 (no tabs) and y=70 (with tabs)
+        if ((y >= 90 && y <= 110) || (y >= 60 && y <= 80)) return 'shinto_spirit_sense';
+        // cleansing_ritual: handle both y=200 (no tabs) and y=170 (with tabs)
+        if ((y >= 190 && y <= 210) || (y >= 160 && y <= 180)) return 'shinto_cleansing_ritual';
       }
       return undefined;
     });
 
     // Mock evaluateNode to return proper evaluation results
     vi.spyOn(MagicModule, 'evaluateNode').mockImplementation((node: any, tree: any, context: any) => {
+      // Check if node is unlocked (unlockedNodes is Record<string, number>)
       const isUnlocked = context.progress?.unlockedNodes?.[node.id] !== undefined;
+
+      // Check prerequisites - all must be in unlockedNodes
       const hasPrerequisites = node.unlockConditions?.every((cond: any) => {
         if (cond.type === 'prerequisite_node') {
           return context.progress?.unlockedNodes?.[cond.nodeId] !== undefined;
         }
+        // Other condition types assumed to be met for testing
         return true;
       }) ?? true;
 
@@ -67,11 +73,14 @@ describe('SkillTreePanel', () => {
       const xpCost = node.xpCost ?? 100;
       const hasEnoughXP = availableXp >= xpCost;
 
+      // canPurchase: not unlocked AND has prerequisites AND has enough XP
+      const canPurchase = !isUnlocked && hasPrerequisites && hasEnoughXP;
+
       return {
         nodeId: node.id,
         isUnlocked,
         isVisible: true,
-        canPurchase: !isUnlocked && hasPrerequisites && hasEnoughXP,
+        canPurchase,
         xpCost,
         availableXp,
         metConditions: hasPrerequisites ? [{ type: 'prerequisite_node', description: 'Prerequisites met' }] : [],

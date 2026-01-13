@@ -281,10 +281,8 @@ function createInitialBuildings(world: WorldMutator) {
 
 function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string): string[] {
   const agentCount = 5;
-  // Spawn in an interesting area with diverse biomes nearby
-  // Coordinates chosen to place players in/near forest biome with desert accessible
-  const centerX = 8000;
-  const centerY = 3000;
+  const centerX = 0;
+  const centerY = 0;
   const spread = 2;
 
   const agentIds: string[] = [];
@@ -666,7 +664,7 @@ async function createInitialPlants(world: WorldMutator) {
 async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpawningSystem) {
   const animalsToSpawn = [
     { species: 'chicken', position: { x: 3, y: 2 } },
-    { species: 'sheep', position: { x: -4, y: 3 } },
+    { species: 'sheep_white', position: { x: -4, y: 3 } },
     { species: 'rabbit', position: { x: 5, y: -2 } },
     { species: 'rabbit', position: { x: -3, y: -4 } },
   ];
@@ -4245,17 +4243,17 @@ async function main() {
     await createInitialPlants(gameLoop.world);
     await createInitialAnimals(gameLoop.world, systemsResult.wildAnimalSpawning);
 
-    // Center camera on spawn location (agents are at 8000, 3000)
+    // Center camera on spawn location (agents are at 0, 0)
     if (renderer && renderer.camera) {
-      const spawnCenterWorldX = 8000;
-      const spawnCenterWorldY = 3000;
+      const spawnCenterWorldX = 0;
+      const spawnCenterWorldY = 0;
       renderer.camera.setPosition(spawnCenterWorldX, spawnCenterWorldY);
       console.log(`[WorldInit] Camera centered on spawn location (${spawnCenterWorldX}, ${spawnCenterWorldY})`);
     }
 
     // Spawn berry bushes relative to spawn location
-    const berrySpawnX = 8000;
-    const berrySpawnY = 3000;
+    const berrySpawnX = 0;
+    const berrySpawnY = 0;
     const berryPositions = [
       { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
       { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
@@ -4294,8 +4292,8 @@ async function main() {
     };
 
     // Spawn center matches agent spawn location
-    const spawnCenterX = 8000;
-    const spawnCenterY = 3000;
+    const spawnCenterX = 0;
+    const spawnCenterY = 0;
 
     // Campfire at spawn center
     spawnBuilding(BuildingType.Campfire, spawnCenterX, spawnCenterY);
