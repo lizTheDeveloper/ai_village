@@ -102,7 +102,7 @@ async function generateWithReference(
       type: 'base64',
       base64: referenceBase64,
     },
-    init_image_strength: 300, // Medium influence from reference
+    init_image_strength: 75, // Lower value for more freedom to turn
     image_size: { height: size, width: size },
     no_background: true,
   });

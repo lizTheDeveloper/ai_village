@@ -42,6 +42,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
   private readonly WATER_COOLING_RANGE = 3; // tiles near water that are cooler
   private readonly SHALLOW_WATER_MAX_DEPTH = 2; // depth 1-2 can be waded into
 
+  // Performance: Cache search results and throttle expensive searches
+  private readonly SEARCH_INTERVAL = 100; // Re-search every 5 seconds (100 ticks at 20 TPS)
+
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
@@ -63,8 +66,24 @@ export class SeekCoolingBehavior extends BaseBehavior {
       return { complete: true, reason: 'Already cool enough' };
     }
 
-    // Find cooling sources (prioritize water > shade > interiors)
-    const coolingSource = this.findBestCoolingSource(world, position);
+    // Performance: Throttle expensive cooling source searches
+    // Only search every SEARCH_INTERVAL ticks, otherwise use cached source
+    const state = this.getState(entity);
+    const lastSearchTick = (state.lastSearchTick as number) ?? 0;
+    const cachedSource = state.cachedCoolingSource as CoolingSource | undefined;
+
+    let coolingSource: CoolingSource | null;
+    if (world.tick - lastSearchTick >= this.SEARCH_INTERVAL || !cachedSource) {
+      // Time to search for new cooling source
+      coolingSource = this.findBestCoolingSource(world, position);
+      this.updateState(entity, {
+        lastSearchTick: world.tick,
+        cachedCoolingSource: coolingSource,
+      });
+    } else {
+      // Use cached source
+      coolingSource = cachedSource;
+    }
 
     if (!coolingSource) {
       // No cooling source found - try to move away from heat sources

@@ -576,7 +576,52 @@
       "fileSize": 2508859,
       "checksum": "-1fae11f9",
       "filename": "9007.json.gz"
+    },
+    {
+      "tick": 1208,
+      "timestamp": 1768269841320,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 2428112,
+      "checksum": "-306797d3",
+      "filename": "1208.json.gz"
+    },
+    {
+      "tick": 7125,
+      "timestamp": 1768270776863,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2448920,
+      "checksum": "34adb23a",
+      "filename": "7125.json.gz"
+    },
+    {
+      "tick": 9008,
+      "timestamp": 1768270877630,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2518584,
+      "checksum": "-57302b27",
+      "filename": "9008.json.gz"
+    },
+    {
+      "tick": 1582,
+      "timestamp": 1768273424944,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1745014,
+      "checksum": "1c5ba4f8",
+      "filename": "1582.json.gz"
+    },
+    {
+      "tick": 1361,
+      "timestamp": 1768273834730,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1729314,
+      "checksum": "-653e3b10",
+      "filename": "1361.json.gz"
     }
   ],
-  "lastUpdated": 1768264122351
+  "lastUpdated": 1768273834730
 }

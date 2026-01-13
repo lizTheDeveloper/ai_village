@@ -576,6 +576,18 @@ export interface GameEventMap {
     material: string;
   };
 
+  // === Terrain & Fluid Events ===
+  'terrain:modified': {
+    x: number;
+    y: number;
+    z?: number;
+  };
+  'fluid:changed': {
+    x: number;
+    y: number;
+    z?: number;
+  };
+
   // === Progression Events ===
   'progression:xp_gained': {
     skill: string;

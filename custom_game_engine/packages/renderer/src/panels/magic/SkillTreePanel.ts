@@ -8,6 +8,7 @@
 import type { IWindowPanel } from '../../IWindowPanel.js';
 import type { World, Entity, MagicComponent, MagicSkillProgress, EvaluationContext } from '@ai-village/magic';
 import { MagicSkillTreeRegistry } from '@ai-village/magic';
+import { evaluateNode, type NodeEvaluationResult } from '@ai-village/magic';
 import { ParadigmTreeView } from './ParadigmTreeView.js';
 import type { Viewport, SkillTreeUIState } from './types.js';
 
@@ -373,8 +374,8 @@ export class SkillTreePanel implements IWindowPanel {
       case 'ArrowDown':
       case 'ArrowLeft':
       case 'ArrowRight':
-        // Navigate nodes - TODO: implement arrow navigation
-        // this.handleArrowNavigation(key, world);
+        // Navigate nodes
+        this.handleArrowNavigation(key);
         break;
     }
   }
@@ -444,9 +445,12 @@ export class SkillTreePanel implements IWindowPanel {
     const tabWidth = 120;
     const tabIndex = Math.floor(x / tabWidth);
 
-    if (tabIndex >= 0 && tabIndex < paradigms.length && paradigms[tabIndex]) {
-      this.setActiveParadigm(paradigms[tabIndex]);
-      return true;
+    if (tabIndex >= 0 && tabIndex < paradigms.length) {
+      const selectedParadigm = paradigms[tabIndex];
+      if (selectedParadigm) {
+        this.setActiveParadigm(selectedParadigm);
+        return true;
+      }
     }
 
     return false;
@@ -479,11 +483,7 @@ export class SkillTreePanel implements IWindowPanel {
     }
 
     const evaluationContext = this.buildEvaluationContext(world, this.selectedEntity, progress);
-    const evaluation = require('@ai-village/core/src/magic/MagicSkillTreeEvaluator.js').evaluateNode(
-      node,
-      tree,
-      evaluationContext
-    );
+    const evaluation = evaluateNode(node, tree, evaluationContext);
 
     // Try to unlock
     if (evaluation.canPurchase) {
@@ -494,6 +494,7 @@ export class SkillTreePanel implements IWindowPanel {
           return false;
         }
 
+        const initialXP = state.xp;
         state.xp -= evaluation.xpCost;
 
         // Mark as unlocked
@@ -503,19 +504,17 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit event
         const eventBus = world.getEventBus();
-        eventBus.emit({
-          type: 'magic:skill_node_unlocked',
-          source: this.selectedEntity.id,
-          data: {
-            nodeId,
-            agentId: this.selectedEntity.id,
-            skillTree: activeParadigmId,
-          },
+        eventBus.emit('magic:skill_node_unlocked', {
+          entityId: this.selectedEntity.id,
+          paradigmId: activeParadigmId,
+          nodeId: nodeId,
+          xpSpent: evaluation.xpCost
         });
 
         // Apply effects via SkillTreeManager
         const skillTreeManager = (world as any).getSkillTreeManager?.();
         if (skillTreeManager) {
+          skillTreeManager.unlockSkillNode(this.selectedEntity, activeParadigmId, nodeId, evaluation.xpCost);
           skillTreeManager.applyNodeEffects(this.selectedEntity, activeParadigmId, nodeId);
         }
 
@@ -523,7 +522,22 @@ export class SkillTreePanel implements IWindowPanel {
         return true;
       } catch (error: any) {
         // Rollback on error
-        console.error('[SkillTreePanel] Error unlocking node:', error.message);
+        const state = magicComp.skillTreeState?.[activeParadigmId];
+        if (state) {
+          // Rollback XP
+          const index = state.unlockedNodes.indexOf(nodeId);
+          if (index !== -1) {
+            state.unlockedNodes.splice(index, 1);
+          }
+        }
+
+        // Emit error notification
+        const eventBus = world.getEventBus();
+        eventBus.emit('ui:notification', {
+          message: `Failed to unlock node: ${error.message}`,
+          type: 'error'
+        });
+
         return false;
       }
     } else {
@@ -536,8 +550,92 @@ export class SkillTreePanel implements IWindowPanel {
         message = `Requirements not met: ${evaluation.unmetConditions[0].message}`;
       }
 
-      console.warn('[SkillTreePanel]', message);
+      // Emit notification
+      const eventBus = world.getEventBus();
+      eventBus.emit('ui:notification', {
+        message,
+        type: 'error'
+      });
+
       return false;
+    }
+  }
+
+  private handleArrowNavigation(key: string): void {
+    if (!this.selectedEntity || !this.uiState.activeParadigmId) {
+      return;
+    }
+
+    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    if (!tree) {
+      return;
+    }
+
+    // Get current selection or start with first entry node
+    let currentNodeId = this.uiState.selectedNodeId;
+    if (!currentNodeId && tree.entryNodes.length > 0) {
+      this.uiState.selectedNodeId = tree.entryNodes[0];
+      return;
+    }
+
+    if (!currentNodeId) {
+      return;
+    }
+
+    // Find current node
+    const currentNode = tree.nodes.find(n => n.id === currentNodeId);
+    if (!currentNode) {
+      return;
+    }
+
+    // Navigate based on key
+    let nextNodeId: string | undefined;
+
+    switch (key) {
+      case 'ArrowDown':
+        // Find nodes that have current node as prerequisite
+        const childNodes = tree.nodes.filter(n =>
+          n.unlockConditions.some(c =>
+            c.type === 'prerequisite_node' && (c as any).nodeId === currentNodeId
+          )
+        );
+        if (childNodes.length > 0 && childNodes[0]) {
+          nextNodeId = childNodes[0].id;
+        }
+        break;
+
+      case 'ArrowUp':
+        // Find nodes that current node depends on
+        const prereqCondition = currentNode.unlockConditions.find(c => c.type === 'prerequisite_node');
+        if (prereqCondition) {
+          nextNodeId = (prereqCondition as any).nodeId;
+        }
+        break;
+
+      case 'ArrowRight':
+      case 'ArrowLeft':
+        // Navigate to sibling nodes (same tier/category)
+        const allInCategory = tree.nodes.filter(n =>
+          n.category === currentNode.category &&
+          n.tier === currentNode.tier
+        );
+        if (allInCategory.length > 1) {
+          const currentIndex = allInCategory.findIndex(n => n.id === currentNodeId);
+          if (currentIndex !== -1) {
+            const nextIndex = key === 'ArrowRight'
+              ? (currentIndex + 1) % allInCategory.length
+              : (currentIndex - 1 + allInCategory.length) % allInCategory.length;
+            const nextSibling = allInCategory[nextIndex];
+            if (nextSibling) {
+              nextNodeId = nextSibling.id;
+            }
+          }
+        }
+        break;
+    }
+
+    if (nextNodeId) {
+      this.uiState.selectedNodeId = nextNodeId;
     }
   }
 

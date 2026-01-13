@@ -1,7 +1,7 @@
 import type { WorldMutator } from '@ai-village/core';
 import type { Chunk } from '../chunks/Chunk.js';
 import { CHUNK_SIZE, setTileAt } from '../chunks/Chunk.js';
-import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
+import type { Tile, TerrainType, BiomeType, FluidLayer } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
@@ -767,6 +767,9 @@ export class TerrainGenerator {
       elevation = elevation * (1 - ridgeStrength) + ridgedNoise * ridgeStrength;
     }
 
+    // Save original elevation for biome determination (before forest/desert/spawn modifications)
+    const biomeElevation = elevation;
+
     // Moisture uses biome scale for climate zones (~20km patterns)
     // NOTE: Calculated early because desert geological features need moisture/temperature
     const moisture = this.moistureNoise.octaveNoise(
@@ -1077,10 +1080,10 @@ export class TerrainGenerator {
     // Flatten spawn area - lerp toward 0 elevation
     elevation = elevation * (1 - spawnFlatten * 0.8);
 
-    // Determine terrain and biome
-    // (moisture and temperature already calculated above for desert features)
-    const { terrain, biome } = this.determineTerrainAndBiome(
-      elevation,
+    // Determine terrain and biome using ORIGINAL elevation (before forest/desert/spawn modifications)
+    // This ensures biome boundaries follow environmental gradients, not micro-terrain features
+    const { terrain, biome, fluid } = this.determineTerrainAndBiome(
+      biomeElevation,
       moisture,
       temperature
     );
@@ -1147,6 +1150,7 @@ export class TerrainGenerator {
       lastTilled: 0,
       composted: false,
       plantId: null,
+      ...(fluid && { fluid }), // Include fluid layer if present
     };
   }
 
@@ -1243,13 +1247,26 @@ export class TerrainGenerator {
     elevation: number,
     moisture: number,
     temperature: number
-  ): { terrain: TerrainType; biome: BiomeType } {
+  ): { terrain: TerrainType; biome: BiomeType; fluid?: FluidLayer } {
 
     // PRIORITY 1: Water (hard boundary at WATER_LEVEL)
     if (elevation < this.WATER_LEVEL) {
+      // Calculate water depth (0-7 scale, Dwarf Fortress convention)
+      // Range: elevation -1.0 to -0.3 maps to depth 7 to 1
+      const depthFactor = (this.WATER_LEVEL - elevation) / (1.0 + this.WATER_LEVEL);
+      const waterDepth = Math.max(1, Math.min(7, Math.floor(depthFactor * 7) + 1));
+
       return {
         terrain: 'water',
         biome: elevation < -0.5 ? 'ocean' : 'river',
+        fluid: {
+          type: 'water' as const,
+          depth: waterDepth,
+          pressure: waterDepth, // Initial pressure = depth
+          temperature: 20, // 20°C default
+          stagnant: true, // No flow initially
+          lastUpdate: 0,
+        },
       };
     }
 
@@ -1305,12 +1322,12 @@ export class TerrainGenerator {
     }
 
     // Moderate-high moisture = Woodland (forest transition)
-    if (moisture > 0.2 && temperature > -0.2) {
+    if (moisture >= 0.2 && temperature > -0.2) {
       return { terrain: 'forest', biome: 'woodland' };
     }
 
     // Light moisture = Woodland-grassland transition
-    if (moisture > 0.05 && temperature > -0.2) {
+    if (moisture >= 0.05 && temperature > -0.2) {
       return { terrain: 'grass', biome: 'woodland' };
     }
 

@@ -41,7 +41,8 @@ import { AgentVisualsSystem } from './AgentVisualsSystem.js';
 // Agent Core
 import { AgentBrainSystem } from './AgentBrainSystem.js';
 import { MovementSystem } from './MovementSystem.js';
-import { StateMutatorSystem } from './StateMutatorSystem.js'; // Batched vector updates (priority 5)
+import { StateMutatorSystem } from './StateMutatorSystem.js';
+import { FluidDynamicsSystem } from './FluidDynamicsSystem.js'; // Batched vector updates (priority 5)
 import { NeedsSystem } from './NeedsSystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
@@ -411,6 +412,11 @@ export function registerAllSystems(
   // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.
   const stateMutator = new StateMutatorSystem();
   gameLoop.systemRegistry.register(stateMutator);
+
+  // FluidDynamicsSystem - Dwarf Fortress-style water flow (priority 16)
+  // Updates once per game minute for planetary-scale performance
+  const fluidDynamics = new FluidDynamicsSystem();
+  gameLoop.systemRegistry.register(fluidDynamics);
 
   // TemperatureSystem - Uses StateMutatorSystem for batched temperature damage
   const temperatureSystem = new TemperatureSystem();

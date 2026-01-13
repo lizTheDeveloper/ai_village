@@ -4245,6 +4245,14 @@ async function main() {
     await createInitialPlants(gameLoop.world);
     await createInitialAnimals(gameLoop.world, systemsResult.wildAnimalSpawning);
 
+    // Center camera on spawn location (agents are at 8000, 3000)
+    if (renderer && renderer.camera) {
+      const spawnCenterWorldX = 8000;
+      const spawnCenterWorldY = 3000;
+      renderer.camera.setPosition(spawnCenterWorldX, spawnCenterWorldY);
+      console.log(`[WorldInit] Camera centered on spawn location (${spawnCenterWorldX}, ${spawnCenterWorldY})`);
+    }
+
     // Spawn berry bushes relative to spawn location
     const berrySpawnX = 8000;
     const berrySpawnY = 3000;

@@ -13,6 +13,7 @@ import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { SteeringComponent } from '../components/SteeringComponent.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { Tile } from '@ai-village/world';
 
 interface TimeComponent {
   speedMultiplier?: number;
@@ -304,12 +305,7 @@ export class MovementSystem implements System {
     // Extended world interface with tile access
     const worldWithTerrain = world as {
       getTerrainAt?: (x: number, y: number) => string | null;
-      getTileAt?: (x: number, y: number) => {
-        elevation?: number;
-        wall?: { constructionProgress?: number };
-        door?: { state: 'open' | 'closed' | 'locked'; constructionProgress?: number };
-        window?: { constructionProgress?: number };
-      } | undefined;
+      getTileAt?: (x: number, y: number) => Tile | undefined;
       getChunkManager?: () => {
         getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
       } | undefined;
@@ -331,10 +327,28 @@ export class MovementSystem implements System {
       }
     }
 
-    // Check for water terrain (blocks land-based movement)
-    if (typeof worldWithTerrain.getTerrainAt === 'function') {
-      const terrain = worldWithTerrain.getTerrainAt(Math.floor(x), Math.floor(y));
-      if (terrain === 'water' || terrain === 'deep_water') {
+    // Check for water terrain - depth-based blocking
+    if (typeof worldWithTerrain.getTileAt === 'function') {
+      const tile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
+
+      if (tile?.fluid && tile.fluid.type === 'water') {
+        const depth = tile.fluid.depth;
+
+        // Shallow water (depth 1-2): Wadeable, no blocking
+        // Movement penalty applied by AgentSwimmingSystem instead
+        if (depth <= 2) {
+          return false; // Allow movement (will be slowed)
+        }
+
+        // Medium-deep water (depth 3-4): Swimmable for aquatic species
+        // For now, block all movement (AgentSwimmingSystem will handle swimming later)
+        if (depth <= 4) {
+          // TODO: Check if agent has 'swimming' locomotion
+          // For now: block movement
+          return true;
+        }
+
+        // Deep water (depth 5-7): Dangerous, blocks all
         return true;
       }
     }

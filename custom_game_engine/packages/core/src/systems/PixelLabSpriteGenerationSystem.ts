@@ -268,7 +268,8 @@ export class PixelLabSpriteGenerationSystem implements System {
     const { reference_image_path, ...apiParams } = params;
     const requestBody = {
       ...apiParams,
-      image: base64Image, // PixelLab uses 'image' parameter for reference
+      init_image: base64Image, // Correct parameter name for Pixflux API
+      init_image_strength: 75, // Lower value = more freedom to turn while maintaining style (1-999, default 300)
     };
 
     const response = await fetch('https://api.pixellab.ai/v1/generate-image-pixflux', {

@@ -43,12 +43,19 @@ export class ChatRoomSystem implements System {
   /** Track if we've initialized permanent rooms */
   private initialized: boolean = false;
 
+  // Performance: Throttle membership updates - don't need to check every tick
+  private readonly MEMBERSHIP_UPDATE_INTERVAL = 100; // Check every 5 seconds (100 ticks at 20 TPS)
+  private lastMembershipUpdate = 0;
+
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Initialize permanent rooms on first update
     if (!this.initialized) {
       this.initializePermanentRooms(world);
       this.initialized = true;
     }
+
+    // Performance: Throttle membership updates to avoid expensive queries every tick
+    const shouldUpdateMembership = (world.tick - this.lastMembershipUpdate) >= this.MEMBERSHIP_UPDATE_INTERVAL;
 
     // Update all criteria-based rooms
     for (const [roomId, entityId] of this.roomEntities) {
@@ -61,8 +68,8 @@ export class ChatRoomSystem implements System {
       const room = entity.components.get(ComponentType.ChatRoom) as ChatRoomComponent | undefined;
       if (!room) continue;
 
-      // Only auto-update criteria-based rooms
-      if (room.config.membership.type === 'criteria_based') {
+      // Only auto-update criteria-based rooms (and only when interval has passed)
+      if (room.config.membership.type === 'criteria_based' && shouldUpdateMembership) {
         this.updateCriteriaMembership(world, room);
       }
 
@@ -78,6 +85,11 @@ export class ChatRoomSystem implements System {
       }
 
       room.lastActivityTick = world.tick;
+    }
+
+    // Update last membership update tick
+    if (shouldUpdateMembership) {
+      this.lastMembershipUpdate = world.tick;
     }
   }
 

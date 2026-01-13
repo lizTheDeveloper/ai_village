@@ -24,6 +24,9 @@ import { ComponentType } from '../../types/ComponentType.js';
 export class SeekWarmthBehavior extends BaseBehavior {
   readonly name = 'seek_warmth' as const;
 
+  // Performance: Cache search results and throttle expensive searches
+  private readonly SEARCH_INTERVAL = 100; // Re-search every 5 seconds (100 ticks at 20 TPS)
+
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
@@ -45,8 +48,24 @@ export class SeekWarmthBehavior extends BaseBehavior {
       return { complete: true, reason: 'Already warm enough' };
     }
 
-    // Find heat sources (campfires and warm buildings)
-    const heatSource = this.findNearestHeatSource(world, position);
+    // Performance: Throttle expensive heat source searches
+    // Only search every SEARCH_INTERVAL ticks, otherwise use cached source
+    const state = this.getState(entity);
+    const lastSearchTick = (state.lastSearchTick as number) ?? 0;
+    const cachedSource = state.cachedHeatSource as { entity: Entity; distance: number } | undefined;
+
+    let heatSource: { entity: Entity; distance: number } | null;
+    if (world.tick - lastSearchTick >= this.SEARCH_INTERVAL || !cachedSource) {
+      // Time to search for new heat source
+      heatSource = this.findNearestHeatSource(world, position);
+      this.updateState(entity, {
+        lastSearchTick: world.tick,
+        cachedHeatSource: heatSource,
+      });
+    } else {
+      // Use cached source
+      heatSource = cachedSource;
+    }
 
     if (!heatSource) {
       // No heat source found (maybe build a campfire?)
