@@ -431,6 +431,86 @@ export class TerrainGenerator {
           }
         }
 
+        // === WOODLAND PLANT PLACEMENT (forest → plains transition) ===
+        else if (tile.biome === 'woodland') {
+          // Woodland: 30-50% tree density based on moisture
+          const moisture = (tile.moisture / 100) * 2 - 1; // Convert back to -1..1
+          const woodlandDensity = 0.30 + Math.max(0, Math.min(0.20, (moisture - 0.05) / 0.30 * 0.20));
+
+          if (placementValue > 0.1 && Math.random() < woodlandDensity) {
+            // Medium trees (1-3 tiles)
+            const treeHeight = 1 + Math.floor(Math.random() * 3);
+            createTree(world, worldX, worldY, treeHeight);
+          }
+
+          // Leaf piles: 15% chance
+          if (Math.random() < 0.15) {
+            createLeafPile(world, worldX, worldY);
+          }
+
+          // Fiber plants: 20% chance
+          if (Math.random() < 0.20) {
+            createFiberPlant(world, worldX, worldY);
+          }
+        }
+
+        // === WETLAND PLANT PLACEMENT (land → water transition) ===
+        else if (tile.biome === 'wetland') {
+          // Wetland: 20-30% tree density, short trees
+          if (placementValue > 0.3 && Math.random() < 0.25) {
+            const treeHeight = Math.floor(Math.random() * 3); // 0-2 tiles
+            createTree(world, worldX, worldY, treeHeight);
+          }
+
+          // High vegetation density (marsh plants, reeds, etc.)
+          if (Math.random() < 0.50) {
+            createFiberPlant(world, worldX, worldY); // Wetland plants placeholder
+          }
+        }
+
+        // === SAVANNA PLANT PLACEMENT (hot grassland) ===
+        else if (tile.biome === 'savanna') {
+          // Savanna: 10-15% tree density, widely spaced trees
+          if (placementValue > 0.5 && Math.random() < 0.12) {
+            const treeHeight = 1 + Math.floor(Math.random() * 3);
+            createTree(world, worldX, worldY, treeHeight);
+          }
+
+          // Grass and hardy plants: 35% chance
+          if (Math.random() < 0.35) {
+            createFiberPlant(world, worldX, worldY);
+          }
+        }
+
+        // === SCRUBLAND PLANT PLACEMENT (desert → plains transition) ===
+        else if (tile.biome === 'scrubland') {
+          // Scrubland: sparse vegetation
+          // Fiber plants (desert shrubs): 10% chance
+          if (Math.random() < 0.10) {
+            createFiberPlant(world, worldX, worldY);
+          }
+
+          // Rocks: 15-20% density
+          if (placementValue < 0.0 && Math.random() < 0.18) {
+            createRock(world, worldX, worldY);
+          }
+        }
+
+        // === FOOTHILLS PLANT PLACEMENT (mountain → plains transition) ===
+        else if (tile.biome === 'foothills') {
+          // Foothills: 5-15% tree density at high moisture
+          if (tile.moisture > 50 && placementValue > 0.4 && Math.random() < 0.10) {
+            const treeHeight = 1 + Math.floor(Math.random() * 2); // Short alpine trees
+            createTree(world, worldX, worldY, treeHeight);
+          }
+
+          // Rocks: 20-40% density based on elevation (using placementValue as proxy)
+          const rockDensity = 0.20 + Math.max(0, Math.min(0.20, placementValue * 0.30));
+          if (Math.random() < rockDensity) {
+            createRock(world, worldX, worldY);
+          }
+        }
+
         // Place rocks in mountains and stone areas
         if (tile.terrain === 'stone' && placementValue < -0.2) {
           if (Math.random() > 0.5) {
@@ -1090,6 +1170,12 @@ export class TerrainGenerator {
       ocean: [0, 0], // Not farmable
       desert: [20, 30],
       mountains: [40, 50],
+      // Transition biomes
+      scrubland: [35, 45],     // Desert → Plains transition
+      wetland: [75, 85],       // High moisture, rich soil
+      foothills: [50, 60],     // Mountain → Plains transition
+      savanna: [50, 60],       // Hot grassland
+      woodland: [65, 75],      // Forest → Plains transition (good soil)
     };
 
     const range = BIOME_FERTILITY_RANGES[biome];
@@ -1111,12 +1197,55 @@ export class TerrainGenerator {
   /**
    * Determine terrain type and biome from noise values.
    */
+  /**
+   * Determine terrain for foothills based on elevation gradient.
+   * Blends stone, dirt, and grass based on how close to mountain threshold.
+   */
+  private determineFoothillsTerrain(elevation: number, moisture: number): TerrainType {
+    // elevation range: 0.35 to 0.5
+    const elevationFactor = (elevation - 0.35) / 0.15; // 0.0 at base, 1.0 at mountains
+
+    // Higher elevation = more stone
+    const stoneThreshold = 0.4 + elevationFactor * 0.4; // 40-80% chance of stone
+    const terrainRoll = Math.random();
+
+    if (terrainRoll < stoneThreshold) {
+      return 'stone';
+    } else if (moisture > 0.1) {
+      return 'grass';
+    } else {
+      return 'dirt';
+    }
+  }
+
+  /**
+   * Blend between two terrain types based on a gradient value.
+   * Used for smooth transitions (e.g., sand → dirt in scrubland).
+   */
+  private determineTransitionTerrain(
+    terrainA: TerrainType,
+    terrainB: TerrainType,
+    value: number,
+    minValue: number,
+    maxValue: number
+  ): TerrainType {
+    const factor = (value - minValue) / (maxValue - minValue); // 0.0 to 1.0
+    const threshold = factor; // 0% terrainB at min, 100% terrainB at max
+
+    return Math.random() < threshold ? terrainB : terrainA;
+  }
+
+  /**
+   * Determine biome with soft transitions using environmental gradients.
+   * Returns both the biome and terrain type based on elevation, moisture, temperature.
+   */
   private determineTerrainAndBiome(
     elevation: number,
     moisture: number,
     temperature: number
   ): { terrain: TerrainType; biome: BiomeType } {
-    // Water
+
+    // PRIORITY 1: Water (hard boundary at WATER_LEVEL)
     if (elevation < this.WATER_LEVEL) {
       return {
         terrain: 'water',
@@ -1124,39 +1253,73 @@ export class TerrainGenerator {
       };
     }
 
-    // Sand (beaches/desert)
-    if (elevation < this.SAND_LEVEL) {
+    // PRIORITY 2: Near-water transitions (beaches, wetlands, marshes)
+    if (elevation < this.SAND_LEVEL) { // -0.1 to -0.3 range
+      // High moisture near water = wetland/marsh
+      if (moisture > 0.3) {
+        return { terrain: 'grass', biome: 'wetland' };
+      }
+      // Low moisture near water = beach
       return {
         terrain: 'sand',
         biome: moisture < -0.3 ? 'desert' : 'plains',
       };
     }
 
-    // Mountains/stone
-    if (elevation > this.STONE_LEVEL) {
-      return {
-        terrain: 'stone',
-        biome: 'mountains',
-      };
+    // PRIORITY 3: Wetlands (just above water level, high moisture)
+    if (elevation < 0.05 && moisture > 0.35) {
+      return { terrain: 'grass', biome: 'wetland' };
     }
 
-    // Forest
+    // PRIORITY 4: Mountains and foothills (elevation-based)
+    if (elevation > this.STONE_LEVEL) { // > 0.5
+      return { terrain: 'stone', biome: 'mountains' };
+    }
+    if (elevation > 0.35) { // 0.35 to 0.5 = foothills
+      // Foothills terrain is a blend
+      const terrain = this.determineFoothillsTerrain(elevation, moisture);
+      return { terrain, biome: 'foothills' };
+    }
+
+    // PRIORITY 5: Temperature/moisture-based biomes (forests, deserts, plains)
+
+    // Hot and dry = Desert spectrum
+    if (temperature > 0.2 && moisture < -0.3) {
+      return { terrain: 'sand', biome: 'desert' };
+    }
+
+    // Hot with some moisture = Scrubland (desert transition)
+    if (temperature > 0.2 && moisture >= -0.3 && moisture < -0.1) {
+      const terrain = this.determineTransitionTerrain('sand', 'dirt', moisture, -0.3, -0.1);
+      return { terrain, biome: 'scrubland' };
+    }
+
+    // Hot with moderate moisture = Savanna (grassland with sparse trees)
+    if (temperature > 0.3 && moisture >= -0.1 && moisture < 0.15) {
+      return { terrain: 'grass', biome: 'savanna' };
+    }
+
+    // High moisture = Forest spectrum (temperate zones)
+    if (moisture > 0.35 && temperature > -0.2) {
+      return { terrain: 'forest', biome: 'forest' };
+    }
+
+    // Moderate-high moisture = Woodland (forest transition)
     if (moisture > 0.2 && temperature > -0.2) {
-      return {
-        terrain: 'forest',
-        biome: 'forest',
-      };
+      return { terrain: 'forest', biome: 'woodland' };
     }
 
-    // Desert (with potential canyon terrain)
-    if (moisture < -0.3 && temperature > 0.2) {
-      return {
-        terrain: 'sand',
-        biome: 'desert',
-      };
+    // Light moisture = Woodland-grassland transition
+    if (moisture > 0.05 && temperature > -0.2) {
+      return { terrain: 'grass', biome: 'woodland' };
     }
 
-    // Plains/grassland
+    // Dry grassland (plains edge toward desert)
+    if (moisture >= -0.1 && moisture <= 0.05) {
+      return { terrain: moisture > 0 ? 'grass' : 'dirt', biome: 'plains' };
+    }
+
+    // DEFAULT: Plains/grassland
     return {
       terrain: moisture > 0 ? 'grass' : 'dirt',
       biome: 'plains',

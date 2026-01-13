@@ -549,7 +549,34 @@
       "fileSize": 2444324,
       "checksum": "-6252f8a3",
       "filename": "1419.json.gz"
+    },
+    {
+      "tick": 1780,
+      "timestamp": 1768263748927,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 2497393,
+      "checksum": "-4fdc24dd",
+      "filename": "1780.json.gz"
+    },
+    {
+      "tick": 7763,
+      "timestamp": 1768264056560,
+      "day": 1,
+      "type": "auto",
+      "fileSize": 2510695,
+      "checksum": "-5f0755c",
+      "filename": "7763.json.gz"
+    },
+    {
+      "tick": 9007,
+      "timestamp": 1768264122348,
+      "day": 2,
+      "type": "auto",
+      "fileSize": 2508859,
+      "checksum": "-1fae11f9",
+      "filename": "9007.json.gz"
     }
   ],
-  "lastUpdated": 1768262930912
+  "lastUpdated": 1768264122351
 }

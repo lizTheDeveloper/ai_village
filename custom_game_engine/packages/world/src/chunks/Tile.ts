@@ -338,7 +338,12 @@ export type BiomeType =
   | 'desert'
   | 'mountains'
   | 'ocean'
-  | 'river';
+  | 'river'
+  | 'scrubland'    // Desert ↔ Plains transition (moisture: -0.4 to -0.1)
+  | 'wetland'      // Land ↔ Water transition (elevation: -0.3 to 0.05, high moisture)
+  | 'foothills'    // Mountains ↔ Plains transition (elevation: 0.35 to 0.5)
+  | 'savanna'      // Hot grassland with sparse trees (hot + moderate moisture)
+  | 'woodland';    // Forest ↔ Plains transition (moisture: 0.05 to 0.35)
 
 /**
  * Create a default tile.
