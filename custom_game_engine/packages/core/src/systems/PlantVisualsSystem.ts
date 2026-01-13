@@ -40,12 +40,15 @@ export class PlantVisualsSystem implements System {
     'willow_tree': 'willow-tree',
     'willow': 'willow-tree',
     'willow_bark': 'willow-tree', // Medicinal willow
-    // Berry bushes
-    'berry_bush': 'berry-bush',
-    'berry-bush': 'berry-bush',
-    'blueberry': 'berry-bush',
-    'raspberry': 'berry-bush',
-    'blackberry': 'berry-bush',
+    // Berry bushes - specific types
+    'berry_bush': 'berry-bush', // Legacy fallback
+    'berry-bush': 'berry-bush', // Legacy fallback
+    'blueberry-bush': 'blueberry-bush',
+    'raspberry-bush': 'raspberry-bush',
+    'blackberry-bush': 'blackberry-bush',
+    'blueberry': 'blueberry-bush',
+    'raspberry': 'raspberry-bush',
+    'blackberry': 'blackberry-bush',
     // Grains
     'wheat': 'wheat',
     'corn': 'corn',
@@ -152,6 +155,17 @@ export class PlantVisualsSystem implements System {
     if (speciesLower.includes('tree')) {
       return 'oak-tree';
     }
+    // Berry bushes - check specific types first
+    if (speciesLower.includes('blueberry')) {
+      return 'blueberry-bush';
+    }
+    if (speciesLower.includes('raspberry')) {
+      return 'raspberry-bush';
+    }
+    if (speciesLower.includes('blackberry')) {
+      return 'blackberry-bush';
+    }
+    // Generic berry/bush/shrub fallback
     if (speciesLower.includes('berry') || speciesLower.includes('bush') ||
         speciesLower.includes('shrub')) {
       return 'berry-bush';

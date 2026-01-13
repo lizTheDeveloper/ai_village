@@ -43,7 +43,7 @@ export const RESOURCE_ITEMS: ItemDefinition[] = [
     rarity: 'common',
   }),
 
-  defineItem('fiber', 'Plant Fiber', 'resource', {
+  defineItem('plant_fiber', 'Plant Fiber', 'resource', {
     weight: 0.5,
     stackSize: 100,
     isGatherable: true,
@@ -314,7 +314,7 @@ export const MATERIAL_ITEMS: ItemDefinition[] = [
     weight: 0.5,
     stackSize: 50,
     isGatherable: false,
-    craftedFrom: [{ itemId: 'fiber', amount: 3 }],
+    craftedFrom: [{ itemId: 'plant_fiber', amount: 3 }],
     baseValue: 10,
     rarity: 'common',
   }),
@@ -323,7 +323,7 @@ export const MATERIAL_ITEMS: ItemDefinition[] = [
     weight: 0.8,
     stackSize: 30,
     isGatherable: false,
-    craftedFrom: [{ itemId: 'fiber', amount: 5 }],
+    craftedFrom: [{ itemId: 'plant_fiber', amount: 5 }],
     baseValue: 12,
     rarity: 'common',
   }),
@@ -341,7 +341,7 @@ export const MATERIAL_ITEMS: ItemDefinition[] = [
     weight: 0.8,
     stackSize: 50,
     isGatherable: false,
-    craftedFrom: [{ itemId: 'fiber', amount: 5 }],
+    craftedFrom: [{ itemId: 'plant_fiber', amount: 5 }],
     baseValue: 6,
     rarity: 'common',
   }),

@@ -113,6 +113,43 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     // EXISTING: Instant damage (no duration)
     const damageApplied = this.applyDamageToTarget(target, finalDamage);
 
+    // NEW: Fire damage ignition (Trogdor burnination!)
+    // If this is fire damage and FireSpreadSystem is available, ignite the target
+    if (effect.damageType === 'fire' && context.fireSpreadSystem && finalDamage > 0) {
+      // Calculate burn intensity based on damage dealt (0-100 scale)
+      const burnIntensity = Math.min(100, (finalDamage / 100) * 100);
+
+      // Calculate burn duration based on spell tags
+      // 'breath_weapon' and 'legendary' effects burn longer
+      let burnDuration = 200; // Default: 10 seconds at 20 TPS
+      if (effect.tags?.includes('breath_weapon') || effect.tags?.includes('legendary')) {
+        burnDuration = 400; // 20 seconds for dragon breath
+      }
+      if (effect.tags?.includes('burnination')) {
+        burnDuration = 600; // 30 seconds for TROGDOR!
+      }
+
+      // Ignite the target
+      const source = effect.tags?.includes('breath_weapon') ? 'breath' : 'spell';
+      context.fireSpreadSystem.igniteEntity(world, target, burnIntensity, burnDuration, source);
+
+      // Also ignite tiles around the target if this is Trogdor's breath or similar AoE fire
+      if (effect.tags?.includes('burnination') || effect.targetType === 'cone') {
+        const position = target.components.get(CT.Position) as any;
+        if (position && world.getTileAt) {
+          // Ignite tile at target position
+          context.fireSpreadSystem.igniteTile(
+            world,
+            Math.floor(position.x),
+            Math.floor(position.y),
+            burnIntensity * 0.8, // Tiles burn slightly less intensely
+            burnDuration,
+            source
+          );
+        }
+      }
+    }
+
     // Handle on-hit effects
     if (effect.onHitEffects && effect.onHitEffects.length > 0) {
       this.applyOnHitEffects(effect.onHitEffects, caster, target, world, context);

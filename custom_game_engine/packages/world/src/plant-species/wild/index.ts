@@ -9,7 +9,9 @@
 import {
   GRASS,
   WILDFLOWER,
-  BERRY_BUSH,
+  BLUEBERRY_BUSH,
+  RASPBERRY_BUSH,
+  BLACKBERRY_BUSH,
   TREE,
   WILD_PLANTS,
 } from '../wild-plants.js';
@@ -18,13 +20,17 @@ import {
 export {
   GRASS,
   WILDFLOWER,
-  BERRY_BUSH,
+  BLUEBERRY_BUSH,
+  RASPBERRY_BUSH,
+  BLACKBERRY_BUSH,
   TREE,
   WILD_PLANTS,
 };
 
 // Category groupings for easier access
-export const BASIC_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH, TREE];
+export const BASIC_PLANTS = [GRASS, WILDFLOWER, BLUEBERRY_BUSH, TREE];
+export const BERRY_BUSHES = [BLUEBERRY_BUSH, RASPBERRY_BUSH, BLACKBERRY_BUSH];
 
 // Type helpers
-export type BasicPlantId = 'grass' | 'wildflower' | 'berry-bush' | 'tree';
+export type BasicPlantId = 'grass' | 'wildflower' | 'blueberry-bush' | 'tree';
+export type BerryBushId = 'blueberry-bush' | 'raspberry-bush' | 'blackberry-bush';

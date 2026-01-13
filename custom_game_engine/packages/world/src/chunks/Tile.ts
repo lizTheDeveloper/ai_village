@@ -300,6 +300,13 @@ export interface Tile {
   fluid?: FluidLayer;
 
   /**
+   * Ocean depth zone for water tiles.
+   * Determines depth-based properties: light, pressure, temperature, life.
+   * Only set for ocean/water tiles. See packages/world/src/ocean/OceanBiomes.ts
+   */
+  oceanZone?: 'epipelagic' | 'mesopelagic' | 'bathypelagic' | 'abyssal' | 'hadal';
+
+  /**
    * Whether this tile can be mined/dug.
    * Future: Used by mining system.
    */

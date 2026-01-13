@@ -145,20 +145,44 @@ export class MidwiferySystem implements System {
 
     if (deltaTicks <= 0) return;
 
+    // Early exit if no reproductive components exist
+    // Note: This system iterates world.entities directly (not using entities parameter)
+    // so it can't benefit from GameLoop's entity filtering. Early-exit optimization is needed.
+    // All reproductive components are configured as ALWAYS in SimulationScheduler.
+    const hasPregnancies = world.query().with('pregnancy').executeEntities().length > 0;
+    const hasLabors = world.query().with('labor').executeEntities().length > 0;
+    const hasPostpartum = world.query().with('postpartum').executeEntities().length > 0;
+    const hasInfants = world.query().with('infant').executeEntities().length > 0;
+    const hasNursing = world.query().with('nursing').executeEntities().length > 0;
+
+    if (!hasPregnancies && !hasLabors && !hasPostpartum && !hasInfants && !hasNursing) {
+      return;
+    }
+
     // Update all pregnant entities
-    this.updatePregnancies(world, currentTick, deltaTicks);
+    if (hasPregnancies) {
+      this.updatePregnancies(world, currentTick, deltaTicks);
+    }
 
     // Update all entities in labor
-    this.updateLabors(world, currentTick, deltaTicks);
+    if (hasLabors) {
+      this.updateLabors(world, currentTick, deltaTicks);
+    }
 
     // Update postpartum recovery
-    this.updatePostpartum(world, deltaTicks);
+    if (hasPostpartum) {
+      this.updatePostpartum(world, deltaTicks);
+    }
 
     // Update infants
-    this.updateInfants(world, currentTick, deltaTicks);
+    if (hasInfants) {
+      this.updateInfants(world, currentTick, deltaTicks);
+    }
 
     // Update nursing mothers
-    this.updateNursing(world, currentTick, deltaTicks);
+    if (hasNursing) {
+      this.updateNursing(world, currentTick, deltaTicks);
+    }
   }
 
   // =========================================================================

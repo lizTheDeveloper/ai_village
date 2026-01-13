@@ -65,6 +65,15 @@ export class CrossRealmPhoneSystem implements System {
   }
 
   public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Use SimulationScheduler to filter active entities
+    // cross_realm_phone is configured as ALWAYS, so this will return all phones
+    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+
+    // Early exit if no phones exist and no pending calls
+    if (activeEntities.length === 0 && this.pendingCalls.length === 0) {
+      return;
+    }
+
     const currentTick = this.getCurrentTick(world);
 
     // Build phone directory from entities
@@ -74,7 +83,7 @@ export class CrossRealmPhoneSystem implements System {
     this.processPendingCalls(world, currentTick);
 
     // Update all phones
-    for (const entity of world.query().with('cross_realm_phone').executeEntities()) {
+    for (const entity of activeEntities) {
       const phoneComp = entity.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
 
       // Handle charging

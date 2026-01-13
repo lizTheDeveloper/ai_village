@@ -85,9 +85,15 @@ export class MagicSystem implements System {
       // Get StateMutatorSystem from world for gradual effects
       this.stateMutatorSystem = world.getSystem('state_mutator') as StateMutatorSystem | null;
 
+      // Get FireSpreadSystem for fire ignition effects
+      const fireSpreadSystem = world.getSystem('fire_spread');
+
       // Pass to effect executor
       if (this.effectExecutor && this.stateMutatorSystem) {
         this.effectExecutor.setStateMutatorSystem(this.stateMutatorSystem);
+      }
+      if (this.effectExecutor && fireSpreadSystem) {
+        this.effectExecutor.setFireSpreadSystem(fireSpreadSystem);
       }
     }
 

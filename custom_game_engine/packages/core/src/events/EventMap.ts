@@ -1233,6 +1233,25 @@ export interface GameEventMap {
     temperature?: number;
   };
 
+  // === Fire Events ===
+  'fire:ignited': {
+    entityId: EntityId;
+    intensity: number;
+    source: 'spell' | 'spread' | 'breath' | 'other';
+  };
+  'fire:extinguished': {
+    entityId: EntityId;
+  };
+  'fire:tile_ignited': {
+    x: number;
+    y: number;
+    material?: string;
+  };
+  'fire:tile_extinguished': {
+    x: number;
+    y: number;
+  };
+
   // === Station Events ===
   'station:fuel_low': {
     stationId: EntityId;

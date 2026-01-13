@@ -123,17 +123,15 @@ export class AssemblyMachineSystem implements System {
 
       // Check if crafting is complete
       if (machine.progress >= 100) {
-        // Consume ingredients
-        this.consumeIngredients(recipe, connection.inputs);
-
-        // Produce output
+        // Try to produce output first
         const success = this.produceOutput(recipe, connection.outputs, world);
 
         if (success) {
-          // Reset progress
+          // Output successful - consume ingredients and reset progress
+          this.consumeIngredients(recipe, connection.inputs);
           machine.progress = 0;
         } else {
-          // Output blocked - halt production
+          // Output blocked - halt production at 100% without consuming ingredients
           machine.progress = 100;
         }
       }

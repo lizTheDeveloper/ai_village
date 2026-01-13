@@ -230,7 +230,7 @@ export const WILDFLOWER: PlantSpecies = {
     environmental: {
       companionEffects: {
         attracts: ['bee', 'butterfly'],
-        benefitsNearby: ['berry-bush', 'tomato']
+        benefitsNearby: ['blueberry-bush', 'raspberry-bush', 'blackberry-bush', 'tomato']
       },
       soilEffects: {
         nitrogenFixer: false,
@@ -251,9 +251,9 @@ export const WILDFLOWER: PlantSpecies = {
   }
 };
 
-export const BERRY_BUSH: PlantSpecies = {
-  id: 'berry-bush',
-  name: 'Berry Bush',
+export const BLUEBERRY_BUSH: PlantSpecies = {
+  id: 'blueberry-bush',
+  name: 'Blueberry Bush',
   category: 'herb',
   biomes: ['forest', 'grassland'],
   rarity: 'uncommon',
@@ -383,19 +383,309 @@ export const BERRY_BUSH: PlantSpecies = {
   },
 
   sprites: {
-    seed: 'berry-bush-seed',
-    sprout: 'berry-bush-sprout',
-    vegetative: 'berry-bush-vegetative',
-    flowering: 'berry-bush-flowering',
-    fruiting: 'berry-bush-fruiting',
-    mature: 'berry-bush-mature',
-    seeding: 'berry-bush-seeding',
-    withered: 'berry-bush-withered'
+    seed: 'blueberry-bush-seed',
+    sprout: 'blueberry-bush-sprout',
+    vegetative: 'blueberry-bush-vegetative',
+    flowering: 'blueberry-bush-flowering',
+    fruiting: 'blueberry-bush-fruiting',
+    mature: 'blueberry-bush-mature',
+    seeding: 'blueberry-bush-seeding',
+    withered: 'blueberry-bush-withered'
   },
 
-  // Berry bushes regrow after harvest - picking berries doesn't destroy the bush
+  // Blueberry bushes regrow after harvest - picking berries doesn't destroy the bush
   harvestDestroysPlant: false,
   harvestResetStage: 'fruiting'  // Reset to fruiting stage to regrow berries
+};
+
+export const RASPBERRY_BUSH: PlantSpecies = {
+  id: 'raspberry-bush',
+  name: 'Raspberry Bush',
+  category: 'herb',
+  biomes: ['forest', 'woodland'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.75,
+      conditions: { minHydration: 30, minTemperature: 10, minNutrition: 25 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 25 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHydration: 25, minNutrition: 30 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 30, minNutrition: 35 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '8-15' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1.5,
+      conditions: { minHydration: 25 },
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 2,
+      conditions: { minHydration: 25 },
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 2,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.8,
+    yieldAmount: 1.2,
+    diseaseResistance: 60,
+    droughtTolerance: 50,
+    coldTolerance: 65,
+    flavorProfile: 85,
+    mutations: []
+  },
+
+  seedsPerPlant: 12,
+  seedDispersalRadius: 2,
+  requiresDormancy: true,
+
+  optimalTemperatureRange: [10, 22],
+  optimalMoistureRange: [40, 75],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 22,
+    taste: {
+      sweet: 0.5,
+      bitter: 0.1,
+      sour: 0.5,
+      savory: 0.0,
+      spicy: 0.0,
+      aromatic: 0.6
+    },
+    medicinal: {
+      treats: ['nausea'],
+      effectiveness: 0.2,
+      preparation: ['raw'],
+      dosage: 'small',
+      toxicIfOverused: false
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bird', 'bee']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'raspberry-bush-seed',
+    sprout: 'raspberry-bush-sprout',
+    vegetative: 'raspberry-bush-vegetative',
+    flowering: 'raspberry-bush-flowering',
+    fruiting: 'raspberry-bush-fruiting',
+    mature: 'raspberry-bush-mature',
+    seeding: 'raspberry-bush-seeding',
+    withered: 'raspberry-bush-withered'
+  },
+
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting'
+};
+
+export const BLACKBERRY_BUSH: PlantSpecies = {
+  id: 'blackberry-bush',
+  name: 'Blackberry Bush',
+  category: 'herb',
+  biomes: ['forest', 'woodland', 'plains'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 0.5,
+      conditions: { minHydration: 25, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1,
+      conditions: { minHydration: 20 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHydration: 20, minNutrition: 25 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 2,
+      conditions: { minHydration: 25, minNutrition: 30 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '10-20' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 1.5,
+      conditions: { minHydration: 20 },
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 2,
+      conditions: { minHydration: 20 },
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 3 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 1.5,
+      conditions: { minHealth: 45 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 2,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.9,
+    yieldAmount: 1.4,
+    diseaseResistance: 70,
+    droughtTolerance: 60,
+    coldTolerance: 60,
+    flavorProfile: 88,
+    mutations: []
+  },
+
+  seedsPerPlant: 15,
+  seedDispersalRadius: 3,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [10, 25],
+  optimalMoistureRange: [35, 75],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 26,
+    taste: {
+      sweet: 0.7,
+      bitter: 0.1,
+      sour: 0.3,
+      savory: 0.0,
+      spicy: 0.0,
+      aromatic: 0.5
+    },
+    medicinal: {
+      treats: ['nausea'],
+      effectiveness: 0.25,
+      preparation: ['raw'],
+      dosage: 'small',
+      toxicIfOverused: false
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bird', 'bee', 'butterfly']
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'blackberry-bush-seed',
+    sprout: 'blackberry-bush-sprout',
+    vegetative: 'blackberry-bush-vegetative',
+    flowering: 'blackberry-bush-flowering',
+    fruiting: 'blackberry-bush-fruiting',
+    mature: 'blackberry-bush-mature',
+    seeding: 'blackberry-bush-seeding',
+    withered: 'blackberry-bush-withered'
+  },
+
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting'
 };
 
 export const TREE: PlantSpecies = {
@@ -930,7 +1220,7 @@ export const YARROW: PlantSpecies = {
     environmental: {
       companionEffects: {
         attracts: ['bee', 'butterfly', 'ladybug'],
-        benefitsNearby: ['tomato', 'berry-bush']
+        benefitsNearby: ['tomato', 'blueberry-bush', 'raspberry-bush', 'blackberry-bush']
       }
     }
   },
@@ -1690,7 +1980,7 @@ export const WILD_GARLIC: PlantSpecies = {
     environmental: {
       companionEffects: {
         repels: ['pest', 'aphid', 'deer'],
-        benefitsNearby: ['berry-bush', 'tree']
+        benefitsNearby: ['blueberry-bush', 'raspberry-bush', 'blackberry-bush', 'tree']
       }
     }
   },
@@ -2261,8 +2551,8 @@ export const ELDERBERRY: PlantSpecies = {
 };
 
 export const WILD_PLANTS = [
-  GRASS, WILDFLOWER, BERRY_BUSH, TREE,
+  GRASS, WILDFLOWER, BLUEBERRY_BUSH, TREE,
   CLOVER, SAGE, YARROW, THISTLE, WILD_ONION,
   FERN, MUSHROOM, MOSS, WILD_GARLIC, OAK_TREE, PINE_TREE,
-  GINSENG, ELDERBERRY
+  GINSENG, ELDERBERRY, RASPBERRY_BUSH, BLACKBERRY_BUSH
 ];

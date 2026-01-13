@@ -128,6 +128,7 @@ export class AgentBrainSystem implements System {
   // Performance: Cache agents query to avoid O(N²) in shouldThink()
   private allAgentsCache: ReadonlyArray<Entity> = [];
   private allAgentsCacheTick: number = -1;
+  private agentIndexMap: Map<string, number> = new Map();
 
   constructor(
     llmQueue?: LLMDecisionQueue,
@@ -326,6 +327,12 @@ export class AgentBrainSystem implements System {
     if (world.tick !== this.allAgentsCacheTick) {
       this.allAgentsCache = world.query().with(CT.Agent).executeEntities();
       this.allAgentsCacheTick = world.tick;
+
+      // Build index map for O(1) lookups instead of O(N) findIndex
+      this.agentIndexMap.clear();
+      for (let i = 0; i < this.allAgentsCache.length; i++) {
+        this.agentIndexMap.set(this.allAgentsCache[i]!.id, i);
+      }
     }
     const allAgents = this.allAgentsCache;
     const agentCount = allAgents.length;
@@ -335,9 +342,9 @@ export class AgentBrainSystem implements System {
       return ticksSinceLastThink >= agent.thinkInterval;
     }
 
-    // Find this agent's index in the list (stable ordering)
-    const agentIndex = allAgents.findIndex((a) => a.id === entity.id);
-    if (agentIndex === -1) {
+    // Find this agent's index in the list (stable ordering) - O(1) lookup via Map
+    const agentIndex = this.agentIndexMap.get(entity.id);
+    if (agentIndex === undefined) {
       // Agent not found (shouldn't happen), think immediately
       return true;
     }

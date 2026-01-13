@@ -1114,12 +1114,13 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     // Determine the food item ID based on species
-    // berry-bush -> berry, wheat -> wheat, etc.
+    // berry-bush -> berry (legacy), blueberry-bush -> blueberry, raspberry-bush -> raspberry, etc.
     const speciesId = plantComp.speciesId;
     let foodItemId = speciesId;
     if (speciesId === 'berry-bush' || speciesId === 'berry_bush') {
-      foodItemId = 'berry';
+      foodItemId = 'berry'; // Legacy generic berry
     } else if (speciesId.endsWith('-bush') || speciesId.endsWith('_bush')) {
+      // Strip -bush suffix: blueberry-bush -> blueberry, raspberry-bush -> raspberry, etc.
       foodItemId = speciesId.replace(/-bush$/, '').replace(/_bush$/, '');
     }
 

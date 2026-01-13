@@ -123,6 +123,20 @@ export const SIMULATION_CONFIGS: Record<string, ComponentSimulationConfig> = {
   inventory: { mode: SimulationMode.PASSIVE },
 
   // ============================================================================
+  // Reproductive & Communication - Always simulate
+  // ============================================================================
+
+  /** Pregnancy should progress even off-screen */
+  pregnancy: { mode: SimulationMode.ALWAYS },
+  labor: { mode: SimulationMode.ALWAYS },
+  postpartum: { mode: SimulationMode.ALWAYS },
+  infant: { mode: SimulationMode.ALWAYS },
+  nursing: { mode: SimulationMode.ALWAYS },
+
+  /** Cross-realm phones work anywhere */
+  cross_realm_phone: { mode: SimulationMode.ALWAYS },
+
+  // ============================================================================
   // Special cases - can override based on entity tags
   // ============================================================================
 

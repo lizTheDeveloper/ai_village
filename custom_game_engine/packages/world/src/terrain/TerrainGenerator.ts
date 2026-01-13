@@ -2,12 +2,20 @@ import type { WorldMutator } from '@ai-village/core';
 import type { Chunk } from '../chunks/Chunk.js';
 import { CHUNK_SIZE, setTileAt } from '../chunks/Chunk.js';
 import type { Tile, TerrainType, BiomeType, FluidLayer } from '../chunks/Tile.js';
+import {
+  getOceanBiomeZone,
+  calculatePressure,
+  calculateLightLevel,
+  calculateWaterTemperature,
+} from '../ocean/OceanBiomes.js';
+import type { OceanBiomeZone } from '../ocean/OceanBiomes.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
 import { createMountain } from '../entities/MountainEntity.js';
 import { createLeafPile } from '../entities/LeafPileEntity.js';
 import { createFiberPlant } from '../entities/FiberPlantEntity.js';
+import { createBerryBush } from '../entities/BerryBushEntity.js';
 import {
   createIronDeposit,
   createCoalDeposit,
@@ -232,7 +240,7 @@ export class TerrainGenerator {
             }
             // Berry bushes - 12% chance in dense forest
             if (Math.random() < 0.12) {
-              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+              createBerryBush(world, worldX, worldY);
             }
           }
           // Young forest
@@ -268,7 +276,7 @@ export class TerrainGenerator {
             }
             // Berry bushes - 15% chance
             if (Math.random() < 0.15) {
-              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+              createBerryBush(world, worldX, worldY);
             }
           }
           // Open woodland
@@ -301,7 +309,7 @@ export class TerrainGenerator {
             }
             // Berry bushes - 18% chance
             if (Math.random() < 0.18) {
-              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+              createBerryBush(world, worldX, worldY);
             }
           }
           // Forest clearings (meadow-like)
@@ -316,7 +324,7 @@ export class TerrainGenerator {
             }
             // Berry bushes - 35% chance (high in clearings - good foraging areas!)
             if (Math.random() < 0.35) {
-              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+              createBerryBush(world, worldX, worldY);
             }
             // Rocks in clearings - exposed boulders - 20% chance
             if (Math.random() < 0.20) {
@@ -1082,18 +1090,26 @@ export class TerrainGenerator {
 
     // Determine terrain and biome using ORIGINAL elevation (before forest/desert/spawn modifications)
     // This ensures biome boundaries follow environmental gradients, not micro-terrain features
-    const { terrain, biome, fluid } = this.determineTerrainAndBiome(
+    const { terrain, biome, fluid, oceanZone } = this.determineTerrainAndBiome(
       biomeElevation,
       moisture,
       temperature
     );
 
     // Calculate tile Z elevation based on improved noise
-    // Scale: water = -2 to -1, plains = -1 to 2, hills = 2-6, mountains = 6-15
+    // Scale: water (planetary ocean) = -11000 to 0, plains = -1 to 2, hills = 2-6, mountains = 6-15
     let tileElevation = 0;
-    if (biome === 'ocean' || biome === 'river') {
-      // Water is below sea level
-      tileElevation = Math.floor((elevation + 1) * -1.5); // -3 to -1
+    if (biome === 'ocean') {
+      // OCEAN: Planetary-scale depth (0 to -11,000m for trenches)
+      // Map elevation -1.0 to -0.3 to depth 0 to -11000m
+      // Deeper elevation values = deeper ocean trenches
+      const depthFactor = (this.WATER_LEVEL - elevation) / (1.0 + this.WATER_LEVEL);
+      // Non-linear mapping: shallow areas common, deep trenches rare
+      const depthCurve = Math.pow(depthFactor, 2.5); // Exponential curve
+      tileElevation = -Math.floor(depthCurve * 11000); // 0 to -11000m
+    } else if (biome === 'river') {
+      // Rivers: Shallow water (0 to -10m)
+      tileElevation = Math.floor((elevation + 1) * -5); // -7 to 0m
     } else if (biome === 'mountains') {
       // Mountains use ridged noise for cliffs - map 0.5-1.0 to 6-15
       const mountainFactor = (elevation - this.STONE_LEVEL) / (1 - this.STONE_LEVEL);
@@ -1131,6 +1147,32 @@ export class TerrainGenerator {
       fertility = Math.min(fertility, 0.3);
     }
 
+    // For ocean tiles, update fluid properties based on actual depth
+    let finalFluid = fluid;
+    let finalOceanZone = oceanZone;
+
+    if (biome === 'ocean' && tileElevation < 0) {
+      // Calculate ocean zone based on actual tile depth
+      finalOceanZone = getOceanBiomeZone(tileElevation) || undefined;
+
+      // Calculate realistic water properties
+      const waterTemp = calculateWaterTemperature(tileElevation, temperature * 20 + 10); // Convert -1/1 to 10-30°C
+      const pressure = calculatePressure(tileElevation);
+
+      // Dwarf Fortress-style depth (0-7) for flow simulation
+      // Map ocean depth to DF depth scale for compatibility
+      const dfDepth = tileElevation >= -200 ? Math.floor(Math.abs(tileElevation) / 30) + 1 : 7;
+
+      finalFluid = {
+        type: 'water' as const,
+        depth: Math.min(7, Math.max(1, dfDepth)), // Clamp to 1-7
+        pressure: pressure,
+        temperature: waterTemp,
+        stagnant: true, // No flow initially
+        lastUpdate: 0,
+      };
+    }
+
     return {
       terrain,
       biome,
@@ -1150,7 +1192,8 @@ export class TerrainGenerator {
       lastTilled: 0,
       composted: false,
       plantId: null,
-      ...(fluid && { fluid }), // Include fluid layer if present
+      ...(finalFluid && { fluid: finalFluid }), // Include fluid layer if present
+      ...(finalOceanZone && { oceanZone: finalOceanZone }), // Include ocean zone for water tiles
     };
   }
 
@@ -1247,7 +1290,7 @@ export class TerrainGenerator {
     elevation: number,
     moisture: number,
     temperature: number
-  ): { terrain: TerrainType; biome: BiomeType; fluid?: FluidLayer } {
+  ): { terrain: TerrainType; biome: BiomeType; fluid?: FluidLayer; oceanZone?: OceanBiomeZone } {
 
     // PRIORITY 1: Water (hard boundary at WATER_LEVEL)
     if (elevation < this.WATER_LEVEL) {

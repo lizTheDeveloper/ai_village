@@ -344,10 +344,12 @@ describe('Automation Edge Cases', () => {
       machine.addComponent(power);
 
       // Run for enough time to complete one craft
-      for (let i = 0; i < 25; i++) {
+      // Need >1200 ticks for StateMutatorSystem to apply first delta
+      for (let i = 0; i < 1250; i++) {
         assemblySystem.update(world, [machine], 0.05);
         // Apply deltas via StateMutatorSystem each tick
         stateMutatorSystem.update(world, [], 0.05);
+        world.advanceTick();
       }
 
       // Get updated components
@@ -511,9 +513,12 @@ describe('Automation Edge Cases', () => {
       machine.addComponent(power);
 
       // Very large time step (10 seconds)
+      // First call: AssemblySystem registers delta
       assemblySystem.update(world, [machine], 10.0);
-      // Apply deltas via StateMutatorSystem
+      // Second call: StateMutatorSystem applies delta
       stateMutatorSystem.update(world, [], 10.0);
+      // Third call: AssemblySystem checks completion and produces output
+      assemblySystem.update(world, [machine], 0.05);
 
       // Get the updated component from the entity
       const updatedAssembly = machine.getComponent('assembly_machine' as any);

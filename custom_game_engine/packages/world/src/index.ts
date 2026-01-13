@@ -6,6 +6,7 @@
 
 export * from './chunks/index.js';
 export * from './terrain/index.js';
+export * from './ocean/index.js';
 export * from './entities/index.js';
 export * from './plant-species/index.js';
 export * from './alien-generation/index.js';

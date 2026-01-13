@@ -175,8 +175,26 @@ export class PromptRenderer {
 
       const value = (component as any)[fieldName];
 
-      // Get LLM config for this field
+      // Skip null/undefined/empty values unless explicitly required
       const llmConfig = (fieldSchema as any).llm;
+      if ((value === null || value === undefined) && !llmConfig?.alwaysInclude) {
+        continue;
+      }
+
+      // Skip empty strings unless explicitly required
+      if (value === '' && !llmConfig?.alwaysInclude) {
+        continue;
+      }
+
+      // Skip empty arrays unless explicitly required
+      if (Array.isArray(value) && value.length === 0 && !llmConfig?.alwaysInclude) {
+        continue;
+      }
+
+      // Skip empty objects unless explicitly required
+      if (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length === 0 && !llmConfig?.alwaysInclude) {
+        continue;
+      }
 
       // Check hideIf condition
       if (llmConfig?.hideIf && llmConfig.hideIf(value)) {

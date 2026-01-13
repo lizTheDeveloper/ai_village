@@ -116,6 +116,9 @@ export class NeedsComponent extends ComponentBase {
   /** Health level: 0 = dead, 1 = healthy */
   public health: number;
 
+  /** Oxygen level: 0 = drowning, 1 = full breath (optional, for underwater survival) */
+  public oxygen?: number;
+
   /** Hydration level: 0 = dehydrated, 1 = hydrated */
   public thirst: number;
 

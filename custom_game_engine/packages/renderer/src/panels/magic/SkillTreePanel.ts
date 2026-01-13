@@ -19,6 +19,7 @@ export class SkillTreePanel implements IWindowPanel {
   private treeView: ParadigmTreeView;
   private recentlyDiscoveredNodes: Set<string> = new Set();
   private lastDiscoveryCheckTime: number = 0;
+  private tabScrollOffset: number = 0;
 
   constructor(_windowManager: any) {
     // WindowManager reference not currently needed
@@ -95,7 +96,7 @@ export class SkillTreePanel implements IWindowPanel {
     }
 
     // Check for new discoveries
-    this.checkForNewDiscoveries(magicComp);
+    this.checkForNewDiscoveries(magicComp, world);
 
     // Render tabs (hide if only one paradigm)
     const tabHeight = magicComp.knownParadigmIds.length > 1 ? 30 : 0;
@@ -149,10 +150,10 @@ export class SkillTreePanel implements IWindowPanel {
       return false;
     }
 
-    // Check if clicking on tabs
-    const tabHeight = 30;
-    if (y < tabHeight) {
-      return this.handleTabClick(x, magicComp.knownParadigmIds);
+    // Check if clicking on tabs (only if multiple paradigms)
+    const tabHeight = magicComp.knownParadigmIds.length > 1 ? 30 : 0;
+    if (tabHeight > 0 && y < tabHeight) {
+      return this.handleTabClick(x, magicComp.knownParadigmIds, this.getDefaultWidth());
     }
 
     // Check if clicking on a node
@@ -192,6 +193,12 @@ export class SkillTreePanel implements IWindowPanel {
       this.uiState.selectedEntityId = entity.id;
       // Reset viewport when switching entities
       this.uiState.viewport = this.createDefaultViewport();
+
+      // Set activeParadigmId to first paradigm if entity has magic
+      const magicComp = entity.getComponent('magic') as MagicComponent | undefined;
+      if (magicComp && magicComp.knownParadigmIds && magicComp.knownParadigmIds.length > 0) {
+        this.uiState.activeParadigmId = magicComp.knownParadigmIds[0];
+      }
     }
   }
 
@@ -305,8 +312,9 @@ export class SkillTreePanel implements IWindowPanel {
       return;
     }
 
-    const tabHeight = 30;
-    if (y < tabHeight) {
+    const magicComp = this.selectedEntity.getComponent('magic') as MagicComponent | undefined;
+    const tabHeight = magicComp && magicComp.knownParadigmIds.length > 1 ? 30 : 0;
+    if (tabHeight > 0 && y < tabHeight) {
       this.uiState.hoveredNodeId = undefined;
       return;
     }
@@ -441,15 +449,55 @@ export class SkillTreePanel implements IWindowPanel {
     };
   }
 
-  private handleTabClick(x: number, paradigms: string[]): boolean {
+  private handleTabClick(x: number, paradigms: string[], width: number): boolean {
     const tabWidth = 120;
-    const tabIndex = Math.floor(x / tabWidth);
+    const arrowWidth = 20;
 
-    if (tabIndex >= 0 && tabIndex < paradigms.length) {
-      const selectedParadigm = paradigms[tabIndex];
-      if (selectedParadigm) {
-        this.setActiveParadigm(selectedParadigm);
-        return true;
+    // Check if we need scrolling (10+ paradigms)
+    const needsScrolling = paradigms.length >= 10;
+
+    if (needsScrolling) {
+      // Check if clicking on left arrow
+      if (x < arrowWidth) {
+        if (this.tabScrollOffset > 0) {
+          this.tabScrollOffset--;
+          return true;
+        }
+        return false;
+      }
+
+      // Check if clicking on right arrow
+      const maxVisibleTabs = Math.floor((width - arrowWidth * 2) / tabWidth);
+      const maxScrollOffset = Math.max(0, paradigms.length - maxVisibleTabs);
+      if (x > width - arrowWidth) {
+        if (this.tabScrollOffset < maxScrollOffset) {
+          this.tabScrollOffset++;
+          return true;
+        }
+        return false;
+      }
+
+      // Click is in tab area
+      const tabAreaX = x - arrowWidth;
+      const tabIndex = this.tabScrollOffset + Math.floor(tabAreaX / tabWidth);
+
+      if (tabIndex >= 0 && tabIndex < paradigms.length) {
+        const selectedParadigm = paradigms[tabIndex];
+        if (selectedParadigm) {
+          this.setActiveParadigm(selectedParadigm);
+          return true;
+        }
+      }
+    } else {
+      // No scrolling needed - simple tab click
+      const tabIndex = Math.floor(x / tabWidth);
+
+      if (tabIndex >= 0 && tabIndex < paradigms.length) {
+        const selectedParadigm = paradigms[tabIndex];
+        if (selectedParadigm) {
+          this.setActiveParadigm(selectedParadigm);
+          return true;
+        }
       }
     }
 
@@ -639,25 +687,109 @@ export class SkillTreePanel implements IWindowPanel {
     }
   }
 
-  private checkForNewDiscoveries(_magicComp: MagicComponent): void {
+  private checkForNewDiscoveries(magicComp: MagicComponent, world: World): void {
     // Check if any hidden nodes became visible since last check
-    // This would trigger discovery notifications
-    // For now, simplified - would need to compare previous state
     const now = Date.now();
     if (now - this.lastDiscoveryCheckTime < 1000) {
       return; // Throttle checks
     }
     this.lastDiscoveryCheckTime = now;
 
-    // TODO: Implement discovery tracking
+    if (!this.selectedEntity || !this.uiState.activeParadigmId) {
+      return;
+    }
+
+    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    if (!tree) {
+      return;
+    }
+
+    const progress = this.getProgressForParadigm(magicComp, this.uiState.activeParadigmId);
+    if (!progress) {
+      return;
+    }
+
+    const evaluationContext = this.buildEvaluationContext(world, this.selectedEntity, progress);
+
+    // Track which nodes are currently visible
+    const currentlyVisibleNodes = new Set<string>();
+
+    for (const node of tree.nodes) {
+      // Check if node is hidden
+      if ((node as any).hidden !== true) {
+        continue; // Not a hidden node
+      }
+
+      // Evaluate if this hidden node should now be visible
+      const evaluation = evaluateNode(node, tree, evaluationContext);
+
+      if (evaluation.isVisible) {
+        currentlyVisibleNodes.add(node.id);
+
+        // Check if this is a NEW discovery (wasn't in recentlyDiscoveredNodes before)
+        if (!this.recentlyDiscoveredNodes.has(node.id)) {
+          this.recentlyDiscoveredNodes.add(node.id);
+
+          // Emit notification event
+          const eventBus = world.getEventBus();
+          eventBus.emit('ui:notification', {
+            message: 'New ability discovered',
+            type: 'discovery'
+          });
+        }
+      }
+    }
   }
 
-  private renderTabs(ctx: CanvasRenderingContext2D, paradigms: string[], x: number, y: number, _width: number, height: number): void {
+  private renderTabs(ctx: CanvasRenderingContext2D, paradigms: string[], x: number, y: number, width: number, height: number): void {
     const tabWidth = 120;
+    const arrowWidth = 20;
+    const needsScrolling = paradigms.length >= 10;
 
-    for (let i = 0; i < paradigms.length; i++) {
-      const tabX = x + (i * tabWidth);
-      const isActive = paradigms[i] === this.uiState.activeParadigmId;
+    let startX = x;
+    let endX = x + width;
+    let visibleParadigms = paradigms;
+    let visibleStartIndex = 0;
+
+    if (needsScrolling) {
+      // Render left scroll arrow
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(x, y, arrowWidth, height);
+      ctx.strokeStyle = '#666666';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, arrowWidth, height);
+      ctx.fillStyle = this.tabScrollOffset > 0 ? '#ffffff' : '#666666';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('<', x + arrowWidth / 2, y + height / 2);
+
+      // Calculate visible tabs
+      const maxVisibleTabs = Math.floor((width - arrowWidth * 2) / tabWidth);
+      visibleStartIndex = this.tabScrollOffset;
+      visibleParadigms = paradigms.slice(visibleStartIndex, visibleStartIndex + maxVisibleTabs);
+      startX = x + arrowWidth;
+      endX = x + width - arrowWidth;
+
+      // Render right scroll arrow
+      const maxScrollOffset = Math.max(0, paradigms.length - maxVisibleTabs);
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(x + width - arrowWidth, y, arrowWidth, height);
+      ctx.strokeStyle = '#666666';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + width - arrowWidth, y, arrowWidth, height);
+      ctx.fillStyle = this.tabScrollOffset < maxScrollOffset ? '#ffffff' : '#666666';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('>', x + width - arrowWidth / 2, y + height / 2);
+    }
+
+    // Render visible tabs
+    for (let i = 0; i < visibleParadigms.length; i++) {
+      const tabX = startX + (i * tabWidth);
+      const paradigm = visibleParadigms[i];
+      const isActive = paradigm === this.uiState.activeParadigmId;
 
       // Tab background
       ctx.fillStyle = isActive ? '#444444' : '#222222';
@@ -673,7 +805,6 @@ export class SkillTreePanel implements IWindowPanel {
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const paradigm = paradigms[i];
       if (paradigm) {
         const paradigmName = paradigm.charAt(0).toUpperCase() + paradigm.slice(1);
         ctx.fillText(paradigmName, tabX + tabWidth / 2, y + height / 2);

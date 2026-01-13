@@ -236,6 +236,66 @@ export class SideViewTerrainRenderer {
       this.ctx.lineTo(tuftX2 + 8 * this.camera.zoom, tileScreenY);
       this.ctx.fill();
     }
+
+    // Draw roof on front layer (voxel building system)
+    if (layerIdx === 0) {
+      const tileWithRoof = tile as typeof tile & {
+        roof?: { material: string; condition: number; constructionProgress?: number };
+      };
+      if (tileWithRoof.roof) {
+        const roof = tileWithRoof.roof;
+        const progress = roof.constructionProgress ?? 100;
+        const alpha = progress >= 100 ? 0.8 : 0.4 + (progress / 100) * 0.4;
+
+        // Material-based colors for roofs
+        const roofColors: Record<string, string> = {
+          thatch: '#C4A35A', // Golden straw
+          wood: '#8B6914',   // Darker wood
+          tile: '#B85C38',   // Terracotta
+          slate: '#4A5568',  // Gray slate
+          metal: '#6B7280',  // Metallic gray
+        };
+        const roofColor = roofColors[roof.material] ?? '#C4A35A';
+
+        // Parse roof color for rgba
+        const hex = roofColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Draw roof as semi-transparent overlay on top of the tile
+        this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        this.ctx.fillRect(screenX, tileScreenY, tilePixelSize, tilePixelSize);
+
+        // Add diagonal line pattern for roof texture
+        this.ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+        this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.3);
+
+        // Draw diagonal lines
+        const step = Math.max(3, tilePixelSize / 4);
+        for (let i = 0; i < tilePixelSize * 2; i += step) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(screenX + i, tileScreenY);
+          this.ctx.lineTo(screenX, tileScreenY + i);
+          this.ctx.stroke();
+        }
+
+        // Show construction progress if incomplete
+        if (progress < 100) {
+          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          this.ctx.font = `${Math.max(8, this.camera.zoom * 6)}px sans-serif`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText(
+            `${Math.round(progress)}%`,
+            screenX + tilePixelSize / 2,
+            tileScreenY + tilePixelSize / 2
+          );
+          this.ctx.textAlign = 'left';
+          this.ctx.textBaseline = 'alphabetic';
+        }
+      }
+    }
   }
 
   /**

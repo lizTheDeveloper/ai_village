@@ -9,13 +9,21 @@ import {
   createResourceComponent,
   PlantComponent,
 } from '@ai-village/core';
-import { BERRY_BUSH } from '../plant-species/wild-plants.js';
+import { BLUEBERRY_BUSH, RASPBERRY_BUSH, BLACKBERRY_BUSH } from '../plant-species/wild-plants.js';
 
 /**
  * Create a berry bush entity at the specified position.
- * Berry bushes provide food for agents to harvest.
+ * Creates blueberry, raspberry, or blackberry bushes randomly.
  */
 export function createBerryBush(world: WorldMutator, x: number, y: number): string {
+  // Randomly choose berry type
+  const berryTypes = [
+    { species: BLUEBERRY_BUSH, id: 'blueberry-bush', sprite: 'blueberry-bush', nutrition: 25 },
+    { species: RASPBERRY_BUSH, id: 'raspberry-bush', sprite: 'raspberry-bush', nutrition: 22 },
+    { species: BLACKBERRY_BUSH, id: 'blackberry-bush', sprite: 'blackberry-bush', nutrition: 26 },
+  ] as const;
+  const berryType = berryTypes[Math.floor(Math.random() * berryTypes.length)]!; // Non-null assertion - array is never empty
+
   const entity = new EntityImpl(createEntityId(), world.tick);
 
   // Position
@@ -25,25 +33,25 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
   entity.addComponent(createPhysicsComponent(false, 1, 1));
 
   // Renderable
-  entity.addComponent(createRenderableComponent('berry-bush', 'object'));
+  entity.addComponent(createRenderableComponent(berryType.sprite, 'object'));
 
   // Tags
   entity.addComponent(createTagsComponent('berries', 'harvestable', 'food'));
 
   // Resource - berry bushes provide food
-  entity.addComponent(createResourceComponent('food', 20, 0.3)); // 20 food, regenerates 0.3/sec
+  entity.addComponent(createResourceComponent('food', berryType.nutrition, 0.3)); // regenerates 0.3/sec
 
   // Plant - berry bushes are mature wild plants
   entity.addComponent(new PlantComponent({
-    speciesId: 'berry-bush',
+    speciesId: berryType.id,
     position: { x, y },
     stage: 'mature',
     health: 100,
     hydration: 80,
     nutrition: 80,
     // Harvest behavior from species - berry bushes regrow after picking
-    harvestDestroysPlant: BERRY_BUSH.harvestDestroysPlant ?? true,
-    harvestResetStage: BERRY_BUSH.harvestResetStage ?? 'fruiting',
+    harvestDestroysPlant: berryType.species.harvestDestroysPlant ?? true,
+    harvestResetStage: berryType.species.harvestResetStage ?? 'fruiting',
   }));
 
   // Add to world

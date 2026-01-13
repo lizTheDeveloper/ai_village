@@ -577,6 +577,7 @@ export class DivineBodyModification implements System {
         ['damage', { value: 0, baseValue: 0, modifiers: [] }],
       ]),
       stateMutatorSystem: null,
+      fireSpreadSystem: null,
     };
   }
 

@@ -102,9 +102,27 @@ export class NodeTooltip {
       });
       contentHeight += lineHeight;
 
-      // Conditions will be rendered separately
-      const conditionsHeight = this.conditionRenderer.calculateHeight(evaluation.conditions, 200);
+      // Check if we have 10+ conditions - show scroll indicator
+      const maxVisibleConditions = 10;
+      const hasMoreConditions = evaluation.conditions.length > maxVisibleConditions;
+
+      // Conditions will be rendered separately (limit to first 10)
+      const visibleConditions = hasMoreConditions
+        ? evaluation.conditions.slice(0, maxVisibleConditions)
+        : evaluation.conditions;
+      const conditionsHeight = this.conditionRenderer.calculateHeight(visibleConditions, 200);
       contentHeight += conditionsHeight;
+
+      // Add scroll indicator if there are more
+      if (hasMoreConditions) {
+        lines.push({
+          text: `↓ ${evaluation.conditions.length - maxVisibleConditions} more...`,
+          font: '12px sans-serif',
+          color: '#888888',
+          indent: 0,
+        });
+        contentHeight += lineHeight;
+      }
     }
 
     // Effects
@@ -175,11 +193,16 @@ export class NodeTooltip {
       currentY += lineHeight;
     }
 
-    // Render conditions
+    // Render conditions (limit to first 10 if there are more)
     if (evaluation.conditions.length > 0) {
+      const maxVisibleConditions = 10;
+      const visibleConditions = evaluation.conditions.length > maxVisibleConditions
+        ? evaluation.conditions.slice(0, maxVisibleConditions)
+        : evaluation.conditions;
+
       this.conditionRenderer.render(
         ctx,
-        evaluation.conditions,
+        visibleConditions,
         tooltipX + padding,
         currentY,
         tooltipWidth - (padding * 2),

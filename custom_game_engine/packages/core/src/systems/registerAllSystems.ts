@@ -14,6 +14,7 @@ import type { System } from '../ecs/System.js';
 import { TimeSystem } from './TimeSystem.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
+import { FireSpreadSystem } from './FireSpreadSystem.js';
 import { SoilSystem } from './SoilSystem.js';
 
 // Plants - Import from @ai-village/botany package and pass via config.plantSystems
@@ -25,6 +26,7 @@ import { AnimalSystem } from './AnimalSystem.js';
 import { AnimalProductionSystem } from './AnimalProductionSystem.js';
 import { AnimalHousingSystem } from './AnimalHousingSystem.js';
 import { WildAnimalSpawningSystem } from './WildAnimalSpawningSystem.js';
+import { AquaticAnimalSpawningSystem } from './AquaticAnimalSpawningSystem.js';
 import { TamingSystem } from './TamingSystem.js';
 import { AnimalVisualsSystem } from './AnimalVisualsSystem.js';
 
@@ -42,7 +44,9 @@ import { AgentVisualsSystem } from './AgentVisualsSystem.js';
 import { AgentBrainSystem } from './AgentBrainSystem.js';
 import { MovementSystem } from './MovementSystem.js';
 import { StateMutatorSystem } from './StateMutatorSystem.js';
-import { FluidDynamicsSystem } from './FluidDynamicsSystem.js'; // Batched vector updates (priority 5)
+import { FluidDynamicsSystem } from './FluidDynamicsSystem.js';
+import { PlanetaryCurrentsSystem } from './PlanetaryCurrentsSystem.js';
+import { AgentSwimmingSystem } from './AgentSwimmingSystem.js';
 import { NeedsSystem } from './NeedsSystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
@@ -83,6 +87,7 @@ import { BuildingSystem } from './BuildingSystem.js';
 import { BuildingMaintenanceSystem } from './BuildingMaintenanceSystem.js';
 import { BuildingSpatialAnalysisSystem } from './BuildingSpatialAnalysisSystem.js';
 import { ResourceGatheringSystem } from './ResourceGatheringSystem.js';
+import { RoofRepairSystem } from './RoofRepairSystem.js';
 
 // Tile-Based Voxel Building (Phase 3-4)
 import { TreeFellingSystem } from './TreeFellingSystem.js';
@@ -344,6 +349,7 @@ export interface SystemRegistrationResult {
   /** PlantSystem instance (from @ai-village/botany or deprecated core version) */
   plantSystem: System & { setStateMutatorSystem(s: any): void };
   wildAnimalSpawning: WildAnimalSpawningSystem;
+  aquaticAnimalSpawning: AquaticAnimalSpawningSystem;
   governanceDataSystem: GovernanceDataSystem;
   metricsSystem?: MetricsCollectionSystem;
   magicSystem: MagicSystem;
@@ -418,10 +424,27 @@ export function registerAllSystems(
   const fluidDynamics = new FluidDynamicsSystem();
   gameLoop.systemRegistry.register(fluidDynamics);
 
+  // PlanetaryCurrentsSystem - Large-scale ocean circulation (priority 17)
+  // Handles ocean gyres, thermohaline circulation, and tidal forces
+  const planetaryCurrents = new PlanetaryCurrentsSystem();
+  gameLoop.systemRegistry.register(planetaryCurrents);
+
+  // AgentSwimmingSystem - Depth-based swimming mechanics (priority 18)
+  // Oxygen consumption and pressure damage - uses StateMutatorSystem for gradual effects
+  const agentSwimming = new AgentSwimmingSystem();
+  agentSwimming.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(agentSwimming);
+
   // TemperatureSystem - Uses StateMutatorSystem for batched temperature damage
   const temperatureSystem = new TemperatureSystem();
   temperatureSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(temperatureSystem);
+
+  // FireSpreadSystem - Handles fire spreading and burning damage
+  // Uses StateMutatorSystem for batched burning DoT damage
+  const fireSpreadSystem = new FireSpreadSystem();
+  fireSpreadSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(fireSpreadSystem);
 
   // ============================================================================
   // RENDERING
@@ -461,6 +484,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new AnimalHousingSystem());
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
   gameLoop.systemRegistry.register(wildAnimalSpawning);
+  const aquaticAnimalSpawning = new AquaticAnimalSpawningSystem();
+  gameLoop.systemRegistry.register(aquaticAnimalSpawning);
   gameLoop.systemRegistry.register(new TamingSystem());
 
   // ============================================================================
@@ -561,6 +586,9 @@ export function registerAllSystems(
   // BUILDING & CONSTRUCTION
   // ============================================================================
   gameLoop.systemRegistry.register(new BuildingSystem());
+
+  // RoofRepairSystem - One-time migration to add roofs to existing buildings
+  gameLoop.systemRegistry.register(new RoofRepairSystem());
 
   // BuildingMaintenanceSystem - Uses StateMutatorSystem for batched condition decay
   const buildingMaintenanceSystem = new BuildingMaintenanceSystem();
@@ -932,6 +960,7 @@ export function registerAllSystems(
     soilSystem,
     plantSystem,
     wildAnimalSpawning,
+    aquaticAnimalSpawning,
     governanceDataSystem,
     metricsSystem,
     magicSystem,

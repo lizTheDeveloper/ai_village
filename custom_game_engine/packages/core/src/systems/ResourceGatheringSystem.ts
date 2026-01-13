@@ -50,6 +50,17 @@ export class ResourceGatheringSystem implements System {
     // Resources near active areas regenerate, distant ones are paused
     const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
 
+    // Early exit if no active resources
+    if (activeEntities.length === 0) {
+      if (shouldUpdateDeltas) {
+        this.lastDeltaUpdateTick = currentTick;
+      }
+      return;
+    }
+
+    // Check for discrete event emission once per second (move modulo check outside loop)
+    const shouldCheckEvents = currentTick % ResourceGatheringSystem.UPDATE_INTERVAL === 0;
+
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const resource = impl.getComponent<ResourceComponent>(CT.Resource);
@@ -86,7 +97,7 @@ export class ResourceGatheringSystem implements System {
       // ========================================================================
 
       // Check for full regeneration event every second
-      if (currentTick % ResourceGatheringSystem.UPDATE_INTERVAL === 0) {
+      if (shouldCheckEvents) {
         // Check if just became fully regenerated
         const wasNotFull = resource.amount < resource.maxAmount;
         const isNowFull = resource.amount >= resource.maxAmount;

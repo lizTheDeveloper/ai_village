@@ -123,6 +123,7 @@ export enum ComponentType {
 
   // Animals
   Animal = 'animal',
+  Bioluminescent = 'bioluminescent',
 
   // Body Parts, Species & Genetics
   Body = 'body',
@@ -169,6 +170,8 @@ export enum ComponentType {
   Conflict = 'conflict',
   CombatStats = 'combat_stats',
   ThreatDetection = 'threat_detection',
+  Injury = 'injury',
+  Burning = 'burning',
 
   // Reproduction & Life
   Sexuality = 'sexuality',

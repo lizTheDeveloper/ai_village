@@ -144,21 +144,29 @@ export class DivineParameterModal {
    * Show the modal for a specific divine power
    */
   show(config: DivineParameterConfig): void {
+    console.log('[DivineParameterModal] Showing modal for power:', config.powerType);
     this.currentConfig = config;
     this.selectedTargetId = null;
     this.inputMessage = '';
     this.selectedSignType = null;
 
     this.container.style.display = 'flex';
+    console.log('[DivineParameterModal] Container display set to flex');
     this.render();
+    console.log('[DivineParameterModal] Render complete');
   }
 
   /**
    * Hide and cancel
    */
   cancel(): void {
-    if (this.currentConfig?.onCancel) {
-      this.currentConfig.onCancel();
+    console.log('[DivineParameterModal] Cancel clicked');
+    try {
+      if (this.currentConfig?.onCancel) {
+        this.currentConfig.onCancel();
+      }
+    } catch (error) {
+      console.error('[DivineParameterModal] Error in onCancel:', error);
     }
     this.hide();
   }
@@ -167,6 +175,7 @@ export class DivineParameterModal {
    * Hide modal
    */
   hide(): void {
+    console.log('[DivineParameterModal] Hiding modal');
     this.container.style.display = 'none';
     this.currentConfig = null;
   }
@@ -175,7 +184,11 @@ export class DivineParameterModal {
    * Confirm and return parameters
    */
   confirm(): void {
-    if (!this.currentConfig) return;
+    console.log('[DivineParameterModal] Confirm clicked');
+    if (!this.currentConfig) {
+      console.warn('[DivineParameterModal] No config, cannot confirm');
+      return;
+    }
 
     const result: DivineParameterResult = {
       targetId: this.selectedTargetId ?? undefined,
@@ -183,6 +196,8 @@ export class DivineParameterModal {
       signType: this.selectedSignType ?? undefined,
       params: {},
     };
+
+    console.log('[DivineParameterModal] Result:', result);
 
     // Add power-specific params
     if (this.currentConfig.powerType === 'subtle_sign' && this.selectedSignType) {
@@ -196,7 +211,11 @@ export class DivineParameterModal {
       }
     }
 
-    this.currentConfig.onConfirm(result);
+    try {
+      this.currentConfig.onConfirm(result);
+    } catch (error) {
+      console.error('[DivineParameterModal] Error in onConfirm:', error);
+    }
     this.hide();
   }
 
@@ -419,6 +438,8 @@ export class DivineParameterModal {
       cursor: pointer;
       transition: all 0.2s;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+      user-select: none;
     `;
 
     if (type === 'primary') {
@@ -508,7 +529,13 @@ export class DivineParameterModal {
     const confirmBtn = document.getElementById('divine-param-confirm');
 
     if (cancelBtn) {
-      cancelBtn.addEventListener('click', () => this.cancel());
+      console.log('[DivineParameterModal] Cancel button found, attaching listener');
+      cancelBtn.addEventListener('click', (e) => {
+        console.log('[DivineParameterModal] Cancel button clicked');
+        e.preventDefault();
+        e.stopPropagation();
+        this.cancel();
+      });
 
       // Hover effects
       cancelBtn.addEventListener('mouseenter', () => {
@@ -519,10 +546,18 @@ export class DivineParameterModal {
         cancelBtn.style.opacity = '1';
         cancelBtn.style.transform = 'translateY(0)';
       });
+    } else {
+      console.error('[DivineParameterModal] Cancel button NOT found!');
     }
 
     if (confirmBtn) {
-      confirmBtn.addEventListener('click', () => this.confirm());
+      console.log('[DivineParameterModal] Confirm button found, attaching listener');
+      confirmBtn.addEventListener('click', (e) => {
+        console.log('[DivineParameterModal] Confirm button clicked');
+        e.preventDefault();
+        e.stopPropagation();
+        this.confirm();
+      });
 
       // Hover effects
       confirmBtn.addEventListener('mouseenter', () => {
@@ -533,6 +568,8 @@ export class DivineParameterModal {
         confirmBtn.style.opacity = '1';
         confirmBtn.style.transform = 'translateY(0)';
       });
+    } else {
+      console.error('[DivineParameterModal] Confirm button NOT found!');
     }
   }
 }

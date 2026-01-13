@@ -105,6 +105,9 @@ export interface EffectContext {
 
   /** StateMutatorSystem for gradual effect registration (required for DoT/HoT effects) */
   stateMutatorSystem: StateMutatorSystem | null;
+
+  /** FireSpreadSystem for fire ignition (required for fire damage effects) */
+  fireSpreadSystem: any | null; // Using 'any' to avoid circular dependency with FireSpreadSystem
 }
 
 // ============================================================================
@@ -129,6 +132,9 @@ export class SpellEffectExecutor {
   /** StateMutatorSystem for gradual effects */
   private stateMutatorSystem: StateMutatorSystem | null = null;
 
+  /** FireSpreadSystem for fire ignition effects */
+  private fireSpreadSystem: any | null = null;
+
   private constructor() {}
 
   static getInstance(): SpellEffectExecutor {
@@ -151,6 +157,17 @@ export class SpellEffectExecutor {
       throw new Error('[SpellEffectExecutor] StateMutatorSystem already set');
     }
     this.stateMutatorSystem = system;
+  }
+
+  /**
+   * Set the FireSpreadSystem for fire ignition effects.
+   * Must be called during MagicSystem initialization.
+   */
+  setFireSpreadSystem(system: any): void {
+    if (this.fireSpreadSystem !== null) {
+      throw new Error('[SpellEffectExecutor] FireSpreadSystem already set');
+    }
+    this.fireSpreadSystem = system;
   }
 
   // ========== Applier Registration ==========
@@ -262,6 +279,7 @@ export class SpellEffectExecutor {
       powerMultiplier,
       paradigmId: casterMagic.activeParadigmId,
       stateMutatorSystem: this.stateMutatorSystem,
+      fireSpreadSystem: this.fireSpreadSystem,
     };
 
     // Apply the effect
@@ -352,6 +370,7 @@ export class SpellEffectExecutor {
           powerMultiplier: 1.0,
           paradigmId: activeEffect.paradigmId,
           stateMutatorSystem: null,
+          fireSpreadSystem: null,
         };
 
         // Process tick
