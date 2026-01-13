@@ -1986,8 +1986,283 @@ export const PINE_TREE: PlantSpecies = {
   },
 };
 
+export const GINSENG: PlantSpecies = {
+  id: 'ginseng',
+  name: 'Ginseng',
+  category: 'herb',
+  biomes: ['forest'],
+  rarity: 'rare',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 2,
+      conditions: { minHydration: 35, minTemperature: 8 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 3,
+      conditions: { minHydration: 30 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 5,
+      conditions: { minHydration: 30, minNutrition: 30 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 20,
+      conditions: { minHydration: 30 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 60,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 1 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'mature',
+      baseDuration: 20,
+      conditions: { minHealth: 60 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 100,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 2,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.4,
+    yieldAmount: 1.5,
+    diseaseResistance: 70,
+    droughtTolerance: 40,
+    coldTolerance: 65,
+    flavorProfile: 60,
+    mutations: []
+  },
+
+  seedsPerPlant: 5,
+  seedDispersalRadius: 1,
+  requiresDormancy: true,
+
+  optimalTemperatureRange: [10, 22],
+  optimalMoistureRange: [45, 80],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 12,
+    medicinal: {
+      treats: ['fatigue', 'illness'],
+      effectiveness: 0.8,
+      preparation: ['tea', 'tincture'],
+      dosage: 'small',
+      toxicIfOverused: true,
+      toxicityThreshold: 2
+    },
+    environmental: {
+      companionEffects: {
+        benefitsNearby: ['fern', 'moss']
+      },
+      soilEffects: {
+        fertilityOnDecay: 8
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'ginseng-seed',
+    sprout: 'ginseng-sprout',
+    vegetative: 'ginseng-vegetative',
+    flowering: 'ginseng-vegetative',
+    fruiting: 'ginseng-vegetative',
+    mature: 'ginseng-mature',
+    seeding: 'ginseng-mature',
+    withered: 'ginseng-withered'
+  }
+};
+
+export const ELDERBERRY: PlantSpecies = {
+  id: 'elderberry',
+  name: 'Elderberry',
+  category: 'herb',
+  biomes: ['forest'],
+  rarity: 'uncommon',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 1,
+      conditions: { minHydration: 30, minTemperature: 10 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 1.5,
+      conditions: { minHydration: 25 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 3,
+      conditions: { minHydration: 25, minNutrition: 25 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'flowering',
+      baseDuration: 3,
+      conditions: { minHydration: 30 },
+      onTransition: [{ type: 'spawn_flowers', params: { count: '15-25' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 2,
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 2.5,
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 3 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'vegetative',
+      baseDuration: 2,
+      conditions: { minHealth: 50 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 3,
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1.5,
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 1,
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.8,
+    yieldAmount: 1.4,
+    diseaseResistance: 75,
+    droughtTolerance: 50,
+    coldTolerance: 70,
+    flavorProfile: 85,
+    mutations: []
+  },
+
+  seedsPerPlant: 15,
+  seedDispersalRadius: 3,
+  requiresDormancy: false,
+
+  optimalTemperatureRange: [10, 24],
+  optimalMoistureRange: [40, 80],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    edible: true,
+    nutritionValue: 28,
+    taste: {
+      sweet: 0.6,
+      bitter: 0.2,
+      sour: 0.4,
+      savory: 0.0,
+      spicy: 0.0,
+      aromatic: 0.7
+    },
+    medicinal: {
+      treats: ['cold', 'fever', 'infection'],
+      effectiveness: 0.7,
+      preparation: ['tea', 'tincture'],
+      dosage: 'medium',
+      toxicIfOverused: false,
+      synergiesWith: ['yarrow', 'sage']
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bird', 'bee'],
+        benefitsNearby: ['fern', 'wildflower']
+      },
+      soilEffects: {
+        fertilityOnDecay: 10
+      }
+    }
+  },
+
+  sprites: {
+    seed: 'elderberry-seed',
+    sprout: 'elderberry-sprout',
+    vegetative: 'elderberry-vegetative',
+    flowering: 'elderberry-flowering',
+    fruiting: 'elderberry-fruiting',
+    mature: 'elderberry-mature',
+    seeding: 'elderberry-seeding',
+    withered: 'elderberry-withered'
+  },
+
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting'
+};
+
 export const WILD_PLANTS = [
   GRASS, WILDFLOWER, BERRY_BUSH, TREE,
   CLOVER, SAGE, YARROW, THISTLE, WILD_ONION,
-  FERN, MUSHROOM, MOSS, WILD_GARLIC, OAK_TREE, PINE_TREE
+  FERN, MUSHROOM, MOSS, WILD_GARLIC, OAK_TREE, PINE_TREE,
+  GINSENG, ELDERBERRY
 ];

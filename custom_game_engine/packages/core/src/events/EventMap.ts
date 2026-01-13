@@ -2252,6 +2252,14 @@ export interface GameEventMap {
     wasTerminal?: boolean;
   };
 
+  /** Spell cast was cancelled */
+  'magic:cast_cancelled': {
+    spellId: string;
+    reason: string;
+    progress: number;
+    duration: number;
+  };
+
   /** Entity learns a new spell */
   'magic:spell_learned': {
     entityId: EntityId;

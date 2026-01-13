@@ -37,6 +37,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import {
   hasBehaviorQueue,
   getCurrentQueuedBehavior,
@@ -268,7 +269,7 @@ export class AgentBrainSystem implements System {
       const needs = impl.getComponent<NeedsComponent>(CT.Needs);
       if (needs && needs.health <= 0) {
         // Check if they're in the afterlife - souls can still think
-        const afterlife = impl.getComponent<{ type: 'afterlife'; isShade?: boolean; hasPassedOn?: boolean }>('afterlife' as CT);
+        const afterlife = impl.getComponent<AfterlifeComponent>('afterlife' as CT);
         if (!afterlife) continue; // Not yet transitioned - skip
         if (afterlife.isShade) continue; // Lost identity - can't think
         if (afterlife.hasPassedOn) continue; // Gone - no more thinking

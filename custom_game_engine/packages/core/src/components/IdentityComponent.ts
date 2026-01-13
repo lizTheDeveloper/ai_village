@@ -7,7 +7,7 @@ export interface IdentityComponent extends Component {
   type: 'identity';
   name: string;
   age: number;
-  species: 'human' | 'elf' | 'dwarf' | 'animal';
+  species: 'human' | 'elf' | 'dwarf' | 'animal' | 'deity';
 }
 
 /**
@@ -15,11 +15,11 @@ export interface IdentityComponent extends Component {
  */
 export function createIdentityComponent(
   name: string,
-  species?: 'human' | 'elf' | 'dwarf' | 'animal',
+  species?: 'human' | 'elf' | 'dwarf' | 'animal' | 'deity',
   age?: number
 ): IdentityComponent {
   // Validate and default species to 'human'
-  const validSpecies: Array<'human' | 'elf' | 'dwarf' | 'animal'> = ['human', 'elf', 'dwarf', 'animal'];
+  const validSpecies: Array<'human' | 'elf' | 'dwarf' | 'animal' | 'deity'> = ['human', 'elf', 'dwarf', 'animal', 'deity'];
   const finalSpecies = species && validSpecies.includes(species) ? species : 'human';
 
   // Random age between 20-35 if not specified

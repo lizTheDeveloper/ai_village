@@ -875,7 +875,7 @@ export class LLMDecisionProcessor {
       // Legacy text parsing
       const action = parseAction(decision);
       if (action) {
-        behavior = actionToBehavior(action);
+        behavior = actionToBehavior(action) ?? null;
         // Build behaviorState based on action type
         if (action.type === 'chop') {
           behaviorState.resourceType = 'wood';

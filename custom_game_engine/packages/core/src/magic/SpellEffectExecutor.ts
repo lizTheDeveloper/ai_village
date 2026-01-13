@@ -351,6 +351,7 @@ export class SpellEffectExecutor {
           isCrit: false,
           powerMultiplier: 1.0,
           paradigmId: activeEffect.paradigmId,
+          stateMutatorSystem: null,
         };
 
         // Process tick

@@ -345,7 +345,7 @@ export class DivineParameterModal {
             box-sizing: border-box;
           "
         >${this.inputMessage}</textarea>
-        <div style="text-align: right; color: ${remaining < 20 ? '#FF6B6B' : '#888'}; font-size: 11px; margin-top: 4px;">
+        <div id="divine-char-counter" style="text-align: right; color: ${remaining < 20 ? '#FF6B6B' : '#888'}; font-size: 11px; margin-top: 4px;">
           ${remaining} / ${maxChars} characters remaining
         </div>
       </div>
@@ -489,12 +489,17 @@ export class DivineParameterModal {
       });
     });
 
-    // Message input
+    // Message input - update character count without re-rendering
     const messageInput = document.getElementById('divine-message-input') as HTMLTextAreaElement;
-    if (messageInput) {
+    const charCounter = document.getElementById('divine-char-counter');
+    if (messageInput && charCounter) {
       messageInput.addEventListener('input', () => {
         this.inputMessage = messageInput.value;
-        this.render(); // Re-render to update character count
+        // Update character counter without re-rendering
+        const maxChars = 100;
+        const remaining = maxChars - this.inputMessage.length;
+        charCounter.textContent = `${remaining} / ${maxChars} characters remaining`;
+        charCounter.style.color = remaining < 20 ? '#FF6B6B' : '#888';
       });
     }
 

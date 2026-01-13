@@ -281,8 +281,10 @@ function createInitialBuildings(world: WorldMutator) {
 
 function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string): string[] {
   const agentCount = 5;
-  const centerX = 0;
-  const centerY = 0;
+  // Spawn in an interesting area with diverse biomes nearby
+  // Coordinates chosen to place players in/near forest biome with desert accessible
+  const centerX = 8000;
+  const centerY = 3000;
   const spread = 2;
 
   const agentIds: string[] = [];
@@ -4243,7 +4245,9 @@ async function main() {
     await createInitialPlants(gameLoop.world);
     await createInitialAnimals(gameLoop.world, systemsResult.wildAnimalSpawning);
 
-    // Spawn berry bushes
+    // Spawn berry bushes relative to spawn location
+    const berrySpawnX = 8000;
+    const berrySpawnY = 3000;
     const berryPositions = [
       { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
       { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
@@ -4251,7 +4255,7 @@ async function main() {
       { x: -9, y: -2 }, { x: 4, y: -8 }, { x: -4, y: 8 },
       { x: 10, y: 0 }, { x: -10, y: 1 }, { x: 0, y: 10 },
     ];
-    berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
+    berryPositions.forEach(pos => createBerryBush(gameLoop.world, berrySpawnX + pos.x, berrySpawnY + pos.y));
 
     // Spawn initial buildings at origin
     console.log('[WorldInit] Spawning initial buildings...');
@@ -4281,14 +4285,18 @@ async function main() {
       return entity;
     };
 
-    // Campfire at origin
-    spawnBuilding(BuildingType.Campfire, 0, 0);
+    // Spawn center matches agent spawn location
+    const spawnCenterX = 8000;
+    const spawnCenterY = 3000;
+
+    // Campfire at spawn center
+    spawnBuilding(BuildingType.Campfire, spawnCenterX, spawnCenterY);
 
     // Storage chest nearby
-    spawnBuilding(BuildingType.StorageChest, 2, 0);
+    spawnBuilding(BuildingType.StorageChest, spawnCenterX + 2, spawnCenterY);
 
     // Bedroll (temporary shelter)
-    spawnBuilding(BuildingType.Bedroll, -2, 0);
+    spawnBuilding(BuildingType.Bedroll, spawnCenterX - 2, spawnCenterY);
 
     // Spawn 5 houses to the right of the berry bush ring (x = 17-18)
     console.log('[WorldInit] Spawning 5 houses near berry ring...');

@@ -27,6 +27,7 @@ import type { SkillTreePanel } from '../panels/magic/SkillTreePanel.js';
 import type { DivinePowersPanel } from '../DivinePowersPanel.js';
 import type { DivineChatPanel } from '../DivineChatPanel.js';
 import type { VisionComposerPanel } from '../VisionComposerPanel.js';
+import type { DivineCommunicationPanel } from '../DivineCommunicationPanel.js';
 import type { DevPanel } from '../DevPanel.js';
 import type { FarmManagementPanel } from '../FarmManagementPanel.js';
 import type { DivineAnalyticsPanel } from '../divine/DivineAnalyticsPanel.js';
@@ -818,6 +819,40 @@ export const VISION_COMPOSER_PANEL_CONFIG: PanelConfig<VisionComposerPanel> = {
  */
 export function createVisionComposerPanelAdapter(panel: VisionComposerPanel): PanelAdapter<VisionComposerPanel> {
   return new PanelAdapter(panel, VISION_COMPOSER_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for DivineCommunicationPanel adapter.
+ * Unified panel for divine-mortal communication (replaces scattered VisionComposer/DivinePowers functionality)
+ */
+export const DIVINE_COMMUNICATION_PANEL_CONFIG: PanelConfig<DivineCommunicationPanel> = {
+  id: 'divine-communication',
+  title: 'Divine Communication',
+  defaultWidth: 500,
+  defaultHeight: 600,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, _x, _y, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a DivineCommunicationPanel adapter
+ */
+export function createDivineCommunicationPanelAdapter(panel: DivineCommunicationPanel): PanelAdapter<DivineCommunicationPanel> {
+  return new PanelAdapter(panel, DIVINE_COMMUNICATION_PANEL_CONFIG);
 }
 
 /**

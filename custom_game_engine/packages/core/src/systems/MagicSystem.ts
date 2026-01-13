@@ -17,6 +17,8 @@ import type { World } from '../ecs/World.js';
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type {
   MagicComponent,
   ComposedSpell,
@@ -528,7 +530,7 @@ export class MagicSystem implements System {
     }
 
     // Get caster position for movement interruption tracking
-    const position = caster.getComponent<{ x: number; y: number }>(CT.Position);
+    const position = caster.getComponent<PositionComponent>(CT.Position);
 
     // Create casting state
     const castState = createCastingState(
@@ -577,7 +579,7 @@ export class MagicSystem implements System {
     // Check interruption conditions
 
     // 1. Check if caster died
-    const needs = caster.getComponent<{ health: number }>(CT.Needs);
+    const needs = caster.getComponent<NeedsComponent>(CT.Needs);
     if (needs && needs.health <= 0) {
       this.cancelCast(castState, caster, 'caster_died');
       return;
@@ -585,7 +587,7 @@ export class MagicSystem implements System {
 
     // 2. Check if caster moved (if tracking movement)
     if (castState.casterMovedFrom) {
-      const currentPos = caster.getComponent<{ x: number; y: number }>(CT.Position);
+      const currentPos = caster.getComponent<PositionComponent>(CT.Position);
       if (currentPos) {
         const dx = currentPos.x - castState.casterMovedFrom.x;
         const dy = currentPos.y - castState.casterMovedFrom.y;
@@ -639,7 +641,7 @@ export class MagicSystem implements System {
       }
 
       // Check if target died
-      const targetNeeds = targetEntity.getComponent<{ health: number }>(CT.Needs);
+      const targetNeeds = targetEntity.getComponent<NeedsComponent>(CT.Needs);
       if (targetNeeds && targetNeeds.health <= 0) {
         this.cancelCast(castState, caster, 'target_died');
         return;

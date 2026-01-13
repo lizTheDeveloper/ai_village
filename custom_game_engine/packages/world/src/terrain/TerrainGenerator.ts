@@ -192,9 +192,9 @@ export class TerrainGenerator {
           }
 
           // Dense old-growth forest
-          if (forestDensity === 'dense' && placementValue > -0.3) {
-            // Trees - 80% chance
-            if (Math.random() > 0.2) {
+          if (forestDensity === 'dense') {
+            // Trees - 85% chance (increased from 80%)
+            if (Math.random() > 0.15) {
               const treeType = Math.random();
               if (treeType < 0.6) {
                 // 60% oak trees (6-15 voxels)
@@ -226,11 +226,19 @@ export class TerrainGenerator {
             if (Math.random() < 0.4) {
               createLeafPile(world, worldX, worldY);
             }
+            // Rocks in dense forest - scattered boulders - 8% chance
+            if (Math.random() < 0.08) {
+              createRock(world, worldX, worldY);
+            }
+            // Berry bushes - 12% chance in dense forest
+            if (Math.random() < 0.12) {
+              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+            }
           }
           // Young forest
-          else if (forestDensity === 'young' && placementValue > -0.2) {
-            // Trees - 60% chance
-            if (Math.random() > 0.4) {
+          else if (forestDensity === 'young') {
+            // Trees - 70% chance (increased from 60%)
+            if (Math.random() > 0.3) {
               const treeType = Math.random();
               if (treeType < 0.4) {
                 // 40% oak trees
@@ -254,11 +262,19 @@ export class TerrainGenerator {
             if (Math.random() < 0.3) {
               createLeafPile(world, worldX, worldY);
             }
+            // Rocks in young forest - 10% chance
+            if (Math.random() < 0.10) {
+              createRock(world, worldX, worldY);
+            }
+            // Berry bushes - 15% chance
+            if (Math.random() < 0.15) {
+              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+            }
           }
           // Open woodland
-          else if (forestDensity === 'open' && placementValue > -0.1) {
-            // Trees - 30% chance
-            if (Math.random() > 0.7) {
+          else if (forestDensity === 'open') {
+            // Trees - 40% chance (increased from 30%)
+            if (Math.random() > 0.6) {
               const treeType = Math.random();
               if (treeType < 0.3) {
                 // 30% oak trees
@@ -279,6 +295,14 @@ export class TerrainGenerator {
             if (Math.random() < 0.2) {
               createLeafPile(world, worldX, worldY);
             }
+            // Rocks in open woodland - more exposed - 15% chance
+            if (Math.random() < 0.15) {
+              createRock(world, worldX, worldY);
+            }
+            // Berry bushes - 18% chance
+            if (Math.random() < 0.18) {
+              createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+            }
           }
           // Forest clearings (meadow-like)
           else if (forestDensity === 'clearing') {
@@ -290,15 +314,23 @@ export class TerrainGenerator {
             if (Math.random() < 0.4) {
               createFiberPlant(world, worldX, worldY); // Grass placeholder
             }
-            // Berry bushes - 20% chance
-            if (Math.random() < 0.2) {
+            // Berry bushes - 35% chance (high in clearings - good foraging areas!)
+            if (Math.random() < 0.35) {
               createFiberPlant(world, worldX, worldY); // Berry bush placeholder
+            }
+            // Rocks in clearings - exposed boulders - 20% chance
+            if (Math.random() < 0.20) {
+              createRock(world, worldX, worldY);
+            }
+            // Wild garlic, herbs - 25% chance
+            if (Math.random() < 0.25) {
+              createFiberPlant(world, worldX, worldY); // Wild garlic/herbs placeholder
             }
           }
           // Forest edge/ecotone
-          else if (forestDensity === 'edge' && placementValue > 0.0) {
-            // Trees - 10-20% chance
-            if (Math.random() > 0.85) {
+          else if (forestDensity === 'edge') {
+            // Trees - 15-20% chance (increased for variety)
+            if (Math.random() > 0.82) {
               const treeHeight = 4 + Math.floor(Math.random() * 9);
               createTree(world, worldX, worldY, treeHeight);
             }

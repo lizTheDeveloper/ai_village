@@ -576,6 +576,7 @@ export class DivineBodyModification implements System {
         ['healing', { value: 100, baseValue: 100, modifiers: [] }],
         ['damage', { value: 0, baseValue: 0, modifiers: [] }],
       ]),
+      stateMutatorSystem: null,
     };
   }
 

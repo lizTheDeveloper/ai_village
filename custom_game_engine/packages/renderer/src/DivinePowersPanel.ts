@@ -109,12 +109,12 @@ const BELIEF_THRESHOLDS = {
 };
 
 // Example powers (would come from divinity system in real implementation)
+// NOTE: Communication powers (whisper, dream, vision) moved to DivineCommunicationPanel
 const DIVINE_POWERS: DivinePower[] = [
-  { id: 'whisper', name: 'Divine Whisper', tier: 'minor', beliefCost: 5, cooldown: 60, description: 'Send a subtle message to a believer.', targetType: 'believer' },
-  { id: 'subtle_sign', name: 'Subtle Sign', tier: 'minor', beliefCost: 8, cooldown: 120, description: 'Create a minor omen in the world.', targetType: 'location' },
-  { id: 'dream_hint', name: 'Dream Hint', tier: 'minor', beliefCost: 10, cooldown: 200, description: 'Send a message through dreams.', targetType: 'believer' },
+  // Minor tier - non-communication powers
   { id: 'minor_luck', name: 'Minor Luck', tier: 'minor', beliefCost: 15, cooldown: 300, description: 'Grant a small fortune boost.', targetType: 'believer' },
-  { id: 'clear_vision', name: 'Clear Vision', tier: 'moderate', beliefCost: 50, cooldown: 600, description: 'Send an unmistakable vision.', targetType: 'believer' },
+
+  // Moderate tier
   { id: 'bless_individual', name: 'Bless', tier: 'moderate', beliefCost: 80, cooldown: 1200, description: 'Grant a lasting blessing.', targetType: 'believer' },
   { id: 'curse_individual', name: 'Curse', tier: 'moderate', beliefCost: 100, cooldown: 1200, description: 'Inflict a curse on someone.', targetType: 'anyone' },
   { id: 'minor_miracle', name: 'Minor Miracle', tier: 'moderate', beliefCost: 150, cooldown: 3600, description: 'Perform a small but visible miracle.', targetType: 'location' },
@@ -494,8 +494,15 @@ export class DivinePowersPanel implements IWindowPanel {
       y += 14;
     }
 
-    // Domains
+    // Note about Divine Communication panel
     y += 6;
+    ctx.fillStyle = '#4CAF50';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('💬 For visions/whispers: Use Divine Communication panel', SIZES.padding, y + 4);
+    y += 12;
+
+    // Domains
+    y += 4;
     ctx.fillStyle = COLORS.textDim;
     ctx.fillText('Domains:', SIZES.padding, y + 4);
 
@@ -844,7 +851,8 @@ export class DivinePowersPanel implements IWindowPanel {
           this.executePowerWithParameters(powerId, power, params);
         },
         onCancel: () => {
-          // User cancelled, do nothing
+          // User cancelled - deselect the power to return to full list
+          this.selectedPowerId = null;
         },
       });
     } else {
