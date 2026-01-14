@@ -66,17 +66,36 @@ Multiverse: The End of Eternity is a simulation game where autonomous AI agents:
 - **Live** - They have needs, moods, relationships, and memories
 - **Work** - They gather resources, craft items, build structures
 - **Socialize** - They talk, form friendships, hold opinions about each other
+- **Survive** - They navigate environmental hazards like fire, drowning, and temperature extremes
 - **Surprise** - Their LLM-driven decisions create emergent stories
 
 You'll eventually have a **pawn** - a character you control - who lives alongside these agents. But the village persists and grows even when you're not directing it.
 
-### Key Features (Planned)
+### Key Features
 
+#### Environmental Systems
+- **Ocean Ecosystems** - Deep ocean life with 15+ aquatic species, bioluminescence, and depth-based spawning
+- **Fluid Dynamics** - Realistic water currents, swimming mechanics, and drowning simulation
+- **Fire Propagation** - Material-based fire spread with wind effects, fuel consumption, and extinguishing mechanics
+- **Temperature Simulation** - Heat and cold affecting agent behavior and survival
+
+#### Magic Systems
+- **25+ Magic Paradigms** - From Shinto spirit magic to Allomancy to Sympathy
+- **Skill Tree Progression** - Visual skill trees with XP-based unlocking
+- **Composable Spells** - Verb/noun spell composition (inspired by Ars Magica)
+- **LLM-Generated Effects** - Novel magic validated through simulation testing
+
+#### Simulation Depth
 - **Multiverse Architecture** - Fork universes to test "what if" scenarios
-- **Composable Magic Systems** - Verb/noun spell composition (inspired by Ars Magica)
-- **LLM-Generated Effects** - Novel magic that's validated through simulation testing
-- **Cross-Universe Sharing** - Items and effects can travel between game instances
-- **Deep Simulation** - Material properties, not just item types
+- **Material Properties** - Not just item types, but how materials burn, conduct heat, and interact
+- **Genetic Systems** - Plant genetics, animal breeding, and trait inheritance
+- **Deep Simulation** - 212+ systems modeling everything from soil pH to divine intervention
+
+#### World & Content
+- **Procedural Generation** - Biome-based terrain with smooth transitions
+- **Wild Plants** - Extensive flora including aquatic plants, trees, and crops
+- **Aquatic Life** - Kelp forests, coral reefs, bioluminescent deep-sea creatures
+- **Cross-Universe Sharing** - Items and effects can travel between game instances (planned)
 
 ---
 
@@ -102,6 +121,24 @@ npm run dev
 Then open http://localhost:3000
 
 See [custom_game_engine/README.md](./custom_game_engine/README.md) for detailed setup instructions.
+
+---
+
+## Recent Updates (January 2026)
+
+### Ocean Life & Aquatic Systems
+Complete ocean ecosystem with depth-based creature spawning, bioluminescent species, swimming mechanics, and fluid dynamics. Agents can now explore underwater environments, manage oxygen, and interact with 15+ aquatic species across multiple ocean biomes.
+
+### Fire & Environmental Hazards
+Realistic fire propagation system with material-based burn rates, wind effects, and fuel consumption. Buildings can catch fire and spread to neighbors. Includes firefighting mechanics and building repair systems.
+
+### Magic Skill Tree UI
+Polished visual skill tree interface with improved tooltips, node rendering, and unlock feedback. Players can see clear progression paths through 25+ magic paradigms with XP costs and prerequisites.
+
+### Fluid Dynamics
+Complete fluid simulation system modeling ocean currents, water pressure, and flow dynamics. Affects swimming entities and floating objects with realistic drift mechanics.
+
+See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for detailed changelog.
 
 ---
 

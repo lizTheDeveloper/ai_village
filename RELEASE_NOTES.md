@@ -1,5 +1,253 @@
 # Release Notes
 
+## 2026-01-13 - Ocean Systems, Fire Mechanics & Magic Skill Tree Polish
+
+### Ocean Life System
+
+#### Core Ocean Systems
+- **AquaticAnimalSpawningSystem.ts** - Spawn and manage ocean creatures (+334 lines)
+  - Depth-based creature spawning (surface, mid-water, deep ocean)
+  - Species distribution based on biome and depth
+  - Population density management
+  - Migration patterns for mobile species
+- **AgentSwimmingSystem.ts** - Swimming mechanics for agents (+429 lines)
+  - Underwater movement with buoyancy
+  - Oxygen consumption tracking
+  - Drowning mechanics
+  - Swimming skill progression
+  - Breath-holding system
+- **PlanetaryCurrentsSystem.ts** - Fluid dynamics simulation (+229 lines)
+  - Ocean current generation and propagation
+  - Current strength based on depth and temperature
+  - Effect on swimming entities
+  - Drift mechanics for floating objects
+
+#### Ocean Components
+- **BioluminescentComponent.ts** - Bioluminescence for deep sea creatures (+195 lines)
+  - Light emission patterns
+  - Brightness variation (pulsing, constant, flickering)
+  - Predator attraction/deterrence
+  - Mating signals
+- **Ocean Species Definitions** - AquaticSpecies.ts (+762 lines)
+  - 15+ aquatic species (kelp, coral, fish, rays, eels, squid)
+  - Depth preferences and behaviors
+  - Predator-prey relationships
+  - Bioluminescent species
+
+#### Ocean Biomes
+- **OceanBiomes.ts** - Biome definitions (+229 lines)
+  - Shallow coastal waters
+  - Kelp forests
+  - Coral reefs
+  - Open ocean
+  - Deep ocean trenches
+  - Hydrothermal vents
+
+#### Terrain Generation
+- **TerrainGenerator.ts** - Ocean biome integration
+  - Underwater terrain features
+  - Depth gradients
+  - Seamount and trench generation
+  - Biome transition zones
+
+### Fire & Environmental Hazards
+
+#### Fire Spread System
+- **FireSpreadSystem.ts** - Dynamic fire propagation (+680 lines)
+  - Material-based burn rates
+  - Wind-driven spread
+  - Temperature-based ignition
+  - Fuel consumption tracking
+  - Smoke generation
+  - Extinguishing mechanics (rain, water, smothering)
+- **BurningComponent.ts** - Track burning entities (+71 lines)
+  - Burn intensity
+  - Fuel remaining
+  - Heat output
+  - Damage to structure
+- **RoofRepairSystem.ts** - Building repair mechanics (+166 lines)
+  - Damage assessment
+  - Material requirements for repairs
+  - Progressive repair over time
+  - Skill-based repair quality
+
+### Magic System Improvements
+
+#### Magic Skill Tree UI Polish
+- **SkillTreePanel.ts** - Enhanced UI/UX (+154 lines modified)
+  - Improved node rendering
+  - Better tooltip positioning
+  - Visual feedback for unlockable nodes
+  - XP cost display improvements
+- **NodeTooltip.ts** - Enhanced tooltip system (+27 lines modified)
+  - Condition visualization (checkmarks/X marks)
+  - Prerequisite node highlighting
+  - Cost breakdown display
+- **Magic Skill Tree Tests** - Comprehensive test coverage
+  - MAGIC-SKILL-TREE-TEST-FIXES-FINAL-01-12.md (+458 lines)
+  - Test pass rate improved from 41% to 55%
+  - Mock infrastructure for evaluateNode, ParadigmTreeView
+  - Integration test improvements
+
+#### Spell System Enhancements
+- **SpellEffectExecutor.ts** - Effect execution improvements (+19 lines)
+- **DamageEffectApplier.ts** - Damage calculation refinements (+37 lines)
+- **MagicSystem.ts** - Core system improvements
+
+### Fluid Dynamics & Physics
+
+#### FluidDynamicsSystem
+- **FluidDynamicsSystem.ts** - General fluid simulation (+418 lines)
+  - Pressure gradients
+  - Viscosity modeling
+  - Turbulence effects
+  - Particle-based fluid rendering
+- **FluidDynamics.test.ts** - Comprehensive test suite (+70 lines)
+
+### World & Terrain Improvements
+
+#### Plant System Expansion
+- **wild-plants.ts** - Aquatic plant species (+307 lines)
+  - Kelp varieties (giant kelp, bull kelp)
+  - Seagrass species
+  - Coral species
+  - Underwater flowering plants
+- **BerryBushEntity.ts** - Berry bush improvements
+- **PlantVisualsSystem.ts** - Visual rendering enhancements
+
+#### Terrain Features
+- **Biome transition zones** - Smooth blending between biomes
+- **Underwater terrain** - Realistic ocean floor generation
+- **Tile.ts** - Extended tile properties for underwater terrain
+
+### Rendering Improvements
+
+#### Sprite Rendering
+- **SpriteRenderer.ts** - Underwater sprite effects (+66 lines)
+  - Water ripple effects
+  - Light refraction
+  - Depth-based color tinting
+- **SideViewTerrainRenderer.ts** - Side-view underwater rendering (+60 lines)
+  - Water surface visualization
+  - Depth gradients
+  - Caustic light patterns
+
+#### Divine UI
+- **DivineParameterModal.ts** - Enhanced parameter input (+43 lines)
+- **DivinePowersPanel.ts** - UI improvements
+
+### System Improvements
+
+#### Behavior & AI
+- **SeekCoolingBehavior.ts** - Temperature-seeking improvements
+- **SeekWarmthBehavior.ts** - Heat-seeking enhancements
+- **GatherBehavior.ts** - Resource gathering fixes
+- **AgentBrainSystem.ts** - Decision-making optimizations
+
+#### Core Systems
+- **MovementSystem.ts** - Movement improvements for swimming
+- **SimulationScheduler.ts** - Performance optimizations
+- **ChatRoomSystem.ts** - Communication improvements
+- **MidwiferySystem.ts** - Midwifery system refinements
+
+### Testing & Quality
+
+#### Test Infrastructure
+- **AutomationEdgeCases.test.ts** - Edge case coverage
+- **AutomationIntegration.test.ts** - Integration test improvements (+72 lines)
+- Test pass rate improvements across multiple systems
+
+### Documentation
+
+#### Specifications
+- **DEEP_OCEAN_LIFE_SPEC.md** - Complete ocean ecosystem spec (+1,508 lines)
+  - Bioluminescence mechanics
+  - Pressure adaptations
+  - Food chains and predator-prey relationships
+  - Migration patterns
+- **fire-spreading-spec.md** - Fire system specification (+1,241 lines)
+  - Fire propagation algorithms
+  - Material burn properties
+  - Environmental factors (wind, humidity)
+  - Firefighting mechanics
+
+#### Devlogs
+- **MAGIC-SKILL-TREE-TEST-FIXES-FINAL-01-12.md** - Test improvement session
+- **MAGIC-SKILL-TREE-FIXES-01-12.md** - UI fixes and enhancements
+
+### Summary
+
+This release focuses on expanding environmental systems with realistic ocean ecosystems and fire mechanics, while continuing to polish the magic skill tree UI. The ocean system includes depth-based spawning, bioluminescent creatures, and fluid dynamics. The fire system models realistic propagation with material-based burn rates and environmental factors. Magic UI improvements enhance the player experience with better visual feedback and tooltip systems.
+
+**Stats:**
+- 46+ files modified/created
+- 7,000+ lines added
+- 15+ new ocean species
+- 2 major system specs (ocean, fire)
+- Test pass rate improved 14 percentage points
+- Comprehensive fluid dynamics simulation
+
+---
+
+## 2026-01-12 - Test Infrastructure & Biome Transitions
+
+### Test Infrastructure Improvements
+
+#### Magic Skill Tree Testing
+- Enhanced test mocking infrastructure
+- Improved evaluateNode mocking
+- ParadigmTreeView render mock improvements
+- Integration test setup enhancements
+
+### Terrain Generation
+
+#### Biome Transition Zones
+- Smooth blending between adjacent biomes
+- Gradient-based terrain mixing
+- Edge detection for biome boundaries
+- Natural-looking transitions
+
+### Bug Fixes
+- **Spawn coordinate simplification** - More reliable entity placement
+- **Test infrastructure corrections** - Fixed mock setup issues
+- **Ocean biome definitions** - Complete biome system
+
+---
+
+## 2026-01-12 - Fluid Dynamics & Behavior Optimization
+
+### Fluid Dynamics System
+
+#### Core Implementation
+- **FluidDynamicsSystem.ts** - Complete fluid simulation system
+  - Pressure calculation
+  - Flow dynamics
+  - Viscosity effects
+  - Performance-optimized updates
+- Comprehensive test coverage
+
+### Behavior System Optimization
+
+#### Temperature-Seeking Behaviors
+- **SeekCoolingBehavior.ts** - Optimized cooling seeking
+- **SeekWarmthBehavior.ts** - Optimized heat seeking
+- Reduced CPU overhead
+- Improved pathfinding efficiency
+
+### Magic Skill Tree Enhancements
+
+#### UI Improvements
+- Node interaction improvements
+- Visual feedback enhancements
+- Tooltip positioning fixes
+- Better keyboard navigation
+
+### System Registration
+- FluidDynamicsSystem registered (priority 155)
+- System integration with movement and physics
+
+---
+
 ## 2026-01-05 - Soul Reincarnation, Architecture Planning & Text UI (Round 14)
 
 ### Conservation of Game Matter: Soul Reincarnation System
