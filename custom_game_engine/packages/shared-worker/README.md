@@ -47,8 +47,9 @@ packages/shared-worker/
 ```
 
 **Dependencies:**
-- `@ai-village/core` - ECS world, systems, entities
+- `@ai-village/core` - ECS world, systems, entities, action registry
 - `@ai-village/world` - World setup and configuration
+- `@ai-village/botany` - Plant systems (via game-setup.ts)
 - `dexie` - IndexedDB wrapper for persistence
 
 ---
@@ -647,7 +648,45 @@ function onCameraMove(newX: number, newY: number) {
 }
 ```
 
-### Example 4: Multi-Window Gameplay
+### Example 4: Delta Updates for Advanced Rendering
+
+```typescript
+import { universeClient } from '@ai-village/shared-worker/client';
+import type { DeltaUpdate } from '@ai-village/shared-worker';
+
+universeClient.connect();
+
+// Subscribe to delta updates (incremental)
+universeClient.subscribeDelta((delta: DeltaUpdate) => {
+  console.log(`Tick ${delta.tick}: ${delta.updates.length} entities changed`);
+
+  // Process only changed entities
+  for (const update of delta.updates) {
+    // Update position (correction from worker)
+    updateEntityVisual(update.entityId, update.position);
+
+    // Update path prediction for local interpolation
+    if (update.prediction) {
+      console.log(`Entity ${update.entityId}: ${update.prediction.type} path`);
+      // PathInterpolationSystem will use this automatically
+    }
+
+    // New entity - create visual representation
+    if (update.components) {
+      createEntitySprite(update.entityId, update.components);
+    }
+  }
+
+  // Remove deleted entities
+  if (delta.removed) {
+    for (const entityId of delta.removed) {
+      removeEntitySprite(entityId);
+    }
+  }
+});
+```
+
+### Example 5: Multi-Window Gameplay
 
 ```typescript
 // Window 1: Main game view
@@ -680,7 +719,7 @@ universeClient.subscribe((state) => {
 // All windows share same simulation!
 ```
 
-### Example 5: Export/Import Snapshots
+### Example 6: Export/Import Snapshots
 
 ```typescript
 import { universeClient } from '@ai-village/shared-worker/client';
@@ -900,9 +939,109 @@ console.log('PathPredictionSystem:', pathPredictionSystem);
 console.log('DeltaSyncSystem:', deltaSyncSystem);
 ```
 
+### Entities appearing jerky or delayed
+
+**Symptoms:** Entities jump or stutter during movement, visible lag
+
+**Check:**
+1. PathInterpolationSystem running in window? (priority 5)
+2. Frame rate sufficient? (needs 30+ FPS for smooth interpolation)
+3. Deviation threshold too aggressive? (causing frequent corrections)
+4. Network latency? (affects correction timing)
+
+**Debug:**
+```typescript
+// Check if interpolation is working
+const entity = world.getEntity(entityId);
+const interpolator = entity.getComponent('path_interpolator');
+console.log('Has interpolator:', !!interpolator);
+if (interpolator) {
+  console.log('Prediction type:', interpolator.prediction.type);
+  console.log('Ticks elapsed:', world.tick - interpolator.baseTick);
+}
+```
+
+### Game setup using wrong context
+
+**Error:** Systems registered twice, worker and window both running simulation
+
+**Fix:** Use `game-setup.ts` correctly based on context:
+
+```typescript
+// ✅ GOOD: Worker setup (runs simulation)
+import { setupGameSystems } from './game-setup.js';
+
+const result = await setupGameSystems(gameLoop, {
+  sessionId: 'worker-session',
+  llmQueue: null,  // Worker doesn't need LLM for now
+  promptBuilder: null,
+  enableAutoSave: false,  // Worker manages its own persistence
+});
+
+// ✅ GOOD: Window setup (view only)
+import { gameBridge } from './game-bridge.js';
+
+await gameBridge.init();  // Connects to worker, no simulation
+
+// ❌ BAD: Window running simulation
+import { setupGameSystems } from './game-setup.js';
+const result = await setupGameSystems(gameLoop, {...});  // WRONG!
+```
+
 ---
 
 ## Integration with Other Systems
+
+### Game Setup Integration
+
+**Shared system initialization across contexts:**
+
+The `game-setup.ts` module provides unified game initialization for worker, browser, and Node.js contexts:
+
+```typescript
+import { setupGameSystems, type GameSetupConfig } from './game-setup.js';
+
+// Worker context (full simulation)
+const workerResult = await setupGameSystems(gameLoop, {
+  sessionId: gameLoop.universeId,
+  llmQueue: null,  // Worker doesn't use LLM yet
+  promptBuilder: null,
+  metricsServerUrl: 'ws://localhost:8765',
+  enableMetrics: true,
+  enableAutoSave: false,  // Worker uses own persistence
+});
+
+// Browser context (via GameBridge - NO systems registered)
+// GameBridge connects to worker, does NOT call setupGameSystems
+
+// Node.js headless context (full simulation)
+const headlessResult = await setupGameSystems(gameLoop, {
+  sessionId: 'headless-test',
+  llmQueue: myLLMQueue,
+  promptBuilder: myPromptBuilder,
+  metricsServerUrl: 'ws://localhost:8765',
+  enableMetrics: true,
+  enableAutoSave: true,
+});
+```
+
+**What setupGameSystems does:**
+1. Registers default materials, recipes, research
+2. Registers all game systems via `registerAllSystems()`
+3. Configures SoilSystem, CraftingSystem, CookingSystem
+4. Registers action handlers (TillActionHandler, PlantActionHandler, etc.)
+5. Sets up Live Entity API (if metrics enabled)
+6. Initializes governance data system
+
+**GameSetupResult:**
+```typescript
+interface GameSetupResult {
+  soilSystem: SoilSystem;
+  craftingSystem: CraftingSystem;
+  systemRegistration: SystemRegistrationResult;  // All registered systems
+  metricsSystem: MetricsCollectionSystem | null;
+}
+```
 
 ### Renderer Integration
 
@@ -958,6 +1097,34 @@ function onSpawnAgentClick(x: number, y: number) {
 
 ---
 
+## When to Use This Architecture
+
+**Use SharedWorker architecture when:**
+- Multi-window support needed (same universe across tabs)
+- Browser-based persistence required (IndexedDB)
+- Bandwidth optimization critical (thousands of entities)
+- Simulation must continue when tabs closed
+
+**Use regular GameLoop when:**
+- Single-window browser game
+- Node.js headless simulation
+- Testing/prototyping (simpler setup)
+- Desktop application (Electron, Tauri)
+
+**Architecture comparison:**
+
+```typescript
+// SharedWorker architecture (multi-window)
+Worker: GameLoop + all systems → IndexedDB
+Window 1: GameBridge → rendering only
+Window 2: GameBridge → rendering only
+
+// Regular GameLoop (single-window/headless)
+Browser/Node: GameLoop + all systems → saveLoadService
+```
+
+---
+
 ## Summary for Language Models
 
 **Before working with SharedWorker architecture:**
@@ -966,6 +1133,7 @@ function onSpawnAgentClick(x: number, y: number) {
 3. Know the message protocol (window ↔ worker communication)
 4. Understand path prediction & delta sync (bandwidth optimization)
 5. Know when to use worker-side vs client-side systems
+6. Understand game-setup.ts provides shared initialization logic
 
 **Common tasks:**
 - **Connect window to worker:** `universeClient.connect()` + `universeClient.subscribe()`

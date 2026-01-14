@@ -11,8 +11,9 @@ The **Deterministic Sprite Generator** (`@ai-village/deterministic-sprite-genera
 - Modular composition system (body parts layered with z-index)
 - Parametric variation via colors, scale, and template selection
 - Client-side only (works in browser and Node.js with zero dependencies)
-- Planetary art styles (NES, SNES, PS1, GBA, Game Boy, Neo Geo)
+- Planetary art styles (30+ console era styles: NES, SNES, PS1, GBA, Game Boy, Neo Geo, C64, Amiga, etc.)
 - Interactive sprite wizard for generating consistent part libraries
+- PixelLab API integration for AI-generated high-quality sprite parts
 
 **Key files:**
 - `src/generateSprite.ts` - Main sprite generation function
@@ -20,8 +21,10 @@ The **Deterministic Sprite Generator** (`@ai-village/deterministic-sprite-genera
 - `src/templates.ts` - Body structure definitions (humanoid, quadruped, simple)
 - `src/parts.ts` - Procedural drawing functions for body parts
 - `src/PixelCanvas.ts` - Low-level pixel drawing utilities
-- `src/artStyles.ts` - Planetary art style configurations
+- `src/artStyles.ts` - Planetary art style configurations (30+ styles)
+- `src/loadPNG.ts` - PNG loading for PixelLab-generated parts
 - `sprite-set-generator/main.ts` - Interactive wizard for part library generation
+- `scripts/` - PixelLab API integration scripts
 
 **NOT integrated with game:** This is a standalone research/prototype package. It can import game data for demos but runs independently.
 
@@ -38,9 +41,15 @@ packages/deterministic-sprite-generator/
 │   ├── parts.ts                    # Part library (heads, bodies, hair, etc.)
 │   ├── PixelCanvas.ts              # Pixel drawing primitives
 │   ├── scalePixelData.ts           # Nearest-neighbor scaling
-│   ├── artStyles.ts                # Planetary art style configs
+│   ├── artStyles.ts                # Planetary art style configs (30+ styles)
+│   ├── loadPNG.ts                  # PNG loading utilities
 │   ├── types.ts                    # TypeScript interfaces
 │   └── index.ts                    # Package exports
+├── assets/
+│   └── parts/
+│       ├── snes/                   # SNES-style parts (PixelLab-generated)
+│       ├── nes/                    # NES-style parts (future)
+│       └── ...                     # Other console styles
 ├── test-screen/
 │   ├── main.ts                     # Standalone demo UI
 │   └── index.html                  # Test harness
@@ -48,11 +57,15 @@ packages/deterministic-sprite-generator/
 │   ├── main.ts                     # Interactive part wizard
 │   └── index.html                  # Wizard UI
 ├── scripts/
-│   ├── generate-pixellab-parts.ts  # PixelLab API integration
+│   ├── generate-pixellab-parts.ts  # PixelLab API integration spec
 │   ├── generate-snes-parts.ts      # SNES-style part generator
-│   └── batch-generate-snes-parts.ts # Batch SNES generation
+│   ├── batch-generate-snes-parts.ts # Batch SNES generation
+│   ├── reference-parts-spec.ts     # Part specifications
+│   ├── generation-progress.json    # Generation progress tracker
+│   └── README.md                   # Scripts documentation
 ├── package.json
 ├── QUICKSTART.md                   # Quick reference
+├── MULTI_STYLE_ARCHITECTURE.md     # Art style architecture
 └── README.md                       # This file
 ```
 
@@ -158,7 +171,7 @@ interface PartDefinition {
 }
 ```
 
-**Current part library:**
+**Current part library (procedural):**
 - **Humanoid bodies**: `stocky`, `thin`, `athletic` (3 variations)
 - **Humanoid heads**: `round`, `square`, `oval` (3 variations)
 - **Eyes**: `dot`, `normal`, `wide`, `narrow` (4 variations)
@@ -166,6 +179,12 @@ interface PartDefinition {
 - **Simple shapes**: `square`, `circle` (debug parts)
 
 **Total combinations** (humanoid): 3 bodies × 3 heads × 4 eyes × 6 hair = **216 unique sprites** (before colors)
+
+**PixelLab-generated parts (high quality):**
+- SNES-style parts in `assets/parts/snes/` (64x64 to 64x96 pixels)
+- Generated using PixelLab MCP character generation API
+- Consistent art style via reference character
+- See `scripts/README.md` for generation workflow
 
 **Example part:**
 ```typescript
@@ -233,10 +252,14 @@ for (const slot of template.slots) {
 
 ### 5. Planetary Art Styles
 
-Each planet/universe renders sprites in a different retro console art style:
+Each planet/universe renders sprites in a different retro console art style. **30+ art styles** supported spanning gaming history:
 
 ```typescript
-type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo';
+type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo' |
+  'genesis' | 'mastersystem' | 'turbografx' | 'n64' | 'dreamcast' | 'saturn' |
+  'c64' | 'amiga' | 'atarist' | 'zxspectrum' | 'cga' | 'ega' | 'vga' | 'msx' | 'pc98' |
+  'atari2600' | 'atari7800' | 'wonderswan' | 'ngpc' | 'virtualboy' | '3do' |
+  'celeste' | 'undertale' | 'stardew' | 'terraria';
 
 interface ArtStyleConfig {
   era: string;                     // '16-bit SNES (1991-1996)'
@@ -250,7 +273,22 @@ interface ArtStyleConfig {
 }
 ```
 
-**Available styles:**
+**Major art style categories:**
+
+| Category | Styles | Era | Example |
+|----------|--------|-----|---------|
+| **Nintendo 8-bit** | NES, Game Boy | 1985-1998 | Super Mario Bros, Pokemon Red |
+| **Nintendo 16-bit** | SNES, GBA | 1991-2008 | Chrono Trigger, Golden Sun |
+| **Nintendo 3D** | N64 | 1996-2002 | Paper Mario |
+| **Sega Consoles** | Genesis, Master System, Saturn, Dreamcast | 1985-2001 | Sonic, Phantasy Star |
+| **Sony** | PS1 | 1995-2000 | Final Fantasy Tactics |
+| **Arcade** | Neo Geo | 1990-2004 | Metal Slug |
+| **PC/DOS Era** | CGA, EGA, VGA | 1981-1995 | Commander Keen |
+| **Home Computers** | C64, Amiga, Atari ST, ZX Spectrum, MSX, PC-98 | 1982-2000 | European/Japanese classics |
+| **Handhelds** | Wonder Swan, Neo Geo Pocket Color, Virtual Boy | 1995-2003 | SNK/Bandai games |
+| **Modern Indie** | Celeste, Undertale, Stardew Valley, Terraria | 2011-2018 | Contemporary pixel art |
+
+**Detailed style comparison:**
 
 | Style | Era | Canvas Size | Colors | Shading | Example Games |
 |-------|-----|-------------|--------|---------|---------------|
@@ -260,6 +298,12 @@ interface ArtStyleConfig {
 | `gba` | GBA (2001-2008) | 64-80px | 32,768 colors | Medium | Golden Sun |
 | `gameboy` | GB (1989-1998) | 32-48px | 4 shades | Basic | Pokemon Red/Blue |
 | `neogeo` | Arcade (1990-2004) | 128-256px | 65,536 colors | Detailed | Metal Slug |
+| `genesis` | 16-bit (1988-1997) | 64-96px | 512 colors | Medium | Sonic the Hedgehog |
+| `c64` | 8-bit (1982-1994) | 24-32px | 16 colors | Flat | Commodore 64 games |
+| `amiga` | 16-bit (1985-1996) | 48-64px | 4096 colors | Medium | European computer games |
+| `vga` | DOS (1987-1995) | 48-80px | 256 colors | Medium | Commander Keen |
+| `celeste` | Modern (2018) | 64-96px | True color | Medium | Celeste |
+| `stardew` | Modern (2016) | 48-64px | True color | Medium | Stardew Valley |
 
 **Usage:**
 ```typescript
@@ -405,6 +449,19 @@ function getArtStyleFromPlanetId(planetId: string): ArtStyle;  // Deterministic 
 const ART_STYLES: Record<ArtStyle, ArtStyleConfig>;
 ```
 
+### PNG Loading API
+
+```typescript
+// Load PNG from base64 string
+async function loadPNGFromBase64(base64: string): Promise<PixelData>;
+
+// Load PNG from URL
+async function loadPNGFromURL(url: string): Promise<PixelData>;
+
+// Load PNG from file path (browser)
+async function loadPNGFromFile(path: string): Promise<PixelData>;
+```
+
 ---
 
 ## Usage Examples
@@ -495,7 +552,32 @@ for (const style of styles) {
 // const parts = loadPartsFromDirectory(config.partsDirectory);
 ```
 
-### Example 5: Agent Integration (Future)
+### Example 5: Loading PixelLab-Generated Parts
+
+```typescript
+import { loadPNGFromFile, PixelCanvas } from '@ai-village/deterministic-sprite-generator';
+
+// Load a PixelLab-generated part
+const headPixels = await loadPNGFromFile('assets/parts/snes/head/head_round_pale.png');
+
+// Composite with other parts
+const canvas = new PixelCanvas(64, 96);
+canvas.compositeOver(headPixels, 0, 0);
+
+// Or use in part definition
+const partDef: PartDefinition = {
+  id: 'snes_head_round_pale',
+  name: 'Round Head (Pale)',
+  slot: 'head',
+  tags: ['snes', 'round', 'pale'],
+  colorZones: [],  // No color zones (pre-rendered)
+  draw: async (w, h, colors) => {
+    return await loadPNGFromFile('assets/parts/snes/head/head_round_pale.png');
+  }
+};
+```
+
+### Example 6: Agent Integration (Future)
 
 ```typescript
 // Hypothetical integration with game agents
@@ -527,7 +609,7 @@ function generateAgentSprite(agent: AgentEntity): PixelData {
 }
 ```
 
-### Example 6: Creating Custom Parts
+### Example 7: Creating Custom Parts
 
 ```typescript
 // Add a new hair part to parts.ts
@@ -566,7 +648,7 @@ export const PARTS: PartDefinition[] = [
 // Now 'hair_mohawk' is in the pool - deterministic selection will pick it for some seeds
 ```
 
-### Example 7: Creating Custom Templates
+### Example 8: Creating Custom Templates
 
 ```typescript
 // Add a new template to templates.ts
@@ -592,6 +674,216 @@ export const TEMPLATES: Record<string, SpriteTemplate> = {
 
 // Then create parts for each slot (dragon_body_*, dragon_wings_*, etc.)
 ```
+
+---
+
+## PixelLab Integration
+
+The package integrates with **PixelLab MCP** for generating high-quality sprite parts using AI character generation.
+
+### Overview
+
+**PixelLab** is an AI-powered pixel art generator accessed via MCP (Model Context Protocol). The integration allows:
+
+- Generating consistent sprite parts matching specific art styles
+- Creating reference characters for style consistency
+- Batch generation of complete part libraries
+- Automatic rate limiting and progress tracking
+
+### Architecture
+
+```
+PixelLab Daemon (via start.sh)
+    ↓
+MCP Character Generation API
+    ↓
+Generated Character Images
+    ↓
+Extract Rotations/Parts
+    ↓
+Save to assets/parts/{style}/
+    ↓
+Load via loadPNG() utilities
+    ↓
+Use in sprite generation
+```
+
+### Reference Character System
+
+PixelLab uses **reference characters** to maintain consistent art style across all generated parts:
+
+1. Create a reference character with desired style (e.g., SNES 16-bit)
+2. Store reference character ID in art style config
+3. Use reference when generating new parts to match style
+
+**Example:**
+```typescript
+// artStyles.ts
+snes: {
+  era: '16-bit SNES (1991-1996)',
+  // ... other config ...
+  referenceImageId: '762d156d-60dc-4822-915b-af55bc06fb49',  // SNES reference
+}
+```
+
+### Generation Scripts
+
+Three main scripts handle PixelLab integration:
+
+#### 1. `generate-pixellab-parts.ts`
+
+Specification file defining parts to generate:
+
+```typescript
+interface PartSpec {
+  category: 'head' | 'body' | 'hair' | 'eyes' | 'accessory';
+  description: string;
+  width: number;
+  height: number;
+  tags: string[];
+}
+
+const PARTS_TO_GENERATE: PartSpec[] = [
+  {
+    category: 'head',
+    description: 'round face, pale skin, front view, neutral expression',
+    width: 64,
+    height: 64,
+    tags: ['round', 'pale']
+  },
+  // ... 49+ parts defined
+];
+```
+
+#### 2. `generate-snes-parts.ts`
+
+Main generation script with features:
+- Auto-resume from progress checkpoint
+- 5-second rate limiting between API calls
+- Reference-based style matching
+- Organized output by category
+- Error handling and retry logic
+
+**Usage:**
+```bash
+cd packages/deterministic-sprite-generator
+npx ts-node scripts/generate-snes-parts.ts
+```
+
+#### 3. `batch-generate-snes-parts.ts`
+
+Batch processor for generating entire part libraries:
+- 49 parts total (heads, bodies, hair, accessories)
+- 8 human heads (different face shapes and skin tones)
+- 5 human bodies (athletic, stocky, thin, average, heavy)
+- 12 hair styles (spiky, long, short, ponytail, curly, bald, etc.)
+- 6 accessories (glasses, beards, wizard hat, crown, eyepatch)
+- 10 monster bodies (tentacles, wings, slime, scales, robot, etc.)
+- 8 monster heads (dragon, demon, skull, cat, octopus, etc.)
+
+### Output Structure
+
+Generated parts saved to:
+```
+assets/parts/snes/
+  head/
+    head_round_pale.png
+    head_round_tan.png
+    head_square_pale.png
+    ...
+  body/
+    body_athletic.png
+    body_stocky.png
+    body_thin.png
+    ...
+  hair/
+    hair_spiky_brown.png
+    hair_long_blonde.png
+    hair_ponytail_brown.png
+    ...
+  accessory/
+    accessory_glasses_round.png
+    accessory_beard_short.png
+    accessory_wizard_hat.png
+    ...
+```
+
+### Rate Limiting
+
+PixelLab API enforces rate limits:
+- **~1 generation per 5 seconds**
+- **Generation time:** 2-5 minutes per character
+- **Total time for 49 parts:** ~4-6 hours
+
+Scripts automatically handle rate limiting:
+```typescript
+const RATE_LIMIT_MS = 5000;
+await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_MS));
+```
+
+### Progress Tracking
+
+Generation progress saved to `scripts/generation-progress.json`:
+
+```json
+{
+  "completed": ["head_round_pale", "head_round_tan", ...],
+  "failed": [],
+  "lastUpdate": 1704936000000
+}
+```
+
+Scripts automatically resume from checkpoint if interrupted.
+
+### PixelLab Daemon
+
+The PixelLab daemon auto-starts with game server:
+
+```bash
+./start.sh              # Starts metrics + pixellab + game
+./start.sh server       # Starts metrics + pixellab (no game)
+```
+
+**Management via `pixellab` skill:**
+```bash
+pixellab status         # Check daemon status
+pixellab logs           # View generation logs
+pixellab add <desc>     # Queue sprite generation
+pixellab verify <id>    # Check generation status
+```
+
+### Sprite Wizard Integration
+
+Interactive UI for PixelLab generation at http://localhost:3011:
+
+```bash
+npm run sprite-wizard
+```
+
+**Features:**
+- Visual part library browser
+- PixelLab generation queue
+- Style matching preview
+- Export to TypeScript definitions
+- Batch generation controls
+
+### Troubleshooting PixelLab
+
+**"PIXELLAB_API_KEY not set"**
+- Set in `custom_game_engine/.env`: `PIXELLAB_API_KEY=your_key_here`
+
+**"Reference character has no rotations"**
+- Reference character still generating
+- Check status via PixelLab MCP tools
+
+**"API error 429: Sorry, you need to wait longer"**
+- Rate limit hit
+- Wait 10 seconds and restart script (auto-resumes from progress)
+
+**Generation failed**
+- Check `scripts/generation-progress.json` for failed parts
+- Review error logs
+- Manually regenerate failed parts
 
 ---
 
@@ -678,7 +970,7 @@ generateSprite()
 4. **Cached part queries**: `getPartsBySlot()` filters once per slot, not per call
 5. **Integer math**: LCG uses bitwise ops, no floating-point except final division
 
-**Query caching (future optimization):**
+**Query caching (recommended for batch generation):**
 
 ```typescript
 // ❌ BAD: Query parts every generation
@@ -709,6 +1001,105 @@ ctx.putImageData(imageData, 0, 0);
 // ❌ Inefficient: Converting to base64 → img.src (extra encoding)
 ```
 
+**Caching Strategies:**
+
+### 1. Sprite Cache (In-Memory)
+
+Cache generated sprites by seed:
+
+```typescript
+class SpriteCache {
+  private cache = new Map<string, GeneratedSprite>();
+
+  get(seed: string, template: string): GeneratedSprite | undefined {
+    const key = `${seed}:${template}`;
+    return this.cache.get(key);
+  }
+
+  set(seed: string, template: string, sprite: GeneratedSprite): void {
+    const key = `${seed}:${template}`;
+    this.cache.set(key, sprite);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// Usage
+const cache = new SpriteCache();
+
+function getCachedSprite(seed: string, template: string): GeneratedSprite {
+  let sprite = cache.get(seed, template);
+  if (!sprite) {
+    sprite = generateSprite({ seed, template });
+    cache.set(seed, template, sprite);
+  }
+  return sprite;
+}
+```
+
+### 2. Part Library Cache
+
+Pre-load and cache PNG parts:
+
+```typescript
+class PartLibraryCache {
+  private cache = new Map<string, PixelData>();
+
+  async load(style: ArtStyle): Promise<void> {
+    const config = getArtStyle(style);
+    const partsDir = config.partsDirectory;
+
+    // Load all parts for this style
+    const partFiles = await listFiles(partsDir);
+
+    for (const file of partFiles) {
+      const pixelData = await loadPNGFromFile(file);
+      this.cache.set(file, pixelData);
+    }
+  }
+
+  get(path: string): PixelData | undefined {
+    return this.cache.get(path);
+  }
+}
+```
+
+### 3. Async Generation
+
+For UI responsiveness, generate sprites async:
+
+```typescript
+async function generateSpriteAsync(params: GenerationParams): Promise<GeneratedSprite> {
+  return new Promise(resolve => {
+    // Yield to event loop between parts
+    setTimeout(() => {
+      const sprite = generateSprite(params);
+      resolve(sprite);
+    }, 0);
+  });
+}
+
+// Batch generation with progress
+async function generateBatch(seeds: string[], onProgress: (n: number) => void): Promise<GeneratedSprite[]> {
+  const sprites: GeneratedSprite[] = [];
+
+  for (let i = 0; i < seeds.length; i++) {
+    const sprite = await generateSpriteAsync({ seed: seeds[i], template: 'humanoid' });
+    sprites.push(sprite);
+    onProgress(i + 1);
+
+    // Yield every 10 sprites
+    if (i % 10 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+  }
+
+  return sprites;
+}
+```
+
 ---
 
 ## Development Tools
@@ -727,6 +1118,7 @@ npm run test-screen
 - Seed input, template selection, color pickers
 - Game data import (upload save files to generate agent sprites)
 - Part inspection (see which parts were selected)
+- Art style selector (test all 30+ console styles)
 
 ### Sprite Wizard
 
@@ -741,18 +1133,20 @@ npm run sprite-wizard
 - Batch generation of consistent part sets
 - Style matching (uses reference image for aesthetic consistency)
 - Export to TypeScript part definitions
+- Visual preview of all generated parts
+- Part tagging and categorization
 
 ### Scripts
 
 ```bash
 # Generate SNES-style parts using PixelLab API
-node scripts/generate-snes-parts.ts
+npx ts-node scripts/generate-snes-parts.ts
 
 # Batch generate all parts for a template
-node scripts/batch-generate-snes-parts.ts
+npx ts-node scripts/batch-generate-snes-parts.ts
 
-# Generate PixelLab parts from manifest
-node scripts/generate-pixellab-parts.ts
+# View part generation manifest
+npx ts-node scripts/generate-pixellab-parts.ts
 ```
 
 ---
@@ -869,6 +1263,30 @@ export const PARTS: PartDefinition[] = [
     // ...
   }
 ];
+```
+
+### PNG loading fails
+
+**Error:** `Failed to load image: assets/parts/snes/head/head_round_pale.png`
+
+**Fix:**
+1. Check file exists at path
+2. Check path is relative to web server root
+3. Verify PNG is valid (not corrupted)
+4. Check CORS headers if loading from different domain
+
+```typescript
+// Verify file exists
+const response = await fetch('assets/parts/snes/head/head_round_pale.png');
+console.log('Status:', response.status);  // Should be 200
+
+// Test PNG loading
+try {
+  const pixels = await loadPNGFromFile('assets/parts/snes/head/head_round_pale.png');
+  console.log('Loaded:', pixels.width, 'x', pixels.height);
+} catch (error) {
+  console.error('Load failed:', error);
+}
 ```
 
 ---
@@ -993,9 +1411,11 @@ npm test -- templates.test.ts
 ## Further Reading
 
 - **QUICKSTART.md** - Quick reference guide
+- **MULTI_STYLE_ARCHITECTURE.md** - Art style system architecture
+- **scripts/README.md** - PixelLab generation workflow
+- **sprite-set-generator/README.md** - Sprite wizard documentation
 - **ARCHITECTURE_OVERVIEW.md** - Main engine architecture (not integrated)
 - **SYSTEMS_CATALOG.md** - All game systems (not integrated)
-- **PixelLab API Docs** - For sprite wizard integration
 
 ---
 
@@ -1007,14 +1427,18 @@ npm test -- templates.test.ts
 3. Understand **templates** (structure) vs **parts** (content)
 4. Know **color zones** for parametric variation
 5. Understand this is **standalone** (not integrated with game)
+6. Know **30+ art styles** available (console eras + modern indie)
+7. Understand **PixelLab integration** for high-quality part generation
 
 **Common tasks:**
-- **Generate sprite:** `generateSprite({ seed, template, colors?, scale? })`
+- **Generate sprite:** `generateSprite({ seed, template, colors?, scale?, planetaryArtStyle? })`
 - **Add new part:** Add to `PARTS` array in `src/parts.ts`
 - **Add new template:** Add to `TEMPLATES` object in `src/templates.ts`
 - **Verify determinism:** Generate same sprite multiple times, compare pixel data
 - **Custom colors:** Pass `colors` object with zone names → Color values
 - **Test changes:** `npm run test-screen` for live preview
+- **Generate PixelLab parts:** Use `scripts/generate-snes-parts.ts`
+- **Load PNG parts:** Use `loadPNGFromFile()` utility
 
 **Critical rules:**
 - Never use `Math.random()` (breaks determinism)
@@ -1031,14 +1455,24 @@ npm test -- templates.test.ts
 - Session-independent (same result across restarts)
 - Pure functional (no external state)
 
-**Event-driven architecture:**
+**Architecture notes:**
 - NOT event-driven (this is a pure function library)
 - No system integration (standalone package)
 - No save/load hooks (consumer handles persistence)
 - No rendering (consumer handles display)
+- PixelLab integration via external scripts (not runtime)
 
 **Performance:**
 - Generation is fast (5-10ms for humanoid)
 - Use `ImageData` constructor for zero-copy rendering
 - Cache part queries if generating thousands of sprites
 - Scale parameter affects memory (4× scale = 16× pixels)
+- Pre-load PNG parts for best performance
+- Use async generation for UI responsiveness
+
+**PixelLab workflow:**
+1. Create reference character for art style
+2. Run generation scripts to create part library
+3. Parts saved to `assets/parts/{style}/`
+4. Load parts via `loadPNGFromFile()` in code
+5. Use in sprite generation pipeline

@@ -1,342 +1,261 @@
-# Hierarchy Simulator - Multi-Scale Social Hierarchy System
+# Hierarchy Simulator
 
-> **For Language Models:** This README is optimized for LM understanding. Read this document completely before working with the hierarchy simulator to understand its architecture, renormalization mechanics, and multi-scale social systems.
+> **Renormalization Group Theory for Game Design**
+> Simulate ringworld-scale civilizations with emergent behavior across 7 orders of magnitude.
 
 ## Overview
 
-The **Hierarchy Simulator Package** (`@ai-village/hierarchy-simulator`) implements a multi-scale hierarchical abstraction system for simulating massive populations across 7 tiers of scale, from individual tiles (9m²) to gigasegments (10^15 km²). It uses renormalization group theory to zoom between statistical summaries and detailed ECS simulation.
+The Hierarchy Simulator implements **renormalization group (RG) theory** from physics to enable multi-scale simulation of a ringworld civilization. Instead of simulating billions of entities individually, the system uses **coarse-graining** and **scale hierarchies** to efficiently model emergent behavior at cosmic scales.
 
-**What it does:**
-- Simulates populations from hundreds to billions across 7 hierarchical tiers
-- Renormalization engine for zooming in/out between statistical and detailed simulation
-- Social hierarchies with leadership, roles, and status rankings
-- Scientist emergence system with tier-based research infrastructure
-- Economic flows and trade routes between hierarchical levels
-- Time scaling (higher tiers simulate faster - decades per tick at gigasegment scale)
+**Key Innovation**: At high tiers, you simulate *statistics about populations*, not individual agents. A gigasegment (10^15 km²) advances by *decades per tick*, tracking birth rates, tech levels, and belief densities—while a chunk (3 km²) runs full ECS simulation in real-time.
 
-**Key files:**
-- `src/simulation/SimulationController.ts` - Central simulation controller with zoom/renormalization
-- `src/renormalization/RenormalizationEngine.ts` - Statistical summarization and instantiation
-- `src/abstraction/AbstractTierBase.ts` - Base tier implementation with population/economy
-- `src/research/ScientistEmergence.ts` - Statistical scientist emergence system
-- `src/renormalization/TierConstants.ts` - Time scaling and simulation constants
+**Use Case**: Enables the ringworld game to simulate:
+- Individual agent behavior (chunk tier, 10-1K population)
+- City dynamics (region tier, 100K-10M population)
+- Planetary civilizations (subsection tier, 10M-500M population)
+- Galactic empires (gigasegment tier, 10B-100B population)
 
----
+All running simultaneously at appropriate time scales.
 
 ## Package Structure
 
 ```
-packages/hierarchy-simulator/
+hierarchy-simulator/
 ├── src/
-│   ├── simulation/
-│   │   └── SimulationController.ts         # Main controller, zoom in/out, state management
-│   ├── renormalization/
-│   │   ├── RenormalizationEngine.ts        # Summarize/instantiate tier data
-│   │   ├── TierConstants.ts                # Time scales, emergence rates, constants
-│   │   └── index.ts                        # Exports
-│   ├── abstraction/
-│   │   ├── types.ts                        # Tier types, addresses, events
-│   │   ├── AbstractTierBase.ts             # Base tier implementation
-│   │   ├── AbstractMegasegment.ts          # Megasegment-specific logic
-│   │   └── AbstractGigasegment.ts          # Gigasegment-specific logic
-│   ├── research/
-│   │   ├── ScientistEmergence.ts           # Statistical scientist emergence
-│   │   ├── ResearchTypes.ts                # Research fields, papers, universities
-│   │   └── README.md                       # Research system documentation
-│   ├── renderers/
-│   │   └── HierarchyDOMRenderer.ts         # DOM rendering (introspection pattern)
-│   ├── mock/
-│   │   └── DataGenerator.ts                # Test data generation
-│   └── main.ts                             # App entry point
+│   ├── abstraction/           # Tier definitions and base classes
+│   │   ├── types.ts           # Core types (TierLevel, AbstractTier, ResourceFlow)
+│   │   ├── AbstractTierBase.ts    # Base tier implementation (population, economy, events)
+│   │   ├── AbstractGigasegment.ts # Galactic-scale tier (cultural influence, diplomacy)
+│   │   └── AbstractMegasegment.ts # Solar-system-scale tier (cultures, phenomena)
+│   ├── renormalization/       # RG engine and time scaling
+│   │   ├── RenormalizationEngine.ts  # Summarization, instantiation, statistical simulation
+│   │   ├── TierConstants.ts          # Time scales, summarization rules
+│   │   └── index.ts
+│   ├── research/              # Emergent scientist system
+│   │   ├── ScientistEmergence.ts # HARD STEPS model for tier-100 physicists
+│   │   └── ResearchTypes.ts      # Papers, universities, guilds
+│   ├── simulation/            # Main controller
+│   │   └── SimulationController.ts  # Game loop, zoom in/out, belief tracking
+│   ├── renderers/             # UI rendering (DOM-based)
+│   │   └── HierarchyDOMRenderer.ts
+│   ├── mock/                  # Test data generation
+│   │   └── DataGenerator.ts
+│   └── main.ts                # App entry point
 ├── package.json
-└── README.md                               # This file
+└── README.md (this file)
 ```
-
----
 
 ## Core Concepts
 
-### 1. Hierarchical Tiers
+### 1. Scale Hierarchy (7 Tiers)
 
-7 levels of abstraction from microscopic to cosmic:
+The simulator models a nested hierarchy from individual physics to galactic civilizations:
 
+| Tier | Area | Population | Children | Time Scale | Simulation Mode |
+|------|------|------------|----------|------------|-----------------|
+| **Tile** | 9 m² | 0-10 | - | 1:1 (real-time) | Individual physics |
+| **Chunk** | 3 km² | 10-1K | 1024 tiles | 1:1 (real-time) | **FULL ECS** |
+| **Zone** | 10^5 km² | 1K-100K | 100 chunks | 1 hour/tick | Demographics |
+| **Region** | 10^8 km² | 100K-10M | 100 zones | 1 day/tick | Economy |
+| **Subsection** | 10^10 km² | 10M-500M | 100 regions | 1 week/tick | Politics |
+| **Megasegment** | 10^13 km² | 100M-1B | 100 subsections | 1 month/tick | Culture |
+| **Gigasegment** | 10^15 km² | 10B-100B | 100 megasegments | 1 year/tick | Civilization |
+
+**Key Insight**: At chunk tier, full ECS runs (position, behavior, skills). At gigasegment tier, only *aggregates* exist (birth rate, tech level, belief density). Individual agent lifetimes become statistical noise.
+
+### 2. Renormalization (Zoom In/Out)
+
+**Zoom Out** (Summarization):
 ```typescript
-type TierLevel =
-  | 'tile'         // 9m² - Individual physics
-  | 'chunk'        // 3km² - FULL ECS SIMULATION (10-1K population)
-  | 'zone'         // 10^5 km² - Building cluster (1K-100K)
-  | 'region'       // 10^8 km² - District (100K-10M)
-  | 'subsection'   // 10^10 km² - Planet-city (10M-500M)
-  | 'megasegment'  // 10^13 km² - Solar system (100M-1B)
-  | 'gigasegment'; // 10^15 km² - Galactic (10B-100B)
+// Convert detailed ECS state to statistical summary
+const summary = renormalizationEngine.summarize(tier);
+
+// What gets preserved:
+summary.preserved = {
+  namedNPCs: [/* famous heroes, governors */],
+  majorBuildings: [/* temples, universities */],
+  historicalEvents: [/* wars, golden ages */]
+};
+
+// What gets lost:
+// - Individual positions
+// - Personal relationships
+// - Exact behaviors
+// - Skill distributions
 ```
 
-**Universal Addressing:**
-
-Every entity has a precise hierarchical address:
-
+**Zoom In** (Instantiation):
 ```typescript
-interface UniversalAddress {
-  gigasegment: number;           // 0-9999 (galactic scale)
-  megasegment: number;           // 0-99 (solar system scale)
-  subsection: number;            // 0-999 (planet-sized)
-  region: number;                // 0-99 (district)
-  zone: number;                  // 0-999 (building cluster)
-  chunk: { x: number; y: number };  // 32×32 tiles
-  tile: { x: number; y: number };   // 3m × 3m
-}
+// Get constraints for generating entities that match statistics
+const constraints = renormalizationEngine.getInstantiationConstraints(tierId);
+
+// Constraints include:
+constraints = {
+  targetPopulation: 450_000_000,  // Must generate this many agents
+  beliefDistribution: { 'wisdom_goddess': 135_000_000, ... },
+  techLevel: 7,
+  avgSkillLevel: 3.5,
+  stability: 0.82,
+  namedNPCs: [/* must include these specific NPCs */],
+  majorBuildings: [/* must include these buildings */]
+};
+
+// Then generate ECS entities satisfying these constraints
 ```
 
-### 2. Simulation Modes
+### 3. Time Scaling
 
-Each tier can operate in 3 modes:
+Higher tiers simulate *faster* (more game time per system tick):
 
 ```typescript
-type SimulationMode =
-  | 'abstract'      // Statistics only (differential equations)
-  | 'semi-active'   // Partial simulation (trade routes, events)
-  | 'active';       // Full ECS (chunk-level only)
+const TIME_SCALE = {
+  chunk: 1,           // 1 tick = 1 tick (real ECS)
+  zone: 60,           // 1 tick = 1 hour
+  region: 1440,       // 1 tick = 1 day
+  subsection: 10080,  // 1 tick = 1 week
+  megasegment: 43200, // 1 tick = 1 month
+  gigasegment: 525600 // 1 tick = 1 year (365 days)
+};
+
+// At 20 TPS, gigasegment advances 10,512,000 ticks/second = ~16.7 years/second
 ```
 
-**Mode transitions:**
-- **Zoom out** → Switch to abstract mode, create statistical summary
-- **Zoom in** → Switch to active mode, instantiate entities from constraints
-- **Time scaling** → Abstract tiers run 10x slower (timeScale = 0.1)
+**Result**: While the player watches a village evolve over minutes, the broader civilization advances through centuries.
 
-### 3. Renormalization
-
-The core mechanic for multi-scale simulation:
+### 4. Summarization Rules (What Gets Lost)
 
 ```typescript
-// ZOOM OUT: Summarize detailed simulation into statistics
-const summary: TierSummary = renormalizationEngine.summarize(tier);
-// Summary contains: population stats, economy, belief, stability, preserved entities
-
-// ZOOM IN: Generate entities matching statistical constraints
-const constraints: InstantiationConstraints =
-  renormalizationEngine.getInstantiationConstraints(tierId);
-// Constraints define: target population, belief distribution, tech level, etc.
-```
-
-**What gets preserved across zoom:**
-- Named NPCs (governors, priests, heroes)
-- Major buildings (temples, universities, wonders)
-- Historical events (breakthroughs, disasters, wars)
-- Belief stats (per deity)
-- Tech progress
-
-### 4. Time Scaling
-
-Higher tiers simulate exponentially faster:
-
-```typescript
-const TIME_SCALE: Record<TierLevel, number> = {
-  tile: 1,                    // 1 second per tick
-  chunk: 1,                   // 1 second per tick
-  zone: 60,                   // 1 minute per tick
-  region: 3600,               // 1 hour per tick
-  subsection: 86400,          // 1 day per tick
-  megasegment: 525600,        // 1 year per tick
-  gigasegment: 5256000        // 10 years per tick
+const SUMMARIZATION_RULES = {
+  chunk: {
+    sum: ['population', 'resources'],           // Totals preserved
+    average: ['happiness', 'hunger'],           // Means preserved
+    computed: ['productivity'],                 // Derived values
+    preserved: ['named_npcs', 'buildings'],     // Specific entities
+    lost: ['individual_positions', 'behaviors'] // Gone forever
+  },
+  gigasegment: {
+    sum: ['population', 'stellar_energy'],
+    average: ['cosmic_stability', 'tech_level'],
+    computed: ['galactic_influence'],
+    preserved: ['galactic_empires', 'deity_domains'],
+    lost: ['megasegment_details', 'cultural_nuances']
+  }
 };
 ```
 
-This allows cosmic-scale simulation without performance collapse.
+**Critical**: Information loss is *intentional*. You can't track individual agent positions at planetary scale—only aggregates matter.
 
-### 5. Social Hierarchies
+### 5. Statistical Simulation (Inactive Tiers)
 
-Hierarchies emerge statistically from population dynamics:
-
-**Named NPCs:**
+When a tier is inactive (zoomed out), it's simulated using **differential equations** instead of ECS:
 
 ```typescript
-interface NamedNPC {
-  id: string;
-  name: string;
-  role: 'governor' | 'high_priest' | 'hero' | 'villain' | 'scientist' | 'merchant';
-  tierId: string;
-  alive: boolean;
-  fame: number;              // 0-100, preservation priority
-  deityAllegiance?: string;
-  achievements: string[];
-}
+// Population: Logistic growth
+dP/dt = r * P * (1 - P/K)
+
+// Belief spread: Word-of-mouth + temples
+dB/dt = B * wordOfMouth + temples * templePower - B * decay
+
+// Economy: Production with tech bonus
+production = workers * baseRate * (1 + techLevel * 0.15)
 ```
 
-**Emergence conditions:**
-- **Governor:** Population > 100,000
-- **High Priest:** Social stability > 60%
-- **Scientist:** Based on emergence rates (see Research System)
+**Benefits**:
+- O(1) cost per tier vs O(N) for individual agents
+- Can simulate 100+ tiers simultaneously
+- Statistically accurate for large populations
 
-### 6. Scientist Emergence
+### 6. Emergent Scientist System (HARD STEPS)
 
-Scientists don't spawn instantly - they emerge statistically from conditions:
+Scientists don't spawn instantly—they **emerge** from conditions:
 
 ```typescript
-interface EmergenceRate {
-  tier: number;                   // Scientist tier (1-100)
-  field: ResearchField;
-  probabilityPerYear: number;     // 0-1 chance per year
-  expectedYears: number;          // 1 / probability
-}
+// Tier-100 physicist requirements:
+const emergenceConditions = {
+  totalPopulation: 1_000_000_000_000,  // 1 trillion
+  universities: 100,                    // Tier-8+ physics universities
+  guilds: 30,                          // Tier-8+ physics guilds
+  stabilityYears: 200,                 // 200+ years of >80% stability
+  activePapers: 1000,                  // Active tier-9+ research
+};
+
+// Base probability: 0.00000001/year (100M years)
+// With ideal conditions: ~0.00000025/year (~4M years)
+// Expected emergence: Centuries to millennia
 ```
 
-**Emergence factors:**
-- **Population:** More population = higher chance (diminishing returns)
-- **Universities:** Tier-100 physicist needs 100+ tier-8 physics universities
-- **Stability:** High-tier scientists need 200+ years sustained stability
-- **Active research:** Need active papers at similar tier (80%+)
+**Hard Step Progression**: Tier-N scientists require 100× tier-(N-1) scientists. You can't skip rungs.
 
-**Example:** Tier-100 physicist
-- Base rate: 1 per 100 million years
-- With ideal conditions: 1 per 4 million years
-- Achievable in 2000-hour game where 1 hour = centuries
-
----
-
-## System APIs
+## API
 
 ### SimulationController
 
-Central controller for multi-scale simulation.
-
-**Update interval:** requestAnimationFrame loop with speed multiplier
-
-**Key methods:**
-
-```typescript
-class SimulationController {
-  // Lifecycle
-  start(): void;                    // Start simulation loop
-  stop(): void;                     // Stop simulation
-  togglePause(): boolean;           // Pause/resume
-  setSpeed(speed: number): void;    // 0.1-1000x speed
-  reset(hierarchyDepth: number): void;  // Reset to new hierarchy
-
-  // State access
-  getState(): Readonly<SimulationState>;
-  getHistory(): Readonly<HistoryData>;  // For charts
-  getTierById(tierId: string): AbstractTier | null;
-  getAllDescendants(tier: AbstractTier): AbstractTier[];
-
-  // Renormalization
-  zoomOut(tierId: string): TierSummary | null;
-  zoomIn(tierId: string): InstantiationConstraints | null;
-  getTierSummary(tierId: string): TierSummary | null;
-  getAllTierSummaries(): Map<string, TierSummary>;
-  isTierActive(tierId: string): boolean;
-
-  // Belief tracking
-  recordMiracle(tierId: string, deityId: string): void;
-  addTemple(tierId: string, deityId: string): void;
-  getBeliefHeatmap(): Map<string, { density: number; dominant: string | null }>;
-
-  // Time scaling
-  getTimeScale(tierLevel: TierLevel): number;
-}
-```
-
-**Creating a simulation:**
+Main controller for the simulation loop and tier management.
 
 ```typescript
 import { SimulationController } from '@ai-village/hierarchy-simulator';
 
-// Create 5-tier hierarchy (gigasegment → megasegment → subsection → region → zone)
-const controller = new SimulationController(5);
+const controller = new SimulationController(5); // 5-level hierarchy
+controller.start(); // Start simulation loop
 
-// Start simulation
-controller.start();
-
-// Set speed to 100x
-controller.setSpeed(100);
-
-// Access state
+// State access
 const state = controller.getState();
-console.log(`Tick: ${state.tick}, Population: ${state.stats.totalPopulation}`);
+state.rootTier;       // Top-level tier
+state.tick;           // Current simulation tick
+state.stats;          // Aggregated stats
+state.running;        // Pause state
+
+// Tier access
+const tier = controller.getTierById('gigaseg_0');
+const descendants = controller.getAllDescendants(tier);
+
+// Speed control
+controller.setSpeed(10);    // 10x speed
+controller.togglePause();   // Pause/resume
+controller.reset(5);        // Reset to new hierarchy
 ```
 
-### RenormalizationEngine
+### Renormalization Engine
 
 Handles zoom in/out and statistical simulation.
 
-**Key methods:**
-
 ```typescript
-class RenormalizationEngine {
-  // Tier activation
-  activateTier(tierId: string): void;
-  deactivateTier(tierId: string): void;
-  isTierActive(tierId: string): boolean;
+import { renormalizationEngine } from '@ai-village/hierarchy-simulator';
 
-  // Summarization
-  summarize(tier: AbstractTier): TierSummary;
-  getSummary(tierId: string): TierSummary | undefined;
-  getAllSummaries(): Map<string, TierSummary>;
+// Zoom out: Summarize a tier
+const summary = controller.zoomOut('region_0');
+summary.population;          // Total population
+summary.economy;             // Production/consumption
+summary.belief;              // Deity tracking
+summary.preserved.namedNPCs; // Famous characters
 
-  // Instantiation
-  getInstantiationConstraints(tierId: string): InstantiationConstraints | null;
+// Zoom in: Get instantiation constraints
+const constraints = controller.zoomIn('region_0');
+constraints.targetPopulation;     // Must generate this many
+constraints.beliefDistribution;   // Deity followers distribution
+constraints.namedNPCs;            // Must include these NPCs
 
-  // Statistical simulation (called for inactive tiers)
-  simulateTier(tierId: string, deltaTicks: number): void;
+// Get summary
+const cached = controller.getTierSummary('region_0');
 
-  // Time scaling
-  getTimeScale(tierLevel: TierLevel): number;
+// Check if tier is active (full simulation)
+const isActive = controller.isTierActive('region_0');
 
-  // Belief mechanics
-  recordMiracle(tierId: string, deityId: string): void;
-  addTemple(tierId: string, deityId: string): void;
-}
-```
-
-**Zoom out workflow:**
-
-```typescript
-// Player zooms out from a tier
-const summary = controller.zoomOut('region_42');
-
-// Summary now contains statistical representation:
-console.log(`Population: ${summary.population}`);
-console.log(`Birth rate: ${summary.birthRate}`);
-console.log(`Dominant deity: ${summary.belief.dominantDeity}`);
-console.log(`Named NPCs: ${summary.preserved.namedNPCs.length}`);
-
-// Tier switches to abstract mode (statistical simulation)
-// Time scale slows to 0.1x (10% normal speed when abstract)
-```
-
-**Zoom in workflow:**
-
-```typescript
-// Player zooms into a tier
-const constraints = controller.zoomIn('region_42');
-
-// Constraints define what to generate:
-console.log(`Target population: ${constraints.targetPopulation}`);
-console.log(`Tech level: ${constraints.techLevel}`);
-console.log(`Stability: ${constraints.stability}`);
-console.log(`Preserved NPCs: ${constraints.namedNPCs.length}`);
-
-// Use constraints to generate ECS entities that match statistics
-// Tier switches to active mode (full simulation)
+// Simulate inactive tier statistically
+renormalizationEngine.simulateTier('region_0', deltaTicks);
 ```
 
 ### AbstractTier
 
-Base class for all hierarchical tiers.
-
-**Key properties:**
+Base class for all tier implementations.
 
 ```typescript
-interface AbstractTier {
+class AbstractTierBase implements AbstractTier {
   // Identity
   id: string;
   name: string;
   tier: TierLevel;
-  address: Partial<UniversalAddress>;
-
-  // Simulation
-  mode: SimulationMode;
-  tick: number;
-  timeScale: number;
+  mode: SimulationMode; // 'abstract' | 'semi-active' | 'active'
 
   // Population
   population: PopulationStats;
@@ -344,688 +263,531 @@ interface AbstractTier {
   // Economy
   economy: EconomicState;
 
-  // Trade
-  tradeRoutes: TradeRoute[];
-  transportHubs: TransportHub[];
-
-  // Research infrastructure
-  universities: number;
-  researchGuilds: Map<string, number>;
-  scientistPool: Map<number, number>;  // Tier → count
-
-  // Stability & tech
+  // Stability
   stability: StabilityMetrics;
   tech: TechProgress;
-  activeEvents: GameEvent[];
 
-  // Hierarchy
-  children: AbstractTier[];
-}
-```
+  // Research
+  universities: number;
+  researchGuilds: Map<string, number>;
+  scientistPool: Map<number, number>; // Tier -> count
 
-**Methods:**
-
-```typescript
-class AbstractTierBase implements AbstractTier {
+  // Methods
   update(deltaTime: number): void;
-  activate(): void;        // Switch to higher simulation mode
-  deactivate(): void;      // Switch to lower simulation mode
-  addEvent(event: GameEvent): void;
+  activate(): void;   // Switch to full simulation
+  deactivate(): void; // Switch to statistical
   addChild(child: AbstractTier): void;
-  getTotalPopulation(): number;  // Includes all descendants
-  getAllDescendants(): AbstractTier[];
-  toJSON(): any;
+  getTotalPopulation(): number;
 }
 ```
 
-### ScientistEmergenceSystem
+### Scientist Emergence System
 
-Statistical emergence of high-tier scientists.
-
-**Key methods:**
-
-```typescript
-class ScientistEmergenceSystem {
-  // Calculate emergence probabilities
-  calculateEmergenceRates(
-    field: ResearchField,
-    conditions: EmergenceConditions
-  ): EmergenceRate[];
-
-  // Attempt to spawn a scientist
-  attemptEmergence(
-    tier: number,
-    field: ResearchField,
-    probability: number,
-    location: string
-  ): Scientist | null;
-}
-```
-
-**Usage:**
+Calculate emergence rates for scientists.
 
 ```typescript
 import { ScientistEmergenceSystem } from '@ai-village/hierarchy-simulator';
 
-const emergence = new ScientistEmergenceSystem();
+const emergenceSystem = new ScientistEmergenceSystem();
 
-// Define conditions
-const conditions: EmergenceConditions = {
-  totalPopulation: 1_000_000_000_000,  // 1 trillion
-  educatedPopulation: 0.3,             // 30% educated
-  universities: [...],                 // 100+ physics universities
-  guilds: [...],                       // 30+ physics guilds
-  stabilityYears: 250,                 // 250 years stability
-  fundingYears: 200,
+const conditions = {
+  totalPopulation: 10_000_000_000,
+  educatedPopulation: 0.15,
+  universities: myUniversities,
+  guilds: myGuilds,
+  stabilityYears: 150,
+  fundingYears: 120,
   activePapers: 500,
-  publishedPapers: 2000,
-  highestTierActive: 90
+  publishedPapers: 5000,
+  highestTierActive: 80
 };
 
-// Calculate rates
-const rates = emergence.calculateEmergenceRates('physics', conditions);
+const rates = emergenceSystem.calculateEmergenceRates('physics', conditions);
 
-// Find tier-100 rate
-const tier100Rate = rates.find(r => r.tier === 100);
-console.log(`Tier-100 physicist: ${tier100Rate.expectedYears} years expected`);
+// rates = [
+//   { tier: 50, probabilityPerYear: 0.08, expectedYears: 12.5 },
+//   { tier: 60, probabilityPerYear: 0.005, expectedYears: 200 },
+//   { tier: 80, probabilityPerYear: 0.00001, expectedYears: 100000 },
+//   ...
+// ]
 
-// Attempt emergence (called each simulated year)
-const scientist = emergence.attemptEmergence(
-  100,
-  'physics',
-  tier100Rate.probabilityPerYear,
-  'gigasegment_alpha'
+// Attempt emergence
+const scientist = emergenceSystem.attemptEmergence(
+  tier: 90,
+  field: 'physics',
+  probability: rates[3].probabilityPerYear,
+  location: 'gigaseg_0'
 );
-
-if (scientist) {
-  console.log(`A tier-${scientist.tier} ${scientist.field} scientist emerged!`);
-  console.log(`Specializations: ${scientist.specializations.join(', ')}`);
-}
 ```
-
----
 
 ## Usage Examples
 
-### Example 1: Creating a Hierarchy
+### Creating a Hierarchy
 
 ```typescript
-import { SimulationController } from '@ai-village/hierarchy-simulator';
+import { DataGenerator } from '@ai-village/hierarchy-simulator';
 
-// Create 6-tier hierarchy (gigasegment down to chunk level)
-const controller = new SimulationController(6);
+const generator = new DataGenerator();
 
-// Access root tier
-const state = controller.getState();
-const root = state.rootTier;
+// Generate 5-level hierarchy
+const rootTier = generator.generateHierarchy(5);
 
-console.log(`Root tier: ${root.name} (${root.tier})`);
-console.log(`Population: ${root.getTotalPopulation()}`);
-console.log(`Children: ${root.children.length}`);
-
-// Navigate hierarchy
-const firstChild = root.children[0];
-console.log(`First child: ${firstChild.name} (${firstChild.tier})`);
-
-// Get all tiers at once
-const allTiers = root.getAllDescendants();
-console.log(`Total tiers: ${allTiers.length}`);
+// Structure:
+// - 1 Gigasegment
+//   - 3-5 Megasegments
+//     - 2-4 Subsections (first megasegment only)
+//       - 2-4 Regions (first subsection only)
+//         - 2-3 Zones (first region only)
 ```
 
-### Example 2: Zoom In/Out
+### Simulating Multiple Scales
 
 ```typescript
-// Zoom out from a region (switch to statistical simulation)
-const regionTier = controller.getTierById('region_42');
+const controller = new SimulationController(5);
 
-if (regionTier && regionTier.mode === 'active') {
-  // Zoom out
-  const summary = controller.zoomOut('region_42');
+// Player is viewing chunk tier (full ECS)
+const chunk = controller.getTierById('chunk_0_0');
+chunk.mode; // 'active'
 
-  console.log(`Zoomed out from ${regionTier.name}`);
-  console.log(`Population: ${summary.population}`);
-  console.log(`Stability: ${summary.stability.overall}`);
-  console.log(`Preserved NPCs: ${summary.preserved.namedNPCs.length}`);
+// Parent region simulated statistically
+const region = controller.getTierById('region_0');
+region.mode; // 'abstract'
 
-  // Tier is now in abstract mode (statistical simulation)
-  // Time scale reduced to 0.1x
+// Get region summary
+const summary = controller.getTierSummary('region_0');
+summary.population;        // 4,500,000
+summary.belief.totalBelievers; // 2,700,000
+summary.economy.foodProduction; // 9,000,000/tick
+
+// Player zooms out to region view
+controller.zoomOut('chunk_0_0');  // Chunk becomes abstract
+controller.zoomIn('region_0');    // Region becomes active
+
+// Now generate chunk entities matching summary
+const constraints = controller.zoomIn('chunk_0_0');
+// Use constraints to spawn agents with correct belief distribution
+```
+
+### Tracking Belief Spread
+
+```typescript
+// Record a miracle
+controller.recordMiracle('region_0', 'wisdom_goddess');
+
+// Add a temple
+controller.addTemple('region_0', 'wisdom_goddess');
+
+// Get belief heatmap
+const heatmap = controller.getBeliefHeatmap();
+// Map<tierId, { density: 0.65, dominant: 'wisdom_goddess' }>
+
+// Access detailed belief stats
+const summary = controller.getTierSummary('region_0');
+for (const [deityId, stats] of summary.belief.byDeity) {
+  console.log(`${stats.deityName}: ${stats.believers} believers`);
+  console.log(`  Temples: ${stats.temples}`);
+  console.log(`  Recent miracles: ${stats.recentMiracles}`);
+  console.log(`  Faith density: ${stats.faithDensity}`);
 }
-
-// Later, zoom back in
-const constraints = controller.zoomIn('region_42');
-
-if (constraints) {
-  console.log(`Zooming into region_42...`);
-  console.log(`Need to generate ${constraints.targetPopulation} agents`);
-  console.log(`With tech level ${constraints.techLevel}`);
-  console.log(`Restore ${constraints.namedNPCs.length} named NPCs`);
-
-  // Generate ECS entities matching constraints
-  // (Integration with game engine ECS happens here)
-}
 ```
 
-### Example 3: Statistical Simulation
+### Statistical Simulation of Inactive Tiers
 
 ```typescript
-// Get tier summary
-const summary = controller.getTierSummary('megasegment_5');
+// Get all summaries
+const summaries = controller.getAllTierSummaries();
 
-// Simulate tier statistically (engine calls this automatically for inactive tiers)
-const engine = controller.getRenormalizationEngine();
-engine.simulateTier('megasegment_5', 1.0);  // Simulate 1 tick
+for (const [tierId, summary] of summaries) {
+  if (!controller.isTierActive(tierId)) {
+    // This tier is simulated statistically
 
-// Summary updated with:
-// - Population growth (logistic)
-// - Economy production/consumption
-// - Belief spread
-// - Tech progression
-// - Random events
+    // Population grows logistically
+    const r = summary.birthRate - summary.deathRate;
+    const K = summary.carryingCapacity;
+    const dP = r * P * (1 - P/K);
 
-console.log(`After 1 tick simulation:`);
-console.log(`Population: ${summary.population}`);
-console.log(`Tech level: ${summary.progress.techLevel}`);
-console.log(`Belief density: ${summary.belief.beliefDensity}`);
-```
+    // Belief spreads via word-of-mouth and temples
+    for (const [deityId, stats] of summary.belief.byDeity) {
+      const growth = stats.believers * 0.0001 + stats.temples * 10;
+      stats.believers += growth;
+    }
 
-### Example 4: Managing Social Hierarchies
+    // Tech advances via research
+    summary.progress.researchProgress +=
+      summary.progress.universities * 0.01;
 
-```typescript
-// Access tier
-const tier = controller.getTierById('subsection_alpha');
-const summary = controller.getTierSummary('subsection_alpha');
-
-// Check for named NPCs (emergent leaders)
-for (const npc of summary.preserved.namedNPCs) {
-  console.log(`${npc.role}: ${npc.name}`);
-  console.log(`  Fame: ${npc.fame}`);
-  console.log(`  Achievements: ${npc.achievements.join(', ')}`);
-
-  if (npc.role === 'high_priest') {
-    console.log(`  Deity: ${npc.deityAllegiance}`);
+    if (summary.progress.researchProgress >= 100) {
+      summary.progress.techLevel++;
+    }
   }
 }
-
-// Check major buildings
-for (const building of summary.preserved.majorBuildings) {
-  console.log(`${building.type}: ${building.name}`);
-  console.log(`  Capacity: ${building.capacity}`);
-  console.log(`  Operational: ${building.operational}`);
-
-  if (building.type === 'university') {
-    console.log(`  Tech level: ${building.techLevel}`);
-  }
-}
-
-// Record a miracle (affects belief spread)
-controller.recordMiracle('subsection_alpha', 'wisdom_goddess');
-
-// Add a temple (boosts belief growth)
-controller.addTemple('subsection_alpha', 'wisdom_goddess');
 ```
 
-### Example 5: Tracking Scientist Emergence
+### Research and Emergence
 
 ```typescript
-import { ScientistEmergenceSystem } from '@ai-village/hierarchy-simulator';
+import { ScientistEmergenceSystem, PaperTitleGenerator } from '@ai-village/hierarchy-simulator';
 
 const emergence = new ScientistEmergenceSystem();
+const titleGen = new PaperTitleGenerator();
 
-// Get tier
-const tier = controller.getTierById('megasegment_tau');
-const summary = controller.getTierSummary('megasegment_tau');
+// Generate paper requirements
+const requirements = titleGen.generatePaperRequirements(tier: 90);
+// {
+//   requiredGuilds: { physics: 150, transcendent_physics: 30 },
+//   requiredSpecialists: { 100: 729000, 80: 5100, 50: 8100 },
+//   estimatedYears: 84604 // ~84,000 years
+// }
 
-// Build conditions from tier state
-const conditions: EmergenceConditions = {
-  totalPopulation: tier.population.total,
-  educatedPopulation: tier.population.distribution.researchers / tier.population.total,
-  universities: summary.preserved.majorBuildings.filter(b => b.type === 'university'),
+// Check if tier has enough infrastructure
+const tier = controller.getTierById('gigaseg_0');
+const summary = controller.getTierSummary('gigaseg_0');
+
+const conditions = {
+  totalPopulation: summary.population,
+  educatedPopulation: summary.progress.techLevel / 10,
+  universities: tier.universities,
   guilds: Array.from(tier.researchGuilds.entries()).map(([field, count]) => ({
-    id: `${tier.id}_guild_${field}`,
-    field: field as ResearchField,
-    tier: tier.tech.level,
-    influence: count * 10,
-    memberCount: count * 100
+    field,
+    tier: 8,
+    count
   })),
-  stabilityYears: summary.simulatedYears,
-  fundingYears: summary.simulatedYears * (tier.stability.economic / 100),
+  stabilityYears: 300,
+  fundingYears: 250,
   activePapers: tier.activeResearch.length,
-  publishedPapers: summary.progress.researchProgress,
-  highestTierActive: tier.tech.level * 10
+  publishedPapers: 10000,
+  highestTierActive: 85
 };
 
-// Calculate emergence rates for physics
-const rates = emergence.calculateEmergenceRates('physics', conditions);
+// Calculate emergence rates
+const rates = emergence.calculateEmergenceRates('transcendent_physics', conditions);
 
-// Check tier-80 emergence
-const tier80Rate = rates.find(r => r.tier === 80);
-console.log(`Tier-80 physicist: 1 in ${tier80Rate.expectedYears} years`);
-
-// Simulate 1000 years
-for (let year = 0; year < 1000; year++) {
+// Attempt emergence each year
+for (const rate of rates) {
   const scientist = emergence.attemptEmergence(
-    80,
-    'physics',
-    tier80Rate.probabilityPerYear,
+    rate.tier,
+    'transcendent_physics',
+    rate.probabilityPerYear,
     tier.id
   );
 
   if (scientist) {
-    console.log(`Year ${year}: Tier-${scientist.tier} ${scientist.field} scientist emerged!`);
-    break;
+    console.log(`Tier-${scientist.tier} physicist emerged!`);
+    console.log(`Specializations: ${scientist.specializations.join(', ')}`);
+    tier.scientistPool.set(scientist.tier,
+      (tier.scientistPool.get(scientist.tier) || 0) + 1
+    );
   }
 }
 ```
 
----
+## Theory (RG Concepts for LLMs)
 
-## Architecture & Data Flow
+### Renormalization Group Theory
 
-### System Execution Order
+In physics, **renormalization group (RG) theory** explains how physical systems behave at different scales. Key ideas:
 
-```
-1. SimulationController.update() (every frame)
-   ↓ Updates all tiers recursively
-2. AbstractTier.update(deltaTime)
-   ↓ Chooses mode: abstract, semi-active, or active
-3a. updateAbstract() (for inactive tiers)
-   ↓ Statistical simulation: population, economy, tech, events
-3b. updateActive() (for active tiers)
-   ↓ Full ECS integration (chunk-level)
-4. RenormalizationEngine.simulateTier() (for summarized tiers)
-   ↓ Differential equations: logistic growth, belief spread, tech progress
-5. Event collection and history tracking
-   ↓ Aggregate stats for dashboard
-```
+1. **Scale Invariance**: Laws at small scales ≠ laws at large scales
+   - Atomic physics (quantum) → Fluid dynamics (classical)
+   - Individual neurons → Consciousness
+   - Single agents → Civilizations
 
-### Renormalization Flow
+2. **Coarse-Graining**: Averaging over small-scale details to get large-scale behavior
+   - Average molecular velocities → Temperature
+   - Average agent beliefs → Cultural trends
+   - Sum individual production → GDP
 
-```
-ZOOM OUT:
-SimulationController.zoomOut()
-  ↓ Calls renormalizationEngine.summarize(tier)
-  → Extracts: population stats, economy, belief, stability
-  → Preserves: named NPCs, buildings, events
-  → Returns TierSummary
-  ↓ Calls renormalizationEngine.deactivateTier()
-  → Sets tier.mode = 'abstract'
-  → Sets tier.timeScale = 0.1
+3. **Emergent Properties**: Large-scale behavior not present at small scales
+   - Temperature doesn't exist for single atoms
+   - Culture doesn't exist for single agents
+   - Galactic diplomacy doesn't exist at planetary scale
 
-ZOOM IN:
-SimulationController.zoomIn()
-  ↓ Calls renormalizationEngine.getInstantiationConstraints(tierId)
-  → Returns: target population, belief distribution, tech level, preserved entities
-  ↓ Calls renormalizationEngine.activateTier()
-  → Sets tier.mode = 'active'
-  → Sets tier.timeScale = 1.0
-  ↓ Game engine generates ECS entities matching constraints
-```
+4. **Fixed Points**: Stable patterns that emerge at different scales
+   - Logistic growth (populations)
+   - Power laws (city sizes)
+   - Cultural attractors (belief convergence)
 
-### Scientist Emergence Flow
+### Application to Game Design
 
-```
-Conditions → EmergenceRates
-  ↓ Population modifier
-  ↓ Infrastructure modifier (universities + guilds)
-  ↓ Stability modifier (years at >80%)
-  ↓ Research activity modifier (active papers)
-  → Combined probability
+The hierarchy simulator applies RG theory to game simulation:
 
-Each simulated year:
-  attemptEmergence(tier, field, probability)
-    ↓ Roll random < probability
-    ↓ If success: createScientist()
-      → Assign tier, field, specializations
-      → Calculate lifespan (80-200 years based on tier)
-      → Assign to university
-```
+**Problem**: Can't simulate 100 billion individual agents at 20 TPS.
 
-### Component Relationships
+**Solution**: Simulate different scales using different physics:
+- **Microscale** (chunk): Full ECS with position, velocity, inventory
+- **Mesoscale** (region): Demographics, economy, culture (differential equations)
+- **Macroscale** (gigasegment): Civilization-level aggregates (statistics)
 
-```
-SimulationController
-├── state: SimulationState
-│   ├── rootTier: AbstractTier
-│   │   ├── population: PopulationStats
-│   │   ├── economy: EconomicState
-│   │   ├── stability: StabilityMetrics
-│   │   ├── tech: TechProgress
-│   │   ├── universities: number
-│   │   ├── scientistPool: Map<tier, count>
-│   │   └── children: AbstractTier[]
-│   ├── tick: number
-│   ├── stats: SimulationStats
-│   └── allEvents: GameEvent[]
-└── renormalizationEngine: RenormalizationEngine
-    ├── summaries: Map<tierId, TierSummary>
-    │   ├── population, birthRate, deathRate
-    │   ├── economy: production, consumption, stockpiles
-    │   ├── belief: byDeity, dominantDeity, temples
-    │   ├── progress: techLevel, universities
-    │   └── preserved: namedNPCs, majorBuildings, events
-    └── activeTiers: Set<tierId>
-```
+**Key Insight**: Individual agent details are *irrelevant noise* at planetary scale. Only aggregates matter. This isn't a limitation—it's physically correct. You can't predict individual atom positions in a gas, only pressure/temperature.
 
----
+### Information Loss is Fundamental
 
-## Performance Considerations
-
-**Optimization strategies:**
-
-1. **Time scaling:** Higher tiers run 10-5,256,000x faster (chunk = 1 sec/tick, gigasegment = 10 years/tick)
-2. **Mode switching:** Inactive tiers use statistical simulation (differential equations), not full ECS
-3. **Lazy summarization:** Summaries generated on-demand, cached indefinitely
-4. **Event pruning:** Only keep last 100 events per tier
-5. **History buffer:** Charts limited to last 100 ticks (circular buffer)
-
-**Query caching:**
+When zooming out, information is *permanently lost*:
 
 ```typescript
-// ❌ BAD: Query children in loop
-for (const tier of allTiers) {
-  const children = tier.children.filter(c => c.mode === 'active'); // Every iteration
-}
+// Chunk tier (ECS): Full detail
+agent.position = { x: 145.3, y: 892.1 };
+agent.beliefs = { wisdom_goddess: 0.75, war_god: 0.15 };
+agent.skills = { farming: 3, combat: 1, magic: 0 };
 
-// ✅ GOOD: Cache query once
-const allTiers = root.getAllDescendants(); // Query once, flattened
-const activeTiers = allTiers.filter(t => t.mode === 'active');
-for (const tier of activeTiers) {
-  // Use cached data
-}
+// Region tier (statistical): Aggregates only
+summary.population = 4_500_000;
+summary.belief.byDeity.get('wisdom_goddess').believers = 2_700_000; // 60%
+summary.demographics.workerDistribution.get('farmers') = 0.55; // 55%
 ```
 
-**Statistical vs. Full Simulation:**
+**You cannot recover** agent position from region summary. This is RG information loss—fundamental, not a bug.
+
+### Hard Steps (Scientist Emergence)
+
+Inspired by condensed matter physics: **Phase transitions require threshold conditions**.
 
 ```typescript
-// ❌ BAD: Run full ECS for all tiers (performance collapse)
-for (const tier of allTiers) {
-  tier.mode = 'active';  // 10,000+ tiers simulating full ECS!
-}
+// You can't skip tiers
+Tier-N scientists require 100× Tier-(N-1) scientists
 
-// ✅ GOOD: Only active tier runs full ECS, rest are statistical
-const currentTier = controller.getTierById(playerFocusId);
-controller.zoomIn(playerFocusId);  // Only this tier active
-// Other tiers: differential equations (cheap)
+// Example: To get 1 tier-100 physicist:
+1 tier-100 = 100 tier-99
+100 tier-99 = 10,000 tier-98
+10,000 tier-98 = 1,000,000 tier-97
+...
+// Total base: ~10^200 tier-1 scientists
+
+// You must build the pyramid slowly
 ```
 
----
+**Why**: Represents knowledge accumulation. You can't discover quantum field theory without classical mechanics first. Tier-100 insights require entire civilizations of supporting infrastructure.
+
+## Integration with Game Mechanics
+
+### ECS Integration (Chunk Tier)
+
+```typescript
+// When zooming into chunk tier, use constraints to spawn ECS entities
+const constraints = controller.zoomIn('chunk_0');
+
+// Spawn agents matching belief distribution
+for (const [deityId, believerCount] of constraints.beliefDistribution) {
+  const agentsToSpawn = Math.floor(believerCount / constraints.targetPopulation * 200);
+
+  for (let i = 0; i < agentsToSpawn; i++) {
+    const agent = world.createEntity();
+    agent.addComponent({ type: 'position', x: random(), y: random() });
+    agent.addComponent({
+      type: 'belief',
+      deity: deityId,
+      faith: 0.7 + random() * 0.3
+    });
+    agent.addComponent({
+      type: 'skills',
+      levels: generateSkills(constraints.avgSkillLevel)
+    });
+  }
+}
+```
+
+### Divinity System Integration
+
+```typescript
+// Deity gains power from tier-aggregate belief
+const gigasegSummary = controller.getTierSummary('gigaseg_0');
+const belief = gigasegSummary.belief.byDeity.get('wisdom_goddess');
+
+deity.power = belief.believers / 1_000_000; // 1 power per million believers
+deity.influence = belief.faithDensity;      // 0-1 based on density
+
+// Miracles affect statistical simulation
+deity.performMiracle('gigaseg_0');
+controller.recordMiracle('gigaseg_0', deity.id);
+
+// Increases belief spread rate in that tier
+summary.belief.byDeity.get(deity.id).recentMiracles++;
+```
+
+### Multiverse Integration
+
+```typescript
+// Each universe fork has independent hierarchy
+const mainTimeline = controller.getState().rootTier;
+const branchTimeline = mainTimeline.clone();
+
+// Simulate both at different speeds
+controller.setSpeed(10);  // Main timeline 10x
+branchController.setSpeed(1000); // Branch 1000x (fast-forward)
+
+// Compare outcomes after 1000 years
+const mainSummary = controller.getTierSummary(mainTimeline.id);
+const branchSummary = branchController.getTierSummary(branchTimeline.id);
+
+if (branchSummary.population.total < mainSummary.population.total * 0.5) {
+  console.log('Branch timeline collapsed');
+  rejectBranch(branchTimeline);
+}
+```
+
+### Magic System Integration
+
+```typescript
+// High-tier magic requires high-tier scientists
+const tier100Mages = tier.scientistPool.get(100) || 0;
+
+if (tier100Mages >= 10) {
+  // Unlock reality manipulation
+  enableMagicParadigm('reality_manipulation');
+
+  // Tier-10 research paper
+  const paper = {
+    title: 'Ontological Engineering in Post-Singularity Contexts',
+    tier: 10,
+    field: 'reality_manipulation',
+    requiredSpecialists: { 100: 10000 },
+    estimatedYears: 100000
+  };
+}
+```
 
 ## Troubleshooting
 
-### Population growing exponentially
+### Population Becomes NaN/Infinity
 
-**Check:**
-1. Carrying capacity configured? (`tier.population.carryingCapacity`)
-2. Logistic growth enabled? (see `AbstractTierBase.updateAbstract()`)
-3. Resource constraints applied? (food shortages reduce capacity)
+**Symptom**: `summary.population = NaN` or `Infinity`
 
-**Debug:**
+**Cause**: Division by zero in logistic growth when `carryingCapacity = 0`
+
+**Fix**: Enforced in `AbstractTierBase.updateAbstract()`:
 ```typescript
-const tier = controller.getTierById('region_42');
-console.log(`Population: ${tier.population.total}`);
-console.log(`Carrying capacity: ${tier.population.carryingCapacity}`);
-console.log(`Growth rate: ${tier.population.growth}`);
+if (this.population.carryingCapacity <= 0) {
+  const scale = TIER_SCALES[this.tier];
+  this.population.carryingCapacity = scale.populationRange[1];
+}
 
-// Check pressure
-const pressure = tier.population.total / tier.population.carryingCapacity;
-console.log(`Pressure: ${pressure} (should be < 1.0)`);
+if (!isFinite(this.population.total)) {
+  this.population.total = scale.populationRange[0];
+  this.population.growth = 0;
+}
 ```
 
-### Scientists not emerging
+### Tier Simulation Too Fast/Slow
 
-**Check:**
-1. Population high enough? (Tier-100 needs ~1 trillion)
-2. Universities sufficient? (Tier-100 needs 100+ tier-8 universities)
-3. Stability years? (Tier-100 needs 200+ years at >80%)
-4. Active research at similar tier? (Need tier-90+ papers for tier-100)
+**Symptom**: Region advances too quickly, or gigasegment barely changes
 
-**Debug:**
+**Cause**: Incorrect time scale or speed multiplier
+
+**Fix**: Check time scales in `TierConstants.ts`:
 ```typescript
-const summary = controller.getTierSummary('megasegment_5');
-console.log(`Population: ${summary.population}`);
-console.log(`Universities: ${summary.progress.universities}`);
-console.log(`Simulated years: ${summary.simulatedYears}`);
-console.log(`Stability overall: ${summary.stability.overall}`);
+const timeScale = controller.getTimeScale('region'); // Should be 1440 (1 day/tick)
+controller.setSpeed(10); // 10x speed = 10 days/second at region tier
+```
 
-// Calculate emergence rates
-const emergence = new ScientistEmergenceSystem();
+### Scientists Never Emerge
+
+**Symptom**: `attemptEmergence()` always returns null
+
+**Cause**: Insufficient infrastructure or stability
+
+**Debug**:
+```typescript
 const rates = emergence.calculateEmergenceRates('physics', conditions);
-const tier100 = rates.find(r => r.tier === 100);
-console.log(`Tier-100 expected years: ${tier100.expectedYears}`);
+console.log(rates);
+// [{ tier: 80, probabilityPerYear: 0.00000001, expectedYears: 100000000 }]
+//  ^^^ Probability too low
+
+// Increase infrastructure:
+// - Add more universities
+// - Increase stability years
+// - Add research guilds
+// - Increase population
 ```
 
-### Tier summaries not updating
+**Expected**: Tier-100 emergence requires *millions of years* with ideal conditions. This is intentional.
 
-**Check:**
-1. Tier deactivated? (summaries only update for inactive tiers via `simulateTier()`)
-2. Engine calling `simulateTier()`? (automatic for deactivated tiers)
-3. Time scale correct? (abstract tiers run at 0.1x speed)
+### Belief Doesn't Spread
 
-**Debug:**
+**Symptom**: `summary.belief.totalBelievers` stays at 0
+
+**Cause**: No temples or miracles to seed belief
+
+**Fix**:
 ```typescript
-const engine = controller.getRenormalizationEngine();
-const isActive = engine.isTierActive('region_42');
-console.log(`Tier active: ${isActive}`);
+// Add initial temples
+controller.addTemple('gigaseg_0', 'wisdom_goddess');
 
-const summary = engine.getSummary('region_42');
-console.log(`Last updated: ${summary.lastUpdated}`);
-console.log(`Simulated years: ${summary.simulatedYears}`);
+// Perform miracles to boost spread
+controller.recordMiracle('gigaseg_0', 'wisdom_goddess');
 
-// Manually simulate
-engine.simulateTier('region_42', 1.0);  // Force update
+// Check belief spread parameters in TierConstants.ts:
+BELIEF_CONSTANTS.WORD_OF_MOUTH_RATE;  // 0.0001 (spread rate)
+BELIEF_CONSTANTS.TEMPLE_BONUS;        // 10 believers/temple/tick
+BELIEF_CONSTANTS.MIRACLE_BONUS;       // 100 believers/miracle
 ```
 
-### Zoom in/out not working
+### Simulation Pauses Unexpectedly
 
-**Error:** `Cannot zoom into active tier` or `Cannot zoom out of abstract tier`
+**Symptom**: `controller.getState().running = false`
 
-**Fix:** Check current mode before zooming:
+**Cause**: Manual pause or error in update loop
 
+**Fix**:
 ```typescript
-const tier = controller.getTierById('region_42');
+// Resume simulation
+controller.togglePause();
 
-// Zoom out (must be active or semi-active)
-if (tier.mode !== 'abstract') {
-  controller.zoomOut('region_42');
-}
-
-// Zoom in (must be abstract)
-if (tier.mode === 'abstract') {
-  controller.zoomIn('region_42');
-}
+// Check for errors in console
+// Errors in tier.update() will stop the loop
 ```
 
-### NaN or Infinity in economy
+### Memory Leak (Too Many Tiers)
 
-**Error:** Stockpiles become NaN or Infinity
+**Symptom**: Browser slows down after hours of simulation
 
-**Fix:** Validation checks in `AbstractTierBase.updateAbstract()`:
+**Cause**: Event history or summaries not trimmed
 
+**Fix**: Events auto-trim to 100 per tier:
 ```typescript
-// Check stockpiles
-for (const [resource, stock] of tier.economy.stockpiles) {
-  if (!isFinite(stock)) {
-    console.error(`Invalid stockpile for ${resource}: ${stock}`);
-    // Reset to baseline
-    const baseProduction = tier.economy.production.get(resource) || 0;
-    tier.economy.stockpiles.set(resource, baseProduction * 100);
-  }
-}
-
-// Check carrying capacity
-if (tier.population.carryingCapacity <= 0 || !isFinite(tier.population.carryingCapacity)) {
-  const scale = TIER_SCALES[tier.tier];
-  tier.population.carryingCapacity = scale.populationRange[1];
+// In RenormalizationEngine.rollRandomEvents():
+if (summary.preserved.historicalEvents.length > 50) {
+  summary.preserved.historicalEvents.shift();
 }
 ```
+
+### Trade Routes Don't Form
+
+**Symptom**: `tier.tradeRoutes.length = 0` despite imbalances
+
+**Cause**: Auto-stabilizer only runs for tiers with children
+
+**Fix**: Ensure hierarchy has at least 2 children:
+```typescript
+// In AbstractTierBase.autoFormTradeRoutes():
+if (this.children.length < 2) return; // Need siblings to trade
+
+// Generate more children:
+const generator = new DataGenerator();
+const hierarchy = generator.generateHierarchy(5); // Depth 5 ensures children
+```
+
+## Performance Notes
+
+- **O(1) per tier** for statistical simulation (not O(N) per agent)
+- **~100 tiers** can be simulated at 60 FPS
+- **Memory**: ~10 KB per tier summary, ~100 KB per active tier
+- **Bottleneck**: Full ECS at chunk tier (use SimulationScheduler to cull entities)
+
+## Philosophy
+
+This package demonstrates that **game simulation can learn from physics**:
+
+1. **Scale Separation**: Different physics at different scales
+2. **Emergence**: Large-scale behavior ≠ sum of parts
+3. **Information Loss**: Can't recover microscopic details from macroscopic state
+4. **Statistical Mechanics**: Large populations → deterministic aggregates
+5. **Fixed Points**: Stable patterns emerge across scales (logistic growth, power laws)
+
+The hierarchy simulator isn't an approximation—it's the *correct* way to simulate multi-scale systems. Just as thermodynamics doesn't track individual atoms, civilization simulators shouldn't track individual agents at cosmic scales.
 
 ---
 
-## Integration with Other Systems
-
-### ECS Integration (Chunk-Level)
-
-When a tier is zoomed to `chunk` level and set to `active` mode:
-
-```typescript
-// Generate ECS entities from constraints
-const constraints = controller.zoomIn('chunk_32_45');
-
-// Create agents matching constraints
-for (let i = 0; i < constraints.targetPopulation; i++) {
-  const agent = world.createEntity();
-
-  // Assign belief based on distribution
-  const deity = selectDeityByDistribution(constraints.beliefDistribution);
-  agent.addComponent({ type: 'divine_belief', deityId: deity });
-
-  // Assign skills based on tech level
-  const skillLevel = constraints.avgSkillLevel;
-  agent.addComponent({ type: 'skills', levels: { farming: skillLevel } });
-}
-
-// Restore named NPCs as special entities
-for (const npc of constraints.namedNPCs) {
-  const entity = createNamedNPC(npc);
-  world.addEntity(entity);
-}
-```
-
-### Belief System
-
-Hierarchies track deity belief at every tier:
-
-```typescript
-// Belief spreads via differential equations at abstract tiers
-summary.belief = {
-  totalBelievers: 500_000_000,
-  beliefDensity: 0.7,  // 70% believers
-  byDeity: Map {
-    'wisdom_goddess' => {
-      deityId: 'wisdom_goddess',
-      deityName: 'Goddess of Wisdom',
-      believers: 300_000_000,
-      temples: 50,
-      recentMiracles: 2,
-      faithDensity: 0.42
-    }
-  },
-  dominantDeity: 'wisdom_goddess'
-};
-
-// When zooming in, constraints preserve belief distribution
-constraints.beliefDistribution = Map {
-  'wisdom_goddess' => 300_000_000,
-  'war_god' => 200_000_000
-};
-```
-
-### Research System
-
-Research infrastructure emerges at scale:
-
-```typescript
-// Universities scale with population and tech
-tier.universities = 150;  // 150 universities at megasegment
-
-// Scientist pool follows HARD STEPS model
-tier.scientistPool = Map {
-  1 => 1_000_000,    // 1M tier-1 scientists
-  2 => 10_000,       // Need 100x tier-1 for tier-2
-  3 => 100,          // Need 100x tier-2 for tier-3
-  4 => 1             // Need 100x tier-3 for tier-4
-};
-
-// Tier-N requires 100× tier-(N-1)
-// Cannot skip tiers - must build research ladder
-```
-
----
-
-## Testing
-
-Run tests:
-
-```bash
-npm test -- SimulationController.test.ts
-npm test -- RenormalizationEngine.test.ts
-npm test -- TierConstants.test.ts
-```
-
-**Key test files:**
-- `src/simulation/__tests__/SimulationController.test.ts`
-- `src/renormalization/__tests__/RenormalizationEngine.test.ts`
-- `src/renormalization/__tests__/TierConstants.test.ts`
-
----
-
-## Running the Standalone Simulator
-
-The hierarchy simulator includes a standalone web UI for testing and visualization:
-
-```bash
-cd custom_game_engine/packages/hierarchy-simulator
-npm install
-npm run dev
-```
-
-Opens on **http://localhost:3031**
-
-**Features:**
-- Interactive hierarchy tree (click nodes to expand)
-- Real-time population/economy graphs
-- Speed controls (1x, 10x, 100x)
-- Pause/resume/reset controls
-
----
-
-## Further Reading
-
-- **SYSTEMS_CATALOG.md** - Complete system reference
-- **METASYSTEMS_GUIDE.md** - Multi-scale metasystem architecture
-- **src/research/README.md** - Research system deep dive
-- **Renormalization Group Theory** - Physics basis for multi-scale simulation
-- **Logistic Growth Model** - Population dynamics reference
-
----
-
-## Summary for Language Models
-
-**Before working with hierarchy simulator:**
-1. Understand 7-tier scale ladder (tile → chunk → zone → region → subsection → megasegment → gigasegment)
-2. Know renormalization mechanics (zoom out = summarize, zoom in = instantiate)
-3. Understand time scaling (higher tiers = faster simulation)
-4. Know scientist emergence system (statistical, condition-based)
-5. Understand conservation across zoom (named NPCs, buildings, events preserved)
-
-**Common tasks:**
-- **Create hierarchy:** `new SimulationController(hierarchyDepth)`
-- **Zoom out:** `controller.zoomOut(tierId)` → returns `TierSummary`
-- **Zoom in:** `controller.zoomIn(tierId)` → returns `InstantiationConstraints`
-- **Access tier:** `controller.getTierById(tierId)` or `tier.children[index]`
-- **Check mode:** `tier.mode` → 'abstract' | 'semi-active' | 'active'
-- **Simulate statistically:** `renormalizationEngine.simulateTier(tierId, deltaTicks)`
-- **Track scientists:** `ScientistEmergenceSystem.calculateEmergenceRates()`
-
-**Critical rules:**
-- Only `chunk` tier supports full ECS (`mode = 'active'`)
-- Higher tiers MUST use abstract or semi-active mode (performance)
-- Summaries cached indefinitely - call `summarize()` to update
-- Time scale varies by tier (gigasegment = 10 years/tick)
-- Scientists emerge statistically - cannot spawn directly
-- Tier-N scientists require 100× tier-(N-1) (hard ladder)
-- Named NPCs, buildings, events preserved across zoom
-- Belief tracks per-deity stats at every tier
-
-**Event-driven architecture:**
-- Listen to tier events: `'tech_breakthrough'`, `'population_boom'`, `'natural_disaster'`
-- Emit events when zooming: `'tier:zoomed_out'`, `'tier:zoomed_in'`
-- Statistical simulation runs differential equations (no events)
-- Events pruned to last 100 per tier (prevent memory bloat)
-
-**Multi-scale philosophy:**
-- Simulate the SCALE you care about, abstract everything else
-- Zoom determines detail level (not data deletion - renormalization preserves)
-- Time flows faster at higher scales (cosmic perspective)
-- Social hierarchies emerge from population dynamics
-- Research ladder prevents instant tier-100 scientists (must build infrastructure)
+**See Also**:
+- [ARCHITECTURE_OVERVIEW.md](../ARCHITECTURE_OVERVIEW.md) - ECS, packages, metasystems, data flow
+- [METASYSTEMS_GUIDE.md](../METASYSTEMS_GUIDE.md) - Consciousness, Divinity, Reproduction, Multiverse, Magic, Realms
+- [SYSTEMS_CATALOG.md](../SYSTEMS_CATALOG.md) - 212+ systems with priorities, components, locations

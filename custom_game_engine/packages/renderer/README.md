@@ -184,7 +184,86 @@ class Renderer {
 }
 ```
 
-### 2. Camera & Viewport System
+### 2. 3D Renderer (Three.js Voxel Engine)
+
+The **Renderer3D** provides a Minecraft-style 3D visualization of the game world using Three.js:
+
+```typescript
+class Renderer3D {
+  // Three.js scene management
+  private scene: THREE.Scene;
+  private camera: THREE.PerspectiveCamera;
+  private renderer: THREE.WebGLRenderer;
+  private controls: PointerLockControls; // First-person camera controls
+
+  // Voxel terrain rendering
+  private terrainGroup: THREE.Group;
+  private blockGeometry: THREE.BoxGeometry;
+  private materials: Map<string, THREE.MeshLambertMaterial>;
+
+  // Billboard sprites for entities
+  private entitySprites: Map<string, THREE.Sprite>;
+  private animalSprites: Map<string, THREE.Sprite>;
+  private plantSprites: Map<string, THREE.Sprite>;
+
+  // Lighting with time-of-day
+  private sunLight: THREE.DirectionalLight;
+  private ambientLight: THREE.AmbientLight;
+}
+```
+
+**Features:**
+
+- **Voxel terrain:** World rendered as colored cubes (grass, dirt, stone, sand, water)
+- **Billboard sprites:** Agents, animals, plants rendered as always-facing-camera sprites
+- **Time-of-day lighting:** Sun position and ambient lighting changes with world time
+- **First-person controls:** WASD + mouse look with pointer lock
+- **Entity selection:** Click entities to select them, shows golden halo above selection
+- **Animated animals:** 8-directional walk animations for species with PixelLab sprites
+- **Building rendering:** Buildings shown as colored boxes scaled by tier
+- **Dynamic fog:** Fog distance adjusts with draw distance setting
+
+**Activation:**
+
+3D mode is activated when camera switches to side-view mode. The 3D canvas is positioned behind the 2D canvas, which becomes transparent and only renders UI.
+
+```typescript
+// Activate 3D renderer
+renderer3D.mount(container);
+renderer3D.activate();
+renderer3D.setWorld(world);
+
+// Position camera in 3D space
+renderer3D.setCameraFromWorld(worldX, worldY, elevation);
+
+// Set draw distance (in tiles)
+renderer3D.setDrawDistance(60); // Default render radius
+```
+
+**Coordinate system:**
+
+- Three.js X = World X
+- Three.js Y = World Z (elevation)
+- Three.js Z = World Y
+
+**Entity rendering:**
+
+Agents use procedural sprites with directional billboards (front, back, left, right) that rotate to face the camera. Animals and plants load textures from `/assets/sprites/pixellab/{species}/`.
+
+**Animation system:**
+
+Animals with walk animations load 8 directions × 8 frames from `/assets/sprites/pixellab/{species}/animations/walking-8-frames/{direction}/frame_000.png`. Frames cycle at 10 FPS when moving.
+
+**Time-of-day lighting:**
+
+Sun angle, color, and intensity change based on world time:
+- Night (0-6, 20-24): Dark blue ambient, minimal sun
+- Dawn/Dusk (6-7, 19-20): Orange sun, warm ambient
+- Day (8-18): White sun, bright ambient
+
+Sky color and fog color sync with lighting.
+
+### 3. Camera & Viewport System
 
 The **Camera** controls what portion of the world is visible:
 
@@ -301,7 +380,133 @@ if (instanceId) {
 }
 ```
 
-### 4. Window Management System
+### 4. Context Menu System
+
+The **radial context menu** provides right-click actions for world entities and tiles:
+
+```typescript
+// Architecture components
+ContextMenuManager      // Orchestrates menu lifecycle, integrates with input
+ContextMenuRenderer     // Renders radial menu with animation
+ContextActionRegistry   // Manages action definitions and execution
+MenuContext            // Builds context from clicked position/entity
+```
+
+**Radial menu architecture:**
+
+The menu displays actions in a circular layout around the click point. Items arranged as arc segments with labels, icons, and shortcuts.
+
+```typescript
+interface RadialMenuItem {
+  id: string;
+  label: string;
+  icon?: string;
+  shortcut?: string;
+  category: string;
+  enabled: boolean;
+  hovered: boolean;
+  hasSubmenu: boolean;
+  // Arc geometry (calculated)
+  startAngle: number;    // Degrees
+  endAngle: number;      // Degrees
+  innerRadius: number;   // Pixels
+  outerRadius: number;   // Pixels
+}
+```
+
+**Action registration:**
+
+Actions define when they're applicable and what they do:
+
+```typescript
+contextRegistry.register({
+  id: 'harvest',
+  label: 'Harvest',
+  icon: 'harvest',
+  shortcut: 'H',
+  category: 'gathering',
+
+  // Applicability check
+  isApplicable: (ctx: MenuContext) => {
+    if (ctx.targetType !== 'resource') return false;
+    const resource = ctx.getTargetEntity(world);
+    const harvestable = resource?.getComponent('harvestable');
+    return harvestable && harvestable.amount > 0;
+  },
+
+  // Execution
+  execute: (ctx, world, eventBus) => {
+    eventBus.emit({
+      type: 'action:harvest',
+      data: { resourceId: ctx.targetEntity }
+    });
+  }
+});
+```
+
+**Menu context building:**
+
+When user right-clicks, system builds context from clicked location:
+
+```typescript
+const context: MenuContext = {
+  worldPosition: { x, y },           // World coordinates
+  screenPosition: { x, y },          // Screen coordinates
+  targetEntity: entityId | null,     // Clicked entity (if any)
+  targetType: 'agent' | 'building' | 'resource' | 'empty_tile',
+  selectedEntities: [...],           // Currently selected entities
+  isWalkable: boolean,
+  isBuildable: boolean,
+  // Helper methods
+  hasSelection(): boolean,
+  getSelectedCount(): number,
+  getTargetEntity(world): Entity | null,
+  getSelectedEntities(world): Entity[]
+};
+```
+
+**Interaction flow:**
+
+1. User right-clicks on world
+2. ContextMenuManager detects right-click, builds MenuContext
+3. Registry filters actions based on `isApplicable(context)`
+4. ContextMenuRenderer calculates arc angles and renders menu
+5. User hovers over items (hit testing via arc geometry)
+6. User clicks item → Registry executes action → Menu closes
+
+**Animation styles:**
+
+Menu supports open/close animations: `'fade'`, `'scale'`, `'rotate_in'`, `'pop'`
+
+**Submenu support:**
+
+Actions can have submenus for hierarchical choices:
+
+```typescript
+{
+  id: 'prioritize',
+  label: 'Prioritize',
+  hasSubmenu: true,
+  submenu: [
+    { id: 'priority_high', label: 'High Priority', ... },
+    { id: 'priority_normal', label: 'Normal Priority', ... },
+    { id: 'priority_low', label: 'Low Priority', ... }
+  ]
+}
+```
+
+**Default actions:**
+
+System registers 30+ default actions across categories:
+- **Movement:** Move Here, Follow, Scatter, Formation
+- **Social:** Talk To, Create Group
+- **Gathering:** Harvest, Assign Worker, Prioritize
+- **Building:** Enter, Repair, Demolish
+- **Construction:** Build (with submenu for categories)
+- **Navigation:** Place Waypoint, Focus Camera
+- **Info:** Inspect, Tile Info
+
+### 5. Window Management System
 
 **WindowManager** manages all UI panels with dragging, resizing, and persistence:
 
@@ -425,7 +630,246 @@ windowManager.showWindow('agent-info'); // May be auto-closed
 - `SettingsPanel` - Game settings
 - `DevPanel` - Developer tools
 
-### 6. Particle Effects
+### 6. Text Rendering & Accessibility
+
+The **TextRenderer** generates prose descriptions of the game world for accessibility and AI context:
+
+```typescript
+class TextRenderer {
+  // Renders world state as text descriptions
+  render(world: World, camera: Camera): TextFrame;
+
+  // Configuration
+  config: {
+    voice: VoiceMode;           // Narrative style
+    maxEntities: number;        // How many entities to describe
+    includeDialogue: boolean;   // Include agent speech
+    includeEvents: boolean;     // Include world events
+  };
+}
+```
+
+**Voice modes:**
+
+- **`'live'`** - Present tense, player perspective ("You see Mira gathering berries")
+- **`'record'`** - Past tense, documentary style ("Mira gathered berries near the river")
+- **`'screen_reader'`** - Accessibility format, ARIA-friendly, structured lists
+- **`'llm_context'`** - Compact format for LLM consumption, technical details
+- **`'text_adventure'`** - Classic interactive fiction style
+
+**Output format:**
+
+```typescript
+interface TextFrame {
+  timestamp: number;
+  worldTick: number;
+  scene: string;              // Main scene description
+  dialogue: DialogueLine[];   // Recent speech
+  events: string[];           // Recent world events
+  inventory: string;          // Player/selected agent inventory
+  stats: string;              // Key statistics
+}
+```
+
+**Scene composition:**
+
+The `SceneComposer` builds descriptions in layers:
+
+1. **Context:** Time of day, weather, location type
+2. **Entities:** Visible agents, animals, buildings (sorted by proximity)
+3. **Actions:** What entities are doing
+4. **Environment:** Terrain features, plants, resources
+
+```typescript
+// Example output (live voice)
+"Day 47, Afternoon. You are in the village square. The weather is clear.
+
+Mira gathers berries to the east (10m). She looks focused.
+A campfire (unlit) stands at the center.
+Three wooden houses line the northern edge.
+
+The air feels cold."
+```
+
+**Accessibility integration:**
+
+Screen reader mode formats output with ARIA landmarks and semantic structure for assistive technology:
+
+```
+REGION: Village Square
+TIME: Day 47, Afternoon, 14:32
+
+AGENTS (3 visible):
+- Mira (East, 10m): gathering berries, focused
+- Kael (North, 15m): crafting at workbench
+- Luna (West, 8m): idle
+
+BUILDINGS (4):
+- Campfire (unlit)
+- Workbench (occupied by Kael)
+- Storage chest (closed)
+```
+
+**LLM context mode:**
+
+Compact technical format for feeding to AI agents:
+
+```
+T47.14:32 LOC:village WEATHER:clear
+AGENTS: Mira@10,23(gather,berries) Kael@8,19(craft,workbench) Luna@12,25(idle)
+BUILDINGS: campfire@11,22(unlit) workbench@8,19(busy) storage@9,20
+TERRAIN: grass(75%) dirt(20%) water(5%)
+```
+
+**Integration with EntityDescriber:**
+
+EntityDescriber generates natural language descriptions for individual entities:
+
+```typescript
+entityDescriber.describe(entity, context) → string
+
+// Examples:
+// "Mira (human, female) - gathering berries, health 95%, carrying 3 items"
+// "Ancient oak tree - 45 years old, provides shade, harvestable"
+// "Workbench (tier 2) - occupied, 80% durability"
+```
+
+### 7. Adapter Pattern
+
+The renderer uses **adapters** to bridge different panel interfaces to the WindowManager:
+
+**ViewAdapter:**
+
+Wraps DashboardView instances from `@ai-village/core` for compatibility with WindowManager:
+
+```typescript
+class ViewAdapter<TData extends ViewData> implements IWindowPanel {
+  constructor(view: DashboardView<TData>);
+
+  // Bridges DashboardView lifecycle
+  render(ctx, x, y, width, height, world) {
+    // 1. Fetch data via view.getData(context)
+    const data = this.view.getData({ world, selectedEntityId });
+
+    // 2. Render via view.canvasRenderer(ctx, data, bounds, theme)
+    this.view.canvasRenderer(ctx, data, { x, y, width, height }, theme);
+  }
+
+  // Forwards interactions
+  handleScroll(deltaY, contentHeight) {
+    return this.view.handleScroll?.(deltaY, contentHeight, viewState);
+  }
+
+  handleContentClick(x, y, width, height) {
+    return this.view.handleClick?.(x, y, bounds, data);
+  }
+}
+```
+
+**PanelAdapter:**
+
+Generic adapter for panels with varying interfaces:
+
+```typescript
+interface PanelConfig<T> {
+  id: string;
+  title: string;
+  defaultWidth: number;
+  defaultHeight: number;
+
+  // Custom render delegation
+  renderMethod?: (panel, ctx, x, y, width, height, world) => void;
+
+  // Optional interaction handlers
+  handleScroll?: (panel, deltaY, contentHeight) => boolean;
+  handleContentClick?: (panel, x, y, width, height) => boolean;
+}
+
+class PanelAdapter<T> implements IWindowPanel {
+  constructor(panel: T, config: PanelConfig<T>);
+}
+```
+
+**Usage example:**
+
+```typescript
+// Adapt ResourcesPanel (has custom render signature)
+const config: PanelConfig<ResourcesPanel> = {
+  id: 'resources',
+  title: 'Village Stockpile',
+  defaultWidth: 280,
+  defaultHeight: 200,
+  renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
+    panel.render(ctx, width, world, false); // Custom signature
+  },
+};
+const adapter = new PanelAdapter(resourcesPanel, config);
+windowManager.registerWindow(adapter.getId(), adapter, config);
+```
+
+**Why adapters?**
+
+Different panel sources have incompatible interfaces:
+- DashboardView (from core): Uses `getData()` + `canvasRenderer()`
+- Legacy panels: Use `render(ctx, width, world, inWindow)`
+- Standard panels: Use `render(ctx, x, y, width, height, world)`
+
+Adapters normalize these into `IWindowPanel` interface for WindowManager.
+
+### 8. Divine UI Components
+
+Rendering integration with the **divinity package** for god-mode gameplay:
+
+**DivineStatusBar:**
+
+Fixed top bar showing divine resources:
+
+```typescript
+class DivineStatusBar {
+  render(ctx, screenWidth, props: {
+    energy: DivineEnergy;        // Current/max divine energy + regen rate
+    averageFaith: number;         // Faith level across all agents
+    prayers: Prayer[];            // Active prayer requests
+    angels: Angel[];              // Angels working on tasks
+    prophecies: Prophecy[];       // Pending prophecies
+  }): void;
+}
+```
+
+Displays:
+- Divine Energy bar (golden)
+- Faith level (colored by intensity)
+- Quick stats (prayer count, angel count, prophecy count)
+
+**Prayer Panels:**
+
+- **PrayerPanel:** Manage incoming prayer requests from agents
+- **AngelManagementPanel:** Assign angels to fulfill prayers
+- **SacredGeographyPanel:** Mark sacred sites and manage divine influence zones
+
+**Divine Indicators:**
+
+- **PrayingAgentIndicators:** Renders prayer icons above agents during prayer
+- **FloatingPrayerNotifications:** Shows answered prayer notifications with sparkle effects
+- **DivineActionsPalette:** Quick-access palette for common divine actions
+
+**Integration pattern:**
+
+Divine panels follow adapter pattern for WindowManager integration:
+
+```typescript
+const prayerPanelAdapter = new PanelAdapter(prayerPanel, {
+  id: 'divine_prayers',
+  title: 'Prayers',
+  defaultWidth: 400,
+  defaultHeight: 500,
+  menuCategory: 'divine',
+});
+```
+
+Divine status bar renders independently on top of game canvas before UI panels.
+
+### 9. Particle Effects
 
 **ParticleRenderer** creates visual feedback effects:
 
@@ -460,37 +904,166 @@ particleRenderer.createDustCloud(tileX, tileY, 12);
 particleRenderer.render(ctx, camera, performance.now());
 ```
 
-### 7. Overlay Renderers
+### 10. Specialized Renderers
 
-**Specialized renderers for entity overlays:**
+The renderer package includes **specialized rendering modules** for different entity types and production quality:
+
+**Production Renderers:**
+
+- **ProductionRenderer:** High-quality character rendering for TV shows, movies, gladiator arenas
+  - Quality levels: Broadcast (128px), Premium (256px), Cinematic (512px), Ultra (1024px+)
+  - Render formats: sprite, portrait, action, scene
+  - Costuming system: peasant, noble, gladiator, custom
+  - Equipment specs: weapons, shields, props with placement
+  - Animation support: idle, walking, fighting, speaking sequences
+
+```typescript
+const renderRequest: RenderRequest = {
+  entityId: 'agent_123',
+  qualityLevel: QualityLevel.Cinematic,
+  format: 'portrait',
+  costume: { costumeType: 'gladiator', accessories: ['helmet', 'sword'] },
+  pose: 'dramatic',
+  expression: 'determined',
+  lighting: 'dramatic',
+  purpose: 'tv_episode_intro',
+};
+productionRenderer.queueRender(renderRequest);
+```
+
+- **CombatAnimator:** Advanced combat animation system with hit reactions, dodge rolls, parries
+- **SoulSpriteRenderer:** Visualizes souls and spirits with ethereal effects
+
+**Terrain Renderers:**
+
+- **TerrainRenderer:** Top-down chunk-based terrain rendering
+  - Renders terrain tiles with biome colors
+  - Tilled soil indicator (dark brown with furrows)
+  - Wall rendering (stone blocks)
+  - Temperature overlay visualization
+
+- **SideViewTerrainRenderer:** 2.5D side-scrolling terrain with parallax layers
+  - Background, midground, foreground layers
+  - Parallax scrolling effect
+  - Elevation-based depth
+
+**Entity Renderers:**
+
+- **AgentRenderer:** Human and agent character rendering
+  - PixelLab sprite integration (8 directions)
+  - Animation state management (idle, walk, run, action)
+  - Equipment layering (weapons, armor, accessories)
+
+- **AnimalRenderer:** Animal creature rendering
+  - Species-specific sprites
+  - 8-directional movement with automatic direction calculation
+  - Walk cycle animations (8 frames @ 10 FPS)
+  - Size scaling based on species
+
+- **BuildingRenderer:** Structure rendering for placed buildings
+  - Construction progress visualization
+  - Multi-tile building support
+  - Tier-based visual upgrades
+
+**Integration:**
+
+These renderers are used by the main `Renderer.ts` which orchestrates:
+
+```typescript
+// Renderer.ts delegates to specialized renderers
+this.terrainRenderer.renderChunk(chunk, camera);
+this.agentRenderer.renderAgent(agent, camera);
+this.animalRenderer.renderAnimal(animal, camera);
+this.buildingRenderer.renderBuilding(building, camera);
+```
+
+### 11. Overlay Renderers
+
+**Specialized renderers for entity overlays and indicators:**
 
 **HealthBarRenderer:**
 ```typescript
 // Render health bar above entity
 healthBarRenderer.render(ctx, entity, screenX, screenY);
-// Green bar that depletes as health decreases
+// Green bar (100% health) → yellow (50%) → red (0%)
+// Shows background bar + foreground fill + border
 ```
 
 **SpeechBubbleRenderer:**
 ```typescript
-// Show agent speech
-speechBubbleRenderer.addSpeech(entityId, "Hello!", 3000); // 3 second duration
+// Show agent speech with word-wrap and timing
+speechBubbleRenderer.addSpeech(entityId, "Hello, traveler!", 3000); // 3 second duration
 speechBubbleRenderer.render(ctx, camera, world);
+// Renders rounded rectangle bubble above agent with tail pointer
 ```
 
 **FloatingTextRenderer:**
 ```typescript
-// Show damage/XP numbers
-floatingTextRenderer.addText(worldX, worldY, "-15", 'red'); // Damage
-floatingTextRenderer.addText(worldX, worldY, "+50 XP", 'gold'); // XP gain
+// Show damage/XP/status numbers that float upward and fade
+floatingTextRenderer.addText(worldX, worldY, "-15", 'red');      // Damage
+floatingTextRenderer.addText(worldX, worldY, "+50 XP", 'gold');  // XP gain
+floatingTextRenderer.addText(worldX, worldY, "CRIT!", 'orange'); // Status
 floatingTextRenderer.render(ctx, camera, currentTime);
+// Text floats upward with alpha fade over 1.5 seconds
 ```
 
 **ThreatIndicatorRenderer:**
 ```typescript
-// Show threat indicators in combat
+// Show combat threat rings around entities
 threatIndicatorRenderer.render(ctx, camera, world);
-// Red circles around enemies, blue around allies
+// Red circles around hostile entities
+// Blue circles around friendly entities
+// Orange circles around neutral-but-dangerous entities
+// Circle size pulses to draw attention
+```
+
+**BedOwnershipRenderer:**
+```typescript
+// Show ownership markers on claimed beds
+bedOwnershipRenderer.render(ctx, camera, world);
+// Renders house icon (🏠) + owner's name initial above bed
+// Only for claimed beds (not communal)
+```
+
+**DebugOverlay:**
+```typescript
+// Development overlay showing entity IDs, positions, component counts
+debugOverlay.render(ctx, camera, world, showEntityIds, showPositions);
+```
+
+**InteractionOverlay:**
+```typescript
+// Shows interaction prompts when player is near interactive entities
+// "Press E to harvest" / "Press F to enter building"
+interactionOverlay.render(ctx, camera, world, playerEntity);
+```
+
+**GhostPreview:**
+```typescript
+// Shows translucent preview of building placement
+ghostPreview.render(ctx, camera, buildingType, position, isValidPlacement);
+// Green tint if valid, red tint if invalid
+```
+
+**Rendering order:**
+
+Overlays render after all world entities to appear on top:
+
+```
+1. Terrain
+2. Buildings
+3. Entities
+4. Particles
+5. Overlays: ↓
+   - Health bars
+   - Speech bubbles
+   - Floating text
+   - Threat indicators
+   - Bed ownership markers
+   - Debug overlay
+   - Interaction prompts
+   - Ghost preview
+6. UI Panels
 ```
 
 ---
@@ -1364,17 +1937,29 @@ npm test -- PixelLabSpriteLoader.test.ts
 **Before working with renderer:**
 1. Read this README completely
 2. Understand rendering pipeline (terrain → entities → particles → overlays → UI)
-3. Know camera/viewport system (culling, coordinate conversion)
-4. Understand PixelLab sprite system (8 directions, animations, caching)
-5. Know window management system (dragging, resizing, LRU, persistence)
+3. Know the **3 rendering modes**: 2D top-down (Canvas 2D), 3D voxel (Three.js), Text (accessibility)
+4. Understand camera/viewport system (culling, coordinate conversion, view modes)
+5. Know PixelLab sprite system (8 directions, animations, caching)
+6. Understand window management (dragging, resizing, LRU, persistence)
+7. Know context menu system (radial menu, action registry, MenuContext)
+8. Understand adapter pattern (ViewAdapter, PanelAdapter for interface bridging)
+
+**Rendering modes:**
+- **2D Canvas:** Primary mode - top-down sprites on HTML5 canvas
+- **3D Voxel:** Three.js voxel world with billboard sprites, activated in side-view mode
+- **Text:** Accessibility mode - prose descriptions with multiple voice modes
 
 **Common tasks:**
-- **Create UI panel:** Implement `IWindowPanel`, register with `WindowManager`
+- **Create UI panel:** Implement `IWindowPanel` OR use `PanelAdapter` with config, register with `WindowManager`
+- **Adapt DashboardView:** Use `ViewAdapter` to bridge core views to WindowManager
 - **Render entity overlay:** Query entities, convert to screen coords, draw on canvas
 - **Load sprite:** Use `findSprite()` + `getPixelLabSpriteLoader().loadSprite()`
 - **Add particle effect:** Call `particleRenderer.createDustCloud(x, y, count)`
 - **Control camera:** Use `camera.centerOn()`, `camera.setZoom()`, `camera.setViewMode()`
 - **Show floating text:** Call `floatingTextRenderer.addText(x, y, text, color)`
+- **Register context action:** Call `contextRegistry.register({ id, label, isApplicable, execute })`
+- **Generate text description:** Use `textRenderer.render(world, camera)` for accessibility
+- **Activate 3D mode:** Call `renderer3D.activate()` when switching to side-view
 
 **Critical rules:**
 - Always cull entities outside viewport (use `camera.isVisible()`)
@@ -1383,12 +1968,15 @@ npm test -- PixelLabSpriteLoader.test.ts
 - Use world coordinates for entities, screen coordinates for rendering
 - Handle cleanup in `IWindowPanel.cleanup()` (remove event listeners)
 - Never modify camera state from panels (panels are pure view)
+- Use adapters for interface compatibility (don't rewrite panel interfaces)
+- Context actions must define `isApplicable` and `execute` (no silent failures)
 
 **Event-driven architecture:**
 - Listen to `action:*` events for visual feedback (particles, floating text)
 - Emit events when UI state changes (`window:opened`, `window:closed`)
 - Never bypass WindowManager for panel visibility (use `showWindow()/hideWindow()`)
 - Use camera events for viewport changes (`camera:moved`, `camera:zoomed`)
+- Context menu actions emit events for game systems to handle
 
 **Performance critical paths:**
 - Viewport culling (only render visible entities)
@@ -1396,3 +1984,13 @@ npm test -- PixelLabSpriteLoader.test.ts
 - Chunk lazy loading (only generate visible chunks)
 - Entity depth sorting (once per frame, not per entity)
 - Particle pooling (reuse particle objects)
+- 3D voxel culling (render radius limits terrain generation)
+
+**New in this documentation:**
+- **3D Renderer (§2):** Three.js voxel engine, billboard sprites, time-of-day lighting
+- **Context Menu System (§4):** Radial menu, action registry, MenuContext building
+- **Text Rendering (§6):** 5 voice modes, accessibility, LLM context, prose generation
+- **Adapter Pattern (§7):** ViewAdapter and PanelAdapter for interface bridging
+- **Divine UI (§8):** God-mode panels, prayer system, divine status bar
+- **Specialized Renderers (§10):** Production, terrain, entity-specific renderers
+- **Overlay Renderers (§11):** Expanded coverage of all overlay types

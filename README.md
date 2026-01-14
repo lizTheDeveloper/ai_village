@@ -1,5 +1,7 @@
 # Multiverse: The End of Eternity
 
+## 🔥 Release: "Turnin' Up the Heat" 🔥
+
 An open-source simulation game where AI agents live, work, and build communities together.
 
 ---
@@ -78,18 +80,33 @@ You'll eventually have a **pawn** - a character you control - who lives alongsid
 - **Fluid Dynamics** - Realistic water currents, swimming mechanics, and drowning simulation
 - **Fire Propagation** - Material-based fire spread with wind effects, fuel consumption, and extinguishing mechanics
 - **Temperature Simulation** - Heat and cold affecting agent behavior and survival
+- **Biome Transitions** - Smooth terrain blending between biomes with gradient-based mixing
 
-#### Magic Systems
+#### Magic & Divine Systems
 - **25+ Magic Paradigms** - From Shinto spirit magic to Allomancy to Sympathy
 - **Skill Tree Progression** - Visual skill trees with XP-based unlocking
 - **Composable Spells** - Verb/noun spell composition (inspired by Ars Magica)
 - **LLM-Generated Effects** - Novel magic validated through simulation testing
+- **Divinity Systems** - Gods, temples, prayers, miracles, divine intervention, and theology
+- **Belief & Faith** - Agent belief systems, religious conversion, and divine power accumulation
+
+#### Life & Consciousness
+- **Reproduction & Genetics** - Courtship, pregnancy, midwifery, family relationships, and trait inheritance
+- **Realms & Afterlife** - Underworld, judgment, reincarnation, and soul progression
+- **Consciousness** - Hive minds, pack minds, and emergent collective intelligence
+- **Soul System** - Souls persist across incarnations with memory bleeds and past-life connections
+
+#### Automation & Infrastructure
+- **Power Grids** - Energy generation, distribution, and consumption
+- **Conveyor Belts** - Item transport and logistics
+- **Assembly Machines** - Automated crafting and production chains
+- **Factories** - Complete automation systems for resource processing
 
 #### Simulation Depth
 - **Multiverse Architecture** - Fork universes to test "what if" scenarios
 - **Material Properties** - Not just item types, but how materials burn, conduct heat, and interact
 - **Genetic Systems** - Plant genetics, animal breeding, and trait inheritance
-- **Deep Simulation** - 212+ systems modeling everything from soil pH to divine intervention
+- **Deep Simulation** - 211+ systems modeling everything from soil pH to divine intervention
 
 #### World & Content
 - **Procedural Generation** - Biome-based terrain with smooth transitions
@@ -104,39 +121,46 @@ You'll eventually have a **pawn** - a character you control - who lives alongsid
 ```bash
 # Clone the repository
 git clone https://github.com/[your-org]/ai_village.git
-cd ai_village
+cd ai_village/custom_game_engine
 
 # Install dependencies
-cd custom_game_engine
 npm install
 
-# Build
-npm run build
+# Start the game (launches metrics, orchestration, game server, and browser)
+./start.sh
 
-# Run the game
-cd demo
-npm run dev
+# Or just start backend services
+./start.sh server
+
+# Stop all services
+./start.sh kill
 ```
 
-Then open http://localhost:3000
+Then open http://localhost:3000 (or it will open automatically with `./start.sh`)
 
-See [custom_game_engine/README.md](./custom_game_engine/README.md) for detailed setup instructions.
+See [CLAUDE.md](./CLAUDE.md) for comprehensive development guidelines and [custom_game_engine/README.md](./custom_game_engine/README.md) for detailed setup instructions.
 
 ---
 
 ## Recent Updates (January 2026)
 
-### Ocean Life & Aquatic Systems
+### Comprehensive Documentation (Jan 2026)
+Complete architecture documentation for all 211 systems and 19 packages, including detailed guides for ECS architecture, metasystems, components, and performance optimization. LLM context optimized for development efficiency.
+
+### Ocean Life & Aquatic Systems (Jan 13)
 Complete ocean ecosystem with depth-based creature spawning, bioluminescent species, swimming mechanics, and fluid dynamics. Agents can now explore underwater environments, manage oxygen, and interact with 15+ aquatic species across multiple ocean biomes.
 
-### Fire & Environmental Hazards
+### Fire & Environmental Hazards (Jan 13)
 Realistic fire propagation system with material-based burn rates, wind effects, and fuel consumption. Buildings can catch fire and spread to neighbors. Includes firefighting mechanics and building repair systems.
 
-### Magic Skill Tree UI
+### Magic Skill Tree Improvements (Jan 13)
 Polished visual skill tree interface with improved tooltips, node rendering, and unlock feedback. Players can see clear progression paths through 25+ magic paradigms with XP costs and prerequisites.
 
-### Fluid Dynamics
-Complete fluid simulation system modeling ocean currents, water pressure, and flow dynamics. Affects swimming entities and floating objects with realistic drift mechanics.
+### Biome Transitions & Terrain (Jan 12)
+Smooth biome transition zones with gradient-based terrain mixing, improved spawn coordinate handling, and test infrastructure enhancements.
+
+### Soul Reincarnation System (Jan 5)
+Conservation of Game Matter implementation - souls never deleted, persist forever across incarnations. Veil of Forgetting system with memory bleeds (dreams, déjà vu, flashbacks) creating multi-lifetime storylines.
 
 See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for detailed changelog.
 
@@ -156,14 +180,42 @@ Key principles:
 
 ## Architecture
 
-Multiverse: The End of Eternity is built on an Entity-Component-System (ECS) architecture with:
+Multiverse: The End of Eternity is built on an Entity-Component-System (ECS) architecture with 19 specialized packages:
 
-- **@ai-village/core** - Game engine, ECS, events, actions
-- **@ai-village/renderer** - 2D canvas rendering, UI
-- **@ai-village/llm** - LLM integration for agent decisions
-- **@ai-village/world** - Terrain, entities, world generation
+### Core Packages
+- **@ai-village/core** - Game engine, ECS framework, events, actions, and admin systems
+- **@ai-village/world** - Terrain generation, chunks, tiles, and world management
+- **@ai-village/persistence** - Save/load system, time travel, and snapshot management
 
-See the [architecture documentation](./custom_game_engine/architecture/) for details.
+### Gameplay Packages
+- **@ai-village/botany** - Plant genetics, growth systems, and wild flora
+- **@ai-village/environment** - Weather, temperature, soil chemistry, and environmental systems
+- **@ai-village/navigation** - Pathfinding and movement systems
+- **@ai-village/reproduction** - Courtship, pregnancy, genetics, and family relationships
+- **@ai-village/building-designer** - Voxel building construction and blueprints
+
+### Advanced Systems
+- **@ai-village/divinity** - Gods, temples, prayers, miracles, and theology (25+ systems)
+- **@ai-village/magic** - 25+ magic paradigms, skill trees, and spell composition
+- **@ai-village/hierarchy-simulator** - Renormalization group and hierarchical simulation
+
+### AI/LLM Integration
+- **@ai-village/llm** - LLM providers, routing, cost tracking, and agent decision-making
+- **@ai-village/introspection** - Schema generation, mutations, and system introspection
+
+### Rendering & UI
+- **@ai-village/renderer** - 2D canvas rendering, 40+ UI panels, and sprite management
+- **@ai-village/deterministic-sprite-generator** - Procedural sprite generation from entity traits
+
+### Infrastructure
+- **@ai-village/metrics** - Performance metrics, entity tracking, and analytics
+- **@ai-village/metrics-dashboard** - Web dashboard for metrics visualization
+- **@ai-village/shared-worker** - Web workers for background processing
+
+### Demo & Testing
+- **@ai-village/city-simulator** - Headless simulation testing and benchmarking
+
+See [ARCHITECTURE_OVERVIEW.md](./custom_game_engine/ARCHITECTURE_OVERVIEW.md), [SYSTEMS_CATALOG.md](./custom_game_engine/SYSTEMS_CATALOG.md), and [COMPONENTS_REFERENCE.md](./custom_game_engine/COMPONENTS_REFERENCE.md) for comprehensive technical documentation.
 
 ---
 

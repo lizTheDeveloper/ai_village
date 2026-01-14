@@ -1,27 +1,35 @@
-# Introspection Package - Component Self-Awareness System
+# Introspection Package - Schema-Driven Component Metadata System
 
 > **For Language Models:** This README is optimized for LM understanding. Read this document completely before working with the introspection system to understand its architecture, interfaces, and usage patterns.
 
 ## Overview
 
-The **Introspection Package** (`@ai-village/introspection`) provides a schema-driven metadata system that enables runtime component introspection, self-awareness, and automatic UI generation across the entire ECS.
+The **Introspection Package** (`@ai-village/introspection`) implements a comprehensive schema-driven metadata system that allows the game engine to introspect, validate, mutate, and render component data across multiple contexts.
 
 **What it does:**
-- Define component schemas with field-level metadata (types, constraints, visibility, documentation)
-- Auto-generate debug UIs with mutation support (sliders, dropdowns, text inputs)
-- Generate LLM prompts from component state (agent self-awareness, world context)
-- Validate component mutations with undo/redo support
-- Cache rendered component views with scheduler-aware invalidation
-- Provide type-safe component registry with category filtering
+- **Schema Definition**: Define component metadata with field types, constraints, visibility, and UI hints
+- **Component Registry**: Centralized registry for component schemas with type-safe queries
+- **Mutation System**: Validated, reversible component mutations with event emission and undo/redo
+- **Multi-Context Rendering**: Auto-generate UIs for dev tools, player interfaces, and LLM prompts
+- **Validation**: Runtime validation of component data against schemas
+- **Caching**: Scheduler-aware render caching that reduces redundant renders by 85-99%
+
+**Key benefits:**
+- **Single source of truth**: Define component structure once, use everywhere
+- **Type safety**: Full TypeScript type inference from schemas
+- **Self-documenting**: Schemas serve as living documentation for components
+- **LLM integration**: Automatic prompt generation for agent self-awareness
+- **Developer tools**: Auto-generated debug UIs from schemas
+- **Performance**: Intelligent caching based on system update frequencies
 
 **Key files:**
-- `src/registry/ComponentRegistry.ts` - Central schema registry (singleton)
-- `src/types/ComponentSchema.ts` - Schema type definitions and `defineComponent()` helper
-- `src/mutation/MutationService.ts` - Validated component mutations with undo/redo
-- `src/prompt/AgentPromptRenderer.ts` - LLM prompt generation for agent self-awareness
-- `src/renderers/DevRenderer.ts` - Auto-generated debug UI from schemas
-- `src/cache/RenderCache.ts` - Scheduler-aware render caching (85-99% cache hits)
-- `src/schemas/` - 125+ component schemas organized by category
+- `src/types/ComponentSchema.ts` - Core schema interface and `defineComponent()` helper
+- `src/registry/ComponentRegistry.ts` - Singleton registry for all component schemas
+- `src/mutation/MutationService.ts` - Validated mutation system with undo/redo
+- `src/prompt/PromptRenderer.ts` - LLM prompt generation from schemas
+- `src/renderers/DevRenderer.ts` - Auto-generated dev UI renderer
+- `src/cache/RenderCache.ts` - Scheduler-based render caching
+- `src/schemas/` - 125+ component schema definitions
 
 ---
 
@@ -31,68 +39,67 @@ The **Introspection Package** (`@ai-village/introspection`) provides a schema-dr
 packages/introspection/
 ├── src/
 │   ├── types/
-│   │   ├── ComponentSchema.ts           # Schema type definitions
-│   │   ├── FieldSchema.ts               # Field metadata types
-│   │   ├── FieldTypes.ts                # Field type enums, visibility, UI hints
-│   │   ├── CategoryTypes.ts             # Component categories
-│   │   ├── LLMConfig.ts                 # LLM prompt configuration
-│   │   ├── MutabilityTypes.ts           # Mutability settings
-│   │   └── VisibilityTypes.ts           # Visibility rules (player/llm/agent/dev)
-│   │
-│   ├── registry/
-│   │   ├── ComponentRegistry.ts         # Central schema registry (singleton)
-│   │   └── autoRegister.ts              # Auto-registration helper
-│   │
+│   │   ├── ComponentSchema.ts        # Core schema interface
+│   │   ├── FieldSchema.ts            # Field metadata definition
+│   │   ├── FieldTypes.ts             # Field type definitions
+│   │   ├── CategoryTypes.ts          # Component categories
+│   │   ├── VisibilityTypes.ts        # Visibility flags (player/llm/agent/dev)
+│   │   ├── UIHints.ts                # UI rendering hints
+│   │   ├── MutabilityTypes.ts        # Mutation permissions
+│   │   ├── LLMConfig.ts              # LLM prompt configuration
+│   │   └── WidgetTypes.ts            # UI widget types
 │   ├── core/
-│   │   └── validateSchema.ts            # Schema validation utilities
-│   │
+│   │   ├── validateSchema.ts         # Schema validation
+│   │   └── index.ts
+│   ├── registry/
+│   │   ├── ComponentRegistry.ts      # Global schema registry
+│   │   ├── autoRegister.ts           # Auto-registration helper
+│   │   └── index.ts
 │   ├── mutation/
-│   │   ├── MutationService.ts           # Component mutation with validation
-│   │   ├── ValidationService.ts         # Field validation logic
-│   │   ├── UndoStack.ts                 # Undo/redo command stack
-│   │   └── MutationEvent.ts             # Mutation event types
-│   │
+│   │   ├── MutationService.ts        # Central mutation service
+│   │   ├── ValidationService.ts      # Field validation
+│   │   ├── UndoStack.ts              # Undo/redo stack
+│   │   ├── MutationEvent.ts          # Mutation event types
+│   │   └── index.ts
 │   ├── prompt/
-│   │   ├── PromptRenderer.ts            # LLM prompt rendering (world context)
-│   │   └── AgentPromptRenderer.ts       # Agent self-awareness prompts
-│   │
+│   │   ├── PromptRenderer.ts         # LLM prompt generation
+│   │   ├── AgentPromptRenderer.ts    # Agent-specific prompts
+│   │   └── index.ts
 │   ├── renderers/
-│   │   ├── DevRenderer.ts               # Auto-generated debug UI
-│   │   ├── PlayerRenderer.ts            # Player-facing UI renderer
-│   │   ├── PlayerDOMRenderer.ts         # DOM-based player UI
-│   │   ├── PlayerCanvasRenderer.ts      # Canvas-based player UI
-│   │   ├── CachedDevRenderer.ts         # Cached dev renderer
-│   │   └── widgets/
-│   │       ├── WidgetFactory.ts         # Widget creation factory
-│   │       ├── TextWidget.ts            # Text input widget
-│   │       ├── SliderWidget.ts          # Numeric slider widget
-│   │       ├── DropdownWidget.ts        # Enum dropdown widget
-│   │       ├── CheckboxWidget.ts        # Boolean checkbox widget
-│   │       ├── ReadonlyWidget.ts        # Read-only display widget
-│   │       └── JsonWidget.ts            # JSON object viewer widget
-│   │
+│   │   ├── DevRenderer.ts            # Dev UI renderer (canvas)
+│   │   ├── CachedDevRenderer.ts      # Cached dev renderer
+│   │   ├── PlayerRenderer.ts         # Player UI renderer (abstract)
+│   │   ├── PlayerCanvasRenderer.ts   # Canvas player UI
+│   │   ├── PlayerDOMRenderer.ts      # DOM player UI
+│   │   └── widgets/                  # UI widget implementations
+│   │       ├── WidgetFactory.ts      # Widget creation
+│   │       ├── TextWidget.ts
+│   │       ├── SliderWidget.ts
+│   │       ├── CheckboxWidget.ts
+│   │       ├── DropdownWidget.ts
+│   │       ├── ReadonlyWidget.ts
+│   │       └── JsonWidget.ts
 │   ├── cache/
-│   │   ├── RenderCache.ts               # Scheduler-aware render caching
-│   │   └── CacheMetrics.ts              # Cache performance metrics
-│   │
-│   ├── schemas/
-│   │   ├── agent/                       # Agent-specific schemas (17 schemas)
-│   │   ├── cognitive/                   # Memory, beliefs, goals (20 schemas)
-│   │   ├── physical/                    # Body, movement, genetics (13 schemas)
-│   │   ├── social/                      # Relationships, economy (16 schemas)
-│   │   ├── afterlife/                   # Death, reincarnation (4 schemas)
-│   │   ├── magic/                       # Divinity, spells, myths (6 schemas)
-│   │   ├── world/                       # Buildings, realms, weather (28 schemas)
-│   │   ├── system/                      # Infrastructure (11 schemas)
-│   │   └── *.ts                         # Core schemas (10 schemas)
-│   │
+│   │   ├── RenderCache.ts            # Scheduler-aware cache
+│   │   ├── CacheMetrics.ts           # Cache statistics
+│   │   └── index.ts
+│   ├── schemas/                       # 125+ component schemas
+│   │   ├── agent/                    # Agent components (18 schemas)
+│   │   ├── cognitive/                # Memory, beliefs, goals (20 schemas)
+│   │   ├── physical/                 # Body, movement, resources (12 schemas)
+│   │   ├── social/                   # Relationships, economy, conflict (15 schemas)
+│   │   ├── magic/                    # Divinity, spells, lore (7 schemas)
+│   │   ├── world/                    # Buildings, weather, realms (30 schemas)
+│   │   ├── system/                   # Internal systems (12 schemas)
+│   │   ├── afterlife/                # Death, judgment, bargains (5 schemas)
+│   │   └── index.ts
 │   ├── utils/
-│   │   └── typeGuards.ts                # Type validation utilities
-│   │
-│   └── index.ts                         # Package exports
-│
+│   │   ├── typeGuards.ts             # Runtime type guards
+│   │   └── index.ts
+│   └── index.ts                       # Package exports
+├── example-usage.ts                   # Example usage and tests
 ├── package.json
-└── README.md                            # This file
+└── README.md                          # This file
 ```
 
 ---
@@ -101,94 +108,164 @@ packages/introspection/
 
 ### 1. Component Schemas
 
-Component schemas are the heart of the introspection system. They define metadata for every component type in the ECS.
+A **ComponentSchema** defines the complete metadata for a component type:
 
 ```typescript
 interface ComponentSchema<T extends Component> {
-  type: string;                          // Component type identifier
+  type: string;                          // Component type identifier ('identity', 'agent', etc.)
   version: number;                       // Schema version for migrations
-  category: ComponentCategory;           // 'core' | 'agent' | 'cognitive' | etc.
+  category: ComponentCategory;           // Logical grouping ('agent', 'physical', etc.)
   description?: string;                  // Human-readable description
 
-  fields: Record<string, FieldSchema>;   // Field definitions with metadata
+  fields: Record<string, FieldSchema>;   // Field definitions with full metadata
 
-  ui?: UIConfig;                         // UI rendering hints
+  ui?: UIConfig;                         // Component-level UI configuration
   llm?: LLMConfig<T>;                    // LLM prompt configuration
   dev?: DevConfig;                       // Developer tools config
 
   renderers?: {                          // Custom renderers (optional)
-    player?: (data: T) => string;
+    player?: (data: T) => string | CanvasRenderable;
     dev?: (data: T, mutate: any) => HTMLElement;
     llm?: (data: T) => string;
   };
 
-  mutators?: Record<string, MutatorFunction<T>>; // Custom mutation handlers
+  mutators?: Record<string, MutatorFunction<T>>;  // Custom mutation handlers
 
   validate?(data: unknown): data is T;   // Runtime validation
-  createDefault?(): T;                   // Factory function
+  createDefault?(): T;                   // Default instance factory
 }
 ```
 
-**Example schema:**
+**Component categories** (9 types):
+- `core`: Fundamental components (identity, position, sprite)
+- `agent`: Agent-specific (personality, skills, needs)
+- `physical`: Physical attributes (health, inventory, equipment)
+- `social`: Social systems (relationships, reputation, economy)
+- `cognitive`: Cognitive systems (memory, goals, beliefs)
+- `magic`: Magic systems (mana, spells, paradigms, divinity)
+- `world`: World systems (time, weather, terrain, buildings)
+- `system`: Internal systems (steering, pathfinding, debug)
+- `afterlife`: Afterlife/spiritual systems (death, judgment, bargains)
+
+### 2. Field Schemas
+
+Each field in a component has a **FieldSchema** defining its properties:
+
+```typescript
+interface FieldSchema {
+  // Type information
+  type: FieldType;                       // 'string', 'number', 'boolean', 'enum', 'array', 'map', 'object'
+  itemType?: FieldType;                  // For arrays/maps
+  enumValues?: readonly string[];        // For enum fields
+
+  // Constraints
+  required: boolean;                     // Is field required?
+  default?: unknown;                     // Default value
+  range?: [number, number];              // Min/max for numbers
+  maxLength?: number;                    // Max length for strings/arrays
+
+  // Documentation
+  description?: string;                  // Field description
+  displayName?: string;                  // Display name (defaults to field key)
+
+  // Visibility
+  visibility: Visibility;                // Who can see this field
+
+  // UI hints
+  ui?: UIHints;                          // Widget type, grouping, order
+
+  // Mutation
+  mutable?: boolean;                     // Can field be edited?
+  mutateVia?: string;                    // Use custom mutator instead of direct set
+}
+```
+
+**Visibility flags** control who sees each field:
+
+```typescript
+interface Visibility {
+  player: boolean;                       // Player-facing UI
+  llm: boolean | 'summarized';           // LLM prompts (true = detailed, 'summarized' = use summarize function)
+  agent: boolean | 'summarized';         // Agent self-awareness
+  user: boolean;                         // User settings UI
+  dev: boolean;                          // Developer debug tools
+}
+```
+
+**UI hints** control how fields render:
+
+```typescript
+interface UIHints {
+  widget: WidgetType;                    // 'text', 'slider', 'checkbox', 'dropdown', 'json', 'readonly'
+  group?: string;                        // Group name for organizing fields
+  order?: number;                        // Display order within group
+}
+```
+
+### 3. Defining Component Schemas
+
+Use `defineComponent()` to define schemas with full type inference:
 
 ```typescript
 import { defineComponent, autoRegister } from '@ai-village/introspection';
+import type { Component } from '@ai-village/introspection';
 
+// Define component type
 interface IdentityComponent extends Component {
   type: 'identity';
   version: 1;
   name: string;
-  age: number;
   species: 'human' | 'elf' | 'dwarf';
+  age: number;
 }
 
+// Create schema with type inference
 export const IdentitySchema = autoRegister(
   defineComponent<IdentityComponent>({
     type: 'identity',
     version: 1,
     category: 'core',
+    description: 'Core identity information for entities',
 
     fields: {
       name: {
         type: 'string',
         required: true,
-        description: 'Entity display name',
-        visibility: { player: true, llm: true, agent: true, dev: true },
+        description: 'Entity name',
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
         ui: { widget: 'text', group: 'basic', order: 1 },
         mutable: true,
       },
-
       species: {
         type: 'enum',
         enumValues: ['human', 'elf', 'dwarf'] as const,
         required: true,
         description: 'Species type',
-        visibility: { player: true, llm: true, agent: true, dev: true },
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
         ui: { widget: 'dropdown', group: 'basic', order: 2 },
-        mutable: false, // Cannot change species
+        mutable: false,  // Species can't change
       },
-
       age: {
         type: 'number',
         required: true,
-        range: [0, 10000] as const,
+        range: [0, 10000],
         description: 'Age in days',
-        visibility: { player: true, llm: true, agent: true, dev: true },
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
         ui: { widget: 'slider', group: 'basic', order: 3 },
         mutable: true,
       },
     },
 
-    llm: {
-      promptSection: 'Identity',
-      summarize: (data) =>
-        `${data.name} (${data.species}, ${Math.floor(data.age / 365)} years old)`,
-    },
-
+    // Optional: Runtime validation
     validate: (data): data is IdentityComponent => {
-      return typeof data?.name === 'string' && typeof data?.age === 'number';
+      return typeof data === 'object'
+        && data !== null
+        && (data as any).type === 'identity'
+        && typeof (data as any).name === 'string'
+        && typeof (data as any).age === 'number';
     },
 
+    // Optional: Default instance factory
     createDefault: () => ({
       type: 'identity',
       version: 1,
@@ -200,125 +277,62 @@ export const IdentitySchema = autoRegister(
 );
 ```
 
-### 2. Field Schemas
+**Auto-registration:** `autoRegister()` registers the schema immediately when imported.
 
-Field schemas define metadata for individual component fields:
+### 4. Component Registry
 
-```typescript
-interface FieldSchema {
-  // Type information
-  type: FieldType;                       // 'string' | 'number' | 'boolean' | 'enum' | 'array' | 'map' | 'object'
-  itemType?: FieldType;                  // For arrays/maps
-  enumValues?: readonly string[];        // For enums
-
-  // Constraints
-  required: boolean;                     // Is field required?
-  default?: unknown;                     // Default value
-  range?: readonly [number, number];     // Min/max for numbers
-  min?: number;                          // Minimum value
-  max?: number;                          // Maximum value
-  maxLength?: number;                    // Max length for strings/arrays
-
-  // Documentation
-  description?: string;                  // Field description (required if visibility.llm is true)
-  displayName?: string;                  // Display name (defaults to field key)
-
-  // Visibility
-  visibility: Visibility;                // Who can see this field?
-
-  // UI hints
-  ui?: UIHints;                          // Rendering hints for UI
-
-  // Mutation
-  mutable?: boolean;                     // Can field be edited?
-  mutateVia?: string;                    // Use custom mutator function
-}
-```
-
-**Visibility rules:**
-
-```typescript
-interface Visibility {
-  player: boolean;        // Visible in player UI
-  llm: boolean | 'summarized';  // Included in LLM prompts (summarized = compressed)
-  agent: boolean;         // Agent self-awareness (what agents know about themselves)
-  user?: boolean;         // User settings UI
-  dev: boolean;           // Developer debug tools
-}
-```
-
-**UI hints:**
-
-```typescript
-interface UIHints {
-  widget: WidgetType;     // 'text' | 'slider' | 'dropdown' | 'checkbox' | 'readonly' | 'json'
-  group?: string;         // Field group for organization
-  order?: number;         // Display order within group
-  icon?: string;          // Icon emoji/string
-  color?: string;         // Color hint
-}
-```
-
-### 3. Component Registry
-
-The `ComponentRegistry` is a singleton that stores all component schemas and provides type-safe queries.
+The **ComponentRegistry** is a singleton that stores all component schemas:
 
 ```typescript
 import { ComponentRegistry } from '@ai-village/introspection';
 
-// Register a schema
+// Manual registration (if not using autoRegister)
 ComponentRegistry.register(IdentitySchema);
 
-// Retrieve a schema
-const schema = ComponentRegistry.get<IdentityComponent>('identity');
-
-// Check if schema exists
-if (ComponentRegistry.has('identity')) {
-  console.log('Identity schema registered');
+// Retrieve schema (type-safe)
+const schema = ComponentRegistry.get('identity');
+if (schema) {
+  console.log('Type:', schema.type);
+  console.log('Fields:', Object.keys(schema.fields));
 }
 
-// List all schemas
-const allTypes = ComponentRegistry.list();
+// Check existence
+const hasIdentity = ComponentRegistry.has('identity');
 
-// Get schemas by category
+// List all registered types
+const allTypes = ComponentRegistry.list();  // ['identity', 'agent', 'position', ...]
+
+// Get by category
 const agentSchemas = ComponentRegistry.getByCategory('agent');
 
 // Get all schemas
 const allSchemas = ComponentRegistry.getAll();
+
+// Count registered schemas
+const count = ComponentRegistry.count();
 ```
 
-**Auto-registration:**
+### 5. Mutation System
 
-```typescript
-import { autoRegister, defineComponent } from '@ai-village/introspection';
-
-// Schema is automatically registered on import
-export const IdentitySchema = autoRegister(
-  defineComponent<IdentityComponent>({ /* ... */ })
-);
-```
-
-### 4. Mutation System
-
-The `MutationService` provides validated, reversible component mutations with event emission.
+The **MutationService** provides validated, reversible mutations with undo/redo:
 
 ```typescript
 import { MutationService } from '@ai-village/introspection';
 
-// Enable dev mode (allows mutation of all fields, even mutable: false)
+// Enable dev mode to allow mutation of all fields (bypasses mutable checks)
 MutationService.setDevMode(true);
 
 // Mutate a field
 const result = MutationService.mutate(
-  entity,                  // Entity to mutate
-  'identity',              // Component type
-  'name',                  // Field name
-  'New Name',              // New value
-  'user'                   // Source: 'user' | 'system' | 'agent' | 'llm'
+  entity,              // Entity to mutate
+  'identity',          // Component type
+  'name',              // Field name
+  'New Name',          // New value
+  'user'               // Source: 'system' | 'user' | 'llm' | 'dev'
 );
 
 if (result.success) {
-  console.log('Mutation successful');
+  console.log('Mutation succeeded');
 } else {
   console.error('Mutation failed:', result.error);
 }
@@ -326,248 +340,281 @@ if (result.success) {
 // Batch mutations (all-or-nothing)
 const results = MutationService.mutateBatch([
   { entity, componentType: 'identity', fieldName: 'name', value: 'Alice' },
-  { entity, componentType: 'identity', fieldName: 'age', value: 100 },
+  { entity, componentType: 'identity', fieldName: 'age', value: 25 },
 ]);
 
-// Undo/redo
+// Undo/Redo
 if (MutationService.canUndo()) {
   MutationService.undo();
 }
-
 if (MutationService.canRedo()) {
   MutationService.redo();
 }
 
 // Subscribe to mutation events
 MutationService.on('mutated', (event) => {
-  console.log(`${event.componentType}.${event.fieldName} changed:`,
-    event.oldValue, '→', event.newValue);
+  console.log('Field mutated:', event.componentType, event.fieldName);
+  console.log('Old value:', event.oldValue);
+  console.log('New value:', event.newValue);
+});
+
+// Clear undo history
+MutationService.clearHistory();
+```
+
+**Mutation validation:**
+- **Type checking**: Ensures value matches field type
+- **Range checking**: Validates numbers are within range
+- **Enum checking**: Validates enum values are valid
+- **Required checking**: Ensures required fields are not null/undefined
+- **Mutability checking**: Ensures field is mutable (or dev mode enabled)
+- **Custom mutators**: Uses custom mutation handlers if defined in schema
+
+**Custom mutators:**
+
+```typescript
+export const HealthSchema = defineComponent<HealthComponent>({
+  type: 'health',
+  fields: {
+    current: {
+      type: 'number',
+      mutable: true,
+      mutateVia: 'setHealth',  // Use custom mutator
+    },
+  },
+  mutators: {
+    setHealth: (entity, newValue: number) => {
+      // Custom logic: clamp to [0, max], emit events, etc.
+      const health = entity.getComponent('health');
+      const clamped = Math.max(0, Math.min(newValue, health.max));
+      entity.updateComponent('health', (h) => ({ ...h, current: clamped }));
+      // Emit custom events, trigger side effects, etc.
+    },
+  },
 });
 ```
 
-**Validation:**
+### 6. LLM Prompt Rendering
 
-All mutations are validated against field schemas:
-
-```typescript
-// ✅ Valid mutation
-MutationService.mutate(entity, 'identity', 'age', 25);
-
-// ❌ Invalid: age out of range
-MutationService.mutate(entity, 'identity', 'age', 999999);
-// Error: "Value 999999 exceeds maximum 10000"
-
-// ❌ Invalid: wrong type
-MutationService.mutate(entity, 'identity', 'age', 'twenty-five');
-// Error: "Expected number, got string"
-
-// ❌ Invalid: immutable field (unless dev mode enabled)
-MutationService.mutate(entity, 'identity', 'species', 'elf');
-// Error: "Field 'species' is not mutable"
-```
-
-### 5. LLM Prompt Generation
-
-The introspection system generates LLM prompts from component state for two use cases:
-
-**Agent self-awareness** (what agents know about themselves):
-
-```typescript
-import { AgentPromptRenderer } from '@ai-village/introspection';
-
-// Generate agent self-awareness prompt
-const prompt = AgentPromptRenderer.renderEntity(entity);
-```
-
-**Output:**
-```
-## Identity
-Name: Alice
-Species: human
-Age: 100 days (27%)
-
-## Needs
-Hunger: 45 (satisfied)
-Energy: 80 (high)
-Social: 30 (lonely)
-
-## Skills
-Farming: 5.2
-Crafting: 3.8
-Combat: 1.5
-```
-
-**World context** (what LLMs see about the world):
+The **PromptRenderer** auto-generates LLM prompts from schemas:
 
 ```typescript
 import { PromptRenderer } from '@ai-village/introspection';
 
-// Generate world context prompt
-const worldPrompt = PromptRenderer.renderEntity(entity);
+// Render all LLM-visible components for an entity
+const prompt = PromptRenderer.renderEntity(entity, world);
+
+// Output example:
+// ## Identity
+// Name: Alice
+// Species: human
+// Age: 25 (2%)
+//
+// ## Agent
+// Behavior: wander
+// AI-Powered: yes
+//
+// ## Needs
+// Hunger: 45 (45%)
+// Thirst: 80 (80%)
+
+// Render single component
+const schema = ComponentRegistry.get('identity');
+const componentPrompt = PromptRenderer.renderComponent(
+  entity.getComponent('identity'),
+  schema,
+  context  // Optional: for entity ID resolution
+);
 ```
 
-**Visibility filtering:**
-- `AgentPromptRenderer` only includes fields where `visibility.agent === true`
-- `PromptRenderer` includes fields where `visibility.llm === true` or `'summarized'`
-
-**LLM configuration:**
+**LLM configuration in schemas:**
 
 ```typescript
-interface LLMConfig<T> {
-  promptSection?: string;                // Section header in prompt
-  priority?: number;                     // Prompt ordering (lower = earlier)
-  includeFieldNames?: boolean;           // Show field names? (default: true)
-  includeInAgentPrompt?: boolean;        // Include in agent self-awareness?
-
-  summarize?: (data: T) => string;       // Custom summary function
-}
+fields: {
+  name: {
+    type: 'string',
+    visibility: { llm: true },  // Include in prompts
+    llm: {
+      promptLabel: 'Name',       // Custom label (defaults to displayName or field key)
+      promptSection: 'Identity', // Section grouping
+      alwaysInclude: true,       // Include even if empty
+      format: (value) => value.toUpperCase(),  // Custom formatter
+    },
+  },
+  behaviorState: {
+    type: 'object',
+    visibility: { llm: 'summarized' },  // Use summarize function
+  },
+},
+llm: {
+  priority: 10,                  // Lower = earlier in prompt (default: 100)
+  promptSection: 'Agent State',  // Component-level section
+  includeFieldNames: true,       // Include field names in output (default: true)
+  maxLength: 500,                // Max characters for summarized output
+  summarize: (component, context) => {
+    // Custom summarization function
+    return `Agent is currently ${component.behavior}`;
+  },
+  template: 'Name: {name}, Age: {age}',  // Template string (alternative to field-by-field)
+},
 ```
 
-### 6. Auto-Generated Debug UI
+**Visibility modes:**
+- `llm: true` → Include field in detailed prompt
+- `llm: 'summarized'` → Include via `summarize` function (more compact)
+- `llm: false` → Exclude from prompts
 
-The `DevRenderer` automatically generates debug UIs from schemas:
+### 7. Dev UI Rendering
+
+The **DevRenderer** auto-generates canvas-based debug UIs:
 
 ```typescript
 import { DevRenderer } from '@ai-village/introspection';
 
 const renderer = new DevRenderer({
-  showGroups: true,      // Show field groups
-  fieldSpacing: 4,       // Space between fields (pixels)
-  groupSpacing: 12,      // Space between groups (pixels)
+  showGroups: true,      // Show group headers
+  fieldSpacing: 4,       // Pixels between fields
+  groupSpacing: 12,      // Pixels between groups
 });
 
-// Initialize component UI
+// Initialize component for rendering
 renderer.initializeComponent(
   'identity',
-  identityComponent,
+  entity.getComponent('identity'),
   (fieldName, newValue) => {
     // Handle field changes
-    MutationService.mutate(entity, 'identity', fieldName, newValue);
+    MutationService.mutate(entity, 'identity', fieldName, newValue, 'dev');
   }
 );
 
 // Render to canvas
-const heightUsed = renderer.render(
-  ctx,           // CanvasRenderingContext2D
-  'identity',    // Component type
-  x, y,          // Position
-  width          // Width
+const height = renderer.render(
+  ctx,                   // Canvas 2D context
+  'identity',            // Component type
+  x,                     // X position
+  y,                     // Y position
+  width                  // Width
 );
 
-// Handle clicks
-renderer.handleClick('identity', clickX, clickY, componentX, componentY, width);
+// Handle click events
+const handled = renderer.handleClick(
+  'identity',
+  clickX,
+  clickY,
+  componentX,
+  componentY,
+  componentWidth
+);
+
+// Update component data (refresh widgets)
+renderer.updateComponent('identity', entity.getComponent('identity'));
+
+// Clear all widgets
+renderer.clear();
 ```
 
-**Widgets:**
+**Widgets** are auto-created based on `ui.widget` field:
+- `text`: Text input
+- `slider`: Number slider (with range)
+- `checkbox`: Boolean toggle
+- `dropdown`: Enum selector
+- `json`: JSON editor (for objects/arrays)
+- `readonly`: Read-only display
 
-The system includes 6 built-in widgets:
+### 8. Render Caching
 
-- **TextWidget** - String input
-- **SliderWidget** - Numeric slider with range
-- **DropdownWidget** - Enum selection
-- **CheckboxWidget** - Boolean toggle
-- **ReadonlyWidget** - Read-only display
-- **JsonWidget** - JSON object viewer
-
-Widgets are automatically selected based on field type and UI hints.
-
-### 7. Render Caching
-
-The `SchedulerRenderCache` caches rendered component output until the scheduler indicates the component will be updated, reducing redundant renders by 85-99%.
+The **SchedulerRenderCache** uses scheduler update frequencies to cache renders:
 
 ```typescript
 import { SchedulerRenderCache } from '@ai-village/introspection';
 
-const cache = new SchedulerRenderCache<HTMLElement>();
+const cache = new SchedulerRenderCache<string>();
 
 // Try to get cached render
-const cached = cache.get(entityId, 'plant');
-
-if (cached) {
-  // Use cached render (cache hit!)
-  return cached;
+const cachedRender = cache.get(entityId, 'agent');
+if (cachedRender) {
+  // Use cached output
+  return cachedRender;
 }
 
 // Cache miss - render and store
-const rendered = renderPlantComponent(plant);
-cache.set(entityId, 'plant', rendered, world.tick);
+const rendered = renderComponent(component);
+cache.set(entityId, 'agent', rendered, currentTick);
 
-// Manually invalidate on mutations
-cache.invalidate(entityId, 'plant');
-
-// Update tick counter each frame
+// Update tick (invalidates expired entries)
 cache.onTick(world.tick);
 
-// Get cache statistics
+// Manual invalidation (when component mutated outside scheduler)
+cache.invalidate(entityId, 'agent');
+cache.invalidateEntity(entityId);  // All components for entity
+cache.invalidateComponentType('agent');  // All entities with component
+
+// Check if cached
+const isCached = cache.has(entityId, 'agent');
+
+// Get statistics
 const stats = cache.getStats();
-console.log(`Cache hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
-console.log(`Avg cache lifetime: ${stats.avgCacheLifetime} ticks`);
+console.log('Hit rate:', stats.hitRate);  // 0.85-0.99 typical
+console.log('Cache size:', stats.size);
+console.log('Memory usage:', stats.memoryUsage);
+
+// Clear cache
+cache.clear();
+
+// Register with MutationService for automatic invalidation
+MutationService.registerRenderCache(cache);
 ```
 
-**Cache invalidation strategies:**
-
-- **Automatic:** Cache expires when scheduler will update component (based on `SimulationScheduler` update frequencies)
-- **Manual:** Invalidate on component mutations (integrated with `MutationService`)
-- **Entity-level:** Invalidate all components for an entity
-- **Type-level:** Invalidate all components of a type
-
-**Cache performance:**
-
-- `agent`: 1 tick update frequency → 67% cache hit
-- `needs`: 1 tick update frequency → 67% cache hit
-- `plant`: 86400 ticks (1 day) → 99.7% cache hit
-- `weather`: High update frequency → 85% cache hit
+**Cache behavior:**
+- **Scheduler-based expiry**: Cache until next system update (based on `SimulationScheduler` config)
+- **Agent component**: Updates every tick → 67% cache hit
+- **Plant component**: Updates every 86400 ticks → 99.7% cache hit
+- **Manual invalidation**: Mutations trigger cache invalidation via `MutationService`
 
 ---
 
-## System APIs
+## API Reference
 
-### ComponentRegistry (Singleton)
+### defineComponent()
 
-Central schema storage and retrieval.
+```typescript
+function defineComponent<T extends Component>(
+  schema: ComponentSchema<T>
+): ComponentSchema<T>
+```
 
-**Methods:**
+Helper function for defining component schemas with full type inference.
+
+### autoRegister()
+
+```typescript
+function autoRegister<T extends Component>(
+  schema: ComponentSchema<T>
+): ComponentSchema<T>
+```
+
+Automatically registers schema with `ComponentRegistry` when imported.
+
+### ComponentRegistry
 
 ```typescript
 class ComponentRegistry {
-  // Register a schema
-  static register<T extends Component>(schema: ComponentSchema<T>): void;
-
-  // Retrieve a schema
-  static get<T extends Component>(type: string): ComponentSchema<T> | undefined;
-
-  // Check if schema exists
+  static register<T>(schema: ComponentSchema<T>): void;
+  static get<T>(type: string): ComponentSchema<T> | undefined;
   static has(type: string): boolean;
-
-  // List all schema types
   static list(): string[];
-
-  // Get schemas by category
   static getByCategory(category: ComponentCategory): ComponentSchema<any>[];
-
-  // Get all schemas
   static getAll(): ComponentSchema<any>[];
-
-  // Clear all schemas (testing only)
-  static clear(): void;
-
-  // Get schema count
   static count(): number;
+  static clear(): void;
 }
 ```
 
-### MutationService (Singleton)
-
-Validated component mutations with undo/redo.
-
-**Methods:**
+### MutationService
 
 ```typescript
 class MutationService {
-  // Enable dev mode (allows all mutations)
   static setDevMode(enabled: boolean): void;
-
-  // Mutate a field
   static mutate<T>(
     entity: Entity,
     componentType: string,
@@ -575,95 +622,45 @@ class MutationService {
     value: unknown,
     source?: MutationSource
   ): MutationResult;
-
-  // Batch mutations (all-or-nothing)
   static mutateBatch(mutations: MutationRequest[]): MutationResult[];
-
-  // Undo last mutation
   static undo(): boolean;
-
-  // Redo last undone mutation
   static redo(): boolean;
-
-  // Check undo availability
   static canUndo(): boolean;
-
-  // Check redo availability
   static canRedo(): boolean;
-
-  // Clear undo/redo history
   static clearHistory(): void;
-
-  // Subscribe to mutation events
   static on(event: 'mutated', handler: MutationEventHandler): void;
-
-  // Unsubscribe from mutation events
   static off(event: 'mutated', handler: MutationEventHandler): void;
-
-  // Register render cache for auto-invalidation
   static registerRenderCache(cache: SchedulerRenderCache<any>): void;
-
-  // Unregister render cache
   static unregisterRenderCache(cache: SchedulerRenderCache<any>): void;
-}
-```
-
-### AgentPromptRenderer
-
-Generates agent self-awareness prompts.
-
-**Methods:**
-
-```typescript
-class AgentPromptRenderer {
-  // Render all agent-visible components for an entity
-  static renderEntity(entity: { id: string; components: Map<string, any> }): string;
-
-  // Render a single component for agent self-awareness
-  static renderComponent<T extends Component>(
-    component: T,
-    schema: ComponentSchema<T>
-  ): string;
 }
 ```
 
 ### PromptRenderer
 
-Generates LLM prompts from world state.
-
-**Methods:**
-
 ```typescript
 class PromptRenderer {
-  // Render all LLM-visible components for an entity
-  static renderEntity(entity: { id: string; components: Map<string, any> }): string;
-
-  // Render a single component for LLM prompts
-  static renderComponent<T extends Component>(
+  static renderEntity(
+    entity: { id: string; components: Map<string, any> },
+    world?: any
+  ): string;
+  static renderComponent<T>(
     component: T,
-    schema: ComponentSchema<T>
+    schema: ComponentSchema<T>,
+    context?: SummarizeContext
   ): string;
 }
 ```
 
 ### DevRenderer
 
-Auto-generates debug UI from schemas.
-
-**Methods:**
-
 ```typescript
 class DevRenderer {
   constructor(options?: DevRenderOptions);
-
-  // Initialize component widgets
   initializeComponent(
     componentType: string,
     componentData: Component,
     onFieldChange: (fieldName: string, newValue: unknown) => void
   ): void;
-
-  // Render component UI
   render(
     ctx: CanvasRenderingContext2D,
     componentType: string,
@@ -671,11 +668,7 @@ class DevRenderer {
     y: number,
     width: number
   ): number;
-
-  // Update component data (refresh widgets)
   updateComponent(componentType: string, componentData: Component): void;
-
-  // Handle click events
   handleClick(
     componentType: string,
     x: number,
@@ -684,63 +677,33 @@ class DevRenderer {
     componentY: number,
     componentWidth: number
   ): boolean;
-
-  // Clear all widgets
   clear(): void;
-
-  // Get registered component types
   getComponentTypes(): string[];
 }
 ```
 
 ### SchedulerRenderCache
 
-Scheduler-aware render caching.
-
-**Methods:**
-
 ```typescript
-class SchedulerRenderCache<T> {
-  // Get cached render if valid
+class SchedulerRenderCache<T = any> {
   get(entityId: string, componentType: string): T | null;
-
-  // Store rendered output
-  set(
-    entityId: string,
-    componentType: string,
-    renderedOutput: T,
-    currentTick: number
-  ): void;
-
-  // Manually invalidate a cached render
-  invalidate(entityId: string, componentType: string): void;
-
-  // Invalidate all caches for an entity
-  invalidateEntity(entityId: string): void;
-
-  // Invalidate all caches for a component type
-  invalidateComponentType(componentType: string): void;
-
-  // Update tick counter
-  onTick(tick: number): void;
-
-  // Check if render is cached and valid
+  set(entityId: string, componentType: string, renderedOutput: T, currentTick: number): void;
   has(entityId: string, componentType: string): boolean;
-
-  // Clear all cached renders
+  invalidate(entityId: string, componentType: string): void;
+  invalidateEntity(entityId: string): void;
+  invalidateComponentType(componentType: string): void;
+  onTick(tick: number): void;
   clear(): void;
-
-  // Get cache statistics
   getStats(): CacheStats;
-
-  // Reset statistics
   resetStats(): void;
-
-  // Get cached entity IDs
   getCachedEntities(): string[];
-
-  // Get cache details for debugging
-  getCacheDetails(): Array<{ entityId, componentType, age, ticksUntilExpiry, invalidated }>;
+  getCacheDetails(): Array<{
+    entityId: string;
+    componentType: string;
+    age: number;
+    ticksUntilExpiry: number;
+    invalidated: boolean;
+  }>;
 }
 ```
 
@@ -748,7 +711,7 @@ class SchedulerRenderCache<T> {
 
 ## Usage Examples
 
-### Example 1: Define and Register a Schema
+### Example 1: Defining a Component Schema
 
 ```typescript
 import { defineComponent, autoRegister, type Component } from '@ai-village/introspection';
@@ -757,8 +720,8 @@ interface NeedsComponent extends Component {
   type: 'needs';
   version: 1;
   hunger: number;
+  thirst: number;
   energy: number;
-  social: number;
 }
 
 export const NeedsSchema = autoRegister(
@@ -766,372 +729,509 @@ export const NeedsSchema = autoRegister(
     type: 'needs',
     version: 1,
     category: 'agent',
-    description: 'Agent physiological and social needs',
+    description: 'Agent survival needs',
 
     fields: {
       hunger: {
         type: 'number',
         required: true,
-        range: [0, 100] as const,
+        range: [0, 100],
         default: 50,
-        description: 'Hunger level (0=starving, 100=full)',
-        visibility: { player: true, llm: true, agent: true, dev: true },
-        ui: { widget: 'slider', group: 'needs', order: 1, icon: '🍽️' },
+        description: 'Hunger level (0 = starving, 100 = full)',
+        displayName: 'Hunger',
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
+        ui: { widget: 'slider', group: 'survival', order: 1 },
         mutable: true,
       },
-
+      thirst: {
+        type: 'number',
+        required: true,
+        range: [0, 100],
+        default: 50,
+        description: 'Thirst level (0 = dehydrated, 100 = hydrated)',
+        displayName: 'Thirst',
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
+        ui: { widget: 'slider', group: 'survival', order: 2 },
+        mutable: true,
+      },
       energy: {
         type: 'number',
         required: true,
-        range: [0, 100] as const,
-        default: 100,
-        description: 'Energy level (0=exhausted, 100=energized)',
-        visibility: { player: true, llm: true, agent: true, dev: true },
-        ui: { widget: 'slider', group: 'needs', order: 2, icon: '⚡' },
+        range: [0, 100],
+        default: 75,
+        description: 'Energy level (0 = exhausted, 100 = rested)',
+        displayName: 'Energy',
+        visibility: { player: true, llm: true, agent: true, user: false, dev: true },
+        ui: { widget: 'slider', group: 'survival', order: 3 },
         mutable: true,
       },
-
-      social: {
-        type: 'number',
-        required: true,
-        range: [0, 100] as const,
-        default: 50,
-        description: 'Social need (0=lonely, 100=fulfilled)',
-        visibility: { player: true, llm: true, agent: true, dev: true },
-        ui: { widget: 'slider', group: 'needs', order: 3, icon: '👥' },
-        mutable: true,
-      },
-    },
-
-    ui: {
-      icon: '💚',
-      color: '#4CAF50',
-      priority: 2,
     },
 
     llm: {
+      priority: 20,  // Show early in prompt
       promptSection: 'Needs',
-      priority: 20,
-      summarize: (data) => {
-        const status = (value: number) =>
-          value > 70 ? 'satisfied' : value > 40 ? 'moderate' : 'low';
-        return `Hunger: ${status(data.hunger)}, Energy: ${status(data.energy)}, Social: ${status(data.social)}`;
-      },
     },
 
     validate: (data): data is NeedsComponent => {
-      return (
-        typeof data?.hunger === 'number' &&
-        typeof data?.energy === 'number' &&
-        typeof data?.social === 'number'
-      );
+      return typeof data === 'object'
+        && data !== null
+        && (data as any).type === 'needs'
+        && typeof (data as any).hunger === 'number'
+        && typeof (data as any).thirst === 'number'
+        && typeof (data as any).energy === 'number';
     },
 
     createDefault: () => ({
       type: 'needs',
       version: 1,
       hunger: 50,
-      energy: 100,
-      social: 50,
+      thirst: 50,
+      energy: 75,
     }),
   })
 );
 ```
 
-### Example 2: Query Component Schema
+### Example 2: Querying the Registry
 
 ```typescript
 import { ComponentRegistry } from '@ai-village/introspection';
 
 // Get schema
-const needsSchema = ComponentRegistry.get<NeedsComponent>('needs');
-
+const needsSchema = ComponentRegistry.get('needs');
 if (needsSchema) {
-  // Access field metadata
-  console.log('Hunger field:');
-  console.log('  Type:', needsSchema.fields.hunger.type);
-  console.log('  Range:', needsSchema.fields.hunger.range);
-  console.log('  Description:', needsSchema.fields.hunger.description);
-  console.log('  Mutable:', needsSchema.fields.hunger.mutable);
-
-  // Access UI config
-  console.log('UI icon:', needsSchema.ui?.icon);
-  console.log('UI color:', needsSchema.ui?.color);
-
-  // Access LLM config
-  console.log('LLM section:', needsSchema.llm?.promptSection);
+  console.log('Fields:', Object.keys(needsSchema.fields));
+  console.log('Category:', needsSchema.category);
 }
 
-// Get all agent schemas
+// Get all agent-related schemas
 const agentSchemas = ComponentRegistry.getByCategory('agent');
-console.log(`Found ${agentSchemas.length} agent schemas`);
-for (const schema of agentSchemas) {
-  console.log(`  - ${schema.type}: ${schema.description}`);
-}
+console.log('Agent schemas:', agentSchemas.map(s => s.type));
+
+// List all registered types
+const allTypes = ComponentRegistry.list();
+console.log('Total schemas:', allTypes.length);
 ```
 
-### Example 3: Mutate Component Fields
+### Example 3: Mutating Component Data
 
 ```typescript
 import { MutationService } from '@ai-village/introspection';
 
-// Enable dev mode for testing
-MutationService.setDevMode(true);
+// Get entity with needs component
+const entity = world.getEntity(entityId);
 
-// Mutate hunger
+// Mutate hunger field
 const result = MutationService.mutate(
   entity,
   'needs',
   'hunger',
   75,
-  'system'
+  'system'  // Source: system update
 );
 
 if (result.success) {
   console.log('Hunger updated to 75');
 } else {
-  console.error('Mutation failed:', result.error);
+  console.error('Failed to update hunger:', result.error);
 }
 
-// Batch update all needs
-const results = MutationService.mutateBatch([
-  { entity, componentType: 'needs', fieldName: 'hunger', value: 80 },
-  { entity, componentType: 'needs', fieldName: 'energy', value: 60 },
-  { entity, componentType: 'needs', fieldName: 'social', value: 40 },
-]);
+// Subscribe to mutation events
+MutationService.on('mutated', (event) => {
+  if (event.componentType === 'needs' && event.fieldName === 'hunger') {
+    console.log('Hunger changed from', event.oldValue, 'to', event.newValue);
+  }
+});
 
-if (results.every(r => r.success)) {
-  console.log('All needs updated successfully');
-}
-
-// Undo the batch mutation
+// Undo mutation
 if (MutationService.canUndo()) {
   MutationService.undo();
-  console.log('Undid batch mutation');
+  console.log('Undid hunger update');
 }
 ```
 
-### Example 4: Generate Agent Self-Awareness Prompt
+### Example 4: Generating LLM Prompts
 
 ```typescript
-import { AgentPromptRenderer } from '@ai-village/introspection';
+import { PromptRenderer } from '@ai-village/introspection';
 
-// Generate prompt for agent (only agent-visible fields)
-const prompt = AgentPromptRenderer.renderEntity(agent);
+// Generate prompt for entity
+const entity = world.getEntity(entityId);
+const prompt = PromptRenderer.renderEntity(entity, world);
 
 console.log(prompt);
+// Output:
+// ## Identity
+// Name: Alice
+// Species: human
+// Age: 25
+//
+// ## Needs
+// Hunger: 75 (75%)
+// Thirst: 60 (60%)
+// Energy: 80 (80%)
+//
+// ## Agent
+// Behavior: wander
+// AI-Powered: yes
 ```
 
-**Output:**
-```
-## Identity
-Name: Alice
-Species: human
-Age: 100 (0%)
-
-## Needs
-Hunger: 75 (75%)
-Energy: 60 (60%)
-Social: 40 (40%)
-
-## Skills
-Farming: 5.2
-Crafting: 3.8
-Combat: 1.5
-
-## Memory
-Recent events: 12
-Spatial memories: 45
-```
-
-### Example 5: Auto-Generate Debug UI
+### Example 5: Rendering Dev UI
 
 ```typescript
 import { DevRenderer, MutationService } from '@ai-village/introspection';
 
-const renderer = new DevRenderer({
-  showGroups: true,
-  fieldSpacing: 4,
-  groupSpacing: 12,
-});
+const renderer = new DevRenderer();
 
-// Initialize UI for needs component
+// Initialize for entity's needs component
+const needs = entity.getComponent('needs');
 renderer.initializeComponent(
   'needs',
-  needsComponent,
+  needs,
   (fieldName, newValue) => {
-    // Mutate component when field changes
-    MutationService.mutate(entity, 'needs', fieldName, newValue, 'user');
+    // Handle field changes
+    MutationService.mutate(entity, 'needs', fieldName, newValue, 'dev');
   }
 );
 
-// Render in game loop
-function renderDebugPanel(ctx: CanvasRenderingContext2D) {
-  const x = 10;
-  const y = 10;
-  const width = 300;
-
-  const height = renderer.render(ctx, 'needs', x, y, width);
-
-  return height;
+// Render to canvas
+function renderDevPanel(ctx: CanvasRenderingContext2D) {
+  const height = renderer.render(ctx, 'needs', 10, 10, 300);
+  console.log('Rendered height:', height);
 }
 
 // Handle clicks
-canvas.addEventListener('click', (event) => {
-  const rect = canvas.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+function handleClick(x: number, y: number) {
+  const handled = renderer.handleClick('needs', x, y, 10, 10, 300);
+  if (handled) {
+    console.log('Widget clicked');
+  }
+}
 
-  renderer.handleClick('needs', x, y, 10, 10, 300);
-});
+// Update when component changes
+function onComponentUpdate() {
+  const updatedNeeds = entity.getComponent('needs');
+  renderer.updateComponent('needs', updatedNeeds);
+}
 ```
 
-### Example 6: Cache Rendered Components
+### Example 6: Using Render Cache
 
 ```typescript
 import { SchedulerRenderCache, MutationService } from '@ai-village/introspection';
 
 const cache = new SchedulerRenderCache<HTMLElement>();
 
-// Register cache for auto-invalidation on mutations
+// Register with MutationService for automatic invalidation
 MutationService.registerRenderCache(cache);
 
-function renderPlantComponent(entity: Entity): HTMLElement {
-  const plant = entity.getComponent('plant');
-
+function renderNeedsPanel(entityId: string): HTMLElement {
   // Try cache first
-  const cached = cache.get(entity.id, 'plant');
+  const cached = cache.get(entityId, 'needs');
   if (cached) {
-    return cached; // Cache hit!
+    console.log('Cache hit!');
+    return cached;
   }
 
-  // Cache miss - render component
-  const div = document.createElement('div');
-  div.textContent = `Plant: ${plant.speciesId}, Stage: ${plant.stage}`;
+  // Cache miss - render
+  console.log('Cache miss - rendering');
+  const element = document.createElement('div');
+  const needs = entity.getComponent('needs');
+  element.textContent = `Hunger: ${needs.hunger}, Thirst: ${needs.thirst}`;
 
   // Store in cache
-  cache.set(entity.id, 'plant', div, world.tick);
+  cache.set(entityId, 'needs', element, world.tick);
 
-  return div;
+  return element;
 }
 
-// Update cache tick each frame
-gameLoop.on('tick', (tick) => {
-  cache.onTick(tick);
-});
+// Update tick every frame
+function onTick() {
+  cache.onTick(world.tick);
+}
 
-// Check cache performance
-setInterval(() => {
-  const stats = cache.getStats();
-  console.log(`Cache hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
-  console.log(`Cache size: ${stats.size} entries`);
-  console.log(`Avg lifetime: ${stats.avgCacheLifetime} ticks`);
-}, 5000);
+// Check stats
+const stats = cache.getStats();
+console.log('Cache hit rate:', (stats.hitRate * 100).toFixed(1) + '%');
+console.log('Cache size:', stats.size);
+```
+
+### Example 7: Custom Summarization for LLM
+
+```typescript
+export const InventorySchema = autoRegister(
+  defineComponent<InventoryComponent>({
+    type: 'inventory',
+    version: 1,
+    category: 'physical',
+
+    fields: {
+      slots: {
+        type: 'array',
+        itemType: 'object',
+        required: true,
+        visibility: { llm: 'summarized' },  // Use summarize function
+      },
+      capacity: {
+        type: 'number',
+        required: true,
+        visibility: { llm: true },
+      },
+    },
+
+    llm: {
+      priority: 30,
+      promptSection: 'Inventory',
+      summarize: (inventory, context) => {
+        // Custom summarization logic
+        const items = inventory.slots.filter(s => s.itemId);
+        if (items.length === 0) {
+          return 'Inventory: empty';
+        }
+
+        const summary = items
+          .map(slot => `${slot.itemId} ×${slot.quantity}`)
+          .join(', ');
+
+        return `Inventory (${items.length}/${inventory.capacity}): ${summary}`;
+      },
+    },
+  })
+);
+
+// LLM prompt output:
+// ## Inventory
+// Inventory (3/10): wood ×5, stone ×12, berries ×3
 ```
 
 ---
 
 ## Architecture & Data Flow
 
-### System Integration
+### Schema Definition Flow
 
 ```
-1. Component Creation
-   ↓ defineComponent()
-2. Schema Registration
-   ↓ autoRegister() or ComponentRegistry.register()
-3. ComponentRegistry
-   ↓ Stores schema metadata
-4. Runtime Usage:
-
-   A. Debug UI Path:
-      ComponentRegistry.get()
-        ↓ Schema retrieval
-      DevRenderer.initializeComponent()
-        ↓ Widget creation from schema
-      DevRenderer.render()
-        ↓ Canvas rendering
-      User interaction
-        ↓ Widget events
-      MutationService.mutate()
-        ↓ Validated mutation
-      Component updated
-        ↓ Cache invalidation
-      DevRenderer.updateComponent()
-        ↓ Widget refresh
-
-   B. LLM Prompt Path:
-      ComponentRegistry.get()
-        ↓ Schema retrieval
-      AgentPromptRenderer.renderEntity()
-        ↓ Filter agent-visible fields
-      Prompt generation
-        ↓ Formatted text
-      LLM receives context
-
-   C. Mutation Path:
-      User/System initiates change
-        ↓
-      MutationService.mutate()
-        ↓ Validate against schema
-      ValidationService.validate()
-        ↓ Check constraints
-      Entity.updateComponent()
-        ↓ Apply change
-      UndoStack.push()
-        ↓ Record for undo/redo
-      Emit 'mutated' event
-        ↓
-      RenderCache.invalidate()
-        ↓ Clear cached render
-      UI updates
+1. Define component interface
+   ↓
+2. Create schema with defineComponent<T>()
+   ↓
+3. Wrap with autoRegister() for auto-registration
+   ↓
+4. Export schema
+   ↓
+5. Schema auto-registers when imported
+   ↓
+6. ComponentRegistry has schema available
 ```
 
-### Event Flow
+### Mutation Flow
 
 ```
-Schema Definition
-  ↓ defineComponent()
-ComponentRegistry
-  ↓ autoRegister()
-Schema Available
-
-User Interaction
-  ↓ Click widget
-DevRenderer
-  ↓ Call onChange callback
-MutationService.mutate()
-  ↓ Validate & apply
-Component Updated
-  ↓ Emit 'mutated' event
-Observers
-  ↓ React to change
-RenderCache
-  ↓ Invalidate cache
-UI Updates
+User/System triggers mutation
+   ↓
+MutationService.mutate(entity, type, field, value, source)
+   ↓
+1. Validate entity has component
+2. Get schema from ComponentRegistry
+3. Validate mutation (type, range, enum, mutability)
+4. Check for custom mutator (mutateVia)
+   ↓
+5a. Custom mutator path:
+    → Execute mutator function
+    → Mutator handles update + events
+    → Return success
+   ↓
+5b. Standard mutation path:
+    → Create mutation command
+    → Execute mutation
+    → Push to undo stack
+    → Invalidate render caches
+    → Emit 'mutated' event
+    → Validate full component (optional)
+    → Return success
+   ↓
+Listeners receive mutation event
+   ↓
+Render caches invalidated
+   ↓
+Next render uses fresh data
 ```
 
-### Component Relationships
+### LLM Prompt Generation Flow
 
 ```
-ComponentSchema
-├── type: string (unique identifier)
-├── version: number
-├── category: ComponentCategory
-├── fields: Record<string, FieldSchema>
-│   ├── FieldSchema
-│   │   ├── type: FieldType
-│   │   ├── required: boolean
-│   │   ├── visibility: Visibility
-│   │   ├── ui: UIHints
-│   │   └── mutable: boolean
-│   └── ...
-├── ui: UIConfig
-├── llm: LLMConfig
-├── renderers: CustomRenderers
-├── mutators: Record<string, MutatorFunction>
-├── validate: (data) => boolean
-└── createDefault: () => Component
+PromptRenderer.renderEntity(entity, world)
+   ↓
+For each component in entity:
+   1. Get schema from ComponentRegistry
+   2. Check if any fields have visibility.llm === true
+   3. Skip if no LLM-visible fields
+   ↓
+   4. Use custom llm renderer if provided
+      → Return custom output
+   ↓
+   5. Check for summarize function
+      → Use if any field has visibility.llm === 'summarized'
+      → Return summarized output
+   ↓
+   6. Use template if provided
+      → Replace {fieldName} placeholders
+      → Return templated output
+   ↓
+   7. Generate detailed field-by-field output
+      → Group fields by promptSection
+      → Filter LLM-visible fields
+      → Skip empty/default values (unless alwaysInclude)
+      → Format values by type
+      → Return detailed output
+   ↓
+Sort all sections by priority
+   ↓
+Combine sections with ## headers
+   ↓
+Return complete prompt
+```
+
+### Render Cache Flow
+
+```
+Renderer requests component render
+   ↓
+cache.get(entityId, componentType)
+   ↓
+Check if cached:
+   1. No entry → cache miss
+   2. Past nextUpdateTick → cache miss (expired)
+   3. Manually invalidated → cache miss
+   4. Otherwise → cache hit
+   ↓
+Cache miss:
+   → Render component
+   → Get update interval from SimulationScheduler
+   → Calculate nextUpdateTick = currentTick + updateInterval
+   → cache.set(entityId, componentType, rendered, currentTick)
+   → Return rendered
+   ↓
+Cache hit:
+   → Return cached output
+   ↓
+On mutation:
+   → MutationService invalidates cache entry
+   → Next render will be cache miss
+   ↓
+On tick:
+   → cache.onTick(tick) updates currentTick
+   → Prunes expired entries
+```
+
+### Component Categories & Organization
+
+```
+core/          → identity, position, renderable (fundamental)
+agent/         → agent, personality, skills, needs, mood, profession
+physical/      → body, movement, health, inventory, equipment, species
+social/        → relationships, reputation, currency, trade, conflict
+cognitive/     → memory, goals, beliefs, knowledge, discovery
+magic/         → mana, spells, paradigms, divinity, myths, lore
+world/         → time, weather, buildings, resources, realms, portals
+system/        → steering, pathfinding, vision, recording, debug
+afterlife/     → death, judgment, bargains, reincarnation
+```
+
+---
+
+## Integration with Other Systems
+
+### LLM Package Integration
+
+The LLM package uses introspection for prompt generation:
+
+```typescript
+import { PromptRenderer } from '@ai-village/introspection';
+import { LLMService } from '@ai-village/llm';
+
+// Generate agent self-awareness prompt
+const prompt = PromptRenderer.renderEntity(agentEntity, world);
+
+// Send to LLM
+const response = await LLMService.sendPrompt({
+  systemPrompt: 'You are an agent in a simulation.',
+  userPrompt: prompt,
+  agentId: agentEntity.id,
+});
+```
+
+### Admin Dashboard Integration
+
+The admin dashboard uses introspection for component editing:
+
+```typescript
+import { ComponentRegistry, MutationService } from '@ai-village/introspection';
+
+// Get all editable fields for a component
+const schema = ComponentRegistry.get('agent');
+const editableFields = Object.entries(schema.fields)
+  .filter(([_, field]) => field.mutable && field.visibility.dev)
+  .map(([name, field]) => ({ name, field }));
+
+// Generate edit UI
+for (const { name, field } of editableFields) {
+  renderFieldEditor(name, field, (newValue) => {
+    MutationService.mutate(entity, 'agent', name, newValue, 'user');
+  });
+}
+```
+
+### Renderer Package Integration
+
+The renderer package uses introspection for dev panels:
+
+```typescript
+import { DevRenderer } from '@ai-village/introspection';
+
+class AgentInfoPanel {
+  private devRenderer = new DevRenderer();
+
+  renderComponent(componentType: string, component: Component) {
+    this.devRenderer.initializeComponent(
+      componentType,
+      component,
+      (fieldName, newValue) => {
+        MutationService.mutate(entity, componentType, fieldName, newValue, 'dev');
+      }
+    );
+
+    return this.devRenderer.render(this.ctx, componentType, x, y, width);
+  }
+}
+```
+
+### Persistence Integration
+
+Schemas provide validation for save/load:
+
+```typescript
+import { ComponentRegistry } from '@ai-village/introspection';
+
+// Validate loaded component data
+function validateComponent(type: string, data: unknown): boolean {
+  const schema = ComponentRegistry.get(type);
+  if (!schema || !schema.validate) {
+    return true;  // No validation available
+  }
+
+  return schema.validate(data);
+}
+
+// Create default component if data corrupted
+function recoverComponent(type: string): Component | null {
+  const schema = ComponentRegistry.get(type);
+  if (!schema || !schema.createDefault) {
+    return null;
+  }
+
+  return schema.createDefault();
+}
 ```
 
 ---
@@ -1140,64 +1240,75 @@ ComponentSchema
 
 **Optimization strategies:**
 
-1. **Schema caching:** Schemas are registered once at import time, not per-component instance
-2. **Lazy rendering:** UIs are only rendered when visible
-3. **Render caching:** `SchedulerRenderCache` reduces redundant renders by 85-99%
-4. **Event batching:** Mutation events are emitted after all mutations complete
-5. **Widget reuse:** Widgets are initialized once, not recreated on every render
+1. **Auto-registration overhead**: Schemas register immediately when imported. For large codebases, consider lazy loading schema modules.
 
-**Query caching:**
+2. **Cache render output**: Use `SchedulerRenderCache` to avoid redundant renders. Typical hit rates:
+   - Agent components: 67% (updates every tick)
+   - Plant components: 99.7% (updates every 86400 ticks)
+   - Weather: 99% (updates every 100 ticks)
+
+3. **LLM prompt generation**: Cache prompts per entity using `SchedulerRenderCache<string>`:
 
 ```typescript
-// ❌ BAD: Query schema repeatedly
-for (const entity of entities) {
-  const schema = ComponentRegistry.get('needs'); // Query every iteration!
-  renderComponent(entity, schema);
-}
+const promptCache = new SchedulerRenderCache<string>();
 
-// ✅ GOOD: Query once, reuse
-const schema = ComponentRegistry.get('needs'); // Query once
-for (const entity of entities) {
-  renderComponent(entity, schema);
+function getAgentPrompt(entityId: string): string {
+  const cached = promptCache.get(entityId, 'agent');
+  if (cached) return cached;
+
+  const prompt = PromptRenderer.renderEntity(entity, world);
+  promptCache.set(entityId, 'agent', prompt, world.tick);
+  return prompt;
 }
 ```
 
-**Render caching:**
+4. **Mutation batching**: Use `mutateBatch()` to validate multiple mutations at once:
 
 ```typescript
-// ❌ BAD: Render every frame
-function render() {
-  const rendered = renderPlantComponent(plant); // Render every frame!
-  display(rendered);
+// ❌ BAD: Individual mutations (multiple validations)
+MutationService.mutate(entity, 'needs', 'hunger', 75);
+MutationService.mutate(entity, 'needs', 'thirst', 60);
+MutationService.mutate(entity, 'needs', 'energy', 80);
+
+// ✅ GOOD: Batch mutations (single validation pass)
+MutationService.mutateBatch([
+  { entity, componentType: 'needs', fieldName: 'hunger', value: 75 },
+  { entity, componentType: 'needs', fieldName: 'thirst', value: 60 },
+  { entity, componentType: 'needs', fieldName: 'energy', value: 80 },
+]);
+```
+
+5. **Schema lookups**: `ComponentRegistry.get()` is O(1) Map lookup. Cache schemas if calling repeatedly:
+
+```typescript
+// ❌ BAD: Repeated lookups in loop
+for (const entity of entities) {
+  const schema = ComponentRegistry.get('agent');  // Lookup every iteration
+  processEntity(entity, schema);
 }
 
-// ✅ GOOD: Use scheduler-aware cache
-function render() {
-  const cached = cache.get(entity.id, 'plant');
-  if (cached) {
-    display(cached); // Cache hit (99.7% for plants)
-  } else {
-    const rendered = renderPlantComponent(plant);
-    cache.set(entity.id, 'plant', rendered, world.tick);
-    display(rendered);
-  }
+// ✅ GOOD: Lookup once before loop
+const schema = ComponentRegistry.get('agent');  // Lookup once
+for (const entity of entities) {
+  processEntity(entity, schema);
 }
 ```
 
-**Visibility filtering:**
+6. **Widget creation**: DevRenderer creates widgets once during `initializeComponent()`. Reuse renderer instances:
 
 ```typescript
-// ❌ BAD: Include all fields in prompts
-for (const [key, value] of Object.entries(component)) {
-  prompt += `${key}: ${value}\n`;
+// ❌ BAD: Create new renderer per entity
+for (const entity of entities) {
+  const renderer = new DevRenderer();  // Creates new widget instances
+  renderer.initializeComponent('agent', entity.getComponent('agent'), onChange);
+  renderer.render(ctx, 'agent', x, y, width);
 }
 
-// ✅ GOOD: Filter by visibility
-for (const [fieldName, fieldSchema] of Object.entries(schema.fields)) {
-  if (fieldSchema.visibility.llm === true) {
-    const value = component[fieldName];
-    prompt += `${fieldName}: ${value}\n`;
-  }
+// ✅ GOOD: Reuse renderer, reinitialize per entity
+const renderer = new DevRenderer();  // Create once
+for (const entity of entities) {
+  renderer.initializeComponent('agent', entity.getComponent('agent'), onChange);
+  renderer.render(ctx, 'agent', x, y, width);
 }
 ```
 
@@ -1207,174 +1318,61 @@ for (const [fieldName, fieldSchema] of Object.entries(schema.fields)) {
 
 ### Schema not found
 
-**Error:** `No schema registered for component type 'identity'`
+**Error:** `No schema registered for component type 'my_component'`
 
-**Check:**
-1. Schema file is imported somewhere in the application
-2. `autoRegister()` is used or `ComponentRegistry.register()` is called manually
-3. Schema `type` matches component `type` exactly (case-sensitive)
+**Fix:**
+1. Ensure schema file is imported somewhere in the codebase
+2. Use `autoRegister()` wrapper for auto-registration
+3. Check that schema is exported from `src/schemas/index.ts`
+4. Manually register if needed: `ComponentRegistry.register(MySchema)`
 
-**Debug:**
-```typescript
-console.log('Registered schemas:', ComponentRegistry.list());
-console.log('Has identity?', ComponentRegistry.has('identity'));
-```
+### Mutation validation failed
 
-### Mutation validation failing
+**Error:** `Mutation failed: Field 'name' is not mutable`
 
-**Error:** `Validation failed: Value 999 exceeds maximum 100`
+**Fix:**
+1. Set `mutable: true` in field schema
+2. Enable dev mode: `MutationService.setDevMode(true)`
+3. Use custom mutator via `mutateVia` field
 
-**Check:**
-1. Field constraints in schema (`range`, `min`, `max`, `required`)
-2. Value type matches field type
-3. Enum values are valid (for enum fields)
-4. Dev mode is enabled if mutating immutable fields
+### LLM prompt missing fields
 
-**Debug:**
-```typescript
-const schema = ComponentRegistry.get('needs');
-console.log('Hunger constraints:');
-console.log('  Type:', schema.fields.hunger.type);
-console.log('  Range:', schema.fields.hunger.range);
-console.log('  Required:', schema.fields.hunger.required);
-console.log('  Mutable:', schema.fields.hunger.mutable);
-```
+**Issue:** Expected fields not appearing in LLM prompts
 
-### Field not visible in UI/prompts
-
-**Check:**
-1. `visibility.dev === true` for debug UI
-2. `visibility.llm === true` for LLM prompts
-3. `visibility.agent === true` for agent self-awareness
-4. `visibility.player === true` for player UI
-
-**Debug:**
-```typescript
-const schema = ComponentRegistry.get('needs');
-console.log('Hunger visibility:', schema.fields.hunger.visibility);
-```
-
-### Widgets not rendering
-
-**Check:**
-1. `DevRenderer.initializeComponent()` called before rendering
-2. Component type matches registered schema type
-3. Field has `visibility.dev === true`
-4. Widget type is valid (`'text'`, `'slider'`, `'dropdown'`, etc.)
-
-**Debug:**
-```typescript
-const renderer = new DevRenderer();
-renderer.initializeComponent('needs', needsComponent, () => {});
-console.log('Registered components:', renderer.getComponentTypes());
-```
+**Fix:**
+1. Check `visibility.llm` is `true` or `'summarized'`
+2. Ensure field is not empty/default (set `llm.alwaysInclude: true` to force inclusion)
+3. Check `llm.hideIf` condition is not filtering field
+4. Verify field is in correct `llm.promptSection`
 
 ### Cache not invalidating
 
-**Check:**
-1. `cache.onTick(tick)` is called every frame
-2. `MutationService.registerRenderCache(cache)` was called
-3. Mutations use `MutationService.mutate()` (not direct component updates)
-4. Cache key is correct (`entityId:componentType`)
+**Issue:** Stale data appearing in renders after mutation
 
-**Debug:**
-```typescript
-const stats = cache.getStats();
-console.log('Cache stats:', stats);
-console.log('Cached entities:', cache.getCachedEntities());
-console.log('Cache details:', cache.getCacheDetails());
-```
+**Fix:**
+1. Register cache with MutationService: `MutationService.registerRenderCache(cache)`
+2. Manually invalidate: `cache.invalidate(entityId, componentType)`
+3. Call `cache.onTick(tick)` every tick to prune expired entries
 
-### Undo/redo not working
+### Dev UI widget not rendering
 
-**Check:**
-1. Mutations use `MutationService.mutate()` (not direct updates)
-2. Custom mutators don't handle undo (only direct mutations are undoable)
-3. Undo stack hasn't been cleared
+**Issue:** Field not appearing in DevRenderer output
 
-**Debug:**
-```typescript
-console.log('Can undo?', MutationService.canUndo());
-console.log('Can redo?', MutationService.canRedo());
-```
+**Fix:**
+1. Check `visibility.dev` is `true` (default)
+2. Verify `ui.widget` is valid widget type
+3. Ensure field is not filtered by custom logic
+4. Check widget factory supports field type
 
----
+### Type inference not working
 
-## Integration with Other Systems
+**Issue:** TypeScript not inferring component types from schema
 
-### ECS Integration
-
-The introspection system integrates with the ECS via component schemas:
-
-```typescript
-// Define component
-interface NeedsComponent extends Component {
-  type: 'needs';
-  version: 1;
-  hunger: number;
-  energy: number;
-}
-
-// Create schema
-const NeedsSchema = autoRegister(defineComponent<NeedsComponent>({ /* ... */ }));
-
-// Use in ECS
-const entity = world.createEntity();
-entity.addComponent(NeedsSchema.createDefault());
-
-// Mutate via introspection
-MutationService.mutate(entity, 'needs', 'hunger', 75);
-
-// Generate prompts
-const prompt = AgentPromptRenderer.renderEntity(entity);
-```
-
-### LLM Integration
-
-The introspection system generates prompts for LLMs:
-
-```typescript
-import { AgentPromptRenderer } from '@ai-village/introspection';
-import { generateBehavior } from '@ai-village/llm';
-
-// Generate agent self-awareness prompt
-const agentContext = AgentPromptRenderer.renderEntity(agent);
-
-// Pass to LLM
-const behavior = await generateBehavior({
-  agentContext,
-  worldState,
-  recentEvents,
-});
-```
-
-### Debug Panel Integration
-
-The introspection system powers the debug panel:
-
-```typescript
-import { DevRenderer, MutationService } from '@ai-village/introspection';
-
-class DebugPanel {
-  private renderer = new DevRenderer();
-
-  showEntity(entity: Entity) {
-    // Initialize UI for all components
-    for (const [type, component] of entity.components.entries()) {
-      this.renderer.initializeComponent(type, component, (field, value) => {
-        MutationService.mutate(entity, type, field, value, 'user');
-      });
-    }
-  }
-
-  render(ctx: CanvasRenderingContext2D) {
-    let y = 10;
-    for (const type of this.renderer.getComponentTypes()) {
-      y += this.renderer.render(ctx, type, 10, y, 300);
-    }
-  }
-}
-```
+**Fix:**
+1. Pass component interface to `defineComponent<T>()`
+2. Ensure interface extends `Component`
+3. Use `readonly` modifiers on schema properties
+4. Check TypeScript version (requires 5.0+)
 
 ---
 
@@ -1383,66 +1381,80 @@ class DebugPanel {
 Run introspection tests:
 
 ```bash
-npm test -- mutation.test.ts
-npm test -- types.test.ts
+cd custom_game_engine/packages/introspection
+npm test
 ```
 
-**Key test files:**
-- `src/__tests__/mutation.test.ts` - Mutation system tests
-- `src/__tests__/types.test.ts` - Type validation tests
+**Key test coverage:**
+- Schema validation
+- Component registry operations
+- Mutation validation and execution
+- Undo/redo functionality
+- LLM prompt generation
+- Dev UI rendering
+- Render cache behavior
 
 ---
 
 ## Further Reading
 
-- **SYSTEMS_CATALOG.md** - Complete system reference (introspection systems not cataloged)
-- **COMPONENTS_REFERENCE.md** - All 125+ component types with introspection schemas
-- **METASYSTEMS_GUIDE.md** - Metasystems that use introspection (Consciousness, Divinity)
-- **PERFORMANCE.md** - Performance optimization guide
-- **example-usage.ts** - Complete usage examples
+- **COMPONENTS_REFERENCE.md** - Complete list of 125+ components with schemas
+- **SYSTEMS_CATALOG.md** - System reference (how systems use introspection)
+- **ARCHITECTURE_OVERVIEW.md** - ECS architecture and introspection integration
+- **LLM Package README** - How LLM agents use introspection for self-awareness
+- **Renderer Package README** - How UI panels use introspection for dev tools
 
 ---
 
 ## Summary for Language Models
 
 **Before working with introspection:**
-1. Read this README completely to understand schema structure, mutation system, and rendering
-2. Understand visibility rules (player/llm/agent/dev) and their implications
-3. Know the difference between `AgentPromptRenderer` (agent self-awareness) and `PromptRenderer` (world context)
-4. Understand mutation validation and undo/redo mechanics
-5. Know how to query schemas from `ComponentRegistry`
+1. Read this README completely
+2. Understand ComponentSchema structure (type, fields, visibility, UI hints)
+3. Know how to define schemas with `defineComponent()` and `autoRegister()`
+4. Understand mutation validation and undo/redo
+5. Know how LLM prompts are generated from schemas
+6. Understand render caching for performance
 
 **Common tasks:**
-- **Define schema:** Use `autoRegister(defineComponent<T>({ ... }))` pattern
-- **Query schema:** `ComponentRegistry.get<T>('type')` with type narrowing
-- **Mutate field:** `MutationService.mutate(entity, type, field, value)`
-- **Generate agent prompt:** `AgentPromptRenderer.renderEntity(agent)`
-- **Generate LLM prompt:** `PromptRenderer.renderEntity(entity)`
-- **Auto-generate UI:** `DevRenderer.initializeComponent()` then `render()`
-- **Cache renders:** `SchedulerRenderCache.get()/set()` with tick-based invalidation
+- **Define schema:** Use `defineComponent<T>()` with full field metadata
+- **Register schema:** Wrap with `autoRegister()` for automatic registration
+- **Query schema:** `ComponentRegistry.get('type')` for type-safe retrieval
+- **Mutate field:** `MutationService.mutate(entity, type, field, value, source)`
+- **Generate prompt:** `PromptRenderer.renderEntity(entity, world)`
+- **Render dev UI:** Create `DevRenderer`, initialize component, render to canvas
+- **Cache renders:** Use `SchedulerRenderCache` with scheduler update frequencies
 
 **Critical rules:**
-- Always define schemas with `defineComponent()` for type safety
-- Use `autoRegister()` to ensure schemas are registered on import
-- Never mutate components directly - use `MutationService.mutate()` for validation and undo/redo
-- Always set `description` for fields where `visibility.llm === true` (LLMs need context)
-- Cache schemas - don't query `ComponentRegistry` in loops
-- Use visibility filtering - don't expose all fields to all consumers
-- Register render caches with `MutationService` for auto-invalidation on mutations
-- Call `cache.onTick(tick)` every frame to enable scheduler-based invalidation
+- Always define schemas for new components (enables introspection)
+- Use `autoRegister()` for auto-registration on import
+- Set visibility flags appropriately (player/llm/agent/dev)
+- Mark fields `mutable: true` if they should be editable
+- Use `SchedulerRenderCache` for performance (85-99% hit rate)
+- Register caches with `MutationService` for automatic invalidation
+- Provide `description` for all LLM-visible fields
+- Use appropriate widget types for dev UI rendering
+- Cache schema lookups if calling in loops
+- Use mutation batching for multiple field updates
 
 **Event-driven architecture:**
-- Listen to `'mutated'` events from `MutationService` for component changes
-- Emit mutations through `MutationService.mutate()` (never bypass)
-- Never modify components directly - always use the mutation system
-- Render caches automatically invalidate on mutations via `MutationService` integration
+- Subscribe to mutation events via `MutationService.on('mutated', handler)`
+- Mutations auto-invalidate render caches
+- Schemas are immutable (registered once at startup)
+- Registry is thread-safe singleton
 
-**Schema design best practices:**
-- Group related fields with `ui.group`
-- Order fields logically with `ui.order`
-- Provide clear descriptions for all LLM-visible fields
-- Set appropriate visibility for each field (don't over-expose)
-- Mark fields as immutable unless they should be user-editable
-- Provide `validate()` for runtime type checking
-- Provide `createDefault()` for factory instantiation
-- Use `llm.summarize()` for concise component summaries
+**LLM integration:**
+- Set `visibility.llm = true` for fields LLMs should see
+- Use `visibility.llm = 'summarized'` + `llm.summarize` for compact representation
+- Set `llm.priority` to control section ordering (lower = earlier)
+- Use `llm.promptSection` to group related fields
+- Provide `llm.promptLabel` for custom field labels
+- Use `llm.template` for custom formatting
+
+**Performance best practices:**
+- Cache prompts with `SchedulerRenderCache<string>`
+- Reuse `DevRenderer` instances
+- Batch mutations with `mutateBatch()`
+- Cache schema lookups before loops
+- Register render caches with `MutationService`
+- Call `cache.onTick(tick)` every tick

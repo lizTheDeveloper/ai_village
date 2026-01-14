@@ -217,7 +217,38 @@ steering.containmentMargin = 10; // Apply force when within 10 tiles of edge
 - Coverage calculation: `exploredSectors / totalSectors`
 - Milestone events at 25%, 50%, 75%, 90% coverage
 
-### 6. Performance Optimizations
+### 6. Pathfinding (Future Work)
+
+**Status:** Planned but not yet implemented (see `TODO.md`)
+
+**Current behavior:**
+- Agents use steering behaviors (seek, arrive, obstacle_avoidance)
+- Stuck agents (3+ seconds) use random jitter to try different angles
+- Works well for open spaces but can struggle with complex obstacles
+
+**Planned A* pathfinding integration:**
+```typescript
+// Future: When agent stuck, calculate path around obstacles
+if (isStuck(entity)) {
+  const path = await pathfindingSystem.findPath(position, target);
+  steering.waypoints = path;
+  steering.behavior = 'follow_path';
+}
+```
+
+**Use cases for pathfinding:**
+- Navigating around buildings and walls
+- Finding routes through complex terrain
+- Multi-waypoint paths for long-distance travel
+- Dynamic path recalculation when obstacles change
+
+**Current workaround:**
+- Obstacle avoidance behavior steers around nearby obstacles
+- Combined behaviors (seek + obstacle_avoidance) work for most cases
+- Stuck detection adds random jitter after 3 seconds
+- See troubleshooting section for stuck agent handling
+
+### 7. Performance Optimizations
 
 **Chunk-based spatial index:**
 - World divided into 32×32 tile chunks
@@ -1242,28 +1273,31 @@ const nearbyIds = world.getEntitiesInChunk(chunkX, chunkY);
 
 ## Testing
 
-Run navigation system tests:
+**Status:** Test coverage to be added (see `TODO.md`)
 
+**Planned test coverage:**
+- MovementSystem: Collision detection (hard/soft), position updates, fatigue penalties
+- SteeringSystem: All behaviors (seek, arrive, wander, obstacle_avoidance, combined), stuck detection
+- ExplorationSystem: Frontier/spiral algorithms, sector tracking, milestone events
+- Integration tests: Interaction with Time, Circadian, Needs, Building systems
+
+**When tests are added, run with:**
 ```bash
 npm test -- MovementSystem.test.ts
 npm test -- SteeringSystem.test.ts
 npm test -- ExplorationSystem.test.ts
 ```
 
-**Key test files:**
-- `packages/navigation/src/__tests__/MovementSystem.test.ts` (if exists)
-- `packages/navigation/src/__tests__/SteeringSystem.test.ts` (if exists)
-- `packages/core/src/__tests__/NavigationIntegration.test.ts` (if exists)
-
 ---
 
 ## Further Reading
 
-- **SYSTEMS_CATALOG.md** - Complete system reference (MovementSystem priority 100, SteeringSystem priority 95)
+- **SYSTEMS_CATALOG.md** - Complete system reference (MovementSystem priority 20, SteeringSystem priority 15, ExplorationSystem priority 25)
 - **COMPONENTS_REFERENCE.md** - All component types (movement, velocity, steering, exploration_state)
 - **METASYSTEMS_GUIDE.md** - No direct metasystem (navigation is a utility system)
 - **PERFORMANCE.md** - Performance optimization guide (chunk-based queries, squared distance)
 - **CLAUDE.md** - Code quality rules (no fallbacks, fail fast, squared distance)
+- **TODO.md** - Implementation status, planned improvements, missing features
 
 ---
 
@@ -1276,6 +1310,7 @@ npm test -- ExplorationSystem.test.ts
 4. Know component relationships: Position → Movement → Velocity → Steering
 5. Understand containment bounds (keeps entities within areas)
 6. Know exploration modes: frontier (organic), spiral (systematic)
+7. Be aware: A* pathfinding is planned future work (agents currently use steering + stuck detection)
 
 **Common tasks:**
 - **Move agent to target:** Set `steering.behavior = 'arrive'` and `steering.target = {x, y}`
