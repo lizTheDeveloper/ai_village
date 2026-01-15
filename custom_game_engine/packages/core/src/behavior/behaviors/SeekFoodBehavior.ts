@@ -7,6 +7,8 @@
  * 3. If no food in inventory → gather food from environment
  *
  * Part of the AISystem decomposition (work-order: ai-system-refactor)
+ *
+ * Performance: Uses ChunkSpatialQuery and SpatialMemory for efficient food source lookups
  */
 
 import type { EntityImpl, Entity } from '../../ecs/Entity.js';
@@ -17,6 +19,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
+import { getSpatialMemoriesByType } from '../../components/SpatialMemoryComponent.js';
 import { itemRegistry } from '../../items/index.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { eatFromStorage, eatFromPlant, type InteractionResult } from '../../services/InteractionAPI.js';
@@ -24,6 +28,17 @@ import { isEdibleSpecies } from '../../services/TargetingAPI.js';
 import { HUNGER_THRESHOLD_SEEK_FOOD, HUNGER_RESTORED_DEFAULT } from '../../constants/index.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
+
+/**
+ * Injection point for ChunkSpatialQuery (optional dependency)
+ * Used for efficient nearby food source lookups
+ */
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToSeekFood(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[SeekFoodBehavior] ChunkSpatialQuery injected for efficient food lookups');
+}
 
 /** Default hunger restored if item not in registry */
 const DEFAULT_HUNGER_RESTORED = HUNGER_RESTORED_DEFAULT;
@@ -130,6 +145,10 @@ export class SeekFoodBehavior extends BaseBehavior {
    * Find the best food source considering both distance and food quality.
    * Score = distance - (hungerRestored * 2)
    * Lower score = better (close AND nutritious)
+   *
+   * Performance optimizations:
+   * - Uses ChunkSpatialQuery when available for nearby lookups
+   * - Falls back to global queries only when needed
    */
   private findNearestFoodSource(
     entity: EntityImpl,
@@ -139,7 +158,80 @@ export class SeekFoodBehavior extends BaseBehavior {
     if (!position) return null;
 
     let best: { type: 'plant' | 'storage'; entity: Entity; position: { x: number; y: number }; distance: number; score: number } | null = null;
+    const FOOD_SEARCH_RADIUS = 30; // Limit search radius for performance
 
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      // Get nearby plants using chunk queries
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, FOOD_SEARCH_RADIUS,
+        [ComponentType.Plant]
+      );
+
+      for (const { entity: plantEntity, distance } of plantsInRadius) {
+        const plantImpl = plantEntity as EntityImpl;
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plant = plantImpl.getComponent(ComponentType.Plant) as { speciesId: string; fruitCount: number } | undefined;
+
+        if (!plantPos || !plant) continue;
+        if (!isEdibleSpecies(plant.speciesId)) continue;
+        if (plant.fruitCount <= 0) continue; // Only plants with fruit
+
+        // Get nutritional value of fruit from this plant type
+        const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+        const fruitItemId = isBerry ? 'berry' : 'fruit';
+        const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
+
+        // Score: prefer closer AND more nutritious (lower score = better)
+        const score = distance - (hungerRestored * 2);
+
+        if (!best || score < best.score) {
+          best = { type: 'plant', entity: plantEntity, position: { x: plantPos.x, y: plantPos.y }, distance, score };
+        }
+      }
+
+      // Get nearby buildings using chunk queries
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, FOOD_SEARCH_RADIUS,
+        [ComponentType.Building]
+      );
+
+      for (const { entity: buildingEntity, distance } of buildingsInRadius) {
+        const buildingImpl = buildingEntity as EntityImpl;
+        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+
+        if (!buildingPos || !buildingComp || !buildingInventory) continue;
+
+        // Check if it's a storage building
+        const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
+                         buildingComp.buildingType === BuildingType.StorageBox;
+        if (!isStorage) continue;
+
+        // Find best food item in storage
+        let bestFoodValue = 0;
+        for (const slot of buildingInventory.slots) {
+          if (slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
+            const hungerRestored = itemRegistry.getHungerRestored(slot.itemId) || DEFAULT_HUNGER_RESTORED;
+            bestFoodValue = Math.max(bestFoodValue, hungerRestored);
+          }
+        }
+
+        if (bestFoodValue === 0) continue;
+
+        // Score: prefer closer AND more nutritious
+        const score = distance - (bestFoodValue * 2);
+
+        if (!best || score < best.score) {
+          best = { type: 'storage', entity: buildingEntity, position: { x: buildingPos.x, y: buildingPos.y }, distance, score };
+        }
+      }
+
+      return best;
+    }
+
+    // Fallback: Use global queries (slow, only when ChunkSpatialQuery not available)
     // Check edible plants with fruit
     const plantEntities = world.query()
       .with(ComponentType.Plant)
@@ -159,8 +251,11 @@ export class SeekFoodBehavior extends BaseBehavior {
       const dy = position.y - plantPos.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
+      if (distance > FOOD_SEARCH_RADIUS) continue; // Skip distant plants
+
       // Get nutritional value of fruit from this plant type
-      const fruitItemId = plant.speciesId === 'berry-bush' ? 'berry' : 'fruit';
+      const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+      const fruitItemId = isBerry ? 'berry' : 'fruit';
       const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
 
       // Score: prefer closer AND more nutritious (lower score = better)
@@ -191,6 +286,12 @@ export class SeekFoodBehavior extends BaseBehavior {
                        buildingComp.buildingType === BuildingType.StorageBox;
       if (!isStorage) continue;
 
+      const dx = position.x - buildingPos.x;
+      const dy = position.y - buildingPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > FOOD_SEARCH_RADIUS) continue; // Skip distant buildings
+
       // Find best food item in storage
       let bestFoodValue = 0;
       for (const slot of buildingInventory.slots) {
@@ -201,10 +302,6 @@ export class SeekFoodBehavior extends BaseBehavior {
       }
 
       if (bestFoodValue === 0) continue;
-
-      const dx = position.x - buildingPos.x;
-      const dy = position.y - buildingPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
 
       // Score: prefer closer AND more nutritious
       const score = distance - (bestFoodValue * 2);
@@ -284,15 +381,52 @@ export class SeekFoodBehavior extends BaseBehavior {
   /**
    * Try to eat food directly from a nearby storage building.
    * Returns the result of the interaction, or null if no storage found.
+   *
+   * Performance: Uses ChunkSpatialQuery when available
    */
   private tryEatFromNearbyStorage(entity: EntityImpl, world: World): InteractionResult | null {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
 
-    // Find nearby storage buildings with food
     const nearbyDistance = 3; // Must be within 3 tiles of storage
 
-    // Query for buildings with inventory
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, nearbyDistance,
+        [ComponentType.Building]
+      );
+
+      for (const { entity: buildingEntity } of buildingsInRadius) {
+        const buildingImpl = buildingEntity as EntityImpl;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+
+        if (!buildingComp || !buildingInventory) continue;
+
+        // Check if it's a storage building
+        const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
+                         buildingComp.buildingType === BuildingType.StorageBox;
+        if (!isStorage) continue;
+
+        // Check if storage has food
+        const hasFood = buildingInventory.slots.some(
+          slot => slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)
+        );
+
+        if (!hasFood) continue;
+
+        // Try to eat from this storage
+        const result = eatFromStorage(entity, buildingEntity, world);
+        if (result.success) {
+          return result;
+        }
+      }
+
+      return null;
+    }
+
+    // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
     const buildingEntities = world.query()
       .with(ComponentType.Building)
       .with(ComponentType.Inventory)
@@ -339,15 +473,46 @@ export class SeekFoodBehavior extends BaseBehavior {
   /**
    * Try to eat fruit directly from a nearby plant (berry bush, etc.).
    * Returns the result of the interaction, or null if no suitable plant found.
+   *
+   * Performance: Uses ChunkSpatialQuery when available
    */
   private tryEatFromNearbyPlant(entity: EntityImpl, world: World): InteractionResult | null {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
 
-    // Find nearby edible plants with fruit
     const nearbyDistance = 2; // Must be within 2 tiles of plant
 
-    // Query for plants with position
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, nearbyDistance,
+        [ComponentType.Plant]
+      );
+
+      for (const { entity: plantEntity } of plantsInRadius) {
+        const plantImpl = plantEntity as EntityImpl;
+        const plant = plantImpl.getComponent(ComponentType.Plant) as {
+          speciesId: string;
+          fruitCount: number;
+        } | undefined;
+
+        if (!plant) continue;
+
+        // Check if it's an edible species with fruit
+        if (!isEdibleSpecies(plant.speciesId)) continue;
+        if (plant.fruitCount <= 0) continue;
+
+        // Try to eat from this plant
+        const result = eatFromPlant(entity, plantEntity, world);
+        if (result.success) {
+          return result;
+        }
+      }
+
+      return null;
+    }
+
+    // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
     const plantEntities = world.query()
       .with(ComponentType.Plant)
       .with(ComponentType.Position)

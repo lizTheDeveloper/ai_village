@@ -116,8 +116,19 @@ export const SIMULATION_CONFIGS: Record<string, ComponentSimulationConfig> = {
   // PASSIVE - Event-driven only (zero per-tick cost)
   // ============================================================================
 
-  /** Resources never update, only react to harvest events */
-  resource: { mode: SimulationMode.PASSIVE },
+  /** Resources need spatial indexing for gathering but don't need updates */
+  resource: {
+    mode: SimulationMode.PROXIMITY,
+    range: 200, // Large range for chunk indexing
+    updateFrequency: Infinity, // Never update (event-driven)
+  },
+
+  /** VoxelResource also needs spatial indexing */
+  voxel_resource: {
+    mode: SimulationMode.PROXIMITY,
+    range: 200,
+    updateFrequency: Infinity,
+  },
 
   /** Items are passive until picked up */
   inventory: { mode: SimulationMode.PASSIVE },

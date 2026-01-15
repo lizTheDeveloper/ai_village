@@ -14,6 +14,20 @@ import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { SteeringComponent } from '../components/SteeringComponent.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Tile } from '@ai-village/world';
+import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js';
+import { addSpatialMemory } from '../components/SpatialMemoryComponent.js';
+import type { ResourceComponent } from '../components/ResourceComponent.js';
+
+/**
+ * Injection point for ChunkSpatialQuery (optional dependency)
+ * Used for passive resource discovery when agents move
+ */
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToMovement(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[MovementSystem] ChunkSpatialQuery injected for passive resource discovery');
+}
 
 interface TimeComponent {
   speedMultiplier?: number;
@@ -52,6 +66,11 @@ export class MovementSystem implements System {
 
   // Performance: Cache time entity ID to avoid querying every tick
   private timeEntityId: string | null = null;
+
+  // Passive resource discovery - throttle discovery checks
+  private readonly DISCOVERY_INTERVAL_TICKS = 5; // Check every 5 ticks (~250ms)
+  private readonly DISCOVERY_RADIUS = 5; // Tiles
+  private lastDiscoveryCheck: Map<string, number> = new Map();
 
   /**
    * Initialize event listeners to invalidate cache on building changes
@@ -226,9 +245,9 @@ export class MovementSystem implements System {
         const alt2Y = position.y + perpY2;
 
         if (!this.hasHardCollision(world, entity.id, alt1X, alt1Y)) {
-          this.updatePosition(impl, alt1X, alt1Y);
+          this.updatePosition(impl, alt1X, alt1Y, world);
         } else if (!this.hasHardCollision(world, entity.id, alt2X, alt2Y)) {
-          this.updatePosition(impl, alt2X, alt2Y);
+          this.updatePosition(impl, alt2X, alt2Y, world);
         } else {
           // Completely blocked by buildings - stop
           this.stopEntity(impl, velocity);
@@ -245,16 +264,16 @@ export class MovementSystem implements System {
 
         // Final check that adjusted position doesn't hit a building
         if (!this.hasHardCollision(world, entity.id, adjustedNewX, adjustedNewY)) {
-          this.updatePosition(impl, adjustedNewX, adjustedNewY);
+          this.updatePosition(impl, adjustedNewX, adjustedNewY, world);
         } else {
           // The adjusted position would hit a building - try original with penalty
-          this.updatePosition(impl, newX, newY);
+          this.updatePosition(impl, newX, newY, world);
         }
       }
     }
   }
 
-  private updatePosition(impl: EntityImpl, x: number, y: number): void {
+  private updatePosition(impl: EntityImpl, x: number, y: number, world?: World): void {
     // Check for containment bounds and clamp position if necessary
     const steering = impl.getComponent<SteeringComponent>(CT.Steering);
     let clampedX = x;
@@ -275,6 +294,11 @@ export class MovementSystem implements System {
       chunkX: newChunkX,
       chunkY: newChunkY,
     }));
+
+    // Passive resource discovery for agents with spatial memory
+    if (world && impl.hasComponent(CT.Agent) && impl.hasComponent(CT.SpatialMemory)) {
+      this.tryDiscoverResources(impl, clampedX, clampedY, world);
+    }
   }
 
   private stopEntity(impl: EntityImpl, velocity: VelocityComponent | undefined): void {
@@ -506,5 +530,119 @@ export class MovementSystem implements System {
     }
 
     return penalty;
+  }
+
+  /**
+   * Passive resource discovery - agents discover PASSIVE resources as they move
+   *
+   * Throttled to DISCOVERY_INTERVAL_TICKS to avoid overhead
+   * Uses ChunkSpatialQuery when available for efficient lookup
+   *
+   * Resources are added to agent's SpatialMemory for later targeting
+   */
+  private tryDiscoverResources(
+    impl: EntityImpl,
+    x: number,
+    y: number,
+    world: World
+  ): void {
+    // Throttle discovery checks
+    const lastCheck = this.lastDiscoveryCheck.get(impl.id) ?? 0;
+    if (world.tick - lastCheck < this.DISCOVERY_INTERVAL_TICKS) {
+      return;
+    }
+    this.lastDiscoveryCheck.set(impl.id, world.tick);
+
+    // Get spatial memory component
+    const spatialMemory = impl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+    if (!spatialMemory) return;
+
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        x,
+        y,
+        this.DISCOVERY_RADIUS,
+        [CT.Resource],
+        { limit: 10 } // Limit to 10 nearest resources
+      );
+
+      for (const { entity: resourceEntity } of resourcesInRadius) {
+        const resourceImpl = resourceEntity as EntityImpl;
+        const resourcePos = resourceImpl.getComponent<PositionComponent>(CT.Position);
+        const resource = resourceImpl.getComponent<ResourceComponent>(CT.Resource);
+
+        if (resourcePos && resource && resource.harvestable && resource.amount > 0) {
+          // Add to spatial memory
+          addSpatialMemory(
+            spatialMemory,
+            {
+              type: 'resource_location',
+              x: resourcePos.x,
+              y: resourcePos.y,
+              entityId: resourceEntity.id,
+              metadata: {
+                resourceType: resource.resourceType,
+                amount: resource.amount,
+              },
+            },
+            world.tick,
+            80 // Initial strength (fairly strong since it's a direct observation)
+          );
+
+          // Also use legacy recordResourceLocation for backward compatibility
+          spatialMemory.recordResourceLocation(
+            resource.resourceType,
+            { x: resourcePos.x, y: resourcePos.y },
+            world.tick
+          );
+        }
+      }
+    } else {
+      // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
+      const allResources = world.query().with(CT.Position).with(CT.Resource).executeEntities();
+
+      for (const resourceEntity of allResources) {
+        const resourceImpl = resourceEntity as EntityImpl;
+        const resourcePos = resourceImpl.getComponent<PositionComponent>(CT.Position);
+        const resource = resourceImpl.getComponent<ResourceComponent>(CT.Resource);
+
+        if (!resourcePos || !resource || !resource.harvestable || resource.amount <= 0) {
+          continue;
+        }
+
+        // Check distance (squared distance, no sqrt)
+        const dx = resourcePos.x - x;
+        const dy = resourcePos.y - y;
+        const distanceSquared = dx * dx + dy * dy;
+        const radiusSquared = this.DISCOVERY_RADIUS * this.DISCOVERY_RADIUS;
+
+        if (distanceSquared <= radiusSquared) {
+          // Add to spatial memory
+          addSpatialMemory(
+            spatialMemory,
+            {
+              type: 'resource_location',
+              x: resourcePos.x,
+              y: resourcePos.y,
+              entityId: resourceEntity.id,
+              metadata: {
+                resourceType: resource.resourceType,
+                amount: resource.amount,
+              },
+            },
+            world.tick,
+            80
+          );
+
+          // Also use legacy recordResourceLocation for backward compatibility
+          spatialMemory.recordResourceLocation(
+            resource.resourceType,
+            { x: resourcePos.x, y: resourcePos.y },
+            world.tick
+          );
+        }
+      }
+    }
   }
 }

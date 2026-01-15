@@ -8,6 +8,7 @@
   "exclude": ["src/**/__tests__/**/*", "src/**/*.test.ts", "dist"],
   "references": [
     { "path": "../core" },
+    { "path": "../reproduction" },
     { "path": "../divinity" },
     { "path": "../world" }
   ]

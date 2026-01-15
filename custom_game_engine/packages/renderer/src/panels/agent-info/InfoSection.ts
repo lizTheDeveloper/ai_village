@@ -944,6 +944,25 @@ export class InfoSection {
     return y;
   }
 
+  /**
+   * Get emoji for autonomic behaviors to make them more visible.
+   */
+  private getAutonomicEmoji(behavior: string): string {
+    switch (behavior) {
+      case 'seek_warmth':
+        return '🔥 ';
+      case 'seek_cooling':
+        return '❄️ ';
+      case 'seek_food':
+        return '🍎 ';
+      case 'seek_sleep':
+      case 'forced_sleep':
+        return '😴 ';
+      default:
+        return '';
+    }
+  }
+
   private renderBehaviorQueue(
     ctx: CanvasRenderingContext2D,
     panelX: number,
@@ -971,11 +990,17 @@ export class InfoSection {
       return y;
     }
 
-    const queueStatus = agent.queuePaused
-      ? '⏸️ PAUSED'
-      : agent.queueInterruptedBy
-        ? `⚠️ INTERRUPTED (${agent.queueInterruptedBy})`
-        : '▶️ ACTIVE';
+    // Format queue status with better autonomic behavior labeling
+    let queueStatus: string;
+    if (agent.queuePaused) {
+      queueStatus = '⏸️ PAUSED';
+    } else if (agent.queueInterruptedBy) {
+      // Add emoji for common autonomic behaviors
+      const interruptEmoji = this.getAutonomicEmoji(agent.queueInterruptedBy);
+      queueStatus = `⚠️ INTERRUPTED BY ${interruptEmoji}${agent.queueInterruptedBy.replace(/_/g, ' ').toUpperCase()}`;
+    } else {
+      queueStatus = '▶️ ACTIVE';
+    }
 
     ctx.fillText(`📋 Behavior Queue (${queueLength}) ${queueStatus}`, panelX + padding, y);
     y += lineHeight + 5;
@@ -1310,6 +1335,23 @@ export class InfoSection {
           return `PLANT ${seedType.replace(/_/g, ' ').toUpperCase()}`;
         }
         return baseName;
+      }
+
+      case 'seek_warmth': {
+        return '🔥 SEEKING WARMTH (autonomic)';
+      }
+
+      case 'seek_cooling': {
+        return '❄️ SEEKING COOLING (autonomic)';
+      }
+
+      case 'seek_food': {
+        return '🍎 SEEKING FOOD (autonomic)';
+      }
+
+      case 'seek_sleep':
+      case 'forced_sleep': {
+        return '😴 SEEKING SLEEP (autonomic)';
       }
 
       case 'water': {

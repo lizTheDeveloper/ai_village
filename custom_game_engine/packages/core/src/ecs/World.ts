@@ -229,6 +229,11 @@ export interface World {
   getSystem(systemId: string): import('./System.js').System | undefined;
 
   /**
+   * Get or create chunk name registry for named locations.
+   */
+  getChunkNameRegistry(): import('@ai-village/world').ChunkNameRegistry;
+
+  /**
    * Divine configuration for this universe.
    * Controls how divine powers, belief economy, avatars, angels, etc. work.
    * See UniverseConfig.ts for presets (high_fantasy, grimdark, deistic, etc.)
@@ -294,6 +299,9 @@ export class WorldImpl implements WorldMutator {
   private _itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
   private _systemRegistry?: import('./SystemRegistry.js').ISystemRegistry;
   private _divineConfig?: Partial<UniverseDivineConfig>;
+
+  // Chunk naming registry for named locations
+  private _chunkNameRegistry?: import('@ai-village/world').ChunkNameRegistry;
 
   // Simulation scheduling for performance optimization
   private _simulationScheduler = new SimulationScheduler();
@@ -650,6 +658,26 @@ export class WorldImpl implements WorldMutator {
    */
   getChunkManager(): IChunkManager | undefined {
     return this._chunkManager;
+  }
+
+  /**
+   * Get or create ChunkNameRegistry for named locations.
+   * Used by systems to name chunks and navigate to named places.
+   */
+  getChunkNameRegistry(): import('@ai-village/world').ChunkNameRegistry {
+    if (!this._chunkNameRegistry) {
+      // Lazy initialization
+      const { ChunkNameRegistry } = require('@ai-village/world');
+      this._chunkNameRegistry = new ChunkNameRegistry();
+    }
+    return this._chunkNameRegistry!;
+  }
+
+  /**
+   * Set ChunkNameRegistry (used for deserialization).
+   */
+  setChunkNameRegistry(registry: import('@ai-village/world').ChunkNameRegistry): void {
+    this._chunkNameRegistry = registry;
   }
 
   /**

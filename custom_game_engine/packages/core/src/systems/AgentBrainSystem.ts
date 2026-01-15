@@ -102,6 +102,20 @@ import { followReportingTargetBehavior } from '../behaviors/FollowReportingTarge
 import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 
 /**
+ * Chunk spatial query service injected at runtime from @ai-village/world.
+ * Used for efficient spatial entity queries.
+ */
+let chunkSpatialQuery: any | null = null; // ChunkSpatialQuery from @ai-village/world
+
+/**
+ * Inject chunk spatial query service from @ai-village/world.
+ * Called by the application bootstrap.
+ */
+export function injectChunkSpatialQueryForBrain(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+}
+
+/**
  * AgentBrainSystem - The thin orchestrator (~300 lines as per design)
  *
  * Uses composition to delegate to specialized processors:
@@ -670,6 +684,22 @@ export class AgentBrainSystem implements System {
     const position = entity.getComponent(CT.Position) as any;
     if (!position) return [];
 
+    // Use ChunkSpatialQuery for efficient nearby agent lookups
+    if (chunkSpatialQuery) {
+      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        range,
+        [CT.Agent],
+        {
+          excludeIds: new Set([entity.id]), // Exclude self
+        }
+      );
+
+      return agentsInRadius.map(({ entity }: any) => entity);
+    }
+
+    // Fallback to manual chunk iteration (tests or when chunk query unavailable)
     const CHUNK_SIZE = 32;
     const chunkX = Math.floor(position.x / CHUNK_SIZE);
     const chunkY = Math.floor(position.y / CHUNK_SIZE);
@@ -702,12 +732,12 @@ export class AgentBrainSystem implements System {
           const manhattanDist = Math.abs(otherPos.x - position.x) + Math.abs(otherPos.y - position.y);
           if (manhattanDist > range * 1.5) continue;
 
-          // Euclidean distance check
+          // Euclidean distance check (squared to avoid sqrt)
           const dx2 = otherPos.x - position.x;
           const dy2 = otherPos.y - position.y;
-          const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          const distSquared = dx2 * dx2 + dy2 * dy2;
 
-          if (dist <= range) {
+          if (distSquared <= range * range) {
             result.push(nearbyEntity);
           }
         }

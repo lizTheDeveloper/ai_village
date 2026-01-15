@@ -1,6 +1,6 @@
 # Multiverse: The End of Eternity
 
-## 🔥 Release: "Turnin' Up the Heat" 🔥
+## 🔥 Release: "Still Burnin'" 🔥
 
 An open-source simulation game where AI agents live, work, and build communities together.
 

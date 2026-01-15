@@ -26,13 +26,7 @@ import { BuildingType } from '../../types/BuildingType.js';
  * Get the current game day from the world's time entity.
  */
 function getCurrentDay(world: World): number {
-  const timeEntities = world.query().with(ComponentType.Time).executeEntities();
-  if (timeEntities.length > 0) {
-    const timeEntity = timeEntities[0] as EntityImpl;
-    const timeComp = timeEntity.getComponent(ComponentType.Time) as { day?: number } | undefined;
-    return timeComp?.day ?? 0;
-  }
-  return 0;
+  return world.gameTime.day;
 }
 
 /**

@@ -524,6 +524,44 @@ export {
   type BehaviorMeta,
 } from './behavior/index.js';
 
+// Chunk spatial query injection functions
+export {
+  injectChunkSpatialQuery,
+  injectChunkSpatialQueryForHearing,
+} from './perception/index.js';
+
+export {
+  injectChunkSpatialQueryToMovement,
+} from './systems/MovementSystem.js';
+
+export {
+  injectChunkSpatialQueryToFarmBehaviors,
+} from './behavior/behaviors/FarmBehaviors.js';
+
+export {
+  injectChunkSpatialQueryToSeekFood,
+} from './behavior/behaviors/SeekFoodBehavior.js';
+
+export {
+  injectChunkSpatialQueryToSeekCooling,
+} from './behavior/behaviors/SeekCoolingBehavior.js';
+
+export {
+  injectChunkSpatialQueryToSleep,
+} from './behavior/behaviors/SleepBehavior.js';
+
+export {
+  injectChunkSpatialQueryToGather,
+} from './behavior/behaviors/GatherBehavior.js';
+
+export {
+  injectChunkSpatialQueryToBuild,
+} from './behavior/behaviors/BuildBehavior.js';
+
+export {
+  injectChunkSpatialQueryForBrain,
+} from './systems/AgentBrainSystem.js';
+
 // Behaviors module - Extracted behavior implementations
 export {
   navigateBehavior,

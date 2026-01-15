@@ -401,7 +401,7 @@ async function createInitialPlants(world: WorldMutator) {
     const species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)];
     if (!species) continue;
 
-    const isEdibleSpecies = species.id === 'berry-bush';
+    const isEdibleSpecies = species.id === 'blueberry-bush' || species.id === 'raspberry-bush' || species.id === 'blackberry-bush';
     const stage = isEdibleSpecies ? 'mature' : 'vegetative';
     const age = stage === 'mature' ? 20 : 10;
     const initialFruit = (stage === 'mature' && isEdibleSpecies) ? 10 + Math.floor(Math.random() * 10) : 0;

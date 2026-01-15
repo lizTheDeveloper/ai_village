@@ -507,7 +507,7 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
         // Add berry seeds
         const seedSlot = inventory.slots.find((s: any) => !s.itemId);
         if (seedSlot) {
-          seedSlot.itemId = 'seed:berry-bush';
+          seedSlot.itemId = 'seed:blueberry-bush';
           seedSlot.quantity = 5;
         }
         return inventory;
@@ -548,11 +548,11 @@ function createInitialPlants(world: WorldMutator, agentCount: number = 5) {
     const forceBerryBush = i < berryBushCount;
     let species;
     if (forceBerryBush) {
-      species = wildSpecies.find(s => s.id === 'berry-bush')!;
+      species = wildSpecies.find(s => s.id === 'blueberry-bush')!;
     } else {
       species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)]!;
     }
-    const isEdibleSpecies = species.id === 'berry-bush';
+    const isEdibleSpecies = species.id === 'blueberry-bush' || species.id === 'raspberry-bush' || species.id === 'blackberry-bush';
 
     let stage: 'sprout' | 'vegetative' | 'mature' | 'seeding' = 'mature';
     let stageProgress = 0;
@@ -625,9 +625,9 @@ function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpa
  */
 function createPregeneratedFarms(world: WorldMutator, agentCount: number = 5) {
   const wildSpecies = getWildSpawnableSpecies();
-  const berryBushSpecies = wildSpecies.find(s => s.id === 'berry-bush');
+  const berryBushSpecies = wildSpecies.find(s => s.id === 'blueberry-bush');
   if (!berryBushSpecies) {
-    throw new Error('Berry bush species not found');
+    throw new Error('Blueberry bush species not found');
   }
 
   // Scale farm size: 10 berry bushes per NPC for sustainable food production
@@ -651,7 +651,7 @@ function createPregeneratedFarms(world: WorldMutator, agentCount: number = 5) {
 
       const plantEntity = new EntityImpl(createEntityId(), (world as any)._tick);
       const plantComponent = new PlantComponent({
-        speciesId: 'berry-bush',
+        speciesId: 'blueberry-bush',
         position: { x, y },
         stage: 'mature',
         stageProgress: 0.8 + Math.random() * 0.2,
@@ -668,7 +668,7 @@ function createPregeneratedFarms(world: WorldMutator, agentCount: number = 5) {
       (plantComponent as any).entityId = plantEntity.id;
       plantEntity.addComponent(plantComponent);
       plantEntity.addComponent(createPositionComponent(x, y));
-      plantEntity.addComponent(createRenderableComponent('berry-bush', 'plant'));
+      plantEntity.addComponent(createRenderableComponent('blueberry-bush', 'plant'));
       (world as any)._addEntity(plantEntity);
 
       bushesCreated++;

@@ -745,7 +745,7 @@ export class EffectValidationPipeline {
       addComponent: (entityId: string, component: any) => {
         const entity = entities.get(entityId);
         if (entity) {
-          entity.components.set(component.type, component);
+          (entity.components as Map<string, any>).set(component.type, component);
         }
       },
       query: () => ({

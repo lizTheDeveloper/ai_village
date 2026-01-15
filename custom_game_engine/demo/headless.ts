@@ -285,7 +285,7 @@ function createInitialPlants(world: WorldMutator) {
       nutrition: 50 + Math.random() * 30,
       genetics: { ...species.baseGenetics },
       seedsProduced: Math.floor(species.seedsPerPlant * species.baseGenetics.yieldAmount),
-      fruitCount: species.id === 'berry-bush' ? 8 : 0,
+      fruitCount: (species.id === 'blueberry-bush' || species.id === 'raspberry-bush' || species.id === 'blackberry-bush') ? 8 : 0,
     });
     (plantComponent as any).entityId = plantEntity.id;
     plantEntity.addComponent(plantComponent);

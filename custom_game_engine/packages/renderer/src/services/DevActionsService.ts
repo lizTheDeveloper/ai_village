@@ -6,6 +6,7 @@
  */
 
 import type { World, Entity } from '@ai-village/core';
+import { cleanAllSoulsInWorld, scanForCorruptedSouls } from '@ai-village/core';
 
 export interface DevActionsResult {
   success: boolean;
@@ -568,6 +569,49 @@ export class DevActionsService {
     agent.useLLM = useLLM;
 
     return { success: true, data: { agentId, useLLM } };
+  }
+
+  /**
+   * Scan for corrupted souls (diagnostic).
+   * Returns list of souls with thinking tags in purpose/destiny fields.
+   */
+  scanCorruptedSouls(): DevActionsResult {
+    if (!this.world) {
+      return { success: false, error: 'World not set' };
+    }
+
+    const corrupted = scanForCorruptedSouls(this.world);
+
+    return {
+      success: true,
+      data: {
+        count: corrupted.length,
+        souls: corrupted,
+      },
+    };
+  }
+
+  /**
+   * Clean corrupted soul data.
+   * Removes LLM thinking tags from soul purpose/destiny fields.
+   * Returns count of souls that were cleaned.
+   */
+  cleanCorruptedSouls(): DevActionsResult {
+    if (!this.world) {
+      return { success: false, error: 'World not set' };
+    }
+
+    const cleanedCount = cleanAllSoulsInWorld(this.world);
+
+    return {
+      success: true,
+      data: {
+        cleanedCount,
+        message: cleanedCount > 0
+          ? `Cleaned ${cleanedCount} corrupted souls. Save your game to persist the fixes.`
+          : 'No corrupted souls found.',
+      },
+    };
   }
 }
 

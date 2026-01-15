@@ -41,7 +41,6 @@ const MAP_OBJECT_SPRITES: Record<string, string> = {
   // Wild plants
   'grass': 'grass.png',
   'wildflower': 'wildflower.png',
-  'berry-bush': 'berry_bush.png',
   'blueberry-bush': 'blueberry_bush.png',
   'raspberry-bush': 'raspberry_bush.png',
   'blackberry-bush': 'blackberry_bush.png',
@@ -511,7 +510,6 @@ export function renderSprite(
     // Plant sprites
     case 'grass':
     case 'wildflower':
-    case 'berry-bush':
     case 'blueberry-bush':
     case 'raspberry-bush':
     case 'blackberry-bush':
@@ -600,26 +598,6 @@ function renderPlantSprite(
       ctx.beginPath();
       ctx.arc(x + size / 2, y + size * 0.35, size / 12, 0, Math.PI * 2);
       ctx.fill();
-      break;
-
-    case 'berry-bush':
-      // Bushy shrub with berries
-      // Foliage (dark green)
-      ctx.fillStyle = '#2F4F2F'; // Dark green
-      ctx.beginPath();
-      ctx.arc(x + size / 2, y + size / 2, size / 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Berries (red dots)
-      ctx.fillStyle = '#DC143C'; // Crimson
-      for (let i = 0; i < 4; i++) {
-        const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
-        const berryX = x + size / 2 + Math.cos(angle) * size * 0.2;
-        const berryY = y + size / 2 + Math.sin(angle) * size * 0.2;
-        ctx.beginPath();
-        ctx.arc(berryX, berryY, size / 16, 0, Math.PI * 2);
-        ctx.fill();
-      }
       break;
 
     case 'blueberry-bush':

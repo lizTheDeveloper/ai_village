@@ -48,6 +48,7 @@ import { getZoneManager } from '../navigation/ZoneManager.js';
 import { getPosition } from '../utils/componentHelpers.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { TerrainType } from '../types/TerrainTypes.js';
+import { getCardinalNeighbors, type Tile } from '@ai-village/world';
 
 // ============================================================================
 // Types
@@ -246,8 +247,27 @@ export class PlacementScorer {
   private mapKnowledge = getMapKnowledge();
   private zoneManager = getZoneManager();
 
+  // Building cache for performance
+  private buildingsCache: EntityImpl[] | null = null;
+  private buildingsCacheTick: number = -1;
+
   constructor(world: World) {
     this.world = world as WorldWithTerrain;
+  }
+
+  /**
+   * Get cached buildings for current tick
+   * Avoids repeated global queries in hasOverlappingBuilding
+   */
+  private getCachedBuildings(): EntityImpl[] {
+    if (this.buildingsCacheTick !== this.world.tick) {
+      this.buildingsCache = this.world.query()
+        .with(ComponentType.Building)
+        .with(ComponentType.Position)
+        .executeEntities() as EntityImpl[];
+      this.buildingsCacheTick = this.world.tick;
+    }
+    return this.buildingsCache!;
   }
 
   /**
@@ -496,12 +516,13 @@ export class PlacementScorer {
           .with(ComponentType.Position)
           .executeEntities();
 
+        const maxDistSq = constraint.maxDistance * constraint.maxDistance;
         for (const storage of storageBuildings) {
           const sPos = getPosition(storage);
           if (!sPos) continue;
 
-          const dist = Math.sqrt((sPos.x - x) ** 2 + (sPos.y - y) ** 2);
-          if (dist <= constraint.maxDistance) {
+          const distSq = (sPos.x - x) ** 2 + (sPos.y - y) ** 2;
+          if (distSq <= maxDistSq) {
             return true;
           }
         }
@@ -509,7 +530,46 @@ export class PlacementScorer {
       }
 
       case 'min_accessibility': {
-        // Count adjacent open tiles
+        // Count adjacent open tiles using graph tile neighbors
+        const placementTile = this.world.getTileAt?.(x, y) as Tile | undefined;
+
+        if (placementTile?.neighbors) {
+          // Use graph tile neighbors (faster - O(1) pointer dereference vs getTileAt lookup)
+          let openCount = 0;
+          const n = placementTile.neighbors;
+
+          // Check north
+          if (n.north && n.north.terrain !== 'water') {
+            if (!this.hasOverlappingBuilding(x, y - 1)) {
+              openCount++;
+            }
+          }
+
+          // Check south
+          if (n.south && n.south.terrain !== 'water') {
+            if (!this.hasOverlappingBuilding(x, y + 1)) {
+              openCount++;
+            }
+          }
+
+          // Check east
+          if (n.east && n.east.terrain !== 'water') {
+            if (!this.hasOverlappingBuilding(x + 1, y)) {
+              openCount++;
+            }
+          }
+
+          // Check west
+          if (n.west && n.west.terrain !== 'water') {
+            if (!this.hasOverlappingBuilding(x - 1, y)) {
+              openCount++;
+            }
+          }
+
+          return openCount >= constraint.value;
+        }
+
+        // Fallback to coordinate-based method if tile graph not available
         let openCount = 0;
         const adjacents = [
           { dx: -1, dy: 0 }, { dx: 1, dy: 0 },
@@ -518,7 +578,7 @@ export class PlacementScorer {
 
         for (const adj of adjacents) {
           const terrain = this.world.getTerrainAt?.(x + adj.dx, y + adj.dy);
-          if (terrain && terrain !== 'water' && terrain !== 'deep_water') {
+          if (terrain && terrain !== 'water') {
             if (!this.hasOverlappingBuilding(x + adj.dx, y + adj.dy)) {
               openCount++;
             }
@@ -539,10 +599,7 @@ export class PlacementScorer {
   }
 
   private hasOverlappingBuilding(x: number, y: number): boolean {
-    const buildings = this.world.query()
-      .with(ComponentType.Building)
-      .with(ComponentType.Position)
-      .executeEntities();
+    const buildings = this.getCachedBuildings();
 
     for (const building of buildings) {
       const bPos = getPosition(building);
@@ -565,19 +622,21 @@ export class PlacementScorer {
   private getWaterProximity(x: number, y: number): number {
     // Check nearby tiles for water
     const searchRadius = 5;
-    let minDist = Infinity;
+    let minDistSq = Infinity;
 
     for (let dx = -searchRadius; dx <= searchRadius; dx++) {
       for (let dy = -searchRadius; dy <= searchRadius; dy++) {
         const terrain = this.world.getTerrainAt?.(x + dx, y + dy);
         if (terrain === 'water' || terrain === 'deep_water') {
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          minDist = Math.min(minDist, dist);
+          const distSq = dx * dx + dy * dy;
+          minDistSq = Math.min(minDistSq, distSq);
         }
       }
     }
 
-    if (minDist === Infinity) return 0;
+    if (minDistSq === Infinity) return 0;
+    // Only sqrt once at the end
+    const minDist = Math.sqrt(minDistSq);
     return Math.max(0, 100 - minDist * 20);
   }
 
@@ -624,11 +683,13 @@ export class PlacementScorer {
       const pos = agent.getComponent<PositionComponent>(ComponentType.Position);
       if (!pos) return 0;
 
-      const dist = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
+      const distSq = (pos.x - x) ** 2 + (pos.y - y) ** 2;
+      const dist = Math.sqrt(distSq);
       return Math.max(0, 50 - dist);
     }
 
-    const dist = Math.sqrt((homeBase.x - x) ** 2 + (homeBase.y - y) ** 2);
+    const distSq = (homeBase.x - x) ** 2 + (homeBase.y - y) ** 2;
+    const dist = Math.sqrt(distSq);
     return Math.max(0, 100 - dist * 2);
   }
 
@@ -651,12 +712,13 @@ export class PlacementScorer {
 
     let score = 0;
     const searchRadius = 5;
+    const searchRadiusSq = searchRadius * searchRadius;
 
     for (const m of memory.episodicMemories) {
       if (!m.location) continue;
 
-      const dist = Math.sqrt((m.location.x - x) ** 2 + (m.location.y - y) ** 2);
-      if (dist > searchRadius) continue;
+      const distSq = (m.location.x - x) ** 2 + (m.location.y - y) ** 2;
+      if (distSq > searchRadiusSq) continue;
 
       // Positive memories add to score, weighted by importance
       if (m.emotionalValence > 0) {
@@ -678,13 +740,14 @@ export class PlacementScorer {
 
     let score = 0;
     const searchRadius = 8;
+    const searchRadiusSq = searchRadius * searchRadius;
 
     // Query memories for this resource type
     const memories = spatialMem.queryResourceLocations(resourceType as any);
 
     for (const m of memories) {
-      const dist = Math.sqrt((m.position.x - x) ** 2 + (m.position.y - y) ** 2);
-      if (dist <= searchRadius) {
+      const distSq = (m.position.x - x) ** 2 + (m.position.y - y) ** 2;
+      if (distSq <= searchRadiusSq) {
         score += m.confidence * 20;
       }
     }

@@ -1,5 +1,94 @@
 # Release Notes
 
+## 🔥 2026-01-14 - "Still Burnin'" - Complete Documentation & Emergent Chaos
+
+### The Campfire Saga Continues
+
+Following the "Turnin' Up the Heat" release (30 campfires), our autonomous agents have outdone themselves:
+- **85 total campfires** built in 13 minutes (59 complete + 26 in progress)
+- 100% agent failure rate - all 5 agents eventually stuck from overheating
+- Emergent behavior cycle: Build → Gather → Overheat → Seek cooling → Stuck
+- Environmental consequences working as designed (agents detecting heat and responding)
+- The duplicate building warning persists, but with style
+
+**What makes this fun:**
+- Genuine emergent chaos from simple rules
+- Agents show adaptive behavior (seeking cooling when hot)
+- Resource gathering continues despite campfire madness
+- Each village develops its own character through dysfunction
+
+### Complete Documentation Overhaul
+
+#### Player Documentation (docs/)
+- **8 comprehensive player guides** (~15,000 words)
+  - Getting Started - Installation, first launch, understanding the simulation
+  - Controls - Camera, UI panels, keyboard shortcuts, admin dashboard
+  - Gameplay Basics - Agents, needs, resources, building, time, weather, death
+  - Advanced Features - Magic (25+ paradigms), divinity, reproduction, realms, automation
+  - UI Panels Guide - Detailed reference for all 40+ panels
+  - Tips & Strategies - Helping agents survive, efficient gathering, building placement
+  - Troubleshooting - Common issues, performance optimization, bug reporting
+- Friendly, accessible writing for new players
+- Designed for humans, not LLMs
+
+#### LLM Programmatic Documentation (docs/llm/)
+- **8 technical guides** for autonomous LLM gameplay (~3,500 lines)
+  - README - Three interaction modes (Observer, Controller, Experimenter)
+  - Metrics API - Complete REST endpoint reference, WebSocket streaming
+  - Admin API - Capabilities system (queries + actions), safety guidelines
+  - Headless Gameplay - City simulator, preset configs, long-running experiments
+  - Observation Guide - What to track, pattern identification, time-series analysis
+  - Interaction Guide - Issuing commands, spawning entities, universe forking, A/B testing
+  - Experiment Workflows - Scientific method, hypothesis testing, regression testing
+  - Examples - Complete working code (Bash, JavaScript, Python)
+- Enables LLM agents to observe, analyze, and interact with the game programmatically
+- Designed for machine consumption and autonomous gameplay
+
+#### Package Documentation (19 packages)
+- **Core Package** (+1,400 lines) - 155+ systems documented
+  - Agent core (Brain, Movement, Steering, Needs, Mood, Sleep)
+  - Memory & cognition (8 systems)
+  - Social & communication (5 systems)
+  - Skills, crafting, combat, animals, economy
+  - Automation & factories (6 systems)
+  - Complete integration examples and performance patterns
+- **Navigation** - Enhanced with pathfinding section, fixed priorities
+- **Introspection** (1,460 lines) - Schema system, mutation tracking, LLM prompts, dev UI
+- **Metrics** (878 lines) - Event streaming, analytics, dashboard API
+- **Metrics Dashboard** - React visualization, 6 panel types
+- **City Simulator** - Headless testing, benchmarking enhancements
+- **Shared Worker** (1,180 lines) - Multi-window architecture, path prediction
+- **Deterministic Sprite Generator** - Procedural art, PixelLab integration
+- **Hierarchy Simulator** - Renormalization theory, 7-tier scale
+- **Renderer** (+598 lines) - 3D rendering, context menus, text mode, adapters, divine UI
+
+#### Top-Level READMEs
+- **Project README** - Full feature list, all 19 packages architecture
+- **Engine README** - Production-ready state (432K LOC, 11.5K files)
+- Accurate scale metrics and package coverage
+
+### Documentation Status
+- **211+ systems** documented in SYSTEMS_CATALOG
+- **100% package coverage** (19/19 with comprehensive LLM context)
+- **Player guides** for humans (8 guides)
+- **LLM guides** for autonomous agents (8 technical guides)
+- **Developer docs** complete (architecture, systems, performance)
+
+### Testing Through Play
+- Metrics server observation confirmed environmental systems working
+- Agents respond to overheating (seek_cooling behavior)
+- Building coordination still needs work (but hilariously)
+- Resource gathering functions correctly
+- Agent lifecycle tracking operational
+
+### What Changed
+- **29 files changed** (+13,787 insertions, -3,625 deletions)
+- Net: +10,162 lines of documentation
+- Zero gameplay code changes (this is a docs-only release)
+- The campfire chaos is a feature, not a bug
+
+---
+
 ## 2026-01-13 - Ocean Systems, Fire Mechanics & Magic Skill Tree Polish
 
 ### Ocean Life System

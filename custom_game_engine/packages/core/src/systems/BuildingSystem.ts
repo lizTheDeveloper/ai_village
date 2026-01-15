@@ -22,6 +22,9 @@ import { createUniversityComponent } from '../components/UniversityComponent.js'
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { getTileConstructionSystem } from './TileConstructionSystem.js';
 import type { WallMaterial, DoorMaterial, WindowMaterial, RoofMaterial } from '@ai-village/world';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import { createResourceComponent } from '../components/ResourceComponent.js';
+import { createTagsComponent } from '../components/TagsComponent.js';
 
 /**
  * BuildingSystem handles construction progress for buildings.
@@ -504,6 +507,70 @@ export class BuildingSystem implements System {
     (entity as EntityImpl).addComponent(createPositionComponent(position.x, position.y));
     (entity as EntityImpl).addComponent(createRenderableComponent(blueprintId, 'building'));
 
+    // CAMPFIRE CONSTRUCTION CANCELLATION: When a campfire begins construction,
+    // cancel all other campfire construction/plans within 200 tiles to prevent clustering
+    if (blueprintId === 'campfire') {
+      const CAMPFIRE_PROXIMITY_THRESHOLD = 200;
+      const entitiesToRemove: string[] = [];
+      const buildingPositions: Map<string, PositionComponent> = new Map();
+
+      // 1. Cancel in-progress campfire buildings within range
+      const allBuildings = world.query().with(CT.Building).with(CT.Position).executeEntities();
+      for (const building of allBuildings) {
+        if (building.id === entity.id) continue; // Skip the one we just created
+
+        const buildingImpl = building as EntityImpl;
+        const bc = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+        const bp = buildingImpl.getComponent<PositionComponent>(CT.Position);
+
+        if (bc?.buildingType === 'campfire' && !bc.isComplete && bp) {
+          const dx = position.x - bp.x;
+          const dy = position.y - bp.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+            entitiesToRemove.push(building.id);
+            buildingPositions.set(building.id, bp);
+          }
+        }
+      }
+
+      // Remove conflicting in-progress buildings and refund resources
+      for (const buildingId of entitiesToRemove) {
+        const buildingPos = buildingPositions.get(buildingId);
+        if (buildingPos) {
+          // Drop resources on the ground at the building location
+          this.dropBuildingResources(world, buildingPos, 'campfire');
+        }
+        worldMutator.destroyEntity(buildingId, 'Cancelled: another campfire started construction within 200 tiles');
+      }
+
+      // 2. Cancel planned campfires from agents within range
+      const allAgents = world.query().with(CT.Agent).with(CT.Position).executeEntities();
+      for (const agent of allAgents) {
+        const agentImpl = agent as EntityImpl;
+        const agentComp = agentImpl.getComponent<AgentComponent>(CT.Agent);
+        const agentPos = agentImpl.getComponent<PositionComponent>(CT.Position);
+
+        if (agentComp?.plannedBuilds && agentPos) {
+          const dx = position.x - agentPos.x;
+          const dy = position.y - agentPos.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+            // Remove campfire from planned builds
+            const filteredBuilds = agentComp.plannedBuilds.filter(p => p.buildingType !== 'campfire');
+            if (filteredBuilds.length !== agentComp.plannedBuilds.length) {
+              agentImpl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+                ...current,
+                plannedBuilds: filteredBuilds,
+              }));
+            }
+          }
+        }
+      }
+    }
+
     // Stamp the building layout onto world tiles if the blueprint has one
     // This creates actual wall/door/floor tiles from the ASCII layout
     this.stampBuildingLayout(world, blueprintId, position, entity.id);
@@ -866,6 +933,53 @@ export class BuildingSystem implements System {
     }
 
     return true;
+  }
+
+  /**
+   * Drop building resources on the ground at the specified position.
+   * Used when cancelling construction to refund resources to the world.
+   */
+  private dropBuildingResources(
+    world: World,
+    position: PositionComponent,
+    buildingType: string
+  ): void {
+    const resourceCost = this.getResourceCost(buildingType);
+    const mutator = world as WorldMutator;
+
+    // Drop each resource type on the ground
+    for (const [resourceType, amount] of Object.entries(resourceCost)) {
+      // Create item drop entity
+      const itemEntity = mutator.createEntity();
+
+      // Add position (ground level at building location)
+      mutator.addComponent(itemEntity.id, createPositionComponent(position.x, position.y, 0));
+
+      // Add resource component for pickup
+      // Map resource type to valid ResourceType (wood, stone, etc)
+      const validResourceType = (resourceType === 'stone' || resourceType === 'wood') ? resourceType : 'wood';
+      mutator.addComponent(itemEntity.id, createResourceComponent(
+        validResourceType,
+        amount,
+        0, // no regeneration
+        0.5 // easy to pick up
+      ));
+
+      // Add tags for identification
+      mutator.addComponent(itemEntity.id, createTagsComponent('item', 'dropped', 'pickup', 'refund', resourceType));
+
+      // Emit item dropped event
+      world.eventBus.emit({
+        type: 'item:dropped',
+        source: 'building-system',
+        data: {
+          entityId: itemEntity.id,
+          material: resourceType,
+          amount,
+          position: { x: position.x, y: position.y },
+        },
+      });
+    }
   }
 
   /**

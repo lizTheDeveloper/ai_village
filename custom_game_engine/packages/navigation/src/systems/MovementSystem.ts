@@ -12,9 +12,10 @@ import type {
   CircadianComponent,
   NeedsComponent,
   SteeringComponent,
+  SpatialMemoryComponent,
   EventBus,
 } from '@ai-village/core';
-import { ComponentType as CT, EntityImpl } from '@ai-village/core';
+import { ComponentType as CT, EntityImpl, recordChunkVisit } from '@ai-village/core';
 
 interface TimeComponent {
   speedMultiplier?: number;
@@ -227,9 +228,9 @@ export class MovementSystem implements System {
         const alt2Y = position.y + perpY2;
 
         if (!this.hasHardCollision(world, entity.id, alt1X, alt1Y)) {
-          this.updatePosition(impl, alt1X, alt1Y);
+          this.updatePosition(impl, alt1X, alt1Y, world);
         } else if (!this.hasHardCollision(world, entity.id, alt2X, alt2Y)) {
-          this.updatePosition(impl, alt2X, alt2Y);
+          this.updatePosition(impl, alt2X, alt2Y, world);
         } else {
           // Completely blocked by buildings - stop
           this.stopEntity(impl, velocity);
@@ -246,16 +247,16 @@ export class MovementSystem implements System {
 
         // Final check that adjusted position doesn't hit a building
         if (!this.hasHardCollision(world, entity.id, adjustedNewX, adjustedNewY)) {
-          this.updatePosition(impl, adjustedNewX, adjustedNewY);
+          this.updatePosition(impl, adjustedNewX, adjustedNewY, world);
         } else {
           // The adjusted position would hit a building - try original with penalty
-          this.updatePosition(impl, newX, newY);
+          this.updatePosition(impl, newX, newY, world);
         }
       }
     }
   }
 
-  private updatePosition(impl: EntityImpl, x: number, y: number): void {
+  private updatePosition(impl: EntityImpl, x: number, y: number, world: World): void {
     // Check for containment bounds and clamp position if necessary
     const steering = impl.getComponent<SteeringComponent>(CT.Steering);
     let clampedX = x;
@@ -269,6 +270,21 @@ export class MovementSystem implements System {
 
     const newChunkX = Math.floor(clampedX / 32);
     const newChunkY = Math.floor(clampedY / 32);
+
+    // Track chunk visits for agents with spatial memory
+    const currentPos = impl.getComponent<PositionComponent>(CT.Position);
+    const oldChunkX = currentPos?.chunkX;
+    const oldChunkY = currentPos?.chunkY;
+
+    // Record chunk visit if we entered a new chunk
+    if (oldChunkX !== newChunkX || oldChunkY !== newChunkY) {
+      const spatialMemory = impl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+      if (spatialMemory) {
+        recordChunkVisit(spatialMemory, newChunkX, newChunkY, world.tick);
+        impl.updateComponent<SpatialMemoryComponent>(CT.SpatialMemory, (current) => current);
+      }
+    }
+
     impl.updateComponent<PositionComponent>(CT.Position, (current) => ({
       ...current,
       x: clampedX,

@@ -37,15 +37,19 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  * - Oxygen tank: Extends breath capacity
  *
  * PERFORMANCE OPTIMIZATIONS:
- * - Throttled to update every 20 ticks (1 second) instead of every tick
+ * - Throttled to update every 40 ticks (2 seconds) instead of every tick
+ * - Spatial proximity check - skips system entirely if no water nearby
  * - Tracks underwaterEntities Set - only processes entities actually in water!
  * - Uses SimulationScheduler to only process active entities
+ * - Position tracking - skips agents that haven't moved to a new tile
+ * - Single-pass processing - combines water detection + underwater processing in one loop
  * - Caches tile lookups - only rechecks when entity moves to different tile
  * - Uses StateMutatorSystem for gradual oxygen drain and pressure damage
  *   (Applied once per game minute, not every tick)
  * - Only sets movement speed multiplier when depth zone changes
  *
  * Performance: Typically processes ~0-5 underwater entities instead of 4000+ total entities
+ * With landlocked villages: System exits immediately (zero cost)
  *
  * Future enhancements:
  * - Decompression sickness (rapid ascent)
@@ -62,8 +66,8 @@ export class AgentSwimmingSystem implements System {
     CT.Needs,
   ];
 
-  // Throttling: Update every 20 ticks (1 second at 20 TPS)
-  private readonly UPDATE_INTERVAL = 20;
+  // Throttling: Update every 40 ticks (2 seconds at 20 TPS)
+  private readonly UPDATE_INTERVAL = 40;
   private lastUpdateTick = 0;
 
   // Reference to StateMutatorSystem for registering deltas
@@ -95,6 +99,12 @@ export class AgentSwimmingSystem implements System {
     }
   >();
 
+  // Track last checked position to skip non-moving agents
+  private lastCheckedPosition = new Map<
+    string,
+    { x: number; y: number; z: number }
+  >();
+
   /**
    * Set the StateMutatorSystem reference (called during registration)
    */
@@ -105,7 +115,7 @@ export class AgentSwimmingSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     const currentTick = world.tick;
 
-    // Throttle: Only update once per second
+    // Throttle: Only update every 2 seconds
     if (currentTick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
       return;
     }
@@ -114,9 +124,17 @@ export class AgentSwimmingSystem implements System {
 
     const worldWithTiles = world as {
       getTileAt?: (x: number, y: number, z?: number) => SwimmingTile | undefined;
+      getChunkManager?: () => {
+        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
+      } | undefined;
     };
 
     if (!worldWithTiles.getTileAt) return;
+
+    // Get chunk manager for generation checks
+    const chunkManager = typeof worldWithTiles.getChunkManager === 'function'
+      ? worldWithTiles.getChunkManager()
+      : undefined;
 
     // Use SimulationScheduler to filter to active entities only
     const activeEntities = world.simulationScheduler.filterActiveEntities(entities, currentTick);
@@ -126,26 +144,61 @@ export class AgentSwimmingSystem implements System {
       return;
     }
 
+    // OPTIMIZATION: If no one is swimming and no one near water, skip entirely
+    if (this.underwaterEntities.size === 0 && !this.hasNearbyWater(activeEntities, worldWithTiles, chunkManager)) {
+      return;
+    }
+
     // Clear stale cache entries every 100 ticks (5 seconds)
     if (currentTick % 100 === 0 && this.tileCache.size > 1000) {
       this.tileCache.clear();
+      this.lastCheckedPosition.clear();
     }
 
-    // First pass: Check for entities entering/exiting water
-    // This updates our underwater tracking set
+    // SINGLE-PASS OPTIMIZATION: Process all agents in one loop
+    // Combines water detection + underwater processing
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const position = impl.getComponent<PositionComponent>(CT.Position);
+      const movement = impl.getComponent<MovementComponent>(CT.Movement);
+      const needs = impl.getComponent<NeedsComponent>(CT.Needs);
 
-      if (!position) continue;
+      if (!position || !movement || !needs) continue;
 
-      // Get tile with caching
+      // OPTIMIZATION: Skip if agent hasn't moved since last check
+      const lastPos = this.lastCheckedPosition.get(entity.id);
       const tileX = Math.floor(position.x);
       const tileY = Math.floor(position.y);
       const tileZ = position.z ?? 0;
-      const cacheKey = `${entity.id}`;
 
-      let cached = this.tileCache.get(cacheKey);
+      if (
+        lastPos &&
+        lastPos.x === tileX &&
+        lastPos.y === tileY &&
+        lastPos.z === tileZ
+      ) {
+        // Agent hasn't moved to a new tile - use cached underwater state
+        if (this.underwaterEntities.has(entity.id)) {
+          // Still underwater, process depth effects
+          const cached = this.tileCache.get(entity.id);
+          if (cached?.tile?.fluid) {
+            this.processUnderwaterAgent(
+              entity.id,
+              impl,
+              cached.tile,
+              movement,
+              needs
+            );
+          }
+        }
+        continue;
+      }
+
+      // Agent moved - update position tracking
+      this.lastCheckedPosition.set(entity.id, { x: tileX, y: tileY, z: tileZ });
+
+      // Get tile with caching
+      let cached = this.tileCache.get(entity.id);
 
       // Only query tile if entity moved to different tile
       if (
@@ -154,95 +207,147 @@ export class AgentSwimmingSystem implements System {
         cached.tileY !== tileY ||
         cached.tileZ !== tileZ
       ) {
-        const tile = worldWithTiles.getTileAt(tileX, tileY, tileZ);
-        const isWater = tile?.fluid?.type === 'water';
+        // CRITICAL: Skip ungenerated chunks to avoid expensive terrain generation
+        if (!this.isChunkGenerated(tileX, tileY, chunkManager)) {
+          // Cache as non-water for ungenerated chunks
+          cached = {
+            tileX,
+            tileY,
+            tileZ,
+            tile: undefined,
+            isWater: false,
+          };
+          this.tileCache.set(entity.id, cached);
+        } else {
+          const tile = worldWithTiles.getTileAt(tileX, tileY, tileZ);
+          const isWater = tile?.fluid?.type === 'water';
 
-        cached = {
-          tileX,
-          tileY,
-          tileZ,
-          tile,
-          isWater,
-        };
-        this.tileCache.set(cacheKey, cached);
-      }
-
-      // Update tracking set
-      if (cached.isWater && cached.tile?.fluid) {
-        this.underwaterEntities.add(entity.id);
-      } else {
-        this.underwaterEntities.delete(entity.id);
-      }
-    }
-
-    // Early return if no underwater entities
-    if (this.underwaterEntities.size === 0) {
-      return;
-    }
-
-    // Second pass: Only process entities currently underwater
-    // This is the huge optimization - skip all entities not in water!
-    for (const entity of activeEntities) {
-      // Skip if not underwater
-      if (!this.underwaterEntities.has(entity.id)) {
-        // Make sure to clean up if they just exited water
-        const impl = entity as EntityImpl;
-        const needs = impl.getComponent<NeedsComponent>(CT.Needs);
-        if (needs) {
-          this.handleSurfaceState(entity.id, impl, needs);
+          cached = {
+            tileX,
+            tileY,
+            tileZ,
+            tile,
+            isWater,
+          };
+          this.tileCache.set(entity.id, cached);
         }
+      }
+
+      // Process based on water state
+      if (cached.isWater && cached.tile?.fluid) {
+        // Agent entered or still in water
+        this.underwaterEntities.add(entity.id);
+        this.processUnderwaterAgent(entity.id, impl, cached.tile, movement, needs);
+      } else {
+        // Agent on land/surface
+        this.underwaterEntities.delete(entity.id);
+        this.handleSurfaceState(entity.id, impl, needs);
+      }
+    }
+  }
+
+  /**
+   * Process an agent that is currently underwater
+   */
+  private processUnderwaterAgent(
+    entityId: string,
+    impl: EntityImpl,
+    tile: SwimmingTile,
+    movement: MovementComponent,
+    needs: NeedsComponent
+  ): void {
+    const depth = tile.elevation; // Negative value (meters)
+    const oceanDepth = Math.abs(depth);
+
+    // Initialize oxygen if needed
+    if (needs.oxygen === undefined) {
+      impl.updateComponent<NeedsComponent>(CT.Needs, (current) =>
+        new NeedsComponent({
+          ...current,
+          oxygen: 1.0, // Full oxygen initially
+        })
+      );
+      return; // Skip this tick, oxygen will be set
+    }
+
+    // Get equipment state
+    const equipment = impl.getComponent(CT.Equipment) as
+      | { lightSource?: boolean; deepSeaSuit?: boolean; oxygenTank?: boolean }
+      | undefined;
+    const hasLightSource = equipment?.lightSource === true;
+    const hasDeepSeaSuit = equipment?.deepSeaSuit === true;
+    const hasOxygenTank = equipment?.oxygenTank === true;
+
+    // Calculate depth zone effects and manage deltas
+    this.manageUnderwaterEffects(
+      entityId,
+      impl,
+      oceanDepth,
+      depth,
+      hasLightSource,
+      hasDeepSeaSuit,
+      hasOxygenTank,
+      needs
+    );
+  }
+
+  /**
+   * Check if a chunk is generated before calling getTileAt
+   * CRITICAL: Prevents expensive terrain generation (20-50ms per chunk!)
+   */
+  private isChunkGenerated(
+    tileX: number,
+    tileY: number,
+    chunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined
+  ): boolean {
+    if (!chunkManager) return true; // No chunk manager, assume generated
+
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(tileX / CHUNK_SIZE);
+    const chunkY = Math.floor(tileY / CHUNK_SIZE);
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+
+    return chunk?.generated === true;
+  }
+
+  /**
+   * Quick check if any active agents are near water tiles
+   * Returns false if all agents are landlocked, allowing early exit
+   */
+  private hasNearbyWater(
+    activeEntities: ReadonlyArray<Entity>,
+    worldWithTiles: { getTileAt?: (x: number, y: number, z?: number) => SwimmingTile | undefined },
+    chunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined
+  ): boolean {
+    if (!worldWithTiles.getTileAt) return false;
+
+    // Sample up to 10 agents to check for nearby water
+    // If all 10 are landlocked, assume no water nearby
+    const sampleSize = Math.min(10, activeEntities.length);
+
+    for (let i = 0; i < sampleSize; i++) {
+      const entity = activeEntities[i];
+      const impl = entity as EntityImpl;
+      const position = impl.getComponent<PositionComponent>(CT.Position);
+
+      if (!position) continue;
+
+      const tileX = Math.floor(position.x);
+      const tileY = Math.floor(position.y);
+      const tileZ = position.z ?? 0;
+
+      // CRITICAL: Skip ungenerated chunks to avoid expensive terrain generation
+      if (!this.isChunkGenerated(tileX, tileY, chunkManager)) {
         continue;
       }
 
-      const impl = entity as EntityImpl;
-      const position = impl.getComponent<PositionComponent>(CT.Position);
-      const movement = impl.getComponent<MovementComponent>(CT.Movement);
-      const needs = impl.getComponent<NeedsComponent>(CT.Needs);
-
-      if (!position || !movement || !needs) continue;
-
-      // Get cached tile (we know it's water from first pass)
-      const cacheKey = `${entity.id}`;
-      const cached = this.tileCache.get(cacheKey);
-
-      if (!cached?.tile?.fluid) continue; // Shouldn't happen, but safety check
-
-      // Agent is underwater - manage depth-based effects
-      const tile = cached.tile;
-      const depth = tile.elevation; // Negative value (meters)
-      const oceanDepth = Math.abs(depth);
-
-      // Initialize oxygen if needed
-      if (needs.oxygen === undefined) {
-        impl.updateComponent<NeedsComponent>(CT.Needs, (current) =>
-          new NeedsComponent({
-            ...current,
-            oxygen: 1.0, // Full oxygen initially
-          })
-        );
-        continue; // Skip this tick, oxygen will be set
+      const tile = worldWithTiles.getTileAt(tileX, tileY, tileZ);
+      if (tile?.fluid?.type === 'water') {
+        return true; // Found water, continue processing
       }
-
-      // Get equipment state
-      const equipment = impl.getComponent(CT.Equipment) as
-        | { lightSource?: boolean; deepSeaSuit?: boolean; oxygenTank?: boolean }
-        | undefined;
-      const hasLightSource = equipment?.lightSource === true;
-      const hasDeepSeaSuit = equipment?.deepSeaSuit === true;
-      const hasOxygenTank = equipment?.oxygenTank === true;
-
-      // Calculate depth zone effects and manage deltas
-      this.manageUnderwaterEffects(
-        entity.id,
-        impl,
-        oceanDepth,
-        depth,
-        hasLightSource,
-        hasDeepSeaSuit,
-        hasOxygenTank,
-        needs
-      );
     }
+
+    return false; // No water found in sample
   }
 
   /**

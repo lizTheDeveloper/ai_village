@@ -90,8 +90,8 @@ export class DivineCommunicationPanel implements IWindowPanel {
     // Find player deity
     const deities = world.query().with(CT.Deity).executeEntities();
     this.deity = deities.find(d => {
-      const deityComp = d.components.get(CT.Deity) as DeityComponent;
-      return deityComp.isPlayerDeity;
+      const deityComp = d.components.get(CT.Deity) as any;
+      return deityComp && deityComp.controller === 'player';
     }) || null;
 
     if (!this.deity) {
@@ -118,11 +118,11 @@ export class DivineCommunicationPanel implements IWindowPanel {
       const spiritual = believer.components.get(CT.Spiritual) as SpiritualComponent;
       if (spiritual.believedDeity !== deityId) continue;
 
-      const agent = believer.components.get(CT.Agent) as AgentComponent;
+      const identity = believer.components.get(CT.Identity) as any;
 
       this.followers.push({
         id: believer.id,
-        name: agent.name || 'Unknown',
+        name: identity?.name || 'Unknown',
         faith: spiritual.faith,
         totalPrayers: spiritual.totalPrayers,
         answeredPrayers: spiritual.answeredPrayers,
@@ -185,7 +185,7 @@ export class DivineCommunicationPanel implements IWindowPanel {
     const deityComp = this.deity.components.get(CT.Deity) as DeityComponent;
 
     // Header: Belief and tabs
-    this.renderHeader(ctx, deityComp, width);
+    this.renderDeityHeader(ctx, deityComp, width);
 
     // Tab content
     const contentY = 100;
@@ -202,12 +202,12 @@ export class DivineCommunicationPanel implements IWindowPanel {
     }
   }
 
-  private renderHeader(ctx: CanvasRenderingContext2D, deityComp: DeityComponent, width: number): void {
+  private renderDeityHeader(ctx: CanvasRenderingContext2D, deityComp: DeityComponent, width: number): void {
     // Belief display
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 16px monospace';
     const belief = Math.floor(deityComp.belief.currentBelief);
-    const beliefPerHour = deityComp.belief.totalBeliefGained > 0 ? '+12' : '+0';
+    const beliefPerHour = deityComp.belief.totalBeliefEarned > 0 ? '+12' : '+0';
     ctx.fillText(`Belief: ${belief} (${beliefPerHour}/hr)`, 20, 30);
 
     // Tab buttons
@@ -531,8 +531,8 @@ export class DivineCommunicationPanel implements IWindowPanel {
     const index = Math.floor((y - startY) / rowHeight);
 
     if (index >= 0 && index < this.followers.length) {
-      this.selectedFollower = this.followers[index].id;
-      this.targetFollowerId = this.followers[index].id;
+      this.selectedFollower = this.followers[index]!.id;
+      this.targetFollowerId = this.followers[index]!.id;
       this.currentTab = 'send'; // Jump to send tab
       return true;
     }
@@ -547,7 +547,7 @@ export class DivineCommunicationPanel implements IWindowPanel {
     const index = Math.floor((y - startY) / prayerHeight);
 
     if (index >= 0 && index < this.prayers.length) {
-      const prayer = this.prayers[index];
+      const prayer = this.prayers[index]!;
       this.targetFollowerId = prayer.agentId;
       this.messageContent = `Re: ${prayer.content}`;
       this.currentTab = 'send';
@@ -569,7 +569,7 @@ export class DivineCommunicationPanel implements IWindowPanel {
           ? this.followers.findIndex(f => f.id === this.targetFollowerId)
           : -1;
         const nextIndex = (currentIndex + 1) % this.followers.length;
-        this.targetFollowerId = this.followers[nextIndex].id;
+        this.targetFollowerId = this.followers[nextIndex]!.id;
         return true;
       }
     }

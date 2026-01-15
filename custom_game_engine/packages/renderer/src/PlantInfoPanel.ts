@@ -296,7 +296,8 @@ export class PlantInfoPanel implements IWindowPanel {
 
     // Always show fruit count for fruit-bearing plants
     if (plant.fruitCount > 0 || isFruitBearing) {
-      const fruitEmoji = plant.speciesId === 'berry-bush' ? '🫐' : '🍅';
+      const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+      const fruitEmoji = isBerry ? '🫐' : '🍅';
       drawText(`${fruitEmoji} Food: ${plant.fruitCount}`, '#FF6347');
     }
 

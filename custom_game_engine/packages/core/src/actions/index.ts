@@ -14,3 +14,4 @@ export * from './GatherSeedsActionHandler.js';
 export * from './HarvestActionHandler.js';
 export * from './CraftActionHandler.js';
 export * from './TradeActionHandler.js';
+export * from './GoToActionHandler.js';

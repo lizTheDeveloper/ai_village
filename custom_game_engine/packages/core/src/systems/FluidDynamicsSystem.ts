@@ -1,6 +1,8 @@
 import type { System, World, Entity } from '../ecs/index.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { Tile } from '@ai-village/world';
+import { get3DNeighbors } from '@ai-village/world';
 
 /**
  * FluidDynamicsSystem - Dwarf Fortress-style water flow with slow updates
@@ -159,8 +161,15 @@ export class FluidDynamicsSystem implements System {
     // Dwarf Fortress pressure formula: pressure = depth + elevation
     const sourcePressure = sourceDepth + sourceElevation;
 
-    // Get all 6 neighbors (3D: North, South, East, West, Up, Down)
-    const neighbors = this.get3DNeighbors(x, y, z);
+    // Use graph-based neighbor pointers for O(1) access
+    const neighborChecks = [
+      { tile: tile.neighbors.north, dx: 0, dy: -1, dz: 0 },
+      { tile: tile.neighbors.south, dx: 0, dy: 1, dz: 0 },
+      { tile: tile.neighbors.east, dx: 1, dy: 0, dz: 0 },
+      { tile: tile.neighbors.west, dx: -1, dy: 0, dz: 0 },
+      { tile: tile.neighbors.up, dx: 0, dy: 0, dz: 1 },
+      { tile: tile.neighbors.down, dx: 0, dy: 0, dz: -1 },
+    ];
 
     // Calculate pressure differences and find flow targets
     const flowTargets: Array<{
@@ -170,9 +179,8 @@ export class FluidDynamicsSystem implements System {
       pressureDiff: number;
     }> = [];
 
-    for (const neighbor of neighbors) {
-      const targetTile = worldWithTiles.getTileAt(neighbor.x, neighbor.y, neighbor.z);
-      if (!targetTile) continue; // Out of bounds or unloaded chunk
+    for (const { tile: targetTile, dx, dy, dz } of neighborChecks) {
+      if (!targetTile) continue; // null = unloaded chunk
 
       // Can't flow into solid walls
       if (targetTile.wall || targetTile.window) continue;
@@ -187,9 +195,9 @@ export class FluidDynamicsSystem implements System {
       // Only flow to lower pressure (threshold prevents tiny oscillations)
       if (pressureDiff > 0.5) {
         flowTargets.push({
-          x: neighbor.x,
-          y: neighbor.y,
-          z: neighbor.z,
+          x: x + dx,
+          y: y + dy,
+          z: z + dz,
           pressureDiff,
         });
       }
@@ -289,20 +297,6 @@ export class FluidDynamicsSystem implements System {
   }
 
   /**
-   * Get all 6 neighbors in 3D space (N, S, E, W, Up, Down)
-   */
-  private get3DNeighbors(x: number, y: number, z: number): Array<{ x: number; y: number; z: number }> {
-    return [
-      { x: x + 1, y: y, z: z },     // East
-      { x: x - 1, y: y, z: z },     // West
-      { x: x, y: y + 1, z: z },     // South
-      { x: x, y: y - 1, z: z },     // North
-      { x: x, y: y, z: z + 1 },     // Up
-      { x: x, y: y, z: z - 1 },     // Down
-    ];
-  }
-
-  /**
    * Mark a tile as dirty (needs flow simulation)
    */
   markDirty(x: number, y: number, z: number): void {
@@ -312,10 +306,36 @@ export class FluidDynamicsSystem implements System {
   /**
    * Mark all neighbors of a tile as dirty
    */
-  private markNeighborsDirty(x: number, y: number, z: number): void {
-    const neighbors = this.get3DNeighbors(x, y, z);
-    for (const n of neighbors) {
-      this.markDirty(n.x, n.y, n.z);
+  private markNeighborsDirty(x: number, y: number, z: number, tile?: Tile): void {
+    // If tile not provided, calculate coordinates (backward compatibility)
+    if (!tile) {
+      const neighborCoords = [
+        { x: x + 1, y: y, z: z },
+        { x: x - 1, y: y, z: z },
+        { x: x, y: y + 1, z: z },
+        { x: x, y: y - 1, z: z },
+        { x: x, y: y, z: z + 1 },
+        { x: x, y: y, z: z - 1 },
+      ];
+      for (const n of neighborCoords) {
+        this.markDirty(n.x, n.y, n.z);
+      }
+      return;
+    }
+
+    // Use graph-based neighbors for O(1) access
+    const neighborChecks = [
+      { tile: tile.neighbors.north, dx: 0, dy: -1, dz: 0 },
+      { tile: tile.neighbors.south, dx: 0, dy: 1, dz: 0 },
+      { tile: tile.neighbors.east, dx: 1, dy: 0, dz: 0 },
+      { tile: tile.neighbors.west, dx: -1, dy: 0, dz: 0 },
+      { tile: tile.neighbors.up, dx: 0, dy: 0, dz: 1 },
+      { tile: tile.neighbors.down, dx: 0, dy: 0, dz: -1 },
+    ];
+
+    for (const { tile: neighbor, dx, dy, dz } of neighborChecks) {
+      if (!neighbor) continue; // null = unloaded chunk
+      this.markDirty(x + dx, y + dy, z + dz);
     }
   }
 
@@ -397,15 +417,6 @@ export class FluidDynamicsSystem implements System {
 }
 
 // Type definitions (from world package)
-interface Tile {
-  terrain: string;
-  elevation: number;
-  fluid?: FluidLayer;
-  wall?: { constructionProgress?: number };
-  window?: { constructionProgress?: number };
-  door?: { state: 'open' | 'closed' | 'locked'; constructionProgress?: number };
-}
-
 interface FluidLayer {
   type: 'water' | 'magma' | 'blood' | 'oil' | 'acid';
   depth: number; // 0-7 (Dwarf Fortress scale)

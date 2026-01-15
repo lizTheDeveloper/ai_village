@@ -199,6 +199,28 @@ export interface MultiverseSnapshot extends Versioned {
 // Save File
 // ============================================================================
 
+/**
+ * Snapshot decay policy - controls how long a snapshot persists
+ * Decay is measured in universe-relative time (tau = causality delta)
+ */
+export interface SnapshotDecayPolicy {
+  /**
+   * Decay after this many universe-ticks (tau).
+   * Example: 1200 ticks/min at 20 TPS → 24000 ticks = 20 min
+   */
+  decayAfterTicks?: number;
+
+  /**
+   * Never decay (canonical events, important milestones)
+   */
+  neverDecay?: boolean;
+
+  /**
+   * Reason for preservation (for debugging/logging)
+   */
+  preservationReason?: string;
+}
+
 export interface SaveFileHeader {
   /** When this save was created */
   createdAt: number;
@@ -223,6 +245,12 @@ export interface SaveFileHeader {
 
   /** Screenshot (base64 PNG) */
   screenshot?: string;
+
+  /**
+   * Snapshot decay policy (client-controlled)
+   * Default: decay after 24 hours of universe-time
+   */
+  decayPolicy?: SnapshotDecayPolicy;
 }
 
 export interface SaveFileChecksums {

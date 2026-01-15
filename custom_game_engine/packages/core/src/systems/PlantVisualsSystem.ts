@@ -41,8 +41,7 @@ export class PlantVisualsSystem implements System {
     'willow': 'willow-tree',
     'willow_bark': 'willow-tree', // Medicinal willow
     // Berry bushes - specific types
-    'berry_bush': 'berry-bush', // Legacy fallback
-    'berry-bush': 'berry-bush', // Legacy fallback
+    'berry_bush': 'blueberry-bush', // Legacy fallback to blueberry
     'blueberry-bush': 'blueberry-bush',
     'raspberry-bush': 'raspberry-bush',
     'blackberry-bush': 'blackberry-bush',
@@ -97,7 +96,7 @@ export class PlantVisualsSystem implements System {
    */
   private static readonly CATEGORY_SPRITE_MAP: Record<string, string> = {
     'tree': 'oak-tree',
-    'shrub': 'berry-bush',
+    'shrub': 'blueberry-bush',
     'crop': 'wheat',
     'grain': 'corn',
     'flower': 'wildflower',
@@ -168,7 +167,7 @@ export class PlantVisualsSystem implements System {
     // Generic berry/bush/shrub fallback
     if (speciesLower.includes('berry') || speciesLower.includes('bush') ||
         speciesLower.includes('shrub')) {
-      return 'berry-bush';
+      return 'blueberry-bush';
     }
     if (speciesLower.includes('corn')) {
       return 'corn';

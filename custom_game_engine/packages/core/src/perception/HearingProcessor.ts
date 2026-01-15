@@ -36,6 +36,20 @@ export interface HearingResult {
 const DEFAULT_HEARING_RANGE = 50;
 
 /**
+ * Chunk spatial query service injected at runtime from @ai-village/world.
+ * Used for efficient spatial entity queries.
+ */
+let chunkSpatialQuery: any | null = null; // ChunkSpatialQuery from @ai-village/world
+
+/**
+ * Inject chunk spatial query service from @ai-village/world.
+ * Called by the application bootstrap.
+ */
+export function injectChunkSpatialQueryForHearing(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+}
+
+/**
  * HearingProcessor Class
  *
  * Usage:
@@ -104,35 +118,74 @@ export class HearingProcessor {
     world: World,
     position: PositionComponent
   ): HeardSpeech[] {
-    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
     const heardSpeech: HeardSpeech[] = [];
 
-    for (const otherAgent of agents) {
-      if (otherAgent.id === entity.id) continue;
+    // Use chunk spatial query if available for efficient spatial filtering
+    if (chunkSpatialQuery) {
+      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        this.hearingRange,
+        [ComponentType.Agent],
+        {
+          excludeIds: new Set([entity.id]), // Exclude self
+        }
+      );
 
-      const otherImpl = otherAgent as EntityImpl;
-      const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
-      const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
+      for (const { entity: otherAgent, distance } of agentsInRadius) {
+        const otherImpl = otherAgent as EntityImpl;
+        const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
 
-      if (!otherPos || !otherAgentComp) continue;
+        if (!otherAgentComp) continue;
 
-      // Skip sleeping agents - they shouldn't be speaking
-      const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
-      if (otherCircadian?.isSleeping) continue;
+        // Skip sleeping agents - they shouldn't be speaking
+        const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
+        if (otherCircadian?.isSleeping) continue;
 
-      const distance = this.distance(position, otherPos);
+        // Check if agent has recent speech
+        if (otherAgentComp.recentSpeech) {
+          const identity = otherImpl.getComponent(ComponentType.Identity) as any;
+          const speakerName = identity?.name || 'Someone';
 
-      // Within hearing range and has recent speech
-      if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
-        const identity = otherImpl.getComponent(ComponentType.Identity) as any;
-        const speakerName = identity?.name || 'Someone';
+          heardSpeech.push({
+            speaker: speakerName,
+            text: otherAgentComp.recentSpeech,
+            speakerId: otherAgent.id,
+            distance,
+          });
+        }
+      }
+    } else {
+      // Fallback to global query (slower, used in tests or when chunk query not available)
+      const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
 
-        heardSpeech.push({
-          speaker: speakerName,
-          text: otherAgentComp.recentSpeech,
-          speakerId: otherAgent.id,
-          distance,
-        });
+      for (const otherAgent of agents) {
+        if (otherAgent.id === entity.id) continue;
+
+        const otherImpl = otherAgent as EntityImpl;
+        const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
+
+        if (!otherPos || !otherAgentComp) continue;
+
+        // Skip sleeping agents - they shouldn't be speaking
+        const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
+        if (otherCircadian?.isSleeping) continue;
+
+        const distance = this.distance(position, otherPos);
+
+        // Within hearing range and has recent speech
+        if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
+          const identity = otherImpl.getComponent(ComponentType.Identity) as any;
+          const speakerName = identity?.name || 'Someone';
+
+          heardSpeech.push({
+            speaker: speakerName,
+            text: otherAgentComp.recentSpeech,
+            speakerId: otherAgent.id,
+            distance,
+          });
+        }
       }
     }
 
@@ -159,17 +212,33 @@ export class HearingProcessor {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return [];
 
-    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+    // Use chunk spatial query if available
+    if (chunkSpatialQuery) {
+      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        this.hearingRange,
+        [ComponentType.Agent],
+        {
+          excludeIds: new Set([entity.id]), // Exclude self
+        }
+      );
 
-    return agents.filter((other) => {
-      if (other.id === entity.id) return false;
+      return agentsInRadius.map(({ entity }: any) => entity);
+    } else {
+      // Fallback to global query
+      const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
 
-      const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
-      if (!otherPos) return false;
+      return agents.filter((other) => {
+        if (other.id === entity.id) return false;
 
-      const distance = this.distance(position, otherPos);
-      return distance <= this.hearingRange;
-    });
+        const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+        if (!otherPos) return false;
+
+        const distance = this.distance(position, otherPos);
+        return distance <= this.hearingRange;
+      });
+    }
   }
 
   /**

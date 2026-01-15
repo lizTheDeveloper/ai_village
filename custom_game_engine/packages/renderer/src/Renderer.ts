@@ -677,6 +677,22 @@ export class Renderer {
   }
 
   /**
+   * Center camera on world position (works in both 2D and 3D modes).
+   * @param worldX World X coordinate (in tile units)
+   * @param worldY World Y coordinate (in tile units)
+   * @param elevation Optional elevation/z-coordinate (defaults to 0)
+   */
+  centerCameraOnWorldPosition(worldX: number, worldY: number, elevation: number = 0): void {
+    // Update 2D camera
+    this.camera.setPosition(worldX * this.tileSize, worldY * this.tileSize);
+
+    // Also update 3D camera if in 3D mode
+    if (this.was3DActive && this.renderer3D) {
+      this.renderer3D.setCameraFromWorld(worldX, worldY, elevation);
+    }
+  }
+
+  /**
    * Forward a click to the 3D renderer for entity selection.
    * Call this from main.ts when a click in 3D mode doesn't hit a window.
    * @param screenX Screen X coordinate (relative to canvas)
@@ -697,7 +713,7 @@ export class Renderer {
    */
   private getOrCreate3DRenderer(): Renderer3D {
     if (!this.renderer3D) {
-      this.renderer3D = new Renderer3D({}, this.chunkManager, this.terrainGenerator);
+      this.renderer3D = new Renderer3D({}, this.chunkManager, this.terrainGenerator, this.pixelLabEntityRenderer);
       // Set up selection callback if one exists
       if (this.onEntitySelectedCallback) {
         this.renderer3D.setOnEntitySelected(this.onEntitySelectedCallback);

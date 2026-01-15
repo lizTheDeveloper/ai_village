@@ -263,7 +263,7 @@ function createResources(world: World, bounds: { minX: number; maxX: number; min
       maxAmount: 25,
     });
     foodEntity.addComponent(createPositionComponent(x, y));
-    foodEntity.addComponent(createRenderableComponent('berry-bush', 'resource'));
+    foodEntity.addComponent(createRenderableComponent('blueberry-bush', 'resource'));
     (world as any)._addEntity(foodEntity);
   }
 

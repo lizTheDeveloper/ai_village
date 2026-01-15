@@ -318,7 +318,7 @@ RESPOND WITH ONLY THE JSON OBJECT (no markdown, no explanation):`;
     } catch {
       // Try extracting from markdown code block
       const codeBlockMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
+      if (codeBlockMatch && codeBlockMatch[1]) {
         try {
           return JSON.parse(codeBlockMatch[1]) as EffectExpression;
         } catch {

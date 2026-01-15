@@ -64,15 +64,42 @@ export class ActionBuilder {
     const buildingCounts = promptCache.getBuildingCounts(world);
     const campfireCount = buildingCounts.byType['campfire'] ?? 0;
 
+    // Check if there's a campfire (complete OR in-progress) within 200 tiles
+    let nearbyCampfireForPriority = false;
+    if (world && entity) {
+      const entityPos = entity.components.get('position') as (Component & { x: number; y: number }) | undefined;
+      if (entityPos) {
+        const buildings = world.query()?.with?.('building')?.executeEntities?.() ?? [];
+        const CAMPFIRE_PROXIMITY_THRESHOLD = 200;
+
+        for (const building of buildings) {
+          const buildingComp = building.components.get('building') as (Component & { buildingType?: string; isComplete?: boolean }) | undefined;
+          const buildingPos = building.components.get('position') as (Component & { x: number; y: number }) | undefined;
+
+          // Check for ANY campfire (complete OR in-progress) within range
+          if (buildingComp?.buildingType === 'campfire' && buildingPos) {
+            const dx = entityPos.x - buildingPos.x;
+            const dy = entityPos.y - buildingPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+              nearbyCampfireForPriority = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
     if (isCold && isTired) {
-      if (campfireCount > 0) {
-        priority.push(`You need warmth and rest! The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to warm up!`);
+      if (nearbyCampfireForPriority) {
+        priority.push(`You need warmth and rest! There's a campfire nearby (within 200 tiles) - use seek_warmth to warm up!`);
       } else {
         priority.push('URGENT! You need shelter - use plan_build for campfire or tent!');
       }
     } else if (isCold) {
-      if (campfireCount > 0) {
-        priority.push(`You're cold! The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth!`);
+      if (nearbyCampfireForPriority) {
+        priority.push(`You're cold! There's a campfire nearby (within 200 tiles) - use seek_warmth to find warmth!`);
       } else {
         priority.push('You\'re freezing! Use plan_build for campfire or tent!');
       }
@@ -126,7 +153,11 @@ export class ActionBuilder {
     }
 
     // BUILDING
-    building.push('plan_build - Plan a building project: queues the build and you\'ll automatically gather resources then construct it. Just say what building you want! (Examples: "plan_build storage-chest", "plan_build campfire", "plan_build tent")');
+    if (nearbyCampfireForPriority) {
+      building.push('plan_build - Plan a building project: queues the build and you\'ll automatically gather resources then construct it. Just say what building you want! (Examples: "plan_build storage-chest", "plan_build tent", "plan_build bed") NOTE: There\'s already a campfire nearby - use seek_warmth instead of building another!');
+    } else {
+      building.push('plan_build - Plan a building project: queues the build and you\'ll automatically gather resources then construct it. Just say what building you want! (Examples: "plan_build storage-chest", "plan_build campfire", "plan_build tent")');
+    }
 
     // EXPLORATION
     exploration.push('explore - Systematically explore unknown areas to find new resources');

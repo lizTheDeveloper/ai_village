@@ -20,12 +20,41 @@ export class RoofRepairSystem implements System {
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   private hasRun = false;
 
+  /**
+   * Check if a chunk is generated before calling getTileAt.
+   * CRITICAL: Prevents expensive terrain generation (20-50ms per chunk!)
+   */
+  private isChunkGenerated(
+    tileX: number,
+    tileY: number,
+    chunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined
+  ): boolean {
+    if (!chunkManager) return true; // No chunk manager, assume generated
+
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(tileX / CHUNK_SIZE);
+    const chunkY = Math.floor(tileY / CHUNK_SIZE);
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+
+    return chunk?.generated === true;
+  }
+
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Only run once per session
     if (this.hasRun) return;
     this.hasRun = true;
 
     console.log('[RoofRepair] Checking for buildings missing roofs...');
+
+    // Get chunk manager for generation checks
+    const worldWithChunks = world as {
+      getChunkManager?: () => {
+        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
+      } | undefined;
+    };
+    const chunkManager = typeof worldWithChunks.getChunkManager === 'function'
+      ? worldWithChunks.getChunkManager()
+      : undefined;
 
     const buildings = world.query()
       .with(CT.Building)
@@ -40,14 +69,14 @@ export class RoofRepairSystem implements System {
       const position = building.components.get(CT.Position) as PositionComponent;
 
       // Determine roof material from building type or first wall material found
-      const roofMaterial = this.inferRoofMaterial(world, position, buildingComp);
+      const roofMaterial = this.inferRoofMaterial(world, position, buildingComp, chunkManager);
 
       if (!roofMaterial) {
         continue; // No walls found, skip this building
       }
 
       // Add roofs to all tiles within the building's footprint
-      const repaired = this.addRoofsToBuilding(world, position, buildingComp, roofMaterial);
+      const repaired = this.addRoofsToBuilding(world, position, buildingComp, roofMaterial, chunkManager);
 
       if (repaired > 0) {
         buildingsRepaired++;
@@ -70,7 +99,8 @@ export class RoofRepairSystem implements System {
   private inferRoofMaterial(
     world: World,
     position: PositionComponent,
-    building: BuildingComponent
+    building: BuildingComponent,
+    chunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined
   ): RoofMaterial | null {
     if (!world.getTileAt) return null;
 
@@ -80,6 +110,12 @@ export class RoofRepairSystem implements System {
       for (let dx = -checkRadius; dx <= checkRadius; dx++) {
         const tx = position.x + dx;
         const ty = position.y + dy;
+
+        // CRITICAL: Skip ungenerated chunks to avoid expensive terrain generation
+        if (!this.isChunkGenerated(tx, ty, chunkManager)) {
+          continue;
+        }
+
         const tile = world.getTileAt(tx, ty) as Tile | null;
 
         if (tile?.wall) {
@@ -132,7 +168,8 @@ export class RoofRepairSystem implements System {
     world: World,
     position: PositionComponent,
     building: BuildingComponent,
-    roofMaterial: RoofMaterial
+    roofMaterial: RoofMaterial,
+    chunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined
   ): number {
     if (!world.getTileAt) return 0;
 
@@ -143,6 +180,12 @@ export class RoofRepairSystem implements System {
       for (let dx = -checkRadius; dx <= checkRadius; dx++) {
         const tx = position.x + dx;
         const ty = position.y + dy;
+
+        // CRITICAL: Skip ungenerated chunks to avoid expensive terrain generation
+        if (!this.isChunkGenerated(tx, ty, chunkManager)) {
+          continue;
+        }
+
         const tile = world.getTileAt(tx, ty) as Tile | null;
 
         if (!tile) continue;

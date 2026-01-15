@@ -25,6 +25,14 @@ import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
+// Chunk spatial query injection for efficient nearby entity lookups
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToSeekCooling(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[SeekCoolingBehavior] ChunkSpatialQuery injected for efficient cooling source lookups');
+}
+
 interface CoolingSource {
   type: 'water' | 'shade' | 'interior';
   position: { x: number; y: number };
@@ -201,59 +209,129 @@ export class SeekCoolingBehavior extends BaseBehavior {
   private findShadeSources(world: World, position: PositionComponent): CoolingSource[] {
     const sources: CoolingSource[] = [];
 
-    // Check buildings for shade
-    const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        this.SEARCH_RADIUS,
+        [ComponentType.Building]
+      );
 
-    for (const building of buildings) {
-      const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+      for (const { entity: building, distance } of buildingsInRadius) {
+        const buildingImpl = building as EntityImpl;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
-      if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
+        if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
-      const distance = this.distance(position, buildingPos);
+        // Check if building provides shade
+        if (buildingComp.providesShade) {
+          sources.push({
+            type: 'shade',
+            position: { x: buildingPos.x, y: buildingPos.y },
+            distance,
+            entity: building,
+          });
+        }
 
-      // Check if building provides shade
-      if (buildingComp.providesShade) {
-        sources.push({
-          type: 'shade',
-          position: { x: buildingPos.x, y: buildingPos.y },
-          distance,
-          entity: building,
-        });
+        // Check if building has cool interior
+        if (buildingComp.interior && buildingComp.baseTemperature < 0) {
+          sources.push({
+            type: 'interior',
+            position: { x: buildingPos.x, y: buildingPos.y },
+            distance,
+            entity: building,
+          });
+        }
       }
 
-      // Check if building has cool interior
-      if (buildingComp.interior && buildingComp.baseTemperature < 0) {
-        sources.push({
-          type: 'interior',
-          position: { x: buildingPos.x, y: buildingPos.y },
-          distance,
-          entity: building,
-        });
+      // Check plants (trees) for shade using ChunkSpatialQuery
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        this.SEARCH_RADIUS,
+        [ComponentType.Plant]
+      );
+
+      for (const { entity: plant, distance } of plantsInRadius) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant) as any;
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+        if (!plantComp || !plantPos) continue;
+
+        // Check if plant provides shade (e.g., tall trees)
+        if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+          sources.push({
+            type: 'shade',
+            position: { x: plantPos.x, y: plantPos.y },
+            distance,
+            entity: plant,
+          });
+        }
       }
-    }
+    } else {
+      // Fallback to global queries
+      const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
 
-    // Check plants (trees) for shade
-    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
+      for (const building of buildings) {
+        const buildingImpl = building as EntityImpl;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
-    for (const plant of plants) {
-      const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent(ComponentType.Plant) as any;
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
-      if (!plantComp || !plantPos) continue;
+        const distance = this.distance(position, buildingPos);
 
-      // Check if plant provides shade (e.g., tall trees)
-      if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+        // Only consider buildings within search radius
+        if (distance > this.SEARCH_RADIUS) continue;
+
+        // Check if building provides shade
+        if (buildingComp.providesShade) {
+          sources.push({
+            type: 'shade',
+            position: { x: buildingPos.x, y: buildingPos.y },
+            distance,
+            entity: building,
+          });
+        }
+
+        // Check if building has cool interior
+        if (buildingComp.interior && buildingComp.baseTemperature < 0) {
+          sources.push({
+            type: 'interior',
+            position: { x: buildingPos.x, y: buildingPos.y },
+            distance,
+            entity: building,
+          });
+        }
+      }
+
+      // Check plants (trees) for shade
+      const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
+
+      for (const plant of plants) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant) as any;
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+        if (!plantComp || !plantPos) continue;
+
         const distance = this.distance(position, plantPos);
 
-        sources.push({
-          type: 'shade',
-          position: { x: plantPos.x, y: plantPos.y },
-          distance,
-          entity: plant,
-        });
+        // Only consider plants within search radius
+        if (distance > this.SEARCH_RADIUS) continue;
+
+        // Check if plant provides shade (e.g., tall trees)
+        if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+          sources.push({
+            type: 'shade',
+            position: { x: plantPos.x, y: plantPos.y },
+            distance,
+            entity: plant,
+          });
+        }
       }
     }
 
@@ -300,39 +378,90 @@ export class SeekCoolingBehavior extends BaseBehavior {
     movement: MovementComponent
   ): void {
     // Find nearby heat sources and move away from them
-    const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+    const HEAT_DETECTION_RADIUS = 30; // Limit search for performance
     let totalAvoidanceX = 0;
     let totalAvoidanceY = 0;
     let heatSourceCount = 0;
+    let heatSourceCenterX = 0;
+    let heatSourceCenterY = 0;
 
-    for (const building of buildings) {
-      const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        HEAT_DETECTION_RADIUS,
+        [ComponentType.Building]
+      );
 
-      if (!buildingComp || !buildingPos || !buildingComp.providesHeat) continue;
+      for (const { entity: building, distance } of buildingsInRadius) {
+        const buildingImpl = building as EntityImpl;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
-      const distance = this.distance(position, buildingPos);
+        if (!buildingComp || !buildingPos || !buildingComp.providesHeat) continue;
 
-      // If within heat radius (or very close regardless), move away
-      // Use a minimum detection distance of 2 tiles even if heatRadius is smaller
-      const effectiveRadius = Math.max(buildingComp.heatRadius, 2);
-      if (distance <= effectiveRadius) {
-        const dx = position.x - buildingPos.x;
-        const dy = position.y - buildingPos.y;
+        // If within heat radius (or very close regardless), move away
+        // Use a minimum detection distance of 2 tiles even if heatRadius is smaller
+        const effectiveRadius = Math.max(buildingComp.heatRadius, 2);
+        if (distance <= effectiveRadius) {
+          const dx = position.x - buildingPos.x;
+          const dy = position.y - buildingPos.y;
 
-        // Weight by inverse distance (closer = stronger push away)
-        // Add 0.1 to avoid division issues when standing exactly on the source
-        const weight = 1 - (distance / (effectiveRadius + 0.1));
+          // Weight by inverse distance (closer = stronger push away)
+          // Add 0.1 to avoid division issues when standing exactly on the source
+          const weight = 1 - (distance / (effectiveRadius + 0.1));
 
-        totalAvoidanceX += dx * weight;
-        totalAvoidanceY += dy * weight;
-        heatSourceCount++;
+          totalAvoidanceX += dx * weight;
+          totalAvoidanceY += dy * weight;
+
+          // Track center of mass of heat sources for fallback escape direction
+          heatSourceCenterX += buildingPos.x;
+          heatSourceCenterY += buildingPos.y;
+          heatSourceCount++;
+        }
+      }
+    } else {
+      // Fallback to global query
+      const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+
+      for (const building of buildings) {
+        const buildingImpl = building as EntityImpl;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+        if (!buildingComp || !buildingPos || !buildingComp.providesHeat) continue;
+
+        const distance = this.distance(position, buildingPos);
+
+        // Only consider buildings within detection radius for performance
+        if (distance > HEAT_DETECTION_RADIUS) continue;
+
+        // If within heat radius (or very close regardless), move away
+        // Use a minimum detection distance of 2 tiles even if heatRadius is smaller
+        const effectiveRadius = Math.max(buildingComp.heatRadius, 2);
+        if (distance <= effectiveRadius) {
+          const dx = position.x - buildingPos.x;
+          const dy = position.y - buildingPos.y;
+
+          // Weight by inverse distance (closer = stronger push away)
+          // Add 0.1 to avoid division issues when standing exactly on the source
+          const weight = 1 - (distance / (effectiveRadius + 0.1));
+
+          totalAvoidanceX += dx * weight;
+          totalAvoidanceY += dy * weight;
+
+          // Track center of mass of heat sources for fallback escape direction
+          heatSourceCenterX += buildingPos.x;
+          heatSourceCenterY += buildingPos.y;
+          heatSourceCount++;
+        }
       }
     }
 
     // Minimum distance to travel before picking a new escape direction (in tiles)
-    const MIN_ESCAPE_DISTANCE = 8;
+    // Increased from 8 to 20 to prevent oscillation in large campfire clusters
+    const MIN_ESCAPE_DISTANCE = 20;
 
     if (heatSourceCount > 0) {
       // Normalize and apply movement
@@ -356,7 +485,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
         });
       } else {
         // Vectors cancelled out (equidistant from multiple heat sources)
-        // Use persistent escape direction or pick a new random one
+        // Calculate center of mass of heat sources and flee in opposite direction
+        // This prevents random wandering that could lead back into the heat cluster
         const state = this.getState(entity);
         let escapeAngle = state.escapeAngle as number | undefined;
         const escapeStartX = state.escapeStartX as number | undefined;
@@ -370,8 +500,23 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
         // Pick new direction if: no escape direction set, or traveled far enough
         if (escapeAngle === undefined || distanceTraveled >= MIN_ESCAPE_DISTANCE) {
-          // Pick a new random escape direction
-          escapeAngle = Math.random() * Math.PI * 2;
+          // Calculate center of mass of all heat sources
+          const centerX = heatSourceCenterX / heatSourceCount;
+          const centerY = heatSourceCenterY / heatSourceCount;
+
+          // Escape direction is away from center of mass
+          const dx = position.x - centerX;
+          const dy = position.y - centerY;
+          const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+          if (distFromCenter > 0.1) {
+            // Clear direction away from center - use it
+            escapeAngle = Math.atan2(dy, dx);
+          } else {
+            // Standing exactly at center (unlikely) - pick random direction
+            escapeAngle = Math.random() * Math.PI * 2;
+          }
+
           this.updateState(entity, {
             escapeAngle,
             escapeStartX: position.x,

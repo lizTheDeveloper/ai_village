@@ -38,6 +38,8 @@ import {
   getConversationStyle,
   findSharedInterests,
 } from '@ai-village/core';
+import type { SexualityComponent, ActiveAttraction, CurrentMate } from '@ai-village/reproduction';
+import type { CourtshipComponent } from '@ai-village/reproduction';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
 // Phase 3: Prompt Integration - Schema-driven prompt generation
@@ -119,7 +121,7 @@ export class StructuredPromptBuilder {
     const villageStatus = this.buildVillageStatus(world, agent.id);
 
     // Buildings: What you can construct (comes before actions)
-    const buildingsText = this.buildBuildingsKnowledge(world, inventory, skills);
+    const buildingsText = this.buildBuildingsKnowledge(agent, world, inventory, skills);
 
     // Available Actions (what you can do)
     const actions = this.getAvailableActions(vision, world, agent);
@@ -157,14 +159,13 @@ export class StructuredPromptBuilder {
       const isTired = needs?.energy !== undefined && needs.energy < 0.3 && needs.energy >= 0.1; // ENERGY_LOW: 10-30%
 
       // STRONGEST PRIORITY: Agent has ALL required resources + urgent need
-      // Check if campfire already exists - don't build duplicates!
-      const buildingCounts = promptCache.getBuildingCounts(world);
-      const hasCampfire = (buildingCounts.byType['campfire'] ?? 0) > 0;
+      // Check if campfire is in the current chunk - don't build duplicates!
+      const hasCampfireInChunk = this.hasCampfireInChunk(agent, world);
 
       if ((canBuildCampfire || canBuildTent) && isCold) {
-        if (hasCampfire) {
-          // Campfire exists - go to it instead of building another one!
-          instruction = `YOU ARE COLD! The village already has ${buildingCounts.byType['campfire']} campfire${buildingCounts.byType['campfire'] > 1 ? 's' : ''} - head to one and warm up! Use seek_warmth to find the nearest heat source.`;
+        if (hasCampfireInChunk) {
+          // Campfire in chunk - go to it instead of building another one!
+          instruction = `YOU ARE COLD! There's a campfire in your area - use seek_warmth to find it and warm up!`;
         } else if (canBuildCampfire && canBuildTent) {
           instruction = `YOU ARE COLD and you have materials for warmth! URGENT: build a campfire (10 stone + 5 wood) or tent (10 cloth + 5 wood) NOW to avoid freezing! What will you build?`;
         } else if (canBuildCampfire) {
@@ -456,7 +457,7 @@ export class StructuredPromptBuilder {
    * Build the buildings knowledge section.
    * Shows what buildings the agent knows how to construct with costs.
    */
-  private buildBuildingsKnowledge(world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
+  private buildBuildingsKnowledge(agent: Entity, world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
     // Check for buildingRegistry (extended World interface)
     // Use any cast to avoid intersection type issues with private properties
     const worldAny = world as any;
@@ -487,11 +488,19 @@ export class StructuredPromptBuilder {
     const buildingCounts = promptCache.getBuildingCounts(world);
     const existingBuildingTypes = new Set<string>(Object.keys(buildingCounts.byType));
 
+    // Check if campfire exists in agent's chunk
+    const hasCampfireInChunk = this.hasCampfireInChunk(agent, world);
+
     // Filter out buildings we already have (unless they're capacity buildings like storage)
     // Note: tent is now tile-based, not an entity building
     const capacityBuildings = new Set(['storage-chest', 'storage-box', 'bed', 'bedroll']);
     const filteredBuildings = buildings.filter((building: { name: string; category: string }) => {
       const buildingType = building.name;
+
+      // Hide campfire entirely if one exists in this chunk
+      if (buildingType === 'campfire' && hasCampfireInChunk) {
+        return false;
+      }
 
       // If it's a capacity building (can have multiples), always show it
       if (capacityBuildings.has(buildingType)) {
@@ -628,6 +637,15 @@ export class StructuredPromptBuilder {
       context += `- Temperature: ${temp}°C (${tempDesc})\n`;
     }
 
+    // Romantic feelings (only shows when relevant)
+    if (entity && vision) {
+      const nearbyAgents = vision.nearbyAgents ?? [];
+      const romanticContext = this.getRomanticFeelingsContext(entity, world, nearbyAgents);
+      if (romanticContext) {
+        context += romanticContext;
+      }
+    }
+
     // Inventory
     if (inventory) {
       const resources: Record<string, number> = {};
@@ -673,7 +691,7 @@ export class StructuredPromptBuilder {
 
       if (nearbyAgents.length > 0) {
         // Show detailed information about close-range agents
-        const agentInfo = this.getSeenAgentsInfo(world, nearbyAgents);
+        const agentInfo = this.getSeenAgentsInfo(world, nearbyAgents, entity);
         if (agentInfo) {
           context += agentInfo;
         }
@@ -764,7 +782,9 @@ export class StructuredPromptBuilder {
       if (plantCount > 0) {
         // Map plant species to gatherable food resource types
         const speciesResourceMap: Record<string, string> = {
-          'berry-bush': 'berry',
+          'blueberry-bush': 'berry',
+          'raspberry-bush': 'berry',
+          'blackberry-bush': 'berry',
           'berry_bush': 'berry',
           'apple': 'apple',
           'apple-tree': 'apple',
@@ -887,7 +907,7 @@ export class StructuredPromptBuilder {
 
     // Add building recommendations based on needs
     if (needs || temperature) {
-      context += this.suggestBuildings(needs, temperature, inventory, world);
+      context += this.suggestBuildings(entity, needs, temperature, inventory, world);
     }
 
     // VILLAGE RESOURCES: Skilled agents as affordances
@@ -976,6 +996,7 @@ export class StructuredPromptBuilder {
    * Context-aware - only shows relevant buildings.
    */
   private suggestBuildings(
+    entity: Entity | undefined,
     needs: NeedsComponent | undefined,
     temperature: TemperatureComponent | undefined,
     inventory: InventoryComponent | undefined,
@@ -994,15 +1015,14 @@ export class StructuredPromptBuilder {
       });
     };
 
-    // Check existing buildings to avoid suggesting duplicates
-    const buildingCounts = promptCache.getBuildingCounts(world);
-    const hasCampfire = (buildingCounts.byType['campfire'] ?? 0) > 0;
+    // Check if campfire exists in agent's chunk
+    const hasCampfireInChunk = entity ? this.hasCampfireInChunk(entity, world) : false;
 
     // Check if cold → suggest warmth buildings
     if (temperature?.state === 'cold' || temperature?.state === 'dangerously_cold') {
-      // Only suggest campfire if none exist - otherwise tell them to go to the existing one
-      if (hasCampfire) {
-        suggestions.push(`GO TO CAMPFIRE - the village has ${buildingCounts.byType['campfire']} campfire${buildingCounts.byType['campfire'] > 1 ? 's' : ''}, head to one to warm up!`);
+      // Only suggest campfire if none in chunk - otherwise tell them to go to the existing one
+      if (hasCampfireInChunk) {
+        suggestions.push(`GO TO CAMPFIRE - there's a campfire in your area, use seek_warmth to find it and warm up!`);
       } else if (hasResources({ stone: 10, wood: 5 })) {
         suggestions.push('campfire (10 stone + 5 wood) - provides warmth in 3-tile radius');
       } else {
@@ -1215,6 +1235,43 @@ export class StructuredPromptBuilder {
   }
 
   /**
+   * Check if there's a campfire in the agent's current chunk.
+   * Returns true if a campfire (complete or in-progress) exists in the same chunk.
+   * This is much more efficient than querying all entities.
+   */
+  private hasCampfireInChunk(agent: Entity, world: World): boolean {
+    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    if (!agentPos) return false;
+
+    // Safety check: getChunkManager might not exist in test mocks
+    if (typeof world.getChunkManager !== 'function') return false;
+
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return false;
+
+    // Convert world coordinates to chunk coordinates
+    const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
+    const chunkX = Math.floor(agentPos.x / CHUNK_SIZE);
+    const chunkY = Math.floor(agentPos.y / CHUNK_SIZE);
+
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+    if (!chunk || !chunk.entities) return false;
+
+    // Check if any entity in the chunk is a campfire
+    for (const entityId of chunk.entities) {
+      const entity = world.getEntity(entityId);
+      if (!entity) continue;
+
+      const building = entity.components.get('building') as BuildingComponent | undefined;
+      if (building?.buildingType === 'campfire') {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Get vague impression of a skill for social skill level 1.
    */
   private getSkillImpression(skillId: SkillId): string {
@@ -1264,11 +1321,20 @@ export class StructuredPromptBuilder {
 
   /**
    * Get information about nearby agents (from vision).
-   * Shows agent names and what they're currently doing.
+   * Shows agent names, what they're doing, and romantic feelings if applicable.
    */
-  private getSeenAgentsInfo(world: World, seenAgentIds: string[]): string | null {
+  private getSeenAgentsInfo(world: World, seenAgentIds: string[], viewingEntity?: Entity): string | null {
     if (!world || !seenAgentIds || seenAgentIds.length === 0) {
       return null;
+    }
+
+    // Check if viewing agent has any attractions
+    const sexuality = viewingEntity?.components.get('sexuality') as SexualityComponent | undefined;
+    const attractionMap = new Map<string, ActiveAttraction>();
+    if (sexuality?.activeAttractions) {
+      for (const attraction of sexuality.activeAttractions) {
+        attractionMap.set(attraction.targetId, attraction);
+      }
     }
 
     const agentDescriptions: string[] = [];
@@ -1304,6 +1370,12 @@ export class StructuredPromptBuilder {
         description += ` (${action})`;
       }
 
+      // Add attraction note if viewing agent feels attracted to this agent
+      const attraction = attractionMap.get(agentId);
+      if (attraction && attraction.currentIntensity > 0.3) {
+        description += ' 💕'; // Subtle indicator of attraction
+      }
+
       // Add their speech if they recently said something
       if (agentComp?.recentSpeech) {
         description += ` - said: "${agentComp.recentSpeech}"`;
@@ -1317,6 +1389,117 @@ export class StructuredPromptBuilder {
     }
 
     return `- You see nearby: ${agentDescriptions.join(', ')}\n`;
+  }
+
+  /**
+   * Get romantic feelings context (attractions, relationships, courtship).
+   * Only shows information when agent has active feelings - doesn't mention lack of attraction.
+   */
+  private getRomanticFeelingsContext(entity: Entity, world: World, nearbyAgentIds: string[]): string {
+    const sexuality = entity.components.get('sexuality') as SexualityComponent | undefined;
+    const courtship = entity.components.get('courtship') as CourtshipComponent | undefined;
+
+    if (!sexuality && !courtship) {
+      return ''; // No romantic components, hide entirely
+    }
+
+    let context = '';
+
+    // Current relationships/mates
+    if (sexuality?.currentMates && sexuality.currentMates.length > 0) {
+      const mateDescriptions: string[] = [];
+      for (const mate of sexuality.currentMates) {
+        const mateEntity = world.getEntity(mate.entityId);
+        if (!mateEntity) continue;
+
+        const mateIdentity = mateEntity.components.get('identity') as IdentityComponent | undefined;
+        if (!mateIdentity?.name) continue;
+
+        let bondDesc = mate.bondType.replace(/_/g, ' ');
+        if (mate.bondStrength > 0.8) {
+          bondDesc = `deeply bonded ${bondDesc}`;
+        } else if (mate.bondStrength > 0.5) {
+          bondDesc = `${bondDesc}`;
+        } else {
+          bondDesc = `developing ${bondDesc}`;
+        }
+
+        mateDescriptions.push(`${mateIdentity.name} (your ${bondDesc})`);
+      }
+
+      if (mateDescriptions.length > 0) {
+        context += `- Relationships: ${mateDescriptions.join(', ')}\n`;
+      }
+    }
+
+    // Active attractions (feelings for others)
+    if (sexuality?.activeAttractions && sexuality.activeAttractions.length > 0) {
+      const attractionDescriptions: string[] = [];
+
+      for (const attraction of sexuality.activeAttractions) {
+        const targetEntity = world.getEntity(attraction.targetId);
+        if (!targetEntity) continue;
+
+        const targetIdentity = targetEntity.components.get('identity') as IdentityComponent | undefined;
+        if (!targetIdentity?.name) continue;
+
+        // Determine primary attraction type
+        const dimensions = Object.entries(attraction.attractions)
+          .filter(([_, intensity]) => intensity > 0.3)
+          .sort((a, b) => b[1] - a[1]);
+
+        if (dimensions.length === 0) continue;
+
+        const primary = dimensions[0];
+        if (!primary) continue; // Type guard
+        const primaryDimension = primary[0];
+        const intensity = attraction.currentIntensity;
+
+        let feelingDesc = '';
+        if (primaryDimension === 'romantic') {
+          if (intensity > 0.7) feelingDesc = 'strongly attracted to';
+          else if (intensity > 0.4) feelingDesc = 'attracted to';
+          else feelingDesc = 'developing feelings for';
+        } else if (primaryDimension === 'sexual') {
+          if (intensity > 0.7) feelingDesc = 'deeply drawn to';
+          else feelingDesc = 'attracted to';
+        } else if (primaryDimension === 'aesthetic') {
+          feelingDesc = 'find beautiful';
+        } else {
+          feelingDesc = `feel ${primaryDimension} attraction to`;
+        }
+
+        attractionDescriptions.push(`you ${feelingDesc} ${targetIdentity.name}`);
+      }
+
+      if (attractionDescriptions.length > 0) {
+        context += `- Romantic feelings: ${attractionDescriptions.join('; ')}\n`;
+      }
+    }
+
+    // Active courtship state (only if in an active courtship state)
+    if (courtship && courtship.state !== 'idle') {
+      const targetId = courtship.currentCourtshipTarget || courtship.currentCourtshipInitiator;
+      if (targetId) {
+        const targetEntity = world.getEntity(targetId);
+        if (targetEntity) {
+          const targetIdentity = targetEntity.components.get('identity') as IdentityComponent | undefined;
+          if (targetIdentity?.name) {
+            if (courtship.state === 'interested') {
+              context += `- You're thinking about ${targetIdentity.name} romantically\n`;
+            } else if (courtship.state === 'courting') {
+              context += `- You're courting ${targetIdentity.name}\n`;
+            } else if (courtship.state === 'being_courted') {
+              context += `- ${targetIdentity.name} is courting you\n`;
+            } else if (courtship.state === 'consenting') {
+              context += `- You and ${targetIdentity.name} are drawn to each other\n`;
+            }
+          }
+        }
+      }
+    }
+
+    return context;
   }
 
   /**
@@ -1467,7 +1650,11 @@ export class StructuredPromptBuilder {
     }
 
     const criticalMissing: string[] = [];
-    if (!buildingTypes.has('campfire')) criticalMissing.push('campfire (warmth)');
+    // Check for campfire in agent's chunk - if none in chunk, it's critical to build one
+    const currentAgent = world.getEntity(currentAgentId);
+    if (currentAgent && !this.hasCampfireInChunk(currentAgent, world)) {
+      criticalMissing.push('campfire (warmth)');
+    }
     if (!buildingTypes.has('storage-chest') && !buildingTypes.has('storage-box')) {
       criticalMissing.push('storage (items)');
     }
@@ -1690,19 +1877,18 @@ export class StructuredPromptBuilder {
 
     // PRIORITY 1: Urgent building hints (when agent has pressing needs)
     // These are just hints - the actual action is plan_build (shown later)
-    // Check for existing campfires to avoid building duplicates
-    const actionBuildingCounts = promptCache.getBuildingCounts(_world);
-    const villageCampfireCount = actionBuildingCounts.byType['campfire'] ?? 0;
+    const buildingCounts = promptCache.getBuildingCounts(_world);
+    const hasCampfire = (buildingCounts.byType['campfire'] ?? 0) > 0;
 
     if (isCold && isTired) {
-      if (villageCampfireCount > 0) {
-        priority.push(`🔥 You need warmth and rest! The village has ${villageCampfireCount} campfire${villageCampfireCount > 1 ? 's' : ''} - use seek_warmth to warm up, then rest!`);
+      if (hasCampfire) {
+        priority.push(`🔥 You need warmth and rest! There's a campfire in the village - use seek_warmth to warm up, then rest!`);
       } else {
         priority.push('🏗️ URGENT! You need shelter - use plan_build for campfire or tent!');
       }
     } else if (isCold) {
-      if (villageCampfireCount > 0) {
-        priority.push(`🔥 You're cold! The village has ${villageCampfireCount} campfire${villageCampfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth!`);
+      if (hasCampfire) {
+        priority.push(`🔥 You're cold! There's a campfire in the village - use seek_warmth to find warmth!`);
       } else {
         priority.push('🏗️ You\'re freezing! Use plan_build for campfire or tent!');
       }

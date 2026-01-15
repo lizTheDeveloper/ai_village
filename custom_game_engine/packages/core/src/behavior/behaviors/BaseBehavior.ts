@@ -71,6 +71,21 @@ export abstract class BaseBehavior implements IBehavior {
   }
 
   /**
+   * Calculate squared distance between two positions.
+   * Use this for distance comparisons to avoid expensive sqrt.
+   *
+   * Example: if (distanceSquared(a, b) < radius * radius) { ... }
+   */
+  protected distanceSquared(
+    a: { x: number; y: number },
+    b: { x: number; y: number }
+  ): number {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
    * Set movement target for entity.
    */
   protected setMovementTarget(

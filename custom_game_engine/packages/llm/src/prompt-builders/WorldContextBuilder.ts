@@ -108,7 +108,7 @@ export class WorldContextBuilder {
 
     // Building recommendations based on needs
     if (needs || temperature) {
-      context += this.suggestBuildings(needs, temperature, inventory, world);
+      context += this.suggestBuildings(needs, temperature, inventory, world, entity);
     }
 
     // Terrain features
@@ -388,7 +388,9 @@ export class WorldContextBuilder {
     skills: SkillsComponent | undefined
   ): string {
     const speciesResourceMap: Record<string, string> = {
-      'berry-bush': 'berry',
+      'blueberry-bush': 'berry',
+      'raspberry-bush': 'berry',
+      'blackberry-bush': 'berry',
       'berry_bush': 'berry',
       'apple': 'apple',
       'apple-tree': 'apple',
@@ -543,13 +545,51 @@ export class WorldContextBuilder {
   }
 
   /**
+   * Check if there's a campfire in the agent's current chunk.
+   * Returns true if a campfire (complete or in-progress) exists in the same chunk.
+   * This is much more efficient than querying all entities.
+   */
+  private hasCampfireInChunk(agent: Entity, world: World): boolean {
+    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    if (!agentPos) return false;
+
+    // Safety check: getChunkManager might not exist in test mocks
+    if (typeof world.getChunkManager !== 'function') return false;
+
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return false;
+
+    // Convert world coordinates to chunk coordinates
+    const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
+    const chunkX = Math.floor(agentPos.x / CHUNK_SIZE);
+    const chunkY = Math.floor(agentPos.y / CHUNK_SIZE);
+
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+    if (!chunk || !chunk.entities) return false;
+
+    // Check if any entity in the chunk is a campfire
+    for (const entityId of chunk.entities) {
+      const entity = world.getEntity(entityId);
+      if (!entity) continue;
+
+      const building = entity.components.get('building') as BuildingComponent | undefined;
+      if (building?.buildingType === 'campfire') {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Suggest buildings based on agent's current needs.
    */
   suggestBuildings(
     needs: NeedsComponent | undefined,
     temperature: TemperatureComponent | undefined,
     inventory: InventoryComponent | undefined,
-    world: World
+    world: World,
+    entity?: Entity
   ): string {
     const suggestions: string[] = [];
 
@@ -563,19 +603,18 @@ export class WorldContextBuilder {
       });
     };
 
-    // Check existing buildings to avoid suggesting duplicates
-    const buildingCounts = promptCache.getBuildingCounts(world);
-    const campfireCount = buildingCounts.byType['campfire'] ?? 0;
+    // Check if campfire exists in agent's chunk
+    const hasCampfireInChunk = entity ? this.hasCampfireInChunk(entity, world) : false;
 
     // Check if cold
     if (temperature?.state === 'cold' || temperature?.state === 'dangerously_cold') {
-      // Only suggest building campfire if none exist
-      if (campfireCount > 0) {
-        suggestions.push(`GO TO CAMPFIRE - the village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''}, use seek_warmth!`);
-      } else if (hasResources({ stone: 10, wood: 5 })) {
-        suggestions.push('campfire (10 stone + 5 wood) - provides warmth in 3-tile radius');
-      } else {
-        suggestions.push('campfire (10 stone + 5 wood) - provides warmth [NEED: more resources]');
+      // Only show campfire option if none exist in chunk (behavior queue will handle seeking warmth)
+      if (!hasCampfireInChunk) {
+        if (hasResources({ stone: 10, wood: 5 })) {
+          suggestions.push('campfire (10 stone + 5 wood) - provides warmth in 3-tile radius');
+        } else {
+          suggestions.push('campfire (10 stone + 5 wood) - provides warmth [NEED: more resources]');
+        }
       }
 
       if (hasResources({ cloth: 10, wood: 5 })) {

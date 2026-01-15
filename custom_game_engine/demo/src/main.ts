@@ -11,6 +11,7 @@ import {
   HarvestActionHandler,
   CraftActionHandler,
   TradeActionHandler,
+  GoToActionHandler,
   createTimeComponent,
   createResearchStateComponent,
   FERTILIZERS,
@@ -61,10 +62,22 @@ import {
   GodCraftedDiscoverySystem,
   // Agent debug logging
   AgentDebugManager,
+  // Chunk spatial query injection functions
+  injectChunkSpatialQuery,
+  injectChunkSpatialQueryForHearing,
+  injectChunkSpatialQueryForBrain,
+  injectChunkSpatialQueryToMovement,
+  injectChunkSpatialQueryToFarmBehaviors,
+  injectChunkSpatialQueryToSeekFood,
+  injectChunkSpatialQueryToSeekCooling,
+  injectChunkSpatialQueryToSleep,
+  injectChunkSpatialQueryToGather,
+  injectChunkSpatialQueryToBuild,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
+import { injectChunkSpatialQueryToTemperature } from '@ai-village/environment';
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
   PlantSystem as BotanyPlantSystem,
@@ -158,6 +171,8 @@ import {
   TextAdventurePanel,
   createTextAdventurePanelAdapter,
   createTextAdventurePanel,
+  // Dev Actions Service
+  devActionsService,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -171,7 +186,8 @@ import {
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, createLLMAgent, createWanderingAgent, createBerryBush, getPlantSpecies } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery } from '@ai-village/world';
+import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -600,7 +616,7 @@ async function createInitialPlants(world: WorldMutator) {
     const x = -15 + Math.random() * 30;
     const y = -15 + Math.random() * 30;
     const species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)];
-    const isEdibleSpecies = species.id === 'berry-bush';
+    const isEdibleSpecies = species.id === 'blueberry-bush' || species.id === 'raspberry-bush' || species.id === 'blackberry-bush';
 
     let stage: 'sprout' | 'vegetative' | 'mature' | 'seeding';
     let stageProgress = 0;
@@ -758,6 +774,7 @@ async function registerAllSystems(
   gameLoop.actionRegistry.register(new HarvestActionHandler());
   gameLoop.actionRegistry.register(new CraftActionHandler());
   gameLoop.actionRegistry.register(new TradeActionHandler());
+  gameLoop.actionRegistry.register(new GoToActionHandler());
 
   // Set up crafting system with recipe registry
   const craftingSystem = new CraftingSystem();
@@ -1770,6 +1787,10 @@ function setupEventHandlers(
 
     if (!chunk.generated) {
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
+
+      // Link tile neighbors for O(1) graph traversal
+      chunkManager.linkChunkNeighbors(chunk);
+      chunkManager.updateCrossChunkNeighbors(chunk);
     }
 
     const agent = gameLoop.world.getEntity(agentId);
@@ -2001,6 +2022,10 @@ function setupEventHandlers(
 
     if (!chunk.generated) {
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
+
+      // Link tile neighbors for O(1) graph traversal
+      chunkManager.linkChunkNeighbors(chunk);
+      chunkManager.updateCrossChunkNeighbors(chunk);
     }
 
     const tileIndex = localY * CHUNK_SIZE + localX;
@@ -2045,6 +2070,10 @@ function setupEventHandlers(
 
     if (!chunk.generated) {
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
+
+      // Link tile neighbors for O(1) graph traversal
+      chunkManager.linkChunkNeighbors(chunk);
+      chunkManager.updateCrossChunkNeighbors(chunk);
     }
 
     const tileIndex = localY * CHUNK_SIZE + localX;
@@ -2571,7 +2600,7 @@ function handleKeyDown(
 
       const testStages: Array<'mature' | 'seeding' | 'senescence'> = ['mature', 'seeding', 'senescence'];
       const stage = testStages[Math.floor(Math.random() * testStages.length)];
-      const speciesId = 'berry-bush';
+      const speciesId = 'blueberry-bush';
       const species = getPlantSpecies(speciesId);
 
       const yieldAmount = species.baseGenetics.yieldAmount;
@@ -3184,6 +3213,41 @@ function setupDebugAPI(
 
       console.log('[Analyze] === END ===');
     },
+
+    // Soul corruption cleanup API
+    scanCorruptedSouls: () => {
+      const result = devActionsService.scanCorruptedSouls();
+      if (result.success && result.data) {
+        const data = result.data as { count: number; souls: any[] };
+        console.log(`[SoulCleanup] Found ${data.count} corrupted souls`);
+        if (data.count > 0) {
+          console.log('[SoulCleanup] Corrupted souls:');
+          for (const soul of data.souls) {
+            const issues = [];
+            if (soul.purposeCorrupted) issues.push('purpose');
+            if (soul.destinyCorrupted) issues.push('destiny');
+            console.log(`  - ${soul.soulName} (${soul.soulId.substring(0, 16)}...): ${issues.join(', ')}`);
+          }
+        }
+        return data;
+      }
+      console.error('[SoulCleanup] Failed to scan:', result.error);
+      return null;
+    },
+
+    cleanCorruptedSouls: () => {
+      const result = devActionsService.cleanCorruptedSouls();
+      if (result.success && result.data) {
+        const data = result.data as { cleanedCount: number; message: string };
+        console.log(`[SoulCleanup] ${data.message}`);
+        if (data.cleanedCount > 0) {
+          console.log('[SoulCleanup] TIP: Save your game to persist these fixes!');
+        }
+        return data;
+      }
+      console.error('[SoulCleanup] Failed to clean:', result.error);
+      return null;
+    },
   };
 
   (window as any).__gameTest = {
@@ -3692,6 +3756,53 @@ async function main() {
     };
   }
 
+  // ============================================================================
+  // CHUNK SPATIAL QUERY INJECTION
+  // ============================================================================
+  // Inject ChunkSpatialQuery for optimized spatial queries
+  // This provides chunk-based entity lookups for VisionProcessor, MovementSystem, and FarmBehaviors
+  // Performance: Reduces queries from O(N) to O(C × E_avg) where C = chunks in radius
+  const chunkSpatialQuery = new ChunkSpatialQuery(
+    gameLoop.world,
+    chunkManager,
+    chunkManager.getChunkCaches()
+  );
+
+  // Inject into VisionProcessor (for plant and agent detection)
+  injectChunkSpatialQuery(chunkSpatialQuery);
+
+  // Inject into HearingProcessor (for nearby speech detection)
+  injectChunkSpatialQueryForHearing(chunkSpatialQuery);
+
+  // Inject into AgentBrainSystem (for nearby agent lookups in decision making)
+  injectChunkSpatialQueryForBrain(chunkSpatialQuery);
+
+  // Inject into MovementSystem (for passive resource discovery)
+  injectChunkSpatialQueryToMovement(chunkSpatialQuery);
+
+  // Inject into FarmBehaviors (for plant lookups)
+  injectChunkSpatialQueryToFarmBehaviors(chunkSpatialQuery);
+
+  // Inject into SeekFoodBehavior (for food source lookups)
+  injectChunkSpatialQueryToSeekFood(chunkSpatialQuery);
+
+  // Inject into SeekCoolingBehavior (for cooling source lookups)
+  injectChunkSpatialQueryToSeekCooling(chunkSpatialQuery);
+
+  // Inject into SleepBehavior (for bed lookups)
+  injectChunkSpatialQueryToSleep(chunkSpatialQuery);
+
+  // Inject into GatherBehavior (for resource and plant lookups)
+  injectChunkSpatialQueryToGather(chunkSpatialQuery);
+
+  // Inject into BuildBehavior (for building proximity checks)
+  injectChunkSpatialQueryToBuild(chunkSpatialQuery);
+
+  // Inject into TemperatureSystem (for agent proximity checks)
+  injectChunkSpatialQueryToTemperature(chunkSpatialQuery);
+
+  console.log('[Main] ChunkSpatialQuery injected into VisionProcessor, HearingProcessor, AgentBrainSystem, MovementSystem, FarmBehaviors, SeekFoodBehavior, SeekCoolingBehavior, SleepBehavior, GatherBehavior, BuildBehavior, and TemperatureSystem');
+
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
@@ -3817,10 +3928,27 @@ async function main() {
   // Generate terrain only if NOT loading from a checkpoint
   // (terrain is restored from checkpoint by WorldSerializer)
   if (!loadedCheckpoint) {
+    // Generate all starting chunks
     for (let cy = -1; cy <= 1; cy++) {
       for (let cx = -1; cx <= 1; cx++) {
         const chunk = chunkManager.getChunk(cx, cy);
         terrainGenerator.generateChunk(chunk, gameLoop.world as WorldMutator);
+      }
+    }
+
+    // Link tile neighbors for O(1) graph traversal
+    for (let cy = -1; cy <= 1; cy++) {
+      for (let cx = -1; cx <= 1; cx++) {
+        const chunk = chunkManager.getChunk(cx, cy);
+        chunkManager.linkChunkNeighbors(chunk);
+      }
+    }
+
+    // Update cross-chunk neighbors
+    for (let cy = -1; cy <= 1; cy++) {
+      for (let cx = -1; cx <= 1; cx++) {
+        const chunk = chunkManager.getChunk(cx, cy);
+        chunkManager.updateCrossChunkNeighbors(chunk);
       }
     }
   } else {
@@ -3909,12 +4037,12 @@ async function main() {
     // Properly select the agent (shows info panel, memory, relationships, etc.)
     handleEntitySelectionById(agentId, gameLoop);
 
-    // Focus camera on the agent
+    // Focus camera on the agent (works in both 2D and 3D modes)
     const entity = gameLoop.world.getEntity(agentId);
     if (entity) {
       const pos = entity.components.get('position') as any;
-      if (pos && renderer.camera) {
-        renderer.camera.setPosition(pos.x, pos.y);
+      if (pos) {
+        renderer.centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
       }
     }
   });
@@ -3929,12 +4057,12 @@ async function main() {
     // Properly select the animal (shows info panel and hides other panels)
     handleEntitySelectionById(animalId, gameLoop);
 
-    // Focus camera on the animal
+    // Focus camera on the animal (works in both 2D and 3D modes)
     const entity = gameLoop.world.getEntity(animalId);
     if (entity) {
       const pos = entity.components.get('position') as any;
-      if (pos && renderer.camera) {
-        renderer.camera.setPosition(pos.x, pos.y);
+      if (pos) {
+        renderer.centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
       }
     }
   });

@@ -552,7 +552,8 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit event
         const eventBus = world.getEventBus();
-        eventBus.emit('magic:skill_node_unlocked', {
+        (eventBus as any).emit({
+          type: 'magic:skill_node_unlocked',
           entityId: this.selectedEntity.id,
           paradigmId: activeParadigmId,
           nodeId: nodeId,
@@ -581,9 +582,10 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit error notification
         const eventBus = world.getEventBus();
-        eventBus.emit('ui:notification', {
+        (eventBus as any).emit({
+          type: 'ui:notification',
           message: `Failed to unlock node: ${error.message}`,
-          type: 'error'
+          level: 'error'
         });
 
         return false;
@@ -595,14 +597,15 @@ export class SkillTreePanel implements IWindowPanel {
       if (evaluation.availableXp < evaluation.xpCost) {
         message = `Insufficient XP (need ${evaluation.xpCost}, have ${evaluation.availableXp})`;
       } else if (evaluation.unmetConditions.length > 0) {
-        message = `Requirements not met: ${evaluation.unmetConditions[0].message}`;
+        message = `Requirements not met: ${evaluation.unmetConditions[0]!.message}`;
       }
 
       // Emit notification
       const eventBus = world.getEventBus();
-      eventBus.emit('ui:notification', {
+      (eventBus as any).emit({
+        type: 'ui:notification',
         message,
-        type: 'error'
+        level: 'error'
       });
 
       return false;
@@ -644,7 +647,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Find nodes that have current node as prerequisite
         const childNodes = tree.nodes.filter(n =>
           n.unlockConditions.some(c =>
-            c.type === 'prerequisite_node' && (c as any).nodeId === currentNodeId
+            c.type === 'node_unlocked' && (c as any).nodeId === currentNodeId
           )
         );
         if (childNodes.length > 0 && childNodes[0]) {
@@ -654,7 +657,7 @@ export class SkillTreePanel implements IWindowPanel {
 
       case 'ArrowUp':
         // Find nodes that current node depends on
-        const prereqCondition = currentNode.unlockConditions.find(c => c.type === 'prerequisite_node');
+        const prereqCondition = currentNode.unlockConditions.find(c => c.type === 'node_unlocked');
         if (prereqCondition) {
           nextNodeId = (prereqCondition as any).nodeId;
         }
@@ -723,7 +726,7 @@ export class SkillTreePanel implements IWindowPanel {
       // Evaluate if this hidden node should now be visible
       const evaluation = evaluateNode(node, tree, evaluationContext);
 
-      if (evaluation.isVisible) {
+      if (evaluation.visible) {
         currentlyVisibleNodes.add(node.id);
 
         // Check if this is a NEW discovery (wasn't in recentlyDiscoveredNodes before)
@@ -732,9 +735,10 @@ export class SkillTreePanel implements IWindowPanel {
 
           // Emit notification event
           const eventBus = world.getEventBus();
-          eventBus.emit('ui:notification', {
+          (eventBus as any).emit({
+            type: 'ui:notification',
             message: 'New ability discovered',
-            type: 'discovery'
+            level: 'discovery'
           });
         }
       }

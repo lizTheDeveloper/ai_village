@@ -93,6 +93,15 @@ function checkAttractionConditionsMet(
   // Check attraction conditions
   const condition = sexuality.attractionCondition;
 
+  // Validate that attractionCondition exists (should always be set)
+  if (!condition) {
+    throw new Error(
+      `SexualityComponent missing required field 'attractionCondition'. ` +
+      `This indicates corrupted or incompletely initialized sexuality data. ` +
+      `Entity may need to be marked for corruption recovery.`
+    );
+  }
+
   if (condition.type === 'never') {
     return false;
   }

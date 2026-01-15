@@ -407,8 +407,8 @@ export class LiveEntityAPI {
     const options = believedDeity && typeof believedDeity === 'string' ? { believedDeity } : undefined;
 
     try {
-      // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-      const { createLLMAgent, createWanderingAgent } = await import('@ai-village/world');
+      // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
+      const { createLLMAgent, createWanderingAgent } = await import('@ai-village/agents');
       const agentId = shouldUseLLM
         ? createLLMAgent(this.world as any, x, y, agentSpeed, undefined, options)
         : createWanderingAgent(this.world as any, x, y, agentSpeed, options);

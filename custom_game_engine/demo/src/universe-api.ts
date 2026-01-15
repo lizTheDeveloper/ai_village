@@ -152,7 +152,7 @@ export function createUniverseApiRouter(): Router {
   router.post('/universe/:id/snapshot', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { snapshot, compressedSnapshot, tick, day, type, canonEvent } = req.body;
+      const { snapshot, compressedSnapshot, tick, day, type, canonEvent, decayPolicy } = req.body;
       const isCompressed = req.headers['x-snapshot-compressed'] === 'gzip-base64';
 
       let snapshotData = snapshot;
@@ -190,6 +190,7 @@ export function createUniverseApiRouter(): Router {
         day: day ?? 0,
         type: type ?? 'manual',
         canonEvent: canonEvent as CanonEvent | undefined,
+        decayPolicy: decayPolicy as SnapshotDecayPolicy | undefined,
       });
 
       res.status(201).json({
@@ -293,6 +294,84 @@ export function createUniverseApiRouter(): Router {
       }
     } catch (error: any) {
       console.error('[UniverseAPI] Error getting timeline:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================================
+  // SNAPSHOT DECAY / CLEANUP ENDPOINTS
+  // ============================================================
+
+  /**
+   * POST /api/universe/:id/cleanup
+   * Evaluate and remove decayed snapshots
+   */
+  router.post('/universe/:id/cleanup', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { currentTick } = req.body;
+
+      if (currentTick === undefined) {
+        return res.status(400).json({
+          error: 'Missing required field: currentTick',
+        });
+      }
+
+      const metadata = await multiverseStorage.getUniverseMetadata(id);
+      if (!metadata) {
+        return res.status(404).json({ error: 'Universe not found' });
+      }
+
+      const stats = await multiverseStorage.cleanupDecayedSnapshots(id, currentTick);
+
+      res.json({
+        success: true,
+        cleanup: stats,
+        message: `Cleaned up ${stats.decayed} snapshot(s), freed ${(stats.bytesFreed / 1024 / 1024).toFixed(2)} MB`,
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error cleaning up snapshots:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/universe/:id/decay-preview
+   * Preview which snapshots would be decayed (without actually removing them)
+   */
+  router.get('/universe/:id/decay-preview', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { currentTick } = req.query;
+
+      if (!currentTick) {
+        return res.status(400).json({
+          error: 'Missing required query parameter: currentTick',
+        });
+      }
+
+      const tick = parseInt(currentTick as string, 10);
+      if (isNaN(tick)) {
+        return res.status(400).json({ error: 'currentTick must be a number' });
+      }
+
+      const toDecay = await multiverseStorage.evaluateSnapshotDecay(id, tick);
+
+      res.json({
+        universeId: id,
+        currentTick: tick,
+        snapshotsToDecay: toDecay.length,
+        snapshots: toDecay.map(s => ({
+          tick: s.tick,
+          tau: tick - s.tick,
+          type: s.type,
+          day: s.day,
+          filename: s.filename,
+          decayPolicy: s.decayPolicy,
+        })),
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error previewing decay:', error);
       res.status(500).json({ error: error.message });
     }
   });

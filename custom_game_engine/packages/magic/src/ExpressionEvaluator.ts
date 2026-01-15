@@ -247,7 +247,7 @@ export class ExpressionEvaluator {
     if (args.length !== 1) {
       throw new Error('sqrt requires exactly 1 argument');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
     if (typeof value !== 'number') {
       throw new Error(`sqrt requires numeric argument (got ${typeof value})`);
     }
@@ -258,8 +258,8 @@ export class ExpressionEvaluator {
     if (args.length !== 2) {
       throw new Error('pow requires exactly 2 arguments');
     }
-    const base = this.evaluate(args[0], context, depth + 1);
-    const exponent = this.evaluate(args[1], context, depth + 1);
+    const base = this.evaluate(args[0]!, context, depth + 1);
+    const exponent = this.evaluate(args[1]!, context, depth + 1);
     if (typeof base !== 'number' || typeof exponent !== 'number') {
       throw new Error('pow requires numeric arguments');
     }
@@ -270,7 +270,7 @@ export class ExpressionEvaluator {
     if (args.length !== 1) {
       throw new Error('abs requires exactly 1 argument');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
     if (typeof value !== 'number') {
       throw new Error(`abs requires numeric argument (got ${typeof value})`);
     }
@@ -281,7 +281,7 @@ export class ExpressionEvaluator {
     if (args.length !== 1) {
       throw new Error('floor requires exactly 1 argument');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
     if (typeof value !== 'number') {
       throw new Error(`floor requires numeric argument (got ${typeof value})`);
     }
@@ -292,7 +292,7 @@ export class ExpressionEvaluator {
     if (args.length !== 1) {
       throw new Error('ceil requires exactly 1 argument');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
     if (typeof value !== 'number') {
       throw new Error(`ceil requires numeric argument (got ${typeof value})`);
     }
@@ -303,7 +303,7 @@ export class ExpressionEvaluator {
     if (args.length !== 1) {
       throw new Error('round requires exactly 1 argument');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
     if (typeof value !== 'number') {
       throw new Error(`round requires numeric argument (got ${typeof value})`);
     }
@@ -342,9 +342,9 @@ export class ExpressionEvaluator {
     if (args.length !== 3) {
       throw new Error('clamp requires exactly 3 arguments (value, min, max)');
     }
-    const value = this.evaluate(args[0], context, depth + 1);
-    const min = this.evaluate(args[1], context, depth + 1);
-    const max = this.evaluate(args[2], context, depth + 1);
+    const value = this.evaluate(args[0]!, context, depth + 1);
+    const min = this.evaluate(args[1]!, context, depth + 1);
+    const max = this.evaluate(args[2]!, context, depth + 1);
     if (typeof value !== 'number' || typeof min !== 'number' || typeof max !== 'number') {
       throw new Error('clamp requires numeric arguments');
     }
@@ -359,8 +359,8 @@ export class ExpressionEvaluator {
     if (args.length !== 2) {
       throw new Error('random requires exactly 2 arguments (min, max)');
     }
-    const min = this.evaluate(args[0], context, depth + 1);
-    const max = this.evaluate(args[1], context, depth + 1);
+    const min = this.evaluate(args[0]!, context, depth + 1);
+    const max = this.evaluate(args[1]!, context, depth + 1);
     if (typeof min !== 'number' || typeof max !== 'number') {
       throw new Error('random requires numeric arguments');
     }
@@ -371,8 +371,8 @@ export class ExpressionEvaluator {
     if (args.length !== 2) {
       throw new Error('random_int requires exactly 2 arguments (min, max)');
     }
-    const min = this.evaluate(args[0], context, depth + 1);
-    const max = this.evaluate(args[1], context, depth + 1);
+    const min = this.evaluate(args[0]!, context, depth + 1);
+    const max = this.evaluate(args[1]!, context, depth + 1);
     if (typeof min !== 'number' || typeof max !== 'number') {
       throw new Error('random_int requires numeric arguments');
     }
@@ -406,7 +406,7 @@ export class ExpressionEvaluator {
       throw new Error('random_choice requires at least 1 choice');
     }
 
-    return choices[Math.floor(Math.random() * choices.length)];
+    return choices[Math.floor(Math.random() * choices.length)]!;
   }
 
   // ============================================================================
@@ -418,8 +418,8 @@ export class ExpressionEvaluator {
       throw new Error('distance requires exactly 2 arguments (point1, point2)');
     }
 
-    const point1 = this.resolvePoint(args[0], context, depth);
-    const point2 = this.resolvePoint(args[1], context, depth);
+    const point1 = this.resolvePoint(args[0]!, context, depth);
+    const point2 = this.resolvePoint(args[1]!, context, depth);
 
     const dx = point2.x - point1.x;
     const dy = point2.y - point1.y;
@@ -431,8 +431,8 @@ export class ExpressionEvaluator {
       throw new Error('direction requires exactly 2 arguments (from, to)');
     }
 
-    const from = this.resolvePoint(args[0], context, depth);
-    const to = this.resolvePoint(args[1], context, depth);
+    const from = this.resolvePoint(args[0]!, context, depth);
+    const to = this.resolvePoint(args[1]!, context, depth);
 
     const dx = to.x - from.x;
     const dy = to.y - from.y;
@@ -609,11 +609,11 @@ export class ExpressionEvaluator {
       throw new Error('if_else requires exactly 3 arguments (condition, thenValue, elseValue)');
     }
 
-    const condition = this.evaluate(args[0], context, depth + 1);
+    const condition = this.evaluate(args[0]!, context, depth + 1);
     if (condition) {
-      return this.evaluate(args[1], context, depth + 1);
+      return this.evaluate(args[1]!, context, depth + 1);
     } else {
-      return this.evaluate(args[2], context, depth + 1);
+      return this.evaluate(args[2]!, context, depth + 1);
     }
   }
 

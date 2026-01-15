@@ -200,7 +200,7 @@ describe('Targeting Module', () => {
     it('finds nearest visible plant with food', () => {
       const plant = createEntity({
         position: { x: 8, y: 0 },
-        plant: { speciesId: 'berry-bush', fruitCount: 5, seedsProduced: 0, growthStage: 1.0 },
+        plant: { speciesId: 'blueberry-bush', fruitCount: 5, seedsProduced: 0, growthStage: 1.0 },
       });
 
       const agent = createAgentWithVision(
@@ -212,7 +212,7 @@ describe('Targeting Module', () => {
       const nearest = targeting.findNearest(agent, world, { hasFood: true });
 
       expect(nearest).not.toBeNull();
-      expect(nearest!.speciesId).toBe('berry-bush');
+      expect(nearest!.speciesId).toBe('blueberry-bush');
       expect(nearest!.fruitCount).toBe(5);
       expect(nearest!.isEdible).toBe(true);
     });
@@ -220,7 +220,7 @@ describe('Targeting Module', () => {
     it('filters by species', () => {
       const berry = createEntity({
         position: { x: 5, y: 0 },
-        plant: { speciesId: 'berry-bush', fruitCount: 3, growthStage: 1.0 },
+        plant: { speciesId: 'blueberry-bush', fruitCount: 3, growthStage: 1.0 },
       });
 
       const wheat = createEntity({
@@ -234,7 +234,7 @@ describe('Targeting Module', () => {
       );
 
       const targeting = new PlantTargeting();
-      const nearest = targeting.findNearest(agent, world, { speciesId: 'berry-bush' });
+      const nearest = targeting.findNearest(agent, world, { speciesId: 'blueberry-bush' });
 
       expect(nearest).not.toBeNull();
       expect(nearest!.entity.id).toBe(berry.id);
@@ -243,12 +243,12 @@ describe('Targeting Module', () => {
     it('finds plants with seeds', () => {
       const withSeeds = createEntity({
         position: { x: 5, y: 0 },
-        plant: { speciesId: 'berry-bush', fruitCount: 0, seedsProduced: 3, growthStage: 1.0 },
+        plant: { speciesId: 'blueberry-bush', fruitCount: 0, seedsProduced: 3, growthStage: 1.0 },
       });
 
       const noSeeds = createEntity({
         position: { x: 3, y: 0 },
-        plant: { speciesId: 'berry-bush', fruitCount: 5, seedsProduced: 0, growthStage: 1.0 },
+        plant: { speciesId: 'blueberry-bush', fruitCount: 5, seedsProduced: 0, growthStage: 1.0 },
       });
 
       const agent = createAgentWithVision(
@@ -267,7 +267,7 @@ describe('Targeting Module', () => {
     it('convenience methods work', () => {
       const ediblePlant = createEntity({
         position: { x: 5, y: 0 },
-        plant: { speciesId: 'berry-bush', fruitCount: 3, growthStage: 1.0 },
+        plant: { speciesId: 'blueberry-bush', fruitCount: 3, growthStage: 1.0 },
       });
 
       const agent = createAgentWithVision(

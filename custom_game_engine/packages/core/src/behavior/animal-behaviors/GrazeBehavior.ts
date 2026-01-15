@@ -15,7 +15,7 @@ import type { PlantComponent } from '../../components/PlantComponent.js';
 import { BaseAnimalBehavior, type AnimalBehaviorResult } from './AnimalBehavior.js';
 
 /** Species of plants that animals can graze on */
-const GRAZEABLE_SPECIES = ['grass', 'berry-bush', 'clover', 'wildflower'];
+const GRAZEABLE_SPECIES = ['grass', 'blueberry-bush', 'raspberry-bush', 'blackberry-bush', 'clover', 'wildflower'];
 
 /** Stages of plants that can be grazed */
 const GRAZEABLE_STAGES = ['mature', 'fruiting', 'seeding'];

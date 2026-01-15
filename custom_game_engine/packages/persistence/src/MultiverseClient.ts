@@ -51,6 +51,15 @@ export interface CanonEvent {
   entities?: string[];
 }
 
+export interface SnapshotDecayPolicy {
+  /** Decay after this many universe-ticks (tau = causality delta) */
+  decayAfterTicks?: number;
+  /** Never decay (canonical events) */
+  neverDecay?: boolean;
+  /** Reason for preservation */
+  preservationReason?: string;
+}
+
 export interface SnapshotEntry {
   tick: number;
   timestamp: number;
@@ -60,6 +69,8 @@ export interface SnapshotEntry {
   fileSize: number;
   checksum: string;
   filename: string;
+  /** Client-specified decay policy (defaults to 24 hours of universe-time) */
+  decayPolicy?: SnapshotDecayPolicy;
 }
 
 export interface TimelineIndex {
@@ -264,6 +275,7 @@ export class MultiverseClient {
         day,
         type: options?.type ?? 'manual',
         canonEvent: options?.canonEvent,
+        decayPolicy: saveFile.header.decayPolicy,
       });
       headers['X-Snapshot-Compressed'] = 'gzip-base64';
     } else {
@@ -273,6 +285,7 @@ export class MultiverseClient {
         day,
         type: options?.type ?? 'manual',
         canonEvent: options?.canonEvent,
+        decayPolicy: saveFile.header.decayPolicy,
       });
     }
 

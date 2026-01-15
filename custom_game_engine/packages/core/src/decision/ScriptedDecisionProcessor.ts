@@ -63,7 +63,7 @@ interface ResourceTarget {
   isPlant?: boolean;
 }
 /** Edible plant species */
-const EDIBLE_SPECIES = ['berry-bush'];
+const EDIBLE_SPECIES = ['blueberry-bush', 'raspberry-bush', 'blackberry-bush'];
 /** Detection range for resources */
 const DETECTION_RANGE = 15;
 /**

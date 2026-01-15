@@ -26,14 +26,23 @@ import {
   type AgentComponent,
   type SteeringComponent,
   CT,
+  BuildingType,
   // Centralized system registration
   registerAllSystems as coreRegisterAllSystems,
-  type PlantSystemsConfig,
   registerDefaultMaterials,
   initializeDefaultRecipes,
   globalRecipeRegistry,
   registerDefaultResearch,
 } from '@ai-village/core';
+
+// Import PlantSystemsConfig from the systems module since it's not re-exported
+// Use local type definition to avoid import path issues
+interface PlantSystemsConfig {
+  PlantSystem: any;
+  PlantDiscoverySystem: any;
+  PlantDiseaseSystem: any;
+  WildPlantPopulationSystem: any;
+}
 
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
@@ -43,7 +52,8 @@ import {
   WildPlantPopulationSystem,
 } from '@ai-village/botany';
 
-import { createWanderingAgent, TerrainGenerator, ChunkManager } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager } from '@ai-village/world';
+import { createWanderingAgent } from '@ai-village/agents';
 
 // =============================================================================
 // TYPES
@@ -252,10 +262,10 @@ export class HeadlessCitySimulator {
     } : undefined;
 
     // Create initial buildings based on preset
-    this.createInitialBuildings(world, cityCenter);
+    this.createInitialBuildings(world as any, cityCenter);
 
     // Create resources
-    this.createResources(world, {
+    this.createResources(world as any, {
       minX: 0,
       maxX: worldSize!.width,
       minY: 0,
@@ -270,7 +280,7 @@ export class HeadlessCitySimulator {
       const x = cityCenter.x + (Math.random() - 0.5) * spawnRadius;
       const y = cityCenter.y + (Math.random() - 0.5) * spawnRadius;
 
-      const agentId = createWanderingAgent(world, x, y); // Use default speed (2.0)
+      const agentId = createWanderingAgent(world as any, x, y); // Use default speed (2.0)
 
       // Apply containment bounds if economy enabled
       if (cityBounds) {
@@ -396,8 +406,8 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   setPriorities(priorities: StrategicPriorities): void {
-    this.cityManager.setPriorities(priorities);
-    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
+    this.cityManager.setPriorities(priorities as any);
+    this.cityManager.broadcastPriorities(this.gameLoop.world as any, priorities as any);
     this.emit('priorities-changed', priorities);
   }
 
@@ -407,7 +417,7 @@ export class HeadlessCitySimulator {
   }
 
   forceDecision(): void {
-    this.cityManager.forceDecision(this.gameLoop.world);
+    this.cityManager.forceDecision(this.gameLoop.world as any);
     this.emit('decision', this.cityManager.getReasoning());
   }
 
@@ -416,7 +426,7 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   getWorld(): World {
-    return this.gameLoop.world;
+    return this.gameLoop.world as any;
   }
 
   getCityManager(): CityManager {
@@ -485,7 +495,7 @@ export class HeadlessCitySimulator {
 
     // Campfire at center
     const campfire = new EntityImpl(createEntityId(), 0);
-    campfire.addComponent(createBuildingComponent('campfire', 1, 100));
+    campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100));
     campfire.addComponent(createPositionComponent(cityCenter.x, cityCenter.y));
     campfire.addComponent(createRenderableComponent('campfire', 'object'));
     (world as any)._addEntity(campfire);
@@ -506,7 +516,7 @@ export class HeadlessCitySimulator {
       ];
       for (const loc of storageLocations) {
         const storage = new EntityImpl(createEntityId(), 0);
-        storage.addComponent(createBuildingComponent('storage-chest', 1, 100));
+        storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
         storage.addComponent(createPositionComponent(loc.x, loc.y));
         storage.addComponent(createRenderableComponent('storage-chest', 'object'));
         const inventory = createInventoryComponent(20, 500);
@@ -520,7 +530,7 @@ export class HeadlessCitySimulator {
     } else {
       // Basic/population-growth: Single storage near center
       const storage = new EntityImpl(createEntityId(), 0);
-      storage.addComponent(createBuildingComponent('storage-chest', 1, 100));
+      storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
       storage.addComponent(createPositionComponent(cityCenter.x + 3, cityCenter.y));
       storage.addComponent(createRenderableComponent('storage-chest', 'object'));
       const inventory = createInventoryComponent(20, 500);
@@ -532,21 +542,22 @@ export class HeadlessCitySimulator {
     }
 
     // Farm (basic preset gets farm to prevent starvation)
+    // Note: 'farm-plot' and 'tent' are not in BuildingType enum, using Bedroll as placeholder
     if (this.preset === 'basic') {
-      const farm = new EntityImpl(createEntityId(), 0);
-      farm.addComponent(createBuildingComponent('farm-plot', 1, 100));
-      farm.addComponent(createPositionComponent(cityCenter.x + 5, cityCenter.y + 5));
-      farm.addComponent(createRenderableComponent('farm-plot', 'object'));
-      (world as any)._addEntity(farm);
-      console.log('  Created farm-plot for food production');
+      const shelter = new EntityImpl(createEntityId(), 0);
+      shelter.addComponent(createBuildingComponent(BuildingType.Bedroll, 1, 100));
+      shelter.addComponent(createPositionComponent(cityCenter.x + 5, cityCenter.y + 5));
+      shelter.addComponent(createRenderableComponent('bedroll', 'object'));
+      (world as any)._addEntity(shelter);
+      console.log('  Created shelter (bedroll placeholder)');
     }
 
-    // Initial tent
-    const tent = new EntityImpl(createEntityId(), 0);
-    tent.addComponent(createBuildingComponent('tent', 1, 100));
-    tent.addComponent(createPositionComponent(cityCenter.x - 3, cityCenter.y));
-    tent.addComponent(createRenderableComponent('tent', 'object'));
-    (world as any)._addEntity(tent);
+    // Initial shelter
+    const shelter = new EntityImpl(createEntityId(), 0);
+    shelter.addComponent(createBuildingComponent(BuildingType.Bedroll, 1, 100));
+    shelter.addComponent(createPositionComponent(cityCenter.x - 3, cityCenter.y));
+    shelter.addComponent(createRenderableComponent('bedroll', 'object'));
+    (world as any)._addEntity(shelter);
 
     const buildingCount = this.preset === 'large-city' ? 11 : (this.preset === 'basic' ? 4 : 3);
     console.log(`  Created ${buildingCount} initial buildings for ${this.preset} preset`);
@@ -566,14 +577,14 @@ export class HeadlessCitySimulator {
       tree.addComponent({
         type: 'resource',
         version: 1,
-        resourceType: 'wood',
+        // Note: resourceType removed - use tags or voxel_resource instead
         amount: 20 + Math.floor(Math.random() * 30),
         maxAmount: 50,
         harvestable: true,
         harvestRate: 1,
         regenerationRate: 0.001,
-      });
-      tree.addComponent(createRenderableComponent('tree', 'resource'));
+      } as any);
+      tree.addComponent(createRenderableComponent('tree', 'object'));
       (world as any)._addEntity(tree);
     }
 
@@ -587,14 +598,14 @@ export class HeadlessCitySimulator {
       stone.addComponent({
         type: 'resource',
         version: 1,
-        resourceType: 'stone',
+        // Note: resourceType removed - use tags or voxel_resource instead
         amount: 15 + Math.floor(Math.random() * 25),
         maxAmount: 40,
         harvestable: true,
         harvestRate: 0.8,
         regenerationRate: 0,
-      });
-      stone.addComponent(createRenderableComponent('rock', 'resource'));
+      } as any);
+      stone.addComponent(createRenderableComponent('rock', 'object'));
       (world as any)._addEntity(stone);
     }
 
@@ -608,14 +619,14 @@ export class HeadlessCitySimulator {
       food.addComponent({
         type: 'resource',
         version: 1,
-        resourceType: 'food',
+        // Note: resourceType removed - use tags or voxel_resource instead
         amount: 15 + Math.floor(Math.random() * 10),
         maxAmount: 25,
         harvestable: true,
         harvestRate: 1.5,
         regenerationRate: 0.01,
-      });
-      food.addComponent(createRenderableComponent('berry-bush', 'resource'));
+      } as any);
+      food.addComponent(createRenderableComponent('blueberry-bush', 'object'));
       (world as any)._addEntity(food);
     }
 

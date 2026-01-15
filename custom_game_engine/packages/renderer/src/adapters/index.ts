@@ -843,8 +843,8 @@ export const DIVINE_COMMUNICATION_PANEL_CONFIG: PanelConfig<DivineCommunicationP
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
   },
-  handleContentClick: (panel, x, y, _width, _height) => {
-    return panel.handleClick(x, y);
+  handleContentClick: (panel, x, y, width, height) => {
+    return panel.handleContentClick(x, y, width, height);
   },
 };
 

@@ -75,3 +75,13 @@ export {
   generateSoulDream,
   shouldReceiveSoulDream,
 } from './SoulInfluencedDreams.js';
+
+// Soul Data Cleaner
+export {
+  stripThinkingTags,
+  hasThinkingTags,
+  extractCleanContent,
+  cleanSoulData,
+  cleanAllSoulsInWorld,
+  scanForCorruptedSouls,
+} from './SoulDataCleaner.js';

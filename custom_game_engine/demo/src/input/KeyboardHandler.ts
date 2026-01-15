@@ -296,7 +296,7 @@ function handleDebugSpawnPlant(
 
   const testStages: Array<'mature' | 'seeding' | 'senescence'> = ['mature', 'seeding', 'senescence'];
   const stage = testStages[Math.floor(Math.random() * testStages.length)];
-  const speciesId = 'berry-bush';
+  const speciesId = 'blueberry-bush';
   const species = getPlantSpecies(speciesId);
 
   const yieldAmount = species.baseGenetics.yieldAmount;

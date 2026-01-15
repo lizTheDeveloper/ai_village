@@ -6,6 +6,8 @@
  * - TillBehavior: Find and till grass for planting
  *
  * Part of the AISystem decomposition (work-order: ai-system-refactor)
+ *
+ * Performance: Uses ChunkSpatialQuery when available for efficient plant lookups
  */
 
 import type { EntityImpl } from '../../ecs/Entity.js';
@@ -16,6 +18,17 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
+
+/**
+ * Injection point for ChunkSpatialQuery (optional dependency)
+ * Used for efficient plant lookups when available
+ */
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToFarmBehaviors(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[FarmBehaviors] ChunkSpatialQuery injected for efficient plant lookups');
+}
 
 /** Search radius for tillable tiles */
 const TILL_SEARCH_RADIUS = 10;
@@ -292,6 +305,25 @@ export class PlantBehavior extends BaseBehavior {
   }
 
   private hasPlantAt(world: World, x: number, y: number): boolean {
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const plantsNearby = chunkSpatialQuery.getEntitiesInRadius(
+        x, y, 1, // Search within 1 tile radius
+        [ComponentType.Plant],
+        { limit: 10 }
+      );
+
+      for (const { entity: plantEntity } of plantsNearby) {
+        const plantImpl = plantEntity as EntityImpl;
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        if (plantPos && Math.floor(plantPos.x) === x && Math.floor(plantPos.y) === y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
     const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
@@ -336,7 +368,7 @@ export class PlantBehavior extends BaseBehavior {
 
     // Priority categories (lower = higher priority)
     const FOOD_CROPS = ['wheat', 'carrot', 'potato', 'tomato', 'corn', 'pumpkin'];
-    const FRUIT_PLANTS = ['apple', 'berry_bush', 'berry-bush'];
+    const FRUIT_PLANTS = ['apple', 'berry_bush', 'blueberry-bush', 'raspberry-bush', 'blackberry-bush'];
     const DECORATIVE = ['sunflower', 'grass', 'wildflower'];
 
     function getPriority(speciesId: string): number {
@@ -447,11 +479,53 @@ export class WaterBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { plantId: string; x: number; y: number; hydration: number; distance: number } | null {
-    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
-    let nearestDryPlant: { plantId: string; x: number; y: number; hydration: number; distance: number } | null = null;
-
     const WATER_SEARCH_RADIUS = 15;
     const HYDRATION_THRESHOLD = 50; // Plants below this need watering
+    let nearestDryPlant: { plantId: string; x: number; y: number; hydration: number; distance: number } | null = null;
+
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, WATER_SEARCH_RADIUS,
+        [ComponentType.Plant]
+      );
+
+      for (const { entity: plantEntity, distance } of plantsInRadius) {
+        const plantImpl = plantEntity as EntityImpl;
+        const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+        if (!plant || !plantPos) continue;
+
+        // Skip dead plants
+        if (plant.stage === 'dead' || plant.stage === 'decay') continue;
+
+        // Check if plant needs water
+        const hydration = plant._hydration ?? plant.hydration ?? 50;
+        if (hydration >= HYDRATION_THRESHOLD) continue;
+
+        // Prefer driest plants that are closest
+        const priority = distance + (hydration / 10); // Lower is better
+        const currentPriority = nearestDryPlant
+          ? nearestDryPlant.distance + (nearestDryPlant.hydration / 10)
+          : Infinity;
+
+        if (priority < currentPriority) {
+          nearestDryPlant = {
+            plantId: plantEntity.id,
+            x: plantPos.x,
+            y: plantPos.y,
+            hydration,
+            distance,
+          };
+        }
+      }
+
+      return nearestDryPlant;
+    }
+
+    // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
 
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
@@ -575,11 +649,44 @@ export class HarvestBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { plantId: string; x: number; y: number; speciesId: string; distance: number } | null {
-    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
-    let nearestHarvestable: { plantId: string; x: number; y: number; speciesId: string; distance: number } | null = null;
-
     const HARVEST_SEARCH_RADIUS = 15;
     const HARVESTABLE_STAGES = ['mature', 'seeding', 'fruiting'];
+    let nearestHarvestable: { plantId: string; x: number; y: number; speciesId: string; distance: number } | null = null;
+
+    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    if (chunkSpatialQuery) {
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, HARVEST_SEARCH_RADIUS,
+        [ComponentType.Plant]
+      );
+
+      for (const { entity: plantEntity, distance } of plantsInRadius) {
+        const plantImpl = plantEntity as EntityImpl;
+        const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+        if (!plant || !plantPos) continue;
+
+        // Check if plant is harvestable
+        if (!HARVESTABLE_STAGES.includes(plant.stage)) continue;
+        if (plant.fruitCount <= 0 && plant.seedsProduced <= 0) continue;
+
+        if (!nearestHarvestable || distance < nearestHarvestable.distance) {
+          nearestHarvestable = {
+            plantId: plantEntity.id,
+            x: plantPos.x,
+            y: plantPos.y,
+            speciesId: plant.speciesId,
+            distance,
+          };
+        }
+      }
+
+      return nearestHarvestable;
+    }
+
+    // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
 
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;

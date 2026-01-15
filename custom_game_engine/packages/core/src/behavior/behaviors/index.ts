@@ -27,12 +27,13 @@ export {
   ForcedSleepBehavior,
   seekSleepBehavior,
   forcedSleepBehavior,
+  injectChunkSpatialQueryToSleep,
 } from './SleepBehavior.js';
 
 // Resource behaviors
-export { GatherBehavior, gatherBehavior } from './GatherBehavior.js';
+export { GatherBehavior, gatherBehavior, injectChunkSpatialQueryToGather } from './GatherBehavior.js';
 export { DepositItemsBehavior, depositItemsBehavior } from './DepositItemsBehavior.js';
-export { SeekFoodBehavior, seekFoodBehavior } from './SeekFoodBehavior.js';
+export { SeekFoodBehavior, seekFoodBehavior, injectChunkSpatialQueryToSeekFood } from './SeekFoodBehavior.js';
 
 // Social behaviors
 export { FollowAgentBehavior, followAgentBehavior } from './FollowAgentBehavior.js';
@@ -63,10 +64,11 @@ export {
   plantBehavior,
   waterBehavior,
   harvestBehavior,
+  injectChunkSpatialQueryToFarmBehaviors,
 } from './FarmBehaviors.js';
 
 // Build behaviors
-export { BuildBehavior, buildBehavior } from './BuildBehavior.js';
+export { BuildBehavior, buildBehavior, injectChunkSpatialQueryToBuild } from './BuildBehavior.js';
 
 // Crafting behaviors
 export { CraftBehavior, craftBehavior } from './CraftBehavior.js';
@@ -82,7 +84,7 @@ export { CastSpellBehavior, castSpellBehavior } from './CastSpellBehavior.js';
 
 // Survival behaviors
 export { SeekWarmthBehavior, seekWarmthBehavior } from './SeekWarmthBehavior.js';
-export { SeekCoolingBehavior, seekCoolingBehavior } from './SeekCoolingBehavior.js';
+export { SeekCoolingBehavior, seekCoolingBehavior, injectChunkSpatialQueryToSeekCooling } from './SeekCoolingBehavior.js';
 export { FleeToHomeBehavior, fleeToHomeBehavior } from './FleeToHomeBehavior.js';
 
 // Navigation behaviors

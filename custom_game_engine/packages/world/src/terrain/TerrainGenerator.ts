@@ -2,6 +2,7 @@ import type { WorldMutator } from '@ai-village/core';
 import type { Chunk } from '../chunks/Chunk.js';
 import { CHUNK_SIZE, setTileAt } from '../chunks/Chunk.js';
 import type { Tile, TerrainType, BiomeType, FluidLayer } from '../chunks/Tile.js';
+import { createEmptyNeighbors } from '../chunks/TileNeighbors.js';
 import {
   getOceanBiomeZone,
   calculatePressure,
@@ -1194,6 +1195,9 @@ export class TerrainGenerator {
       plantId: null,
       ...(finalFluid && { fluid: finalFluid }), // Include fluid layer if present
       ...(finalOceanZone && { oceanZone: finalOceanZone }), // Include ocean zone for water tiles
+
+      // Neighbors will be linked by ChunkManager after generation
+      neighbors: createEmptyNeighbors(),
     };
   }
 

@@ -428,11 +428,13 @@ export class InteractionAPI {
   }
 
   /**
-   * Get food type from plant species (e.g., berry-bush -> berry).
+   * Get food type from plant species (e.g., blueberry-bush -> berry).
    */
   private getFoodTypeFromSpecies(speciesId: string): string {
     const mapping: Record<string, string> = {
-      'berry-bush': 'berry',
+      'blueberry-bush': 'berry',
+      'raspberry-bush': 'berry',
+      'blackberry-bush': 'berry',
       'berry_bush': 'berry',
       'wheat': 'wheat',
       'carrot': 'carrot',

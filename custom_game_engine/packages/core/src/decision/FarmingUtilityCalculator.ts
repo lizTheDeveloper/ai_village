@@ -385,7 +385,7 @@ export function chooseSeedToPlant(seedInventory: SeedInventory[]): SeedInventory
 
   // Priority categories (lower number = higher priority)
   const FOOD_CROPS = ['wheat', 'carrot', 'potato', 'tomato', 'corn', 'pumpkin'];
-  const FRUIT_PLANTS = ['apple', 'berry_bush', 'berry-bush'];
+  const FRUIT_PLANTS = ['apple', 'berry_bush', 'blueberry-bush', 'raspberry-bush', 'blackberry-bush'];
   const DECORATIVE = ['sunflower', 'grass', 'wildflower'];
 
   function getPriority(speciesId: string): number {

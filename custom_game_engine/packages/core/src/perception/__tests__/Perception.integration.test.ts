@@ -185,7 +185,7 @@ describe('Perception Integration Tests', () => {
       plant.addComponent(createPositionComponent(10, 10));
       plant.addComponent({
         type: ComponentType.Plant,
-        speciesId: 'berry-bush',
+        speciesId: 'blueberry-bush',
         stage: 'mature',
         seedsProduced: 5,
         fruitCount: 8,
@@ -203,7 +203,7 @@ describe('Perception Integration Tests', () => {
       const memory = agent.getComponent(ComponentType.SpatialMemory) as any;
       const plantMemory = memory.memories.find((m: any) => m.type === 'plant_location');
       expect(plantMemory).toBeDefined();
-      expect(plantMemory.metadata.speciesId).toBe('berry-bush');
+      expect(plantMemory.metadata.speciesId).toBe('blueberry-bush');
       expect(plantMemory.metadata.hasSeeds).toBe(true);
       expect(plantMemory.metadata.hasFruit).toBe(true);
     });

@@ -47,6 +47,20 @@ export interface SaveOptions {
 
   /** Canon event that triggered this save (for canonical saves) */
   canonEvent?: CanonEvent;
+
+  /**
+   * Snapshot decay policy - how long to keep this snapshot
+   * Decay is measured in universe-ticks (tau = causality delta)
+   *
+   * Defaults:
+   * - canonical: neverDecay = true
+   * - auto/manual: decayAfterTicks = 1728000 (24 hours at 20 TPS)
+   */
+  decayPolicy?: {
+    decayAfterTicks?: number;
+    neverDecay?: boolean;
+    preservationReason?: string;
+  };
 }
 
 export interface LoadResult {
@@ -161,8 +175,8 @@ export class SaveLoadService {
     const key = options.key ?? this.generateSaveKey(options.name);
 
     // Find which universe this world belongs to
-    let universeId = 'universe:main';  // Default fallback
-    let universeName = 'Main Universe';
+    let universeId: string | undefined;
+    let universeName: string | undefined;
 
     for (const [id, instance] of multiverseCoordinator.getAllUniverses()) {
       if (instance.world === world) {
@@ -170,6 +184,13 @@ export class SaveLoadService {
         universeName = instance.config.name;
         break;
       }
+    }
+
+    if (!universeId || !universeName) {
+      throw new Error(
+        'Cannot save: world is not registered with any universe. ' +
+        'Call multiverseCoordinator.registerUniverse() first.'
+      );
     }
 
     // Serialize world
@@ -195,6 +216,21 @@ export class SaveLoadService {
       config: {},
     };
 
+    // Determine decay policy
+    // Default: 24 hours of universe-time (1728000 ticks at 20 TPS)
+    const DEFAULT_DECAY_TICKS = 1728000;
+    let decayPolicy = options.decayPolicy;
+
+    if (!decayPolicy) {
+      if (options.type === 'canonical' || options.canonEvent) {
+        // Canonical snapshots never decay
+        decayPolicy = { neverDecay: true, preservationReason: 'canonical event' };
+      } else {
+        // Auto/manual: decay after 24 hours
+        decayPolicy = { decayAfterTicks: DEFAULT_DECAY_TICKS };
+      }
+    }
+
     // Create save file
     const now = Date.now();
 
@@ -211,6 +247,7 @@ export class SaveLoadService {
         name: options.name,
         description: options.description,
         screenshot: options.screenshot,
+        decayPolicy,
       },
 
       multiverse: multiverseSnapshot,

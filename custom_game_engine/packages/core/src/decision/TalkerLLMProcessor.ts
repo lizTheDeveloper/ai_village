@@ -20,6 +20,8 @@ import type { World } from '../ecs/World.js';
 import type { AgentComponent, AgentBehavior, StrategicPriorities } from '../components/AgentComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { GoalsComponent, PersonalGoal, GoalCategory } from '../components/GoalsComponent.js';
+import type { SpatialMemoryComponent, PositionComponent } from '../components/index.js';
+import { nameChunk } from '../components/SpatialMemoryComponent.js';
 
 /**
  * Talker LLM decision result
@@ -460,6 +462,59 @@ export class TalkerLLMProcessor {
         });
 
         return { changed: true, goalsChanged: true, speaking, thinking, source: 'talker' };
+      }
+
+      // Name location
+      if (typedAction.type === 'name_location') {
+        const nameAction = typedAction as { type: string; name?: string };
+        const locationName = nameAction.name;
+
+        if (!locationName) {
+          return { changed: false, source: 'talker' };
+        }
+
+        // Get current chunk coordinates
+        const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+        if (!position) {
+          return { changed: false, source: 'talker' };
+        }
+
+        const chunkX = position.chunkX;
+        const chunkY = position.chunkY;
+
+        // Store name in agent's spatial memory (personal name)
+        const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+        if (spatialMemory) {
+          nameChunk(spatialMemory, chunkX, chunkY, locationName);
+          entity.updateComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory, (current) => current);
+        }
+
+        // Store name in world chunk registry (shared name)
+        const chunkRegistry = world.getChunkNameRegistry();
+        const identityComp = entity.getComponent(ComponentType.Identity) as { name?: string } | undefined;
+        const agentName = identityComp?.name || entity.id;
+        chunkRegistry.setName(chunkX, chunkY, locationName, entity.id, world.tick, `Named by ${agentName}`);
+
+        // Update agent speech/thinking
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+          ...current,
+          recentSpeech: speaking,
+          lastThought: thinking || `I've named this place "${locationName}"`,
+        }));
+
+        world.eventBus.emit({
+          type: 'llm:decision',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            decision: 'name_location',
+            behavior: 'name_location',
+            reasoning: thinking || `Named this place "${locationName}"`,
+            source: 'talker',
+          },
+        });
+
+        return { changed: true, speaking, thinking, source: 'talker' };
       }
 
       // Set priorities

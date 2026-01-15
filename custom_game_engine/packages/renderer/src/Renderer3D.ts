@@ -10,6 +10,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
+import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -154,12 +155,13 @@ export class Renderer3D {
   // Entities (agents)
   private entitySprites: Map<string, {
     sprite: THREE.Sprite;
-    textures: Record<string, THREE.Texture>;
-    name: string;
+    texture: THREE.CanvasTexture;
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    entity: Entity;
     worldX: number;
     worldY: number;
     worldZ: number;
-    currentDirection: string;
   }> = new Map();
 
   // Buildings
@@ -238,15 +240,22 @@ export class Renderer3D {
   // TerrainGenerator reference (chunkManager removed - chunk loading now handled by ChunkLoadingSystem)
   private terrainGenerator: TerrainGenerator | null = null;
 
+  // PixelLab sprite renderer for getting actual sprite images
+  private pixelLabEntityRenderer: PixelLabEntityRenderer | null = null;
+
   constructor(
     config: Partial<Renderer3DConfig> = {},
     chunkManager?: ChunkManager,
-    terrainGenerator?: TerrainGenerator
+    terrainGenerator?: TerrainGenerator,
+    pixelLabEntityRenderer?: PixelLabEntityRenderer
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
 
     // Store terrain generator reference (chunkManager parameter kept for backwards compatibility but unused)
     if (terrainGenerator) this.terrainGenerator = terrainGenerator;
+
+    // Store sprite renderer reference for getting actual sprite images
+    if (pixelLabEntityRenderer) this.pixelLabEntityRenderer = pixelLabEntityRenderer;
 
     // Create scene
     this.scene = new THREE.Scene();
@@ -766,9 +775,6 @@ export class Renderer3D {
       const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
       if (!position) continue;
 
-      const identity = entity.components.get('identity') as { name?: string } | undefined;
-      const name = identity?.name || entity.id;
-
       currentIds.add(entity.id);
 
       const x = position.x ?? 0;
@@ -776,7 +782,13 @@ export class Renderer3D {
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
 
-      this.addOrUpdateEntity(entity.id, name, x, y, elevation);
+      this.addOrUpdateEntity(entity, x, y, elevation);
+
+      // Render the entity sprite to the offscreen canvas
+      const data = this.entitySprites.get(entity.id);
+      if (data) {
+        this.renderEntityToCanvas(entity, data);
+      }
     }
 
     // Remove entities no longer present
@@ -791,31 +803,41 @@ export class Renderer3D {
     }
   }
 
-  private addOrUpdateEntity(id: string, name: string, x: number, y: number, elevation: number): void {
-    let data = this.entitySprites.get(id);
+  private addOrUpdateEntity(entity: Entity, x: number, y: number, elevation: number): void {
+    let data = this.entitySprites.get(entity.id);
 
     if (!data) {
-      const color = this.getAgentColor(name);
-      const textures = this.createDirectionalTextures(color);
+      // Create offscreen canvas for rendering sprites
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d')!;
+
+      // Create canvas texture for Three.js
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.magFilter = THREE.NearestFilter;
+      texture.minFilter = THREE.NearestFilter;
+
       const material = new THREE.SpriteMaterial({
-        map: textures['front'],
+        map: texture,
         transparent: true,
       });
       const sprite = new THREE.Sprite(material);
-      sprite.scale.set(1.5, 2.25, 1);
+      sprite.scale.set(2, 2, 1);
 
       this.scene.add(sprite);
 
       data = {
         sprite,
-        textures,
-        name,
+        texture,
+        canvas,
+        ctx,
+        entity,
         worldX: x,
         worldY: y,
         worldZ: elevation,
-        currentDirection: 'front',
       };
-      this.entitySprites.set(id, data);
+      this.entitySprites.set(entity.id, data);
     }
 
     // Update position
@@ -823,6 +845,81 @@ export class Renderer3D {
     data.worldX = x;
     data.worldY = y;
     data.worldZ = elevation;
+    data.entity = entity; // Update entity reference in case it changed
+  }
+
+  /**
+   * Render entity sprite to its offscreen canvas
+   */
+  private renderEntityToCanvas(entity: Entity, data: {
+    ctx: CanvasRenderingContext2D;
+    canvas: HTMLCanvasElement;
+    texture: THREE.CanvasTexture;
+  }): void {
+    // Clear canvas
+    data.ctx.clearRect(0, 0, data.canvas.width, data.canvas.height);
+
+    let rendered = false;
+
+    if (this.pixelLabEntityRenderer) {
+      const spriteLoader = this.pixelLabEntityRenderer.getSpriteLoader();
+
+      // Use the same instance ID format as the 2D renderer
+      // The 2D renderer creates instances with format: `entity_${entity.id}`
+      const instanceId = `entity_${entity.id}`;
+
+      // Try to render directly to our canvas using the sprite loader
+      // The sprite instance should already exist from the 2D renderer
+      // Scale: canvas is 64px, sprites are 48px, so scale = 64/48 ≈ 1.33
+      rendered = spriteLoader.render(data.ctx, instanceId, 0, 0, data.canvas.width / 48);
+    }
+
+    // If sprite rendering failed, draw a fallback
+    if (!rendered) {
+      this.drawFallbackSprite(data.ctx, data.canvas.width, data.canvas.height);
+    }
+
+    // Mark texture as needing update
+    data.texture.needsUpdate = true;
+  }
+
+  /**
+   * Draw a simple fallback sprite when PixelLab sprite is not available
+   */
+  private drawFallbackSprite(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+    // Draw a simple stick figure as fallback
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    ctx.fillStyle = '#fcd34d';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+
+    // Head
+    ctx.beginPath();
+    ctx.arc(centerX, centerY - height * 0.25, width * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Body
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - height * 0.1);
+    ctx.lineTo(centerX, centerY + height * 0.2);
+    ctx.stroke();
+
+    // Arms
+    ctx.beginPath();
+    ctx.moveTo(centerX - width * 0.2, centerY);
+    ctx.lineTo(centerX + width * 0.2, centerY);
+    ctx.stroke();
+
+    // Legs
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY + height * 0.2);
+    ctx.lineTo(centerX - width * 0.15, centerY + height * 0.4);
+    ctx.moveTo(centerX, centerY + height * 0.2);
+    ctx.lineTo(centerX + width * 0.15, centerY + height * 0.4);
+    ctx.stroke();
   }
 
   private getAgentColor(name: string): number {
@@ -834,134 +931,13 @@ export class Renderer3D {
     return colors[Math.abs(hash) % colors.length]!;
   }
 
-  private createDirectionalTextures(color: number): Record<string, THREE.Texture> {
-    const c = new THREE.Color(color);
-    const hex = '#' + c.getHexString();
-    const skinColor = '#f5d0c5';
-    const pantsColor = '#374151';
-    const hairColor = '#5c4033';
-
-    return {
-      front: this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'front'),
-      back: this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'back'),
-      left: this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'left'),
-      right: this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'right'),
-    };
-  }
-
-  private createSpriteTexture(
-    shirtColor: string,
-    skinColor: string,
-    pantsColor: string,
-    hairColor: string,
-    direction: string
-  ): THREE.CanvasTexture {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 48;
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, 32, 48);
-
-    if (direction === 'front') {
-      ctx.fillStyle = skinColor;
-      ctx.beginPath();
-      ctx.arc(16, 8, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = hairColor;
-      ctx.beginPath();
-      ctx.arc(16, 5, 5, Math.PI, 0);
-      ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.fillRect(12, 6, 2, 2);
-      ctx.fillRect(18, 6, 2, 2);
-      ctx.fillRect(14, 10, 4, 1);
-      ctx.fillStyle = shirtColor;
-      ctx.fillRect(8, 14, 16, 14);
-      ctx.fillStyle = skinColor;
-      ctx.fillRect(4, 16, 4, 10);
-      ctx.fillRect(24, 16, 4, 10);
-      ctx.fillStyle = pantsColor;
-      ctx.fillRect(8, 28, 7, 14);
-      ctx.fillRect(17, 28, 7, 14);
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(8, 42, 7, 4);
-      ctx.fillRect(17, 42, 7, 4);
-    } else if (direction === 'back') {
-      ctx.fillStyle = skinColor;
-      ctx.beginPath();
-      ctx.arc(16, 8, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = hairColor;
-      ctx.beginPath();
-      ctx.arc(16, 7, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = shirtColor;
-      ctx.fillRect(8, 14, 16, 14);
-      ctx.fillStyle = skinColor;
-      ctx.fillRect(4, 16, 4, 10);
-      ctx.fillRect(24, 16, 4, 10);
-      ctx.fillStyle = pantsColor;
-      ctx.fillRect(8, 28, 7, 14);
-      ctx.fillRect(17, 28, 7, 14);
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(8, 42, 7, 4);
-      ctx.fillRect(17, 42, 7, 4);
-    } else {
-      ctx.fillStyle = skinColor;
-      ctx.beginPath();
-      ctx.ellipse(16, 8, 5, 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = hairColor;
-      ctx.beginPath();
-      ctx.ellipse(direction === 'left' ? 18 : 14, 5, 4, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.fillRect(direction === 'left' ? 13 : 17, 7, 2, 2);
-      ctx.fillStyle = shirtColor;
-      ctx.fillRect(10, 14, 12, 14);
-      ctx.fillStyle = skinColor;
-      ctx.fillRect(direction === 'left' ? 6 : 22, 16, 4, 10);
-      ctx.fillStyle = pantsColor;
-      ctx.fillRect(11, 28, 10, 14);
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(11, 42, 10, 4);
-    }
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.magFilter = THREE.NearestFilter;
-    texture.minFilter = THREE.NearestFilter;
-    return texture;
-  }
-
+  /**
+   * Sprites are now rendered directly from PixelLab assets in updateEntities()
+   * Direction is handled automatically by PixelLabEntityRenderer based on entity velocity
+   * This method is kept for backwards compatibility but does nothing
+   */
   private updateDirectionalSprites(): void {
-    for (const [, data] of this.entitySprites) {
-      const { sprite, textures, worldX, worldY } = data;
-
-      const dx = this.camera.position.x - worldX;
-      const dz = this.camera.position.z - worldY;
-      const angleToCamera = Math.atan2(dz, dx);
-
-      let relativeAngle = angleToCamera;
-      while (relativeAngle < 0) relativeAngle += Math.PI * 2;
-      while (relativeAngle >= Math.PI * 2) relativeAngle -= Math.PI * 2;
-
-      let newDirection: string;
-      if (relativeAngle < Math.PI / 4 || relativeAngle >= 7 * Math.PI / 4) {
-        newDirection = 'right';
-      } else if (relativeAngle < 3 * Math.PI / 4) {
-        newDirection = 'front';
-      } else if (relativeAngle < 5 * Math.PI / 4) {
-        newDirection = 'left';
-      } else {
-        newDirection = 'back';
-      }
-
-      if (newDirection !== data.currentDirection) {
-        sprite.material.map = textures[newDirection]!;
-        sprite.material.needsUpdate = true;
-        data.currentDirection = newDirection;
-      }
-    }
+    // No-op: Sprite rendering now handled in updateEntities()
   }
 
   // ============================================================================
@@ -1775,6 +1751,11 @@ export class Renderer3D {
       // Update movement
       this.updateMovement(0.016);
 
+      // Update sprite animations before rendering
+      if (this.pixelLabEntityRenderer) {
+        this.pixelLabEntityRenderer.updateAnimations(performance.now());
+      }
+
       // Update terrain around camera
       this.updateTerrain();
 
@@ -1871,9 +1852,7 @@ export class Renderer3D {
     // Dispose entity sprites
     for (const data of this.entitySprites.values()) {
       data.sprite.material.dispose();
-      for (const texture of Object.values(data.textures)) {
-        texture.dispose();
-      }
+      data.texture.dispose();
     }
 
     // Dispose animal sprites

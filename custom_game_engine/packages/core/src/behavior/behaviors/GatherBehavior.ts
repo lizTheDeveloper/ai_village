@@ -51,6 +51,14 @@ import {
   GATHER_SPEED_PER_SKILL_LEVEL,
 } from '../../constants/index.js';
 
+// Chunk spatial query injection for efficient nearby entity lookups
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToGather(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[GatherBehavior] ChunkSpatialQuery injected for efficient resource/plant lookups');
+}
+
 /**
  * Food types that should be gathered from plants (fruit) rather than resource entities.
  * These map to plant species that produce edible fruit.
@@ -62,13 +70,7 @@ const PLANT_FRUIT_TYPES = new Set(['berry', 'berries', 'fruit', 'apple', 'carrot
  * Get the current game day from the world's time entity.
  */
 function getCurrentDay(world: World): number {
-  const timeEntities = world.query().with(ComponentType.Time).executeEntities();
-  if (timeEntities.length > 0) {
-    const timeEntity = timeEntities[0] as EntityImpl;
-    const timeComp = timeEntity.getComponent(ComponentType.Time) as { day?: number } | undefined;
-    return timeComp?.day ?? 0;
-  }
-  return 0;
+  return world.gameTime.day;
 }
 
 /**
@@ -746,90 +748,167 @@ export class GatherBehavior extends BaseBehavior {
     let bestPosition: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    // Search regular resource entities
-    const resources = world
-      .query()
-      .with(ComponentType.Resource)
-      .with(ComponentType.Position)
-      .executeEntities();
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        GATHER_MAX_RANGE,
+        [ComponentType.Resource]
+      );
 
-    for (const resource of resources) {
-      const resourceImpl = resource as EntityImpl;
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
-      const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+      for (const { entity: resource, distance: distanceToAgent } of resourcesInRadius) {
+        const resourceImpl = resource as EntityImpl;
+        const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
+        const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
-      // Skip non-harvestable resources
-      if (!resourceComp.harvestable) continue;
-      if (resourceComp.amount <= 0) continue;
+        // Skip non-harvestable resources
+        if (!resourceComp.harvestable) continue;
+        if (resourceComp.amount <= 0) continue;
 
-      // If preferred type specified, only consider that type
-      if (preferredType && resourceComp.resourceType !== preferredType) continue;
+        // If preferred type specified, only consider that type
+        if (preferredType && resourceComp.resourceType !== preferredType) continue;
 
-      // Distance from agent to resource
-      const distanceToAgent = this.distance(position, resourcePos);
+        // Distance from resource to home (0, 0)
+        const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
 
-      // Only consider resources within max gather range
-      if (distanceToAgent > GATHER_MAX_RANGE) continue;
+        // Scoring: prefer resources near home AND near agent
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize resources far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
 
-      // Distance from resource to home (0, 0)
-      const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
-
-      // Scoring: prefer resources near home AND near agent
-      let score = distanceToAgent;
-      if (distanceToHome > HOME_RADIUS) {
-        // Penalize resources far from home (add 2x the excess distance)
-        score += (distanceToHome - HOME_RADIUS) * 2.0;
+        if (score < bestScore) {
+          bestScore = score;
+          bestResource = resource;
+          bestPosition = { x: resourcePos.x, y: resourcePos.y };
+          bestDistance = distanceToAgent;
+        }
       }
 
-      if (score < bestScore) {
-        bestScore = score;
-        bestResource = resource;
-        bestPosition = { x: resourcePos.x, y: resourcePos.y };
-        bestDistance = distanceToAgent;
+      // Also search voxel resources using chunk queries
+      const voxelResourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        GATHER_MAX_RANGE,
+        [ComponentType.VoxelResource]
+      );
+
+      for (const { entity: voxelResource, distance: distanceToAgent } of voxelResourcesInRadius) {
+        const voxelImpl = voxelResource as EntityImpl;
+        const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
+        const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+        // Skip non-harvestable, depleted, or falling resources
+        if (!voxelComp.harvestable) continue;
+        if (voxelComp.height <= 0) continue;
+        if (voxelComp.isFalling) continue;
+
+        // If preferred type specified, check if material matches
+        if (preferredType && voxelComp.material !== preferredType) continue;
+
+        // Distance from resource to home (0, 0)
+        const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+
+        // Scoring: prefer resources near home AND near agent
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize resources far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestResource = voxelResource;
+          bestPosition = { x: voxelPos.x, y: voxelPos.y };
+          bestDistance = distanceToAgent;
+        }
       }
-    }
+    } else {
+      // Fallback to global queries
+      const resources = world
+        .query()
+        .with(ComponentType.Resource)
+        .with(ComponentType.Position)
+        .executeEntities();
 
-    // Also search voxel resources (trees, rocks with height-based harvesting)
-    const voxelResources = world
-      .query()
-      .with(ComponentType.VoxelResource)
-      .with(ComponentType.Position)
-      .executeEntities();
+      for (const resource of resources) {
+        const resourceImpl = resource as EntityImpl;
+        const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
+        const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
-    for (const voxelResource of voxelResources) {
-      const voxelImpl = voxelResource as EntityImpl;
-      const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
-      const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        // Skip non-harvestable resources
+        if (!resourceComp.harvestable) continue;
+        if (resourceComp.amount <= 0) continue;
 
-      // Skip non-harvestable, depleted, or falling resources
-      if (!voxelComp.harvestable) continue;
-      if (voxelComp.height <= 0) continue;
-      if (voxelComp.isFalling) continue;
+        // If preferred type specified, only consider that type
+        if (preferredType && resourceComp.resourceType !== preferredType) continue;
 
-      // If preferred type specified, check if material matches
-      if (preferredType && voxelComp.material !== preferredType) continue;
+        const distanceToAgent = this.distance(position, resourcePos);
 
-      // Distance from agent to resource
-      const distanceToAgent = this.distance(position, voxelPos);
+        // Only consider resources within max gather range
+        if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-      // Only consider resources within max gather range
-      if (distanceToAgent > GATHER_MAX_RANGE) continue;
+        // Distance from resource to home (0, 0)
+        const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
 
-      // Distance from resource to home (0, 0)
-      const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+        // Scoring: prefer resources near home AND near agent
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize resources far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
 
-      // Scoring: prefer resources near home AND near agent
-      let score = distanceToAgent;
-      if (distanceToHome > HOME_RADIUS) {
-        // Penalize resources far from home (add 2x the excess distance)
-        score += (distanceToHome - HOME_RADIUS) * 2.0;
+        if (score < bestScore) {
+          bestScore = score;
+          bestResource = resource;
+          bestPosition = { x: resourcePos.x, y: resourcePos.y };
+          bestDistance = distanceToAgent;
+        }
       }
 
-      if (score < bestScore) {
-        bestScore = score;
-        bestResource = voxelResource;
-        bestPosition = { x: voxelPos.x, y: voxelPos.y };
-        bestDistance = distanceToAgent;
+      // Also search voxel resources
+      const voxelResources = world
+        .query()
+        .with(ComponentType.VoxelResource)
+        .with(ComponentType.Position)
+        .executeEntities();
+
+      for (const voxelResource of voxelResources) {
+        const voxelImpl = voxelResource as EntityImpl;
+        const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
+        const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+        // Skip non-harvestable, depleted, or falling resources
+        if (!voxelComp.harvestable) continue;
+        if (voxelComp.height <= 0) continue;
+        if (voxelComp.isFalling) continue;
+
+        // If preferred type specified, check if material matches
+        if (preferredType && voxelComp.material !== preferredType) continue;
+
+        const distanceToAgent = this.distance(position, voxelPos);
+
+        // Only consider resources within max gather range
+        if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+        // Distance from resource to home (0, 0)
+        const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+
+        // Scoring: prefer resources near home AND near agent
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize resources far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestResource = voxelResource;
+          bestPosition = { x: voxelPos.x, y: voxelPos.y };
+          bestDistance = distanceToAgent;
+        }
       }
     }
 
@@ -844,49 +923,91 @@ export class GatherBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
-    const plants = world
-      .query()
-      .with(ComponentType.Plant)
-      .with(ComponentType.Position)
-      .executeEntities();
-
     let bestScore = Infinity;
     let bestPlant: Entity | null = null;
     let bestPos: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    for (const plant of plants) {
-      const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        GATHER_MAX_RANGE,
+        [ComponentType.Plant]
+      );
 
-      if (!plantComp) continue;
+      for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
-      // Check if plant has harvestable fruit and is edible species
-      const hasFruit = (plantComp.fruitCount ?? 0) > 0;
-      const isEdible = isEdibleSpecies(plantComp.speciesId);
+        if (!plantComp) continue;
 
-      if (hasFruit && isEdible) {
-        const distanceToAgent = this.distance(position, plantPos);
+        // Check if plant has harvestable fruit and is edible species
+        const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+        const isEdible = isEdibleSpecies(plantComp.speciesId);
 
-        // Only consider plants within max gather range
-        if (distanceToAgent > GATHER_MAX_RANGE) continue;
+        if (hasFruit && isEdible) {
+          // Distance from plant to home (0, 0)
+          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
 
-        // Distance from plant to home (0, 0)
-        const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Scoring: prefer plants near home AND near agent (same as resources)
+          let score = distanceToAgent;
+          if (distanceToHome > HOME_RADIUS) {
+            // Penalize plants far from home (add 2x the excess distance)
+            score += (distanceToHome - HOME_RADIUS) * 2.0;
+          }
 
-        // Scoring: prefer plants near home AND near agent (same as resources)
-        let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
-          // Penalize plants far from home (add 2x the excess distance)
-          score += (distanceToHome - HOME_RADIUS) * 2.0;
+          if (score < bestScore) {
+            bestScore = score;
+            bestPlant = plant;
+            bestPos = { x: plantPos.x, y: plantPos.y };
+            bestDistance = distanceToAgent;
+          }
         }
+      }
+    } else {
+      // Fallback to global query
+      const plants = world
+        .query()
+        .with(ComponentType.Plant)
+        .with(ComponentType.Position)
+        .executeEntities();
 
-        if (score < bestScore) {
-          bestScore = score;
-          bestPlant = plant;
-          bestPos = { x: plantPos.x, y: plantPos.y };
-          bestDistance = distanceToAgent;
+      for (const plant of plants) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+        if (!plantComp) continue;
+
+        // Check if plant has harvestable fruit and is edible species
+        const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+        const isEdible = isEdibleSpecies(plantComp.speciesId);
+
+        if (hasFruit && isEdible) {
+          const distanceToAgent = this.distance(position, plantPos);
+
+          // Only consider plants within max gather range
+          if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+          // Distance from plant to home (0, 0)
+          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+
+          // Scoring: prefer plants near home AND near agent (same as resources)
+          let score = distanceToAgent;
+          if (distanceToHome > HOME_RADIUS) {
+            // Penalize plants far from home (add 2x the excess distance)
+            score += (distanceToHome - HOME_RADIUS) * 2.0;
+          }
+
+          if (score < bestScore) {
+            bestScore = score;
+            bestPlant = plant;
+            bestPos = { x: plantPos.x, y: plantPos.y };
+            bestDistance = distanceToAgent;
+          }
         }
       }
     }
@@ -902,50 +1023,93 @@ export class GatherBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
-    const plants = world
-      .query()
-      .with(ComponentType.Plant)
-      .with(ComponentType.Position)
-      .executeEntities();
-
     let bestScore = Infinity;
     let bestPlant: Entity | null = null;
     let bestPos: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    for (const plant of plants) {
-      const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        GATHER_MAX_RANGE,
+        [ComponentType.Plant]
+      );
 
-      if (!plantComp) continue;
+      for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
-      // Check if plant has seeds available for gathering
-      const validStages = ['mature', 'seeding', 'senescence'];
-      const hasSeeds = plantComp.seedsProduced > 0;
-      const isValidStage = validStages.includes(plantComp.stage);
+        if (!plantComp) continue;
 
-      if (hasSeeds && isValidStage) {
-        const distanceToAgent = this.distance(position, plantPos);
+        // Check if plant has seeds available for gathering
+        const validStages = ['mature', 'seeding', 'senescence'];
+        const hasSeeds = plantComp.seedsProduced > 0;
+        const isValidStage = validStages.includes(plantComp.stage);
 
-        // Only consider plants within max gather range
-        if (distanceToAgent > GATHER_MAX_RANGE) continue;
+        if (hasSeeds && isValidStage) {
+          // Distance from plant to home (0, 0)
+          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
 
-        // Distance from plant to home (0, 0)
-        const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Scoring: prefer plants near home AND near agent (same as resources)
+          let score = distanceToAgent;
+          if (distanceToHome > HOME_RADIUS) {
+            // Penalize plants far from home (add 2x the excess distance)
+            score += (distanceToHome - HOME_RADIUS) * 2.0;
+          }
 
-        // Scoring: prefer plants near home AND near agent (same as resources)
-        let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
-          // Penalize plants far from home (add 2x the excess distance)
-          score += (distanceToHome - HOME_RADIUS) * 2.0;
+          if (score < bestScore) {
+            bestScore = score;
+            bestPlant = plant;
+            bestPos = { x: plantPos.x, y: plantPos.y };
+            bestDistance = distanceToAgent;
+          }
         }
+      }
+    } else {
+      // Fallback to global query
+      const plants = world
+        .query()
+        .with(ComponentType.Plant)
+        .with(ComponentType.Position)
+        .executeEntities();
 
-        if (score < bestScore) {
-          bestScore = score;
-          bestPlant = plant;
-          bestPos = { x: plantPos.x, y: plantPos.y };
-          bestDistance = distanceToAgent;
+      for (const plant of plants) {
+        const plantImpl = plant as EntityImpl;
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+        if (!plantComp) continue;
+
+        // Check if plant has seeds available for gathering
+        const validStages = ['mature', 'seeding', 'senescence'];
+        const hasSeeds = plantComp.seedsProduced > 0;
+        const isValidStage = validStages.includes(plantComp.stage);
+
+        if (hasSeeds && isValidStage) {
+          const distanceToAgent = this.distance(position, plantPos);
+
+          // Only consider plants within max gather range
+          if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+          // Distance from plant to home (0, 0)
+          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+
+          // Scoring: prefer plants near home AND near agent (same as resources)
+          let score = distanceToAgent;
+          if (distanceToHome > HOME_RADIUS) {
+            // Penalize plants far from home (add 2x the excess distance)
+            score += (distanceToHome - HOME_RADIUS) * 2.0;
+          }
+
+          if (score < bestScore) {
+            bestScore = score;
+            bestPlant = plant;
+            bestPos = { x: plantPos.x, y: plantPos.y };
+            bestDistance = distanceToAgent;
+          }
         }
       }
     }
@@ -1114,10 +1278,10 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     // Determine the food item ID based on species
-    // berry-bush -> berry (legacy), blueberry-bush -> blueberry, raspberry-bush -> raspberry, etc.
+    // blueberry-bush -> blueberry, raspberry-bush -> raspberry, etc.
     const speciesId = plantComp.speciesId;
     let foodItemId = speciesId;
-    if (speciesId === 'berry-bush' || speciesId === 'berry_bush') {
+    if (speciesId === 'berry_bush') {
       foodItemId = 'berry'; // Legacy generic berry
     } else if (speciesId.endsWith('-bush') || speciesId.endsWith('_bush')) {
       // Strip -bush suffix: blueberry-bush -> blueberry, raspberry-bush -> raspberry, etc.

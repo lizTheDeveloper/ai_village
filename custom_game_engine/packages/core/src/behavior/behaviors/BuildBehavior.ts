@@ -31,6 +31,14 @@ import { BuildingType as BT } from '../../types/BuildingType.js';
 import { getTileConstructionSystem } from '../../systems/TileConstructionSystem.js';
 import { getTileBasedBlueprintRegistry, calculateDimensions } from '../../buildings/TileBasedBlueprintRegistry.js';
 
+// Chunk spatial query injection for efficient nearby entity lookups
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToBuild(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[BuildBehavior] ChunkSpatialQuery injected for efficient building lookups');
+}
+
 interface WorldWithBuilding extends World {
   buildingRegistry?: {
     tryGet(buildingType: BuildingType): {
@@ -98,6 +106,74 @@ export class BuildBehavior extends BaseBehavior {
 
     // Get and validate building type
     let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.Campfire;
+
+    // CAMPFIRE DUPLICATE PREVENTION: Before building a campfire, check if one exists nearby
+    // This prevents the over-building issue where agents create 85+ campfires
+    if (buildingType === BT.Campfire) {
+      const CAMPFIRE_CHECK_RADIUS = 200; // Match BuildingSystem's cancellation radius
+
+      // Fast path: Use chunk queries to find nearby buildings
+      if (chunkSpatialQuery) {
+        const nearbyBuildings = chunkSpatialQuery.getEntitiesInRadius(
+          position.x,
+          position.y,
+          CAMPFIRE_CHECK_RADIUS,
+          [ComponentType.Building]
+        );
+
+        for (const { entity: building, distance } of nearbyBuildings) {
+          const buildingImpl = building as EntityImpl;
+          const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+
+          if (buildingComp?.buildingType === BT.Campfire) {
+            // Campfire already exists nearby - use that instead of building a new one
+            world.eventBus.emit({
+              type: 'construction:failed',
+              source: entity.id,
+              data: {
+                buildingId: `campfire_${Date.now()}`,
+                reason: `Campfire already exists within ${CAMPFIRE_CHECK_RADIUS} tiles - use seek_warmth instead`,
+                builderId: entity.id,
+                agentId: entity.id,
+              },
+            });
+
+            return { complete: true, reason: 'Campfire already exists nearby - use seek_warmth behavior instead' };
+          }
+        }
+      } else {
+        // Fallback: Global query with distance filtering
+        const nearbyBuildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+
+        for (const building of nearbyBuildings) {
+          const buildingImpl = building as EntityImpl;
+          const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+          const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+          if (buildingComp?.buildingType === BT.Campfire && buildingPos) {
+            const dx = position.x - buildingPos.x;
+            const dy = position.y - buildingPos.y;
+            const distanceSquared = dx * dx + dy * dy;
+
+            if (distanceSquared <= CAMPFIRE_CHECK_RADIUS * CAMPFIRE_CHECK_RADIUS) {
+              // Campfire already exists nearby - use that instead of building a new one
+              world.eventBus.emit({
+                type: 'construction:failed',
+                source: entity.id,
+                data: {
+                  buildingId: `campfire_${Date.now()}`,
+                  reason: `Campfire already exists within ${CAMPFIRE_CHECK_RADIUS} tiles - use seek_warmth instead`,
+                  builderId: entity.id,
+                  agentId: entity.id,
+                },
+              });
+
+              return { complete: true, reason: 'Campfire already exists nearby - use seek_warmth behavior instead' };
+            }
+          }
+        }
+      }
+    }
 
     // Route to tile-based construction if applicable
     const tileBasedBlueprintId = TILE_BASED_STRUCTURE_MAP[buildingType];
@@ -327,6 +403,8 @@ export class BuildBehavior extends BaseBehavior {
     _width: number,
     _height: number
   ): { x: number; y: number } | null {
+    const BUILD_SPOT_CHECK_RADIUS = 5; // Small radius for build spot validation
+
     // Try positions in expanding radius around agent
     for (let radius = 0; radius <= 2; radius++) {
       for (let dx = -radius; dx <= radius; dx++) {
@@ -340,14 +418,34 @@ export class BuildBehavior extends BaseBehavior {
           const terrain = worldWithBuilding.getTerrainAt?.(testX, testY);
           if (terrain && (terrain === 'grass' || terrain === 'dirt' || terrain === 'sand')) {
             // Check no existing buildings
-            const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
             let blocked = false;
 
-            for (const building of buildings) {
-              const bPos = getPosition(building);
-              if (bPos && Math.abs(bPos.x - testX) < 2 && Math.abs(bPos.y - testY) < 2) {
-                blocked = true;
-                break;
+            // Fast path: Use chunk queries to find nearby buildings
+            if (chunkSpatialQuery) {
+              const nearbyBuildings = chunkSpatialQuery.getEntitiesInRadius(
+                testX,
+                testY,
+                BUILD_SPOT_CHECK_RADIUS,
+                [ComponentType.Building]
+              );
+
+              for (const { entity: building } of nearbyBuildings) {
+                const bPos = getPosition(building);
+                if (bPos && Math.abs(bPos.x - testX) < 2 && Math.abs(bPos.y - testY) < 2) {
+                  blocked = true;
+                  break;
+                }
+              }
+            } else {
+              // Fallback: Global query with distance filtering
+              const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+
+              for (const building of buildings) {
+                const bPos = getPosition(building);
+                if (bPos && Math.abs(bPos.x - testX) < 2 && Math.abs(bPos.y - testY) < 2) {
+                  blocked = true;
+                  break;
+                }
               }
             }
 

@@ -28,7 +28,7 @@ export interface PlantTargetingOptions {
   hasFood?: boolean;
   /** Only find plants with seeds to gather */
   hasSeeds?: boolean;
-  /** Filter by specific species (e.g., 'berry-bush', 'wheat') */
+  /** Filter by specific species (e.g., 'blueberry-bush', 'wheat') */
   speciesId?: string;
   /** Maximum distance to search */
   maxDistance?: number;
@@ -66,7 +66,7 @@ export interface PlantTarget {
  * const seeds = targeting.findNearest(entity, world, { hasSeeds: true });
  *
  * // Find specific species
- * const berries = targeting.findNearest(entity, world, { speciesId: 'berry-bush' });
+ * const berries = targeting.findNearest(entity, world, { speciesId: 'blueberry-bush' });
  * ```
  */
 export class PlantTargeting {

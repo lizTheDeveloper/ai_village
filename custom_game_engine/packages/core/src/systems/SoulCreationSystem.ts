@@ -476,14 +476,40 @@ export class SoulCreationSystem implements System {
         });
         let fullResponse = llmResponse.text.trim();
 
-        // Extract thinking content (both <think> and <thinking> variants)
-        const thinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)<\/thinking>/i);
-        const thinkMatch = fullResponse.match(/<think>([\s\S]*?)<\/think>/i);
-        thoughts = thinkingMatch?.[1]?.trim() || thinkMatch?.[1]?.trim();
+        // Extract thinking content - match BOTH complete and incomplete blocks
+        // Complete: <think>...</think> or <thinking>...</thinking>
+        // Incomplete: <think>... or <thinking>... (LLM didn't close the tag)
+        const completeThinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)<\/thinking>/i);
+        const completeThinkMatch = fullResponse.match(/<think>([\s\S]*?)<\/think>/i);
+        const incompleteThinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)$/i);
+        const incompleteThinkMatch = fullResponse.match(/<think>([\s\S]*?)$/i);
 
-        // Strip thinking tags to get only character speech
-        response = fullResponse.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim();
-        response = response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        thoughts = completeThinkingMatch?.[1]?.trim()
+          || completeThinkMatch?.[1]?.trim()
+          || incompleteThinkingMatch?.[1]?.trim()
+          || incompleteThinkMatch?.[1]?.trim();
+
+        // Strip ALL thinking content (both complete and incomplete blocks)
+        response = fullResponse
+          .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '') // Complete blocks
+          .replace(/<think>[\s\S]*?<\/think>/gi, '')
+          .replace(/<thinking>[\s\S]*$/gi, '')              // Incomplete blocks (to end of string)
+          .replace(/<think>[\s\S]*$/gi, '')
+          .trim();
+
+        // If response is empty after stripping, the LLM only returned thinking - use placeholder
+        if (!response || response.length === 0) {
+          console.warn('[SoulCreationSystem] LLM returned only thinking content with no character speech, using placeholder');
+          response = this.getPlaceholderResponse(
+            ceremony.currentSpeaker,
+            ceremony.request.context,
+            ceremony.transcript
+          );
+          // Store the malformed response as "thoughts" for debugging
+          if (!thoughts) {
+            thoughts = fullResponse;
+          }
+        }
 
         // Also handle JSON responses
         const jsonMatch = response.match(/\{[\s\S]*"speaking":\s*"([^"]+)"[\s\S]*\}/);

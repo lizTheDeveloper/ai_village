@@ -5,6 +5,7 @@
 import type { Chunk } from './Chunk.js';
 import type { ChunkManager } from './ChunkManager.js';
 import type { Tile } from './Tile.js';
+import { createEmptyNeighbors } from './TileNeighbors.js';
 import type {
   TerrainSnapshot,
   SerializedChunk,
@@ -484,6 +485,9 @@ export class ChunkSerializer {
       embeddedResource: data.embeddedResource,
       resourceAmount: data.resourceAmount,
       ceilingSupported: data.ceilingSupported,
+
+      // Neighbors will be linked by ChunkManager after deserialization
+      neighbors: createEmptyNeighbors(),
     };
   }
 

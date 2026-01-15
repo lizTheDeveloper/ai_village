@@ -13,7 +13,7 @@ import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, A
 import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
 // TODO: Re-export these from core or import directly from source files
 // import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
-import { createLLMAgent, createWanderingAgent } from '@ai-village/world';
+import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
 
 /**

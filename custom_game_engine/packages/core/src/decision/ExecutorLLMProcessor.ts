@@ -19,7 +19,7 @@
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { AgentComponent, AgentBehavior, QueuedBehavior, PlannedBuild, AgentTier } from '../components/AgentComponent.js';
-import { PLANNED_BUILD_REACH, AGENT_TIER_CONFIG, shouldUseLLM } from '../components/AgentComponent.js';
+import { PLANNED_BUILD_REACH, AGENT_TIER_CONFIG, shouldUseLLM, getAssignedLocation } from '../components/AgentComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { calculateStorageStats } from '../utils/StorageContext.js';
@@ -67,6 +67,7 @@ interface ParsedAction {
   lethal?: boolean;
   surprise?: boolean;
   reason?: string;
+  location?: string; // For go_to action
 }
 
 /**
@@ -155,6 +156,12 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       }
       return { behavior: 'trade', behaviorState };
 
+    case 'go_to':
+      // go_to is handled by the action system (GoToActionHandler)
+      // It's not a direct behavior, so return null to keep current behavior
+      // The action will be queued and executed, which will set navigate behavior
+      return null;
+
     case 'idle':
     case 'wander':
       // NO FALLBACK - idle/wander should not be explicitly set
@@ -201,6 +208,8 @@ function generateBehaviorLabel(action: ParsedAction): string {
       return `Buy ${action.amount || 1} ${action.recipe || action.building || 'items'}`;
     case 'sell':
       return `Sell ${action.amount || 1} ${action.recipe || action.building || 'items'}`;
+    case 'go_to':
+      return `Go to ${action.location || action.target || 'location'}`;
     default:
       return action.type;
   }
@@ -537,6 +546,18 @@ export class ExecutorLLMProcessor {
       if (typedAction.type === 'cancel_planned_build') {
         return this.handleCancelPlannedBuild(entity, world, typedAction.building, speaking, thinking);
       }
+
+      // Handle go_to action (navigate to named location)
+      if (typedAction.type === 'go_to') {
+        const goToAction = typedAction as { type: string; location?: string; target?: string };
+        const locationName = goToAction.location || goToAction.target;
+        if (locationName) {
+          const goToResult = this.handleGoTo(entity, world, locationName, speaking, thinking);
+          if (goToResult) {
+            return goToResult;
+          }
+        }
+      }
     }
 
     // Check if action is a plan array (multi-step)
@@ -824,6 +845,118 @@ export class ExecutorLLMProcessor {
   }
 
   /**
+   * Handle go_to action (navigate to named location).
+   * Looks up location and sets navigate behavior.
+   */
+  private handleGoTo(
+    entity: EntityImpl,
+    world: World,
+    locationName: string,
+    speaking?: string,
+    thinking?: string
+  ): ExecutorDecisionResult | null {
+    const agentComp = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    if (!agentComp) {
+      return null;
+    }
+
+    // Find location using same logic as GoToActionHandler
+    const location = this.findLocation(entity, world, locationName);
+
+    if (!location) {
+      // Location not found - agent doesn't know this place
+      // Don't change behavior, just record the thought
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+        ...current,
+        recentSpeech: speaking,
+        lastThought: thinking || `I don't know where "${locationName}" is`,
+      }));
+      return {
+        changed: false,
+        speaking,
+        thinking,
+        source: 'executor',
+      };
+    }
+
+    // Set navigate behavior to location
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+      ...current,
+      behavior: 'navigate',
+      behaviorState: {
+        target: { x: location.x, y: location.y },
+        locationName,
+      },
+      recentSpeech: speaking,
+      lastThought: thinking,
+    }));
+
+    world.eventBus.emit({
+      type: 'llm:decision',
+      source: entity.id,
+      data: {
+        agentId: entity.id,
+        decision: `go_to:${locationName}`,
+        behavior: 'navigate',
+        reasoning: thinking,
+        source: 'executor',
+      },
+    });
+
+    return {
+      changed: true,
+      speaking,
+      thinking,
+      source: 'executor',
+    };
+  }
+
+  /**
+   * Find a location by name (same logic as GoToActionHandler).
+   */
+  private findLocation(
+    actor: import('../ecs/Entity.js').Entity,
+    world: World,
+    locationName: string
+  ): { x: number; y: number } | undefined {
+    const searchName = locationName.toLowerCase().trim();
+
+    // 1. Check agent's assigned locations (home, work, etc.)
+    const agentComp = actor.components.get(ComponentType.Agent) as AgentComponent | undefined;
+    if (agentComp) {
+      const assigned = getAssignedLocation(agentComp, searchName);
+      if (assigned) {
+        return { x: assigned.x, y: assigned.y };
+      }
+    }
+
+    // 2. Check agent's spatial memory (personal chunk names)
+    const spatialMem = actor.components.get(ComponentType.SpatialMemory) as import('../components/SpatialMemoryComponent.js').SpatialMemoryComponent | undefined;
+    if (spatialMem) {
+      const { findChunkByName } = require('../components/SpatialMemoryComponent.js');
+      const chunk = findChunkByName(spatialMem, searchName);
+      if (chunk) {
+        const { CHUNK_SIZE } = require('@ai-village/world');
+        const centerX = (chunk.chunkX * CHUNK_SIZE) + (CHUNK_SIZE / 2);
+        const centerY = (chunk.chunkY * CHUNK_SIZE) + (CHUNK_SIZE / 2);
+        return { x: centerX, y: centerY };
+      }
+    }
+
+    // 3. Check world chunk name registry (shared names)
+    const chunkRegistry = world.getChunkNameRegistry();
+    const worldChunk = chunkRegistry.findByName(searchName);
+    if (worldChunk) {
+      const { CHUNK_SIZE } = require('@ai-village/world');
+      const centerX = (worldChunk.chunkX * CHUNK_SIZE) + (CHUNK_SIZE / 2);
+      const centerY = (worldChunk.chunkY * CHUNK_SIZE) + (CHUNK_SIZE / 2);
+      return { x: centerX, y: centerY };
+    }
+
+    return undefined;
+  }
+
+  /**
    * Convert a plan array to a behavior queue.
    */
   private convertPlanToQueue(actions: ParsedAction[]): QueuedBehavior[] {
@@ -831,6 +964,24 @@ export class ExecutorLLMProcessor {
 
     for (const action of actions) {
       if (!action.type) continue;
+
+      // Handle go_to specially - it needs special conversion
+      if (action.type === 'go_to') {
+        const locationName = action.location || action.target;
+        if (locationName) {
+          // go_to becomes a navigate behavior with location metadata
+          // The actual location lookup will happen during queue processing
+          queue.push({
+            behavior: 'navigate',
+            behaviorState: {
+              namedLocation: locationName, // Marker for location lookup
+            },
+            priority: 'normal',
+            label: `Go to ${locationName}`,
+          });
+        }
+        continue;
+      }
 
       const converted = actionObjectToBehavior(action);
       // Skip unrecognized actions - don't add them to queue

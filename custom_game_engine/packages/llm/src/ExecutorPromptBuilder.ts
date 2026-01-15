@@ -119,7 +119,7 @@ export class ExecutorPromptBuilder {
     const environment = this.buildEnvironmentContext(vision, needs, world);
 
     // Instruction: What to decide
-    const instruction = this.buildExecutorInstruction(agentComp, needs, skills, inventory, world);
+    const instruction = this.buildExecutorInstruction(agent, agentComp, needs, skills, inventory, world);
 
     // Combine into single prompt
     return this.formatPrompt({
@@ -162,6 +162,43 @@ export class ExecutorPromptBuilder {
     }
 
     return `--- Schema-Driven Component Info ---\n${schemaPrompt}`;
+  }
+
+  /**
+   * Check if there's a campfire in the agent's current chunk.
+   * Returns true if a campfire (complete or in-progress) exists in the same chunk.
+   * This is much more efficient than querying all entities.
+   */
+  private hasCampfireInChunk(agent: Entity, world: World): boolean {
+    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    if (!agentPos) return false;
+
+    // Safety check: getChunkManager might not exist in test mocks
+    if (typeof world.getChunkManager !== 'function') return false;
+
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return false;
+
+    // Convert world coordinates to chunk coordinates
+    const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
+    const chunkX = Math.floor(agentPos.x / CHUNK_SIZE);
+    const chunkY = Math.floor(agentPos.y / CHUNK_SIZE);
+
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+    if (!chunk || !chunk.entities) return false;
+
+    // Check if any entity in the chunk is a campfire
+    for (const entityId of chunk.entities) {
+      const entity = world.getEntity(entityId);
+      if (!entity) continue;
+
+      const building = entity.components.get('building') as any;
+      if (building?.buildingType === 'campfire') {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -498,14 +535,14 @@ export class ExecutorPromptBuilder {
     actions.push('cancel_planned_build - Cancel a planned building by type (e.g., {"type": "cancel_planned_build", "building": "campfire"})');
 
     // BUILDING (plan_build is beginner-friendly, build requires skill)
-    actions.push('plan_build - Plan and queue a building project (auto-gathers resources)');
+    actions.push('plan_build - Plan a building project (AUTOMATICALLY gathers all required resources then builds - use this for ALL buildings)');
     if (buildingSkill >= 1) {
-      actions.push('build - Construct a building directly (requires building skill level 1)');
+      actions.push('build - Construct a building directly if you already have materials in inventory (requires building skill level 1)');
     }
 
     // GATHERING
-    actions.push('pick - Grab a single item nearby (say "pick wood" or "pick berries")');
-    actions.push('gather - Stockpile resources - gather a specified amount and store in chest');
+    actions.push('pick - Grab a single item nearby (opportunistic gathering)');
+    actions.push('gather - Collect seeds, rare herbs, or plants (needed for farming). NOT for building materials - plan_build auto-gathers those');
 
     // FARMING (requires farming skill)
     if (farmingSkill >= 1) {
@@ -517,6 +554,9 @@ export class ExecutorPromptBuilder {
     // EXPLORATION
     actions.push('explore - Systematically explore unknown areas to find new resources');
 
+    // NAVIGATION
+    actions.push('go_to - Navigate to a named location (e.g., "home", "herb garden", "village center")');
+
     // RESEARCH (requires research skill)
     if (researchSkill >= 1) {
       actions.push('research - Conduct research at a research building to unlock new technologies (requires research skill level 1)');
@@ -526,6 +566,17 @@ export class ExecutorPromptBuilder {
     if (animalHandlingSkill >= 2) {
       actions.push('tame_animal - Approach and tame a wild animal (requires animal_handling skill level 2)');
       actions.push('house_animal - Lead a tamed animal to its housing (requires animal_handling skill level 2)');
+    }
+
+    // CRAFTING (requires crafting skill)
+    const craftingSkill = skillLevels.crafting ?? 0;
+    if (craftingSkill >= 1) {
+      actions.push('craft - Craft items from recipes at workbench (requires crafting skill level 1, specify recipe and amount)');
+    }
+
+    // COOKING (requires cooking skill)
+    if (cookingSkill >= 1) {
+      actions.push('cook - Prepare food from ingredients (requires cooking skill level 1)');
     }
 
     // HUNTING & BUTCHERING
@@ -554,6 +605,7 @@ export class ExecutorPromptBuilder {
    * Context-aware based on task completion, needs, and skills.
    */
   private buildExecutorInstruction(
+    agent: Entity,
     agentComp: AgentComponent | undefined,
     needs: NeedsComponent | undefined,
     skills: SkillsComponent | undefined,
@@ -571,18 +623,17 @@ export class ExecutorPromptBuilder {
       const isCold = needs?.temperature !== undefined && needs.temperature < 0.3;
       const isTired = needs?.energy !== undefined && needs.energy < 0.3;
 
-      // Check existing buildings to avoid suggesting duplicates
-      const buildingCounts = promptCache.getBuildingCounts(world);
-      const campfireCount = buildingCounts.byType['campfire'] ?? 0;
+      // Check if campfire exists in agent's chunk
+      const hasCampfireInChunk = this.hasCampfireInChunk(agent, world);
 
       if (isCold && isTired) {
-        if (campfireCount > 0) {
-          return `You are cold and tired. The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to warm up! Then consider rest. What will you do?`;
+        if (hasCampfireInChunk) {
+          return `You are cold and tired. There's a campfire in your area - use seek_warmth to warm up! Then consider rest. What will you do?`;
         }
         return 'You are cold and tired. Consider using plan_build to create a campfire (warmth) or tent/bed (rest). What will you plan?';
       } else if (isCold) {
-        if (campfireCount > 0) {
-          return `You are cold. The village has ${campfireCount} campfire${campfireCount > 1 ? 's' : ''} - use seek_warmth to find warmth! What will you do?`;
+        if (hasCampfireInChunk) {
+          return `You are cold. There's a campfire in your area - use seek_warmth to find warmth! What will you do?`;
         }
         return 'You are cold. Consider using plan_build to create a campfire or tent for warmth. What will you plan?';
       } else if (isTired) {
@@ -619,16 +670,30 @@ You are NOT responsible for:
 - Expressing emotions verbally (Talker does the speaking)
 
 COORDINATION WITH TALKER:
-- TALKER sets goals: "Gather at least 50 berries for winter storage"
-- YOU read the goal and execute: find 50 berries → gather them → store in chest
-- TALKER sets goals: "Plant a berry farm with 20 berry bushes in rows"
-- YOU execute: gather berry bush seeds → till soil in rows → plant 20 bushes
+- TALKER sets goals: "We need shelter"
+- YOU execute: plan_build tent (which auto-gathers wood and plant_fiber, then builds)
+- TALKER sets goals: "Create a berry farm for food security"
+- YOU execute: gather berry_bush seeds → till soil → plant berry_bush → water
+
+CRITICAL: BUILDING AUTO-GATHERS RESOURCES
+- plan_build AUTOMATICALLY gathers all required materials before building
+- Do NOT manually gather wood/stone before plan_build - it's redundant and wastes time
+- ❌ WRONG: gather wood → gather stone → plan_build campfire
+- ✅ RIGHT: plan_build campfire (auto-gathers wood and stone, then builds)
+
+WHEN TO USE 'GATHER':
+- ✅ Seeds for farming (gather berry_bush → till → plant)
+- ✅ Rare herbs and medicinal plants (gather healing_herb → plant)
+- ✅ Specialty crops you need to cultivate
+- ❌ NOT for wood, stone, or building materials (plan_build handles these)
+- ❌ NOT before plan_build (building auto-gathers its own resources)
 
 When responding:
 - Focus on HOW to achieve the goal, not WHAT or WHY
-- Use available tools: plan_build, gather, pick, farm, till, plant, etc.
-- Plan multi-step tasks: "First gather 10 wood, then gather 5 stone, then plan_build tent"
-- Think in numbers: "I need 50 berries, I see 15 available, need to find 35 more"
+- Use plan_build for ALL buildings (it handles resource gathering automatically)
+- Use gather for seeds, rare herbs, and plants you need to farm/cultivate
+- Multi-step farming plans: gather seeds → till → plant → water
+- Think in numbers: "I need 10 berry bushes, I see 3 available, need to find 7 more"
 - Use your detailed environment data to make informed decisions
 
 Remember: Talker dreams it, you do it. You're the hands and planner, they're the voice and vision-setter.`;
@@ -685,14 +750,80 @@ Remember: Talker dreams it, you do it. You're the hands and planner, they're the
       sections.push('What You Can Do:\n' + prompt.availableActions.map(a => `- ${a}`).join('\n'));
     }
 
+    // Response format for multi-step plans
+    const responseFormat = `--- RESPONSE FORMAT ---
+
+Respond with JSON in this format:
+{
+  "thinking": "Your reasoning about what to do",
+  "action": <single action object OR array of actions for multi-step plans>
+}
+
+SINGLE ACTION - Building (plan_build auto-gathers resources, no manual gathering needed):
+{
+  "thinking": "I need shelter, I'll build a tent. plan_build will gather the wood and plant_fiber automatically",
+  "action": { "type": "plan_build", "building": "tent" }
+}
+
+MULTI-STEP PLAN - Farming (gather seeds/herbs, then till, plant, water):
+{
+  "thinking": "I'll create a berry farm. First gather berry bush seeds, then prepare soil and plant them",
+  "action": [
+    { "type": "gather", "resourceType": "berry_bush", "amount": 10 },
+    { "type": "till", "area": "nearby" },
+    { "type": "plant", "crop": "berry_bush", "amount": 10 },
+    { "type": "water" }
+  ]
+}
+
+MULTI-STEP PLAN - Herb garden (gather rare plants, then tend them):
+{
+  "thinking": "I'll cultivate medicinal herbs. Need to find rare herbs first",
+  "action": [
+    { "type": "explore" },
+    { "type": "gather", "resourceType": "healing_herb", "amount": 5 },
+    { "type": "till" },
+    { "type": "plant", "crop": "healing_herb", "amount": 5 }
+  ]
+}
+
+SINGLE ACTION - Crafting (craft items from recipes):
+{
+  "thinking": "I'll craft some wooden planks from logs at the workbench",
+  "action": { "type": "craft", "recipe": "wood_plank", "amount": 10 }
+}
+
+SINGLE ACTION - Navigation (go to named location):
+{
+  "thinking": "I found rare healing herbs. I'll go home to plant them",
+  "action": { "type": "go_to", "location": "home" }
+}
+
+IMPORTANT: Do NOT gather before building! plan_build automatically gathers resources.
+❌ WRONG: [{"type":"gather","resourceType":"wood","amount":10}, {"type":"plan_build","building":"campfire"}]
+✅ RIGHT: {"type":"plan_build","building":"campfire"}
+
+Use 'gather' for: seeds, rare herbs, medicinal plants, specialty crops (things you plant/use later)
+Do NOT use 'gather' for: wood, stone, building materials (plan_build handles these automatically)
+
+MULTI-STEP PLAN - Gather herbs and return home to plant:
+{
+  "thinking": "I found rare healing herbs while exploring. I'll gather them and return home to cultivate them",
+  "action": [
+    { "type": "gather", "resourceType": "healing_herb", "amount": 5 },
+    { "type": "go_to", "location": "home" },
+    { "type": "till" },
+    { "type": "plant", "crop": "healing_herb", "amount": 5 }
+  ]
+}
+
+When you return an array of actions, they will be queued and executed in order.
+Use multi-step plans for complex workflows like farming (gather seeds → go_to home → till → plant → water).`;
+
+    sections.push(responseFormat);
+
     // Instruction
     sections.push(prompt.instruction);
-
-    // Note: We DO NOT add "RESPOND IN JSON ONLY" here because:
-    // - Tool calling providers inject their own response format instructions
-    // - Asking for JSON conflicts with tool calling and confuses the LLM
-    // - The provider handles response format via tool definitions
-    // The actions are provided as tools and the LLM uses tool calls
 
     return sections.join('\n\n');
   }

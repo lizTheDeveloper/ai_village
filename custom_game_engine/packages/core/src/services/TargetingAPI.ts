@@ -527,7 +527,9 @@ export function isEdibleSpecies(speciesId: string): boolean {
 }
 
 // Default plant classifications - can be extended by game code
-registerPlantSpecies({ speciesId: 'berry-bush', isEdible: true, producesFruit: true, producesSeeds: true });
+registerPlantSpecies({ speciesId: 'blueberry-bush', isEdible: true, producesFruit: true, producesSeeds: true });
+registerPlantSpecies({ speciesId: 'raspberry-bush', isEdible: true, producesFruit: true, producesSeeds: true });
+registerPlantSpecies({ speciesId: 'blackberry-bush', isEdible: true, producesFruit: true, producesSeeds: true });
 registerPlantSpecies({ speciesId: 'wheat', isEdible: true, producesFruit: true, producesSeeds: true });
 registerPlantSpecies({ speciesId: 'carrot', isEdible: true, producesFruit: true, producesSeeds: true });
 registerPlantSpecies({ speciesId: 'oak-tree', isEdible: false, producesFruit: false, producesSeeds: true });

@@ -180,12 +180,20 @@ export class RelationshipsPanel implements IWindowPanel {
     const targetMemory = socialMemories.get(targetId);
     if (!targetMemory) return;
 
-    // Adjust the field with clamping
+    // Create updated memory with adjusted field (clamped)
+    let updated: any;
     if (field === 'trust') {
-      targetMemory.trust = Math.max(0, Math.min(1, targetMemory.trust + delta));
+      const newTrust = Math.max(0, Math.min(1, targetMemory.trust + delta));
+      updated = Object.freeze({ ...targetMemory, trust: newTrust });
     } else if (field === 'overallSentiment') {
-      targetMemory.overallSentiment = Math.max(-1, Math.min(1, targetMemory.overallSentiment + delta));
+      const newSentiment = Math.max(-1, Math.min(1, targetMemory.overallSentiment + delta));
+      updated = Object.freeze({ ...targetMemory, overallSentiment: newSentiment });
+    } else {
+      return;
     }
+
+    // Update the social memory
+    (socialMemory as any)._socialMemories.set(targetId, updated);
   }
 
   /**

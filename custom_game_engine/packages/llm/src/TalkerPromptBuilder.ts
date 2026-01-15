@@ -34,8 +34,11 @@ import {
   type RelationshipComponent,
   type Relationship,
   type ResourceComponent,
+  type SpatialMemoryComponent,
+  type PositionComponent,
   formatGoalsForPrompt,
   formatGoalsSectionForPrompt,
+  getChunkVisit,
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
@@ -395,6 +398,21 @@ export class TalkerPromptBuilder {
   ): string {
     let context = '--- Environment ---\n';
 
+    // Check if current chunk has been visited frequently but lacks a name
+    const position = agent.components.get('position') as PositionComponent | undefined;
+    const spatialMemory = agent.components.get('spatial_memory') as SpatialMemoryComponent | undefined;
+    if (position && spatialMemory) {
+      const currentChunkX = position.chunkX;
+      const currentChunkY = position.chunkY;
+      const chunkVisit = getChunkVisit(spatialMemory, currentChunkX, currentChunkY);
+
+      if (chunkVisit && chunkVisit.visitCount >= 10 && !chunkVisit.name) {
+        context += `[LOCATION] You've been to this area ${chunkVisit.visitCount} times, but it doesn't have a name yet. Consider naming it based on what you've experienced here.\n`;
+      } else if (chunkVisit && chunkVisit.name) {
+        context += `Location: ${chunkVisit.name}\n`;
+      }
+    }
+
     // Needs (how you feel)
     if (needs) {
       // Critical needs first (for extraction to top of prompt)
@@ -548,6 +566,9 @@ export class TalkerPromptBuilder {
     if (hasNearbyAgents) {
       actions.push(this.formatAction('set_group_goal'));
     }
+
+    // Location naming - always available for exploring agents
+    actions.push('name_location - Name this place based on what you\'ve experienced here (e.g., "herb garden", "berry grove", "village center")');
 
     // Social coordination (secondary - available if nearby agents)
     if (hasNearbyAgents) {

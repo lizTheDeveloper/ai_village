@@ -115,7 +115,7 @@ describe('VisionProcessor', () => {
       plant.addComponent(createPositionComponent(5, 5));
       plant.addComponent({
         type: ComponentType.Plant,
-        speciesId: 'berry-bush',
+        speciesId: 'blueberry-bush',
         stage: 'mature',
         seedsProduced: 3,
         fruitCount: 5,

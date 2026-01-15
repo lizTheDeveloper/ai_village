@@ -19,6 +19,7 @@ import { PLANNED_BUILD_REACH, AGENT_TIER_CONFIG, shouldUseLLM, disableInteractio
 const INTERACTION_LLM_TIMEOUT_TICKS = 1200;
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 import { calculateStorageStats } from '../utils/StorageContext.js';
 import { ComponentType } from '../types/ComponentType.js';
@@ -745,6 +746,57 @@ export class LLMDecisionProcessor {
             if (bc?.buildingType === buildingType) {
               if (bc.isComplete) completeCount++;
               else inProgressCount++;
+            }
+          }
+
+          // PROXIMITY CHECK: For campfires specifically, check if there's one within reasonable distance
+          // This prevents agents from building campfires when they can just walk to an existing one
+          // Check BOTH complete and in-progress campfires to prevent simultaneous building
+          if (buildingType === 'campfire') {
+            const agentPosition = entity.getComponent<PositionComponent>(ComponentType.Position);
+            if (agentPosition) {
+              const CAMPFIRE_PROXIMITY_THRESHOLD = 200; // tiles
+
+              // Check existing/in-progress campfires
+              for (const building of existingBuildings) {
+                const buildingImpl = building as EntityImpl;
+                const bc = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+                const bp = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+                // Check for ANY campfire (complete OR in-progress) within range
+                if (bc?.buildingType === 'campfire' && bp) {
+                  const distance = Math.sqrt(
+                    Math.pow(agentPosition.x - bp.x, 2) + Math.pow(agentPosition.y - bp.y, 2)
+                  );
+                  if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+                    // There's already a campfire (or one being built) within 200 tiles - don't build another
+                    return { changed: false, source: 'llm' };
+                  }
+                }
+              }
+
+              // ALSO check if any other agent has a campfire PLANNED nearby
+              const allAgents = world.query().with(ComponentType.Agent).executeEntities();
+              for (const otherAgent of allAgents) {
+                if (otherAgent.id === entity.id) continue;
+                const otherAgentComp = otherAgent.getComponent<AgentComponent>(ComponentType.Agent);
+                const otherAgentPos = otherAgent.getComponent<PositionComponent>(ComponentType.Position);
+
+                if (otherAgentComp?.plannedBuilds && otherAgentPos) {
+                  const hasCampfirePlanned = otherAgentComp.plannedBuilds.some(p => p.buildingType === 'campfire');
+                  if (hasCampfirePlanned) {
+                    // Check if the planned location would be within our threshold
+                    // Use the other agent's position as proxy for where they'll build
+                    const distance = Math.sqrt(
+                      Math.pow(agentPosition.x - otherAgentPos.x, 2) + Math.pow(agentPosition.y - otherAgentPos.y, 2)
+                    );
+                    if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+                      // Another agent nearby is already planning a campfire - don't duplicate
+                      return { changed: false, source: 'llm' };
+                    }
+                  }
+                }
+              }
             }
           }
 

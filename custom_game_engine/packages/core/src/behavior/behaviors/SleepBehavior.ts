@@ -21,6 +21,14 @@ import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 import { assignBed } from '../../components/AgentComponent.js';
 
+// Chunk spatial query injection for efficient nearby entity lookups
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToSleep(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[SleepBehavior] ChunkSpatialQuery injected for efficient bed lookups');
+}
+
 /**
  * SeekSleepBehavior - Find a bed/bedroll and go to sleep
  */
@@ -124,38 +132,79 @@ export class SeekSleepBehavior extends BaseBehavior {
    * 3. If no unclaimed beds, fall back to any bed (agent will sleep on ground near it)
    */
   private findNearestBed(world: World, position: PositionComponent, agentId: string): Entity | null {
-    const beds = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
-
+    const BED_SEARCH_RADIUS = 50; // Search within 50 tiles for beds
     let nearestUnclaimed: Entity | null = null;
     let nearestUnclaimedDist = Infinity;
     let nearestOwned: Entity | null = null;
     let nearestOwnedDist = Infinity;
 
-    for (const bed of beds) {
-      const building = getBuilding(bed);
-      const bedPos = getPosition(bed);
+    if (chunkSpatialQuery) {
+      // Use ChunkSpatialQuery for efficient nearby lookups
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x,
+        position.y,
+        BED_SEARCH_RADIUS,
+        [ComponentType.Building]
+      );
 
-      if (!building || !bedPos) continue;
-      if (!building.isComplete) continue; // Only complete beds
+      for (const { entity: bed, distance } of buildingsInRadius) {
+        const building = getBuilding(bed);
+        const bedPos = getPosition(bed);
 
-      if (building.buildingType === BuildingType.Bed || building.buildingType === BuildingType.Bedroll) {
+        if (!building || !bedPos) continue;
+        if (!building.isComplete) continue; // Only complete beds
+
+        if (building.buildingType === BuildingType.Bed || building.buildingType === BuildingType.Bedroll) {
+          // Check ownership
+          if (building.ownerId === agentId) {
+            // This agent owns this bed
+            if (distance < nearestOwnedDist) {
+              nearestOwnedDist = distance;
+              nearestOwned = bed;
+            }
+          } else if (!building.ownerId || building.accessType === 'communal') {
+            // Unclaimed or communal bed
+            if (distance < nearestUnclaimedDist) {
+              nearestUnclaimedDist = distance;
+              nearestUnclaimed = bed;
+            }
+          }
+          // Skip beds owned by other agents
+        }
+      }
+    } else {
+      // Fallback to global query
+      const beds = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
+
+      for (const bed of beds) {
+        const building = getBuilding(bed);
+        const bedPos = getPosition(bed);
+
+        if (!building || !bedPos) continue;
+        if (!building.isComplete) continue; // Only complete beds
+
         const dist = this.distance(position, bedPos);
 
-        // Check ownership
-        if (building.ownerId === agentId) {
-          // This agent owns this bed
-          if (dist < nearestOwnedDist) {
-            nearestOwnedDist = dist;
-            nearestOwned = bed;
+        // Only consider beds within search radius for performance
+        if (dist > BED_SEARCH_RADIUS) continue;
+
+        if (building.buildingType === BuildingType.Bed || building.buildingType === BuildingType.Bedroll) {
+          // Check ownership
+          if (building.ownerId === agentId) {
+            // This agent owns this bed
+            if (dist < nearestOwnedDist) {
+              nearestOwnedDist = dist;
+              nearestOwned = bed;
+            }
+          } else if (!building.ownerId || building.accessType === 'communal') {
+            // Unclaimed or communal bed
+            if (dist < nearestUnclaimedDist) {
+              nearestUnclaimedDist = dist;
+              nearestUnclaimed = bed;
+            }
           }
-        } else if (!building.ownerId || building.accessType === 'communal') {
-          // Unclaimed or communal bed
-          if (dist < nearestUnclaimedDist) {
-            nearestUnclaimedDist = dist;
-            nearestUnclaimed = bed;
-          }
+          // Skip beds owned by other agents
         }
-        // Skip beds owned by other agents
       }
     }
 

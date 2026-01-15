@@ -83,6 +83,15 @@ export interface CanonEvent {
   entities?: string[];
 }
 
+export interface SnapshotDecayPolicy {
+  /** Decay after this many universe-ticks (tau = causality delta) */
+  decayAfterTicks?: number;
+  /** Never decay (canonical events) */
+  neverDecay?: boolean;
+  /** Reason for preservation */
+  preservationReason?: string;
+}
+
 export interface SnapshotEntry {
   tick: number;
   timestamp: number;
@@ -92,6 +101,8 @@ export interface SnapshotEntry {
   fileSize: number;
   checksum: string;
   filename: string;
+  /** Client-specified decay policy (defaults to 24 hours of universe-time) */
+  decayPolicy?: SnapshotDecayPolicy;
 }
 
 export interface TimelineIndex {
@@ -296,6 +307,7 @@ export class MultiverseStorage {
       day: number;
       type: 'auto' | 'manual' | 'canonical';
       canonEvent?: CanonEvent;
+      decayPolicy?: SnapshotDecayPolicy;
     }
   ): Promise<SnapshotEntry> {
     await this.init();
@@ -322,6 +334,21 @@ export class MultiverseStorage {
 
     const stats = await fs.stat(fullPath);
 
+    // Apply default decay policy if not provided
+    // Default: 24 hours of universe-time (1728000 ticks at 20 TPS)
+    const DEFAULT_DECAY_TICKS = 1728000;
+    let decayPolicy = options.decayPolicy;
+
+    if (!decayPolicy) {
+      if (options.type === 'canonical') {
+        // Canonical snapshots never decay
+        decayPolicy = { neverDecay: true, preservationReason: 'canonical event' };
+      } else {
+        // Auto/manual: decay after 24 hours
+        decayPolicy = { decayAfterTicks: DEFAULT_DECAY_TICKS };
+      }
+    }
+
     // Create snapshot entry
     const entry: SnapshotEntry = {
       tick: options.tick,
@@ -332,6 +359,7 @@ export class MultiverseStorage {
       fileSize: stats.size,
       checksum,
       filename,
+      decayPolicy,
     };
 
     // Update timeline
@@ -437,6 +465,135 @@ export class MultiverseStorage {
 
     const timelinePath = path.join(DATA_DIR, 'universes', universeId, 'timeline.json');
     await fs.writeFile(timelinePath, JSON.stringify(timeline, null, 2));
+  }
+
+  /**
+   * Evaluate which snapshots should be decayed
+   * Uses tau (causality delta) = currentTick - snapshotTick
+   *
+   * @param universeId Universe to evaluate
+   * @param currentTick Current universe tick (for tau calculation)
+   * @returns Array of snapshots that should be removed
+   */
+  async evaluateSnapshotDecay(
+    universeId: string,
+    currentTick: number
+  ): Promise<SnapshotEntry[]> {
+    await this.init();
+
+    const timeline = await this.getTimeline(universeId);
+    if (!timeline) return [];
+
+    const toDecay: SnapshotEntry[] = [];
+
+    for (const snapshot of timeline.snapshots) {
+      const policy = snapshot.decayPolicy;
+
+      // Never decay if explicitly marked
+      if (policy?.neverDecay) {
+        continue;
+      }
+
+      // Calculate tau (causality delta)
+      const tau = currentTick - snapshot.tick;
+
+      // Check if decay threshold exceeded
+      const decayThreshold = policy?.decayAfterTicks ?? 1728000; // Default: 24 hours
+      if (tau >= decayThreshold) {
+        toDecay.push(snapshot);
+      }
+    }
+
+    return toDecay;
+  }
+
+  /**
+   * Remove decayed snapshots
+   *
+   * @param universeId Universe to clean up
+   * @param currentTick Current universe tick
+   * @returns Stats about cleanup operation
+   */
+  async cleanupDecayedSnapshots(
+    universeId: string,
+    currentTick: number
+  ): Promise<{
+    totalSnapshots: number;
+    decayed: number;
+    preserved: number;
+    bytesFreed: number;
+  }> {
+    await this.init();
+
+    const timeline = await this.getTimeline(universeId);
+    if (!timeline) {
+      return { totalSnapshots: 0, decayed: 0, preserved: 0, bytesFreed: 0 };
+    }
+
+    const totalSnapshots = timeline.snapshots.length;
+    const toDecay = await this.evaluateSnapshotDecay(universeId, currentTick);
+
+    let bytesFreed = 0;
+    const decayedEntries: SnapshotEntry[] = [];
+
+    // Delete snapshot files
+    for (const snapshot of toDecay) {
+      const snapshotPath = path.join(
+        DATA_DIR,
+        'universes',
+        universeId,
+        'snapshots',
+        snapshot.filename
+      );
+
+      try {
+        // Track file size before deletion
+        const stats = await fs.stat(snapshotPath);
+        bytesFreed += stats.size;
+
+        // Delete file
+        await fs.unlink(snapshotPath);
+
+        decayedEntries.push(snapshot);
+        console.log(`[MultiverseStorage] Decayed snapshot: ${snapshot.filename} (tau: ${currentTick - snapshot.tick} ticks)`);
+      } catch (error: any) {
+        if (error.code !== 'ENOENT') {
+          console.error(`[MultiverseStorage] Failed to delete snapshot ${snapshot.filename}:`, error);
+        }
+      }
+    }
+
+    // Update timeline (remove decayed entries)
+    const decayedFilenames = new Set(decayedEntries.map(s => s.filename));
+    timeline.snapshots = timeline.snapshots.filter(s => !decayedFilenames.has(s.filename));
+    timeline.lastUpdated = Date.now();
+
+    const timelinePath = path.join(DATA_DIR, 'universes', universeId, 'timeline.json');
+    await fs.writeFile(timelinePath, JSON.stringify(timeline, null, 2));
+
+    // Update metadata
+    const metadata = await this.getUniverseMetadata(universeId);
+    if (metadata) {
+      await this.updateUniverseMetadata(universeId, {
+        snapshotCount: timeline.snapshots.length,
+        canonicalEventCount: timeline.snapshots.filter(s => s.type === 'canonical').length,
+      });
+    }
+
+    const preserved = timeline.snapshots.length;
+
+    console.log(
+      `[MultiverseStorage] Cleanup complete for ${universeId}: ` +
+      `${decayedEntries.length} decayed, ${preserved} preserved, ` +
+      `${(bytesFreed / 1024 / 1024).toFixed(2)} MB freed`
+    );
+
+    return {
+      totalSnapshots,
+      decayed: decayedEntries.length,
+      preserved,
+      bytesFreed,
+    };
   }
 
   // ============================================================

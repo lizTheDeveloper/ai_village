@@ -36,6 +36,19 @@ export interface ResourceLocationMemory {
 }
 
 /**
+ * Chunk visit record - tracks how many times an agent has visited a chunk.
+ * Used for chunk naming (Talker names chunks after 10+ visits).
+ */
+export interface ChunkVisit {
+  chunkX: number;
+  chunkY: number;
+  visitCount: number;
+  lastVisited: Tick;
+  /** Name of this chunk (if agent has named it) */
+  name?: string;
+}
+
+/**
  * Spatial memory component for remembering locations and spatial information
  */
 export class SpatialMemoryComponent extends ComponentBase {
@@ -45,6 +58,12 @@ export class SpatialMemoryComponent extends ComponentBase {
   public decayRate: number;
   private _resourceMemories: ResourceLocationMemory[] = [];
   private _memoryCounter: number = 0;
+
+  /**
+   * Chunk visit tracking - maps chunk coordinates to visit data.
+   * Key format: "chunkX,chunkY"
+   */
+  public chunkVisits: Map<string, ChunkVisit> = new Map();
 
   constructor(options?: { maxMemories?: number; decayRate?: number }) {
     super();
@@ -308,4 +327,105 @@ export function getSpatialMemoriesByImportance(
   return component.memories
     .filter((m) => m.strength >= threshold)
     .sort((a, b) => b.strength - a.strength);
+}
+
+// ============================================================================
+// Chunk Visit Tracking
+// ============================================================================
+
+/**
+ * Record a visit to a chunk.
+ * Increments visit count and updates last visited timestamp.
+ */
+export function recordChunkVisit(
+  component: SpatialMemoryComponent,
+  chunkX: number,
+  chunkY: number,
+  currentTick: Tick
+): void {
+  const key = `${chunkX},${chunkY}`;
+  const existing = component.chunkVisits.get(key);
+
+  if (existing) {
+    existing.visitCount++;
+    existing.lastVisited = currentTick;
+  } else {
+    component.chunkVisits.set(key, {
+      chunkX,
+      chunkY,
+      visitCount: 1,
+      lastVisited: currentTick,
+    });
+  }
+}
+
+/**
+ * Get chunk visit data.
+ */
+export function getChunkVisit(
+  component: SpatialMemoryComponent,
+  chunkX: number,
+  chunkY: number
+): ChunkVisit | undefined {
+  const key = `${chunkX},${chunkY}`;
+  return component.chunkVisits.get(key);
+}
+
+/**
+ * Get all chunks visited at least minVisits times.
+ * Useful for finding frequently-visited chunks that should be named.
+ */
+export function getFrequentlyVisitedChunks(
+  component: SpatialMemoryComponent,
+  minVisits: number = 10
+): ChunkVisit[] {
+  return Array.from(component.chunkVisits.values())
+    .filter((visit) => visit.visitCount >= minVisits)
+    .sort((a, b) => b.visitCount - a.visitCount);
+}
+
+/**
+ * Set a name for a chunk in the agent's memory.
+ * This is the agent's personal name for the chunk.
+ */
+export function nameChunk(
+  component: SpatialMemoryComponent,
+  chunkX: number,
+  chunkY: number,
+  name: string
+): void {
+  const key = `${chunkX},${chunkY}`;
+  const visit = component.chunkVisits.get(key);
+
+  if (visit) {
+    visit.name = name;
+  } else {
+    // Create visit record if it doesn't exist
+    component.chunkVisits.set(key, {
+      chunkX,
+      chunkY,
+      visitCount: 0,
+      lastVisited: 0,
+      name,
+    });
+  }
+}
+
+/**
+ * Find a chunk by name in the agent's memory.
+ * @returns { chunkX, chunkY } if found, undefined otherwise
+ */
+export function findChunkByName(
+  component: SpatialMemoryComponent,
+  name: string
+): { chunkX: number; chunkY: number } | undefined {
+  const searchName = name.toLowerCase().trim();
+
+  for (const visit of component.chunkVisits.values()) {
+    if (visit.name && visit.name.toLowerCase().trim() === searchName) {
+      return { chunkX: visit.chunkX, chunkY: visit.chunkY };
+    }
+  }
+
+  return undefined;
 }

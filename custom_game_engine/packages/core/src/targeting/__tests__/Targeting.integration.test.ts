@@ -546,12 +546,12 @@ describe('Targeting Integration Tests', () => {
       (harness.world as any)._addEntity(agent);
 
       // Berry bush (edible) - uses fruitCount for PlantTargeting
-      // Note: 'berry-bush' is registered in plantRegistry as edible
+      // Note: 'blueberry-bush' is registered in plantRegistry as edible
       const berryBush = new EntityImpl(createEntityId(), 0);
       berryBush.addComponent(createPositionComponent(10, 0));
       berryBush.addComponent({
         type: ComponentType.Plant,
-        speciesId: 'berry-bush', // Using registered species with hyphen
+        speciesId: 'blueberry-bush', // Using registered species with hyphen
         classification: 'fruit',
         growthStage: 1.0,
         fruitCount: 5,
@@ -575,13 +575,13 @@ describe('Targeting Integration Tests', () => {
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenPlants = [berryBush.id, oakTree.id];
 
-      // Find edible plants (berry-bush is edible in plantRegistry)
+      // Find edible plants (blueberry-bush is edible in plantRegistry)
       const edible = plantTargeting.findNearest(agent, harness.world, {
         hasFood: true,
       });
 
       expect(edible).not.toBeNull();
-      expect(edible!.speciesId).toBe('berry-bush');
+      expect(edible!.speciesId).toBe('blueberry-bush');
       expect(edible!.fruitCount).toBe(5);
     });
 
