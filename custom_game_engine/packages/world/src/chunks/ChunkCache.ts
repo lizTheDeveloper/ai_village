@@ -16,6 +16,7 @@
 
 import type { EntityId } from '@ai-village/core';
 import type { ComponentType } from '@ai-village/core';
+import type { TerrainFeature } from '../terrain/TerrainFeatureAnalyzer.js';
 
 /**
  * Per-chunk entity index and statistics
@@ -44,8 +45,21 @@ export interface ChunkCache {
   stats: ChunkCacheStats;
 
   /**
+   * Terrain features detected in this chunk
+   * null = not yet analyzed (lazy initialization)
+   * Analyzed on first access by VisionProcessor
+   */
+  terrainFeatures: TerrainFeature[] | null;
+
+  /**
+   * Game tick when terrain was last analyzed
+   * Used for cache expiry (re-analyze after 12000 ticks = 10 minutes)
+   */
+  terrainAnalyzedAt: number;
+
+  /**
    * Cache invalidation flag
-   * Set to true when entities move in/out of chunk
+   * Set to true when entities move in/out of chunk or terrain changes
    * Cleared when cache is rebuilt
    */
   dirty: boolean;
@@ -105,6 +119,8 @@ export function createChunkCache(chunkX: number, chunkY: number): ChunkCache {
         animals: 0,
       },
     },
+    terrainFeatures: null, // Lazy initialization - analyzed on first access
+    terrainAnalyzedAt: 0,
     dirty: true, // Start dirty, will be built on first query
     lastUpdate: 0,
   };

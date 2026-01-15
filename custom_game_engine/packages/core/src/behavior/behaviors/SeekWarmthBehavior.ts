@@ -74,8 +74,29 @@ export class SeekWarmthBehavior extends BaseBehavior {
     }
 
     const heatSourceImpl = heatSource.entity as EntityImpl;
-    const heatSourcePos = heatSourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
-    const heatSourceComp = heatSourceImpl.getComponent<BuildingComponent>(ComponentType.Building)!;
+
+    // Validate cached entity is still valid (might be deleted/deserialized)
+    if (!heatSourceImpl || typeof heatSourceImpl.getComponent !== 'function') {
+      // Cached entity is invalid - invalidate cache and re-search next tick
+      this.updateState(entity, {
+        lastSearchTick: 0,
+        cachedHeatSource: null,
+      });
+      return; // Continue behavior, will re-search next tick
+    }
+
+    const heatSourcePos = heatSourceImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const heatSourceComp = heatSourceImpl.getComponent<BuildingComponent>(ComponentType.Building);
+
+    // Double-check components exist (entity might have lost components)
+    if (!heatSourcePos || !heatSourceComp) {
+      // Entity lost required components - invalidate cache
+      this.updateState(entity, {
+        lastSearchTick: 0,
+        cachedHeatSource: null,
+      });
+      return; // Continue behavior, will re-search next tick
+    }
 
     // Check if we're in heat range
     const inHeatRange = heatSourceComp.providesHeat && heatSource.distance <= heatSourceComp.heatRadius;

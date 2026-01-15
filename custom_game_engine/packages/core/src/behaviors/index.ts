@@ -15,3 +15,4 @@ export { navigateBehavior } from './NavigateBehavior.js';
 export { exploreFrontierBehavior } from './ExploreFrontierBehavior.js';
 export { exploreSpiralBehavior } from './ExploreSpiralBehavior.js';
 export { followGradientBehavior } from './FollowGradientBehavior.js';
+export { exploreBehavior } from './ExploreBehavior.js';

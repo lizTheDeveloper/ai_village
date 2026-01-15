@@ -98,6 +98,9 @@ import {
 // Reporter-specific behaviors
 import { followReportingTargetBehavior } from '../behaviors/FollowReportingTargetBehavior.js';
 
+// Exploration behaviors
+import { exploreBehavior } from '../behaviors/ExploreBehavior.js';
+
 // LLM types
 import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 
@@ -234,6 +237,7 @@ export class AgentBrainSystem implements System {
     // Navigation & Exploration behaviors
     this.behaviors.register('navigate', navigateBehavior, { description: 'Navigate to coordinates' });
     this.behaviors.register('follow_reporting_target', followReportingTargetBehavior, { description: 'Follow entity at safe distance (reporters)' });
+    this.behaviors.register('explore', exploreBehavior, { description: 'Explore unvisited/ungenerated chunks' });
     this.behaviors.register('explore_frontier', exploreFrontierBehavior, { description: 'Explore frontier areas' });
     this.behaviors.register('explore_spiral', exploreSpiralBehavior, { description: 'Spiral exploration pattern' });
     this.behaviors.register('follow_gradient', followGradientBehavior, { description: 'Follow social gradients' });
@@ -245,7 +249,6 @@ export class AgentBrainSystem implements System {
     this.behaviors.register('pick', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('harvest', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('gather_seeds', gatherBehavior, { description: 'Alias for gather' });
-    this.behaviors.register('explore', exploreFrontierBehavior, { description: 'Alias for explore_frontier' });
     this.behaviors.register('rest', idleBehavior, { description: 'Alias for idle (rest is recovery-focused idle)' });
   }
 
@@ -271,6 +274,12 @@ export class AgentBrainSystem implements System {
    * Main update loop.
    */
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    const startTime = performance.now();
+    let perceptionTime = 0;
+    let decisionTime = 0;
+    let executionTime = 0;
+    let thinkingAgents = 0;
+
     for (const entity of entities) {
       const impl = entity as EntityImpl;
       let agent = impl.getComponent<AgentComponent>(CT.Agent);
@@ -295,6 +304,8 @@ export class AgentBrainSystem implements System {
       const shouldThink = this.shouldThink(impl, agent, world);
       if (!shouldThink) continue;
 
+      thinkingAgents++;
+
       // Update last think time
       this.updateThinkTime(impl, world.tick);
 
@@ -302,15 +313,26 @@ export class AgentBrainSystem implements System {
       agent = impl.getComponent<AgentComponent>(CT.Agent)!;
 
       // Phase 1: Perception
+      const p1 = performance.now();
       this.perception.processAll(impl, world);
+      perceptionTime += performance.now() - p1;
 
       // Phase 2: Decision
+      const p2 = performance.now();
       const decisionResult = this.processDecision(impl, world, agent);
+      decisionTime += performance.now() - p2;
 
       // Phase 3: Execution
       if (decisionResult.execute) {
+        const p3 = performance.now();
         this.behaviors.execute(decisionResult.behavior, impl, world);
+        executionTime += performance.now() - p3;
       }
+    }
+
+    const totalTime = performance.now() - startTime;
+    if (totalTime > 10 && thinkingAgents > 0) {
+      console.log(`[AgentBrainSystem] ${totalTime.toFixed(1)}ms total | ${thinkingAgents} agents | perception:${perceptionTime.toFixed(1)}ms decision:${decisionTime.toFixed(1)}ms execution:${executionTime.toFixed(1)}ms`);
     }
   }
 
@@ -540,10 +562,11 @@ export class AgentBrainSystem implements System {
       return { behavior: decisionResult.behavior, execute: true };
     }
 
-    // Don't execute default/fallback behaviors (idle, wander, explore, rest)
-    // Agent will stand still, allowing next think cycle to schedule LLM decision
+    // Don't execute default/fallback behaviors UNLESS the LLM explicitly requested them
+    // This allows agents to stand still while waiting for LLM decisions
+    // but still execute wander/rest/explore if the LLM specifically chose them
     const defaultBehaviors = ['idle', 'wander', 'explore', 'explore_frontier', 'explore_spiral', 'rest'];
-    if (defaultBehaviors.includes(agent.behavior)) {
+    if (defaultBehaviors.includes(agent.behavior) && !decisionResult.changed) {
       return { behavior: agent.behavior, execute: false };
     }
 
@@ -681,6 +704,7 @@ export class AgentBrainSystem implements System {
     world: World,
     range: number
   ): Entity[] {
+    const startTime = performance.now();
     const position = entity.getComponent(CT.Position) as any;
     if (!position) return [];
 
@@ -695,6 +719,11 @@ export class AgentBrainSystem implements System {
           excludeIds: new Set([entity.id]), // Exclude self
         }
       );
+
+      const elapsed = performance.now() - startTime;
+      if (elapsed > 5) {
+        console.log(`[AgentBrainSystem] getNearbyAgents took ${elapsed.toFixed(1)}ms (chunk query, ${agentsInRadius.length} agents found)`);
+      }
 
       return agentsInRadius.map(({ entity }: any) => entity);
     }

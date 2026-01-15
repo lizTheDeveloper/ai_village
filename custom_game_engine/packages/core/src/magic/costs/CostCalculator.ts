@@ -529,9 +529,7 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
         // If we have a resourcePool for mana, use it AND sync to manaPools
         if (pool) {
           const available = pool.current - pool.locked;
-          console.log('[DEBUG lockCosts] resourcePools.mana - available:', available, 'needed:', cost.amount);
           if (available < cost.amount) {
-            console.log('[DEBUG lockCosts] Insufficient mana in resourcePools.mana');
             return {
               success: false,
               deducted,

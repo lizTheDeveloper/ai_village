@@ -80,19 +80,20 @@ export interface TerrainAnalyzer {
 
 /**
  * Interface for terrain description cache (provided by @ai-village/world at runtime).
+ * Now uses chunk coordinates (32×32 tiles) instead of sector coordinates.
  */
 export interface TerrainCache {
-  get(sectorX: number, sectorY: number, tick: number): TerrainFeature[] | null;
-  set(sectorX: number, sectorY: number, features: TerrainFeature[], tick: number): void;
+  get(chunkX: number, chunkY: number, tick: number): TerrainFeature[] | null;
+  set(chunkX: number, chunkY: number, features: TerrainFeature[], tick: number): void;
 }
 
 /**
  * Static methods for terrain description cache.
  */
 export interface TerrainDescriptionCacheStatic {
-  getSectorsInRadius(
+  getChunksInRadius(
     x: number,
     y: number,
     radius: number
-  ): Array<{ sectorX: number; sectorY: number }>;
+  ): Array<{ chunkX: number; chunkY: number }>;
 }

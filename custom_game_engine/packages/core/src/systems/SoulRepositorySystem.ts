@@ -163,7 +163,6 @@ export class SoulRepositorySystem implements System {
 
       // Check if this soul is already in the repository (avoid duplicates)
       if (this.soulNameExists(name)) {
-        console.log(`[SoulRepository] Soul "${name}" already exists in repository, skipping duplicate`);
         return;
       }
 
@@ -221,8 +220,6 @@ export class SoulRepositorySystem implements System {
 
       // Update index
       this.updateIndex(soulRecord);
-
-      console.log(`[SoulRepository] ✅ Saved soul "${name}" (${archetype}) to repository`);
 
     } catch (error) {
       console.error('[SoulRepository] Failed to backup soul:', error);

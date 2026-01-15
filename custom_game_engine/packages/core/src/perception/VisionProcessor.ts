@@ -589,40 +589,40 @@ export class VisionProcessor {
       return { features: [], description: '' };
     }
 
-    // Get all sectors that intersect with vision range
-    const sectors = terrainDescriptionCacheStatic.getSectorsInRadius(
+    // Get all chunks that intersect with vision range
+    const chunks = terrainDescriptionCacheStatic.getChunksInRadius(
       position.x,
       position.y,
       vision.range
     );
 
-    // Collect features from all sectors (using cache when available)
+    // Collect features from all chunks (using cache when available)
     const allFeatures: TerrainFeature[] = [];
 
-    for (const { sectorX, sectorY } of sectors) {
+    for (const { chunkX, chunkY } of chunks) {
       // Try to get from cache first
-      let sectorFeatures = terrainCache!.get(sectorX, sectorY, world.tick);
+      let chunkFeatures = terrainCache!.get(chunkX, chunkY, world.tick);
 
-      if (!sectorFeatures) {
-        // Cache miss - analyze this sector
-        // Each sector is 32x32 tiles, centered on sector * 32
-        const sectorCenterX = sectorX * 32 + 16;
-        const sectorCenterY = sectorY * 32 + 16;
-        const sectorRadius = 32; // Analyze full sector plus some overlap
+      if (!chunkFeatures) {
+        // Cache miss - analyze this chunk
+        // Each chunk is 32x32 tiles (CHUNK_SIZE), centered on chunk * CHUNK_SIZE + 16
+        const chunkCenterX = chunkX * 32 + 16;
+        const chunkCenterY = chunkY * 32 + 16;
+        const chunkRadius = 32; // Analyze full chunk plus some overlap
 
-        sectorFeatures = terrainAnalyzer!.analyzeArea(
+        chunkFeatures = terrainAnalyzer!.analyzeArea(
           worldWithTerrain.getTileAt.bind(worldWithTerrain),
-          sectorCenterX,
-          sectorCenterY,
-          sectorRadius
+          chunkCenterX,
+          chunkCenterY,
+          chunkRadius
         );
 
         // Cache the results
-        terrainCache!.set(sectorX, sectorY, sectorFeatures, world.tick);
+        terrainCache!.set(chunkX, chunkY, chunkFeatures, world.tick);
       }
 
-      // Add features from this sector that are within vision range
-      for (const feature of sectorFeatures) {
+      // Add features from this chunk that are within vision range
+      for (const feature of chunkFeatures) {
         const dx = feature.x - position.x;
         const dy = feature.y - position.y;
         const distance = Math.sqrt(dx * dx + dy * dy);

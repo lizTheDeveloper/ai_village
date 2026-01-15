@@ -54,16 +54,12 @@ class UniverseWorker {
   constructor() {
     this.gameLoop = new GameLoop();
     this.persistence = new PersistenceService();
-
-    console.log('[UniverseWorker] Created');
   }
 
   /**
    * Initialize the worker and start simulation
    */
   async init(): Promise<void> {
-    console.log('[UniverseWorker] Initializing...');
-
     // Set up all game systems using shared setup logic
     // This matches the initialization in demo/headless.ts
     this.gameSetup = await setupGameSystems(this.gameLoop, {
@@ -77,8 +73,6 @@ class UniverseWorker {
 
     // Register path prediction systems if enabled
     if (this.config.enablePathPrediction) {
-      console.log('[UniverseWorker] Enabling path prediction');
-
       // Path prediction system (priority 50 - after movement, before rendering)
       this.pathPredictionSystem = new PathPredictionSystem();
       this.gameLoop.systemRegistry.register(this.pathPredictionSystem);
@@ -104,8 +98,6 @@ class UniverseWorker {
     // Start simulation loop
     this.running = true;
     this.loop();
-
-    console.log('[UniverseWorker] Initialized and running');
   }
 
   /**
@@ -246,10 +238,6 @@ class UniverseWorker {
     const state = this.serializeState();
 
     await this.persistence.saveState(state);
-
-    if (this.config.debug) {
-      console.log(`[UniverseWorker] Persisted at tick ${this.tick}`);
-    }
   }
 
   /**
@@ -449,9 +437,6 @@ class UniverseWorker {
 
       case 'set-viewport':
         conn.viewport = message.viewport;
-        if (this.config.debug) {
-          console.log(`[UniverseWorker] Connection ${connectionId} viewport: ${message.viewport.width}x${message.viewport.height} @ (${message.viewport.x}, ${message.viewport.y})`);
-        }
         break;
     }
   }
@@ -570,5 +555,3 @@ self.onconnect = (e: MessageEvent) => {
   const port = e.ports[0];
   universe.addConnection(port);
 };
-
-console.log('[SharedWorker] Universe worker loaded');

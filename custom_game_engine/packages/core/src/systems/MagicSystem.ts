@@ -518,9 +518,7 @@ export class MagicSystem implements System {
     // Lock resources (if calculator supports it)
     let lockedCosts = costs;
     if (calculator.lockCosts) {
-      console.log('[DEBUG beginCast] Attempting to lock costs');
       const lockResult = calculator.lockCosts(costs, magic);
-      console.log('[DEBUG beginCast] lockResult:', lockResult);
       if (!lockResult.success) {
         console.error('[MagicSystem] Failed to lock resources for cast');
         return null;
@@ -577,7 +575,6 @@ export class MagicSystem implements System {
 
     const magic = caster.getComponent<MagicComponent>(CT.Magic);
     if (!magic) {
-      console.log('[DEBUG tickCast] Caster lost magic component');
       this.cancelCast(castState, caster, 'caster_lost_magic');
       return;
     }
@@ -620,7 +617,6 @@ export class MagicSystem implements System {
             p => p.source === magic.primarySource || p.source === 'arcane'
           );
           if (manaPool && manaPool.current < manaPool.locked) {
-            console.log('[DEBUG tickCast] ManaPool current below locked - current:', manaPool.current, 'locked:', manaPool.locked);
             this.cancelCast(castState, caster, 'resource_depleted_during_cast');
             return;
           }
@@ -632,7 +628,6 @@ export class MagicSystem implements System {
       // This is more permissive than mana since we expect current < locked after locking
       const pool = magic.resourcePools[cost.type];
       if (pool && pool.current < 0) {
-        console.log('[DEBUG tickCast] Resource pool depleted below zero:', cost.type, pool);
         this.cancelCast(castState, caster, 'resource_depleted_during_cast');
         return;
       }

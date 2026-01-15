@@ -327,8 +327,6 @@ export class SoulCreationSystem implements System {
       .with('soul_identity' as any)
       .executeEntities();
 
-    console.log(`[SoulCreationSystem] Found ${afterlifeSouls.length} souls in afterlife`);
-
     const eligibleSouls = afterlifeSouls.filter(soul => {
       const afterlife = soul.components.get('afterlife') as any;
       return afterlife &&
@@ -336,8 +334,6 @@ export class SoulCreationSystem implements System {
              !afterlife.isShade &&  // Shades have lost identity
              !afterlife.hasPassedOn; // Already moved on
     });
-
-    console.log(`[SoulCreationSystem] ${eligibleSouls.length} souls eligible for reincarnation`);
 
     if (eligibleSouls.length === 0) {
       return null;
@@ -355,7 +351,6 @@ export class SoulCreationSystem implements System {
     // PRIORITY 1: Check global soul repository for existing souls to reuse
     if (this.soulRepositorySystem && !request.context.isReforging) {
       const stats = this.soulRepositorySystem.getStats();
-      console.log(`[SoulCreationSystem] Checking repository: ${stats.totalSouls} souls available`);
 
       if (stats.totalSouls > 0) {
         // 50% chance to reuse an existing soul from the repository (50% new souls, 50% reforged)
@@ -382,8 +377,6 @@ export class SoulCreationSystem implements System {
 
     // PRIORITY 2: Check local afterlife for souls wanting to reincarnate
     const shouldTryReincarnation = Math.random() < 1.0;
-
-    console.log(`[SoulCreationSystem] Starting ceremony, shouldTryReincarnation: ${shouldTryReincarnation}, isAlreadyReforging: ${request.context.isReforging}`);
 
     if (shouldTryReincarnation && !request.context.isReforging) {
       const soulToReincarnate = this.findSoulForReincarnation(world);

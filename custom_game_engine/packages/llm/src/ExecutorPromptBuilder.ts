@@ -235,8 +235,9 @@ export class ExecutorPromptBuilder {
   }
 
   /**
-   * Build priorities section showing agent's current strategic focus.
-   * Critical for Executor to know what to prioritize.
+   * Build priorities section showing agent's autonomic priorities (what happens when idle).
+   * These are NOT instructions for the LLM to follow - they're what the autonomic system does.
+   * The LLM can SET these via set_priorities action.
    */
   private buildPrioritiesSection(agentComp: AgentComponent | undefined): string {
     if (!agentComp?.priorities) {
@@ -258,7 +259,7 @@ export class ExecutorPromptBuilder {
       return `${category} (${percentage}%)`;
     });
 
-    return `Your Current Priorities:\nYou're focusing on ${priorityDescriptions.join(', ')} right now.\n`;
+    return `Autonomic Priorities (what you do when idle):\nWhen you have no specific task, the autonomic system focuses you on: ${priorityDescriptions.join(', ')}.\nUse set_priorities to change these if needed.\n`;
   }
 
   /**
@@ -551,8 +552,7 @@ export class ExecutorPromptBuilder {
       actions.push('plant - Plant seeds in tilled soil (requires farming skill level 1)');
     }
 
-    // EXPLORATION
-    actions.push('explore - Systematically explore unknown areas to find new resources');
+    // EXPLORATION - removed 'explore' as it should be autonomous idle-triggered behavior, not LLM-chosen
 
     // NAVIGATION
     actions.push('go_to - Navigate to a named location (e.g., "home", "herb garden", "village center")');
@@ -778,9 +778,8 @@ MULTI-STEP PLAN - Farming (gather seeds/herbs, then till, plant, water):
 
 MULTI-STEP PLAN - Herb garden (gather rare plants, then tend them):
 {
-  "thinking": "I'll cultivate medicinal herbs. Need to find rare herbs first",
+  "thinking": "I see healing herbs nearby. I'll gather them and cultivate a medicinal herb garden",
   "action": [
-    { "type": "explore" },
     { "type": "gather", "resourceType": "healing_herb", "amount": 5 },
     { "type": "till" },
     { "type": "plant", "crop": "healing_herb", "amount": 5 }

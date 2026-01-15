@@ -82,13 +82,34 @@ export function navigateBehavior(entity: EntityImpl, world: World): void {
       },
     });
 
-    // Switch to idle
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
-      ...current,
-      behavior: 'idle',
-      behaviorState: {},
-      lastThought: `I arrived at my destination (${Math.floor(target.x)}, ${Math.floor(target.y)})`,
-    }));
+    // Check if this was part of exploration
+    const explorationTarget = agent.behaviorState.explorationTarget as boolean | undefined;
+
+    if (explorationTarget) {
+      // Return to explore behavior to continue exploring
+      const explorationThreshold = agent.behaviorState.explorationThreshold as number | undefined;
+      const newChunksDiscovered = agent.behaviorState.newChunksDiscovered as number | undefined;
+      const startChunk = agent.behaviorState.startChunk as { x: number; y: number } | undefined;
+
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'explore',
+        behaviorState: {
+          explorationThreshold,
+          newChunksDiscovered,
+          startChunk,
+        },
+        lastThought: `Reached exploration target. Continuing exploration.`,
+      }));
+    } else {
+      // Switch to idle
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'idle',
+        behaviorState: {},
+        lastThought: `I arrived at my destination (${Math.floor(target.x)}, ${Math.floor(target.y)})`,
+      }));
+    }
     return;
   }
 

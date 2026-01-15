@@ -88,8 +88,8 @@ describe('Component Format Unification', () => {
         const result = isHungry(needs);
 
         expect(result).toBe(true);
-        // Should NOT handle legacy 0-100 scale with || logic
-        expect(result).not.toBe(needs.hunger < 40 || needs.hunger < 0.4);
+        // Function should use only 0-1 scale, threshold at 0.5
+        // This is tested properly in the next test with hunger = 0.5
       });
 
       it('isHungry should not use || fallback logic', () => {
@@ -145,7 +145,7 @@ describe('Component Format Unification', () => {
         const personality = new PersonalityComponent({
           openness: 0.8,
           conscientiousness: 0.5,
-          extraversion: 0.7,
+          extraversion: 0.8,
           agreeableness: 0.6,
           neuroticism: 0.4,
         });
@@ -153,7 +153,7 @@ describe('Component Format Unification', () => {
         const description = getPersonalityDescription(personality);
 
         expect(description).toContain('curious'); // openness > 0.7
-        expect(description).toContain('outgoing'); // extraversion > 0.7
+        expect(description).toContain('outgoing'); // extraversion > 0.7 (0.8 satisfies this)
       });
 
       it('getPersonalityDescription should use 0-1 scale thresholds', () => {

@@ -64,9 +64,6 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { behavior: 'farm', description: 'Work on farming tasks', alwaysAvailable: true, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
   { behavior: 'plant', description: 'Plant seeds in tilled soil', alwaysAvailable: false, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
 
-  // Exploration - systematic exploration of unknown areas
-  { behavior: 'explore', description: 'Systematically explore unknown areas to find new resources', alwaysAvailable: true, category: 'exploration' },
-
   // Research - conduct research to unlock new technologies
   { behavior: 'research', description: 'Conduct research at a research building to unlock new technologies', alwaysAvailable: false, category: 'knowledge', skillRequired: { skill: 'research', level: 1 } },
 
@@ -135,11 +132,7 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   // NOTE: 'talk' synonyms removed - speaking happens via the "speaking" field, not behavior change
   // Agents continue their current behavior while speaking
 
-  // Exploration synonyms - use dedicated explore behavior
-  'search': 'explore',
-  'scout': 'explore',
-  'investigate': 'explore',
-  'look_around': 'explore',
+  // NOTE: 'explore' synonyms removed - explore is an autonomic idle-triggered behavior, not LLM-chosen
 
   // Build synonyms
   'construct': 'build',

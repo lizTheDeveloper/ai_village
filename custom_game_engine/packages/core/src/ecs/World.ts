@@ -44,6 +44,8 @@ export interface IChunk {
  */
 export interface IChunkManager {
   getChunk(chunkX: number, chunkY: number): IChunk | undefined;
+  hasChunk(chunkX: number, chunkY: number): boolean;
+  getLoadedChunks?(): Array<{ x: number; y: number; tiles: any[] }>;
 }
 
 /**
@@ -227,6 +229,11 @@ export interface World {
 
   /** Get a system by ID */
   getSystem(systemId: string): import('./System.js').System | undefined;
+
+  /**
+   * Get chunk manager for accessing terrain chunks.
+   */
+  getChunkManager(): IChunkManager | undefined;
 
   /**
    * Get or create chunk name registry for named locations.

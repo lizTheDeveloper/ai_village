@@ -77,14 +77,27 @@ export class PerceptionProcessor {
     hearing: HearingResultType;
     meeting: MeetingDetectionResultType;
   } {
+    const startTime = performance.now();
+
     // Phase 1: Vision (detect entities)
+    const v1 = performance.now();
     const vision = this.visionProcessor.process(entity, world);
+    const visionTime = performance.now() - v1;
 
     // Phase 2: Hearing (collect speech)
+    const h1 = performance.now();
     const hearing = this.hearingProcessor.process(entity, world);
+    const hearingTime = performance.now() - h1;
 
     // Phase 3: Meeting detection (respond to calls)
+    const m1 = performance.now();
     const meeting = this.meetingDetector.process(entity, world);
+    const meetingTime = performance.now() - m1;
+
+    const totalTime = performance.now() - startTime;
+    if (totalTime > 5) {
+      console.log(`[PerceptionProcessor] ${totalTime.toFixed(1)}ms total | vision:${visionTime.toFixed(1)}ms hearing:${hearingTime.toFixed(1)}ms meeting:${meetingTime.toFixed(1)}ms`);
+    }
 
     return { vision, hearing, meeting };
   }

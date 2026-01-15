@@ -99,6 +99,14 @@ export class SeekCoolingBehavior extends BaseBehavior {
       return; // Continue behavior
     }
 
+    // Re-check comfort after potentially finding/using cached cooling source
+    // Agent might have cooled down while fleeing/moving
+    if (temperature.state === 'comfortable') {
+      this.stopAllMovement(entity);
+      this.complete(entity);
+      return { complete: true, reason: 'Cooled down while seeking' };
+    }
+
     // Check if we're already in the cooling zone
     const inCoolingRange = this.isInCoolingRange(coolingSource, position);
 
@@ -561,8 +569,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
           Math.sin(escapeAngle) * movement.speed
         );
       } else {
-        // Actually cooled down, stop moving
+        // Actually cooled down, stop moving and complete behavior
         this.stopAllMovement(entity);
+        this.complete(entity);
       }
     }
   }

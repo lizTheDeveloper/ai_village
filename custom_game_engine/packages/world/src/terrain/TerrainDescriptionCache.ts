@@ -1,9 +1,13 @@
 /**
  * Terrain Description Cache
  *
- * Caches terrain feature analysis per sector to avoid expensive re-computation.
+ * Caches terrain feature analysis per chunk to avoid expensive re-computation.
  * Terrain analysis (TPI, slope calculation, flood-fill) is computationally expensive,
- * so we cache results by sector and reuse them until terrain changes.
+ * so we cache results by chunk and reuse them until terrain changes.
+ *
+ * NOTE: This cache is now primarily integrated with ChunkCache.
+ * Terrain features are stored directly on chunks (ChunkCache.terrainFeatures).
+ * This class provides backward compatibility and global cache invalidation.
  *
  * Cache invalidation triggers:
  * - Terrain modification (building placement, terraforming)
@@ -11,13 +15,11 @@
  */
 
 import type { TerrainFeature } from './TerrainFeatureAnalyzer.js';
+import { CHUNK_SIZE } from '../chunks/Chunk.js';
 
-/** Sector size in tiles (must match MapKnowledge SECTOR_SIZE) */
-const SECTOR_SIZE = 32;
-
-/** Cache entry for a terrain sector */
-interface CachedSectorFeatures {
-  /** All detected features in this sector */
+/** Cache entry for a terrain chunk */
+interface CachedChunkFeatures {
+  /** All detected features in this chunk */
   features: TerrainFeature[];
 
   /** Timestamp when cache was created */
@@ -28,28 +30,28 @@ interface CachedSectorFeatures {
 }
 
 /**
- * Cache for terrain descriptions organized by sector.
+ * Cache for terrain descriptions organized by chunk.
  *
- * Each sector (32x32 tiles) has terrain analyzed once and cached.
+ * Each chunk (32x32 tiles) has terrain analyzed once and cached.
  * Agents query the cache instead of re-analyzing every frame.
  */
 export class TerrainDescriptionCache {
-  /** Map of sector key -> cached features */
-  private cache = new Map<string, CachedSectorFeatures>();
+  /** Map of chunk key -> cached features */
+  private cache = new Map<string, CachedChunkFeatures>();
 
   /** Cache expiry time in milliseconds (default 5 minutes) */
   private readonly CACHE_TTL_MS = 5 * 60 * 1000;
 
   /**
-   * Get cached terrain features for a sector.
+   * Get cached terrain features for a chunk.
    *
-   * @param sectorX Sector X coordinate
-   * @param sectorY Sector Y coordinate
+   * @param chunkX Chunk X coordinate
+   * @param chunkY Chunk Y coordinate
    * @param currentTick Current game tick
    * @returns Cached features or null if expired/missing
    */
-  get(sectorX: number, sectorY: number, currentTick?: number): TerrainFeature[] | null {
-    const key = `${sectorX},${sectorY}`;
+  get(chunkX: number, chunkY: number, currentTick?: number): TerrainFeature[] | null {
+    const key = `${chunkX},${chunkY}`;
     const cached = this.cache.get(key);
 
     if (!cached) {
@@ -75,15 +77,15 @@ export class TerrainDescriptionCache {
   }
 
   /**
-   * Store terrain features for a sector.
+   * Store terrain features for a chunk.
    *
-   * @param sectorX Sector X coordinate
-   * @param sectorY Sector Y coordinate
+   * @param chunkX Chunk X coordinate
+   * @param chunkY Chunk Y coordinate
    * @param features Detected features
    * @param currentTick Current game tick (optional)
    */
-  set(sectorX: number, sectorY: number, features: TerrainFeature[], currentTick: number = 0): void {
-    const key = `${sectorX},${sectorY}`;
+  set(chunkX: number, chunkY: number, features: TerrainFeature[], currentTick: number = 0): void {
+    const key = `${chunkX},${chunkY}`;
     this.cache.set(key, {
       features,
       cachedAt: Date.now(),
@@ -92,44 +94,44 @@ export class TerrainDescriptionCache {
   }
 
   /**
-   * Invalidate cache for a specific sector (e.g., when terrain changes).
+   * Invalidate cache for a specific chunk (e.g., when terrain changes).
    *
-   * @param sectorX Sector X coordinate
-   * @param sectorY Sector Y coordinate
+   * @param chunkX Chunk X coordinate
+   * @param chunkY Chunk Y coordinate
    */
-  invalidate(sectorX: number, sectorY: number): void {
-    const key = `${sectorX},${sectorY}`;
+  invalidate(chunkX: number, chunkY: number): void {
+    const key = `${chunkX},${chunkY}`;
     this.cache.delete(key);
   }
 
   /**
-   * Invalidate cache for a world position (converts to sector).
+   * Invalidate cache for a world position (converts to chunk).
    *
    * @param worldX World X coordinate
    * @param worldY World Y coordinate
    */
   invalidateAt(worldX: number, worldY: number): void {
-    const sectorX = Math.floor(worldX / SECTOR_SIZE);
-    const sectorY = Math.floor(worldY / SECTOR_SIZE);
-    this.invalidate(sectorX, sectorY);
+    const chunkX = Math.floor(worldX / CHUNK_SIZE);
+    const chunkY = Math.floor(worldY / CHUNK_SIZE);
+    this.invalidate(chunkX, chunkY);
   }
 
   /**
    * Invalidate cache for a radius around a position.
-   * Useful when terrain modifications affect multiple sectors.
+   * Useful when terrain modifications affect multiple chunks.
    *
    * @param worldX World X coordinate
    * @param worldY World Y coordinate
    * @param radius Radius in tiles
    */
   invalidateRadius(worldX: number, worldY: number, radius: number): void {
-    const sectorRadius = Math.ceil(radius / SECTOR_SIZE);
-    const centerSectorX = Math.floor(worldX / SECTOR_SIZE);
-    const centerSectorY = Math.floor(worldY / SECTOR_SIZE);
+    const chunkRadius = Math.ceil(radius / CHUNK_SIZE);
+    const centerChunkX = Math.floor(worldX / CHUNK_SIZE);
+    const centerChunkY = Math.floor(worldY / CHUNK_SIZE);
 
-    for (let dy = -sectorRadius; dy <= sectorRadius; dy++) {
-      for (let dx = -sectorRadius; dx <= sectorRadius; dx++) {
-        this.invalidate(centerSectorX + dx, centerSectorY + dy);
+    for (let dy = -chunkRadius; dy <= chunkRadius; dy++) {
+      for (let dx = -chunkRadius; dx <= chunkRadius; dx++) {
+        this.invalidate(centerChunkX + dx, centerChunkY + dy);
       }
     }
   }
@@ -144,42 +146,42 @@ export class TerrainDescriptionCache {
   /**
    * Get cache statistics for debugging/monitoring.
    */
-  getStats(): { size: number; sectors: string[] } {
+  getStats(): { size: number; chunks: string[] } {
     return {
       size: this.cache.size,
-      sectors: Array.from(this.cache.keys()),
+      chunks: Array.from(this.cache.keys()),
     };
   }
 
   /**
-   * Convert world coordinates to sector coordinates.
+   * Convert world coordinates to chunk coordinates.
    */
-  static worldToSector(worldX: number, worldY: number): { sectorX: number; sectorY: number } {
+  static worldToChunk(worldX: number, worldY: number): { chunkX: number; chunkY: number } {
     return {
-      sectorX: Math.floor(worldX / SECTOR_SIZE),
-      sectorY: Math.floor(worldY / SECTOR_SIZE),
+      chunkX: Math.floor(worldX / CHUNK_SIZE),
+      chunkY: Math.floor(worldY / CHUNK_SIZE),
     };
   }
 
   /**
-   * Get sectors that intersect with a radius around a position.
+   * Get chunks that intersect with a radius around a position.
    */
-  static getSectorsInRadius(worldX: number, worldY: number, radius: number): Array<{ sectorX: number; sectorY: number }> {
-    const sectors: Array<{ sectorX: number; sectorY: number }> = [];
-    const sectorRadius = Math.ceil(radius / SECTOR_SIZE);
-    const centerSectorX = Math.floor(worldX / SECTOR_SIZE);
-    const centerSectorY = Math.floor(worldY / SECTOR_SIZE);
+  static getChunksInRadius(worldX: number, worldY: number, radius: number): Array<{ chunkX: number; chunkY: number }> {
+    const chunks: Array<{ chunkX: number; chunkY: number }> = [];
+    const chunkRadius = Math.ceil(radius / CHUNK_SIZE);
+    const centerChunkX = Math.floor(worldX / CHUNK_SIZE);
+    const centerChunkY = Math.floor(worldY / CHUNK_SIZE);
 
-    for (let dy = -sectorRadius; dy <= sectorRadius; dy++) {
-      for (let dx = -sectorRadius; dx <= sectorRadius; dx++) {
-        sectors.push({
-          sectorX: centerSectorX + dx,
-          sectorY: centerSectorY + dy,
+    for (let dy = -chunkRadius; dy <= chunkRadius; dy++) {
+      for (let dx = -chunkRadius; dx <= chunkRadius; dx++) {
+        chunks.push({
+          chunkX: centerChunkX + dx,
+          chunkY: centerChunkY + dy,
         });
       }
     }
 
-    return sectors;
+    return chunks;
   }
 }
 

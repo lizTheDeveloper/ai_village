@@ -877,27 +877,132 @@ function formatRecordings(data) {
   return '<div><strong>' + recordings.length + '</strong> recordings available</div>';
 }
 
-// Saves formatter
+// Timeline/Saves formatter - shows snapshots as visual timeline nodes
 function formatSaves(data) {
-  const saves = data.saves || [];
-  if (saves.length === 0) {
-    return '<div style="color: #888;">No saves found</div>';
+  // Handle error case
+  if (data.error) {
+    return '<div style="color: #ff6666; padding: 1rem; border: 1px solid #ff0000; background: #1a0000;">' +
+      '<strong>⚠️ Error:</strong> ' + data.error + '</div>';
   }
 
-  let html = '<table class="data-table"><thead><tr>';
-  html += '<th>Name</th><th>Day</th><th>Agents</th><th>Date</th>';
+  const snapshots = data.snapshots || [];
+  if (snapshots.length === 0) {
+    return '<div style="color: #888; padding: 1rem;">No snapshots found. Start the game to create saves.</div>';
+  }
+
+  // Stats summary
+  const stats = data.stats || {
+    total: snapshots.length,
+    canonical: snapshots.filter(s => s.type === 'canonical').length,
+    manual: snapshots.filter(s => s.type === 'manual').length,
+    auto: snapshots.filter(s => s.type === 'auto').length,
+    totalSize: snapshots.reduce((sum, s) => sum + (s.fileSize || 0), 0),
+  };
+
+  let html = '<div style="margin-bottom: 1rem;">';
+  html += '<div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">';
+  html += '<div><strong>Universe:</strong> <span style="color: #00ffff;">' + (data.universeId || 'universe:main') + '</span></div>';
+  html += '<div><strong>Total:</strong> ' + stats.total + '</div>';
+  html += '<div><span style="color: #ffcc00;">★</span> Canonical: ' + stats.canonical + '</div>';
+  html += '<div><span style="color: #00ff00;">●</span> Manual: ' + stats.manual + '</div>';
+  html += '<div><span style="color: #666;">○</span> Auto: ' + stats.auto + '</div>';
+  html += '<div><strong>Size:</strong> ' + (stats.totalSize / 1024 / 1024).toFixed(1) + ' MB</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Visual timeline
+  html += '<div style="overflow-x: auto; padding: 1rem 0;">';
+  html += '<div style="display: flex; flex-direction: column; min-width: max-content;">';
+
+  // Timeline header with day markers
+  const days = [...new Set(snapshots.map(s => s.day))].sort((a, b) => a - b);
+  html += '<div style="display: flex; align-items: center; margin-bottom: 0.5rem; padding-left: 80px;">';
+  for (const day of days) {
+    const daySnapshots = snapshots.filter(s => s.day === day);
+    const width = Math.max(daySnapshots.length * 28, 60);
+    html += '<div style="width: ' + width + 'px; text-align: center; color: #00aa00; font-size: 0.75rem; border-left: 1px dashed #333; padding-left: 4px;">';
+    html += 'Day ' + day;
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Main timeline line with nodes
+  html += '<div style="display: flex; align-items: center;">';
+  html += '<div style="width: 80px; text-align: right; padding-right: 10px; color: #888; font-size: 0.75rem;">Snapshots</div>';
+  html += '<div style="display: flex; align-items: center; position: relative;">';
+
+  // Horizontal line
+  html += '<div style="position: absolute; left: 0; right: 0; height: 2px; background: #333;"></div>';
+
+  // Snapshot nodes grouped by day
+  for (const day of days) {
+    const daySnapshots = snapshots.filter(s => s.day === day).sort((a, b) => a.tick - b.tick);
+
+    for (const snap of daySnapshots) {
+      let nodeColor, nodeSymbol, nodeSize;
+      if (snap.type === 'canonical') {
+        nodeColor = '#ffcc00';
+        nodeSymbol = '★';
+        nodeSize = '24px';
+      } else if (snap.type === 'manual') {
+        nodeColor = '#00ff00';
+        nodeSymbol = '●';
+        nodeSize = '16px';
+      } else {
+        nodeColor = '#666';
+        nodeSymbol = '○';
+        nodeSize = '12px';
+      }
+
+      const tooltip = 'Tick: ' + snap.tick + '\\nDay: ' + snap.day + '\\nType: ' + snap.type +
+        '\\nSize: ' + (snap.fileSize / 1024).toFixed(0) + ' KB' +
+        '\\nDate: ' + new Date(snap.timestamp).toLocaleString() +
+        (snap.canonEvent ? '\\n\\n' + snap.canonEvent.title : '');
+
+      html += '<div class="timeline-node" style="';
+      html += 'width: ' + nodeSize + '; height: ' + nodeSize + ';';
+      html += 'display: flex; align-items: center; justify-content: center;';
+      html += 'color: ' + nodeColor + '; cursor: pointer; margin: 0 6px;';
+      html += 'position: relative; z-index: 1; background: #0a0a0a;';
+      html += 'font-size: ' + (snap.type === 'canonical' ? '1.2rem' : '0.8rem') + ';';
+      html += '" title="' + tooltip + '" data-tick="' + snap.tick + '" data-type="' + snap.type + '">';
+      html += nodeSymbol;
+      html += '</div>';
+    }
+  }
+
+  html += '</div>'; // End nodes container
+  html += '</div>'; // End timeline line
+
+  html += '</div>'; // End flex column
+  html += '</div>'; // End overflow container
+
+  // Recent snapshots table (last 10)
+  html += '<div style="margin-top: 1rem;">';
+  html += '<div style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">Recent Snapshots (newest first):</div>';
+  html += '<table class="data-table"><thead><tr>';
+  html += '<th>Type</th><th>Tick</th><th>Day</th><th>Size</th><th>Date</th><th>Event</th>';
   html += '</tr></thead><tbody>';
 
-  for (const s of saves.slice(0, 10)) {
+  const recentSnapshots = [...snapshots].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+  for (const s of recentSnapshots) {
+    const typeIcon = s.type === 'canonical' ? '<span style="color: #ffcc00;">★</span>' :
+                     s.type === 'manual' ? '<span style="color: #00ff00;">●</span>' :
+                     '<span style="color: #666;">○</span>';
     html += '<tr>';
-    html += '<td>' + (s.name || s.id || '?') + '</td>';
-    html += '<td>' + (s.day || '?') + '</td>';
-    html += '<td>' + (s.agentCount || '?') + '</td>';
-    html += '<td>' + (s.timestamp ? new Date(s.timestamp).toLocaleDateString() : '?') + '</td>';
+    html += '<td>' + typeIcon + ' ' + s.type + '</td>';
+    html += '<td>' + s.tick + '</td>';
+    html += '<td>' + s.day + '</td>';
+    html += '<td>' + (s.fileSize / 1024).toFixed(0) + ' KB</td>';
+    html += '<td>' + new Date(s.timestamp).toLocaleString() + '</td>';
+    html += '<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">' +
+            (s.canonEvent ? s.canonEvent.title : '-') + '</td>';
     html += '</tr>';
   }
 
   html += '</tbody></table>';
+  html += '</div>';
+
   return html;
 }
 

@@ -9,6 +9,8 @@ import type {
   SteeringComponent,
   VelocityComponent,
   PositionComponent,
+  PhysicsComponent,
+  BuildingComponent,
 } from '@ai-village/core';
 import {
   ComponentType as CT,
@@ -305,7 +307,8 @@ export class SteeringSystem implements System {
     const chunkY = Math.floor(position.y / CHUNK_SIZE);
 
     // Collect obstacles from nearby chunks
-    const obstacles: Entity[] = [];
+    // Check for: PhysicsComponent (solid=true), BuildingComponent (blocksMovement=true)
+    const obstacles: Array<{ entity: Entity; radius: number }> = [];
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
         const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
@@ -313,11 +316,31 @@ export class SteeringSystem implements System {
           if (nearbyId === entity.id) continue;
 
           const e = world.entities.get(nearbyId);
-          if (!e || !e.components.has('collision')) continue;
+          if (!e) continue;
 
           const obstaclePos = getPosition(e);
-          const collision = e.components.get('collision') as unknown as { radius: number } | undefined;
-          if (!obstaclePos || !collision) continue;
+          if (!obstaclePos) continue;
+
+          // Check if entity is a solid obstacle (physics or building)
+          let obstacleRadius = 0;
+          const impl = e as EntityImpl;
+
+          // Check PhysicsComponent first (trees, rocks, solid objects)
+          const physics = impl.getComponent<PhysicsComponent>(CT.Physics);
+          if (physics && physics.solid) {
+            // Use average of width/height as radius, minimum 0.5
+            obstacleRadius = Math.max(0.5, (physics.width + physics.height) / 4);
+          }
+
+          // Check BuildingComponent (chests, beds, furniture)
+          const building = impl.getComponent<BuildingComponent>(CT.Building);
+          if (building && building.blocksMovement) {
+            // Buildings are typically 1x1 tiles, use 0.5 radius
+            obstacleRadius = Math.max(obstacleRadius, 0.5);
+          }
+
+          // Skip if not a solid obstacle
+          if (obstacleRadius === 0) continue;
 
           // Quick distance check to filter out far obstacles BEFORE detailed checks
           const quickDist = Math.abs(obstaclePos.x - position.x) + Math.abs(obstaclePos.y - position.y);
@@ -325,9 +348,9 @@ export class SteeringSystem implements System {
 
           // Check if obstacle is in path (use squared distance for performance)
           const distSquared = this._distanceSquared(ahead, obstaclePos);
-          const thresholdSquared = (collision.radius + 1.0) * (collision.radius + 1.0);
+          const thresholdSquared = (obstacleRadius + 1.0) * (obstacleRadius + 1.0);
           if (distSquared <= thresholdSquared) {
-            obstacles.push(e);
+            obstacles.push({ entity: e, radius: obstacleRadius });
           }
         }
       }
@@ -338,16 +361,16 @@ export class SteeringSystem implements System {
     }
 
     // Find closest obstacle (use squared distance for performance - no sqrt needed for comparison)
-    const closest = obstacles.reduce((prev: Entity, curr: Entity) => {
-      const prevPos = getPosition(prev);
-      const currPos = getPosition(curr);
+    const closest = obstacles.reduce((prev, curr) => {
+      const prevPos = getPosition(prev.entity);
+      const currPos = getPosition(curr.entity);
       if (!prevPos || !currPos) return prev;
       const prevDistSq = this._distanceSquared(position, prevPos);
       const currDistSq = this._distanceSquared(position, currPos);
       return currDistSq < prevDistSq ? curr : prev;
     });
 
-    const obstaclePos = getPosition(closest);
+    const obstaclePos = getPosition(closest.entity);
     if (!obstaclePos) {
       return { x: 0, y: 0 };
     }
