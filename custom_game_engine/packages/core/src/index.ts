@@ -26,6 +26,11 @@ export * from './serialization/index.js';
 export * from './loop/index.js';
 export * from './debug/index.js';
 export * from './components/index.js';
+
+// Diagnostics
+export { diagnosticsHarness } from './diagnostics/DiagnosticsHarness.js';
+export type { DiagnosticIssue } from './diagnostics/DiagnosticsHarness.js';
+export { wrapEntity, wrapComponent, wrapWorld, wrapObject } from './diagnostics/ProxyWrappers.js';
 // Explicit component type and value re-exports for renderer and world packages
 export type { Relationship, RelationshipComponent } from './components/index.js';
 export {

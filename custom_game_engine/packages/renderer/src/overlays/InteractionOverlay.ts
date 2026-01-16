@@ -164,7 +164,9 @@ export class InteractionOverlay {
     tileSize: number,
     selectedEntity?: Entity | { id: string }
   ): void {
-    if (!selectedEntity) return;
+    if (!selectedEntity) {
+      return;
+    }
 
     // Get the full entity from world if we only have an ID
     let entity: Entity | undefined;
@@ -192,7 +194,50 @@ export class InteractionOverlay {
       targetY = steering.target.y;
     }
 
-    // 2. If no steering target, check action queue for targetPos
+    // 2. Check agent.behaviorState.target (used by NavigateBehavior)
+    if (targetX === undefined || targetY === undefined) {
+      const agent = entity.getComponent('agent') as any;
+      if (agent?.behaviorState?.target) {
+        targetX = agent.behaviorState.target.x;
+        targetY = agent.behaviorState.target.y;
+      }
+    }
+
+    // 3. Check agent.behaviorState.destination (alternative target field)
+    if (targetX === undefined || targetY === undefined) {
+      const agent = entity.getComponent('agent') as any;
+      if (agent?.behaviorState?.destination) {
+        targetX = agent.behaviorState.destination.x;
+        targetY = agent.behaviorState.destination.y;
+      }
+    }
+
+    // 4. Check movement component for targetX/targetY (used by BaseBehavior.moveToward)
+    if (targetX === undefined || targetY === undefined) {
+      const movement = entity.getComponent('movement') as any;
+      // Check for target coordinates - hasTarget flag is optional
+      if (movement && typeof movement.targetX === 'number' && typeof movement.targetY === 'number') {
+        // Only use if hasTarget is true OR if coordinates are non-zero (active target)
+        if (movement.hasTarget || (movement.targetX !== 0 || movement.targetY !== 0)) {
+          targetX = movement.targetX;
+          targetY = movement.targetY;
+        }
+      }
+    }
+
+    // 5. Check pending_action for navigation targets
+    if (targetX === undefined || targetY === undefined) {
+      const pendingAction = entity.getComponent('pending_action') as any;
+      if (pendingAction?.targetPos) {
+        targetX = pendingAction.targetPos.x;
+        targetY = pendingAction.targetPos.y;
+      } else if (pendingAction?.target) {
+        targetX = pendingAction.target.x;
+        targetY = pendingAction.target.y;
+      }
+    }
+
+    // 6. If still no target, check action queue for targetPos
     if (targetX === undefined || targetY === undefined) {
       const actionQueue = entity.getComponent('action_queue') as any;
 
@@ -219,6 +264,20 @@ export class InteractionOverlay {
         }
       }
     }
+
+    // DEBUG: Log all target sources we checked
+    const agent = entity.getComponent('agent') as any;
+    const movement = entity.getComponent('movement') as any;
+    console.log('[PathViz] Target search for', entity.id.substring(0, 8), ':', {
+      behavior: agent?.behavior,
+      steeringTarget: steering?.target,
+      behaviorStateTarget: agent?.behaviorState?.target,
+      behaviorStateDest: agent?.behaviorState?.destination,
+      movementHasTarget: movement?.hasTarget,
+      movementTargetX: movement?.targetX,
+      movementTargetY: movement?.targetY,
+      finalTarget: targetX !== undefined ? { x: targetX, y: targetY } : 'none',
+    });
 
     // No target found
     if (targetX === undefined || targetY === undefined) {

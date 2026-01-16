@@ -3248,6 +3248,29 @@ function setupDebugAPI(
       console.error('[SoulCleanup] Failed to clean:', result.error);
       return null;
     },
+
+    // Diagnostics API
+    diagnostics: {
+      enable: () => {
+        (window as any).__DIAGNOSTICS_ENABLED__ = true;
+        console.log('[Diagnostics] Enabled - invalid property/method access will be tracked');
+      },
+      disable: () => {
+        (window as any).__DIAGNOSTICS_ENABLED__ = false;
+        console.log('[Diagnostics] Disabled');
+      },
+      isEnabled: () => {
+        return (window as any).__DIAGNOSTICS_ENABLED__ === true;
+      },
+      summary: () => {
+        console.log('[Diagnostics] Visit http://localhost:8766/admin and select Diagnostics tab');
+        console.log('[Diagnostics] Or use curl: curl http://localhost:8766/admin/queries/diagnostics/summary?format=json');
+      },
+      exportJSON: () => {
+        console.log('[Diagnostics] Visit: http://localhost:8766/admin/queries/diagnostics/export?format=json');
+        console.log('[Diagnostics] Or use: curl http://localhost:8766/admin/queries/diagnostics/export?format=json > diagnostics.json');
+      }
+    },
   };
 
   (window as any).__gameTest = {

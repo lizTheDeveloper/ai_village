@@ -93,6 +93,7 @@ export abstract class BaseBehavior implements IBehavior {
     target: { x: number; y: number },
     speed?: number
   ): void {
+    console.log('[BaseBehavior] setMovementTarget for', entity.id.substring(0, 8), 'to', target);
     entity.updateComponent<MovementComponent>('movement', (current) => ({
       ...current,
       targetX: target.x,

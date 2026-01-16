@@ -105,8 +105,16 @@ export class SeekFoodBehavior extends BaseBehavior {
 
     // No food available nearby - move toward nearest food source
     const nearestFood = this.findNearestFoodSource(entity, world);
+
+    // DEBUG: Log food search result
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    console.log('[SeekFood] Agent', entity.id.substring(0, 8), 'at',
+      position ? `(${Math.floor(position.x)}, ${Math.floor(position.y)})` : 'unknown',
+      '- nearestFood:', nearestFood ? `${nearestFood.type} at (${Math.floor(nearestFood.position.x)}, ${Math.floor(nearestFood.position.y)}) dist=${Math.floor(nearestFood.distance)}` : 'NONE');
+
     if (nearestFood) {
       // Move toward the food source
+      console.log('[SeekFood] Calling moveToward to', nearestFood.position);
       this.moveToward(entity, nearestFood.position, { arrivalDistance: 2 });
       return; // Continue moving
     }

@@ -773,19 +773,14 @@ export class ScriptedDecisionProcessor {
         }
       }
     }
-    // EXPLORATION: wander, explore
+    // EXPLORATION: wander only (explore sets targets too far away - up to 160+ tiles)
+    // Agents can still explore via LLM decisions when appropriate
     if (priorities.exploration) {
-      candidates.push({
-        behavior: 'explore',
-        behaviorState: {},
-        category: 'exploration',
-        baseWeight: 0.6,
-      });
       candidates.push({
         behavior: 'wander',
         behaviorState: {},
         category: 'exploration',
-        baseWeight: 0.3,
+        baseWeight: 0.6,
       });
     }
     // REST: idle, rest

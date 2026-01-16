@@ -13,3 +13,4 @@ import './sprites.js';
 import './media.js';
 import './llm.js';
 import './saves.js';
+import './diagnostics.js';

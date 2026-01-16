@@ -34,7 +34,8 @@ import { getAssignedLocation } from '../components/AgentComponent.js';
 const DEFAULT_EXPLORATION_THRESHOLD = 5;
 
 /** Maximum search radius for finding unexplored chunks (in chunks) */
-const MAX_SEARCH_RADIUS = 10;
+// Reduced from 10 to 5 - prevents agents from setting targets 320+ tiles away
+const MAX_SEARCH_RADIUS = 5;
 
 /**
  * Handler function for explore behavior

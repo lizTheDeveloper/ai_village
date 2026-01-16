@@ -748,6 +748,9 @@ export class GatherBehavior extends BaseBehavior {
     let bestPosition: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
+    // DEBUG: Check if chunkSpatialQuery is injected
+    console.log('[GatherBehavior] findNearestResource: chunkSpatialQuery =', chunkSpatialQuery ? 'AVAILABLE' : 'NOT AVAILABLE');
+
     if (chunkSpatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
       const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
@@ -756,6 +759,45 @@ export class GatherBehavior extends BaseBehavior {
         GATHER_MAX_RANGE,
         [ComponentType.Resource]
       );
+
+      console.log('[GatherBehavior] ChunkSpatialQuery returned', resourcesInRadius.length, 'resources within', GATHER_MAX_RANGE, 'of', position.x.toFixed(1), position.y.toFixed(1));
+
+      // WORKAROUND: ChunkCache entity indexing is not implemented yet
+      // If spatial query returns 0, fall back to global query
+      if (resourcesInRadius.length === 0) {
+        console.log('[GatherBehavior] Falling back to global query (chunk index empty)');
+        const globalResources = world
+          .query()
+          .with(ComponentType.Resource)
+          .with(ComponentType.Position)
+          .executeEntities();
+
+        for (const resource of globalResources) {
+          const resourceImpl = resource as EntityImpl;
+          const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
+          const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+          if (!resourceComp.harvestable) continue;
+          if (resourceComp.amount <= 0) continue;
+          if (preferredType && resourceComp.resourceType !== preferredType) continue;
+
+          const distanceToAgent = this.distance(position, resourcePos);
+          if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+          const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+          let score = distanceToAgent;
+          if (distanceToHome > HOME_RADIUS) {
+            score += (distanceToHome - HOME_RADIUS) * 2.0;
+          }
+
+          if (score < bestScore) {
+            bestScore = score;
+            bestResource = resource;
+            bestPosition = { x: resourcePos.x, y: resourcePos.y };
+            bestDistance = distanceToAgent;
+          }
+        }
+      }
 
       for (const { entity: resource, distance: distanceToAgent } of resourcesInRadius) {
         const resourceImpl = resource as EntityImpl;
@@ -936,6 +978,8 @@ export class GatherBehavior extends BaseBehavior {
         GATHER_MAX_RANGE,
         [ComponentType.Plant]
       );
+
+      console.log('[GatherBehavior] findNearestPlantWithFruit: ChunkSpatialQuery returned', plantsInRadius.length, 'plants within', GATHER_MAX_RANGE, 'of', position.x.toFixed(1), position.y.toFixed(1));
 
       for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
         const plantImpl = plant as EntityImpl;

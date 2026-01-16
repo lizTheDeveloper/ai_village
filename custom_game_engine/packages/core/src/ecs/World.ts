@@ -21,6 +21,7 @@ import { PlacementValidator } from '../buildings/PlacementValidator.js';
 import { resetUsedNames } from '../components/IdentityComponent.js';
 import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
 import { SimulationScheduler } from './SimulationScheduler.js';
+import { diagnosticsHarness } from '../diagnostics/DiagnosticsHarness.js';
 // ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
 // Re-export for backwards compatibility
@@ -541,6 +542,7 @@ export class WorldImpl implements WorldMutator {
   advanceTick(): void {
     this._tick++;
     this._gameTime = this.calculateGameTime(this._tick);
+    diagnosticsHarness.setCurrentTick(this._tick);
   }
 
   /**
@@ -550,6 +552,7 @@ export class WorldImpl implements WorldMutator {
   setTick(tick: Tick): void {
     this._tick = tick;
     this._gameTime = this.calculateGameTime(tick);
+    diagnosticsHarness.setCurrentTick(tick);
   }
 
   setFeature(feature: string, enabled: boolean): void {

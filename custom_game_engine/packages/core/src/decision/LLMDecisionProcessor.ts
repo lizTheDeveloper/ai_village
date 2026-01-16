@@ -255,7 +255,10 @@ function selectBehaviorFromPriorities(
       return { behavior: 'farm', behaviorState: {} };
     }
     case 'exploration': {
-      return { behavior: 'explore', behaviorState: {} };
+      // Exploration priority does NOT automatically trigger explore behavior
+      // Exploration should be an LLM decision, not an automatic fallback
+      // This prevents agents from wandering 320+ tiles away due to high exploration skill
+      return null;
     }
     // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     default:
@@ -915,12 +918,19 @@ export class LLMDecisionProcessor {
       }
       // Simple string action - apply default behaviorState for behaviors that need it
       else if (typeof action === 'string') {
-        behavior = action as AgentBehavior;
-        // Set default behaviorState for behaviors that require parameters
-        if (behavior === 'talk') {
-          behaviorState.partnerId = 'nearest';
-        } else if (behavior === 'gather' || behavior === 'pick') {
-          behaviorState.resourceType = 'wood';
+        // Skip autonomic-only behaviors - these should not be set via LLM action
+        // 'talk' happens via recentSpeech, not behavior switch
+        // 'wander', 'rest', 'idle', 'explore' are fallback behaviors
+        const autonomicBehaviors = ['talk', 'wander', 'rest', 'idle', 'explore', 'explore_frontier', 'explore_spiral'];
+        if (autonomicBehaviors.includes(action)) {
+          // Don't change behavior - stay in current behavior
+          behavior = null;
+        } else {
+          behavior = action as AgentBehavior;
+          // Set default behaviorState for behaviors that require parameters
+          if (behavior === 'gather' || behavior === 'pick') {
+            behaviorState.resourceType = 'wood';
+          }
         }
       }
     } else {
