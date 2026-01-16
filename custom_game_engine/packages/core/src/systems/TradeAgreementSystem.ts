@@ -121,7 +121,7 @@ export class TradeAgreementSystem implements System {
     const civEntities = world.query().with('trade_agreement').executeEntities();
 
     for (const entity of civEntities) {
-      const tradeComp = entity.components.get('trade_agreement') as TradeAgreementComponent;
+      const tradeComp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
       if (!tradeComp) continue;
 
       // Process causal event queue
@@ -162,10 +162,8 @@ export class TradeAgreementSystem implements System {
       );
     }
 
-    const proposerComp = proposerEntity.components.get(
-      'trade_agreement'
-    ) as TradeAgreementComponent;
-    const targetComp = targetEntity.components.get('trade_agreement') as TradeAgreementComponent;
+    const proposerComp = proposerEntity.getComponent<TradeAgreementComponent>('trade_agreement');
+    const targetComp = targetEntity.getComponent<TradeAgreementComponent>('trade_agreement');
 
     if (!proposerComp || !targetComp) {
       throw new Error('One or both civilizations missing trade_agreement component');
@@ -259,7 +257,7 @@ export class TradeAgreementSystem implements System {
       pendingNegotiations: [...proposerComp.pendingNegotiations, negotiationState],
     };
 
-    // Update entities
+    // Update entities (cast to EntityImpl required - Entity interface is readonly)
     (proposerEntity as EntityImpl).updateComponent('trade_agreement', () => updatedProposerComp);
     (targetEntity as EntityImpl).updateComponent('trade_agreement', () => updatedTargetComp);
 
@@ -304,9 +302,7 @@ export class TradeAgreementSystem implements System {
       throw new Error(`Civilization ${acceptorCivId} not found`);
     }
 
-    const acceptorComp = acceptorEntity.components.get(
-      'trade_agreement'
-    ) as TradeAgreementComponent;
+    const acceptorComp = acceptorEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!acceptorComp) {
       throw new Error(`Civilization ${acceptorCivId} missing trade_agreement component`);
     }
@@ -342,6 +338,7 @@ export class TradeAgreementSystem implements System {
       activeAgreements: [...acceptorComp.activeAgreements, acceptedAgreement],
     };
 
+    // Cast to EntityImpl required - Entity interface is readonly
     (acceptorEntity as EntityImpl).updateComponent('trade_agreement', () => updatedAcceptorComp);
 
     // Update proposer's component
@@ -349,9 +346,7 @@ export class TradeAgreementSystem implements System {
     if (proposerCivId) {
       const proposerEntity = this.getCivilizationEntity(world, proposerCivId);
       if (proposerEntity) {
-        const proposerComp = proposerEntity.components.get(
-          'trade_agreement'
-        ) as TradeAgreementComponent;
+        const proposerComp = proposerEntity.getComponent<TradeAgreementComponent>('trade_agreement');
         if (proposerComp) {
           const updatedProposerComp: TradeAgreementComponent = {
             ...proposerComp,
@@ -360,6 +355,7 @@ export class TradeAgreementSystem implements System {
             ),
             activeAgreements: [...proposerComp.activeAgreements, acceptedAgreement],
           };
+          // Cast to EntityImpl required - Entity interface is readonly
           (proposerEntity as EntityImpl).updateComponent(
             'trade_agreement',
             () => updatedProposerComp
@@ -393,9 +389,7 @@ export class TradeAgreementSystem implements System {
       throw new Error(`Civilization ${responderCivId} not found`);
     }
 
-    const responderComp = responderEntity.components.get(
-      'trade_agreement'
-    ) as TradeAgreementComponent;
+    const responderComp = responderEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!responderComp) {
       throw new Error(`Civilization ${responderCivId} missing trade_agreement component`);
     }
@@ -451,6 +445,7 @@ export class TradeAgreementSystem implements System {
       pendingNegotiations: [...responderComp.pendingNegotiations, negotiationState],
     };
 
+    // Cast to EntityImpl required - Entity interface is readonly
     (responderEntity as EntityImpl).updateComponent('trade_agreement', () => updatedResponderComp);
 
     // Update original proposer - add counter-offer to their incoming
@@ -458,9 +453,7 @@ export class TradeAgreementSystem implements System {
     if (proposerCivId) {
       const proposerEntity = this.getCivilizationEntity(world, proposerCivId);
       if (proposerEntity) {
-        const proposerComp = proposerEntity.components.get(
-          'trade_agreement'
-        ) as TradeAgreementComponent;
+        const proposerComp = proposerEntity.getComponent<TradeAgreementComponent>('trade_agreement');
         if (proposerComp) {
           const updatedProposerComp: TradeAgreementComponent = {
             ...proposerComp,
@@ -469,6 +462,7 @@ export class TradeAgreementSystem implements System {
             ),
             incomingProposals: [...proposerComp.incomingProposals, updatedProposal],
           };
+          // Cast to EntityImpl required - Entity interface is readonly
           (proposerEntity as EntityImpl).updateComponent(
             'trade_agreement',
             () => updatedProposerComp
@@ -506,7 +500,7 @@ export class TradeAgreementSystem implements System {
       throw new Error(`Civilization ${civId} not found`);
     }
 
-    const comp = entity.components.get('trade_agreement') as TradeAgreementComponent;
+    const comp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!comp) {
       throw new Error(`Civilization ${civId} missing trade_agreement component`);
     }
@@ -600,7 +594,7 @@ export class TradeAgreementSystem implements System {
       throw new Error(`Civilization ${civId} not found`);
     }
 
-    const comp = entity.components.get('trade_agreement') as TradeAgreementComponent;
+    const comp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!comp) {
       throw new Error(`Civilization ${civId} missing trade_agreement component`);
     }
@@ -617,6 +611,7 @@ export class TradeAgreementSystem implements System {
       ),
     };
 
+    // Cast to EntityImpl required - Entity interface is readonly
     (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
 
     // Emit event
@@ -645,7 +640,7 @@ export class TradeAgreementSystem implements System {
       throw new Error(`Civilization ${civId} not found`);
     }
 
-    const comp = entity.components.get('trade_agreement') as TradeAgreementComponent;
+    const comp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!comp) {
       throw new Error(`Civilization ${civId} missing trade_agreement component`);
     }
@@ -689,17 +684,19 @@ export class TradeAgreementSystem implements System {
       escrowHeld: [...comp.escrowHeld, escrowItem],
     };
 
+    // Cast to EntityImpl required - Entity interface is readonly
     (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
 
     // Also update the receiving party's escrowPending
     const otherEntity = this.getCivilizationEntity(world, otherPartyId);
     if (otherEntity) {
-      const otherComp = otherEntity.components.get('trade_agreement') as TradeAgreementComponent;
+      const otherComp = otherEntity.getComponent<TradeAgreementComponent>('trade_agreement');
       if (otherComp) {
         const updatedOtherComp: TradeAgreementComponent = {
           ...otherComp,
           escrowPending: [...otherComp.escrowPending, escrowItem],
         };
+        // Cast to EntityImpl required - Entity interface is readonly
         (otherEntity as EntityImpl).updateComponent('trade_agreement', () => updatedOtherComp);
       }
     }
@@ -758,6 +755,7 @@ export class TradeAgreementSystem implements System {
         ].slice(-comp.maxEventHistory),
       };
 
+      // Cast to EntityImpl required - Entity interface is readonly
       (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
     }
   }
@@ -796,6 +794,7 @@ export class TradeAgreementSystem implements System {
       causalEventQueue: [...comp.causalEventQueue, event],
     };
 
+    // Cast to EntityImpl required - Entity interface is readonly
     (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
   }
 
@@ -818,8 +817,8 @@ export class TradeAgreementSystem implements System {
       // Check if event requires timeline fork
       if (event.forkRequired) {
         // Emit fork event for multiverse coordinator to handle
-        (world.eventBus.emit as any)({
-          type: 'multiverse:timeline_fork_required',
+        world.eventBus.emit({
+          type: 'multiverse:timeline_fork_required' as const,
           source: entity.id,
           data: {
             reason: event.forkRequired.reason,
@@ -869,6 +868,7 @@ export class TradeAgreementSystem implements System {
         ...comp,
         causalEventQueue: remaining,
       };
+      // Cast to EntityImpl required - Entity interface is readonly
       (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
     }
   }
@@ -887,8 +887,8 @@ export class TradeAgreementSystem implements System {
     if (!agreementId) return;
 
     // Emit event for higher-level handling
-    (world.eventBus.emit as any)({
-      type: 'trade:remote_acceptance',
+    world.eventBus.emit({
+      type: 'trade:remote_acceptance' as const,
       source: entity.id,
       data: {
         agreementId,
@@ -911,8 +911,8 @@ export class TradeAgreementSystem implements System {
     const agreementId = event.data?.agreementId;
     if (!agreementId) return;
 
-    (world.eventBus.emit as any)({
-      type: 'trade:remote_cancellation',
+    world.eventBus.emit({
+      type: 'trade:remote_cancellation' as const,
       source: entity.id,
       data: {
         agreementId,
@@ -962,11 +962,12 @@ export class TradeAgreementSystem implements System {
         ...comp,
         diplomaticRelations: updatedRelations,
       };
+      // Cast to EntityImpl required - Entity interface is readonly
       (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
     }
 
-    (world.eventBus.emit as any)({
-      type: 'trade:remote_violation',
+    world.eventBus.emit({
+      type: 'trade:remote_violation' as const,
       source: entity.id,
       data: {
         agreementId,
@@ -1042,6 +1043,7 @@ export class TradeAgreementSystem implements System {
         ...comp,
         activeAgreements: updatedAgreements,
       };
+      // Cast to EntityImpl required - Entity interface is readonly
       (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
     }
   }
@@ -1092,7 +1094,7 @@ export class TradeAgreementSystem implements System {
   private getCivilizationEntity(world: World, civId: string): Entity | undefined {
     const entities = world.query().with('trade_agreement').executeEntities();
     return entities.find((e) => {
-      const comp = e.components.get('trade_agreement') as TradeAgreementComponent;
+      const comp = e.getComponent<TradeAgreementComponent>('trade_agreement');
       return comp?.civilizationId === civId;
     });
   }
@@ -1171,11 +1173,11 @@ export class TradeAgreementSystem implements System {
     // Build the full event type
     const eventType = `trade_agreement:${type}` as keyof import('../events/EventMap.js').GameEventMap;
 
-    // Emit with type assertion since we dynamically build event types
+    // Emit event - EventBus.emit accepts dynamic event types
     world.eventBus.emit({
       type: eventType,
-      source: 'trade_agreement_system',
+      source: 'trade_agreement_system' as const,
       data: { agreementId, ...data },
-    } as any);
+    });
   }
 }

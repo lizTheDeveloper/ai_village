@@ -12,6 +12,7 @@ import {
   type MemoryComponent,
   type IdentityComponent,
   type PositionComponent,
+  type AgentComponent,
   getFoodStorageInfo,
   getVillageInfo,
   isEntityVisibleWithSkill,
@@ -548,6 +549,9 @@ export class WorldContextBuilder {
    * Check if there's a campfire in the agent's current chunk.
    * Returns true if a campfire (complete or in-progress) exists in the same chunk.
    * This is much more efficient than querying all entities.
+   *
+   * IMPORTANT: Also checks for agents currently building campfires to prevent
+   * simultaneous duplicate construction (addresses LLM context visibility issue).
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
     const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
@@ -567,13 +571,20 @@ export class WorldContextBuilder {
     const chunk = chunkManager.getChunk(chunkX, chunkY);
     if (!chunk || !chunk.entities) return false;
 
-    // Check if any entity in the chunk is a campfire
+    // Check if any entity in the chunk is a campfire OR an agent building a campfire
     for (const entityId of chunk.entities) {
       const entity = world.getEntity(entityId);
       if (!entity) continue;
 
+      // Check for completed campfire buildings
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building?.buildingType === 'campfire') {
+        return true;
+      }
+
+      // Check for agents currently building campfires (prevents duplicate simultaneous builds)
+      const agentComp = entity.components.get('agent') as AgentComponent | undefined;
+      if (agentComp?.behavior === 'build' && (agentComp.behaviorState as any)?.buildingType === 'campfire') {
         return true;
       }
     }

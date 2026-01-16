@@ -95,6 +95,20 @@ export interface ChunkCacheStats {
     plants: number;
     animals: number;
   };
+
+  /**
+   * Building type counts for O(1) lookups (e.g., campfire detection)
+   * Map<buildingType, count>
+   * Example: { 'campfire': 1, 'workbench': 2 }
+   */
+  buildingTypes: Map<string, number>;
+
+  /**
+   * Pending builds - agents currently building specific types
+   * Map<buildingType, count>
+   * Example: { 'campfire': 1 } = one agent is building a campfire
+   */
+  pendingBuilds: Map<string, number>;
 }
 
 /**
@@ -118,6 +132,8 @@ export function createChunkCache(chunkX: number, chunkY: number): ChunkCache {
         plants: 0,
         animals: 0,
       },
+      buildingTypes: new Map(),
+      pendingBuilds: new Map(),
     },
     terrainFeatures: null, // Lazy initialization - analyzed on first access
     terrainAnalyzedAt: 0,
@@ -221,6 +237,8 @@ export function clearChunkCache(cache: ChunkCache): void {
       plants: 0,
       animals: 0,
     },
+    buildingTypes: new Map(),
+    pendingBuilds: new Map(),
   };
   cache.dirty = false;
 }
@@ -229,12 +247,10 @@ export function clearChunkCache(cache: ChunkCache): void {
  * Recalculate chunk statistics
  * Call this after adding/removing entities or when dirty flag is set
  *
- * NOTE: This is a placeholder - actual implementation will query entities
- * to determine simulation modes and types. For now, we just count total.
- *
  * @param cache - Chunk cache
+ * @param world - World instance (needed to query entity components for building types)
  */
-export function recalculateChunkStats(cache: ChunkCache): void {
+export function recalculateChunkStats(cache: ChunkCache, world?: any): void {
   let totalEntities = 0;
   const entityTypes = {
     agents: 0,
@@ -243,14 +259,46 @@ export function recalculateChunkStats(cache: ChunkCache): void {
     animals: 0,
   };
 
+  // Clear previous Maps
+  const buildingTypes = new Map<string, number>();
+  const pendingBuilds = new Map<string, number>();
+
   for (const [componentType, entities] of cache.entityIndex) {
     totalEntities += entities.size;
 
     // Count by entity type (based on component)
     if (componentType === 'agent') {
       entityTypes.agents += entities.size;
+
+      // If world provided, check for agents building specific types
+      if (world) {
+        for (const entityId of entities) {
+          const entity = world.getEntity(entityId);
+          if (!entity) continue;
+
+          const agentComp = entity.components.get('agent') as any;
+          if (agentComp?.behavior === 'build' && agentComp.behaviorState?.buildingType) {
+            const buildingType = agentComp.behaviorState.buildingType;
+            pendingBuilds.set(buildingType, (pendingBuilds.get(buildingType) || 0) + 1);
+          }
+        }
+      }
     } else if (componentType === 'building') {
       entityTypes.buildings += entities.size;
+
+      // If world provided, count by building type for O(1) lookups
+      if (world) {
+        for (const entityId of entities) {
+          const entity = world.getEntity(entityId);
+          if (!entity) continue;
+
+          const buildingComp = entity.components.get('building') as any;
+          if (buildingComp?.buildingType) {
+            const buildingType = buildingComp.buildingType;
+            buildingTypes.set(buildingType, (buildingTypes.get(buildingType) || 0) + 1);
+          }
+        }
+      }
     } else if (componentType === 'plant') {
       entityTypes.plants += entities.size;
     } else if (componentType === 'animal') {
@@ -268,6 +316,8 @@ export function recalculateChunkStats(cache: ChunkCache): void {
       passive: 0, // PASSIVE entities are not indexed
     },
     entityTypes,
+    buildingTypes,
+    pendingBuilds,
   };
 
   cache.dirty = false;

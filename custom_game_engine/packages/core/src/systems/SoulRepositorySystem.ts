@@ -21,6 +21,11 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
+import type { GameEvent } from '../events/GameEvent.js';
+import type { GameEventMap } from '../events/EventMap.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { IncarnationComponent } from '../components/IncarnationComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -141,25 +146,32 @@ export class SoulRepositorySystem implements System {
 
   onInit(world: World): void {
     // Subscribe to soul creation events
-    world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
+    world.eventBus.subscribe('soul:ceremony_complete', (event: GameEvent<'soul:ceremony_complete'>) => {
       this.backupSoul(world, event.data);
     });
 
   }
 
-  private async backupSoul(world: World, soulData: any): Promise<void> {
+  private async backupSoul(world: World, soulData: GameEventMap['soul:ceremony_complete']): Promise<void> {
     try {
       const { soulId, agentId, name, archetype, purpose, species, interests, thoughts } = soulData;
 
+      // Determine entity ID (soulId is primary, agentId is fallback for backward compatibility)
+      const entityId = soulId || agentId;
+      if (!entityId) {
+        console.warn('[SoulRepository] Soul data missing both soulId and agentId');
+        return;
+      }
+
       // Get soul entity (not agent - this is the soul itself)
-      const soul = world.getEntity(soulId || agentId);
+      const soul = world.getEntity(entityId);
       if (!soul) {
-        console.warn(`[SoulRepository] Soul ${soulId || agentId} not found for backup`);
+        console.warn(`[SoulRepository] Soul ${entityId} not found for backup`);
         return;
       }
 
       // Extract additional information
-      const soulIdentity = soul.components.get('soul_identity') as any;
+      const soulIdentity = soul.getComponent<SoulIdentityComponent>('soul_identity');
 
       // Check if this soul is already in the repository (avoid duplicates)
       if (this.soulNameExists(name)) {
@@ -169,8 +181,8 @@ export class SoulRepositorySystem implements System {
       // Build soul record
       const soulRecord: SoulRecord = {
         // Identity
-        soulId: soulId || agentId,
-        agentId: agentId || soulId, // Might be same as soulId if not incarnated yet
+        soulId: entityId,
+        agentId: agentId || entityId, // Might be same as soulId if not incarnated yet
         name,
 
         // Attributes
@@ -185,8 +197,9 @@ export class SoulRepositorySystem implements System {
         // Creation Context
         createdAt: new Date().toISOString(),
         soulBirthTick: soulIdentity?.soulBirthTick ?? world.tick,
-        universeId: (world as any).universeId || 'unknown',
-        universeName: (world as any).name || undefined,
+        // Note: universeId/name are set by multiverse package but not in World interface
+        universeId: 'universeId' in world ? (world as { universeId: string }).universeId : 'unknown',
+        universeName: 'name' in world ? (world as { name: string }).name : undefined,
 
         // Sprite Info (may not have sprite yet if not incarnated)
         spriteFolder: undefined,
@@ -196,15 +209,17 @@ export class SoulRepositorySystem implements System {
       };
 
       // Add lineage if available
-      const incarnation = soul.components.get('incarnation') as any;
-      if (incarnation?.parentIds && incarnation.parentIds.length > 0) {
-        soulRecord.parentIds = incarnation.parentIds;
+      const incarnation = soul.getComponent<IncarnationComponent>('incarnation');
+      // Note: parentIds not in IncarnationComponent interface - checking for compatibility with old save data
+      const incarnationData = incarnation as IncarnationComponent & { parentIds?: string[] };
+      if (incarnationData?.parentIds && incarnationData.parentIds.length > 0) {
+        soulRecord.parentIds = incarnationData.parentIds;
         // Try to get parent names
         const parentNames: string[] = [];
-        for (const parentId of incarnation.parentIds) {
+        for (const parentId of incarnationData.parentIds) {
           const parent = world.getEntity(parentId);
           if (parent) {
-            const parentIdentity = parent.components.get('identity') as any;
+            const parentIdentity = parent.getComponent<IdentityComponent>('identity');
             if (parentIdentity?.name) {
               parentNames.push(parentIdentity.name);
             }

@@ -8,6 +8,9 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
+import type { AppearanceComponent } from '../components/AppearanceComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { GameEvent } from '../events/EventBus.js';
 import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
 interface PendingSpriteJob {
@@ -40,12 +43,15 @@ export class PixelLabSpriteGenerationSystem implements System {
 
   onInit(world: World): void {
     // Subscribe to agent birth events
-    world.eventBus.subscribe('agent:birth', (event: any) => {
+    world.eventBus.subscribe<'agent:birth'>('agent:birth', (event: GameEvent<'agent:birth'>) => {
       this.enqueueSpriteGeneration(world, event.data);
     });
   }
 
-  private async enqueueSpriteGeneration(world: World, birthData: any): Promise<void> {
+  private async enqueueSpriteGeneration(
+    world: World,
+    birthData: { agentId: string; name: string; useLLM: boolean; generation: number; parents: [string, string] | null; initialStats: { health: number; hunger: number; energy: number } }
+  ): Promise<void> {
     const { agentId, name } = birthData;
 
     // Get the agent entity to extract species and soul attributes
@@ -56,14 +62,14 @@ export class PixelLabSpriteGenerationSystem implements System {
     }
 
     // Extract species from appearance component
-    const appearance = agent.components.get('appearance');
-    const species = (appearance as any)?.species || 'human';
+    const appearance = agent.getComponent<AppearanceComponent>('appearance');
+    const species = appearance?.species || 'human';
 
     // Extract soul attributes (archetype, purpose, interests)
-    const soulIdentity = agent.components.get('soul_identity');
-    const archetype = (soulIdentity as any)?.archetype || 'wanderer';
-    const purpose = (soulIdentity as any)?.purpose || 'To find their place in the world';
-    const interests = (soulIdentity as any)?.coreInterests || [];
+    const soulIdentity = agent.getComponent<SoulIdentityComponent>('soul_identity');
+    const archetype = soulIdentity?.archetype || 'wanderer';
+    const purpose = soulIdentity?.purpose || 'To find their place in the world';
+    const interests = soulIdentity?.coreInterests || [];
 
 
     try {
@@ -398,9 +404,9 @@ export class PixelLabSpriteGenerationSystem implements System {
         // Update the agent's appearance component with the new sprite folder
         const agent = world.getEntity(job.agentId);
         if (agent) {
-          const appearance = agent.components.get('appearance') as any;
+          const appearance = agent.getComponent<AppearanceComponent>('appearance');
           if (appearance) {
-            appearance.spriteFolder = job.characterId;
+            appearance.spriteFolderId = job.characterId;
           }
         }
 
@@ -408,7 +414,7 @@ export class PixelLabSpriteGenerationSystem implements System {
         this.pendingJobs.delete(job.agentId);
 
         // Emit event for UI updates
-        (world.eventBus as any).emit({
+        world.eventBus.emit<'pixellab:sprite_complete'>({
           type: 'pixellab:sprite_complete',
           source: job.agentId,
           data: {

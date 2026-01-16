@@ -20,6 +20,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { recordPrayer } from '../../components/SpiritualComponent.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Group prayer configuration
@@ -414,9 +416,265 @@ export class GroupPrayBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use groupPrayBehaviorWithContext for new code
  */
 export function groupPrayBehavior(entity: EntityImpl, world: World): void {
   const behavior = new GroupPrayBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern group_pray behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('group_pray', groupPrayBehaviorWithContext);
+ */
+export function groupPrayBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const phase = (ctx.getState<string>('phase')) ?? 'gathering';
+
+  const spiritual = ctx.getComponent<SpiritualComponent>(CT.Spiritual);
+
+  if (!spiritual) {
+    throw new Error(`[GroupPrayBehavior] Agent ${ctx.entity.id} missing spiritual component`);
+  }
+
+  switch (phase) {
+    case 'gathering':
+      return handleGatheringPhaseWithContext(ctx);
+    case 'praying':
+      return handlePrayingPhaseWithContext(ctx, spiritual);
+    case 'complete':
+      return ctx.complete('group_prayer_complete');
+  }
+}
+
+function handleGatheringPhaseWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  // Initialize gathering
+  if (!ctx.getState('gatherStarted')) {
+    const call = GATHERING_CALLS[Math.floor(Math.random() * GATHERING_CALLS.length)]!;
+
+    ctx.setThought(call);
+
+    // Emit call to prayer event
+    ctx.emit({
+      type: 'group_prayer:call',
+      data: {
+        leaderId: ctx.entity.id,
+        location: { x: ctx.position.x, y: ctx.position.y },
+        message: call,
+        tick: ctx.tick,
+      },
+    });
+
+    ctx.updateState({
+      gatherStarted: ctx.tick,
+      isLeader: true,
+      participants: [ctx.entity.id],
+    });
+    return;
+  }
+
+  // Check for timeout
+  const gatherStarted = ctx.getState<number>('gatherStarted')!;
+  const elapsed = ctx.tick - gatherStarted;
+
+  if (elapsed > GROUP_PRAYER_CONFIG.GATHER_TIMEOUT) {
+    // Find nearby agents who might join
+    const participants = gatherParticipantsWithContext(ctx);
+
+    if (participants.length < GROUP_PRAYER_CONFIG.MIN_PARTICIPANTS) {
+      // Not enough participants, pray alone instead
+      return ctx.switchTo('pray', {});
+    }
+
+    // Transition to praying phase
+    ctx.updateState({
+      phase: 'praying',
+      participants: participants.map(p => p.id),
+      prayerStarted: ctx.tick,
+    });
+
+    // Notify participants
+    for (const participant of participants) {
+      if (participant.id !== ctx.entity.id) {
+        ctx.emit({
+          type: 'group_prayer:joined',
+          data: {
+            participantId: participant.id,
+            leaderId: ctx.entity.id,
+            tick: ctx.tick,
+          },
+        });
+      }
+    }
+
+    return;
+  }
+
+  // Still waiting
+  if (elapsed % 100 === 0) {
+    ctx.setThought('Waiting for others to gather...');
+  }
+}
+
+function handlePrayingPhaseWithContext(
+  ctx: BehaviorContext,
+  spiritual: SpiritualComponent
+): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  const participants = ctx.getState<string[]>('participants') || [];
+  const prayerStarted = ctx.getState<number>('prayerStarted')!;
+  const duration = GROUP_PRAYER_CONFIG.BASE_DURATION +
+    (participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_BONUS);
+
+  const elapsed = ctx.tick - prayerStarted;
+
+  // Periodic group prayer utterances (only leader speaks)
+  if (ctx.getState('isLeader')) {
+    const lastUtterance = ctx.getState<number>('lastUtterance') ?? 0;
+    if (ctx.tick - lastUtterance > 100) {
+      const prayer = GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+      ctx.setThought(prayer);
+      ctx.updateState({ lastUtterance: ctx.tick });
+
+      // Emit spoken prayer
+      ctx.emit({
+        type: 'agent:speak',
+        data: {
+          agentId: ctx.entity.id,
+          text: prayer,
+          category: 'prayer' as const,
+          tick: ctx.tick,
+        },
+      });
+    }
+  }
+
+  // Complete prayer
+  if (elapsed >= duration) {
+    return completeGroupPrayerWithContext(ctx, spiritual, participants);
+  }
+
+  // Continue praying
+}
+
+function completeGroupPrayerWithContext(
+  ctx: BehaviorContext,
+  spiritual: SpiritualComponent,
+  participants: string[]
+): BehaviorResult {
+  // Calculate amplification
+  const amplification = GROUP_PRAYER_CONFIG.BASE_AMPLIFICATION +
+    (participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_AMPLIFICATION);
+
+  // Create group prayer record
+  const prayer: Prayer = {
+    id: `group_prayer_${groupPrayerIdCounter++}`,
+    type: 'praise' as PrayerType,
+    urgency: 'routine',
+    content: 'United prayer of the community.',
+    timestamp: ctx.tick,
+    answered: false,
+  };
+
+  // Record prayer for leader
+  const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
+  (ctx.entity as any).addComponent(updatedSpiritual);
+
+  // Calculate vision chance
+  const visionChance = GROUP_PRAYER_CONFIG.BASE_VISION_CHANCE +
+    (participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_VISION_BONUS);
+
+  const receivedGroupVision = Math.random() < visionChance;
+
+  // Emit group prayer complete event
+  ctx.emit({
+    type: 'group_prayer:complete',
+    data: {
+      leaderId: ctx.entity.id,
+      participants,
+      tick: ctx.tick,
+      duration: participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_BONUS + GROUP_PRAYER_CONFIG.BASE_DURATION,
+      deityId: spiritual.believedDeity,
+      answered: false,
+      prayerPower: amplification,
+    },
+  });
+
+  // If vision received, emit vision event
+  if (receivedGroupVision && ctx.getState('isLeader')) {
+    ctx.emit({
+      type: 'group_vision:received',
+      data: {
+        participants,
+        deityId: spiritual.believedDeity,
+        clarity: Math.min(1.0, 0.6 + (participants.length * 0.05)),
+        prayerPower: amplification,
+      },
+    });
+
+    ctx.setThought('A vision came to all of us!');
+  } else {
+    ctx.setThought('The prayer is complete. We are blessed.');
+  }
+
+  // Improve relationships between participants
+  for (const participantId of participants) {
+    for (const otherId of participants) {
+      if (otherId === participantId) continue;
+
+      ctx.emit({
+        type: 'relationship:improved',
+        data: {
+          agent1: participantId,
+          agent2: otherId,
+          reason: 'shared_prayer',
+          delta: 0.05,
+        },
+      });
+    }
+  }
+
+  return ctx.complete('group_prayer_complete');
+}
+
+function gatherParticipantsWithContext(ctx: BehaviorContext): EntityImpl[] {
+  const participants: EntityImpl[] = [ctx.entity];
+
+  // Query nearby agents with spiritual components
+  const nearbyAgents = ctx.getEntitiesInRadius(
+    GROUP_PRAYER_CONFIG.GATHER_RADIUS,
+    [CT.Agent, CT.Spiritual],
+    { limit: GROUP_PRAYER_CONFIG.MAX_PARTICIPANTS }
+  );
+
+  for (const { entity: agent } of nearbyAgents) {
+    if (agent.id === ctx.entity.id) continue;
+    if (participants.length >= GROUP_PRAYER_CONFIG.MAX_PARTICIPANTS) break;
+
+    const agentImpl = agent as EntityImpl;
+    const spiritual = agentImpl.getComponent<SpiritualComponent>(CT.Spiritual);
+    const agentComp = agentImpl.getComponent<AgentComponent>(CT.Agent);
+
+    if (!spiritual || !agentComp) continue;
+
+    // Check if agent is busy with critical behavior
+    const busyBehaviors = ['flee', 'seek_food', 'seek_sleep', 'forced_sleep'];
+    if (busyBehaviors.includes(agentComp.behavior)) continue;
+
+    // Check willingness based on faith
+    if (spiritual.faith < 0.2) continue; // Low faith agents won't join
+    if (spiritual.crisisOfFaith) continue; // Crisis agents won't join groups
+
+    // Add to participants
+    participants.push(agentImpl);
+  }
+
+  return participants;
 }

@@ -722,6 +722,7 @@ export class HarvestBehavior extends BaseBehavior {
 
 /**
  * Standalone functions for use with BehaviorRegistry.
+ * @deprecated Use *WithContext versions for better performance
  */
 export function farmBehavior(entity: EntityImpl, world: World): void {
   const behavior = new FarmBehavior();
@@ -746,4 +747,183 @@ export function waterBehavior(entity: EntityImpl, world: World): void {
 export function harvestBehavior(entity: EntityImpl, world: World): void {
   const behavior = new HarvestBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern versions using BehaviorContext
+ * @example registerBehaviorWithContext('till', tillBehaviorWithContext);
+ */
+
+export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  ctx.stopMovement();
+
+  const hasSeeds = inventory?.slots?.some((slot: any) =>
+    slot.itemId && (slot.itemId.includes('seed') || slot.itemId === 'wheat_seed' || slot.itemId === 'carrot_seed')
+  );
+
+  if (!hasSeeds) {
+    return ctx.complete('No seeds to plant');
+  }
+
+  // Delegate to class for tile finding logic
+  const behavior = new TillBehavior();
+  const world = { tick: ctx.tick, getTileAt: (ctx as any).world?.getTileAt, eventBus: { emit: (e: any) => ctx.emit(e) } } as any;
+  return behavior.execute(ctx.entity, world);
+}
+
+export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  ctx.stopMovement();
+
+  // Delegate to class implementation which uses spatial queries
+  const behavior = new PlantBehavior();
+  const world = {
+    tick: ctx.tick,
+    getTileAt: (ctx as any).world?.getTileAt,
+    getEntity: (id: string) => ctx.getEntity(id),
+    eventBus: { emit: (e: any) => ctx.emit(e) },
+  } as any;
+
+  return behavior.execute(ctx.entity, world);
+}
+
+export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  ctx.stopMovement();
+
+  // Find nearest dry plant using context
+  const WATER_SEARCH_RADIUS = 15;
+  const HYDRATION_THRESHOLD = 50;
+  const nearbyPlants = ctx.getEntitiesInRadius(WATER_SEARCH_RADIUS, [ComponentType.Plant]);
+
+  let nearestDryPlant: { plantId: string; x: number; y: number; hydration: number; distance: number } | null = null;
+
+  for (const { entity: plantEntity, distance } of nearbyPlants) {
+    const plantImpl = plantEntity as EntityImpl;
+    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+    if (!plant || !plantPos) continue;
+    if (plant.stage === 'dead' || plant.stage === 'decay') continue;
+
+    const hydration = plant._hydration ?? plant.hydration ?? 50;
+    if (hydration >= HYDRATION_THRESHOLD) continue;
+
+    const priority = distance + (hydration / 10);
+    const currentPriority = nearestDryPlant
+      ? nearestDryPlant.distance + (nearestDryPlant.hydration / 10)
+      : Infinity;
+
+    if (priority < currentPriority) {
+      nearestDryPlant = {
+        plantId: plantEntity.id,
+        x: plantPos.x,
+        y: plantPos.y,
+        hydration,
+        distance,
+      };
+    }
+  }
+
+  if (!nearestDryPlant) {
+    return ctx.complete('No plants need watering');
+  }
+
+  const dx = nearestDryPlant.x - ctx.position.x;
+  const dy = nearestDryPlant.y - ctx.position.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const MAX_WATER_DISTANCE = Math.sqrt(2);
+
+  if (distance > MAX_WATER_DISTANCE) {
+    ctx.setVelocity((dx / distance) * 1.0, (dy / distance) * 1.0);
+    return;
+  }
+
+  ctx.emit({
+    type: 'action:water',
+    data: {
+      agentId: ctx.entity.id,
+      plantId: nearestDryPlant.plantId,
+      position: { x: nearestDryPlant.x, y: nearestDryPlant.y },
+    },
+  });
+
+  const plantEntity = ctx.getEntity(nearestDryPlant.plantId);
+  if (plantEntity) {
+    const plantImpl = plantEntity as EntityImpl;
+    plantImpl.updateComponent<any>(ComponentType.Plant, (plant) => ({
+      ...plant,
+      _hydration: Math.min(100, (plant._hydration ?? plant.hydration ?? 50) + 20),
+    }));
+  }
+
+  return ctx.switchTo('farm', { lastAction: 'water' });
+}
+
+export function harvestBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  ctx.stopMovement();
+
+  if (inventory) {
+    const usedSlots = inventory.slots.filter(s => s.itemId && s.quantity > 0).length;
+    if (usedSlots >= inventory.slots.length) {
+      return ctx.switchTo('deposit_items', {});
+    }
+  }
+
+  // Find nearest harvestable plant using context
+  const HARVEST_SEARCH_RADIUS = 15;
+  const HARVESTABLE_STAGES = ['mature', 'seeding', 'fruiting'];
+  const nearbyPlants = ctx.getEntitiesInRadius(HARVEST_SEARCH_RADIUS, [ComponentType.Plant]);
+
+  let nearestHarvestable: { plantId: string; x: number; y: number; speciesId: string; distance: number } | null = null;
+
+  for (const { entity: plantEntity, distance } of nearbyPlants) {
+    const plantImpl = plantEntity as EntityImpl;
+    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+    if (!plant || !plantPos) continue;
+    if (!HARVESTABLE_STAGES.includes(plant.stage)) continue;
+    if (plant.fruitCount <= 0 && plant.seedsProduced <= 0) continue;
+
+    if (!nearestHarvestable || distance < nearestHarvestable.distance) {
+      nearestHarvestable = {
+        plantId: plantEntity.id,
+        x: plantPos.x,
+        y: plantPos.y,
+        speciesId: plant.speciesId,
+        distance,
+      };
+    }
+  }
+
+  if (!nearestHarvestable) {
+    return ctx.complete('No harvestable plants');
+  }
+
+  const dx = nearestHarvestable.x - ctx.position.x;
+  const dy = nearestHarvestable.y - ctx.position.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const MAX_HARVEST_DISTANCE = Math.sqrt(2);
+
+  if (distance > MAX_HARVEST_DISTANCE) {
+    ctx.setVelocity((dx / distance) * 1.0, (dy / distance) * 1.0);
+    return;
+  }
+
+  ctx.emit({
+    type: 'action:harvest',
+    data: {
+      agentId: ctx.entity.id,
+      plantId: nearestHarvestable.plantId,
+      speciesId: nearestHarvestable.speciesId,
+      position: { x: nearestHarvestable.x, y: nearestHarvestable.y },
+    },
+  });
+
+  return ctx.switchTo('farm', { lastAction: 'harvest' });
 }

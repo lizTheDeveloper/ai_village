@@ -17,9 +17,11 @@ import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getCircadian, getBuilding, getPosition, getNeeds, getAgent } from '../../utils/componentHelpers.js';
 import { safeUpdateComponent } from '../../utils/componentUtils.js';
-import { ComponentType } from '../../types/ComponentType.js';
+import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 import { assignBed } from '../../components/AgentComponent.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import type { NeedsComponent } from '../../components/NeedsComponent.js';
 
 // Chunk spatial query injection for efficient nearby entity lookups
 let chunkSpatialQuery: any | null = null;
@@ -389,7 +391,8 @@ export class ForcedSleepBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone functions for BehaviorRegistry.
+ * Standalone functions for BehaviorRegistry (legacy).
+ * @deprecated Use seekSleepBehaviorWithContext and forcedSleepBehaviorWithContext for new code
  */
 export function seekSleepBehavior(entity: EntityImpl, world: World): void {
   const behavior = new SeekSleepBehavior();
@@ -399,4 +402,268 @@ export function seekSleepBehavior(entity: EntityImpl, world: World): void {
 export function forcedSleepBehavior(entity: EntityImpl, world: World): void {
   const behavior = new ForcedSleepBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+const BED_SEARCH_RADIUS = 50;
+
+/**
+ * Modern seek sleep behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('seek_sleep', seekSleepBehaviorWithContext);
+ */
+export function seekSleepBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const circadian = ctx.getComponent<CircadianComponent>(CT.Circadian);
+
+  if (!circadian) {
+    ctx.stopMovement();
+    return ctx.complete('No circadian component');
+  }
+
+  // Already sleeping - SleepSystem handles wake conditions
+  if (circadian.isSleeping) {
+    ctx.stopMovement();
+    return ctx.complete('sleep_complete');
+  }
+
+  // First, check for assigned bed
+  let sleepLocation: Entity | null = null;
+
+  if (ctx.agent.assignedBed) {
+    const assignedBedEntity = ctx.getEntity(ctx.agent.assignedBed);
+    if (assignedBedEntity) {
+      const bedBuilding = getBuilding(assignedBedEntity);
+      if (bedBuilding?.isComplete) {
+        sleepLocation = assignedBedEntity;
+      } else {
+        // Bed was destroyed or incomplete - clear assignment
+        clearBedAssignment(ctx);
+      }
+    } else {
+      // Bed entity no longer exists - clear assignment
+      clearBedAssignment(ctx);
+    }
+  }
+
+  // If no assigned bed, find nearest available bed
+  if (!sleepLocation) {
+    sleepLocation = findNearestBedWithContext(ctx);
+  }
+
+  if (sleepLocation) {
+    const bedPos = (sleepLocation as EntityImpl).getComponent<PositionComponent>(CT.Position)!;
+
+    // Move toward bed
+    const distance = ctx.moveToward(bedPos, { arrivalDistance: 1.5 });
+
+    if (distance <= 1.5) {
+      // Close enough - start sleeping and claim bed if unclaimed
+      ctx.stopMovement();
+      startSleepingWithContext(ctx, sleepLocation);
+      return ctx.complete('Started sleeping in bed');
+    }
+  } else {
+    // No bed found - sleep on ground
+    startSleepingWithContext(ctx, null);
+    return ctx.complete('Started sleeping on ground');
+  }
+}
+
+/**
+ * Modern forced sleep behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('forced_sleep', forcedSleepBehaviorWithContext);
+ */
+export function forcedSleepBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const circadian = ctx.getComponent<CircadianComponent>(CT.Circadian);
+
+  if (!circadian) {
+    ctx.stopMovement();
+    return ctx.complete('No circadian component');
+  }
+
+  // If not already sleeping, collapse
+  if (!circadian.isSleeping) {
+    const quality = 0.5; // Poor quality when collapsed
+
+    ctx.updateComponent<CircadianComponent>(CT.Circadian, (current) => ({
+      ...current,
+      isSleeping: true,
+      sleepStartTime: ctx.tick,
+      sleepLocationId: null,
+      sleepQuality: quality,
+      sleepDurationHours: 0,
+    }));
+
+    ctx.emit({
+      type: 'agent:collapsed',
+      data: {
+        agentId: ctx.entity.id,
+        reason: 'exhaustion',
+        entityId: ctx.entity.id,
+      },
+    });
+
+    ctx.emit({
+      type: 'agent:sleep_start',
+      data: {
+        agentId: ctx.entity.id,
+        timestamp: ctx.tick,
+      },
+    });
+  }
+
+  // Stop moving
+  ctx.stopMovement();
+
+  // Check wake conditions
+  if (ctx.needs && circadian.isSleeping) {
+    const hoursAsleep = circadian.sleepDurationHours;
+
+    const energyFull = ctx.needs.energy >= 1.0;
+    const urgentNeed = ctx.needs.hunger < 0.1;
+    const maxSleepReached = hoursAsleep >= 12;
+
+    if (energyFull || urgentNeed || maxSleepReached) {
+      return ctx.complete('Wake conditions met');
+    }
+  }
+
+  // Continue sleeping
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function clearBedAssignment(ctx: BehaviorContext): void {
+  ctx.updateComponent<AgentComponent>(CT.Agent, (current) => {
+    const locations = current.assignedLocations ? { ...current.assignedLocations } : {};
+    delete locations['bed'];
+    return {
+      ...current,
+      assignedBed: undefined,
+      assignedLocations: Object.keys(locations).length > 0 ? locations : undefined,
+    };
+  });
+}
+
+function findNearestBedWithContext(ctx: BehaviorContext): Entity | null {
+  let nearestUnclaimed: Entity | null = null;
+  let nearestUnclaimedDist = Infinity;
+  let nearestOwned: Entity | null = null;
+  let nearestOwnedDist = Infinity;
+
+  const buildingsInRadius = ctx.getEntitiesInRadius(BED_SEARCH_RADIUS, [CT.Building]);
+
+  for (const { entity: bed, distance } of buildingsInRadius) {
+    const building = getBuilding(bed);
+
+    if (!building || !building.isComplete) continue;
+
+    if (building.buildingType === BuildingType.Bed || building.buildingType === BuildingType.Bedroll) {
+      if (building.ownerId === ctx.entity.id) {
+        // This agent owns this bed
+        if (distance < nearestOwnedDist) {
+          nearestOwnedDist = distance;
+          nearestOwned = bed;
+        }
+      } else if (!building.ownerId || building.accessType === 'communal') {
+        // Unclaimed or communal bed
+        if (distance < nearestUnclaimedDist) {
+          nearestUnclaimedDist = distance;
+          nearestUnclaimed = bed;
+        }
+      }
+    }
+  }
+
+  return nearestOwned ?? nearestUnclaimed;
+}
+
+function startSleepingWithContext(ctx: BehaviorContext, location: Entity | null): void {
+  const quality = calculateSleepQuality(location);
+
+  // Claim bed if it's unclaimed and agent doesn't already have an assigned bed
+  if (location && ctx.agent) {
+    const bedBuilding = getBuilding(location);
+    const bedPos = getPosition(location);
+
+    if (bedBuilding && bedPos && !bedBuilding.ownerId && !ctx.agent.assignedBed) {
+      // Claim the bed - set ownership on building
+      (location as EntityImpl).updateComponent<BuildingComponent>(CT.Building, (current) => ({
+        ...current,
+        ownerId: ctx.entity.id,
+        accessType: 'personal',
+      }));
+
+      // Assign bed to agent
+      const updatedAgent = assignBed(ctx.agent, location.id, bedPos.x, bedPos.y, ctx.tick);
+      ctx.updateComponent<AgentComponent>(CT.Agent, () => ({
+        ...ctx.agent,
+        assignedBed: updatedAgent.assignedBed,
+        assignedLocations: updatedAgent.assignedLocations,
+      }));
+
+      // Emit bed claimed event
+      ctx.emit({
+        type: 'building:claimed',
+        data: {
+          agentId: ctx.entity.id,
+          buildingId: location.id,
+          buildingType: bedBuilding.buildingType,
+          timestamp: ctx.tick,
+        },
+      });
+    }
+  }
+
+  // Update circadian component
+  ctx.updateComponent<CircadianComponent>(CT.Circadian, (current) => ({
+    ...current,
+    isSleeping: true,
+    sleepStartTime: ctx.tick,
+    sleepLocationId: location ? location.id : null,
+    sleepQuality: quality,
+    sleepDurationHours: 0,
+  }));
+
+  // Emit events
+  ctx.emit({
+    type: 'agent:sleeping',
+    data: {
+      agentId: ctx.entity.id,
+      entityId: ctx.entity.id,
+      location: { x: ctx.position.x, y: ctx.position.y },
+      timestamp: ctx.tick,
+    },
+  });
+
+  ctx.emit({
+    type: 'agent:sleep_start',
+    data: {
+      agentId: ctx.entity.id,
+      timestamp: ctx.tick,
+    },
+  });
+}
+
+function calculateSleepQuality(location: Entity | null): number {
+  let quality = 0.5; // Base quality (ground)
+
+  if (location) {
+    const building = getBuilding(location);
+    if (building) {
+      if (building.buildingType === BuildingType.Bed) {
+        quality += 0.4; // Bed: 0.9 total
+      } else if (building.buildingType === BuildingType.Bedroll) {
+        quality += 0.2; // Bedroll: 0.7 total
+      } else {
+        quality += 0.1; // Other building: 0.6 total
+      }
+    }
+  }
+
+  return Math.max(0.1, Math.min(1.0, quality));
 }

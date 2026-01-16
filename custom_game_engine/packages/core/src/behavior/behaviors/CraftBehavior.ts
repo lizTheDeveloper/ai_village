@@ -352,8 +352,39 @@ export class CraftBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use craftBehaviorWithContext for better performance
  */
 export function craftBehavior(entity: EntityImpl, world: World): void {
   const behavior = new CraftBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('craft', craftBehaviorWithContext);
+ */
+export function craftBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  if (!ctx.position || !ctx.agent) {
+    return ctx.complete('Missing required components');
+  }
+
+  const recipeId = ctx.getState<string>('recipeId');
+  if (!recipeId) {
+    return ctx.complete('No recipe specified in behaviorState.recipeId');
+  }
+
+  const phase = ctx.getState<string>('phase') || 'find_station';
+
+  // For finding stations and crafting, delegate to class implementation
+  const behavior = new CraftBehavior();
+  const world = {
+    tick: ctx.tick,
+    getEntity: (id: string) => ctx.getEntity(id),
+    eventBus: { emit: (e: any) => ctx.emit(e) },
+    craftingSystem: (ctx as any).world?.craftingSystem,
+  } as any;
+
+  return behavior.execute(ctx.entity, world);
 }

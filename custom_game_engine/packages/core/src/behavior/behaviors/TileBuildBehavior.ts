@@ -280,8 +280,154 @@ export class TileBuildBehavior extends BaseBehavior {
 
 /**
  * Factory function for behavior registry.
+ * @deprecated Use tileBuildBehaviorWithContext instead for better performance
  */
 export function tileBuildBehavior(entity: EntityImpl, world: World): void {
   const behavior = new TileBuildBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('tile_build', tileBuildBehaviorWithContext);
+ */
+export function tileBuildBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const state = ctx.getAllState() as any;
+
+  if (!state.taskId || state.tileIndex === undefined) {
+    return ctx.complete('No build state set');
+  }
+
+  // Get the construction system
+  const constructionSystem = getTileConstructionSystem();
+  const task = constructionSystem.getTask(state.taskId);
+
+  if (!task || task.state !== 'in_progress') {
+    return ctx.complete('Task not found or not in progress');
+  }
+
+  const buildState = state.buildState ?? 'moving_to_tile';
+
+  // Execute state machine
+  switch (buildState) {
+    case 'moving_to_tile':
+      return handleBuildMovingToTile(ctx, state, task);
+
+    case 'building':
+      return handleBuildBuilding(ctx, state, task);
+
+    case 'complete':
+      return checkForMoreBuildWork(ctx, task);
+  }
+}
+
+function handleBuildMovingToTile(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex];
+  if (!tile) {
+    return ctx.complete('Tile not found');
+  }
+
+  // Check if tile still needs building
+  if (tile.status !== 'in_progress' || tile.progress >= 100) {
+    ctx.updateState({ buildState: 'complete' });
+    return;
+  }
+
+  const tilePosition = { x: tile.x, y: tile.y };
+
+  if (ctx.isWithinRange(tilePosition, 1.5)) {
+    // Arrived at tile
+    ctx.stopMovement();
+
+    // Register as builder
+    const constructionSystem = getTileConstructionSystem();
+    constructionSystem.registerBuilder(state.taskId, ctx.entity.id);
+
+    ctx.updateState({
+      buildState: 'building',
+      workProgress: 0,
+    });
+    return;
+  }
+
+  ctx.moveToward(tilePosition, { arrivalDistance: 1.5 });
+}
+
+function handleBuildBuilding(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex];
+  if (!tile) {
+    return ctx.complete('Tile not found');
+  }
+
+  // Check if tile is done (another builder might have finished it)
+  if (tile.status === 'placed' || tile.progress >= 100) {
+    ctx.updateState({ buildState: 'complete' });
+    return;
+  }
+
+  // Calculate build speed based on skill
+  const skills = ctx.getComponent<SkillsComponent>(CT.Skills);
+  const buildingLevel = skills?.levels?.building ?? 0;
+  const speedMultiplier = 1 + (buildingLevel * SKILL_SPEED_MULTIPLIER);
+  const buildSpeed = BASE_BUILD_SPEED * speedMultiplier;
+
+  // Advance construction
+  const world = (ctx as any).world;
+  const constructionSystem = getTileConstructionSystem();
+  const completed = constructionSystem.advanceProgress(
+    world,
+    state.taskId,
+    state.tileIndex,
+    ctx.entity.id,
+    buildSpeed
+  );
+
+  if (completed) {
+    // Tile is done
+    ctx.updateState({ buildState: 'complete' });
+    return;
+  }
+
+  // Track progress
+  const newProgress = (state.workProgress ?? 0) + buildSpeed;
+  ctx.updateState({ workProgress: newProgress });
+}
+
+function checkForMoreBuildWork(ctx: BehaviorContext, task: ConstructionTask): ContextBehaviorResult | void {
+  const constructionSystem = getTileConstructionSystem();
+
+  // First check if there are tiles that need building
+  const nextBuildTile = constructionSystem.getNextTileForConstruction(task.id);
+  if (nextBuildTile) {
+    ctx.updateState({
+      buildState: 'moving_to_tile',
+      taskId: task.id,
+      tileIndex: nextBuildTile.index,
+      workProgress: 0,
+    });
+    return;
+  }
+
+  // Check if there are tiles needing materials - switch to transport
+  const nextMaterialTile = constructionSystem.getNextTileNeedingMaterials(task.id);
+  if (nextMaterialTile) {
+    return ctx.switchTo('material_transport', {
+      transportState: 'finding_storage',
+      taskId: task.id,
+      tileIndex: nextMaterialTile.index,
+      materialId: nextMaterialTile.tile.materialId,
+      carryingAmount: 0,
+    });
+  }
+
+  // Task is fully complete
+  constructionSystem.unregisterBuilder(task.id, ctx.entity.id);
+  return ctx.complete('Construction task complete!');
 }

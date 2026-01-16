@@ -104,9 +104,9 @@ export default [
       // Detect common performance anti-patterns
       'no-constant-binary-expression': 'error',
 
-      // Catch performance issues with restricted syntax
+      // Catch performance issues and anti-patterns with restricted syntax
       'no-restricted-syntax': [
-        'error',
+        'warn',  // Using 'warn' for global rules; 'error' for system-specific rules
         {
           selector: 'CallExpression[callee.object.name="Math"][callee.property.name="pow"][arguments.1.value=2]',
           message: 'Use x * x instead of Math.pow(x, 2) for better performance'
@@ -119,11 +119,35 @@ export default [
           selector: 'CallExpression[callee.object.name="Object"][callee.property.name="keys"] > CallExpression[callee.property.name="getComponent"]',
           message: 'Avoid Object.keys() in hot paths - cache component access'
         },
+        // ============================================================
+        // ANTI-PATTERN DETECTION - CLAUDE.md Compliance
+        // ============================================================
+        {
+          selector: 'CallExpression[callee.property.name="removeEntity"]',
+          message: 'FORBIDDEN: Do not use removeEntity(). Mark entities as corrupted instead. See CORRUPTION_SYSTEM.md'
+        },
+        // NOTE: Silent fallback detection - these are warnings because some fallbacks are legitimate
+        // (e.g., optional descriptions, UI text). For required data, always throw instead of defaulting.
+        {
+          selector: 'LogicalExpression[operator="||"][right.type="Literal"]',
+          message: 'ANTI-PATTERN: Silent fallback with ||. If data is truly required, throw an error instead. See CLAUDE.md Code Quality Rules #2'
+        },
+        {
+          selector: 'LogicalExpression[operator="??"][right.type="Literal"]',
+          message: 'ANTI-PATTERN: Silent fallback with ??. If data is truly required, throw an error instead. See CLAUDE.md Code Quality Rules #2'
+        },
       ],
     },
   },
   {
     // Performance-critical system code
+    // NOTE: Systems with broad required components (e.g., only [CT.Position]) should use
+    // SimulationScheduler.filterActiveEntities() to avoid processing off-screen entities.
+    // See SIMULATION_SCHEDULER.md for details.
+    //
+    // Systems that don't run every tick should use throttling with UPDATE_INTERVAL and lastUpdate.
+    // Add a comment explaining why throttling is not needed if the system runs every tick.
+    // Example: "// NO_THROTTLE: Critical pathfinding updates required every tick"
     files: ['**/systems/**/*.ts'],
     rules: {
       'no-restricted-syntax': [
@@ -148,6 +172,10 @@ export default [
           selector: 'CallExpression[callee.object.name="console"][callee.property.name=/^(log|debug|info)$/]',
           message: 'Remove console.log/debug/info from system code - use console.error/warn only for errors'
         },
+        {
+          selector: 'CallExpression[callee.property.name="removeEntity"]',
+          message: 'FORBIDDEN: Do not use removeEntity(). Mark entities as corrupted instead. See CORRUPTION_SYSTEM.md'
+        },
       ],
       'no-restricted-properties': [
         'error',
@@ -155,6 +183,56 @@ export default [
           object: 'world',
           property: 'query',
           message: 'Consider caching query results if called multiple times in update()'
+        },
+      ],
+    },
+  },
+  {
+    // Behavior files - enforce BehaviorContext patterns
+    // These rules guide developers to use the correct, performant APIs
+    files: ['**/behavior/behaviors/**/*.ts', '**/behaviors/**/*.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'warn',
+        // ============================================================
+        // SPATIAL QUERIES - Use BehaviorContext instead of world.query()
+        // ============================================================
+        {
+          selector: 'CallExpression[callee.property.name="query"][callee.object.name="world"]',
+          message: 'BEHAVIOR PATTERN: Avoid world.query() in behaviors - use ctx.getEntitiesInRadius() or ctx.getNearestEntity() for optimized chunk-based queries'
+        },
+        {
+          selector: 'MemberExpression[property.name="query"][object.name="world"]',
+          message: 'BEHAVIOR PATTERN: Avoid world.query() in behaviors - use ctx.getEntitiesInRadius() or ctx.getNearestEntity() for optimized chunk-based queries'
+        },
+        // ============================================================
+        // COMPONENT ACCESS - Use ComponentType enum, not string literals
+        // ============================================================
+        {
+          selector: 'CallExpression[callee.property.name="getComponent"][arguments.0.type="Literal"]',
+          message: 'BEHAVIOR PATTERN: Use ComponentType enum (CT.Agent, CT.Position) instead of string literals for component access'
+        },
+        {
+          selector: 'CallExpression[callee.property.name="hasComponent"][arguments.0.type="Literal"]',
+          message: 'BEHAVIOR PATTERN: Use ComponentType enum (CT.Agent, CT.Position) instead of string literals for component access'
+        },
+        {
+          selector: 'CallExpression[callee.property.name="updateComponent"][arguments.0.type="Literal"]',
+          message: 'BEHAVIOR PATTERN: Use ComponentType enum (CT.Agent, CT.Position) instead of string literals for component access'
+        },
+        // ============================================================
+        // DISTANCE CALCULATIONS - Use squared distance for comparisons
+        // ============================================================
+        {
+          selector: 'CallExpression[callee.object.name="Math"][callee.property.name="sqrt"]',
+          message: 'PERFORMANCE: Consider using squared distance (dx*dx + dy*dy) for comparisons instead of Math.sqrt(). Only use sqrt when you need the actual distance value (e.g., for display)'
+        },
+        // ============================================================
+        // CONSERVATION OF MATTER - No entity removal
+        // ============================================================
+        {
+          selector: 'CallExpression[callee.property.name="removeEntity"]',
+          message: 'FORBIDDEN: Do not use removeEntity(). Mark entities as corrupted instead. See CORRUPTION_SYSTEM.md'
         },
       ],
     },

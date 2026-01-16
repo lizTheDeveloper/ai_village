@@ -6,6 +6,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { GameEventMap, EventType } from '../events/EventMap.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 /**
  * Base interface for memory trigger events - fields common to all events.
@@ -197,10 +198,16 @@ export class MemoryFormationSystem implements System {
 
       // Handle conversation:started - requires participants array
       if (eventType === 'conversation:started') {
-        const participants = (data as any).participants;
-        if (!participants || !Array.isArray(participants) || participants.length < 2) {
+        if (!('participants' in data)) {
           throw new Error(
-            `Invalid conversation:started event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. ` +
+            `Invalid conversation:started event - missing participants array. ` +
+            `data=${JSON.stringify(data)}`
+          );
+        }
+        const participants = data.participants;
+        if (!Array.isArray(participants) || participants.length < 2) {
+          throw new Error(
+            `Invalid conversation:started event - ${!Array.isArray(participants) ? 'participants is not an array' : `only ${participants.length} participant(s), need at least 2`}. ` +
             `data=${JSON.stringify(data)}`
           );
         }
@@ -219,10 +226,16 @@ export class MemoryFormationSystem implements System {
 
       // Handle conversation:ended - requires participants array
       if (eventType === 'conversation:ended') {
-        const participants = (data as any).participants;
-        if (!participants || !Array.isArray(participants) || participants.length < 2) {
+        if (!('participants' in data)) {
           throw new Error(
-            `Invalid conversation:ended event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. ` +
+            `Invalid conversation:ended event - missing participants array. ` +
+            `data=${JSON.stringify(data)}`
+          );
+        }
+        const participants = data.participants;
+        if (!Array.isArray(participants) || participants.length < 2) {
+          throw new Error(
+            `Invalid conversation:ended event - ${!Array.isArray(participants) ? 'participants is not an array' : `only ${participants.length} participant(s), need at least 2`}. ` +
             `data=${JSON.stringify(data)}`
           );
         }
@@ -241,22 +254,22 @@ export class MemoryFormationSystem implements System {
 
       // Handle conversation:utterance - requires both speakerId and listenerId
       if (eventType === 'conversation:utterance') {
-        const speakerId = (data as any).speakerId;
-        const listenerId = (data as any).listenerId;
-
         // Per CLAUDE.md: validate both are present, throw if not
-        if (!speakerId) {
+        if (!('speakerId' in data) || !data.speakerId) {
           throw new Error(
             `conversation:utterance event missing required speakerId. ` +
             `Event data: ${JSON.stringify(data)}`
           );
         }
-        if (!listenerId) {
+        if (!('listenerId' in data) || !data.listenerId) {
           throw new Error(
             `conversation:utterance event missing required listenerId. ` +
             `Event data: ${JSON.stringify(data)}`
           );
         }
+
+        const speakerId = data.speakerId;
+        const listenerId = data.listenerId;
 
         // Create memory for speaker
         if (!this.pendingMemories.has(speakerId)) {
@@ -280,15 +293,21 @@ export class MemoryFormationSystem implements System {
 
       // Handle information:shared - has 'from' and 'to' instead of agentId
       if (eventType === 'information:shared') {
-        const fromId = (data as any).from;
-        const toId = (data as any).to;
-
-        if (!fromId || !toId) {
+        if (!('from' in data) || !data.from) {
           throw new Error(
-            `Invalid information:shared event - missing ${!fromId ? 'from' : 'to'} field. ` +
+            `Invalid information:shared event - missing 'from' field. ` +
             `Event data: ${JSON.stringify(data)}`
           );
         }
+        if (!('to' in data) || !data.to) {
+          throw new Error(
+            `Invalid information:shared event - missing 'to' field. ` +
+            `Event data: ${JSON.stringify(data)}`
+          );
+        }
+
+        const fromId = data.from;
+        const toId = data.to;
 
         // Create memory for the receiver (the one who learned new information)
         if (!this.pendingMemories.has(toId)) {
@@ -303,14 +322,14 @@ export class MemoryFormationSystem implements System {
 
       // Handle divine power events - has 'targetId' instead of agentId
       if (eventType.startsWith('divine_power:')) {
-        const targetId = (data as any).targetId;
-
-        if (!targetId) {
+        if (!('targetId' in data) || !data.targetId || typeof data.targetId !== 'string') {
           throw new Error(
-            `Invalid ${eventType} event - missing targetId field. ` +
+            `Invalid ${eventType} event - missing or invalid targetId field. ` +
             `Event data: ${JSON.stringify(data)}`
           );
         }
+
+        const targetId: string = data.targetId;
 
         // Create memory for the target (the one who received the divine power)
         if (!this.pendingMemories.has(targetId)) {
@@ -450,7 +469,7 @@ export class MemoryFormationSystem implements System {
       if (builderId && world) {
         const builderEntity = world.getEntity(builderId);
         if (builderEntity) {
-          const identity = builderEntity.components.get(CT.Identity) as { name?: string } | undefined;
+          const identity = builderEntity.getComponent<IdentityComponent>(CT.Identity);
           const builderName = identity?.name || builderId;
           return `${builderName} started building a ${buildingType}`;
         }
@@ -596,7 +615,7 @@ export class MemoryFormationSystem implements System {
       if (speakerId && speakerId !== data.agentId) {
         const speakerEntity = world.getEntity(speakerId);
         if (speakerEntity) {
-          const identity = speakerEntity.components.get(CT.Identity) as { name?: string } | undefined;
+          const identity = speakerEntity.getComponent<IdentityComponent>(CT.Identity);
           speakerName = identity?.name || speakerId;
         }
       }

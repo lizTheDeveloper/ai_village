@@ -17,6 +17,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SystemId } from '../types.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import {
   LORE_FRAGMENTS,
   type LoreFragmentComponent,
@@ -252,18 +253,22 @@ export class LoreSpawnSystem implements System {
     // Create entity
     const entity = world.createEntity();
 
+    // EntityImpl cast is necessary for addComponent (internal mutable interface)
+    // Entity interface is readonly, only EntityImpl exposes addComponent
+    const entityImpl = entity as EntityImpl;
+
     // Add lore fragment component
     const loreComponent: LoreFragmentComponent = {
       ...fragment,
       hasBeenRead: false,
       discoveredAt: world.tick,
     };
-    (entity as any).addComponent(loreComponent);
+    entityImpl.addComponent(loreComponent);
 
     // Add position (random location)
     const x = Math.random() * 1000 - 500;
     const y = Math.random() * 1000 - 500;
-    (entity as any).addComponent(createPositionComponent(x, y));
+    entityImpl.addComponent(createPositionComponent(x, y));
 
     // Add renderable (visual representation)
     const glyphByCategory: Record<string, string> = {
@@ -277,23 +282,23 @@ export class LoreSpawnSystem implements System {
       flavor: '📝',
     };
 
-    (entity as any).addComponent(
+    entityImpl.addComponent(
       createRenderableComponent(glyphByCategory[fragment.category] || '📄')
     );
 
     // Emit event
     this.eventBus?.emit({
-      type: 'lore:spawned',
+      type: 'lore:spawned' as const,
       source: entity.id,
       data: {
-      fragmentId: fragment.fragmentId,
-      title: fragment.title,
-      importance: fragment.importance,
-      category: fragment.category,
-      entityId: entity.id,
-      position: { x, y },
+        fragmentId: fragment.fragmentId,
+        title: fragment.title,
+        importance: fragment.importance,
+        category: fragment.category,
+        entityId: entity.id,
+        position: { x, y },
       },
-    } as any);
+    });
   }
 
   // ============ Public API ============

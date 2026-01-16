@@ -21,6 +21,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { recordPrayer } from '../../components/SpiritualComponent.js';
 import { SacredSiteSystem } from '../../systems/SacredSiteSystem.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Prayer configuration
@@ -339,9 +341,205 @@ export class PrayBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use prayBehaviorWithContext for new code
  */
 export function prayBehavior(entity: EntityImpl, world: World): void {
   const behavior = new PrayBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern pray behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('pray', prayBehaviorWithContext);
+ */
+export function prayBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  // Stop all movement
+  ctx.stopMovement();
+
+  const spiritual = ctx.getComponent<SpiritualComponent>(CT.Spiritual);
+
+  if (!spiritual) {
+    throw new Error(`[PrayBehavior] Agent ${ctx.entity.id} missing spiritual component`);
+  }
+
+  // Initialize prayer state
+  if (!ctx.getState('prayerStarted')) {
+    const needs = ctx.needs;
+    const mood = ctx.getComponent<MoodComponent>(CT.Mood);
+
+    // Determine prayer type and urgency
+    const { type, urgency, content } = determinePrayerContentWithContext(spiritual, needs, mood);
+
+    // Calculate duration based on urgency and style
+    let duration = PRAYER_CONFIG.BASE_DURATION;
+    if (urgency === 'desperate') {
+      duration = PRAYER_CONFIG.DESPERATE_DURATION;
+    } else if (spiritual.prayerStyle === 'formal') {
+      duration = PRAYER_CONFIG.RITUAL_DURATION;
+    }
+
+    // Create prayer record
+    const prayer: Prayer = {
+      id: `prayer_${prayerIdCounter++}`,
+      type,
+      urgency,
+      content,
+      timestamp: ctx.tick,
+      answered: false,
+    };
+
+    // Record prayer in spiritual component
+    const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
+    (ctx.entity as any).addComponent(updatedSpiritual);
+
+    ctx.updateState({
+      prayerStarted: ctx.tick,
+      prayerDuration: duration,
+      prayer,
+      lastMonologue: 0,
+    });
+
+    ctx.setThought(`Praying: "${content}"`);
+
+    // Emit prayer event
+    ctx.emit({
+      type: 'prayer:offered',
+      data: {
+        agentId: ctx.entity.id,
+        deityId: spiritual.believedDeity ?? 'unknown',
+        prayerType: type,
+        answered: false,
+        duration: duration,
+      },
+    });
+
+    return;
+  }
+
+  const startTick = ctx.getState<number>('prayerStarted')!;
+  const duration = ctx.getState<number>('prayerDuration') || PRAYER_CONFIG.BASE_DURATION;
+  const elapsed = ctx.tick - startTick;
+
+  // Periodic prayer utterances
+  const lastMonologue = ctx.getState<number>('lastMonologue') ?? 0;
+  if (ctx.tick - lastMonologue > PRAYER_CONFIG.MONOLOGUE_INTERVAL) {
+    const prayer = ctx.getState<Prayer>('prayer');
+    if (prayer) {
+      ctx.setThought(prayer.content);
+      ctx.updateState({ lastMonologue: ctx.tick });
+    }
+  }
+
+  // Complete prayer
+  if (elapsed >= duration) {
+    const prayer = ctx.getState<Prayer>('prayer')!;
+
+    // Update preferred prayer spot if at a sacred site
+    const sacredSiteSystem = getSacredSiteSystemFromContext(ctx);
+    if (sacredSiteSystem) {
+      const site = sacredSiteSystem.isAtSacredSite({ x: ctx.position.x, y: ctx.position.y });
+      if (site && !spiritual.preferredPrayerSpot) {
+        ctx.updateComponent<SpiritualComponent>(CT.Spiritual, (comp) => ({
+          ...comp,
+          preferredPrayerSpot: site.id,
+        }));
+        sacredSiteSystem.registerVisit(site.id, ctx.entity.id);
+      }
+    }
+
+    // Emit completion event
+    ctx.emit({
+      type: 'prayer:complete',
+      data: {
+        agentId: ctx.entity.id,
+        deityId: spiritual.believedDeity ?? 'unknown',
+        prayerType: prayer.type,
+        answered: false,
+        duration: elapsed,
+      },
+    });
+
+    // Decide whether to meditate after
+    if (Math.random() < PRAYER_CONFIG.MEDITATION_CHANCE) {
+      return ctx.switchTo('meditate', {});
+    }
+
+    return ctx.complete('prayer_complete');
+  }
+
+  // Continue praying
+}
+
+function determinePrayerContentWithContext(
+  spiritual: SpiritualComponent,
+  needs: NeedsComponent | null,
+  mood: MoodComponent | undefined
+): { type: PrayerType; urgency: PrayerUrgency; content: string } {
+  // Check for desperate needs first
+  if (needs) {
+    if (needs.hunger < 0.2 || needs.health < 0.2 || needs.energy < 0.2) {
+      return generatePrayerFromTemplate('help', 'desperate');
+    }
+    if (needs.hunger < 0.4 || needs.health < 0.4) {
+      return generatePrayerFromTemplate('help', 'earnest');
+    }
+  }
+
+  // Crisis of faith
+  if (spiritual.crisisOfFaith) {
+    return generatePrayerFromTemplate('question', 'desperate');
+  }
+
+  // Mood-based prayers
+  if (mood) {
+    if (mood.currentMood < -40) {
+      return generatePrayerFromTemplate('plea', 'earnest');
+    }
+    if (mood.currentMood > 60) {
+      return generatePrayerFromTemplate('gratitude', 'routine');
+    }
+  }
+
+  // Style-based default prayers
+  switch (spiritual.prayerStyle) {
+    case 'grateful':
+      return generatePrayerFromTemplate('gratitude', 'routine');
+    case 'questioning':
+      return generatePrayerFromTemplate('question', 'routine');
+    case 'desperate':
+      return generatePrayerFromTemplate('plea', 'earnest');
+    case 'formal':
+      return generatePrayerFromTemplate('praise', 'routine');
+    default:
+      // Conversational style - random routine prayer
+      const types: PrayerType[] = ['guidance', 'gratitude', 'praise'];
+      const type = types[Math.floor(Math.random() * types.length)]!;
+      return generatePrayerFromTemplate(type, 'routine');
+  }
+}
+
+function generatePrayerFromTemplate(
+  type: PrayerType,
+  urgency: PrayerUrgency
+): { type: PrayerType; urgency: PrayerUrgency; content: string } {
+  const templates = PRAYER_TEMPLATES[type];
+  const content = templates[Math.floor(Math.random() * templates.length)]!;
+  return { type, urgency, content };
+}
+
+function getSacredSiteSystemFromContext(ctx: BehaviorContext): SacredSiteSystem | null {
+  // Access world through entity's internal reference
+  const world = (ctx.entity as any).world;
+  if (!world) return null;
+
+  const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+  if (systems instanceof Map) {
+    return systems.get('sacred_site') as SacredSiteSystem | null;
+  }
+  return null;
 }

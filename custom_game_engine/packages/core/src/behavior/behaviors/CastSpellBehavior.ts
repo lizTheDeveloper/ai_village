@@ -424,8 +424,276 @@ export class CastSpellBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use castSpellBehaviorWithContext instead for better performance
  */
 export function castSpellBehavior(entity: EntityImpl, world: World): void {
   const behavior = new CastSpellBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('cast_spell', castSpellBehaviorWithContext);
+ */
+export function castSpellBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const magic = ctx.getComponent<MagicComponent>(CT.Magic);
+
+  if (!magic || !magic.magicUser) {
+    return ctx.complete('Entity cannot use magic');
+  }
+
+  const state = ctx.getAllState() as any;
+  const phase = state.phase ?? 'validate';
+
+  // Execute phase
+  switch (phase) {
+    case 'validate':
+      return validateSpellCtx(ctx, state, magic);
+
+    case 'find_target':
+      return findTargetCtx(ctx, state);
+
+    case 'move_to_range':
+      return moveToRangeCtx(ctx, state);
+
+    case 'casting':
+      return castSpellCtx(ctx, state);
+
+    case 'complete':
+      return ctx.complete(state.error ?? 'Spell cast complete');
+  }
+}
+
+function validateSpellCtx(ctx: BehaviorContext, state: any, magic: MagicComponent): ContextBehaviorResult | void {
+  const spellId = state.spellId;
+  if (!spellId) {
+    return ctx.complete('No spell specified in behaviorState.spellId');
+  }
+
+  const castingService = SpellCastingService.getInstance();
+  const spellRegistry = SpellRegistry.getInstance();
+
+  // Check spell exists
+  const spell = spellRegistry.getSpell(spellId);
+  if (!spell) {
+    return ctx.complete(`Spell not found: ${spellId}`);
+  }
+
+  // Check spell is unlocked
+  const playerState = spellRegistry.getPlayerState(spellId);
+  if (!playerState?.unlocked) {
+    return ctx.complete(`Spell not unlocked: ${spell.name}`);
+  }
+
+  // Check if agent knows this spell
+  const knownSpell = magic.knownSpells.find(s => s.spellId === spellId);
+  if (!knownSpell) {
+    return ctx.complete(`Agent does not know spell: ${spell.name}`);
+  }
+
+  // Check if can afford spell
+  const canCast = castingService.canCast(spellId, ctx.entity);
+  if (!canCast.canCast) {
+    return ctx.complete(canCast.error ?? 'Cannot afford spell');
+  }
+
+  // Spell validated, move to target finding
+  ctx.updateState({ phase: 'find_target' });
+}
+
+function findTargetCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const spellRegistry = SpellRegistry.getInstance();
+  const spellId = state.spellId!;
+  const spell = spellRegistry.getSpell(spellId)!;
+
+  // Self-targeted spells don't need external target
+  if (spell.range === 0) {
+    ctx.updateState({
+      targetId: ctx.entity.id,
+      phase: 'move_to_range'
+    });
+    return;
+  }
+
+  // If target already specified, validate it
+  if (state.targetId) {
+    const target = ctx.getEntity(state.targetId);
+    if (target) {
+      // Target exists, proceed to movement
+      ctx.updateState({ phase: 'move_to_range' });
+      return;
+    } else {
+      // Target no longer exists, need to find new one
+      ctx.updateState({ targetId: undefined });
+    }
+  }
+
+  // Find suitable target based on spell effect
+  const targetEntity = findSuitableTargetCtx(ctx, spell);
+
+  if (!targetEntity) {
+    return ctx.complete(`No suitable target found for spell: ${spell.name}`);
+  }
+
+  ctx.updateState({
+    targetId: targetEntity.id,
+    phase: 'move_to_range'
+  });
+}
+
+function moveToRangeCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const spellRegistry = SpellRegistry.getInstance();
+  const spellId = state.spellId!;
+  const spell = spellRegistry.getSpell(spellId)!;
+
+  // Self-targeted spells are always in range
+  if (spell.range === 0) {
+    ctx.stopMovement();
+    ctx.updateState({ phase: 'casting' });
+    return;
+  }
+
+  const targetId = state.targetId;
+  if (!targetId) {
+    // Lost target, go back to finding
+    ctx.updateState({ phase: 'find_target' });
+    return;
+  }
+
+  const targetEntity = ctx.getEntity(targetId);
+  if (!targetEntity) {
+    // Target disappeared
+    ctx.updateState({ phase: 'find_target', targetId: undefined });
+    return;
+  }
+
+  const targetPos = targetEntity.components.get(CT.Position) as PositionComponent | undefined;
+  if (!targetPos) {
+    ctx.updateState({ phase: 'find_target', targetId: undefined });
+    return;
+  }
+
+  // Check if in range
+  if (ctx.isWithinRange(targetPos, spell.range)) {
+    ctx.stopMovement();
+    ctx.updateState({ phase: 'casting' });
+    return;
+  }
+
+  // Move toward target
+  ctx.moveToward({ x: targetPos.x, y: targetPos.y }, {
+    arrivalDistance: spell.range * 0.9 // Get 90% of the way to max range
+  });
+}
+
+function castSpellCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  const spellId = state.spellId!;
+  const targetId = state.targetId;
+
+  // Get target entity if specified
+  let targetEntity: EntityImpl | undefined;
+  if (targetId) {
+    targetEntity = ctx.getEntity(targetId) as EntityImpl | undefined;
+    if (!targetEntity && targetId !== ctx.entity.id) {
+      // Target vanished during cast
+      ctx.updateState({
+        phase: 'complete',
+        error: 'Target vanished before cast'
+      });
+      return ctx.complete('Target vanished before cast');
+    }
+  }
+
+  // Execute spell cast
+  const world = (ctx as any).world;
+  const castingService = SpellCastingService.getInstance();
+  const result = castingService.castSpell(
+    spellId,
+    ctx.entity,
+    world,
+    ctx.tick,
+    {
+      target: targetEntity ?? ctx.entity,
+      targetX: state.targetX,
+      targetY: state.targetY
+    }
+  );
+
+  // Emit casting event
+  const spellRegistry = SpellRegistry.getInstance();
+  const spell = spellRegistry.getSpell(spellId);
+  if (spell) {
+    ctx.emit({
+      type: 'magic:spell_cast',
+      source: 'cast-spell-behavior',
+      data: {
+        spellId,
+        spell: spell.name,
+        technique: spell.technique,
+        form: spell.form,
+        manaCost: spell.manaCost,
+        casterId: ctx.entity.id,
+        targetId: result.targetId,
+        success: result.success,
+        mishap: result.mishap
+      }
+    });
+  }
+
+  // Mark complete
+  ctx.updateState({
+    phase: 'complete',
+    castSuccess: result.success,
+    error: result.error ?? (result.mishap ? 'Spell mishap occurred' : undefined)
+  });
+
+  return ctx.complete(
+    result.success ? 'Spell cast successfully' : (result.error ?? 'Spell cast failed')
+  );
+}
+
+function findSuitableTargetCtx(ctx: BehaviorContext, spell: any): EntityImpl | null {
+  const effectId = spell.effectId;
+
+  // Healing/buff spells: target self or injured allies
+  if (effectId.includes('heal') || effectId.includes('buff') || effectId.includes('protect')) {
+    // Target self if injured
+    if (ctx.needs && ctx.needs.health < 0.7) {
+      return ctx.entity;
+    }
+
+    // Find injured ally
+    const allies = ctx.getEntitiesInRadius(MAX_TARGET_SEARCH_DISTANCE, [CT.Agent, CT.Needs]);
+
+    for (const { entity: ally } of allies) {
+      if (ally.id === ctx.entity.id) continue;
+
+      const allyNeeds = (ally as EntityImpl).getComponent<NeedsComponent>(CT.Needs);
+      if (allyNeeds && allyNeeds.health < 0.7) {
+        return ally as EntityImpl;
+      }
+    }
+
+    return ctx.entity; // Default to self
+  }
+
+  // Damage/debuff spells: target nearest enemy or hostile animal
+  if (effectId.includes('damage') || effectId.includes('debuff') || effectId.includes('control')) {
+    const nearestAnimal = ctx.getNearestEntity([CT.Animal], MAX_TARGET_SEARCH_DISTANCE);
+    if (nearestAnimal) {
+      return nearestAnimal.entity as EntityImpl;
+    }
+  }
+
+  // Default: no suitable target
+  return null;
 }

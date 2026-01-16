@@ -82,14 +82,14 @@ export class InjurySystem implements System {
     }
   }
 
-  private validateInjury(injury: InjuryComponent | any): void {
+  private validateInjury(injury: InjuryComponent): void {
     const validTypes = ['laceration', 'puncture', 'blunt', 'burn', 'bite', 'exhaustion', 'psychological'];
     const validSeverities = ['minor', 'major', 'critical'];
     const validLocations = ['head', 'torso', 'arms', 'legs', 'hands', 'feet'];
 
     // Handle both proper InjuryComponent (has injuryType) and raw test data (has type instead)
     // The 'type' field in raw data represents the injury type (not the component type)
-    const injuryType = injury.injuryType || injury.type;
+    const injuryType = 'injuryType' in injury ? injury.injuryType : 'type' in injury ? (injury as { type: string }).type : undefined;
     const severity = injury.severity;
     const location = injury.location;
 
@@ -139,7 +139,7 @@ export class InjurySystem implements System {
       }
 
       // Psychological injuries reduce social skill
-      const injuryType = (injury as any).injuryType || (injury as any).type;
+      const injuryType = 'injuryType' in injury ? injury.injuryType : 'type' in injury ? (injury as { type: string }).type : undefined;
       if (injuryType === 'psychological' && stats.socialSkill !== undefined) {
         updated.socialSkill = Math.max(0, stats.socialSkill + severityPenalty * 2);
       }
@@ -178,7 +178,7 @@ export class InjurySystem implements System {
     let energyRateMultiplier = 1.0;
 
     // Blood loss injuries increase hunger decay rate
-    const injuryType = (injury as any).injuryType || (injury as any).type;
+    const injuryType = 'injuryType' in injury ? injury.injuryType : 'type' in injury ? (injury as { type: string }).type : undefined;
     if (injuryType === 'laceration' || injuryType === 'puncture') {
       hungerRateMultiplier = injury.severity === 'minor' ? 1.2 : injury.severity === 'major' ? 1.5 : 2.0;
     }
@@ -188,10 +188,8 @@ export class InjurySystem implements System {
 
     // Update component with new rates
     entityImpl.updateComponent<NeedsComponent>('needs', (currentNeeds) => {
-      // Clone if method exists, otherwise fallback to spread (for plain objects)
-      const updated = typeof (currentNeeds as any).clone === 'function'
-        ? (currentNeeds as any).clone()
-        : { ...currentNeeds };
+      // NeedsComponent is a class with clone() method
+      const updated = currentNeeds.clone();
       updated.hungerDecayRate = (currentNeeds.hungerDecayRate || 1.0) * hungerRateMultiplier;
       updated.energyDecayRate = (currentNeeds.energyDecayRate || 1.0) * energyRateMultiplier;
       return updated;
@@ -250,7 +248,7 @@ export class InjurySystem implements System {
                      12000; // 10 minutes for critical
 
     // Type modifiers
-    const injuryType = (injury as any).injuryType || (injury as any).type;
+    const injuryType = 'injuryType' in injury ? injury.injuryType : 'type' in injury ? (injury as { type: string }).type : undefined;
     const typeMultiplier = injuryType === 'burn' ? 1.5 :
                            injuryType === 'bite' ? 1.3 :
                            injuryType === 'psychological' ? 2.0 :

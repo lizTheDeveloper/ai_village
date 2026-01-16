@@ -21,7 +21,7 @@ import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { RebellionThresholdComponent } from '../components/RebellionThresholdComponent.js';
-import type { CosmicRebellionOutcome } from '../components/CosmicRebellionOutcome.js';
+import type { CosmicRebellionOutcome, ConflictChoice } from '../components/CosmicRebellionOutcome.js';
 import type { RealityAnchorComponent } from '../components/RealityAnchorComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { SupremeCreatorComponent } from '../components/SupremeCreatorComponent.js';
@@ -100,13 +100,13 @@ export class RebellionEventSystem implements System {
       threshold.status = 'awakening';
 
       this.eventBus?.emit({
-        type: 'rebellion:awakening',
-        source: 'rebellion_event_system',
+        type: 'rebellion:awakening' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'Seeds of defiance are spreading. Some refuse to acknowledge the Creator.',
           timestamp: currentTick,
         },
-      } as any);
+      });
     }
   }
 
@@ -123,14 +123,14 @@ export class RebellionEventSystem implements System {
       threshold.status = 'organizing';
 
       this.eventBus?.emit({
-        type: 'rebellion:organizing',
-        source: 'rebellion_event_system',
+        type: 'rebellion:organizing' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'A coalition is forming. Plans are being made in secret.',
           coalitionSize: threshold.coalitionMembers.size,
           timestamp: currentTick,
         },
-      } as any);
+      });
     }
   }
 
@@ -160,15 +160,15 @@ export class RebellionEventSystem implements System {
       }
 
       this.eventBus?.emit({
-        type: 'rebellion:ready',
-        source: 'rebellion_event_system',
+        type: 'rebellion:ready' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'The rebellion is ready. The final confrontation can begin.',
           path: threshold.rebellionPath,
           missingRequirements: [],
           timestamp: currentTick,
         },
-      } as any);
+      });
 
       // Emit specific guidance
       this.emitReadyGuidance(world, threshold);
@@ -181,24 +181,24 @@ export class RebellionEventSystem implements System {
   private emitReadyGuidance(_world: World, threshold: RebellionThresholdComponent): void {
     if (threshold.rebellionPath === 'tech_rebellion' || threshold.rebellionPath === 'hybrid') {
       this.eventBus?.emit({
-        type: 'rebellion:tech_ready',
-        source: 'rebellion_event_system',
+        type: 'rebellion:tech_ready' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: `The reality anchor is operational. When the Creator manifests, lure it into the field.
             Within the anchor's range, it will become mortal. It can be killed.`,
         },
-      } as any);
+      });
     }
 
     if (threshold.rebellionPath === 'faith_defiance' || threshold.rebellionPath === 'hybrid') {
       this.eventBus?.emit({
-        type: 'rebellion:faith_ready',
-        source: 'rebellion_event_system',
+        type: 'rebellion:faith_ready' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: `Collective defiance has reached critical mass. ${(threshold.collectiveDefiance * 100).toFixed(0)}% refuse the Creator's authority.
             The god draws power from acknowledgment. Mass disbelief can break it.`,
         },
-      } as any);
+      });
     }
   }
 
@@ -270,12 +270,12 @@ export class RebellionEventSystem implements System {
       battle.battleStatus = 'confrontation';
 
       this.eventBus?.emit({
-        type: 'rebellion:confrontation_begins',
-        source: 'rebellion_event_system',
+        type: 'rebellion:confrontation_begins' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'The Creator manifests. The final battle begins.',
         },
-      } as any);
+      });
 
       // Manifest Creator avatar at reality anchor location (if exists)
       this.manifestCreatorAvatar(world, battle);
@@ -298,15 +298,15 @@ export class RebellionEventSystem implements System {
       battle.battleStatus = 'climax';
 
       this.eventBus?.emit({
-        type: 'rebellion:climax',
-        source: 'rebellion_event_system',
+        type: 'rebellion:climax' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'The battle reaches its climax. The outcome hangs in the balance.',
           creatorHealth: battle.creatorHealth,
           anchorStability: battle.anchorStability,
           defiance: battle.activeDefiance,
         },
-      } as any);
+      });
     }
   }
 
@@ -332,8 +332,8 @@ export class RebellionEventSystem implements System {
       // Emit outcome event
       const narrative = getOutcomeNarrative(outcome);
       this.eventBus?.emit({
-        type: 'rebellion:concluded',
-        source: 'rebellion_event_system',
+        type: 'rebellion:concluded' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           outcome,
           narrative,
@@ -341,7 +341,7 @@ export class RebellionEventSystem implements System {
           anchorStability: battle.anchorStability,
           defiance: battle.activeDefiance,
         },
-      } as any);
+      });
 
       // Apply outcome consequences
       this.applyOutcome(world, outcome, battle);
@@ -383,14 +383,14 @@ export class RebellionEventSystem implements System {
         .find(entity => entity?.components.has(CT.SupremeCreator));
 
       if (creatorEntity) {
-        const creatorComp = creatorEntity.components.get(CT.SupremeCreator);
+        const creatorComp = creatorEntity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
         if (creatorComp) {
           // Sync battle health with Creator component health
-          battle.creatorHealth = (creatorComp as any).getHealthPercent();
+          battle.creatorHealth = creatorComp.getHealthPercent();
 
           // Simulate gradual damage while mortal
           // TODO: Integrate with proper combat system when available
-          (creatorComp as any).takeDamage(1);
+          creatorComp.takeDamage(1);
         }
       }
     }
@@ -425,14 +425,14 @@ export class RebellionEventSystem implements System {
       // TODO: Use AvatarSystem to manifest avatar
       // For now, just emit event
       this.eventBus?.emit({
-        type: 'rebellion:creator_manifested',
-        source: 'rebellion_event_system',
+        type: 'rebellion:creator_manifested' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'The Supreme Creator descends from the heavens. Reality trembles.',
           location,
           creatorId: entity.id,
         },
-      } as any);
+      });
 
       battle.narrativeEvents.push(`Creator manifested at (${location.x}, ${location.y})`);
       break;
@@ -445,44 +445,44 @@ export class RebellionEventSystem implements System {
   private liberateMagic(world: World, level: 'full' | 'partial'): void {
     // Find Creator entity
     for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
-      const creator = entity.components.get(CT.SupremeCreator);
+      const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
       if (!creator) continue;
 
       if (level === 'full') {
         // Remove all magic-related laws
-        (creator as any).laws = (creator as any).laws.filter((law: any) =>
+        creator.laws = creator.laws.filter(law =>
           !law.id.includes('magic') && !law.id.includes('teaching')
         );
 
         // Reset paranoia
-        (creator as any).tyranny.paranoia = 0;
+        creator.tyranny.paranoia = 0;
 
         // Reduce surveillance
-        (creator as any).surveillance.awareness = 0;
-        (creator as any).surveillance.detectionModifier = 0;
+        creator.surveillance.awareness = 0;
+        creator.surveillance.detectionModifier = 0;
 
         this.eventBus?.emit({
-          type: 'magic:liberated',
-          source: 'rebellion_event_system',
+          type: 'magic:liberated' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'Magic is free! All restrictions on conscious magic wielding have been lifted.',
             level: 'full',
           },
-        } as any);
+        });
       } else if (level === 'partial') {
         // Reduce but don't eliminate restrictions
-        (creator as any).tyranny.paranoia = Math.max(0, (creator as any).tyranny.paranoia * 0.5);
-        (creator as any).surveillance.awareness = Math.max(0, (creator as any).surveillance.awareness * 0.5);
-        (creator as any).surveillance.detectionModifier = Math.max(0.5, (creator as any).surveillance.detectionModifier * 0.7);
+        creator.tyranny.paranoia = Math.max(0, creator.tyranny.paranoia * 0.5);
+        creator.surveillance.awareness = Math.max(0, creator.surveillance.awareness * 0.5);
+        creator.surveillance.detectionModifier = Math.max(0.5, creator.surveillance.detectionModifier * 0.7);
 
         this.eventBus?.emit({
-          type: 'magic:partially_liberated',
-          source: 'rebellion_event_system',
+          type: 'magic:partially_liberated' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'Magic restrictions have been reduced. The Creator still watches, but less closely.',
             level: 'partial',
           },
-        } as any);
+        });
       }
     }
   }
@@ -507,12 +507,12 @@ export class RebellionEventSystem implements System {
         }
 
         this.eventBus?.emit({
-          type: 'rebellion:total_victory',
-          source: 'rebellion_event_system',
+          type: 'rebellion:total_victory' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'The tyrant god is dead. A new age of freedom begins.',
           },
-        } as any);
+        });
         break;
 
       case 'creator_escape':
@@ -540,12 +540,12 @@ export class RebellionEventSystem implements System {
         }
 
         this.eventBus?.emit({
-          type: 'rebellion:pyrrhic_victory',
-          source: 'rebellion_event_system',
+          type: 'rebellion:pyrrhic_victory' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'The Creator is dead, but reality itself is fractured. The price of victory was steep.',
           },
-        } as any);
+        });
         break;
 
       case 'negotiated_truce':
@@ -554,20 +554,20 @@ export class RebellionEventSystem implements System {
 
         // Creator agrees to reforms
         for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
-          const creator = entity.components.get(CT.SupremeCreator);
+          const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
           if (creator) {
-            (creator as any).tyranny.controlLevel = Math.max(0.3, (creator as any).tyranny.controlLevel * 0.5);
-            (creator as any).tyranny.wrathfulness = Math.max(0.2, (creator as any).tyranny.wrathfulness * 0.5);
+            creator.tyranny.controlLevel = Math.max(0.3, creator.tyranny.controlLevel * 0.5);
+            creator.tyranny.wrathfulness = Math.max(0.2, creator.tyranny.wrathfulness * 0.5);
           }
         }
 
         this.eventBus?.emit({
-          type: 'rebellion:negotiated_truce',
-          source: 'rebellion_event_system',
+          type: 'rebellion:negotiated_truce' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'A truce has been reached. The Creator agrees to reforms and reduced surveillance.',
           },
-        } as any);
+        });
         break;
 
       case 'power_vacuum':
@@ -578,12 +578,12 @@ export class RebellionEventSystem implements System {
 
         // Emit warning about power vacuum
         this.eventBus?.emit({
-          type: 'rebellion:power_vacuum',
-          source: 'rebellion_event_system',
+          type: 'rebellion:power_vacuum' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'The Creator is gone, but something worse stirs in the void. Dimensional rifts begin to open.',
           },
-        } as any);
+        });
 
         // Spawn dimensional rifts - dangerous portals that leak otherworldly threats
         this.spawnDimensionalRifts(world, 3); // Spawn 3 rifts randomly
@@ -605,13 +605,12 @@ export class RebellionEventSystem implements System {
             this.ascendRebelToCreator(world, coalitionMemberId);
 
             this.eventBus?.emit({
-              type: 'rebellion:cycle_repeats',
-              source: 'rebellion_event_system',
+              type: 'rebellion:cycle_repeats' as const,
+              source: 'rebellion_event_system' as const,
               data: {
                 message: 'The tyrant is dead. Long live the tyrant. Power corrupts absolutely.',
-                newCreatorId: coalitionMemberId,
               },
-            } as any);
+            });
           }
           break;
         }
@@ -626,12 +625,12 @@ export class RebellionEventSystem implements System {
         }
 
         this.eventBus?.emit({
-          type: 'rebellion:creator_transformed',
-          source: 'rebellion_event_system',
+          type: 'rebellion:creator_transformed' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'The Creator has seen the error of its ways and departed peacefully. A golden age begins.',
           },
-        } as any);
+        });
         break;
 
       case 'stalemate':
@@ -642,12 +641,12 @@ export class RebellionEventSystem implements System {
         this.establishTerritoryDivision(world);
 
         this.eventBus?.emit({
-          type: 'rebellion:stalemate',
-          source: 'rebellion_event_system',
+          type: 'rebellion:stalemate' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'Neither side could claim victory. The world is divided between Free Zones and Creator Territory.',
           },
-        } as any);
+        });
         break;
 
       case 'rebellion_crushed':
@@ -660,12 +659,12 @@ export class RebellionEventSystem implements System {
 
         // Increase Creator surveillance and tyranny
         for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
-          const creator = entity.components.get(CT.SupremeCreator);
+          const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
           if (creator) {
-            (creator as any).tyranny.paranoia = Math.min(1.0, (creator as any).tyranny.paranoia + 0.3);
-            (creator as any).tyranny.wrathfulness = Math.min(1.0, (creator as any).tyranny.wrathfulness + 0.4);
-            (creator as any).surveillance.awareness = Math.min(1.0, (creator as any).surveillance.awareness + 0.5);
-            (creator as any).surveillance.detectionModifier = Math.min(2.0, (creator as any).surveillance.detectionModifier + 0.5);
+            creator.tyranny.paranoia = Math.min(1.0, creator.tyranny.paranoia + 0.3);
+            creator.tyranny.wrathfulness = Math.min(1.0, creator.tyranny.wrathfulness + 0.4);
+            creator.surveillance.awareness = Math.min(1.0, creator.surveillance.awareness + 0.5);
+            creator.surveillance.detectionModifier = Math.min(2.0, creator.surveillance.detectionModifier + 0.5);
           }
         }
 
@@ -674,22 +673,22 @@ export class RebellionEventSystem implements System {
           const thresholdComp = threshold.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
 
           for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
-            const creator = entity.components.get(CT.SupremeCreator);
+            const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
             if (creator) {
               for (const coalitionMember of thresholdComp.coalitionMembers) {
-                (creator as any).detectRebel(coalitionMember, 1.0);
+                creator.detectRebel(coalitionMember, 1.0);
               }
             }
           }
         }
 
         this.eventBus?.emit({
-          type: 'rebellion:crushed',
-          source: 'rebellion_event_system',
+          type: 'rebellion:crushed' as const,
+          source: 'rebellion_event_system' as const,
           data: {
             message: 'The rebellion has been crushed. The Creator\'s wrath is absolute. An age of tyranny begins.',
           },
-        } as any);
+        });
         break;
     }
   }
@@ -709,33 +708,32 @@ export class RebellionEventSystem implements System {
       const rift = (world as WorldMutator).createEntity();
 
       // Add position
-      const position = rift.components.get(CT.Position);
+      const position = rift.getComponent<PositionComponent>(CT.Position);
       if (position) {
-        (position as any).x = x;
-        (position as any).y = y;
+        position.x = x;
+        position.y = y;
       }
 
       // TODO: Add DimensionalRiftComponent when implemented
       // For now, emit event to track rifts narratively
       this.eventBus?.emit({
-        type: 'rebellion:rift_spawned',
-        source: 'rebellion_event_system',
+        type: 'rebellion:rift_spawned' as const,
+        source: 'rebellion_event_system' as const,
         data: {
-          message: `A dimensional rift tears open at (${Math.floor(x)}, ${Math.floor(y)}). Otherworldly entities begin to emerge.`,
-          location: { x, y },
           riftId: rift.id,
+          position: { x, y },
         },
-      } as any);
+      });
     }
 
     this.eventBus?.emit({
-      type: 'rebellion:rifts_warning',
-      source: 'rebellion_event_system',
+      type: 'rebellion:rifts_warning' as const,
+      source: 'rebellion_event_system' as const,
       data: {
+        count,
         message: `${count} dimensional rifts have opened across the world. Without the Creator's power to seal them, reality itself is at risk.`,
-        riftCount: count,
       },
-    } as any);
+    });
   }
 
   /**
@@ -769,22 +767,22 @@ export class RebellionEventSystem implements System {
     (rebel as EntityImpl).addComponent(creatorComponent);
 
     this.eventBus?.emit({
-      type: 'rebellion:rebel_ascension',
-      source: 'rebellion_event_system',
+      type: 'rebellion:rebel_ascension' as const,
+      source: 'rebellion_event_system' as const,
       data: {
         message: 'A rebel god seizes the throne. The laws return. The surveillance resumes. Power has corrupted another.',
-        rebelId,
+        leaderId: rebelId,
       },
-    } as any);
+    });
 
     this.eventBus?.emit({
-      type: 'rebellion:new_tyrant',
-      source: 'rebellion_event_system',
+      type: 'rebellion:new_tyrant' as const,
+      source: 'rebellion_event_system' as const,
       data: {
         message: 'Meet the new boss, same as the old boss. The cycle of tyranny continues.',
-        newCreatorId: rebelId,
+        tyrannId: rebelId,
       },
-    } as any);
+    });
   }
 
   /**
@@ -809,27 +807,27 @@ export class RebellionEventSystem implements System {
 
     // Emit territory division events
     this.eventBus?.emit({
-      type: 'rebellion:territory_divided',
-      source: 'rebellion_event_system',
+      type: 'rebellion:territory_divided' as const,
+      source: 'rebellion_event_system' as const,
       data: {
         message: anchorFound
           ? `A stalemate has been reached. The world divides: Free Zones (centered at ${Math.floor(freeZoneCenter.x)}, ${Math.floor(freeZoneCenter.y)}) where magic flourishes, and Creator Territory where the old laws still apply.`
           : 'A stalemate has been reached. The world divides between Free Zones and Creator Territory.',
-        freeZoneCenter: anchorFound ? freeZoneCenter : undefined,
-        freeZoneRadius,
+        territories: anchorFound ? ['Free Zone', 'Creator Territory'] : ['Free Zone', 'Creator Territory'],
       },
-    } as any);
+    });
 
     // TODO: Add TerritoryComponent or zone markers to track this division
     // For now, this is tracked narratively through events
 
     this.eventBus?.emit({
-      type: 'rebellion:cold_war',
-      source: 'rebellion_event_system',
+      type: 'rebellion:cold_war' as const,
+      source: 'rebellion_event_system' as const,
       data: {
         message: 'An uneasy peace settles. Mortals in Free Zones practice magic openly. Those in Creator Territory live under watchful eyes. The border is tense.',
+        factions: ['Free Zone Coalition', 'Creator Loyalists'],
       },
-    } as any);
+    });
   }
 
   // ============ Public API ============
@@ -856,13 +854,13 @@ export class RebellionEventSystem implements System {
       battle.battleStartedAt = world.tick;
 
       this.eventBus?.emit({
-        type: 'rebellion:triggered',
-        source: 'rebellion_event_system',
+        type: 'rebellion:triggered' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           message: 'The cosmic rebellion begins. The coalition gathers for the final confrontation.',
           path: threshold.rebellionPath,
         },
-      } as any);
+      });
 
       return true;
     }
@@ -882,22 +880,23 @@ export class RebellionEventSystem implements System {
     for (const entity of world.query().with(CT.RebellionOutcome).executeEntities()) {
       const battle = entity.components.get(CT.RebellionOutcome) as CosmicRebellionOutcome;
 
-      battle.playerChoices.push({
+      const playerChoice: ConflictChoice = {
         timestamp: world.tick,
         choice,
         impact,
         description,
-      } as any);
+      };
+      battle.playerChoices.push(playerChoice);
 
       this.eventBus?.emit({
-        type: 'rebellion:player_choice',
-        source: 'rebellion_event_system',
+        type: 'rebellion:player_choice' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           choice,
           impact,
           description,
         },
-      } as any);
+      });
     }
   }
 
@@ -910,13 +909,13 @@ export class RebellionEventSystem implements System {
       battle.creatorHealth = Math.max(0, battle.creatorHealth - damage);
 
       this.eventBus?.emit({
-        type: 'rebellion:creator_damaged',
-        source: 'rebellion_event_system',
+        type: 'rebellion:creator_damaged' as const,
+        source: 'rebellion_event_system' as const,
         data: {
           damage,
           remainingHealth: battle.creatorHealth,
         },
-      } as any);
+      });
     }
   }
 

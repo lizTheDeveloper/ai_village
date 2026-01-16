@@ -22,6 +22,8 @@ import type { NewsStory, NewsCategory, NewsPriority, FieldReporter, NewsDesk } f
 import { createRecordingComponent } from '../components/RecordingComponent.js';
 import type { RecordingCategory } from '../components/RecordingComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 /**
  * Event newsworthiness scoring.
@@ -92,9 +94,12 @@ export class EventReportingSystem implements System {
   }
 
   /**
-   * Helper to subscribe to an event type.
+   * Helper to subscribe to an event type with proper typing.
    */
-  private subscribeToEvent(eventType: EventType, handler: (event: GameEvent) => void): void {
+  private subscribeToEvent<T extends EventType>(
+    eventType: T,
+    handler: (event: GameEvent<T>) => void
+  ): void {
     if (!this.eventBus) return;
 
     const unsubscribe = this.eventBus.subscribe(eventType, handler);
@@ -105,18 +110,19 @@ export class EventReportingSystem implements System {
   // EVENT HANDLERS
   // ============================================================================
 
-  private handleAgentDeath(event: GameEvent): void {
-    const data = event.data as any;
-    const agentId = data.agentId ?? data.entityId;
-    const agentName = data.agentName ?? data.name ?? 'Unknown';
-    const cause = data.cause ?? 'unknown causes';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleAgentDeath(event: GameEvent<'agent:died'>): void {
+    const data = event.data;
+    const agentId = data.entityId;
+    const agentName = data.name;
+    const cause = data.causeOfDeath;
+    // Note: agent:died event doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'crime',
       priority: 'high',
-      headline: `${agentName} Dies ${cause === 'unknown causes' ? '' : `from ${cause}`}`,
-      summary: `The community mourns the loss of ${agentName}, who died ${cause === 'unknown causes' ? 'unexpectedly' : `from ${cause}`}.`,
+      headline: `${agentName} Dies ${cause === 'unknown' ? '' : `from ${cause}`}`,
+      summary: `The community mourns the loss of ${agentName}, who died ${cause === 'unknown' ? 'unexpectedly' : `from ${cause}`}.`,
       sendReporter: true,
       recordingType: 'event_coverage',
     };
@@ -124,13 +130,15 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, agentId, location, event.tick);
   }
 
-  private handleAgentBirth(event: GameEvent): void {
-    const data = event.data as any;
-    const agentName = data.name ?? 'a new citizen';
-    const parentNames = data.parentNames ?? [];
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleAgentBirth(event: GameEvent<'agent:born'>): void {
+    const data = event.data;
+    const agentName = data.agentName ?? 'a new citizen';
+    const parentIds = data.parentIds ?? [];
+    // Note: agent:born event doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
-    const parentStr = parentNames.length > 0 ? ` to ${parentNames.join(' and ')}` : '';
+    // We don't have parent names in the event, just IDs
+    const parentStr = parentIds.length > 0 ? ' to loving parents' : '';
 
     const score: EventScore = {
       category: 'human_interest',
@@ -143,11 +151,13 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, data.agentId, location, event.tick);
   }
 
-  private handleUnionFormed(event: GameEvent): void {
-    const data = event.data as any;
-    const agent1Name = data.agent1Name ?? 'someone';
-    const agent2Name = data.agent2Name ?? 'someone';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleUnionFormed(event: GameEvent<'union:formed'>): void {
+    const data = event.data;
+    // Note: union:formed event doesn't have names in EventMap, only IDs
+    const agent1Name = 'someone';
+    const agent2Name = 'someone else';
+    // Note: union:formed event doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'human_interest',
@@ -160,44 +170,49 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, data.agent1Id, location, event.tick);
   }
 
-  private handleBattleStarted(event: GameEvent): void {
-    const data = event.data as any;
-    const location = data.location ?? { x: 0, y: 0 };
-    const participants = data.participants ?? 0;
+  private handleBattleStarted(event: GameEvent<'combat:battle_started'>): void {
+    const data = event.data;
+    const location = data.location;
+    const participantCount = data.participants.length;
 
     const score: EventScore = {
       category: 'breaking',
       priority: 'critical',
-      headline: `BREAKING: Battle Erupts${location ? ' in City Center' : ''}`,
-      summary: `A violent confrontation involving ${participants} combatants has broken out. Residents urged to stay indoors.`,
+      headline: `BREAKING: Battle Erupts in City Center`,
+      summary: `A violent confrontation involving ${participantCount} combatants has broken out. Residents urged to stay indoors.`,
       sendReporter: true,  // CRITICAL - send reporter immediately
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.battleId, location, event.tick);
+    // Use first participant as sourceEntityId
+    const sourceEntityId = data.participants[0] ?? 'unknown';
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleBattleEnded(event: GameEvent): void {
-    const data = event.data as any;
-    const casualties = data.casualties ?? 0;
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleBattleEnded(event: GameEvent<'combat:battle_ended'>): void {
+    const data = event.data;
+    const casualtyCount = data.casualties?.length ?? 0;
+    // Note: combat:battle_ended doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'breaking',
       priority: 'high',
-      headline: `Battle Ends: ${casualties} Casualties Reported`,
-      summary: `The fighting has ceased with ${casualties} casualties. Emergency services on scene.`,
+      headline: `Battle Ends: ${casualtyCount} Casualties Reported`,
+      summary: `The fighting has ceased with ${casualtyCount} casualties. Emergency services on scene.`,
       sendReporter: true,
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.battleId, location, event.tick);
+    // Use first participant as sourceEntityId
+    const sourceEntityId = data.participants[0] ?? 'unknown';
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleBuildingCompleted(event: GameEvent): void {
-    const data = event.data as any;
-    const buildingType = data.buildingType ?? 'building';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleBuildingCompleted(event: GameEvent<'building:completed'>): void {
+    const data = event.data;
+    const buildingType = data.buildingType;
+    const location = data.location;
 
     const score: EventScore = {
       category: 'local',
@@ -210,11 +225,12 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, data.buildingId, location, event.tick);
   }
 
-  private handleBuildingDestroyed(event: GameEvent): void {
-    const data = event.data as any;
-    const buildingType = data.buildingType ?? 'building';
-    const cause = data.cause ?? 'unknown';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleBuildingDestroyed(event: GameEvent<'building:destroyed'>): void {
+    const data = event.data;
+    // Note: building:destroyed doesn't have buildingType, cause, or location in EventMap
+    const buildingType = 'building';
+    const cause = 'unknown';
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'breaking',
@@ -228,30 +244,34 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, data.buildingId, location, event.tick);
   }
 
-  private handleDisaster(event: GameEvent): void {
-    const data = event.data as any;
-    const disasterType = data.type ?? 'disaster';
-    const severity = data.severity ?? 'moderate';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleDisaster(event: GameEvent<'disaster:occurred'>): void {
+    const data = event.data;
+    const disasterType = data.disasterType;
+    const severity = data.severity;
+    const location = data.location;
 
-    const priority = severity === 'catastrophic' ? 'critical' : severity === 'severe' ? 'high' : 'medium';
+    const priority = severity > 8 ? 'critical' : severity > 5 ? 'high' : 'medium';
+
+    const severityLabel = severity > 8 ? 'CATASTROPHIC' : severity > 5 ? 'SEVERE' : 'MODERATE';
 
     const score: EventScore = {
       category: 'breaking',
       priority: priority as NewsPriority,
-      headline: `${severity.toUpperCase()}: ${disasterType} Strikes City`,
-      summary: `A ${severity} ${disasterType} has struck the area. Emergency response teams deployed.`,
+      headline: `${severityLabel}: ${disasterType} Strikes City`,
+      summary: `A ${severityLabel.toLowerCase()} ${disasterType} has struck the area. Emergency response teams deployed.`,
       sendReporter: true,
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.disasterId, location, event.tick);
+    // Use location as a string ID since disaster doesn't have a dedicated ID
+    const sourceEntityId = `disaster_${disasterType}_${event.tick}`;
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleInvasion(event: GameEvent): void {
-    const data = event.data as any;
+  private handleInvasion(event: GameEvent<'invasion:started'>): void {
+    const data = event.data;
     const invaderType = data.invaderType ?? 'hostile forces';
-    const location = data.location ?? { x: 0, y: 0 };
+    const location = data.targetLocation;
 
     const score: EventScore = {
       category: 'breaking',
@@ -262,13 +282,15 @@ export class EventReportingSystem implements System {
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.invasionId, location, event.tick);
+    // Use first invader as sourceEntityId
+    const sourceEntityId = data.invaderIds[0] ?? 'unknown';
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleFestival(event: GameEvent): void {
-    const data = event.data as any;
-    const festivalName = data.name ?? 'Community Festival';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleFestival(event: GameEvent<'festival:started'>): void {
+    const data = event.data;
+    const festivalName = data.festivalType;
+    const location = data.location;
 
     const score: EventScore = {
       category: 'entertainment',
@@ -278,13 +300,16 @@ export class EventReportingSystem implements System {
       sendReporter: false,  // Entertainment, not urgent
     };
 
-    this.createNewsStory(score, data.festivalId, location, event.tick);
+    // Use organizer or first participant as sourceEntityId
+    const sourceEntityId = data.organizerId ?? data.participants?.[0] ?? 'unknown';
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleSacredSite(event: GameEvent): void {
-    const data = event.data as any;
-    const siteName = data.name ?? 'Sacred Site';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleSacredSite(event: GameEvent<'sacred_site:named'>): void {
+    const data = event.data;
+    const siteName = data.name;
+    // Note: sacred_site:named doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'human_interest',
@@ -298,11 +323,12 @@ export class EventReportingSystem implements System {
     this.createNewsStory(score, data.siteId, location, event.tick);
   }
 
-  private handleDivineIntervention(event: GameEvent): void {
-    const data = event.data as any;
-    const deity = data.deityName ?? 'divine forces';
-    const effect = data.effect ?? 'mysterious occurrence';
-    const location = data.location ?? { x: 0, y: 0 };
+  private handleDivineIntervention(event: GameEvent<'divine:intervention'>): void {
+    const data = event.data;
+    const deity = 'divine forces'; // deityId is in data, but not name
+    const effect = data.description ?? data.interventionType;
+    // Note: divine:intervention doesn't have location in EventMap, default to origin
+    const location = { x: 0, y: 0 };
 
     const score: EventScore = {
       category: 'breaking',
@@ -313,19 +339,21 @@ export class EventReportingSystem implements System {
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.interventionId, location, event.tick);
+    // Use deity or target as sourceEntityId
+    const sourceEntityId = data.deityId ?? data.targetId ?? 'divine_intervention';
+    this.createNewsStory(score, sourceEntityId, location, event.tick);
   }
 
-  private handleGodCraftedDiscovery(event: GameEvent): void {
-    const data = event.data as any;
-    const contentType = data.contentType ?? 'artifact';
-    const name = data.name ?? 'mysterious artifact';
-    const creator = data.creatorName ?? 'Unknown God';
-    const domain = data.creatorDomain ?? 'the Unknown';
+  private handleGodCraftedDiscovery(event: GameEvent<'godcrafted:discovered'>): void {
+    const data = event.data;
+    const contentType = data.contentType;
+    const name = data.name;
+    const creator = data.creatorName;
+    const domain = data.creatorDomain;
     const method = data.discoveryMethod ?? 'unknown means';
 
     // Create headline based on content type
-    const typeLabelMap: Record<string, string> = {
+    const typeLabelMap: Record<typeof contentType, string> = {
       riddle: 'Ancient Riddle',
       spell: 'Legendary Spell',
       recipe: 'Divine Recipe',
@@ -333,7 +361,7 @@ export class EventReportingSystem implements System {
       soul: 'Ancient Soul',
       quest: 'Divine Quest',
     };
-    const typeLabel = typeLabelMap[contentType as string] || 'Divine Artifact';
+    const typeLabel = typeLabelMap[contentType] || 'Divine Artifact';
 
     const score: EventScore = {
       category: 'breaking',
@@ -344,7 +372,7 @@ export class EventReportingSystem implements System {
       recordingType: 'event_coverage',
     };
 
-    this.createNewsStory(score, data.entityId, { x: 0, y: 0 }, event.tick);
+    this.createNewsStory(score, data.contentId, { x: 0, y: 0 }, event.tick);
   }
 
   // ============================================================================
@@ -403,8 +431,9 @@ export class EventReportingSystem implements System {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
 
-    // Find all news desks
-    const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+    // Find all news desks - accessing private field via type casting
+    // TODO: Add public method to DeskManager to get all desks
+    const desks = Array.from((deskManager as unknown as { desks: Map<string, NewsDesk> }).desks.values());
 
     for (const desk of desks) {
       // Find available field reporter
@@ -442,7 +471,9 @@ export class EventReportingSystem implements System {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
 
-    const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+    // Find all news desks - accessing private field via type casting
+    // TODO: Add public method to DeskManager to get all desks
+    const desks = Array.from((deskManager as unknown as { desks: Map<string, NewsDesk> }).desks.values());
 
     for (const desk of desks) {
       for (const reporter of desk.fieldReporters) {
@@ -457,7 +488,7 @@ export class EventReportingSystem implements System {
         const story = desk.storyQueue.find((s: NewsStory) => s.id === reporter.assignedStoryId);
         if (!story || !story.location) continue;
 
-        const position = entity.getComponent(CT.Position) as any;
+        const position = entity.getComponent<PositionComponent>(CT.Position);
         if (!position) continue;
 
         // Check if reporter arrived at location
@@ -493,10 +524,10 @@ export class EventReportingSystem implements System {
     story: NewsStory,
     currentTick: number
   ): void {
-    const agentComp = reporterEntity.getComponent(CT.Agent) as any;
-    const position = reporterEntity.getComponent(CT.Position) as any;
+    const identity = reporterEntity.getComponent<IdentityComponent>(CT.Identity);
+    const position = reporterEntity.getComponent<PositionComponent>(CT.Position);
 
-    if (!agentComp || !position) return;
+    if (!identity || !position) return;
 
     // Create recording entity
     const recordingEntity = world.createEntity();
@@ -504,7 +535,7 @@ export class EventReportingSystem implements System {
       'video',
       'event_coverage',
       reporterEntity.id,
-      agentComp.name ?? 'Reporter',
+      identity.name,
       { x: position.x, y: position.y },
       currentTick,
       {
@@ -514,7 +545,8 @@ export class EventReportingSystem implements System {
       }
     );
 
-    (recordingEntity as any).addComponent(recording);
+    // EntityImpl exposes addComponent method
+    (recordingEntity as EntityImpl).addComponent(recording);
 
   }
 

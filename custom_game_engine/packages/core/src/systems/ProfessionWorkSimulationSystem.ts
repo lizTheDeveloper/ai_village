@@ -43,6 +43,14 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import { updateReporterBehaviors } from '../profession/ReporterBehaviorHandler.js';
 
 /**
+ * Generic event emission helper for events not yet in EventMap.
+ * These profession events should be added to EventMap in the future.
+ */
+interface GenericEventEmitter {
+  emit: (event: { type: string; source: string; data: Record<string, unknown> }) => void;
+}
+
+/**
  * Configuration for ProfessionWorkSimulationSystem.
  */
 export interface ProfessionWorkConfig {
@@ -116,12 +124,12 @@ export class ProfessionWorkSimulationSystem implements System {
     const professionAgents = world
       .query()
       .with(CT.Agent)
-      .with('profession' as ComponentType)
+      .with(CT.Profession)
       .executeEntities();
 
     for (const entity of professionAgents) {
       const impl = entity as EntityImpl;
-      const profession = impl.getComponent<ProfessionComponent>('profession' as ComponentType);
+      const profession = impl.getComponent<ProfessionComponent>(CT.Profession);
       const agent = impl.getComponent<AgentComponent>(CT.Agent);
 
       if (!profession || !agent) {
@@ -222,17 +230,19 @@ export class ProfessionWorkSimulationSystem implements System {
 
     startProfessionWork(profession, workDescription, currentTick, workDuration);
 
-    // Emit event
-    this.eventBus?.emit({
-      type: 'profession:work_started' as any,
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-        role: profession.role,
-        description: workDescription,
-        expectedCompletionTick: currentTick + workDuration,
-      },
-    });
+    // Emit event (using generic emitter for events not yet in EventMap)
+    if (this.eventBus) {
+      (this.eventBus as unknown as GenericEventEmitter).emit({
+        type: 'profession:work_started',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          role: profession.role,
+          description: workDescription,
+          expectedCompletionTick: currentTick + workDuration,
+        },
+      });
+    }
   }
 
   /**
@@ -262,17 +272,19 @@ export class ProfessionWorkSimulationSystem implements System {
     // Increase experience
     profession.experienceDays += 1 / profession.dailyOutputQuota; // Fractional for sub-daily work
 
-    // Emit completion event
-    this.eventBus?.emit({
-      type: 'profession:work_completed' as any,
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-        role: profession.role,
-        output,
-        quality,
-      },
-    });
+    // Emit completion event (using generic emitter for events not yet in EventMap)
+    if (this.eventBus) {
+      (this.eventBus as unknown as GenericEventEmitter).emit({
+        type: 'profession:work_completed',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          role: profession.role,
+          output,
+          quality,
+        },
+      });
+    }
 
     // Special handling for media professions
     this.handleMediaOutput(world, profession, output);
@@ -301,11 +313,11 @@ export class ProfessionWorkSimulationSystem implements System {
    * Aggregate profession outputs to CityDirector for caching.
    */
   private aggregateOutputsToDirectors(world: World, currentTick: number): void {
-    const directors = world.query().with('city_director' as ComponentType).executeEntities();
+    const directors = world.query().with(CT.CityDirector).executeEntities();
 
     for (const directorEntity of directors) {
       const impl = directorEntity as EntityImpl;
-      const director = impl.getComponent<CityDirectorComponent>('city_director' as ComponentType);
+      const director = impl.getComponent<CityDirectorComponent>(CT.CityDirector);
 
       if (!director) {
         continue;
@@ -320,16 +332,16 @@ export class ProfessionWorkSimulationSystem implements System {
       // Find all profession agents in this city
       const professionAgents = world
         .query()
-        .with('profession' as ComponentType)
+        .with(CT.Profession)
         .executeEntities()
         .filter((e) => {
-          const prof = (e as EntityImpl).getComponent<ProfessionComponent>('profession' as ComponentType);
+          const prof = (e as EntityImpl).getComponent<ProfessionComponent>(CT.Profession);
           return prof?.cityDirectorId === impl.id;
         });
 
       // Aggregate outputs by type
       for (const entity of professionAgents) {
-        const profession = (entity as EntityImpl).getComponent<ProfessionComponent>('profession' as ComponentType);
+        const profession = (entity as EntityImpl).getComponent<ProfessionComponent>(CT.Profession);
         if (!profession) continue;
 
         for (const output of profession.recentOutputs) {
@@ -356,19 +368,21 @@ export class ProfessionWorkSimulationSystem implements System {
       // Update production metrics
       this.updateProductionMetrics(director, currentTick);
 
-      // Emit aggregation event
-      this.eventBus?.emit({
-        type: 'city:professions_updated' as any,
-        source: impl.id,
-        data: {
-          cityId: director.cityId,
-          newsArticleCount: director.professionOutputs.newsArticles.length,
-          tvEpisodeCount: director.professionOutputs.tvEpisodes.length,
-          radioBroadcastCount: director.professionOutputs.radioBroadcasts.length,
-          serviceCount: director.professionOutputs.services.length,
-          metrics: director.professionMetrics,
-        },
-      });
+      // Emit aggregation event (using generic emitter for events not yet in EventMap)
+      if (this.eventBus) {
+        (this.eventBus as unknown as GenericEventEmitter).emit({
+          type: 'city:professions_updated',
+          source: impl.id,
+          data: {
+            cityId: director.cityId,
+            newsArticleCount: director.professionOutputs.newsArticles.length,
+            tvEpisodeCount: director.professionOutputs.tvEpisodes.length,
+            radioBroadcastCount: director.professionOutputs.radioBroadcasts.length,
+            serviceCount: director.professionOutputs.services.length,
+            metrics: director.professionMetrics,
+          },
+        });
+      }
     }
   }
 
@@ -695,11 +709,11 @@ export class ProfessionWorkSimulationSystem implements System {
   private checkCityCrises(world: World): Map<string, 'none' | 'minor' | 'major' | 'critical'> {
     const crisisMap = new Map<string, 'none' | 'minor' | 'major' | 'critical'>();
 
-    const directors = world.query().with('city_director' as any).executeEntities();
+    const directors = world.query().with(CT.CityDirector).executeEntities();
 
     for (const directorEntity of directors) {
       const impl = directorEntity as EntityImpl;
-      const director = impl.getComponent<CityDirectorComponent>('city_director' as any);
+      const director = impl.getComponent<CityDirectorComponent>(CT.CityDirector);
 
       if (!director) {
         continue;
@@ -735,7 +749,7 @@ export class ProfessionWorkSimulationSystem implements System {
    */
   private canAgentWork(entity: EntityImpl): boolean {
     // Check if agent has needs component
-    const needs = entity.getComponent('needs' as any) as NeedsComponent | undefined;
+    const needs = entity.getComponent<NeedsComponent>(CT.Needs);
     if (!needs) {
       return true; // No needs component = can work
     }

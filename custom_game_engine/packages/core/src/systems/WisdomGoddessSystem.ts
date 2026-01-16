@@ -11,6 +11,7 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { ComponentType, EntityId } from '../types.js';
 import { TICKS_PER_HOUR } from '../constants/TimeConstants.js';
 import { pendingApprovalRegistry, type PendingCreation } from '../crafting/PendingApprovalRegistry.js';
@@ -31,6 +32,8 @@ import { ChatRoomSystem, DIVINE_CHAT_CONFIG } from '../communication/index.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import { updateRelationship } from '../components/RelationshipComponent.js';
 import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 /** Configuration for wisdom goddess manifestation */
 interface SystemConfig {
@@ -229,8 +232,8 @@ export class WisdomGoddessSystem implements System {
     approvedCount: number;
     rejectedCount: number;
   } {
-    const relComp = goddess.components.get('relationship') as RelationshipComponent | undefined;
-    const memComp = goddess.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const relComp = goddess.getComponent<RelationshipComponent>('relationship');
+    const memComp = goddess.getComponent<EpisodicMemoryComponent>('episodic_memory');
 
     let familiarity = 0;
     let affinity = 0;
@@ -455,7 +458,7 @@ export class WisdomGoddessSystem implements System {
     message: string,
     currentTick: number
   ): void {
-    const relComp = goddess.components.get('relationship') as RelationshipComponent | undefined;
+    const relComp = goddess.getComponent<RelationshipComponent>('relationship');
     if (!relComp) return;
 
     // Analyze message sentiment (simple heuristic)
@@ -483,12 +486,14 @@ export class WisdomGoddessSystem implements System {
       affinityChange += 1;
     }
 
-    // Update the relationship (cast to Tick type which is bigint)
-    const updatedRel = updateRelationship(relComp, targetId, BigInt(currentTick) as any, 3, affinityChange);
+    // Update the relationship (Tick is number type)
+    const updatedRel = updateRelationship(relComp, targetId, currentTick, 3, affinityChange);
 
     // Replace the component (immutable pattern)
-    (goddess as any).removeComponent('relationship');
-    (goddess as any).addComponent(updatedRel);
+    // Note: Entity interface doesn't expose mutation methods, but EntityImpl does
+    // This is by design - systems work with mutable entities internally
+    (goddess as EntityImpl).removeComponent('relationship');
+    (goddess as EntityImpl).addComponent(updatedRel);
   }
 
   /**
@@ -502,7 +507,7 @@ export class WisdomGoddessSystem implements System {
     ourResponse: string,
     currentTick: number
   ): void {
-    const memComp = goddess.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const memComp = goddess.getComponent<EpisodicMemoryComponent>('episodic_memory');
     if (!memComp) return;
 
     memComp.formMemory({
@@ -534,7 +539,7 @@ export class WisdomGoddessSystem implements System {
    * Get the goddess's name from the entity
    */
   private getGoddessName(goddess: Entity): string {
-    const identity = goddess.components.get('identity') as any;
+    const identity = goddess.getComponent<IdentityComponent>('identity');
     return identity?.name || 'Goddess of Wisdom';
   }
 
@@ -568,7 +573,7 @@ export class WisdomGoddessSystem implements System {
       // Try to find the creator entity for their location
       const creator = world.getEntity(firstCreation.creatorId);
       if (creator) {
-        const pos = creator.components.get('position') as { x: number; y: number } | undefined;
+        const pos = creator.getComponent<PositionComponent>('position');
         if (pos) {
           location = { x: pos.x, y: pos.y };
         }
@@ -606,7 +611,7 @@ export class WisdomGoddessSystem implements System {
     }
 
     // Store goddess config and start processing
-    this.activeGoddessConfig = goddessConfig as any;
+    this.activeGoddessConfig = goddessConfig;
     this.processingQueue = [...staleCreations];
     this.isProcessing = true;
   }

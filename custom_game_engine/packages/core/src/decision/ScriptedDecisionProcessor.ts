@@ -642,8 +642,9 @@ export class ScriptedDecisionProcessor {
               // Check if this resource is available nearby
               const resourcesNearby = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
               const hasNearbyResource = resourcesNearby.some((r) => {
-                const rc = r.components.get(ComponentType.Resource) as ResourceComponent | undefined;
-                const rp = r.components.get(ComponentType.Position) as PositionComponent | undefined;
+                const rImpl = r as EntityImpl;
+                const rc = rImpl.getComponent<ResourceComponent>(ComponentType.Resource);
+                const rp = rImpl.getComponent<PositionComponent>(ComponentType.Position);
                 if (!rc || !rp || !rc.harvestable || rc.amount <= 0) return false;
                 if (rc.resourceType !== resourceType) return false;
                 const dist = this.distance(position, rp);

@@ -20,6 +20,9 @@ const INTERACTION_LLM_TIMEOUT_TICKS = 1200;
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 import { calculateStorageStats } from '../utils/StorageContext.js';
 import { ComponentType } from '../types/ComponentType.js';
@@ -509,11 +512,11 @@ export class LLMDecisionProcessor {
         });
 
         // Emit comprehensive agent state snapshot for dashboard
-        const identity = entity.components.get(ComponentType.Identity) as { name?: string } | undefined;
+        const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
         const position = entity.getComponent<PositionComponent>(ComponentType.Position);
         const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
-        const needs = entity.components.get(ComponentType.Needs) as { hunger?: number; energy?: number; social?: number } | undefined;
-        const skillsComp = entity.components.get(ComponentType.Skills) as { levels?: Record<string, number> } | undefined;
+        const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+        const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
 
         // Build skills snapshot (only include non-zero skills)
         let skills: Record<string, number> | undefined;
@@ -745,7 +748,7 @@ export class LLMDecisionProcessor {
           let completeCount = 0;
           let inProgressCount = 0;
           for (const b of existingBuildings) {
-            const bc = b.components.get(ComponentType.Building) as { buildingType?: string; isComplete?: boolean } | undefined;
+            const bc = b.getComponent<BuildingComponent>(ComponentType.Building);
             if (bc?.buildingType === buildingType) {
               if (bc.isComplete) completeCount++;
               else inProgressCount++;
@@ -826,7 +829,7 @@ export class LLMDecisionProcessor {
           let plannedByOthers = 0;
           for (const otherAgent of allAgents) {
             if (otherAgent.id === entity.id) continue;
-            const otherAgentComp = otherAgent.components.get(ComponentType.Agent) as AgentComponent | undefined;
+            const otherAgentComp = otherAgent.getComponent<AgentComponent>(ComponentType.Agent);
             if (otherAgentComp?.plannedBuilds?.some(p => p.buildingType === buildingType)) {
               plannedByOthers++;
             }

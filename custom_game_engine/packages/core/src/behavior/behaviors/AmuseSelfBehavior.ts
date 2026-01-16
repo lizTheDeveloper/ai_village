@@ -147,8 +147,129 @@ export class AmuseSelfBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use amuseSelfBehaviorWithContext instead
  */
 export function amuseSelfBehavior(entity: EntityImpl, world: World): void {
   const behavior = new AmuseSelfBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('amuse_self', amuseSelfBehaviorWithContext);
+ */
+export function amuseSelfBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  // Stop all movement
+  ctx.stopMovement();
+
+  // Initialize amusement type based on personality
+  let amusementType = ctx.getState<string>('amusementType');
+  if (!amusementType) {
+    const personality = ctx.getComponent<PersonalityComponent>(ComponentType.Personality);
+    amusementType = selectAmusementType(personality);
+    ctx.updateState({
+      amusementType,
+      amusementStart: ctx.tick,
+    });
+
+    // Generate initial monologue
+    const monologue = generateAmusementMonologue(amusementType);
+    ctx.setThought(monologue);
+  }
+
+  // Update monologue occasionally
+  const lastMonologue = ctx.getState<number>('lastMonologue') ?? 0;
+  if (ctx.tick - lastMonologue > 300) {
+    const monologue = generateAmusementMonologue(amusementType);
+    ctx.setThought(monologue);
+    ctx.updateState({ lastMonologue: ctx.tick });
+  }
+
+  // Amuse self for ~15 seconds (300 ticks)
+  const amusementStart = ctx.getState<number>('amusementStart')!;
+  const ticksAmusing = ctx.tick - amusementStart;
+
+  if (ticksAmusing > 300) {
+    // Done amusing self
+    return ctx.complete('amusement_complete');
+  }
+}
+
+/**
+ * Select amusement type based on personality.
+ * Helper function for amuseSelfBehaviorWithContext.
+ */
+function selectAmusementType(personality: PersonalityComponent | undefined): string {
+  if (!personality) {
+    return 'daydream';
+  }
+
+  // High creativity → imaginative activities
+  if (personality.creativity > 70) {
+    const creative = ['imagine', 'daydream', 'create_stories', 'think_creatively'];
+    return creative[Math.floor(Math.random() * creative.length)]!;
+  }
+
+  // High conscientiousness → organized activities
+  if (personality.conscientiousness > 70) {
+    const organized = ['plan', 'organize_thoughts', 'mental_practice'];
+    return organized[Math.floor(Math.random() * organized.length)]!;
+  }
+
+  // High openness → curious activities
+  if (personality.openness > 70) {
+    const curious = ['wonder', 'philosophize', 'imagine_possibilities'];
+    return curious[Math.floor(Math.random() * curious.length)]!;
+  }
+
+  // Default activities
+  const defaults = ['daydream', 'hum', 'people_watch', 'think'];
+  return defaults[Math.floor(Math.random() * defaults.length)]!;
+}
+
+/**
+ * Generate amusement monologue based on type.
+ * Helper function for amuseSelfBehaviorWithContext.
+ */
+function generateAmusementMonologue(type: string): string {
+  const monologues: Record<string, string[]> = {
+    daydream: [
+      'Lost in thought... so many possibilities.',
+      'Imagining what could be...',
+      'My mind wanders to interesting places.',
+    ],
+    imagine: [
+      'What if I tried it this way instead?',
+      'Creating something in my mind...',
+      'The imagination has no limits.',
+    ],
+    plan: [
+      'Mentally organizing my next steps.',
+      'Planning ahead makes everything smoother.',
+      'Thinking through the details...',
+    ],
+    wonder: [
+      'I wonder how that works?',
+      'So many questions, so many mysteries.',
+      'The world is full of things to discover.',
+    ],
+    hum: [
+      'Humming a little tune to myself...',
+      'Music makes everything better.',
+      'Just enjoying the simple pleasures.',
+    ],
+    people_watch: [
+      'Watching others go about their day.',
+      'Everyone has their own story.',
+      'Interesting to see what people do.',
+    ],
+    think: [
+      'Just thinking about things.',
+      'Enjoying my own thoughts.',
+      'Sometimes it\'s good to just think.',
+    ],
+  };
+
+  const options = monologues[type] || monologues.think!;
+  return options[Math.floor(Math.random() * options.length)]!;
 }

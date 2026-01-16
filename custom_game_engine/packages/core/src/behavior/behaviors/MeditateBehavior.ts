@@ -25,6 +25,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { receiveVision } from '../../components/SpiritualComponent.js';
 import { SacredSiteSystem } from '../../systems/SacredSiteSystem.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Meditation configuration
@@ -365,9 +367,236 @@ export class MeditateBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use meditateBehaviorWithContext for new code
  */
 export function meditateBehavior(entity: EntityImpl, world: World): void {
   const behavior = new MeditateBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern meditate behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('meditate', meditateBehaviorWithContext);
+ */
+export function meditateBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  // Stop all movement
+  ctx.stopMovement();
+
+  const spiritual = ctx.getComponent<SpiritualComponent>(CT.Spiritual);
+
+  if (!spiritual) {
+    throw new Error(`[MeditateBehavior] Agent ${ctx.entity.id} missing spiritual component`);
+  }
+
+  // Initialize meditation state
+  if (!ctx.getState('meditationStarted')) {
+    // Calculate meditation duration based on spiritual aptitude
+    const aptitudeBonus = spiritual.faith * 0.3;
+    const duration = Math.floor(
+      MEDITATION_CONFIG.BASE_DURATION * (1 - aptitudeBonus)
+    );
+
+    ctx.updateState({
+      meditationStarted: ctx.tick,
+      meditationDuration: Math.max(MEDITATION_CONFIG.MIN_DURATION, duration),
+      lastMonologue: 0,
+    });
+
+    // Mark as meditating
+    ctx.updateComponent<SpiritualComponent>(CT.Spiritual, (comp) => ({
+      ...comp,
+      meditating: true,
+      meditationProgress: 0,
+    }));
+
+    // Emit event
+    ctx.emit({
+      type: 'agent:meditation_started',
+      data: {
+        agentId: ctx.entity.id,
+        position: undefined,
+      },
+    });
+
+    return;
+  }
+
+  const startTick = ctx.getState<number>('meditationStarted')!;
+  const duration = ctx.getState<number>('meditationDuration') || MEDITATION_CONFIG.BASE_DURATION;
+  const elapsed = ctx.tick - startTick;
+
+  // Update meditation progress
+  const progress = Math.min(1.0, elapsed / duration);
+  ctx.updateComponent<SpiritualComponent>(CT.Spiritual, (comp) => ({
+    ...comp,
+    meditating: true,
+    meditationProgress: progress,
+  }));
+
+  // Restore energy while meditating
+  if (ctx.needs) {
+    ctx.updateComponent<NeedsComponent>(CT.Needs, (comp) => {
+      return new NeedsComponent({
+        ...comp,
+        energy: Math.min(1.0, comp.energy + MEDITATION_CONFIG.ENERGY_RESTORE_RATE),
+      });
+    });
+  }
+
+  // Periodic internal monologue
+  const lastMonologue = ctx.getState<number>('lastMonologue') ?? 0;
+  if (ctx.tick - lastMonologue > MEDITATION_CONFIG.MONOLOGUE_INTERVAL) {
+    const thought = MEDITATION_THOUGHTS[Math.floor(Math.random() * MEDITATION_THOUGHTS.length)]!;
+    ctx.setThought(thought);
+    ctx.updateState({ lastMonologue: ctx.tick });
+
+    // Emit internal monologue event
+    ctx.emit({
+      type: 'agent:internal_monologue',
+      data: {
+        agentId: ctx.entity.id,
+        behaviorType: 'meditate',
+        monologue: thought,
+        timestamp: ctx.tick,
+      },
+    });
+  }
+
+  // Check for vision at end of meditation
+  if (elapsed >= duration) {
+    return completeMeditationWithContext(ctx, spiritual);
+  }
+
+  // Continue meditating
+}
+
+function completeMeditationWithContext(
+  ctx: BehaviorContext,
+  spiritual: SpiritualComponent
+): BehaviorResult {
+  // Calculate vision chance
+  let visionChance = MEDITATION_CONFIG.BASE_VISION_CHANCE;
+
+  // Bonus if recently prayed
+  const timeSinceLastPrayer = ctx.tick - (spiritual.lastPrayerTime ?? 0);
+  if (timeSinceLastPrayer < 600) {
+    visionChance += MEDITATION_CONFIG.POST_PRAYER_BONUS;
+  }
+
+  // Bonus from sacred site
+  const sacredSiteSystem = getSacredSiteSystemFromMeditationContext(ctx);
+  if (sacredSiteSystem) {
+    const visionClarityBonus = sacredSiteSystem.getVisionClarity({ x: ctx.position.x, y: ctx.position.y });
+    visionChance += visionClarityBonus;
+    visionChance += MEDITATION_CONFIG.SACRED_SITE_BONUS * (visionClarityBonus > 0 ? 1 : 0);
+  }
+
+  // Faith affects vision chance
+  visionChance *= (0.5 + spiritual.faith * 0.5);
+
+  const receivedVision = Math.random() < visionChance;
+
+  // End meditation state
+  ctx.updateComponent<SpiritualComponent>(CT.Spiritual, (comp) => ({
+    ...comp,
+    meditating: false,
+    meditationProgress: undefined,
+  }));
+
+  if (receivedVision) {
+    // Generate and deliver vision
+    const vision = generateVisionWithContext(ctx, spiritual);
+    const updatedSpiritual = receiveVision(spiritual, vision, 10);
+    (ctx.entity as any).addComponent(updatedSpiritual);
+
+    // Thought about receiving vision
+    const thought = VISION_RECEIVED_THOUGHTS[Math.floor(Math.random() * VISION_RECEIVED_THOUGHTS.length)]!;
+    ctx.setThought(thought);
+
+    // Emit vision event
+    ctx.emit({
+      type: 'vision:received',
+      data: {
+        agentId: ctx.entity.id,
+        deityId: undefined,
+        visionType: 'meditation',
+        content: vision.content,
+        clarity: vision.clarity,
+        position: { x: ctx.position.x, y: ctx.position.y },
+      },
+    });
+  } else {
+    // No vision - peaceful ending
+    const thought = NO_VISION_THOUGHTS[Math.floor(Math.random() * NO_VISION_THOUGHTS.length)]!;
+    ctx.setThought(thought);
+  }
+
+  // Emit meditation complete event
+  ctx.emit({
+    type: 'agent:meditation_complete',
+    data: {
+      agentId: ctx.entity.id,
+      visionReceived: receivedVision,
+      duration: ctx.getState<number>('meditationDuration') || MEDITATION_CONFIG.BASE_DURATION,
+    },
+  });
+
+  return ctx.complete(receivedVision ? 'vision_received' : 'meditation_complete');
+}
+
+function generateVisionWithContext(
+  ctx: BehaviorContext,
+  spiritual: SpiritualComponent
+): Vision {
+  // Calculate clarity based on faith and sacred site
+  let clarity = spiritual.faith * 0.5 + 0.3;
+
+  const sacredSiteSystem = getSacredSiteSystemFromMeditationContext(ctx);
+  if (sacredSiteSystem) {
+    clarity += sacredSiteSystem.getVisionClarity({ x: ctx.position.x, y: ctx.position.y });
+  }
+
+  clarity = Math.min(1.0, clarity);
+
+  // Generate vision content
+  const visionTemplates = [
+    'A path unfolds before you, leading to great purpose.',
+    'Those you care for are watched over.',
+    'Change is coming. Embrace it.',
+    'Your efforts do not go unnoticed.',
+    'The village will grow strong under your guidance.',
+    'Trust in those around you.',
+    'A challenge approaches, but you are ready.',
+    'Peace will come to those who seek it.',
+  ];
+
+  const content = visionTemplates[Math.floor(Math.random() * visionTemplates.length)]!;
+
+  return {
+    id: `vision_${ctx.tick}`,
+    content,
+    source: 'meditation',
+    clarity,
+    timestamp: ctx.tick,
+    receivedAt: ctx.tick,
+    interpreted: false,
+    sharedWith: [],
+  };
+}
+
+function getSacredSiteSystemFromMeditationContext(ctx: BehaviorContext): SacredSiteSystem | null {
+  // Access world through entity's internal reference
+  const world = (ctx.entity as any).world;
+  if (!world) return null;
+
+  const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+  if (systems instanceof Map) {
+    return systems.get('sacred_site') as SacredSiteSystem | null;
+  }
+  return null;
 }

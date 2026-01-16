@@ -12,7 +12,7 @@ export { BaseBehavior, type BehaviorResult, type IBehavior } from './BaseBehavio
 
 // Simple behaviors
 export { WanderBehavior, wanderBehavior } from './WanderBehavior.js';
-export { IdleBehavior, idleBehavior } from './IdleBehavior.js';
+export { IdleBehavior, idleBehavior, idleBehaviorWithContext } from './IdleBehavior.js';
 
 // Idle & reflection behaviors
 export { ReflectBehavior, reflectBehavior } from './ReflectBehavior.js';
@@ -32,7 +32,7 @@ export {
 
 // Resource behaviors
 export { GatherBehavior, gatherBehavior, injectChunkSpatialQueryToGather } from './GatherBehavior.js';
-export { DepositItemsBehavior, depositItemsBehavior } from './DepositItemsBehavior.js';
+export { DepositItemsBehavior, depositItemsBehavior, injectChunkSpatialQueryToDepositItems } from './DepositItemsBehavior.js';
 export { SeekFoodBehavior, seekFoodBehavior, injectChunkSpatialQueryToSeekFood } from './SeekFoodBehavior.js';
 
 // Social behaviors
@@ -113,7 +113,7 @@ export * from './GroupPrayBehavior.js';
 export * from './MeditateBehavior.js';
 
 // Building maintenance behaviors
-export * from './RepairBehavior.js';
+export { RepairBehavior, repairBehavior, injectChunkSpatialQueryToRepair } from './RepairBehavior.js';
 export * from './UpgradeBehavior.js';
 
 // Tile-Based Voxel Building Behaviors (Phase 4)

@@ -6,12 +6,14 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { GameEvent } from '../events/GameEvent.js';
-import type { Myth, TraitImplication } from '../components/MythComponent.js';
+import type { Myth, TraitImplication, MythologyComponent } from '../components/MythComponent.js';
 import { createMythologyComponent, addMyth, tellMyth } from '../components/MythComponent.js';
 import type { SpiritualComponent, Prayer } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 /**
  * Pending myth to be created (before LLM request)
@@ -202,9 +204,9 @@ export class MythGenerationSystem implements System {
       );
 
       // Add to deity's mythology component
-      const mythology = deity.components.get(CT.Mythology);
+      const mythology = deity.getComponent<MythologyComponent>(CT.Mythology);
       if (mythology) {
-        const updatedMythology = addMyth(mythology as any, myth);
+        const updatedMythology = addMyth(mythology, myth);
 
         // Spread to agent (witness) and nearby agents
         const nearbyAgents = this._findNearbyAgents(agent, entities);
@@ -261,7 +263,7 @@ export class MythGenerationSystem implements System {
     const interventionism = deityComp.identity.perceivedPersonality.interventionism;
 
     // Get agent identity if available
-    const identity = agent.components.get(CT.Identity) as any;
+    const identity = agent.getComponent<IdentityComponent>(CT.Identity);
     const agentName = identity?.name || `Agent ${agent.id.slice(0, 8)}`;
 
     let prompt = `You are a storyteller in an ancient village, telling a tale about ${deityName}, a deity of ${domain}.\n\n`;
@@ -450,7 +452,7 @@ export class MythGenerationSystem implements System {
    * Find agents near the given agent
    */
   private _findNearbyAgents(agent: Entity, entities: ReadonlyArray<Entity>): Entity[] {
-    const position = agent.components.get(CT.Position);
+    const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return [];
 
     const nearby: Entity[] = [];
@@ -460,11 +462,11 @@ export class MythGenerationSystem implements System {
       if (other.id === agent.id) continue;
       if (!other.components.has(CT.Agent)) continue;
 
-      const otherPos = other.components.get(CT.Position);
+      const otherPos = other.getComponent<PositionComponent>(CT.Position);
       if (!otherPos) continue;
 
-      const dx = (otherPos as any).x - (position as any).x;
-      const dy = (otherPos as any).y - (position as any).y;
+      const dx = otherPos.x - position.x;
+      const dy = otherPos.y - position.y;
       const distSq = dx * dx + dy * dy;
 
       if (distSq <= SPREAD_RADIUS * SPREAD_RADIUS) {

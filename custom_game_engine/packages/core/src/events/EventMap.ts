@@ -1019,6 +1019,63 @@ export interface GameEventMap {
     violationCount: number;
   };
 
+  // === Reality Anchor Events ===
+  /** Reality anchor charging interrupted */
+  'reality_anchor:charging_interrupted': {
+    message: string;
+    powerLevel: number;
+  };
+
+  /** Reality anchor ready to activate */
+  'reality_anchor:ready': Record<string, never>;
+
+  /** Reality anchor activated */
+  'reality_anchor:activated': {
+    message: string;
+  };
+
+  /** Reality anchor receiving partial power */
+  'reality_anchor:power_insufficient': {
+    message: string;
+    efficiency: number;
+  };
+
+  /** Reality anchor critical power loss */
+  'reality_anchor:power_loss': {
+    message: string;
+    efficiency: number;
+  };
+
+  /** God entered reality anchor field and became mortal */
+  'reality_anchor:god_mortalized': {
+    godId: string;
+    message: string;
+  };
+
+  /** Supreme Creator entered reality anchor field */
+  'reality_anchor:creator_mortalized': {
+    godId: string;
+    message: string;
+  };
+
+  /** God left reality anchor field and powers restored */
+  'reality_anchor:god_restored': {
+    godId: string;
+    message: string;
+  };
+
+  /** Reality anchor overloading */
+  'reality_anchor:overloading': {
+    message: string;
+    countdown: number;
+  };
+
+  /** Reality anchor field collapsed */
+  'reality_anchor:field_collapse': {
+    message: string;
+    reason: string;
+  };
+
   'trust:verified': {
     trusterId: EntityId;
     trusteeId: EntityId;
@@ -1721,6 +1778,13 @@ export interface GameEventMap {
       hunger: number;
       energy: number;
     };
+  };
+
+  // === PixelLab Sprite Generation Events ===
+  'pixellab:sprite_complete': {
+    agentId: string;
+    characterId: string;
+    name: string;
   };
 
   // === Courtship & Reproduction Events ===

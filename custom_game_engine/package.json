@@ -17,6 +17,7 @@
     "bench": "vitest bench --run",
     "bench:watch": "vitest bench",
     "lint": "eslint .",
+    "lint:errors": "eslint . --quiet",
     "clean": "rm -rf packages/*/dist",
     "detect-oscillation": "npx tsx scripts/detect-oscillation.ts",
     "metrics-server": "npx tsx --no-cache scripts/metrics-server.ts",

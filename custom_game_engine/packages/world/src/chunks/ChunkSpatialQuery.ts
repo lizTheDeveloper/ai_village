@@ -102,13 +102,40 @@ export class ChunkSpatialQuery {
 
     for (const chunk of chunks) {
       const cache = this.chunkCaches.get(getChunkKey(chunk.chunkX, chunk.chunkY));
-      if (!cache) continue;
 
-      // Get entities of requested types from this chunk
-      for (const componentType of componentTypes) {
-        const entities = getEntitiesInChunk(cache, componentType);
-        for (const entityId of entities) {
-          candidateIds.add(entityId);
+      // Try ChunkCache's component-based index first
+      let foundInCache = false;
+      if (cache) {
+        for (const componentType of componentTypes) {
+          const entities = getEntitiesInChunk(cache, componentType);
+          if (entities.size > 0) {
+            foundInCache = true;
+            for (const entityId of entities) {
+              candidateIds.add(entityId);
+            }
+          }
+        }
+      }
+
+      // FALLBACK: Use World's basic chunk index if ChunkCache is empty
+      // This handles the case where ChunkCache entityIndex isn't populated yet
+      if (!foundInCache) {
+        // Get all entities in this chunk from World's chunkIndex
+        const chunkEntityIds = this.world.getEntitiesInChunk(chunk.chunkX, chunk.chunkY);
+
+        // Filter by component type
+        for (const entityId of chunkEntityIds) {
+          const entity = this.world.getEntity(entityId);
+          if (!entity) continue;
+
+          const impl = entity as EntityImpl;
+          // Check if entity has any of the requested component types
+          for (const componentType of componentTypes) {
+            if (impl.hasComponent(componentType)) {
+              candidateIds.add(entityId);
+              break; // Only add once even if has multiple matching components
+            }
+          }
         }
       }
     }
@@ -375,5 +402,45 @@ export class ChunkSpatialQuery {
     }
 
     return false;
+  }
+
+  /**
+   * Check if a specific building type exists or is being built in a chunk (O(1) lookup)
+   *
+   * Uses cached chunk stats for instant lookups without scanning entities.
+   * Checks both completed buildings and agents currently building that type.
+   *
+   * @param chunkX - Chunk X coordinate
+   * @param chunkY - Chunk Y coordinate
+   * @param buildingType - Building type to check (e.g., 'campfire', 'workbench')
+   * @returns True if building exists (completed or under construction)
+   */
+  hasBuildingInChunk(chunkX: number, chunkY: number, buildingType: string): boolean {
+    const cache = this.chunkCaches.get(getChunkKey(chunkX, chunkY));
+    if (!cache) return false;
+
+    // O(1) lookup: Check completed buildings
+    const completedCount = cache.stats.buildingTypes.get(buildingType) || 0;
+    if (completedCount > 0) return true;
+
+    // O(1) lookup: Check agents building this type
+    const pendingCount = cache.stats.pendingBuilds.get(buildingType) || 0;
+    return pendingCount > 0;
+  }
+
+  /**
+   * Check if a specific building type exists or is being built near a position (O(1) per chunk)
+   *
+   * Checks the agent's current chunk for the building type.
+   * Much faster than scanning all entities.
+   *
+   * @param worldX - World X coordinate
+   * @param worldY - World Y coordinate
+   * @param buildingType - Building type to check
+   * @returns True if building exists in agent's chunk
+   */
+  hasBuildingNearPosition(worldX: number, worldY: number, buildingType: string): boolean {
+    const { chunkX, chunkY } = worldToChunk(worldX, worldY);
+    return this.hasBuildingInChunk(chunkX, chunkY, buildingType);
   }
 }

@@ -21,6 +21,17 @@ import { recordDeposited } from '../../components/GatheringStatsComponent.js';
 import { itemRegistry } from '../../items/index.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
+import { CHUNK_SIZE } from '../../types.js';
+
+/**
+ * Injection point for ChunkSpatialQuery (optional dependency)
+ */
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToDepositItems(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[DepositItemsBehavior] ChunkSpatialQuery injected');
+}
 
 /**
  * Get the current game day from the world's time entity.
@@ -61,24 +72,49 @@ export class DepositItemsBehavior extends BaseBehavior {
       return { complete: true, reason: 'No items to deposit' };
     }
 
-    // Find storage buildings with inventory components
-    const storageBuildings = world.query()
-      .with(ComponentType.Building)
-      .with(ComponentType.Inventory)
-      .with(ComponentType.Position)
-      .executeEntities();
+    // Find storage buildings - use ChunkSpatialQuery if available
+    let validStorage: Entity[];
 
-    // Filter for storage-chest and storage-box types
-    const validStorage = storageBuildings.filter(storage => {
-      const storageImpl = storage as EntityImpl;
-      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      if (!building) return false;
-
-      return (
-        (building.buildingType === BuildingType.StorageChest || building.buildingType === BuildingType.StorageBox) &&
-        building.isComplete // Only deposit to completed buildings
+    if (chunkSpatialQuery) {
+      // Fast: chunk-based spatial query within reasonable radius
+      const SEARCH_RADIUS = CHUNK_SIZE * 3; // ~3 chunks
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        position.x, position.y, SEARCH_RADIUS,
+        [ComponentType.Building]
       );
-    });
+
+      validStorage = buildingsInRadius
+        .map((result: { entity: Entity }) => result.entity)
+        .filter((storage: Entity) => {
+          const storageImpl = storage as EntityImpl;
+          const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+          const inv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+          if (!building || !inv) return false;
+          return (
+            (building.buildingType === BuildingType.StorageChest ||
+             building.buildingType === BuildingType.StorageBox) &&
+            building.isComplete
+          );
+        });
+    } else {
+      // Fallback: global query
+      const storageBuildings = world.query()
+        .with(ComponentType.Building)
+        .with(ComponentType.Inventory)
+        .with(ComponentType.Position)
+        .executeEntities();
+
+      validStorage = storageBuildings.filter(storage => {
+        const storageImpl = storage as EntityImpl;
+        const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        if (!building) return false;
+        return (
+          (building.buildingType === BuildingType.StorageChest ||
+           building.buildingType === BuildingType.StorageBox) &&
+          building.isComplete // Only deposit to completed buildings
+        );
+      });
+    }
 
     if (validStorage.length === 0) {
       // No storage available
@@ -162,7 +198,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     return nearest ? { entity: nearest, distance: nearestDistance } : null;
   }
 
-  private performDeposit(
+  performDeposit(
     entity: EntityImpl,
     storageEntity: EntityImpl,
     world: World,
@@ -337,8 +373,102 @@ export class DepositItemsBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use depositItemsBehaviorWithContext for better performance
  */
 export function depositItemsBehavior(entity: EntityImpl, world: World): void {
   const behavior = new DepositItemsBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('deposit_items', depositItemsBehaviorWithContext);
+ */
+export function depositItemsBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  if (!inventory) {
+    return ctx.complete('No inventory component');
+  }
+
+  const hasItems = inventory.slots.some(slot => slot.itemId && slot.quantity > 0);
+  if (!hasItems) {
+    const previousBehavior = ctx.getState<AgentBehavior>('previousBehavior');
+    const previousState = ctx.getState<Record<string, unknown>>('previousState');
+
+    if (previousBehavior) {
+      return ctx.switchTo(previousBehavior, previousState || {});
+    }
+    return ctx.complete('No items to deposit');
+  }
+
+  // Find storage using context
+  const SEARCH_RADIUS = CHUNK_SIZE * 3;
+  const validStorage = ctx.getEntitiesInRadius(SEARCH_RADIUS, [ComponentType.Building, ComponentType.Inventory])
+    .filter(({ entity: storage }) => {
+      const storageImpl = storage as EntityImpl;
+      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const inv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      if (!building || !inv) return false;
+      return (
+        (building.buildingType === BuildingType.StorageChest ||
+         building.buildingType === BuildingType.StorageBox) &&
+        building.isComplete
+      );
+    });
+
+  if (validStorage.length === 0) {
+    ctx.emit({
+      type: 'storage:not_found',
+      data: { agentId: ctx.entity.id },
+    });
+    return ctx.complete('No storage buildings found');
+  }
+
+  // Find nearest with capacity
+  const lastStorageId = ctx.getState<string>('lastStorageId');
+  let nearest: { entity: Entity; distance: number } | null = null;
+  let nearestDistance = Infinity;
+
+  for (const { entity: storage, distance } of validStorage) {
+    if (lastStorageId && storage.id === lastStorageId) continue;
+
+    const storageImpl = storage as EntityImpl;
+    const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory)!;
+
+    if (storageInv.currentWeight >= storageInv.maxWeight) continue;
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearest = { entity: storage, distance };
+    }
+  }
+
+  if (!nearest) {
+    ctx.emit({
+      type: 'storage:full',
+      data: {
+        storageId: 'all-storage-full',
+        agentId: ctx.entity.id
+      },
+    });
+
+    return ctx.switchTo('build', {
+      buildingType: 'storage-chest',
+      previousBehavior: ctx.getState('previousBehavior'),
+      previousState: ctx.getState('previousState'),
+    });
+  }
+
+  const nearestStorageImpl = nearest.entity as EntityImpl;
+  const storagePos = nearestStorageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+  const distanceToStorage = ctx.moveToward(storagePos);
+
+  if (distanceToStorage <= 1.5) {
+    ctx.stopMovement();
+    // Delegate to class for deposit logic
+    const behavior = new DepositItemsBehavior();
+    behavior.performDeposit(ctx.entity, nearestStorageImpl, { tick: ctx.tick, gameTime: ctx.gameTime, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+  }
 }

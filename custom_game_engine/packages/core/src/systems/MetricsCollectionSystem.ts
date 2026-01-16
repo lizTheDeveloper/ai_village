@@ -17,6 +17,9 @@ import { MetricsCollector } from '../metrics/MetricsCollector.js';
 import { MetricsStreamClient, type MetricsStreamConfig } from '../metrics/MetricsStreamClient.js';
 import type { StoredMetric } from '../metrics/MetricsStorage.js';
 import { CanonEventRecorder, type CanonEventConfig } from '../metrics/CanonEventRecorder.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { TimeComponent } from './TimeSystem.js';
 
 interface MetricsCollectionConfig {
   enabled: boolean;
@@ -373,6 +376,15 @@ export class MetricsCollectionSystem implements System {
       const data = event.data;
       const produced = data.produced;
 
+      // Access optional properties using type guard
+      const eventData = data as Record<string, unknown>;
+      const quality = ('quality' in eventData && typeof eventData.quality === 'number')
+        ? eventData.quality
+        : undefined;
+      const station = ('station' in eventData && typeof eventData.station === 'string')
+        ? eventData.station
+        : undefined;
+
       // Record the crafting completion event with full details
       this.recordEvent({
         type: 'crafting:completed',
@@ -382,8 +394,8 @@ export class MetricsCollectionSystem implements System {
           recipeId: data.recipeId,
           agentId: data.agentId,
           produced: produced,
-          quality: (data as any).quality,  // Include quality if available
-          station: (data as any).station,  // Include station if available
+          quality,
+          station,
         },
       });
 
@@ -398,7 +410,7 @@ export class MetricsCollectionSystem implements System {
           data: {
             source: 'crafting',
             recipeId: data.recipeId,
-            quality: (data as any).quality,
+            quality,
           },
         });
       }
@@ -685,10 +697,10 @@ export class MetricsCollectionSystem implements System {
           // Send canon event to metrics server
           if (this.streamClient) {
             this.streamClient.send({
-              type: 'canon_event',
+              type: 'canon_event' as const,
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as any,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -770,9 +782,11 @@ export class MetricsCollectionSystem implements System {
     eventBus.subscribe('soul:reincarnated', (event) => {
       const data = event.data;
       const entity = this.world.getEntity(data.newEntityId);
-      const agentComp = entity?.getComponent(CT.Agent) as any;
+      // Get name from identity component (agents may have been renamed)
+      const identityComp = entity?.getComponent<IdentityComponent>(CT.Identity);
+      const agentName = identityComp?.name ?? 'Unknown';
       this.canonRecorder.recordEvent('soul:reincarnated', this.world, {
-        description: `Soul reincarnated as ${agentComp?.name ?? 'Unknown'}`,
+        description: `Soul reincarnated as ${agentName}`,
         agentIds: [data.newEntityId],
         eventData: {
           originalEntityId: data.originalEntityId,
@@ -886,8 +900,10 @@ export class MetricsCollectionSystem implements System {
     const timeEntities = world.query().with(CT.Time).execute();
     if (timeEntities.length === 0) return;
 
-    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as any;
-    const currentDay = timeComp?.day ?? 1;
+    const timeComp = world.getComponent<TimeComponent>(timeEntities[0]!, CT.Time);
+    if (!timeComp) return;
+
+    const currentDay = timeComp.day;
 
     if (this.canonRecorder.shouldRecordTimeMilestone(currentDay)) {
       this.canonRecorder.recordEvent('time:milestone', world, {
@@ -895,9 +911,9 @@ export class MetricsCollectionSystem implements System {
         agentIds: [],
         eventData: {
           day: currentDay,
-          tick: timeComp?.tick ?? 0,
-          phase: timeComp?.phase,
-          season: timeComp?.season,
+          tick: world.tick,
+          phase: timeComp.phase,
+          season: ('season' in timeComp) ? (timeComp as Record<string, unknown>).season : undefined,
         },
       }).catch((error) => {
         console.error('[MetricsCollection] Failed to record time milestone canon event:', error);

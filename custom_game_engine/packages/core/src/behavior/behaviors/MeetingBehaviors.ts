@@ -23,6 +23,8 @@ import {
   addMeetingAttendee,
   type MeetingComponent,
 } from '../../components/MeetingComponent.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /** Default meeting duration in ticks (~20 seconds) */
 const DEFAULT_MEETING_DURATION = 400;
@@ -203,7 +205,8 @@ export class AttendMeetingBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone functions for use with BehaviorRegistry.
+ * Standalone functions for use with BehaviorRegistry (legacy).
+ * @deprecated Use callMeetingBehaviorWithContext and attendMeetingBehaviorWithContext for new code
  */
 export function callMeetingBehavior(entity: EntityImpl, world: World): void {
   const behavior = new CallMeetingBehavior();
@@ -213,4 +216,117 @@ export function callMeetingBehavior(entity: EntityImpl, world: World): void {
 export function attendMeetingBehavior(entity: EntityImpl, world: World): void {
   const behavior = new AttendMeetingBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Versions
+// ============================================================================
+
+/**
+ * Modern call_meeting behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('call_meeting', callMeetingBehaviorWithContext);
+ */
+export function callMeetingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const identity = ctx.getComponent<IdentityComponent>(CT.Identity);
+
+  // Check if we already have a meeting component
+  const meeting = ctx.getComponent<MeetingComponent>(CT.Meeting);
+
+  if (!meeting) {
+    // Create new meeting
+    const topic = ctx.agent.behaviorState.topic as string || 'village gathering';
+
+    const newMeeting = createMeetingComponent(
+      ctx.entity.id,
+      topic,
+      { x: ctx.position.x, y: ctx.position.y },
+      ctx.tick,
+      DEFAULT_MEETING_DURATION
+    );
+
+    (ctx.entity as any).addComponent(newMeeting);
+
+    // Announce the meeting through speech
+    const callerName = identity?.name || 'Someone';
+    const announcement = `${callerName} is calling a meeting about ${topic}! Everyone gather around!`;
+
+    ctx.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+      ...current,
+      recentSpeech: announcement,
+      lastThought: `I'm calling a meeting to discuss ${topic}`,
+    }));
+  } else {
+    // Update existing meeting
+    let updatedMeeting = updateMeetingStatus(meeting, ctx.tick);
+    ctx.updateComponent('meeting', () => updatedMeeting);
+
+    // Check if meeting has ended
+    if (hasMeetingEnded(updatedMeeting, ctx.tick)) {
+      // Remove meeting component
+      ctx.entity.removeComponent(CT.Meeting);
+
+      // Go back to wandering
+      return ctx.switchTo('wander', {});
+    }
+
+    // Stay in place during meeting
+    ctx.stopMovement();
+
+    // Periodically remind people
+    if (updatedMeeting.status === 'calling' && ctx.tick % REMINDER_INTERVAL === 0) {
+      ctx.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        recentSpeech: `The meeting is starting! Please come join us!`,
+      }));
+    }
+  }
+}
+
+/**
+ * Modern attend_meeting behavior using BehaviorContext.
+ * @example registerBehaviorWithContext('attend_meeting', attendMeetingBehaviorWithContext);
+ */
+export function attendMeetingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const identity = ctx.getComponent<IdentityComponent>(CT.Identity);
+
+  // Get meeting caller ID from behavior state
+  const meetingCallerId = ctx.agent.behaviorState.meetingCallerId as string;
+  if (!meetingCallerId) {
+    return ctx.complete('No meeting to attend');
+  }
+
+  // Find the meeting caller
+  const caller = ctx.getEntity(meetingCallerId);
+  if (!caller) {
+    return ctx.complete('Meeting caller not found');
+  }
+
+  const callerImpl = caller as EntityImpl;
+  const meeting = callerImpl.getComponent<MeetingComponent>(CT.Meeting);
+
+  if (!meeting || meeting.status === 'ended') {
+    return ctx.complete('Meeting ended');
+  }
+
+  // Calculate distance to meeting location
+  const distanceSquared = ctx.distanceSquaredTo(meeting.location);
+
+  if (distanceSquared <= ARRIVAL_THRESHOLD * ARRIVAL_THRESHOLD) {
+    // We've arrived! Join the meeting
+    if (!meeting.attendees.includes(ctx.entity.id)) {
+      const updatedMeeting = addMeetingAttendee(meeting, ctx.entity.id);
+      callerImpl.updateComponent('meeting', () => updatedMeeting);
+
+      ctx.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        lastThought: `I've joined the meeting about ${meeting.topic}`,
+      }));
+    }
+
+    // Stay at the meeting location
+    ctx.stopMovement();
+  } else {
+    // Move towards the meeting
+    ctx.moveToward(meeting.location, { arrivalDistance: ARRIVAL_THRESHOLD });
+  }
 }

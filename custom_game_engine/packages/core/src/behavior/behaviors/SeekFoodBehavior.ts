@@ -26,8 +26,10 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { eatFromStorage, eatFromPlant, type InteractionResult } from '../../services/InteractionAPI.js';
 import { isEdibleSpecies } from '../../services/TargetingAPI.js';
 import { HUNGER_THRESHOLD_SEEK_FOOD, HUNGER_RESTORED_DEFAULT } from '../../constants/index.js';
-import { ComponentType } from '../../types/ComponentType.js';
+import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
+import { CHUNK_SIZE } from '../../types.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 /**
  * Injection point for ChunkSpatialQuery (optional dependency)
@@ -119,8 +121,38 @@ export class SeekFoodBehavior extends BaseBehavior {
       return; // Continue moving
     }
 
-    // No food sources found at all - wander to explore for food
+    // No food sources found nearby - try spatial memory for remembered food locations
+    const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    if (spatialMemory && position) {
+      // Try both resource_location and plant_location types (food can be either)
+      const resourceMemories = getSpatialMemoriesByType(spatialMemory, 'resource_location');
+      const plantMemories = getSpatialMemoriesByType(spatialMemory, 'plant_location');
+      const foodMemories = [...resourceMemories, ...plantMemories];
 
+      if (foodMemories.length > 0) {
+        // Sort by distance and find closest remembered food location
+        const sortedMemories = foodMemories
+          .map(mem => ({
+            memory: mem,
+            distance: Math.sqrt(
+              Math.pow(mem.x - position.x, 2) +
+              Math.pow(mem.y - position.y, 2)
+            )
+          }))
+          .sort((a, b) => a.distance - b.distance);
+
+        const closestMemory = sortedMemories[0];
+        if (closestMemory && closestMemory.distance > 5) {
+          // Navigate toward remembered food location
+          console.log('[SeekFood] No food nearby, navigating to remembered food at',
+            `(${closestMemory.memory.x}, ${closestMemory.memory.y})`, 'dist=', Math.floor(closestMemory.distance));
+          this.moveToward(entity, { x: closestMemory.memory.x, y: closestMemory.memory.y }, { arrivalDistance: 5 });
+          return;
+        }
+      }
+    }
+
+    // No food found and no memories - wander to explore for food
     // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
     // wander directly as part of seeking food (exploring to find food)
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
@@ -150,13 +182,17 @@ export class SeekFoodBehavior extends BaseBehavior {
   }
 
   /**
-   * Find the best food source considering both distance and food quality.
-   * Score = distance - (hungerRestored * 2)
-   * Lower score = better (close AND nutritious)
+   * Find the best food source using chunk-spiral search.
+   * Searches current chunk first, then spirals outward to adjacent chunks.
+   * This guarantees finding the closest food by chunk proximity.
    *
-   * Performance optimizations:
-   * - Uses ChunkSpatialQuery when available for nearby lookups
-   * - Falls back to global queries only when needed
+   * Algorithm:
+   * 1. Search current chunk (ring 0)
+   * 2. If no food, search 8 adjacent chunks (ring 1)
+   * 3. If still no food, search next ring (ring 2)
+   * 4. Continue up to MAX_CHUNK_RINGS
+   *
+   * Performance: O(chunks searched) instead of O(all entities in radius)
    */
   private findNearestFoodSource(
     entity: EntityImpl,
@@ -165,161 +201,135 @@ export class SeekFoodBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
 
-    let best: { type: 'plant' | 'storage'; entity: Entity; position: { x: number; y: number }; distance: number; score: number } | null = null;
-    const FOOD_SEARCH_RADIUS = 30; // Limit search radius for performance
+    const MAX_CHUNK_RINGS = 3; // Search current + 3 rings = 7x7 chunks max
 
-    // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      // Get nearby plants using chunk queries
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
-        position.x, position.y, FOOD_SEARCH_RADIUS,
-        [ComponentType.Plant]
-      );
+    // Get agent's current chunk coordinates
+    const centerChunkX = Math.floor(position.x / CHUNK_SIZE);
+    const centerChunkY = Math.floor(position.y / CHUNK_SIZE);
 
-      for (const { entity: plantEntity, distance } of plantsInRadius) {
-        const plantImpl = plantEntity as EntityImpl;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-        const plant = plantImpl.getComponent(ComponentType.Plant) as { speciesId: string; fruitCount: number } | undefined;
-
-        if (!plantPos || !plant) continue;
-        if (!isEdibleSpecies(plant.speciesId)) continue;
-        if (plant.fruitCount <= 0) continue; // Only plants with fruit
-
-        // Get nutritional value of fruit from this plant type
-        const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
-        const fruitItemId = isBerry ? 'berry' : 'fruit';
-        const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
-
-        // Score: prefer closer AND more nutritious (lower score = better)
-        const score = distance - (hungerRestored * 2);
-
-        if (!best || score < best.score) {
-          best = { type: 'plant', entity: plantEntity, position: { x: plantPos.x, y: plantPos.y }, distance, score };
-        }
+    // Spiral outward from current chunk
+    for (let ring = 0; ring <= MAX_CHUNK_RINGS; ring++) {
+      const foodInRing = this.searchChunkRing(world, position, centerChunkX, centerChunkY, ring);
+      if (foodInRing) {
+        console.log(`[SeekFood] Found food in ring ${ring}: ${foodInRing.type} at (${Math.floor(foodInRing.position.x)}, ${Math.floor(foodInRing.position.y)})`);
+        return foodInRing;
       }
+    }
 
-      // Get nearby buildings using chunk queries
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
-        position.x, position.y, FOOD_SEARCH_RADIUS,
-        [ComponentType.Building]
-      );
+    return null;
+  }
 
-      for (const { entity: buildingEntity, distance } of buildingsInRadius) {
-        const buildingImpl = buildingEntity as EntityImpl;
-        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+  /**
+   * Search a single ring of chunks around the center.
+   * Ring 0 = just the center chunk
+   * Ring 1 = 8 chunks surrounding center
+   * Ring 2 = 16 chunks in the next ring
+   * etc.
+   */
+  private searchChunkRing(
+    world: World,
+    agentPos: PositionComponent,
+    centerChunkX: number,
+    centerChunkY: number,
+    ring: number
+  ): { type: 'plant' | 'storage'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
+    let best: { type: 'plant' | 'storage'; entity: Entity; position: { x: number; y: number }; distance: number; score: number } | null = null;
 
-        if (!buildingPos || !buildingComp || !buildingInventory) continue;
+    // Generate chunk coordinates for this ring
+    const chunks = this.getChunksInRing(centerChunkX, centerChunkY, ring);
 
-        // Check if it's a storage building
-        const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
-                         buildingComp.buildingType === BuildingType.StorageBox;
-        if (!isStorage) continue;
+    for (const { chunkX, chunkY } of chunks) {
+      // Get all entities in this chunk using World's chunkIndex
+      const entityIds = world.getEntitiesInChunk(chunkX, chunkY);
 
-        // Find best food item in storage
-        let bestFoodValue = 0;
-        for (const slot of buildingInventory.slots) {
-          if (slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
-            const hungerRestored = itemRegistry.getHungerRestored(slot.itemId) || DEFAULT_HUNGER_RESTORED;
-            bestFoodValue = Math.max(bestFoodValue, hungerRestored);
+      for (const entityId of entityIds) {
+        const entityObj = world.getEntity(entityId);
+        if (!entityObj) continue;
+
+        const entityImpl = entityObj as EntityImpl;
+        const entityPos = entityImpl.getComponent<PositionComponent>(ComponentType.Position);
+        if (!entityPos) continue;
+
+        // Calculate distance for scoring
+        const dx = agentPos.x - entityPos.x;
+        const dy = agentPos.y - entityPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Check if it's an edible plant with fruit
+        const plant = entityImpl.getComponent(ComponentType.Plant) as { speciesId: string; fruitCount: number } | undefined;
+        if (plant && isEdibleSpecies(plant.speciesId) && plant.fruitCount > 0) {
+          const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+          const fruitItemId = isBerry ? 'berry' : 'fruit';
+          const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
+          const score = distance - (hungerRestored * 2);
+
+          if (!best || score < best.score) {
+            best = { type: 'plant', entity: entityObj, position: { x: entityPos.x, y: entityPos.y }, distance, score };
+          }
+          continue;
+        }
+
+        // Check if it's a storage building with food
+        const building = entityImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const inventory = entityImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+        if (building && inventory) {
+          const isStorage = building.buildingType === BuildingType.StorageChest ||
+                           building.buildingType === BuildingType.StorageBox;
+          if (!isStorage) continue;
+
+          // Find best food item in storage
+          let bestFoodValue = 0;
+          for (const slot of inventory.slots) {
+            if (slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
+              const hungerRestored = itemRegistry.getHungerRestored(slot.itemId) || DEFAULT_HUNGER_RESTORED;
+              bestFoodValue = Math.max(bestFoodValue, hungerRestored);
+            }
+          }
+
+          if (bestFoodValue > 0) {
+            const score = distance - (bestFoodValue * 2);
+            if (!best || score < best.score) {
+              best = { type: 'storage', entity: entityObj, position: { x: entityPos.x, y: entityPos.y }, distance, score };
+            }
           }
         }
-
-        if (bestFoodValue === 0) continue;
-
-        // Score: prefer closer AND more nutritious
-        const score = distance - (bestFoodValue * 2);
-
-        if (!best || score < best.score) {
-          best = { type: 'storage', entity: buildingEntity, position: { x: buildingPos.x, y: buildingPos.y }, distance, score };
-        }
-      }
-
-      return best;
-    }
-
-    // Fallback: Use global queries (slow, only when ChunkSpatialQuery not available)
-    // Check edible plants with fruit
-    const plantEntities = world.query()
-      .with(ComponentType.Plant)
-      .with(ComponentType.Position)
-      .executeEntities() as Entity[];
-
-    for (const plantEntity of plantEntities) {
-      const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-      const plant = plantImpl.getComponent(ComponentType.Plant) as { speciesId: string; fruitCount: number } | undefined;
-
-      if (!plantPos || !plant) continue;
-      if (!isEdibleSpecies(plant.speciesId)) continue;
-      if (plant.fruitCount <= 0) continue; // Only plants with fruit
-
-      const dx = position.x - plantPos.x;
-      const dy = position.y - plantPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > FOOD_SEARCH_RADIUS) continue; // Skip distant plants
-
-      // Get nutritional value of fruit from this plant type
-      const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
-      const fruitItemId = isBerry ? 'berry' : 'fruit';
-      const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
-
-      // Score: prefer closer AND more nutritious (lower score = better)
-      const score = distance - (hungerRestored * 2);
-
-      if (!best || score < best.score) {
-        best = { type: 'plant', entity: plantEntity, position: { x: plantPos.x, y: plantPos.y }, distance, score };
-      }
-    }
-
-    // Check storage buildings with food
-    const buildingEntities = world.query()
-      .with(ComponentType.Building)
-      .with(ComponentType.Inventory)
-      .with(ComponentType.Position)
-      .executeEntities() as Entity[];
-
-    for (const buildingEntity of buildingEntities) {
-      const buildingImpl = buildingEntity as EntityImpl;
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
-
-      if (!buildingPos || !buildingComp || !buildingInventory) continue;
-
-      // Check if it's a storage building
-      const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
-                       buildingComp.buildingType === BuildingType.StorageBox;
-      if (!isStorage) continue;
-
-      const dx = position.x - buildingPos.x;
-      const dy = position.y - buildingPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > FOOD_SEARCH_RADIUS) continue; // Skip distant buildings
-
-      // Find best food item in storage
-      let bestFoodValue = 0;
-      for (const slot of buildingInventory.slots) {
-        if (slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
-          const hungerRestored = itemRegistry.getHungerRestored(slot.itemId) || DEFAULT_HUNGER_RESTORED;
-          bestFoodValue = Math.max(bestFoodValue, hungerRestored);
-        }
-      }
-
-      if (bestFoodValue === 0) continue;
-
-      // Score: prefer closer AND more nutritious
-      const score = distance - (bestFoodValue * 2);
-
-      if (!best || score < best.score) {
-        best = { type: 'storage', entity: buildingEntity, position: { x: buildingPos.x, y: buildingPos.y }, distance, score };
       }
     }
 
     return best;
+  }
+
+  /**
+   * Get chunk coordinates for a specific ring around center.
+   * Ring 0: just center chunk
+   * Ring 1: 8 surrounding chunks
+   * Ring 2: 16 chunks in next ring
+   * etc.
+   */
+  private getChunksInRing(
+    centerX: number,
+    centerY: number,
+    ring: number
+  ): Array<{ chunkX: number; chunkY: number }> {
+    if (ring === 0) {
+      return [{ chunkX: centerX, chunkY: centerY }];
+    }
+
+    const chunks: Array<{ chunkX: number; chunkY: number }> = [];
+
+    // Top and bottom edges
+    for (let dx = -ring; dx <= ring; dx++) {
+      chunks.push({ chunkX: centerX + dx, chunkY: centerY - ring }); // Top
+      chunks.push({ chunkX: centerX + dx, chunkY: centerY + ring }); // Bottom
+    }
+
+    // Left and right edges (excluding corners already added)
+    for (let dy = -ring + 1; dy <= ring - 1; dy++) {
+      chunks.push({ chunkX: centerX - ring, chunkY: centerY + dy }); // Left
+      chunks.push({ chunkX: centerX + ring, chunkY: centerY + dy }); // Right
+    }
+
+    return chunks;
   }
 
   private findFoodInInventory(inventory: InventoryComponent): { slotIndex: number; itemId: string; quantity: number } | null {
@@ -454,12 +464,12 @@ export class SeekFoodBehavior extends BaseBehavior {
                        buildingComp.buildingType === BuildingType.StorageBox;
       if (!isStorage) continue;
 
-      // Check distance
+      // Check distance (using squared distance for performance)
       const dx = position.x - buildingPos.x;
       const dy = position.y - buildingPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > nearbyDistance) continue;
+      if (distanceSquared > nearbyDistance * nearbyDistance) continue;
 
       // Check if storage has food
       const hasFood = buildingInventory.slots.some(
@@ -540,12 +550,12 @@ export class SeekFoodBehavior extends BaseBehavior {
       if (!isEdibleSpecies(plant.speciesId)) continue;
       if (plant.fruitCount <= 0) continue;
 
-      // Check distance
+      // Check distance (using squared distance for performance)
       const dx = position.x - plantPos.x;
       const dy = position.y - plantPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > nearbyDistance) continue;
+      if (distanceSquared > nearbyDistance * nearbyDistance) continue;
 
       // Try to eat from this plant
       const result = eatFromPlant(entity, plantEntity, world);
@@ -559,9 +569,291 @@ export class SeekFoodBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use seekFoodBehaviorWithContext for new code
  */
 export function seekFoodBehavior(entity: EntityImpl, world: World): void {
   const behavior = new SeekFoodBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('seek_food', seekFoodBehaviorWithContext);
+ */
+export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  if (!ctx.inventory || !ctx.needs) {
+    return ctx.complete('Missing required components');
+  }
+
+  // Check if agent has food in inventory
+  const foodSlot = findFoodInInventory(ctx.inventory);
+
+  if (foodSlot) {
+    // Eat food from inventory
+    eatFoodFromInventory(ctx, foodSlot.slotIndex, foodSlot.itemId);
+
+    // Check if still hungry
+    const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
+    if (updatedNeeds && updatedNeeds.hunger < HUNGER_THRESHOLD_SEEK_FOOD) {
+      // Still hungry, continue seeking food
+      return;
+    } else {
+      // Hunger satisfied
+      return ctx.complete('Hunger satisfied');
+    }
+  }
+
+  // No food in inventory - try eating directly from plants or storage
+  const plantResult = tryEatFromNearbyPlant(ctx);
+  if (plantResult?.success) {
+    const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
+    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
+      return ctx.complete('Hunger satisfied from plant');
+    }
+    return;
+  }
+
+  const storageResult = tryEatFromNearbyStorage(ctx);
+  if (storageResult?.success) {
+    const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
+    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
+      return ctx.complete('Hunger satisfied from storage');
+    }
+    return;
+  }
+
+  // No food available nearby - find nearest food source
+  const nearestFood = findNearestFoodSourceWithContext(ctx);
+
+  if (nearestFood) {
+    ctx.moveToward(nearestFood.position, { arrivalDistance: 2 });
+    return;
+  }
+
+  // No food sources found nearby - try spatial memory
+  const spatialMemory = ctx.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+  if (spatialMemory) {
+    const resourceMemories = getSpatialMemoriesByType(spatialMemory, 'resource_location');
+    const plantMemories = getSpatialMemoriesByType(spatialMemory, 'plant_location');
+    const foodMemories = [...resourceMemories, ...plantMemories];
+
+    if (foodMemories.length > 0) {
+      // Sort by distance and find closest remembered food location
+      const sortedMemories = foodMemories
+        .map(mem => ({
+          memory: mem,
+          distanceSquared: ctx.distanceSquaredTo({ x: mem.x, y: mem.y })
+        }))
+        .sort((a, b) => a.distanceSquared - b.distanceSquared);
+
+      const closestMemory = sortedMemories[0];
+      if (closestMemory && closestMemory.distanceSquared > 25) { // > 5 tiles
+        ctx.moveToward({ x: closestMemory.memory.x, y: closestMemory.memory.y }, { arrivalDistance: 5 });
+        return;
+      }
+    }
+  }
+
+  // No food found and no memories - wander to explore for food
+  if (!ctx.movement) return;
+
+  let wanderAngle = ctx.getState<number>('wanderAngle');
+  if (wanderAngle === undefined) {
+    wanderAngle = Math.random() * Math.PI * 2;
+  }
+
+  // Add small random jitter for natural exploration
+  wanderAngle += (Math.random() - 0.5) * (Math.PI / 18); // ~10 degrees
+
+  // Calculate velocity
+  const speed = ctx.movement.speed;
+  const velocityX = Math.cos(wanderAngle) * speed;
+  const velocityY = Math.sin(wanderAngle) * speed;
+
+  ctx.setVelocity(velocityX, velocityY);
+  ctx.updateState({ wanderAngle });
+
+  return; // Continue seeking food
+}
+
+// ============================================================================
+// Helper Functions for BehaviorContext Version
+// ============================================================================
+
+function findFoodInInventory(inventory: InventoryComponent): { slotIndex: number; itemId: string; quantity: number } | null {
+  for (let i = 0; i < inventory.slots.length; i++) {
+    const slot = inventory.slots[i];
+    if (slot && slot.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
+      return { slotIndex: i, itemId: slot.itemId, quantity: slot.quantity };
+    }
+  }
+  return null;
+}
+
+function eatFoodFromInventory(ctx: BehaviorContext, slotIndex: number, foodType: string): void {
+  const hungerRestored = itemRegistry.getHungerRestored(foodType) || DEFAULT_HUNGER_RESTORED;
+
+  // Consume food from inventory
+  ctx.updateComponent<InventoryComponent>(CT.Inventory, (current) => {
+    const newSlots = [...current.slots];
+    const slot = newSlots[slotIndex]!;
+
+    newSlots[slotIndex] = {
+      ...slot,
+      quantity: slot.quantity - 1,
+    };
+
+    // Clear slot if empty
+    if (newSlots[slotIndex]!.quantity <= 0) {
+      newSlots[slotIndex] = { itemId: null, quantity: 0 };
+    }
+
+    return {
+      ...current,
+      slots: newSlots,
+      currentWeight: Math.max(0, current.currentWeight - 1),
+    };
+  });
+
+  // Restore hunger
+  const needs = ctx.needs;
+  if (needs) {
+    const newHunger = Math.min(1.0, needs.hunger + hungerRestored);
+    ctx.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+      const updated = current.clone();
+      updated.hunger = newHunger;
+      return updated;
+    });
+  }
+
+  // Emit event
+  ctx.emit({
+    type: 'agent:ate',
+    data: {
+      agentId: ctx.entity.id,
+      foodType,
+      hungerRestored,
+      amount: 1,
+    },
+  });
+}
+
+function tryEatFromNearbyPlant(ctx: BehaviorContext): InteractionResult | null {
+  const nearbyDistance = 2;
+  const plantsInRadius = ctx.getEntitiesInRadius(nearbyDistance, [CT.Plant]);
+
+  for (const { entity: plantEntity } of plantsInRadius) {
+    const plantImpl = plantEntity as EntityImpl;
+    const plant = plantImpl.getComponent(CT.Plant) as {
+      speciesId: string;
+      fruitCount: number;
+    } | undefined;
+
+    if (!plant) continue;
+    if (!isEdibleSpecies(plant.speciesId)) continue;
+    if (plant.fruitCount <= 0) continue;
+
+    // Try to eat from this plant
+    const result = eatFromPlant(ctx.entity, plantEntity, ctx as any);
+    if (result.success) {
+      return result;
+    }
+  }
+
+  return null;
+}
+
+function tryEatFromNearbyStorage(ctx: BehaviorContext): InteractionResult | null {
+  const nearbyDistance = 3;
+  const buildingsInRadius = ctx.getEntitiesInRadius(nearbyDistance, [CT.Building, CT.Inventory]);
+
+  for (const { entity: buildingEntity } of buildingsInRadius) {
+    const buildingImpl = buildingEntity as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+    const buildingInventory = buildingImpl.getComponent<InventoryComponent>(CT.Inventory);
+
+    if (!buildingComp || !buildingInventory) continue;
+
+    // Check if it's a storage building
+    const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
+                     buildingComp.buildingType === BuildingType.StorageBox;
+    if (!isStorage) continue;
+
+    // Check if storage has food
+    const hasFood = buildingInventory.slots.some(
+      slot => slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)
+    );
+
+    if (!hasFood) continue;
+
+    // Try to eat from this storage
+    const result = eatFromStorage(ctx.entity, buildingEntity, ctx as any);
+    if (result.success) {
+      return result;
+    }
+  }
+
+  return null;
+}
+
+function findNearestFoodSourceWithContext(
+  ctx: BehaviorContext
+): { type: 'plant' | 'storage'; position: { x: number; y: number }; distance: number } | null {
+  const MAX_SEARCH_RADIUS = 100; // Search up to 100 tiles
+  let best: { type: 'plant' | 'storage'; position: { x: number; y: number }; distance: number; score: number } | null = null;
+
+  // Search for plants
+  const plantsInRadius = ctx.getEntitiesInRadius(MAX_SEARCH_RADIUS, [CT.Plant]);
+  for (const { entity: plantEntity, distance, position } of plantsInRadius) {
+    const plantImpl = plantEntity as EntityImpl;
+    const plant = plantImpl.getComponent(CT.Plant) as { speciesId: string; fruitCount: number } | undefined;
+
+    if (!plant || !isEdibleSpecies(plant.speciesId) || plant.fruitCount <= 0) continue;
+
+    const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+    const fruitItemId = isBerry ? 'berry' : 'fruit';
+    const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
+    const score = distance - (hungerRestored * 2);
+
+    if (!best || score < best.score) {
+      best = { type: 'plant', position, distance, score };
+    }
+  }
+
+  // Search for storage buildings
+  const buildingsInRadius = ctx.getEntitiesInRadius(MAX_SEARCH_RADIUS, [CT.Building, CT.Inventory]);
+  for (const { entity: buildingEntity, distance, position } of buildingsInRadius) {
+    const buildingImpl = buildingEntity as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+    const inventory = buildingImpl.getComponent<InventoryComponent>(CT.Inventory);
+
+    if (!buildingComp || !inventory) continue;
+
+    const isStorage = buildingComp.buildingType === BuildingType.StorageChest ||
+                     buildingComp.buildingType === BuildingType.StorageBox;
+    if (!isStorage) continue;
+
+    // Find best food item in storage
+    let bestFoodValue = 0;
+    for (const slot of inventory.slots) {
+      if (slot?.itemId && slot.quantity > 0 && itemRegistry.isEdible(slot.itemId)) {
+        const hungerRestored = itemRegistry.getHungerRestored(slot.itemId) || DEFAULT_HUNGER_RESTORED;
+        bestFoodValue = Math.max(bestFoodValue, hungerRestored);
+      }
+    }
+
+    if (bestFoodValue > 0) {
+      const score = distance - (bestFoodValue * 2);
+      if (!best || score < best.score) {
+        best = { type: 'storage', position, distance, score };
+      }
+    }
+  }
+
+  return best;
 }

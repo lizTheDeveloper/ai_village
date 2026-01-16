@@ -14,7 +14,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getPosition } from '../../utils/componentHelpers.js';
-import { ComponentType } from '../../types/ComponentType.js';
+import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 /**
  * FleeToHomeBehavior - Navigate to assigned bed when scared/hurt
@@ -78,9 +79,61 @@ export class FleeToHomeBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for BehaviorRegistry.
+ * Standalone function for BehaviorRegistry (legacy).
+ * @deprecated Use fleeToHomeBehaviorWithContext for new code
  */
 export function fleeToHomeBehavior(entity: EntityImpl, world: World): void {
   const behavior = new FleeToHomeBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('flee_to_home', fleeToHomeBehaviorWithContext);
+ */
+export function fleeToHomeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  // Check if agent has an assigned bed
+  if (!ctx.agent.assignedBed) {
+    // No home to flee to - fall back to regular flee
+    return ctx.switchTo('flee');
+  }
+
+  // Get bed entity
+  const bedEntity = ctx.getEntity(ctx.agent.assignedBed);
+  if (!bedEntity) {
+    // Bed no longer exists - fall back
+    return ctx.switchTo('flee');
+  }
+
+  const bedPos = getPosition(bedEntity);
+  if (!bedPos) {
+    return ctx.switchTo('flee');
+  }
+
+  // Navigate toward bed
+  const distance = ctx.moveToward(bedPos, { arrivalDistance: 2.0 });
+
+  // Check if arrived at home (within 2 tiles)
+  if (distance <= 2.0) {
+    ctx.stopMovement();
+
+    // Emit event that agent reached home safely
+    ctx.emit({
+      type: 'agent:reached_home',
+      data: {
+        agentId: ctx.entity.id,
+        bedId: ctx.agent.assignedBed,
+        timestamp: ctx.tick,
+      },
+    });
+
+    // Behavior complete - agent is now safe at home
+    return ctx.complete('arrived_home');
+  }
+
+  // Continue fleeing to home
 }

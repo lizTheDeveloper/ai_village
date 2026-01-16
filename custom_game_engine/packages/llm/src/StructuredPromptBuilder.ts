@@ -64,6 +64,14 @@ export interface AgentPrompt {
   instruction: string;         // What to decide
 }
 
+// Chunk spatial query injection for O(1) building lookups
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToPromptBuilder(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[StructuredPromptBuilder] ChunkSpatialQuery injected for O(1) campfire detection');
+}
+
 /**
  * Builds structured prompts for LLM decision making.
  * Follows agent-system/spec.md REQ-AGT-002
@@ -1237,12 +1245,23 @@ export class StructuredPromptBuilder {
   /**
    * Check if there's a campfire in the agent's current chunk.
    * Returns true if a campfire (complete or in-progress) exists in the same chunk.
-   * This is much more efficient than querying all entities.
+   *
+   * Uses O(1) chunk cache lookup when ChunkSpatialQuery is available (fast path),
+   * falls back to entity scanning if not (compatibility mode).
+   *
+   * IMPORTANT: Checks both completed buildings AND agents currently building campfires
+   * to prevent simultaneous duplicate construction.
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
     const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
+    // FAST PATH: O(1) lookup using ChunkSpatialQuery
+    if (chunkSpatialQuery) {
+      return chunkSpatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
+    }
+
+    // FALLBACK: Scan entities (for compatibility/tests)
     // Safety check: getChunkManager might not exist in test mocks
     if (typeof world.getChunkManager !== 'function') return false;
 
@@ -1257,13 +1276,20 @@ export class StructuredPromptBuilder {
     const chunk = chunkManager.getChunk(chunkX, chunkY);
     if (!chunk || !chunk.entities) return false;
 
-    // Check if any entity in the chunk is a campfire
+    // Check if any entity in the chunk is a campfire OR an agent building a campfire
     for (const entityId of chunk.entities) {
       const entity = world.getEntity(entityId);
       if (!entity) continue;
 
+      // Check for completed campfire buildings
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building?.buildingType === 'campfire') {
+        return true;
+      }
+
+      // Check for agents currently building campfires (prevents duplicate simultaneous builds)
+      const agentComp = entity.components.get('agent') as AgentComponent | undefined;
+      if (agentComp?.behavior === 'build' && (agentComp.behaviorState as any)?.buildingType === 'campfire') {
         return true;
       }
     }

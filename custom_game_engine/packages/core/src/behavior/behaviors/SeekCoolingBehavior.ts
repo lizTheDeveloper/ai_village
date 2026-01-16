@@ -23,7 +23,8 @@ import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
-import { ComponentType } from '../../types/ComponentType.js';
+import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 // Chunk spatial query injection for efficient nearby entity lookups
 let chunkSpatialQuery: any | null = null;
@@ -578,9 +579,360 @@ export class SeekCoolingBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use seekCoolingBehaviorWithContext for new code
  */
 export function seekCoolingBehavior(entity: EntityImpl, world: World): void {
   const behavior = new SeekCoolingBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+const SEEK_COOLING_SEARCH_INTERVAL = 100; // Re-search every 5 seconds
+const SEEK_COOLING_SEARCH_RADIUS = 50; // tiles
+const WATER_COOLING_RANGE = 3; // tiles near water that are cooler
+const SHALLOW_WATER_MAX_DEPTH = 2; // depth 1-2 can be waded into
+const MIN_ESCAPE_DISTANCE = 20; // Minimum distance before picking new escape direction
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('seek_cooling', seekCoolingBehaviorWithContext);
+ */
+export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const temperature = ctx.getComponent(CT.Temperature) as any;
+
+  if (!temperature) {
+    return ctx.complete('No temperature component');
+  }
+
+  // Only complete when actually comfortable
+  if (temperature.state === 'comfortable') {
+    ctx.stopMovement();
+    return ctx.complete('Already cool enough');
+  }
+
+  // Performance: Throttle expensive cooling source searches
+  const lastSearchTick = ctx.getState<number>('lastSearchTick') ?? 0;
+  const cachedSource = ctx.getState<CoolingSource>('cachedCoolingSource');
+
+  let coolingSource: CoolingSource | null;
+  if (ctx.tick - lastSearchTick >= SEEK_COOLING_SEARCH_INTERVAL || !cachedSource) {
+    coolingSource = findBestCoolingSourceWithContext(ctx);
+    ctx.updateState({
+      lastSearchTick: ctx.tick,
+      cachedCoolingSource: coolingSource,
+    });
+  } else {
+    coolingSource = cachedSource;
+  }
+
+  if (!coolingSource) {
+    // No cooling source found - flee heat sources
+    fleeHeatSourcesWithContext(ctx);
+    return;
+  }
+
+  // Re-check comfort after potentially finding/using cached cooling source
+  if (temperature.state === 'comfortable') {
+    ctx.stopMovement();
+    return ctx.complete('Cooled down while seeking');
+  }
+
+  // Check if we're already in the cooling zone
+  const inCoolingRange = isInCoolingRangeWithContext(ctx, coolingSource);
+
+  if (inCoolingRange && temperature.state === 'comfortable') {
+    ctx.stopMovement();
+    return ctx.complete('Cooled down in cooling range');
+  } else if (inCoolingRange) {
+    // In "cooling range" but still hot - the shade isn't enough, flee heat sources
+    fleeHeatSourcesWithContext(ctx);
+  } else {
+    // Move towards the cooling source
+    ctx.moveToward(coolingSource.position);
+  }
+}
+
+function findBestCoolingSourceWithContext(ctx: BehaviorContext): CoolingSource | null {
+  const waterSources = findWaterSourcesWithContext(ctx);
+  const shadeSources = findShadeSourcesWithContext(ctx);
+
+  const allSources = [...waterSources, ...shadeSources];
+
+  if (allSources.length === 0) {
+    return null;
+  }
+
+  // Sort by priority (water depth matters), then distance
+  allSources.sort((a, b) => {
+    // Prioritize shallow water you can wade into
+    if (a.type === 'water' && a.waterDepth && a.waterDepth <= SHALLOW_WATER_MAX_DEPTH) {
+      if (b.type !== 'water' || !b.waterDepth || b.waterDepth > SHALLOW_WATER_MAX_DEPTH) {
+        return -1; // a wins
+      }
+    }
+    if (b.type === 'water' && b.waterDepth && b.waterDepth <= SHALLOW_WATER_MAX_DEPTH) {
+      return 1; // b wins
+    }
+
+    // Otherwise prioritize by distance
+    return a.distance - b.distance;
+  });
+
+  return allSources[0] ?? null;
+}
+
+function findWaterSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
+  const sources: CoolingSource[] = [];
+  const chunks = (ctx as any).world?.chunkManager;
+
+  if (!chunks) return sources;
+
+  const searchRadius = SEEK_COOLING_SEARCH_RADIUS;
+  const minX = Math.floor((ctx.position.x - searchRadius) / 16);
+  const maxX = Math.floor((ctx.position.x + searchRadius) / 16);
+  const minY = Math.floor((ctx.position.y - searchRadius) / 16);
+  const maxY = Math.floor((ctx.position.y + searchRadius) / 16);
+
+  for (let chunkX = minX; chunkX <= maxX; chunkX++) {
+    for (let chunkY = minY; chunkY <= maxY; chunkY++) {
+      const chunk = chunks.getChunk(chunkX, chunkY);
+      if (!chunk) continue;
+
+      for (let tileX = 0; tileX < 16; tileX++) {
+        for (let tileY = 0; tileY < 16; tileY++) {
+          const tile = chunk.getTile(tileX, tileY);
+          const worldX = chunkX * 16 + tileX;
+          const worldY = chunkY * 16 + tileY;
+
+          const isWater = tile.terrain === 'water' || (tile.fluid && tile.fluid.type === 'water');
+
+          if (isWater) {
+            const distance = ctx.distanceTo({ x: worldX, y: worldY });
+
+            if (distance <= searchRadius) {
+              const waterDepth = tile.fluid?.depth ?? 7;
+
+              sources.push({
+                type: 'water',
+                position: { x: worldX, y: worldY },
+                distance,
+                waterDepth,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return sources;
+}
+
+function findShadeSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
+  const sources: CoolingSource[] = [];
+
+  // Search for buildings
+  const buildingsInRadius = ctx.getEntitiesInRadius(SEEK_COOLING_SEARCH_RADIUS, [CT.Building]);
+
+  for (const { entity: building, distance, position } of buildingsInRadius) {
+    const buildingImpl = building as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+
+    if (!buildingComp || !buildingComp.isComplete) continue;
+
+    // Check if building provides shade
+    if (buildingComp.providesShade) {
+      sources.push({
+        type: 'shade',
+        position,
+        distance,
+        entity: building,
+      });
+    }
+
+    // Check if building has cool interior
+    if (buildingComp.interior && buildingComp.baseTemperature < 0) {
+      sources.push({
+        type: 'interior',
+        position,
+        distance,
+        entity: building,
+      });
+    }
+  }
+
+  // Check plants (trees) for shade
+  const plantsInRadius = ctx.getEntitiesInRadius(SEEK_COOLING_SEARCH_RADIUS, [CT.Plant]);
+
+  for (const { entity: plant, distance, position } of plantsInRadius) {
+    const plantImpl = plant as EntityImpl;
+    const plantComp = plantImpl.getComponent(CT.Plant) as any;
+
+    if (!plantComp) continue;
+
+    // Check if plant provides shade (e.g., tall trees)
+    if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+      sources.push({
+        type: 'shade',
+        position,
+        distance,
+        entity: plant,
+      });
+    }
+  }
+
+  return sources;
+}
+
+function isInCoolingRangeWithContext(ctx: BehaviorContext, source: CoolingSource): boolean {
+  if (source.type === 'water') {
+    return source.distance <= WATER_COOLING_RANGE;
+  }
+
+  if (source.type === 'shade' && source.entity) {
+    const entityImpl = source.entity as EntityImpl;
+
+    const buildingComp = entityImpl.getComponent<BuildingComponent>(CT.Building);
+    if (buildingComp) {
+      return !!(buildingComp && source.distance <= buildingComp.shadeRadius);
+    }
+
+    const plantComp = entityImpl.getComponent(CT.Plant) as any;
+    if (plantComp && plantComp.providesShade) {
+      return !!(plantComp.shadeRadius && source.distance <= plantComp.shadeRadius);
+    }
+
+    return false;
+  }
+
+  if (source.type === 'interior' && source.entity) {
+    const buildingImpl = source.entity as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+    return !!(buildingComp && source.distance <= buildingComp.interiorRadius);
+  }
+
+  return false;
+}
+
+function fleeHeatSourcesWithContext(ctx: BehaviorContext): void {
+  if (!ctx.movement) return;
+
+  const HEAT_DETECTION_RADIUS = 30;
+  let totalAvoidanceX = 0;
+  let totalAvoidanceY = 0;
+  let heatSourceCount = 0;
+  let heatSourceCenterX = 0;
+  let heatSourceCenterY = 0;
+
+  const buildingsInRadius = ctx.getEntitiesInRadius(HEAT_DETECTION_RADIUS, [CT.Building]);
+
+  for (const { entity: building, distance, position } of buildingsInRadius) {
+    const buildingImpl = building as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+
+    if (!buildingComp || !buildingComp.providesHeat) continue;
+
+    const effectiveRadius = Math.max(buildingComp.heatRadius, 2);
+    if (distance <= effectiveRadius) {
+      const dx = ctx.position.x - position.x;
+      const dy = ctx.position.y - position.y;
+
+      const weight = 1 - (distance / (effectiveRadius + 0.1));
+
+      totalAvoidanceX += dx * weight;
+      totalAvoidanceY += dy * weight;
+
+      heatSourceCenterX += position.x;
+      heatSourceCenterY += position.y;
+      heatSourceCount++;
+    }
+  }
+
+  if (heatSourceCount > 0) {
+    const magnitude = Math.sqrt(totalAvoidanceX * totalAvoidanceX + totalAvoidanceY * totalAvoidanceY);
+    const MIN_MAGNITUDE_THRESHOLD = 0.5;
+
+    if (magnitude >= MIN_MAGNITUDE_THRESHOLD) {
+      // Clear direction - move that way
+      const velocityX = (totalAvoidanceX / magnitude) * ctx.movement.speed;
+      const velocityY = (totalAvoidanceY / magnitude) * ctx.movement.speed;
+      ctx.setVelocity(velocityX, velocityY);
+
+      ctx.updateState({
+        escapeAngle: Math.atan2(velocityY, velocityX),
+        escapeStartX: ctx.position.x,
+        escapeStartY: ctx.position.y
+      });
+    } else {
+      // Vectors cancelled out - flee from center of mass
+      let escapeAngle = ctx.getState<number>('escapeAngle');
+      const escapeStartX = ctx.getState<number>('escapeStartX');
+      const escapeStartY = ctx.getState<number>('escapeStartY');
+
+      let distanceTraveled = 0;
+      if (escapeStartX !== undefined && escapeStartY !== undefined) {
+        distanceTraveled = ctx.distanceTo({ x: escapeStartX, y: escapeStartY });
+      }
+
+      if (escapeAngle === undefined || distanceTraveled >= MIN_ESCAPE_DISTANCE) {
+        const centerX = heatSourceCenterX / heatSourceCount;
+        const centerY = heatSourceCenterY / heatSourceCount;
+
+        const dx = ctx.position.x - centerX;
+        const dy = ctx.position.y - centerY;
+        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+        if (distFromCenter > 0.1) {
+          escapeAngle = Math.atan2(dy, dx);
+        } else {
+          escapeAngle = Math.random() * Math.PI * 2;
+        }
+
+        ctx.updateState({
+          escapeAngle,
+          escapeStartX: ctx.position.x,
+          escapeStartY: ctx.position.y
+        });
+      }
+
+      ctx.setVelocity(
+        Math.cos(escapeAngle) * ctx.movement.speed,
+        Math.sin(escapeAngle) * ctx.movement.speed
+      );
+    }
+  } else {
+    // No heat sources detected but still hot
+    const temperature = ctx.getComponent(CT.Temperature) as any;
+    if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
+      let escapeAngle = ctx.getState<number>('escapeAngle');
+      const escapeStartX = ctx.getState<number>('escapeStartX');
+      const escapeStartY = ctx.getState<number>('escapeStartY');
+
+      let distanceTraveled = 0;
+      if (escapeStartX !== undefined && escapeStartY !== undefined) {
+        distanceTraveled = ctx.distanceTo({ x: escapeStartX, y: escapeStartY });
+      }
+
+      if (escapeAngle === undefined || distanceTraveled >= MIN_ESCAPE_DISTANCE) {
+        escapeAngle = Math.random() * Math.PI * 2;
+        ctx.updateState({
+          escapeAngle,
+          escapeStartX: ctx.position.x,
+          escapeStartY: ctx.position.y
+        });
+      }
+
+      ctx.setVelocity(
+        Math.cos(escapeAngle) * ctx.movement.speed,
+        Math.sin(escapeAngle) * ctx.movement.speed
+      );
+    } else {
+      // Actually cooled down
+      ctx.stopMovement();
+    }
+  }
 }

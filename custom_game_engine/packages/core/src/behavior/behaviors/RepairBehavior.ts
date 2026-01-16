@@ -11,6 +11,7 @@
  */
 
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import type { Entity } from '../../ecs/Entity.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
@@ -19,6 +20,16 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
+
+/**
+ * Injection point for ChunkSpatialQuery (optional dependency)
+ */
+let chunkSpatialQuery: any | null = null;
+
+export function injectChunkSpatialQueryToRepair(spatialQuery: any): void {
+  chunkSpatialQuery = spatialQuery;
+  console.log('[RepairBehavior] ChunkSpatialQuery injected');
+}
 
 /**
  * Repair configuration
@@ -128,12 +139,13 @@ export class RepairBehavior extends BaseBehavior {
       return;
     }
 
-    // Check distance to target
+    // Check distance to target (using squared distance for performance)
     const dx = targetPosition.x - position.x;
     const dy = targetPosition.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
+    const repairRangeSquared = REPAIR_CONFIG.REPAIR_RANGE * REPAIR_CONFIG.REPAIR_RANGE;
 
-    if (distance <= REPAIR_CONFIG.REPAIR_RANGE) {
+    if (distanceSquared <= repairRangeSquared) {
       // In range - start repairing
       this.disableSteeringAndStop(entity);
       this.updateState(entity, {
@@ -226,13 +238,14 @@ export class RepairBehavior extends BaseBehavior {
       return { complete: true, reason: 'repair_complete' };
     }
 
-    // Check distance (may have moved)
+    // Check distance (may have moved) - using squared distance for performance
     const buildingPos = (building as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
     if (buildingPos) {
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > REPAIR_CONFIG.REPAIR_RANGE + 1) {
+      const distanceSquared = dx * dx + dy * dy;
+      const maxRangeSquared = (REPAIR_CONFIG.REPAIR_RANGE + 1) * (REPAIR_CONFIG.REPAIR_RANGE + 1);
+      if (distanceSquared > maxRangeSquared) {
         this.updateState(entity, { phase: 'moving' });
         return;
       }
@@ -276,13 +289,29 @@ export class RepairBehavior extends BaseBehavior {
     agentPos: PositionComponent,
     world: World
   ): { id: string; building: BuildingComponent; position: PositionComponent } | null {
-    const buildings = world.query()
-      .with(ComponentType.Building)
-      .with(ComponentType.Position)
-      .executeEntities();
+    let buildings: readonly Entity[];
+
+    if (chunkSpatialQuery) {
+      // Fast: chunk-based spatial query
+      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+        agentPos.x,
+        agentPos.y,
+        REPAIR_CONFIG.SEARCH_RADIUS,
+        [ComponentType.Building]
+      );
+      buildings = buildingsInRadius.map((result: { entity: Entity }) => result.entity);
+    } else {
+      // Fallback: global query
+      buildings = world.query()
+        .with(ComponentType.Building)
+        .with(ComponentType.Position)
+        .executeEntities();
+    }
 
     let bestTarget: { id: string; building: BuildingComponent; position: PositionComponent } | null = null;
     let bestScore = -Infinity;
+
+    const searchRadiusSquared = REPAIR_CONFIG.SEARCH_RADIUS * REPAIR_CONFIG.SEARCH_RADIUS;
 
     for (const buildingEntity of buildings) {
       const building = (buildingEntity as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
@@ -296,13 +325,16 @@ export class RepairBehavior extends BaseBehavior {
       // Skip buildings under construction
       if (!building.isComplete) continue;
 
-      // Calculate distance
+      // Calculate distance using squared distance for performance
       const dx = position.x - agentPos.x;
       const dy = position.y - agentPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
       // Skip if too far
-      if (distance > REPAIR_CONFIG.SEARCH_RADIUS) continue;
+      if (distanceSquared > searchRadiusSquared) continue;
+
+      // Calculate actual distance only when needed for scoring
+      const distance = Math.sqrt(distanceSquared);
 
       // Score: prioritize lower condition and closer distance
       // Critical buildings get bonus
@@ -357,8 +389,245 @@ export class RepairBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use repairBehaviorWithContext instead for better performance
  */
 export function repairBehavior(entity: EntityImpl, world: World): void {
   const behavior = new RepairBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('repair', repairBehaviorWithContext);
+ */
+export function repairBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const state = ctx.getAllState() as any;
+  const phase = (state.phase as RepairPhase) ?? 'searching';
+
+  switch (phase) {
+    case 'searching':
+      return handleSearchingPhaseCtx(ctx, state);
+    case 'moving':
+      return handleMovingPhaseCtx(ctx, state);
+    case 'repairing':
+      return handleRepairingPhaseCtx(ctx, state);
+    case 'complete':
+      return ctx.complete('repair_complete');
+  }
+}
+
+function handleSearchingPhaseCtx(ctx: BehaviorContext, _state: any): ContextBehaviorResult | void {
+  const target = findDamagedBuildingCtx(ctx);
+
+  if (!target) {
+    ctx.setThought('No buildings need repair.');
+    return ctx.complete('no_damaged_buildings');
+  }
+
+  // Store target and transition to moving
+  ctx.updateState({
+    phase: 'moving',
+    targetBuildingId: target.id,
+    targetPosition: { x: target.position.x, y: target.position.y },
+  });
+
+  ctx.setThought(`Going to repair the ${target.building.buildingType}.`);
+}
+
+function handleMovingPhaseCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const targetPosition = state.targetPosition as { x: number; y: number };
+  const targetBuildingId = state.targetBuildingId as string;
+
+  if (!targetPosition || !targetBuildingId) {
+    ctx.updateState({ phase: 'searching' });
+    return;
+  }
+
+  // Check distance to target (using squared distance)
+  if (ctx.isWithinRange(targetPosition, REPAIR_CONFIG.REPAIR_RANGE)) {
+    // In range - start repairing
+    ctx.stopMovement();
+    ctx.updateState({
+      phase: 'repairing',
+      repairStarted: ctx.tick,
+    });
+
+    ctx.setThought('Beginning repairs...');
+    return;
+  }
+
+  // Move toward target
+  ctx.moveToward(targetPosition, { arrivalDistance: REPAIR_CONFIG.REPAIR_RANGE });
+
+  // Check if target building still needs repair
+  const building = ctx.getEntity(targetBuildingId);
+  if (!building) {
+    ctx.updateState({ phase: 'searching' });
+    return;
+  }
+
+  const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+  if (!buildingComp || buildingComp.condition >= 100) {
+    // Building was repaired by someone else
+    ctx.setThought('Someone else repaired that building.');
+    ctx.updateState({ phase: 'searching' });
+  }
+}
+
+function handleRepairingPhaseCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  const targetBuildingId = state.targetBuildingId as string;
+  const repairStarted = state.repairStarted as number;
+
+  // Safety timeout
+  if (ctx.tick - repairStarted > REPAIR_CONFIG.MAX_REPAIR_TICKS) {
+    ctx.setThought('Repair session complete.');
+    return ctx.complete('repair_timeout');
+  }
+
+  // Get target building
+  const building = ctx.getEntity(targetBuildingId);
+  if (!building) {
+    return ctx.complete('building_not_found');
+  }
+
+  const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+  if (!buildingComp) {
+    return ctx.complete('building_missing_component');
+  }
+
+  // Check if repair is complete
+  if (buildingComp.condition >= 100) {
+    ctx.setThought('Repairs complete!');
+
+    // Emit repair complete event
+    ctx.emit({
+      type: 'action:completed',
+      source: 'repair_behavior',
+      data: {
+        actionType: 'repair',
+        actionId: `repair_${targetBuildingId}`,
+        agentId: ctx.entity.id,
+      },
+    });
+
+    return ctx.complete('repair_complete');
+  }
+
+  // Check distance (may have moved)
+  const buildingPos = (building as EntityImpl).getComponent<PositionComponent>(CT.Position);
+  if (buildingPos) {
+    if (!ctx.isWithinRange(buildingPos, REPAIR_CONFIG.REPAIR_RANGE + 1)) {
+      ctx.updateState({ phase: 'moving' });
+      return;
+    }
+  }
+
+  // Calculate repair rate based on skills
+  const skills = ctx.getComponent<SkillsComponent>(CT.Skills);
+  const buildingSkill = skills?.levels?.building ?? 0;
+  const repairRate = REPAIR_CONFIG.BASE_REPAIR_RATE +
+    (buildingSkill * REPAIR_CONFIG.SKILL_BONUS_MULTIPLIER);
+
+  // Check if we have repair materials
+  const hasRepairMaterials = checkRepairMaterials(ctx.inventory);
+
+  // Apply repair (slower without materials)
+  const actualRepairRate = hasRepairMaterials ? repairRate : repairRate * 0.3;
+  const deltaTime = 1 / 20; // Assume 20 TPS
+  const conditionIncrease = actualRepairRate * deltaTime;
+
+  (building as EntityImpl).updateComponent<BuildingComponent>(CT.Building, (comp) => ({
+    ...comp,
+    condition: Math.min(100, comp.condition + conditionIncrease),
+  }));
+
+  // Consume materials occasionally if we have them
+  if (hasRepairMaterials && ctx.inventory) {
+    consumeRepairMaterialsCtx(ctx);
+  }
+
+  // Periodic thoughts
+  const lastThoughtTick = (state.lastThoughtTick as number) ?? 0;
+  if (ctx.tick - lastThoughtTick > 100) {
+    const progress = Math.round(buildingComp.condition);
+    ctx.setThought(`Repairing... ${progress}% condition.`);
+    ctx.updateState({ lastThoughtTick: ctx.tick });
+  }
+}
+
+function findDamagedBuildingCtx(
+  ctx: BehaviorContext
+): { id: string; building: BuildingComponent; position: PositionComponent } | null {
+  // Use context's spatial query (automatically uses ChunkSpatialQuery if available)
+  const buildings = ctx.getEntitiesInRadius(REPAIR_CONFIG.SEARCH_RADIUS, [CT.Building, CT.Position]);
+
+  let bestTarget: { id: string; building: BuildingComponent; position: PositionComponent } | null = null;
+  let bestScore = -Infinity;
+
+  for (const { entity: buildingEntity, position: pos, distance } of buildings) {
+    const building = (buildingEntity as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+    const position = (buildingEntity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+
+    if (!building || !position) continue;
+
+    // Skip buildings that don't need repair
+    if (building.condition >= REPAIR_CONFIG.NEEDS_REPAIR_THRESHOLD) continue;
+
+    // Skip buildings under construction
+    if (!building.isComplete) continue;
+
+    // Score: prioritize lower condition and closer distance
+    // Critical buildings get bonus
+    const urgencyBonus = building.condition < REPAIR_CONFIG.CRITICAL_THRESHOLD ? 50 : 0;
+    const score = (100 - building.condition) + urgencyBonus - (distance * 2);
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestTarget = { id: buildingEntity.id, building, position };
+    }
+  }
+
+  return bestTarget;
+}
+
+function checkRepairMaterials(inventory: InventoryComponent | null): boolean {
+  if (!inventory) return false;
+
+  const repairMaterials = ['wood', 'stone', 'repair_kit'];
+
+  for (const slot of inventory.slots) {
+    if (slot.itemId && repairMaterials.includes(slot.itemId) && slot.quantity > 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function consumeRepairMaterialsCtx(ctx: BehaviorContext): void {
+  if (!ctx.inventory) return;
+
+  const repairMaterials = ['wood', 'stone', 'repair_kit'];
+  const consumeChance = REPAIR_CONFIG.REPAIR_MATERIAL_RATE / 20; // Per tick
+
+  if (Math.random() >= consumeChance) return;
+
+  ctx.updateComponent<InventoryComponent>(CT.Inventory, (inv) => {
+    const updatedSlots = inv.slots.map(s => {
+      if (s.itemId && repairMaterials.includes(s.itemId) && s.quantity > 0) {
+        return { ...s, quantity: s.quantity - 1 };
+      }
+      return s;
+    });
+    return { ...inv, slots: updatedSlots };
+  });
 }

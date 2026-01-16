@@ -53,6 +53,7 @@ import {
   createGoalsComponent,
   createCombatStatsComponent,
   createRealmLocationComponent,
+  createInjuryComponent,
 } from '../components/index.js';
 import { EpisodicMemoryComponent as EpisodicMemoryComponentClass } from '../components/EpisodicMemoryComponent.js';
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
@@ -242,20 +243,20 @@ export class ReincarnationSystem implements System {
     const preserved: QueuedSoul['preserved'] = {};
 
     // Always preserve death location for spawn point
-    const position = entity.components.get('position') as PositionComponent | undefined;
+    const position = entity.getComponent<PositionComponent>('position');
     if (position) {
       preserved.deathLocation = { x: position.x, y: position.y };
     }
 
     // Preserve species for same/similar constraints
     if (speciesConstraint === 'same' || speciesConstraint === 'similar') {
-      const species = entity.components.get('species') as SpeciesComponent | undefined;
+      const species = entity.getComponent<SpeciesComponent>('species');
       preserved.species = species?.speciesId ?? 'human';
     }
 
     // Calculate deed score for karmic constraint
     if (speciesConstraint === 'karmic') {
-      const ledger = entity.components.get('deed_ledger') as DeedLedgerComponent | undefined;
+      const ledger = entity.getComponent<DeedLedgerComponent>('deed_ledger');
       if (ledger) {
         // Use empty weights for simple sum of all deeds
         preserved.deedScore = calculateDeedScore(ledger, [], false);
@@ -263,7 +264,7 @@ export class ReincarnationSystem implements System {
     }
 
     // Preserve identity
-    const identity = entity.components.get('identity') as IdentityComponent | undefined;
+    const identity = entity.getComponent<IdentityComponent>('identity');
     if (identity) {
       preserved.name = identity.name;
     }
@@ -271,14 +272,14 @@ export class ReincarnationSystem implements System {
     // ALWAYS preserve suppressed memories (soul wisdom accumulation)
     // These persist across ALL reincarnations regardless of memory retention policy
     // The God of Death can see these when evaluating souls for ascension to angelhood
-    const episodicMemory = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const episodicMemory = entity.getComponent<EpisodicMemoryComponent>('episodic_memory');
     if (episodicMemory?.suppressedMemories && episodicMemory.suppressedMemories.length > 0) {
       preserved.suppressedMemories = [...episodicMemory.suppressedMemories];
     }
 
     // ALWAYS preserve soul wisdom (tracks reincarnation count and path to godhood)
     // If entity doesn't have SoulWisdomComponent, create one (first death)
-    const soulWisdom = entity.components.get('soul_wisdom') as SoulWisdomComponent | undefined;
+    const soulWisdom = entity.getComponent<SoulWisdomComponent>('soul_wisdom');
     if (soulWisdom) {
       preserved.soulWisdom = { ...soulWisdom };
     } else {
@@ -288,7 +289,7 @@ export class ReincarnationSystem implements System {
 
     // ALWAYS preserve soul identity (soul's true name, origin, and incarnation history)
     // This is THE core of the soul that persists across all incarnations
-    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>('soul_identity');
     if (soulIdentity) {
       preserved.soulIdentity = { ...soulIdentity };
     }
@@ -297,14 +298,14 @@ export class ReincarnationSystem implements System {
     switch (memoryRetention) {
       case 'full':
         // Full memory retention - keep everything
-        preserved.personality = entity.components.get('personality') as PersonalityComponent | undefined;
-        preserved.skills = entity.components.get('skills') as SkillsComponent | undefined;
+        preserved.personality = entity.getComponent<PersonalityComponent>('personality');
+        preserved.skills = entity.getComponent<SkillsComponent>('skills');
         preserved.memories = this.getSignificantMemories(entity, 1000); // All memories
         break;
 
       case 'fragments':
         // Partial retention - keep personality and some memories
-        preserved.personality = entity.components.get('personality') as PersonalityComponent | undefined;
+        preserved.personality = entity.getComponent<PersonalityComponent>('personality');
         preserved.memories = this.getSignificantMemories(entity, 20); // Top 20 emotional memories
         break;
 
@@ -315,7 +316,7 @@ export class ReincarnationSystem implements System {
 
       case 'talents':
         // Skills carry over but not memories
-        preserved.skills = entity.components.get('skills') as SkillsComponent | undefined;
+        preserved.skills = entity.getComponent<SkillsComponent>('skills');
         break;
 
       case 'none':
@@ -331,7 +332,7 @@ export class ReincarnationSystem implements System {
    * Get the most emotionally significant memories
    */
   private getSignificantMemories(entity: Entity, limit: number): EpisodicMemory[] {
-    const episodic = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const episodic = entity.getComponent<EpisodicMemoryComponent>('episodic_memory');
     if (!episodic?.episodicMemories) return [];
 
     // Sort by emotional intensity and get top N
@@ -398,12 +399,17 @@ export class ReincarnationSystem implements System {
     // Personality - preserved or new
     let personality: PersonalityComponentClass;
     if (soul.preserved.personality && (soul.config.memoryRetention === 'full' || soul.config.memoryRetention === 'fragments')) {
+      const preserved = soul.preserved.personality;
+      if (!preserved.openness || !preserved.conscientiousness || !preserved.extraversion ||
+          !preserved.agreeableness || !preserved.neuroticism) {
+        throw new Error('Preserved personality missing required traits');
+      }
       personality = new PersonalityComponentClass({
-        openness: (soul.preserved.personality as any).openness ?? Math.random(),
-        conscientiousness: (soul.preserved.personality as any).conscientiousness ?? Math.random(),
-        extraversion: (soul.preserved.personality as any).extraversion ?? Math.random(),
-        agreeableness: (soul.preserved.personality as any).agreeableness ?? Math.random(),
-        neuroticism: (soul.preserved.personality as any).neuroticism ?? Math.random(),
+        openness: preserved.openness,
+        conscientiousness: preserved.conscientiousness,
+        extraversion: preserved.extraversion,
+        agreeableness: preserved.agreeableness,
+        neuroticism: preserved.neuroticism,
       });
     } else {
       personality = new PersonalityComponentClass({
@@ -482,7 +488,8 @@ export class ReincarnationSystem implements System {
     if (soul.preserved.suppressedMemories && soul.preserved.suppressedMemories.length > 0) {
       for (const suppressedMemory of soul.preserved.suppressedMemories) {
         // Add directly to suppressed storage (bypassing active memory)
-        (episodicMemory as any)._suppressedMemories.push(suppressedMemory);
+        // Access private field through bracket notation (necessary for reincarnation system)
+        (episodicMemory as unknown as { _suppressedMemories: EpisodicMemory[] })._suppressedMemories.push(suppressedMemory);
       }
     }
 
@@ -540,11 +547,11 @@ export class ReincarnationSystem implements System {
 
     // Spiritual - may have connection to deity that reincarnated them
     const spirituality = Math.random() * 0.3 + 0.5; // 0.5-0.8 range for reincarnated souls
-    const spiritual = createSpiritualComponent(spirituality);
+    const spiritual = createSpiritualComponent(spirituality, soul.deityId);
     if (soul.deityId) {
-      // Set the deity that facilitated rebirth as believed deity
-      (spiritual as any).believedDeity = soul.deityId;
-      (spiritual as any).faithLevel = 0.3; // Start with some faith
+      // Start with some faith in the deity that facilitated rebirth
+      spiritual.faith = 0.3;
+      spiritual.peakFaith = 0.3;
     }
     newEntity.addComponent(spiritual);
 
@@ -566,10 +573,8 @@ export class ReincarnationSystem implements System {
       stealthSkill: (skills.levels?.stealth || 0) / 5,
     }));
 
-    // Injury tracking - none
-    newEntity.addComponent({
-      type: 'injury',
-      version: 1,
+    // Injury tracking - start with no injuries (healthy reincarnation)
+    newEntity.addComponent(createInjuryComponent({
       injuryType: 'laceration',
       severity: 'minor',
       location: 'torso',
@@ -578,13 +583,18 @@ export class ReincarnationSystem implements System {
       elapsed: 0,
       treated: false,
       untreatedDuration: 0,
-    } as any);
+    }));
 
     // Realm location - start in mortal realm
     newEntity.addComponent(createRealmLocationComponent('mortal'));
 
-    // Add entity to world
-    (world as any)._addEntity?.(newEntity) || (world as any).addEntity?.(newEntity);
+    // Add entity to world using private _addEntity method
+    // This is necessary because we're creating a fully-formed entity with components
+    // rather than using the standard createEntity flow
+    interface WorldInternal {
+      _addEntity(entity: Entity): void;
+    }
+    (world as unknown as WorldInternal)._addEntity(newEntity);
 
     // Emit reincarnation complete event
     world.eventBus.emit({

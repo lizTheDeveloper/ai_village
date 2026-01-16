@@ -39,6 +39,7 @@ import { evaluateNode, type EvaluationContext } from '../magic/MagicSkillTreeEva
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import type { MagicParadigm } from '../magic/MagicParadigm.js';
 
 /**
  * MagicSystem - Process magic casting and effects
@@ -115,18 +116,21 @@ export class MagicSystem implements System {
       }
     });
 
-    // Subscribe to skill tree node unlock events (custom event type)
-    (world.eventBus as any).subscribe('magic:skill_node_unlocked', (event: any) => {
-      const { entityId, paradigmId, nodeId } = event.data;
-      const entity = world.getEntity(entityId);
+    // Subscribe to skill tree node unlock events
+    world.eventBus.subscribe<'magic:skill_node_unlocked'>('magic:skill_node_unlocked', (event) => {
+      const { agentId, skillTree, nodeId } = event.data;
+      const entity = world.getEntity(agentId);
       if (entity) {
-        this.handleSkillNodeUnlocked(entity as EntityImpl, paradigmId, nodeId);
+        this.handleSkillNodeUnlocked(entity as EntityImpl, skillTree, nodeId);
       }
     });
 
-    // Subscribe to skill tree XP grant events (custom event type)
-    (world.eventBus as any).subscribe('magic:grant_skill_xp', (event: any) => {
-      const { entityId, paradigmId, xpAmount } = event.data;
+    // Subscribe to skill tree XP grant events (custom event not in EventMap)
+    // Note: 'magic:grant_skill_xp' is not defined in EventMap, so we handle the type mismatch
+    // by using a type assertion on the handler's event data
+    world.eventBus.subscribe('magic:grant_skill_xp' as keyof import('../events/EventMap.js').GameEventMap, (event) => {
+      const data = event.data as unknown as { entityId: string; paradigmId: string; xpAmount: number };
+      const { entityId, paradigmId, xpAmount } = data;
       const entity = world.getEntity(entityId);
       if (entity) {
         this.grantSkillXP(entity as EntityImpl, paradigmId, xpAmount);
@@ -235,7 +239,7 @@ export class MagicSystem implements System {
         totalMishaps: 0,
         version: 1,
       };
-      (entity as any).addComponent(newMagic);
+      entity.addComponent(newMagic);
       magic = newMagic;
     }
 
@@ -277,19 +281,14 @@ export class MagicSystem implements System {
             if (Math.random() < revelationChance) {
               this.learnSpell(entity, threshold.spellId, 10); // Start with 10 proficiency for divine gift
 
-              // Emit divine revelation event (using any cast for extended event data)
-              (this.world?.eventBus as any)?.emit({
+              // Emit divine revelation event
+              this.world?.eventBus.emit<'magic:spell_learned'>({
                 type: 'magic:spell_learned',
                 source: entity.id,
                 data: {
                   entityId: entity.id,
                   spellId: threshold.spellId,
                   proficiency: 10,
-                  // Extended fields for divine revelation context
-                  spellName: threshold.description,
-                  paradigmId: 'divine',
-                  source: 'divine_revelation',
-                  deityId,
                 },
               });
             }
@@ -526,7 +525,9 @@ export class MagicSystem implements System {
       lockedCosts = lockResult.deducted;
     } else {
       // Fallback: use regular deduction (no locking)
-      const deductResult = calculator.deductCosts(costs, magic, { id: paradigmId } as any);
+      // Create minimal paradigm interface for deduction
+      const paradigmStub: Pick<MagicParadigm, 'id'> = { id: paradigmId };
+      const deductResult = calculator.deductCosts(costs, magic, paradigmStub as MagicParadigm);
       if (!deductResult.success) {
         return null;
       }
@@ -948,7 +949,9 @@ export class MagicSystem implements System {
         }
 
         // Deduct costs using paradigm calculator
-        const result = calculator.deductCosts(costs, magic, { id: paradigmId } as any);
+        // Create minimal paradigm interface for deduction
+        const paradigmStub: Pick<MagicParadigm, 'id'> = { id: paradigmId };
+        const result = calculator.deductCosts(costs, magic, paradigmStub as MagicParadigm);
         deductionSuccess = result.success;
         terminal = result.terminal;
 
@@ -1182,16 +1185,13 @@ export class MagicSystem implements System {
     }));
 
     // Emit spell learned confirmation event
-    // (Using generic emit since magic:spell_learned_confirmed not in GameEventMap)
-    (this.world?.eventBus as any)?.emit({
-      type: 'magic:spell_learned_confirmed',
+    this.world?.eventBus.emit<'magic:spell_learned'>({
+      type: 'magic:spell_learned',
       source: entity.id,
       data: {
         entityId: entity.id,
         spellId,
-        spellName: spellDef?.name ?? spellId,
-        paradigmId,
-        initialProficiency,
+        proficiency: initialProficiency,
       },
     });
 
@@ -1277,15 +1277,14 @@ export class MagicSystem implements System {
         // Auto-learn the unlocked spell
         this.learnSpell(entity, spellId, effect.baseValue ?? 0);
 
-        // Emit event (using type assertion for custom event)
-        (this.world?.eventBus as any)?.emit({
+        // Emit spell unlocked event
+        this.world?.eventBus.emit<'magic:spell_unlocked_from_skill_tree'>({
           type: 'magic:spell_unlocked_from_skill_tree',
           source: entity.id,
           data: {
             spellId,
-            paradigmId,
+            agentId: entity.id,
             nodeId,
-            initialProficiency: effect.baseValue ?? 0,
           },
         });
       }
@@ -1439,15 +1438,13 @@ export class MagicSystem implements System {
     });
 
     // Emit unlock event (triggers handleSkillNodeUnlocked)
-    // Using generic emit for events not in GameEventMap
-    (this.world?.eventBus as unknown as { emit: (e: Record<string, unknown>) => void })?.emit({
+    this.world?.eventBus.emit<'magic:skill_node_unlocked'>({
       type: 'magic:skill_node_unlocked',
       source: entity.id,
       data: {
-        entityId: entity.id,
-        paradigmId,
         nodeId,
-        xpSpent: xpCost,
+        agentId: entity.id,
+        skillTree: paradigmId,
       },
     });
 

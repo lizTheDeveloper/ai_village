@@ -117,8 +117,8 @@ export function createBuildingComponent(
     case 'campfire':
       blocksMovement = false; // Can walk through campfire
       providesHeat = true;
-      heatRadius = 8; // Increased from 3 to cover spawn area
-      heatAmount = 10;
+      heatRadius = 5; // Reduced from 8 to prevent overheating during day
+      heatAmount = 6; // Reduced from 10 to be warm at night without being oppressive during day
       break;
     case 'well':
       // Water source - blocks movement

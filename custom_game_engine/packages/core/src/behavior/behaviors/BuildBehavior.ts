@@ -573,8 +573,78 @@ export class BuildBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use buildBehaviorWithContext for better performance
  */
 export function buildBehavior(entity: EntityImpl, world: World): void {
   const behavior = new BuildBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('build', buildBehaviorWithContext);
+ */
+export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory } = ctx;
+
+  ctx.stopMovement();
+
+  // Check if waiting for building completion
+  const waitingForBuildingId = ctx.getState<string>('waitingForBuildingId');
+  if (waitingForBuildingId) {
+    const buildingEntity = ctx.getEntity(waitingForBuildingId);
+    if (!buildingEntity) {
+      return ctx.complete('Building not found');
+    }
+
+    const buildingImpl = buildingEntity as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+
+    if (buildingComp?.isComplete) {
+      ctx.emit({
+        type: 'building:complete',
+        data: {
+          buildingId: waitingForBuildingId,
+          buildingType: buildingComp.buildingType,
+          entityId: waitingForBuildingId,
+        },
+      });
+      return ctx.complete('Construction complete');
+    }
+
+    const progress = buildingComp?.progress ?? 0;
+    return { complete: false, reason: `Construction in progress (${Math.round(progress)}%)` };
+  }
+
+  let buildingType = ctx.getState<BuildingType>('buildingType') || BT.Campfire;
+
+  // CAMPFIRE DUPLICATE PREVENTION
+  if (buildingType === BT.Campfire) {
+    const CAMPFIRE_CHECK_RADIUS = 200;
+    const nearbyBuildings = ctx.getEntitiesInRadius(CAMPFIRE_CHECK_RADIUS, [ComponentType.Building]);
+
+    for (const { entity: building } of nearbyBuildings) {
+      const buildingImpl = building as EntityImpl;
+      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+
+      if (buildingComp?.buildingType === BT.Campfire) {
+        ctx.emit({
+          type: 'construction:failed',
+          data: {
+            buildingId: `campfire_${Date.now()}`,
+            reason: `Campfire already exists within ${CAMPFIRE_CHECK_RADIUS} tiles`,
+            builderId: ctx.entity.id,
+            agentId: ctx.entity.id,
+          },
+        });
+
+        return ctx.complete('Campfire already exists nearby - use seek_warmth behavior instead');
+      }
+    }
+  }
+
+  // Delegate to class for complex building logic
+  const behavior = new BuildBehavior();
+  const world = { tick: ctx.tick, getEntity: (id: string) => ctx.getEntity(id), eventBus: { emit: (e: any) => ctx.emit(e) } } as any;
+  return behavior.execute(ctx.entity, world);
 }

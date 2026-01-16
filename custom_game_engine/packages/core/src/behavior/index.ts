@@ -14,10 +14,24 @@ export {
   getBehaviorRegistry,
   initBehaviorRegistry,
   registerBehavior,
+  registerBehaviorWithContext,
   executeBehavior,
   type BehaviorHandler,
+  type ContextBehaviorHandler,
+  type AnyBehaviorHandler,
   type BehaviorMeta,
 } from './BehaviorRegistry.js';
+
+// Behavior Context - the modern API for behaviors
+export {
+  type BehaviorContext,
+  type BehaviorResult,
+  type EntityWithDistance,
+  type SpatialQueryOptions,
+  type MoveOptions,
+  BehaviorContextImpl,
+  createBehaviorContext,
+} from './BehaviorContext.js';
 
 // Animal Behaviors (from Phase 5)
 export {

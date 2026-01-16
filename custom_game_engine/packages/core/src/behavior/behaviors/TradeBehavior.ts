@@ -303,8 +303,192 @@ export class TradeBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use tradeBehaviorWithContext instead for better performance
  */
 export function tradeBehavior(entity: EntityImpl, world: World): void {
   const behavior = new TradeBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('trade', tradeBehaviorWithContext);
+ */
+export function tradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const state = ctx.getAllState() as any;
+
+  // Validate required state
+  if (!state.itemId) {
+    return ctx.complete('No itemId specified in behaviorState');
+  }
+
+  if (!state.quantity || state.quantity <= 0) {
+    return ctx.complete('Invalid quantity in behaviorState');
+  }
+
+  if (!state.tradeType || (state.tradeType !== 'buy' && state.tradeType !== 'sell')) {
+    return ctx.complete('Invalid tradeType in behaviorState (must be "buy" or "sell")');
+  }
+
+  const phase = state.phase ?? 'find_shop';
+
+  // Execute phase
+  switch (phase) {
+    case 'find_shop':
+      return handleFindShop(ctx, state);
+
+    case 'move_to_shop':
+      return handleMoveToShop(ctx, state);
+
+    case 'trading':
+      return handleExecuteTrade(ctx, state);
+
+    case 'complete':
+      return ctx.complete('Trade complete');
+  }
+}
+
+function handleFindShop(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  // If shopId already specified, validate it and move to next phase
+  if (state.shopId) {
+    const shop = ctx.getEntity(state.shopId);
+    if (shop && shop.components.has(CT.Shop)) {
+      ctx.updateState({ phase: 'move_to_shop' });
+      return;
+    }
+    // Shop no longer valid, need to find a new one
+    ctx.updateState({ shopId: undefined });
+  }
+
+  // Find nearest shop
+  const shops = ctx.getEntitiesInRadius(MAX_SHOP_SEARCH_DISTANCE, [CT.Shop, CT.Position]);
+
+  let bestShop: { entity: any; position: { x: number; y: number } } | null = null;
+  let bestDistance = Infinity;
+
+  for (const { entity: shopEntity, position: shopPos, distance } of shops) {
+    const shopImpl = shopEntity as EntityImpl;
+    const shop = shopImpl.getComponent<ShopComponent>(CT.Shop);
+
+    if (!shop) continue;
+
+    // Check if shop is suitable for this trade
+    if (state.tradeType === 'buy') {
+      // For buying, shop must have stock
+      const stockQuantity = getStockQuantity(shop, state.itemId);
+      if (stockQuantity < (state.quantity || 1)) {
+        continue; // Not enough stock
+      }
+    }
+    // For selling, we assume all shops accept all items (shop will check funds)
+
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestShop = { entity: shopEntity, position: shopPos };
+    }
+  }
+
+  if (!bestShop) {
+    // No shop found
+    return ctx.complete(`No shop found for ${state.tradeType} ${state.itemId}`);
+  }
+
+  // Found shop, move to it
+  ctx.updateState({
+    shopId: bestShop.entity.id,
+    phase: 'move_to_shop'
+  });
+}
+
+function handleMoveToShop(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const shopId = state.shopId;
+  if (!shopId) {
+    // Lost target, restart
+    ctx.updateState({ phase: 'find_shop' });
+    return;
+  }
+
+  const shopEntity = ctx.getEntity(shopId);
+  if (!shopEntity) {
+    // Shop no longer exists
+    ctx.updateState({ phase: 'find_shop', shopId: undefined });
+    return;
+  }
+
+  const shopPos = shopEntity.components.get(CT.Position) as PositionComponent | undefined;
+  if (!shopPos) {
+    ctx.updateState({ phase: 'find_shop', shopId: undefined });
+    return;
+  }
+
+  // Check if we've arrived (using squared distance)
+  if (ctx.isWithinRange(shopPos, TRADE_DISTANCE)) {
+    ctx.stopMovement();
+    ctx.updateState({ phase: 'trading' });
+    return;
+  }
+
+  // Move toward shop
+  ctx.moveToward({ x: shopPos.x, y: shopPos.y }, {
+    arrivalDistance: TRADE_DISTANCE
+  });
+}
+
+function handleExecuteTrade(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  if (!state.shopId || !state.itemId || !state.quantity || !state.tradeType) {
+    return ctx.complete('Missing trade parameters');
+  }
+
+  // Get trading system - access via the entity's world reference
+  const world = (ctx as any).world;
+  const tradingSystem = (world as any).getSystem?.('trading') ?? (world as any).tradingSystem;
+
+  if (!tradingSystem) {
+    return ctx.complete('Trading system not available');
+  }
+
+  // Execute trade
+  try {
+    let result;
+
+    if (state.tradeType === 'buy') {
+      result = tradingSystem.buyFromShop(
+        world,
+        ctx.entity.id,
+        state.shopId,
+        state.itemId,
+        state.quantity
+      );
+    } else {
+      result = tradingSystem.sellToShop(
+        world,
+        ctx.entity.id,
+        state.shopId,
+        state.itemId,
+        state.quantity
+      );
+    }
+
+    if (!result.success) {
+      // Trade failed
+      return ctx.complete(`Trade failed: ${result.reason || 'Unknown error'}`);
+    }
+
+    // Trade successful
+    ctx.updateState({ phase: 'complete' });
+    return ctx.complete(
+      `Successfully ${state.tradeType === 'buy' ? 'bought' : 'sold'} ${state.quantity}x ${state.itemId}`
+    );
+  } catch (error) {
+    return ctx.complete(`Trade error: ${(error as Error).message}`);
+  }
 }

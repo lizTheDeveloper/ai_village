@@ -77,8 +77,60 @@ export class SitQuietlyBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use sitQuietlyBehaviorWithContext instead
  */
 export function sitQuietlyBehavior(entity: EntityImpl, world: World): void {
   const behavior = new SitQuietlyBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('sit_quietly', sitQuietlyBehaviorWithContext);
+ */
+export function sitQuietlyBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  // Stop all movement
+  ctx.stopMovement();
+
+  const lastMonologue = ctx.getState<number>('lastMonologue') ?? 0;
+
+  if (ctx.tick - lastMonologue > 400) {
+    // Update every ~20 seconds
+    const monologue = generatePeacefulMonologue();
+    ctx.setThought(monologue);
+    ctx.updateState({ lastMonologue: ctx.tick });
+
+    // Emit internal monologue event
+    ctx.emit({
+      type: 'agent:internal_monologue',
+      source: 'sit_quietly_behavior',
+      data: {
+        agentId: ctx.entity.id,
+        behaviorType: 'sit_quietly',
+        monologue,
+        timestamp: ctx.tick,
+      },
+    });
+  }
+
+  // Sit quietly indefinitely until interrupted
+  // This behavior doesn't complete on its own
+}
+
+/**
+ * Generate peaceful monologue.
+ * Helper function for sitQuietlyBehaviorWithContext.
+ */
+function generatePeacefulMonologue(): string {
+  const thoughts = [
+    'Everything is peaceful right now.',
+    'Just enjoying this moment.',
+    'No need to rush anywhere.',
+    'Feeling content and at ease.',
+    'Sometimes it\'s good to just be.',
+    'Life is good right now.',
+    'Finding peace in the stillness.',
+  ];
+
+  return thoughts[Math.floor(Math.random() * thoughts.length)]!;
 }

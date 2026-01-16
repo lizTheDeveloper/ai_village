@@ -24,6 +24,7 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { getTopicCategory } from '../components/InterestsComponent.js';
 import type { GameEvent } from '../events/GameEvent.js';
+import type { EventType } from '../events/EventMap.js';
 
 /**
  * Skill to interest mappings
@@ -77,8 +78,10 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
     intensity: 0.4,
     condition: (agent, event) => {
       // Only if they built it
-      const data = event.data as any;
-      return data?.builderId === agent.id;
+      if ('builderId' in event.data && typeof event.data.builderId === 'string') {
+        return event.data.builderId === agent.id;
+      }
+      return false;
     },
   },
   {
@@ -87,8 +90,10 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
     intensity: 0.8,
     condition: (agent, event) => {
       // Only for parents
-      const data = event.data as any;
-      return data?.parentId === agent.id;
+      if ('parentIds' in event.data && Array.isArray(event.data.parentIds)) {
+        return event.data.parentIds.includes(agent.id);
+      }
+      return false;
     },
   },
   {
@@ -157,18 +162,19 @@ export class InterestEvolutionSystem implements System {
 
   init(world: World): void {
     // Listen for experience triggers
-    // Use type assertions for events that may not be in GameEventMap
-    (world.eventBus as any).on('agent:death', (e: any) => this.handleExperience(e, world));
-    (world.eventBus as any).on('deity:miracle', (e: any) => this.handleExperience(e, world));
-    world.eventBus.on('building:completed', (e) => this.handleExperience(e as any, world));
-    world.eventBus.on('agent:born', (e) => this.handleExperience(e as any, world));
-    (world.eventBus as any).on('prayer:answered', (e: any) => this.handleExperience(e, world));
+    // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
+    // Using subscribe with string literal types for forward compatibility
+    world.eventBus.subscribe('agent:death' as EventType, (e) => this.handleExperience(e, world));
+    world.eventBus.subscribe('deity:miracle' as EventType, (e) => this.handleExperience(e, world));
+    world.eventBus.subscribe<'building:completed'>('building:completed', (e) => this.handleExperience(e, world));
+    world.eventBus.subscribe<'agent:born'>('agent:born', (e) => this.handleExperience(e, world));
+    world.eventBus.subscribe('prayer:answered' as EventType, (e) => this.handleExperience(e, world));
 
     // Listen for skill increases
-    (world.eventBus as any).on('skill:levelup', (e: any) => this.handleSkillGrowth(e, world));
+    world.eventBus.subscribe<'skill:level_up'>('skill:level_up', (e) => this.handleSkillGrowth(e, world));
 
     // Listen for conversations (mentorship transfer)
-    world.eventBus.on('conversation:ended', (e) => this.handleMentorship(e as any, world));
+    world.eventBus.subscribe<'conversation:ended'>('conversation:ended', (e) => this.handleMentorship(e, world));
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -177,7 +183,9 @@ export class InterestEvolutionSystem implements System {
     this.lastUpdateTick = world.tick;
 
     for (const entity of entities) {
-      this.processDecay(entity as EntityImpl, world);
+      // Systems receive EntityImpl instances from ECS
+      if (!(entity instanceof EntityImpl)) continue;
+      this.processDecay(entity, world);
     }
   }
 
@@ -228,13 +236,12 @@ export class InterestEvolutionSystem implements System {
   /**
    * Handle skill increases - strengthen related interests
    */
-  private handleSkillGrowth(event: GameEvent, world: World): void {
-    const data = event.data as any;
-    const { agentId, skill } = data;
-    const agent = world.getEntity(agentId) as EntityImpl;
-    if (!agent) return;
+  private handleSkillGrowth(event: GameEvent<'skill:level_up'>, world: World): void {
+    const { agentId, skillId } = event.data;
+    const agent = world.getEntity(agentId);
+    if (!agent || !(agent instanceof EntityImpl)) return;
 
-    const mapping = SKILL_INTEREST_MAPPINGS.find(m => m.skill === skill);
+    const mapping = SKILL_INTEREST_MAPPINGS.find(m => m.skill === skillId);
     if (!mapping) return;
 
     const interests = agent.getComponent<InterestsComponent>(CT.Interests);
@@ -258,14 +265,14 @@ export class InterestEvolutionSystem implements System {
       interests.addInterest(interest);
 
       if (increase >= InterestEvolutionSystem.EMERGENCE_THRESHOLD) {
-        this.emitMutationEvent(world, agent, interest, 'interest:emerged', 0, `skill:${skill}`);
+        this.emitMutationEvent(world, agent, interest, 'interest:emerged', 0, `skill:${skillId}`);
       }
     } else {
       // Strengthen existing interest
       interest.intensity = Math.min(1.0, interest.intensity + increase);
 
       if (interest.intensity - oldIntensity >= InterestEvolutionSystem.SIGNIFICANT_CHANGE) {
-        this.emitMutationEvent(world, agent, interest, 'interest:strengthened', oldIntensity, `skill:${skill}`);
+        this.emitMutationEvent(world, agent, interest, 'interest:strengthened', oldIntensity, `skill:${skillId}`);
       }
     }
   }
@@ -316,20 +323,26 @@ export class InterestEvolutionSystem implements System {
   /**
    * Handle mentorship - transfer interests during high-quality conversations
    */
-  private handleMentorship(event: GameEvent, world: World): void {
-    const data = event.data as any;
-    const { agent1, agent2, topicsDiscussed, overallQuality } = data;
+  private handleMentorship(event: GameEvent<'conversation:ended'>, world: World): void {
+    const { agent1, agent2, topics, quality } = event.data;
 
-    if (!topicsDiscussed || topicsDiscussed.length === 0) return;
+    // Check if topics were discussed and quality is high enough
+    const topicsDiscussed = topics || [];
+    const overallQuality = quality || 0;
+
+    if (topicsDiscussed.length === 0) return;
     if (overallQuality < 0.6) return; // Only high-quality conversations transfer
 
-    const entity1 = world.getEntity(agent1) as EntityImpl;
-    const entity2 = world.getEntity(agent2) as EntityImpl;
+    if (!agent1 || !agent2) return;
+
+    const entity1 = world.getEntity(agent1);
+    const entity2 = world.getEntity(agent2);
     if (!entity1 || !entity2) return;
+    if (!(entity1 instanceof EntityImpl) || !(entity2 instanceof EntityImpl)) return;
 
     // Bidirectional transfer
-    this.transferInterests(entity1, entity2, topicsDiscussed, overallQuality, world);
-    this.transferInterests(entity2, entity1, topicsDiscussed, overallQuality, world);
+    this.transferInterests(entity1, entity2, topicsDiscussed as TopicId[], overallQuality, world);
+    this.transferInterests(entity2, entity1, topicsDiscussed as TopicId[], overallQuality, world);
   }
 
   /**
@@ -443,8 +456,8 @@ export class InterestEvolutionSystem implements System {
   private findAffectedAgents(event: GameEvent, world: World): EntityImpl[] {
     // For now, just return the source agent
     // In future, could check proximity, relationships, etc.
-    const source = world.getEntity(event.source) as EntityImpl;
-    if (!source) return [];
+    const source = world.getEntity(event.source);
+    if (!source || !(source instanceof EntityImpl)) return [];
 
     // For death events, could include witnesses
     // For miracle events, could include all nearby agents

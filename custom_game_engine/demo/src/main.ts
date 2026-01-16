@@ -73,6 +73,9 @@ import {
   injectChunkSpatialQueryToSleep,
   injectChunkSpatialQueryToGather,
   injectChunkSpatialQueryToBuild,
+  injectChunkSpatialQueryToDepositItems,
+  injectChunkSpatialQueryToRepair,
+  injectChunkSpatialQueryToBehaviors,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -3821,10 +3824,19 @@ async function main() {
   // Inject into BuildBehavior (for building proximity checks)
   injectChunkSpatialQueryToBuild(chunkSpatialQuery);
 
+  // Inject into DepositItemsBehavior (for storage building lookups)
+  injectChunkSpatialQueryToDepositItems(chunkSpatialQuery);
+
+  // Inject into RepairBehavior (for damaged building lookups)
+  injectChunkSpatialQueryToRepair(chunkSpatialQuery);
+
+  // Inject centralized spatial query for all behaviors (via BaseBehavior)
+  injectChunkSpatialQueryToBehaviors(chunkSpatialQuery);
+
   // Inject into TemperatureSystem (for agent proximity checks)
   injectChunkSpatialQueryToTemperature(chunkSpatialQuery);
 
-  console.log('[Main] ChunkSpatialQuery injected into VisionProcessor, HearingProcessor, AgentBrainSystem, MovementSystem, FarmBehaviors, SeekFoodBehavior, SeekCoolingBehavior, SleepBehavior, GatherBehavior, BuildBehavior, and TemperatureSystem');
+  console.log('[Main] ChunkSpatialQuery injected into all systems and behaviors');
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);

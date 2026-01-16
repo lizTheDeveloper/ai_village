@@ -34,6 +34,7 @@ import type { EventBus } from '../events/EventBus.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import {
   type ResearchStateComponent,
   updateResearchProgress,
@@ -101,8 +102,8 @@ export class ResearchSystem implements System {
 
     // Use existing registry from world if available, otherwise create new one
     // This prevents duplicate registration when multiple systems initialize
-    if ((world as any).buildingRegistry) {
-      this.blueprintRegistry = (world as any).buildingRegistry;
+    if ('buildingRegistry' in world && world.buildingRegistry instanceof BuildingBlueprintRegistry) {
+      this.blueprintRegistry = world.buildingRegistry;
     } else {
       this.blueprintRegistry = new BuildingBlueprintRegistry();
       this.blueprintRegistry.registerDefaults();
@@ -298,18 +299,18 @@ export class ResearchSystem implements System {
 
         // Get first author (contributor with most time on project)
         const firstContributor = contributors[0]!;
-        const firstAgentComp = (firstContributor.agent as EntityImpl).getComponent<AgentComponent>(CT.Agent) as any;
+        const firstIdentity = (firstContributor.agent as EntityImpl).getComponent<IdentityComponent>(CT.Identity);
         const firstAuthorId = firstContributor.agent.id;
-        const firstAuthorName = firstAgentComp?.name ?? 'Unknown Researcher';
+        const firstAuthorName = firstIdentity?.name ?? 'Unknown Researcher';
 
         // Get co-authors (other contributors)
         const coAuthorIds: string[] = [];
         const coAuthorNames: string[] = [];
         for (let i = 1; i < contributors.length; i++) {
           const contributor = contributors[i]!;
-          const agentComp = (contributor.agent as EntityImpl).getComponent<AgentComponent>(CT.Agent) as any;
+          const identity = (contributor.agent as EntityImpl).getComponent<IdentityComponent>(CT.Identity);
           coAuthorIds.push(contributor.agent.id);
-          coAuthorNames.push(agentComp?.name ?? 'Unknown Researcher');
+          coAuthorNames.push(identity?.name ?? 'Unknown Researcher');
         }
 
         // Check if this paper will be a breakthrough (random chance, higher for high-tier)
@@ -484,8 +485,9 @@ export class ResearchSystem implements System {
       case 'generated':
         return unlock.generationType;
       default: {
+        // TypeScript exhaustiveness check - this should never be reached
         const exhaustiveCheck: never = unlock;
-        throw new Error(`Unknown unlock type: ${(exhaustiveCheck as any).type}`);
+        throw new Error(`Unknown unlock type: ${JSON.stringify(exhaustiveCheck)}`);
       }
     }
   }

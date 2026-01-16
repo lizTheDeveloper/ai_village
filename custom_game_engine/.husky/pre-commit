@@ -1,1 +1,33 @@
-npm test
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Change to the custom_game_engine directory
+cd custom_game_engine
+
+# Step 1: Type checking
+echo "📝 Checking TypeScript types..."
+npm run build --if-present || {
+  echo "❌ TypeScript build failed. Please fix type errors before committing."
+  exit 1
+}
+
+# Step 2: Linting (fail on errors only, warnings are OK for now)
+echo "🧹 Running ESLint..."
+npm run lint -- --max-warnings -1 2>/dev/null || {
+  # Check if there were actual errors (not just warnings)
+  npm run lint:errors || {
+    echo "❌ ESLint found errors. Please fix them before committing."
+    echo "   Run 'npm run lint' to see all issues."
+    exit 1
+  }
+}
+
+# Step 3: Tests
+echo "🧪 Running tests..."
+npm test || {
+  echo "❌ Tests failed. Please fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ All pre-commit checks passed!"

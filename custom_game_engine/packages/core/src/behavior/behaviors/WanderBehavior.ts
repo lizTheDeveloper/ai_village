@@ -228,8 +228,175 @@ export class WanderBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use wanderBehaviorWithContext instead
  */
 export function wanderBehavior(entity: EntityImpl, world: World): void {
   const behavior = new WanderBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('wander', wanderBehaviorWithContext);
+ */
+export function wanderBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  // Clear idleStartTick when wandering (no longer idle)
+  if (ctx.agent.idleStartTick !== undefined) {
+    ctx.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+      ...current,
+      idleStartTick: undefined,
+    }));
+  }
+
+  // Enable steering system for wander behavior
+  if (ctx.hasComponent(ComponentType.Steering)) {
+    ctx.updateComponent(ComponentType.Steering, (current: any) => ({
+      ...current,
+      behavior: 'wander',
+    }));
+  }
+
+  // Get or initialize wander angle and start tick
+  let wanderAngle = ctx.getState<number>('wanderAngle');
+  let wanderStartTick = ctx.getState<number>('wanderStartTick');
+
+  // Initialize on first wander tick
+  if (wanderAngle === undefined) {
+    wanderAngle = Math.random() * Math.PI * 2;
+  }
+  if (wanderStartTick === undefined) {
+    wanderStartTick = ctx.tick;
+  }
+
+  // Try frontier-seeking first, fall back to home bias
+  const exploration = ctx.getComponent(ComponentType.ExplorationState) as ExplorationStateComponent | undefined;
+
+  if (exploration) {
+    wanderAngle = applyFrontierBias(wanderAngle, ctx.position, exploration, ctx.agent, ctx);
+  } else {
+    // No exploration component - use simple home bias
+    wanderAngle = applyHomeBias(wanderAngle, ctx.position, ctx.agent, ctx);
+  }
+
+  // Normalize angle to 0-2π range
+  wanderAngle = wanderAngle % (Math.PI * 2);
+  if (wanderAngle < 0) wanderAngle += Math.PI * 2;
+
+  // Calculate velocity from angle
+  const speed = ctx.movement?.speed ?? 1;
+  const velocityX = Math.cos(wanderAngle) * speed;
+  const velocityY = Math.sin(wanderAngle) * speed;
+
+  // Update movement velocity
+  ctx.setVelocity(velocityX, velocityY);
+
+  // Save wander angle and start tick for next tick
+  ctx.updateState({
+    wanderAngle,
+    wanderStartTick,
+  });
+}
+
+/**
+ * Apply bias toward unexplored frontier sectors.
+ * Helper function for wanderBehaviorWithContext.
+ */
+function applyFrontierBias(
+  wanderAngle: number,
+  position: PositionComponent,
+  exploration: ExplorationStateComponent,
+  agent: AgentComponent,
+  ctx: import('../BehaviorContext.js').BehaviorContext
+): number {
+  // Get frontier sectors (unexplored areas adjacent to explored)
+  const frontiers = exploration.getFrontierSectors();
+
+  if (frontiers.length === 0) {
+    // All explored - fall back to home bias
+    return applyHomeBias(wanderAngle, position, agent, ctx);
+  }
+
+  // Find closest frontier sector
+  const currentSector = exploration.worldToSector(position);
+  let closestFrontier = frontiers[0]!;
+  let closestDist = Infinity;
+
+  for (const frontier of frontiers) {
+    const dx = frontier.x - currentSector.x;
+    const dy = frontier.y - currentSector.y;
+    const dist = dx * dx + dy * dy; // squared distance is fine for comparison
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestFrontier = frontier;
+    }
+  }
+
+  // Calculate angle to closest frontier (convert sector to world coords)
+  const frontierWorld = exploration.sectorToWorld({ x: closestFrontier.x, y: closestFrontier.y });
+  const angleToFrontier = Math.atan2(
+    frontierWorld.y - position.y,
+    frontierWorld.x - position.x
+  );
+
+  // Apply bias toward frontier with small jitter for natural movement
+  const jitter = (Math.random() - 0.5) * WANDER_JITTER;
+  const angleDiff = normalizeAngle(angleToFrontier - wanderAngle);
+
+  return wanderAngle + angleDiff * FRONTIER_BIAS + jitter;
+}
+
+/**
+ * Get the home position for an agent.
+ * Helper function for wanderBehaviorWithContext.
+ */
+function getHomePosition(agent: AgentComponent, ctx: import('../BehaviorContext.js').BehaviorContext): { x: number; y: number } | null {
+  if (agent.assignedBed) {
+    const bedEntity = ctx.getEntity(agent.assignedBed);
+    if (bedEntity) {
+      const bedPos = getPosition(bedEntity);
+      return bedPos ? { x: bedPos.x, y: bedPos.y } : null;
+    }
+  }
+  return null; // No home - agents will use origin (0,0) as fallback
+}
+
+/**
+ * Apply progressive home bias based on distance from home.
+ * Helper function for wanderBehaviorWithContext.
+ */
+function applyHomeBias(
+  wanderAngle: number,
+  position: PositionComponent,
+  agent: AgentComponent,
+  ctx: import('../BehaviorContext.js').BehaviorContext
+): number {
+  // Get home position (assigned bed or fallback to origin)
+  const home = getHomePosition(agent, ctx) || { x: 0, y: 0 };
+  const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
+
+  // Calculate distance from home
+  const dx = position.x - home.x;
+  const dy = position.y - home.y;
+  const distanceFromHome = Math.sqrt(dx * dx + dy * dy);
+
+  // If outside home radius, bias toward home
+  if (distanceFromHome > homeRadius) {
+    const angleToHome = Math.atan2(-dy, -dx);
+    // Progressive bias: stronger pull when farther from home
+    const bias = Math.min(0.8, (distanceFromHome - homeRadius) / homeRadius);
+    return wanderAngle + normalizeAngle(angleToHome - wanderAngle) * bias;
+  }
+
+  // Within home radius - normal random wander
+  return wanderAngle + (Math.random() - 0.5) * WANDER_JITTER * 2;
+}
+
+/**
+ * Normalize angle difference to -π to π range.
+ * Helper function for wanderBehaviorWithContext.
+ */
+function normalizeAngle(angle: number): number {
+  while (angle > Math.PI) angle -= Math.PI * 2;
+  while (angle < -Math.PI) angle += Math.PI * 2;
+  return angle;
 }

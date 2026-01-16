@@ -75,8 +75,58 @@ export class ObserveBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use observeBehaviorWithContext instead
  */
 export function observeBehavior(entity: EntityImpl, world: World): void {
   const behavior = new ObserveBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('observe', observeBehaviorWithContext);
+ */
+export function observeBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  // Stop all movement
+  ctx.stopMovement();
+
+  // Generate observation monologue occasionally
+  const lastMonologue = ctx.getState<number>('lastMonologue') ?? 0;
+
+  if (ctx.tick - lastMonologue > 300) {
+    // Update every ~15 seconds
+    const monologue = generateObservationMonologue();
+    ctx.setThought(monologue);
+    ctx.updateState({ lastMonologue: ctx.tick });
+  }
+
+  // Observe for ~20 seconds (400 ticks)
+  const observeStart = ctx.getState<number>('observeStart') ?? ctx.tick;
+  if (observeStart === ctx.tick) {
+    ctx.updateState({ observeStart: ctx.tick });
+  }
+
+  const ticksObserving = ctx.tick - observeStart;
+  if (ticksObserving > 400) {
+    // Done observing
+    return ctx.complete('observation_complete');
+  }
+}
+
+/**
+ * Generate observation monologue.
+ * Helper function for observeBehaviorWithContext.
+ */
+function generateObservationMonologue(): string {
+  const observations = [
+    'Watching the world go by...',
+    'Interesting how everything works together.',
+    'There\'s always something new to notice.',
+    'Taking in the sights and sounds.',
+    'I wonder what that is over there?',
+    'Observing the patterns of daily life.',
+    'The world is full of small details.',
+  ];
+
+  return observations[Math.floor(Math.random() * observations.length)]!;
 }

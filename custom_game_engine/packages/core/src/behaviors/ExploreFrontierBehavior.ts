@@ -25,6 +25,9 @@ import type { World } from '../ecs/World.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
+import type { VisionComponent } from '../components/VisionComponent.js';
+import type { ResourceComponent } from '../components/ResourceComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 import {
   getMapKnowledge,
   worldToSector,
@@ -36,6 +39,8 @@ import {
   getUnexploredInRadius,
   markExplored,
 } from '../navigation/HearsayMemory.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../behavior/BehaviorContext.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 
 /** Default exploration radius in sectors */
 const DEFAULT_EXPLORATION_RADIUS = 3;
@@ -45,11 +50,12 @@ const SECTOR_EXPLORATION_TIME = 50;
 
 /**
  * Handler function for explore_frontier behavior
+ * @deprecated Use exploreFrontierBehaviorWithContext instead
  */
 export function exploreFrontierBehavior(entity: EntityImpl, world: World): void {
-  const agent = entity.getComponent<AgentComponent>('agent');
-  const position = entity.getComponent<PositionComponent>('position');
-  const movement = entity.getComponent<MovementComponent>('movement');
+  const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+  const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+  const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
 
   if (!agent || !position || !movement) {
     return;
@@ -60,7 +66,7 @@ export function exploreFrontierBehavior(entity: EntityImpl, world: World): void 
   const explorationRadius = (behaviorState.radius as number) || DEFAULT_EXPLORATION_RADIUS;
 
   // Get agent's personal exploration memory
-  const hearsayMemory = entity.getComponent('hearsay_memory') as HearsayMemoryComponent | null;
+  const hearsayMemory = entity.getComponent(ComponentType.HearsayMemory) as HearsayMemoryComponent | null;
 
   // Get current sector
   const currentSector = worldToSector(position.x, position.y);
@@ -95,7 +101,7 @@ export function exploreFrontierBehavior(entity: EntityImpl, world: World): void 
       }
 
       // Clear target to find next sector
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behaviorState: {
           ...current.behaviorState,
@@ -141,7 +147,7 @@ export function exploreFrontierBehavior(entity: EntityImpl, world: World): void 
 
   // If still no target, we've explored everything nearby - wander
   if (!nextSector) {
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'wander',
       behaviorState: {},
@@ -151,7 +157,7 @@ export function exploreFrontierBehavior(entity: EntityImpl, world: World): void 
   }
 
   // Set new exploration target
-  entity.updateComponent<AgentComponent>('agent', (current) => ({
+  entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
     ...current,
     behaviorState: {
       ...current.behaviorState,
@@ -178,16 +184,17 @@ function navigateToSector(
 
   const dx = target.worldX - position.x;
   const dy = target.worldY - position.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  const distanceSquared = dx * dx + dy * dy;
 
-  if (distance < 1) {
+  if (distanceSquared < 1) {
     return;
   }
 
+  const distance = Math.sqrt(distanceSquared);
   const velocityX = (dx / distance) * movement.speed;
   const velocityY = (dy / distance) * movement.speed;
 
-  entity.updateComponent<MovementComponent>('movement', (current) => ({
+  entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
     ...current,
     velocityX,
     velocityY,
@@ -208,7 +215,7 @@ function wanderWithinSector(
   const velocityX = Math.cos(angle) * movement.speed * 0.5;
   const velocityY = Math.sin(angle) * movement.speed * 0.5;
 
-  entity.updateComponent<MovementComponent>('movement', (current) => ({
+  entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
     ...current,
     velocityX,
     velocityY,
@@ -225,7 +232,7 @@ function findResourcesInSector(
 ): ('food' | 'wood' | 'stone' | 'water' | 'minerals')[] {
   void _currentSector; // Reserved for future sector-specific logic
 
-  const vision = entity.getComponent('vision') as any;
+  const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
   if (!vision) {
     return [];
   }
@@ -237,7 +244,7 @@ function findResourcesInSector(
     for (const resourceId of vision.seenResources) {
       const resource = world.getEntity(resourceId);
       if (resource) {
-        const resourceComp = (resource as EntityImpl).getComponent('resource') as any;
+        const resourceComp = (resource as EntityImpl).getComponent<ResourceComponent>(ComponentType.Resource);
         if (resourceComp?.resourceType) {
           // Map resource types to area resource types
           const areaType = mapResourceType(resourceComp.resourceType);
@@ -301,4 +308,152 @@ function getNeighborSector(
     sectorX: current.sectorX + offset.dx,
     sectorY: current.sectorY + offset.dy,
   };
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('explore_frontier', exploreFrontierBehaviorWithContext);
+ */
+export function exploreFrontierBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const explorationRadius = (ctx.getState<number>('radius')) || DEFAULT_EXPLORATION_RADIUS;
+
+  // Get agent's personal exploration memory
+  const hearsayMemory = ctx.getComponent<HearsayMemoryComponent>(CT.HearsayMemory);
+
+  // Get current sector
+  const currentSector = worldToSector(ctx.position.x, ctx.position.y);
+
+  // Check if we have a target sector we're exploring
+  const targetSector = ctx.getState<{ sectorX: number; sectorY: number }>('targetSector');
+  const explorationStartTick = ctx.getState<number>('explorationStartTick');
+
+  // If we have a target and haven't been there long enough, keep moving
+  if (targetSector && explorationStartTick !== undefined) {
+    const timeInSector = ctx.tick - explorationStartTick;
+
+    // Check if we've arrived at target sector
+    if (
+      currentSector.sectorX === targetSector.sectorX &&
+      currentSector.sectorY === targetSector.sectorY
+    ) {
+      // We're in the target sector - explore it
+      if (timeInSector < SECTOR_EXPLORATION_TIME) {
+        // Still exploring - wander within sector
+        const angle = Math.random() * 2 * Math.PI;
+        const speed = ctx.movement?.speed || 1;
+        const velocityX = Math.cos(angle) * speed * 0.5;
+        const velocityY = Math.sin(angle) * speed * 0.5;
+        ctx.setVelocity(velocityX, velocityY);
+        return;
+      }
+
+      // Done exploring this sector - mark it
+      if (hearsayMemory) {
+        // Look for resources in this sector
+        const vision = ctx.getComponent<VisionComponent>(CT.Vision);
+        const foundResources = vision ? findResourcesInSectorWithContext(ctx, vision, currentSector) : [];
+        markExplored(hearsayMemory, currentSector.sectorX, currentSector.sectorY, foundResources, ctx.tick);
+      }
+
+      // Clear target to find next sector
+      ctx.updateState({
+        targetSector: undefined,
+        explorationStartTick: undefined,
+      });
+    } else {
+      // Still moving to target - navigate there
+      const target = sectorToWorld(targetSector.sectorX, targetSector.sectorY);
+      const dx = target.worldX - ctx.position.x;
+      const dy = target.worldY - ctx.position.y;
+      const distanceSquared = dx * dx + dy * dy;
+
+      if (distanceSquared >= 1) {
+        const distance = Math.sqrt(distanceSquared);
+        const speed = ctx.movement?.speed || 1;
+        const velocityX = (dx / distance) * speed;
+        const velocityY = (dy / distance) * speed;
+        ctx.setVelocity(velocityX, velocityY);
+      }
+      return;
+    }
+  }
+
+  // Find next sector to explore
+  let nextSector: { sectorX: number; sectorY: number } | null = null;
+
+  // First check personal fog-of-war
+  if (hearsayMemory) {
+    const unexplored = getUnexploredInRadius(
+      hearsayMemory,
+      currentSector.sectorX,
+      currentSector.sectorY,
+      explorationRadius
+    );
+
+    if (unexplored.length > 0 && unexplored[0]) {
+      // Get closest unexplored
+      nextSector = unexplored[0];
+    }
+  }
+
+  // If no personal unexplored, use world-level knowledge
+  if (!nextSector) {
+    const mapKnowledge = getMapKnowledge();
+    const bestDirection = mapKnowledge.getBestExplorationDirection(ctx.position.x, ctx.position.y);
+
+    if (bestDirection) {
+      // Convert direction to target sector
+      nextSector = getNeighborSector(currentSector, bestDirection);
+    }
+  }
+
+  // If still no target, we've explored everything nearby - wander
+  if (!nextSector) {
+    ctx.setThought("I've explored everything nearby. Time to wander.");
+    return ctx.switchTo('wander', {});
+  }
+
+  // Set new exploration target
+  ctx.updateState({
+    targetSector: nextSector,
+    explorationStartTick: ctx.tick,
+  });
+
+  ctx.setThought(`Exploring sector (${nextSector.sectorX}, ${nextSector.sectorY})`);
+
+  // Start moving toward target
+  const target = sectorToWorld(nextSector.sectorX, nextSector.sectorY);
+  ctx.moveToward({ x: target.worldX, y: target.worldY });
+}
+
+/**
+ * Find resources visible in current sector (context version)
+ */
+function findResourcesInSectorWithContext(
+  ctx: BehaviorContext,
+  vision: VisionComponent,
+  _currentSector: { sectorX: number; sectorY: number }
+): ('food' | 'wood' | 'stone' | 'water' | 'minerals')[] {
+  void _currentSector; // Reserved for future sector-specific logic
+
+  const foundTypes: Set<'food' | 'wood' | 'stone' | 'water' | 'minerals'> = new Set();
+
+  // Check seen resources
+  if (vision.seenResources && Array.isArray(vision.seenResources)) {
+    for (const resourceId of vision.seenResources) {
+      const resource = ctx.getEntity(resourceId);
+      if (resource) {
+        const resourceComp = (resource as EntityImpl).getComponent<ResourceComponent>(CT.Resource);
+        if (resourceComp?.resourceType) {
+          // Map resource types to area resource types
+          const areaType = mapResourceType(resourceComp.resourceType);
+          if (areaType) {
+            foundTypes.add(areaType);
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(foundTypes);
 }

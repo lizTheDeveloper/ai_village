@@ -600,10 +600,15 @@ export class WorldImpl implements WorldMutator {
     // CRITICAL FIX: Update spatial chunk index if entity has position component
     // Without this, findNearestResources() returns empty arrays and NPCs can't find food
     const pos = entity.components.get('position') as
-      | { chunkX: number; chunkY: number }
+      | { x: number; y: number; chunkX?: number; chunkY?: number }
       | undefined;
     if (pos) {
-      const key = `${pos.chunkX},${pos.chunkY}`;
+      // Calculate chunk coordinates if not present (migration for old saves)
+      const CHUNK_SIZE = 32;
+      const chunkX = pos.chunkX ?? Math.floor(pos.x / CHUNK_SIZE);
+      const chunkY = pos.chunkY ?? Math.floor(pos.y / CHUNK_SIZE);
+      const key = `${chunkX},${chunkY}`;
+
       if (!this.chunkIndex.has(key)) {
         this.chunkIndex.set(key, new Set());
       }

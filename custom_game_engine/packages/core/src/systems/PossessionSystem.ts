@@ -51,8 +51,8 @@ export class PossessionSystem implements System {
     if (!playerEntity) {
       return;
     }
-    const playerControl = playerEntity.components.get('player_control') as PlayerControlComponent;
-    const deity = playerEntity.components.get('deity') as DeityComponent;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
+    const deity = playerEntity.getComponent<DeityComponent>('deity');
 
     if (!playerControl || !deity) {
       return;
@@ -72,8 +72,8 @@ export class PossessionSystem implements System {
     }
 
     // Get agent components
-    const agentComp = possessedAgent.components.get('agent') as AgentComponent | undefined;
-    const needs = possessedAgent.components.get('needs') as NeedsComponent | undefined;
+    const agentComp = possessedAgent.getComponent<AgentComponent>('agent');
+    const needs = possessedAgent.getComponent<NeedsComponent>('needs');
 
     if (!agentComp || !needs) {
       // Missing required components - force jack-out
@@ -127,20 +127,10 @@ export class PossessionSystem implements System {
       crossUniverseMultiplier
     );
 
-    // Apply cost
-    (playerEntity as any).updateComponent('deity', (current: DeityComponent) => ({
-      ...current,
-      belief: {
-        ...current.belief,
-        currentBelief: Math.max(0, current.belief.currentBelief - cost),
-        totalBeliefSpent: current.belief.totalBeliefSpent + cost,
-      },
-    }));
-
-    (playerEntity as any).updateComponent('player_control', (current: PlayerControlComponent) => ({
-      ...current,
-      totalBeliefSpent: current.totalBeliefSpent + cost,
-    }));
+    // Apply cost - directly mutate components (class-based components are mutable)
+    deity.belief.currentBelief = Math.max(0, deity.belief.currentBelief - cost);
+    deity.belief.totalBeliefSpent += cost;
+    playerControl.totalBeliefSpent += cost;
 
     // Emit tick event for UI updates
     world.eventBus.emit({
@@ -163,10 +153,10 @@ export class PossessionSystem implements System {
     agentEntity: Entity,
     world: World
   ): { success: boolean; reason?: string } {
-    const playerControl = playerEntity.components.get('player_control') as PlayerControlComponent | undefined;
-    const deity = playerEntity.components.get('deity') as DeityComponent | undefined;
-    const agent = agentEntity.components.get('agent') as AgentComponent | undefined;
-    const needs = agentEntity.components.get('needs') as NeedsComponent | undefined;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
+    const deity = playerEntity.getComponent<DeityComponent>('deity');
+    const agent = agentEntity.getComponent<AgentComponent>('agent');
+    const needs = agentEntity.getComponent<NeedsComponent>('needs');
 
     if (!playerControl || !deity || !agent || !needs) {
       return { success: false, reason: 'Missing required components' };
@@ -188,36 +178,24 @@ export class PossessionSystem implements System {
       return { success: false, reason: 'Insufficient belief' };
     }
 
-    // Apply initial cost
-    (playerEntity as any).updateComponent('deity', (current: DeityComponent) => ({
-      ...current,
-      belief: {
-        ...current.belief,
-        currentBelief: current.belief.currentBelief - initialCost,
-        totalBeliefSpent: current.belief.totalBeliefSpent + initialCost,
-      },
-    }));
+    // Apply initial cost - directly mutate components
+    deity.belief.currentBelief -= initialCost;
+    deity.belief.totalBeliefSpent += initialCost;
 
     // Set possession state
     const currentTick = world.tick;
-    (playerEntity as any).updateComponent('player_control', (current: PlayerControlComponent) => ({
-      ...current,
-      isPossessed: true,
-      possessedAgentId: agentEntity.id,
-      possessionStartTick: currentTick,
-      totalBeliefSpent: initialCost,
-      inputMode: 'possessed',
-      lastInputTick: currentTick,
-      movementCommand: null,
-      pendingInteraction: null,
-    }));
+    playerControl.isPossessed = true;
+    playerControl.possessedAgentId = agentEntity.id;
+    playerControl.possessionStartTick = currentTick;
+    playerControl.totalBeliefSpent = initialCost;
+    playerControl.inputMode = 'possessed' as const;
+    playerControl.lastInputTick = currentTick;
+    playerControl.movementCommand = null;
+    playerControl.pendingInteraction = null;
 
     // Mark agent as possessed
-    (agentEntity as any).updateComponent('agent', (current: AgentComponent) => ({
-      ...current,
-      behavior: 'player_controlled',
-      behaviorState: { possessedBy: playerEntity.id },
-    }));
+    agent.behavior = 'player_controlled' as const;
+    agent.behaviorState = { possessedBy: playerEntity.id };
 
     // Emit event
     world.eventBus.emit({
@@ -237,7 +215,7 @@ export class PossessionSystem implements System {
    * Jack out - return to god mode
    */
   public jackOut(playerEntity: Entity, world: World, reason?: string): void {
-    const playerControl = playerEntity.components.get('player_control') as PlayerControlComponent | undefined;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
 
     if (!playerControl || !playerControl.isPossessed) {
       return; // Not currently possessed
@@ -248,28 +226,25 @@ export class PossessionSystem implements System {
 
     // Get possessed agent (if still exists)
     if (agentId) {
-      const agent = world.getEntity(agentId);
-      if (agent) {
-        // Restore normal behavior
-        (agent as any).updateComponent('agent', (current: AgentComponent) => ({
-          ...current,
-          behavior: 'idle',
-          behaviorState: {},
-        }));
+      const agentEntity = world.getEntity(agentId);
+      if (agentEntity) {
+        const agentComp = agentEntity.getComponent<AgentComponent>('agent');
+        if (agentComp) {
+          // Restore normal behavior
+          agentComp.behavior = 'idle' as const;
+          agentComp.behaviorState = {};
+        }
       }
     }
 
     // Clear possession state
-    (playerEntity as any).updateComponent('player_control', (current: PlayerControlComponent) => ({
-      ...current,
-      isPossessed: false,
-      possessedAgentId: null,
-      possessionStartTick: 0,
-      totalBeliefSpent: 0,
-      inputMode: 'god',
-      movementCommand: null,
-      pendingInteraction: null,
-    }));
+    playerControl.isPossessed = false;
+    playerControl.possessedAgentId = null;
+    playerControl.possessionStartTick = 0;
+    playerControl.totalBeliefSpent = 0;
+    playerControl.inputMode = 'god' as const;
+    playerControl.movementCommand = null;
+    playerControl.pendingInteraction = null;
 
     // Emit event
     world.eventBus.emit({
@@ -297,11 +272,9 @@ export class PossessionSystem implements System {
       return null;
     }
 
-    const playerControl = playerEntity.components.get(
-      'player_control'
-    ) as PlayerControlComponent;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
 
-    if (!playerControl.isPossessed || !playerControl.possessedAgentId) {
+    if (!playerControl || !playerControl.isPossessed || !playerControl.possessedAgentId) {
       return null;
     }
 
@@ -322,11 +295,9 @@ export class PossessionSystem implements System {
       return false;
     }
 
-    const playerControl = playerEntity.components.get(
-      'player_control'
-    ) as PlayerControlComponent;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
 
-    return playerControl.isPossessed && playerControl.possessedAgentId === agentId;
+    return !!(playerControl && playerControl.isPossessed && playerControl.possessedAgentId === agentId);
   }
 
   /**
@@ -343,8 +314,8 @@ export class PossessionSystem implements System {
       return null;
     }
 
-    const playerControl = playerEntity.components.get('player_control') as PlayerControlComponent;
-    const deity = playerEntity.components.get('deity') as DeityComponent;
+    const playerControl = playerEntity.getComponent<PlayerControlComponent>('player_control');
+    const deity = playerEntity.getComponent<DeityComponent>('deity');
 
     if (!playerControl || !deity || !playerControl.isPossessed || !playerControl.possessedAgentId) {
       return null;

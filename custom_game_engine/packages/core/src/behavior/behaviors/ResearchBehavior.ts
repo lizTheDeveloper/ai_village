@@ -284,5 +284,186 @@ export class ResearchBehavior extends BaseBehavior {
 
 /**
  * Factory function to create ResearchBehavior
+ * @deprecated Use researchBehaviorWithContext instead for better performance
  */
 export const researchBehavior = () => new ResearchBehavior();
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('research', researchBehaviorWithContext);
+ */
+export function researchBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const state = ctx.getAllState() as any;
+  const phase = state.phase ?? 'find_building';
+
+  // Execute phase
+  switch (phase) {
+    case 'find_building':
+      return handleFindBuilding(ctx, state);
+
+    case 'move_to_building':
+      return handleMoveToBuilding(ctx, state);
+
+    case 'researching':
+      return handleConductResearch(ctx, state);
+
+    case 'complete':
+      return ctx.complete('Research complete');
+
+    default:
+      return ctx.complete(`Unknown phase: ${phase}`);
+  }
+}
+
+function handleFindBuilding(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  // Get research system
+  const world = (ctx as any).world;
+  const researchSystem = (world as any).getSystem?.('research');
+
+  if (!researchSystem) {
+    return ctx.complete('No research system available');
+  }
+
+  // Check if we're already at a research building
+  if (researchSystem.isAgentAtResearchBuilding(world, ctx.entity.id)) {
+    // Transition to researching phase
+    ctx.updateState({ phase: 'researching' });
+    return;
+  }
+
+  // Find nearest research building
+  const buildings = ctx.getEntitiesInRadius(MAX_BUILDING_SEARCH_DISTANCE, [CT.Building, CT.Position]);
+
+  let nearestBuilding: { entity: any; position: { x: number; y: number } } | null = null;
+  let nearestDistance = Infinity;
+
+  for (const { entity: buildingEntity, position: buildingPos, distance } of buildings) {
+    const buildingImpl = buildingEntity as EntityImpl;
+    const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+
+    if (!buildingComp || !buildingComp.isComplete) continue;
+
+    // Check if this is a research building
+    const blueprint = (world as any).buildingRegistry?.tryGet(buildingComp.buildingType);
+    if (!blueprint) continue;
+
+    const hasResearch = blueprint.functionality.some((f: any) => f.type === 'research');
+    if (!hasResearch) continue;
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestBuilding = { entity: buildingEntity, position: buildingPos };
+    }
+  }
+
+  if (!nearestBuilding) {
+    return ctx.complete('No research building found nearby');
+  }
+
+  // Set target and move to it
+  ctx.updateState({
+    targetBuildingId: nearestBuilding.entity.id,
+    phase: 'move_to_building'
+  });
+}
+
+function handleMoveToBuilding(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const targetId = state.targetBuildingId;
+  if (!targetId) {
+    return ctx.complete('No target building ID');
+  }
+
+  const targetBuilding = ctx.getEntity(targetId);
+  if (!targetBuilding) {
+    // Building no longer exists, restart
+    ctx.updateState({ phase: 'find_building', targetBuildingId: undefined });
+    return;
+  }
+
+  const targetPos = (targetBuilding as EntityImpl).getComponent<PositionComponent>(CT.Position);
+  if (!targetPos) {
+    return ctx.complete('Target building has no position');
+  }
+
+  // If within research distance, start researching
+  if (ctx.isWithinRange(targetPos, RESEARCH_DISTANCE)) {
+    ctx.stopMovement();
+    ctx.updateState({ phase: 'researching' });
+    return;
+  }
+
+  // Move toward building
+  ctx.moveToward({ x: targetPos.x, y: targetPos.y }, {
+    arrivalDistance: RESEARCH_DISTANCE
+  });
+}
+
+function handleConductResearch(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  // Get research system
+  const world = (ctx as any).world;
+  const researchSystem = (world as any).getSystem?.('research');
+
+  if (!researchSystem) {
+    return ctx.complete('No research system available');
+  }
+
+  // Check if still at research building
+  if (!researchSystem.isAgentAtResearchBuilding(world, ctx.entity.id)) {
+    // Not at building anymore, find another
+    ctx.updateState({
+      phase: 'find_building',
+      researchStarted: false
+    });
+    return;
+  }
+
+  // Start research if not started
+  if (!state.researchStarted) {
+    // Get available research
+    const available = researchSystem.getAvailableResearch(world);
+    if (available.length === 0) {
+      return ctx.complete('No research available');
+    }
+
+    // Pick first available research (or use specified researchId)
+    const researchToStart = state.researchId ?? available[0]?.id;
+    if (!researchToStart) {
+      return ctx.complete('No research to start');
+    }
+
+    // Emit event to start research
+    ctx.emit({
+      type: 'research:started',
+      data: {
+        agentId: ctx.entity.id,
+        researchId: researchToStart,
+        researchers: [ctx.entity.id],
+      },
+    });
+
+    ctx.updateState({
+      researchStarted: true,
+      researchId: researchToStart,
+      startedTick: ctx.tick
+    });
+  }
+
+  // Research ongoing - ResearchSystem handles progress accumulation
+  // Stay at building for a while (600 ticks = ~30 seconds at 20 TPS)
+  const ticksElapsed = ctx.tick - (state.startedTick ?? ctx.tick);
+  if (ticksElapsed > 600) {
+    // Research session complete
+    ctx.updateState({ phase: 'complete' });
+    return ctx.complete('Research session complete');
+  }
+
+  // Continue researching
+  return;
+}

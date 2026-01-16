@@ -120,8 +120,10 @@ export class WorldSerializer {
 
     // Add entities to world
     // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
+    // CRITICAL: Use _addEntity instead of _entities.set() to properly update the spatial chunk index
+    // Without this, findNearestResources() returns empty arrays and NPCs can't find food/resources
     for (const entity of deserializedEntities) {
-      (worldImpl as any)._entities.set(entity.id, entity);
+      (worldImpl as any)._addEntity(entity);
     }
 
     // Deserialize world state (terrain, weather, etc.)

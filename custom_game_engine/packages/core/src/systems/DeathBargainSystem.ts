@@ -27,7 +27,14 @@ import {
 } from '../components/DeathBargainComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
+import type { TagsComponent } from '../components/TagsComponent.js';
 import { createConversationComponent } from '../components/ConversationComponent.js';
+import type { ConversationComponent, ConversationMessage } from '../components/ConversationComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { RiddleGenerator, type HeroContext } from '../divinity/RiddleGenerator.js';
 import {
@@ -35,6 +42,66 @@ import {
   findGodOfDeath,
   moveGodOfDeath,
 } from '../divinity/GodOfDeathEntity.js';
+
+// Import needs and health component types
+interface NeedsComponent {
+  hunger: number;
+  warmth: number;
+  [key: string]: unknown;
+}
+
+interface HealthComponent {
+  current: number;
+  max: number;
+  [key: string]: unknown;
+}
+
+// Chat room member type
+interface ChatRoomMember {
+  name: string;
+  [key: string]: unknown;
+}
+
+// System registry type for accessing other systems
+interface SystemRegistry {
+  get(systemId: string): System | undefined;
+}
+
+// Chat room system type
+interface ChatRoomSystem extends System {
+  getRoomMembers(world: World, roomId: string): ChatRoomMember[] | undefined;
+  sendSystemMessage(world: World, roomId: string, message: string): void;
+  getRoom(world: World, roomId: string): ChatRoom | undefined;
+}
+
+// Chat room type
+interface ChatRoom {
+  messages: ChatRoomMessage[];
+  [key: string]: unknown;
+}
+
+// Chat room message type
+interface ChatRoomMessage {
+  content: string;
+  tick: number;
+  senderName: string;
+  [key: string]: unknown;
+}
+
+// Episodic memory type
+interface EpisodicMemoryComponent {
+  memories?: Array<{
+    description: string;
+    importance: number;
+    [key: string]: unknown;
+  }>;
+  episodicMemories?: ReadonlyArray<{
+    summary: string;
+    importance: number;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
 
 /**
  * DeathBargainSystem - Offers dying heroes a chance to return
@@ -58,7 +125,7 @@ export class DeathBargainSystem implements System {
    * Set LLM queue (adapter method for compatibility)
    * Wraps the queue as an LLMProvider
    */
-  setLLMQueue(queue: any): void {
+  setLLMQueue(queue: LLMProvider): void {
     // Wrap the queue as an LLMProvider
     this.llmProvider = queue;
     this.riddleGenerator = new RiddleGenerator(queue);
@@ -73,8 +140,12 @@ export class DeathBargainSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Note: This method is intentionally synchronous for ECS compatibility
+    // Async operations (generateChallenge, evaluateResponse) fire-and-forget
+    // They update component state asynchronously, which is picked up in future ticks
     for (const entity of entities) {
-      const bargain = entity.getComponent(ComponentType.DeathBargain) as DeathBargainComponent;
+      const bargain = entity.getComponent<DeathBargainComponent>(ComponentType.DeathBargain);
+      if (!bargain) continue;
 
       // Process based on current status
       if (bargain.status === 'offered') {
@@ -84,12 +155,12 @@ export class DeathBargainSystem implements System {
       }
 
       if (bargain.status === 'accepted' && bargain.challengeDescription === '') {
-        // Generate the challenge
+        // Generate the challenge (async, updates component when done)
         this.generateChallenge(world, entity, bargain);
       }
 
       if (bargain.status === 'in_progress' && bargain.heroResponse) {
-        // Evaluate hero's answer
+        // Evaluate hero's answer (async, updates component when done)
         this.evaluateResponse(world, entity, bargain);
       }
 
@@ -113,7 +184,7 @@ export class DeathBargainSystem implements System {
    */
   qualifiesForDeathBargain(entity: Entity, world?: World): boolean {
     // Must have a soul
-    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>('soul_identity');
     if (!soulIdentity) {
       return false;
     }
@@ -134,7 +205,7 @@ export class DeathBargainSystem implements System {
     // The God of Death will PRETEND to care about destiny,
     // but really cares about putting on a good show
     if (world) {
-      const position = entity.components.get('position') as any;
+      const position = entity.getComponent<PositionComponent>(ComponentType.Position);
       const deathLocation = position ? { x: position.x, y: position.y } : { x: 0, y: 0 };
       const entertainmentValue = this.calculateEntertainmentValue(world, entity, deathLocation);
 
@@ -176,15 +247,18 @@ export class DeathBargainSystem implements System {
    */
   private isHero(entity: Entity): boolean {
     // Check for combat skills
-    const skills = entity.components.get('skills');
-    if (skills && (skills as any).combat && (skills as any).combat > 5) {
+    const skills = entity.getComponent<SkillsComponent>('skills');
+    if (skills && skills.levels.combat && skills.levels.combat > 5) {
       return true;
     }
 
     // Check for achievements/reputation
-    const agent = entity.components.get('agent');
-    if (agent && (agent as any).reputation && (agent as any).reputation > 10) {
-      return true;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    if (agent && agent.reputation) {
+      const totalReputation = Object.values(agent.reputation).reduce((sum, val) => sum + val, 0);
+      if (totalReputation > 10) {
+        return true;
+      }
     }
 
     // Default: anyone who made it this far might be a hero
@@ -204,9 +278,9 @@ export class DeathBargainSystem implements System {
     deathLocation: { x: number; y: number },
     causeOfDeath: string
   ): Promise<void> {
-    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>('soul_identity');
     const destinyText = soulIdentity?.destiny;
-    const identity = entity.components.get('identity') as any;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
     const heroName = identity?.name || 'mortal';
 
     // Manifest or move the God of Death
@@ -273,11 +347,11 @@ export class DeathBargainSystem implements System {
     });
 
     // Log to divine chat that intervention is possible
-    const systemRegistry = (world as any).systemRegistry;
+    const systemRegistry = (world as World & { systemRegistry?: SystemRegistry }).systemRegistry;
     if (systemRegistry) {
-      const chatRoomSystem = systemRegistry.get('chat_rooms');
+      const chatRoomSystem = systemRegistry.get('chat_rooms') as ChatRoomSystem | undefined;
       if (chatRoomSystem) {
-        (chatRoomSystem as any).sendSystemMessage(
+        chatRoomSystem.sendSystemMessage(
           world,
           'divine_chat',
           `${deathGodName} is judging ${heroName}. Fellow gods may speak on their behalf...`
@@ -366,7 +440,7 @@ export class DeathBargainSystem implements System {
     }
 
     // Emit event
-    const identity = deathGod?.components.get('identity') as any;
+    const identity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
     const psychopompName = identity?.name || 'The God of Death';
 
     world.eventBus.emit({
@@ -384,18 +458,32 @@ export class DeathBargainSystem implements System {
    * Build hero context for personalized riddle generation
    */
   private buildHeroContext(entity: Entity, bargain: DeathBargainComponent): HeroContext {
-    const identity = entity.components.get('identity') as any;
-    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
-    const memories = entity.components.get('episodic_memory') as any;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>('soul_identity');
+    const memories = entity.getComponent('episodic_memory') as EpisodicMemoryComponent | undefined;
 
     // Extract notable deeds from memories
     const notableDeeds: string[] = [];
-    if (memories?.memories) {
-      const memoryArray = Array.from(memories.memories as any[]);
+    if (memories) {
+      // Check for both memory formats (class and plain object)
+      const memoryArray = memories.episodicMemories
+        ? Array.from(memories.episodicMemories)
+        : memories.memories
+        ? Array.from(memories.memories)
+        : [];
+
       notableDeeds.push(
         ...memoryArray
-          .filter((m: any) => m.importance && m.importance > 7)
-          .map((m: any) => m.description)
+          .filter((m) => m.importance && m.importance > 7)
+          .map((m) => {
+            if ('summary' in m && typeof m.summary === 'string') {
+              return m.summary;
+            } else if ('description' in m && typeof m.description === 'string') {
+              return m.description;
+            }
+            return '';
+          })
+          .filter(s => s.length > 0)
           .slice(0, 3) // Top 3 most important memories
       );
     }
@@ -462,7 +550,7 @@ export class DeathBargainSystem implements System {
           debtOwed: 'When Death calls, you must answer',
         };
 
-        const deathGodIdentity = deathGod?.components.get('identity') as any;
+        const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
         const psychopompName = deathGodIdentity?.name || 'The God of Death';
 
         world.eventBus.emit({
@@ -495,7 +583,7 @@ export class DeathBargainSystem implements System {
             }
           }
 
-          const deathGodIdentity = deathGod?.components.get('identity') as any;
+          const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
           const psychopompName = deathGodIdentity?.name || 'The God of Death';
 
           world.eventBus.emit({
@@ -665,7 +753,7 @@ Answer ONLY with "YES" or "NO".`;
       .executeEntities();
 
     for (const entity of entities) {
-      const pos = entity.getComponent(ComponentType.Position) as any;
+      const pos = entity.getComponent<PositionComponent>(ComponentType.Position);
       if (!pos) continue;
 
       // Check if entity is mortal (has agent component)
@@ -691,20 +779,20 @@ Answer ONLY with "YES" or "NO".`;
    */
   private getObservingGods(world: World): string[] {
     // Try to get ChatRoomSystem from the world's system registry
-    const systemRegistry = (world as any).systemRegistry;
+    const systemRegistry = (world as World & { systemRegistry?: SystemRegistry }).systemRegistry;
     if (!systemRegistry) {
       return [];
     }
 
-    const chatRoomSystem = systemRegistry.get('chat_rooms');
+    const chatRoomSystem = systemRegistry.get('chat_rooms') as ChatRoomSystem | undefined;
     if (!chatRoomSystem) {
       // ChatRoomSystem not registered yet - fallback to empty
       return [];
     }
 
     // Get members of the divine chat room
-    const members = (chatRoomSystem as any).getRoomMembers(world, 'divine_chat');
-    return members ? members.map((m: any) => m.name) : [];
+    const members = chatRoomSystem.getRoomMembers(world, 'divine_chat');
+    return members ? members.map((m) => m.name) : [];
   }
 
   /**
@@ -722,32 +810,34 @@ Answer ONLY with "YES" or "NO".`;
 
     // Apply health penalty if specified
     if (bargain.resurrectConditions?.healthPenalty) {
-      const health = entity.components.get('health');
+      const health = entity.getComponent('health') as HealthComponent | undefined;
       if (health) {
-        (health as any).max *= 1 - bargain.resurrectConditions.healthPenalty;
-        (health as any).current = (health as any).max;
+        health.max *= 1 - bargain.resurrectConditions.healthPenalty;
+        health.current = health.max;
       }
     }
 
     // Add blessing
     if (bargain.resurrectConditions?.blessing) {
-      const tags = entity.components.get('tags');
-      if (tags && (tags as any).tags) {
-        (tags as any).tags.add(bargain.resurrectConditions.blessing);
+      const tags = entity.getComponent<TagsComponent>('tags');
+      if (tags && tags.tags) {
+        if (!tags.tags.includes(bargain.resurrectConditions.blessing)) {
+          tags.tags.push(bargain.resurrectConditions.blessing);
+        }
       }
     }
 
     // Return to location of death
-    const position = entity.components.get('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (position) {
-      (position as any).x = bargain.deathLocation.x;
-      (position as any).y = bargain.deathLocation.y;
+      position.x = bargain.deathLocation.x;
+      position.y = bargain.deathLocation.y;
     }
 
     // Remove death bargain component (challenge complete)
     (entity as any).removeComponent?.(ComponentType.DeathBargain);
 
-    const deathGodIdentity = deathGod?.components.get('identity') as any;
+    const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
     const resurrectionPsychopompName = deathGodIdentity?.name || 'The God of Death';
 
     world.eventBus.emit({
@@ -772,7 +862,7 @@ Answer ONLY with "YES" or "NO".`;
     }
 
     // Update afterlife component with servitude status
-    const afterlife = entity.components.get('afterlife') as AfterlifeComponent | undefined;
+    const afterlife = entity.getComponent<AfterlifeComponent>('afterlife');
     if (afterlife) {
       afterlife.peace = 0; // No peace in servitude
       afterlife.isRestless = true;
@@ -783,7 +873,7 @@ Answer ONLY with "YES" or "NO".`;
     (entity as any).removeComponent?.(ComponentType.DeathBargain);
 
     // Get psychopomp name for the event (reuse deathGod from above)
-    const deathGodIdentity = deathGod?.components.get('identity') as any;
+    const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
     const psychopompName = deathGodIdentity?.name || 'The God of Death';
 
     world.eventBus.emit({
@@ -880,28 +970,42 @@ Answer ONLY with "YES" or "NO".`;
     let potential = 0;
 
     // Check for unfinished goals in memories
-    const memories = entity.components.get('episodic_memory') as any;
-    if (memories?.memories) {
-      const memoryArray = Array.from(memories.memories as any[]);
+    const memories = entity.getComponent('episodic_memory') as EpisodicMemoryComponent | undefined;
+    if (memories) {
+      // Check for both memory formats
+      const memoryArray = memories.episodicMemories
+        ? Array.from(memories.episodicMemories)
+        : memories.memories
+        ? Array.from(memories.memories)
+        : [];
+
       const unfinishedGoals = memoryArray.filter(
-        (m: any) =>
-          m.importance > 5 &&
-          (m.description.includes('quest') || m.description.includes('goal') || m.description.includes('promise'))
+        (m) => {
+          if (m.importance <= 5) return false;
+
+          const text = 'summary' in m && typeof m.summary === 'string'
+            ? m.summary
+            : 'description' in m && typeof m.description === 'string'
+            ? m.description
+            : '';
+
+          return text.includes('quest') || text.includes('goal') || text.includes('promise');
+        }
       );
       potential += Math.min(unfinishedGoals.length * 0.2, 0.4);
     }
 
     // Check for relationships (people who would miss them)
-    const relationships = entity.components.get('relationship') as any;
+    const relationships = entity.getComponent<RelationshipComponent>('relationship');
     if (relationships?.relationships) {
-      const closeRelationships = Array.from(relationships.relationships.values() as any[]).filter(
-        (r: any) => r.value > 50 // Strong positive relationships
+      const closeRelationships = Array.from(relationships.relationships.values()).filter(
+        (r: Relationship) => r.affinity > 50 // Strong positive relationships
       );
       potential += Math.min(closeRelationships.length * 0.1, 0.3);
     }
 
     // Check soul identity for destiny keywords
-    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>('soul_identity');
     if (soulIdentity?.destiny) {
       const destiny = soulIdentity.destiny.toLowerCase();
       if (destiny.includes('save') || destiny.includes('unite')) potential += 0.3;
@@ -915,8 +1019,8 @@ Answer ONLY with "YES" or "NO".`;
    * Determine cause of death from entity state
    */
   private determineCauseOfDeath(entity: Entity): string {
-    const needs = entity.components.get('needs') as any;
-    const health = entity.components.get('health') as any;
+    const needs = entity.getComponent('needs') as NeedsComponent | undefined;
+    const health = entity.getComponent('health') as HealthComponent | undefined;
 
     if (!needs || !health) {
       return 'unknown causes';
@@ -968,26 +1072,40 @@ Answer ONLY with "YES" or "NO".`;
 
     try {
       // Gather context for the performance
-      const identity = entity.components.get('identity') as any;
+      const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
       const heroName = identity?.name || 'mortal';
 
-      const memories = entity.components.get('episodic_memory') as any;
+      const memories = entity.getComponent('episodic_memory') as EpisodicMemoryComponent | undefined;
       let notableDeeds = '';
-      if (memories?.memories) {
-        const memoryArray = Array.from(memories.memories as any[]);
+      if (memories) {
+        const memoryArray = memories.episodicMemories
+          ? Array.from(memories.episodicMemories)
+          : memories.memories
+          ? Array.from(memories.memories)
+          : [];
+
         const important = memoryArray
-          .filter((m: any) => m.importance > 7)
+          .filter((m) => m.importance > 7)
           .slice(0, 3)
-          .map((m: any) => m.description);
+          .map((m) => {
+            if ('summary' in m && typeof m.summary === 'string') {
+              return m.summary;
+            } else if ('description' in m && typeof m.description === 'string') {
+              return m.description;
+            }
+            return '';
+          })
+          .filter(s => s.length > 0);
         if (important.length > 0) {
           notableDeeds = important.join('; ');
         }
       }
 
       const observingGods = this.getObservingGods(world);
+      const position = entity.getComponent<PositionComponent>(ComponentType.Position);
       const witnessCount = this.countNearbyWitnesses(
         world,
-        entity.components.get('position') as any || { x: 0, y: 0 }
+        position || { x: 0, y: 0 }
       );
 
       const prompt = `You are ${deathGodName}, weighing whether to offer a dying hero a chance to return to life.
@@ -1054,28 +1172,28 @@ Return ONLY the dialogue lines, one per line. No quotes, no stage directions.`;
     bargain: DeathBargainComponent
   ): Promise<number> {
     // Get divine chat messages from the past few ticks
-    const systemRegistry = (world as any).systemRegistry;
+    const systemRegistry = (world as World & { systemRegistry?: SystemRegistry }).systemRegistry;
     if (!systemRegistry) return 0;
 
-    const chatRoomSystem = systemRegistry.get('chat_rooms');
+    const chatRoomSystem = systemRegistry.get('chat_rooms') as ChatRoomSystem | undefined;
     if (!chatRoomSystem) return 0;
 
-    const divineChat = (chatRoomSystem as any).getRoom(world, 'divine_chat');
+    const divineChat = chatRoomSystem.getRoom(world, 'divine_chat');
     if (!divineChat) return 0;
 
     // Look for recent messages about this entity
     const recentMessages = divineChat.messages
       .slice(-20) // Last 20 messages
-      .filter((msg: any) => {
+      .filter((msg: ChatRoomMessage) => {
         const ticksSince = world.tick - msg.tick;
         return ticksSince < 100; // Within last 100 ticks
       });
 
     // Check if any message mentions this entity or contains intervention keywords
-    const identity = entity.components.get('identity') as any;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
     const entityName = identity?.name?.toLowerCase() || '';
 
-    const interventionMessages = recentMessages.filter((msg: any) => {
+    const interventionMessages = recentMessages.filter((msg: ChatRoomMessage) => {
       const content = msg.content.toLowerCase();
       const isAboutEntity = entityName && content.includes(entityName);
       const hasInterventionKeywords =
@@ -1096,7 +1214,7 @@ Return ONLY the dialogue lines, one per line. No quotes, no stage directions.`;
     // Evaluate intervention quality with LLM (if available)
     if (this.llmProvider) {
       try {
-        const interventionText = interventionMessages.map((m: any) => `${m.senderName}: ${m.content}`).join('\n');
+        const interventionText = interventionMessages.map((m: ChatRoomMessage) => `${m.senderName}: ${m.content}`).join('\n');
 
         const prompt = `You are the God of Death evaluating a fellow deity's argument to spare a dying mortal.
 
@@ -1133,7 +1251,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     }
 
     // Fallback: Simple keyword-based evaluation
-    const totalLength = interventionMessages.reduce((sum: number, m: any) => sum + m.content.length, 0);
+    const totalLength = interventionMessages.reduce((sum: number, m: ChatRoomMessage) => sum + m.content.length, 0);
     const effortBonus = Math.min(totalLength / 200, 0.3); // Longer arguments = more effort
     const messageBonus = Math.min(interventionMessages.length * 0.1, 0.2); // Multiple pleas
 
@@ -1156,7 +1274,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
       // FIRST TIME - Create God of Death
       deathGod = createGodOfDeath(world, location);
 
-      const identity = deathGod.components.get('identity') as any;
+      const identity = deathGod.getComponent<IdentityComponent>(ComponentType.Identity);
       const deathGodName = identity?.name || 'The God of Death';
 
       // Emit manifestation event - "The God of Death has entered the chat"
@@ -1188,7 +1306,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
   private getDeathGodName(world: World): string {
     const deathGod = findGodOfDeath(world);
     if (deathGod) {
-      const identity = deathGod.components.get('identity') as any;
+      const identity = deathGod.getComponent<IdentityComponent>(ComponentType.Identity);
       return identity?.name || 'The God of Death';
     }
     return 'Thanatos'; // Fallback
@@ -1205,7 +1323,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     message: string
   ): void {
     // Add message to speaker's conversation component
-    const speakerConv = speaker.components.get('conversation') as any;
+    const speakerConv = speaker.getComponent<ConversationComponent>('conversation');
     if (speakerConv) {
       speakerConv.partnerId = listener.id;
       speakerConv.isActive = true;
@@ -1215,11 +1333,13 @@ Respond with ONLY a number between 0.0 and 1.0.`;
         speakerConv.messages = [];
       }
 
-      speakerConv.messages.push({
+      const newMessage: ConversationMessage = {
         speakerId: speaker.id,
         message,
         tick: world.tick,
-      });
+      };
+
+      speakerConv.messages.push(newMessage);
 
       // Keep only recent messages
       if (speakerConv.messages.length > speakerConv.maxMessages) {
@@ -1228,7 +1348,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     }
 
     // Mirror to listener's conversation component
-    const listenerConv = listener.components.get('conversation') as any;
+    const listenerConv = listener.getComponent<ConversationComponent>('conversation');
     if (listenerConv) {
       listenerConv.partnerId = speaker.id;
       listenerConv.isActive = true;
@@ -1238,11 +1358,13 @@ Respond with ONLY a number between 0.0 and 1.0.`;
         listenerConv.messages = [];
       }
 
-      listenerConv.messages.push({
+      const newMessage: ConversationMessage = {
         speakerId: speaker.id,
         message,
         tick: world.tick,
-      });
+      };
+
+      listenerConv.messages.push(newMessage);
 
       // Keep only recent messages
       if (listenerConv.messages.length > listenerConv.maxMessages) {
@@ -1264,14 +1386,14 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     hero: Entity
   ): void {
     // Ensure hero has conversation component
-    if (!hero.components.get('conversation')) {
+    if (!hero.getComponent('conversation')) {
       const conv = createConversationComponent(50);
       (hero as any).addComponent(conv);
     }
 
     // Set up conversation partnership
-    const godConv = deathGod.components.get('conversation') as any;
-    const heroConv = hero.components.get('conversation') as any;
+    const godConv = deathGod.getComponent<ConversationComponent>('conversation');
+    const heroConv = hero.getComponent<ConversationComponent>('conversation');
 
     if (godConv) {
       godConv.partnerId = hero.id;
@@ -1292,8 +1414,8 @@ Respond with ONLY a number between 0.0 and 1.0.`;
    * End a death bargain conversation
    */
   private endDeathBargainConversation(deathGod: Entity, hero: Entity): void {
-    const godConv = deathGod.components.get('conversation') as any;
-    const heroConv = hero.components.get('conversation') as any;
+    const godConv = deathGod.getComponent<ConversationComponent>('conversation');
+    const heroConv = hero.getComponent<ConversationComponent>('conversation');
 
     if (godConv) {
       godConv.isActive = false;

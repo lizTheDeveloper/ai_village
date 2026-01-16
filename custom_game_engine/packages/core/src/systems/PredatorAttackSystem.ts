@@ -173,12 +173,12 @@ export class PredatorAttackSystem implements System {
     // Emit predator:attack event
     if (this.eventBus) {
       this.eventBus.emit({
-        type: 'predator:attack' as any,
+        type: 'predator:attack' as const,
         source: predator.id,
         data: {
           predatorId: predator.id,
           targetId: target.id,
-          trigger,
+          predatorType: animal.species,
         },
       });
     }
@@ -190,7 +190,7 @@ export class PredatorAttackSystem implements System {
     this.resolveCombat(world, predator, target, animal, combatStats ?? null, allies);
 
     // Alert nearby agents
-    this.alertNearbyAgents(world, target, targetPos, agents);
+    this.alertNearbyAgents(world, predator, target, targetPos, agents);
   }
 
   private evaluateAttackTrigger(
@@ -360,12 +360,12 @@ export class PredatorAttackSystem implements System {
       // Emit predator:attack event
       if (this.eventBus) {
         this.eventBus.emit({
-          type: 'predator:attack' as any,
+          type: 'predator:attack' as const,
           source: predator.id,
           data: {
             predatorId: predator.id,
             targetId: target.id,
-            outcome: 'injury',
+            predatorType: animal.species,
           },
         });
       }
@@ -380,11 +380,11 @@ export class PredatorAttackSystem implements System {
       // Emit predator:repelled event
       if (this.eventBus) {
         this.eventBus.emit({
-          type: 'predator:repelled' as any,
+          type: 'predator:repelled' as const,
           source: predator.id,
           data: {
             predatorId: predator.id,
-            targetId: target.id,
+            defenderId: target.id,
           },
         });
       }
@@ -440,10 +440,10 @@ export class PredatorAttackSystem implements System {
     // Emit injury:inflicted event
     if (this.eventBus) {
       this.eventBus.emit({
-        type: 'injury:inflicted' as any,
+        type: 'injury:inflicted' as const,
         source: target.id,
         data: {
-          targetId: target.id,
+          entityId: target.id,
           injuryType,
           severity,
           location,
@@ -455,10 +455,16 @@ export class PredatorAttackSystem implements System {
 
   private alertNearbyAgents(
     world: World,
+    predator: Entity,
     target: Entity,
     targetPos: PositionComponent,
     agents: Entity[]
   ): void {
+    const predatorAnimal = world.getComponent<AnimalComponent>(predator.id, 'animal');
+    if (!predatorAnimal) {
+      throw new Error('Predator missing required component: animal');
+    }
+
     const alertRadius = 15;
     for (const agent of agents) {
       if (agent.id === target.id) {
@@ -481,12 +487,14 @@ export class PredatorAttackSystem implements System {
         // Emit guard:threat_detected event
         if (this.eventBus) {
           this.eventBus.emit({
-            type: 'guard:threat_detected' as any,
+            type: 'guard:threat_detected' as const,
             source: agent.id,
             data: {
               guardId: agent.id,
-              threatType: 'predator_attack',
-              location: targetPos,
+              threatId: predator.id,
+              threatLevel: predatorAnimal.danger,
+              distance,
+              location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
             },
           });
         }

@@ -24,6 +24,8 @@ import { isInConversation, addMessage, startConversation } from '../../component
 import { updateRelationship, shareMemory } from '../../components/RelationshipComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory, getSpatialMemoriesByType } from '../../components/SpatialMemoryComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /** Probability of speaking each tick */
 const SPEAK_CHANCE = 0.3;
@@ -434,9 +436,318 @@ export class TalkBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
+ * Standalone function for use with BehaviorRegistry (legacy).
+ * @deprecated Use talkBehaviorWithContext for new code
  */
 export function talkBehavior(entity: EntityImpl, world: World): void {
   const behavior = new TalkBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Version
+// ============================================================================
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('talk', talkBehaviorWithContext);
+ */
+export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const conversation = ctx.getComponent<ConversationComponent>(CT.Conversation);
+  const relationship = ctx.getComponent<RelationshipComponent>(CT.Relationship);
+  const spatialMemory = ctx.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+  const socialMemory = ctx.getComponent<SocialMemoryComponent>(CT.SocialMemory);
+
+  // Check if we need to start a new conversation
+  if (conversation && !isInConversation(conversation) && ctx.agent.behaviorState?.partnerId) {
+    let targetPartnerId = ctx.agent.behaviorState.partnerId as string;
+
+    // Resolve 'nearest' to actual agent ID
+    if (targetPartnerId === 'nearest') {
+      const nearbyAgents = ctx.getEntitiesInRadius(50, [CT.Agent, CT.Conversation], {
+        filter: (other) => {
+          if (other.id === ctx.entity.id) return false;
+          const otherConv = (other as EntityImpl).getComponent<ConversationComponent>(CT.Conversation);
+          return otherConv ? !isInConversation(otherConv) : false;
+        }
+      });
+
+      if (nearbyAgents.length > 0) {
+        targetPartnerId = nearbyAgents[0]!.entity.id;
+      } else {
+        return ctx.complete('No available conversation partners');
+      }
+    }
+
+    const partner = ctx.getEntity(targetPartnerId);
+    if (!partner) {
+      return ctx.complete('Partner not found');
+    }
+
+    const partnerImpl = partner as EntityImpl;
+    const partnerConversation = partnerImpl.getComponent<ConversationComponent>(CT.Conversation);
+
+    // Only start if partner is available
+    if (partnerConversation && !isInConversation(partnerConversation)) {
+      // Calculate conversation center
+      const partnerPos = partnerImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      let centerX: number | undefined;
+      let centerY: number | undefined;
+
+      if (partnerPos) {
+        centerX = (ctx.position.x + partnerPos.x) / 2;
+        centerY = (ctx.position.y + partnerPos.y) / 2;
+      }
+
+      // Start conversation for both agents
+      ctx.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+        startConversation(current, targetPartnerId, ctx.tick, ctx.entity.id, centerX, centerY)
+      );
+      partnerImpl.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+        startConversation(current, ctx.entity.id, ctx.tick, partner.id, centerX, centerY)
+      );
+
+      // Enable interaction-triggered LLM for autonomic agents
+      ctx.updateComponent<AgentComponent>(CT.Agent, (current) => {
+        if (current.tier === 'autonomic') {
+          return enableInteractionLLM(current, ctx.tick);
+        }
+        return current;
+      });
+      partnerImpl.updateComponent<AgentComponent>(CT.Agent, (current) => {
+        if (current.tier === 'autonomic') {
+          return enableInteractionLLM(current, ctx.tick);
+        }
+        return current;
+      });
+
+      // Set up conversation partner in behaviorState
+      partnerImpl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        behaviorState: { ...current.behaviorState, conversationPartnerId: ctx.entity.id },
+      }));
+
+      // Emit conversation started event
+      ctx.emit({
+        type: 'conversation:started',
+        data: {
+          participants: [ctx.entity.id, targetPartnerId],
+          initiator: ctx.entity.id,
+          agent1: ctx.entity.id,
+          agent2: targetPartnerId,
+        },
+      });
+    } else {
+      return ctx.complete('Partner unavailable for conversation');
+    }
+  }
+
+  // Re-fetch conversation after potentially starting it
+  const activeConversation = ctx.getComponent<ConversationComponent>(CT.Conversation);
+
+  if (!activeConversation || !isInConversation(activeConversation)) {
+    return ctx.complete('Not in conversation');
+  }
+
+  const partnerId = activeConversation.partnerId;
+  if (!partnerId) {
+    return ctx.complete('No conversation partner');
+  }
+
+  const activePartner = ctx.getEntity(partnerId);
+  if (!activePartner) {
+    // Partner no longer exists, end conversation
+    ctx.updateComponent<ConversationComponent>(CT.Conversation, (current) => ({
+      ...current,
+      isActive: false,
+      partnerId: null,
+    }));
+    return ctx.complete('Partner no longer exists');
+  }
+
+  // Apply spatial stickiness: steer toward conversation center
+  if (activeConversation.conversationCenterX !== undefined && activeConversation.conversationCenterY !== undefined) {
+    ctx.updateComponent(CT.Steering, (current: any) => ({
+      ...current,
+      behavior: 'arrive',
+      target: {
+        x: activeConversation.conversationCenterX,
+        y: activeConversation.conversationCenterY,
+      },
+      arrivalRadius: 8,
+    }));
+  } else {
+    // No conversation center set, stop moving
+    ctx.stopMovement();
+  }
+
+  // Update relationship
+  if (relationship) {
+    ctx.updateComponent<RelationshipComponent>(CT.Relationship, (current) =>
+      updateRelationship(current, partnerId, ctx.tick, 2)
+    );
+  }
+
+  // Update social memory
+  if (socialMemory) {
+    const partnerIdentity = (activePartner as EntityImpl).getComponent<IdentityComponent>(CT.Identity);
+    const partnerName = partnerIdentity?.name || 'someone';
+
+    socialMemory.recordInteraction({
+      agentId: partnerId,
+      interactionType: 'conversation',
+      sentiment: 0.2,
+      timestamp: ctx.tick,
+      trustDelta: 0.02,
+      impression: `Had a conversation with ${partnerName}`,
+    });
+  }
+
+  // Also record for partner
+  const partnerSocialMemory = (activePartner as EntityImpl).getComponent<SocialMemoryComponent>(CT.SocialMemory);
+  if (partnerSocialMemory) {
+    const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
+    const myName = myIdentity?.name || 'someone';
+
+    partnerSocialMemory.recordInteraction({
+      agentId: ctx.entity.id,
+      interactionType: 'conversation',
+      sentiment: 0.2,
+      timestamp: ctx.tick,
+      trustDelta: 0.02,
+      impression: `Had a conversation with ${myName}`,
+    });
+  }
+
+  // Chance to speak
+  if (Math.random() < SPEAK_CHANCE) {
+    const message = CASUAL_MESSAGES[Math.floor(Math.random() * CASUAL_MESSAGES.length)] || 'Hello!';
+
+    ctx.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+      addMessage(current, ctx.entity.id, message, ctx.tick)
+    );
+
+    // Partner also adds conversation to their component
+    (activePartner as EntityImpl).updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+      addMessage(current, ctx.entity.id, message, ctx.tick)
+    );
+
+    // Emit conversation:utterance event
+    ctx.emit({
+      type: 'conversation:utterance',
+      data: {
+        conversationId: `${ctx.entity.id}-${partnerId}`,
+        speaker: ctx.entity.id,
+        speakerId: ctx.entity.id,
+        listenerId: partnerId,
+        message: message,
+      },
+    });
+  }
+
+  // Chance to share a memory about food location
+  if (Math.random() < SHARE_MEMORY_CHANCE && spatialMemory && relationship) {
+    const foodMemories = getSpatialMemoriesByType(spatialMemory, 'resource_location').filter(
+      (m) => m.metadata?.resourceType === 'food' && m.strength > 50
+    );
+
+    if (foodMemories.length > 0) {
+      const sharedMemory = foodMemories[0]!;
+      const partnerSpatialMemory = (activePartner as EntityImpl).getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+
+      if (partnerSpatialMemory) {
+        addSpatialMemory(
+          partnerSpatialMemory,
+          {
+            type: 'resource_location',
+            x: sharedMemory.x,
+            y: sharedMemory.y,
+            entityId: sharedMemory.entityId,
+            metadata: sharedMemory.metadata,
+          },
+          ctx.tick,
+          70
+        );
+
+        ctx.updateComponent<RelationshipComponent>(CT.Relationship, (current) =>
+          shareMemory(current, partnerId)
+        );
+
+        ctx.emit({
+          type: 'information:shared',
+          data: {
+            from: ctx.entity.id,
+            to: partnerId,
+            informationType: 'resource_location',
+            content: { x: sharedMemory.x, y: sharedMemory.y, entityId: sharedMemory.entityId },
+            memoryType: 'resource_location',
+          },
+        });
+      }
+    }
+  }
+
+  // Chance to share a named landmark
+  if (Math.random() < SHARE_MEMORY_CHANCE && spatialMemory && relationship) {
+    const landmarkMemories = getSpatialMemoriesByType(spatialMemory, 'terrain_landmark').filter(
+      (m) => m.metadata?.name && m.metadata?.namedBy && m.strength > 60
+    );
+
+    if (landmarkMemories.length > 0) {
+      const sharedLandmark = landmarkMemories[0]!;
+      if (sharedLandmark.metadata?.name) {
+        const landmarkName = sharedLandmark.metadata.name as string;
+        const featureType = sharedLandmark.metadata.featureType || 'place';
+        const partnerSpatialMemory = (activePartner as EntityImpl).getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+
+        if (partnerSpatialMemory) {
+          addSpatialMemory(
+            partnerSpatialMemory,
+            {
+              type: 'terrain_landmark',
+              x: sharedLandmark.x,
+              y: sharedLandmark.y,
+              metadata: {
+                ...sharedLandmark.metadata,
+                learnedFrom: ctx.entity.id,
+              },
+            },
+            ctx.tick,
+            75
+          );
+
+          // Add to partner's episodic memory
+          const partnerMemory = (activePartner as EntityImpl).getComponent(CT.Memory);
+          const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
+          const myName = myIdentity?.name || 'someone';
+
+          if (partnerMemory && 'addMemory' in partnerMemory) {
+            (partnerMemory as any).addMemory({
+              id: `learned_landmark_${landmarkName}_${ctx.tick}`,
+              type: 'knowledge',
+              content: `${myName} told me about ${featureType} called "${landmarkName}"`,
+              createdAt: ctx.tick,
+              importance: 70,
+            });
+          }
+
+          ctx.emit({
+            type: 'information:shared',
+            data: {
+              from: ctx.entity.id,
+              to: partnerId,
+              informationType: 'landmark_name',
+              content: {
+                x: sharedLandmark.x,
+                y: sharedLandmark.y,
+                name: landmarkName,
+                featureType,
+              },
+              memoryType: 'terrain_landmark',
+            },
+          });
+        }
+      }
+    }
+  }
 }

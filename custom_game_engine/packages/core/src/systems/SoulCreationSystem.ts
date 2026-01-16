@@ -44,6 +44,7 @@ import { createSoulCreationEventComponent } from '../components/SoulCreationEven
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createRealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { createAfterlifeComponent, type AfterlifeComponent } from '../components/AfterlifeComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import { soulNameGenerator } from '../divinity/SoulNameGenerator.js';
 
 /** Request to create a soul */
@@ -81,7 +82,7 @@ export class SoulCreationSystem implements System {
   private llmProvider?: LLMProvider;
   private useLLM: boolean = true;
   private turnInProgress: boolean = false;
-  private soulRepositorySystem?: any; // Will be set during init
+  private soulRepositorySystem?: any; // SoulRepositorySystem - type unavailable to avoid circular dependency
 
   /**
    * Set the LLM provider for the Fates to use
@@ -186,8 +187,9 @@ export class SoulCreationSystem implements System {
       // Realm Location
       ancientSoul.addComponent(createRealmLocationComponent('elysium'));
 
-      // Add to world
-      (world as any)._addEntity?.(ancientSoul) || (world as any).addEntity?.(ancientSoul);
+      // Add to world - uses internal _addEntity as public API doesn't expose direct entity addition
+      const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
+      worldImpl._addEntity(ancientSoul);
 
       console.log(`[SoulCreationSystem]   Created ancient soul: ${randomName} (${lives} lives, ${(wisdom * 100).toFixed(0)}% wisdom)`);
     }
@@ -250,8 +252,9 @@ export class SoulCreationSystem implements System {
     const realmLocation = createRealmLocationComponent('tapestry_of_fate');
     soulEntity.addComponent(realmLocation);
 
-    // Add to world
-    (world as any)._addEntity?.(soulEntity) || (world as any).addEntity?.(soulEntity);
+    // Add to world - uses internal _addEntity as public API doesn't expose direct entity addition
+    const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
+    worldImpl._addEntity(soulEntity);
 
     return soulEntity.id;
   }
@@ -275,7 +278,10 @@ export class SoulCreationSystem implements System {
    * Initialize - get reference to soul repository
    */
   init(world: World): void {
-    this.soulRepositorySystem = (world as any).systemRegistry?.get('soul_repository');
+    // Use getSystem instead of accessing systemRegistry directly
+    const worldImpl = world as unknown as { getSystem(id: string): any };
+    this.soulRepositorySystem = worldImpl.getSystem('soul_repository');
+
     if (!this.soulRepositorySystem) {
       console.warn('[SoulCreationSystem] SoulRepositorySystem not found - soul reuse disabled');
     } else {
@@ -323,12 +329,12 @@ export class SoulCreationSystem implements System {
   private findSoulForReincarnation(world: World): Entity | null {
     // Query all entities in the afterlife realm that want to reincarnate
     const afterlifeSouls = world.query()
-      .with('afterlife' as any)
-      .with('soul_identity' as any)
+      .with('afterlife')
+      .with('soul_identity')
       .executeEntities();
 
     const eligibleSouls = afterlifeSouls.filter(soul => {
-      const afterlife = soul.components.get('afterlife') as any;
+      const afterlife = soul.getComponent<AfterlifeComponent>('afterlife');
       return afterlife &&
              afterlife.wantsToReincarnate &&
              !afterlife.isShade &&  // Shades have lost identity
@@ -383,8 +389,8 @@ export class SoulCreationSystem implements System {
 
       if (soulToReincarnate) {
         // Extract data from the soul being reincarnated
-        const soulWisdom = soulToReincarnate.components.get('soul_wisdom') as any;
-        const soulIdentity = soulToReincarnate.components.get('soul_identity') as any;
+        const soulWisdom = soulToReincarnate.getComponent<SoulWisdomComponent>('soul_wisdom');
+        const soulIdentity = soulToReincarnate.getComponent<SoulIdentityComponent>('soul_identity');
 
         console.log(`[SoulCreationSystem] 🔄 REINCARNATING SOUL: ${soulIdentity?.soulName || 'Unknown'}, lives: ${soulWisdom?.reincarnationCount ?? 1}, wisdom: ${soulWisdom?.wisdomLevel ?? 0.5}`);
 
@@ -631,7 +637,7 @@ export class SoulCreationSystem implements System {
 
     // Get the soul entity to extract name and species for repository
     const soulEntity = world.getEntity(soulId);
-    const soulIdentity = soulEntity?.components.get('soul_identity') as any;
+    const soulIdentity = soulEntity?.getComponent<SoulIdentityComponent>('soul_identity');
 
     // Compile all Fate thoughts into a single string for the soul record
     const allThoughts = ceremony.transcript
@@ -704,11 +710,19 @@ export class SoulCreationSystem implements System {
 
     if (context.reincarnatedSoulId && soulEntity.hasComponent('soul_identity')) {
       // Reincarnating - preserve original name and culture
-      const existingIdentity = soulEntity.getComponent('soul_identity') as any;
-      soulName = existingIdentity.soulName;
-      soulCulture = existingIdentity.soulOriginCulture;
-      soulOriginSpecies = existingIdentity.soulOriginSpecies;
-      console.log(`[SoulCreationSystem] Preserving soul name: ${soulName} (${soulCulture})`);
+      const existingIdentity = soulEntity.getComponent<SoulIdentityComponent>('soul_identity');
+      if (existingIdentity) {
+        soulName = existingIdentity.soulName;
+        soulCulture = existingIdentity.soulOriginCulture;
+        soulOriginSpecies = existingIdentity.soulOriginSpecies;
+        console.log(`[SoulCreationSystem] Preserving soul name: ${soulName} (${soulCulture})`);
+      } else {
+        // Fallback if component not found (shouldn't happen)
+        const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
+        soulName = generatedName.name;
+        soulCulture = generatedName.culture as SoulCulture;
+        soulOriginSpecies = getDefaultSpeciesForCulture(soulCulture);
+      }
     } else {
       // New soul - generate unique name
       const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
@@ -785,14 +799,17 @@ export class SoulCreationSystem implements System {
       isObservable: true,
     });
 
-    // Populate with ceremony details
+    // Populate with ceremony details - only include Fates' statements
     for (const exchange of ceremony.transcript) {
-      creationEvent.creationDebate.statements.push({
-        fate: exchange.speaker as any,
-        statement: exchange.text,
-        aspect: this.mapTopicToAspect(exchange.topic),
-        tick: exchange.tick,
-      });
+      // Filter out non-Fate speakers (soul, chorus)
+      if (exchange.speaker === 'weaver' || exchange.speaker === 'spinner' || exchange.speaker === 'cutter') {
+        creationEvent.creationDebate.statements.push({
+          fate: exchange.speaker,
+          statement: exchange.text,
+          aspect: this.mapTopicToAspect(exchange.topic),
+          tick: exchange.tick,
+        });
+      }
     }
 
     creationEvent.wovenPurpose = parsed.purpose ?? 'Unknown';
@@ -817,7 +834,9 @@ export class SoulCreationSystem implements System {
 
     // Add to world ONLY if this is a new soul (reincarnated souls are already in the world)
     if (!context.reincarnatedSoulId) {
-      (world as any)._addEntity?.(soulEntity) || (world as any).addEntity?.(soulEntity);
+      // Uses internal _addEntity as public API doesn't expose direct entity addition
+      const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
+      worldImpl._addEntity(soulEntity);
       console.log(`[SoulCreationSystem] Added new soul ${soulName} to world`);
     } else {
       console.log(`[SoulCreationSystem] Updated existing soul ${soulName} with new destiny from ceremony`);

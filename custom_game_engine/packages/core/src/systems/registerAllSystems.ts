@@ -9,6 +9,22 @@
 
 import type { GameLoop } from '../loop/GameLoop.js';
 import type { System } from '../ecs/System.js';
+import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
+import type { EventBus } from '../events/EventBus.js';
+import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
+import type { ScheduledDecisionProcessor } from '../decision/ScheduledDecisionProcessor.js';
+import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
+
+/**
+ * Simplified EventBus interface used by some combat systems.
+ * HuntingSystem and AgentCombatSystem define their own minimal EventBus interface
+ * internally for loose coupling. The main EventBus satisfies this structurally,
+ * but TypeScript requires explicit casting for interface compatibility.
+ */
+interface SimplifiedEventBus {
+  emit(event: string, data: unknown): void;
+  on(event: string, handler: (data: unknown) => void): void;
+}
 
 // Time & Environment
 import { TimeSystem } from './TimeSystem.js';
@@ -286,15 +302,39 @@ import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSyste
 import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
 
 /**
+ * Validate system dependency ordering.
+ * Checks if systems declare dependencies on systems that run at same time or later.
+ * Logs warnings for potential dependency issues.
+ */
+function validateSystemDependencies(registry: ISystemRegistry): void {
+  const systems = registry.getSorted();
+  const priorityMap = new Map(systems.map(s => [s.id, s.priority]));
+
+  for (const system of systems) {
+    if (system.metadata?.dependsOn) {
+      for (const depId of system.metadata.dependsOn) {
+        const depPriority = priorityMap.get(depId);
+        if (depPriority !== undefined && depPriority >= system.priority) {
+          console.warn(
+            `[SystemRegistry] Dependency order issue: ${system.id} (priority ${system.priority}) ` +
+            `depends on ${depId} (priority ${depPriority}) which runs at same time or later`
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
  * LLM-related types (passed from caller to avoid circular dependency)
  */
 export interface LLMDependencies {
   /** LLM queue for AI-powered systems (from @ai-village/llm) */
-  llmQueue?: unknown;
+  llmQueue?: LLMDecisionQueue;
   /** Prompt builder for agent brain (from @ai-village/llm) */
-  promptBuilder?: unknown;
+  promptBuilder?: PromptBuilder;
   /** Scheduled decision processor with LLMScheduler (from @ai-village/core) - NEW SCHEDULER-BASED APPROACH */
-  scheduledProcessor?: unknown;
+  scheduledProcessor?: ScheduledDecisionProcessor;
 }
 
 /**
@@ -303,13 +343,13 @@ export interface LLMDependencies {
  */
 export interface PlantSystemsConfig {
   /** PlantSystem class constructor */
-  PlantSystem: new (eventBus: any) => System & { setStateMutatorSystem(s: any): void };
+  PlantSystem: new (eventBus: EventBus) => System & { setStateMutatorSystem(s: StateMutatorSystem): void };
   /** PlantDiscoverySystem class constructor */
   PlantDiscoverySystem: new () => System;
   /** PlantDiseaseSystem class constructor */
-  PlantDiseaseSystem: new (eventBus: any) => System;
+  PlantDiseaseSystem: new (eventBus: EventBus) => System;
   /** WildPlantPopulationSystem class constructor */
-  WildPlantPopulationSystem: new (eventBus: any) => System;
+  WildPlantPopulationSystem: new (eventBus: EventBus) => System;
 }
 
 /**
@@ -336,9 +376,9 @@ export interface SystemRegistrationConfig extends LLMDependencies {
    */
   plantSystems?: PlantSystemsConfig;
   /** ChunkManager instance for terrain chunk loading (optional - if not provided, ChunkLoadingSystem won't be registered) */
-  chunkManager?: unknown;
+  chunkManager?: ChunkManager;
   /** TerrainGenerator instance for chunk generation (optional - if not provided, ChunkLoadingSystem won't be registered) */
-  terrainGenerator?: unknown;
+  terrainGenerator?: TerrainGenerator;
 }
 
 /**
@@ -347,7 +387,7 @@ export interface SystemRegistrationConfig extends LLMDependencies {
 export interface SystemRegistrationResult {
   soilSystem: SoilSystem;
   /** PlantSystem instance (from @ai-village/botany or deprecated core version) */
-  plantSystem: System & { setStateMutatorSystem(s: any): void };
+  plantSystem: System & { setStateMutatorSystem(s: StateMutatorSystem): void };
   wildAnimalSpawning: WildAnimalSpawningSystem;
   aquaticAnimalSpawning: AquaticAnimalSpawningSystem;
   governanceDataSystem: GovernanceDataSystem;
@@ -410,7 +450,7 @@ export function registerAllSystems(
   // In headless mode: loads chunks around agents
   let chunkLoadingSystem: ChunkLoadingSystem | undefined;
   if (chunkManager && terrainGenerator) {
-    chunkLoadingSystem = new ChunkLoadingSystem(chunkManager as any, terrainGenerator as any);
+    chunkLoadingSystem = new ChunkLoadingSystem(chunkManager, terrainGenerator);
     gameLoop.systemRegistry.register(chunkLoadingSystem);
   }
 
@@ -504,14 +544,13 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new GoalGenerationSystem(eventBus));
 
   // Always register AgentBrainSystem - it works without LLM (uses scripted behaviors)
-  // Cast to expected types (caller is responsible for correct types)
   // NEW: If scheduledProcessor provided, use scheduler-based approach for intelligent layer selection
   gameLoop.systemRegistry.register(
     new AgentBrainSystem(
-      llmQueue as any,
-      promptBuilder as any,
+      llmQueue,
+      promptBuilder,
       undefined, // behaviorRegistry (use default)
-      scheduledProcessor as any // NEW: ScheduledDecisionProcessor
+      scheduledProcessor // NEW: ScheduledDecisionProcessor
     )
   );
 
@@ -571,7 +610,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new ExplorationSystem());
   if (llmQueue) {
-    gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue as any));
+    gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
   }
   gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
 
@@ -732,7 +771,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PrayerSystem());
   gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
   if (llmQueue) {
-    gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue as any));
+    gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));
     gameLoop.systemRegistry.register(new MythRetellingSystem()); // Handles myth spreading & mutation
   }
   // MythGenerationSystem requires llmQueue, so skip if not provided
@@ -798,13 +837,15 @@ export function registerAllSystems(
   // ============================================================================
   // COMBAT & SECURITY
   // ============================================================================
-  // Cast eventBus to any since combat systems define their own simpler EventBus interface
-  gameLoop.systemRegistry.register(new HuntingSystem(eventBus as any));
-  gameLoop.systemRegistry.register(new PredatorAttackSystem(eventBus as any));
-  gameLoop.systemRegistry.register(new AgentCombatSystem(undefined, eventBus as any));
-  gameLoop.systemRegistry.register(new DominanceChallengeSystem(eventBus as any));
+  // HuntingSystem and AgentCombatSystem define their own minimal EventBus interface internally.
+  // The main EventBus satisfies this structurally, but needs explicit casting for TypeScript.
+  gameLoop.systemRegistry.register(new HuntingSystem(eventBus as unknown as SimplifiedEventBus));
+  // PredatorAttackSystem, DominanceChallengeSystem, and GuardDutySystem use the full EventBus type
+  gameLoop.systemRegistry.register(new PredatorAttackSystem(eventBus));
+  gameLoop.systemRegistry.register(new AgentCombatSystem(undefined, eventBus as unknown as SimplifiedEventBus));
+  gameLoop.systemRegistry.register(new DominanceChallengeSystem(eventBus));
   gameLoop.systemRegistry.register(new InjurySystem());
-  gameLoop.systemRegistry.register(new GuardDutySystem(eventBus as any));
+  gameLoop.systemRegistry.register(new GuardDutySystem(eventBus));
   gameLoop.systemRegistry.register(new VillageDefenseSystem());
   gameLoop.systemRegistry.register(new ThreatResponseSystem());
 
@@ -955,6 +996,11 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(autoSaveSystem);
   }
 
+  // ============================================================================
+  // VALIDATION
+  // ============================================================================
+  // Validate system dependency ordering
+  validateSystemDependencies(gameLoop.systemRegistry);
 
   return {
     soilSystem,

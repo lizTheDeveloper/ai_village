@@ -14,6 +14,7 @@ import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 /** Minimum distance to maintain from target */
 const MIN_FOLLOW_DISTANCE = 3;
@@ -93,8 +94,50 @@ export class FollowAgentBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use followAgentBehaviorWithContext with BehaviorContext instead
  */
 export function followAgentBehavior(entity: EntityImpl, world: World): void {
   const behavior = new FollowAgentBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('follow_agent', followAgentBehaviorWithContext);
+ */
+export function followAgentBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const targetId = ctx.getState<string>('targetId');
+  if (!targetId) {
+    // No target
+    return ctx.complete('No target to follow');
+  }
+
+  const target = ctx.getEntity(targetId);
+  if (!target) {
+    // Target no longer exists
+    return ctx.complete('Target no longer exists');
+  }
+
+  const targetEntity = target as EntityImpl;
+  const targetPos = targetEntity.getComponent<PositionComponent>(ComponentType.Position);
+  if (!targetPos) {
+    return ctx.complete('Target has no position');
+  }
+
+  // Calculate squared distance (avoid sqrt for performance)
+  const distanceSquared = ctx.distanceSquaredTo(targetPos);
+  const distance = Math.sqrt(distanceSquared);
+
+  if (distance < MIN_FOLLOW_DISTANCE) {
+    // Too close, stop
+    ctx.stopMovement();
+  } else if (distance > MAX_FOLLOW_DISTANCE) {
+    // Too far, speed up to catch up
+    if (ctx.movement) {
+      ctx.moveToward(targetPos, { speed: ctx.movement.speed * CATCH_UP_SPEED });
+    }
+  } else {
+    // Just right, match speed and follow
+    ctx.moveToward(targetPos);
+  }
 }

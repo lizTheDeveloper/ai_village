@@ -18,6 +18,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent, Vision } from '../components/SpiritualComponent.js';
 import { receiveVision, answerPrayer } from '../components/SpiritualComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import {
   type CrossingMethod,
   type PassageType,
@@ -82,9 +83,10 @@ export class DivinePowerSystem implements System {
 
     // Listen for divine power requests from UI
     this.unsubscribe = eventBus.subscribe('divine_power:request', (event) => {
-      const data = event.data as DivinePowerRequest;
-      if (data && data.deityId && data.powerType) {
-        this.queuePower(data);
+      const data = event.data;
+      // Type guard: ensure data has required DivinePowerRequest fields
+      if (data && typeof data === 'object' && 'deityId' in data && 'powerType' in data) {
+        this.queuePower(data as DivinePowerRequest);
       }
     });
   }
@@ -127,7 +129,7 @@ export class DivinePowerSystem implements System {
     const target = world.getEntity(targetId);
     if (!target) return;
 
-    const spiritual = target.components.get(CT.Spiritual) as SpiritualComponent;
+    const spiritual = target.getComponent<SpiritualComponent>(CT.Spiritual);
     if (!spiritual) return;
 
     const updatedSpiritual = answerPrayer(spiritual, prayerId, responseType, deityId);
@@ -137,11 +139,11 @@ export class DivinePowerSystem implements System {
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return;
 
-    const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
+    const deityComp = deityEntity.getComponent<DeityComponent>(CT.Deity);
     if (!deityComp) return;
 
     deityComp.prayerQueue = deityComp.prayerQueue.filter(
-      p => p.prayerId !== prayerId
+      (p) => p.prayerId !== prayerId
     );
   }
 
@@ -162,7 +164,7 @@ export class DivinePowerSystem implements System {
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return;
 
-    const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
+    const deityComp = deityEntity.getComponent<DeityComponent>(CT.Deity);
     if (!deityComp) return;
 
     deityComp.sentVisions.push({
@@ -187,7 +189,7 @@ export class DivinePowerSystem implements System {
    * Get the power config from the world's divine config
    */
   private getPowerConfig(world: World): PowerConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
+    const divineConfig = world.divineConfig;
     return divineConfig?.powers;
   }
 
@@ -216,7 +218,7 @@ export class DivinePowerSystem implements System {
       throw new Error(`Deity entity ${request.deityId} not found`);
     }
 
-    const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
+    const deityComp = deityEntity.getComponent<DeityComponent>(CT.Deity);
     if (!deityComp) {
       throw new Error(`Entity ${request.deityId} has no deity component`);
     }
@@ -321,8 +323,8 @@ export class DivinePowerSystem implements System {
     (target as EntityImpl).addComponent(updatedSpiritual);
 
     // Track sent vision
-    const agentComp = target.components.get(CT.Agent) as any;
-    const targetName = agentComp?.name ?? 'Unknown';
+    const identity = target.getComponent<IdentityComponent>(CT.Identity);
+    const targetName = identity?.name ?? 'Unknown';
     this._trackSentVision(
       world,
       request.deityId,
@@ -396,8 +398,8 @@ export class DivinePowerSystem implements System {
     (target as EntityImpl).addComponent(updatedSpiritual);
 
     // Track sent vision
-    const agentComp = target.components.get(CT.Agent) as any;
-    const targetName = agentComp?.name ?? 'Unknown';
+    const identity = target.getComponent<IdentityComponent>(CT.Identity);
+    const targetName = identity?.name ?? 'Unknown';
     this._trackSentVision(
       world,
       request.deityId,
@@ -472,8 +474,8 @@ export class DivinePowerSystem implements System {
     (target as EntityImpl).addComponent(updatedSpiritual);
 
     // Track sent vision
-    const agentComp = target.components.get(CT.Agent) as any;
-    const targetName = agentComp?.name ?? 'Unknown';
+    const identity = target.getComponent<IdentityComponent>(CT.Identity);
+    const targetName = identity?.name ?? 'Unknown';
     this._trackSentVision(
       world,
       request.deityId,
@@ -545,8 +547,8 @@ export class DivinePowerSystem implements System {
     (target as EntityImpl).addComponent(updatedSpiritual);
 
     // Track sent vision
-    const agentComp = target.components.get(CT.Agent) as any;
-    const targetName = agentComp?.name ?? 'Unknown';
+    const identity = target.getComponent<IdentityComponent>(CT.Identity);
+    const targetName = identity?.name ?? 'Unknown';
     this._trackSentVision(
       world,
       request.deityId,
@@ -722,8 +724,8 @@ export class DivinePowerSystem implements System {
       (target as EntityImpl).addComponent(updatedSpiritual);
 
       // Track sent vision
-      const agentComp = target.components.get(CT.Agent) as any;
-      const targetName = agentComp?.name ?? 'Unknown';
+      const identity = target.getComponent<IdentityComponent>(CT.Identity);
+      const targetName = identity?.name ?? 'Unknown';
       this._trackSentVision(
         world,
         request.deityId,

@@ -15,6 +15,7 @@ import { EntityImpl } from '../../ecs/Entity.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import { createConflictComponent } from '../../components/ConflictComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 export interface InitiateHuntState {
   /** Target animal entity to hunt */
@@ -113,8 +114,70 @@ export class InitiateHuntBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use initiateHuntBehaviorWithContext with BehaviorContext instead
  */
 export function initiateHuntBehavior(entity: EntityImpl, world: World): void {
   const behavior = new InitiateHuntBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('hunt', initiateHuntBehaviorWithContext);
+ */
+export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  // Read behavior state
+  const state = ctx.getAllState() as unknown as InitiateHuntState | undefined;
+  if (!state || !state.targetId) {
+    return ctx.complete('Missing hunt target in behaviorState');
+  }
+
+  const { targetId, reason = 'food' } = state;
+
+  // Validate target exists
+  const target = ctx.getEntity(targetId);
+  if (!target) {
+    return ctx.complete(`Hunt target ${targetId} not found`);
+  }
+
+  const targetEntity = target as EntityImpl;
+
+  // Check if target is an animal
+  if (!targetEntity.hasComponent(CT.Animal)) {
+    return ctx.complete(`Cannot hunt ${targetId} - not an animal`);
+  }
+
+  // Check if already in conflict
+  if (ctx.hasComponent(CT.Conflict)) {
+    return ctx.complete('Already in conflict');
+  }
+
+  // Check if hunter has combat stats (required for hunting)
+  if (!ctx.hasComponent(CT.CombatStats)) {
+    return ctx.complete('Missing combat_stats component - cannot hunt');
+  }
+
+  // Create conflict component with hunting type
+  const conflict = createConflictComponent({
+    conflictType: 'hunting',
+    target: targetId,
+    state: 'initiated',
+    startTime: ctx.tick,
+  });
+
+  (ctx.entity as any).addComponent(conflict);
+
+  // TODO: Add hunting event types to EventMap
+  // Emit event for narrative/logging
+  // ctx.emit({
+  //   type: 'hunt:initiated_by_agent',
+  //   data: {
+  //     hunterId: ctx.entity.id,
+  //     targetId: targetId,
+  //     reason: reason,
+  //     autonomousDecision: true,
+  //   },
+  // });
+
+  return ctx.complete(`Initiated hunt for ${targetId} (${reason})`);
 }

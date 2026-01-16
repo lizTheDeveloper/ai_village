@@ -10,6 +10,8 @@ import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { DeityComponent } from '../components/DeityComponent.js';
+import type { SpiritComponent } from '../components/SpiritComponent.js';
 import { resolvePrayer } from '../divinity/CosmologyInteraction.js';
 import type { Spirit } from '../divinity/AnimistTypes.js';
 import type { Deity } from '../divinity/DeityTypes.js';
@@ -88,9 +90,9 @@ export class PrayerSystem implements System {
     // Add prayer to deity's queue
     const deity = deities.find(d => d.id === spiritual.believedDeity);
     if (deity) {
-      const deityComp = deity.components.get(CT.Deity);
+      const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
       if (deityComp) {
-        (deityComp as any).addPrayer(entity.id, prayer.id, currentTick);
+        deityComp.addPrayer(entity.id, prayer.id, currentTick);
       }
     }
 
@@ -131,27 +133,28 @@ export class PrayerSystem implements System {
     currentTick: number
   ): void {
     // Extract nearby spirits and deities for cosmology resolution
+    // Note: Converting ECS components to interface types for CosmologyInteraction
     const nearbySpirits: Spirit[] = nearbyEntities
       .filter(e => e.components.has(CT.Spirit))
       .map(e => {
-        const spiritComp = e.components.get(CT.Spirit) as any;
+        const spiritComp = e.getComponent<SpiritComponent>(CT.Spirit);
         return {
           id: e.id,
           entityType: 'spirit' as const,
           magnitude: spiritComp?.magnitude ?? 'minor',
           totalRespect: spiritComp?.totalRespect ?? 0,
           ...spiritComp,
-        } as Spirit;
+        } as unknown as Spirit;
       });
 
     const nearbyDeities: Deity[] = nearbyEntities
       .filter(e => e.components.has(CT.Deity))
       .map(e => {
-        const deityComp = e.components.get(CT.Deity) as any;
+        const deityComp = e.getComponent<DeityComponent>(CT.Deity);
         return {
           id: e.id,
           ...deityComp,
-        } as Deity;
+        } as unknown as Deity;
       });
 
     // Use cosmology to resolve where this prayer should go
@@ -184,7 +187,7 @@ export class PrayerSystem implements System {
     if (resolution.type === 'spirit' && resolution.targetId) {
       const spirit = nearbyEntities.find(e => e.id === resolution.targetId);
       if (spirit) {
-        const spiritComp = spirit.components.get(CT.Spirit) as any;
+        const spiritComp = spirit.getComponent<SpiritComponent>(CT.Spirit);
         if (spiritComp) {
           // Add respect to spirit
           spiritComp.totalRespect = (spiritComp.totalRespect ?? 0) + resolution.respectGenerated;

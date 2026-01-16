@@ -238,7 +238,7 @@ export class GatherBehavior extends BaseBehavior {
    * Handle resource gathering with skill-based timing.
    * Gathers exactly 1 resource per completion.
    */
-  private handleResourceGathering(
+  handleResourceGathering(
     entity: EntityImpl,
     resourceEntity: Entity,
     world: World,
@@ -295,7 +295,7 @@ export class GatherBehavior extends BaseBehavior {
    * Agents can only cut from the base since they can't reach the top.
    * Harvesting reduces stability and may cause the structure to fall.
    */
-  private handleVoxelResourceGathering(
+  handleVoxelResourceGathering(
     entity: EntityImpl,
     resourceEntity: Entity,
     world: World,
@@ -1190,7 +1190,7 @@ export class GatherBehavior extends BaseBehavior {
     return 1.0; // Full speed
   }
 
-  private gatherSeeds(
+  gatherSeeds(
     entity: EntityImpl,
     plantEntity: Entity,
     world: World,
@@ -1291,7 +1291,7 @@ export class GatherBehavior extends BaseBehavior {
    * Gather fruit from a plant (e.g., berries from berry bushes).
    * Adds the fruit to inventory and reduces plant's fruitCount.
    */
-  private gatherFruit(
+  gatherFruit(
     entity: EntityImpl,
     plantEntity: Entity,
     world: World,
@@ -1560,8 +1560,218 @@ export class GatherBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use gatherBehaviorWithContext for better performance
  */
 export function gatherBehavior(entity: EntityImpl, world: World): void {
   const behavior = new GatherBehavior();
   behavior.execute(entity, world);
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * Provides optimized spatial queries and pre-fetched components.
+ * @example registerBehaviorWithContext('gather', gatherBehaviorWithContext);
+ */
+export function gatherBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
+  const { inventory, needs } = ctx;
+
+  if (!inventory) {
+    throw new Error(`[GatherBehavior] Agent ${ctx.entity.id} cannot gather: missing InventoryComponent`);
+  }
+
+  // STARVATION PREVENTION: Check hunger and override resource preference if starving
+  let preferredType = ctx.getState<string>('resourceType');
+  let isStarvingMode = false;
+
+  if (needs) {
+    const hunger = needs.hunger;
+
+    if (hunger < 0.15) {
+      preferredType = undefined;
+      isStarvingMode = true;
+
+      if (hunger < 0.05) {
+        ctx.emit({
+          type: 'need:critical',
+          data: {
+            agentId: ctx.entity.id,
+            entityId: ctx.entity.id,
+            needType: 'hunger',
+            value: hunger,
+            survivalRelevance: 100,
+          },
+        });
+      }
+    } else if (hunger < 0.30 && !ctx.getState('returnToBuild')) {
+      preferredType = undefined;
+      isStarvingMode = true;
+    }
+  }
+
+  // Find target using context
+  const target = findGatherTargetWithContext(ctx, preferredType, isStarvingMode);
+
+  if (!target) {
+    if (preferredType && !isStarvingMode) {
+      ctx.updateState({ resourceType: undefined });
+      return;
+    }
+
+    return ctx.complete('no_resources_found');
+  }
+
+  const distanceToTarget = ctx.moveToward(target.position, { arrivalDistance: HARVEST_DISTANCE });
+
+  if (distanceToTarget <= HARVEST_DISTANCE) {
+    ctx.stopMovement();
+
+    const workSpeedMultiplier = calculateWorkSpeedFromContext(ctx);
+    if (workSpeedMultiplier === 0) {
+      return ctx.complete('too_exhausted_to_work');
+    }
+
+    // Delegate to class methods for actual gathering
+    const behavior = new GatherBehavior();
+    if (target.type === 'resource') {
+      const targetImpl = target.entity as EntityImpl;
+      const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
+      if (voxelComp) {
+        behavior.handleVoxelResourceGathering(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+      } else {
+        behavior.handleResourceGathering(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+      }
+    } else if (target.subtype === 'fruit') {
+      behavior.gatherFruit(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, target.position, workSpeedMultiplier);
+    } else {
+      behavior.gatherSeeds(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, target.position, workSpeedMultiplier);
+    }
+  }
+}
+
+/**
+ * Find gather target using BehaviorContext spatial queries
+ */
+function findGatherTargetWithContext(
+  ctx: import('../BehaviorContext.js').BehaviorContext,
+  preferredType: string | undefined,
+  isStarvingMode: boolean
+): { type: 'resource' | 'plant'; subtype?: 'fruit' | 'seeds'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
+  if (isStarvingMode) {
+    const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
+    for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
+      const plantImpl = plant as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      if (!plantComp) continue;
+
+      const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+      const isEdible = isEdibleSpecies(plantComp.speciesId);
+
+      if (hasFruit && isEdible) {
+        return { type: 'plant', subtype: 'fruit', entity: plant, position: plantPos, distance };
+      }
+    }
+    return null;
+  }
+
+  const isSeekingSeeds = preferredType === 'seeds';
+  const isSeekingPlantFruit = preferredType && PLANT_FRUIT_TYPES.has(preferredType.toLowerCase());
+
+  if (isSeekingSeeds || isSeekingPlantFruit) {
+    const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
+    for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
+      const plantImpl = plant as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      if (!plantComp) continue;
+
+      if (isSeekingSeeds) {
+        const validStages = ['mature', 'seeding', 'senescence'];
+        const hasSeeds = plantComp.seedsProduced > 0;
+        const isValidStage = validStages.includes(plantComp.stage);
+        if (hasSeeds && isValidStage) {
+          return { type: 'plant', subtype: 'seeds', entity: plant, position: plantPos, distance };
+        }
+      } else if (isSeekingPlantFruit) {
+        const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+        const isEdible = isEdibleSpecies(plantComp.speciesId);
+        if (hasFruit && isEdible) {
+          return { type: 'plant', subtype: 'fruit', entity: plant, position: plantPos, distance };
+        }
+      }
+    }
+    if (isSeekingSeeds) return null;
+  }
+
+  // Look for resources
+  const nearbyResources = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Resource, ComponentType.VoxelResource]);
+  let bestScore = Infinity;
+  let bestResource: { type: 'resource'; entity: Entity; position: { x: number; y: number }; distance: number } | null = null;
+
+  for (const { entity: resource, position: resourcePos, distance: distanceToAgent } of nearbyResources) {
+    const resourceImpl = resource as EntityImpl;
+    const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
+    const voxelComp = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
+
+    if (resourceComp) {
+      if (!resourceComp.harvestable || resourceComp.amount <= 0) continue;
+      if (preferredType && resourceComp.resourceType !== preferredType) continue;
+    } else if (voxelComp) {
+      if (!voxelComp.harvestable || voxelComp.height <= 0 || voxelComp.isFalling) continue;
+      if (preferredType && voxelComp.material !== preferredType) continue;
+    } else {
+      continue;
+    }
+
+    const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+    let score = distanceToAgent;
+    if (distanceToHome > HOME_RADIUS) {
+      score += (distanceToHome - HOME_RADIUS) * 2.0;
+    }
+
+    if (score < bestScore) {
+      bestScore = score;
+      bestResource = { type: 'resource', entity: resource, position: resourcePos, distance: distanceToAgent };
+    }
+  }
+
+  if (bestResource) return bestResource;
+
+  // Fallback to plants
+  if (!preferredType) {
+    const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
+    for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
+      const plantImpl = plant as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      if (!plantComp) continue;
+
+      const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+      const isEdible = isEdibleSpecies(plantComp.speciesId);
+      if (hasFruit && isEdible) {
+        return { type: 'plant', subtype: 'fruit', entity: plant, position: plantPos, distance };
+      }
+
+      const validStages = ['mature', 'seeding', 'senescence'];
+      const hasSeeds = plantComp.seedsProduced > 0;
+      const isValidStage = validStages.includes(plantComp.stage);
+      if (hasSeeds && isValidStage) {
+        return { type: 'plant', subtype: 'seeds', entity: plant, position: plantPos, distance };
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Calculate work speed from context needs
+ */
+function calculateWorkSpeedFromContext(ctx: import('../BehaviorContext.js').BehaviorContext): number {
+  const { needs } = ctx;
+  if (!needs) return 1.0;
+
+  const energy = needs.energy;
+  if (energy < ENERGY_CRITICAL) return 0;
+  if (energy < ENERGY_LOW) return WORK_SPEED_CRITICAL;
+  if (energy < ENERGY_MODERATE) return WORK_SPEED_LOW;
+  if (energy < ENERGY_HIGH) return 0.9;
+  return 1.0;
 }

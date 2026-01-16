@@ -22,6 +22,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { RealityAnchorComponent } from '../components/RealityAnchorComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
+import type { PowerComponent } from '../components/PowerComponent.js';
 
 export class RealityAnchorSystem implements System {
   public readonly id: SystemId = 'reality_anchor';
@@ -49,10 +50,10 @@ export class RealityAnchorSystem implements System {
 
     // Process each reality anchor
     for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
-      const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
-      const position = anchor.components.get(CT.Position) as PositionComponent | undefined;
+      const anchorComp = anchor.getComponent<RealityAnchorComponent>(CT.RealityAnchor);
+      const position = anchor.getComponent<PositionComponent>(CT.Position);
 
-      if (!position) {
+      if (!anchorComp || !position) {
         continue;
       }
 
@@ -79,7 +80,7 @@ export class RealityAnchorSystem implements System {
     if (anchor.status === 'charging') {
       // Check if anchor has power available
       const anchorEntity = world.getEntity(anchorId);
-      const powerComp = anchorEntity?.components.get(CT.Power) as any;
+      const powerComp = anchorEntity?.getComponent<PowerComponent>(CT.Power);
 
       if (!powerComp) {
         // No power component - can't charge
@@ -95,7 +96,7 @@ export class RealityAnchorSystem implements System {
             message: 'Reality Anchor charging interrupted: Insufficient power',
             powerLevel: anchor.powerLevel,
           },
-        } as any);
+        });
         return;
       }
 
@@ -108,7 +109,7 @@ export class RealityAnchorSystem implements System {
           type: 'reality_anchor:ready',
           source: anchorId,
           data: {},
-        } as any);
+        });
       }
     }
 
@@ -139,7 +140,7 @@ export class RealityAnchorSystem implements System {
   ): void {
     // Check if anchor has sufficient power
     const anchorEntity = world.getEntity(anchorId);
-    const powerComp = anchorEntity?.components.get(CT.Power) as any;
+    const powerComp = anchorEntity?.getComponent<PowerComponent>(CT.Power);
 
     if (!powerComp) {
       // No power component - field collapses
@@ -156,7 +157,7 @@ export class RealityAnchorSystem implements System {
           message: 'WARNING: Reality Anchor receiving partial power - field unstable!',
           efficiency: powerComp.efficiency,
         },
-      } as any);
+      });
 
       // Field becomes unstable but doesn't collapse immediately
       // If efficiency < 0.5, start countdown to collapse
@@ -186,7 +187,7 @@ export class RealityAnchorSystem implements System {
           message: 'Reality Anchor power loss: Field collapsing!',
           efficiency: powerComp.efficiency,
         },
-      } as any);
+      });
 
       this.fieldCollapse(world, anchorId, anchor, 'Insufficient power');
       return;
@@ -201,7 +202,7 @@ export class RealityAnchorSystem implements System {
 
     // Check all entities for proximity
     for (const entity of world.query().executeEntities()) {
-      const entityPos = entity.components.get(CT.Position) as PositionComponent | undefined;
+      const entityPos = entity.getComponent<PositionComponent>(CT.Position);
       if (!entityPos) {
         continue;
       }
@@ -214,7 +215,7 @@ export class RealityAnchorSystem implements System {
         anchor.entitiesInField.add(entity.id);
 
         // Check if this is a deity
-        const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
+        const deity = entity.getComponent<DeityComponent>(CT.Deity);
         if (deity && !previousEntities.has(entity.id)) {
           this.godEnteredField(world, anchorId, anchor, entity.id, deity, currentTick);
         }
@@ -226,7 +227,7 @@ export class RealityAnchorSystem implements System {
       if (!anchor.entitiesInField.has(entityId)) {
         const entity = world.getEntity(entityId);
         if (entity) {
-          const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
+          const deity = entity.getComponent<DeityComponent>(CT.Deity);
           if (deity) {
             this.godLeftField(world, anchorId, anchor, entityId, deity);
           }
@@ -264,7 +265,7 @@ export class RealityAnchorSystem implements System {
         godId,
         message: 'Divine intervention fails. The god has become mortal.',
       },
-    } as any);
+    });
 
     // Check if this is the Supreme Creator
     const godEntity = world.getEntity(godId);
@@ -276,7 +277,7 @@ export class RealityAnchorSystem implements System {
           godId,
           message: 'The Supreme Creator has entered the field. It bleeds. It can be killed.',
         },
-      } as any);
+      });
     }
   }
 
@@ -301,7 +302,7 @@ export class RealityAnchorSystem implements System {
         godId,
         message: 'Divine power restored. The god has left the field.',
       },
-    } as any);
+    });
   }
 
   /**
@@ -330,7 +331,7 @@ export class RealityAnchorSystem implements System {
             message: 'WARNING: Reality anchor overloading! Field collapse imminent!',
             countdown: anchor.overloadCountdown,
           },
-        } as any);
+        });
       }
     }
   }
@@ -357,7 +358,7 @@ export class RealityAnchorSystem implements System {
           godId,
           message: 'Field collapse! Divine power restored!',
         },
-      } as any);
+      });
     }
 
     anchor.mortalizedGods.clear();
@@ -370,7 +371,7 @@ export class RealityAnchorSystem implements System {
         message: `Reality Anchor field collapsed: ${reason}`,
         reason,
       },
-    } as any);
+    });
   }
 
   /**
@@ -395,7 +396,7 @@ export class RealityAnchorSystem implements System {
       return false;
     }
 
-    const anchor = entity.components.get(CT.RealityAnchor) as RealityAnchorComponent | undefined;
+    const anchor = entity.getComponent<RealityAnchorComponent>(CT.RealityAnchor);
     if (!anchor) {
       return false;
     }
@@ -413,7 +414,7 @@ export class RealityAnchorSystem implements System {
       data: {
         message: 'Reality anchor activated. Divine intervention nullified within field.',
       },
-    } as any);
+    });
 
     return true;
   }
@@ -423,8 +424,8 @@ export class RealityAnchorSystem implements System {
    */
   public isGodMortal(world: World, godId: string): boolean {
     for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
-      const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
-      if (anchorComp.mortalizedGods.has(godId)) {
+      const anchorComp = anchor.getComponent<RealityAnchorComponent>(CT.RealityAnchor);
+      if (anchorComp && anchorComp.mortalizedGods.has(godId)) {
         return true;
       }
     }
@@ -436,10 +437,10 @@ export class RealityAnchorSystem implements System {
    */
   public isDivineInterventionBlocked(world: World, x: number, y: number): boolean {
     for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
-      const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
-      const position = anchor.components.get(CT.Position) as PositionComponent | undefined;
+      const anchorComp = anchor.getComponent<RealityAnchorComponent>(CT.RealityAnchor);
+      const position = anchor.getComponent<PositionComponent>(CT.Position);
 
-      if (!position || anchorComp.status !== 'active') {
+      if (!anchorComp || !position || anchorComp.status !== 'active') {
         continue;
       }
 

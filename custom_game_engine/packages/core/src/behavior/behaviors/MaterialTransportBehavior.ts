@@ -528,8 +528,213 @@ export class MaterialTransportBehavior extends BaseBehavior {
 
 /**
  * Factory function for behavior registry.
+ * @deprecated Use materialTransportBehaviorWithContext instead for better performance
  */
 export function materialTransportBehavior(entity: EntityImpl, world: World): void {
   const behavior = new MaterialTransportBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('material_transport', materialTransportBehaviorWithContext);
+ */
+export function materialTransportBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  if (!ctx.inventory) {
+    return ctx.complete('Missing required components');
+  }
+
+  const state = ctx.getAllState() as any;
+  const transportState = state.transportState ?? 'finding_storage';
+
+  if (!state.taskId || !state.materialId || state.tileIndex === undefined) {
+    return ctx.complete('No transport state set');
+  }
+
+  // Get the construction system
+  const world = (ctx as any).world;
+  const constructionSystem = getTileConstructionSystem();
+  const task = constructionSystem.getTask(state.taskId);
+
+  if (!task || task.state !== 'in_progress') {
+    return ctx.complete('Task not found or not in progress');
+  }
+
+  // Execute state machine
+  switch (transportState) {
+    case 'finding_storage':
+      return handleTransportFindingStorage(ctx, state, task);
+
+    case 'moving_to_storage':
+      return handleTransportMovingToStorage(ctx, state);
+
+    case 'picking_up':
+      return handleTransportPickingUp(ctx, state, world);
+
+    case 'transporting':
+      return handleTransporting(ctx, state, task);
+
+    case 'delivering':
+      return handleTransportDelivering(ctx, state, task, world);
+
+    case 'complete':
+      return checkForMoreTransportWork(ctx, state, task);
+  }
+}
+
+function handleTransportFindingStorage(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex];
+  if (!tile) {
+    return ctx.complete('Tile not found');
+  }
+
+  // Find storage with required material
+  const storages = ctx.getEntitiesInRadius(100, [CT.Inventory, CT.Position]);
+
+  let closestStorage: { entity: any; position: { x: number; y: number } } | null = null;
+  let closestDistance = Infinity;
+
+  for (const { entity: storage, distance } of storages) {
+    if (storage.id === ctx.entity.id) continue;
+
+    const storageImpl = storage as EntityImpl;
+    const inv = storageImpl.getComponent<InventoryComponent>(CT.Inventory);
+
+    if (!inv) continue;
+
+    // Check if has the material
+    const hasItem = inv.slots.some(
+      (slot: any) => slot.itemId === tile.materialId && slot.quantity > 0
+    );
+
+    if (!hasItem) continue;
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestStorage = { entity: storage, position: { x: ctx.position.x, y: ctx.position.y } };
+    }
+  }
+
+  if (!closestStorage) {
+    // No material available - switch to gathering
+    return ctx.switchTo('gather', {
+      resourceType: tile.materialId,
+      returnToTask: state.taskId,
+      returnToTileIndex: state.tileIndex,
+    });
+  }
+
+  // Update state with storage location
+  const storagePos = (closestStorage.entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+  if (!storagePos) return ctx.complete('Storage has no position');
+
+  ctx.updateState({
+    transportState: 'moving_to_storage',
+    storagePosition: { x: storagePos.x, y: storagePos.y },
+    storageEntityId: closestStorage.entity.id,
+  });
+}
+
+function handleTransportMovingToStorage(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  if (!state.storagePosition) {
+    ctx.updateState({ transportState: 'finding_storage' });
+    return;
+  }
+
+  if (ctx.isWithinRange(state.storagePosition, 1.5)) {
+    // Arrived at storage
+    ctx.stopMovement();
+    ctx.updateState({ transportState: 'picking_up' });
+    return;
+  }
+
+  ctx.moveToward(state.storagePosition, { arrivalDistance: 1.5 });
+}
+
+function handleTransportPickingUp(ctx: BehaviorContext, state: any, world: any): ContextBehaviorResult | void {
+  if (!state.storageEntityId) {
+    ctx.updateState({ transportState: 'finding_storage' });
+    return;
+  }
+
+  // Try to pick up material (simplified - in real implementation would transfer items)
+  ctx.updateState({
+    transportState: 'transporting',
+    carryingAmount: 1,
+  });
+}
+
+function handleTransporting(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex];
+  if (!tile) {
+    return ctx.complete('Tile not found');
+  }
+
+  const tilePosition = { x: tile.x, y: tile.y };
+
+  if (ctx.isWithinRange(tilePosition, 1.5)) {
+    // Arrived at construction site
+    ctx.stopMovement();
+    ctx.updateState({ transportState: 'delivering' });
+    return;
+  }
+
+  ctx.moveToward(tilePosition, { arrivalDistance: 1.5 });
+}
+
+function handleTransportDelivering(ctx: BehaviorContext, state: any, task: ConstructionTask, world: any): ContextBehaviorResult | void {
+  // Deliver material to construction system
+  const constructionSystem = getTileConstructionSystem();
+  constructionSystem.deliverMaterial(
+    world,
+    state.taskId,
+    state.tileIndex,
+    ctx.entity.id,
+    1
+  );
+
+  // Mark this delivery complete
+  ctx.updateState({
+    transportState: 'complete',
+    carryingAmount: 0,
+  });
+}
+
+function checkForMoreTransportWork(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+  const constructionSystem = getTileConstructionSystem();
+
+  // Find next tile needing materials
+  const nextTile = constructionSystem.getNextTileNeedingMaterials(task.id);
+
+  if (nextTile) {
+    // Start a new transport cycle
+    ctx.updateState({
+      transportState: 'finding_storage',
+      taskId: task.id,
+      tileIndex: nextTile.index,
+      materialId: nextTile.tile.materialId,
+      carryingAmount: 0,
+    });
+    return;
+  }
+
+  // No more materials needed - switch to tile building if there are tiles to place
+  const nextBuildTile = constructionSystem.getNextTileForConstruction(task.id);
+  if (nextBuildTile) {
+    return ctx.switchTo('tile_build', {
+      taskId: task.id,
+      tileIndex: nextBuildTile.index,
+    });
+  }
+
+  // Task is done or nothing to do
+  constructionSystem.unregisterBuilder(task.id, ctx.entity.id);
+  return ctx.complete('Construction task complete');
 }

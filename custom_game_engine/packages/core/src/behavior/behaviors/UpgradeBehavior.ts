@@ -434,8 +434,269 @@ export class UpgradeBehavior extends BaseBehavior {
 
 /**
  * Standalone function for use with BehaviorRegistry.
+ * @deprecated Use upgradeBehaviorWithContext instead for better performance
  */
 export function upgradeBehavior(entity: EntityImpl, world: World): void {
   const behavior = new UpgradeBehavior();
   behavior.execute(entity, world);
+}
+
+// ============================================================================
+// Modern BehaviorContext Implementation
+// ============================================================================
+
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('upgrade', upgradeBehaviorWithContext);
+ */
+export function upgradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  const state = ctx.getAllState() as any;
+  const phase = (state.phase as UpgradePhase) ?? 'searching';
+
+  switch (phase) {
+    case 'searching':
+      return handleUpgradeSearching(ctx, state);
+    case 'moving':
+      return handleUpgradeMoving(ctx, state);
+    case 'upgrading':
+      return handleUpgrading(ctx, state);
+    case 'complete':
+      return ctx.complete('upgrade_complete');
+  }
+}
+
+function handleUpgradeSearching(ctx: BehaviorContext, _state: any): ContextBehaviorResult | void {
+  const target = findUpgradeableBuildingCtx(ctx);
+
+  if (!target) {
+    ctx.setThought('No buildings ready for upgrade.');
+    return ctx.complete('no_upgradeable_buildings');
+  }
+
+  // Store target and transition to moving
+  ctx.updateState({
+    phase: 'moving',
+    targetBuildingId: target.id,
+    targetPosition: { x: target.position.x, y: target.position.y },
+    targetTier: target.building.tier + 1,
+  });
+
+  ctx.setThought(`Going to upgrade ${target.building.buildingType} to tier ${target.building.tier + 1}.`);
+}
+
+function handleUpgradeMoving(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  const targetPosition = state.targetPosition as { x: number; y: number };
+  const targetBuildingId = state.targetBuildingId as string;
+
+  if (!targetPosition || !targetBuildingId) {
+    ctx.updateState({ phase: 'searching' });
+    return;
+  }
+
+  // Check if in range
+  if (ctx.isWithinRange(targetPosition, UPGRADE_CONFIG.UPGRADE_RANGE)) {
+    // In range - start upgrading
+    ctx.stopMovement();
+    ctx.updateState({
+      phase: 'upgrading',
+      upgradeStarted: ctx.tick,
+      upgradeProgress: 0,
+    });
+
+    ctx.setThought('Beginning upgrade work...');
+    return;
+  }
+
+  // Move toward target
+  ctx.moveToward(targetPosition, { arrivalDistance: UPGRADE_CONFIG.UPGRADE_RANGE });
+
+  // Check if target building still exists and can be upgraded
+  const building = ctx.getEntity(targetBuildingId);
+  if (!building) {
+    ctx.updateState({ phase: 'searching' });
+    return;
+  }
+
+  const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+  if (!buildingComp || buildingComp.tier >= UPGRADE_CONFIG.MAX_TIER) {
+    ctx.setThought('That building was already upgraded.');
+    ctx.updateState({ phase: 'searching' });
+  }
+}
+
+function handleUpgrading(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+  ctx.stopMovement();
+
+  const targetBuildingId = state.targetBuildingId as string;
+  const upgradeStarted = state.upgradeStarted as number;
+  const targetTier = state.targetTier as number;
+
+  // Get target building
+  const building = ctx.getEntity(targetBuildingId);
+  if (!building) {
+    return ctx.complete('building_not_found');
+  }
+
+  const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+  if (!buildingComp) {
+    return ctx.complete('building_missing_component');
+  }
+
+  // Check distance
+  const buildingPos = (building as EntityImpl).getComponent<PositionComponent>(CT.Position);
+  if (buildingPos) {
+    if (!ctx.isWithinRange(buildingPos, UPGRADE_CONFIG.UPGRADE_RANGE + 1)) {
+      ctx.updateState({ phase: 'moving' });
+      return;
+    }
+  }
+
+  // Calculate upgrade progress based on time
+  const elapsed = ctx.tick - upgradeStarted;
+  const skills = ctx.getComponent<SkillsComponent>(CT.Skills);
+  const buildingSkill = skills?.levels?.building ?? 0;
+  const speedMultiplier = 1 + (buildingSkill * UPGRADE_CONFIG.SKILL_BONUS_MULTIPLIER);
+
+  const adjustedDuration = UPGRADE_CONFIG.UPGRADE_DURATION / speedMultiplier;
+  const progress = Math.min(100, (elapsed / adjustedDuration) * 100);
+
+  // Check if upgrade is complete
+  if (progress >= 100) {
+    // Consume resources
+    const cost = getUpgradeCostForType(buildingComp.buildingType, targetTier);
+
+    if (ctx.inventory && cost) {
+      consumeResourcesCtx(ctx, cost);
+    }
+
+    // Apply upgrade
+    (building as EntityImpl).updateComponent<BuildingComponent>(CT.Building, (comp) => ({
+      ...comp,
+      tier: targetTier,
+      // Improve building properties based on tier
+      storageCapacity: Math.floor(comp.storageCapacity * (1 + 0.5 * (targetTier - comp.tier))),
+      heatRadius: Math.floor(comp.heatRadius * (1 + 0.3 * (targetTier - comp.tier))),
+      insulation: Math.min(1, comp.insulation + 0.1 * (targetTier - comp.tier)),
+    }));
+
+    ctx.setThought(`Upgrade complete! ${buildingComp.buildingType} is now tier ${targetTier}!`);
+
+    // Emit upgrade complete event
+    ctx.emit({
+      type: 'action:completed',
+      source: 'upgrade_behavior',
+      data: {
+        actionType: 'upgrade',
+        actionId: `upgrade_${targetBuildingId}`,
+        agentId: ctx.entity.id,
+      },
+    });
+
+    return ctx.complete('upgrade_complete');
+  }
+
+  // Update progress thoughts periodically
+  const lastThoughtTick = (state.lastThoughtTick as number) ?? 0;
+  if (ctx.tick - lastThoughtTick > 80) {
+    ctx.setThought(`Upgrading... ${Math.round(progress)}% complete.`);
+    ctx.updateState({ lastThoughtTick: ctx.tick });
+  }
+}
+
+function findUpgradeableBuildingCtx(
+  ctx: BehaviorContext
+): { id: string; building: BuildingComponent; position: PositionComponent } | null {
+  const buildings = ctx.getEntitiesInRadius(UPGRADE_CONFIG.SEARCH_RADIUS, [CT.Building, CT.Position]);
+
+  // Get available resources
+  const availableResources = getInventoryResourcesFromCtx(ctx.inventory);
+
+  let bestTarget: { id: string; building: BuildingComponent; position: PositionComponent } | null = null;
+  let bestScore = -Infinity;
+
+  for (const { entity: buildingEntity, distance } of buildings) {
+    const building = (buildingEntity as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+    const position = (buildingEntity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+
+    if (!building || !position) continue;
+
+    // Skip buildings at max tier
+    if (building.tier >= UPGRADE_CONFIG.MAX_TIER) continue;
+
+    // Skip incomplete buildings
+    if (!building.isComplete) continue;
+
+    // Skip buildings in poor condition
+    if (building.condition < UPGRADE_CONFIG.MIN_CONDITION_FOR_UPGRADE) continue;
+
+    // Check if we have resources for upgrade
+    const targetTier = building.tier + 1;
+    const cost = getUpgradeCostForType(building.buildingType, targetTier);
+    if (!hasResourcesForUpgrade(availableResources, cost)) continue;
+
+    // Score: prioritize lower tier buildings and closer distance
+    const tierScore = (UPGRADE_CONFIG.MAX_TIER - building.tier) * 20;
+    const score = tierScore - distance;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestTarget = { id: buildingEntity.id, building, position };
+    }
+  }
+
+  return bestTarget;
+}
+
+function getUpgradeCostForType(buildingType: string, targetTier: number): Record<string, number> {
+  const buildingCosts = UPGRADE_COSTS[buildingType] ?? UPGRADE_COSTS['default'];
+  return buildingCosts?.[targetTier] ?? {};
+}
+
+function getInventoryResourcesFromCtx(inventory: InventoryComponent | null): Record<string, number> {
+  const resources: Record<string, number> = {};
+  if (!inventory) return resources;
+
+  for (const slot of inventory.slots) {
+    if (slot.itemId && slot.quantity > 0) {
+      resources[slot.itemId] = (resources[slot.itemId] ?? 0) + slot.quantity;
+    }
+  }
+
+  return resources;
+}
+
+function hasResourcesForUpgrade(available: Record<string, number>, required: Record<string, number>): boolean {
+  for (const [resource, amount] of Object.entries(required)) {
+    if ((available[resource] ?? 0) < amount) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function consumeResourcesCtx(ctx: BehaviorContext, cost: Record<string, number>): void {
+  const remaining = { ...cost };
+
+  ctx.updateComponent<InventoryComponent>(CT.Inventory, (inv) => {
+    const updatedSlots = inv.slots.map(slot => {
+      if (!slot.itemId || slot.quantity <= 0) return slot;
+
+      const needed = remaining[slot.itemId] ?? 0;
+      if (needed <= 0) return slot;
+
+      const toConsume = Math.min(slot.quantity, needed);
+      remaining[slot.itemId] = needed - toConsume;
+
+      return {
+        ...slot,
+        quantity: slot.quantity - toConsume,
+        itemId: slot.quantity - toConsume > 0 ? slot.itemId : null,
+      };
+    });
+
+    return { ...inv, slots: updatedSlots };
+  });
 }
