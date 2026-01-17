@@ -161,3 +161,33 @@ export {
   type TechnologyInventionContext,
   type TechnologyInventionResult,
 } from './LLMTechnologyGenerator.js';
+
+// === Spaceflight Research ===
+export {
+  SPACEFLIGHT_RESEARCH,
+  registerSpaceflightResearch,
+  // Tier 1
+  BASIC_PROPULSION,
+  WORLDSHIP_DESIGN,
+  LIFE_SUPPORT_SYSTEMS,
+  SHIPYARD_CONSTRUCTION,
+  // Tier 2
+  EMOTIONAL_TOPOLOGY,
+  THRESHOLD_SHIP,
+  COURIER_SHIP,
+  BRAINSHIP_SYMBIOSIS,
+  THE_HEART,
+  MEDITATION_CHAMBERS,
+  ADVANCED_SHIPYARD,
+  VR_SYSTEMS,
+  // Tier 3
+  STORY_SHIP,
+  GLEISNER_VESSEL,
+  MEMORY_HALLS,
+  EMOTION_THEATERS,
+  // Tier 4
+  SVETZ_RETRIEVAL,
+  PROBABILITY_SCOUT,
+  // Tier 5
+  TIMELINE_MERGER,
+} from './SpaceshipResearch.js';

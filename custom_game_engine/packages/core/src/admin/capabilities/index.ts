@@ -9,6 +9,7 @@ import './overview.js';
 import './roadmap.js';
 import './universes.js';
 import './agents.js';
+import './introspection.js';
 import './sprites.js';
 import './media.js';
 import './llm.js';

@@ -1,4 +1,4 @@
-import { MaterialTemplate } from './MaterialTemplate';
+import { MaterialTemplate, MaterialCategory } from './MaterialTemplate';
 
 /**
  * Registry for material templates.
@@ -57,8 +57,8 @@ export class MaterialRegistry {
   /**
    * Get materials by category.
    */
-  public getByCategory(category: string): MaterialTemplate[] {
-    return this.getAll().filter((m) => m.categories.includes(category as any));
+  public getByCategory(category: MaterialCategory): MaterialTemplate[] {
+    return this.getAll().filter((m) => m.categories.includes(category));
   }
 
   /**

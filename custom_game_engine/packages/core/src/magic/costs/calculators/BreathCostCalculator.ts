@@ -22,6 +22,7 @@ import {
   type AffordabilityResult,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Heightening tier thresholds */
 const HEIGHTENING_THRESHOLDS = [50, 200, 600, 1000, 2000, 10000, 50000];
@@ -203,7 +204,7 @@ export class BreathCostCalculator extends BaseCostCalculator {
    * Override terminal effect for Breath-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -213,6 +214,6 @@ export class BreathCostCalculator extends BaseCostCalculator {
         breathsRemaining: 0,
       };
     }
-    return super.getTerminalEffect(costType as any, trigger, caster);
+    return super.getTerminalEffect(costType, trigger, caster);
   }
 }

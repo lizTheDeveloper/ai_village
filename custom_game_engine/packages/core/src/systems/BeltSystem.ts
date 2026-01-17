@@ -1,5 +1,4 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId } from '../types.js';
+import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -10,6 +9,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MachineConnectionComponent } from '../components/MachineConnectionComponent.js';
 import { BELT_SPEEDS } from '../components/BeltComponent.js';
 import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * BeltSystem - Moves items along conveyor belts
@@ -24,24 +24,26 @@ import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
  *
  * Part of automation system (AUTOMATION_LOGISTICS_SPEC.md Part 3)
  */
-export class BeltSystem implements System {
+export class BeltSystem extends BaseSystem {
   public readonly id: SystemId = 'belt';
   public readonly priority: number = 53; // After PowerGridSystem
-  public readonly requiredComponents = [CT.Belt, CT.Position] as const;
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Belt, CT.Position];
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+
     // Step 1: Accumulate transfer progress
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const belt = (entity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
 
       if (!belt || belt.count === 0) continue;
 
-      const speed = BELT_SPEEDS[belt.tier] * deltaTime;
+      const speed = BELT_SPEEDS[belt.tier] * ctx.deltaTime;
       belt.transferProgress += speed;
     }
 
     // Step 2: Transfer items to adjacent belts/machines
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const belt = (entity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
 

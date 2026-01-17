@@ -387,12 +387,21 @@ export const RainbowPlanetComponentSchema: ComponentSchema<RainbowPlanetComponen
     { name: 'contamination', type: 'object', required: true },
   ],
   validate: (data: unknown): data is RainbowPlanetComponent => {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) return false;
+
     return (
-      d &&
-      d.type === 'rainbow_planet' &&
-      typeof d.name === 'string' &&
-      typeof d.planet_type === 'string'
+      'type' in data &&
+      data.type === 'rainbow_planet' &&
+      'name' in data &&
+      typeof data.name === 'string' &&
+      'planet_type' in data &&
+      typeof data.planet_type === 'string' &&
+      'quantum_state' in data &&
+      typeof data.quantum_state === 'object' &&
+      'discovery' in data &&
+      typeof data.discovery === 'object' &&
+      'contamination' in data &&
+      typeof data.contamination === 'object'
     );
   },
   createDefault: () => createRainbowMars(),

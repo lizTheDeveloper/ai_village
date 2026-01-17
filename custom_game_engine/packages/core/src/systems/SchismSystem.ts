@@ -11,6 +11,8 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -91,9 +93,18 @@ export class SchismSystem implements System {
   private config: SchismConfig;
   private schisms: Map<string, SchismData> = new Map();
   private lastCheck: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<SchismConfig> = {}) {
     this.config = { ...DEFAULT_SCHISM_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -258,8 +269,14 @@ export class SchismSystem implements System {
 
     this.schisms.set(schism.id, schism);
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'schism_occurred', ... });
+    // Emit schism event
+    this.events.emitGeneric('schism_occurred', {
+      schismId: schism.id,
+      originalDeityId,
+      newDeityId: newDeityEntity.id,
+      cause: divergence.cause,
+      believersAffected: remainedWith.length + joinedNew.length,
+    });
   }
 
   /**

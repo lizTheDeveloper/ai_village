@@ -12,6 +12,8 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -97,9 +99,18 @@ export class SyncretismSystem implements System {
   private config: SyncretismConfig;
   private syncretisms: Map<string, SyncretismData> = new Map();
   private lastCheck: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<SyncretismConfig> = {}) {
     this.config = { ...DEFAULT_SYNCRETISM_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -271,8 +282,15 @@ export class SyncretismSystem implements System {
 
     this.syncretisms.set(syncretism.id, syncretism);
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'syncretism_occurred', ... });
+    // Emit syncretism event
+    this.events.emitGeneric('syncretism_occurred', {
+      syncretismId: syncretism.id,
+      deity1Id,
+      deity2Id,
+      syncretismType: type,
+      outcome: result.outcome,
+      newDeityId: result.newDeityId,
+    });
   }
 
   /**

@@ -52,8 +52,8 @@ export class TVRatingsSystem implements System {
     this.eventBus = eventBus;
 
     // Subscribe to viewer rating events
-    eventBus.subscribe('tv:viewer:rated', (event) => {
-      this.handleViewerRating(event.data as any);
+    eventBus.subscribe<'tv:viewer:rated'>('tv:viewer:rated', (event) => {
+      this.handleViewerRating(event.data);
     });
   }
 

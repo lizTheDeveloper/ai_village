@@ -1,11 +1,10 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { getProductsForSpecies, canProduceProduct, calculateProductQuality, type AnimalProduct } from '../data/animalProducts.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * Tracks production state for each animal
@@ -22,7 +21,7 @@ interface ProductionState {
  *
  * @dependencies AnimalSystem - Reads animal health, life stage, and bond level for production
  */
-export class AnimalProductionSystem implements System {
+export class AnimalProductionSystem extends BaseSystem {
   public readonly id: SystemId = 'animal_production';
   public readonly priority: number = 60;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
@@ -30,18 +29,13 @@ export class AnimalProductionSystem implements System {
 
   // Track production state for each animal
   private productionState: Map<string, ProductionState[]> = new Map();
-  private world: World | null = null;
 
-  constructor(_eventBus?: EventBus) {
-    // EventBus passed for consistency but not used directly
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    this.world = world;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
     // Convert deltaTime to game days (deltaTime is in seconds)
-    const daysPassed = deltaTime / 86400;
+    const daysPassed = ctx.deltaTime / 86400;
 
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
       if (!animal) {
         continue;
@@ -104,7 +98,7 @@ export class AnimalProductionSystem implements System {
             bondLevel: animal.bondLevel,
           });
           if (canProduce) {
-            this.produceProduct(world, entity, animal, product);
+            this.produceProduct(world, entity, animal, product, ctx);
 
             // Reset production timer
             productState.daysSinceLastProduction = 0;
@@ -117,7 +111,7 @@ export class AnimalProductionSystem implements System {
   /**
    * Produce a product and emit event
    */
-  private produceProduct(world: World, entity: Entity, animal: AnimalComponent, product: AnimalProduct): void {
+  private produceProduct(world: World, entity: Entity, animal: AnimalComponent, product: AnimalProduct, ctx: SystemContext): void {
     // Quality calculation omitted for automatic production (not returned)
 
     // Calculate quantity (random between min and max)
@@ -128,17 +122,13 @@ export class AnimalProductionSystem implements System {
     // Only produce if quantity > 0
     if (quantity > 0) {
       // Emit product ready event
-      world.eventBus.emit({
-        type: 'product_ready',
-        source: entity.id,
-        data: {
-          animalId: animal.id,
-          productType: product.id,
-          productId: product.id,
-          itemId: product.itemId,
-          amount: quantity,
-          },
-      });
+      ctx.emit('product_ready', {
+        animalId: animal.id,
+        productType: product.id,
+        productId: product.id,
+        itemId: product.itemId,
+        amount: quantity,
+      }, entity.id);
     }
   }
 
@@ -162,9 +152,6 @@ export class AnimalProductionSystem implements System {
     // Handle both signatures: (entityId, productId, agentId?) or (world, entity, animal, productId)
     if (typeof entityIdOrWorld === 'string') {
       // Signature: (entityId, productId, agentId?)
-      if (!this.world) {
-        return { success: false, reason: 'System not initialized - world not set' };
-      }
       world = this.world;
       const entityId = entityIdOrWorld;
       actualProductId = productIdOrEntity as string;
@@ -257,19 +244,19 @@ export class AnimalProductionSystem implements System {
     productState.lastCollectionTick = currentTick;
 
     // Emit product collected event
+    // Note: Using world.eventBus directly here since this method can be called outside of onUpdate
     world.eventBus.emit({
       type: 'product_ready',
       source: entity.id,
       data: {
         animalId: animal.id,
-          productType: product.id,
-          productId: product.id,
+        productType: product.id,
+        productId: product.id,
         itemId: product.itemId,
         amount: quantity,
-        },
+      },
     });
 
-    return { success: true,
-        quantity: quantity, quality };
+    return { success: true, quantity: quantity, quality };
   }
 }

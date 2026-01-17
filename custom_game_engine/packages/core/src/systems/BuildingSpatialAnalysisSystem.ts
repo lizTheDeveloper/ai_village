@@ -16,11 +16,10 @@
  * - Harmony affects building occupant mood/productivity
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
@@ -54,56 +53,40 @@ export interface BuildingAnalysisComplete {
 /**
  * BuildingSpatialAnalysisSystem handles Feng Shui analysis of buildings.
  */
-export class BuildingSpatialAnalysisSystem implements System {
+export class BuildingSpatialAnalysisSystem extends BaseSystem {
   public readonly id: SystemId = 'building_spatial_analysis';
   public readonly priority: number = 17; // Run after BuildingSystem (16)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
 
-  private world: World | null = null;
-  private eventBus: EventBus | null = null;
-  private isInitialized = false;
-
   /** Cache of pending layout data for buildings being constructed */
   private pendingLayouts = new Map<string, BuildingLayout>();
 
-  initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) return;
-
-    this.world = world;
-    this.eventBus = eventBus;
-
-    // Use untyped subscription for custom events
-    const untypedBus = eventBus as { subscribe: (type: string, handler: (event: unknown) => void) => void };
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Listen for building completion to run analysis
-    untypedBus.subscribe('building:complete', (event: unknown) => {
-      this.onBuildingComplete(event as { data?: { buildingId?: string } });
+    this.events.subscribe('building:complete', (data: { buildingId?: string }) => {
+      this.onBuildingComplete(data);
     });
 
     // Listen for analysis requests
-    untypedBus.subscribe('building:analyze_harmony', (event: unknown) => {
-      this.onAnalysisRequested(event as { data?: BuildingAnalysisRequest });
+    this.events.subscribe('building:analyze_harmony', (data: BuildingAnalysisRequest) => {
+      this.onAnalysisRequested(data);
     });
 
     // Listen for layout data being provided (from building designer)
-    untypedBus.subscribe('building:layout_provided', (event: unknown) => {
-      this.onLayoutProvided(event as { data?: { buildingId: string; layout: BuildingLayout } });
+    this.events.subscribe('building:layout_provided', (data: { buildingId: string; layout: BuildingLayout }) => {
+      this.onLayoutProvided(data);
     });
-
-    this.isInitialized = true;
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system is event-driven, no per-tick updates needed
   }
 
   /**
    * Handle building completion - add default or analyzed harmony component.
    */
-  private onBuildingComplete(event: { data?: { buildingId?: string } }): void {
-    if (!this.world) return;
-
-    const buildingId = event.data?.buildingId;
+  private onBuildingComplete(data: { buildingId?: string }): void {
+    const buildingId = data.buildingId;
     if (!buildingId) return;
 
     const building = this.world.entities.get(buildingId);
@@ -129,11 +112,8 @@ export class BuildingSpatialAnalysisSystem implements System {
   /**
    * Handle analysis request from an agent.
    */
-  private onAnalysisRequested(event: { data?: BuildingAnalysisRequest }): void {
-    if (!this.world) return;
-
-    const request = event.data;
-    if (!request?.buildingId) return;
+  private onAnalysisRequested(request: BuildingAnalysisRequest): void {
+    if (!request.buildingId) return;
 
     const building = this.world.entities.get(request.buildingId);
     if (!building) return;
@@ -146,9 +126,8 @@ export class BuildingSpatialAnalysisSystem implements System {
   /**
    * Store layout data for a building being constructed.
    */
-  private onLayoutProvided(event: { data?: { buildingId: string; layout: BuildingLayout } }): void {
-    const data = event.data;
-    if (!data?.buildingId || !data?.layout) return;
+  private onLayoutProvided(data: { buildingId: string; layout: BuildingLayout }): void {
+    if (!data.buildingId || !data.layout) return;
 
     this.pendingLayouts.set(data.buildingId, data.layout);
   }
@@ -161,8 +140,6 @@ export class BuildingSpatialAnalysisSystem implements System {
     layout: BuildingLayout,
     analyzerId?: string
   ): void {
-    if (!this.world || !this.eventBus) return;
-
     // Run analysis
     const harmony = fengShuiAnalyzer.analyze(
       layout,
@@ -176,47 +153,32 @@ export class BuildingSpatialAnalysisSystem implements System {
     }
     building.addComponent(harmony);
 
-    // Use untyped event emission for custom events
-    const untypedBus = this.eventBus as { emit: (event: unknown) => void };
-
     // Emit analysis complete event
-    untypedBus.emit({
-      type: 'building:harmony_analyzed',
-      source: 'building_spatial_analysis_system',
-      data: {
-        buildingId: building.id,
-        harmonyScore: harmony.harmonyScore,
-        harmonyLevel: harmony.harmonyLevel,
-        issueCount: harmony.issues.length,
-        analyzerId,
-      } as BuildingAnalysisComplete,
-    });
+    this.events.emit('building:harmony_analyzed', {
+      buildingId: building.id,
+      harmonyScore: harmony.harmonyScore,
+      harmonyLevel: harmony.harmonyLevel,
+      issueCount: harmony.issues.length,
+      analyzerId,
+    } as BuildingAnalysisComplete, 'building_spatial_analysis_system');
 
     // If analyzer is an agent, grant XP
     if (analyzerId) {
-      untypedBus.emit({
-        type: 'agent:xp_gained',
-        source: 'building_spatial_analysis_system',
-        data: {
-          agentId: analyzerId,
-          skill: 'architecture',
-          amount: 15,
-          source: 'analyze_building_harmony',
-        },
-      });
+      this.events.emit('agent:xp_gained', {
+        agentId: analyzerId,
+        skill: 'architecture',
+        amount: 15,
+        source: 'analyze_building_harmony',
+      }, 'building_spatial_analysis_system');
 
       // Extra XP for finding issues
       if (harmony.issues.length > 0) {
-        untypedBus.emit({
-          type: 'agent:xp_gained',
-          source: 'building_spatial_analysis_system',
-          data: {
-            agentId: analyzerId,
-            skill: 'architecture',
-            amount: harmony.issues.length * 5,
-            source: 'identify_harmony_issues',
-          },
-        });
+        this.events.emit('agent:xp_gained', {
+          agentId: analyzerId,
+          skill: 'architecture',
+          amount: harmony.issues.length * 5,
+          source: 'identify_harmony_issues',
+        }, 'building_spatial_analysis_system');
       }
     }
   }

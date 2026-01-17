@@ -128,8 +128,7 @@ export function executeEffect(
       });
 
       // Note: addLessonToSoul mutates in place, so we need to update the component
-      // Use type cast since SoulIdentityComponent uses ComponentType enum
-      world.addComponent(context.entityId, soul as any);
+      world.addComponent(context.entityId, soul);
       break;
     }
 

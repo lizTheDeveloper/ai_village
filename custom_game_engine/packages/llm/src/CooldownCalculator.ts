@@ -28,6 +28,7 @@ export interface ProviderRateLimits {
   anthropic?: RateLimitConfig;
   ollama?: RateLimitConfig;
   customKeys: Map<string, RateLimitConfig>;
+  [provider: string]: RateLimitConfig | Map<string, RateLimitConfig> | undefined;
 }
 
 export const DEFAULT_RATE_LIMITS: ProviderRateLimits = {
@@ -160,7 +161,9 @@ export class CooldownCalculator {
       return this.rateLimits.customKeys.get(apiKeyHash);
     }
 
-    return this.rateLimits[provider as keyof Omit<ProviderRateLimits, 'customKeys'>];
+    const value = this.rateLimits[provider];
+    // Type guard: exclude Map type from index signature
+    return value instanceof Map ? undefined : value;
   }
 
   /**
@@ -183,7 +186,7 @@ export class CooldownCalculator {
    * @param rateLimit - New rate limit configuration
    */
   updateProviderRateLimit(provider: string, rateLimit: RateLimitConfig): void {
-    (this.rateLimits as any)[provider] = rateLimit;
+    this.rateLimits[provider] = rateLimit;
     console.log(
       `[CooldownCalculator] Updated rate limit for ${provider}: ${rateLimit.requestsPerMinute} RPM`
     );

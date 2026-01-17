@@ -103,3 +103,6 @@ export * from './RainbowPlanetComponent.js';
 // Planet travel
 export * from './PlanetTravelComponent.js';
 export * from './PlanetPortalComponent.js';
+
+// Ship internal components
+export * from './ShipComponentEntities.js';

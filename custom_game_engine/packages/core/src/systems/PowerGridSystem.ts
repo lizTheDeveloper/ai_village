@@ -1,11 +1,11 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId } from '../types.js';
+import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { PowerComponent, PowerType } from '../components/PowerComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * Power network - group of connected power entities
@@ -44,16 +44,18 @@ export interface PowerNetwork {
  *
  * Part of automation system (AUTOMATION_LOGISTICS_SPEC.md Part 2)
  */
-export class PowerGridSystem implements System {
+export class PowerGridSystem extends BaseSystem {
   public readonly id: SystemId = 'power_grid';
   public readonly priority: number = 50; // Before other automation systems
-  public readonly requiredComponents = [CT.Power, CT.Position] as const;
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Power, CT.Position];
 
   private networks: Map<string, PowerNetwork> = new Map();
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+
     // Step 1: Rebuild power networks from connections
-    this.buildNetworks(entities);
+    this.buildNetworks(ctx.activeEntities);
 
     // Step 2: Calculate generation and consumption for each network
     for (const network of this.networks.values()) {

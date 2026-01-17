@@ -13,9 +13,7 @@
  * - Climactic lore only appears when ready for war path
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import {
@@ -101,12 +99,13 @@ const ENGAGEMENT_THRESHOLDS: Record<LoreImportance, EngagementThreshold> = {
   },
 };
 
-export class LoreSpawnSystem implements System {
+export class LoreSpawnSystem extends BaseSystem {
   public readonly id: SystemId = 'lore_spawn';
   public readonly priority = 50; // Run late, after magic/intervention systems
   public readonly requiredComponents = [] as const;
 
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 600; // 30 seconds at 20 TPS
+
   private metrics: EngagementMetrics = {
     totalSpellsCast: 0,
     magicDetections: 0,
@@ -118,41 +117,27 @@ export class LoreSpawnSystem implements System {
     spawnedFragments: new Set(),
   };
 
-  /** Tick interval between spawn checks (default: every 30 seconds at 20 TPS) */
-  private spawnCheckInterval = 600; // 30 seconds
-
-  public initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-
+  protected onInitialize(): void {
     // Listen to magic and divine events
-    this.eventBus.subscribe('magic:spell_cast', () => {
+    this.events.subscribe('magic:spell_cast', () => {
       this.metrics.totalSpellsCast++;
     });
 
-    this.eventBus.subscribe('divinity:magic_detected', () => {
+    this.events.subscribe('divinity:magic_detected', () => {
       this.metrics.magicDetections++;
     });
 
-    this.eventBus.subscribe('divinity:creator_intervention', () => {
+    this.events.subscribe('divinity:creator_intervention', () => {
       this.metrics.interventionsReceived++;
     });
   }
 
-  public update(world: World): void {
-    const currentTick = world.tick;
-
-    // Only check for spawns periodically
-    if (currentTick - this.metrics.lastSpawnTick < this.spawnCheckInterval) {
-      return;
-    }
-
-    this.metrics.lastSpawnTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update metrics from world state
-    this.updateMetricsFromWorld(world);
+    this.updateMetricsFromWorld(ctx.world);
 
     // Try to spawn lore
-    this.attemptLoreSpawn(world);
+    this.attemptLoreSpawn(ctx.world);
   }
 
   /**
@@ -287,18 +272,14 @@ export class LoreSpawnSystem implements System {
     );
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'lore:spawned' as const,
-      source: entity.id,
-      data: {
-        fragmentId: fragment.fragmentId,
-        title: fragment.title,
-        importance: fragment.importance,
-        category: fragment.category,
-        entityId: entity.id,
-        position: { x, y },
-      },
-    });
+    this.events.emit('lore:spawned' as any, {
+      fragmentId: fragment.fragmentId,
+      title: fragment.title,
+      importance: fragment.importance,
+      category: fragment.category,
+      entityId: entity.id,
+      position: { x, y },
+    } as any, entity.id);
   }
 
   // ============ Public API ============

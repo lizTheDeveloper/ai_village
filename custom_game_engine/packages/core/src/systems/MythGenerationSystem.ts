@@ -5,6 +5,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { Myth, TraitImplication, MythologyComponent } from '../components/MythComponent.js';
 import { createMythologyComponent, addMyth, tellMyth } from '../components/MythComponent.js';
@@ -56,20 +57,23 @@ export class MythGenerationSystem implements System {
   private pendingMyths: PendingMyth[] = [];
   private pendingLLMMyths = new Map<string, PendingLLMMyth>();
   private llmQueue: LLMDecisionQueue;
+  private events!: SystemEventManager;
 
   constructor(llmQueue: LLMDecisionQueue) {
     this.llmQueue = llmQueue;
   }
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+
     // Listen for divine events that create myths
-    eventBus.subscribe('prayer:answered', (event: GameEvent) => {
-      this._onPrayerAnswered(event);
+    this.events.on('prayer:answered', (data) => {
+      this._onPrayerAnswered(data);
     });
 
     // Future: Listen for more event types
-    // eventBus.on('miracle:performed', ...)
-    // eventBus.on('vision:sent', ...)
+    // this.events.on('miracle:performed', ...)
+    // this.events.on('vision:sent', ...)
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -97,15 +101,8 @@ export class MythGenerationSystem implements System {
   /**
    * Handle prayer:answered event - queue myth creation
    */
-  private _onPrayerAnswered(event: GameEvent): void {
-    if (event.type !== 'prayer:answered') return;
-
-    const { deityId, agentId, prayerId } = event.data as {
-      deityId: string;
-      agentId: string;
-      prayerId: string;
-      responseType: string;
-    };
+  private _onPrayerAnswered(data: { deityId: string; agentId: string; prayerId: string; responseType: string }): void {
+    const { deityId, agentId, prayerId } = data;
 
     // Queue for processing in update()
     this.pendingMyths.push({
@@ -113,7 +110,7 @@ export class MythGenerationSystem implements System {
       agentId,
       prayerId,
       eventType: 'prayer_answered',
-      timestamp: event.tick || 0,
+      timestamp: 0, // Will be updated with current tick
     });
   }
 
@@ -475,5 +472,9 @@ export class MythGenerationSystem implements System {
     }
 
     return nearby;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

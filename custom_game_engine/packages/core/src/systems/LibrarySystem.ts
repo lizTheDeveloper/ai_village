@@ -4,6 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EntityId } from '../types.js';
 import type { LibraryComponent } from '../components/LibraryComponent.js';
 
@@ -40,6 +41,7 @@ export class LibrarySystem implements System {
   public readonly priority = 45;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Library];
   private eventBus: CoreEventBus;
+  private events!: SystemEventManager;
 
   // Borrowed books tracking (bookId → BorrowedBook)
   private borrowedBooks: Map<string, BorrowedBook> = new Map();
@@ -49,6 +51,10 @@ export class LibrarySystem implements System {
 
   constructor(eventBus: CoreEventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(_world: World, eventBus: CoreEventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   public update(world: World, _entities: Entity[], _deltaTime: number): void {
@@ -100,15 +106,11 @@ export class LibrarySystem implements System {
 
     this.borrowedBooks.set(bookId, borrowed);
 
-    this.eventBus.emit({
-      type: 'library:book_borrowed',
-      source: this.id,
-      data: {
-        libraryId,
-        borrowerId,
-        bookId,
-        dueDate,
-      },
+    this.events.emit('library:book_borrowed', {
+      libraryId,
+      borrowerId,
+      bookId,
+      dueDate,
     });
 
     return true;
@@ -133,15 +135,11 @@ export class LibrarySystem implements System {
 
     this.borrowedBooks.delete(bookId);
 
-    this.eventBus.emit({
-      type: 'library:book_returned',
-      source: this.id,
-      data: {
-        libraryId,
-        borrowerId,
-        bookId,
-        daysOverdue: daysOverdue > 0 ? daysOverdue : undefined,
-      },
+    this.events.emit('library:book_returned', {
+      libraryId,
+      borrowerId,
+      bookId,
+      daysOverdue: daysOverdue > 0 ? daysOverdue : undefined,
     });
 
     return true;
@@ -175,15 +173,11 @@ export class LibrarySystem implements System {
    * End a reading session
    */
   private endReadingSession(sessionId: string, session: ReadingSession): void {
-    this.eventBus.emit({
-      type: 'library:reading',
-      source: this.id,
-      data: {
-        libraryId: session.libraryId,
-        readerId: session.readerId,
-        bookId: session.bookId,
-        duration: session.duration,
-      },
+    this.events.emit('library:reading', {
+      libraryId: session.libraryId,
+      readerId: session.readerId,
+      bookId: session.bookId,
+      duration: session.duration,
     });
 
     this.readingSessions.delete(sessionId);
@@ -226,14 +220,10 @@ export class LibrarySystem implements System {
     agentId: EntityId,
     reason: string
   ): void {
-    this.eventBus.emit({
-      type: 'library:access_denied',
-      source: this.id,
-      data: {
-        libraryId,
-        agentId,
-        reason,
-      },
+    this.events.emit('library:access_denied', {
+      libraryId,
+      agentId,
+      reason,
     });
   }
 
@@ -277,5 +267,9 @@ export class LibrarySystem implements System {
 
   public onRemoveEntity(_world: World, _entity: Entity): void {
     // Clean up library data
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

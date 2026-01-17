@@ -7,12 +7,11 @@
  * Part of Phase 22: Sociological Metrics Foundation
  */
 
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { World } from '../ecs/World.js';
 import { MetricsCollector } from '../metrics/MetricsCollector.js';
 import { MetricsStreamClient, type MetricsStreamConfig } from '../metrics/MetricsStreamClient.js';
 import type { StoredMetric } from '../metrics/MetricsStorage.js';
@@ -40,31 +39,24 @@ const DEFAULT_CONFIG: MetricsCollectionConfig = {
   streaming: false,
 };
 
-export class MetricsCollectionSystem implements System {
+export class MetricsCollectionSystem extends BaseSystem {
   public readonly id: SystemId = 'metrics_collection';
   public readonly priority: number = 999; // Run last to capture all events
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private collector: MetricsCollector;
+  protected readonly throttleInterval = 0; // Run every tick
+
+  private collector!: MetricsCollector;
   private config: MetricsCollectionConfig;
   private tickCount = 0;
   private lastSnapshotTick = 0;
   private streamClient: MetricsStreamClient | null = null;
   private canonRecorder: CanonEventRecorder;
-  private world: World;
 
-  constructor(world: World, config: Partial<MetricsCollectionConfig> = {}) {
+  constructor(config: Partial<MetricsCollectionConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_CONFIG, ...config };
-    this.world = world;
-    this.collector = new MetricsCollector(world);
     this.canonRecorder = new CanonEventRecorder(this.config.canonEvents);
-    this.setupEventListeners(world.eventBus);
-
-    // Initialize streaming if enabled
-    if (this.config.streaming) {
-      this.streamClient = new MetricsStreamClient(this.config.streamConfig);
-      this.streamClient.connect();
-    }
   }
 
   /**
@@ -72,6 +64,18 @@ export class MetricsCollectionSystem implements System {
    */
   getStreamClient(): MetricsStreamClient | null {
     return this.streamClient;
+  }
+
+  protected onInitialize(world: World, eventBus: EventBus): void {
+    this.collector = new MetricsCollector(world);
+
+    // Initialize streaming if enabled
+    if (this.config.streaming) {
+      this.streamClient = new MetricsStreamClient(this.config.streamConfig);
+      this.streamClient.connect();
+    }
+
+    this.setupEventListeners(eventBus);
   }
 
   /**
@@ -875,22 +879,19 @@ export class MetricsCollectionSystem implements System {
     }
   }
 
-  /**
-   * Update method called each tick
-   */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.config.enabled) return;
 
     this.tickCount++;
 
     // Take periodic snapshots
     if (this.tickCount - this.lastSnapshotTick >= this.config.snapshotInterval) {
-      this.takeSnapshot(world);
+      this.takeSnapshot(ctx.world);
       this.lastSnapshotTick = this.tickCount;
     }
 
     // Check for time milestones (canon events)
-    this.checkTimeMilestones(world);
+    this.checkTimeMilestones(ctx.world);
   }
 
   /**

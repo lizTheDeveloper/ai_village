@@ -174,26 +174,17 @@ export class RelationshipsPanel implements IWindowPanel {
     const socialMemory = entity.components.get('social_memory') as SocialMemoryComponent | undefined;
     if (!socialMemory) return;
 
-    const socialMemories = socialMemory.socialMemories as Map<string, SocialMemory> | undefined;
-    if (!socialMemories) return;
-
-    const targetMemory = socialMemories.get(targetId);
+    const targetMemory = socialMemory.getSocialMemory(targetId);
     if (!targetMemory) return;
 
     // Create updated memory with adjusted field (clamped)
-    let updated: any;
     if (field === 'trust') {
       const newTrust = Math.max(0, Math.min(1, targetMemory.trust + delta));
-      updated = Object.freeze({ ...targetMemory, trust: newTrust });
+      socialMemory.updateSocialMemory(targetId, { trust: newTrust });
     } else if (field === 'overallSentiment') {
       const newSentiment = Math.max(-1, Math.min(1, targetMemory.overallSentiment + delta));
-      updated = Object.freeze({ ...targetMemory, overallSentiment: newSentiment });
-    } else {
-      return;
+      socialMemory.updateSocialMemory(targetId, { overallSentiment: newSentiment });
     }
-
-    // Update the social memory
-    (socialMemory as any)._socialMemories.set(targetId, updated);
   }
 
   /**

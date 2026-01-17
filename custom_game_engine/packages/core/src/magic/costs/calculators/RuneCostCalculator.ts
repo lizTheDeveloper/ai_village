@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Material qualities for rune carving */
 type MaterialQuality = 'poor' | 'common' | 'good' | 'fine' | 'masterwork';
@@ -162,7 +163,7 @@ export class RuneCostCalculator extends BaseCostCalculator {
    * Override terminal effect for rune-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     _caster: MagicComponent
   ): TerminalEffect {
@@ -180,6 +181,6 @@ export class RuneCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    return super.getTerminalEffect(costType, trigger, _caster);
   }
 }

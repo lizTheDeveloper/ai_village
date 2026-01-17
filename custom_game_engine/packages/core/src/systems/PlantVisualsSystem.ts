@@ -1,6 +1,4 @@
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { PlantComponent, PlantStage } from '../components/PlantComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
@@ -16,12 +14,11 @@ import { createRenderableComponent } from '../components/RenderableComponent.js'
  *
  * Priority: 300 (runs after PlantGrowthSystem at 200, before rendering)
  */
-export class PlantVisualsSystem implements System {
-  id = 'plant_visuals' as const;
-  name = 'plant_visuals';
-  priority = 300;
+export class PlantVisualsSystem extends BaseSystem {
+  readonly id = 'plant_visuals' as const;
+  readonly priority = 300;
   // Only require 'plant' - we'll add 'renderable' if missing
-  requiredComponents = ['plant'] as const;
+  readonly requiredComponents = ['plant'] as const;
 
   /**
    * Map plant species to sprite IDs
@@ -271,9 +268,9 @@ export class PlantVisualsSystem implements System {
     return stageAlphaMap[plant.stage] ?? 1.0;
   }
 
-  update(world: World, _entities: readonly Entity[], _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Query ALL entities with plant component (including those without renderable)
-    const plantEntities = world
+    const plantEntities = ctx.world
       .query()
       .with('plant')
       .executeEntities();

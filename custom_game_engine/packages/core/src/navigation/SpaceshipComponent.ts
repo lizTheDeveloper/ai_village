@@ -336,13 +336,11 @@ export const SpaceshipComponentSchema: ComponentSchema<SpaceshipComponent> = {
     { name: 'components', type: 'object', required: true },
   ],
   validate: (data: unknown): data is SpaceshipComponent => {
-    const d = data as any;
-    return (
-      d &&
-      d.type === 'spaceship' &&
-      typeof d.ship_type === 'string' &&
-      typeof d.name === 'string'
-    );
+    if (typeof data !== 'object' || data === null) return false;
+    if (!('type' in data) || data.type !== 'spaceship') return false;
+    if (!('ship_type' in data) || typeof data.ship_type !== 'string') return false;
+    if (!('name' in data) || typeof data.name !== 'string') return false;
+    return true;
   },
   createDefault: () => createSpaceshipComponent('worldship', 'Untitled Ship'),
 };

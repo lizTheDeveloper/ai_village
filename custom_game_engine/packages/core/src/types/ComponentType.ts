@@ -213,6 +213,12 @@ export enum ComponentType {
   PlanetTravel = 'planet_travel',    // Active travel state between planets
   PlanetPortal = 'planet_portal',    // Intra-universe portal between planets
 
+  // Ship Components (internal spaceship infrastructure)
+  EmotionTheater = 'emotion_theater',      // VR space for emotional induction
+  MemoryHall = 'memory_hall',              // Memory preservation and replay
+  MeditationChamber = 'meditation_chamber', // Emotional regulation
+  HeartChamber = 'heart_chamber',          // The Heart - crew sync for jumps
+
   // Virtual Reality
   VRSystem = 'vr_system',
 }

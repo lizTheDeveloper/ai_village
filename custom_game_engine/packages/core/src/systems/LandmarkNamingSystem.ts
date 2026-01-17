@@ -9,9 +9,8 @@
  * with each other and refer to places by their names in conversation.
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity, EntityImpl } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { SpatialMemoryComponent, SpatialMemory } from '../components/SpatialMemoryComponent.js';
@@ -51,7 +50,7 @@ const NAMEABLE_TERRAIN_TYPES = new Set([
  * Detects when agents discover significant terrain features for the first time
  * and prompts them to name the landmarks based on their personality and memories.
  */
-export class LandmarkNamingSystem implements System {
+export class LandmarkNamingSystem extends BaseSystem {
   public readonly id = 'landmark-naming';
   public readonly priority = 45; // After exploration (40), before other social systems
   public readonly requiredComponents: ReadonlyArray<CT> = [];
@@ -74,6 +73,7 @@ export class LandmarkNamingSystem implements System {
    * @param llmQueue LLM decision queue for generating names
    */
   constructor(llmQueue: LLMDecisionQueue) {
+    super();
     this.llmQueue = llmQueue;
   }
 
@@ -81,9 +81,9 @@ export class LandmarkNamingSystem implements System {
    * Update the landmark naming system.
    * Checks for new discoveries and processes naming responses.
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get the world-level named landmarks registry
-    const worldEntities = world.query().with(ComponentType.NamedLandmarks).executeEntities();
+    const worldEntities = ctx.world.query().with(ComponentType.NamedLandmarks).executeEntities();
     let landmarksComponent: NamedLandmarksComponent | undefined;
 
     for (const worldEntity of worldEntities) {
@@ -95,7 +95,7 @@ export class LandmarkNamingSystem implements System {
 
     // If no landmarks component exists, create one on the first world entity
     if (!landmarksComponent) {
-      const worldEntity = world.entities.values().next().value as EntityImpl | undefined;
+      const worldEntity = ctx.world.entities.values().next().value as EntityImpl | undefined;
       if (worldEntity) {
         landmarksComponent = new NamedLandmarksComponent();
         worldEntity.addComponent(landmarksComponent);
@@ -105,17 +105,17 @@ export class LandmarkNamingSystem implements System {
     }
 
     // Process pending naming responses
-    this.processPendingNamings(world, landmarksComponent);
+    this.processPendingNamings(ctx, landmarksComponent);
 
     // Check for new discoveries
-    this.checkForNewDiscoveries(world, landmarksComponent);
+    this.checkForNewDiscoveries(ctx, landmarksComponent);
   }
 
   /**
    * Check agents' vision for newly discovered landmarks.
    */
-  private checkForNewDiscoveries(world: World, landmarksComponent: NamedLandmarksComponent): void {
-    const agents = world.query()
+  private checkForNewDiscoveries(ctx: SystemContext, landmarksComponent: NamedLandmarksComponent): void {
+    const agents = ctx.world.query()
       .with(ComponentType.Agent)
       .with(ComponentType.Vision)
       .with(ComponentType.SpatialMemory)
@@ -135,7 +135,7 @@ export class LandmarkNamingSystem implements System {
 
       // Check naming cooldown
       const lastNaming = this.namingCooldowns.get(entity.id);
-      if (lastNaming && world.tick - lastNaming < this.NAMING_COOLDOWN_TICKS) {
+      if (lastNaming && ctx.tick - lastNaming < this.NAMING_COOLDOWN_TICKS) {
         continue; // Still on cooldown
       }
 
@@ -147,7 +147,7 @@ export class LandmarkNamingSystem implements System {
       // Get terrain features from vision (VisionProcessor stores these)
       // We need to access the actual terrain features seen
       // For now, check spatial memory for recent terrain landmarks
-      const recentLandmarks = this.getRecentTerrainLandmarks(spatialMemory, world.tick);
+      const recentLandmarks = this.getRecentTerrainLandmarks(spatialMemory, ctx.tick);
 
       for (const landmarkMemory of recentLandmarks) {
         // Check if this landmark is nameable
@@ -159,7 +159,7 @@ export class LandmarkNamingSystem implements System {
           // Already named - agent should learn the existing name
           const namedLandmark = landmarksComponent.getLandmark(landmarkMemory.x, landmarkMemory.y);
           if (namedLandmark) {
-            this.learnExistingName(entity, landmarkMemory, namedLandmark.name, world.tick);
+            this.learnExistingName(entity, landmarkMemory, namedLandmark.name, ctx.tick);
           }
           continue;
         }
@@ -169,7 +169,7 @@ export class LandmarkNamingSystem implements System {
         if (hasNamed) continue;
 
         // New unnamed landmark! Queue a naming request
-        this.requestLandmarkName(entity, landmarkMemory, world);
+        this.requestLandmarkName(entity, landmarkMemory, ctx);
         break; // Only name one landmark per update
       }
     }
@@ -202,7 +202,7 @@ export class LandmarkNamingSystem implements System {
   private requestLandmarkName(
     entity: EntityImpl,
     landmarkMemory: SpatialMemory,
-    world: World
+    ctx: SystemContext
   ): void {
     const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
     const memory = entity.getComponent<MemoryComponent>(ComponentType.Memory);
@@ -211,7 +211,7 @@ export class LandmarkNamingSystem implements System {
     if (!personality || !memory || !agent) return;
 
     // Build naming prompt
-    const prompt = this.buildNamingPrompt(entity, landmarkMemory, personality, memory, world);
+    const prompt = this.buildNamingPrompt(entity, landmarkMemory, personality, memory, ctx);
 
     // Queue the naming request
     // TODO: Add customLLMConfig to AgentComponent if needed
@@ -233,7 +233,7 @@ export class LandmarkNamingSystem implements System {
     this.pendingNamings.set(entity.id, {
       agentId: entity.id,
       feature,
-      requestedAt: world.tick,
+      requestedAt: ctx.tick,
     });
   }
 
@@ -245,7 +245,7 @@ export class LandmarkNamingSystem implements System {
     landmarkMemory: SpatialMemory,
     personality: PersonalityComponent,
     memory: MemoryComponent,
-    __world: World
+    __ctx: SystemContext
   ): string {
     const featureType = landmarkMemory.metadata?.featureType || 'terrain feature';
     const description = landmarkMemory.metadata?.description || 'a notable place';
@@ -285,7 +285,7 @@ export class LandmarkNamingSystem implements System {
   /**
    * Process pending naming requests and store approved names.
    */
-  private processPendingNamings(world: World, landmarksComponent: NamedLandmarksComponent): void {
+  private processPendingNamings(ctx: SystemContext, landmarksComponent: NamedLandmarksComponent): void {
     const completedNamings: string[] = [];
 
     for (const [entityId, pending] of this.pendingNamings.entries()) {
@@ -307,7 +307,7 @@ export class LandmarkNamingSystem implements System {
         pending.feature.type,
         name,
         entityId,
-        world.tick,
+        ctx.tick,
         {
           elevation: pending.feature.elevation,
           size: pending.feature.size,
@@ -316,7 +316,7 @@ export class LandmarkNamingSystem implements System {
       );
 
       // Update agent's spatial memory with the name
-      const entity = world.entities.get(entityId) as EntityImpl | undefined;
+      const entity = ctx.world.entities.get(entityId) as EntityImpl | undefined;
       if (entity) {
         const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
         if (spatialMemory) {
@@ -327,7 +327,7 @@ export class LandmarkNamingSystem implements System {
             pending.feature.y,
             name,
             entityId,
-            world.tick
+            ctx.tick
           );
         }
 
@@ -338,7 +338,7 @@ export class LandmarkNamingSystem implements System {
             id: `naming_${landmark.id}`,
             type: 'episodic',
             content: `I discovered and named ${landmark.featureType} "${name}"`,
-            timestamp: world.tick,
+            timestamp: ctx.tick,
             importance: 80, // High importance for discovery
             location: { x: landmark.x, y: landmark.y },
           });
@@ -346,7 +346,7 @@ export class LandmarkNamingSystem implements System {
       }
 
       // Set cooldown
-      this.namingCooldowns.set(entityId, world.tick);
+      this.namingCooldowns.set(entityId, ctx.tick);
 
       completedNamings.push(entityId);
     }

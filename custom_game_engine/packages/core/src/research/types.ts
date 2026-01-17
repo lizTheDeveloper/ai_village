@@ -25,7 +25,8 @@ export type ResearchField =
   | 'society'
   | 'arcane'
   | 'experimental'
-  | 'genetics';
+  | 'genetics'
+  | 'spaceflight';  // β-space navigation and spaceship technology
 
 /**
  * Types of content that can be unlocked by research.

@@ -1,6 +1,7 @@
-import type { System, World, WorldMutator, Entity } from '../index.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, WorldMutator } from '../index.js';
 import type { PositionComponent } from '../components/index.js';
-import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
+import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 import { CHUNK_SIZE } from '@ai-village/world';
 
 /**
@@ -11,10 +12,10 @@ import { CHUNK_SIZE } from '@ai-village/world';
  *
  * This was extracted from Renderer.ts to enable headless game execution.
  */
-export class ChunkLoadingSystem implements System {
-  id = 'chunk_loading';
-  priority = 5; // Run early, after TimeSystem
-  requiredComponents: string[] = [];
+export class ChunkLoadingSystem extends BaseSystem {
+  readonly id = 'chunk_loading';
+  readonly priority = 5; // Run early, after TimeSystem
+  readonly requiredComponents: string[] = [];
 
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
@@ -25,6 +26,7 @@ export class ChunkLoadingSystem implements System {
     chunkManager: ChunkManager,
     terrainGenerator: TerrainGenerator
   ) {
+    super();
     this.chunkManager = chunkManager;
     this.terrainGenerator = terrainGenerator;
   }
@@ -37,15 +39,15 @@ export class ChunkLoadingSystem implements System {
     this.viewportProvider = provider;
   }
 
-  update(world: World): void {
+  protected onUpdate(ctx: SystemContext): void {
     const viewport = this.viewportProvider?.();
 
     if (viewport) {
       // Visual mode: load chunks in viewport
-      this.loadChunksInViewport(world, viewport);
+      this.loadChunksInViewport(ctx.world, viewport);
     } else {
       // Headless mode: load chunks around agents
-      this.loadChunksAroundAgents(world);
+      this.loadChunksAroundAgents(ctx);
     }
   }
 
@@ -63,9 +65,9 @@ export class ChunkLoadingSystem implements System {
     }
   }
 
-  private loadChunksAroundAgents(world: World): void {
+  private loadChunksAroundAgents(ctx: SystemContext): void {
     // For headless: ensure chunks exist around all agents
-    const agents = world.query().with('agent', 'position').executeEntities();
+    const agents = ctx.world.query().with('agent', 'position').executeEntities();
 
     for (const agent of agents) {
       const pos = agent.getComponent<PositionComponent>('position');
@@ -83,7 +85,7 @@ export class ChunkLoadingSystem implements System {
           if (!this.chunkManager.hasChunk(cx, cy)) {
             const chunk = this.chunkManager.getChunk(cx, cy);
             if (chunk && !chunk.generated) {
-              this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
+              this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
             }
           }
         }

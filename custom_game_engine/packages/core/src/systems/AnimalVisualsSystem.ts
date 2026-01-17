@@ -1,6 +1,4 @@
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 
@@ -14,11 +12,10 @@ import type { RenderableComponent } from '../components/RenderableComponent.js';
  *
  * Priority: 301 (runs after AnimalGrowthSystem, before rendering)
  */
-export class AnimalVisualsSystem implements System {
-  id = 'animal_visuals' as const;
-  name = 'animal_visuals';
-  priority = 301;
-  requiredComponents = ['animal', 'renderable'] as const;
+export class AnimalVisualsSystem extends BaseSystem {
+  readonly id = 'animal_visuals' as const;
+  readonly priority = 301;
+  readonly requiredComponents = ['animal', 'renderable'] as const;
 
   /**
    * Calculate size multiplier based on animal size and life stage
@@ -62,9 +59,9 @@ export class AnimalVisualsSystem implements System {
     return 1.0;
   }
 
-  update(world: World, _entities: readonly Entity[], _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Query entities with animal and renderable components
-    const animalEntities = world
+    const animalEntities = ctx.world
       .query()
       .with('animal')
       .with('renderable')

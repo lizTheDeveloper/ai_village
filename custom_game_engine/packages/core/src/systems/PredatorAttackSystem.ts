@@ -8,6 +8,7 @@ import { createConflictComponent, type ConflictComponent } from '../components/C
 import { createInjuryComponent } from '../components/InjuryComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
 // Simplified animal component interface for predator attacks
@@ -62,9 +63,18 @@ export class PredatorAttackSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus?: EventBus;
+  private events!: SystemEventManager;
 
   constructor(eventBus?: EventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -171,16 +181,12 @@ export class PredatorAttackSystem implements System {
     }));
 
     // Emit predator:attack event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'predator:attack' as const,
-        source: predator.id,
-        data: {
-          predatorId: predator.id,
-          targetId: target.id,
-          predatorType: animal.species,
-        },
-      });
+    if (this.events) {
+      this.events.emit('predator:attack', {
+        predatorId: predator.id,
+        targetId: target.id,
+        predatorType: animal.species,
+      }, predator.id);
     }
 
     // Find allies within 5 units
@@ -358,16 +364,12 @@ export class PredatorAttackSystem implements System {
       }));
 
       // Emit predator:attack event
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'predator:attack' as const,
-          source: predator.id,
-          data: {
-            predatorId: predator.id,
-            targetId: target.id,
-            predatorType: animal.species,
-          },
-        });
+      if (this.events) {
+        this.events.emit('predator:attack', {
+          predatorId: predator.id,
+          targetId: target.id,
+          predatorType: animal.species,
+        }, predator.id);
       }
     } else {
       // Agent successfully defended - predator repelled
@@ -378,15 +380,11 @@ export class PredatorAttackSystem implements System {
       }));
 
       // Emit predator:repelled event
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'predator:repelled' as const,
-          source: predator.id,
-          data: {
-            predatorId: predator.id,
-            defenderId: target.id,
-          },
-        });
+      if (this.events) {
+        this.events.emit('predator:repelled', {
+          predatorId: predator.id,
+          defenderId: target.id,
+        }, predator.id);
       }
     }
   }
@@ -438,18 +436,14 @@ export class PredatorAttackSystem implements System {
     }
 
     // Emit injury:inflicted event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'injury:inflicted' as const,
-        source: target.id,
-        data: {
-          entityId: target.id,
-          injuryType,
-          severity,
-          location,
-          cause: 'predator_attack',
-        },
-      });
+    if (this.events) {
+      this.events.emit('injury:inflicted', {
+        entityId: target.id,
+        injuryType,
+        severity,
+        location,
+        cause: 'predator_attack',
+      }, target.id);
     }
   }
 
@@ -485,18 +479,14 @@ export class PredatorAttackSystem implements System {
         } as AlertComponent);
 
         // Emit guard:threat_detected event
-        if (this.eventBus) {
-          this.eventBus.emit({
-            type: 'guard:threat_detected' as const,
-            source: agent.id,
-            data: {
-              guardId: agent.id,
-              threatId: predator.id,
-              threatLevel: predatorAnimal.danger,
-              distance,
-              location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
-            },
-          });
+        if (this.events) {
+          this.events.emit('guard:threat_detected', {
+            guardId: agent.id,
+            threatId: predator.id,
+            threatLevel: predatorAnimal.danger,
+            distance,
+            location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
+          }, agent.id);
         }
       }
     }

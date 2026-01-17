@@ -18,9 +18,8 @@
  *           └── {soul-id}.json
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
-import type { World } from '../ecs/World.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
@@ -81,7 +80,7 @@ interface SoulIndex {
   };
 }
 
-export class SoulRepositorySystem implements System {
+export class SoulRepositorySystem extends BaseSystem {
   readonly id: SystemId = 'soul_repository';
   readonly priority = 950; // Run very late, after sprite generation
   readonly requiredComponents = [] as const; // Event-driven
@@ -91,6 +90,7 @@ export class SoulRepositorySystem implements System {
   private index: SoulIndex;
 
   constructor(repositoryPath?: string) {
+    super();
     // Default to custom_game_engine/soul-repository
     this.repositoryPath = repositoryPath || path.join(process.cwd(), 'soul-repository');
     this.indexPath = path.join(this.repositoryPath, 'index.json');
@@ -144,15 +144,14 @@ export class SoulRepositorySystem implements System {
     }
   }
 
-  onInit(world: World): void {
+  protected onInitialize(): void {
     // Subscribe to soul creation events
-    world.eventBus.subscribe('soul:ceremony_complete', (event: GameEvent<'soul:ceremony_complete'>) => {
-      this.backupSoul(world, event.data);
+    this.events.subscribe('soul:ceremony_complete', (event: GameEvent<'soul:ceremony_complete'>) => {
+      this.backupSoul(this.world, event.data);
     });
-
   }
 
-  private async backupSoul(world: World, soulData: GameEventMap['soul:ceremony_complete']): Promise<void> {
+  private async backupSoul(world: any, soulData: GameEventMap['soul:ceremony_complete']): Promise<void> {
     try {
       const { soulId, agentId, name, archetype, purpose, species, interests, thoughts } = soulData;
 
@@ -283,7 +282,7 @@ export class SoulRepositorySystem implements System {
     this.saveIndex();
   }
 
-  update(_world: World): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system is purely event-driven, no per-tick updates needed
   }
 

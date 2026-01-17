@@ -225,6 +225,21 @@ export type { CrossRealmPhoneSystemConfig } from './CrossRealmPhoneSystem.js';
 // Chunk Loading System - Terrain generation as ECS system
 export * from './ChunkLoadingSystem.js';
 
+// Spaceship Systems (β-space navigation)
+export * from './SpaceshipManagementSystem.js';
+export { SpaceshipManagementSystem } from './SpaceshipManagementSystem.js';
+export * from './SpaceshipConstructionSystem.js';
+export {
+  SpaceshipConstructionSystem,
+  getSpaceshipConstructionSystem,
+  resetSpaceshipConstructionSystem,
+} from './SpaceshipConstructionSystem.js';
+export type { SpaceshipConstructionProject } from './SpaceshipConstructionSystem.js';
+
+// Planet Travel System
+export * from './PlanetTravelSystem.js';
+export { PlanetTravelSystem } from './PlanetTravelSystem.js';
+
 // Centralized system registration
 export {
   registerAllSystems,

@@ -90,11 +90,16 @@ export const VRSystemComponentSchema: ComponentSchema<VRSystemComponent> = {
     { name: 'max_participants_per_session', type: 'number', required: true },
   ],
   validate: (data: unknown): data is VRSystemComponent => {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const d = data as Record<string, unknown>;
     return (
-      d &&
+      'type' in d &&
       d.type === 'vr_system' &&
+      'vr_type' in d &&
       typeof d.vr_type === 'string' &&
+      'name' in d &&
       typeof d.name === 'string'
     );
   },

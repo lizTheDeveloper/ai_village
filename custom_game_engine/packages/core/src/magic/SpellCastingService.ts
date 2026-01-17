@@ -14,6 +14,7 @@
 import type { Entity } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { SpellDefinition } from './SpellRegistry.js';
 import type { EffectApplicationResult } from './SpellEffect.js';
@@ -412,7 +413,7 @@ export class SpellCastingService {
           magic.corruption = Math.min(100, magic.corruption + 5);
           consequences.push('corruption_increase:+5');
         }
-        const needs = caster.components.get('needs') as any;
+        const needs = caster.components.get('needs') as NeedsComponent | undefined;
         if (needs) {
           needs.health = Math.max(0, needs.health - 0.1);
           consequences.push('health_drain:-0.1');

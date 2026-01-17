@@ -21,6 +21,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { UniversityComponent, ResearchProject } from '../components/UniversityComponent.js';
 import { startResearch, completeResearch, proposeResearch } from '../components/UniversityComponent.js';
 import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
@@ -92,11 +93,16 @@ export class UniversitySystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
 
   private eventBus: CoreEventBus;
+  private events!: SystemEventManager;
   private readonly RESEARCH_PROGRESS_PER_TICK = 0.1; // Base research speed
   private lastUpdateTick: number = 0;
 
   constructor(eventBus: CoreEventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(_world: World, eventBus: CoreEventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   public update(world: World, entities: Entity[], _deltaTime: number): void {
@@ -224,20 +230,16 @@ export class UniversitySystem implements System {
       completeResearch(university, project.id, paper.id, currentTick);
 
       // Emit research completed event
-      this.eventBus.emit({
-        type: 'university:research_completed',
-        source: this.id,
-        data: {
-          universityId: entity.id,
-          projectId: project.id,
-          paperId: paper.id,
-          title: project.title,
-          researchers: project.researchers,
-          quality: project.quality,
-          novelty: project.novelty,
-          tick: currentTick,
-          researchComplete, // Did this complete the overall research?
-        },
+      this.events.emit('university:research_completed', {
+        universityId: entity.id,
+        projectId: project.id,
+        paperId: paper.id,
+        title: project.title,
+        researchers: project.researchers,
+        quality: project.quality,
+        novelty: project.novelty,
+        tick: currentTick,
+        researchComplete, // Did this complete the overall research?
       });
 
       if (researchComplete) {
@@ -262,18 +264,14 @@ export class UniversitySystem implements System {
     const activeProjects = university.activeProjects.filter(p => p.status === 'active').length;
     const completedProjects = university.activeProjects.filter(p => p.status === 'published').length;
 
-    this.eventBus.emit({
-      type: 'university:stats',
-      source: this.id,
-      data: {
-        universityId,
-        employeeCount: university.employees.length,
-        activeProjects,
-        completedProjects,
-        totalPublications: university.publications.length,
-        researchMultiplier: university.researchMultiplier,
-        tick: currentTick,
-      },
+    this.events.emit('university:stats', {
+      universityId,
+      employeeCount: university.employees.length,
+      activeProjects,
+      completedProjects,
+      totalPublications: university.publications.length,
+      researchMultiplier: university.researchMultiplier,
+      tick: currentTick,
     });
   }
 
@@ -323,19 +321,19 @@ export class UniversitySystem implements System {
     // Start research immediately
     startResearch(university, projectId, world.tick);
 
-    this.eventBus.emit({
-      type: 'university:research_started',
-      source: this.id,
-      data: {
-        universityId,
-        projectId,
-        title,
-        principalInvestigator,
-        researchers,
-        tick: world.tick,
-      },
+    this.events.emit('university:research_started', {
+      universityId,
+      projectId,
+      title,
+      principalInvestigator,
+      researchers,
+      tick: world.tick,
     });
 
     return projectId;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

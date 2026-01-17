@@ -226,4 +226,23 @@ export class SocialMemoryComponent extends ComponentBase {
   getSocialMemory(agentId: string): SocialMemory | undefined {
     return this._socialMemories.get(agentId);
   }
+
+  /**
+   * Update a social memory entry directly (for debugging/admin tools)
+   * @param agentId Target agent ID
+   * @param updates Partial updates to apply to the social memory
+   */
+  updateSocialMemory(agentId: string, updates: Partial<SocialMemory>): void {
+    const existing = this._socialMemories.get(agentId);
+    if (!existing) {
+      throw new Error(`No social memory found for agent: ${agentId}`);
+    }
+
+    const updated: SocialMemory = Object.freeze({
+      ...existing,
+      ...updates,
+    });
+
+    this._socialMemories.set(agentId, updated);
+  }
 }

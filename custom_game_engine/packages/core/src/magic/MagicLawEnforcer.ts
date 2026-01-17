@@ -337,7 +337,7 @@ export class MagicLawEnforcer {
   ): LawCheckResult {
     // Initialize paradigmState if undefined (can happen after deserialization)
     if (!caster.paradigmState) {
-      (caster as any).paradigmState = {};
+      caster.paradigmState = {};
     }
 
     const paradigmState = caster.paradigmState[this.paradigm.id];

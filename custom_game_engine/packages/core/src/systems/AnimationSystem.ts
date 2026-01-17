@@ -1,6 +1,4 @@
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { AnimationComponent } from '../components/AnimationComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 
@@ -13,15 +11,14 @@ import type { RenderableComponent } from '../components/RenderableComponent.js';
  *
  * Priority: 100 (runs before rendering)
  */
-export class AnimationSystem implements System {
-  id = 'animation' as const;
-  name = 'animation';
-  priority = 100;
-  requiredComponents = ['animation', 'renderable'] as const;
+export class AnimationSystem extends BaseSystem {
+  readonly id = 'animation' as const;
+  readonly priority = 100;
+  readonly requiredComponents = ['animation', 'renderable'] as const;
 
-  update(world: World, _entities: readonly Entity[], deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Query entities with animation and renderable components
-    const animatedEntities = world
+    const animatedEntities = ctx.world
       .query()
       .with('animation')
       .with('renderable')
@@ -41,7 +38,7 @@ export class AnimationSystem implements System {
       }
 
       // Accumulate frame time
-      animation.frameTime += deltaTime;
+      animation.frameTime += ctx.deltaTime;
 
       // Check if it's time to advance to next frame
       if (animation.frameTime >= animation.frameDuration) {

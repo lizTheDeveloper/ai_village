@@ -21,6 +21,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Represents a sacred site in the world
@@ -112,48 +113,45 @@ export class SacredSiteSystem implements System {
   public readonly requiredComponents = [];
 
   private eventBus?: EventBus;
+  private events!: SystemEventManager;
+  private world?: World;
   private sites: Map<string, SacredSite> = new Map();
   private siteIdCounter: number = 0;
 
   // Track prayer locations for emergent site discovery
   private recentPrayers: PrayerRecord[] = [];
 
-  initialize(_world: World, eventBus: EventBus): void {
+  initialize(world: World, eventBus: EventBus): void {
+    this.world = world;
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Listen for prayer events
-    eventBus.subscribe('prayer:offered', (event) => {
-      this.handlePrayerOffered(event.data as {
-        agentId: string;
-        prayerId: string;
-        position?: { x: number; y: number };
-      }, _world);
+    this.events.on('prayer:offered', (data) => {
+      this.handlePrayerOffered(data);
     });
 
     // Listen for prayer answers
-    eventBus.subscribe('prayer:answered', (event) => {
-      this.handlePrayerAnswered(event.data as {
-        agentId: string;
-        prayerId: string;
-      });
+    this.events.on('prayer:answered', (data) => {
+      this.handlePrayerAnswered(data);
     });
 
     // Listen for building completions to register sacred buildings
-    eventBus.subscribe('building:complete', (event) => {
-      this.handleBuildingComplete(event.data as {
-        entityId: string;
-        buildingType: string;
-        position: { x: number; y: number };
-      });
+    this.events.on('building:complete', (data) => {
+      this.handleBuildingComplete(data);
     });
 
     // Listen for visions at locations
-    eventBus.subscribe('vision:received', (event) => {
-      this.handleVisionReceived(event.data as {
-        agentId: string;
-        position?: { x: number; y: number };
-      });
+    this.events.on('vision:received', (data) => {
+      this.handleVisionReceived(data);
     });
+  }
+
+  /**
+   * Cleanup event subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -245,14 +243,10 @@ export class SacredSiteSystem implements System {
       site.name = name;
       site.namedBy = namedBy;
 
-      this.eventBus?.emit({
-        type: 'sacred_site:named',
-        source: 'sacred_site_system',
-        data: {
-          siteId,
-          name,
-          namedBy,
-        },
+      this.events.emit('sacred_site:named', {
+        siteId,
+        name,
+        namedBy,
       });
     }
   }
@@ -262,13 +256,15 @@ export class SacredSiteSystem implements System {
   // ============================================================================
 
   private handlePrayerOffered(
-    data: { agentId: string; prayerId: string; position?: { x: number; y: number } },
-    world: World
+    data: { agentId: string; deityId: string; prayerType: string; urgency: string; prayerId: string }
   ): void {
-    // Get agent position if not provided
-    let position = data.position;
-    if (!position) {
-      const agent = world.getEntity(data.agentId);
+    if (!this.world) return;
+
+    const prayerId = data.prayerId;
+    // Get agent position (prayer:offered doesn't include position)
+    let position: { x: number; y: number } | undefined;
+    {
+      const agent = this.world.getEntity(data.agentId);
       if (agent) {
         const posComp = agent.components.get(CT.Position) as PositionComponent | undefined;
         if (posComp) {
@@ -283,9 +279,9 @@ export class SacredSiteSystem implements System {
     this.recentPrayers.push({
       position,
       agentId: data.agentId,
-      prayerId: data.prayerId,
+      prayerId,
       answered: false,
-      tick: world.tick,
+      tick: this.world.tick,
     });
 
     // Update site statistics if at a sacred site
@@ -296,7 +292,7 @@ export class SacredSiteSystem implements System {
     }
   }
 
-  private handlePrayerAnswered(data: { agentId: string; prayerId: string }): void {
+  private handlePrayerAnswered(data: { agentId: string; deityId: string; prayerId: string; responseType: string; healingApplied?: boolean }): void {
     // Mark prayer as answered
     const prayer = this.recentPrayers.find(p => p.prayerId === data.prayerId);
     if (prayer) {
@@ -312,19 +308,21 @@ export class SacredSiteSystem implements System {
   }
 
   private handleBuildingComplete(data: {
-    entityId: string;
+    buildingId: string;
     buildingType: string;
-    position: { x: number; y: number };
+    entityId?: string;
+    position?: { x: number; y: number };
+    builderId?: string;
   }): void {
     const config = SACRED_BUILDING_CONFIGS[data.buildingType];
-    if (!config) return; // Not a sacred building
+    if (!config || !data.position) return; // Not a sacred building or no position
 
     // Create a sacred site for this building
     const site: SacredSite = {
       id: `sacred_site_${this.siteIdCounter++}`,
       position: data.position,
       type: 'built',
-      buildingId: data.entityId,
+      buildingId: data.buildingId,
       prayerPower: config.prayerPower,
       visionClarity: config.visionClarity,
       meditationBonus: config.meditationBonus,
@@ -338,20 +336,16 @@ export class SacredSiteSystem implements System {
 
     this.sites.set(site.id, site);
 
-    this.eventBus?.emit({
-      type: 'sacred_site:created',
-      source: 'sacred_site_system',
-      data: {
-        siteId: site.id,
-        type: 'built',
-        position: data.position,
-        buildingId: data.entityId,
-        buildingType: data.buildingType,
-      },
+    this.events.emit('sacred_site:created', {
+      siteId: site.id,
+      type: 'built',
+      position: data.position,
+      buildingId: data.buildingId,
+      buildingType: data.buildingType,
     });
   }
 
-  private handleVisionReceived(data: { agentId: string; position?: { x: number; y: number } }): void {
+  private handleVisionReceived(data: { agentId: string; deityId?: string; visionType?: string; content?: string; clarity?: number; position?: { x: number; y: number }; vision?: string }): void {
     if (!data.position) return;
 
     const site = this.isAtSacredSite(data.position);
@@ -459,16 +453,12 @@ export class SacredSiteSystem implements System {
 
     this.sites.set(site.id, site);
 
-    this.eventBus?.emit({
-      type: 'sacred_site:discovered',
-      source: 'sacred_site_system',
-      data: {
-        siteId: site.id,
-        type: 'emergent',
-        position: cluster.center,
-        discoveredBy: site.discoveredBy,
-        answerRate: cluster.answerRate,
-      },
+    this.events.emit('sacred_site:discovered', {
+      siteId: site.id,
+      type: 'emergent',
+      position: cluster.center,
+      discoveredBy: site.discoveredBy,
+      answerRate: cluster.answerRate,
     });
 
     // Clear prayers in this cluster so they don't create another site

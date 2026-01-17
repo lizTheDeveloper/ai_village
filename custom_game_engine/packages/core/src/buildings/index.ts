@@ -12,6 +12,7 @@ export * from './GovernanceBlueprints.js';
 export * from './TempleBlueprints.js';
 export * from './FarmBlueprints.js';
 export * from './MidwiferyBlueprints.js';
+export * from './ShipyardBlueprints.js';
 
 // Tile-Based Voxel Building System (Phase 3)
 export * from './TileBasedBlueprintRegistry.js';

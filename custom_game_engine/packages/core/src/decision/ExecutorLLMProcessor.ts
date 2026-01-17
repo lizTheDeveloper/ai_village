@@ -22,6 +22,9 @@ import type { AgentComponent, AgentBehavior, QueuedBehavior, PlannedBuild, Agent
 import { PLANNED_BUILD_REACH, AGENT_TIER_CONFIG, shouldUseLLM, getAssignedLocation } from '../components/AgentComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { calculateStorageStats } from '../utils/StorageContext.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { BuildingType } from '../types/BuildingType.js';
@@ -443,6 +446,67 @@ export class ExecutorLLMProcessor {
           : !this.hasActiveWork(agent)
             ? 'idle'
             : 'periodic';
+
+        // Emit comprehensive agent state snapshot for dashboard (agent:llm_context)
+        // This allows the metrics dashboard to pair prompts with decisions
+        const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+        const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+        const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+        const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+        const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+
+        // Build skills snapshot (only include non-zero skills)
+        let skills: Record<string, number> | undefined;
+        if (skillsComp?.levels) {
+          const nonZeroSkills: Record<string, number> = {};
+          for (const [skillId, level] of Object.entries(skillsComp.levels)) {
+            if (level > 0) {
+              nonZeroSkills[skillId] = level;
+            }
+          }
+          if (Object.keys(nonZeroSkills).length > 0) {
+            skills = nonZeroSkills;
+          }
+        }
+
+        world.eventBus.emit({
+          type: 'agent:llm_context',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            agentName: identity?.name || 'Unknown',
+            context: prompt,
+            tick: world.tick,
+            // Current state
+            behavior: agent.behavior,
+            behaviorState: agent.behaviorState,
+            priorities: agent.priorities as Record<string, number> | undefined,
+            plannedBuilds: agent.plannedBuilds,
+            // Position
+            position: position ? { x: Math.round(position.x), y: Math.round(position.y) } : undefined,
+            // Needs
+            needs: needs ? {
+              hunger: needs.hunger !== undefined ? Math.round(needs.hunger) : undefined,
+              energy: needs.energy !== undefined ? Math.round(needs.energy) : undefined,
+              social: needs.social !== undefined ? Math.round(needs.social) : undefined,
+            } : undefined,
+            // Inventory summary
+            inventory: inventory?.slots
+              .filter(s => s.quantity > 0 && s.itemId)
+              .map(s => ({ item: s.itemId!, qty: s.quantity })),
+            // Skills
+            skills,
+            // Goals
+            personalGoal: agent.personalGoal,
+            mediumTermGoal: agent.mediumTermGoal,
+            groupGoal: agent.groupGoal,
+            // Recent thoughts
+            lastThought: agent.lastThought,
+            recentSpeech: agent.recentSpeech,
+            // Mark as executor layer
+            llmLayer: 'executor',
+          },
+        });
 
         // Emit LLM request event
         world.eventBus.emit({

@@ -21,6 +21,7 @@ import { itemRegistry } from '../items/index.js';
 import type { StatBonusTrait } from '../items/traits/StatBonusTrait.js';
 import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Weekly wear amount for armor and clothing.
@@ -50,6 +51,7 @@ export class EquipmentSystem implements System {
 
   private eventBus: EventBus | null = null;
   private world: World | null = null;
+  private events!: SystemEventManager;
 
   /**
    * Initialize the system with an event bus for scheduled degradation.
@@ -61,17 +63,32 @@ export class EquipmentSystem implements System {
   }
 
   /**
+   * Initialize event manager
+   */
+  initialize(world: World): void {
+    this.events = new SystemEventManager(world.eventBus, this.id);
+    this._setupEventListeners();
+  }
+
+  /**
    * Subscribe to time events for scheduled degradation.
    */
   private _setupEventListeners(): void {
-    if (!this.eventBus) return;
+    if (!this.events) return;
 
     // Degrade armor and clothing every 7 in-game days
-    this.eventBus.subscribe('time:new_week', () => {
+    this.events.onGeneric('time:new_week', () => {
       if (this.world) {
         this.degradeAllEquipment(this.world);
       }
     });
+  }
+
+  /**
+   * Cleanup event subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {

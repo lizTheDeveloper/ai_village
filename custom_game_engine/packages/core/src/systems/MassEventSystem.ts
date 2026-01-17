@@ -13,6 +13,8 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -147,8 +149,9 @@ export class MassEventSystem implements System {
   public readonly requiredComponents = [];
 
   private config: MassEventConfig;
-  private events: Map<string, MassEvent> = new Map();
+  private massEvents: Map<string, MassEvent> = new Map();
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<MassEventConfig> = {}) {
     this.config = {
@@ -156,6 +159,14 @@ export class MassEventSystem implements System {
       ...config,
       eventCosts: { ...DEFAULT_MASS_EVENT_CONFIG.eventCosts, ...config.eventCosts },
     };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -218,7 +229,7 @@ export class MassEventSystem implements System {
       status: 'pending',
     };
 
-    this.events.set(event.id, event);
+    this.massEvents.set(event.id, event);
 
     // Start event execution
     this.executeEvent(world, event);
@@ -361,8 +372,15 @@ export class MassEventSystem implements System {
 
     event.results = results;
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'mass_event_triggered', ... });
+    // Emit mass event triggered
+    this.events.emitGeneric('mass_event_triggered', {
+      eventId: event.id,
+      deityId: event.deityId,
+      eventType: event.type,
+      target: event.target,
+      affectedCount: event.affectedEntities.length,
+      intensity: event.intensity,
+    });
   }
 
   /**

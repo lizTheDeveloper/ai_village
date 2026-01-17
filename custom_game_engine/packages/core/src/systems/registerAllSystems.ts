@@ -520,7 +520,7 @@ export function registerAllSystems(
   animalSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(animalSystem);
 
-  gameLoop.systemRegistry.register(new AnimalProductionSystem(eventBus));
+  gameLoop.systemRegistry.register(new AnimalProductionSystem());
   gameLoop.systemRegistry.register(new AnimalHousingSystem());
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
   gameLoop.systemRegistry.register(wildAnimalSpawning);
@@ -667,7 +667,7 @@ export function registerAllSystems(
   // ECONOMY & TRADE
   // ============================================================================
   gameLoop.systemRegistry.register(new TradingSystem());
-  const marketEventSystem = new MarketEventSystem(eventBus);
+  const marketEventSystem = new MarketEventSystem();
   gameLoop.systemRegistry.register(marketEventSystem);
   gameLoop.systemRegistry.register(new TradeAgreementSystem());
 

@@ -4,6 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EventData } from '../events/EventMap.js';
 import type { EpisodicMemory, EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import type { JournalComponent } from '../components/JournalComponent.js';
@@ -19,16 +20,17 @@ export class JournalingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus;
+  private events!: SystemEventManager;
   private idleAgents: Set<string> = new Set();
 
   constructor(eventBus: EventBus) {
     this.eventBus = eventBus;
-    this._setupEventListeners();
   }
 
-  private _setupEventListeners(): void {
-    this.eventBus.subscribe('agent:idle', (event) => {
-      const data = event.data as EventData<'agent:idle'>;
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+
+    this.events.on('agent:idle', (data) => {
       if (data.agentId) {
         this.idleAgents.add(data.agentId);
       }
@@ -129,14 +131,10 @@ export class JournalingSystem implements System {
     });
 
     // Emit event
-    this.eventBus.emit({
-      type: 'journal:written',
-      source: this.id,
-      data: {
-        agentId,
-        entryCount: journalComp.entries.length,
-        timestamp: Date.now(),
-      },
+    this.events.emit('journal:written', {
+      agentId,
+      entryCount: journalComp.entries.length,
+      timestamp: Date.now(),
     });
   }
 
@@ -170,5 +168,9 @@ export class JournalingSystem implements System {
     }
 
     return Array.from(topics);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

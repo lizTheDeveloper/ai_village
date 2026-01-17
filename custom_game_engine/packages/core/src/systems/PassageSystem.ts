@@ -2,11 +2,10 @@
  * PassageSystem - Manages cross-universe passage traversal
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { PassageComponent } from '../components/PassageComponent.js';
 import {
@@ -42,25 +41,25 @@ export interface TraversalResult {
  * coordination at the MultiverseCoordinator level. This system handles the mechanics
  * within a single universe (checking passage state, queueing traversals, etc.)
  */
-export class PassageSystem implements System {
+export class PassageSystem extends BaseSystem {
   public readonly id: SystemId = 'passage';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Passage];
 
   private traversalQueue: TraversalRequest[] = [];
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const tick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const tick = ctx.tick;
 
     // Update passage states and cooldowns
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const passage = impl.getComponent<PassageComponent>(CT.Passage);
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const passage = comps.optional<PassageComponent>(CT.Passage);
       if (!passage) continue;
 
       // Reduce cooldown
       if (passage.cooldown > 0) {
-        impl.updateComponent<PassageComponent>(CT.Passage, (current) => ({
+        comps.update<PassageComponent>(CT.Passage, (current) => ({
           ...current,
           cooldown: Math.max(0, current.cooldown - 1),
         }));
@@ -68,42 +67,34 @@ export class PassageSystem implements System {
 
       // Activate dormant passages
       if (passage.state === 'dormant' && passage.active) {
-        impl.updateComponent<PassageComponent>(CT.Passage, (current) => ({
+        comps.update<PassageComponent>(CT.Passage, (current) => ({
           ...current,
           state: 'active',
         }));
 
-        world.eventBus.emit({
-          type: 'passage:activated',
-          source: entity.id,
-          data: {
-            passageId: passage.passageId,
-            sourceUniverse: passage.sourceUniverseId,
-            targetUniverse: passage.targetUniverseId,
-          },
-        });
+        ctx.emit('passage:activated', {
+          passageId: passage.passageId,
+          sourceUniverse: passage.sourceUniverseId,
+          targetUniverse: passage.targetUniverseId,
+        }, entity.id);
       }
 
       // Handle collapsing passages
       if (passage.state === 'collapsing') {
-        impl.updateComponent<PassageComponent>(CT.Passage, (current) => ({
+        comps.update<PassageComponent>(CT.Passage, (current) => ({
           ...current,
           active: false,
           state: 'dormant',
         }));
 
-        world.eventBus.emit({
-          type: 'passage:collapsed',
-          source: entity.id,
-          data: {
-            passageId: passage.passageId,
-          },
-        });
+        ctx.emit('passage:collapsed', {
+          passageId: passage.passageId,
+        }, entity.id);
       }
     }
 
     // Process traversal queue
-    this.processTraversalQueue(world, entities, tick);
+    this.processTraversalQueue(ctx, tick);
   }
 
   /**
@@ -117,8 +108,7 @@ export class PassageSystem implements System {
    * Process all pending traversal requests.
    */
   private processTraversalQueue(
-    world: World,
-    passages: ReadonlyArray<Entity>,
+    ctx: SystemContext,
     tick: number
   ): void {
     if (this.traversalQueue.length === 0) return;
@@ -126,20 +116,16 @@ export class PassageSystem implements System {
     const processed: TraversalRequest[] = [];
 
     for (const request of this.traversalQueue) {
-      const result = this.attemptTraversal(world, passages, request, tick);
+      const result = this.attemptTraversal(ctx, request, tick);
 
       if (result.success) {
         processed.push(request);
       } else {
         // Log failure
-        world.eventBus.emit({
-          type: 'passage:traversal_failed',
-          source: request.entityId,
-          data: {
-            passageId: request.passageId,
-            reason: result.reason ?? 'Unknown error',
-          },
-        });
+        ctx.emit('passage:traversal_failed', {
+          passageId: request.passageId,
+          reason: result.reason ?? 'Unknown error',
+        }, request.entityId);
       }
     }
 
@@ -153,15 +139,13 @@ export class PassageSystem implements System {
    * Attempt to traverse a passage.
    */
   private attemptTraversal(
-    world: World,
-    passages: ReadonlyArray<Entity>,
+    ctx: SystemContext,
     request: TraversalRequest,
     tick: number
   ): TraversalResult {
     // Find the passage entity
-    const passageEntity = passages.find((e) => {
-      const impl = e as EntityImpl;
-      const passage = impl.getComponent<PassageComponent>(CT.Passage);
+    const passageEntity = ctx.activeEntities.find((e) => {
+      const passage = e.getComponent<PassageComponent>(CT.Passage);
       return passage?.passageId === request.passageId;
     });
 
@@ -172,8 +156,7 @@ export class PassageSystem implements System {
       };
     }
 
-    const passageImpl = passageEntity as EntityImpl;
-    const passage = passageImpl.getComponent<PassageComponent>(CT.Passage);
+    const passage = passageEntity.getComponent<PassageComponent>(CT.Passage);
 
     if (!passage) {
       return {
@@ -207,7 +190,7 @@ export class PassageSystem implements System {
     }
 
     // Get entity being traversed
-    const entity = world.getEntity(request.entityId);
+    const entity = ctx.world.getEntity(request.entityId);
     if (!entity) {
       return {
         success: false,
@@ -216,7 +199,7 @@ export class PassageSystem implements System {
     }
 
     // Mark entity as in transit
-    passageImpl.updateComponent<PassageComponent>(CT.Passage, (current) => {
+    passageEntity.updateComponent<PassageComponent>(CT.Passage, (current) => {
       const newInTransit = new Set(current.entitiesInTransit);
       newInTransit.add(request.entityId);
 
@@ -230,17 +213,13 @@ export class PassageSystem implements System {
     });
 
     // Emit traversal event
-    world.eventBus.emit({
-      type: 'passage:entity_traversed',
-      source: request.entityId,
-      data: {
-        passageId: passage.passageId,
-        sourceUniverse: passage.sourceUniverseId,
-        targetUniverse: passage.targetUniverseId,
-        targetPosition: passage.targetPosition,
-        cost: getTraversalCost(passage.passageType),
-      },
-    });
+    ctx.emit('passage:entity_traversed', {
+      passageId: passage.passageId,
+      sourceUniverse: passage.sourceUniverseId,
+      targetUniverse: passage.targetUniverseId,
+      targetPosition: passage.targetPosition,
+      cost: getTraversalCost(passage.passageType),
+    }, request.entityId);
 
     // NOTE: Actual entity transfer between universes would happen at the
     // MultiverseCoordinator level. This system just validates and tracks

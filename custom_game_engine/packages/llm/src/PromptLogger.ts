@@ -82,7 +82,10 @@ export class PromptLogger {
       if (typeof data.parsedAction === 'string') {
         actionType = data.parsedAction;
       } else if (typeof data.parsedAction === 'object' && data.parsedAction !== null) {
-        actionType = (data.parsedAction as any).type || 'unknown';
+        // Type guard: check if object has 'type' property
+        if ('type' in data.parsedAction && typeof data.parsedAction.type === 'string') {
+          actionType = data.parsedAction.type;
+        }
       }
     }
 

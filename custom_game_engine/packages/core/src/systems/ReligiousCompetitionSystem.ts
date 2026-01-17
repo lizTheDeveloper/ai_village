@@ -12,6 +12,8 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 
@@ -91,9 +93,18 @@ export class ReligiousCompetitionSystem implements System {
   private competitions: Map<string, CompetitionData> = new Map();
   private lastUpdate: number = 0;
   private lastCheck: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<CompetitionConfig> = {}) {
     this.config = { ...DEFAULT_COMPETITION_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -219,8 +230,14 @@ export class ReligiousCompetitionSystem implements System {
 
     this.competitions.set(competition.id, competition);
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'competition_started', ... });
+    // Emit competition started event
+    this.events.emitGeneric('competition_started', {
+      competitionId: competition.id,
+      deity1Id,
+      deity2Id,
+      competitionType: type,
+      scores,
+    });
   }
 
   /**
@@ -302,13 +319,25 @@ export class ReligiousCompetitionSystem implements System {
     if (score1 > score2 * 2) {
       competition.status = 'completed';
       competition.winnerId = deity1Id;
-      // In full implementation, would emit event
-      // world.eventBus.emit({ type: 'competition_won', ... });
+      // Emit competition won event
+      this.events.emitGeneric('competition_won', {
+        competitionId: competition.id,
+        winnerId: deity1Id,
+        loserId: deity2Id,
+        competitionType: competition.type,
+        finalScores: competition.scores,
+      });
     } else if (score2 > score1 * 2) {
       competition.status = 'completed';
       competition.winnerId = deity2Id;
-      // In full implementation, would emit event
-      // world.eventBus.emit({ type: 'competition_won', ... });
+      // Emit competition won event
+      this.events.emitGeneric('competition_won', {
+        competitionId: competition.id,
+        winnerId: deity2Id,
+        loserId: deity1Id,
+        competitionType: competition.type,
+        finalScores: competition.scores,
+      });
     }
   }
 

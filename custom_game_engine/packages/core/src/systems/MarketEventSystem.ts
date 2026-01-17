@@ -17,6 +17,7 @@ import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import {
   MARKET_EVENT_CHECK_INTERVAL,
   MARKET_EVENT_CHANCE,
@@ -56,16 +57,13 @@ export class MarketEventSystem implements System {
   public readonly priority: number = 24; // Run before TradingSystem (25)
   public readonly requiredComponents: ReadonlyArray<string> = [];
 
-  private eventBus: EventBus;
+  private eventBus!: EventBus;
+  private events!: SystemEventManager;
   private activeEvents: ActiveMarketEvent[] = [];
   private lastEventCheck = 0;
   private eventCheckInterval = MARKET_EVENT_CHECK_INTERVAL; // Check every 2 minutes at 20 TPS (120 seconds)
   private eventChance = MARKET_EVENT_CHANCE; // 10% chance per check
   private nextEventId = 1;
-
-  constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
-  }
 
   /**
    * Initialize the system
@@ -73,6 +71,14 @@ export class MarketEventSystem implements System {
   public initialize(_world: World, eventBus: EventBus): void {
     // System is initialized via constructor with eventBus
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  /**
+   * Cleanup event subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   /**
@@ -87,13 +93,9 @@ export class MarketEventSystem implements System {
     );
 
     for (const event of expiredEvents) {
-      this.eventBus.emit({
-        type: 'market:event_ended',
-        source: 'market_events',
-        data: {
-          eventId: event.id,
-          eventType: event.type,
-        },
+      this.events.emit('market:event_ended', {
+        eventId: event.id,
+        eventType: event.type,
       });
     }
 
@@ -121,26 +123,18 @@ export class MarketEventSystem implements System {
     this.activeEvents.push(event);
 
     // Emit notification event
-    this.eventBus.emit({
-      type: 'notification:show',
-      source: 'market_events',
-      data: {
-        message: event.description,
-        type: 'info',
-        duration: 5000,
-      },
+    this.events.emitGeneric('notification:show', {
+      message: event.description,
+      type: 'info',
+      duration: 5000,
     });
 
     // Emit market event started
-    this.eventBus.emit({
-      type: 'market:event_started',
-      source: 'market_events',
-      data: {
-        eventId: event.id,
-        eventType: event.type,
-        description: event.description,
-        duration: event.duration,
-      },
+    this.events.emit('market:event_started', {
+      eventId: event.id,
+      eventType: event.type,
+      description: event.description,
+      duration: event.duration,
     });
   }
 
@@ -305,15 +299,11 @@ export class MarketEventSystem implements System {
     // For now, we set it to 0 and caller should update it
     this.activeEvents.push(event);
 
-    this.eventBus.emit({
-      type: 'market:event_started',
-      source: 'market_events',
-      data: {
-        eventId: event.id,
-        eventType: event.type,
-        description: event.description,
-        duration: event.duration,
-      },
+    this.events.emit('market:event_started', {
+      eventId: event.id,
+      eventType: event.type,
+      description: event.description,
+      duration: event.duration,
     });
 
     return event;

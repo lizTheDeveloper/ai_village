@@ -25,6 +25,7 @@ import { createRenderableComponent } from '../components/RenderableComponent.js'
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createResourceComponent } from '../components/ResourceComponent.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { materialRegistry } from '../materials/MaterialRegistry.js';
 
 /**
@@ -72,9 +73,14 @@ export class TreeFellingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VoxelResource, CT.Position];
 
   private eventBus: CoreEventBus;
+  private events!: SystemEventManager;
 
   constructor(eventBus: CoreEventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(_world: World, eventBus: CoreEventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -149,17 +155,13 @@ export class TreeFellingSystem implements System {
     }));
 
     // Emit falling started event
-    this.eventBus.emit({
-      type: 'voxel_resource:falling_started',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        resourceType: voxel.resourceType,
-        position: { x: pos.x, y: pos.y },
-        height: voxel.height,
-        fallDirection,
-      },
-    });
+    this.events.emit('voxel_resource:falling_started', {
+      entityId: entity.id,
+      resourceType: voxel.resourceType,
+      position: { x: pos.x, y: pos.y },
+      height: voxel.height,
+      fallDirection,
+    }, entity.id);
   }
 
   /**
@@ -185,19 +187,15 @@ export class TreeFellingSystem implements System {
     this.dropResources(world, fallPos, voxel.material, totalResources, entity.id);
 
     // Emit fell event before removal
-    this.eventBus.emit({
-      type: 'voxel_resource:fell',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        resourceType: voxel.resourceType,
-        material: voxel.material,
-        originalPosition: { x: pos.x, y: pos.y },
-        fallPosition: fallPos,
-        resourcesDropped: totalResources,
-        height: voxel.height,
-      },
-    });
+    this.events.emit('voxel_resource:fell', {
+      entityId: entity.id,
+      resourceType: voxel.resourceType,
+      material: voxel.material,
+      originalPosition: { x: pos.x, y: pos.y },
+      fallPosition: fallPos,
+      resourcesDropped: totalResources,
+      height: voxel.height,
+    }, entity.id);
 
     // Create visual falling effect (short-lived animation entity)
     this.createFallingAnimation(world, pos, voxel, fallPos);
@@ -241,16 +239,12 @@ export class TreeFellingSystem implements System {
     mutator.addComponent(itemEntity.id, createTagsComponent('item', 'dropped', 'pickup', material));
 
     // Emit item dropped event
-    this.eventBus.emit({
-      type: 'item:dropped',
-      source: sourceId,
-      data: {
-        entityId: itemEntity.id,
-        material,
-        amount,
-        position: pos,
-      },
-    });
+    this.events.emit('item:dropped', {
+      entityId: itemEntity.id,
+      material,
+      amount,
+      position: pos,
+    }, sourceId);
   }
 
   /**
@@ -286,17 +280,17 @@ export class TreeFellingSystem implements System {
     // The animation will be cleaned up by a separate system
     // or we could schedule removal after a duration
     // For now, emit an event that a cleanup system can handle
-    this.eventBus.emit({
-      type: 'animation:created',
-      source: animEntity.id,
-      data: {
-        animationType: 'falling_tree',
-        duration: 1.0, // 1 second animation
-        entityId: animEntity.id,
-        startPosition: { x: startPos.x, y: startPos.y },
-        endPosition: endPos,
-      },
-    });
+    this.events.emit('animation:created', {
+      animationType: 'falling_tree',
+      duration: 1.0, // 1 second animation
+      entityId: animEntity.id,
+      startPosition: { x: startPos.x, y: startPos.y },
+      endPosition: endPos,
+    }, animEntity.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }
 

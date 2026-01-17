@@ -1,7 +1,6 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type { PortalComponent } from '../components/PortalComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
@@ -16,31 +15,32 @@ import { transitionToRealm } from '../realms/RealmTransition.js';
  * - Triggering realm transitions
  * - Managing portal state (active, uses remaining, etc.)
  */
-export class PortalSystem implements System {
+export class PortalSystem extends BaseSystem {
   readonly id: SystemId = 'portal_system';
   readonly priority: number = 55;
   readonly requiredComponents = ['portal', 'position'] as const;
 
   private nearbyEntities: Map<string, Set<string>> = new Map();  // portalId -> Set of nearby entityIds
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Clear proximity tracking
     this.nearbyEntities.clear();
 
     // Process each portal
-    for (const portalEntity of entities) {
-      const portal = portalEntity.components.get('portal') as PortalComponent | undefined;
-      const portalPos = portalEntity.components.get('position') as PositionComponent | undefined;
+    for (const portalEntity of ctx.activeEntities) {
+      const comps = ctx.components(portalEntity);
+      const portal = comps.optional<PortalComponent>('portal');
+      const portalPos = comps.optional<PositionComponent>('position');
 
       if (!portal || !portalPos || !portal.active) continue;
 
       // Find entities near this portal
-      const nearbyEntities = this.findNearbyEntities(world, portalPos, portalEntity.id);
+      const nearbyEntities = this.findNearbyEntities(ctx, portalPos, portalEntity.id);
       this.nearbyEntities.set(portalEntity.id, nearbyEntities);
 
       // Check if any entities should auto-transition
       for (const entityId of nearbyEntities) {
-        const entity = world.getEntity(entityId);
+        const entity = ctx.world.getEntity(entityId);
         if (!entity) continue;
 
         const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
@@ -48,7 +48,7 @@ export class PortalSystem implements System {
 
         // Auto-transition for certain access methods
         if (this.shouldAutoTransition(portal, realmLocation)) {
-          this.attemptTransition(world, entity.id, portalEntity.id, portal);
+          this.attemptTransition(ctx.world, entity.id, portalEntity.id, portal);
         }
       }
     }
@@ -57,27 +57,20 @@ export class PortalSystem implements System {
   /**
    * Find entities within portal activation range
    */
-  private findNearbyEntities(world: World, portalPos: PositionComponent, portalId: string): Set<string> {
+  private findNearbyEntities(ctx: SystemContext, portalPos: PositionComponent, portalId: string): Set<string> {
     const nearby = new Set<string>();
     const PORTAL_RANGE = 2;  // Tiles
 
-    // Get all entities with position and realm_location components
-    for (const entity of world.entities.values()) {
-      if (entity.id === portalId) continue;  // Skip the portal itself
+    // Use spatial query for efficient nearby entity lookup
+    const nearbyEntitiesWithDistance = ctx.getNearbyEntities(
+      portalPos,
+      PORTAL_RANGE,
+      ['position', 'realm_location'],
+      { excludeIds: new Set([portalId]) }
+    );
 
-      const pos = entity.components.get('position') as PositionComponent | undefined;
-      const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
-
-      if (!pos || !realmLocation) continue;
-
-      // Check distance
-      const dx = pos.x - portalPos.x;
-      const dy = pos.y - portalPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance <= PORTAL_RANGE) {
-        nearby.add(entity.id);
-      }
+    for (const { entity } of nearbyEntitiesWithDistance) {
+      nearby.add(entity.id);
     }
 
     return nearby;

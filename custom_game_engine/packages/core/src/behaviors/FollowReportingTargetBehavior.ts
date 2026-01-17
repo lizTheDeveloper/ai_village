@@ -75,7 +75,7 @@ export function followReportingTargetBehavior(entity: EntityImpl, world: World):
 
   if (!target) {
     // Target lost - initiate search
-    handleLostTarget(entity, agent, world.tick, purpose);
+    handleLostTarget(entity, agent, world, purpose);
     return;
   }
 
@@ -271,13 +271,13 @@ function getCardinalDirection(angle: number): string {
 function handleLostTarget(
   entity: EntityImpl,
   agent: AgentComponent,
-  currentTick: number,
+  world: World,
   purpose: string
 ): void {
-  const searchStartTick = (agent.behaviorState?.searchStartTick as number) ?? currentTick;
+  const searchStartTick = (agent.behaviorState?.searchStartTick as number) ?? world.tick;
 
   // Check if search timeout exceeded
-  if (currentTick - searchStartTick > SEARCH_TIMEOUT) {
+  if (world.tick - searchStartTick > SEARCH_TIMEOUT) {
     // Give up search
     entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
       ...current,
@@ -286,15 +286,15 @@ function handleLostTarget(
       lastThought: `I couldn't find the subject for ${purpose}. Heading back to the newsroom.`,
     }));
 
-    // Emit event that reporter gave up (TODO: Add eventBus to World or find alternative)
-    // world.eventBus?.emit({
-    //   type: 'reporter:search_failed' as any,
-    //   source: 'ai',
-    //   data: {
-    //     reporterId: entity.id,
-    //     purpose,
-    //   },
-    // });
+    // Emit event that reporter gave up
+    world.eventBus.emit<'reporter:search_failed'>({
+      type: 'reporter:search_failed',
+      source: 'ai',
+      data: {
+        reporterId: entity.id,
+        purpose,
+      },
+    });
     return;
   }
 
@@ -309,9 +309,9 @@ function handleLostTarget(
 
   if (lastKnownPos) {
     // Search in expanding circle
-    const searchPhase = ((currentTick - searchStartTick) / 100) % 8; // Change direction every 5 seconds
+    const searchPhase = ((world.tick - searchStartTick) / 100) % 8; // Change direction every 5 seconds
     const angle = (searchPhase / 8) * Math.PI * 2;
-    const searchDistance = 50 + ((currentTick - searchStartTick) / 200) * 10; // Expand search radius
+    const searchDistance = 50 + ((world.tick - searchStartTick) / 200) * 10; // Expand search radius
 
     const searchX = lastKnownPos.x + Math.cos(angle) * searchDistance;
     const searchY = lastKnownPos.y + Math.sin(angle) * searchDistance;

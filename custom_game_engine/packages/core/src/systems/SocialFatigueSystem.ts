@@ -21,9 +21,7 @@
  * - Agent should choose to leave/end conversation
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType } from '../types.js';
@@ -31,7 +29,7 @@ import type { ConversationComponent } from '../components/ConversationComponent.
 import { isInConversation } from '../components/ConversationComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 
-export class SocialFatigueSystem implements System {
+export class SocialFatigueSystem extends BaseSystem {
   public readonly id: SystemId = 'social_fatigue';
   public readonly priority: number = 16; // After CommunicationSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -51,9 +49,9 @@ export class SocialFatigueSystem implements System {
   private static readonly THRESHOLD_MIN = 50; // Introverts can only handle up to 50 fatigue
   private static readonly THRESHOLD_MAX = 90; // Extroverts can handle up to 90 fatigue
 
-  init(_world: World): void {
+  protected onInitialize(): void {
     // Initialize personality-based fatigue thresholds for all agents
-    const agents = _world.query().with(CT.Conversation).with(CT.Personality).executeEntities();
+    const agents = this.world.query().with(CT.Conversation).with(CT.Personality).executeEntities();
 
     for (const agent of agents) {
       const impl = agent as EntityImpl;
@@ -61,19 +59,18 @@ export class SocialFatigueSystem implements System {
     }
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
-      const personality = impl.getComponent<PersonalityComponent>(CT.Personality);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const conversation = ctx.components(entity).optional<ConversationComponent>(CT.Conversation);
+      const personality = ctx.components(entity).optional<PersonalityComponent>(CT.Personality);
 
       if (!conversation) continue;
 
       // Update fatigue based on conversation state
       if (isInConversation(conversation)) {
-        this.accumulateFatigue(impl, conversation, personality, world);
+        this.accumulateFatigue(entity, conversation, personality, ctx.world);
       } else {
-        this.recoverFatigue(impl, conversation, personality);
+        this.recoverFatigue(entity, conversation, personality);
       }
     }
   }
@@ -111,7 +108,7 @@ export class SocialFatigueSystem implements System {
     entity: EntityImpl,
     conversation: ConversationComponent,
     personality: PersonalityComponent | undefined,
-    world: World
+    world: any
   ): void {
     const extraversion = personality?.extraversion ?? 0.5;
 
@@ -133,16 +130,12 @@ export class SocialFatigueSystem implements System {
 
     // Emit warning event when fatigue exceeds threshold
     if (newFatigue >= conversation.fatigueThreshold && conversation.socialFatigue < conversation.fatigueThreshold) {
-      world.eventBus.emit({
-        type: 'conversation:fatigue_threshold_exceeded',
-        source: entity.id,
-        data: {
-          agentId: entity.id,
-          fatigue: newFatigue,
-          threshold: conversation.fatigueThreshold,
-          extraversion,
-        },
-      });
+      this.events.emit('conversation:fatigue_threshold_exceeded' as any, {
+        agentId: entity.id,
+        fatigue: newFatigue,
+        threshold: conversation.fatigueThreshold,
+        extraversion,
+      } as any, entity.id);
     }
   }
 

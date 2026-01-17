@@ -293,6 +293,19 @@ const TITLE_TEMPLATES: Record<ResearchField, string[]> = {
     'Deep Learning on {topic} Sequences: CNN Finds Patterns We Cannot See',
     'This {topic} Mutation Is Definitely Not From Contamination',
   ],
+  spaceflight: [
+    'Advances in {topic} Propulsion Systems',
+    'Emotional Coherence in {topic} Navigation',
+    'β-Space Topology and {topic} Trajectories',
+    'Crew Synchronization for {topic} Operations',
+    'Narrative Weight in {topic} Journey Planning',
+    // Researcher humor
+    'Why {topic} Takes Longer Than We Told the Grant Committee',
+    'The {topic} Coherence Threshold: 95% of the Time, It Works Every Time',
+    '{topic} Jump Failures: A Retrospective Nobody Wanted',
+    'Emotional Navigation: When Feelings Are Actually Data',
+    'P-Values in {topic} Research: Statistically Significant at α=0.049',
+  ],
 };
 
 /**
@@ -421,6 +434,11 @@ const FIELD_OPENING_LINES: Record<ResearchField, string[]> = {
     'DNA is a four-letter word for "it\'s complicated."',
     'Genes are instructions written in a language that changes meaning depending on who reads them.',
     'Life is a self-replicating error that got very good at making errors.',
+  ],
+  spaceflight: [
+    'β-space navigation proves that feelings can indeed be measured—though perhaps they shouldn\'t be.',
+    'The Heart chamber synchronizes emotions; getting the crew to agree on lunch remains unsolved.',
+    'Emotional coherence is required for jumps. Emotional maturity remains optional.',
   ],
 };
 

@@ -13,9 +13,7 @@
  * evolve naturally based on their experiences and social interactions.
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType } from '../types.js';
@@ -140,7 +138,7 @@ export interface InterestMutationEventData {
   trigger?: string; // Specific event that caused it
 }
 
-export class InterestEvolutionSystem implements System {
+export class InterestEvolutionSystem extends BaseSystem {
   public readonly id: SystemId = 'interest_evolution';
   public readonly priority: number = 18; // After FriendshipSystem (17)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -148,9 +146,8 @@ export class InterestEvolutionSystem implements System {
     CT.Interests,
   ];
 
-  // Check for decay once per game month
-  private static readonly UPDATE_INTERVAL = 30 * 24 * 1200; // 1 month at 20 TPS
-  private lastUpdateTick = 0;
+  // Check for decay once per game month at 20 TPS
+  protected readonly throttleInterval = 30 * 24 * 1200; // 1 month at 20 TPS
 
   // Thresholds for mutation events
   private static readonly EMERGENCE_THRESHOLD = 0.3;
@@ -160,32 +157,26 @@ export class InterestEvolutionSystem implements System {
   // Ticks in a week (for decay calculation)
   private static readonly WEEK_IN_TICKS = 7 * 24 * 1200; // 7 days * 24 hours * 1200 ticks/hour
 
-  init(world: World): void {
+  protected onInitialize(): void {
     // Listen for experience triggers
     // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
     // Using subscribe with string literal types for forward compatibility
-    world.eventBus.subscribe('agent:death' as EventType, (e) => this.handleExperience(e, world));
-    world.eventBus.subscribe('deity:miracle' as EventType, (e) => this.handleExperience(e, world));
-    world.eventBus.subscribe<'building:completed'>('building:completed', (e) => this.handleExperience(e, world));
-    world.eventBus.subscribe<'agent:born'>('agent:born', (e) => this.handleExperience(e, world));
-    world.eventBus.subscribe('prayer:answered' as EventType, (e) => this.handleExperience(e, world));
+    this.events.subscribe('agent:death' as any, (e) => this.handleExperience(e, this.world));
+    this.events.subscribe('deity:miracle' as any, (e) => this.handleExperience(e, this.world));
+    this.events.subscribe('building:completed', (e) => this.handleExperience(e, this.world));
+    this.events.subscribe('agent:born', (e) => this.handleExperience(e, this.world));
+    this.events.subscribe('prayer:answered' as any, (e) => this.handleExperience(e, this.world));
 
     // Listen for skill increases
-    world.eventBus.subscribe<'skill:level_up'>('skill:level_up', (e) => this.handleSkillGrowth(e, world));
+    this.events.subscribe('skill:level_up', (e) => this.handleSkillGrowth(e, this.world));
 
     // Listen for conversations (mentorship transfer)
-    world.eventBus.subscribe<'conversation:ended'>('conversation:ended', (e) => this.handleMentorship(e, world));
+    this.events.subscribe('conversation:ended', (e) => this.handleMentorship(e, this.world));
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Only check decay once per month (UPDATE_INTERVAL ticks)
-    if (world.tick - this.lastUpdateTick < InterestEvolutionSystem.UPDATE_INTERVAL) return;
-    this.lastUpdateTick = world.tick;
-
-    for (const entity of entities) {
-      // Systems receive EntityImpl instances from ECS
-      if (!(entity instanceof EntityImpl)) continue;
-      this.processDecay(entity, world);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.processDecay(entity, ctx.world);
     }
   }
 
@@ -426,7 +417,7 @@ export class InterestEvolutionSystem implements System {
    * Emit interest mutation event
    */
   private emitMutationEvent(
-    world: World,
+    world: any,
     agent: EntityImpl,
     interest: Interest,
     eventType: InterestMutationEvent,
@@ -435,19 +426,15 @@ export class InterestEvolutionSystem implements System {
   ): void {
     const identity = agent.getComponent<IdentityComponent>(CT.Identity);
 
-    world.eventBus.emit({
-      type: eventType,
-      source: agent.id,
-      data: {
-        agentId: agent.id,
-        agentName: identity?.name || 'Unknown',
-        topic: interest.topic,
-        oldIntensity,
-        newIntensity: interest.intensity,
-        source: interest.source,
-        trigger,
-      } as InterestMutationEventData,
-    });
+    this.events.emit(eventType as any, {
+      agentId: agent.id,
+      agentName: identity?.name || 'Unknown',
+      topic: interest.topic,
+      oldIntensity,
+      newIntensity: interest.intensity,
+      source: interest.source,
+      trigger,
+    } as any, agent.id);
   }
 
   /**

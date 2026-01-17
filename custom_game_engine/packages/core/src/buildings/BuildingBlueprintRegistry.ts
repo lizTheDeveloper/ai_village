@@ -22,6 +22,7 @@ import { getFarmBlueprints } from './FarmBlueprints.js';
 import { SHOP_BLUEPRINTS } from './ShopBlueprints.js';
 import { MIDWIFERY_BLUEPRINTS } from './MidwiferyBlueprints.js';
 import { GOVERNANCE_BLUEPRINTS } from './GovernanceBlueprints.js';
+import { SHIPYARD_BLUEPRINTS } from './ShipyardBlueprints.js';
 
 /**
  * Building categories per construction-system/spec.md
@@ -500,6 +501,7 @@ export class BuildingBlueprintRegistry {
     this.registerFarmBuildings();
     this.registerShopBuildings();
     this.registerMidwiferyBuildings();
+    this.registerShipyardBuildings();
     // NOTE: Not registering GovernanceBlueprints.ts file because those buildings
     // are already registered inline in registerGovernanceBuildings() above
 
@@ -1851,6 +1853,15 @@ export class BuildingBlueprintRegistry {
    */
   registerGovernanceBlueprintsFile(): void {
     for (const blueprint of GOVERNANCE_BLUEPRINTS) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register shipyard/spaceflight buildings (shipyards, VR chambers, research labs)
+   */
+  registerShipyardBuildings(): void {
+    for (const blueprint of SHIPYARD_BLUEPRINTS) {
       this.register(blueprint);
     }
   }

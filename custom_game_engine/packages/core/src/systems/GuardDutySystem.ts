@@ -7,6 +7,7 @@ import type { Component } from '../ecs/Component.js';
 import type { GuardDutyComponent } from '../components/GuardDutyComponent.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 interface PositionComponent extends Component {
   readonly type: 'position';
@@ -47,12 +48,21 @@ export class GuardDutySystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['guard_duty'];
 
   private eventBus?: EventBus;
+  private events!: SystemEventManager;
   private readonly ALERTNESS_DECAY_RATE = 0.0001; // Per millisecond
   private readonly THREAT_CHECK_INTERVAL = 5000; // 5 seconds
   private readonly LOW_ALERTNESS_THRESHOLD = 0.2;
 
   constructor(eventBus?: EventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
@@ -116,15 +126,11 @@ export class GuardDutySystem implements System {
 
     // Emit low alertness warning
     if (newAlertness < this.LOW_ALERTNESS_THRESHOLD && duty.alertness >= this.LOW_ALERTNESS_THRESHOLD) {
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'guard:alertness_low',
-          source: entity.id,
-          data: {
-            guardId: entity.id,
-            alertness: newAlertness,
-          },
-        });
+      if (this.events) {
+        this.events.emit('guard:alertness_low', {
+          guardId: entity.id,
+          alertness: newAlertness,
+        }, entity.id);
       }
     }
   }
@@ -252,18 +258,14 @@ export class GuardDutySystem implements System {
     }
 
     // Emit threat detected event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'guard:threat_detected',
-        source: guard.id,
-        data: {
-          guardId: guard.id,
-          threatId: threat.entity.id,
-          threatLevel: threat.threatLevel,
-          distance: threat.distance,
-          location: watchLocation,
-        },
-      });
+    if (this.events) {
+      this.events.emit('guard:threat_detected', {
+        guardId: guard.id,
+        threatId: threat.entity.id,
+        threatLevel: threat.threatLevel,
+        distance: threat.distance,
+        location: watchLocation,
+      }, guard.id);
     }
 
     // Add alert component to guard
@@ -318,16 +320,12 @@ export class GuardDutySystem implements System {
     threat: Entity,
     response: 'alert_others' | 'intercept' | 'observe' | 'flee'
   ): void {
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'guard:response',
-        source: guard.id,
-        data: {
-          guardId: guard.id,
-          threatId: threat.id,
-          response,
-        },
-      });
+    if (this.events) {
+      this.events.emit('guard:response', {
+        guardId: guard.id,
+        threatId: threat.id,
+        response,
+      }, guard.id);
     }
 
     // Actual response implementation would depend on other systems

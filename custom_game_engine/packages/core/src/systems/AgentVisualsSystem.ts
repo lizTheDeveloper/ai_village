@@ -1,6 +1,4 @@
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 
@@ -14,14 +12,13 @@ import type { RenderableComponent } from '../components/RenderableComponent.js';
  *
  * Priority: 300 (runs before rendering, alongside PlantVisualsSystem)
  */
-export class AgentVisualsSystem implements System {
-  id = 'agent_visuals' as const;
-  name = 'agent_visuals';
-  priority = 300;
-  requiredComponents = ['agent', 'renderable'] as const;
+export class AgentVisualsSystem extends BaseSystem {
+  readonly id = 'agent_visuals' as const;
+  readonly priority = 300;
+  readonly requiredComponents = ['agent', 'renderable'] as const;
 
-  update(world: World, entities: readonly Entity[], _deltaTime: number): void {
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const agent = entity.getComponent<AgentComponent>('agent');
       const renderable = entity.getComponent<RenderableComponent>('renderable');
 

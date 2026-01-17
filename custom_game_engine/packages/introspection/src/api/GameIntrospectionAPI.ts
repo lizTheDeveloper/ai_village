@@ -641,6 +641,247 @@ export class GameIntrospectionAPI {
   }
 
   // ============================================================================
+  // Skills & Progression Methods
+  // ============================================================================
+
+  /**
+   * Grant skill XP with level-up handling.
+   *
+   * This method provides comprehensive skill progression with:
+   * - Entity and skill validation
+   * - Affinity-based XP multipliers
+   * - Automatic level-up calculation (100/300/700/1500/3000 XP thresholds)
+   * - Cache invalidation
+   * - Metrics tracking
+   *
+   * @param entityId - Entity to grant XP to
+   * @param skill - Skill name
+   * @param amount - XP amount to grant (100 XP = 1 level)
+   * @returns Skill progression result
+   *
+   * @example
+   * ```typescript
+   * await api.grantSkillXP('agent-uuid', 'farming', 100);  // 100 XP = 1 level
+   * await api.grantSkillXP('agent-uuid', 'combat', 250);   // 250 XP = 2.5 levels
+   * ```
+   */
+  async grantSkillXP(
+    entityId: string,
+    skill: string,
+    amount: number
+  ): Promise<{
+    success: boolean;
+    skill: string;
+    previousLevel: number;
+    newLevel: number;
+    previousXP: number;
+    newXP: number;
+    leveledUp: boolean;
+    error?: string;
+  }> {
+    // Validate entity exists
+    const entity = this.world.getEntity(entityId);
+    if (!entity) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Entity ${entityId} not found`,
+      };
+    }
+
+    // Get skills component
+    const skillsComponent = entity.getComponent('skills');
+    if (!skillsComponent) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Entity ${entityId} has no skills component`,
+      };
+    }
+
+    // Cast to any to access dynamic skill properties
+    const skills = skillsComponent as any;
+
+    // Validate skill exists
+    if (!skills.levels || !(skill in skills.levels)) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Skill '${skill}' not found in skills component`,
+      };
+    }
+
+    // Validate amount
+    if (amount < 0) {
+      return {
+        success: false,
+        skill,
+        previousLevel: skills.levels[skill] || 0,
+        newLevel: skills.levels[skill] || 0,
+        previousXP: skills.totalExperience?.[skill] || 0,
+        newXP: skills.totalExperience?.[skill] || 0,
+        leveledUp: false,
+        error: 'XP amount must be non-negative',
+      };
+    }
+
+    // Capture old values
+    const previousLevel = skills.levels[skill] || 0;
+    const previousTotalXP = skills.totalExperience?.[skill] || 0;
+    const previousExperience = skills.experience?.[skill] || 0;
+
+    // Use mutateField to apply XP changes with proper validation and tracking
+    // We need to update totalExperience and experience fields
+    const affinity = skills.affinities?.[skill] || 1.0;
+    const actualXP = Math.floor(amount * affinity);
+
+    // Update totalExperience to trigger level recalculation
+    const newTotalXP = previousTotalXP + actualXP;
+    const newExperience = previousExperience + actualXP;
+
+    // Calculate new level from total XP
+    // XP thresholds: 0->1: 100, 1->2: 300, 2->3: 700, 3->4: 1500, 4->5: 3000
+    let newLevel = 0;
+    if (newTotalXP >= 3000) newLevel = 5;
+    else if (newTotalXP >= 1500) newLevel = 4;
+    else if (newTotalXP >= 700) newLevel = 3;
+    else if (newTotalXP >= 300) newLevel = 2;
+    else if (newTotalXP >= 100) newLevel = 1;
+
+    const leveledUp = newLevel > previousLevel;
+
+    // Apply mutations atomically
+    try {
+      // Update totalExperience
+      await this.mutateField({
+        entityId,
+        componentType: 'skills',
+        field: 'totalExperience',
+        value: {
+          ...skills.totalExperience,
+          [skill]: newTotalXP,
+        },
+        reason: `Grant ${amount} XP to ${skill} skill`,
+        validate: false, // Skip schema validation for nested object updates
+        source: 'dev',
+      });
+
+      // Update experience
+      await this.mutateField({
+        entityId,
+        componentType: 'skills',
+        field: 'experience',
+        value: {
+          ...skills.experience,
+          [skill]: newExperience,
+        },
+        reason: `Update experience progress for ${skill}`,
+        validate: false,
+        source: 'dev',
+      });
+
+      // Update level if it changed
+      if (leveledUp) {
+        await this.mutateField({
+          entityId,
+          componentType: 'skills',
+          field: 'levels',
+          value: {
+            ...skills.levels,
+            [skill]: newLevel,
+          },
+          reason: `Level up ${skill} from ${previousLevel} to ${newLevel}`,
+          validate: false,
+          source: 'dev',
+        });
+      }
+
+      // Invalidate cache for this entity
+      this.cache.invalidate(entityId);
+
+      // Emit metrics event if available
+      if (this.metricsAPI && typeof this.metricsAPI.trackEvent === 'function') {
+        this.metricsAPI.trackEvent('skill_xp_grant', {
+          entityId,
+          skill,
+          amount,
+          actualXP,
+          previousLevel,
+          newLevel,
+          leveledUp,
+        });
+      }
+
+      return {
+        success: true,
+        skill,
+        previousLevel,
+        newLevel,
+        previousXP: previousTotalXP,
+        newXP: newTotalXP,
+        leveledUp,
+      };
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        skill,
+        previousLevel,
+        newLevel: previousLevel,
+        previousXP: previousTotalXP,
+        newXP: previousTotalXP,
+        leveledUp: false,
+        error: `Failed to grant XP: ${errorMsg}`,
+      };
+    }
+  }
+
+  /**
+   * Get all skills for entity.
+   *
+   * @param entityId - Entity ID
+   * @returns Map of skill names to levels
+   *
+   * @example
+   * ```typescript
+   * const skills = await api.getSkills('agent-uuid');
+   * // Returns: { farming: 3, combat: 1, cooking: 5 }
+   * ```
+   */
+  async getSkills(entityId: string): Promise<Record<string, number>> {
+    // Get entity with skills component
+    const enriched = this.getEntity(entityId, {});
+    if (!enriched) {
+      throw new Error(`Entity ${entityId} not found`);
+    }
+
+    // Extract skills component
+    const skillsComponent = enriched.components.skills as any;
+    if (!skillsComponent) {
+      throw new Error(`Entity ${entityId} has no skills component`);
+    }
+
+    // Return levels map
+    return skillsComponent.levels || {};
+  }
+
+  // ============================================================================
   // Behavioral Control Methods
   // ============================================================================
 

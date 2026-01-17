@@ -1507,6 +1507,128 @@ export interface GameEventMap {
     toPlanetId: string;
   };
 
+  // === Spaceship Events ===
+  /** Heart chamber reached jump window (ready for β-space jump) */
+  'spaceship_jump_window_open': {
+    shipId: string;
+    coherence: number;
+    windowDuration: number;
+  };
+
+  /** β-space jump executed successfully */
+  'spaceship_beta_jump_executed': {
+    destinationPlanetId: string;
+    coherence: number;
+    crewCount: number;
+    syncTime: number;
+  };
+
+  /** Emotion theater session started */
+  'emotion_theater_session_started': {
+    scenarioId: string;
+    scenarioName: string;
+    participantIds: string[];
+    targetEmotion: { emotions: Record<string, number> };
+  };
+
+  /** Emotion theater session completed normally */
+  'emotion_theater_session_complete': {
+    scenarioId: string;
+    scenarioName: string;
+    participantIds: string[];
+    targetEmotion: { emotions: Record<string, number> };
+  };
+
+  /** Emotion theater session ended (safety or manual) */
+  'emotion_theater_session_ended': {
+    reason: string;
+    participantIds: string[];
+  };
+
+  /** Memory replay completed */
+  'memory_replay_complete': {
+    memoryId: string;
+    memoryTitle: string;
+    viewerIds: string[];
+  };
+
+  /** Memory recording stopped */
+  'memory_recording_stopped': {
+    reason: string;
+    duration: number;
+  };
+
+  /** Meditation session completed */
+  'meditation_session_complete': {
+    technique: string;
+    participantIds: string[];
+    duration: number;
+  };
+
+  // === Spaceship Construction Events ===
+  /** Spaceship construction requested */
+  'spaceship:construction:start': {
+    shipyardId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+  };
+
+  /** Spaceship construction started successfully */
+  'spaceship:construction:started': {
+    projectId: string;
+    shipyardId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+    spaceshipEntityId: string;
+    estimatedTicks: number;
+  };
+
+  /** Spaceship construction progress milestone */
+  'spaceship:construction:progress': {
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    progress: number;
+    milestone: number;
+  };
+
+  /** Spaceship construction completed */
+  'spaceship:construction:complete': {
+    projectId: string;
+    spaceshipEntityId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+    shipyardId: string;
+  };
+
+  /** Spaceship construction failed */
+  'spaceship:construction:failed': {
+    shipyardId: string;
+    shipType: string;
+    reason: string;
+    required?: string;
+    actual?: string;
+  };
+
+  /** Spaceship construction cancelled */
+  'spaceship:construction:cancel': {
+    projectId: string;
+  };
+
+  /** Spaceship construction cancelled (response) */
+  'spaceship:construction:cancelled': {
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    shipyardId: string;
+    builderId: string;
+    progress: number;
+    reason: string;
+  };
+
   // === Action Events (additional) ===
   'action:fertilize': {
     x: number;
@@ -3866,6 +3988,12 @@ export interface GameEventMap {
     interventionType: string;
     targetId?: string;
     description?: string;
+  };
+
+  /** Reporter gave up search for story subject */
+  'reporter:search_failed': {
+    reporterId: string;
+    purpose: string;
   };
 
   // === Rebellion System Events ===

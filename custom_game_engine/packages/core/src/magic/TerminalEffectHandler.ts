@@ -150,7 +150,8 @@ export class TerminalEffectHandler {
     const needs = entity.components.get(CT.Needs);
     if (needs && typeof needs === 'object' && 'health' in needs) {
       const updatedNeeds = { ...needs, health: 0 };
-      (entity as any).addComponent(updatedNeeds);
+      // EntityImpl cast: Entity interface is readonly, but mutation is required for terminal effects
+      entity.addComponent(updatedNeeds);
     }
 
     this.emitEvent('magic:death', entity.id, {

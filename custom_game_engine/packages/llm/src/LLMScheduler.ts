@@ -27,6 +27,7 @@ import type {
   VisionComponent,
   CircadianComponent,
   GoalsComponent,
+  PersonalityComponent,
 } from '@ai-village/core';
 import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
@@ -322,7 +323,7 @@ export class LLMScheduler {
 
     if (agent && layer === 'talker') {
       const conversationComp = agent.components.get('conversation') as ConversationComponent | undefined;
-      const personalityComp = agent.components.get('personality') as any; // PersonalityComponent
+      const personalityComp = agent.components.get('personality') as PersonalityComponent | undefined;
       const isInConversation = conversationComp?.isActive && (conversationComp.partnerId !== null || conversationComp.participantIds.length > 0);
 
       // Extroversion determines how frequently the Talker speaks

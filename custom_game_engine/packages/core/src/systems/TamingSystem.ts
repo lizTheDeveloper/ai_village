@@ -6,6 +6,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import type { TamingMethod, InteractionType } from '../types/AnimalTypes.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 // Re-export for backwards compatibility
 export type { TamingMethod, InteractionType };
@@ -34,12 +35,23 @@ export class TamingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
 
   private world: World | null = null;
+  private events!: SystemEventManager;
+
+  // Initialize event manager
+  initialize(world: World): void {
+    this.events = new SystemEventManager(world.eventBus, this.id);
+  }
 
   // This system doesn't update every tick, it responds to taming attempts
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     this.world = world;
     // No per-tick updates needed
     // All taming logic is handled via attemptTaming() method
+  }
+
+  // Cleanup event subscriptions
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   /**
@@ -108,16 +120,12 @@ export class TamingSystem implements System {
       animal.stress = Math.max(0, animal.stress - 30); // Reduce stress
 
       // Emit tamed event
-      world.eventBus.emit({
-        type: 'animal_tamed',
-        source: agentId,
-        data: {
-          animalId: animal.id,
-          tamerId: agentId,
-          agentId,
-          method,
-        },
-      });
+      this.events.emit('animal_tamed', {
+        animalId: animal.id,
+        tamerId: agentId,
+        agentId,
+        method,
+      }, agentId);
 
       return {
         success: true,
@@ -203,17 +211,13 @@ export class TamingSystem implements System {
 
     if (oldLevel && newLevel && oldLevel.name !== newLevel.name) {
       // Emit bond level changed event
-      world.eventBus.emit({
-        type: 'bond_level_changed',
-        source: agentId,
-        data: {
-          animalId: animal.id,
-          agentId,
-          oldLevel: oldLevel.name,
-          newLevel: newLevel.name,
-          bondLevel: animal.bondLevel,
-        },
-      });
+      this.events.emit('bond_level_changed', {
+        animalId: animal.id,
+        agentId,
+        oldLevel: oldLevel.name,
+        newLevel: newLevel.name,
+        bondLevel: animal.bondLevel,
+      }, agentId);
     }
 
     return {
