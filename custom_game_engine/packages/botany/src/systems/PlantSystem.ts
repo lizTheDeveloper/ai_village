@@ -179,20 +179,18 @@ export class PlantSystem extends BaseSystem {
 
   /** Run every 20 ticks (1 second at 20 TPS) - plants don't need per-frame updates */
   private static readonly UPDATE_INTERVAL = PLANT_CONSTANTS.UPDATE_INTERVAL;
+  protected readonly throttleInterval = PlantSystem.UPDATE_INTERVAL;
 
   /**
    * Main update loop - runs every frame
    */
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const entities = ctx.activeEntities;
+    const deltaTime = ctx.deltaTime;
     if (entities.length === 0) return;
 
-    // Performance: Only run every UPDATE_INTERVAL ticks
-    // Plants grow slowly and don't need per-frame processing
-    if (world.tick % PlantSystem.UPDATE_INTERVAL !== 0) {
-      return;
-    }
-
-    // Multiply deltaTime by interval to compensate for skipped ticks
+    // Multiply deltaTime by interval to compensate for throttled ticks
     const effectiveDeltaTime = deltaTime * PlantSystem.UPDATE_INTERVAL;
 
     // Get current tick for delta update timing
@@ -369,27 +367,19 @@ export class PlantSystem extends BaseSystem {
         // Check for death
         if (plant.health <= 0 && plant.stage !== 'dead') {
           plant.stage = 'dead';
-          this.eventBus.emit({
-            type: 'plant:died',
-            source: 'plant-system',
-            data: {
-              plantId: entity.id,
-              speciesId: plant.speciesId,
-              cause: 'health_depleted',
-              entityId: entity.id
-            }
+          this.events.emit('plant:died', {
+            plantId: entity.id,
+            speciesId: plant.speciesId,
+            cause: 'health_depleted',
+            entityId: entity.id
           });
         }
 
         // Emit event for dead plants (renderer/world can handle removal)
         if (plant.stage === 'dead') {
-          this.eventBus.emit({
-            type: 'plant:dead',
-            source: 'plant-system',
-            data: {
-              entityId: entity.id,
-              position: plant.position
-            }
+          this.events.emit('plant:dead', {
+            entityId: entity.id,
+            position: plant.position
           });
         }
       } catch (error) {
@@ -494,10 +484,10 @@ export class PlantSystem extends BaseSystem {
         const previousHealth = plant.health;
         plant.health -= frostDamage;
 
-        this.eventBus.emit({
-          type: 'plant:healthChanged',
-          source: 'plant-system',
-          data: {
+        this.events.emit(
+          'plant:healthChanged',
+          
+          {
             plantId: entityId,
             oldHealth: previousHealth,
             newHealth: plant.health,
@@ -658,10 +648,10 @@ export class PlantSystem extends BaseSystem {
 
     // Emit health warning if critical (even if health changed via StateMutatorSystem)
     if (plant.health < 50 && plant.health !== previousHealth && healthChangeCauses.length > 0) {
-      this.eventBus.emit({
-        type: 'plant:healthChanged',
-        source: 'plant-system',
-        data: {
+      this.events.emit(
+        'plant:healthChanged',
+        
+        {
           plantId: entityId,
           oldHealth: previousHealth,
           newHealth: plant.health,
@@ -683,10 +673,10 @@ export class PlantSystem extends BaseSystem {
     plant.stageProgress += hourlyGrowth;
 
     // Emit nutrient consumption
-    this.eventBus.emit({
-      type: 'plant:nutrientConsumption',
-      source: 'plant-system',
-      data: {
+    this.events.emit(
+      'plant:nutrientConsumption',
+      
+      {
         x: plant.position.x,
         y: plant.position.y,
         consumed: hourlyGrowth * PLANT_CONSTANTS.NUTRIENT_CONSUMPTION_MULTIPLIER,
@@ -816,10 +806,10 @@ export class PlantSystem extends BaseSystem {
     this.executeTransitionEffects(plant, transition, species, world);
 
     // Emit stage change event
-    this.eventBus.emit({
-      type: 'plant:stageChanged',
-      source: 'plant-system',
-      data: {
+    this.events.emit(
+      'plant:stageChanged',
+      
+      {
         plantId: entityId,
         speciesId: species.id,
         from: previousStage,
@@ -903,10 +893,10 @@ export class PlantSystem extends BaseSystem {
           // Add to existing seeds (for perennial plants that cycle back to mature)
           plant.seedsProduced += calculatedSeeds;
 
-          this.eventBus.emit({
-            type: 'plant:mature',
-            source: 'plant-system',
-            data: {
+          this.events.emit(
+            'plant:mature',
+            
+            {
               plantId: entityId,
               speciesId: plant.speciesId,
               position: plant.position
@@ -920,10 +910,10 @@ export class PlantSystem extends BaseSystem {
           break;
 
         case 'return_nutrients_to_soil':
-          this.eventBus.emit({
-            type: 'plant:nutrientReturn',
-            source: 'plant-system',
-            data: {
+          this.events.emit(
+            'plant:nutrientReturn',
+            
+            {
               x: plant.position.x,
               y: plant.position.y,
               returned: 20,
@@ -1001,10 +991,10 @@ export class PlantSystem extends BaseSystem {
 
       plant.seedsDropped.push(dropPos);
 
-      this.eventBus.emit({
+      this.events.emit(
         type: 'seed:dispersed',
-        source: 'plant-system',
-        data: {
+        
+        {
           plantId: entityId,
           speciesId: species.id,
           seedCount: 1,
@@ -1079,10 +1069,10 @@ export class PlantSystem extends BaseSystem {
     }
 
     // Emit event for germination - world manager will create plant entity
-    this.eventBus.emit({
+    this.events.emit(
       type: 'seed:germinated',
-      source: 'plant-system',
-      data: {
+      
+      {
         seedId: seed.id,
         speciesId: seed.speciesId,
         position,
@@ -1251,10 +1241,10 @@ export class PlantSystem extends BaseSystem {
 
     // Emit event if significant companion effects are active
     if (benefitCount > 0 || harmCount > 0) {
-      this.eventBus.emit({
-        type: 'plant:companionEffect',
-        source: 'plant-system',
-        data: {
+      this.events.emit(
+        'plant:companionEffect',
+        
+        {
           plantId: entityId,
           speciesId: species.id,
           position: plant.position,
@@ -1386,10 +1376,10 @@ export class PlantSystem extends BaseSystem {
         const entityId = this.plantEntityIds.get(plant) || entity.id;
         plantsRegenerated++;
 
-        this.eventBus.emit({
-          type: 'plant:fruitRegenerated',
-          source: 'plant-system',
-          data: {
+        this.events.emit(
+          'plant:fruitRegenerated',
+          
+          {
             plantId: entityId,
             speciesId: plant.speciesId,
             fruitAdded: plant.fruitCount - previousFruit,

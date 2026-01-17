@@ -1,5 +1,4 @@
 import type {
-  System,
   SystemId,
   ComponentType,
   World,
@@ -14,13 +13,13 @@ import type {
   DiseaseSeverity,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType as CT,
   EntityImpl,
   DEFAULT_DISEASES,
   DEFAULT_PESTS,
 } from '@ai-village/core';
-
-type CoreEventBus = EventBus;
 
 /**
  * Configuration for the plant disease system
@@ -60,7 +59,7 @@ const DEFAULT_CONFIG: PlantDiseaseSystemConfig = {
  * Dependencies:
  * @see PlantSystem (priority 20) - Must run after plants are updated to ensure correct plant health and stage data
  */
-export class PlantDiseaseSystem implements System {
+export class PlantDiseaseSystem extends BaseSystem {
   public readonly id: SystemId = 'plant_disease' as SystemId;
   public readonly priority: number = 25; // After PlantSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Plant];
@@ -70,8 +69,6 @@ export class PlantDiseaseSystem implements System {
    * @see PlantSystem - provides plant health, stage, and genetics data for disease/pest calculations
    */
   public readonly dependsOn = ['plant'] as const;
-
-  private eventBus: CoreEventBus;
   private config: PlantDiseaseSystemConfig;
   private speciesLookup: ((id: string) => PlantSpecies | undefined) | null = null;
 
@@ -93,10 +90,12 @@ export class PlantDiseaseSystem implements System {
     season: 'summer'
   };
 
-  constructor(eventBus: CoreEventBus, config?: Partial<PlantDiseaseSystemConfig>) {
-    this.eventBus = eventBus;
+  constructor(config?: Partial<PlantDiseaseSystemConfig>) {
+    super();
     this.config = { ...DEFAULT_CONFIG, ...config };
+  }
 
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Register default diseases and pests
     this.registerDefaults();
     this.setupEventListeners();
@@ -140,24 +139,24 @@ export class PlantDiseaseSystem implements System {
    */
   private setupEventListeners(): void {
     // Listen for weather updates
-    this.eventBus.subscribe('weather:changed', (event) => {
+    this.events.subscribe('weather:changed', (event) => {
       const { weatherType } = event.data;
       this.currentEnvironment.isRaining = weatherType === 'rain' || weatherType === 'storm';
     });
 
     // Listen for time updates
-    this.eventBus.subscribe('world:time:hour', (event) => {
+    this.events.subscribe('world:time:hour', (event) => {
       const { hour } = event.data;
       this.currentEnvironment.isNight = hour < 6 || hour > 20;
     });
 
     // Listen for season changes
-    this.eventBus.subscribe('world:time:season', (event) => {
+    this.events.subscribe('world:time:season', (event) => {
       this.currentEnvironment.season = event.data.season;
     });
 
     // Listen for treatment applications
-    this.eventBus.subscribe('plant:treated', (event) => {
+    this.events.subscribe('plant:treated', (event) => {
       const { entityId, treatmentId, treatmentType } = event.data;
       this.applyTreatmentFromEvent(entityId, treatmentId, treatmentType);
     });
@@ -175,22 +174,9 @@ export class PlantDiseaseSystem implements System {
     // For now this is a placeholder - actual treatment is done via applyTreatment()
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    this.accumulatedTime += deltaTime;
-
-    if (this.accumulatedTime < this.config.updateInterval) {
-      return;
-    }
-    this.accumulatedTime = 0;
-
-    // Update agent positions in scheduler
-    world.simulationScheduler.updateAgentPositions(world);
-
-    // Filter to only visible entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(
-      entities as Entity[],
-      world.tick
-    );
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const activeEntities = ctx.activeEntities;
 
     // Get current game day for tracking
     const gameDay = this.getCurrentGameDay(world);
@@ -257,10 +243,10 @@ export class PlantDiseaseSystem implements System {
           diseaseState.incubating = false;
           diseaseState.spreading = true;
 
-          this.eventBus.emit({
-            type: 'plant:diseaseSymptoms',
-            source: 'plant-disease',
-            data: {
+          this.events.emit(
+            'plant:diseaseSymptoms',
+            
+            
               entityId,
               diseaseId: disease.id,
               diseaseName: disease.name,
@@ -283,10 +269,10 @@ export class PlantDiseaseSystem implements System {
 
       // Check for plant death
       if (plant.health <= disease.lethalHealthThreshold) {
-        this.eventBus.emit({
-          type: 'plant:diedFromDisease',
-          source: 'plant-disease',
-          data: {
+        this.events.emit(
+          'plant:diedFromDisease',
+          
+          
             entityId,
             diseaseId: disease.id,
             diseaseName: disease.name
@@ -302,10 +288,10 @@ export class PlantDiseaseSystem implements System {
       if (plant.genetics.diseaseResistance >= 80 && Math.random() < 0.05) {
         toRemove.push(i);
 
-        this.eventBus.emit({
-          type: 'plant:diseaseRecovered',
-          source: 'plant-disease',
-          data: {
+        this.events.emit(
+          'plant:diseaseRecovered',
+          
+          
             entityId,
             diseaseId: disease.id,
             diseaseName: disease.name
@@ -374,10 +360,10 @@ export class PlantDiseaseSystem implements System {
       if (pestState.population <= 0) {
         toRemove.push(i);
 
-        this.eventBus.emit({
-          type: 'plant:pestsGone',
-          source: 'plant-disease',
-          data: {
+        this.events.emit(
+          'plant:pestsGone',
+          
+          
             entityId,
             pestId: pest.id,
             pestName: pest.name
@@ -459,10 +445,10 @@ export class PlantDiseaseSystem implements System {
 
     plant.diseases.push(diseaseState);
 
-    this.eventBus.emit({
-      type: 'plant:diseaseContracted',
-      source: 'plant-disease',
-      data: {
+    this.events.emit(
+      'plant:diseaseContracted',
+      
+      
         entityId,
         diseaseId: selectedDisease.id,
         diseaseName: selectedDisease.name,
@@ -545,10 +531,10 @@ export class PlantDiseaseSystem implements System {
 
     plant.pests.push(pestState);
 
-    this.eventBus.emit({
-      type: 'plant:pestInfestation',
-      source: 'plant-disease',
-      data: {
+    this.events.emit(
+      'plant:pestInfestation',
+      
+      
         entityId,
         pestId: selectedPest.id,
         pestName: selectedPest.name,
@@ -652,10 +638,10 @@ export class PlantDiseaseSystem implements System {
 
           targetPlant.diseases.push(newDiseaseState);
 
-          this.eventBus.emit({
-            type: 'plant:diseaseSpread',
-            source: 'plant-disease',
-            data: {
+          this.events.emit(
+            'plant:diseaseSpread',
+            
+            
               fromEntityId: entityId,
               toEntityId: impl.id,
               diseaseId: disease.id,
@@ -731,10 +717,10 @@ export class PlantDiseaseSystem implements System {
             controlled: false
           });
 
-          this.eventBus.emit({
-            type: 'plant:pestMigrated',
-            source: 'plant-disease',
-            data: {
+          this.events.emit(
+            'plant:pestMigrated',
+            
+            
               fromEntityId: entityId,
               toEntityId: impl.id,
               pestId: pest.id,
@@ -772,10 +758,10 @@ export class PlantDiseaseSystem implements System {
               plant.diseases.splice(idx, 1);
             }
 
-            this.eventBus.emit({
-              type: 'plant:diseaseTreated',
-              source: 'plant-disease',
-              data: {
+            this.events.emit(
+              'plant:diseaseTreated',
+              
+              
                 entityId,
                 diseaseId: disease.id,
                 diseaseName: disease.name,
@@ -809,10 +795,10 @@ export class PlantDiseaseSystem implements System {
               plant.pests.splice(idx, 1);
             }
 
-            this.eventBus.emit({
-              type: 'plant:pestsEliminated',
-              source: 'plant-disease',
-              data: {
+            this.events.emit(
+              'plant:pestsEliminated',
+              
+              
                 entityId,
                 pestId: pest.id,
                 pestName: pest.name,
