@@ -157,17 +157,13 @@ export class TVDevelopmentSystem implements System {
     this.writerPitchCount.set(writerId, activeCount + 1);
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'tv:pitch:submitted' as any,
-      source: writerId,
-      data: {
-        pitchId: pitch.id,
-        writerId,
-        stationId,
-        title: concept.title,
-        format: concept.format,
-      },
-    });
+    this.events.emitGeneric('tv:pitch:submitted', {
+      pitchId: pitch.id,
+      writerId,
+      stationId,
+      title: concept.title,
+      format: concept.format,
+    }, writerId);
 
     return pitch;
   }
@@ -391,17 +387,13 @@ export class TVDevelopmentSystem implements System {
     pitch.reviewNotes = decision.reason;
 
     // Emit events
-    this.eventBus?.emit({
-      type: 'tv:show:greenlit' as any,
-      source: station.buildingId,
-      data: {
-        showId: show.showId,
-        stationId: station.buildingId,
-        title: concept.title,
-        format: concept.format,
-        creatorId: pitch.writerId,
-      },
-    });
+    this.events.emitGeneric('tv:show:greenlit', {
+      showId: show.showId,
+      stationId: station.buildingId,
+      title: concept.title,
+      format: concept.format,
+      creatorId: pitch.writerId,
+    }, station.buildingId);
   }
 
   /**
@@ -411,16 +403,12 @@ export class TVDevelopmentSystem implements System {
     pitch.status = 'rejected';
     pitch.reviewNotes = reason;
 
-    this.eventBus?.emit({
-      type: 'tv:pitch:rejected' as any,
-      source: pitch.stationId,
-      data: {
-        pitchId: pitch.id,
-        writerId: pitch.writerId,
-        title: pitch.concept.title,
-        reason,
-      },
-    });
+    this.events.emitGeneric('tv:pitch:rejected', {
+      pitchId: pitch.id,
+      writerId: pitch.writerId,
+      title: pitch.concept.title,
+      reason,
+    }, pitch.stationId);
   }
 
   // ============================================================================
@@ -459,15 +447,11 @@ export class TVDevelopmentSystem implements System {
 
     // Emit content needs event for writer agents to pick up
     if (neededFormats.length > 0) {
-      this.eventBus?.emit({
-        type: 'tv:station:needs_content' as any,
-        source: station.buildingId,
-        data: {
-          stationId: station.buildingId,
-          neededFormats,
-          budget: station.budget,
-        },
-      });
+      this.events.emitGeneric('tv:station:needs_content', {
+        stationId: station.buildingId,
+        neededFormats,
+        budget: station.budget,
+      }, station.buildingId);
     }
   }
 
@@ -591,8 +575,8 @@ export class TVDevelopmentSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.pendingPitches.clear();
     this.writerPitchCount.clear();
-    this.eventBus = null;
   }
 }

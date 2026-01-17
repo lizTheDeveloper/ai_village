@@ -22,7 +22,13 @@ export class DirectConnectionSystem implements System {
   public readonly priority: number = 52; // Before BeltSystem
   public readonly requiredComponents = [CT.MachineConnection, CT.Position] as const;
 
+  /** Position -> Entity map, rebuilt once per update for O(1) lookups */
+  private positionIndex: Map<string, Entity> = new Map();
+
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Build position index once per update - O(n) instead of O(n²)
+    this.rebuildPositionIndex(entities);
+
     for (const entity of entities) {
       const connection = (entity as EntityImpl).getComponent<MachineConnectionComponent>(CT.MachineConnection);
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
@@ -31,7 +37,24 @@ export class DirectConnectionSystem implements System {
 
       // Try to output items to adjacent machines
       for (const output of connection.outputs) {
-        this.tryTransferOutput(entity, output, pos, world);
+        this.tryTransferOutput(entity, output, pos);
+      }
+    }
+
+    // Clear index after update to allow GC
+    this.positionIndex.clear();
+  }
+
+  /**
+   * Build position -> entity index for O(1) lookups
+   */
+  private rebuildPositionIndex(entities: ReadonlyArray<Entity>): void {
+    this.positionIndex.clear();
+    for (const entity of entities) {
+      const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+      if (pos) {
+        const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
+        this.positionIndex.set(key, entity);
       }
     }
   }
@@ -42,8 +65,7 @@ export class DirectConnectionSystem implements System {
   private tryTransferOutput(
     _source: Entity,
     output: MachineSlot,
-    sourcePos: PositionComponent,
-    world: World
+    sourcePos: PositionComponent
   ): void {
     if (output.items.length === 0) return;
 
@@ -53,7 +75,7 @@ export class DirectConnectionSystem implements System {
       y: sourcePos.y + output.offset.y,
     };
 
-    const target = this.getEntityAt(world, targetPos);
+    const target = this.getEntityAt(targetPos);
     if (!target) return;
 
     const targetConnection = (target as EntityImpl).getComponent<MachineConnectionComponent>(CT.MachineConnection);
@@ -95,13 +117,10 @@ export class DirectConnectionSystem implements System {
   }
 
   /**
-   * Get entity at position
+   * Get entity at position using O(1) index lookup
    */
-  private getEntityAt(world: World, pos: { x: number; y: number }): Entity | null {
-    const entities = world.query().with(CT.Position).executeEntities();
-    return entities.find(e => {
-      const p = (e as EntityImpl).getComponent<PositionComponent>(CT.Position);
-      return p && Math.floor(p.x) === Math.floor(pos.x) && Math.floor(p.y) === Math.floor(pos.y);
-    }) ?? null;
+  private getEntityAt(pos: { x: number; y: number }): Entity | null {
+    const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
+    return this.positionIndex.get(key) ?? null;
   }
 }

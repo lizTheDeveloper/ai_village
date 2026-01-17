@@ -184,7 +184,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const mood = entity.getComponent('mood') as MoodComponent | undefined;
+      const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
       // Ensure stress state exists
@@ -221,7 +221,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const mood = entity.getComponent('mood') as MoodComponent | undefined;
+      const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
       const stress: StressState = mood.stress ?? createStressState();
@@ -243,7 +243,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const mood = entity.getComponent('mood') as MoodComponent | undefined;
+      const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
       const stress: StressState = mood.stress ?? createStressState();

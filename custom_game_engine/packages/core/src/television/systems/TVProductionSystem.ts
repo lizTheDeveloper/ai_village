@@ -547,16 +547,12 @@ export class TVProductionSystem implements System {
     session.completedScenes.push(filmedScene);
     session.status = 'wrapped';
 
-    this.eventBus?.emit({
-      type: 'tv:production:live_ended' as any,
-      source: session.showId,
-      data: {
-        sessionId: session.id,
-        showId: session.showId,
-        contentId: session.contentId,
-        duration: currentTick - session.startedTick,
-      },
-    });
+    this.events.emitGeneric('tv:production:live_ended', {
+      sessionId: session.id,
+      showId: session.showId,
+      contentId: session.contentId,
+      duration: currentTick - session.startedTick,
+    }, session.showId);
   }
 
   // ============================================================================
@@ -603,6 +599,6 @@ export class TVProductionSystem implements System {
 
   cleanup(): void {
     this.filmingSessions.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }

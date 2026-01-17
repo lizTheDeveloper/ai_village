@@ -295,6 +295,7 @@ export class MoodSystem implements System {
 
   /**
    * Detect if the agent is eating near other agents (social meal).
+   * Uses chunk-based lookup for O(~entities_in_chunk) instead of O(all_agents).
    */
   private detectSocialMeal(agent: EntityImpl): boolean {
     if (!this.world) return false;
@@ -302,24 +303,40 @@ export class MoodSystem implements System {
     const agentPos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
-    // Find other agents with agent component
-    const otherAgents = this.world.query()
-      .with(CT.Agent)
-      .with(CT.Position)
-      .executeEntities();
+    // Use squared distance to avoid sqrt in hot path
+    const distanceSquared = this.SOCIAL_MEAL_DISTANCE * this.SOCIAL_MEAL_DISTANCE;
 
-    for (const other of otherAgents) {
-      if (other.id === agent.id) continue;
+    // Get chunk coordinates (32 tiles per chunk)
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(agentPos.x / CHUNK_SIZE);
+    const chunkY = Math.floor(agentPos.y / CHUNK_SIZE);
 
-      const otherPos = (other as EntityImpl).getComponent(CT.Position) as { x: number; y: number } | undefined;
-      if (!otherPos) continue;
+    // Check current chunk and adjacent chunks (since SOCIAL_MEAL_DISTANCE=5 could cross boundaries)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const entityIds = this.world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-      const dx = agentPos.x - otherPos.x;
-      const dy = agentPos.y - otherPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+        for (const entityId of entityIds) {
+          if (entityId === agent.id) continue;
 
-      if (distance < this.SOCIAL_MEAL_DISTANCE) {
-        return true;
+          const other = this.world.getEntity(entityId);
+          if (!other) continue;
+
+          // Check if it's an agent
+          const otherAgent = (other as EntityImpl).getComponent(CT.Agent);
+          if (!otherAgent) continue;
+
+          const otherPos = (other as EntityImpl).getComponent(CT.Position) as { x: number; y: number } | undefined;
+          if (!otherPos) continue;
+
+          const ddx = agentPos.x - otherPos.x;
+          const ddy = agentPos.y - otherPos.y;
+
+          // Use squared distance comparison (no sqrt)
+          if (ddx * ddx + ddy * ddy < distanceSquared) {
+            return true;
+          }
+        }
       }
     }
 

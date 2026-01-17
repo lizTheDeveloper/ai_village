@@ -22,6 +22,10 @@ export class ChunkLoadingSystem extends BaseSystem {
   private viewportProvider: (() => { x: number; y: number; width: number; height: number } | null) | null = null;
   private tileSize = 16;
 
+  /** Throttling for headless mode - agents don't move fast enough to need every-tick checks */
+  private lastHeadlessUpdateTick = 0;
+  private readonly HEADLESS_UPDATE_INTERVAL = 20; // 1 second at 20 TPS
+
   constructor(
     chunkManager: ChunkManager,
     terrainGenerator: TerrainGenerator
@@ -66,6 +70,12 @@ export class ChunkLoadingSystem extends BaseSystem {
   }
 
   private loadChunksAroundAgents(ctx: SystemContext): void {
+    // Throttle headless chunk loading - agents don't move fast enough to need every tick
+    if (ctx.tick - this.lastHeadlessUpdateTick < this.HEADLESS_UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastHeadlessUpdateTick = ctx.tick;
+
     // For headless: ensure chunks exist around all agents
     const agents = ctx.world.query().with('agent', 'position').executeEntities();
 

@@ -13,6 +13,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 // ============================================================================
@@ -161,7 +162,7 @@ export interface CommercialBreak {
 // ============================================================================
 
 export class AdvertisingManager {
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
 
   private advertisements: Map<string, Advertisement> = new Map();
   private sponsors: Map<string, Sponsor> = new Map();
@@ -173,7 +174,7 @@ export class AdvertisingManager {
   private stationRevenue: Map<string, number> = new Map();
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'tv_advertising_manager');
   }
 
   // ============================================================================
@@ -250,16 +251,12 @@ export class AdvertisingManager {
     this.advertisements.set(ad.id, ad);
     sponsor.activeAds.push(ad.id);
 
-    this.eventBus?.emit({
-      type: 'tv:ad:created' as any,
-      source: sponsorId,
-      data: {
-        adId: ad.id,
-        sponsorName: sponsor.name,
-        productName,
-        type,
-      },
-    });
+    this.events.emitGeneric('tv:ad:created', {
+      adId: ad.id,
+      sponsorName: sponsor.name,
+      productName,
+      type,
+    }, sponsorId);
 
     return ad;
   }
@@ -340,17 +337,13 @@ export class AdvertisingManager {
     const currentRevenue = this.stationRevenue.get(slot.stationId) ?? 0;
     this.stationRevenue.set(slot.stationId, currentRevenue + slot.basePrice);
 
-    this.eventBus?.emit({
-      type: 'tv:ad:slot_booked' as any,
-      source: slot.stationId,
-      data: {
-        slotId,
-        adId,
-        sponsorId: ad.sponsorId,
-        price: slot.basePrice,
-        isPrimeTime: slot.isPrimeTime,
-      },
-    });
+    this.events.emitGeneric('tv:ad:slot_booked', {
+      slotId,
+      adId,
+      sponsorId: ad.sponsorId,
+      price: slot.basePrice,
+      isPrimeTime: slot.isPrimeTime,
+    }, slot.stationId);
 
     return true;
   }
@@ -424,18 +417,14 @@ export class AdvertisingManager {
     const currentRevenue = this.stationRevenue.get(deal.stationId) ?? 0;
     this.stationRevenue.set(deal.stationId, currentRevenue + deal.totalValue);
 
-    this.eventBus?.emit({
-      type: 'tv:sponsorship:accepted' as any,
-      source: deal.stationId,
-      data: {
-        dealId,
-        sponsorId: deal.sponsorId,
-        sponsorName: sponsor.name,
-        showId: deal.showId,
-        dealType: deal.dealType,
-        value: deal.totalValue,
-      },
-    });
+    this.events.emitGeneric('tv:sponsorship:accepted', {
+      dealId,
+      sponsorId: deal.sponsorId,
+      sponsorName: sponsor.name,
+      showId: deal.showId,
+      dealType: deal.dealType,
+      value: deal.totalValue,
+    }, deal.stationId);
 
     return true;
   }
@@ -527,17 +516,13 @@ export class AdvertisingManager {
 
     commercialBreak.viewerRetention = retention;
 
-    this.eventBus?.emit({
-      type: 'tv:commercial_break:executed' as any,
-      source: commercialBreak.showId,
-      data: {
-        breakId,
-        adsShown: commercialBreak.adSlots.length,
-        totalImpressions: currentViewers,
-        viewerRetention: retention,
-        revenue: totalRevenue,
-      },
-    });
+    this.events.emitGeneric('tv:commercial_break:executed', {
+      breakId,
+      adsShown: commercialBreak.adSlots.length,
+      totalImpressions: currentViewers,
+      viewerRetention: retention,
+      revenue: totalRevenue,
+    }, commercialBreak.showId);
 
     return totalRevenue;
   }
@@ -590,7 +575,7 @@ export class AdvertisingManager {
     this.sponsorshipDeals.clear();
     this.commercialBreaks.clear();
     this.stationRevenue.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }
 

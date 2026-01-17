@@ -58,6 +58,27 @@ export interface ITerrainGenerator {
 }
 
 /**
+ * BackgroundChunkGenerator interface for asynchronous chunk pre-generation.
+ * Defined here to avoid circular dependency with world package.
+ */
+export interface IBackgroundChunkGenerator {
+  queueChunk(request: {
+    chunkX: number;
+    chunkY: number;
+    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    requestedBy: string;
+  }): void;
+  queueChunkGrid(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    priority: 'HIGH' | 'MEDIUM' | 'LOW',
+    requestedBy: string
+  ): void;
+  processQueue(world: World, currentTick: number): void;
+}
+
+/**
  * Planet interface for multi-planet support.
  * Defined here to avoid circular dependency with world package.
  *
@@ -313,6 +334,11 @@ export interface World {
   getChunkManager(): IChunkManager | undefined;
 
   /**
+   * Get background chunk generator for asynchronous chunk pre-generation.
+   */
+  getBackgroundChunkGenerator(): IBackgroundChunkGenerator | undefined;
+
+  /**
    * Get or create chunk name registry for named locations.
    */
   getChunkNameRegistry(): import('@ai-village/world').ChunkNameRegistry;
@@ -438,6 +464,7 @@ export class WorldImpl implements WorldMutator {
   private _archetypeVersion = 0;
   private _chunkManager?: IChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
+  private _backgroundChunkGenerator?: IBackgroundChunkGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
   private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
   private _itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
@@ -847,6 +874,24 @@ export class WorldImpl implements WorldMutator {
    */
   setTerrainGenerator(terrainGenerator: ITerrainGenerator): void {
     this._terrainGenerator = terrainGenerator;
+  }
+
+  /**
+   * Set BackgroundChunkGenerator for asynchronous chunk pre-generation.
+   * Called by game initialization after BackgroundChunkGenerator is created.
+   * This enables systems to pre-generate chunks during soul creation, agent spawning, etc.
+   */
+  setBackgroundChunkGenerator(generator: IBackgroundChunkGenerator): void {
+    this._backgroundChunkGenerator = generator;
+  }
+
+  /**
+   * Get BackgroundChunkGenerator for chunk pre-generation.
+   * Returns the BackgroundChunkGenerator if set, otherwise undefined.
+   * Used by systems to queue chunks for background generation.
+   */
+  getBackgroundChunkGenerator(): IBackgroundChunkGenerator | undefined {
+    return this._backgroundChunkGenerator;
   }
 
   /**
