@@ -409,7 +409,14 @@ export class RemoteUniverseView implements IWindowPanel {
     const positionComp = entity.components.find((c: any) => c.type === 'position');
     if (!positionComp || !positionComp.data) return;
 
-    const pos = positionComp.data as any;
+    // Type guard: Validate position data structure
+    const data = positionComp.data;
+    if (typeof data !== 'object' || data === null || !('x' in data) || !('y' in data)) {
+      return;
+    }
+
+    // Type assertion: Runtime validated position data
+    const pos = data as { x: number; y: number };
     const entityX = pos.x - this.state.cameraX;
     const entityY = pos.y - this.state.cameraY;
 

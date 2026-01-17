@@ -1,9 +1,10 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import { createInjuryComponent, type InjuryComponent } from '../components/InjuryComponent.js';
@@ -49,16 +50,15 @@ interface EventBus {
  * - Hunting skill XP
  * - Counterattack from dangerous animals
  */
-export class HuntingSystem implements System {
+export class HuntingSystem extends BaseSystem {
   public readonly id: SystemId = 'hunting';
   public readonly priority = 45; // After movement, before memory
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Conflict];
 
-  private eventBus?: EventBus;
   private llmProvider?: (prompt: any) => Promise<{ narrative: string }>;
 
-  constructor(eventBus?: EventBus, llmProvider?: (prompt: any) => Promise<{ narrative: string }>) {
-    this.eventBus = eventBus;
+  constructor(llmProvider?: (prompt: any) => Promise<{ narrative: string }>) {
+    super();
     this.llmProvider = llmProvider;
   }
 
@@ -66,33 +66,32 @@ export class HuntingSystem implements System {
     this.llmProvider = provider;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+
     // Process all entities with conflict component (already filtered by requiredComponents)
-    for (const entity of entities) {
-      let conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict');
+    for (const entity of ctx.activeEntities) {
+      let conflict = world.getComponent<ConflictComponent>(entity.id, CT.Conflict);
       if (!conflict || conflict.conflictType !== 'hunting') {
         continue;
       }
 
       // Start from 'initiated' state
       if (conflict.state === 'initiated') {
-        const hunterImpl = entity as EntityImpl;
-        hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+        entity.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
           ...c,
           state: 'tracking',
         }));
 
         // Emit hunt:started event
-        if (this.eventBus) {
-          this.eventBus.emit('hunt:started', {
-            hunterId: entity.id,
-            targetId: conflict.target,
-            startTime: conflict.startTime,
-          });
-        }
+        ctx.emit('hunt:started', {
+          hunterId: entity.id,
+          preyId: conflict.target,
+          huntingSkill: 0,
+        }, entity.id);
 
         // Re-fetch conflict after update
-        conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict')!;
+        conflict = world.getComponent<ConflictComponent>(entity.id, CT.Conflict)!;
       }
 
       // Process hunt states until resolved or stuck
@@ -102,7 +101,7 @@ export class HuntingSystem implements System {
         this.processHunt(world, entity, conflict);
 
         // Re-fetch conflict after processing
-        conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict');
+        conflict = world.getComponent<ConflictComponent>(entity.id, CT.Conflict);
 
         // If state didn't change, we're done (waiting for next tick or resolved)
         if (!conflict || conflict.state === previousState) {
@@ -112,9 +111,9 @@ export class HuntingSystem implements System {
     }
   }
 
-  private processHunt(world: World, hunter: Entity, conflict: ConflictComponent): void {
+  private processHunt(world: World, hunter: EntityImpl, conflict: ConflictComponent): void {
     // Validate hunter has required components
-    if (!world.hasComponent(hunter.id, 'combat_stats')) {
+    if (!world.hasComponent(hunter.id, CT.CombatStats)) {
       throw new Error('Hunter missing required component: combat_stats');
     }
 
@@ -124,13 +123,13 @@ export class HuntingSystem implements System {
       throw new Error('Hunt target entity not found');
     }
 
-    if (!world.hasComponent(prey.id, 'animal')) {
+    if (!world.hasComponent(prey.id, CT.Animal)) {
       throw new Error('Hunt target is not an animal');
     }
 
-    const combatStats = world.getComponent<CombatStatsComponent>(hunter.id, 'combat_stats');
-    const animal = world.getComponent<AnimalComponent>(prey.id, 'animal');
-    const inventory = world.getComponent<InventoryComponent>(hunter.id, 'inventory');
+    const combatStats = world.getComponent<CombatStatsComponent>(hunter.id, CT.CombatStats);
+    const animal = world.getComponent<AnimalComponent>(prey.id, CT.Animal);
+    const inventory = world.getComponent<InventoryComponent>(hunter.id, CT.Inventory);
 
     if (!combatStats || !animal) {
       throw new Error('Required components not found');
@@ -154,28 +153,29 @@ export class HuntingSystem implements System {
       case 'lost':
       case 'escape':
         // Hunt is over, mark as resolved
-        const hunterImpl = hunter as EntityImpl;
-        hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+        hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
           ...c,
           state: 'resolved',
           outcome: 'defender_victory', // Hunt failed
         }));
 
         // Emit hunt:failed event
-        if (this.eventBus) {
-          this.eventBus.emit('hunt:failed', {
+        world.eventBus.emit({
+          type: 'hunt:failed',
+          source: hunter.id,
+          data: {
             hunterId: hunter.id,
-            targetId: conflict.target,
+            preyId: conflict.target,
             reason: conflict.state,
-          });
-        }
+          },
+        });
         break;
     }
   }
 
   private processTracking(
     world: World,
-    hunter: Entity,
+    hunter: EntityImpl,
     _prey: Entity,
     _conflict: ConflictComponent,
     combatStats: CombatStatsComponent,
@@ -221,16 +221,15 @@ export class HuntingSystem implements System {
     const roll = Math.random() * 20;
     const success = roll + trackingPower > awareness + 10;
 
-    const hunterImpl = hunter as EntityImpl;
     if (success) {
       // Move to stalking phase
-      hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+      hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
         ...c,
         state: 'stalking',
       }));
     } else {
       // Lost the trail
-      hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+      hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
         ...c,
         state: 'lost',
       }));
@@ -238,8 +237,8 @@ export class HuntingSystem implements System {
   }
 
   private processStalking(
-    _world: World,
-    hunter: Entity,
+    world: World,
+    hunter: EntityImpl,
     _prey: Entity,
     _conflict: ConflictComponent,
     combatStats: CombatStatsComponent,
@@ -255,10 +254,9 @@ export class HuntingSystem implements System {
     const roll = Math.random() * 20;
     const success = roll + killPower > escapePower + 5;
 
-    const hunterImpl = hunter as EntityImpl;
     if (success) {
       // Successful kill
-      hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+      hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
         ...c,
         state: 'kill_success',
       }));
@@ -274,26 +272,31 @@ export class HuntingSystem implements System {
             severity: animal.danger > 7 ? 'major' : 'minor',
             location: ['torso', 'arms', 'legs'][Math.floor(Math.random() * 3)] as InjuryComponent['location'],
           });
-          hunterImpl.addComponent(injury);
+          hunter.addComponent(injury);
         }
         // Hunt failed
-        hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+        hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
           ...c,
           state: 'failed',
         }));
       } else {
         // Animal escapes
-        hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+        hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
           ...c,
           state: 'escape',
         }));
 
         // Emit hunt:injured event if hunter was injured
-        if (this.eventBus && animal.danger >= 5) {
-          this.eventBus.emit('hunt:injured', {
-            hunterId: hunter.id,
-            targetId: _prey.id,
-            animalDanger: animal.danger,
+        if (animal.danger >= 5) {
+          world.eventBus.emit({
+            type: 'hunt:injured',
+            source: hunter.id,
+            data: {
+              hunterId: hunter.id,
+              preyId: _prey.id,
+              injuryType: animal.aggression > 5 ? 'bite' : 'laceration',
+              severity: animal.danger > 7 ? 'major' : 'minor',
+            },
           });
         }
       }
@@ -302,36 +305,34 @@ export class HuntingSystem implements System {
 
   private processKillSuccess(
     world: World,
-    hunter: Entity,
+    hunter: EntityImpl,
     _prey: Entity,
     _conflict: ConflictComponent,
     combatStats: CombatStatsComponent,
     animal: AnimalComponent,
     inventory: InventoryComponent | null
   ): void {
-    const hunterImpl = hunter as EntityImpl;
-
     // Generate resources
     if (inventory) {
       const meat = { type: 'meat', quantity: Math.max(1, Math.floor(animal.danger / 2)) };
       const hide = { type: 'hide', quantity: 1 };
       const bones = { type: 'bones', quantity: 1 };
 
-      hunterImpl.updateComponent<InventoryComponent>('inventory', (inv) => ({
+      hunter.updateComponent<InventoryComponent>(CT.Inventory, (inv) => ({
         ...inv,
         items: [...inv.items, meat, hide, bones],
       }));
     }
 
     // Grant hunting skill XP
-    hunterImpl.updateComponent<CombatStatsComponent>('combat_stats', (stats) => ({
+    hunter.updateComponent<CombatStatsComponent>(CT.CombatStats, (stats) => ({
       ...stats,
       huntingSkill: (stats.huntingSkill || 0) + 0.1,
     }));
 
     // Generate LLM narrative
     if (this.llmProvider) {
-      const identityComp = world.getComponent<IdentityComponent>(hunter.id, 'identity');
+      const identityComp = world.getComponent<IdentityComponent>(hunter.id, CT.Identity);
       const hunterName = identityComp?.name || 'Hunter';
 
       this.llmProvider({
@@ -345,20 +346,21 @@ export class HuntingSystem implements System {
     }
 
     // Mark hunt as resolved with success outcome
-    hunterImpl.updateComponent<ConflictComponent>('conflict', (c) => ({
+    hunter.updateComponent<ConflictComponent>(CT.Conflict, (c) => ({
       ...c,
       state: 'resolved',
       outcome: 'attacker_victory', // Hunt succeeded
     }));
 
     // Emit hunt:success event
-    if (this.eventBus) {
-      this.eventBus.emit('hunt:success', {
+    world.eventBus.emit({
+      type: 'hunt:success',
+      source: hunter.id,
+      data: {
         hunterId: hunter.id,
-        targetId: _prey.id,
-        animalSpecies: animal.species,
-        resourcesGained: inventory ? 3 : 0, // meat, hide, bones
-      });
-    }
+        preyId: _prey.id,
+        resourcesGained: inventory ? ['meat', 'hide', 'bones'] : [],
+      },
+    });
   }
 }

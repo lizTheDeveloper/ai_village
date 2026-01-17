@@ -462,6 +462,9 @@ export * from './RealmComponent.js';
 export * from './PortalComponent.js';
 export * from './RealmLocationComponent.js';
 
+// Planet Components
+export * from './PlanetLocationComponent.js';
+
 // Afterlife system (souls in the Underworld)
 export * from './AfterlifeComponent.js';
 export {

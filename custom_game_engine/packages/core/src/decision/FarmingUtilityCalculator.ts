@@ -18,6 +18,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { PlantComponent } from '../components/PlantComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 
 /**
@@ -132,20 +133,19 @@ export function calculateFarmingContext(
   const inventoryUsage = inventory ? usedSlots / inventory.slots.length : 1;
 
   // Calculate tile context
-  const worldWithTiles = world as any;
   let tilledTileCount = 0;
   let untilledGrassCount = 0;
   let plantableTileCount = 0;
 
   const SEARCH_RADIUS = 10;
 
-  if (typeof worldWithTiles.getTileAt === 'function') {
+  if (world.getTileAt) {
     for (let dx = -SEARCH_RADIUS; dx <= SEARCH_RADIUS; dx++) {
       for (let dy = -SEARCH_RADIUS; dy <= SEARCH_RADIUS; dy++) {
         const checkX = Math.floor(position.x) + dx;
         const checkY = Math.floor(position.y) + dy;
 
-        const tile = worldWithTiles.getTileAt(checkX, checkY);
+        const tile = world.getTileAt(checkX, checkY);
         if (!tile) continue;
 
         if (tile.tilled) {
@@ -177,7 +177,7 @@ export function calculateFarmingContext(
 
   for (const plantEntity of plants) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
     const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
@@ -193,8 +193,8 @@ export function calculateFarmingContext(
 
     plantCount++;
 
-    // Check hydration
-    const hydration = plant._hydration ?? plant.hydration ?? 50;
+    // Check hydration (use public getter, not private _hydration)
+    const hydration = plant.hydration;
     if (hydration < 50) {
       dryPlantCount++;
       if (hydration < 20) {

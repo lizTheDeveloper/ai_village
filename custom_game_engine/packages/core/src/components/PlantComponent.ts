@@ -236,10 +236,10 @@ export class PlantComponent extends ComponentBase {
       'droughtTolerance',
       'coldTolerance',
       'flavorProfile'
-    ];
+    ] as const;
 
     for (const field of resistanceFields) {
-      const value = (genetics as any)[field];
+      const value = genetics[field];
       if (value < 0 || value > 100) {
         throw new Error(`PlantComponent genetics.${field} (resistance) must be 0-100, got ${value}`);
       }

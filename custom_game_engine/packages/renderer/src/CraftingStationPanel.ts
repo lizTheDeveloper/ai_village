@@ -15,6 +15,7 @@
  */
 
 import type { Entity, World } from '@ai-village/core';
+import type { EntityImpl } from '@ai-village/core';
 import type { BuildingComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
@@ -390,8 +391,10 @@ export class CraftingStationPanel implements IWindowPanel {
     if (building?.fuelRequired) {
       const newFuel = Math.min(building.maxFuel, building.currentFuel + 10);
 
-      // Update building component using EntityImpl's updateComponent method
-      (this.selectedStation as any).updateComponent('building', (comp: BuildingComponent) => ({
+      // Type assertion: Cast to EntityImpl to access implementation methods
+      // Entity interface doesn't include updateComponent/getComponent methods
+      const stationImpl = this.selectedStation as EntityImpl;
+      stationImpl.updateComponent<BuildingComponent>('building', (comp) => ({
         ...comp,
         currentFuel: newFuel,
       }));

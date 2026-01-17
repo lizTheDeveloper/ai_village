@@ -39,9 +39,11 @@ export const PhysicsComponentSchema: ComponentSchema<PhysicsComponent> = {
     { name: 'height', type: 'number', required: true, default: 1 },
   ],
   validate: (data: unknown): data is PhysicsComponent => {
-    const d = data as any;
+    // Type guard: check that data is an object with required properties
+    if (!data || typeof data !== 'object') return false;
+
+    const d = data as Record<string, unknown>;
     return (
-      d &&
       d.type === 'physics' &&
       typeof d.solid === 'boolean' &&
       typeof d.width === 'number' &&

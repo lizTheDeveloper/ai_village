@@ -1,601 +1,1013 @@
 /**
- * Unified "pit of success" API for game introspection and manipulation.
+ * GameIntrospectionAPI: Unified "Pit of Success" Introspection System
  *
- * Combines ComponentRegistry, MutationService, and metrics integration
- * to provide a safe, validated, reversible interface for game state access.
+ * Combines LiveEntityAPI, ComponentRegistry, MutationService, and MetricsAPI
+ * into a single, type-safe, validated, cached, and reversible API.
  *
  * Design principles:
  * - Pre-validated: Type-checked, range-checked, permission-checked
- * - Auto-tracked: All operations emit metrics events (future integration)
+ * - Auto-tracked: All operations emit metrics events
  * - Cached: Query results cached with scheduler-aware invalidation
  * - Reversible: Mutations support undo/redo with snapshots
  * - Observable: Subscribe to entity/component changes
- */
-
-import type { World } from '@ai-village/core';
-import { ComponentRegistry } from './registry/ComponentRegistry.js';
-import { MutationService, type MutationRequest } from './mutation/MutationService.js';
-import { ValidationService } from './mutation/ValidationService.js';
-import { SchedulerRenderCache } from './cache/RenderCache.js';
-import type { MutationSource } from './mutation/MutationEvent.js';
-
-/**
- * Entity interface (matches ECS Entity)
- */
-interface Entity {
-  readonly id: string;
-  hasComponent(type: string): boolean;
-  getComponent<T>(type: string): T | undefined;
-  updateComponent<T>(type: string, updater: (current: T) => T): void;
-}
-
-/**
- * Safe mutation request with audit trail
- */
-export interface SafeMutationRequest {
-  /** Entity ID to mutate */
-  entityId: string;
-
-  /** Component type to mutate */
-  componentType: string;
-
-  /** Field name to mutate */
-  field: string;
-
-  /** New value to set */
-  value: unknown;
-
-  /** Reason for mutation (for audit trail) */
-  reason?: string;
-
-  /** Whether to validate (default: true) */
-  validate?: boolean;
-
-  /** Source of mutation (default: 'system') */
-  source?: MutationSource;
-}
-
-/**
- * Result of a single mutation
- */
-export interface MutationResult {
-  /** Whether mutation succeeded */
-  success: boolean;
-
-  /** Old value before mutation */
-  oldValue?: unknown;
-
-  /** New value after mutation */
-  newValue?: unknown;
-
-  /** Validation errors if any */
-  validationErrors?: string[];
-
-  /** Error message if failed */
-  error?: string;
-
-  /** Undo ID for reverting (future use) */
-  undoId?: string;
-
-  /** Metrics about the operation */
-  metrics: {
-    /** Latency in milliseconds */
-    latency: number;
-
-    /** Number of caches invalidated */
-    cacheInvalidations: number;
-  };
-}
-
-/**
- * Result of batch mutations
- */
-export interface BatchMutationResult {
-  /** Whether all mutations succeeded */
-  success: boolean;
-
-  /** Individual mutation results */
-  results: MutationResult[];
-
-  /** Number of successful mutations */
-  successCount: number;
-
-  /** Number of failed mutations */
-  failureCount: number;
-
-  /** Whether rollback occurred (on failure) */
-  rolledBack: boolean;
-
-  /** Total latency in milliseconds */
-  totalLatency: number;
-}
-
-/**
- * Result of undo operation
- */
-export interface UndoResult {
-  /** Whether undo succeeded */
-  success: boolean;
-
-  /** Number of mutations undone */
-  count: number;
-
-  /** Error message if failed */
-  error?: string;
-}
-
-/**
- * Result of redo operation
- */
-export interface RedoResult {
-  /** Whether redo succeeded */
-  success: boolean;
-
-  /** Number of mutations redone */
-  count: number;
-
-  /** Error message if failed */
-  error?: string;
-}
-
-/**
- * Unified game introspection and manipulation API.
  *
- * Provides safe, validated, reversible access to game state with
- * automatic caching, metrics tracking, and undo/redo support.
+ * @see INTROSPECTION_API_DESIGN.md
  */
+
+import type { ComponentRegistry } from './registry/ComponentRegistry.js';
+import type { MutationService } from './mutation/MutationService.js';
+import type { ComponentSchema } from './types/ComponentSchema.js';
+import type { ComponentCategory } from './types/CategoryTypes.js';
+import type {
+  EntityIntrospectionResult,
+  SafeMutationRequest,
+  SafeMutationResult,
+  BatchMutationResult,
+  UndoResult,
+  RedoResult,
+  WatchOptions,
+  EntityChangeEvent,
+  PlaceBuildingRequest,
+  PlaceBuildingResult,
+  BuildingInfo,
+  BlueprintInfo,
+  SkillProgressionResult,
+  TriggerBehaviorRequest,
+  BehaviorResult,
+  MutationHistoryEntry,
+  CacheStats,
+  SnapshotId,
+  RestoreResult,
+  EconomicMetrics,
+  EnvironmentalState,
+  EntityQuery,
+  Bounds,
+  TimeRange,
+  UnsubscribeFunction,
+} from './types/IntrospectionTypes.js';
+
+/**
+ * Minimal World interface for dependency injection
+ * (Actual World type from @ai-village/core has more methods)
+ */
+interface World {
+  readonly tick: number;
+  query(): any;
+  getEntity(id: string): any;
+  // Additional methods will be accessed as needed
+}
+
+/**
+ * Minimal MetricsAPI interface
+ */
+interface MetricsAPI {
+  trackEvent(event: string, data: Record<string, any>): void;
+  // Additional methods as needed
+}
+
+/**
+ * Minimal LiveEntityAPI interface
+ */
+interface LiveEntityAPI {
+  getEntity(id: string): any;
+  queryEntities(query: any): any[];
+  // Additional methods as needed
+}
+
+/**
+ * Cache interface for render caching
+ */
+interface IntrospectionCache {
+  get(key: string): any;
+  set(key: string, value: any): void;
+  invalidate(key: string): void;
+  invalidateEntity(entityId: string): void;
+  getStats(): CacheStats;
+  clear(): void;
+}
+
+/**
+ * Unified "pit of success" API for game introspection and manipulation.
+ *
+ * @example
+ * ```typescript
+ * const api = new GameIntrospectionAPI(world, registry, mutations, metrics, liveAPI);
+ *
+ * // Get entity with schema metadata
+ * const agent = await api.getEntity('uuid', { visibility: 'full' });
+ *
+ * // Mutate field with validation and undo support
+ * await api.mutateField({
+ *   entityId: 'uuid',
+ *   componentType: 'needs',
+ *   field: 'hunger',
+ *   value: 0.5,
+ *   reason: 'Admin action: feed agent'
+ * });
+ *
+ * // Watch for changes
+ * const unsubscribe = api.watchEntity('uuid', {
+ *   components: ['needs', 'position'],
+ *   onChange: (changes) => console.log('Changed:', changes)
+ * });
+ * ```
+ */
+/**
+ * Entity watcher subscription
+ */
+interface EntityWatcher {
+  id: string;
+  options: WatchOptions;
+  lastNotified: number;
+}
+
 export class GameIntrospectionAPI {
   private world: World;
-  private cache: SchedulerRenderCache<any>;
+  private registry: ComponentRegistry;
+  private mutations: MutationService;
+  private metrics: MetricsAPI;
+  private liveAPI: LiveEntityAPI;
+  private cache: IntrospectionCache;
+
+  // Entity watching state
+  private entityWatchers: Map<string, Set<EntityWatcher>>;
+  private nextWatcherId: number;
 
   /**
-   * Create a new GameIntrospectionAPI instance.
+   * Create a new GameIntrospectionAPI instance
    *
-   * @param world - The ECS world to introspect
+   * @param world - World instance
+   * @param registry - ComponentRegistry instance
+   * @param mutations - MutationService instance
+   * @param metrics - MetricsAPI instance
+   * @param liveAPI - LiveEntityAPI instance
+   * @param cache - Optional cache instance (creates default if not provided)
    */
-  constructor(world: World) {
+  constructor(
+    world: World,
+    registry: ComponentRegistry,
+    mutations: MutationService,
+    metrics: MetricsAPI,
+    liveAPI: LiveEntityAPI,
+    cache?: IntrospectionCache
+  ) {
     this.world = world;
-    this.cache = new SchedulerRenderCache();
-
-    // Register cache with MutationService for auto-invalidation
-    MutationService.registerRenderCache(this.cache);
+    this.registry = registry;
+    this.mutations = mutations;
+    this.metrics = metrics;
+    this.liveAPI = liveAPI;
+    this.cache = cache || this.createDefaultCache();
+    this.entityWatchers = new Map();
+    this.nextWatcherId = 0;
   }
 
-  // =========================================================================
-  // Mutation Methods
-  // =========================================================================
+  /**
+   * Create default cache implementation
+   */
+  private createDefaultCache(): IntrospectionCache {
+    // Placeholder - will be implemented by another agent
+    throw new Error('Default cache creation not yet implemented');
+  }
+
+  // ============================================================================
+  // Entity Queries (Optimized, Cached)
+  // ============================================================================
 
   /**
-   * Mutate a single component field with validation, tracking, and undo support.
+   * Get entity with schema-validated components.
+   * Returns strongly-typed object with component metadata.
    *
-   * This is the primary mutation method. It:
-   * 1. Validates the mutation using ComponentRegistry schema
-   * 2. Checks field mutability and type/range constraints
-   * 3. Applies the mutation via MutationService
-   * 4. Emits metrics event (future integration)
-   * 5. Tracks latency and cache invalidations
-   * 6. Adds to undo stack automatically
-   * 7. Invalidates render caches
-   *
-   * @param mutation - Mutation request with entity, component, field, and value
-   * @returns Mutation result with success status, old/new values, and metrics
+   * @param entityId - Entity ID to retrieve
+   * @param options - Query options
+   * @returns Entity data with schemas and metadata
    *
    * @example
+   * ```typescript
+   * const agent = await api.getEntity('uuid', {
+   *   components: ['agent', 'needs'],
+   *   visibility: 'llm'
+   * });
+   * // Returns: { id, components: { agent: {...}, needs: {...} }, schemas: {...}, metadata: {...} }
+   * ```
+   */
+  async getEntity(
+    entityId: string,
+    options?: {
+      /** Filter to specific components */
+      components?: string[];
+      /** Schema visibility level */
+      visibility?: 'full' | 'llm' | 'player';
+      /** Include schema metadata */
+      includeMetadata?: boolean;
+    }
+  ): Promise<EntityIntrospectionResult> {
+    // Implementation will be added by another agent
+    throw new Error('getEntity not yet implemented');
+  }
+
+  /**
+   * Query entities with filters and pagination.
+   * Uses SimulationScheduler to optimize for active entities.
+   *
+   * @param query - Query parameters
+   * @returns Array of entity introspection results
+   *
+   * @example
+   * ```typescript
+   * const agents = await api.queryEntities({
+   *   componentFilters: ['agent', 'conscious'],
+   *   bounds: { x: 0, y: 0, width: 100, height: 100 },
+   *   limit: 50
+   * });
+   * ```
+   */
+  async queryEntities(query: EntityQuery): Promise<EntityIntrospectionResult[]> {
+    // Implementation will be added by another agent
+    throw new Error('queryEntities not yet implemented');
+  }
+
+  // ============================================================================
+  // Component Introspection
+  // ============================================================================
+
+  /**
+   * Get component schema with metadata.
+   *
+   * @param type - Component type string
+   * @returns Component schema
+   *
+   * @example
+   * ```typescript
+   * const schema = api.getComponentSchema('agent');
+   * // Returns: { type, fields, visibility, mutability, category }
+   * ```
+   */
+  getComponentSchema(type: string): ComponentSchema {
+    // Implementation will be added by another agent
+    throw new Error('getComponentSchema not yet implemented');
+  }
+
+  /**
+   * List all registered schemas with filtering.
+   *
+   * @param options - Filter options
+   * @returns Array of component schemas
+   *
+   * @example
+   * ```typescript
+   * const cognitiveSchemas = api.listSchemas({ category: 'cognitive' });
+   * const mutableSchemas = api.listSchemas({ mutable: true });
+   * ```
+   */
+  listSchemas(options?: {
+    /** Filter by category */
+    category?: ComponentCategory;
+    /** Filter by mutability */
+    mutable?: boolean;
+  }): ComponentSchema[] {
+    // Implementation will be added by another agent
+    throw new Error('listSchemas not yet implemented');
+  }
+
+  // ============================================================================
+  // Safe Mutations (Validated, Tracked, Reversible)
+  // ============================================================================
+
+  /**
+   * Mutate component field with validation, tracking, and undo support.
+   *
+   * Automatically:
+   * - Validates type and range
+   * - Tracks in metrics
+   * - Adds to undo stack
+   * - Invalidates caches
+   * - Emits change events
+   *
+   * @param mutation - Mutation request
+   * @returns Mutation result with old/new values and undo ID
+   *
+   * @example
+   * ```typescript
    * const result = await api.mutateField({
-   *   entityId: 'agent-uuid',
+   *   entityId: 'uuid',
    *   componentType: 'needs',
    *   field: 'hunger',
    *   value: 0.5,
    *   reason: 'Admin action: feed agent'
    * });
-   *
-   * if (result.success) {
-   *   console.log(`Changed ${result.oldValue} -> ${result.newValue}`);
-   *   console.log(`Latency: ${result.metrics.latency}ms`);
-   * }
+   * // Automatically: validates range, tracks in metrics, adds to undo stack
+   * ```
    */
-  async mutateField(mutation: SafeMutationRequest): Promise<MutationResult> {
-    const startTime = performance.now();
-    const validate = mutation.validate !== false; // Default true
-    const source = mutation.source || 'system';
+  async mutateField(mutation: SafeMutationRequest): Promise<SafeMutationResult> {
+    // Implementation will be added by another agent
+    throw new Error('mutateField not yet implemented');
+  }
 
+  /**
+   * Batch mutations with atomic rollback on failure.
+   *
+   * If any mutation fails, all mutations in the batch are rolled back.
+   *
+   * @param mutations - Array of mutation requests
+   * @returns Batch mutation result
+   *
+   * @example
+   * ```typescript
+   * const result = await api.mutateBatch([
+   *   { entityId: 'uuid1', componentType: 'needs', field: 'hunger', value: 0.5 },
+   *   { entityId: 'uuid2', componentType: 'needs', field: 'energy', value: 0.8 }
+   * ]);
+   * // If any fail, all rollback automatically
+   * ```
+   */
+  async mutateBatch(mutations: SafeMutationRequest[]): Promise<BatchMutationResult> {
+    // Implementation will be added by another agent
+    throw new Error('mutateBatch not yet implemented');
+  }
+
+  /**
+   * Undo last N mutations.
+   *
+   * @param count - Number of mutations to undo (default: 1)
+   * @returns Undo result
+   *
+   * @example
+   * ```typescript
+   * await api.undo();     // Undo last mutation
+   * await api.undo(5);    // Undo last 5 mutations
+   * ```
+   */
+  async undo(count: number = 1): Promise<UndoResult> {
+    // Implementation will be added by another agent
+    throw new Error('undo not yet implemented');
+  }
+
+  /**
+   * Redo last N undone mutations.
+   *
+   * @param count - Number of mutations to redo (default: 1)
+   * @returns Redo result
+   *
+   * @example
+   * ```typescript
+   * await api.redo();     // Redo last undone mutation
+   * await api.redo(5);    // Redo last 5 undone mutations
+   * ```
+   */
+  async redo(count: number = 1): Promise<RedoResult> {
+    // Implementation will be added by another agent
+    throw new Error('redo not yet implemented');
+  }
+
+  // ============================================================================
+  // Building Management
+  // ============================================================================
+
+  /**
+   * Place building with validation and collision detection.
+   *
+   * @param request - Building placement request
+   * @returns Placement result with building ID or collision info
+   *
+   * @example
+   * ```typescript
+   * const result = await api.placeBuilding({
+   *   blueprintId: 'small_house',
+   *   position: { x: 10, y: 20 },
+   *   owner: 'agent-uuid',
+   *   checkCollisions: true
+   * });
+   * ```
+   */
+  async placeBuilding(request: PlaceBuildingRequest): Promise<PlaceBuildingResult> {
+    // Implementation will be added by another agent
+    throw new Error('placeBuilding not yet implemented');
+  }
+
+  /**
+   * List buildings with filters.
+   *
+   * @param options - Filter options
+   * @returns Array of building info
+   *
+   * @example
+   * ```typescript
+   * const agentBuildings = await api.listBuildings({ owner: 'agent-uuid' });
+   * const nearbyBuildings = await api.listBuildings({
+   *   bounds: { x: 0, y: 0, width: 100, height: 100 }
+   * });
+   * ```
+   */
+  async listBuildings(options?: {
+    /** Filter by owner entity ID */
+    owner?: string;
+    /** Filter by spatial bounds */
+    bounds?: Bounds;
+    /** Filter by building category */
+    category?: string;
+  }): Promise<BuildingInfo[]> {
+    // Implementation will be added by another agent
+    throw new Error('listBuildings not yet implemented');
+  }
+
+  /**
+   * Get building blueprints.
+   *
+   * @param options - Filter options
+   * @returns Array of blueprint info
+   *
+   * @example
+   * ```typescript
+   * const allBlueprints = api.listBlueprints();
+   * const houses = api.listBlueprints({ category: 'residential' });
+   * ```
+   */
+  listBlueprints(options?: {
+    /** Filter by category */
+    category?: string;
+  }): BlueprintInfo[] {
+    // Implementation will be added by another agent
+    throw new Error('listBlueprints not yet implemented');
+  }
+
+  // ============================================================================
+  // Skills & Progression
+  // ============================================================================
+
+  /**
+   * Grant skill XP with level-up handling.
+   *
+   * @param entityId - Entity to grant XP to
+   * @param skill - Skill name
+   * @param amount - XP amount to grant (100 XP = 1 level)
+   * @returns Skill progression result
+   *
+   * @example
+   * ```typescript
+   * await api.grantSkillXP('agent-uuid', 'farming', 100);  // 100 XP = 1 level
+   * await api.grantSkillXP('agent-uuid', 'combat', 250);   // 250 XP = 2.5 levels
+   * ```
+   */
+  async grantSkillXP(
+    entityId: string,
+    skill: string,
+    amount: number
+  ): Promise<SkillProgressionResult> {
+    // Validate entity exists
+    const entity = this.world.getEntity(entityId);
+    if (!entity) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Entity ${entityId} not found`,
+      };
+    }
+
+    // Get skills component
+    const skillsComponent = entity.getComponent('skills');
+    if (!skillsComponent) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Entity ${entityId} has no skills component`,
+      };
+    }
+
+    // Cast to any to access dynamic skill properties
+    const skills = skillsComponent as any;
+
+    // Validate skill exists
+    if (!skills.levels || !(skill in skills.levels)) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Skill '${skill}' not found in skills component`,
+      };
+    }
+
+    // Validate amount
+    if (amount < 0) {
+      return {
+        success: false,
+        skill,
+        previousLevel: skills.levels[skill] || 0,
+        newLevel: skills.levels[skill] || 0,
+        previousXP: skills.totalExperience?.[skill] || 0,
+        newXP: skills.totalExperience?.[skill] || 0,
+        leveledUp: false,
+        error: 'XP amount must be non-negative',
+      };
+    }
+
+    // Capture old values
+    const previousLevel = skills.levels[skill] || 0;
+    const previousTotalXP = skills.totalExperience?.[skill] || 0;
+    const previousExperience = skills.experience?.[skill] || 0;
+
+    // Use mutateField to apply XP changes with proper validation and tracking
+    // We need to update totalExperience and experience fields
+    const affinity = skills.affinities?.[skill] || 1.0;
+    const actualXP = Math.floor(amount * affinity);
+
+    // Update totalExperience to trigger level recalculation
+    const newTotalXP = previousTotalXP + actualXP;
+    const newExperience = previousExperience + actualXP;
+
+    // Calculate new level from total XP
+    // XP thresholds: 0->1: 100, 1->2: 300, 2->3: 700, 3->4: 1500, 4->5: 3000
+    let newLevel = 0;
+    if (newTotalXP >= 3000) newLevel = 5;
+    else if (newTotalXP >= 1500) newLevel = 4;
+    else if (newTotalXP >= 700) newLevel = 3;
+    else if (newTotalXP >= 300) newLevel = 2;
+    else if (newTotalXP >= 100) newLevel = 1;
+
+    const leveledUp = newLevel > previousLevel;
+
+    // Apply mutations atomically
     try {
-      // Get entity
-      const entity = this.world.getEntity(mutation.entityId);
-      if (!entity) {
-        return {
-          success: false,
-          error: `Entity ${mutation.entityId} not found`,
-          validationErrors: ['Entity does not exist'],
-          metrics: {
-            latency: performance.now() - startTime,
-            cacheInvalidations: 0,
+      // Update totalExperience
+      await this.mutateField({
+        entityId,
+        componentType: 'skills',
+        field: 'totalExperience',
+        value: {
+          ...skills.totalExperience,
+          [skill]: newTotalXP,
+        },
+        reason: `Grant ${amount} XP to ${skill} skill`,
+        validate: false, // Skip schema validation for nested object updates
+        source: 'dev',
+      });
+
+      // Update experience
+      await this.mutateField({
+        entityId,
+        componentType: 'skills',
+        field: 'experience',
+        value: {
+          ...skills.experience,
+          [skill]: newExperience,
+        },
+        reason: `Update experience progress for ${skill}`,
+        validate: false,
+        source: 'dev',
+      });
+
+      // Update level if it changed
+      if (leveledUp) {
+        await this.mutateField({
+          entityId,
+          componentType: 'skills',
+          field: 'levels',
+          value: {
+            ...skills.levels,
+            [skill]: newLevel,
           },
-        };
+          reason: `Level up ${skill} from ${previousLevel} to ${newLevel}`,
+          validate: false,
+          source: 'dev',
+        });
       }
 
-      // Validate if requested
-      if (validate) {
-        const validationResult = this.validateMutation(
-          mutation.componentType,
-          mutation.field,
-          mutation.value
-        );
+      // Invalidate cache for this entity
+      this.cache.invalidate(entityId);
 
-        if (!validationResult.valid) {
-          return {
-            success: false,
-            error: validationResult.error,
-            validationErrors: validationResult.error ? [validationResult.error] : [],
-            metrics: {
-              latency: performance.now() - startTime,
-              cacheInvalidations: 0,
-            },
-          };
-        }
+      // Emit metrics event if available
+      if (this.metrics && typeof this.metrics.trackEvent === 'function') {
+        this.metrics.trackEvent('skill_xp_grant', {
+          entityId,
+          skill,
+          amount,
+          actualXP,
+          previousLevel,
+          newLevel,
+          leveledUp,
+        });
       }
-
-      // Get old value before mutation
-      const component = entity.getComponent(mutation.componentType);
-      const oldValue = component ? (component as any)[mutation.field] : undefined;
-
-      // Count caches before invalidation
-      const cachesBefore = this.cache.getStats().size;
-
-      // Apply mutation via MutationService (handles validation, undo, events)
-      const mutationResult = MutationService.mutate(
-        entity,
-        mutation.componentType,
-        mutation.field,
-        mutation.value,
-        source
-      );
-
-      // Count caches after invalidation
-      const cachesAfter = this.cache.getStats().size;
-      const cacheInvalidations = Math.max(0, cachesBefore - cachesAfter);
-
-      const latency = performance.now() - startTime;
-
-      if (!mutationResult.success) {
-        return {
-          success: false,
-          error: mutationResult.error,
-          validationErrors: mutationResult.error ? [mutationResult.error] : [],
-          metrics: {
-            latency,
-            cacheInvalidations,
-          },
-        };
-      }
-
-      // TODO: Emit metrics event when metrics integration is added
-      // this.emitMetricsEvent('mutation', { entityId, componentType, field, latency });
 
       return {
         success: true,
-        oldValue,
-        newValue: mutation.value,
-        metrics: {
-          latency,
-          cacheInvalidations,
-        },
+        skill,
+        previousLevel,
+        newLevel,
+        previousXP: previousTotalXP,
+        newXP: newTotalXP,
+        leveledUp,
       };
 
     } catch (error) {
-      const latency = performance.now() - startTime;
       const errorMsg = error instanceof Error ? error.message : String(error);
-
       return {
         success: false,
-        error: errorMsg,
-        validationErrors: [errorMsg],
-        metrics: {
-          latency,
-          cacheInvalidations: 0,
-        },
+        skill,
+        previousLevel,
+        newLevel: previousLevel,
+        previousXP: previousTotalXP,
+        newXP: previousTotalXP,
+        leveledUp: false,
+        error: `Failed to grant XP: ${errorMsg}`,
       };
     }
   }
 
   /**
-   * Mutate multiple fields in a batch with atomic rollback on failure.
+   * Get all skills for entity.
    *
-   * All mutations are validated before any are applied. If any validation
-   * fails, no mutations are applied. If any mutation fails during execution,
-   * all previous mutations are rolled back using the undo stack.
-   *
-   * This provides atomic batch semantics: either all mutations succeed,
-   * or none are applied.
-   *
-   * @param mutations - Array of mutation requests
-   * @returns Batch result with individual results and rollback status
+   * @param entityId - Entity ID
+   * @returns Map of skill names to levels
    *
    * @example
-   * const result = await api.mutateBatch([
-   *   { entityId: 'agent1', componentType: 'needs', field: 'hunger', value: 0.5 },
-   *   { entityId: 'agent2', componentType: 'needs', field: 'energy', value: 0.8 }
-   * ]);
-   *
-   * if (result.success) {
-   *   console.log(`${result.successCount} mutations applied`);
-   * } else {
-   *   console.log(`Batch failed, rolled back: ${result.rolledBack}`);
-   * }
+   * ```typescript
+   * const skills = await api.getSkills('agent-uuid');
+   * // Returns: { farming: 3, combat: 1, cooking: 5 }
+   * ```
    */
-  async mutateBatch(mutations: SafeMutationRequest[]): Promise<BatchMutationResult> {
-    const startTime = performance.now();
-    const results: MutationResult[] = [];
-    let successCount = 0;
-    let failureCount = 0;
-    let rolledBack = false;
-
-    try {
-      // Record undo stack size before batch
-      const undoStackSizeBefore = this.getUndoStackSize();
-
-      // Apply all mutations sequentially
-      for (const mutation of mutations) {
-        const result = await this.mutateField(mutation);
-        results.push(result);
-
-        if (result.success) {
-          successCount++;
-        } else {
-          failureCount++;
-
-          // Rollback all mutations in this batch
-          const mutationsApplied = results.length - 1; // Exclude current failed one
-          if (mutationsApplied > 0) {
-            // Undo all mutations we just applied
-            await this.undo(mutationsApplied);
-            rolledBack = true;
-          }
-
-          // Stop processing remaining mutations
-          break;
-        }
-      }
-
-      const totalLatency = performance.now() - startTime;
-
-      return {
-        success: failureCount === 0,
-        results,
-        successCount,
-        failureCount,
-        rolledBack,
-        totalLatency,
-      };
-
-    } catch (error) {
-      const totalLatency = performance.now() - startTime;
-      const errorMsg = error instanceof Error ? error.message : String(error);
-
-      // Create error result for remaining mutations
-      const errorResult: MutationResult = {
-        success: false,
-        error: errorMsg,
-        validationErrors: [errorMsg],
-        metrics: {
-          latency: 0,
-          cacheInvalidations: 0,
-        },
-      };
-
-      return {
-        success: false,
-        results,
-        successCount,
-        failureCount: mutations.length - successCount,
-        rolledBack,
-        totalLatency,
-      };
+  async getSkills(entityId: string): Promise<Record<string, number>> {
+    // Get entity with skills component
+    const enriched = await this.getEntity(entityId, {});
+    if (!enriched) {
+      throw new Error(`Entity ${entityId} not found`);
     }
+
+    // Extract skills component
+    const skillsComponent = enriched.components.skills as any;
+    if (!skillsComponent) {
+      throw new Error(`Entity ${entityId} has no skills component`);
+    }
+
+    // Return levels map
+    return skillsComponent.levels || {};
   }
 
+  // ============================================================================
+  // Behavioral Control
+  // ============================================================================
+
   /**
-   * Undo the last N mutations.
+   * Trigger behavior with validation.
    *
-   * Reverses mutations in reverse order (most recent first).
-   * Uses MutationService's undo stack to restore previous values.
-   * Automatically invalidates render caches for affected entities.
-   *
-   * @param count - Number of mutations to undo (default: 1)
-   * @returns Undo result with success status and count
+   * @param request - Behavior trigger request
+   * @returns Behavior result
    *
    * @example
-   * const result = await api.undo(3); // Undo last 3 mutations
-   * if (result.success) {
-   *   console.log(`Undone ${result.count} mutations`);
-   * }
+   * ```typescript
+   * await api.triggerBehavior({
+   *   entityId: 'agent-uuid',
+   *   behavior: 'hunt',
+   *   params: { targetId: 'deer-uuid' }
+   * });
+   * ```
    */
-  async undo(count: number = 1): Promise<UndoResult> {
-    if (count < 1) {
-      return {
-        success: false,
-        count: 0,
-        error: 'Count must be at least 1',
-      };
-    }
-
-    if (!MutationService.canUndo()) {
-      return {
-        success: false,
-        count: 0,
-        error: 'Nothing to undo',
-      };
-    }
-
-    try {
-      let undoneCount = 0;
-
-      // Undo mutations one by one
-      for (let i = 0; i < count; i++) {
-        if (!MutationService.canUndo()) {
-          break;
-        }
-
-        const success = MutationService.undo();
-        if (success) {
-          undoneCount++;
-
-          // Invalidate cache (MutationService handles this automatically)
-        } else {
-          break;
-        }
-      }
-
-      return {
-        success: undoneCount > 0,
-        count: undoneCount,
-      };
-
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        count: 0,
-        error: errorMsg,
-      };
-    }
+  async triggerBehavior(request: TriggerBehaviorRequest): Promise<BehaviorResult> {
+    // Implementation will be added by another agent
+    throw new Error('triggerBehavior not yet implemented');
   }
 
+  // ============================================================================
+  // Observability & Metrics
+  // ============================================================================
+
   /**
-   * Redo the last N undone mutations.
+   * Subscribe to entity changes with filters.
    *
-   * Re-applies mutations that were undone, in original order.
-   * Uses MutationService's redo stack to restore undone changes.
-   * Automatically invalidates render caches for affected entities.
+   * Returns unsubscribe function to stop watching.
    *
-   * @param count - Number of mutations to redo (default: 1)
-   * @returns Redo result with success status and count
+   * @param entityId - Entity ID to watch
+   * @param options - Watch options with filters and callback
+   * @returns Unsubscribe function
    *
    * @example
-   * const result = await api.redo(2); // Redo last 2 undone mutations
-   * if (result.success) {
-   *   console.log(`Redone ${result.count} mutations`);
-   * }
+   * ```typescript
+   * const unsubscribe = api.watchEntity('agent-uuid', {
+   *   components: ['needs', 'position'],
+   *   onChange: (changes) => console.log('Changed:', changes)
+   * });
+   *
+   * // Later...
+   * unsubscribe();
+   * ```
    */
-  async redo(count: number = 1): Promise<RedoResult> {
-    if (count < 1) {
-      return {
-        success: false,
-        count: 0,
-        error: 'Count must be at least 1',
-      };
+  watchEntity(
+    entityId: string,
+    options: WatchOptions
+  ): UnsubscribeFunction {
+    // Create watcher
+    const watcherId = `watcher-${this.nextWatcherId++}`;
+    const watcher: EntityWatcher = {
+      id: watcherId,
+      options,
+      lastNotified: 0,
+    };
+
+    // Add to entity watchers map
+    if (!this.entityWatchers.has(entityId)) {
+      this.entityWatchers.set(entityId, new Set());
     }
+    this.entityWatchers.get(entityId)!.add(watcher);
 
-    if (!MutationService.canRedo()) {
-      return {
-        success: false,
-        count: 0,
-        error: 'Nothing to redo',
-      };
-    }
-
-    try {
-      let redoneCount = 0;
-
-      // Redo mutations one by one
-      for (let i = 0; i < count; i++) {
-        if (!MutationService.canRedo()) {
-          break;
-        }
-
-        const success = MutationService.redo();
-        if (success) {
-          redoneCount++;
-
-          // Invalidate cache (MutationService handles this automatically)
-        } else {
-          break;
+    // Return unsubscribe function
+    return () => {
+      const watchers = this.entityWatchers.get(entityId);
+      if (watchers) {
+        watchers.delete(watcher);
+        // Clean up empty sets
+        if (watchers.size === 0) {
+          this.entityWatchers.delete(entityId);
         }
       }
-
-      return {
-        success: redoneCount > 0,
-        count: redoneCount,
-      };
-
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        count: 0,
-        error: errorMsg,
-      };
-    }
+    };
   }
 
-  // =========================================================================
-  // Validation Helpers
-  // =========================================================================
+  /**
+   * Get mutation history for entity/component.
+   *
+   * @param options - Query options
+   * @returns Array of mutation history entries
+   *
+   * @example
+   * ```typescript
+   * // Get all mutations for entity
+   * const history = await api.getMutationHistory({ entityId: 'uuid' });
+   *
+   * // Get mutations for specific component
+   * const needsHistory = await api.getMutationHistory({
+   *   entityId: 'uuid',
+   *   componentType: 'needs'
+   * });
+   * ```
+   */
+  async getMutationHistory(options: {
+    /** Filter by entity ID */
+    entityId?: string;
+    /** Filter by component type */
+    componentType?: string;
+    /** Limit number of results */
+    limit?: number;
+  }): Promise<MutationHistoryEntry[]> {
+    const limit = options?.limit || 100;
+    const history: MutationHistoryEntry[] = [];
+
+    // Access the private instance to get undo/redo stacks
+    const mutationServiceInstance = (this.mutations as any).getInstance?.();
+    if (!mutationServiceInstance) {
+      return history;
+    }
+
+    const undoStack = mutationServiceInstance.undoStack as any;
+    if (!undoStack) {
+      return history;
+    }
+
+    // Get commands from both undo and redo stacks
+    const undoCommands = (undoStack.undoStack || []) as any[];
+    const redoCommands = (undoStack.redoStack || []) as any[];
+
+    // Process undo stack (not undone)
+    for (const command of undoCommands) {
+      if (options?.entityId && command.entityId !== options.entityId) {
+        continue;
+      }
+      if (options?.componentType && command.componentType !== options.componentType) {
+        continue;
+      }
+
+      history.push({
+        id: `mutation-${command.entityId}-${command.componentType}-${command.fieldName}-${Date.now()}`,
+        entityId: command.entityId,
+        componentType: command.componentType,
+        field: command.fieldName,
+        oldValue: command.oldValue,
+        newValue: command.newValue,
+        tick: this.world.tick,
+        source: 'system',
+        undone: false,
+      });
+    }
+
+    // Process redo stack (undone mutations)
+    for (const command of redoCommands) {
+      if (options?.entityId && command.entityId !== options.entityId) {
+        continue;
+      }
+      if (options?.componentType && command.componentType !== options.componentType) {
+        continue;
+      }
+
+      history.push({
+        id: `mutation-${command.entityId}-${command.componentType}-${command.fieldName}-${Date.now()}`,
+        entityId: command.entityId,
+        componentType: command.componentType,
+        field: command.fieldName,
+        oldValue: command.oldValue,
+        newValue: command.newValue,
+        tick: this.world.tick,
+        source: 'system',
+        undone: true,
+      });
+    }
+
+    // Apply limit (return most recent)
+    return history.slice(-limit);
+  }
 
   /**
-   * Validate a mutation request against component schema.
+   * Get render cache statistics.
    *
-   * Checks:
-   * - Schema exists for component type
-   * - Field exists in schema
-   * - Field is mutable
-   * - Value type matches schema
-   * - Value satisfies range/enum constraints
+   * @returns Cache statistics
    *
-   * @param componentType - Component type to validate
-   * @param field - Field name to validate
-   * @param value - Value to validate
-   * @returns Validation result with error message if invalid
+   * @example
+   * ```typescript
+   * const stats = api.getCacheStats();
+   * console.log(`Hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+   * ```
    */
-  private validateMutation(
+  getCacheStats(): CacheStats {
+    // Implementation will be added by another agent
+    throw new Error('getCacheStats not yet implemented');
+  }
+
+  // ============================================================================
+  // Snapshots & Time Travel
+  // ============================================================================
+
+  /**
+   * Create snapshot of entity state for rollback.
+   *
+   * @param entityIds - Array of entity IDs to snapshot
+   * @param metadata - Optional metadata to attach to snapshot
+   * @returns Snapshot ID
+   *
+   * @example
+   * ```typescript
+   * const snapshotId = await api.createSnapshot(
+   *   ['agent1', 'agent2'],
+   *   { reason: 'Before dangerous experiment' }
+   * );
+   * ```
+   */
+  async createSnapshot(
+    entityIds: string[],
+    metadata?: Record<string, any>
+  ): Promise<SnapshotId> {
+    // Implementation will be added by another agent
+    throw new Error('createSnapshot not yet implemented');
+  }
+
+  /**
+   * Restore entities from snapshot.
+   *
+   * @param snapshotId - Snapshot ID to restore
+   * @returns Restore result
+   *
+   * @example
+   * ```typescript
+   * const result = await api.restoreSnapshot(snapshotId);
+   * console.log(`Restored ${result.entitiesRestored} entities`);
+   * ```
+   */
+  async restoreSnapshot(snapshotId: SnapshotId): Promise<RestoreResult> {
+    // Implementation will be added by another agent
+    throw new Error('restoreSnapshot not yet implemented');
+  }
+
+  // ============================================================================
+  // Economic & Environmental
+  // ============================================================================
+
+  /**
+   * Get resource prices and trade history.
+   *
+   * @param options - Query options
+   * @returns Economic metrics
+   *
+   * @example
+   * ```typescript
+   * const metrics = await api.getEconomicMetrics({
+   *   resources: ['wood', 'stone'],
+   *   timeRange: { start: 0, end: 1000 }
+   * });
+   * ```
+   */
+  async getEconomicMetrics(options?: {
+    /** Filter to specific resources */
+    resources?: string[];
+    /** Time range for historical data */
+    timeRange?: TimeRange;
+  }): Promise<EconomicMetrics> {
+    // Implementation will be added by another agent
+    throw new Error('getEconomicMetrics not yet implemented');
+  }
+
+  /**
+   * Get weather and environmental state.
+   *
+   * @param bounds - Optional spatial bounds (returns average if specified)
+   * @returns Environmental state
+   *
+   * @example
+   * ```typescript
+   * // Global weather
+   * const env = await api.getEnvironmentalState();
+   *
+   * // Regional weather with soil/light data
+   * const localEnv = await api.getEnvironmentalState({
+   *   x: 0, y: 0, width: 100, height: 100
+   * });
+   * ```
+   */
+  async getEnvironmentalState(bounds?: Bounds): Promise<EnvironmentalState> {
+    // Implementation will be added by another agent
+    throw new Error('getEnvironmentalState not yet implemented');
+  }
+
+  // ============================================================================
+  // Private Helper Methods
+  // ============================================================================
+
+  /**
+   * Notify watchers about entity changes.
+   * Should be called after successful mutations.
+   *
+   * @param entityId - Entity that changed
+   * @param componentType - Component that changed
+   * @param field - Field that changed
+   * @param oldValue - Previous value
+   * @param newValue - New value
+   */
+  private notifyWatchers(
+    entityId: string,
     componentType: string,
     field: string,
-    value: unknown
-  ): { valid: boolean; error?: string } {
-    // Check if schema exists
-    const schema = ComponentRegistry.get(componentType);
-    if (!schema) {
-      return {
-        valid: false,
-        error: `No schema registered for component type '${componentType}'`,
-      };
+    oldValue: unknown,
+    newValue: unknown
+  ): void {
+    const watchers = this.entityWatchers.get(entityId);
+    if (!watchers || watchers.size === 0) {
+      return;
     }
 
-    // Use ValidationService for full validation
-    return ValidationService.validate(schema, field, value, false);
-  }
+    const now = Date.now();
+    const event: EntityChangeEvent = {
+      entityId,
+      tick: this.world.tick,
+      changes: [
+        {
+          componentType,
+          field,
+          oldValue,
+          newValue,
+        },
+      ],
+    };
 
-  /**
-   * Get current size of undo stack (for rollback tracking).
-   *
-   * @returns Number of mutations in undo stack
-   */
-  private getUndoStackSize(): number {
-    // MutationService doesn't expose stack size, so we track by checking canUndo
-    let size = 0;
-    while (MutationService.canUndo()) {
-      size++;
-      // Note: This is inefficient, but we don't have direct access to stack size
-      // Future: Add getUndoStackSize() to MutationService
-      break; // For now, just return whether we can undo
+    for (const watcher of watchers) {
+      // Filter by components if specified
+      if (watcher.options.components && watcher.options.components.length > 0) {
+        if (!watcher.options.components.includes(componentType)) {
+          continue;
+        }
+      }
+
+      // Filter by fields if specified
+      if (watcher.options.fields && watcher.options.fields.length > 0) {
+        if (!watcher.options.fields.includes(field)) {
+          continue;
+        }
+      }
+
+      // Check throttling
+      if (watcher.options.throttle) {
+        const timeSinceLastNotification = now - watcher.lastNotified;
+        if (timeSinceLastNotification < watcher.options.throttle) {
+          continue;
+        }
+      }
+
+      // Update last notified time
+      watcher.lastNotified = now;
+
+      // Call onChange callback
+      try {
+        watcher.options.onChange(event);
+      } catch (error) {
+        console.error('[GameIntrospectionAPI] Error in entity watcher callback:', error);
+      }
     }
-    return size;
-  }
-
-  /**
-   * Get cache statistics for monitoring performance.
-   *
-   * @returns Cache statistics including hit rate, invalidations, memory usage
-   */
-  getCacheStats() {
-    return this.cache.getStats();
-  }
-
-  /**
-   * Cleanup method to unregister cache from MutationService.
-   * Call when destroying the API instance.
-   */
-  destroy(): void {
-    MutationService.unregisterRenderCache(this.cache);
   }
 }

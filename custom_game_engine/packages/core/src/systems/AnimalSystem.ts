@@ -1,12 +1,9 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
 import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
@@ -20,7 +17,7 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  *
  * @dependencies StateMutatorSystem - Handles batched needs/age decay updates
  */
-export class AnimalSystem implements System {
+export class AnimalSystem extends BaseSystem {
   public readonly id: SystemId = CT.Animal;
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
@@ -35,7 +32,7 @@ export class AnimalSystem implements System {
   private stateMutator: StateMutatorSystem | null = null;
 
   // Performance: Update delta rates once per game minute (1200 ticks)
-  private lastUpdateTick = 0;
+  private deltaLastUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
 
   // Track cleanup functions for registered deltas
@@ -47,10 +44,6 @@ export class AnimalSystem implements System {
     stress: () => void;
   }>();
 
-  constructor(_eventBus?: EventBus) {
-    // EventBus passed for consistency but not used directly (world.eventBus is used instead)
-  }
-
   /**
    * Set the StateMutatorSystem reference.
    * Called by registerAllSystems during initialization.
@@ -59,30 +52,20 @@ export class AnimalSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Check if StateMutatorSystem has been set
     if (!this.stateMutator) {
       throw new Error('[AnimalSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
     }
 
-    // Update agent positions in scheduler
-    world.simulationScheduler.updateAgentPositions(world);
-
-    // Filter to only visible entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(
-      entities as Entity[],
-      world.tick
-    );
-
     // Performance: Only update delta rates once per game minute
-    const currentTick = world.tick;
-    const shouldUpdateRates = currentTick - this.lastUpdateTick >= this.UPDATE_INTERVAL;
+    const currentTick = ctx.tick;
+    const shouldUpdateRates = currentTick - this.deltaLastUpdateTick >= this.UPDATE_INTERVAL;
 
-    for (const entity of activeEntities) {
-      const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
-      if (!animal) {
-        continue;
-      }
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const animal = comps.optional<AnimalComponent>(CT.Animal);
+      if (!animal) continue;
 
       // Validate required fields (per CLAUDE.md - crash if missing)
       if (animal.health === undefined || animal.health === null) {
@@ -236,7 +219,7 @@ export class AnimalSystem implements System {
         animal.lifeStage = newLifeStage;
 
         // Emit life stage changed event
-        world.eventBus.emit({
+        ctx.world.eventBus.emit({
           type: 'life_stage_changed',
           source: entity.id,
           data: {
@@ -257,7 +240,7 @@ export class AnimalSystem implements System {
         animal.state = newState;
 
         // Emit state changed event
-        world.eventBus.emit({
+        ctx.world.eventBus.emit({
           type: 'animal_state_changed',
           source: entity.id,
           data: {
@@ -269,9 +252,9 @@ export class AnimalSystem implements System {
 
         // State changed - need to update energy delta rates on next update
         // (e.g., sleeping recovers 2x faster, fleeing drains 1.5x faster)
-        // Force rate update by setting lastUpdateTick to trigger update
+        // Force rate update by setting deltaLastUpdateTick to trigger update
         if (shouldUpdateRates) {
-          this.lastUpdateTick = 0; // Force update next tick
+          this.deltaLastUpdateTick = 0; // Force update next tick
         }
       }
 
@@ -280,7 +263,7 @@ export class AnimalSystem implements System {
 
       // Check for death (always runs every tick)
       if (animal.health <= 0 || animal.age >= species.maxAge) {
-        world.eventBus.emit({
+        ctx.world.eventBus.emit({
           type: 'animal_died',
           source: entity.id,
           data: {
@@ -307,7 +290,7 @@ export class AnimalSystem implements System {
 
     // Mark rates as updated
     if (shouldUpdateRates) {
-      this.lastUpdateTick = currentTick;
+      this.deltaLastUpdateTick = currentTick;
     }
   }
 
@@ -401,7 +384,6 @@ export class AnimalSystem implements System {
    * Provides smooth visual updates between batch updates
    */
   getInterpolatedValue(
-    world: World,
     entityId: string,
     field: 'hunger' | 'thirst' | 'energy' | 'age' | 'stress' | 'health',
     currentValue: number
@@ -415,7 +397,7 @@ export class AnimalSystem implements System {
       CT.Animal,
       field,
       currentValue,
-      world.tick
+      this.world.tick
     );
   }
 }

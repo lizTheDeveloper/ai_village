@@ -49,9 +49,13 @@ export const RenderableComponentSchema: ComponentSchema<RenderableComponent> = {
     { name: 'alpha', type: 'number', required: false, default: 1.0 },
   ],
   validate: (data: unknown): data is RenderableComponent => {
-    const d = data as any;
+    // Type guard: check if data is a record type
+    if (!data || typeof data !== 'object') {
+      return false;
+    }
+
+    const d = data as Record<string, unknown>;
     const valid = (
-      d &&
       d.type === 'renderable' &&
       typeof d.spriteId === 'string' &&
       typeof d.layer === 'string' &&

@@ -266,6 +266,20 @@ export class GameLoop {
     // Advance tick
     this._world.advanceTick();
 
+    // Update introspection cache if API is attached
+    // Type guard: Introspection API is dynamically attached at runtime by introspection package
+    if ('__introspectionAPI' in this._world) {
+      const worldWithAPI = this._world as World & {
+        __introspectionAPI?: { onTick?: (tick: number) => void };
+      };
+      if (
+        worldWithAPI.__introspectionAPI &&
+        typeof worldWithAPI.__introspectionAPI.onTick === 'function'
+      ) {
+        worldWithAPI.__introspectionAPI.onTick(this._world.tick);
+      }
+    }
+
     // Update timeline manager for auto-snapshots (fire-and-forget)
     timelineManager.tick(
       this._universeId,

@@ -58,6 +58,82 @@ export interface ITerrainGenerator {
 }
 
 /**
+ * Planet interface for multi-planet support.
+ * Defined here to avoid circular dependency with world package.
+ *
+ * Each planet has its own:
+ * - ChunkManager for terrain storage
+ * - TerrainGenerator with planet-specific parameters
+ * - Named locations registry
+ * - Entity tracking
+ */
+export interface IPlanet {
+  /** Planet configuration */
+  readonly config: {
+    id: string;
+    name: string;
+    type: string;
+    seed: string;
+    gravity?: number;
+    atmosphereDensity?: number;
+    isTidallyLocked?: boolean;
+    isStarless?: boolean;
+    dayLengthHours?: number;
+    skyColor?: string;
+    description?: string;
+  };
+
+  /** Get chunk manager for this planet */
+  readonly chunkManager: IChunkManager;
+
+  /** Get a chunk, generating terrain if needed */
+  getChunk(chunkX: number, chunkY: number, world?: WorldMutator): IChunk;
+
+  /** Get tile at world coordinates */
+  getTileAt(worldX: number, worldY: number): ITile | undefined;
+
+  /** Planet ID shortcut */
+  readonly id: string;
+
+  /** Planet name shortcut */
+  readonly name: string;
+
+  /** Planet type shortcut */
+  readonly type: string;
+
+  /** Add entity to this planet's tracking */
+  addEntity(entityId: string): void;
+
+  /** Remove entity from this planet's tracking */
+  removeEntity(entityId: string): void;
+
+  /** Check if entity is on this planet */
+  hasEntity(entityId: string): boolean;
+
+  /** Get all entity IDs on this planet */
+  readonly entities: ReadonlySet<string>;
+
+  /** Get entity count on this planet */
+  readonly entityCount: number;
+
+  /** Name a location on this planet */
+  nameLocation(
+    chunkX: number,
+    chunkY: number,
+    name: string,
+    namedBy: string,
+    tick: number,
+    description?: string
+  ): void;
+
+  /** Find a named location */
+  findLocation(name: string): { chunkX: number; chunkY: number } | undefined;
+
+  /** Get the name of a location */
+  getLocationName(chunkX: number, chunkY: number): string | undefined;
+}
+
+/**
  * Wall tile structure for voxel buildings.
  */
 export interface IWallTile {
@@ -247,6 +323,37 @@ export interface World {
    * See UniverseConfig.ts for presets (high_fantasy, grimdark, deistic, etc.)
    */
   readonly divineConfig?: Partial<UniverseDivineConfig>;
+
+  // ===========================================================================
+  // Planet System
+  // ===========================================================================
+
+  /**
+   * Get all planets in this world.
+   * Returns a read-only map of planet ID to planet.
+   */
+  getPlanets(): ReadonlyMap<string, IPlanet>;
+
+  /**
+   * Get a specific planet by ID.
+   */
+  getPlanet(planetId: string): IPlanet | undefined;
+
+  /**
+   * Get the currently active planet (where the player/camera is).
+   * Returns undefined if no planets are registered.
+   */
+  getActivePlanet(): IPlanet | undefined;
+
+  /**
+   * Get the ID of the currently active planet.
+   */
+  readonly activePlanetId: string | undefined;
+
+  /**
+   * Check if a planet exists.
+   */
+  hasPlanet(planetId: string): boolean;
 }
 
 /**
@@ -281,6 +388,28 @@ export interface WorldMutator extends World {
 
   /** Set feature flag */
   setFeature(feature: string, enabled: boolean): void;
+
+  // ===========================================================================
+  // Planet Mutation
+  // ===========================================================================
+
+  /**
+   * Register a planet with this world.
+   * The first registered planet becomes the active planet.
+   */
+  registerPlanet(planet: IPlanet): void;
+
+  /**
+   * Remove a planet from this world.
+   * Cannot remove the active planet unless it's the only one.
+   */
+  unregisterPlanet(planetId: string): void;
+
+  /**
+   * Set the active planet (where gameplay happens).
+   * This affects which ChunkManager is used for tile access.
+   */
+  setActivePlanet(planetId: string): void;
 }
 
 /**
@@ -319,6 +448,10 @@ export class WorldImpl implements WorldMutator {
 
   // Door location cache for fast lookups (updated when doors are built/destroyed)
   private doorLocationsCache: Array<{ x: number; y: number }> | null = null;
+
+  // Planet system - multi-planet support
+  private _planets = new Map<string, IPlanet>();
+  private _activePlanetId?: string;
 
   constructor(eventBus: EventBus, chunkManager?: IChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
@@ -374,6 +507,10 @@ export class WorldImpl implements WorldMutator {
 
   get divineConfig(): Partial<UniverseDivineConfig> | undefined {
     return this._divineConfig;
+  }
+
+  get activePlanetId(): string | undefined {
+    return this._activePlanetId;
   }
 
   get features(): FeatureFlags {
@@ -736,6 +873,134 @@ export class WorldImpl implements WorldMutator {
     this._divineConfig = config;
   }
 
+  // ===========================================================================
+  // Planet System Implementation
+  // ===========================================================================
+
+  /**
+   * Get all planets registered with this world.
+   */
+  getPlanets(): ReadonlyMap<string, IPlanet> {
+    return this._planets;
+  }
+
+  /**
+   * Get a specific planet by ID.
+   */
+  getPlanet(planetId: string): IPlanet | undefined {
+    return this._planets.get(planetId);
+  }
+
+  /**
+   * Get the currently active planet.
+   * Returns undefined if no planets are registered.
+   */
+  getActivePlanet(): IPlanet | undefined {
+    if (!this._activePlanetId) return undefined;
+    return this._planets.get(this._activePlanetId);
+  }
+
+  /**
+   * Check if a planet exists.
+   */
+  hasPlanet(planetId: string): boolean {
+    return this._planets.has(planetId);
+  }
+
+  /**
+   * Register a planet with this world.
+   * The first registered planet becomes the active planet automatically.
+   *
+   * @param planet - The planet to register
+   */
+  registerPlanet(planet: IPlanet): void {
+    if (this._planets.has(planet.id)) {
+      throw new Error(`Planet ${planet.id} is already registered`);
+    }
+
+    this._planets.set(planet.id, planet);
+
+    // First planet becomes active automatically
+    if (!this._activePlanetId) {
+      this._activePlanetId = planet.id;
+      // Also set the chunk manager to the active planet's chunk manager
+      this._chunkManager = planet.chunkManager;
+    }
+
+    // Emit event
+    this._eventBus.emit({
+      type: 'planet:registered',
+      source: 'world',
+      data: {
+        planetId: planet.id,
+        planetName: planet.name,
+        planetType: planet.type,
+        isActive: this._activePlanetId === planet.id,
+      },
+    });
+  }
+
+  /**
+   * Remove a planet from this world.
+   * Cannot remove the active planet unless it's the only one.
+   *
+   * @param planetId - ID of the planet to remove
+   */
+  unregisterPlanet(planetId: string): void {
+    if (!this._planets.has(planetId)) {
+      throw new Error(`Planet ${planetId} is not registered`);
+    }
+
+    // Cannot remove active planet if there are others
+    if (this._activePlanetId === planetId && this._planets.size > 1) {
+      throw new Error(`Cannot remove active planet ${planetId}. Set another planet as active first.`);
+    }
+
+    this._planets.delete(planetId);
+
+    // If this was the active planet and it's the last one, clear active
+    if (this._activePlanetId === planetId) {
+      this._activePlanetId = undefined;
+      this._chunkManager = undefined;
+    }
+
+    // Emit event
+    this._eventBus.emit({
+      type: 'planet:unregistered',
+      source: 'world',
+      data: { planetId },
+    });
+  }
+
+  /**
+   * Set the active planet (where gameplay happens).
+   * This switches the chunk manager used for tile access.
+   *
+   * @param planetId - ID of the planet to activate
+   */
+  setActivePlanet(planetId: string): void {
+    const planet = this._planets.get(planetId);
+    if (!planet) {
+      throw new Error(`Planet ${planetId} is not registered`);
+    }
+
+    const previousPlanetId = this._activePlanetId;
+    this._activePlanetId = planetId;
+    this._chunkManager = planet.chunkManager;
+
+    // Emit event
+    this._eventBus.emit({
+      type: 'planet:activated',
+      source: 'world',
+      data: {
+        planetId,
+        previousPlanetId,
+        planetName: planet.name,
+        planetType: planet.type,
+      },
+    });
+  }
+
   /**
    * Get terrain type at world coordinates.
    * Convenience method for PlacementScorer and BuildBehavior.
@@ -792,19 +1057,19 @@ export class WorldImpl implements WorldMutator {
     }
 
     // Iterate through all chunks to find door tiles
-    // ChunkManager should have a method to iterate chunks
-    const chunkManager = this._chunkManager as any;
-    if (chunkManager.getAllChunks && typeof chunkManager.getAllChunks === 'function') {
-      const chunks = chunkManager.getAllChunks();
-      for (const chunk of chunks) {
-        if (!chunk.generated) continue;
+    // Type guard: Check if ChunkManager has getLoadedChunks method (from @ai-village/world)
+    if ('getLoadedChunks' in this._chunkManager && typeof this._chunkManager.getLoadedChunks === 'function') {
+      const chunks = this._chunkManager.getLoadedChunks();
+      for (const chunkData of chunks) {
+        // Type guard: Check if chunk has generated property (IChunk vs limited type)
+        if ('generated' in chunkData && !chunkData.generated) continue;
 
         // Scan all tiles in this chunk
-        const chunkSize = 16; // Standard chunk size
+        const chunkSize = 32; // Standard chunk size (must match world package CHUNK_SIZE)
         for (let localX = 0; localX < chunkSize; localX++) {
           for (let localY = 0; localY < chunkSize; localY++) {
-            const worldX = chunk.x * chunkSize + localX;
-            const worldY = chunk.y * chunkSize + localY;
+            const worldX = chunkData.x * chunkSize + localX;
+            const worldY = chunkData.y * chunkSize + localY;
             const tile = this.getTileAt(worldX, worldY);
 
             if (tile?.door) {

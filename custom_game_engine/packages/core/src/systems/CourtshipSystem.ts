@@ -11,6 +11,8 @@ import { ComponentType as CT } from '../types/ComponentType';
 import type { World } from '../ecs/World';
 import type { Entity } from '../ecs/Entity';
 import { EntityImpl } from '../ecs/Entity';
+import type { EventBus } from '../events/EventBus';
+import { SystemEventManager } from '../events/TypedEventEmitter';
 import type { CourtshipComponent } from '../reproduction/courtship/CourtshipComponent';
 import type { SexualityComponent } from '../reproduction/SexualityComponent';
 import { CourtshipStateMachine } from '../reproduction/courtship/CourtshipStateMachine';
@@ -27,10 +29,15 @@ export class CourtshipSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Courtship];
 
   private stateMachine = new CourtshipStateMachine();
+  private events!: SystemEventManager;
 
   // Throttle: Run courtship checks every 5 ticks (reduces CPU load)
   private static readonly UPDATE_INTERVAL = 5;
   private tickCounter = 0;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Throttle updates
@@ -107,15 +114,11 @@ export class CourtshipSystem implements System {
       if (shouldPursue) {
         // Found someone! State machine already updated state to 'interested'
         // Emit interested event
-        world.eventBus.emit({
-          type: 'courtship:interested',
-          source: agent.id,
-          data: {
-            agentId: agent.id,
-            targetId: target.id,
-            tick: world.tick,
-          },
-        });
+        this.events.emit('courtship:interested', {
+          agentId: agent.id,
+          targetId: target.id,
+          tick: world.tick,
+        }, agent.id);
         break;
       }
     }
@@ -148,15 +151,11 @@ export class CourtshipSystem implements System {
     // State machine updates state to 'courting'
 
     // Emit courtship initiated event
-    world.eventBus.emit({
-      type: 'courtship:initiated',
-      source: agent.id,
-      data: {
-        initiatorId: agent.id,
-        targetId: target.id,
-        tick: world.tick,
-      },
-    });
+    this.events.emit('courtship:initiated', {
+      initiatorId: agent.id,
+      targetId: target.id,
+      tick: world.tick,
+    }, agent.id);
   }
 
   /**
@@ -252,15 +251,11 @@ export class CourtshipSystem implements System {
       }
 
       // Emit rejection event
-      world.eventBus.emit({
-        type: 'courtship:rejected',
-        source: agent.id,
-        data: {
-          rejecterId: agent.id,
-          initiatorId: initiator.id,
-          tick: world.tick,
-        },
-      });
+      this.events.emit('courtship:rejected', {
+        rejecterId: agent.id,
+        initiatorId: initiator.id,
+        tick: world.tick,
+      }, agent.id);
     }
     // 'continue' means keep waiting for more tactics
   }
@@ -299,15 +294,11 @@ export class CourtshipSystem implements System {
     partnerCourtship.state = 'mating';
 
     // Emit event
-    world.eventBus.emit({
-      type: 'courtship:consent',
-      source: agent.id,
-      data: {
-        agent1: agent.id,
-        agent2: partner.id,
-        tick: world.tick,
-      },
-    });
+    this.events.emit('courtship:consent', {
+      agent1: agent.id,
+      agent2: partner.id,
+      tick: world.tick,
+    }, agent.id);
   }
 
   /**
@@ -480,5 +471,9 @@ export class CourtshipSystem implements System {
     // Select tactic based on style
     // For now, random selection
     return suitableTactics[Math.floor(Math.random() * suitableTactics.length)] ?? null;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

@@ -12,6 +12,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import type { DeityComponent } from '../../components/DeityComponent.js';
 
 /**
  * Data returned by the DeityIdentity view
@@ -104,10 +105,10 @@ export const DeityIdentityView: DashboardView<DeityIdentityViewData> = {
 
     try {
       // Find player deity
-      let playerDeity: { id: string; component: any } | null = null;
+      let playerDeity: { id: string; component: DeityComponent } | null = null;
       for (const entity of world.entities.values()) {
         if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as any;
+          const deityComp = entity.getComponent<DeityComponent>(CT.Deity);
           if (deityComp && deityComp.controller === 'player') {
             playerDeity = { id: entity.id, component: deityComp };
             break;

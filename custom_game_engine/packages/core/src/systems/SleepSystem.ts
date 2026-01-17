@@ -5,6 +5,8 @@ import { BuildingType as BT } from '../types/BuildingType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { CircadianComponent, DreamContent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -74,6 +76,11 @@ export class SleepSystem implements System {
     sleepDrive?: () => void;
     energyRecovery?: () => void;
   }>();
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
 
   /**
    * Set the StateMutatorSystem reference (called during system registration)
@@ -395,13 +402,9 @@ export class SleepSystem implements System {
     }
 
     // Emit wake event
-    world.eventBus.emit({
-      type: 'agent:woke',
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-      },
-    });
+    this.events.emit('agent:woke', {
+      agentId: entity.id,
+    }, entity.id);
   }
 
   /**
@@ -482,14 +485,14 @@ export class SleepSystem implements System {
     circadian.hasDreamedThisSleep = true;
 
     // Emit dream event
-    world.eventBus.emit({
-      type: 'agent:dreamed',
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-        dreamContent: dreamNarrative,
-        entityId: entity.id,
-      },
-    });
+    this.events.emit('agent:dreamed', {
+      agentId: entity.id,
+      dreamContent: dreamNarrative,
+      entityId: entity.id,
+    }, entity.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

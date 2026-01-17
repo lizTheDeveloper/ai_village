@@ -2,7 +2,7 @@
  * Core persistence types - Schema versioning and serialization
  */
 
-import type { TerrainSnapshot } from '@ai-village/world';
+import type { TerrainSnapshot, PlanetSnapshot } from '@ai-village/world';
 import type { UniverseDivineConfig } from '@ai-village/divinity';
 
 // ============================================================================
@@ -138,15 +138,95 @@ export interface PassageSnapshot extends Versioned {
 }
 
 // ============================================================================
+// Planet Serialization
+// ============================================================================
+
+/**
+ * Planet terrain snapshot - combines planet config with its terrain data.
+ * Each planet has its own ChunkManager and terrain.
+ */
+export interface PlanetTerrainSnapshot extends Versioned {
+  $schema: 'https://aivillage.dev/schemas/planet-terrain/v1';
+
+  /** Planet configuration and metadata (from PlanetSnapshot in @ai-village/world) */
+  planet: PlanetSnapshot;
+
+  /** Terrain data for this planet (compressed chunks) */
+  terrain: TerrainSnapshot | null;
+}
+
+/**
+ * Intra-universe portal snapshot (planet-to-planet travel).
+ * Distinct from Passage which is universe-to-universe.
+ */
+export interface PlanetPortalSnapshot extends Versioned {
+  $schema: 'https://aivillage.dev/schemas/planet-portal/v1';
+
+  /** Portal ID */
+  id: string;
+
+  /** Source planet ID */
+  fromPlanetId: string;
+
+  /** Target planet ID */
+  toPlanetId: string;
+
+  /** Portal location on source planet */
+  fromPosition?: { x: number; y: number };
+
+  /** Portal location on target planet */
+  toPosition?: { x: number; y: number };
+
+  /** Whether portal is discovered */
+  discovered: boolean;
+
+  /** Whether portal is active/usable */
+  activated: boolean;
+
+  /** Whether travel works both ways */
+  bidirectional: boolean;
+
+  /** Cost to use portal (item IDs and quantities) */
+  usageCost?: Array<{ itemId: string; quantity: number }>;
+
+  /** Who discovered this portal */
+  discoveredBy?: string;
+
+  /** Tick when discovered */
+  discoveredAt?: number;
+}
+
+// ============================================================================
 // World State
 // ============================================================================
 
 export interface WorldSnapshot {
-  /** Terrain data (compressed) */
+  /**
+   * Legacy terrain data (for backward compatibility).
+   * New saves use planets array instead.
+   * @deprecated Use planets array for new saves
+   */
   terrain: TerrainSnapshot | null;
 
   /** Zone configuration */
   zones: ZoneSnapshot[];
+
+  /**
+   * All planets in this universe (Phase 4+).
+   * Each planet has its own terrain and config.
+   */
+  planets?: PlanetTerrainSnapshot[];
+
+  /**
+   * Active planet ID (where the player/camera is focused).
+   * If undefined, defaults to first planet or legacy terrain.
+   */
+  activePlanetId?: string;
+
+  /**
+   * Portals between planets within this universe.
+   */
+  planetPortals?: PlanetPortalSnapshot[];
 
   // NOTE: Weather state is stored as WeatherComponent on entities (already serialized)
   // NOTE: Building data is stored in tiles (walls/doors/windows) and BuildingComponent entities (already serialized)

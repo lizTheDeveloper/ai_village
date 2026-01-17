@@ -12,6 +12,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import { DeityComponent } from '../../components/DeityComponent.js';
 
 /**
  * Myth/story information
@@ -82,11 +83,11 @@ export const MythologyView: DashboardView<MythologyViewData> = {
 
     try {
       // Find player deity
-      let playerDeity: { id: string; component: any } | null = null;
+      let playerDeity: { id: string; component: DeityComponent } | null = null;
       for (const entity of world.entities.values()) {
         if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as any;
-          if (deityComp && deityComp.controller === 'player') {
+          const deityComp = entity.components.get(CT.Deity);
+          if (deityComp instanceof DeityComponent && deityComp.controller === 'player') {
             playerDeity = { id: entity.id, component: deityComp };
             break;
           }

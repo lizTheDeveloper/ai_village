@@ -1,11 +1,8 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
@@ -28,7 +25,7 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  * @see TimeSystem (priority 3) - Provides game time for calculating needs decay rates
  * @see StateMutatorSystem (priority 5) - Batched vector updates for hunger/energy decay
  */
-export class NeedsSystem implements System {
+export class NeedsSystem extends BaseSystem {
   public readonly id: SystemId = 'needs';
   public readonly priority: number = 15; // Run after AI (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
@@ -44,7 +41,7 @@ export class NeedsSystem implements System {
   private timeEntityId: string | null = null;
 
   // Performance: Update delta rates once per game minute (1200 ticks)
-  private lastUpdateTick = 0;
+  private lastDeltaUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
 
   // Track cleanup functions for registered deltas
@@ -56,17 +53,6 @@ export class NeedsSystem implements System {
   // Reference to StateMutatorSystem (set via setStateMutatorSystem)
   private stateMutator: StateMutatorSystem | null = null;
 
-  // Type-safe event manager
-  private events!: SystemEventManager;
-
-  /**
-   * Initialize the event manager.
-   * Called during world initialization with the event bus.
-   */
-  initialize(world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
   /**
    * Set the StateMutatorSystem reference.
    * Called by registerAllSystems during initialization.
@@ -75,29 +61,23 @@ export class NeedsSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Use SimulationScheduler to only process active entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-
+  protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update delta rates once per game minute
-    const currentTick = world.tick;
-    const shouldUpdateRates = currentTick - this.lastUpdateTick >= this.UPDATE_INTERVAL;
+    const currentTick = ctx.tick;
+    const shouldUpdateRates = currentTick - this.lastDeltaUpdateTick >= this.UPDATE_INTERVAL;
 
     // Check if StateMutatorSystem has been set
     if (!this.stateMutator) {
       throw new Error('[NeedsSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
     }
 
-    for (const entity of activeEntities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
-      const needs = impl.getComponent<NeedsComponent>(CT.Needs)!;
-
-      if (!needs) {
-        throw new Error(`Entity ${entity.id} missing required needs component`);
-      }
+      const comps = ctx.components(entity);
+      const { needs } = comps.require(CT.Needs);
 
       // Dead entities don't have physical needs - skip decay entirely
-      const realmLocation = impl.getComponent<RealmLocationComponent>('realm_location');
+      const realmLocation = comps.optional<RealmLocationComponent>('realm_location');
       if (realmLocation?.transformations.includes('dead')) {
         // Clean up any existing deltas for dead entities
         if (this.deltaCleanups.has(entity.id)) {
@@ -112,7 +92,7 @@ export class NeedsSystem implements System {
       // Update delta rates based on current activity (once per game minute)
       if (shouldUpdateRates) {
         // Check if agent is sleeping
-        const circadian = impl.getComponent<CircadianComponent>(CT.Circadian);
+        const circadian = comps.optional<CircadianComponent>(CT.Circadian);
         const isSleeping = circadian?.isSleeping || false;
 
         // Hunger decay rate (per GAME minute)
@@ -123,8 +103,8 @@ export class NeedsSystem implements System {
         let energyDecayPerGameMinute = -0.0003; // Base rate: idle/walking
 
         if (!isSleeping) {
-          const agent = impl.getComponent<AgentComponent>(CT.Agent);
-          const movement = impl.getComponent<MovementComponent>(CT.Movement);
+          const agent = comps.optional<AgentComponent>(CT.Agent);
+          const movement = comps.optional<MovementComponent>(CT.Movement);
 
           if (agent) {
             const behavior = agent.behavior;
@@ -142,7 +122,7 @@ export class NeedsSystem implements System {
           }
 
           // Add temperature penalties
-          const temperature = impl.getComponent<TemperatureComponent>(CT.Temperature);
+          const temperature = comps.optional<TemperatureComponent>(CT.Temperature);
           if (temperature) {
             if (temperature.currentTemp < 10) {
               energyDecayPerGameMinute -= 0.0002; // Cold exposure
@@ -194,14 +174,15 @@ export class NeedsSystem implements System {
       const TICKS_PER_GAME_DAY = 14400;
       const STARVATION_DEATH_DAYS = 5;
 
-      let ticksAtZeroHunger = needs.ticksAtZeroHunger || 0;
+      const needsComp = needs as NeedsComponent;
+      let ticksAtZeroHunger = needsComp.ticksAtZeroHunger || 0;
       let starvationDayMemoriesIssued = new Set<number>(
-        Array.isArray(needs.starvationDayMemoriesIssued)
-          ? needs.starvationDayMemoriesIssued
+        Array.isArray(needsComp.starvationDayMemoriesIssued)
+          ? needsComp.starvationDayMemoriesIssued
           : []
       );
 
-      if (needs.hunger === 0) {
+      if (needsComp.hunger === 0) {
         ticksAtZeroHunger += 1;
       } else {
         // Reset counter if hunger is above 0
@@ -215,13 +196,13 @@ export class NeedsSystem implements System {
       // Check for energy critical (lowered from 20% to 10% to reduce spam)
       // Use tracked state to detect threshold crossings between ticks
       const wasEnergyCritical = this.wasEnergyCritical.get(entity.id) ?? false;
-      const isEnergyCritical = needs.energy < 0.1;
+      const isEnergyCritical = needsComp.energy < 0.1;
 
       // Emit progressive starvation memories (days 1, 2, 3, 4)
       if (daysAtZeroHunger >= 1 && daysAtZeroHunger <= 4) {
         if (!starvationDayMemoriesIssued.has(daysAtZeroHunger)) {
           // Type-safe emission - compile error if data shape is wrong
-          this.events.emit('need:starvation_day', {
+          ctx.emit('need:starvation_day', {
             agentId: entity.id,
             dayNumber: daysAtZeroHunger,
             survivalRelevance: 0.7 + (daysAtZeroHunger * 0.1),
@@ -232,9 +213,9 @@ export class NeedsSystem implements System {
       }
 
       // Update starvation tracking (if changed)
-      if (ticksAtZeroHunger !== needs.ticksAtZeroHunger ||
-          starvationDayMemoriesIssued.size !== needs.starvationDayMemoriesIssued.size) {
-        impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+      if (ticksAtZeroHunger !== needsComp.ticksAtZeroHunger ||
+          starvationDayMemoriesIssued.size !== needsComp.starvationDayMemoriesIssued.size) {
+        comps.update<NeedsComponent>(CT.Needs, (current) => {
           const updated = new NeedsComponent({
             ...current,
             ticksAtZeroHunger,
@@ -247,10 +228,10 @@ export class NeedsSystem implements System {
       // Emit energy critical event (once when crossing threshold)
       if (!wasEnergyCritical && isEnergyCritical) {
         // Type-safe emission - compile error if data shape is wrong
-        this.events.emit('need:critical', {
+        ctx.emit('need:critical', {
           agentId: entity.id,
           needType: 'energy',
-          value: needs.energy,
+          value: needsComp.energy,
           survivalRelevance: 0.7,
         }, entity.id);
       }
@@ -261,7 +242,7 @@ export class NeedsSystem implements System {
       // Check for death (starvation after 5 game days at 0% hunger)
       if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY) {
         // Type-safe emission - compile error if data shape is wrong
-        this.events.emit('agent:starved', {
+        ctx.emit('agent:starved', {
           agentId: entity.id,
           survivalRelevance: 1.0,
         }, entity.id);
@@ -270,7 +251,7 @@ export class NeedsSystem implements System {
 
     // Mark rates as updated
     if (shouldUpdateRates) {
-      this.lastUpdateTick = currentTick;
+      this.lastDeltaUpdateTick = currentTick;
     }
   }
 
@@ -279,7 +260,6 @@ export class NeedsSystem implements System {
    * Provides smooth visual updates between batch updates
    */
   getInterpolatedValue(
-    world: World,
     entityId: string,
     field: 'hunger' | 'energy',
     currentValue: number
@@ -293,11 +273,7 @@ export class NeedsSystem implements System {
       CT.Needs,
       field,
       currentValue,
-      world.tick
+      this.world.tick
     );
-  }
-
-  cleanup(): void {
-    this.events.cleanup(); // Unsubscribes all automatically
   }
 }

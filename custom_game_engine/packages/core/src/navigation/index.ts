@@ -99,3 +99,7 @@ export * from './EmotionalNavigationSystem.js';
 
 // Rainbow Mars quantum mechanics
 export * from './RainbowPlanetComponent.js';
+
+// Planet travel
+export * from './PlanetTravelComponent.js';
+export * from './PlanetPortalComponent.js';

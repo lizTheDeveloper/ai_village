@@ -24,14 +24,13 @@ import {
   GatherSeedsActionHandler,
   HarvestActionHandler,
   LiveEntityAPI,
-  TalkerPromptBuilder,
-  ExecutorPromptBuilder,
   type SystemRegistrationResult,
   type MetricsCollectionSystem,
 } from '@ai-village/core';
 
 import type { LLMDecisionQueue } from '@ai-village/llm';
 import type { StructuredPromptBuilder } from '@ai-village/llm';
+import { TalkerPromptBuilder, ExecutorPromptBuilder } from '@ai-village/llm';
 import { getPlantSpecies } from '@ai-village/world';
 import {
   PlantSystem,

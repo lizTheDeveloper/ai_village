@@ -219,6 +219,7 @@ export class VisionProcessor {
 
     // Detect terrain features using distant range
     const { features, description } = this.detectTerrainFeatures(
+      entity,
       world,
       position,
       { ...vision, range: distantRange }, // Use distant range for terrain
@@ -562,6 +563,7 @@ export class VisionProcessor {
    *
    * Stores significant terrain features in spatial memory for navigation and landmarks.
    *
+   * @param entity Observer entity
    * @param world World instance
    * @param position Observer position
    * @param vision Vision component
@@ -569,6 +571,7 @@ export class VisionProcessor {
    * @returns Features array and natural language description
    */
   private detectTerrainFeatures(
+    entity: EntityImpl,
     world: World,
     position: PositionComponent,
     vision: VisionComponent,
@@ -635,8 +638,7 @@ export class VisionProcessor {
 
     // Filter features to only those in the forward direction (120° cone)
     // Get agent's facing direction from velocity or last movement
-    const entity = worldWithTerrain.getEntity ? worldWithTerrain.getEntity((position as any).entityId) : null;
-    const velocity = entity?.components.get('velocity') as { vx: number; vy: number } | undefined;
+    const velocity = entity.components.get('velocity') as { vx: number; vy: number } | undefined;
 
     let facingAngle = 0; // Default to east if no velocity
     if (velocity && (velocity.vx !== 0 || velocity.vy !== 0)) {

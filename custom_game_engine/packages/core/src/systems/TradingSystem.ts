@@ -20,6 +20,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { ShopComponent } from '../components/ShopComponent.js';
 import type { CurrencyComponent } from '../components/CurrencyComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
@@ -52,14 +53,16 @@ export class TradingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private isInitialized = false;
+  private events!: SystemEventManager;
 
   /**
    * Initialize the system
    */
-  public initialize(_world: World, _eventBus: EventBus): void {
+  public initialize(_world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
+    this.events = new SystemEventManager(eventBus, this.id);
     this.isInitialized = true;
   }
 
@@ -222,19 +225,15 @@ export class TradingSystem implements System {
       }
 
       // Emit trade event
-      world.eventBus.emit({
-        type: 'trade:buy',
-        source: buyerId,
-        data: {
-          buyerId,
-          sellerId: shop.ownerId,
-          shopId: shopEntityId,
-          itemId,
-          quantity,
-          totalPrice,
-          unitPrice,
-        },
-      });
+      this.events.emit('trade:buy', {
+        buyerId,
+        sellerId: shop.ownerId,
+        shopId: shopEntityId,
+        itemId,
+        quantity,
+        totalPrice,
+        unitPrice,
+      }, buyerId);
 
       return {
         success: true,
@@ -421,19 +420,15 @@ export class TradingSystem implements System {
       }
 
       // Emit trade event
-      world.eventBus.emit({
-        type: 'trade:sell',
-        source: sellerId,
-        data: {
-          sellerId,
-          buyerId: shop.ownerId,
-          shopId: shopEntityId,
-          itemId,
-          quantity,
-          totalPrice,
-          unitPrice,
-        },
-      });
+      this.events.emit('trade:sell', {
+        sellerId,
+        buyerId: shop.ownerId,
+        shopId: shopEntityId,
+        itemId,
+        quantity,
+        totalPrice,
+        unitPrice,
+      }, sellerId);
 
       return {
         success: true,
@@ -537,5 +532,9 @@ export class TradingSystem implements System {
     }
 
     return nearestShop;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

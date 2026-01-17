@@ -11,11 +11,7 @@
  * - Magic modification duration tracking
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { SystemId } from '../types.js';
-import { ComponentType } from '../types/ComponentType.js';
+import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type {
   BodyComponent,
@@ -31,11 +27,12 @@ import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { BaseSystem, type SystemContext, type ComponentAccessor } from '../ecs/SystemContext.js';
 
-export class BodySystem implements System {
+export class BodySystem extends BaseSystem {
   public readonly id: SystemId = 'body';
   public readonly priority: number = 13; // After NeedsSystem (15), before AI
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [ComponentType.Body];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Body];
 
   /**
    * Systems that must run before this one.
@@ -64,44 +61,45 @@ export class BodySystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.stateMutator) {
       throw new Error('[BodySystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
     }
 
-    const currentTick = world.tick;
+    const currentTick = ctx.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    for (const entity of entities) {
-      const body = entity.components.get('body') as BodyComponent;
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const body = comps.optional<BodyComponent>(CT.Body);
       if (!body) continue;
 
       // Update blood loss/recovery and healing delta rates once per game minute
       if (shouldUpdateDeltas) {
         this.updateBloodLossDeltas(entity, body);
-        this.updateHealingDeltas(entity, body);
+        this.updateHealingDeltas(entity, body, comps);
       }
 
       // 1. Natural healing over time (handles injury removal when fully healed)
-      this.processNaturalHealing(entity, body, deltaTime);
+      this.processNaturalHealing(entity, body, ctx.deltaTime);
 
       // 3. Infection progression
-      this.processInfections(entity, body, deltaTime, world);
+      this.processInfections(entity, body, ctx.deltaTime);
 
       // 4. Update derived stats
       this.updateDerivedStats(entity, body);
 
       // 5. Check consciousness
-      this.checkConsciousness(entity, body, world);
+      this.checkConsciousness(entity, body, ctx.world);
 
       // 6. Check vital part destruction (death)
-      this.checkVitalParts(entity, body, world);
+      this.checkVitalParts(entity, body, ctx.world);
 
       // 7. Apply pain to stress
-      this.applyPainToStress(entity, body);
+      this.applyPainToStress(entity, body, comps);
 
       // 8. Process temporary modifications (magic duration)
-      this.processModifications(entity, body, world.tick, world);
+      this.processModifications(entity, body, ctx.tick, ctx.world);
     }
 
     // Mark delta rates as updated
@@ -118,7 +116,7 @@ export class BodySystem implements System {
    * Update blood loss and health damage delta rates.
    * Called once per game minute to register/update delta rates with StateMutatorSystem.
    */
-  private updateBloodLossDeltas(entity: Entity, body: BodyComponent): void {
+  private updateBloodLossDeltas(entity: any, body: BodyComponent): void {
     if (!this.stateMutator) {
       throw new Error('[BodySystem] StateMutatorSystem not set');
     }
@@ -204,13 +202,13 @@ export class BodySystem implements System {
    * Update healing delta rates for body parts and injuries.
    * Called once per game minute to register/update delta rates with StateMutatorSystem.
    */
-  private updateHealingDeltas(entity: Entity, body: BodyComponent): void {
+  private updateHealingDeltas(entity: any, body: BodyComponent, comps: ComponentAccessor): void {
     if (!this.stateMutator) {
       throw new Error('[BodySystem] StateMutatorSystem not set');
     }
 
-    const needs = entity.components.get('needs') as NeedsComponent;
-    const isResting = this.isAgentResting(entity);
+    const needs = comps.optional<NeedsComponent>(CT.Needs);
+    const isResting = needs ? needs.energy < 20 : false;
 
     // Calculate healing multiplier
     let healingMultiplier = 1.0;
@@ -294,7 +292,7 @@ export class BodySystem implements System {
   // ==========================================================================
 
   private processNaturalHealing(
-    _entity: Entity,
+    _entity: any,
     body: BodyComponent,
     _deltaTime: number
   ): void {
@@ -328,21 +326,14 @@ export class BodySystem implements System {
     }
   }
 
-  private isAgentResting(entity: Entity): boolean {
-    // Check if agent is sleeping or idle
-    const needs = entity.components.get('needs') as NeedsComponent;
-    return needs ? needs.energy < 20 : false;  // Simplified check
-  }
-
   // ==========================================================================
   // Infections
   // ==========================================================================
 
   private processInfections(
-    __entity: Entity,
+    __entity: any,
     body: BodyComponent,
-    deltaTime: number,
-    __world: World
+    deltaTime: number
   ): void {
     for (const part of Object.values(body.parts)) {
       if (part.infected) {
@@ -372,7 +363,7 @@ export class BodySystem implements System {
   // Derived Stats
   // ==========================================================================
 
-  private updateDerivedStats(_entity: Entity, body: BodyComponent): void {
+  private updateDerivedStats(_entity: any, body: BodyComponent): void {
     body.totalPain = calculateTotalPain(body);
     body.overallHealth = calculateOverallHealth(body);
   }
@@ -382,9 +373,9 @@ export class BodySystem implements System {
   // ==========================================================================
 
   private checkConsciousness(
-    entity: Entity,
+    entity: any,
     body: BodyComponent,
-    world: World
+    world: any
   ): void {
     const wasConscious = body.consciousness;
 
@@ -424,9 +415,9 @@ export class BodySystem implements System {
   // ==========================================================================
 
   private checkVitalParts(
-    entity: Entity,
+    entity: any,
     body: BodyComponent,
-    world: World
+    world: any
   ): void {
     if (hasDestroyedVitalParts(body)) {
       // Vital part destroyed → death
@@ -446,8 +437,8 @@ export class BodySystem implements System {
   // Pain → Stress Integration
   // ==========================================================================
 
-  private applyPainToStress(entity: Entity, body: BodyComponent): void {
-    const mood = entity.components.get('mood') as MoodComponent;
+  private applyPainToStress(entity: any, body: BodyComponent, comps: ComponentAccessor): void {
+    const mood = comps.optional<MoodComponent>(CT.Mood);
     const totalPain = body.totalPain;
 
     if (mood) {
@@ -456,7 +447,7 @@ export class BodySystem implements System {
     }
 
     // For animals (AnimalComponent has stress directly)
-    const animal = entity.components.get('animal') as AnimalComponent;
+    const animal = comps.optional<AnimalComponent>(CT.Animal);
     if (animal) {
       // Pain increases stress
       animal.stress = Math.min(100, animal.stress + totalPain * 0.1);
@@ -468,10 +459,10 @@ export class BodySystem implements System {
   // ==========================================================================
 
   private processModifications(
-    entity: Entity,
+    entity: any,
     body: BodyComponent,
     currentTick: number,
-    world: World
+    world: any
   ): void {
     // Remove expired global modifications
     const expiredGlobal: string[] = [];

@@ -17,11 +17,12 @@
  */
 
 import type { World } from '../ecs/World.js';
-import { System } from '../ecs/System.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
+import type { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { RecipeRegistry } from '../crafting/RecipeRegistry.js';
 import type { Recipe } from '../crafting/Recipe.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
@@ -67,12 +68,11 @@ export interface CookingCompletedEventData {
 /**
  * CookingSystem processes food crafting to apply cooking skill effects.
  */
-export class CookingSystem implements System {
+export class CookingSystem extends BaseSystem {
   public readonly id = 'cooking' as const;
   public readonly priority = 56; // Just after CraftingSystem (55)
   public readonly requiredComponents = [] as const;
 
-  private world: World | null = null;
   private recipeRegistry: RecipeRegistry | null = null;
 
   /**
@@ -85,12 +85,11 @@ export class CookingSystem implements System {
   /**
    * Initialize the system and subscribe to events.
    */
-  init(world: World): void {
-    this.world = world;
-
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
     // Subscribe to crafting:completed events
-    world.eventBus.subscribe('crafting:completed', (event) => {
+    eventBus.subscribe('crafting:completed', (event) => {
       this.handleCraftingCompleted(
+        world,
         event.data.agentId,
         event.data.recipeId,
         event.data.produced
@@ -102,14 +101,11 @@ export class CookingSystem implements System {
    * Handle crafting completion - apply cooking skill effects for food items.
    */
   private handleCraftingCompleted(
+    world: World,
     agentId: EntityId,
     recipeId: string,
     produced: Array<{ itemId: string; amount: number }>
   ): void {
-    if (!this.world) {
-      throw new Error('CookingSystem not initialized. Call init() first.');
-    }
-
     // Check if this is a food recipe
     const recipe = this.getRecipe(recipeId);
     if (!recipe || recipe.category !== 'Food') {
@@ -117,7 +113,7 @@ export class CookingSystem implements System {
     }
 
     // Get the agent
-    const entity = this.world.getEntity(agentId);
+    const entity = world.getEntity(agentId);
     if (!entity) {
       throw new Error(`Agent entity ${agentId} not found`);
     }
@@ -141,7 +137,7 @@ export class CookingSystem implements System {
     const baseXp = this.getXpForComplexity(complexity);
 
     // Record task completion (updates familiarity)
-    const tick = this.world.tick;
+    const tick = world.tick;
     skillsComp = recordTaskCompletion(skillsComp, 'cooking', recipeId, quality, tick);
 
     // Update specialization if station-based recipe
@@ -169,7 +165,7 @@ export class CookingSystem implements System {
       newLevel: undefined,
     };
 
-    this.world.eventBus.emit({
+    world.eventBus.emit({
       type: 'cooking:completed',
       source: 'cooking-system',
       data: eventData,
@@ -311,7 +307,7 @@ export class CookingSystem implements System {
    * System update - currently no per-tick processing needed.
    * All cooking logic is event-driven.
    */
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick updates needed - all logic is event-driven
   }
 }

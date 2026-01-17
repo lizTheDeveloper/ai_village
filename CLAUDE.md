@@ -17,8 +17,11 @@ Quick links to essential docs:
 - **[COMPONENTS_REFERENCE.md](./custom_game_engine/COMPONENTS_REFERENCE.md)** - 125+ component types with fields and examples
 - **[METASYSTEMS_GUIDE.md](./custom_game_engine/METASYSTEMS_GUIDE.md)** - Consciousness, Divinity, Reproduction, Multiverse, Magic, Realms
 
-### Agent Development
-- **[BEHAVIOR_CONTEXT.md](./custom_game_engine/docs/BEHAVIOR_CONTEXT.md)** - Agent behavior API ("pit of success" pattern)
+### Development APIs ("Pit of Success" Patterns)
+- **[PIT_OF_SUCCESS_APIS.md](./custom_game_engine/docs/PIT_OF_SUCCESS_APIS.md)** - Overview of all type-safe APIs
+- **[BEHAVIOR_CONTEXT.md](./custom_game_engine/docs/BEHAVIOR_CONTEXT.md)** - Agent behavior API
+- **SystemContext** (in PIT_OF_SUCCESS_APIS.md) - System development API
+- **TypedEventEmitter** (in PIT_OF_SUCCESS_APIS.md) - Type-safe event emission
 - **[AGENT_DECISION_STATE_DIAGRAM.md](./custom_game_engine/docs/AGENT_DECISION_STATE_DIAGRAM.md)** - Agent decision flow
 
 ### Performance & Quality

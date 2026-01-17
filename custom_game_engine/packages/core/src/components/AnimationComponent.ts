@@ -55,9 +55,11 @@ export const AnimationComponentSchema: ComponentSchema<AnimationComponent> = {
     { name: 'playing', type: 'boolean', required: true, default: true },
   ],
   validate: (data: unknown): data is AnimationComponent => {
-    const d = data as any;
+    // Type guard: Check if data is an object with required properties
+    if (!data || typeof data !== 'object') return false;
+
+    const d = data as Record<string, unknown>;
     return (
-      d &&
       d.type === 'animation' &&
       Array.isArray(d.frames) &&
       typeof d.currentFrame === 'number' &&

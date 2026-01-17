@@ -743,7 +743,7 @@ export class PlacementScorer {
     const searchRadiusSq = searchRadius * searchRadius;
 
     // Query memories for this resource type
-    const memories = spatialMem.queryResourceLocations(resourceType as any);
+    const memories = spatialMem.queryResourceLocations(resourceType);
 
     for (const m of memories) {
       const distSq = (m.position.x - x) ** 2 + (m.position.y - y) ** 2;

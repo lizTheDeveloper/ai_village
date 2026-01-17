@@ -1,9 +1,9 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
@@ -42,12 +42,12 @@ interface MemoryRecalledEventData {
 /**
  * MemoryConsolidationSystem handles memory decay and consolidation
  */
-export class MemoryConsolidationSystem implements System {
+export class MemoryConsolidationSystem extends BaseSystem {
   public readonly id: SystemId = 'memory_consolidation';
   public readonly priority: number = 105;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 1000; // Update every 1000 ticks (50 seconds)
 
-  private eventBus: EventBus | null = null;
   private consolidationTriggers: Set<string> = new Set();
   private recallEvents: Array<{ agentId: string; memoryId: string }> = [];
   /**
@@ -56,30 +56,16 @@ export class MemoryConsolidationSystem implements System {
    */
   private pendingGameDays: number = 0;
 
-  constructor(eventBus?: EventBus) {
-    if (eventBus) {
-      this.eventBus = eventBus;
-      this._setupEventListeners();
-    }
-  }
-
   /**
    * Initialize system with eventBus
    */
-  public initialize(_world: World, eventBus: EventBus): void {
-    if (!this.eventBus) {
-      this.eventBus = eventBus;
-      this._setupEventListeners();
-    }
+  protected onInitialize(_world: World, eventBus: EventBus): void {
+    this._setupEventListeners(eventBus);
   }
 
-  private _setupEventListeners(): void {
-    if (!this.eventBus) {
-      throw new Error('EventBus not initialized in MemoryConsolidationSystem');
-    }
-
+  private _setupEventListeners(eventBus: EventBus): void {
     // Listen for consolidation triggers
-    this.eventBus.subscribe('agent:sleep_start', (event) => {
+    eventBus.subscribe('agent:sleep_start', (event) => {
       const data = event.data as SleepEventData;
       if (!data.agentId) {
         throw new Error('agent:sleep_start event missing agentId');
@@ -87,7 +73,7 @@ export class MemoryConsolidationSystem implements System {
       this.consolidationTriggers.add(data.agentId);
     });
 
-    this.eventBus.subscribe('reflection:completed', (event) => {
+    eventBus.subscribe('reflection:completed', (event) => {
       const data = event.data as ReflectionEventData;
       if (!data.agentId) {
         throw new Error('reflection:completed event missing agentId');
@@ -96,7 +82,7 @@ export class MemoryConsolidationSystem implements System {
     });
 
     // Listen for memory recall events
-    this.eventBus.subscribe('memory:recalled', (event) => {
+    eventBus.subscribe('memory:recalled', (event) => {
       const data = event.data as MemoryRecalledEventData;
       if (!data.agentId) {
         throw new Error('memory:recalled event missing agentId');
@@ -112,28 +98,25 @@ export class MemoryConsolidationSystem implements System {
 
     // Listen for midnight (day change) - triggers daily memory cleanup
     // This is the primary mechanism for memory decay in accelerated simulations
-    this.eventBus.subscribe('time:day_changed', (_event) => {
+    eventBus.subscribe('time:day_changed', (_event) => {
       // Each day change = 1 game day of decay
       this.pendingGameDays += 1;
     });
   }
 
-  update(world: World, deltaTimeOrEntities: number | ReadonlyArray<Entity>, deltaTime?: number): void {
-    // Handle both calling conventions: (world, deltaTime) and (world, entities, deltaTime)
-    const actualDeltaTime = typeof deltaTimeOrEntities === 'number' ? deltaTimeOrEntities : deltaTime!;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const deltaTime = ctx.deltaTime;
 
     // Flush event bus first to process consolidation triggers and recall events
-    if (!this.eventBus) {
-      throw new Error('EventBus not initialized in MemoryConsolidationSystem.update');
-    }
-    this.eventBus.flush();
+    world.eventBus.flush();
 
     // Calculate days elapsed for decay:
     // - Primary: Use pendingGameDays from time:day_changed events (accurate for game time)
     // - Fallback: Use a small real-time delta for sub-day decay (minimal impact)
     // This ensures decay happens correctly in both accelerated simulations and real-time play
     const gameDaysElapsed = this.pendingGameDays;
-    const realTimeDaysElapsed = actualDeltaTime / SECONDS_PER_DAY;
+    const realTimeDaysElapsed = deltaTime / SECONDS_PER_DAY;
 
     // Use game days if available, otherwise use minimal real-time decay
     // The game day decay is the primary mechanism; real-time is just for smooth sub-day decay
@@ -169,10 +152,7 @@ export class MemoryConsolidationSystem implements System {
       // Remove forgotten memories and emit events
       const forgotten = memComp.removeForgotten();
       for (const memory of forgotten) {
-        if (!this.eventBus) {
-          throw new Error('EventBus not initialized in MemoryConsolidationSystem');
-        }
-        this.eventBus.emit({
+        world.eventBus.emit({
           type: 'memory:forgotten',
           source: this.id,
           data: {
@@ -229,10 +209,7 @@ export class MemoryConsolidationSystem implements System {
     this.recallEvents = [];
 
     // Flush event bus
-    if (!this.eventBus) {
-      throw new Error('EventBus not initialized in MemoryConsolidationSystem');
-    }
-    this.eventBus.flush();
+    world.eventBus.flush();
   }
 
   private _consolidateMemories(agentId: string, memComp: EpisodicMemoryComponent): void {
@@ -345,8 +322,8 @@ export class MemoryConsolidationSystem implements System {
       }
 
       // Emit consolidation event
-      if (this.eventBus) {
-        this.eventBus.emit({
+      if (this.world) {
+        this.world.eventBus.emit({
           type: 'memory:consolidated',
           source: this.id,
           data: {

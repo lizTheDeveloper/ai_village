@@ -125,6 +125,38 @@ export class BuildBehavior extends BaseBehavior {
       buildingType = behaviorState.buildingType as BuildingType;
     }
 
+    // STORAGE BUILDING LIMIT CHECK: Prevent over-building storage structures
+    // Dynamic limit: 1 storage per 2 agents, max 10
+    if (buildingType === BT.StorageChest || buildingType === 'storage-box') {
+      const agents = world.query().with(ComponentType.Agent).executeEntities();
+      const agentCount = Math.max(1, agents.length);
+      const maxStorage = Math.min(Math.ceil(agentCount / 2), 10);
+
+      const storageBuildings = world.query().with(ComponentType.Building).executeEntities();
+      let storageCount = 0;
+      for (const b of storageBuildings) {
+        const bc = (b as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+        if (bc?.buildingType === BT.StorageChest || bc?.buildingType === 'storage-box') {
+          storageCount++;
+        }
+      }
+
+      if (storageCount >= maxStorage) {
+        world.eventBus.emit({
+          type: 'construction:failed',
+          source: entity.id,
+          data: {
+            buildingId: `${buildingType}_${Date.now()}`,
+            reason: `Storage limit reached (${storageCount}/${maxStorage}) - use existing storage instead`,
+            builderId: entity.id,
+            agentId: entity.id,
+          },
+        });
+
+        return { complete: true, reason: `Storage limit reached (${storageCount}/${maxStorage})` };
+      }
+    }
+
     // CAMPFIRE DUPLICATE PREVENTION: Before building a campfire, check if one exists nearby
     // This prevents the over-building issue where agents create 85+ campfires
     if (buildingType === BT.Campfire) {
@@ -140,6 +172,7 @@ export class BuildBehavior extends BaseBehavior {
         );
 
         for (const { entity: building, distance } of nearbyBuildings) {
+          // Cast required: ChunkSpatialQuery returns Entity, but we need EntityImpl for component access
           const buildingImpl = building as EntityImpl;
           const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
@@ -164,6 +197,7 @@ export class BuildBehavior extends BaseBehavior {
         const nearbyBuildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
 
         for (const building of nearbyBuildings) {
+          // Cast required: World.query returns Entity, but we need EntityImpl for component access
           const buildingImpl = building as EntityImpl;
           const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
           const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
@@ -360,6 +394,7 @@ export class BuildBehavior extends BaseBehavior {
 
     for (const building of buildings) {
       if (building.id === buildingId) {
+        // Cast required: World.query returns Entity, but we need EntityImpl for component access
         const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
 
         if (buildingComp?.isComplete) {
@@ -566,6 +601,7 @@ export class BuildBehavior extends BaseBehavior {
     const storageBuildings = world.query().with(ComponentType.Building).with(ComponentType.Inventory).executeEntities();
 
     for (const storage of storageBuildings) {
+      // Cast required: World.query returns Entity, but we need EntityImpl for component access
       const storageImpl = storage as EntityImpl;
       const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
       const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
@@ -649,6 +685,39 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   }
 
   let buildingType = ctx.getState<BuildingType>('buildingType') || BT.Campfire;
+
+  // STORAGE BUILDING LIMIT CHECK: Prevent over-building storage structures
+  if (buildingType === BT.StorageChest || buildingType === 'storage-box') {
+    // Get all buildings to count storage
+    const allBuildings = ctx.getEntitiesInRadius(1000, [ComponentType.Building]);
+    let storageCount = 0;
+    for (const { entity: building } of allBuildings) {
+      const buildingImpl = building as EntityImpl;
+      const bc = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      if (bc?.buildingType === BT.StorageChest || bc?.buildingType === 'storage-box') {
+        storageCount++;
+      }
+    }
+
+    // Count agents for dynamic limit
+    const allAgents = ctx.getEntitiesInRadius(1000, [ComponentType.Agent]);
+    const agentCount = Math.max(1, allAgents.length);
+    const maxStorage = Math.min(Math.ceil(agentCount / 2), 10);
+
+    if (storageCount >= maxStorage) {
+      ctx.emit({
+        type: 'construction:failed',
+        data: {
+          buildingId: `${buildingType}_${Date.now()}`,
+          reason: `Storage limit reached (${storageCount}/${maxStorage})`,
+          builderId: ctx.entity.id,
+          agentId: ctx.entity.id,
+        },
+      });
+
+      return ctx.complete(`Storage limit reached (${storageCount}/${maxStorage})`);
+    }
+  }
 
   // CAMPFIRE DUPLICATE PREVENTION
   if (buildingType === BT.Campfire) {

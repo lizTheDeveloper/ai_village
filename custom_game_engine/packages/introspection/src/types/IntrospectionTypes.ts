@@ -7,6 +7,12 @@
 
 import type { ComponentSchema } from './ComponentSchema.js';
 import type { ComponentCategory } from './CategoryTypes.js';
+import type { MutationSource } from '../mutation/MutationEvent.js';
+import type { CacheStats } from '../cache/RenderCache.js';
+
+// Re-export existing types for convenience
+export type { MutationSource };
+export type { CacheStats };
 
 /**
  * Simulation mode from SimulationScheduler
@@ -17,11 +23,6 @@ export type SimulationMode = 'ALWAYS' | 'PROXIMITY' | 'PASSIVE';
  * Visibility level for schema introspection
  */
 export type VisibilityLevel = 'full' | 'llm' | 'player';
-
-/**
- * Source of a mutation (for audit trail)
- */
-export type MutationSource = 'system' | 'player' | 'admin' | 'agent' | 'llm';
 
 /**
  * Function to unsubscribe from entity watching
@@ -130,9 +131,10 @@ export interface SafeMutationRequest {
 }
 
 /**
- * Result of a mutation attempt
+ * Extended result of a mutation attempt (includes metrics and audit trail)
+ * More detailed than the base MutationResult from mutation/MutationService
  */
-export interface MutationResult {
+export interface SafeMutationResult {
   /** Whether the mutation succeeded */
   success: boolean;
 
@@ -166,7 +168,7 @@ export interface BatchMutationResult {
   success: boolean;
 
   /** Individual mutation results */
-  results: MutationResult[];
+  results: SafeMutationResult[];
 
   /** Number of successful mutations */
   successCount: number;
@@ -467,28 +469,7 @@ export interface EntityChangeEvent {
   }>;
 }
 
-/**
- * Cache statistics
- */
-export interface CacheStats {
-  /** Total number of cache entries */
-  size: number;
-
-  /** Number of cache hits */
-  hits: number;
-
-  /** Number of cache misses */
-  misses: number;
-
-  /** Cache hit rate (0-1) */
-  hitRate: number;
-
-  /** Number of cache invalidations */
-  invalidations: number;
-
-  /** Memory usage in bytes (approximate) */
-  memoryUsage: number;
-}
+// CacheStats is re-exported from ../cache/RenderCache.js above
 
 // ============================================================================
 // Snapshots & Time Travel
@@ -498,6 +479,60 @@ export interface CacheStats {
  * Snapshot ID (opaque)
  */
 export type SnapshotId = string;
+
+/**
+ * Entity state within a snapshot
+ */
+export interface EntityState {
+  /** Entity ID */
+  id: string;
+
+  /** Serialized component data */
+  components: Record<string, unknown>;
+}
+
+/**
+ * Full entity snapshot with metadata
+ */
+export interface EntitySnapshot {
+  /** Snapshot ID */
+  id: SnapshotId;
+
+  /** Tick when snapshot was created */
+  createdAt: number;
+
+  /** Custom metadata */
+  metadata: Record<string, any>;
+
+  /** Entity states */
+  entities: Map<string, EntityState>;
+
+  /** Snapshot metrics */
+  metrics: {
+    /** Time taken to create snapshot (ms) */
+    creationLatency: number;
+
+    /** Number of entities in snapshot */
+    entityCount: number;
+  };
+}
+
+/**
+ * Snapshot metadata (for listing)
+ */
+export interface SnapshotMetadata {
+  /** Snapshot ID */
+  id: SnapshotId;
+
+  /** Tick when snapshot was created */
+  createdAt: number;
+
+  /** Number of entities in snapshot */
+  entityCount: number;
+
+  /** Custom metadata */
+  metadata: Record<string, any>;
+}
 
 /**
  * Result of snapshot restoration

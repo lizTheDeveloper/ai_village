@@ -1411,6 +1411,102 @@ export interface GameEventMap {
     componentType: string;
   };
 
+  // === Planet Events ===
+  'planet:registered': {
+    planetId: string;
+    planetName: string;
+    planetType: string;
+    isActive: boolean;
+  };
+  'planet:unregistered': {
+    planetId: string;
+  };
+  'planet:activated': {
+    planetId: string;
+    previousPlanetId?: string;
+    planetName: string;
+    planetType: string;
+  };
+  'planet:entity_arrived': {
+    entityId: EntityId;
+    planetId: string;
+    previousPlanetId?: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage' | 'spawn';
+  };
+  'planet:entity_departed': {
+    entityId: EntityId;
+    planetId: string;
+    destinationPlanetId: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage';
+  };
+
+  // === Planet Travel Events ===
+  /** Travel between planets started */
+  'planet_travel_started': {
+    entityId: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage';
+    portalId?: string;
+    shipId?: string;
+    crewCount?: number;
+  };
+
+  /** Travel between planets completed successfully */
+  'planet_travel_complete': {
+    entityId: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage';
+  };
+
+  /** Travel between planets failed */
+  'planet_travel_failed': {
+    entityId: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+    reason?: string;
+  };
+
+  /** Entity discovered a new planet (first visit) */
+  'planet_discovered': {
+    entityId: EntityId;
+    planetId: string;
+    discoveryMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage' | 'spawn';
+  };
+
+  // === Portal Events ===
+  /** Portal became unstable due to low stability */
+  'portal_unstable': {
+    portalId: string;
+    entityId: EntityId;
+  };
+
+  /** Portal was discovered */
+  'portal_discovered': {
+    portalId: string;
+    discoveredBy: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+    discoveryMethod: 'exploration' | 'research' | 'quest' | 'random';
+  };
+
+  /** Portal was activated */
+  'portal_activated': {
+    portalId: string;
+    activatedBy: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+  };
+
+  /** Portal collapsed (reached stability 0 or max uses) */
+  'portal_collapsed': {
+    portalId: string;
+    reason: 'stability' | 'max_uses' | 'external';
+    fromPlanetId: string;
+    toPlanetId: string;
+  };
+
   // === Action Events (additional) ===
   'action:fertilize': {
     x: number;
@@ -2377,6 +2473,10 @@ export interface GameEventMap {
     entityId: EntityId;
     spellId: string;
     proficiency?: number;
+    spellName?: string;
+    paradigmId?: string;
+    source?: string;
+    deityId?: string;
   };
 
   /** Confirmation event when a spell is learned with detailed info */
@@ -3274,10 +3374,32 @@ export interface GameEventMap {
 
   /** Item dropped on ground (from tree fall, etc.) */
   'item:dropped': {
-    entityId: string;
-    material: string;
-    amount: number;
+    entityId?: string;
+    material?: string;
+    amount?: number;
+    itemId?: string;
+    quantity?: number;
     position: { x: number; y: number };
+  };
+
+  /** Item equipped in equipment slot */
+  'item:equipped': {
+    slot: string;
+    itemId: string;
+  };
+
+  /** Item transferred between inventory slots */
+  'item:transferred': {
+    source: {
+      type: string;
+      index?: number;
+      slot?: string;
+    } | null;
+    item: {
+      itemId: string;
+      quantity: number;
+      quality?: number;
+    } | null;
   };
 
   /** Animation created (for visual effects) */

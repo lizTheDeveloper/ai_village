@@ -135,8 +135,9 @@ export class LLMDecisionQueue {
 
         // Apply custom headers if provided
         if (config.customHeaders) {
-          // Store headers for fetch interceptor
-          (provider as any).customHeaders = config.customHeaders;
+          // Type assertion: OpenAICompatProvider has public customHeaders property
+          // This is safe because we just created an OpenAICompatProvider instance above
+          (provider as OpenAICompatProvider).customHeaders = config.customHeaders;
         }
       }
 

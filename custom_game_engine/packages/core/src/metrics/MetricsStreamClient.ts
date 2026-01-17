@@ -132,8 +132,17 @@ export class MetricsStreamClient {
       }
     }
     // Check for Vite's import.meta.env in browser
+    // Type assertion: Vite injects import.meta.env at build time via globalThis
+    // globalThis doesn't include Vite-specific properties in standard type definitions
     if (typeof globalThis !== 'undefined') {
-      const meta = (globalThis as any).import?.meta?.env;
+      const globalWithVite = globalThis as typeof globalThis & {
+        import?: {
+          meta?: {
+            env?: Record<string, string>;
+          };
+        };
+      };
+      const meta = globalWithVite.import?.meta?.env;
       if (meta?.VITEST || meta?.MODE === 'test') {
         return true;
       }

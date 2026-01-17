@@ -31,7 +31,7 @@
 
 import type { EventBus } from './EventBus.js';
 import type { GameEventMap, EventType } from './EventMap.js';
-import type { GameEvent, EventPriority, Unsubscribe } from './GameEvent.js';
+import type { GameEvent, EventHandler, EventPriority, Unsubscribe } from './GameEvent.js';
 import type { SystemId, EntityId } from '../types.js';
 
 /**
@@ -172,7 +172,7 @@ export class SystemEventManager implements TypedEmitter {
       );
     }
 
-    const wrappedHandler = (event: GameEvent<T>) => {
+    const wrappedHandler: EventHandler<T> = (event: GameEvent<T>) => {
       try {
         handler(event.data, event);
       } catch (error) {
@@ -186,7 +186,7 @@ export class SystemEventManager implements TypedEmitter {
 
     const unsub = this.eventBus.subscribe<T>(
       type,
-      wrappedHandler as any,
+      wrappedHandler,
       priority
     );
     this.subscriptions.push(unsub);
@@ -214,6 +214,97 @@ export class SystemEventManager implements TypedEmitter {
         unsub();
       }
     };
+  }
+
+  /**
+   * Subscribe to a generic event type (not in GameEventMap).
+   * Use this for events that haven't been added to EventMap yet.
+   *
+   * @param type - Event type string
+   * @param handler - Handler receiving unknown data
+   * @param priority - Optional priority
+   */
+  onGeneric(
+    type: string,
+    handler: (data: unknown) => void,
+    priority?: EventPriority
+  ): Unsubscribe {
+    if (this.isCleanedUp) {
+      throw new Error(
+        `[${this.systemId}] Cannot subscribe to '${type}' after cleanup`
+      );
+    }
+
+    // Type assertion required: onGeneric is the subscription counterpart to emitGeneric.
+    // We accept GameEvent<EventType> (union of all event types) because:
+    // 1. This is for events not yet in GameEventMap
+    // 2. Handler receives 'unknown' data, explicitly opting out of type safety
+    // 3. This is a bridge API for experimental/legacy events
+    //
+    // The wrappedHandler function extracts event.data (which could be any event's data)
+    // and passes it as 'unknown' to the caller's handler, which is responsible for
+    // runtime validation if needed.
+    //
+    // Proper long-term fix: Add the event to GameEventMap in EventMap.ts
+    const wrappedHandler = (event: GameEvent<EventType>) => {
+      try {
+        handler(event.data);
+      } catch (error) {
+        console.error(
+          `[${this.systemId}] Error in generic handler for '${type}':`,
+          error
+        );
+        throw error;
+      }
+    };
+
+    const unsub = this.eventBus.subscribe(
+      type as EventType,
+      wrappedHandler,
+      priority
+    );
+    this.subscriptions.push(unsub);
+    return unsub;
+  }
+
+  /**
+   * Emit a generic event (not in GameEventMap).
+   * Use this for events that haven't been added to EventMap yet.
+   *
+   * @param type - Event type string
+   * @param data - Event data (any shape)
+   * @param source - Optional source override
+   */
+  emitGeneric(
+    type: string,
+    data: unknown,
+    source?: EntityId
+  ): void {
+    if (this.isCleanedUp) {
+      console.warn(
+        `[${this.systemId}] Attempted to emit generic '${type}' after cleanup`
+      );
+      return;
+    }
+
+    // Type assertion required: emitGeneric is an intentional escape hatch for events not in GameEventMap.
+    // This is a bridge API for:
+    // 1. Experimental events during development
+    // 2. Legacy events being migrated to typed system
+    // 3. Dynamic events generated at runtime
+    //
+    // The cast to Record<string, unknown> represents untyped event data - we acknowledge
+    // we're bypassing compile-time safety here. This is acceptable because:
+    // - emitGeneric is explicitly marked as "generic" (untyped)
+    // - Callers accepting unknown data are responsible for runtime validation
+    // - This prevents blocking valid use cases (experiments, migrations)
+    //
+    // Proper long-term fix: Add the event to GameEventMap in EventMap.ts
+    this.eventBus.emit({
+      type: type as EventType,
+      source: source ?? this.defaultSource,
+      data: data as Record<string, unknown>,
+    });
   }
 
   /**

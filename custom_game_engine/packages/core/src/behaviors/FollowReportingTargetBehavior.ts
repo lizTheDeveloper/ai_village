@@ -27,6 +27,7 @@ import type { World } from '../ecs/World.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
+import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 /** Safe distance from dangerous targets (aliens, battles) */
@@ -229,13 +230,16 @@ function orientTowardTarget(
   }));
 
   // Also update renderable facing if it exists
-  const renderable = entity.getComponent(CT.Renderable) as any;
+  const renderable = entity.getComponent<RenderableComponent>(CT.Renderable);
   if (renderable) {
     // Calculate cardinal direction for sprite rendering
     const cardinalDirection = getCardinalDirection(angle);
-    entity.updateComponent(CT.Renderable, (current: any) => ({
+    // Store direction in animationState (format: "walk-south", "idle-east", etc.)
+    // The renderer's sprite system reads animState.direction from sprite metadata,
+    // not from component properties. We store it here for potential future use.
+    entity.updateComponent<RenderableComponent>(CT.Renderable, (current) => ({
       ...current,
-      direction: cardinalDirection,
+      animationState: cardinalDirection,
     }));
   }
 }

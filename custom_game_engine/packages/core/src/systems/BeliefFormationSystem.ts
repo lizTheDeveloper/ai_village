@@ -4,6 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { BeliefType, EvidenceType } from '../components/BeliefComponent.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../utils/componentHelpers.js';
@@ -17,13 +18,13 @@ export class BeliefFormationSystem implements System {
   public readonly priority: number = 110; // After memory systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus?: EventBus;
+  private events!: SystemEventManager;
   private readonly patternThreshold: number = 3; // Require 3 observations to form belief
   private lastUpdateTick: number = 0;
   private readonly updateInterval: number = 100; // Only run every 5 seconds (at 20 TPS)
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -123,17 +124,13 @@ export class BeliefFormationSystem implements System {
 
       // Emit event when belief forms
       const existingBelief = belief.getBeliefAbout('character', agentId);
-      if (!existingBelief && this.eventBus) {
-        this.eventBus.emit({
-          type: 'belief:formed',
-          source: 'belief_formation',
-          data: {
-            agentId: entity.id,
+      if (!existingBelief) {
+        this.events.emit('belief:formed', {
+          agentId: entity.id,
           entityId: entity.id,
           beliefType: 'character',
           content: `Observed agent ${agentId}`,
           confidence: 0.5,
-          },
         });
       }
     }
@@ -227,6 +224,10 @@ export class BeliefFormationSystem implements System {
         currentTick
       );
     }
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   // Future: Add _checkSelfBeliefs method for epistemic humility features

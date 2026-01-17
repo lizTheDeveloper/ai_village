@@ -19,7 +19,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { AgentComponent, AgentBehavior, StrategicPriorities } from '../components/AgentComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
-import type { GoalsComponent, PersonalGoal, GoalCategory } from '../components/GoalsComponent.js';
+import { GoalsComponent, type PersonalGoal, type GoalCategory } from '../components/GoalsComponent.js';
 import type { SpatialMemoryComponent, PositionComponent } from '../components/index.js';
 import { nameChunk } from '../components/SpatialMemoryComponent.js';
 
@@ -96,12 +96,8 @@ function addGoalToComponent(
   let goalsComp = entity.getComponent(ComponentType.Goals) as GoalsComponent | undefined;
 
   if (!goalsComp) {
-    // Create goals component with basic structure
-    goalsComp = {
-      type: 'goals',
-      goals: [],
-      MAX_GOALS: 5,
-    } as unknown as GoalsComponent;
+    // Create goals component using proper class instantiation
+    goalsComp = new GoalsComponent();
     entity.addComponent(goalsComp);
   }
 
@@ -134,10 +130,9 @@ function addGoalToComponent(
     completed: false,
   };
 
-  // Check if we can add more goals (raw data check since it might not be a class instance)
-  const goalsArray = (goalsComp as any).goals as PersonalGoal[];
-  if (goalsArray.length < 5) {
-    goalsArray.push(newGoal);
+  // Check if we can add more goals
+  if (goalsComp.goals.length < 5) {
+    goalsComp.goals.push(newGoal);
   }
 }
 

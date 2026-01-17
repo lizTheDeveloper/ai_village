@@ -1,5 +1,5 @@
-import type { System, SystemId, ComponentType, World, Entity, WeatherComponent, WeatherType } from '@ai-village/core';
-import { ComponentType as CT, EntityImpl } from '@ai-village/core';
+import type { SystemId, ComponentType, WeatherComponent, WeatherType } from '@ai-village/core';
+import { ComponentType as CT, BaseSystem, type SystemContext, type ComponentAccessor } from '@ai-village/core';
 
 /**
  * WeatherSystem - Weather pattern simulation
@@ -7,7 +7,7 @@ import { ComponentType as CT, EntityImpl } from '@ai-village/core';
  * Dependencies:
  * @see TimeSystem (priority 3) - Provides time tracking for weather duration and transitions
  */
-export class WeatherSystem implements System {
+export class WeatherSystem extends BaseSystem {
   public readonly id: SystemId = CT.Weather;
   public readonly priority: number = 5; // Run early, before temperature system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Weather];
@@ -22,27 +22,23 @@ export class WeatherSystem implements System {
   private readonly MIN_WEATHER_DURATION = 60; // Minimum 60 seconds per weather state
   private previousWeatherType: WeatherType | null = null;
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const weather = impl.getComponent<WeatherComponent>(CT.Weather);
-
-      // Skip entities without weather component
-      if (!weather) {
-        continue;
-      }
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const weather = comps.optional<WeatherComponent>(CT.Weather);
+      if (!weather) continue;
 
       // Tick down duration
-      const newDuration = Math.max(0, weather.duration - deltaTime);
+      const newDuration = Math.max(0, weather.duration - ctx.deltaTime);
 
-      impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
+      comps.update(CT.Weather, (current: WeatherComponent) => ({
         ...current,
         duration: newDuration,
       }));
 
       // Check if weather should transition
-      if (newDuration <= 0 || Math.random() < this.WEATHER_TRANSITION_CHANCE * deltaTime) {
-        this.transitionWeather(world, entity, impl);
+      if (newDuration <= 0 || Math.random() < this.WEATHER_TRANSITION_CHANCE * ctx.deltaTime) {
+        this.transitionWeather(ctx, entity, comps);
       }
     }
   }
@@ -50,8 +46,9 @@ export class WeatherSystem implements System {
   /**
    * Transition to a new weather type
    */
-  private transitionWeather(world: World, entity: Entity, impl: EntityImpl): void {
-    const currentWeather = impl.getComponent<WeatherComponent>(CT.Weather)!;
+  private transitionWeather(ctx: SystemContext, entity: any, comps: ComponentAccessor): void {
+    const currentWeather = comps.optional<WeatherComponent>(CT.Weather);
+    if (!currentWeather) return;
     const newWeatherType = this.selectNewWeatherType(currentWeather.weatherType);
 
     // Weather type defaults from WeatherComponent spec
@@ -67,7 +64,7 @@ export class WeatherSystem implements System {
     const newIntensity = this.selectIntensity(newWeatherType);
     const newDuration = this.selectDuration();
 
-    impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
+    comps.update(CT.Weather, (current: WeatherComponent) => ({
       ...current,
       weatherType: newWeatherType,
       intensity: newIntensity,
@@ -77,15 +74,11 @@ export class WeatherSystem implements System {
 
     // Emit weather change event if type actually changed
     if (this.previousWeatherType !== newWeatherType) {
-      world.eventBus.emit({
-        type: 'weather:changed',
-        source: entity.id,
-        data: {
-          oldWeather: this.previousWeatherType || 'clear',
-          weatherType: newWeatherType,
-          intensity: newIntensity,
-        },
-      });
+      ctx.emit('weather:changed', {
+        oldWeather: this.previousWeatherType || 'clear',
+        weatherType: newWeatherType,
+        intensity: newIntensity,
+      }, entity.id);
       this.previousWeatherType = newWeatherType;
     }
   }

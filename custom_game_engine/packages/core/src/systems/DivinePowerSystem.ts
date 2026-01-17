@@ -14,6 +14,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent, Vision } from '../components/SpiritualComponent.js';
@@ -74,16 +75,14 @@ export class DivinePowerSystem implements System {
   public readonly priority: number = 120; // After belief generation
   public readonly requiredComponents: ReadonlyArray<string> = [];
 
-  private eventBus?: EventBus;
+  private events!: SystemEventManager;
   private pendingPowers: DivinePowerRequest[] = [];
-  private unsubscribe?: () => void;
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Listen for divine power requests from UI
-    this.unsubscribe = eventBus.subscribe('divine_power:request', (event) => {
-      const data = event.data;
+    this.events.onGeneric('divine_power:request', (data: unknown) => {
       // Type guard: ensure data has required DivinePowerRequest fields
       if (data && typeof data === 'object' && 'deityId' in data && 'powerType' in data) {
         this.queuePower(data as DivinePowerRequest);
@@ -92,10 +91,7 @@ export class DivinePowerSystem implements System {
   }
 
   cleanup(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = undefined;
-    }
+    this.events.cleanup();
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -343,7 +339,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:whisper', 'divine_power', {
+    this.emitGeneric('divine_power:whisper', {
       deityId: request.deityId,
       targetId: request.targetId!,
       message,
@@ -418,7 +414,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:subtle_sign', 'divine_power', {
+    this.emitGeneric('divine_power:subtle_sign', {
       deityId: request.deityId,
       targetId: request.targetId!,
       signType: request.params?.signType,
@@ -493,7 +489,7 @@ export class DivinePowerSystem implements System {
       this._answerPrayer(world, request.deityId, request.targetId, request.prayerId, 'vision');
     }
 
-    this.emitGeneric('divine_power:dream_hint', 'divine_power', {
+    this.emitGeneric('divine_power:dream_hint', {
       deityId: request.deityId,
       targetId: request.targetId!,
       content: dreamContent,
@@ -567,7 +563,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:clear_vision', 'divine_power', {
+    this.emitGeneric('divine_power:clear_vision', {
       deityId: request.deityId,
       targetId: request.targetId!,
       visionContent,
@@ -673,7 +669,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:minor_miracle', 'divine_power', {
+    this.emitGeneric('divine_power:minor_miracle', {
       deityId: request.deityId,
       miracleType,
       cost: miracleResult.beliefSpent,
@@ -745,7 +741,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:bless_individual', 'divine_power', {
+    this.emitGeneric('divine_power:bless_individual', {
       deityId: request.deityId,
       targetId: request.targetId!,
       blessingType: 'grace',
@@ -776,13 +772,8 @@ export class DivinePowerSystem implements System {
   /**
    * Emit a generic event (avoiding strict type checking)
    */
-  private emitGeneric(type: string, source: string, data: Record<string, unknown>): void {
-    if (!this.eventBus) return;
-    (this.eventBus as unknown as { emit: (e: Record<string, unknown>) => void }).emit({
-      type,
-      source,
-      data,
-    });
+  private emitGeneric(type: string, data: Record<string, unknown>): void {
+    this.events.emitGeneric(type, data);
   }
 
   /**
@@ -871,7 +862,7 @@ export class DivinePowerSystem implements System {
       }
     }
 
-    this.emitGeneric('divine_power:universe_crossing', 'divine_power', {
+    this.emitGeneric('divine_power:universe_crossing', {
       deityId: request.deityId,
       method,
       sourceUniverseId,
@@ -936,7 +927,7 @@ export class DivinePowerSystem implements System {
     // Store the passage
     this.passages.set(passageId, passage);
 
-    this.emitGeneric('divine_power:passage_created', 'divine_power', {
+    this.emitGeneric('divine_power:passage_created', {
       deityId: request.deityId,
       passageId,
       passageType,
@@ -991,7 +982,7 @@ export class DivinePowerSystem implements System {
       createdAt: currentTick,
     };
 
-    this.emitGeneric('divine_power:projection_created', 'divine_power', {
+    this.emitGeneric('divine_power:projection_created', {
       deityId: request.deityId,
       projection: projectionData,
       beliefCost: actualCost,
@@ -1118,7 +1109,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Emit event
-    this.emitGeneric('divine_power:spell_cast', 'divine_power', {
+    this.emitGeneric('divine_power:spell_cast', {
       deityId: request.deityId,
       spellId,
       spellName: spellDef.name,
@@ -1129,22 +1120,16 @@ export class DivinePowerSystem implements System {
     });
 
     // Also emit standard magic:spell_cast event for tracking
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'magic:spell_cast',
-        source: deityEntity.id,
-        data: {
-          spellId,
-          spell: spellDef.name,
-          technique: spellDef.technique,
-          form: spellDef.form,
-          paradigm: 'divine',
-          manaCost: spellResult.beliefSpent,
-          targetId: request.targetId,
-          success: true,
-        },
-      });
-    }
+    this.events.emit('magic:spell_cast', {
+      spellId,
+      spell: spellDef.name,
+      technique: spellDef.technique,
+      form: spellDef.form,
+      paradigm: 'divine',
+      manaCost: spellResult.beliefSpent,
+      targetId: request.targetId,
+      success: true,
+    });
   }
 
   /**

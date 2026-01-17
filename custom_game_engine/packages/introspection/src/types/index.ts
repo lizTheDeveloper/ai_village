@@ -34,3 +34,36 @@ export type { FieldType } from './FieldTypes.js';
 // Component schema (core)
 export type { Component, ComponentSchema, DevConfig, MutatorFunction, CanvasRenderable } from './ComponentSchema.js';
 export { defineComponent } from './ComponentSchema.js';
+
+// Introspection API types (note: MutationResult, CacheStats, MutationSource
+// are also exported from mutation/ and cache/ packages to avoid duplication)
+export type {
+  EntityIntrospectionResult,
+  SafeMutationRequest,
+  SafeMutationResult,
+  BatchMutationResult,
+  UndoResult,
+  RedoResult,
+  WatchOptions,
+  EntityChangeEvent,
+  PlaceBuildingRequest,
+  PlaceBuildingResult,
+  BuildingInfo,
+  BlueprintInfo,
+  SkillProgressionResult,
+  TriggerBehaviorRequest,
+  BehaviorResult,
+  MutationHistoryEntry,
+  SnapshotId,
+  RestoreResult,
+  EconomicMetrics,
+  EnvironmentalState,
+  EntityQuery,
+  Bounds,
+  TimeRange,
+  UnsubscribeFunction,
+  SimulationMode,
+  VisibilityLevel,
+  MutationSource,
+  CacheStats,
+} from './IntrospectionTypes.js';

@@ -6,6 +6,8 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * ResourceGatheringSystem handles resource regeneration.
@@ -30,6 +32,11 @@ export class ResourceGatheringSystem implements System {
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
   private deltaCleanups = new Map<string, () => void>();
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
 
   setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
     this.stateMutator = stateMutator;
@@ -103,14 +110,10 @@ export class ResourceGatheringSystem implements System {
         const isNowFull = resource.amount >= resource.maxAmount;
 
         if (wasNotFull && isNowFull) {
-          world.eventBus.emit({
-            type: 'resource:regenerated',
-            source: entity.id,
-            data: {
-              resourceId: entity.id,
-              resourceType: resource.resourceType,
-              amount: resource.amount,
-            },
+          this.events.emit('resource:regenerated', {
+            resourceId: entity.id,
+            resourceType: resource.resourceType,
+            amount: resource.amount,
           });
         }
       }
@@ -151,5 +154,14 @@ export class ResourceGatheringSystem implements System {
     });
 
     this.deltaCleanups.set(entity.id, cleanup);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+    // Also cleanup all delta registrations
+    for (const cleanup of this.deltaCleanups.values()) {
+      cleanup();
+    }
+    this.deltaCleanups.clear();
   }
 }

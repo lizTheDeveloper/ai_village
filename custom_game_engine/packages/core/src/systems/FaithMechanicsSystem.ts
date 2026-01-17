@@ -11,6 +11,8 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { SpiritualComponent, Prayer, Doubt } from '../components/SpiritualComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 
@@ -62,9 +64,14 @@ export class FaithMechanicsSystem implements System {
 
   private config: FaithConfig;
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<FaithConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   public update(world: World): void {
@@ -263,5 +270,9 @@ export class FaithMechanicsSystem implements System {
       inCrisis,
       unansweredPrayerRatio: totalPrayers > 0 ? totalUnanswered / totalPrayers : 0,
     };
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

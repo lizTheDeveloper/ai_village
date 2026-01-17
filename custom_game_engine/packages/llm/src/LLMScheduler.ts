@@ -73,7 +73,7 @@ export const DEFAULT_LAYER_CONFIG: Record<DecisionLayer, LayerConfig> = {
     enabled: true,
   },
   executor: {
-    cooldownMs: 10000, // 10 seconds - strategic planning
+    cooldownMs: 2000, // 2 seconds - strategic planning (reduced from 10s to allow responsive decisions)
     priority: 1, // Lowest priority (but most impactful)
     enabled: true,
   },

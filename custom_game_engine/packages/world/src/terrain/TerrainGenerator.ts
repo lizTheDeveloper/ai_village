@@ -29,9 +29,14 @@ import {
   SECTOR_SIZE,
   type GodCraftedDiscoverySystem,
 } from '@ai-village/core';
+import type { PlanetConfig } from '../planet/PlanetTypes.js';
 
 /**
  * Generates terrain using Perlin noise.
+ *
+ * Supports planet-specific terrain generation through PlanetConfig.
+ * Planet parameters modify the base noise values to create distinct
+ * planetary environments (desert worlds, ice planets, etc.).
  */
 export class TerrainGenerator {
   private elevationNoise: PerlinNoise;
@@ -41,12 +46,36 @@ export class TerrainGenerator {
   private animalSpawner: WildAnimalSpawningSystem;
   private godCraftedSpawner?: GodCraftedDiscoverySystem;
 
-  // Terrain thresholds
-  private readonly WATER_LEVEL = -0.3;
+  // Planet configuration (optional - defaults to terrestrial)
+  private planetConfig?: PlanetConfig;
+
+  // Planet terrain modifiers (cached from config for performance)
+  private tempOffset: number = 0;
+  private tempScale: number = 1.0;
+  private moistureOffset: number = 0;
+  private moistureScale: number = 1.0;
+  private elevationOffset: number = 0;
+  private elevationScale: number = 1.0;
+  private seaLevel: number = -0.3;
+  private allowedBiomes?: BiomeType[];
+
+  // Terrain thresholds (can be modified by planet config)
+  private WATER_LEVEL = -0.3;
   private readonly SAND_LEVEL = -0.1;
   private readonly STONE_LEVEL = 0.5;
 
-  constructor(seed: string = 'default', godCraftedSpawner?: GodCraftedDiscoverySystem) {
+  /**
+   * Create a terrain generator.
+   *
+   * @param seed - Seed for deterministic generation
+   * @param godCraftedSpawner - Optional system for spawning god-crafted content
+   * @param planetConfig - Optional planet configuration for terrain modifiers
+   */
+  constructor(
+    seed: string = 'default',
+    godCraftedSpawner?: GodCraftedDiscoverySystem,
+    planetConfig?: PlanetConfig
+  ) {
     this.seed = seed;
     const seedHash = this.hashString(seed);
 
@@ -55,6 +84,286 @@ export class TerrainGenerator {
     this.temperatureNoise = new PerlinNoise(seedHash + 2000);
     this.animalSpawner = new WildAnimalSpawningSystem();
     this.godCraftedSpawner = godCraftedSpawner;
+
+    // Apply planet configuration if provided
+    if (planetConfig) {
+      this.planetConfig = planetConfig;
+      this.tempOffset = planetConfig.temperatureOffset ?? 0;
+      this.tempScale = planetConfig.temperatureScale ?? 1.0;
+      this.moistureOffset = planetConfig.moistureOffset ?? 0;
+      this.moistureScale = planetConfig.moistureScale ?? 1.0;
+      this.elevationOffset = planetConfig.elevationOffset ?? 0;
+      this.elevationScale = planetConfig.elevationScale ?? 1.0;
+      this.seaLevel = planetConfig.seaLevel ?? -0.3;
+      this.WATER_LEVEL = this.seaLevel;
+      this.allowedBiomes = planetConfig.allowedBiomes;
+    }
+  }
+
+  /**
+   * Get the planet configuration.
+   */
+  getPlanetConfig(): PlanetConfig | undefined {
+    return this.planetConfig;
+  }
+
+  /**
+   * Filter a biome through the allowed list, returning a fallback if not allowed.
+   *
+   * @param biome - The originally determined biome
+   * @param terrain - The terrain type (used for fallback selection)
+   * @returns The biome if allowed, or a suitable fallback
+   */
+  private filterBiome(biome: BiomeType, terrain: TerrainType): BiomeType {
+    // If no restrictions, return the original biome
+    if (!this.allowedBiomes || this.allowedBiomes.length === 0) {
+      return biome;
+    }
+
+    // If biome is allowed, return it
+    if (this.allowedBiomes.includes(biome)) {
+      return biome;
+    }
+
+    // Find a suitable fallback based on terrain type
+    return this.getFallbackBiome(biome, terrain);
+  }
+
+  /**
+   * Get a fallback biome when the original isn't allowed on this planet.
+   *
+   * @param originalBiome - The biome we wanted but isn't allowed
+   * @param terrain - The terrain type (helps select appropriate fallback)
+   * @returns A fallback biome from the allowed list
+   */
+  private getFallbackBiome(originalBiome: BiomeType, terrain: TerrainType): BiomeType {
+    if (!this.allowedBiomes || this.allowedBiomes.length === 0) {
+      return originalBiome;
+    }
+
+    // Define fallback chains - each biome maps to preferred alternatives
+    const fallbackChains: Record<BiomeType, BiomeType[]> = {
+      // -----------------------------------------------------------------------
+      // Standard Biomes
+      // -----------------------------------------------------------------------
+
+      // Cold biomes
+      tundra: ['taiga', 'mountains', 'desert', 'plains'],
+      taiga: ['tundra', 'forest', 'woodland', 'plains'],
+
+      // Temperate biomes
+      plains: ['savanna', 'woodland', 'scrubland', 'desert'],
+      forest: ['woodland', 'taiga', 'jungle', 'plains'],
+      woodland: ['forest', 'plains', 'savanna', 'taiga'],
+
+      // Hot/dry biomes
+      desert: ['scrubland', 'savanna', 'plains', 'tundra'],
+      scrubland: ['desert', 'savanna', 'plains', 'woodland'],
+      savanna: ['scrubland', 'plains', 'woodland', 'desert'],
+
+      // Wet biomes
+      jungle: ['forest', 'woodland', 'wetland', 'plains'],
+      wetland: ['jungle', 'river', 'forest', 'plains'],
+      river: ['ocean', 'wetland', 'plains'],
+      ocean: ['river', 'wetland'],
+
+      // Elevation biomes
+      mountains: ['foothills', 'tundra', 'desert', 'plains'],
+      foothills: ['mountains', 'plains', 'woodland', 'scrubland'],
+
+      // -----------------------------------------------------------------------
+      // Ice World Biomes
+      // -----------------------------------------------------------------------
+      glacier: ['frozen_ocean', 'permafrost', 'tundra', 'mountains'],
+      frozen_ocean: ['glacier', 'ocean', 'permafrost', 'tundra'],
+      ice_caves: ['glacier', 'mountains', 'permafrost', 'tundra'],
+      permafrost: ['tundra', 'glacier', 'frozen_ocean', 'plains'],
+
+      // -----------------------------------------------------------------------
+      // Volcanic Biomes
+      // -----------------------------------------------------------------------
+      lava_field: ['ash_plain', 'obsidian_waste', 'caldera', 'mountains'],
+      ash_plain: ['obsidian_waste', 'lava_field', 'desert', 'scrubland'],
+      obsidian_waste: ['ash_plain', 'lava_field', 'mountains', 'desert'],
+      caldera: ['lava_field', 'ash_plain', 'mountains', 'wetland'],
+      sulfur_flats: ['ash_plain', 'lava_field', 'desert', 'scrubland'],
+
+      // -----------------------------------------------------------------------
+      // Crystal Biomes
+      // -----------------------------------------------------------------------
+      crystal_plains: ['prismatic_forest', 'quartz_desert', 'plains', 'desert'],
+      geode_caves: ['crystal_plains', 'mountains', 'prismatic_forest', 'plains'],
+      prismatic_forest: ['crystal_plains', 'forest', 'geode_caves', 'plains'],
+      quartz_desert: ['crystal_plains', 'desert', 'prismatic_forest', 'scrubland'],
+
+      // -----------------------------------------------------------------------
+      // Fungal Biomes
+      // -----------------------------------------------------------------------
+      mushroom_forest: ['spore_field', 'mycelium_network', 'forest', 'wetland'],
+      spore_field: ['mushroom_forest', 'mycelium_network', 'plains', 'wetland'],
+      mycelium_network: ['mushroom_forest', 'spore_field', 'wetland', 'plains'],
+      bioluminescent_marsh: ['mycelium_network', 'wetland', 'spore_field', 'jungle'],
+
+      // -----------------------------------------------------------------------
+      // Corrupted/Dark Biomes
+      // -----------------------------------------------------------------------
+      blighted_land: ['shadow_forest', 'corruption_heart', 'plains', 'scrubland'],
+      shadow_forest: ['blighted_land', 'forest', 'corruption_heart', 'woodland'],
+      corruption_heart: ['blighted_land', 'shadow_forest', 'void_edge', 'mountains'],
+      void_edge: ['corruption_heart', 'blighted_land', 'shadow_forest', 'desert'],
+
+      // -----------------------------------------------------------------------
+      // Magical Biomes
+      // -----------------------------------------------------------------------
+      arcane_forest: ['forest', 'mana_spring', 'floating_isle', 'woodland'],
+      floating_isle: ['arcane_forest', 'mountains', 'ley_nexus', 'plains'],
+      mana_spring: ['arcane_forest', 'ley_nexus', 'wetland', 'forest'],
+      ley_nexus: ['mana_spring', 'arcane_forest', 'floating_isle', 'plains'],
+
+      // -----------------------------------------------------------------------
+      // Exotic Planet Biomes (scientifically grounded)
+      // -----------------------------------------------------------------------
+      twilight_zone: ['eternal_day', 'eternal_night', 'plains', 'scrubland'],
+      eternal_day: ['twilight_zone', 'desert', 'lava_field', 'plains'],
+      eternal_night: ['twilight_zone', 'frozen_ocean', 'glacier', 'tundra'],
+      carbon_forest: ['forest', 'mountains', 'plains', 'obsidian_waste'],
+      iron_plains: ['plains', 'crater_field', 'regolith_waste', 'mountains'],
+      hydrogen_sea: ['ocean', 'frozen_ocean', 'ammonia_ocean', 'wetland'],
+      ammonia_ocean: ['hydrogen_sea', 'ocean', 'frozen_ocean', 'wetland'],
+      subsurface_ocean: ['frozen_ocean', 'ocean', 'glacier', 'ice_caves'],
+      crater_field: ['regolith_waste', 'iron_plains', 'mountains', 'desert'],
+      regolith_waste: ['crater_field', 'iron_plains', 'desert', 'plains'],
+      hycean_depths: ['ocean', 'subsurface_ocean', 'wetland', 'river'],
+    };
+
+    const chain = fallbackChains[originalBiome] || ['plains'];
+
+    // Find the first allowed biome in the fallback chain
+    for (const fallback of chain) {
+      if (this.allowedBiomes.includes(fallback)) {
+        return fallback;
+      }
+    }
+
+    // Last resort: return the first allowed biome, or 'plains' if list is empty
+    return this.allowedBiomes[0] ?? 'plains';
+  }
+
+  /**
+   * Map exotic biomes to their appropriate terrain types.
+   *
+   * Standard biomes keep their original terrain, but exotic biomes
+   * need exotic terrain types to match their visual appearance.
+   */
+  private mapBiomeToTerrain(biome: BiomeType, originalTerrain: TerrainType, moisture: number): TerrainType {
+    // Exotic biome → terrain mappings
+    switch (biome) {
+      // -----------------------------------------------------------------------
+      // Ice World Biomes
+      // -----------------------------------------------------------------------
+      case 'glacier':
+        return 'ice';
+      case 'frozen_ocean':
+        return 'water'; // Frozen water surface
+      case 'ice_caves':
+        return 'ice';
+      case 'permafrost':
+        return moisture > 0.3 ? 'snow' : 'ice';
+
+      // -----------------------------------------------------------------------
+      // Volcanic Biomes
+      // -----------------------------------------------------------------------
+      case 'lava_field':
+        return 'lava';
+      case 'ash_plain':
+        return 'ash';
+      case 'obsidian_waste':
+        return 'obsidian';
+      case 'caldera':
+        return moisture > 0.2 ? 'water' : 'basalt'; // May have crater lakes
+      case 'sulfur_flats':
+        return 'sulfur';
+
+      // -----------------------------------------------------------------------
+      // Crystal Biomes
+      // -----------------------------------------------------------------------
+      case 'crystal_plains':
+        return 'crystal';
+      case 'geode_caves':
+        return 'geode';
+      case 'prismatic_forest':
+        return 'prismatic';
+      case 'quartz_desert':
+        return 'crystal';
+
+      // -----------------------------------------------------------------------
+      // Fungal Biomes
+      // -----------------------------------------------------------------------
+      case 'mushroom_forest':
+        return 'mycelium';
+      case 'spore_field':
+        return 'spore_soil';
+      case 'mycelium_network':
+        return 'mycelium';
+      case 'bioluminescent_marsh':
+        return moisture > 0.6 ? 'water' : 'mycelium';
+
+      // -----------------------------------------------------------------------
+      // Corrupted/Dark Biomes
+      // -----------------------------------------------------------------------
+      case 'blighted_land':
+        return 'corrupted';
+      case 'shadow_forest':
+        return 'shadow_grass';
+      case 'corruption_heart':
+        return 'corrupted';
+      case 'void_edge':
+        return 'void_stone';
+
+      // -----------------------------------------------------------------------
+      // Magical Biomes
+      // -----------------------------------------------------------------------
+      case 'arcane_forest':
+        return 'ley_grass';
+      case 'floating_isle':
+        return 'aether';
+      case 'mana_spring':
+        return moisture > 0.5 ? 'water' : 'mana_stone';
+      case 'ley_nexus':
+        return 'mana_stone';
+
+      // -----------------------------------------------------------------------
+      // Exotic Planet Biomes
+      // -----------------------------------------------------------------------
+      case 'twilight_zone':
+        return originalTerrain; // Keep original terrain in habitable zone
+      case 'eternal_day':
+        return 'sand'; // Scorched earth
+      case 'eternal_night':
+        return 'ice'; // Frozen side
+      case 'carbon_forest':
+        return 'carbon';
+      case 'iron_plains':
+        return 'iron';
+      case 'hydrogen_sea':
+        return 'hydrogen_ice';
+      case 'ammonia_ocean':
+        return 'water'; // Ammonia liquid
+      case 'subsurface_ocean':
+        return 'water';
+      case 'crater_field':
+        return 'stone';
+      case 'regolith_waste':
+        return 'sand'; // Dusty regolith
+      case 'hycean_depths':
+        return 'water';
+
+      // -----------------------------------------------------------------------
+      // Standard Biomes - keep original terrain
+      // -----------------------------------------------------------------------
+      default:
+        return originalTerrain;
+    }
   }
 
   /**
@@ -1017,24 +1326,38 @@ export class TerrainGenerator {
       elevation = elevation * (1 - ridgeStrength) + ridgedNoise * ridgeStrength;
     }
 
+    // Apply planet elevation modifiers
+    elevation = Math.max(-1, Math.min(1,
+      (elevation * this.elevationScale) + this.elevationOffset
+    ));
+
     // Save original elevation for biome determination (before forest/desert/spawn modifications)
     const biomeElevation = elevation;
 
     // Moisture uses biome scale for climate zones (~20km patterns)
     // NOTE: Calculated early because desert geological features need moisture/temperature
-    const moisture = this.moistureNoise.octaveNoise(
+    const rawMoisture = this.moistureNoise.octaveNoise(
       worldX * biomeScale,
       worldY * biomeScale,
       3,
       0.5
     );
+    // Apply planet moisture modifiers
+    const moisture = Math.max(-1, Math.min(1,
+      (rawMoisture * this.moistureScale) + this.moistureOffset
+    ));
+
     // Temperature uses continental scale for large climate bands (~200km patterns)
-    const temperature = this.temperatureNoise.octaveNoise(
+    const rawTemperature = this.temperatureNoise.octaveNoise(
       worldX * continentalScale * 2,
       worldY * continentalScale * 2,
       2,
       0.5
     );
+    // Apply planet temperature modifiers
+    const temperature = Math.max(-1, Math.min(1,
+      (rawTemperature * this.tempScale) + this.tempOffset
+    ));
 
     // === FOREST DENSITY GRADIENTS ===
     // Creates realistic forest structure: dense old-growth, young forest, sparse woodland, clearings.
@@ -1548,11 +1871,17 @@ export class TerrainGenerator {
 
     // Determine terrain and biome using ORIGINAL elevation (before forest/desert/spawn modifications)
     // This ensures biome boundaries follow environmental gradients, not micro-terrain features
-    const { terrain, biome, fluid, oceanZone } = this.determineTerrainAndBiome(
+    const { terrain, biome: rawBiome, fluid, oceanZone } = this.determineTerrainAndBiome(
       biomeElevation,
       moisture,
       temperature
     );
+
+    // Filter biome through allowed list if planet config specifies restrictions
+    const biome = this.filterBiome(rawBiome, terrain);
+
+    // Map biome to appropriate terrain type (exotic biomes need exotic terrains)
+    const mappedTerrain = this.mapBiomeToTerrain(biome, terrain, moisture);
 
     // Calculate tile Z elevation based on improved noise
     // Scale: water (planetary ocean) = -11000 to 0, plains = -1 to 2, hills = 2-6, mountains = 6-15
@@ -1597,12 +1926,16 @@ export class TerrainGenerator {
     // - Mountains: 40-50
     let fertility = this.calculateBiomeFertility(biome, moisture);
 
-    // Adjust by terrain type
-    if (terrain === 'water' || terrain === 'stone') {
+    // Adjust by terrain type (using mappedTerrain for exotic biomes)
+    if (mappedTerrain === 'water' || mappedTerrain === 'stone' || mappedTerrain === 'lava' ||
+        mappedTerrain === 'void_stone' || mappedTerrain === 'hydrogen_ice') {
       fertility = 0; // Not farmable
-    } else if (terrain === 'sand' && biome !== 'desert') {
+    } else if (mappedTerrain === 'sand' && biome !== 'desert' && biome !== 'quartz_desert') {
       // Sand near water (beaches) - low fertility
       fertility = Math.min(fertility, 0.3);
+    } else if (mappedTerrain === 'corrupted' || mappedTerrain === 'sulfur' || mappedTerrain === 'obsidian') {
+      // Hostile terrains - very low fertility
+      fertility = Math.min(fertility, 0.1);
     }
 
     // For ocean tiles, update fluid properties based on actual depth
@@ -1632,7 +1965,7 @@ export class TerrainGenerator {
     }
 
     return {
-      terrain,
+      terrain: mappedTerrain,
       biome,
       elevation: tileElevation,
       moisture: Math.max(0, Math.min(100, normalizedMoisture * 100)),
@@ -1672,6 +2005,9 @@ export class TerrainGenerator {
   private calculateBiomeFertility(biome: BiomeType, moisture: number): number {
     // Base fertility ranges per biome (0-100 scale)
     const BIOME_FERTILITY_RANGES: Record<BiomeType, [number, number]> = {
+      // -----------------------------------------------------------------------
+      // Standard Biomes
+      // -----------------------------------------------------------------------
       plains: [70, 80],
       forest: [60, 70],
       river: [80, 90],
@@ -1689,6 +2025,70 @@ export class TerrainGenerator {
       taiga: [40, 55],         // Cold coniferous forest, acidic soil
       // Tropical biome
       jungle: [70, 85],        // Rich tropical soil, rapid decomposition
+
+      // -----------------------------------------------------------------------
+      // Ice World Biomes
+      // -----------------------------------------------------------------------
+      glacier: [0, 5],         // Solid ice, no soil
+      frozen_ocean: [0, 0],    // Frozen water, not farmable
+      ice_caves: [5, 15],      // Some mineral deposits
+      permafrost: [10, 20],    // Frozen ground, barely farmable
+
+      // -----------------------------------------------------------------------
+      // Volcanic Biomes
+      // -----------------------------------------------------------------------
+      lava_field: [0, 0],      // Active lava, not farmable
+      ash_plain: [30, 50],     // Volcanic ash is nutrient-rich over time
+      obsidian_waste: [5, 15], // Volcanic glass, poor soil
+      caldera: [25, 40],       // Old crater, some fertility
+      sulfur_flats: [0, 10],   // Toxic sulfur deposits
+
+      // -----------------------------------------------------------------------
+      // Crystal Biomes
+      // -----------------------------------------------------------------------
+      crystal_plains: [20, 35],   // Mineral-rich but rocky
+      geode_caves: [15, 25],      // Underground, limited light
+      prismatic_forest: [35, 50], // Crystal-forest hybrid
+      quartz_desert: [10, 20],    // Crystal desert, poor soil
+
+      // -----------------------------------------------------------------------
+      // Fungal Biomes
+      // -----------------------------------------------------------------------
+      mushroom_forest: [80, 95],     // Excellent fungal decomposition
+      spore_field: [65, 80],         // Rich in organic matter
+      mycelium_network: [75, 90],    // Nutrient transfer via mycelium
+      bioluminescent_marsh: [70, 85], // Wet fungal environment
+
+      // -----------------------------------------------------------------------
+      // Corrupted/Dark Biomes
+      // -----------------------------------------------------------------------
+      blighted_land: [5, 20],     // Corrupted soil, hostile to life
+      shadow_forest: [25, 40],   // Dark but some fertility
+      corruption_heart: [0, 5],  // Extremely hostile
+      void_edge: [0, 0],         // Reality breakdown, not farmable
+
+      // -----------------------------------------------------------------------
+      // Magical Biomes
+      // -----------------------------------------------------------------------
+      arcane_forest: [70, 90],   // Magically enhanced growth
+      floating_isle: [60, 75],   // Floating terrain, good soil
+      mana_spring: [85, 100],    // Maximum magical fertility
+      ley_nexus: [80, 95],       // Magical energy boost
+
+      // -----------------------------------------------------------------------
+      // Exotic Planet Biomes
+      // -----------------------------------------------------------------------
+      twilight_zone: [55, 70],     // Habitable ring, moderate fertility
+      eternal_day: [20, 35],       // Scorched, low fertility
+      eternal_night: [10, 25],     // Frozen, minimal fertility
+      carbon_forest: [40, 55],     // Carbon-based life possible
+      iron_plains: [15, 30],       // Metallic soil, poor for plants
+      hydrogen_sea: [0, 0],        // Liquid hydrogen, not farmable
+      ammonia_ocean: [0, 0],       // Ammonia ocean, not farmable
+      subsurface_ocean: [30, 50],  // Protected ocean, some life
+      crater_field: [10, 25],      // Impact craters, mineral-rich
+      regolith_waste: [5, 15],     // Dusty barren terrain
+      hycean_depths: [40, 60],     // Deep ocean, moderate life
     };
 
     const range = BIOME_FERTILITY_RANGES[biome];

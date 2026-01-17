@@ -182,7 +182,16 @@ export function registerAllSerializers(): void {
     toVersion: 2,
     description: 'Add sizeMultiplier and alpha fields to renderable component',
     migrate: (data: unknown) => {
-      const old = data as any;
+      // Migration from v1 to v2: add sizeMultiplier and alpha fields
+      // V1 format: any object without these fields
+      // V2 format: adds sizeMultiplier (default 1.0) and alpha (default 1.0)
+      if (typeof data !== 'object' || data === null) {
+        throw new Error('Invalid renderable data: expected object');
+      }
+
+      // Cast to Record for safe property access during migration
+      const old = data as Record<string, unknown>;
+
       return {
         ...old,
         sizeMultiplier: old.sizeMultiplier ?? 1.0,

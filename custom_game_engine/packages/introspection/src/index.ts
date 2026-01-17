@@ -253,6 +253,13 @@ export * from './schemas/index.js';
 export * from './cache/index.js';
 
 // ============================================================================
+// Cache Infrastructure
+// ============================================================================
+
+// IntrospectionCache - Entity query cache with tick-based expiry
+export * from './IntrospectionCache.js';
+
+// ============================================================================
 // Runtime API
 // ============================================================================
 

@@ -41,7 +41,7 @@ export interface CachedEntry<T = any> {
 /**
  * Cache statistics
  */
-export interface CacheStats {
+export interface IntrospectionCacheStats {
   /** Total cache hits */
   hits: number;
 
@@ -189,7 +189,7 @@ export class IntrospectionCache<T = any> {
   /**
    * Get cache statistics
    */
-  getStats(): CacheStats {
+  getStats(): IntrospectionCacheStats {
     const total = this.stats.hits + this.stats.misses;
     const hitRate = total > 0 ? this.stats.hits / total : 0;
     const avgLifetime =

@@ -1,10 +1,9 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId } from '../types.js';
+import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type { BiomeType } from '../types/TerrainTypes.js';
 import type { TimeComponent } from './TimeSystem.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World } from '../ecs/World.js';
 
 export interface Tile {
   terrain: string;
@@ -40,10 +39,10 @@ export interface Tile {
  * @see TimeSystem (priority 3) - Provides time tracking for daily soil updates and fertilizer duration
  * @see WeatherSystem (priority 5) - Provides weather events (rain, snow) that affect soil moisture
  */
-export class SoilSystem implements System {
+export class SoilSystem extends BaseSystem {
   public readonly id: SystemId = 'soil';
   public readonly priority: number = 15;
-  public readonly requiredComponents: ReadonlyArray<string> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   /**
    * Systems that must run before this one.
@@ -56,20 +55,13 @@ export class SoilSystem implements System {
   private accumulatedTime: number = 0; // Track elapsed time in seconds
   private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
 
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration from TimeComponent if available
-    const timeEntities = world.query().with(CT.Time).executeEntities();
-    let timeSpeedMultiplier = 1.0;
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0]!; // Safe: length check ensures this exists
-      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
-      if (timeComp && timeComp.speedMultiplier) {
-        timeSpeedMultiplier = timeComp.speedMultiplier;
-      }
-    }
+    const timeComp = ctx.getSingleton<TimeComponent>(CT.Time);
+    const timeSpeedMultiplier = timeComp?.speedMultiplier ?? 1.0;
 
     // Accumulate real-time seconds (accounting for time acceleration)
-    this.accumulatedTime += deltaTime * timeSpeedMultiplier;
+    this.accumulatedTime += ctx.deltaTime * timeSpeedMultiplier;
 
     // Calculate current day based on accumulated time
     const currentDay = Math.floor(this.accumulatedTime / this.SECONDS_PER_DAY);

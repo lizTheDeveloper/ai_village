@@ -18,6 +18,8 @@ import {
   COMBAT_DURATION_EXTENDED,
   COMBAT_DURATION_LETHAL,
 } from '../constants/index.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 interface PositionComponent {
   type: 'position';
@@ -86,18 +88,13 @@ interface LLMProvider {
  * - Social consequences
  * - Legal consequences
  */
-interface EventBus {
-  emit(event: string, data: any): void;
-  on(event: string, handler: (data: any) => void): void;
-}
-
 export class AgentCombatSystem implements System {
   public readonly id: SystemId = 'agent_combat';
   public readonly priority = 46; // After hunting, before injury
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
 
   private llmProvider?: LLMProvider;
-  private eventBus?: EventBus;
+  private events!: SystemEventManager;
 
   /**
    * Sigmoid lookup table for performance optimization.
@@ -135,7 +132,9 @@ export class AgentCombatSystem implements System {
 
   constructor(llmProvider?: LLMProvider, eventBus?: EventBus) {
     this.llmProvider = llmProvider;
-    this.eventBus = eventBus;
+    if (eventBus) {
+      this.events = new SystemEventManager(eventBus, this.id);
+    }
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
@@ -202,15 +201,12 @@ export class AgentCombatSystem implements System {
         }));
 
         // Emit combat:started event
-        if (this.eventBus) {
-          this.eventBus.emit('combat:started', {
-            attackerId: entity.id,
-            defenderId: conflict.target,
-            cause: conflict.cause,
-            startTime: conflict.startTime,
-            duration,
-            attackerPower,
-            defenderPower,
+        if (this.events) {
+          const pos = world.getComponent<PositionComponent>(entity.id, 'position');
+          this.events.emit('combat:started', {
+            participants: [entity.id, conflict.target],
+            initiator: entity.id,
+            position: pos ? { x: pos.x, y: pos.y } : { x: 0, y: 0 },
           });
         }
       } else if (conflict.state === 'fighting') {
@@ -338,13 +334,13 @@ export class AgentCombatSystem implements System {
     }));
 
     // Emit combat:ended event
-    if (this.eventBus) {
-      this.eventBus.emit('combat:ended', {
-        attackerId: attacker.id,
-        defenderId: defender.id,
-        outcome,
-        attackerPower,
-        defenderPower,
+    if (this.events) {
+      const winner = outcome === 'attacker_victory' ? attacker.id :
+                     outcome === 'defender_victory' ? defender.id : undefined;
+      this.events.emit('combat:ended', {
+        participants: [attacker.id, defender.id],
+        winner,
+        duration: conflict.endTime ?? 0,
       });
     }
   }
@@ -529,8 +525,8 @@ export class AgentCombatSystem implements System {
       }
 
       // Emit destiny intervention event
-      if (this.eventBus) {
-        this.eventBus.emit('combat:destiny_intervention', {
+      if (this.events) {
+        this.events.emit('combat:destiny_intervention', {
           agentId: attackerLuck > defenderLuck ? attacker.id : defender.id,
           luckModifier: attackerLuck - defenderLuck,
           attackerLuck,
@@ -601,8 +597,8 @@ export class AgentCombatSystem implements System {
             this.inflictInjury(entityImpl, diff);
 
             // Emit destiny intervention event
-            if (this.eventBus) {
-              this.eventBus.emit('combat:destiny_intervention', {
+            if (this.events) {
+              this.events.emit('combat:destiny_intervention', {
                 agentId: entity.id,
                 luckModifier: destinyLuck,
                 attackerLuck: 0,
@@ -949,5 +945,11 @@ export class AgentCombatSystem implements System {
     }
 
     return luckModifier;
+  }
+
+  cleanup(): void {
+    if (this.events) {
+      this.events.cleanup();
+    }
   }
 }

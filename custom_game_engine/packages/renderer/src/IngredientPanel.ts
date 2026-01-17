@@ -1,4 +1,6 @@
 import type { World, EntityId } from '@ai-village/core';
+import type { InventoryComponent } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 
 // Local types
 interface EventPayload {
@@ -125,7 +127,7 @@ export class IngredientPanel implements IWindowPanel {
       throw new Error(`Agent entity ${this.agentId} not found`);
     }
 
-    const inventory = agent.components.get('inventory') as any;
+    const inventory = agent.getComponent<InventoryComponent>(CT.Inventory);
     if (!inventory || !inventory.slots) {
       throw new Error(`Agent ${this.agentId} has no inventory component`);
     }

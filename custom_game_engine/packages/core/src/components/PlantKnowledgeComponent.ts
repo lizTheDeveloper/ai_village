@@ -190,7 +190,7 @@ export class PlantKnowledgeComponent extends ComponentBase {
   public discoverProperty(
     plantId: string,
     property: 'edible' | 'toxic' | 'medicinal' | 'magical' | 'crafting',
-    value: any,
+    value: unknown,
     method: DiscoveryMethod,
     gameTime: number,
     taughtBy?: string
@@ -215,32 +215,67 @@ export class PlantKnowledgeComponent extends ComponentBase {
       this._knowledge.set(plantId, entry);
     }
 
-    // Update the specific property
+    // Update the specific property with type-safe operations
     switch (property) {
-      case 'edible':
-        entry.knowsEdible = value as boolean;
+      case 'edible': {
+        // Type guard: edible accepts boolean or objects with edible info
+        // Convert objects to boolean (presence of edible properties = true)
+        let isEdible: boolean;
+        if (typeof value === 'boolean') {
+          isEdible = value;
+        } else if (typeof value === 'object' && value !== null) {
+          // EdibleProperties object - treat as edible=true
+          isEdible = true;
+        } else {
+          throw new Error(`Expected boolean or EdibleProperties object for 'edible' property, got ${typeof value}`);
+        }
+        entry.knowsEdible = isEdible;
         break;
-      case 'toxic':
-        entry.knowsToxic = value as boolean;
+      }
+      case 'toxic': {
+        // Type guard: toxic properties expect boolean values
+        if (typeof value !== 'boolean') {
+          throw new Error(`Expected boolean value for 'toxic' property, got ${typeof value}`);
+        }
+        entry.knowsToxic = value;
         break;
-      case 'medicinal':
+      }
+      case 'medicinal': {
+        // Type guard: medicinal expects object with medicinal properties
+        if (typeof value !== 'object' || value === null) {
+          throw new Error(`Expected KnownMedicinalProperties object for 'medicinal' property, got ${typeof value}`);
+        }
         if (entry.medicinal === 'unknown') {
           entry.medicinal = {};
         }
-        Object.assign(entry.medicinal, value);
+        // Safe: value is an object, entry.medicinal is now an object
+        Object.assign(entry.medicinal, value as Record<string, unknown>);
         break;
-      case 'magical':
+      }
+      case 'magical': {
+        // Type guard: magical expects object with magical properties
+        if (typeof value !== 'object' || value === null) {
+          throw new Error(`Expected KnownMagicalProperties object for 'magical' property, got ${typeof value}`);
+        }
         if (entry.magical === 'unknown') {
           entry.magical = {};
         }
-        Object.assign(entry.magical, value);
+        // Safe: value is an object, entry.magical is now an object
+        Object.assign(entry.magical, value as Record<string, unknown>);
         break;
-      case 'crafting':
+      }
+      case 'crafting': {
+        // Type guard: crafting expects object with crafting properties
+        if (typeof value !== 'object' || value === null) {
+          throw new Error(`Expected KnownCraftingProperties object for 'crafting' property, got ${typeof value}`);
+        }
         if (entry.crafting === 'unknown') {
           entry.crafting = {};
         }
-        Object.assign(entry.crafting, value);
+        // Safe: value is an object, entry.crafting is now an object
+        Object.assign(entry.crafting, value as Record<string, unknown>);
         break;
+      }
     }
 
     // Remove from encountered if we now have knowledge
@@ -326,7 +361,7 @@ export class PlantKnowledgeComponent extends ComponentBase {
   /**
    * Serialize to JSON
    */
-  public toJSON(): any {
+  public toJSON(): PlantKnowledgeData {
     const knowledge: Record<string, PlantKnowledgeEntry> = {};
     for (const [plantId, entry] of this._knowledge) {
       knowledge[plantId] = entry;
@@ -341,8 +376,9 @@ export class PlantKnowledgeComponent extends ComponentBase {
 
   /**
    * Deserialize from JSON
+   * Safe: PlantKnowledgeData is validated by the constructor
    */
-  public static fromJSON(data: any): PlantKnowledgeComponent {
+  public static fromJSON(data: PlantKnowledgeData): PlantKnowledgeComponent {
     return new PlantKnowledgeComponent(data);
   }
 }

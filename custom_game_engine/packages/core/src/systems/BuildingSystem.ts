@@ -14,6 +14,8 @@ import { createInventoryComponent } from '../components/InventoryComponent.js';
 import { createShopComponent, type ShopType } from '../components/ShopComponent.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import { createTownHallComponent } from '../components/TownHallComponent.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { createCensusBureauComponent } from '../components/CensusBureauComponent.js';
 import { createWarehouseComponent } from '../components/WarehouseComponent.js';
 import { createWeatherStationComponent } from '../components/WeatherStationComponent.js';
@@ -48,6 +50,7 @@ export class BuildingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
 
   private isInitialized = false;
+  private events!: SystemEventManager;
 
   /**
    * Blueprint registry for looking up building definitions with layouts.
@@ -96,18 +99,16 @@ export class BuildingSystem implements System {
    * Initialize the system and register event listeners.
    * Called once when system is registered.
    */
-  public initialize(world: World, _eventBus: import('../events/EventBus.js').EventBus): void {
+  public initialize(world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
 
-    // Subscribe to world.eventBus directly to ensure we're using the same instance
-    // that will receive emitted events
-    const actualEventBus = world.eventBus;
+    // Initialize SystemEventManager
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Listen for construction started to track builderId
-    actualEventBus.subscribe('construction:started', (event) => {
-      const data = event.data as { buildingId: string; builderId?: string };
+    this.events.on('construction:started', (data) => {
       if (data.builderId) {
         // Store builderId in BuildingComponent using ownerId field
         const entity = world.getEntity(data.buildingId);
@@ -121,13 +122,20 @@ export class BuildingSystem implements System {
     });
 
     // Listen for building placement confirmations
-    actualEventBus.subscribe('building:placement:confirmed', (event) => {
-      this.handleBuildingPlacement(world, event.data as { blueprintId: string; position: { x: number; y: number }; rotation: number });
+    this.events.on('building:placement:confirmed', (data) => {
+      this.handleBuildingPlacement(world, data);
     });
 
     // Listen for building completion to initialize crafting station properties
-    actualEventBus.subscribe('building:complete', (event) => {
-      this.handleBuildingComplete(world, event);
+    this.events.on('building:complete', (data) => {
+      if (!data.entityId) {
+        throw new Error('building:complete event missing entityId');
+      }
+      this.handleBuildingComplete(world, {
+        entityId: data.entityId,
+        buildingType: data.buildingType,
+        builderId: data.builderId,
+      });
     });
 
     this.isInitialized = true;
@@ -227,9 +235,8 @@ export class BuildingSystem implements System {
    */
   private handleBuildingComplete(
     world: World,
-    event: GameEvent
+    data: { entityId: string; buildingType: string; builderId?: string }
   ): void {
-    const data = event.data as { entityId: string; buildingType: string; builderId?: string };
     const { entityId, buildingType } = data;
 
     // Find the entity using world.getEntity
@@ -477,14 +484,10 @@ export class BuildingSystem implements System {
       if (!success) {
         console.error(`[BuildingSystem] Failed to deduct resources for ${blueprintId}`);
         // Per CLAUDE.md: Don't silently continue - emit error event
-        world.eventBus.emit({
-          type: 'building:placement:failed',
-          source: 'building-system',
-          data: {
-            blueprintId,
-            position,
-            reason: 'resource_missing',
-          },
+        this.events.emit('building:placement:failed', {
+          blueprintId,
+          position,
+          reason: 'resource_missing',
         });
         return;
       }
@@ -576,29 +579,21 @@ export class BuildingSystem implements System {
     this.stampBuildingLayout(world, blueprintId, position, entity.id);
 
     // Emit construction:started event
-    world.eventBus.emit({
-      type: 'construction:started',
-      source: entity.id,
-      data: {
-        buildingId: entity.id,
-        blueprintId,
-        entityId: entity.id,
-        buildingType: blueprintId,
-        position,
-      },
+    this.events.emit('construction:started', {
+      buildingId: entity.id,
+      blueprintId,
+      entityId: entity.id,
+      buildingType: blueprintId,
+      position,
     });
 
     // Emit event for other systems
-    world.eventBus.emit({
-      type: 'building:placement:complete',
-      source: 'building-system',
-      data: {
-        buildingId: entity.id,
-        entityId: entity.id,
-        blueprintId,
-        position,
-        rotation: 0,
-      },
+    this.events.emit('building:placement:complete', {
+      buildingId: entity.id,
+      entityId: entity.id,
+      blueprintId,
+      position,
+      rotation: 0,
     });
   }
 
@@ -668,16 +663,12 @@ export class BuildingSystem implements System {
 
     // Emit completion event if just completed
     if (wasUnderConstruction && isNowComplete) {
-      world.eventBus.emit({
-        type: 'building:complete',
-        source: entity.id,
-        data: {
-          buildingId: entity.id,
-          entityId: entity.id,
-          buildingType: building.buildingType,
-          position: { x: position.x, y: position.y },
-          builderId: building.ownerId, // Track which agent built this
-        },
+      this.events.emit('building:complete', {
+        buildingId: entity.id,
+        entityId: entity.id,
+        buildingType: building.buildingType,
+        position: { x: position.x, y: position.y },
+        builderId: building.ownerId, // Track which agent built this
       });
     }
   }
@@ -722,27 +713,19 @@ export class BuildingSystem implements System {
 
     // Emit fuel_low event (only once when crossing threshold)
     if (!wasLow && isNowLow) {
-      world.eventBus.emit({
-        type: 'station:fuel_low',
-        source: entity.id,
-        data: {
-          stationId: entity.id,
-          buildingType: buildingComp.buildingType,
-          currentFuel: newFuel,
-          fuelRemaining: newFuel,
-        },
+      this.events.emit('station:fuel_low', {
+        stationId: entity.id,
+        buildingType: buildingComp.buildingType,
+        currentFuel: newFuel,
+        fuelRemaining: newFuel,
       });
     }
 
     // Emit fuel_empty event (only once when reaching 0)
     if (!wasEmpty && isNowEmpty) {
-      world.eventBus.emit({
-        type: 'station:fuel_empty',
-        source: entity.id,
-        data: {
-          stationId: entity.id,
-          buildingType: buildingComp.buildingType,
-        },
+      this.events.emit('station:fuel_empty', {
+        stationId: entity.id,
+        buildingType: buildingComp.buildingType,
       });
     }
   }
@@ -969,15 +952,11 @@ export class BuildingSystem implements System {
       mutator.addComponent(itemEntity.id, createTagsComponent('item', 'dropped', 'pickup', 'refund', resourceType));
 
       // Emit item dropped event
-      world.eventBus.emit({
-        type: 'item:dropped',
-        source: 'building-system',
-        data: {
-          entityId: itemEntity.id,
-          material: resourceType,
-          amount,
-          position: { x: position.x, y: position.y },
-        },
+      this.events.emit('item:dropped', {
+        entityId: itemEntity.id,
+        material: resourceType,
+        amount,
+        position: { x: position.x, y: position.y },
       });
     }
   }
@@ -1137,5 +1116,9 @@ export class BuildingSystem implements System {
     }
 
     return time;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

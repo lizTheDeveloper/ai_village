@@ -502,6 +502,27 @@ export class StructuredPromptBuilder {
     // Filter out buildings we already have (unless they're capacity buildings like storage)
     // Note: tent is now tile-based, not an entity building
     const capacityBuildings = new Set(['storage-chest', 'storage-box', 'bed', 'bedroll']);
+
+    // Get agent count to calculate capacity thresholds
+    const agentSummary = promptCache.getAgentSummary(world);
+    const agentCount = Math.max(1, agentSummary.total);
+
+    // Calculate max needed for capacity buildings based on village size
+    const getMaxNeeded = (buildingType: string): number => {
+      switch (buildingType) {
+        case 'storage-chest':
+        case 'storage-box':
+          // 1 storage per 2 agents, max 10
+          return Math.min(Math.ceil(agentCount / 2), 10);
+        case 'bed':
+        case 'bedroll':
+          // 1 bed per agent, max 20
+          return Math.min(agentCount, 20);
+        default:
+          return 3; // Default max for other capacity buildings
+      }
+    };
+
     const filteredBuildings = buildings.filter((building: { name: string; category: string }) => {
       const buildingType = building.name;
 
@@ -510,9 +531,12 @@ export class StructuredPromptBuilder {
         return false;
       }
 
-      // If it's a capacity building (can have multiples), always show it
+      // If it's a capacity building, check if we've reached the threshold
       if (capacityBuildings.has(buildingType)) {
-        return true;
+        const existingCount = buildingCounts.byType[buildingType] || 0;
+        const maxNeeded = getMaxNeeded(buildingType);
+        // Only show if we haven't reached capacity
+        return existingCount < maxNeeded;
       }
 
       // Otherwise, only show if we don't have one already
@@ -1044,13 +1068,31 @@ export class StructuredPromptBuilder {
       }
     }
 
-    // Check if inventory full → suggest storage
+    // Check if inventory full → suggest storage (with threshold check)
     const fullSlots = inventory?.slots.filter((s: InventorySlot) => s.itemId).length || 0;
     if (fullSlots >= 8) {
-      if (hasResources({ wood: 10 })) {
-        suggestions.push('storage-chest (10 wood) - 20 item slots');
+      // Count existing storage buildings to avoid over-building
+      const storageBuildings = world.query()?.with?.('building')?.executeEntities?.() ?? [];
+      const storageCount = storageBuildings.filter((b: Entity) => {
+        const building = b.components.get('building') as BuildingComponent | undefined;
+        return building?.buildingType === 'storage-chest' || building?.buildingType === 'storage-box';
+      }).length;
+
+      // Get agent count for threshold calculation
+      const agents = world.query()?.with?.('agent')?.executeEntities?.() ?? [];
+      const agentCount = Math.max(1, agents.length);
+      const maxStorage = Math.min(Math.ceil(agentCount / 2), 10);
+
+      // Only suggest if under threshold
+      if (storageCount < maxStorage) {
+        if (hasResources({ wood: 10 })) {
+          suggestions.push('storage-chest (10 wood) - 20 item slots');
+        } else {
+          suggestions.push('storage-chest (10 wood) - 20 item slots [NEED: 10 wood]');
+        }
       } else {
-        suggestions.push('storage-chest (10 wood) - 20 item slots [NEED: 10 wood]');
+        // Suggest using existing storage instead
+        suggestions.push(`USE EXISTING STORAGE - there are ${storageCount} storage buildings, deposit items there!`);
       }
     }
 
@@ -2166,7 +2208,10 @@ export class StructuredPromptBuilder {
       const building = b.components.get('building') as BuildingComponent | undefined;
       return building?.buildingType === 'storage-chest' || building?.buildingType === 'storage-box';
     });
-    const needsStorage = storageBuildings.length < 2;
+    // Dynamic threshold: 1 storage per 2 agents, max 10
+    const agentCountForStorage = world.query()?.with?.('agent')?.executeEntities?.()?.length ?? 1;
+    const maxStorageNeeded = Math.min(Math.ceil(agentCountForStorage / 2), 10);
+    const needsStorage = storageBuildings.length < maxStorageNeeded;
 
     // Check food situation
     const allStorageInventories = allBuildings

@@ -75,12 +75,17 @@ export class InventoryUI {
     // Wire up event emitter
     if (this.world.eventBus && typeof this.world.eventBus.emit === 'function') {
       this.dragDrop.setEventEmitter((event, data) => {
-        // Emit as a game event - simplified for now
-        // Real implementation would create proper GameEvent objects
-        this.world.eventBus.emit({
-          type: event as any,
-          ...data,
-        });
+        // Emit as a game event with proper type checking
+        // Event types validated against EventMap
+        if (event === 'item:equipped' || event === 'item:transferred' || event === 'item:dropped') {
+          this.world.eventBus.emit({
+            type: event,
+            source: 'player',
+            data,
+          });
+        } else {
+          console.warn(`[InventoryUI] Unknown event type: ${event}`);
+        }
       });
     }
   }

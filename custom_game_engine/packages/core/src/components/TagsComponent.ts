@@ -27,8 +27,9 @@ export const TagsComponentSchema: ComponentSchema<TagsComponent> = {
   version: 1,
   fields: [{ name: 'tags', type: 'stringArray', required: true, default: [] }],
   validate: (data: unknown): data is TagsComponent => {
-    const d = data as any;
-    return d && d.type === 'tags' && Array.isArray(d.tags);
+    if (!data || typeof data !== 'object') return false;
+    const d = data as Record<string, unknown>;
+    return d.type === 'tags' && Array.isArray(d.tags);
   },
   createDefault: () => createTagsComponent(),
 };

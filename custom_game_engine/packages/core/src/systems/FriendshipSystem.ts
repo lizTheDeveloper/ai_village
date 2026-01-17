@@ -18,6 +18,8 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType } from '../types.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
@@ -39,8 +41,10 @@ export class FriendshipSystem implements System {
   private static readonly FRIENDSHIP_AFFINITY = 40;
   private static readonly FRIENDSHIP_INTERACTIONS = 10;
 
-  init(_world: World): void {
-    // No initialization needed
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -129,16 +133,12 @@ export class FriendshipSystem implements System {
     const selfName = selfIdentity?.name ?? 'Unknown';
     const partnerName = partnerIdentity?.name ?? 'Unknown';
 
-    world.eventBus.emit({
-      type: 'friendship:formed',
-      source: entity.id,
-      data: {
-        agent1: entity.id,
-        agent2: partnerId,
-        agent1Name: selfName,
-        agent2Name: partnerName,
-      },
-    });
+    this.events.emit('friendship:formed', {
+      agent1: entity.id,
+      agent2: partnerId,
+      agent1Name: selfName,
+      agent2Name: partnerName,
+    }, entity.id);
   }
 
   /**
@@ -150,4 +150,7 @@ export class FriendshipSystem implements System {
     return '_socialMemories' in component && component['_socialMemories' as keyof typeof component] instanceof Map;
   }
 
+  cleanup(): void {
+    this.events.cleanup();
+  }
 }

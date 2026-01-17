@@ -15,6 +15,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -119,9 +120,7 @@ export class DeityEmergenceSystem implements System {
 
   private config: EmergenceConfig;
   private lastCheck: number = 0;
-  // Stored for future event emission (deity_emerged event)
-  // TODO: Use this to emit deity_emerged events when deities are created
-  // private _eventBus?: EventBus;
+  private events!: SystemEventManager;
 
   // Track belief contributions from proto_deity_belief events
   // Key is inferred concept (or 'unknown' if no concept detected)
@@ -132,11 +131,13 @@ export class DeityEmergenceSystem implements System {
   }
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+
     // Subscribe to proto_deity_belief events from PrayerSystem
     // These are emitted when prayers cannot be routed to an existing deity
     // and might contribute to emerging a new one
-    eventBus.subscribe('divinity:proto_deity_belief', (event) => {
-      const data = event.data as {
+    this.events.onGeneric('divinity:proto_deity_belief', (data: unknown) => {
+      const typedData = data as {
         agentId: string;
         prayerContent: string;
         beliefContributed: number;
@@ -144,7 +145,7 @@ export class DeityEmergenceSystem implements System {
         concept?: string;
       };
 
-      this.trackProtoDeityBelief(data);
+      this.trackProtoDeityBelief(typedData);
     });
   }
 
@@ -739,5 +740,9 @@ export class DeityEmergenceSystem implements System {
     };
 
     return defaultNames[domain];
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

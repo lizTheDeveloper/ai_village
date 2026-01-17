@@ -445,12 +445,36 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     maxValue: number,
     appliedValues: Record<string, number>
   ): void {
-    const currentValue = (needs[resource] as number) ?? 0;
+    // Type-safe property access - avoid dynamic property access
+    let currentValue: number;
+    switch (resource) {
+      case 'health':
+        currentValue = needs.health ?? 0;
+        break;
+      case 'mana':
+        currentValue = needs.mana ?? 0;
+        break;
+      case 'stamina':
+        currentValue = needs.stamina ?? 0;
+        break;
+    }
+
     const newValue = Math.min(currentValue + amount, maxValue);
     const actualHealing = newValue - currentValue;
 
     if (actualHealing > 0) {
-      (needs as any)[resource] = newValue;
+      // Type-safe property mutation - use switch instead of dynamic access
+      switch (resource) {
+        case 'health':
+          needs.health = newValue;
+          break;
+        case 'mana':
+          needs.mana = newValue;
+          break;
+        case 'stamina':
+          needs.stamina = newValue;
+          break;
+      }
       appliedValues[resource] = actualHealing;
     }
 

@@ -9,6 +9,21 @@ export type MemoryType =
   | 'knowledge'          // Learned from others
   | 'resource_location'; // Remembered a resource location
 
+/**
+ * Type guard to check if a value is a valid MemoryType
+ */
+function isMemoryType(value: unknown): value is MemoryType {
+  return typeof value === 'string' && [
+    'episodic',
+    'semantic',
+    'procedural',
+    'success',
+    'failure',
+    'knowledge',
+    'resource_location'
+  ].includes(value);
+}
+
 export interface Memory {
   id: string;
   type: MemoryType;
@@ -86,7 +101,7 @@ export function addMemory(
     const data = memoryOrData as Partial<Memory>;
     const memory: Memory = {
       id: `mem_${Date.now()}_${Math.random()}`,
-      type: (data.type as any) || 'episodic',
+      type: isMemoryType(data.type) ? data.type : 'episodic',
       content: data.content || '',
       importance: strength !== undefined ? strength / 100 : (data.importance || 0.5),
       timestamp: tick || Date.now(),

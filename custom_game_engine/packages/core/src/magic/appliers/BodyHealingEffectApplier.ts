@@ -15,6 +15,7 @@ import type { World } from '../../ecs/World.js';
 import type {
   BodyComponent,
   BodyPart,
+  BodyPartType,
 } from '../../components/BodyComponent.js';
 import { getPartsByType, getBodyPart } from '../../components/BodyComponent.js';
 import { getBodyPlan } from '../../components/BodyPlanRegistry.js';
@@ -38,7 +39,7 @@ export interface BodyHealingEffect extends HealingEffect {
   targetBodyPart?: string;  // Part ID or type (e.g., 'arm', 'left_arm_1')
 
   /** Heal all parts of a specific type */
-  targetBodyPartType?: string;  // e.g., 'arm' heals all arms
+  targetBodyPartType?: BodyPartType;  // e.g., 'arm' heals all arms
 
   /** Mend fractures on target part */
   mendsFractures?: boolean;
@@ -123,7 +124,7 @@ export class BodyHealingEffectApplier implements EffectApplier<BodyHealingEffect
       }
     } else if (effect.targetBodyPartType) {
       // Heal all parts of a type
-      targetParts = getPartsByType(body, effect.targetBodyPartType as any);
+      targetParts = getPartsByType(body, effect.targetBodyPartType);
     } else {
       // Heal all parts (distribute healing)
       targetParts = Object.values(body.parts);

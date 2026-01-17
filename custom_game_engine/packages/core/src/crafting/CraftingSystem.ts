@@ -1,5 +1,5 @@
 import type { World } from '../ecs/World.js';
-import { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { CraftingJob } from './CraftingJob.js';
 import { createCraftingJob } from './CraftingJob.js';
 import type { Recipe } from './Recipe.js';
@@ -53,7 +53,7 @@ interface AgentCraftingQueue {
  * System for managing crafting queues and job execution.
  * Follows CLAUDE.md: No silent fallbacks, throws on errors.
  */
-export class CraftingSystem implements System {
+export class CraftingSystem extends BaseSystem {
   public readonly id = 'crafting' as const;
   public readonly priority = 55; // After BuildingSystem (50), before MemorySystem (100)
   public readonly requiredComponents = [] as const; // Process queues manually, not entity-based
@@ -318,7 +318,10 @@ export class CraftingSystem implements System {
   /**
    * System update - process all active crafting jobs.
    */
-  update(world: World, _entities: ReadonlyArray<import('../ecs/Entity.js').Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const deltaTime = ctx.deltaTime;
+
     // Process each agent's queue
     for (const queueState of this.queues.values()) {
       if (queueState.paused || queueState.queue.length === 0) {

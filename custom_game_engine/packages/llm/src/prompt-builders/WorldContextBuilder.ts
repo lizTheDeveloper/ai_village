@@ -600,7 +600,13 @@ export class WorldContextBuilder {
 
       // Check for agents currently building campfires (prevents duplicate simultaneous builds)
       const agentComp = entity.components.get('agent') as AgentComponent | undefined;
-      if (agentComp?.behavior === 'build' && (agentComp.behaviorState as any)?.buildingType === 'campfire') {
+      if (
+        agentComp?.behavior === 'build' &&
+        agentComp.behaviorState &&
+        typeof agentComp.behaviorState === 'object' &&
+        'buildingType' in agentComp.behaviorState &&
+        agentComp.behaviorState.buildingType === 'campfire'
+      ) {
         return true;
       }
     }

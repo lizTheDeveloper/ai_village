@@ -1,4 +1,4 @@
-import type { Entity, AnimalComponent, AppearanceComponent, SteeringComponent, PositionComponent } from '@ai-village/core';
+import type { Entity, AnimalComponent, AppearanceComponent, SteeringComponent, PositionComponent, VelocityComponent } from '@ai-village/core';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './PixelLabSpriteLoader.js';
 import { PixelLabDirection, angleToPixelLabDirection } from './PixelLabSpriteDefs.js';
 import { findSprite, type SpriteTraits } from './SpriteRegistry.js';
@@ -127,7 +127,7 @@ export class PixelLabEntityRenderer {
     // Determine direction from entity velocity or steering
     // First check steering component for desired direction (more responsive for animals)
     const steering = entity.components.get('steering') as SteeringComponent | undefined;
-    const velocity = entity.components.get('velocity') as any;
+    const velocity = entity.components.get('velocity') as VelocityComponent | undefined;
 
     // Prefer steering target for immediate direction changes
     let vx = 0;

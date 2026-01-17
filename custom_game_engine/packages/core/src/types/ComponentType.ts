@@ -195,6 +195,7 @@ export enum ComponentType {
   SoulCreationEvent = 'soul_creation_event',
   Realm = 'realm',
   RealmLocation = 'realm_location',
+  PlanetLocation = 'planet_location',
   CurrentLifeMemory = 'current_life_memory',
   VeilOfForgetting = 'veil_of_forgetting',
 
@@ -207,6 +208,10 @@ export enum ComponentType {
   // Navigation & β-space
   Spaceship = 'spaceship',
   RainbowPlanet = 'rainbow_planet',  // Quantum superposition of planetary histories (Rainbow Mars)
+
+  // Planet Travel
+  PlanetTravel = 'planet_travel',    // Active travel state between planets
+  PlanetPortal = 'planet_portal',    // Intra-universe portal between planets
 
   // Virtual Reality
   VRSystem = 'vr_system',

@@ -16,6 +16,8 @@ import { transitionToRealm } from '../realms/RealmTransition.js';
 import { routeSoulToAfterlife } from '../realms/SoulRoutingService.js';
 import { createAfterlifeComponent, type CauseOfDeath } from '../components/AfterlifeComponent.js';
 import { DeathBargainSystem } from './DeathBargainSystem.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /** Agent tiers that get full afterlife experience */
 const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
@@ -38,12 +40,17 @@ export class DeathTransitionSystem implements System {
 
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
+  private events!: SystemEventManager;
 
   /**
    * Set the death bargain system for hero resurrection challenges
    */
   setDeathBargainSystem(system: DeathBargainSystem): void {
     this.deathBargainSystem = system;
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -177,17 +184,13 @@ export class DeathTransitionSystem implements System {
 
       // Emit death event with destination realm info
       const identity = entity.components.get('identity') as IdentityComponent | undefined;
-      world.eventBus.emit({
-        type: 'agent:died',
-        source: entityId,
-        data: {
-          entityId,
-          name: identity?.name ?? 'Unknown',
-          causeOfDeath: this.determineCauseOfDeath(entity),
-          destinationRealm: targetRealm,
-          routingReason: routing.reason,
-          routingDeity: routing.deityId,
-        },
+      this.events.emit('agent:died', {
+        entityId,
+        name: identity?.name ?? 'Unknown',
+        causeOfDeath: this.determineCauseOfDeath(entity),
+        destinationRealm: targetRealm,
+        routingReason: routing.reason,
+        routingDeity: routing.deityId,
       });
     }
   }
@@ -199,28 +202,20 @@ export class DeathTransitionSystem implements System {
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
 
     // Emit annihilation event
-    world.eventBus.emit({
-      type: 'agent:died',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        name: identity?.name ?? 'Unknown',
-        causeOfDeath: this.determineCauseOfDeath(entity),
-        destinationRealm: 'annihilation',
-        routingReason: routing.reason,
-        routingDeity: routing.deityId,
-      },
+    this.events.emit('agent:died', {
+      entityId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      causeOfDeath: this.determineCauseOfDeath(entity),
+      destinationRealm: 'annihilation',
+      routingReason: routing.reason,
+      routingDeity: routing.deityId,
     });
 
     // Emit specific soul annihilation event
-    world.eventBus.emit({
-      type: 'soul:annihilated',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        deityId: routing.deityId,
-        context: routing.context,
-      },
+    this.events.emit('soul:annihilated', {
+      entityId: entity.id,
+      deityId: routing.deityId,
+      context: routing.context,
     });
 
     // Entity will be cleaned up by world (no afterlife, no transition)
@@ -234,32 +229,24 @@ export class DeathTransitionSystem implements System {
     const config = routing.reincarnationConfig;
 
     // Emit death event with reincarnation destination
-    world.eventBus.emit({
-      type: 'agent:died',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        name: identity?.name ?? 'Unknown',
-        causeOfDeath: this.determineCauseOfDeath(entity),
-        destinationRealm: 'reincarnation',
-        routingReason: routing.reason,
-        routingDeity: routing.deityId,
-      },
+    this.events.emit('agent:died', {
+      entityId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      causeOfDeath: this.determineCauseOfDeath(entity),
+      destinationRealm: 'reincarnation',
+      routingReason: routing.reason,
+      routingDeity: routing.deityId,
     });
 
     // Emit reincarnation queued event - ReincarnationSystem will handle spawning new entity
-    world.eventBus.emit({
-      type: 'soul:reincarnation_queued',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        deityId: routing.deityId,
-        target: config?.target ?? 'same_world',
-        memoryRetention: config?.memoryRetention ?? 'none',
-        speciesConstraint: config?.speciesConstraint ?? 'any',
-        minimumDelay: config?.minimumDelay ?? 1000,
-        maximumDelay: config?.maximumDelay ?? 10000,
-      },
+    this.events.emit('soul:reincarnation_queued', {
+      entityId: entity.id,
+      deityId: routing.deityId,
+      target: config?.target ?? 'same_world',
+      memoryRetention: config?.memoryRetention ?? 'none',
+      speciesConstraint: config?.speciesConstraint ?? 'any',
+      minimumDelay: config?.minimumDelay ?? 1000,
+      maximumDelay: config?.maximumDelay ?? 10000,
     });
   }
 
@@ -273,33 +260,25 @@ export class DeathTransitionSystem implements System {
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
 
     // Emit death event with reincarnation destination
-    world.eventBus.emit({
-      type: 'agent:died',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        name: identity?.name ?? 'Unknown',
-        causeOfDeath: this.determineCauseOfDeath(entity),
-        destinationRealm: 'reincarnation',
-        routingReason: 'default_reincarnation',
-        routingDeity: undefined,
-      },
+    this.events.emit('agent:died', {
+      entityId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      causeOfDeath: this.determineCauseOfDeath(entity),
+      destinationRealm: 'reincarnation',
+      routingReason: 'default_reincarnation',
+      routingDeity: undefined,
     });
 
     // Queue for reincarnation with default settings that preserve some identity
     // Ensouled agents get fragment memory retention to maintain some continuity
-    world.eventBus.emit({
-      type: 'soul:reincarnation_queued',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        deityId: undefined,
-        target: 'same_world',
-        memoryRetention: 'fragments',  // Keep some memories for ensouled souls
-        speciesConstraint: 'same',     // Stay the same species
-        minimumDelay: 500,             // Faster rebirth for unaffiliated souls
-        maximumDelay: 3000,
-      },
+    this.events.emit('soul:reincarnation_queued', {
+      entityId: entity.id,
+      deityId: undefined,
+      target: 'same_world',
+      memoryRetention: 'fragments',  // Keep some memories for ensouled souls
+      speciesConstraint: 'same',     // Stay the same species
+      minimumDelay: 500,             // Faster rebirth for unaffiliated souls
+      maximumDelay: 3000,
     });
   }
 
@@ -313,17 +292,13 @@ export class DeathTransitionSystem implements System {
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
 
     // Emit simple death event (no afterlife routing)
-    world.eventBus.emit({
-      type: 'agent:died',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        name: identity?.name ?? 'Unknown',
-        causeOfDeath: this.determineCauseOfDeath(entity),
-        destinationRealm: 'none',  // No afterlife
-        routingReason: 'no_soul',  // Not eligible for afterlife
-        routingDeity: undefined,
-      },
+    this.events.emit('agent:died', {
+      entityId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      causeOfDeath: this.determineCauseOfDeath(entity),
+      destinationRealm: 'none',  // No afterlife
+      routingReason: 'no_soul',  // Not eligible for afterlife
+      routingDeity: undefined,
     });
 
     // Mark for cleanup (could be handled by a cleanup system)
@@ -428,5 +403,9 @@ export class DeathTransitionSystem implements System {
    */
   hasProcessedDeath(entityId: string): boolean {
     return this.processedDeaths.has(entityId);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

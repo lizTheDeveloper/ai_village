@@ -18,6 +18,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -51,7 +52,7 @@ export class MoodSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent];
 
   private isInitialized = false;
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private world: World | null = null;
 
   /** How often to fully update mood (in ticks) */
@@ -80,10 +81,10 @@ export class MoodSystem implements System {
     }
 
     this.world = world;
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Subscribe to events that affect mood
-    this.setupEventListeners(eventBus);
+    this.setupEventListeners();
 
     this.isInitialized = true;
   }
@@ -91,36 +92,21 @@ export class MoodSystem implements System {
   /**
    * Set up event listeners for mood-affecting events.
    */
-  private setupEventListeners(eventBus: EventBus): void {
+  private setupEventListeners(): void {
     // Eating events - includes optional quality and flavors for preference system
-    eventBus.subscribe('agent:ate', (event) => {
-      const data = event.data as {
-        agentId: string;
-        foodType: string;
-        hungerRestored: number;
-        quality?: number;
-        flavors?: FlavorType[];
-      };
+    this.events.on('agent:ate', (data) => {
       this.handleAteEvent(data.agentId, data.foodType, data.hungerRestored, data.quality, data.flavors);
     });
 
     // Conversation started - small initial boost for social contact
-    eventBus.subscribe('conversation:started', (event) => {
-      const data = event.data as { participants: string[] };
+    this.events.on('conversation:started', (data) => {
       for (const agentId of data.participants) {
         this.applyMoodBoost(agentId, 'social', 3);
       }
     });
 
     // Conversation ended - quality-based mood impact
-    eventBus.subscribe('conversation:ended', (event) => {
-      const data = event.data as {
-        participants: string[];
-        quality?: number;
-        depth?: number;
-        topics?: string[];
-      };
-
+    this.events.on('conversation:ended', (data) => {
       // Calculate mood boost based on conversation quality
       // Base mood boost for any conversation
       const baseMood = 3;
@@ -146,8 +132,7 @@ export class MoodSystem implements System {
     });
 
     // Building completion boosts achievement mood
-    eventBus.subscribe('building:complete', (event) => {
-      const data = event.data as { builderId?: string };
+    this.events.on('building:complete', (data) => {
       if (data.builderId) {
         this.applyMoodBoost(data.builderId, 'achievement', 15);
       }
@@ -156,17 +141,16 @@ export class MoodSystem implements System {
     });
 
     // Invalidate building cache on building changes
-    eventBus.subscribe('building:destroyed', () => {
+    this.events.on('building:destroyed', () => {
       this.buildingCache = null;
     });
 
-    eventBus.subscribe('building:placement:confirmed', () => {
+    this.events.on('building:placement:confirmed', () => {
       this.buildingCache = null;
     });
 
     // Research completion boosts achievement mood
-    eventBus.subscribe('research:completed', (event) => {
-      const data = event.data as { researchers?: string[] };
+    this.events.on('research:completed', (data) => {
       if (data.researchers) {
         for (const researcherId of data.researchers) {
           this.applyMoodBoost(researcherId, 'achievement', 20);
@@ -175,14 +159,12 @@ export class MoodSystem implements System {
     });
 
     // Gathering resources gives small achievement boost
-    eventBus.subscribe('resource:gathered', (event) => {
-      const data = event.data as { agentId: string };
+    this.events.on('resource:gathered', (data) => {
       this.applyMoodBoost(data.agentId, 'achievement', 2);
     });
 
     // Critical needs cause immediate mood impact
-    eventBus.subscribe('need:critical', (event) => {
-      const data = event.data as { agentId: string; needType: string; value: number };
+    this.events.on('need:critical', (data) => {
       // Physical stress from critical needs
       const stressPenalty = data.needType === 'hunger' ? -25 : -20;
       this.applyMoodBoost(data.agentId, 'physical', stressPenalty);
@@ -615,16 +597,16 @@ export class MoodSystem implements System {
    * Emit mood changed event for significant changes.
    */
   private emitMoodEvent(agentId: string, mood: MoodComponent): void {
-    this.eventBus?.emit({
-      type: 'mood:changed',
-      source: agentId,
-      data: {
-        agentId,
-        currentMood: mood.currentMood,
-        emotionalState: mood.emotionalState,
-        description: getMoodDescription(mood),
-      },
+    this.events.emit('mood:changed', {
+      agentId,
+      currentMood: mood.currentMood,
+      emotionalState: mood.emotionalState,
+      description: getMoodDescription(mood),
     });
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   /**

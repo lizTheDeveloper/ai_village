@@ -9,6 +9,7 @@
 
 import type { MetricsCollector } from '../MetricsCollector.js';
 import type { MetricsStorage, QueryOptions } from '../MetricsStorage.js';
+import type { BehavioralMetrics } from '../types.js';
 
 /**
  * Time range for queries
@@ -485,11 +486,11 @@ export class MetricsAPI {
 
       // Count behaviors
       const behaviorCounts = new Map<string, number>();
-      const behavioralMetrics = allMetrics.behavioral as Record<string, any>;
+      const behavioralMetrics = allMetrics.behavioral as BehavioralMetrics | undefined;
 
       if (behavioralMetrics) {
         for (const [, agentData] of Object.entries(behavioralMetrics)) {
-          const breakdown = (agentData as any).activityBreakdown as Record<string, number> | undefined;
+          const breakdown = agentData.activityBreakdown;
           if (breakdown) {
             for (const [behavior, time] of Object.entries(breakdown)) {
               behaviorCounts.set(behavior, (behaviorCounts.get(behavior) || 0) + time);

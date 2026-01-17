@@ -3,6 +3,7 @@ import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GoalCategory, PersonalGoal } from '../components/GoalsComponent.js';
 import { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { GoalsComponent } from '../components/GoalsComponent.js';
@@ -21,12 +22,12 @@ export class GoalGenerationSystem implements System {
   public readonly requiredComponents = [] as const;
   public readonly dependsOn = [] as const;
 
-  private eventBus: EventBus;
+  private events!: SystemEventManager;
   private world?: World;
   private nextGoalId = 0;
 
   constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
     this._setupEventListeners();
   }
 
@@ -36,8 +37,8 @@ export class GoalGenerationSystem implements System {
 
   private _setupEventListeners(): void {
     // Generate goals after reflection
-    this.eventBus.subscribe('reflection:completed', (event) => {
-      const { agentId } = event.data;
+    this.events.on('reflection:completed', (data) => {
+      const { agentId } = data;
       if (!this.world) return;
       const entity = this.world.getEntity(agentId);
       if (!entity) return;
@@ -52,26 +53,21 @@ export class GoalGenerationSystem implements System {
         const goal = this._generateGoal(agentId, personalityComp, entity);
         if (goal) {
           goalsComp.addGoal(goal);
-          this.eventBus.emit({
-            type: 'agent:goal_formed',
-            source: this.id,
-            data: {
-              agentId,
-              goalId: goal.id,
-              category: goal.category,
-              description: goal.description,
-            },
+          this.events.emit('agent:goal_formed', {
+            agentId,
+            goalId: goal.id,
+            category: goal.category,
+            description: goal.description,
           });
         }
       }
     });
 
     // Track goal progress from action completion
-    this.eventBus.subscribe('agent:action:completed', (event) => {
-      const { actionType } = event.data;
+    this.events.on('agent:action:completed', (data) => {
+      const { actionType, agentId } = data;
 
-      // The agentId is in event.source (set to action.actorId by ActionQueue)
-      const agentId = event.source;
+      // agentId is optional in the event data, skip if not present
       if (!agentId) return;
 
       if (!this.world) return;
@@ -87,7 +83,6 @@ export class GoalGenerationSystem implements System {
 
   update(_world: World): void {
     // This system is event-driven, no per-frame updates needed
-    this.eventBus.flush();
   }
 
   /**
@@ -378,15 +373,11 @@ export class GoalGenerationSystem implements System {
 
         // Emit goal completion event if just completed
         if (willComplete) {
-          this.eventBus.emit({
-            type: 'agent:goal_completed',
-            source: this.id,
-            data: {
-              agentId,
-              goalId: goal.id,
-              category: goal.category,
-              description: goal.description,
-            },
+          this.events.emit('agent:goal_completed', {
+            agentId,
+            goalId: goal.id,
+            category: goal.category,
+            description: goal.description,
           });
         }
       }
@@ -410,18 +401,18 @@ export class GoalGenerationSystem implements System {
       if (goal.progress >= milestoneThreshold && !milestone.completed) {
         goalsComp.completeMilestone(goal.id, i);
 
-        this.eventBus.emit({
-          type: 'agent:goal_milestone',
-          source: this.id,
-          data: {
-            agentId,
-            goalId: goal.id,
-            milestoneIndex: i,
-            description: milestone.description,
-          },
+        this.events.emit('agent:goal_milestone', {
+          agentId,
+          goalId: goal.id,
+          milestoneIndex: i,
+          description: milestone.description,
         });
       }
     }
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   // Action type checkers

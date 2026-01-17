@@ -209,9 +209,12 @@ export const PositionComponentSchema: ComponentSchema<PositionComponent> = {
     { name: 'u', type: 'number', required: false },
   ],
   validate: (data: unknown): data is PositionComponent => {
-    const d = data as any;
+    if (!data || typeof data !== 'object') {
+      return false;
+    }
+
+    const d = data as Record<string, unknown>;
     const baseValid =
-      d &&
       d.type === 'position' &&
       typeof d.x === 'number' &&
       typeof d.y === 'number' &&

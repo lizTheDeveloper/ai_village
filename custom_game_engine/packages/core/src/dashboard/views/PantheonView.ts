@@ -11,6 +11,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import type { DeityComponent } from '../../components/DeityComponent.js';
 
 /**
  * Deity summary information
@@ -111,7 +112,7 @@ export const PantheonView: DashboardView<PantheonViewData> = {
       for (const entity of world.entities.values()) {
         if (!entity.components.has(CT.Deity)) continue;
 
-        const deityComp = entity.components.get(CT.Deity) as any;
+        const deityComp = entity.components.get(CT.Deity) as DeityComponent;
         if (!deityComp) continue;
 
         const belief = deityComp.belief?.currentBelief ?? 0;

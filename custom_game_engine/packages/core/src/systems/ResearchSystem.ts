@@ -31,6 +31,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -68,7 +69,7 @@ export class ResearchSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position];
 
   private isInitialized = false;
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private blueprintRegistry: BuildingBlueprintRegistry | null = null;
   private researchRegistry: ResearchRegistry | null = null;
   private paperSystem: AcademicPaperSystem | null = null;
@@ -96,7 +97,7 @@ export class ResearchSystem implements System {
       return;
     }
 
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
     this.researchRegistry = ResearchRegistry.getInstance();
     this.paperSystem = getAcademicPaperSystem();
 
@@ -114,9 +115,7 @@ export class ResearchSystem implements System {
     }
 
     // Subscribe to research-related events
-    // Use 'research:started' which is already in EventMap - we'll emit it to start research
-    eventBus.subscribe('research:started', (event) => {
-      const data = event.data as { agentId: string; researchId: string };
+    this.events.on('research:started', (data) => {
       // Only handle if this is a start request (not already processing)
       if (!this.getOrCreateResearchState(world)?.inProgress.has(data.researchId)) {
         this.handleStartResearchRequest(world, data.agentId, data.researchId);
@@ -166,14 +165,10 @@ export class ResearchSystem implements System {
     const newState = startResearch(researchState, researchId, agentId, world.tick);
     (worldEntity as EntityImpl).updateComponent(CT.ResearchState, () => newState);
 
-    this.eventBus?.emit({
-      type: 'research:started',
-      source: agentId,
-      data: {
-        researchId,
-        agentId,
-        researchers: newState.inProgress.get(researchId)?.researchers ?? [agentId],
-      },
+    this.events.emit('research:started', {
+      researchId,
+      agentId,
+      researchers: newState.inProgress.get(researchId)?.researchers ?? [agentId],
     });
 
   }
@@ -342,19 +337,15 @@ export class ResearchSystem implements System {
         );
 
         // Emit paper published event
-        this.eventBus?.emit({
-          type: 'research:progress',
-          source: 'research-system',
-          data: {
-            researchId,
-            progress: papersPublished,
-            progressRequired: papersRequired,
-            paperPublished: {
-              id: paper.id,
-              title: paper.title,
-              authors: [firstAuthorName, ...coAuthorNames],
-              isBreakthrough,
-            },
+        this.events.emit('research:progress', {
+          researchId,
+          progress: papersPublished,
+          progressRequired: papersRequired,
+          paperPublished: {
+            id: paper.id,
+            title: paper.title,
+            authors: [firstAuthorName, ...coAuthorNames],
+            isBreakthrough,
           },
         });
 
@@ -375,17 +366,13 @@ export class ResearchSystem implements System {
         const overallProgress = papersPublished + (progressTowardNext / 100);
         const progressPercentage = (overallProgress / papersRequired) * research.progressRequired;
 
-        this.eventBus?.emit({
-          type: 'research:progress',
-          source: 'research-system',
-          data: {
-            researchId,
-            progress: progressPercentage,
-            progressRequired: research.progressRequired,
-            papersPublished,
-            papersRequired,
-            progressTowardNextPaper: progressTowardNext,
-          },
+        this.events.emit('research:progress', {
+          researchId,
+          progress: progressPercentage,
+          progressRequired: research.progressRequired,
+          papersPublished,
+          papersRequired,
+          progressTowardNextPaper: progressTowardNext,
         });
       }
     }
@@ -429,34 +416,26 @@ export class ResearchSystem implements System {
       })) || [];
 
     // Emit completion event with bibliography
-    this.eventBus?.emit({
-      type: 'research:completed',
-      source: 'research-system',
-      data: {
-        researchId: research.id,
-        researchName: research.name,
-        researchers,
-        unlocks: unlockData,
-        tick: world.tick,
-        bibliography: {
-          paperCount: papers.length,
-          papers,
-          leadResearcherId: bibliography?.leadResearcherId,
-          contributorIds: bibliography?.contributorIds || [],
-        },
+    this.events.emit('research:completed', {
+      researchId: research.id,
+      researchName: research.name,
+      researchers,
+      unlocks: unlockData,
+      tick: world.tick,
+      bibliography: {
+        paperCount: papers.length,
+        papers,
+        leadResearcherId: bibliography?.leadResearcherId,
+        contributorIds: bibliography?.contributorIds || [],
       },
     });
 
     // Emit individual unlock events
     for (const unlock of research.unlocks) {
-      this.eventBus?.emit({
-        type: 'research:unlocked',
-        source: 'research-system',
-        data: {
-          researchId: research.id,
-          type: unlock.type,
-          contentId: this.getUnlockId(unlock),
-        },
+      this.events.emit('research:unlocked', {
+        researchId: research.id,
+        type: unlock.type,
+        contentId: this.getUnlockId(unlock),
       });
     }
 
@@ -735,5 +714,9 @@ export class ResearchSystem implements System {
     breakthroughCount: number;
   } | null {
     return this.paperSystem?.getAuthorMetrics(agentId) || null;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

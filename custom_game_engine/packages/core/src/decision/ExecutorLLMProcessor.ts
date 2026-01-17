@@ -649,21 +649,31 @@ export class ExecutorLLMProcessor {
       }
     }
 
-    // Building limits - scaled for 5-10 agent villages
-    const BUILDING_LIMITS: Record<string, number> = {
-      'workbench': 2,
-      'forge': 2,
-      'campfire': 5,      // Warmth is important, multiple camps
-      'well': 2,
-      'farm-shed': 2,
-      'storage-chest': 15, // Storage always useful
-      'storage-box': 15,
-      'bed': 10,
-      'bedroll': 10,
-      'tent': 5,
-      'lean-to': 5,
+    // Building limits - dynamically scaled based on agent count
+    const agentCount = world.query().with(ComponentType.Agent).executeEntities().length;
+    const getBuildingLimit = (type: string): number => {
+      switch (type) {
+        case 'storage-chest':
+        case 'storage-box':
+          // 1 storage per 2 agents, max 10 (matches StructuredPromptBuilder threshold)
+          return Math.min(Math.ceil(agentCount / 2), 10);
+        case 'bed':
+        case 'bedroll':
+          // 1 bed per agent, max 20
+          return Math.min(agentCount, 20);
+        case 'tent':
+        case 'lean-to':
+          // 1 shelter per 2 agents, max 10
+          return Math.min(Math.ceil(agentCount / 2), 10);
+        case 'campfire':
+          // 1 campfire per 3 agents, max 5
+          return Math.min(Math.ceil(agentCount / 3), 5);
+        default:
+          // Default: 2 per village for utility buildings
+          return 2;
+      }
     };
-    const limit = BUILDING_LIMITS[buildingType] ?? 1;
+    const limit = getBuildingLimit(buildingType);
 
     const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
     const alreadyPlannedBySelf = agent?.plannedBuilds?.some(p => p.buildingType === buildingType) ?? false;

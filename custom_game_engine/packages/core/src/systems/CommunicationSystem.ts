@@ -18,6 +18,8 @@ import {
   calculateConversationQuality,
   type ConversationQuality,
 } from '../conversation/ConversationQuality.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 export class CommunicationSystem implements System {
   public readonly id: SystemId = 'communication';
@@ -25,6 +27,8 @@ export class CommunicationSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.Conversation,
   ];
+
+  private events!: SystemEventManager;
 
   // Satisfaction amounts for quality-based social need updates
   private static readonly CONTACT_SATISFACTION = 0.3; // Any conversation satisfies contact need
@@ -35,6 +39,10 @@ export class CommunicationSystem implements System {
   // Personality-based conversation joining
   private static readonly MIN_JOIN_RADIUS = 20; // Introverted agents (extraversion = 0) join from 20 tiles
   private static readonly MAX_JOIN_RADIUS = 30; // Extraverted agents (extraversion = 1) join from 30 tiles
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
 
   update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // First pass: Check for agents who might want to join conversations based on personality
@@ -151,14 +159,10 @@ export class CommunicationSystem implements System {
     }
 
     // Emit event
-    world.eventBus.emit({
-      type: 'conversation:joined',
-      source: joiner.id,
-      data: {
-        conversationId: `conv-${memberConversation.partnerId || participantIds[0]}`,
-        joinerId: joiner.id,
-        participants: [...participantIds, joiner.id],
-      },
+    this.events.emit('conversation:joined', {
+      conversationId: `conv-${memberConversation.partnerId || participantIds[0]}`,
+      joinerId: joiner.id,
+      participants: [...participantIds, joiner.id],
     });
   }
 
@@ -206,16 +210,12 @@ export class CommunicationSystem implements System {
     // If no partner or quality, emit basic event
     if (!partner || !quality || !partnerId) {
       if (partnerId) {
-        world.eventBus.emit({
-          type: 'conversation:ended',
-          source: entity.id,
-          data: {
-            conversationId: `conv-${entity.id}-${partnerId}`,
-            participants: [entity.id, partnerId],
-            agent1: entity.id,
-            agent2: partnerId,
-            duration: durationSeconds,
-          },
+        this.events.emit('conversation:ended', {
+          conversationId: `conv-${entity.id}-${partnerId}`,
+          participants: [entity.id, partnerId],
+          agent1: entity.id,
+          agent2: partnerId,
+          duration: durationSeconds,
         });
       }
     }
@@ -285,5 +285,9 @@ export class CommunicationSystem implements System {
         interest.lastDiscussed = currentTick;
       }
     }
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

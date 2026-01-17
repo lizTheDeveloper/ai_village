@@ -5,6 +5,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { SpiritualComponent, PrayerType, PrayerUrgency, Prayer } from '../components/SpiritualComponent.js';
 import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -32,11 +33,11 @@ export class PrayerSystem implements System {
   public readonly priority: number = 116; // After belief generation
   public readonly requiredComponents = [];
 
-  private eventBus?: EventBus;
+  private events!: SystemEventManager;
   private prayerIdCounter: number = 0;
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -97,19 +98,13 @@ export class PrayerSystem implements System {
     }
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'prayer:offered',
-        source: 'prayer',
-        data: {
-          agentId: entity.id,
-          deityId: spiritual.believedDeity,
-          prayerType: prayer.type,
-          urgency: prayer.urgency,
-          prayerId: prayer.id,
-        },
-      });
-    }
+    this.events.emit('prayer:offered', {
+      agentId: entity.id,
+      deityId: spiritual.believedDeity,
+      prayerType: prayer.type,
+      urgency: prayer.urgency,
+      prayerId: prayer.id,
+    });
   }
 
   /**
@@ -166,22 +161,16 @@ export class PrayerSystem implements System {
     );
 
     // Emit resolution event (using generic emit for events not in GameEventMap)
-    if (this.eventBus) {
-      (this.eventBus as unknown as { emit: (e: Record<string, unknown>) => void }).emit({
-        type: 'prayer:resolved',
-        source: 'prayer',
-        data: {
-          agentId: entity.id,
-          prayerId: prayer.id,
-          resolutionType: resolution.type,
-          targetId: resolution.targetId,
-          beliefGenerated: resolution.beliefGenerated,
-          respectGenerated: resolution.respectGenerated,
-          couldCreateDeity: resolution.couldCreateDeity,
-          timestamp: currentTick,
-        },
-      });
-    }
+    this.events.emitGeneric('prayer:resolved', {
+      agentId: entity.id,
+      prayerId: prayer.id,
+      resolutionType: resolution.type,
+      targetId: resolution.targetId,
+      beliefGenerated: resolution.beliefGenerated,
+      respectGenerated: resolution.respectGenerated,
+      couldCreateDeity: resolution.couldCreateDeity,
+      timestamp: currentTick,
+    });
 
     // Handle spirit prayer
     if (resolution.type === 'spirit' && resolution.targetId) {
@@ -198,15 +187,11 @@ export class PrayerSystem implements System {
 
     // Handle unresolved prayer (potential deity emergence)
     if (resolution.type === 'unresolved' && resolution.couldCreateDeity) {
-      (this.eventBus as unknown as { emit: (e: Record<string, unknown>) => void })?.emit({
-        type: 'divinity:proto_deity_belief',
-        source: 'prayer',
-        data: {
-          agentId: entity.id,
-          prayerContent: prayer.content,
-          beliefContributed: resolution.beliefGenerated,
-          timestamp: currentTick,
-        },
+      this.events.emitGeneric('divinity:proto_deity_belief', {
+        agentId: entity.id,
+        prayerContent: prayer.content,
+        beliefContributed: resolution.beliefGenerated,
+        timestamp: currentTick,
       });
     }
   }
@@ -342,5 +327,9 @@ export class PrayerSystem implements System {
       urgency: 'routine',
       content: chosen.content,
     };
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

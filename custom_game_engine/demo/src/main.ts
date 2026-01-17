@@ -81,6 +81,7 @@ import {
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
+import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
 import { injectChunkSpatialQueryToTemperature } from '@ai-village/environment';
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
@@ -827,6 +828,19 @@ async function registerAllSystems(
       }
       liveEntityAPI.setAgentDebugManager(agentDebugManager);
       liveEntityAPI.attach(streamClient);
+
+      // Set up Game Introspection API for runtime entity introspection
+      const gameIntrospectionAPI = new GameIntrospectionAPI(
+        gameLoop.world,
+        ComponentRegistry,
+        MutationService,
+        null, // metricsAPI - not needed for Phase 1
+        liveEntityAPI
+      );
+      gameIntrospectionAPI.attach(streamClient);
+
+      // Store on world for setupDebugAPI access
+      (gameLoop.world as any).__introspectionAPI = gameIntrospectionAPI;
     }
   }
 
@@ -3358,6 +3372,9 @@ function setupDebugAPI(
     agentInfoPanel,
     animalInfoPanel,
     resourcesPanel,
+
+    // Game Introspection API - runtime entity introspection with schema validation
+    introspection: (gameLoop.world as any).__introspectionAPI || null,
   };
 
   (window as any).promptLogger = promptLogger;
@@ -3958,6 +3975,11 @@ async function main() {
   // NOTE: Shops, farms, temples, and midwifery buildings are now registered
   // automatically in BuildingBlueprintRegistry constructor
   (gameLoop.world as any).buildingRegistry = blueprintRegistry;
+
+  // Update GameIntrospectionAPI with buildingRegistry for building placement methods
+  if ((gameLoop.world as any).__introspectionAPI) {
+    (gameLoop.world as any).__introspectionAPI.buildingRegistry = blueprintRegistry;
+  }
 
   const placementValidator = new PlacementValidator();
   const placementUI = new BuildingPlacementUI({

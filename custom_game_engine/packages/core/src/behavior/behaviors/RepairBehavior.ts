@@ -408,7 +408,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
  * @example registerBehaviorWithContext('repair', repairBehaviorWithContext);
  */
 export function repairBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState();
   const phase = (state.phase as RepairPhase) ?? 'searching';
 
   switch (phase) {
@@ -423,7 +423,7 @@ export function repairBehaviorWithContext(ctx: BehaviorContext): ContextBehavior
   }
 }
 
-function handleSearchingPhaseCtx(ctx: BehaviorContext, _state: any): ContextBehaviorResult | void {
+function handleSearchingPhaseCtx(ctx: BehaviorContext, _state: Record<string, unknown>): ContextBehaviorResult | void {
   const target = findDamagedBuildingCtx(ctx);
 
   if (!target) {
@@ -441,7 +441,7 @@ function handleSearchingPhaseCtx(ctx: BehaviorContext, _state: any): ContextBeha
   ctx.setThought(`Going to repair the ${target.building.buildingType}.`);
 }
 
-function handleMovingPhaseCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleMovingPhaseCtx(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   const targetPosition = state.targetPosition as { x: number; y: number };
   const targetBuildingId = state.targetBuildingId as string;
 
@@ -481,7 +481,7 @@ function handleMovingPhaseCtx(ctx: BehaviorContext, state: any): ContextBehavior
   }
 }
 
-function handleRepairingPhaseCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleRepairingPhaseCtx(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   ctx.stopMovement();
 
   const targetBuildingId = state.targetBuildingId as string;

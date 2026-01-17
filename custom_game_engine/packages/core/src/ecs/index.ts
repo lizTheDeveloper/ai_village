@@ -14,10 +14,10 @@ export * from './World.js';
 export * from './SimulationScheduler.js';
 export * from './CachedQuery.js';
 export {
-  SystemContext,
+  type SystemContext,
   SystemContextImpl,
   BaseSystem,
-  ComponentAccessor,
+  type ComponentAccessor,
   ComponentAccessorImpl,
   createSystemContext,
   type EntityWithDistance,
@@ -25,6 +25,6 @@ export {
 
 // Re-export types explicitly (export * doesn't re-export types)
 // Note: BiomeType is also exported from SoilSystem.ts - avoid duplicate exports
-export type { World, WorldMutator, ITile, TerrainType } from './World.js';
+export type { World, WorldMutator, ITile, TerrainType, IPlanet } from './World.js';
 export type { Entity } from './Entity.js';
 export type { Component } from './Component.js';

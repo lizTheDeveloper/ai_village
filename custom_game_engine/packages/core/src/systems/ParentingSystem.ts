@@ -8,6 +8,8 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType';
+import type { EventBus } from '../events/EventBus';
+import { SystemEventManager } from '../events/TypedEventEmitter';
 import type { ParentingComponent, ParentingResponsibility } from '../components/ParentingComponent';
 import type { NeedsComponent } from '../components/NeedsComponent';
 import type { PositionComponent } from '../components/PositionComponent';
@@ -47,9 +49,14 @@ export class ParentingSystem implements System {
   public readonly name = 'ParentingSystem';
   private config: ParentingSystemConfig;
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<ParentingSystemConfig> = {}) {
     this.config = { ...DEFAULT_PARENTING_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   public update(world: World, _entities: ReadonlyArray<import('../ecs/Entity.js').Entity>, _deltaTime: number): void {
@@ -151,16 +158,12 @@ export class ParentingSystem implements System {
           responsibility.neglectWarnings++;
 
           // Emit neglect event
-          world.eventBus.emit({
-            type: 'parenting:neglect',
-            source: parent.id,
-            data: {
-              parentId: parent.id,
-              childId: responsibility.childId,
-              wellbeing,
-              warnings: responsibility.neglectWarnings,
-            },
-          });
+          this.events.emit('parenting:neglect', {
+            parentId: parent.id,
+            childId: responsibility.childId,
+            wellbeing,
+            warnings: responsibility.neglectWarnings,
+          }, parent.id);
 
           // Add to reputation
           parenting.addNotableEvent(
@@ -177,15 +180,11 @@ export class ParentingSystem implements System {
           // Haven't checked in over 100 seconds
           responsibility.neglectWarnings++;
 
-          world.eventBus.emit({
-            type: 'parenting:concern',
-            source: parent.id,
-            data: {
-              parentId: parent.id,
-              childId: responsibility.childId,
-              wellbeing,
-            },
-          });
+          this.events.emit('parenting:concern', {
+            parentId: parent.id,
+            childId: responsibility.childId,
+            wellbeing,
+          }, parent.id);
         }
       }
       // Child thriving
@@ -206,15 +205,11 @@ export class ParentingSystem implements System {
             0.05
           );
 
-          world.eventBus.emit({
-            type: 'parenting:success',
-            source: parent.id,
-            data: {
-              parentId: parent.id,
-              childId: responsibility.childId,
-              wellbeing,
-            },
-          });
+          this.events.emit('parenting:success', {
+            parentId: parent.id,
+            childId: responsibility.childId,
+            wellbeing,
+          }, parent.id);
         }
       }
     }
@@ -246,16 +241,12 @@ export class ParentingSystem implements System {
     responsibility.lastCheckIn = world.tick;
 
     // Emit parenting action event
-    world.eventBus.emit({
-      type: 'parenting:action',
-      source: parentId,
-      data: {
-        parentId,
-        childId,
-        quality: actionQuality,
-        skill: parenting.parentingSkill,
-      },
-    });
+    this.events.emit('parenting:action', {
+      parentId,
+      childId,
+      quality: actionQuality,
+      skill: parenting.parentingSkill,
+    }, parentId);
   }
 
   /**
@@ -295,16 +286,12 @@ export class ParentingSystem implements System {
     parenting.addChild(responsibility);
 
     // Emit event
-    world.eventBus.emit({
-      type: 'parenting:assigned',
-      source: parentId,
-      data: {
-        parentId,
-        childId,
-        isPrimaryCaregiver,
-        careType,
-      },
-    });
+    this.events.emit('parenting:assigned', {
+      parentId,
+      childId,
+      isPrimaryCaregiver,
+      careType,
+    }, parentId);
   }
 
   /**
@@ -320,13 +307,13 @@ export class ParentingSystem implements System {
     parenting.removeChild(childId);
 
     // Emit event
-    world.eventBus.emit({
-      type: 'parenting:ended',
-      source: parentId,
-      data: {
-        parentId,
-        childId,
-      },
-    });
+    this.events.emit('parenting:ended', {
+      parentId,
+      childId,
+    }, parentId);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 }

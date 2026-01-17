@@ -516,7 +516,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
 
   // AnimalSystem - Uses StateMutatorSystem for batched needs/age decay updates
-  const animalSystem = new AnimalSystem(eventBus);
+  const animalSystem = new AnimalSystem();
   animalSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(animalSystem);
 
@@ -575,7 +575,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new MemorySystem());
   gameLoop.systemRegistry.register(new MemoryFormationSystem(eventBus));
-  gameLoop.systemRegistry.register(new MemoryConsolidationSystem(eventBus));
+  gameLoop.systemRegistry.register(new MemoryConsolidationSystem());
   gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
   gameLoop.systemRegistry.register(new ReflectionSystem(eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(eventBus));
@@ -837,12 +837,11 @@ export function registerAllSystems(
   // ============================================================================
   // COMBAT & SECURITY
   // ============================================================================
-  // HuntingSystem and AgentCombatSystem define their own minimal EventBus interface internally.
-  // The main EventBus satisfies this structurally, but needs explicit casting for TypeScript.
-  gameLoop.systemRegistry.register(new HuntingSystem(eventBus as unknown as SimplifiedEventBus));
-  // PredatorAttackSystem, DominanceChallengeSystem, and GuardDutySystem use the full EventBus type
+  // HuntingSystem now extends BaseSystem and handles event bus in onInitialize
+  gameLoop.systemRegistry.register(new HuntingSystem());
+  // PredatorAttackSystem, DominanceChallengeSystem, and AgentCombatSystem use the full EventBus type
   gameLoop.systemRegistry.register(new PredatorAttackSystem(eventBus));
-  gameLoop.systemRegistry.register(new AgentCombatSystem(undefined, eventBus as unknown as SimplifiedEventBus));
+  gameLoop.systemRegistry.register(new AgentCombatSystem(undefined, eventBus));
   gameLoop.systemRegistry.register(new DominanceChallengeSystem(eventBus));
   gameLoop.systemRegistry.register(new InjurySystem());
   gameLoop.systemRegistry.register(new GuardDutySystem(eventBus));

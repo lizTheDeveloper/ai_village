@@ -2,6 +2,7 @@ import type { EntityId, Tick } from '../types.js';
 import type { WorldMutator } from '../ecs/World.js';
 import type { Action, ActionEffect } from './Action.js';
 import type { IActionRegistry } from './ActionRegistry.js';
+import type { TimeComponent } from '../systems/TimeSystem.js';
 import { v4 as uuidv4 } from 'uuid';
 import { ComponentType } from '../types/ComponentType.js';
 
@@ -91,12 +92,10 @@ export class ActionQueue implements IActionQueue {
     if (!action) return false;
 
     if (action.status === 'executing') {
-      // Call interrupt handler if available
-      const handler = this.registry.get(action.type);
-      if (handler?.onInterrupt) {
-        // In a real implementation, we'd apply these effects
-        handler.onInterrupt(action, {} as any, reason);
-      }
+      // TODO: Call interrupt handler when world reference is available
+      // Currently cancel() doesn't receive a world parameter, but handler.onInterrupt() requires it.
+      // This is a known limitation - interrupt cleanup effects are not applied during cancellation.
+      // To fix: Either (1) add world param to cancel(), or (2) store world ref in ActionQueue.
 
       this.executingByEntity.delete(action.actorId);
       this.executingActions.delete(actionId);
@@ -297,7 +296,7 @@ export class ActionQueue implements IActionQueue {
     if (this.timeEntityId) {
       const timeEntity = world.getEntity(this.timeEntityId);
       if (timeEntity) {
-        const timeComponent = timeEntity.components.get(ComponentType.Time) as { speedMultiplier: number } | undefined;
+        const timeComponent = timeEntity.components.get(ComponentType.Time) as TimeComponent | undefined;
         return timeComponent?.speedMultiplier ?? 1;
       } else {
         this.timeEntityId = null;

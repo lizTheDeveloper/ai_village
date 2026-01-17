@@ -1,9 +1,8 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { PhysicsComponent } from '../components/PhysicsComponent.js';
@@ -45,7 +44,7 @@ interface BuildingCollisionData {
  * Dependencies:
  * @see TimeSystem (priority 3) - Provides time acceleration multiplier for movement speed
  */
-export class MovementSystem implements System {
+export class MovementSystem extends BaseSystem {
   public readonly id: SystemId = CT.Movement;
   public readonly priority: number = 20; // Run after AI
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -75,7 +74,7 @@ export class MovementSystem implements System {
   /**
    * Initialize event listeners to invalidate cache on building changes
    */
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(world: typeof this.world, eventBus: EventBus): void {
     // Invalidate cache when buildings change
     eventBus.subscribe('building:complete', () => {
       this.buildingCollisionCache = null;
@@ -94,14 +93,14 @@ export class MovementSystem implements System {
    * Get building collision data with caching
    * Performance: Returns cached data if valid, otherwise rebuilds cache
    */
-  private getBuildingCollisions(world: World): BuildingCollisionData[] {
+  private getBuildingCollisions(tick: number): BuildingCollisionData[] {
     // Return cached data if still valid
-    if (this.buildingCollisionCache && world.tick < this.cacheValidUntilTick) {
+    if (this.buildingCollisionCache && tick < this.cacheValidUntilTick) {
       return this.buildingCollisionCache;
     }
 
     // Rebuild cache
-    const buildings = world.query().with(CT.Position).with(CT.Building).executeEntities();
+    const buildings = this.world.query().with(CT.Position).with(CT.Building).executeEntities();
     this.buildingCollisionCache = [];
 
     for (const building of buildings) {
@@ -119,24 +118,24 @@ export class MovementSystem implements System {
     }
 
     // Cache valid for 1 second
-    this.cacheValidUntilTick = world.tick + this.CACHE_DURATION_TICKS;
+    this.cacheValidUntilTick = tick + this.CACHE_DURATION_TICKS;
 
     return this.buildingCollisionCache;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration multiplier from TimeComponent (cached)
     let timeSpeedMultiplier = 1.0;
 
     if (!this.timeEntityId) {
-      const timeEntities = world.query().with(CT.Time).executeEntities();
+      const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
       if (timeEntities.length > 0) {
         this.timeEntityId = timeEntities[0]!.id;
       }
     }
 
     if (this.timeEntityId) {
-      const timeEntity = world.getEntity(this.timeEntityId);
+      const timeEntity = ctx.world.getEntity(this.timeEntityId);
       if (timeEntity) {
         const timeComp = (timeEntity as EntityImpl).getComponent(CT.Time) as TimeComponent | undefined;
         if (timeComp && timeComp.speedMultiplier) {
@@ -148,8 +147,8 @@ export class MovementSystem implements System {
       }
     }
 
-    // Entities already filtered by requiredComponents - iterate directly
-    for (const entity of entities) {
+    // Entities already filtered by requiredComponents and SimulationScheduler
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
 
       // Performance: Get all components once at start
@@ -226,13 +225,13 @@ export class MovementSystem implements System {
       // Calculate new position using deltaTime and time acceleration
       // Velocity is in tiles/second, deltaTime is in seconds
       // Apply both fatigue penalty and time acceleration
-      const deltaX = movement.velocityX * speedMultiplier * deltaTime * timeSpeedMultiplier;
-      const deltaY = movement.velocityY * speedMultiplier * deltaTime * timeSpeedMultiplier;
+      const deltaX = movement.velocityX * speedMultiplier * ctx.deltaTime * timeSpeedMultiplier;
+      const deltaY = movement.velocityY * speedMultiplier * ctx.deltaTime * timeSpeedMultiplier;
       const newX = position.x + deltaX;
       const newY = position.y + deltaY;
 
       // Check for hard collisions (buildings) - these block completely
-      if (this.hasHardCollision(world, entity.id, newX, newY)) {
+      if (this.hasHardCollision(ctx.world, entity.id, newX, newY)) {
         // Try perpendicular directions to slide along walls
         const perpX1 = -deltaY;
         const perpY1 = deltaX;
@@ -244,17 +243,17 @@ export class MovementSystem implements System {
         const alt2X = position.x + perpX2;
         const alt2Y = position.y + perpY2;
 
-        if (!this.hasHardCollision(world, entity.id, alt1X, alt1Y)) {
-          this.updatePosition(impl, alt1X, alt1Y, world);
-        } else if (!this.hasHardCollision(world, entity.id, alt2X, alt2Y)) {
-          this.updatePosition(impl, alt2X, alt2Y, world);
+        if (!this.hasHardCollision(ctx.world, entity.id, alt1X, alt1Y)) {
+          this.updatePosition(impl, alt1X, alt1Y, ctx.world);
+        } else if (!this.hasHardCollision(ctx.world, entity.id, alt2X, alt2Y)) {
+          this.updatePosition(impl, alt2X, alt2Y, ctx.world);
         } else {
           // Completely blocked by buildings - stop
           this.stopEntity(impl, velocity);
         }
       } else {
         // Check for soft collisions (other agents) - these slow but don't block
-        const softCollisionPenalty = this.getSoftCollisionPenalty(world, entity.id, newX, newY);
+        const softCollisionPenalty = this.getSoftCollisionPenalty(ctx.world, entity.id, newX, newY);
 
         // Apply soft collision penalty (agents can push through each other, just slower)
         const adjustedDeltaX = deltaX * softCollisionPenalty;
@@ -263,11 +262,11 @@ export class MovementSystem implements System {
         const adjustedNewY = position.y + adjustedDeltaY;
 
         // Final check that adjusted position doesn't hit a building
-        if (!this.hasHardCollision(world, entity.id, adjustedNewX, adjustedNewY)) {
-          this.updatePosition(impl, adjustedNewX, adjustedNewY, world);
+        if (!this.hasHardCollision(ctx.world, entity.id, adjustedNewX, adjustedNewY)) {
+          this.updatePosition(impl, adjustedNewX, adjustedNewY, ctx.world);
         } else {
           // The adjusted position would hit a building - try original with penalty
-          this.updatePosition(impl, newX, newY, world);
+          this.updatePosition(impl, newX, newY, ctx.world);
         }
       }
     }
@@ -441,7 +440,7 @@ export class MovementSystem implements System {
    * Used when chunk is not generated to avoid expensive tile checks
    */
   private checkBuildingCollision(world: World, x: number, y: number): boolean {
-    const buildings = this.getBuildingCollisions(world);
+    const buildings = this.getBuildingCollisions(world.tick);
 
     for (const building of buildings) {
       if (!building.blocksMovement) {

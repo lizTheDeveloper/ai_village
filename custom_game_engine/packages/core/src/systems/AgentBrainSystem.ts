@@ -509,6 +509,40 @@ export class AgentBrainSystem implements System {
       }
     }
 
+    // Layer 2.5: Non-queued behavior completion check
+    // When a productive behavior completes (sets behaviorCompleted: true) outside of a queue,
+    // we need to reset to idle so the LLM can choose a new behavior
+    if (agent.behaviorCompleted && !hasBehaviorQueue(agent)) {
+      const identity = entity.getComponent<IdentityComponent>(CT.Identity);
+      const agentName = identity?.name || entity.id.slice(0, 8);
+      console.log(`[AgentBrainSystem] ${agentName}: behavior '${agent.behavior}' completed, requesting new decision`);
+
+      // Clear the flag and reset to idle - this will trigger a new LLM decision
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        behavior: 'idle',
+        behaviorCompleted: false,
+        behaviorState: {},
+        behaviorChangedAt: world.tick,
+        previousBehavior: current.behavior,
+      }));
+
+      // Emit behavior change event
+      world.eventBus.emit({
+        type: 'behavior:change',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          from: agent.behavior,
+          to: 'idle',
+          reason: 'behavior_completed',
+        },
+      });
+
+      // Return idle but don't execute - let LLM decide next action
+      return { behavior: 'idle', execute: false };
+    }
+
     // Layer 3: LLM or Scripted (both use sync queue+poll pattern now)
     const decisionResult = this.decision.process(
       entity,

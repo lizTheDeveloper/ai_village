@@ -24,6 +24,17 @@ import { BuildingType } from '../../types/BuildingType.js';
 import { CHUNK_SIZE } from '../../types.js';
 
 /**
+ * Minimal interface representing what performDeposit needs from World.
+ * This allows the method to work with both World objects and BehaviorContext.
+ */
+interface DepositWorldLike {
+  gameTime: { day: number };
+  eventBus: {
+    emit(event: { type: string; source?: string; data?: unknown }): void;
+  };
+}
+
+/**
  * Injection point for ChunkSpatialQuery (optional dependency)
  */
 let chunkSpatialQuery: any | null = null;
@@ -36,7 +47,7 @@ export function injectChunkSpatialQueryToDepositItems(spatialQuery: any): void {
 /**
  * Get the current game day from the world's time entity.
  */
-function getCurrentDay(world: World): number {
+function getCurrentDay(world: DepositWorldLike): number {
   return world.gameTime.day;
 }
 
@@ -201,7 +212,7 @@ export class DepositItemsBehavior extends BaseBehavior {
   performDeposit(
     entity: EntityImpl,
     storageEntity: EntityImpl,
-    world: World,
+    world: DepositWorldLike,
     inventory: InventoryComponent,
     agent: AgentComponent
   ): void {
@@ -296,7 +307,7 @@ export class DepositItemsBehavior extends BaseBehavior {
   private handlePartialDeposit(
     entity: EntityImpl,
     storageEntity: EntityImpl,
-    world: World,
+    world: DepositWorldLike,
     itemsDeposited: Array<{ itemId: string; amount: number }>,
     agent: AgentComponent
   ): void {
@@ -469,6 +480,13 @@ export function depositItemsBehaviorWithContext(ctx: import('../BehaviorContext.
     ctx.stopMovement();
     // Delegate to class for deposit logic
     const behavior = new DepositItemsBehavior();
-    behavior.performDeposit(ctx.entity, nearestStorageImpl, { tick: ctx.tick, gameTime: ctx.gameTime, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+    // Create a DepositWorldLike object from BehaviorContext
+    const worldLike: DepositWorldLike = {
+      gameTime: ctx.gameTime,
+      eventBus: {
+        emit: (event) => ctx.emit(event)
+      }
+    };
+    behavior.performDeposit(ctx.entity, nearestStorageImpl, worldLike, inventory, ctx.agent);
   }
 }

@@ -365,15 +365,65 @@ export interface Tile {
 }
 
 export type TerrainType =
+  // -------------------------------------------------------------------------
+  // Standard Terrains (terrestrial planets)
+  // -------------------------------------------------------------------------
   | 'grass'
   | 'dirt'
   | 'water'
   | 'stone'
   | 'sand'
   | 'forest'
-  | 'snow';       // Frozen terrain for tundra and high mountain peaks
+  | 'snow'         // Frozen terrain for tundra and high mountain peaks
+  | 'ice'          // Deep ice for ice worlds (distinct from snow - solid glacier)
+
+  // -------------------------------------------------------------------------
+  // Volcanic Terrains
+  // -------------------------------------------------------------------------
+  | 'lava'         // Active lava flow (impassable, damages entities)
+  | 'ash'          // Volcanic ash coverage (reduced fertility, movement)
+  | 'obsidian'     // Cooled volcanic glass (hard, low fertility)
+  | 'basalt'       // Volcanic rock (like stone but volcanic origin)
+
+  // -------------------------------------------------------------------------
+  // Crystal Terrains
+  // -------------------------------------------------------------------------
+  | 'crystal'      // Crystal formations (refractive, may have special properties)
+  | 'geode'        // Dense crystal clusters (valuable resource)
+  | 'prismatic'    // Light-refracting crystal field
+
+  // -------------------------------------------------------------------------
+  // Fungal Terrains
+  // -------------------------------------------------------------------------
+  | 'mycelium'     // Fungal ground cover (nutrient-rich, spreads)
+  | 'spore_soil'   // Spore-saturated ground (affects breathing entities)
+
+  // -------------------------------------------------------------------------
+  // Corrupted/Dark Terrains
+  // -------------------------------------------------------------------------
+  | 'corrupted'    // Blighted earth (damages plants, spawns dangerous entities)
+  | 'void_stone'   // Near-nothingness terrain (extremely dangerous)
+  | 'shadow_grass' // Twisted dark vegetation
+
+  // -------------------------------------------------------------------------
+  // Magical Terrains
+  // -------------------------------------------------------------------------
+  | 'mana_stone'   // Arcane-infused rock (regenerates mana)
+  | 'ley_grass'    // Magically-charged grassland
+  | 'aether'       // Floating island terrain (defies gravity)
+
+  // -------------------------------------------------------------------------
+  // Exotic Planet Terrains
+  // -------------------------------------------------------------------------
+  | 'carbon'       // Graphite/diamond terrain for carbon worlds
+  | 'iron'         // Metallic iron terrain for iron worlds
+  | 'hydrogen_ice' // Exotic ice from gas dwarfs (not water ice)
+  | 'sulfur';      // Sulfurous terrain (volcanic moons like Io)
 
 export type BiomeType =
+  // -------------------------------------------------------------------------
+  // Standard Biomes (terrestrial planets)
+  // -------------------------------------------------------------------------
   | 'plains'
   | 'forest'
   | 'desert'
@@ -387,7 +437,71 @@ export type BiomeType =
   | 'woodland'     // Forest ↔ Plains transition (moisture: 0.05 to 0.35)
   | 'tundra'       // Frozen arctic terrain (temperature < -0.4, low vegetation)
   | 'taiga'        // Cold coniferous forest (temperature -0.4 to -0.1, moderate moisture)
-  | 'jungle';      // Tropical rainforest (temperature > 0.3, moisture > 0.5)
+  | 'jungle'       // Tropical rainforest (temperature > 0.3, moisture > 0.5)
+
+  // -------------------------------------------------------------------------
+  // Ice World Biomes
+  // -------------------------------------------------------------------------
+  | 'glacier'      // Massive ice sheets (ice worlds)
+  | 'frozen_ocean' // Ice-covered ocean (ice worlds, subsurface liquid)
+  | 'ice_caves'    // Underground ice formations
+  | 'permafrost'   // Permanently frozen ground
+
+  // -------------------------------------------------------------------------
+  // Volcanic Biomes
+  // -------------------------------------------------------------------------
+  | 'lava_field'     // Active lava flows (impassable)
+  | 'ash_plain'      // Volcanic ash coverage
+  | 'obsidian_waste' // Cooled lava formations
+  | 'caldera'        // Volcanic crater (may contain lakes)
+  | 'sulfur_flats'   // Sulfurous volcanic plains (Io-like)
+
+  // -------------------------------------------------------------------------
+  // Crystal Biomes
+  // -------------------------------------------------------------------------
+  | 'crystal_plains'   // Sparse crystal formations
+  | 'geode_caves'      // Dense crystal clusters
+  | 'prismatic_forest' // Light-refracting crystals (forest-like)
+  | 'quartz_desert'    // Crystal-studded desert terrain
+
+  // -------------------------------------------------------------------------
+  // Fungal Biomes
+  // -------------------------------------------------------------------------
+  | 'mushroom_forest'  // Giant fungi as trees
+  | 'spore_field'      // Low vegetation, spore clouds
+  | 'mycelium_network' // Underground fungal connections
+  | 'bioluminescent_marsh' // Glowing fungal wetlands
+
+  // -------------------------------------------------------------------------
+  // Corrupted/Dark Biomes
+  // -------------------------------------------------------------------------
+  | 'blighted_land'    // Twisted vegetation, dark soil
+  | 'shadow_forest'    // Perpetual twilight, dangerous
+  | 'corruption_heart' // Source of corruption (extremely dangerous)
+  | 'void_edge'        // Near-nothingness, reality breakdown
+
+  // -------------------------------------------------------------------------
+  // Magical Biomes
+  // -------------------------------------------------------------------------
+  | 'arcane_forest'  // Glowing trees, mana pools
+  | 'floating_isle'  // Disconnected terrain (special elevation)
+  | 'mana_spring'    // Concentrated magical energy
+  | 'ley_nexus'      // Intersection of magical lines
+
+  // -------------------------------------------------------------------------
+  // Exotic Planet Biomes (scientifically grounded)
+  // -------------------------------------------------------------------------
+  | 'twilight_zone'    // Habitable ring on tidally locked planets
+  | 'eternal_day'      // Permanent day side of tidally locked planets
+  | 'eternal_night'    // Permanent night side of tidally locked planets
+  | 'carbon_forest'    // Graphite/diamond formations (carbon worlds)
+  | 'iron_plains'      // Metallic terrain (iron worlds)
+  | 'hydrogen_sea'     // Liquid hydrogen ocean (gas dwarfs, extremely cold)
+  | 'ammonia_ocean'    // Ammonia-based ocean (cold exoplanets)
+  | 'subsurface_ocean' // Ocean beneath ice shell (Europa-like)
+  | 'crater_field'     // Impact craters (airless moons)
+  | 'regolith_waste'   // Dust-covered barren terrain (moons)
+  | 'hycean_depths';   // High-pressure warm ocean (hycean worlds)
 
 /**
  * Create a default tile.
@@ -421,9 +535,10 @@ export function createDefaultTile(): Tile {
 }
 
 /**
- * Terrain rendering colors (for Phase 1).
+ * Terrain rendering colors.
  */
 export const TERRAIN_COLORS: Record<TerrainType, string> = {
+  // Standard terrains
   grass: '#4a7c59',
   dirt: '#8b7355',
   water: '#4a7c9e',
@@ -431,4 +546,36 @@ export const TERRAIN_COLORS: Record<TerrainType, string> = {
   sand: '#dcc896',
   forest: '#2d5016',
   snow: '#e8e8f0',
+  ice: '#c8e8f8',
+
+  // Volcanic terrains
+  lava: '#ff4500',
+  ash: '#4a4a4a',
+  obsidian: '#1a1a2e',
+  basalt: '#3d3d3d',
+
+  // Crystal terrains
+  crystal: '#88d8f0',
+  geode: '#9b59b6',
+  prismatic: '#e0b0ff',
+
+  // Fungal terrains
+  mycelium: '#7d5a50',
+  spore_soil: '#6b5b4f',
+
+  // Corrupted terrains
+  corrupted: '#2d1f3d',
+  void_stone: '#0a0a0f',
+  shadow_grass: '#1a2f1a',
+
+  // Magical terrains
+  mana_stone: '#4a90d9',
+  ley_grass: '#59c97a',
+  aether: '#d4a5ff',
+
+  // Exotic planet terrains
+  carbon: '#2f2f2f',
+  iron: '#8b8b8b',
+  hydrogen_ice: '#e0f0ff',
+  sulfur: '#d4b82a',
 };

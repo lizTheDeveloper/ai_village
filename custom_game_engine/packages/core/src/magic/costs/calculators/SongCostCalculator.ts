@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /**
  * Cost calculator for the Song/Bardic magic paradigm.
@@ -156,7 +157,7 @@ export class SongCostCalculator extends BaseCostCalculator {
    * Override terminal effect for song-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     _caster: MagicComponent
   ): TerminalEffect {
@@ -174,6 +175,6 @@ export class SongCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    return super.getTerminalEffect(costType, trigger, _caster);
   }
 }

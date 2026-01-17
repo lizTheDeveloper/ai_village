@@ -73,7 +73,8 @@ export class DivineSpellManager {
         totalMishaps: 0,
         version: 1,
       };
-      (entity as any).addComponent(newMagic);
+      // Cast required: Entity interface doesn't expose mutation methods
+      (entity as EntityImpl).addComponent(newMagic);
       magic = newMagic;
     }
 
@@ -115,9 +116,9 @@ export class DivineSpellManager {
             if (Math.random() < revelationChance && this.spellLearning) {
               this.spellLearning.learnSpell(entity, threshold.spellId, 10); // Start with 10 proficiency for divine gift
 
-              // Emit divine revelation event (using any cast for extended event data)
-              (this.world?.eventBus as any)?.emit({
-                type: 'magic:spell_learned',
+              // Emit divine revelation event with extended context
+              this.world?.eventBus.emit({
+                type: 'magic:spell_learned' as const,
                 source: entity.id,
                 data: {
                   entityId: entity.id,

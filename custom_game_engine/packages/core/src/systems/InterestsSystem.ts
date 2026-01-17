@@ -10,33 +10,24 @@
  * Part of Phase 1: Deep Conversation System
  */
 
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { InterestsComponent, TopicId } from '../components/InterestsComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 
 /**
  * InterestsSystem manages discussion hunger accumulation and decay.
  */
-export class InterestsSystem implements System {
+export class InterestsSystem extends BaseSystem {
   public readonly id: SystemId = CT.Interests;
   public readonly priority: number = 46; // After basic needs, before mood
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Interests];
-
-  private isInitialized = false;
-  private eventBus: EventBus | null = null;
-  private world: World | null = null;
-
-  /** How often to update interest hunger (in ticks) - every 2 game hours (100 ticks at 20 tps) */
-  private readonly UPDATE_INTERVAL = 100;
-
-  /** Tick counter for update intervals */
-  private tickCount = 0;
+  protected readonly throttleInterval = 100; // Every 2 game hours (100 ticks at 20 tps)
 
   /** Base rate of hunger growth per update cycle (0-1 scale) */
   private readonly BASE_HUNGER_GROWTH = 0.02;
@@ -53,24 +44,15 @@ export class InterestsSystem implements System {
   /**
    * Initialize the system.
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) {
-      return;
-    }
-
-    this.world = world;
-    this.eventBus = eventBus;
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Subscribe to conversation events
-    this.setupEventListeners(eventBus);
-
-    this.isInitialized = true;
+    this.setupEventListeners(eventBus, world);
   }
 
   /**
    * Set up event listeners for conversation-related events.
    */
-  private setupEventListeners(eventBus: EventBus): void {
+  private setupEventListeners(eventBus: EventBus, world: World): void {
     // When a conversation ends, check if it satisfied any interests
     eventBus.subscribe('conversation:ended', (event) => {
       const data = event.data as {
@@ -82,7 +64,7 @@ export class InterestsSystem implements System {
 
       // Satisfy interests for all participants
       for (const agentId of data.participants) {
-        this.handleConversationEnd(agentId, data.topics || [], data.depth || 0);
+        this.handleConversationEnd(world, agentId, data.topics || [], data.depth || 0);
       }
     });
 
@@ -94,7 +76,7 @@ export class InterestsSystem implements System {
         topic: TopicId;
       };
 
-      this.handleTopicShared(data.speakerId, data.listenerId, data.topic);
+      this.handleTopicShared(world, data.speakerId, data.listenerId, data.topic);
     });
   }
 
@@ -102,20 +84,19 @@ export class InterestsSystem implements System {
    * Handle end of conversation - satisfy discussed topics.
    */
   private handleConversationEnd(
+    world: World,
     agentId: string,
     topics: TopicId[],
     depth: number
   ): void {
-    if (!this.world) return;
-
-    const entity = this.world.getEntity(agentId);
+    const entity = world.getEntity(agentId);
     if (!entity) return;
 
     const impl = entity as EntityImpl;
     const interests = impl.getComponent<InterestsComponent>(CT.Interests);
     if (!interests) return;
 
-    const tick = this.world.tick;
+    const tick = world.tick;
 
     // Satisfy any topics that were discussed
     for (const topic of topics) {
@@ -140,13 +121,12 @@ export class InterestsSystem implements System {
    * The listener learns that the speaker is an enthusiast.
    */
   private handleTopicShared(
+    world: World,
     speakerId: string,
     listenerId: string,
     topic: TopicId
   ): void {
-    if (!this.world) return;
-
-    const listener = this.world.getEntity(listenerId);
+    const listener = world.getEntity(listenerId);
     if (!listener) return;
 
     const impl = listener as EntityImpl;
@@ -166,19 +146,12 @@ export class InterestsSystem implements System {
   /**
    * Main update loop.
    */
-  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    this.tickCount++;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
 
-    // Only update at intervals for performance
-    if (this.tickCount % this.UPDATE_INTERVAL !== 0) {
-      return;
-    }
-
-    // Use SimulationScheduler to only process active entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-
-    for (const entity of activeEntities) {
-      this.updateAgentInterests(entity as EntityImpl, world);
+    // Process active entities (already filtered by SimulationScheduler)
+    for (const entity of ctx.activeEntities) {
+      this.updateAgentInterests(entity, world);
     }
   }
 
@@ -226,7 +199,7 @@ export class InterestsSystem implements System {
     // Emit event if an interest is very hungry
     const hungryInterests = interests.getHungryInterests(0.8);
     if (hungryInterests.length > 0) {
-      this.eventBus?.emit({
+      world.eventBus.emit({
         type: 'interest:hungry',
         source: entity.id,
         data: {

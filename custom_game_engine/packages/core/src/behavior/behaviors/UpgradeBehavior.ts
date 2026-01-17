@@ -84,6 +84,19 @@ const UPGRADE_COSTS: Record<string, Record<number, Record<string, number>>> = {
 type UpgradePhase = 'searching' | 'moving' | 'upgrading' | 'complete';
 
 /**
+ * Upgrade behavior state structure
+ */
+interface UpgradeState {
+  phase?: UpgradePhase;
+  targetBuildingId?: string;
+  targetPosition?: { x: number; y: number };
+  targetTier?: number;
+  upgradeStarted?: number;
+  upgradeProgress?: number;
+  lastThoughtTick?: number;
+}
+
+/**
  * UpgradeBehavior - Improve building tiers
  */
 export class UpgradeBehavior extends BaseBehavior {
@@ -453,8 +466,8 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
  * @example registerBehaviorWithContext('upgrade', upgradeBehaviorWithContext);
  */
 export function upgradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const state = ctx.getAllState() as any;
-  const phase = (state.phase as UpgradePhase) ?? 'searching';
+  const state = ctx.getAllState() as UpgradeState;
+  const phase = state.phase ?? 'searching';
 
   switch (phase) {
     case 'searching':
@@ -468,7 +481,7 @@ export function upgradeBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
   }
 }
 
-function handleUpgradeSearching(ctx: BehaviorContext, _state: any): ContextBehaviorResult | void {
+function handleUpgradeSearching(ctx: BehaviorContext, _state: UpgradeState): ContextBehaviorResult | void {
   const target = findUpgradeableBuildingCtx(ctx);
 
   if (!target) {
@@ -487,7 +500,7 @@ function handleUpgradeSearching(ctx: BehaviorContext, _state: any): ContextBehav
   ctx.setThought(`Going to upgrade ${target.building.buildingType} to tier ${target.building.tier + 1}.`);
 }
 
-function handleUpgradeMoving(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleUpgradeMoving(ctx: BehaviorContext, state: UpgradeState): ContextBehaviorResult | void {
   const targetPosition = state.targetPosition as { x: number; y: number };
   const targetBuildingId = state.targetBuildingId as string;
 
@@ -527,7 +540,7 @@ function handleUpgradeMoving(ctx: BehaviorContext, state: any): ContextBehaviorR
   }
 }
 
-function handleUpgrading(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleUpgrading(ctx: BehaviorContext, state: UpgradeState): ContextBehaviorResult | void {
   ctx.stopMovement();
 
   const targetBuildingId = state.targetBuildingId as string;
