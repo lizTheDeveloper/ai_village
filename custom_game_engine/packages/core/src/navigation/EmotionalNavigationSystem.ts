@@ -9,6 +9,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { SpaceshipComponent } from './SpaceshipComponent.js';
@@ -25,11 +26,16 @@ export class EmotionalNavigationSystem implements System {
     CT.Position,
   ];
 
+  private events!: SystemEventManager;
   private lastUpdateTick = 0;
   private static readonly UPDATE_INTERVAL = 20; // Every 1 second at 20 TPS
 
-  public initialize(_world: World, _eventBus: EventBus): void {
-    // Initialization logic here
+  public initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  public cleanup(): void {
+    this.events.cleanup();
   }
 
   public update(

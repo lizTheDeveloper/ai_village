@@ -141,9 +141,9 @@ describe('calculatePowerBudgetCost', () => {
 
   describe('unknown powers', () => {
     it('should use default cost of 10 for unlisted powers', () => {
-      // Cast to bypass TypeScript for testing edge case
-      const unknownPower = 'some_future_power' as any;
-      expect(calculatePowerBudgetCost(unknownPower, 1.0)).toBe(10);
+      // Test fallback behavior for runtime values not in the DivinePowerType union
+      const unknownPower: unknown = 'some_future_power';
+      expect(calculatePowerBudgetCost(unknownPower as DivinePowerType, 1.0)).toBe(10);
     });
   });
 });

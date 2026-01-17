@@ -9,69 +9,56 @@
  * - Stage transitions
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, Entity } from '../ecs/index.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { UpliftProgramComponent, GenerationResult } from '../components/UpliftProgramComponent.js';
 import type { ProtoSapienceComponent } from '../components/ProtoSapienceComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 
-export class UpliftBreedingProgramSystem implements System {
+export class UpliftBreedingProgramSystem extends BaseSystem {
   readonly id = 'UpliftBreedingProgramSystem';
   readonly priority = 560;
   readonly requiredComponents = [CT.UpliftProgram] as const;
 
-  private eventBus: EventBus | null = null;
-  private tickCounter = 0;
-  private readonly UPDATE_INTERVAL = 20; // Every second
+  protected readonly throttleInterval = 20; // Every second
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
-    for (const programEntity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const programEntity of ctx.activeEntities) {
       const program = programEntity.getComponent(CT.UpliftProgram) as UpliftProgramComponent;
 
       // Update generation progress
-      this.updateGenerationProgress(world, program);
+      this.updateGenerationProgress(ctx, program);
 
       // Check for generation completion
       if (program.progressToNextGeneration >= 100) {
-        this.advanceGeneration(world, program);
+        this.advanceGeneration(ctx, program);
       }
 
       // Update overall progress
       this.updateOverallProgress(program);
 
       // Check for stage transitions
-      this.checkStageTransitions(world, program);
+      this.checkStageTransitions(ctx, program);
     }
-  }
-
-  cleanup(): void {
-    this.eventBus = null;
   }
 
   /**
    * Update progress toward next generation
    */
-  private updateGenerationProgress(world: World, program: UpliftProgramComponent): void {
+  private updateGenerationProgress(ctx: SystemContext, program: UpliftProgramComponent): void {
     // Get breeding population
-    const population = this.getBreedingPopulation(world, program);
+    const population = this.getBreedingPopulation(ctx.world, program);
 
     if (population.length === 0) {
       // Population died out - critical failure
-      this.handlePopulationExtinction(world, program);
+      this.handlePopulationExtinction(ctx, program);
       return;
     }
 
     // Calculate maturation rate based on species
-    const sourceSpecies = world.query()
+    const sourceSpecies = ctx.world.query()
       .with(CT.Species)
       .executeEntities()
       .find(e => {
@@ -88,7 +75,7 @@ export class UpliftBreedingProgramSystem implements System {
 
     // Progress per tick = 100 / ticks to maturity
     const progressPerTick = 100 / ticksToMaturity;
-    program.progressToNextGeneration += progressPerTick * this.UPDATE_INTERVAL;
+    program.progressToNextGeneration += progressPerTick * 20; // throttleInterval = 20
 
     // Cap at 100
     program.progressToNextGeneration = Math.min(100, program.progressToNextGeneration);
@@ -97,13 +84,13 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Advance to next generation
    */
-  private advanceGeneration(world: World, program: UpliftProgramComponent): void {
+  private advanceGeneration(ctx: SystemContext, program: UpliftProgramComponent): void {
     program.currentGeneration++;
     program.progressToNextGeneration = 0;
-    program.lastGenerationAt = world.tick;
+    program.lastGenerationAt = ctx.tick;
 
     // Select breeding population for next generation
-    const newBreedingPop = this.selectBreedingPopulation(world, program);
+    const newBreedingPop = this.selectBreedingPopulation(ctx.world, program);
 
     // Calculate intelligence increase
     const intelligenceGain = this.calculateIntelligenceGain(program);
@@ -122,7 +109,7 @@ export class UpliftBreedingProgramSystem implements System {
       mutations: [],
       breakthroughs: [],
       setbacks: [],
-      notableIndividuals: this.findNotableIndividuals(world, newBreedingPop),
+      notableIndividuals: this.findNotableIndividuals(ctx, newBreedingPop),
     };
 
     // Check for breakthroughs (5% chance per generation)
@@ -139,15 +126,11 @@ export class UpliftBreedingProgramSystem implements System {
     program.populationSize = newBreedingPop.length;
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'uplift_generation_advanced' as any,
-      source: this.id,
-      data: {
-        programId: program.programId,
-        generation: program.currentGeneration,
-        intelligence: program.currentIntelligence,
-        result,
-      },
+    this.events.emit('uplift_generation_advanced' as any, {
+      programId: program.programId,
+      generation: program.currentGeneration,
+      intelligence: program.currentIntelligence,
+      result,
     });
 
     // Add notable event
@@ -201,7 +184,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Find exceptional individuals in generation
    */
-  private findNotableIndividuals(_world: World, population: Entity[]): string[] {
+  private findNotableIndividuals(ctx: SystemContext, population: Entity[]): string[] {
     const notable: string[] = [];
 
     for (const entity of population) {
@@ -272,7 +255,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Check for stage transitions
    */
-  private checkStageTransitions(_world: World, program: UpliftProgramComponent): void {
+  private checkStageTransitions(ctx: SystemContext, program: UpliftProgramComponent): void {
     const prevStage = program.stage;
 
     // Stage transitions based on generation and intelligence
@@ -296,16 +279,12 @@ export class UpliftBreedingProgramSystem implements System {
 
     // Emit event if stage changed
     if (prevStage !== program.stage) {
-      this.eventBus?.emit({
-        type: 'uplift_stage_changed' as any,
-        source: this.id,
-        data: {
-          programId: program.programId,
-          previousStage: prevStage,
-          newStage: program.stage,
-          generation: program.currentGeneration,
-          intelligence: program.currentIntelligence,
-        },
+      this.events.emit('uplift_stage_changed' as any, {
+        programId: program.programId,
+        previousStage: prevStage,
+        newStage: program.stage,
+        generation: program.currentGeneration,
+        intelligence: program.currentIntelligence,
       });
 
       program.notableEvents.push(
@@ -333,15 +312,11 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Handle population extinction
    */
-  private handlePopulationExtinction(_world: World, program: UpliftProgramComponent): void {
-    this.eventBus?.emit({
-      type: 'uplift_population_extinct' as any,
-      source: this.id,
-      data: {
-        programId: program.programId,
-        generation: program.currentGeneration,
-        reason: 'breeding_population_died',
-      },
+  private handlePopulationExtinction(ctx: SystemContext, program: UpliftProgramComponent): void {
+    this.events.emit('uplift_population_extinct' as any, {
+      programId: program.programId,
+      generation: program.currentGeneration,
+      reason: 'breeding_population_died',
     });
 
     program.stage = 'completed';

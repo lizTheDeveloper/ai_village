@@ -11,8 +11,8 @@
  * NOT YET INTEGRATED - Standalone implementation for testing
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, Entity } from '../ecs/index.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
 import type { SpeciesComponent, SpeciesTrait } from '../components/SpeciesComponent.js';
@@ -54,14 +54,12 @@ export class UpliftedSpeciesRegistry {
   }
 }
 
-export class UpliftedSpeciesRegistrationSystem implements System {
+export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
   readonly id = 'UpliftedSpeciesRegistrationSystem';
   readonly priority = 570;
   readonly requiredComponents = [] as const;
 
-  private eventBus: EventBus | null = null;
-  private tickCounter = 0;
-  private readonly UPDATE_INTERVAL = 200; // Every 10 seconds
+  protected readonly throttleInterval = 200; // Every 10 seconds
 
   // Registry of uplifted species (standalone - not yet integrated with SpeciesRegistry)
   private upliftedRegistry: UpliftedSpeciesRegistry = new UpliftedSpeciesRegistry();
@@ -69,16 +67,9 @@ export class UpliftedSpeciesRegistrationSystem implements System {
   // Track which programs have had species registered
   private registeredPrograms: Set<string> = new Set();
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Get all uplift programs in awakening stage
-    const programs = world.query()
+    const programs = ctx.world.query()
       .with(CT.UpliftProgram)
       .executeEntities();
 
@@ -87,13 +78,9 @@ export class UpliftedSpeciesRegistrationSystem implements System {
 
       // Check if species should be registered
       if (this.shouldRegisterSpecies(program)) {
-        this.registerUpliftedSpecies(world, program);
+        this.registerUpliftedSpecies(ctx, program);
       }
     }
-  }
-
-  cleanup(): void {
-    this.eventBus = null;
   }
 
   /**
@@ -108,9 +95,9 @@ export class UpliftedSpeciesRegistrationSystem implements System {
   /**
    * Register a new uplifted species
    */
-  private registerUpliftedSpecies(world: World, program: UpliftProgramComponent): void {
+  private registerUpliftedSpecies(ctx: SystemContext, program: UpliftProgramComponent): void {
     // Get source species template
-    const sourceSpecies = this.getSourceSpeciesTemplate(world, program.sourceSpeciesId);
+    const sourceSpecies = this.getSourceSpeciesTemplate(ctx.world, program.sourceSpeciesId);
     if (!sourceSpecies) {
       console.error(`Source species not found: ${program.sourceSpeciesId}`);
       return;
@@ -129,15 +116,11 @@ export class UpliftedSpeciesRegistrationSystem implements System {
     program.targetSpeciesId = upliftedSpecies.speciesId;
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'uplifted_species_registered' as any,
-      source: this.id,
-      data: {
-        speciesId: upliftedSpecies.speciesId,
-        speciesName: upliftedSpecies.speciesName,
-        programId: program.programId,
-        sourceSpeciesId: program.sourceSpeciesId,
-      },
+    this.events.emit('uplifted_species_registered' as any, {
+      speciesId: upliftedSpecies.speciesId,
+      speciesName: upliftedSpecies.speciesName,
+      programId: program.programId,
+      sourceSpeciesId: program.sourceSpeciesId,
     });
   }
 

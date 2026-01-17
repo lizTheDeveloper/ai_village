@@ -181,7 +181,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
   /**
    * Run behavioral tests
    */
-  private runBehavioralTests(_world: World, animal: Entity, proto: ProtoSapienceComponent): void {
+  private runBehavioralTests(ctx: SystemContext, animal: Entity, proto: ProtoSapienceComponent): void {
     // Mirror test (only if intelligence high enough)
     if (!proto.passedMirrorTest && proto.intelligence >= EMERGENCE_THRESHOLDS.MIRROR_TEST) {
       const passed = this.conductMirrorTest(animal, proto);
@@ -189,14 +189,10 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
         proto.passedMirrorTest = true;
         proto.recognizesSelf = true;
 
-        this.eventBus?.emit({
-          type: 'proto_sapience_milestone' as any,
-          source: this.id,
-          data: {
-            entityId: animal.id,
-            milestone: 'mirror_test_passed',
-            intelligence: proto.intelligence,
-          },
+        this.events.emit('proto_sapience_milestone' as any, {
+          entityId: animal.id,
+          milestone: 'mirror_test_passed',
+          intelligence: proto.intelligence,
         });
       }
     }
@@ -265,7 +261,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
    * Record tool use
    */
   private recordToolUse(
-    world: World,
+    ctx: SystemContext,
     _animal: Entity,
     proto: ProtoSapienceComponent,
     toolType: string,
@@ -274,7 +270,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
     const record: ToolUseRecord = {
       toolType,
       purpose,
-      observedAt: world.tick,
+      observedAt: ctx.tick,
       teachingOthers: false,
     };
 
@@ -284,7 +280,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
   /**
    * Observe communication patterns
    */
-  private observeCommunication(_world: World, animal: Entity, proto: ProtoSapienceComponent): void {
+  private observeCommunication(ctx: SystemContext, animal: Entity, proto: ProtoSapienceComponent): void {
     if (!proto.hasProtocolanguage) return;
 
     // Generate random communication event (placeholder for actual observation)
@@ -339,7 +335,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
    * Observe cultural transmission
    */
   private observeCulturalTransmission(
-    _world: World,
+    ctx: SystemContext,
     animal: Entity,
     proto: ProtoSapienceComponent,
     program: UpliftProgramComponent
@@ -364,15 +360,11 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
         proto.hasCulturalTraditions = true;
         proto.traditions.push(this.generateCulturalTradition());
 
-        this.eventBus?.emit({
-          type: 'proto_sapience_milestone' as any,
-          source: this.id,
-          data: {
-            entityId: animal.id,
-            milestone: 'cultural_tradition_emerged',
-            tradition: proto.traditions[0],
-            generation: program.currentGeneration,
-          },
+        this.events.emit('proto_sapience_milestone' as any, {
+          entityId: animal.id,
+          milestone: 'cultural_tradition_emerged',
+          tradition: proto.traditions[0],
+          generation: program.currentGeneration,
         });
       }
     }

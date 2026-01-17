@@ -13,6 +13,7 @@ import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 // ============================================================================
@@ -172,7 +173,7 @@ export interface TalkShowConfig {
 // ============================================================================
 
 export class TalkShowManager {
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private episodes: Map<string, TalkShowEpisode> = new Map();
   private bookings: Map<string, GuestBooking> = new Map();
 
@@ -180,7 +181,7 @@ export class TalkShowManager {
   private showConfigs: Map<string, TalkShowConfig> = new Map();
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'TalkShowSystem');
   }
 
   configureShow(config: {
@@ -245,16 +246,12 @@ export class TalkShowManager {
 
     this.episodes.set(episode.id, episode);
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:episode_planned' as any,
-      source: showId,
-      data: {
-        episodeId: episode.id,
-        episodeNumber,
-        airDate,
-        segmentCount: episode.segments.length,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:episode_planned', {
+      episodeId: episode.id,
+      episodeNumber,
+      airDate,
+      segmentCount: episode.segments.length,
+    }, showId);
 
     return episode;
   }
@@ -331,16 +328,12 @@ export class TalkShowManager {
 
     this.bookings.set(booking.id, booking);
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:guest_requested' as any,
-      source: agentId,
-      data: {
-        bookingId: booking.id,
-        guestName: agentName,
-        tier,
-        promotion,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:guest_requested', {
+      bookingId: booking.id,
+      guestName: agentName,
+      tier,
+      promotion,
+    }, agentId);
 
     return booking;
   }
@@ -376,16 +369,12 @@ export class TalkShowManager {
       episode.status = 'booking';
     }
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:guest_confirmed' as any,
-      source: episode.showId,
-      data: {
-        bookingId,
-        episodeId,
-        guestName: booking.agentName,
-        tier: booking.tier,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:guest_confirmed', {
+      bookingId,
+      episodeId,
+      guestName: booking.agentName,
+      tier: booking.tier,
+    }, episode.showId);
 
     return true;
   }
@@ -409,15 +398,11 @@ export class TalkShowManager {
       }
     }
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:guest_cancelled' as any,
-      source: booking.agentId,
-      data: {
-        bookingId,
-        guestName: booking.agentName,
-        reason,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:guest_cancelled', {
+      bookingId,
+      guestName: booking.agentName,
+      reason,
+    }, booking.agentId);
 
     return true;
   }
@@ -510,16 +495,12 @@ export class TalkShowManager {
 
     episode.status = 'taping';
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:taping_started' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        episodeNumber: episode.episodeNumber,
-        hosts: episode.hosts,
-        audienceSize: episode.studioAudienceSize,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:taping_started', {
+      episodeId,
+      episodeNumber: episode.episodeNumber,
+      hosts: episode.hosts,
+      audienceSize: episode.studioAudienceSize,
+    }, episode.showId);
 
     return true;
   }
@@ -555,31 +536,23 @@ export class TalkShowManager {
     const energyChange = qualityScore > 70 ? 5 : qualityScore < 50 ? -5 : 0;
     episode.audienceEnergyLevel = Math.max(0, Math.min(100, episode.audienceEnergyLevel + energyChange));
 
-    this.eventBus?.emit({
-      type: 'tv:talk_show:segment_taped' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        segmentId: segment.id,
-        segmentType: segment.type,
-        audienceReaction,
-        qualityScore: segment.qualityScore,
-      },
-    });
+    this.events.emitGeneric('tv:talk_show:segment_taped', {
+      episodeId,
+      segmentId: segment.id,
+      segmentType: segment.type,
+      audienceReaction,
+      qualityScore: segment.qualityScore,
+    }, episode.showId);
 
     // Check if all segments are taped
     if (episode.segments.every(s => s.tapedTick !== undefined)) {
       episode.status = 'complete';
 
-      this.eventBus?.emit({
-        type: 'tv:talk_show:taping_complete' as any,
-        source: episode.showId,
-        data: {
-          episodeId,
-          episodeNumber: episode.episodeNumber,
-          averageQuality: this.calculateAverageQuality(episode),
-        },
-      });
+      this.events.emitGeneric('tv:talk_show:taping_complete', {
+        episodeId,
+        episodeNumber: episode.episodeNumber,
+        averageQuality: this.calculateAverageQuality(episode),
+      }, episode.showId);
     }
 
     return true;
@@ -643,7 +616,7 @@ export class TalkShowManager {
     this.episodes.clear();
     this.bookings.clear();
     this.showConfigs.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }
 

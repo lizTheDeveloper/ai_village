@@ -17,6 +17,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
 // =============================================================================
@@ -128,7 +129,7 @@ export class AppManager {
   private apps: Map<string, App> = new Map();
   private inventors: Map<string, AppInventor> = new Map();
   private users: Map<string, AppUser[]> = new Map(); // agentId -> apps they use
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
 
   // Revenue constants
   private static readonly AD_REVENUE_PER_USER = 0.05;      // $0.05 per user per month
@@ -146,7 +147,7 @@ export class AppManager {
   };
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'AppSystem');
   }
 
   // ---------------------------------------------------------------------------
@@ -196,17 +197,13 @@ export class AppManager {
     const inventor = this.inventors.get(inventorId)!;
     inventor.apps.push(app.id);
 
-    this.eventBus?.emit({
-      type: 'app:created' as any,
-      source: inventorId,
-      data: {
-        appId: app.id,
-        appName: name,
-        inventorId,
-        inventorName,
-        category,
-      },
-    });
+    this.events.emitGeneric('app:created', {
+      appId: app.id,
+      appName: name,
+      inventorId,
+      inventorName,
+      category,
+    }, inventorId);
 
     return app;
   }
@@ -263,15 +260,11 @@ export class AppManager {
 
     app.status = 'launched';
 
-    this.eventBus?.emit({
-      type: 'app:launched' as any,
-      source: appId,
-      data: {
-        appId,
-        appName: app.name,
-        inventorId: app.inventorId,
-      },
-    });
+    this.events.emitGeneric('app:launched', {
+      appId,
+      appName: app.name,
+      inventorId: app.inventorId,
+    }, appId);
 
     return true;
   }
@@ -282,16 +275,12 @@ export class AppManager {
 
     app.status = 'shutdown';
 
-    this.eventBus?.emit({
-      type: 'app:shutdown' as any,
-      source: appId,
-      data: {
-        appId,
-        appName: app.name,
-        finalUsers: app.totalUsers,
-        totalRevenue: app.totalRevenue,
-      },
-    });
+    this.events.emitGeneric('app:shutdown', {
+      appId,
+      appName: app.name,
+      finalUsers: app.totalUsers,
+      totalRevenue: app.totalRevenue,
+    }, appId);
 
     return true;
   }
@@ -346,15 +335,11 @@ export class AppManager {
     // Check for viral status
     if (app.status === 'launched' && app.totalUsers > 10000 && app.userGrowthRate > 100) {
       app.status = 'viral';
-      this.eventBus?.emit({
-        type: 'app:went_viral' as any,
-        source: appId,
-        data: {
-          appId,
-          appName: app.name,
-          totalUsers: app.totalUsers,
-        },
-      });
+      this.events.emitGeneric('app:went_viral', {
+        appId,
+        appName: app.name,
+        totalUsers: app.totalUsers,
+      }, appId);
     }
 
     // Update inventor wealth and fame
@@ -368,16 +353,12 @@ export class AppManager {
       this.createAppJoinMemory(world, agentId, app, currentTick);
     }
 
-    this.eventBus?.emit({
-      type: 'app:user_joined' as any,
-      source: agentId,
-      data: {
-        appId,
-        agentId,
-        totalUsers: app.totalUsers,
-        inventorId: app.inventorId,
-      },
-    });
+    this.events.emitGeneric('app:user_joined', {
+      appId,
+      agentId,
+      totalUsers: app.totalUsers,
+      inventorId: app.inventorId,
+    }, agentId);
 
     return true;
   }
@@ -467,17 +448,13 @@ export class AppManager {
       // Check if we just crossed this milestone
       const previousUsers = totalUsers - 1;
       if (previousUsers < milestone && totalUsers >= milestone) {
-        this.eventBus?.emit({
-          type: 'app:inventor_milestone' as any,
-          source: inventor.agentId,
-          data: {
-            inventorId: inventor.agentId,
-            inventorName: inventor.agentName,
-            milestone,
-            fameLevel: inventor.fameLevel,
-            status: inventor.status,
-          },
-        });
+        this.events.emitGeneric('app:inventor_milestone', {
+          inventorId: inventor.agentId,
+          inventorName: inventor.agentName,
+          milestone,
+          fameLevel: inventor.fameLevel,
+          status: inventor.status,
+        }, inventor.agentId);
 
         // Create memory for inventor
         const inventorEntity = world.getEntity(inventor.agentId);
@@ -636,15 +613,11 @@ export class AppManager {
     if (!app.iconicFeatures.includes(featureName)) {
       app.iconicFeatures.push(featureName);
 
-      this.eventBus?.emit({
-        type: 'app:iconic_feature' as any,
-        source: appId,
-        data: {
-          appId,
-          appName: app.name,
-          feature: featureName,
-        },
-      });
+      this.events.emitGeneric('app:iconic_feature', {
+        appId,
+        appName: app.name,
+        feature: featureName,
+      }, appId);
     }
 
     return true;
@@ -660,15 +633,11 @@ export class AppManager {
       // Boost cultural penetration
       app.culturalPenetration = Math.min(100, app.culturalPenetration + 5);
 
-      this.eventBus?.emit({
-        type: 'app:catchphrase_emerged' as any,
-        source: appId,
-        data: {
-          appId,
-          appName: app.name,
-          catchphrase,
-        },
-      });
+      this.events.emitGeneric('app:catchphrase_emerged', {
+        appId,
+        appName: app.name,
+        catchphrase,
+      }, appId);
     }
 
     return true;
@@ -799,7 +768,7 @@ export class AppManager {
     this.apps.clear();
     this.inventors.clear();
     this.users.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }
 
