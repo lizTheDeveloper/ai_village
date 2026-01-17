@@ -737,8 +737,9 @@ describe('CourtshipStateMachine', () => {
       const courtship1 = createCourtshipComponent();
       (agent1 as EntityImpl).addComponent(courtship1);
 
+      const invalidTarget: unknown = null;
       expect(() => {
-        stateMachine.initiateCourtship(agent1, null as any, world);
+        stateMachine.initiateCourtship(agent1, invalidTarget as Entity, world);
       }).toThrow('Invalid target entity');
     });
 

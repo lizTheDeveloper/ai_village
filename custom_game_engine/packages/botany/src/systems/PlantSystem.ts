@@ -1,5 +1,4 @@
 import type {
-  System,
   SystemId,
   ComponentType,
   World,
@@ -12,6 +11,8 @@ import type {
   StateMutatorSystem,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType as CT,
   EntityImpl,
   applyGenetics,
@@ -20,8 +21,6 @@ import {
   BugReporter,
   PLANT_CONSTANTS,
 } from '@ai-village/core';
-
-type CoreEventBus = EventBus;
 
 /**
  * Soil state interface for planting validation
@@ -53,7 +52,7 @@ interface Environment {
  * @see SoilSystem (priority 15) - Provides soil moisture and nutrient data affecting plant growth
  * @see StateMutatorSystem (priority 5) - Handles batched hydration/age/health updates
  */
-export class PlantSystem implements System {
+export class PlantSystem extends BaseSystem {
   public readonly id: SystemId = 'plant';
   public readonly priority = 20; // After SoilSystem, WeatherSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Plant];
@@ -66,7 +65,6 @@ export class PlantSystem implements System {
    * @see StateMutatorSystem - handles batched hydration/age/health updates
    */
   public readonly dependsOn = ['time', 'weather', 'soil', 'state_mutator'] as const;
-  private eventBus: CoreEventBus;
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
 
   // Reference to StateMutatorSystem (set via setStateMutatorSystem)
@@ -104,8 +102,7 @@ export class PlantSystem implements System {
   // Track entity IDs for plants (to avoid using 'as any')
   private plantEntityIds: WeakMap<PlantComponent, string> = new WeakMap();
 
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
+  protected onInitialize(world: World, eventBus: EventBus): void {
     this.registerEventListeners();
   }
 
@@ -141,23 +138,23 @@ export class PlantSystem implements System {
    */
   private registerEventListeners(): void {
     // Weather events
-    this.eventBus.subscribe('weather:rain', (event) => {
+    this.events.subscribe('weather:rain', (event) => {
       const intensity = event.data?.intensity as string | undefined;
       this.weatherRainIntensity = intensity || 'light';
     });
 
-    this.eventBus.subscribe('weather:frost', (event) => {
+    this.events.subscribe('weather:frost', (event) => {
       const temperature = event.data?.temperature as number | undefined;
       this.weatherFrostTemperature = temperature ?? -2;
     });
 
-    this.eventBus.subscribe('weather:changed', (_event) => {
+    this.events.subscribe('weather:changed', (_event) => {
       // Weather changed event doesn't include temperature
       // Temperature updates come from weather:frost event
     });
 
     // Soil events
-    this.eventBus.subscribe('soil:moistureChanged', (event) => {
+    this.events.subscribe('soil:moistureChanged', (event) => {
       const x = event.data.x;
       const y = event.data.y;
       const newMoisture = event.data.newMoisture;
@@ -165,7 +162,7 @@ export class PlantSystem implements System {
       this.soilMoistureChanges.set(key, newMoisture);
     });
 
-    this.eventBus.subscribe('soil:depleted', (event) => {
+    this.events.subscribe('soil:depleted', (event) => {
       const x = event.data.x;
       const y = event.data.y;
       const nutrientLevel = event.data.nutrientLevel;
@@ -174,7 +171,7 @@ export class PlantSystem implements System {
     });
 
     // Time events
-    this.eventBus.subscribe('time:day_changed', () => {
+    this.events.subscribe('time:day_changed', () => {
       this.dayStarted = true;
       this.daySkipCount += 1; // Increment day skip counter
     });

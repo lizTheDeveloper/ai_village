@@ -287,8 +287,11 @@ describe('MapKnowledge', () => {
       // Serialize
       const serialized = mapKnowledge.serialize();
 
-      // Deserialize
-      const restored = MapKnowledge.deserialize(serialized as any);
+      // Deserialize - validate structure before passing
+      if (typeof serialized !== 'object' || serialized === null || !('sectors' in serialized)) {
+        throw new Error('Invalid serialized data structure');
+      }
+      const restored = MapKnowledge.deserialize(serialized as { sectors: Array<any> });
 
       // Check state preserved
       expect(restored.getSector(0, 0).pathTraffic.get('e')).toBe(1);

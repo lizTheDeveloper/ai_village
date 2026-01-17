@@ -373,12 +373,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
       sideEffects: [],
     };
 
-    this.events.emit('neural:implant_installed', {
+    this.events.emit('neural:implant_installed' as any, {
       agentId: agentEntity.id,
       implantId: implant.id,
       implantType,
       model: implant.model,
-    }, agentEntity.id);
+    } as any, agentEntity.id);
 
     return implant;
   }
@@ -414,13 +414,13 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.vrSessions.set(session.id, session);
 
-    this.events.emit('vr:session_started', {
+    this.events.emit('vr:session_started' as any, {
       sessionId: session.id,
       environment,
       hostId: hostEntity.id,
       participantCount: session.participantIds.length,
       timeDilation: session.timeDilation,
-    }, hostEntity.id);
+    } as any, hostEntity.id);
 
     return session;
   }
@@ -434,11 +434,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     session.endedAt = world.tick;
 
-    this.events.emit('vr:session_ended', {
+    this.events.emit('vr:session_ended' as any, {
       sessionId,
       duration: session.endedAt - session.startedAt,
       participantCount: session.participantIds.length,
-    }, session.hostId);
+    } as any, session.hostId);
 
     this.vrSessions.delete(sessionId);
   }
@@ -470,12 +470,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.uploadedMinds.set(mind.id, mind);
 
-    this.events.emit('neural:mind_uploaded', {
+    this.events.emit('neural:mind_uploaded' as any, {
       mindId: mind.id,
       originalAgentId: agentEntity.id,
       originalName: mind.originalName,
       substrate: targetSubstrate,
-    }, agentEntity.id);
+    } as any, agentEntity.id);
 
     return mind;
   }
@@ -501,11 +501,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.uploadedMinds.set(fork.id, fork);
 
-    this.events.emit('neural:mind_forked', {
+    this.events.emit('neural:mind_forked' as any, {
       originalMindId: mindId,
       forkMindId: fork.id,
       totalForks: original.forkCount,
-    });
+    } as any);
 
     return fork;
   }
@@ -520,11 +520,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
     proficiency: number
   ): boolean {
     // This would integrate with actual skill system
-    this.events.emit('neural:skill_downloaded', {
+    this.events.emit('neural:skill_downloaded' as any, {
       agentId: agentEntity.id,
       skillName,
       proficiency,
-    }, agentEntity.id);
+    } as any, agentEntity.id);
     return true;
   }
 
@@ -553,12 +553,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
       // Emit periodic existential thoughts for high-crisis minds
       if (mind.existentialCrisisLevel > 0.7 && Math.random() < 0.01) {
-        this.events.emit('neural:existential_thought', {
+        this.events.emit('neural:existential_thought' as any, {
           mindId: mind.id,
           originalName: mind.originalName,
           thought: this.getExistentialThought(),
           crisisLevel: mind.existentialCrisisLevel,
-        });
+        } as any);
       }
     }
   }

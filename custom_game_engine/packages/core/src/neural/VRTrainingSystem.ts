@@ -431,13 +431,13 @@ export class VRTrainingSystem extends BaseSystem {
 
     this.programs.set(program.id, program);
 
-    this.events.emit('vr:program_created', {
+    this.events.emit('vr:program_created' as any, {
       programId: program.id,
       name,
       category,
       difficulty,
       creatorId: creatorEntity.id,
-    }, creatorEntity.id);
+    } as any, creatorEntity.id);
 
     return program;
   }
@@ -472,13 +472,13 @@ export class VRTrainingSystem extends BaseSystem {
 
     this.sessions.set(session.id, session);
 
-    this.events.emit('vr:session_started', {
+    this.events.emit('vr:session_started' as any, {
       sessionId: session.id,
       programId,
       programName: program.name,
       traineeId: traineeEntity.id,
       difficulty: program.difficulty,
-    }, traineeEntity.id);
+    } as any, traineeEntity.id);
 
     return session;
   }
@@ -504,12 +504,12 @@ export class VRTrainingSystem extends BaseSystem {
     ];
     session.instructorNotes.push(notes[Math.floor(Math.random() * notes.length)]!);
 
-    this.events.emit('vr:simulated_death', {
+    this.events.emit('vr:simulated_death' as any, {
       sessionId,
       traineeId: session.traineeId,
       causeOfDeath,
       deathCount: session.simulatedDeaths,
-    }, session.traineeId);
+    } as any, session.traineeId);
   }
 
   /**
@@ -553,14 +553,14 @@ export class VRTrainingSystem extends BaseSystem {
       }
     }
 
-    this.events.emit('vr:session_completed', {
+    this.events.emit('vr:session_completed' as any, {
       sessionId,
       traineeId: session.traineeId,
       programId: session.programId,
       performanceRating,
       simulatedDeaths: session.simulatedDeaths,
       achievements: achievements.map(a => a.id),
-    }, session.traineeId);
+    } as any, session.traineeId);
 
     this.sessions.delete(sessionId);
     return achievements;

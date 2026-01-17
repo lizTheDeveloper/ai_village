@@ -155,7 +155,8 @@ describe('ItemLoader', () => {
     });
 
     it('should throw for non-array input', () => {
-      expect(() => parseItemsFromJson({} as any)).toThrow('must be an array');
+      const invalidInput: unknown = {};
+      expect(() => parseItemsFromJson(invalidInput as RawItemData[])).toThrow('must be an array');
     });
   });
 
