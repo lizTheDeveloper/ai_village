@@ -373,12 +373,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
       sideEffects: [],
     };
 
-    this.events.emit('neural:implant_installed' as any, {
+    this.events.emitGeneric('neural:implant_installed', {
       agentId: agentEntity.id,
       implantId: implant.id,
       implantType,
       model: implant.model,
-    } as any, agentEntity.id);
+    }, agentEntity.id);
 
     return implant;
   }
@@ -414,13 +414,13 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.vrSessions.set(session.id, session);
 
-    this.events.emit('vr:session_started' as any, {
+    this.events.emitGeneric('vr:session_started', {
       sessionId: session.id,
       environment,
       hostId: hostEntity.id,
       participantCount: session.participantIds.length,
       timeDilation: session.timeDilation,
-    } as any, hostEntity.id);
+    }, hostEntity.id);
 
     return session;
   }
@@ -434,11 +434,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     session.endedAt = world.tick;
 
-    this.events.emit('vr:session_ended' as any, {
+    this.events.emitGeneric('vr:session_ended', {
       sessionId,
       duration: session.endedAt - session.startedAt,
       participantCount: session.participantIds.length,
-    } as any, session.hostId);
+    }, session.hostId);
 
     this.vrSessions.delete(sessionId);
   }
@@ -470,12 +470,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.uploadedMinds.set(mind.id, mind);
 
-    this.events.emit('neural:mind_uploaded' as any, {
+    this.events.emitGeneric('neural:mind_uploaded', {
       mindId: mind.id,
       originalAgentId: agentEntity.id,
       originalName: mind.originalName,
       substrate: targetSubstrate,
-    } as any, agentEntity.id);
+    }, agentEntity.id);
 
     return mind;
   }
