@@ -548,8 +548,10 @@ describe('Language Physics System', () => {
     });
 
     it('should throw if metaphor detection fails with non-string input', () => {
+      // Test runtime validation: passing number when string is expected
+      const invalidInput: unknown = 123;
       expect(() => {
-        world.detectMetaphor(123 as any);
+        world.detectMetaphor(invalidInput as string);
       }).toThrow('Metaphor detection requires string input');
     });
 

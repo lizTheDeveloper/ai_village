@@ -353,7 +353,19 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
   describe('Error Handling: No Silent Fallbacks', () => {
     it('should throw when recordPopulationSample receives invalid data', () => {
       expect(() => {
-        metricsCollector.recordPopulationSample({} as any);
+        // Test negative case: object missing all required fields
+        // recordPopulationSample expects: timestamp, totalPopulation, averageAge, births, deaths
+        // This tests runtime validation - method should throw when required fields are missing
+        // Using type assertion to bypass compile-time checks and test runtime validation
+        type PopulationSampleData = {
+          timestamp: number;
+          totalPopulation: number;
+          averageAge: number;
+          births: number;
+          deaths: number;
+        };
+        const invalidData: Partial<PopulationSampleData> = {}; // Empty object - no fields provided
+        metricsCollector.recordPopulationSample(invalidData as PopulationSampleData);
       }).toThrow();
     });
 

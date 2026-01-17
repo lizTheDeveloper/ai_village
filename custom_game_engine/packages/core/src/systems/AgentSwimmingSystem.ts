@@ -1,9 +1,9 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
@@ -56,7 +56,7 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  * - Bioluminescent creatures (provide light)
  * - Pressure-adapted aquatic species (no penalties)
  */
-export class AgentSwimmingSystem implements System {
+export class AgentSwimmingSystem extends BaseSystem {
   public readonly id: SystemId = 'agent_swimming';
   public readonly priority: number = 18; // After fluid dynamics (16), planetary currents (17)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -67,8 +67,7 @@ export class AgentSwimmingSystem implements System {
   ];
 
   // Throttling: Update every 40 ticks (2 seconds at 20 TPS)
-  private readonly UPDATE_INTERVAL = 40;
-  private lastUpdateTick = 0;
+  protected readonly throttleInterval = 40;
 
   // Reference to StateMutatorSystem for registering deltas
   private stateMutatorSystem: StateMutatorSystem | null = null;
@@ -112,17 +111,10 @@ export class AgentSwimmingSystem implements System {
     this.stateMutatorSystem = system;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
-    // Throttle: Only update every 2 seconds
-    if (currentTick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
-      return;
-    }
-
-    this.lastUpdateTick = currentTick;
-
-    const worldWithTiles = world as {
+    const worldWithTiles = ctx.world as {
       getTileAt?: (x: number, y: number, z?: number) => SwimmingTile | undefined;
       getChunkManager?: () => {
         getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
@@ -136,16 +128,13 @@ export class AgentSwimmingSystem implements System {
       ? worldWithTiles.getChunkManager()
       : undefined;
 
-    // Use SimulationScheduler to filter to active entities only
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, currentTick);
-
-    // Early return if no entities to process
-    if (activeEntities.length === 0) {
+    // Early return if no entities to process (already filtered by SimulationScheduler via ctx.activeEntities)
+    if (ctx.activeEntities.length === 0) {
       return;
     }
 
     // OPTIMIZATION: If no one is swimming and no one near water, skip entirely
-    if (this.underwaterEntities.size === 0 && !this.hasNearbyWater(activeEntities, worldWithTiles, chunkManager)) {
+    if (this.underwaterEntities.size === 0 && !this.hasNearbyWater(ctx.activeEntities, worldWithTiles, chunkManager)) {
       return;
     }
 

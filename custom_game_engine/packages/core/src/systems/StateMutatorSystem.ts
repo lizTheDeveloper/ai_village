@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -72,14 +72,13 @@ function hasNumericField(obj: object, field: string): obj is Record<string, numb
  * });
  * ```
  */
-export class StateMutatorSystem implements System {
+export class StateMutatorSystem extends BaseSystem {
   public readonly id: SystemId = 'state_mutator';
   public readonly priority: number = 5; // Run early, before most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   // Performance: Update once per game minute instead of every tick
-  private lastUpdateTick = 0;
-  private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+  protected readonly throttleInterval = 1200; // 1 game minute at 20 TPS
 
   // Registered deltas grouped by entity for efficient lookup
   private deltas: Map<string, RegisteredDelta[]> = new Map();
@@ -183,35 +182,17 @@ export class StateMutatorSystem implements System {
   /**
    * Apply all registered deltas in a single batch
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
+    const deltaTime = ctx.deltaTime;
 
-    // Performance: Only update once per game minute in normal gameplay
-    // BUT in edge cases (tests), if tick doesn't advance, use deltaTime
-    const ticksSinceLastUpdate = currentTick - this.lastUpdateTick;
-    const shouldUpdate = ticksSinceLastUpdate >= this.UPDATE_INTERVAL ||
-                        (ticksSinceLastUpdate === 0 && deltaTime > 0 && this.deltas.size > 0);
-
-    if (!shouldUpdate) {
-      return;
-    }
-
-    // Calculate elapsed time:
-    // - Normal case: use tick difference
-    // - Edge case (tests): use deltaTime when ticks don't advance
-    const gameMinutesElapsed = ticksSinceLastUpdate > 0
-      ? (ticksSinceLastUpdate / 1200)
-      : (deltaTime / 60);
-
-    // Only update lastUpdateTick if ticks are actually advancing
-    // This allows tests with static ticks to keep updating every call
-    if (ticksSinceLastUpdate > 0) {
-      this.lastUpdateTick = currentTick;
-    }
+    // Calculate elapsed time (since throttleInterval is used, we get called every 1200 ticks)
+    // However, we need to handle edge cases where deltaTime is provided but ticks don't advance
+    const gameMinutesElapsed = deltaTime > 0 ? (deltaTime / 60) : 1.0; // Default to 1 game minute
 
     // Apply all deltas in batch
     for (const [entityId, entityDeltas] of this.deltas) {
-      const entity = world.getEntity(entityId);
+      const entity = ctx.world.getEntity(entityId);
       if (!entity) {
         // Entity was removed - clean up deltas
         this.deltas.delete(entityId);

@@ -748,9 +748,6 @@ export class GatherBehavior extends BaseBehavior {
     let bestPosition: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    // DEBUG: Check if chunkSpatialQuery is injected
-    console.log('[GatherBehavior] findNearestResource: chunkSpatialQuery =', chunkSpatialQuery ? 'AVAILABLE' : 'NOT AVAILABLE');
-
     if (chunkSpatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
       const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
@@ -760,12 +757,9 @@ export class GatherBehavior extends BaseBehavior {
         [ComponentType.Resource]
       );
 
-      console.log('[GatherBehavior] ChunkSpatialQuery returned', resourcesInRadius.length, 'resources within', GATHER_MAX_RANGE, 'of', position.x.toFixed(1), position.y.toFixed(1));
-
       // WORKAROUND: ChunkCache entity indexing is not implemented yet
       // If spatial query returns 0, fall back to global query
       if (resourcesInRadius.length === 0) {
-        console.log('[GatherBehavior] Falling back to global query (chunk index empty)');
         const globalResources = world
           .query()
           .with(ComponentType.Resource)

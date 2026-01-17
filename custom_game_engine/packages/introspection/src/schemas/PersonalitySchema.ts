@@ -261,37 +261,48 @@ export const PersonalitySchema = autoRegister(
 
     validate: (data): data is PersonalityComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const p = data as any;
+      const p = data as Record<string, unknown>;
 
       return (
+        'type' in p &&
         p.type === 'personality' &&
+        'openness' in p &&
         typeof p.openness === 'number' &&
         p.openness >= 0 &&
         p.openness <= 1 &&
+        'conscientiousness' in p &&
         typeof p.conscientiousness === 'number' &&
         p.conscientiousness >= 0 &&
         p.conscientiousness <= 1 &&
+        'extraversion' in p &&
         typeof p.extraversion === 'number' &&
         p.extraversion >= 0 &&
         p.extraversion <= 1 &&
+        'agreeableness' in p &&
         typeof p.agreeableness === 'number' &&
         p.agreeableness >= 0 &&
         p.agreeableness <= 1 &&
+        'neuroticism' in p &&
         typeof p.neuroticism === 'number' &&
         p.neuroticism >= 0 &&
         p.neuroticism <= 1 &&
+        'workEthic' in p &&
         typeof p.workEthic === 'number' &&
         p.workEthic >= 0 &&
         p.workEthic <= 1 &&
+        'creativity' in p &&
         typeof p.creativity === 'number' &&
         p.creativity >= 0 &&
         p.creativity <= 1 &&
+        'generosity' in p &&
         typeof p.generosity === 'number' &&
         p.generosity >= 0 &&
         p.generosity <= 1 &&
+        'leadership' in p &&
         typeof p.leadership === 'number' &&
         p.leadership >= 0 &&
         p.leadership <= 1 &&
+        'spirituality' in p &&
         typeof p.spirituality === 'number' &&
         p.spirituality >= 0 &&
         p.spirituality <= 1

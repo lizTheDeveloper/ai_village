@@ -63,18 +63,18 @@ export class BuildingSpatialAnalysisSystem extends BaseSystem {
 
   protected onInitialize(world: World, eventBus: EventBus): void {
     // Listen for building completion to run analysis
-    this.events.subscribe('building:complete', (data: { buildingId?: string }) => {
+    this.events.on('building:complete', (data) => {
       this.onBuildingComplete(data);
     });
 
     // Listen for analysis requests
-    this.events.subscribe('building:analyze_harmony', (data: BuildingAnalysisRequest) => {
-      this.onAnalysisRequested(data);
+    this.events.on('building:analyze_harmony', (data) => {
+      this.onAnalysisRequested(data as BuildingAnalysisRequest);
     });
 
     // Listen for layout data being provided (from building designer)
-    this.events.subscribe('building:layout_provided', (data: { buildingId: string; layout: BuildingLayout }) => {
-      this.onLayoutProvided(data);
+    this.events.on('building:layout_provided', (data) => {
+      this.onLayoutProvided(data as { buildingId: string; layout: BuildingLayout });
     });
   }
 
@@ -167,7 +167,7 @@ export class BuildingSpatialAnalysisSystem extends BaseSystem {
       this.events.emit('agent:xp_gained', {
         agentId: analyzerId,
         skill: 'architecture',
-        amount: 15,
+        xp: 15,
         source: 'analyze_building_harmony',
       }, 'building_spatial_analysis_system');
 
@@ -176,7 +176,7 @@ export class BuildingSpatialAnalysisSystem extends BaseSystem {
         this.events.emit('agent:xp_gained', {
           agentId: analyzerId,
           skill: 'architecture',
-          amount: harmony.issues.length * 5,
+          xp: harmony.issues.length * 5,
           source: 'identify_harmony_issues',
         }, 'building_spatial_analysis_system');
       }

@@ -31,11 +31,24 @@ function createMockEntity(id: string, components: Map<string, any>): Entity {
     id,
     components,
     hasComponent: (type: string) => components.has(type),
-    getComponent: (type: string) => components.get(type),
+    getComponent: (type: string) => {
+      const comp = components.get(type);
+      // Ensure component has type field (required by ECS)
+      if (comp && typeof comp === 'object' && !comp.type) {
+        return { type, ...comp };
+      }
+      return comp;
+    },
     updateComponent: (type: string, updater: (current: any) => any) => {
       const current = components.get(type);
-      if (current) {
-        components.set(type, updater(current));
+      if (current && typeof current === 'object') {
+        const componentWithType = { type, ...current };
+        const updated = updater(componentWithType);
+        if (updated && typeof updated === 'object') {
+          // Strip the type field before storing (it's added by getComponent)
+          const { type: _, ...rest } = updated;
+          components.set(type, rest);
+        }
       }
     },
   } as any;
@@ -54,6 +67,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       null, // metricsAPI
       null  // liveEntityAPI
     );
+    // Clear mutation history between tests
+    MutationService.clearHistory();
   });
 
   describe('watchEntity', () => {
@@ -64,7 +79,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['needs', { hunger: 0.5, energy: 0.8 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       // Watch entity
       const events: EntityChangeEvent[] = [];
@@ -83,7 +100,7 @@ describe('GameIntrospectionAPI - Observability', () => {
           hunger: {
             type: 'number',
             description: 'Hunger level',
-            range: { min: 0, max: 1 },
+            range: [0, 1],  // Array, not object
             mutable: true,
             visibility: { full: true, llm: true, player: true },
           },
@@ -97,13 +114,6 @@ describe('GameIntrospectionAPI - Observability', () => {
         field: 'hunger',
         value: 0.7,
       });
-
-      // Debug: check mutation result
-      console.log('Mutation success:', result.success);
-      console.log('Mutation errors:', result.validationErrors);
-      console.log('Old value:', result.oldValue);
-      console.log('New value:', result.newValue);
-      console.log('Events received:', events.length);
 
       // Mutation should have succeeded
       expect(result.success).toBe(true);
@@ -128,7 +138,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['health', { current: 100 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -196,7 +208,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['needs', { hunger: 0.5 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -248,7 +262,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['needs', { hunger: 0.5 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -293,7 +309,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['needs', { hunger: 0.5 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',
@@ -343,7 +361,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['health', { current: 100 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',
@@ -405,7 +425,9 @@ describe('GameIntrospectionAPI - Observability', () => {
         ['needs', { hunger: 0.5 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      // Add entity to world
+      (world as any).entities = new Map([[entityId, entity]]);
+      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',

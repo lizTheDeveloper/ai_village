@@ -11,7 +11,7 @@ import type { CourtshipComponent } from './CourtshipComponent';
 import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '@ai-village/core';
 import { updateRelationship } from '@ai-village/core';
-import type { CourtshipTactic, CourtshipParadigm } from './types';
+import type { CourtshipTactic, CourtshipParadigm, ActiveCourtship } from './types';
 import { calculateCompatibility } from './compatibility';
 
 export class CourtshipStateMachine {
@@ -305,7 +305,7 @@ export class CourtshipStateMachine {
    * Update success probability based on tactics and responses
    */
   private updateSuccessProbability(
-    courtship: { responses: Array<{ tactic: CourtshipTactic; reception: number }> },
+    courtship: ActiveCourtship,
     agent: Entity,
     target: Entity,
     world: World
@@ -324,7 +324,7 @@ export class CourtshipStateMachine {
     // Success probability is weighted combination
     const successProbability = avgReception * 0.4 + compatibility * 0.6;
 
-    (courtship as any).successProbability = Math.max(0, Math.min(1, successProbability));
+    courtship.successProbability = Math.max(0, Math.min(1, successProbability));
   }
 
   /**

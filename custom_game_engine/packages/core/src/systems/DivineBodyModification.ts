@@ -13,7 +13,7 @@
  * - PrayerAnsweringSystem for answering prayers
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -143,17 +143,20 @@ export const DEFAULT_DIVINE_BODY_CONFIG: DivineBodyModificationConfig = {
 // DivineBodyModification System
 // ============================================================================
 
-export class DivineBodyModification implements System {
+export class DivineBodyModification extends BaseSystem {
   public readonly id = 'DivineBodyModification';
   public readonly name = 'DivineBodyModification';
   public readonly priority = 73;
   public readonly requiredComponents = [];
 
   private config: DivineBodyModificationConfig;
+
+  protected readonly throttleInterval = 100; // ~5 seconds at 20 TPS
   private modifications: Map<string, DivineBodyModificationRecord> = new Map();
-  private lastUpdate: number = 0;
+
 
   constructor(config: Partial<DivineBodyModificationConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_DIVINE_BODY_CONFIG,
       ...config,
@@ -162,15 +165,7 @@ export class DivineBodyModification implements System {
     };
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(_ctx: SystemContext): void {
     // System primarily provides API for divine powers
     // Actual usage happens through direct invocation or prayer answering
   }

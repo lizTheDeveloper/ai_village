@@ -14,6 +14,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 
@@ -593,6 +594,7 @@ export class PublicationSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private manager: PublicationManager;
 
   // Tick throttling
@@ -605,6 +607,7 @@ export class PublicationSystem implements System {
 
   public setEventBus(eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   /**
@@ -677,21 +680,15 @@ export class PublicationSystem implements System {
     });
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'publication:created' as any,
-        source: 'publication-system',
-        data: {
-          publicationId: publication.id,
-          type: publication.type,
-          category: 'cooking',
-          authorId: author.id,
-          authorName: author.name,
-          title: publication.title,
-          techLevel,
-        },
-      });
-    }
+    this.events.emitGeneric('publication:created', {
+      publicationId: publication.id,
+      type: publication.type,
+      category: 'cooking',
+      authorId: author.id,
+      authorName: author.name,
+      title: publication.title,
+      techLevel,
+    });
 
     return publication;
   }
@@ -737,21 +734,15 @@ export class PublicationSystem implements System {
     });
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'publication:created' as any,
-        source: 'publication-system',
-        data: {
-          publicationId: publication.id,
-          type: publication.type,
-          category: 'history',
-          authorId: author.id,
-          authorName: author.name,
-          title: publication.title,
-          techLevel,
-        },
-      });
-    }
+    this.events.emitGeneric('publication:created', {
+      publicationId: publication.id,
+      type: publication.type,
+      category: 'history',
+      authorId: author.id,
+      authorName: author.name,
+      title: publication.title,
+      techLevel,
+    });
 
     return publication;
   }
@@ -770,6 +761,13 @@ export class PublicationSystem implements System {
     // - Spread influence of popular publications
     // - Age out old publications
     // - Track reading habits
+  }
+
+  /**
+   * Cleanup subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 }
 

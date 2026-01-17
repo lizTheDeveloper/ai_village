@@ -1,5 +1,5 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
-import type { World, WorldMutator } from '../index.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { PositionComponent } from '../components/index.js';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 import { CHUNK_SIZE } from '@ai-village/world';

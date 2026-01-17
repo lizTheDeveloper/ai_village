@@ -10,7 +10,7 @@
  * - Multi-generation bloodlines
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -53,7 +53,7 @@ export const DEFAULT_REPRODUCTION_CONFIG: ReproductionConfig = {
 // ReproductionSystem
 // ============================================================================
 
-export class ReproductionSystem implements System {
+export class ReproductionSystem extends BaseSystem {
   public readonly id = 'ReproductionSystem';
   public readonly name = 'ReproductionSystem';
   public readonly priority = 50;
@@ -62,13 +62,14 @@ export class ReproductionSystem implements System {
   private config: ReproductionConfig;
 
   constructor(config: Partial<ReproductionConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_REPRODUCTION_CONFIG,
       ...config,
     };
   }
 
-  update(_world: World): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // System provides API for reproduction, doesn't run on its own
   }
 

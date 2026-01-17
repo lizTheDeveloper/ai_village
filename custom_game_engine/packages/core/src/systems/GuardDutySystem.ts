@@ -57,7 +57,7 @@ export class GuardDutySystem implements System {
     this.eventBus = eventBus;
   }
 
-  initialize(eventBus: EventBus): void {
+  initialize(world: World, eventBus: EventBus): void {
     this.events = new SystemEventManager(eventBus, this.id);
   }
 

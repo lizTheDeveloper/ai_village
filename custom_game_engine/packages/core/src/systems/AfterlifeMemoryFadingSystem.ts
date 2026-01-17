@@ -1,7 +1,6 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import {
@@ -21,23 +20,15 @@ import {
  *
  * Priority: 17 (after NeedsSystem at 15, MemoryConsolidation, etc.)
  */
-export class AfterlifeMemoryFadingSystem implements System {
+export class AfterlifeMemoryFadingSystem extends BaseSystem {
   readonly id: SystemId = 'afterlife_memory_fading';
   readonly priority: number = 17;
   readonly requiredComponents = ['afterlife_memory', 'episodic_memory'] as const;
 
-  private lastUpdateTick: number = 0;
-  private readonly UPDATE_INTERVAL = 1000; // Update every 1000 ticks (~game day)
+  protected readonly throttleInterval = 1000; // Update every 1000 ticks (~game day)
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Only update periodically (memory fading is a slow process)
-    if (world.tick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const afterlifeMemory = entity.components.get('afterlife_memory') as AfterlifeMemoryComponent | undefined;
       const episodicMemory = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
 
@@ -46,7 +37,7 @@ export class AfterlifeMemoryFadingSystem implements System {
       // Skip if fading is already complete
       if (afterlifeMemory.fadingComplete) {
         // Remove component once fading is complete to save processing
-        impl.removeComponent('afterlife_memory');
+        entity.removeComponent('afterlife_memory');
         continue;
       }
 
@@ -64,7 +55,7 @@ export class AfterlifeMemoryFadingSystem implements System {
       );
 
       // Update clarity multiplier
-      impl.updateComponent<AfterlifeMemoryComponent>('afterlife_memory', (current) => {
+      entity.updateComponent<AfterlifeMemoryComponent>('afterlife_memory', (current) => {
         const updated = { ...current };
         updated.clarityMultiplier = newClarity;
 
@@ -133,11 +124,13 @@ export class AfterlifeMemoryFadingSystem implements System {
     const entity = world.getEntity(entityId);
     if (!entity) return;
 
-    const impl = entity as EntityImpl;
     const afterlifeMemory = entity.components.get('afterlife_memory') as AfterlifeMemoryComponent | undefined;
 
     if (afterlifeMemory) {
-      impl.updateComponent<AfterlifeMemoryComponent>('afterlife_memory', (current) => {
+      // EntityImpl cast is necessary for updateComponent (internal mutable interface)
+      // Entity interface is readonly, only EntityImpl exposes updateComponent
+      const entityImpl = entity as EntityImpl;
+      entityImpl.updateComponent<AfterlifeMemoryComponent>('afterlife_memory', (current) => {
         const updated = { ...current };
         updated.clarityMultiplier = 0.0;
         updated.fadingComplete = true;

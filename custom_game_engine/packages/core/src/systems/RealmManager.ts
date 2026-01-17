@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -17,7 +17,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
  * - Managing realm stability
  * - Tracking inhabitants per realm
  */
-export class RealmManager implements System {
+export class RealmManager extends BaseSystem {
   readonly id: SystemId = 'realm_manager';
   readonly priority: number = 50;
   readonly requiredComponents = [] as const;
@@ -25,10 +25,10 @@ export class RealmManager implements System {
   private realms: Map<string, string> = new Map();  // realmId -> entity ID
   private realmTicks: Map<string, number> = new Map();  // realmId -> tick count
 
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Update each active realm independently
     for (const [realmId, entityId] of this.realms) {
-      const entity = world.getEntity(entityId);
+      const entity = ctx.world.getEntity(entityId);
       if (!entity) continue;
 
       const realm = entity.getComponent<RealmComponent>(CT.Realm);
@@ -41,7 +41,7 @@ export class RealmManager implements System {
       }
 
       // Calculate realm-specific delta based on time dilation
-      const realmDelta = deltaTime * realm.properties.timeRatio;
+      const realmDelta = ctx.deltaTime * realm.properties.timeRatio;
 
       // Update realm tick
       const currentRealmTick = this.realmTicks.get(realmId) || 0;
@@ -49,17 +49,17 @@ export class RealmManager implements System {
 
       // Drain maintenance cost if not self-sustaining
       if (!realm.properties.selfSustaining) {
-        realm.attentionReserve -= realm.properties.maintenanceCost * deltaTime;
+        realm.attentionReserve -= realm.properties.maintenanceCost * ctx.deltaTime;
 
         // Check if realm should collapse
         if (realm.attentionReserve <= 0) {
-          this.collapseRealm(realmId, world);
+          this.collapseRealm(realmId, ctx.world);
         }
       }
 
       // Update realm component state
       realm.currentTick = currentRealmTick;
-      realm.timeSinceCreation += deltaTime;
+      realm.timeSinceCreation += ctx.deltaTime;
     }
   }
 

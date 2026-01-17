@@ -337,6 +337,18 @@ export class SystemEventManager implements TypedEmitter {
   }
 
   /**
+   * Subscribe to an event type (alias for onGeneric for compatibility).
+   * Prefer using on() for typed events or onGeneric() for untyped events.
+   */
+  subscribe(
+    type: string,
+    handler: (data: unknown) => void,
+    priority?: EventPriority
+  ): Unsubscribe {
+    return this.onGeneric(type, handler, priority);
+  }
+
+  /**
    * Check if this manager has been cleaned up.
    */
   get cleaned(): boolean {

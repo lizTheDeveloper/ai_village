@@ -103,10 +103,20 @@ class HeadlessGameLoop {
     return this.gameLoop.actionRegistry;
   }
 
-  start(): void {
+  async start(): Promise<void> {
     if (this.running) return;
     this.running = true;
     this.lastTime = Date.now();
+
+    // Initialize all systems (GameLoop.start() does this, but we bypass it)
+    console.log('[HeadlessGame] Initializing systems...');
+    const systems = this.gameLoop.systemRegistry.getSorted();
+    for (const system of systems) {
+      if (system.initialize) {
+        await system.initialize(this.gameLoop.world, (this.gameLoop as any).eventBus);
+      }
+    }
+    console.log(`[HeadlessGame] Initialized ${systems.length} systems`);
 
     const frameTime = 1000 / this.targetFps;
     this.intervalId = setInterval(() => {
@@ -455,7 +465,7 @@ async function main() {
   createInitialAnimals(baseGameLoop.world, wildAnimalSpawning);
 
   console.log('[HeadlessGame] Starting game loop...');
-  headlessLoop.start();
+  await headlessLoop.start();
 
   const shutdown = () => {
     console.log('\n[HeadlessGame] Shutting down...');

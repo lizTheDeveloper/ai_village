@@ -12,6 +12,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -213,6 +214,7 @@ export class HerbalistDiscoverySystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private paperSystem: AcademicPaperSystem | null = null;
 
   // Tick throttling
@@ -225,6 +227,7 @@ export class HerbalistDiscoverySystem implements System {
 
   public setEventBus(eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   /**
@@ -288,24 +291,18 @@ export class HerbalistDiscoverySystem implements System {
     this.pendingPublications.push(discovery);
 
     // Emit discovery event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'plant:discovered' as any,
-        source: 'herbalist-discovery-system',
-        data: {
-          discoveryId: discovery.id,
-          speciesId,
-          speciesName,
-          commonName,
-          biome,
-          discovererId: agentEntity.id,
-          discovererName: discovery.discovererName,
-          chemotype,
-          latitudeZone,
-          medicinalProperties,
-        },
-      });
-    }
+    this.events.emitGeneric('plant:discovered', {
+      discoveryId: discovery.id,
+      speciesId,
+      speciesName,
+      commonName,
+      biome,
+      discovererId: agentEntity.id,
+      discovererName: discovery.discovererName,
+      chemotype,
+      latitudeZone,
+      medicinalProperties,
+    });
 
     return discovery;
   }
@@ -354,24 +351,18 @@ export class HerbalistDiscoverySystem implements System {
     discovery.paperId = paper.id;
 
     // Emit publication event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'paper:published' as any,
-        source: 'herbalist-discovery-system',
-        data: {
-          paperId: paper.id,
-          title: paper.title,
-          firstAuthor: { id: paper.firstAuthorId, name: paper.firstAuthorName },
-          coAuthors: paper.coAuthorIds.map((id, i) => ({ id, name: paper.coAuthorNames[i] ?? 'Unknown' })),
-          researchId: paper.researchId,
-          tier: paper.tier,
-          citationCount: 0,
-          isBreakthrough: paper.isBreakthrough,
-          discoveryId: discovery.id,
-          speciesName: discovery.speciesName,
-        },
-      });
-    }
+    this.events.emitGeneric('paper:published', {
+      paperId: paper.id,
+      title: paper.title,
+      firstAuthor: { id: paper.firstAuthorId, name: paper.firstAuthorName },
+      coAuthors: paper.coAuthorIds.map((id, i) => ({ id, name: paper.coAuthorNames[i] ?? 'Unknown' })),
+      researchId: paper.researchId,
+      tier: paper.tier,
+      citationCount: 0,
+      isBreakthrough: paper.isBreakthrough,
+      discoveryId: discovery.id,
+      speciesName: discovery.speciesName,
+    });
 
     return paper;
   }
@@ -421,6 +412,13 @@ export class HerbalistDiscoverySystem implements System {
    */
   public isSpeciesDiscovered(speciesId: string): boolean {
     return this.discoveredSpecies.has(speciesId);
+  }
+
+  /**
+   * Cleanup subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 }
 

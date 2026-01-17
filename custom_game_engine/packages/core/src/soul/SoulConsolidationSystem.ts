@@ -12,6 +12,8 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { SilverThreadComponent, SignificantEventType } from './SilverThreadComponent.js';
@@ -28,6 +30,16 @@ export class SoulConsolidationSystem implements System {
   readonly id = 'soul_consolidation' as const;
   readonly priority = 106;
   readonly requiredComponents = [] as const;
+
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
 
   update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // This system only processes during sleep events, not every tick

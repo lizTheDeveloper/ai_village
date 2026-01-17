@@ -181,22 +181,23 @@ export const InventorySchema = autoRegister(
 
     validate: (data): data is InventoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
-      if (d.type !== 'inventory') return false;
-      if (!Array.isArray(d.slots)) return false;
-      if (typeof d.maxSlots !== 'number' || d.maxSlots < 1) return false;
-      if (typeof d.maxWeight !== 'number' || d.maxWeight < 1) return false;
-      if (typeof d.currentWeight !== 'number' || d.currentWeight < 0) return false;
+      if (!('type' in d) || d.type !== 'inventory') return false;
+      if (!('slots' in d) || !Array.isArray(d.slots)) return false;
+      if (!('maxSlots' in d) || typeof d.maxSlots !== 'number' || d.maxSlots < 1) return false;
+      if (!('maxWeight' in d) || typeof d.maxWeight !== 'number' || d.maxWeight < 1) return false;
+      if (!('currentWeight' in d) || typeof d.currentWeight !== 'number' || d.currentWeight < 0) return false;
 
       // Validate each slot
       for (const slot of d.slots) {
         if (typeof slot !== 'object' || slot === null) return false;
-        if (slot.itemId !== null && typeof slot.itemId !== 'string') return false;
-        if (typeof slot.quantity !== 'number' || slot.quantity < 0) return false;
-        if (slot.quality !== undefined && typeof slot.quality !== 'number')
+        const s = slot as Record<string, unknown>;
+        if (!('itemId' in s) || (s.itemId !== null && typeof s.itemId !== 'string')) return false;
+        if (!('quantity' in s) || typeof s.quantity !== 'number' || s.quantity < 0) return false;
+        if ('quality' in s && s.quality !== undefined && typeof s.quality !== 'number')
           return false;
-        if (slot.instanceId !== undefined && typeof slot.instanceId !== 'string')
+        if ('instanceId' in s && s.instanceId !== undefined && typeof s.instanceId !== 'string')
           return false;
       }
 

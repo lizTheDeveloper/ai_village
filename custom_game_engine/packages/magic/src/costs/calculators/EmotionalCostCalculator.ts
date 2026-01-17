@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Emotion configuration */
 interface EmotionConfig {
@@ -230,7 +231,7 @@ export class EmotionalCostCalculator extends BaseCostCalculator {
    * Override terminal effect for emotional-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -251,6 +252,6 @@ export class EmotionalCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, caster);
+    return super.getTerminalEffect(costType, trigger, caster);
   }
 }

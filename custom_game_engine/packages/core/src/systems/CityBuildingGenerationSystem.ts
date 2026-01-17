@@ -18,13 +18,12 @@
  * - Works alongside CityDirectorSystem for city management
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
 import { getAvailableBuildings } from '../components/TechnologyUnlockComponent.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
@@ -91,18 +90,17 @@ function getBuildingPriority(buildingType: string): number {
 /**
  * CityBuildingGenerationSystem spawns buildings in NPC cities.
  */
-export class CityBuildingGenerationSystem implements System {
+export class CityBuildingGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'city_building_generation';
   public readonly priority: number = 17; // Run after TechnologyUnlockSystem (16)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: CoreEventBus;
-  private lastCheckTick: number = 0;
-  private readonly CHECK_INTERVAL = 600; // Every 30 seconds at 20 TPS
+  protected readonly throttleInterval = 600; // Every 30 seconds at 20 TPS
+
   private blueprintRegistry: BuildingBlueprintRegistry | null = null;
 
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
+  constructor() {
+    super();
   }
 
   /**
@@ -119,15 +117,9 @@ export class CityBuildingGenerationSystem implements System {
   /**
    * Update - periodically spawn buildings in NPC cities.
    */
-  public update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Periodic check
-    if (world.tick - this.lastCheckTick < this.CHECK_INTERVAL) {
-      return;
-    }
-    this.lastCheckTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Get the global technology unlock singleton
-    const unlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
+    const unlockEntities = ctx.world.query().with(CT.TechnologyUnlock).executeEntities();
     if (unlockEntities.length === 0) {
       return; // No unlock tracker yet
     }
@@ -139,7 +131,7 @@ export class CityBuildingGenerationSystem implements System {
     }
 
     // Get all cities
-    const cities = world.query().with(CT.CityDirector).executeEntities();
+    const cities = ctx.world.query().with(CT.CityDirector).executeEntities();
 
     for (const cityEntity of cities) {
       const cityImpl = cityEntity as EntityImpl;
@@ -155,7 +147,7 @@ export class CityBuildingGenerationSystem implements System {
       }
 
       // Try to spawn a building in this NPC city
-      this.considerBuildingForCity(world, cityDirector, unlock);
+      this.considerBuildingForCity(ctx.world, cityDirector, unlock);
     }
   }
 
@@ -328,28 +320,20 @@ export class CityBuildingGenerationSystem implements System {
     this.stampBuildingLayout(world, buildingType, position, entity.id);
 
     // Emit events
-    this.eventBus.emit({
-      type: 'building:spawned',
-      source: this.id,
-      data: {
-        buildingId: entity.id,
-        buildingType,
-        cityId,
-        position,
-        isComplete: true,
-      },
+    this.events.emit('building:spawned', {
+      buildingId: entity.id,
+      buildingType,
+      cityId,
+      position,
+      isComplete: true,
     });
 
     // Also emit building:complete event so other systems can react
-    this.eventBus.emit({
-      type: 'building:complete',
-      source: this.id,
-      data: {
-        buildingId: entity.id,
-        entityId: entity.id,
-        buildingType,
-        position,
-      },
+    this.events.emit('building:complete', {
+      buildingId: entity.id,
+      entityId: entity.id,
+      buildingType,
+      position,
     });
 
   }

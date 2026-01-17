@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /**
  * Cost calculator for the Pact/Warlock magic paradigm.
@@ -151,7 +152,7 @@ export class PactCostCalculator extends BaseCostCalculator {
    * Override terminal effect for pact-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -175,7 +176,7 @@ export class PactCostCalculator extends BaseCostCalculator {
           fragmentsRemaining: 0,
         };
       default:
-        return super.getTerminalEffect(costType as any, trigger, caster);
+        return super.getTerminalEffect(costType, trigger, caster);
     }
   }
 

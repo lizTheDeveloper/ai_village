@@ -14,6 +14,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type {
   PlotTrigger,
   PlotTriggerEvent,
@@ -80,6 +81,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
   /** Distance in tiles for "nearby" death detection */
   private static readonly NEARBY_DEATH_DISTANCE = 10;
 
+  private events!: SystemEventManager;
   private conditionCooldowns: Map<string, ConditionCooldown> = new Map();
 
   /** Relationship baselines by entity ID for change detection */
@@ -89,23 +91,30 @@ export class EventDrivenPlotAssignmentSystem implements System {
   private recentDeaths: RecentDeath[] = [];
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+
     // Subscribe to death events for on_death_nearby trigger
-    eventBus.subscribe('agent:died', (event) => {
-      const data = event.data as {
+    // Using onGeneric since the event data structure differs from GameEventMap
+    this.events.onGeneric('agent:died', (data) => {
+      const deathData = data as {
         entityId: string;
         soulId?: string;
         position?: { x: number; y: number };
         tick?: number;
       };
-      if (data.position) {
+      if (deathData.position) {
         this.recentDeaths.push({
-          deceasedId: data.entityId,
-          deceasedSoulId: data.soulId,
-          position: data.position,
-          tick: data.tick ?? 0,
+          deceasedId: deathData.entityId,
+          deceasedSoulId: deathData.soulId,
+          position: deathData.position,
+          tick: deathData.tick ?? 0,
         });
       }
     });
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -761,6 +770,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
    * Cleanup on system destruction
    */
   destroy(): void {
+    this.cleanup();
     this.conditionCooldowns.clear();
     this.relationshipBaselines.clear();
     this.recentDeaths = [];

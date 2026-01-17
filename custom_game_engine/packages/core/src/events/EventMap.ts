@@ -2172,6 +2172,7 @@ export interface GameEventMap {
     groupGoal?: string;
     lastThought?: string;
     recentSpeech?: string;
+    llmLayer?: 'executor' | 'talker';
   };
 
   // === Trading & Economy Events ===

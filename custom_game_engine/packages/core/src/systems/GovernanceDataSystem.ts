@@ -1,8 +1,8 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { TownHallComponent, AgentRecord, DeathRecord, BirthRecord } from '../components/TownHallComponent.js';
@@ -12,7 +12,6 @@ import type { WeatherStationComponent } from '../components/WeatherStationCompon
 import type { HealthClinicComponent } from '../components/HealthClinicComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
-import type { EventBus } from '../events/EventBus.js';
 
 /**
  * GovernanceDataSystem populates governance building components with data.
@@ -28,14 +27,13 @@ import type { EventBus } from '../events/EventBus.js';
  *
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
  */
-export class GovernanceDataSystem implements System {
+export class GovernanceDataSystem extends BaseSystem {
   public readonly id: SystemId = 'governance_data';
   public readonly priority: number = 50; // Run late, after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private deathLog: DeathRecord[] = [];
   private birthLog: BirthRecord[] = [];
-  private isInitialized = false;
 
   // Performance: Government data updates at midnight (once per game day)
   private needsUpdate = true; // Update on first tick, then wait for day change events
@@ -43,18 +41,14 @@ export class GovernanceDataSystem implements System {
   /**
    * Initialize event listeners for death/birth tracking and day change events.
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) {
-      return;
-    }
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Listen for day change events from TimeSystem
-    eventBus.subscribe('time:day_changed', () => {
+    this.events.subscribe('time:day_changed', () => {
       this.needsUpdate = true; // Flag for update at midnight
     });
 
     // Listen for death events
-    eventBus.subscribe('agent:starved', (event) => {
+    this.events.subscribe('agent:starved', (event) => {
       if (event.data) {
         // Per CLAUDE.md: No silent fallbacks - require all fields
         if (!event.timestamp) {
@@ -64,7 +58,7 @@ export class GovernanceDataSystem implements System {
       }
     });
 
-    eventBus.subscribe('agent:collapsed', (event) => {
+    this.events.subscribe('agent:collapsed', (event) => {
       if (event.data) {
         // Per CLAUDE.md: No silent fallbacks - require all fields
         if (!event.data.reason) {
@@ -78,8 +72,6 @@ export class GovernanceDataSystem implements System {
     });
 
     // Note: Birth tracking would require an 'agent:born' event to be added to EventMap
-
-    this.isInitialized = true;
   }
 
   /**
@@ -120,7 +112,7 @@ export class GovernanceDataSystem implements System {
    * - Early exit if no governance buildings exist
    * - Single query for all agents, passed to all methods
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update when flagged by day change event
     if (!this.needsUpdate) {
       return;
@@ -130,27 +122,27 @@ export class GovernanceDataSystem implements System {
     // Performance: Early exit if no governance buildings exist
     // Check all governance building types in a single pass
     const hasAnyGovernanceBuilding =
-      world.query().with(CT.TownHall).executeEntities().length > 0 ||
-      world.query().with(CT.CensusBureau).executeEntities().length > 0 ||
-      world.query().with(CT.Warehouse).executeEntities().length > 0 ||
-      world.query().with(CT.WeatherStation).executeEntities().length > 0 ||
-      world.query().with(CT.HealthClinic).executeEntities().length > 0;
+      ctx.world.query().with(CT.TownHall).executeEntities().length > 0 ||
+      ctx.world.query().with(CT.CensusBureau).executeEntities().length > 0 ||
+      ctx.world.query().with(CT.Warehouse).executeEntities().length > 0 ||
+      ctx.world.query().with(CT.WeatherStation).executeEntities().length > 0 ||
+      ctx.world.query().with(CT.HealthClinic).executeEntities().length > 0;
 
     if (!hasAnyGovernanceBuilding) {
       return;
     }
 
     // Single query for identity agents (used by TownHalls and CensusBureaus)
-    const agentsWithIdentity = world.query().with(CT.Identity).executeEntities();
+    const agentsWithIdentity = ctx.world.query().with(CT.Identity).executeEntities();
 
     // Single query for agents with needs (used by HealthClinics)
-    const agentsWithNeeds = world.query().with(CT.Agent, CT.Needs).executeEntities();
+    const agentsWithNeeds = ctx.world.query().with(CT.Agent, CT.Needs).executeEntities();
 
-    this.updateTownHalls(world, agentsWithIdentity);
-    this.updateCensusBureaus(world, agentsWithIdentity);
-    this.updateWarehouses(world);
-    this.updateWeatherStations(world);
-    this.updateHealthClinics(world, agentsWithNeeds);
+    this.updateTownHalls(ctx.world, agentsWithIdentity);
+    this.updateCensusBureaus(ctx.world, agentsWithIdentity);
+    this.updateWarehouses(ctx.world);
+    this.updateWeatherStations(ctx.world);
+    this.updateHealthClinics(ctx.world, agentsWithNeeds);
   }
 
   /**

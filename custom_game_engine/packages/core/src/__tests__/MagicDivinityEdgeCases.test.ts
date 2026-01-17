@@ -4,9 +4,35 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { Deity } from '../divinity/DeityTypes.js';
+import type { Deity, DeityController, EmergencePhase } from '../divinity/DeityTypes.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
 import type { ComposedSpell } from '../components/MagicComponent.js';
+
+/**
+ * Simplified mock deity type for testing magic-divinity edge cases.
+ * Does NOT match the full Deity interface - uses simplified structure for test clarity.
+ *
+ * Key differences from real Deity:
+ * - belief: number (not DeityBeliefState object)
+ * - believers: string[] (not believerIds with full relation tracking)
+ * - identity: simplified with domains as Record<string, number>
+ * - knownParadigms: direct array (real deities use different paradigm system)
+ */
+interface MockDeity {
+  id: string;
+  controller: DeityController;
+  belief: number; // Simplified - real deity has DeityBeliefState
+  believers: string[]; // Simplified - real deity has believerIds + BelieverRelation[]
+  identity: {
+    perceivedName: string;
+    domains: Record<string, number>; // Simplified domain tracking
+    personality: Record<string, any>;
+    alignment: { law_chaos: number; good_evil: number; selfless_selfish: number };
+    forms: any[];
+  };
+  knownParadigms?: string[]; // Test-specific field
+  emergencePhase?: EmergencePhase;
+}
 
 describe('Theurgic Casting with Deity State Changes', () => {
   it('should handle deity losing all belief mid-cast', () => {
@@ -506,10 +532,10 @@ describe('Memory and Reference Leaks', () => {
 });
 
 // Helper functions
-function createMockDeity(id: string): Deity {
+function createMockDeity(id: string): MockDeity {
   return {
     id,
-    controller: 'emergent',
+    controller: 'ai',
     belief: 0,
     believers: [],
     identity: {
@@ -521,7 +547,7 @@ function createMockDeity(id: string): Deity {
     },
     knownParadigms: [],
     emergencePhase: 'nascent',
-  } as any;
+  };
 }
 
 function createMockAgent(id: string): any {
@@ -552,7 +578,7 @@ function createTestSpell(): ComposedSpell {
   };
 }
 
-function beginTheurgicCast(caster: any, spell: ComposedSpell, deity: Deity): any {
+function beginTheurgicCast(caster: any, spell: ComposedSpell, deity: MockDeity): any {
   return { caster, spell, deity, started: true, initialBelieverCount: deity.believers.length };
 }
 
@@ -574,7 +600,7 @@ function completeTheurgicCast(castState: any): any {
   };
 }
 
-function beginGrantSpell(deity: Deity, recipient: any, spell: ComposedSpell): any {
+function beginGrantSpell(deity: MockDeity, recipient: any, spell: ComposedSpell): any {
   return { deity, recipient, spell, started: true };
 }
 
@@ -589,7 +615,7 @@ function completeGrantSpell(grantState: any): any {
   return { success: true };
 }
 
-function grantParadigm(deity: Deity, recipient: any, paradigm: string): any {
+function grantParadigm(deity: MockDeity, recipient: any, paradigm: string): any {
   const forbidden = [['divine', 'pact']];
 
   for (const [p1, p2] of forbidden) {
@@ -603,7 +629,7 @@ function grantParadigm(deity: Deity, recipient: any, paradigm: string): any {
   return { success: true };
 }
 
-function grantSpell(deity: Deity, recipient: any, spell: ComposedSpell): any {
+function grantSpell(deity: MockDeity, recipient: any, spell: ComposedSpell): any {
   if (recipient.grantedSpells.includes(spell.id)) {
     return { success: false, reason: 'already_known' };
   }
@@ -612,7 +638,7 @@ function grantSpell(deity: Deity, recipient: any, spell: ComposedSpell): any {
   return { success: true };
 }
 
-function channelBeliefToMana(deity: Deity, mage: any, beliefAmount: number): any {
+function channelBeliefToMana(deity: MockDeity, mage: any, beliefAmount: number): any {
   if (deity.belief < beliefAmount) return { success: false };
   const manaGained = beliefAmount * (0.5 + (mage.faith || 0) * 0.5);
   // Fail if mana pool is already at or near maximum
@@ -624,11 +650,11 @@ function channelBeliefToMana(deity: Deity, mage: any, beliefAmount: number): any
   return { success: true, manaGained };
 }
 
-function channelManaTobelief(mage: any, deity: Deity, manaAmount: number): any {
+function channelManaTobelief(mage: any, deity: MockDeity, manaAmount: number): any {
   return { success: false, reason: 'forbidden_reverse_conversion' };
 }
 
-function beginBeliefManaTransfer(deity: Deity, mage: any, amount: number): any {
+function beginBeliefManaTransfer(deity: MockDeity, mage: any, amount: number): any {
   return { deity, mage, amount, initialFaith: mage.faith };
 }
 
@@ -638,12 +664,12 @@ function completeBeliefManaTransfer(transfer: any): any {
   return { manaReceived };
 }
 
-function deityCastAcademicSpell(deity: Deity, spell: ComposedSpell): any {
+function deityCastAcademicSpell(deity: MockDeity, spell: ComposedSpell): any {
   deity.belief -= spell.manaCost * 0.5;
   return { success: true };
 }
 
-function castTheurgicSpell(caster: any, spell: ComposedSpell, deity: Deity): any {
+function castTheurgicSpell(caster: any, spell: ComposedSpell, deity: MockDeity): any {
   // If caster has divine paradigm active but no faith, assume minimal faith
   const hasDivineParadigm = caster.activeParadigms?.includes('divine');
   const effectiveFaith = hasDivineParadigm && caster.faith === 0 ? 0.1 : caster.faith;
@@ -663,7 +689,7 @@ function validateFaith(agent: any): any {
   return { ...agent, faith: Math.max(0, Math.min(1, agent.faith)) };
 }
 
-function deityLearnParadigm(deity: Deity, paradigm: string): any {
+function deityLearnParadigm(deity: MockDeity, paradigm: string): any {
   const forbidden = [['divine', 'pact']];
 
   for (const [p1, p2] of forbidden) {
@@ -677,7 +703,7 @@ function deityLearnParadigm(deity: Deity, paradigm: string): any {
   return { success: true, acquisitionBypassed: true };
 }
 
-function deityCastMortalSpell(deity: Deity, spell: ComposedSpell): any {
+function deityCastMortalSpell(deity: MockDeity, spell: ComposedSpell): any {
   const cost = spell.manaCost * 0.5;
   if (deity.belief <= cost) {
     return { success: false, reason: 'insufficient_belief' };

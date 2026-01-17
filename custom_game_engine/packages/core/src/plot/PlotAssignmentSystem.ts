@@ -12,6 +12,8 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
@@ -47,9 +49,18 @@ export class PlotAssignmentSystem implements System {
   readonly priority = 85;
   readonly requiredComponents = [] as const;
 
+  private events!: SystemEventManager;
   private tickCounter = 0;
   private readonly assignmentInterval = 100; // Check every 100 ticks
   private readonly scaleLimits: ScaleLimits = DEFAULT_SCALE_LIMITS;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
 
   update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     this.tickCounter++;

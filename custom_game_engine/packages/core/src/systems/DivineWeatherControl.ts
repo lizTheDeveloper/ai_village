@@ -13,8 +13,10 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 // ============================================================================
 // Divine Weather Types
@@ -122,6 +124,7 @@ export class DivineWeatherControl implements System {
   private config: WeatherControlConfig;
   private weatherEvents: Map<string, DivineWeatherEvent> = new Map();
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<WeatherControlConfig> = {}) {
     this.config = {
@@ -129,6 +132,14 @@ export class DivineWeatherControl implements System {
       ...config,
       weatherCosts: { ...DEFAULT_WEATHER_CONTROL_CONFIG.weatherCosts, ...config.weatherCosts },
     };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -192,8 +203,17 @@ export class DivineWeatherControl implements System {
     // Apply weather effects
     this.applyWeatherEffects(world, weatherEvent);
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'divine_weather_summoned', ... });
+    // Emit divine weather summoned event
+    this.events.emitGeneric('divine_weather_summoned', {
+      weatherEventId: weatherEvent.id,
+      deityId,
+      weatherType: type,
+      location,
+      radius,
+      intensity,
+      duration,
+      purpose,
+    });
 
     return weatherEvent;
   }

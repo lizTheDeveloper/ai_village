@@ -23,6 +23,7 @@ import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { getTopicCategory } from '../components/InterestsComponent.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { EventType } from '../events/EventMap.js';
+import type { World } from '../ecs/World.js';
 
 /**
  * Skill to interest mappings
@@ -160,18 +161,18 @@ export class InterestEvolutionSystem extends BaseSystem {
   protected onInitialize(): void {
     // Listen for experience triggers
     // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
-    // Using subscribe with string literal types for forward compatibility
-    this.events.subscribe('agent:death' as any, (e) => this.handleExperience(e, this.world));
-    this.events.subscribe('deity:miracle' as any, (e) => this.handleExperience(e, this.world));
-    this.events.subscribe('building:completed', (e) => this.handleExperience(e, this.world));
-    this.events.subscribe('agent:born', (e) => this.handleExperience(e, this.world));
-    this.events.subscribe('prayer:answered' as any, (e) => this.handleExperience(e, this.world));
+    // Using on with string literal types for forward compatibility
+    this.events.on('agent:death' as any, (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('deity:miracle' as any, (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('building:completed', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('agent:born', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('prayer:answered' as any, (_data, event) => this.handleExperience(event, this.world));
 
     // Listen for skill increases
-    this.events.subscribe('skill:level_up', (e) => this.handleSkillGrowth(e, this.world));
+    this.events.on('skill:level_up', (_data, event) => this.handleSkillGrowth(event, this.world));
 
     // Listen for conversations (mentorship transfer)
-    this.events.subscribe('conversation:ended', (e) => this.handleMentorship(e, this.world));
+    this.events.on('conversation:ended', (_data, event) => this.handleMentorship(event, this.world));
   }
 
   protected onUpdate(ctx: SystemContext): void {

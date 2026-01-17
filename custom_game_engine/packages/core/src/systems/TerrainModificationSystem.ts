@@ -13,8 +13,10 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 // ============================================================================
 // Terrain Modification Types
@@ -115,6 +117,7 @@ export class TerrainModificationSystem implements System {
   private config: TerrainPowerConfig;
   private modifications: Map<string, TerrainModification> = new Map();
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<TerrainPowerConfig> = {}) {
     this.config = {
@@ -122,6 +125,14 @@ export class TerrainModificationSystem implements System {
       ...config,
       powerCosts: { ...DEFAULT_TERRAIN_POWER_CONFIG.powerCosts, ...config.powerCosts },
     };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {
@@ -184,8 +195,15 @@ export class TerrainModificationSystem implements System {
     // Apply the modification
     this.applyModification(world, modification);
 
-    // In full implementation, would emit event
-    // world.eventBus.emit({ type: 'terrain_modified', ... });
+    // Emit terrain modified event (using generic since not in EventMap)
+    this.events.emitGeneric('terrain_modified', {
+      modificationId: modification.id,
+      deityId,
+      type,
+      location,
+      radius,
+      magnitude,
+    });
 
     return modification;
   }

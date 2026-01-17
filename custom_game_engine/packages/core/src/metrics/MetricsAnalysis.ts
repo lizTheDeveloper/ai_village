@@ -93,7 +93,7 @@ export interface OptimizationSuggestion {
 export class MetricsAnalysis {
   private collector: MetricsCollector;
 
-  constructor(collector: MetricsCollector) {
+  constructor(collector: MetricsCollector | null) {
     if (!collector) {
       throw new Error('MetricsAnalysis requires a MetricsCollector instance');
     }

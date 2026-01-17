@@ -7,9 +7,8 @@
  * Priority: 48 (runs before off-screen optimization at 49)
  */
 
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import type {
   FactoryAIComponent,
   FactoryStats,
@@ -26,7 +25,7 @@ import type { MachineConnectionComponent } from '../components/MachineConnection
 import type { PowerComponent } from '../components/PowerComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
-export class FactoryAISystem implements System {
+export class FactoryAISystem extends BaseSystem {
   public readonly id = 'factory_ai';
   public readonly priority = 48; // Before off-screen optimization
   public readonly requiredComponents = [CT.FactoryAI] as const;
@@ -34,25 +33,25 @@ export class FactoryAISystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, entities: Entity[], _deltaTime: number): void {
-    // Entities are pre-filtered by requiredComponents
-    const factoryAIs = entities;
+  protected onUpdate(ctx: SystemContext): void {
+    // Entities are pre-filtered by requiredComponents and SimulationScheduler
+    const factoryAIs = ctx.activeEntities;
 
     for (const factoryEntity of factoryAIs) {
       const ai = factoryEntity.getComponent<FactoryAIComponent>(CT.FactoryAI);
       if (!ai) continue;
 
       // Check if it's time for AI to think
-      const shouldThink = world.tick - ai.lastDecisionTick >= ai.decisionInterval;
+      const shouldThink = ctx.tick - ai.lastDecisionTick >= ai.decisionInterval;
       if (!shouldThink) continue;
 
-      ai.lastDecisionTick = world.tick;
+      ai.lastDecisionTick = ctx.tick;
 
       // Gather factory statistics
-      this.updateFactoryStats(world, factoryEntity, ai, entities);
+      this.updateFactoryStats(ctx, factoryEntity, ai, ctx.activeEntities);
 
       // Detect bottlenecks
-      this.detectBottlenecks(world, factoryEntity, ai, entities);
+      this.detectBottlenecks(ctx, factoryEntity, ai, ctx.activeEntities);
 
       // Clean up resolved bottlenecks
       clearResolvedBottlenecks(ai);
@@ -61,7 +60,7 @@ export class FactoryAISystem implements System {
       ai.health = calculateFactoryHealth(ai);
 
       // Make decisions based on current state
-      this.makeDecisions(world, factoryEntity, ai, entities);
+      this.makeDecisions(ctx, factoryEntity, ai, ctx.activeEntities);
     }
   }
 
@@ -69,10 +68,10 @@ export class FactoryAISystem implements System {
    * Update factory statistics
    */
   private updateFactoryStats(
-    _world: World,
-    _factoryEntity: Entity,
+    _ctx: SystemContext,
+    _factoryEntity: EntityImpl,
     ai: FactoryAIComponent,
-    allEntities: Entity[]
+    allEntities: ReadonlyArray<EntityImpl>
   ): void {
     const stats: FactoryStats = {
       totalMachines: 0,
@@ -140,10 +139,10 @@ export class FactoryAISystem implements System {
    * Detect production bottlenecks
    */
   private detectBottlenecks(
-    _world: World,
-    _factoryEntity: Entity,
+    _ctx: SystemContext,
+    _factoryEntity: EntityImpl,
     ai: FactoryAIComponent,
-    allEntities: Entity[]
+    allEntities: ReadonlyArray<EntityImpl>
   ): void {
     const { stats } = ai;
 
@@ -209,16 +208,16 @@ export class FactoryAISystem implements System {
    * Make AI decisions to improve factory performance
    */
   private makeDecisions(
-    world: World,
-    factoryEntity: Entity,
+    ctx: SystemContext,
+    factoryEntity: EntityImpl,
     ai: FactoryAIComponent,
-    _allEntities: Entity[]
+    _allEntities: ReadonlyArray<EntityImpl>
   ): void {
     const { goal, stats, bottlenecks } = ai;
 
     // Emergency mode: Power critical
     if (stats.powerEfficiency < 0.3) {
-      this.handlePowerCrisis(world, factoryEntity, ai);
+      this.handlePowerCrisis(ctx, factoryEntity, ai);
       return;
     }
 
@@ -231,19 +230,19 @@ export class FactoryAISystem implements System {
 
       switch (bottleneck.type) {
         case 'power':
-          this.requestMorePower(world, factoryEntity, ai);
+          this.requestMorePower(ctx, factoryEntity, ai);
           break;
 
         case 'input':
-          this.requestInputMaterials(world, factoryEntity, ai, bottleneck);
+          this.requestInputMaterials(ctx, factoryEntity, ai, bottleneck);
           break;
 
         case 'output':
-          this.handleOutputBacklog(world, factoryEntity, ai);
+          this.handleOutputBacklog(ctx, factoryEntity, ai);
           break;
 
         case 'transport':
-          this.optimizeTransport(world, factoryEntity, ai);
+          this.optimizeTransport(ctx, factoryEntity, ai);
           break;
       }
     }
@@ -252,24 +251,24 @@ export class FactoryAISystem implements System {
     switch (goal) {
       case 'maximize_output':
         if (stats.efficiency > 0.9 && ai.allowExpansion) {
-          this.considerExpansion(world, factoryEntity, ai);
+          this.considerExpansion(ctx, factoryEntity, ai);
         }
         break;
 
       case 'efficiency':
         if (stats.powerEfficiency < 0.95) {
-          this.optimizePowerUsage(world, factoryEntity, ai);
+          this.optimizePowerUsage(ctx, factoryEntity, ai);
         }
         break;
 
       case 'stockpile':
         if (stats.inputStockpileDays < ai.minStockpileDays) {
-          this.buildStockpile(world, factoryEntity, ai);
+          this.buildStockpile(ctx, factoryEntity, ai);
         }
         break;
 
       case 'emergency':
-        this.runEmergencyMode(world, factoryEntity, ai);
+        this.runEmergencyMode(ctx, factoryEntity, ai);
         break;
     }
   }
@@ -277,7 +276,7 @@ export class FactoryAISystem implements System {
   /**
    * Handle power crisis
    */
-  private handlePowerCrisis(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private handlePowerCrisis(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     const powerShortfall = ai.stats.powerConsumption - ai.stats.powerGeneration;
 
     recordDecision(
@@ -302,7 +301,7 @@ export class FactoryAISystem implements System {
   /**
    * Request more power generation
    */
-  private requestMorePower(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private requestMorePower(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     const powerNeeded = Math.ceil((ai.stats.powerConsumption - ai.stats.powerGeneration) / 1000);
 
     recordDecision(
@@ -327,8 +326,8 @@ export class FactoryAISystem implements System {
    * Request input materials
    */
   private requestInputMaterials(
-    _world: World,
-    _factoryEntity: Entity,
+    _ctx: SystemContext,
+    _factoryEntity: EntityImpl,
     ai: FactoryAIComponent,
     bottleneck: any
   ): void {
@@ -360,7 +359,7 @@ export class FactoryAISystem implements System {
   /**
    * Handle output storage backlog
    */
-  private handleOutputBacklog(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private handleOutputBacklog(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     recordDecision(
       ai,
       'adjust_production',
@@ -385,7 +384,7 @@ export class FactoryAISystem implements System {
   /**
    * Optimize transport (belts/logistics)
    */
-  private optimizeTransport(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private optimizeTransport(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     recordDecision(
       ai,
       'optimize_layout',
@@ -408,7 +407,7 @@ export class FactoryAISystem implements System {
   /**
    * Consider factory expansion
    */
-  private considerExpansion(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private considerExpansion(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     if (!ai.allowExpansion) return;
 
     recordDecision(
@@ -433,7 +432,7 @@ export class FactoryAISystem implements System {
   /**
    * Optimize power usage
    */
-  private optimizePowerUsage(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private optimizePowerUsage(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     recordDecision(
       ai,
       'balance_power',
@@ -449,7 +448,7 @@ export class FactoryAISystem implements System {
   /**
    * Build up stockpile reserves
    */
-  private buildStockpile(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private buildStockpile(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     recordDecision(
       ai,
       'request_resources',
@@ -474,7 +473,7 @@ export class FactoryAISystem implements System {
   /**
    * Run in emergency mode
    */
-  private runEmergencyMode(_world: World, _factoryEntity: Entity, ai: FactoryAIComponent): void {
+  private runEmergencyMode(_ctx: SystemContext, _factoryEntity: EntityImpl, ai: FactoryAIComponent): void {
     // In emergency, only produce critical items
     recordDecision(
       ai,

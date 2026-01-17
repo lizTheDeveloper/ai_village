@@ -13,6 +13,8 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
@@ -44,6 +46,16 @@ export class PlotProgressionSystem implements System {
   readonly id = 'plot_progression' as const;
   readonly priority = 86;
   readonly requiredComponents = [] as const;
+
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Find all souls with active plots

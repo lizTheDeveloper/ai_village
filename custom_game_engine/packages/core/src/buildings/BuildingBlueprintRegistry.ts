@@ -64,6 +64,7 @@ export type BuildingFunction =
   | { type: 'priest_quarters'; priestCapacity: number }
   | { type: 'pilgrimage_site'; attractionRadius: number }
   | { type: 'meditation_site'; visionClarityBonus: number; meditationSpeedBonus: number }
+  | { type: 'resource_generation'; resourceType: string; rate: number }
   // Farming-specific functions
   | { type: 'pest_deterrent'; pestTypes: string[]; radius: number; effectiveness: number }
   | { type: 'irrigation'; waterRate: number; radius: number }

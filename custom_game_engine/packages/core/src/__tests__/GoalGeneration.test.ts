@@ -267,8 +267,10 @@ describe('Goal Generation', () => {
 
   describe('error handling', () => {
     it('should throw when personality is missing', () => {
+      // Test validates that null personality throws expected error
+      // Function signature accepts PersonalityComponent | null to enable this validation
       expect(() => {
-        generatePersonalGoal(null as any, {});
+        generatePersonalGoal(null, {});
       }).toThrow('missing required');
     });
 

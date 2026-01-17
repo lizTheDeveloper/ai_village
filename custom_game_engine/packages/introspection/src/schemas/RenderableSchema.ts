@@ -224,23 +224,26 @@ export const RenderableSchema = autoRegister(
     },
 
     validate: (data): data is RenderableComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) {
+        return false;
+      }
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'renderable') return false;
-      if (typeof d.spriteId !== 'string') return false;
-      if (typeof d.layer !== 'string') return false;
-      if (typeof d.visible !== 'boolean') return false;
+      if (!('type' in d) || d.type !== 'renderable') return false;
+      if (!('spriteId' in d) || typeof d.spriteId !== 'string') return false;
+      if (!('layer' in d) || typeof d.layer !== 'string') return false;
+      if (!('visible' in d) || typeof d.visible !== 'boolean') return false;
 
       // Validate optional fields
-      if (d.animationState !== undefined && typeof d.animationState !== 'string') {
+      if ('animationState' in d && d.animationState !== undefined && typeof d.animationState !== 'string') {
         return false;
       }
 
-      if (d.tint !== undefined && typeof d.tint !== 'string') {
+      if ('tint' in d && d.tint !== undefined && typeof d.tint !== 'string') {
         return false;
       }
 
-      if (d.sizeMultiplier !== undefined) {
+      if ('sizeMultiplier' in d && d.sizeMultiplier !== undefined) {
         if (
           typeof d.sizeMultiplier !== 'number' ||
           d.sizeMultiplier < 0.1 ||
@@ -252,7 +255,7 @@ export const RenderableSchema = autoRegister(
         }
       }
 
-      if (d.alpha !== undefined) {
+      if ('alpha' in d && d.alpha !== undefined) {
         if (typeof d.alpha !== 'number' || d.alpha < 0.0 || d.alpha > 1.0) {
           throw new RangeError(`Invalid alpha: ${d.alpha} (must be 0.0-1.0)`);
         }

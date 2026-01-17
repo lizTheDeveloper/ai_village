@@ -160,15 +160,24 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalResistance = 0;
 
     // Check equipped armor for resistances
-    const equipment = target.components.get('equipment') as EquipmentComponent | undefined;
+    const equipment = target.getComponent<EquipmentComponent>('equipment');
     if (equipment) {
       // Check each equipped item for armor traits
       for (const [_slot, equippedItem] of Object.entries(equipment.equipped)) {
         if (equippedItem) {
           const itemDef = itemRegistry.get(equippedItem.itemId);
           if (itemDef && itemDef.traits?.armor) {
-            const armorTrait = itemDef.traits.armor as ArmorTrait;
-            const resistance = (armorTrait.resistances as any)?.[damageType] ?? 0;
+            const armorTrait = itemDef.traits.armor;
+
+            // Get resistance for this damage type
+            // Note: ArmorTrait uses weapon DamageType, which may differ from spell DamageType
+            // Use dynamic access with type guard for cross-system compatibility
+            let resistance = 0;
+            if (armorTrait.resistances && damageType in armorTrait.resistances) {
+              const resistances = armorTrait.resistances as Partial<Record<string, number>>;
+              resistance = resistances[damageType] ?? 0;
+            }
+
             totalResistance += resistance;
           }
         }
@@ -194,14 +203,14 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalDefense = 0;
 
     // Check equipped armor for defense
-    const equipment = target.components.get('equipment') as EquipmentComponent | undefined;
+    const equipment = target.getComponent<EquipmentComponent>('equipment');
     if (equipment) {
       // Sum defense from all equipped armor
       for (const [_slot, equippedItem] of Object.entries(equipment.equipped)) {
         if (equippedItem) {
           const itemDef = itemRegistry.get(equippedItem.itemId);
           if (itemDef && itemDef.traits?.armor) {
-            const armorTrait = itemDef.traits.armor as ArmorTrait;
+            const armorTrait = itemDef.traits.armor;
             // Note: Durability tracking is not yet implemented in EquipmentSlot
             // Using full defense for now
             totalDefense += armorTrait.defense;
@@ -222,7 +231,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
    * Apply damage to target's health.
    */
   private applyDamageToTarget(target: Entity, damage: number): number {
-    const needs = target.components.get('needs') as NeedsComponent | undefined;
+    const needs = target.getComponent<NeedsComponent>('needs');
     if (!needs) {
       // No health component, can't apply damage
       return 0;

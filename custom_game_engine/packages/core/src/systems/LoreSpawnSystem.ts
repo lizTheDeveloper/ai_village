@@ -16,6 +16,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
 import {
   LORE_FRAGMENTS,
   type LoreFragmentComponent,
@@ -119,15 +120,15 @@ export class LoreSpawnSystem extends BaseSystem {
 
   protected onInitialize(): void {
     // Listen to magic and divine events
-    this.events.subscribe('magic:spell_cast', () => {
+    this.events.on('magic:spell_cast', () => {
       this.metrics.totalSpellsCast++;
     });
 
-    this.events.subscribe('divinity:magic_detected', () => {
+    this.events.on('divinity:magic_detected', () => {
       this.metrics.magicDetections++;
     });
 
-    this.events.subscribe('divinity:creator_intervention', () => {
+    this.events.on('divinity:creator_intervention', () => {
       this.metrics.interventionsReceived++;
     });
   }

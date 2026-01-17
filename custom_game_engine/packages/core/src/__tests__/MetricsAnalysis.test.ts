@@ -16,7 +16,7 @@ describe('MetricsAnalysis', () => {
 
   describe('Initialization', () => {
     it('should require a MetricsCollector instance', () => {
-      expect(() => new MetricsAnalysis(null as any)).toThrow('MetricsAnalysis requires a MetricsCollector instance');
+      expect(() => new MetricsAnalysis(null)).toThrow('MetricsAnalysis requires a MetricsCollector instance');
     });
   });
 

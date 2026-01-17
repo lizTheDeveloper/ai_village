@@ -736,6 +736,7 @@ describe('Magic System Breaking - Component State Corruption', () => {
   });
 
   it('should handle undefined spell properties', () => {
+    // Test that undefined duration is valid (represents instant spells)
     const spell: ComposedSpell = {
       id: 'broken',
       name: 'Broken',
@@ -745,13 +746,13 @@ describe('Magic System Breaking - Component State Corruption', () => {
       manaCost: 30,
       castTime: 50,
       range: 20,
-      duration: undefined as any, // Broken!
+      duration: undefined, // Valid: undefined = instant spell
       effectId: 'damage',
     };
 
     expect(spell.duration).toBeUndefined();
 
-    // System should handle undefined duration
+    // System should handle undefined duration by treating it as instant (0 ticks)
     const effectiveDuration = spell.duration ?? 0;
     expect(effectiveDuration).toBe(0);
   });

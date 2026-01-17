@@ -50,9 +50,30 @@ import type {
   EntityId,
   Tick,
 } from '../types.js';
-// ChunkSpatialQuery is optional - type it as any to avoid package dependency
-// Systems can check if methods exist at runtime
-type ChunkSpatialQuery = any;
+/**
+ * Minimal interface for chunk spatial query to avoid circular package dependency.
+ * The actual ChunkSpatialQuery class from @ai-village/world implements this interface.
+ * Systems should check if methods exist at runtime before using.
+ */
+interface ChunkSpatialQuery {
+  queryRadius?(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes?: ComponentType[]
+  ): Entity[];
+  getEntitiesInRadius?(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: ComponentType[],
+    options?: {
+      limit?: number;
+      excludeIds?: Set<EntityId>;
+      filter?: (entity: Entity) => boolean;
+    }
+  ): Array<{ entity: Entity; distance: number; distanceSquared: number }>;
+}
 
 // ============================================================================
 // Component Accessor
@@ -290,7 +311,7 @@ export class SystemContextImpl implements SystemContext {
     this.chunkSpatialQuery = chunkSpatialQuery ?? null;
 
     // Apply SimulationScheduler filtering
-    const scheduler = (world as any).simulationScheduler;
+    const scheduler = world.simulationScheduler;
     if (scheduler?.filterActiveEntities) {
       this.activeEntities = scheduler.filterActiveEntities(
         entities,
@@ -340,7 +361,7 @@ export class SystemContextImpl implements SystemContext {
     const results: EntityWithDistance[] = [];
 
     // Use chunk spatial query if available
-    if (this.chunkSpatialQuery) {
+    if (this.chunkSpatialQuery && this.chunkSpatialQuery.queryRadius) {
       const entities = this.chunkSpatialQuery.queryRadius(
         center.x,
         center.y,

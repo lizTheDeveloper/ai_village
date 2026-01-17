@@ -25,6 +25,9 @@ import type { GameEventMap } from '../events/EventMap.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { IncarnationComponent } from '../components/IncarnationComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { Entity } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -146,12 +149,12 @@ export class SoulRepositorySystem extends BaseSystem {
 
   protected onInitialize(): void {
     // Subscribe to soul creation events
-    this.events.subscribe('soul:ceremony_complete', (event: GameEvent<'soul:ceremony_complete'>) => {
-      this.backupSoul(this.world, event.data);
+    this.events.on('soul:ceremony_complete', (data) => {
+      this.backupSoul(this.world, data);
     });
   }
 
-  private async backupSoul(world: any, soulData: GameEventMap['soul:ceremony_complete']): Promise<void> {
+  private async backupSoul(world: World, soulData: GameEventMap['soul:ceremony_complete']): Promise<void> {
     try {
       const { soulId, agentId, name, archetype, purpose, species, interests, thoughts } = soulData;
 
@@ -170,7 +173,7 @@ export class SoulRepositorySystem extends BaseSystem {
       }
 
       // Extract additional information
-      const soulIdentity = soul.getComponent<SoulIdentityComponent>('soul_identity');
+      const soulIdentity = soul.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
 
       // Check if this soul is already in the repository (avoid duplicates)
       if (this.soulNameExists(name)) {
@@ -208,7 +211,7 @@ export class SoulRepositorySystem extends BaseSystem {
       };
 
       // Add lineage if available
-      const incarnation = soul.getComponent<IncarnationComponent>('incarnation');
+      const incarnation = soul.getComponent<IncarnationComponent>(CT.Incarnation);
       // Note: parentIds not in IncarnationComponent interface - checking for compatibility with old save data
       const incarnationData = incarnation as IncarnationComponent & { parentIds?: string[] };
       if (incarnationData?.parentIds && incarnationData.parentIds.length > 0) {
@@ -218,7 +221,7 @@ export class SoulRepositorySystem extends BaseSystem {
         for (const parentId of incarnationData.parentIds) {
           const parent = world.getEntity(parentId);
           if (parent) {
-            const parentIdentity = parent.getComponent<IdentityComponent>('identity');
+            const parentIdentity = parent.getComponent<IdentityComponent>(CT.Identity);
             if (parentIdentity?.name) {
               parentNames.push(parentIdentity.name);
             }

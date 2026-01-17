@@ -4,8 +4,9 @@
  * Manages angel creation, AI behavior, and interactions with believers.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -96,18 +97,20 @@ export const DEFAULT_ANGEL_CONFIG: AngelConfig = {
 // AngelSystem
 // ============================================================================
 
-export class AngelSystem implements System {
+export class AngelSystem extends BaseSystem {
   public readonly id = 'AngelSystem';
   public readonly name = 'AngelSystem';
   public readonly priority = 74;
   public readonly requiredComponents = [];
 
+  protected readonly throttleInterval = 200; // ~10 seconds at 20 TPS
+
   private config: AngelConfig;
   private angels: Map<string, AngelData> = new Map();
-  private lastUpdate: number = 0;
   private aiProcessor: AngelAIDecisionProcessor;
 
   constructor(config: Partial<AngelConfig> = {}, llmProvider?: LLMProvider) {
+    super();
     this.config = { ...DEFAULT_ANGEL_CONFIG, ...config };
     this.aiProcessor = new AngelAIDecisionProcessor(llmProvider);
   }
@@ -152,17 +155,9 @@ export class AngelSystem implements System {
     return true;
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update angels
-    this.updateAngels(world, currentTick);
+    this.updateAngels(ctx.world, ctx.tick);
   }
 
   /**

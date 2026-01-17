@@ -13,12 +13,10 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
-
-// Event handler type (internal)
-type EventHandler = (event: any) => void;
 import {
   getPublicationSystem,
   type PublicationSystem,
@@ -263,6 +261,7 @@ export class ChroniclerSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private publicationSystem: PublicationSystem | null = null;
 
   // Tick throttling
@@ -278,11 +277,9 @@ export class ChroniclerSystem implements System {
   private chronicleVolume: number = 1;
   private static readonly CHRONICLE_PERIOD = 12000; // ~10 minutes per chronicle volume
 
-  // Event listeners (to be set up)
-  private eventHandlers: Array<{ type: string; handler: EventHandler }> = [];
-
   public setEventBus(eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
     this.setupEventListeners();
   }
 
@@ -300,8 +297,6 @@ export class ChroniclerSystem implements System {
    * Set up listeners for notable events
    */
   private setupEventListeners(): void {
-    if (!this.eventBus) return;
-
     // Listen for various game events and convert them to historical events
     // This is a framework - actual event types depend on the game's EventMap
 
@@ -353,8 +348,8 @@ export class ChroniclerSystem implements System {
     ];
 
     for (const config of recordableEvents) {
-      const handler: EventHandler = (event: any) => {
-        const extracted = config.extractor(event.data);
+      this.events.onGeneric(config.eventType, (data: unknown) => {
+        const extracted = config.extractor(data);
         this.recordEvent({
           id: `event_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
           type: config.histType,
@@ -365,10 +360,7 @@ export class ChroniclerSystem implements System {
           location: extracted.location,
           recorded: false,
         });
-      };
-
-      this.eventHandlers.push({ type: config.eventType, handler });
-      // Note: Actual subscription would need the eventBus.on method
+      });
     }
   }
 
@@ -430,23 +422,17 @@ export class ChroniclerSystem implements System {
     }
 
     // Emit publication event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'publication:created' as any,
-        source: 'chronicler-system',
-        data: {
-          publicationId: publication.id,
-          type: publication.type,
-          category: 'history',
-          authorId: chronicler.id,
-          authorName: chronicler.name,
-          title: publication.title,
-          eventCount: chronicleEvents.length,
-          period,
-          techLevel: getWritingTechName(techLevel),
-        },
-      });
-    }
+    this.events.emitGeneric('publication:created', {
+      publicationId: publication.id,
+      type: publication.type,
+      category: 'history',
+      authorId: chronicler.id,
+      authorName: chronicler.name,
+      title: publication.title,
+      eventCount: chronicleEvents.length,
+      period,
+      techLevel: getWritingTechName(techLevel),
+    });
 
     return publication;
   }
@@ -546,6 +532,13 @@ export class ChroniclerSystem implements System {
    */
   public getPendingEventCount(): number {
     return this.pendingEvents.length;
+  }
+
+  /**
+   * Cleanup subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 }
 

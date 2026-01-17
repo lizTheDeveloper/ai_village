@@ -19,6 +19,7 @@ import {
   type ResourceInitOptions,
   type TerminalEffect,
 } from '../CostCalculator.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 import type { BodyComponent, Injury } from '@ai-village/core';
 
@@ -207,7 +208,7 @@ export class BloodCostCalculator extends BaseCostCalculator {
    * Override terminal effect for blood-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -230,7 +231,7 @@ export class BloodCostCalculator extends BaseCostCalculator {
           cause: 'Life force expended through blood magic',
         };
       default:
-        return super.getTerminalEffect(costType as any, trigger, caster);
+        return super.getTerminalEffect(costType, trigger, caster);
     }
   }
 

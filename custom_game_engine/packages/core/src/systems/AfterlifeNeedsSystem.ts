@@ -13,11 +13,9 @@
  * - peace < 0.2 → isRestless = true (may haunt)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
@@ -31,7 +29,7 @@ const SOLITUDE_INCREASE = 0.0002;         // Loneliness builds
 const PEACE_GAIN = 0.00005;               // Very slow peace gain if no unfinished business
 const FORGOTTEN_THRESHOLD_TICKS = 12000;  // ~10 minutes at 20 TPS before "forgotten" penalty
 
-export class AfterlifeNeedsSystem implements System {
+export class AfterlifeNeedsSystem extends BaseSystem {
   public readonly id: SystemId = 'afterlife_needs';
   public readonly priority: number = 16;  // Right after NeedsSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
@@ -55,21 +53,17 @@ export class AfterlifeNeedsSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.stateMutator) {
       throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
     }
 
-    // Use SimulationScheduler to only process active entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-
-    const currentTick = world.tick;
+    const currentTick = ctx.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    for (const entity of activeEntities) {
-      const impl = entity as EntityImpl;
-      const afterlife = impl.getComponent<AfterlifeComponent>('afterlife');
-      const realmLocation = impl.getComponent<RealmLocationComponent>('realm_location');
+    for (const entity of ctx.activeEntities) {
+      const afterlife = entity.getComponent<AfterlifeComponent>('afterlife');
+      const realmLocation = entity.getComponent<RealmLocationComponent>('realm_location');
 
       if (!afterlife || !realmLocation) continue;
 
@@ -93,14 +87,10 @@ export class AfterlifeNeedsSystem implements System {
         afterlife.isShade = true;
 
         // Emit shade transformation event
-        world.eventBus.emit({
-          type: 'soul:became_shade',
-          source: entity.id,
-          data: {
-            entityId: entity.id,
-            timeSinceDeath: currentTick - afterlife.deathTick,
-          },
-        });
+        ctx.emit('soul:became_shade', {
+          entityId: entity.id,
+          timeSinceDeath: currentTick - afterlife.deathTick,
+        }, entity.id);
       }
 
       // Check for passing on
@@ -108,15 +98,11 @@ export class AfterlifeNeedsSystem implements System {
         afterlife.hasPassedOn = true;
 
         // Emit passing event
-        world.eventBus.emit({
-          type: 'soul:passed_on',
-          source: entity.id,
-          data: {
-            entityId: entity.id,
-            timeSinceDeath: currentTick - afterlife.deathTick,
-            wasAncestorKami: afterlife.isAncestorKami,
-          },
-        });
+        ctx.emit('soul:passed_on', {
+          entityId: entity.id,
+          timeSinceDeath: currentTick - afterlife.deathTick,
+          wasAncestorKami: afterlife.isAncestorKami,
+        }, entity.id);
       }
 
       // Update restless state
@@ -124,14 +110,10 @@ export class AfterlifeNeedsSystem implements System {
 
       // Emit restless event on transition
       if (afterlife.isRestless) {
-        world.eventBus.emit({
-          type: 'soul:became_restless',
-          source: entity.id,
-          data: {
-            entityId: entity.id,
-            unfinishedGoals: afterlife.unfinishedGoals,
-          },
-        });
+        ctx.emit('soul:became_restless', {
+          entityId: entity.id,
+          unfinishedGoals: afterlife.unfinishedGoals,
+        }, entity.id);
       }
     }
 

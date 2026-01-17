@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -24,7 +24,7 @@ import type {
  * - PlayerActionSystem executes movement/interaction commands
  * - AgentBrainSystem is skipped when agent is player_controlled
  */
-export class PlayerInputSystem implements System {
+export class PlayerInputSystem extends BaseSystem {
   public readonly id = 'player_input' as const;
   public readonly priority = 4; // Very high priority - run before PossessionSystem
   public readonly requiredComponents = [] as const;
@@ -68,11 +68,11 @@ export class PlayerInputSystem implements System {
     });
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Get player control entity
-    const playerControlEntities = world
+    const playerControlEntities = ctx.world
       .query()
       .with('player_control')
       .executeEntities();

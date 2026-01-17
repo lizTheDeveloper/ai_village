@@ -12,11 +12,10 @@
  * intelligent behavior through the single director LLM call.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { StrategicPriorities, AgentComponent } from '../components/AgentComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
@@ -71,7 +70,7 @@ export const DEFAULT_CITY_DIRECTOR_CONFIG: CityDirectorSystemConfig = {
  *
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
  */
-export class CityDirectorSystem implements System {
+export class CityDirectorSystem extends BaseSystem {
   public readonly id: SystemId = 'city_director';
   public readonly priority: number = 45; // Run after governance, before agent brain
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
@@ -84,6 +83,7 @@ export class CityDirectorSystem implements System {
   private llmQueue: { requestDecision: (id: string, prompt: string) => Promise<string> } | null = null;
 
   constructor(config: Partial<CityDirectorSystemConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_CITY_DIRECTOR_CONFIG, ...config };
   }
 
@@ -98,15 +98,15 @@ export class CityDirectorSystem implements System {
   /**
    * Update all city directors.
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const directors = world.query().with('city_director' as ComponentType).executeEntities();
+  protected onUpdate(ctx: SystemContext): void {
+    const directors = ctx.world.query().with('city_director' as ComponentType).executeEntities();
 
     if (directors.length === 0) {
       return;
     }
 
     // Update stats periodically (cheaper than every tick)
-    const shouldUpdateStats = world.tick - this.lastStatsUpdate >= this.config.statsUpdateInterval;
+    const shouldUpdateStats = ctx.tick - this.lastStatsUpdate >= this.config.statsUpdateInterval;
 
     for (const directorEntity of directors) {
       const impl = directorEntity as EntityImpl;
@@ -118,20 +118,20 @@ export class CityDirectorSystem implements System {
 
       // Update city stats
       if (shouldUpdateStats) {
-        this.updateCityStats(world, impl, director);
+        this.updateCityStats(ctx.world, impl, director);
       }
 
       // Check if it's time for a director meeting
-      if (world.tick - director.lastDirectorMeeting >= director.meetingInterval) {
-        this.conductDirectorMeeting(world, impl, director);
+      if (ctx.tick - director.lastDirectorMeeting >= director.meetingInterval) {
+        this.conductDirectorMeeting(ctx.world, impl, director);
       }
 
       // Apply blended priorities to autonomic NPCs in this city
-      this.applyPrioritiesToNPCs(world, director);
+      this.applyPrioritiesToNPCs(ctx.world, director);
     }
 
     if (shouldUpdateStats) {
-      this.lastStatsUpdate = world.tick;
+      this.lastStatsUpdate = ctx.tick;
     }
   }
 

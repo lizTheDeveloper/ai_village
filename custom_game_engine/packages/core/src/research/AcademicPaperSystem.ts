@@ -25,6 +25,7 @@
 
 import { System, World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ResearchRegistry } from './ResearchRegistry.js';
 import type { ResearchDefinition, ResearchField } from './types.js';
 
@@ -1011,20 +1012,22 @@ export class AcademicPaperSystem implements System {
 
   private manager: AcademicPaperManager = new AcademicPaperManager();
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private tickCounter = 0;
 
   initialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Subscribe to research progress events
-    eventBus.subscribe('research:progress', (event) => {
-      const data = event.data as {
+    this.events.onGeneric('research:progress', (data: unknown) => {
+      const eventData = data as {
         researchId?: string;
         progress?: number;
         researchers?: string[];
       };
-      if (data.researchId && data.researchers && data.researchers.length > 0) {
-        this.handleResearchProgress(data.researchId, data.researchers);
+      if (eventData.researchId && eventData.researchers && eventData.researchers.length > 0) {
+        this.handleResearchProgress(eventData.researchId, eventData.researchers);
       }
     });
   }
@@ -1043,6 +1046,7 @@ export class AcademicPaperSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.manager.reset();
     this.eventBus = null;
   }
@@ -1077,53 +1081,39 @@ export class AcademicPaperSystem implements System {
       isBreakthrough
     );
 
-    if (this.eventBus) {
-      // Emit paper published event
-      this.eventBus.emit({
-        type: 'paper:published' as any,
-        source: this.id,
-        data: {
-          paperId: result.paper.id,
-          title: result.paper.title,
-          firstAuthor: firstAuthorName,
-          coAuthors: coAuthorNames,
-          researchId,
-          tier: result.paper.tier,
-          citationCount: result.paper.citations.length,
-          isBreakthrough,
-        },
-      });
+    // Emit paper published event
+    this.events.emitGeneric('paper:published', {
+      paperId: result.paper.id,
+      title: result.paper.title,
+      firstAuthor: firstAuthorName,
+      coAuthors: coAuthorNames,
+      researchId,
+      tier: result.paper.tier,
+      citationCount: result.paper.citations.length,
+      isBreakthrough,
+    });
 
-      // Emit citation events
-      for (const citedPaperId of result.paper.citations) {
-        const citedPaper = this.manager.getPaper(citedPaperId);
-        if (citedPaper) {
-          this.eventBus.emit({
-            type: 'paper:cited' as any,
-            source: this.id,
-            data: {
-              citingPaperId: result.paper.id,
-              citedPaperId,
-              citedAuthorId: citedPaper.firstAuthorId,
-              citedAuthorName: citedPaper.firstAuthorName,
-            },
-          });
-        }
-      }
-
-      // If research complete, emit completion event
-      if (result.researchComplete) {
-        const bib = this.manager.getBibliography(researchId);
-        this.eventBus.emit({
-          type: 'research:completed' as any,
-          source: this.id,
-          data: {
-            researchId,
-            researchers: [firstAuthorId, ...coAuthorIds],
-            paperCount: bib?.papers.length || 0,
-          },
+    // Emit citation events
+    for (const citedPaperId of result.paper.citations) {
+      const citedPaper = this.manager.getPaper(citedPaperId);
+      if (citedPaper) {
+        this.events.emitGeneric('paper:cited', {
+          citingPaperId: result.paper.id,
+          citedPaperId,
+          citedAuthorId: citedPaper.firstAuthorId,
+          citedAuthorName: citedPaper.firstAuthorName,
         });
       }
+    }
+
+    // If research complete, emit completion event
+    if (result.researchComplete) {
+      const bib = this.manager.getBibliography(researchId);
+      this.events.emitGeneric('research:completed', {
+        researchId,
+        researchers: [firstAuthorId, ...coAuthorIds],
+        paperCount: bib?.papers.length || 0,
+      });
     }
 
     return result;

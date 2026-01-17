@@ -44,7 +44,7 @@ export class ThreatResponseSystem implements System {
   private lastUpdateTick = 0;
   private events!: SystemEventManager;
 
-  initialize(eventBus: EventBus): void {
+  initialize(world: World, eventBus: EventBus): void {
     this.events = new SystemEventManager(eventBus, this.id);
   }
 

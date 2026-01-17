@@ -12,30 +12,27 @@
  * Later phases will add full functionality
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { CompanionComponent } from '../components/CompanionComponent.js';
 import { createOphanimimCompanion, findCompanion } from '../companions/OphanimimCompanionEntity.js';
 
-export class CompanionSystem implements System {
+export class CompanionSystem extends BaseSystem {
   public readonly id = 'companion_system';
   public readonly priority = 950; // Low priority - runs after most systems
   public readonly requiredComponents = []; // Global system
   public enabled = true;
 
-  private companionEntityId: string | null = null;
-  private lastUpdateTick = 0;
-  private updateInterval = 60; // Update every 3 seconds (60 ticks at 20 TPS)
+  protected readonly throttleInterval = 60; // Update every 3 seconds (60 ticks at 20 TPS)
 
-  constructor() {
-    // Stub constructor
-  }
+  private companionEntityId: string | null = null;
 
   /**
    * Initialize the system
    */
-  public init(world: World): void {
+  protected onInitialize(world: World, _eventBus: EventBus): void {
     // Ensure companion exists
     this.ensureCompanionExists(world);
   }
@@ -43,24 +40,18 @@ export class CompanionSystem implements System {
   /**
    * Update the companion
    */
-  public update(world: World): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Ensure companion exists
     if (!this.companionEntityId) {
-      this.ensureCompanionExists(world);
+      this.ensureCompanionExists(ctx.world);
       return;
     }
 
-    const companionEntity = world.getEntity(this.companionEntityId);
+    const companionEntity = ctx.world.getEntity(this.companionEntityId);
     if (!companionEntity) {
       console.error('[CompanionSystem] Companion entity not found, recreating');
       this.companionEntityId = null;
-      this.ensureCompanionExists(world);
+      this.ensureCompanionExists(ctx.world);
       return;
     }
 

@@ -12,6 +12,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import {
   getRadioStationManager,
   resetRadioStationManager,
@@ -44,14 +45,14 @@ export class RadioBroadcastingSystem implements System {
   readonly requiredComponents = [] as const; // Operates on radio stations
 
   private manager = getRadioStationManager();
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private listeners: Map<string, RadioListenerState> = new Map();
   private lastUpdateTick = 0;
 
   private static readonly UPDATE_INTERVAL = 20; // Every second at 20 TPS
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -78,15 +79,11 @@ export class RadioBroadcastingSystem implements System {
       station.totalBroadcastHours += 1 / (20 * 60 * 60); // Convert ticks to hours
 
       // Emit listener count periodically
-      this.eventBus?.emit({
-        type: 'radio:listener_update' as any,
-        source: station.config.callSign,
-        data: {
-          stationId: station.config.callSign,
-          listenerCount: station.listenersCount,
-          showName: station.currentShow?.name,
-        },
-      });
+      this.events.emitGeneric('radio:listener_update', {
+        stationId: station.config.callSign,
+        listenerCount: station.listenersCount,
+        showName: station.currentShow?.name,
+      }, station.config.callSign);
     }
 
     // Update listener engagement
@@ -97,16 +94,12 @@ export class RadioBroadcastingSystem implements System {
     const show = this.manager.endShow(station.config.callSign);
     if (!show) return;
 
-    this.eventBus?.emit({
-      type: 'radio:show_ended' as any,
-      source: station.config.callSign,
-      data: {
-        stationId: station.config.callSign,
-        showName: show.name,
-        peakListeners: show.peakListeners,
-        totalListeners: show.currentListeners,
-      },
-    });
+    this.events.emitGeneric('radio:show_ended', {
+      stationId: station.config.callSign,
+      showName: show.name,
+      peakListeners: show.peakListeners,
+      totalListeners: show.currentListeners,
+    }, station.config.callSign);
   }
 
   private updateListeners(world: World, currentTick: number): void {
@@ -182,15 +175,11 @@ export class RadioBroadcastingSystem implements System {
 
     this.manager.updateListeners(stationId, station.listenersCount + 1);
 
-    this.eventBus?.emit({
-      type: 'radio:listener_tuned_in' as any,
-      source: agentId,
-      data: {
-        agentId,
-        stationId: station.config.callSign,
-        listenerCount: station.listenersCount,
-      },
-    });
+    this.events.emitGeneric('radio:listener_tuned_in', {
+      agentId,
+      stationId: station.config.callSign,
+      listenerCount: station.listenersCount,
+    }, agentId);
 
     return true;
   }
@@ -209,15 +198,11 @@ export class RadioBroadcastingSystem implements System {
 
     this.listeners.delete(agentId);
 
-    this.eventBus?.emit({
-      type: 'radio:listener_tuned_out' as any,
-      source: agentId,
-      data: {
-        agentId,
-        stationId: listener.stationId,
-        listenDuration: listener.tuningDuration,
-      },
-    });
+    this.events.emitGeneric('radio:listener_tuned_out', {
+      agentId,
+      stationId: listener.stationId,
+      listenDuration: listener.tuningDuration,
+    }, agentId);
 
     return true;
   }
@@ -247,16 +232,12 @@ export class RadioBroadcastingSystem implements System {
     );
 
     if (show) {
-      this.eventBus?.emit({
-        type: 'radio:show_started' as any,
-        source: stationId,
-        data: {
-          stationId,
-          showName,
-          djName: dj.djName,
-          format,
-        },
-      });
+      this.events.emitGeneric('radio:show_started', {
+        stationId,
+        showName,
+        djName: dj.djName,
+        format,
+      }, stationId);
     }
 
     return show;
@@ -306,16 +287,12 @@ export class RadioBroadcastingSystem implements System {
       });
     }
 
-    this.eventBus?.emit({
-      type: 'radio:catchphrase_said' as any,
-      source: stationId,
-      data: {
-        stationId,
-        djName: dj.djName,
-        catchphrase,
-        listenerCount: station.listenersCount,
-      },
-    });
+    this.events.emitGeneric('radio:catchphrase_said', {
+      stationId,
+      djName: dj.djName,
+      catchphrase,
+      listenerCount: station.listenersCount,
+    }, stationId);
   }
 
   /**
@@ -359,17 +336,13 @@ export class RadioBroadcastingSystem implements System {
           survivalRelevance: 0.0,
         });
 
-        this.eventBus?.emit({
-          type: 'radio:song_discovered' as any,
-          source: agentId,
-          data: {
-            agentId,
-            trackId: track.id,
-            trackTitle: track.title,
-            artist: track.artist,
-            stationId: station.config.callSign,
-          },
-        });
+        this.events.emitGeneric('radio:song_discovered', {
+          agentId,
+          trackId: track.id,
+          trackTitle: track.title,
+          artist: track.artist,
+          stationId: station.config.callSign,
+        }, agentId);
       }
     }
   }
@@ -390,9 +363,9 @@ export class RadioBroadcastingSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.listeners.clear();
     resetRadioStationManager();
-    this.eventBus = null;
   }
 }
 

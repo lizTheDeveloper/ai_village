@@ -976,7 +976,7 @@ export function registerAllSystems(
   // ============================================================================
   let metricsSystem: MetricsCollectionSystem | undefined;
   if (enableMetrics && metricsServerUrl) {
-    metricsSystem = new MetricsCollectionSystem(gameLoop.world, {
+    metricsSystem = new MetricsCollectionSystem({
       streaming: true,
       streamConfig: {
         serverUrl: metricsServerUrl,

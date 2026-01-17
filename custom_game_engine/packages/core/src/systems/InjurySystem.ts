@@ -188,8 +188,10 @@ export class InjurySystem implements System {
 
     // Update component with new rates
     entityImpl.updateComponent<NeedsComponent>('needs', (currentNeeds) => {
-      // NeedsComponent is a class with clone() method
-      const updated = currentNeeds.clone();
+      // Handle both class instances (with clone()) and plain objects (from serialization)
+      const updated = typeof currentNeeds.clone === 'function'
+        ? currentNeeds.clone()
+        : { ...currentNeeds };
       updated.hungerDecayRate = (currentNeeds.hungerDecayRate || 1.0) * hungerRateMultiplier;
       updated.energyDecayRate = (currentNeeds.energyDecayRate || 1.0) * energyRateMultiplier;
       return updated;

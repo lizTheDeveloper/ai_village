@@ -343,6 +343,11 @@ export class MoodSystem implements System {
    * Main update loop.
    */
   public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Skip if not initialized (events not set up yet)
+    if (!this.events) {
+      return;
+    }
+
     this.tickCount++;
 
     // Process pending mood boosts immediately

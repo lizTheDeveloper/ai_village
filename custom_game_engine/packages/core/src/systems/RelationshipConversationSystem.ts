@@ -9,36 +9,33 @@
  * - Helps agents learn about each other's interests
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
-import type { GameEvent } from '../events/GameEvent.js';
+import type { GameEventMap } from '../events/EventMap.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
 import type { TopicId } from '../components/InterestsComponent.js';
 
-export class RelationshipConversationSystem implements System {
+export class RelationshipConversationSystem extends BaseSystem {
   public readonly id: SystemId = 'relationship_conversation';
   public readonly priority: number = 16; // After CommunicationSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private world: World | null = null;
-
-  init(world: World): void {
-    this.world = world;
-
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Listen for conversation:ended events - properly typed via EventMap
-    world.eventBus.on<'conversation:ended'>('conversation:ended', (event) => {
-      this.handleConversationEnded(event.data);
+    // The handler receives data directly (not event.data) per TypedEventEmitter line 177
+    this.events.on<'conversation:ended'>('conversation:ended', (data) => {
+      this.handleConversationEnded(data);
     });
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system is event-driven, no per-tick updates needed
   }
 
@@ -46,8 +43,7 @@ export class RelationshipConversationSystem implements System {
    * Handle conversation:ended events using EventMap-typed data.
    * EventMap defines: conversationId, participants, duration, agent1?, agent2?, topics?, depth?, messageCount?, quality?
    */
-  private handleConversationEnded(data: GameEvent<'conversation:ended'>['data']): void {
-    if (!this.world) return;
+  private handleConversationEnded(data: GameEventMap['conversation:ended']): void {
 
     // EventMap has agent1? and agent2? as optional EntityId
     if (!data.agent1 || !data.agent2) {

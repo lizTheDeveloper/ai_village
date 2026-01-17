@@ -1,8 +1,8 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { AssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
 import type { MachineConnectionComponent, MachineSlot } from '../components/MachineConnectionComponent.js';
@@ -21,7 +21,7 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  *
  * Part of automation system (AUTOMATION_LOGISTICS_SPEC.md Part 4)
  */
-export class AssemblyMachineSystem implements System {
+export class AssemblyMachineSystem extends BaseSystem {
   public readonly id: SystemId = 'assembly_machine';
   public readonly priority: number = 54; // After belt/power systems
   public readonly requiredComponents = [CT.AssemblyMachine, CT.MachineConnection] as const;
@@ -37,9 +37,9 @@ export class AssemblyMachineSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Skip if no entities - empty list is valid edge case
-    if (entities.length === 0) {
+    if (ctx.activeEntities.length === 0) {
       return;
     }
 
@@ -47,13 +47,13 @@ export class AssemblyMachineSystem implements System {
       throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
     }
 
-    const currentTick = world.tick;
+    const currentTick = ctx.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    for (const entity of entities) {
-      const machine = (entity as EntityImpl).getComponent<AssemblyMachineComponent>(CT.AssemblyMachine);
-      const connection = (entity as EntityImpl).getComponent<MachineConnectionComponent>(CT.MachineConnection);
-      const power = (entity as EntityImpl).getComponent<PowerComponent>(CT.Power);
+    for (const entity of ctx.activeEntities) {
+      const machine = entity.getComponent<AssemblyMachineComponent>(CT.AssemblyMachine);
+      const connection = entity.getComponent<MachineConnectionComponent>(CT.MachineConnection);
+      const power = entity.getComponent<PowerComponent>(CT.Power);
 
       if (!machine || !connection) continue;
 
@@ -78,12 +78,12 @@ export class AssemblyMachineSystem implements System {
       }
 
       // Get recipe from world's crafting system
-      if (!world.craftingSystem) {
+      if (!ctx.world.craftingSystem) {
         // Crafting system not registered yet - skip
         continue;
       }
 
-      const recipeRegistry = world.craftingSystem.getRecipeRegistry();
+      const recipeRegistry = ctx.world.craftingSystem.getRecipeRegistry();
 
       // Try to get recipe - handle missing recipe gracefully (edge case)
       let recipe;
@@ -124,7 +124,7 @@ export class AssemblyMachineSystem implements System {
       // Check if crafting is complete
       if (machine.progress >= 100) {
         // Try to produce output first
-        const success = this.produceOutput(recipe, connection.outputs, world);
+        const success = this.produceOutput(recipe, connection.outputs, ctx.world);
 
         if (success) {
           // Output successful - consume ingredients and reset progress
@@ -147,7 +147,7 @@ export class AssemblyMachineSystem implements System {
    * Registers delta with StateMutatorSystem for batched updates.
    */
   private updateProgressDelta(
-    entity: Entity,
+    entity: EntityImpl,
     machine: AssemblyMachineComponent,
     power: PowerComponent | undefined,
     recipe: any

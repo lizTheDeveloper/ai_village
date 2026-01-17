@@ -52,6 +52,8 @@ export class MetricsCollectionSystem extends BaseSystem {
   private lastSnapshotTick = 0;
   private streamClient: MetricsStreamClient | null = null;
   private canonRecorder: CanonEventRecorder;
+  private lastMilestoneCheckTick = 0;
+  private readonly MILESTONE_CHECK_INTERVAL = 20; // Only check milestones once per second
 
   constructor(config: Partial<MetricsCollectionConfig> = {}) {
     super();
@@ -882,6 +884,11 @@ export class MetricsCollectionSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     if (!this.config.enabled) return;
 
+    // Skip if not initialized (collector not set up yet)
+    if (!this.collector) {
+      return;
+    }
+
     this.tickCount++;
 
     // Take periodic snapshots
@@ -890,8 +897,11 @@ export class MetricsCollectionSystem extends BaseSystem {
       this.lastSnapshotTick = this.tickCount;
     }
 
-    // Check for time milestones (canon events)
-    this.checkTimeMilestones(ctx.world);
+    // Check for time milestones (canon events) - throttled to avoid per-tick queries
+    if (this.tickCount - this.lastMilestoneCheckTick >= this.MILESTONE_CHECK_INTERVAL) {
+      this.checkTimeMilestones(ctx.world);
+      this.lastMilestoneCheckTick = this.tickCount;
+    }
   }
 
   /**

@@ -15,6 +15,8 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World, ITile } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import {
   type TileBasedBlueprint,
   parseLayout,
@@ -171,6 +173,17 @@ export class TileConstructionSystem implements System {
   /** Task counter for unique IDs */
   private taskCounter = 0;
 
+  /** Event manager for type-safe emissions */
+  private events!: SystemEventManager;
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
+
   /**
    * Create a new construction task from a blueprint or blueprint ID.
    *
@@ -252,14 +265,10 @@ export class TileConstructionSystem implements System {
     this.tasks.set(taskId, task);
 
     // Emit task created event
-    world.eventBus.emit({
-      type: 'construction:task_created',
-      source: 'tile_construction_system',
-      data: {
-        taskId,
-        blueprintId: blueprint.id,
-        position: { x: originX, y: originY },
-      },
+    this.events.emitGeneric('construction:task_created', {
+      taskId,
+      blueprintId: blueprint.id,
+      position: { x: originX, y: originY },
     });
 
     return task;
@@ -286,10 +295,9 @@ export class TileConstructionSystem implements System {
       tile.status = 'materials_needed';
     }
 
-    world.eventBus.emit({
-      type: 'construction:task_started',
-      source: 'tile_construction_system',
-      data: { taskId, blueprintId: task.blueprintId },
+    this.events.emitGeneric('construction:task_started', {
+      taskId,
+      blueprintId: task.blueprintId,
     });
   }
 
@@ -305,10 +313,9 @@ export class TileConstructionSystem implements System {
     task.state = 'cancelled';
     task.activeBuilders.clear();
 
-    world.eventBus.emit({
-      type: 'construction:task_cancelled',
-      source: 'tile_construction_system',
-      data: { taskId, reason },
+    this.events.emitGeneric('construction:task_cancelled', {
+      taskId,
+      reason,
     });
   }
 
@@ -363,19 +370,15 @@ export class TileConstructionSystem implements System {
     task.activeBuilders.add(builderId);
 
     // Emit material delivered event
-    world.eventBus.emit({
-      type: 'construction:material_delivered',
-      source: builderId,
-      data: {
-        taskId,
-        tilePosition: { x: tile.x, y: tile.y },
-        materialId: tile.materialId,
-        builderId,
-      },
-    });
+    this.events.emitGeneric('construction:material_delivered', {
+      taskId,
+      tilePosition: { x: tile.x, y: tile.y },
+      materialId: tile.materialId,
+      builderId,
+    }, builderId);
 
     // Grant XP for material delivery (5 XP)
-    this.grantXp(world, builderId, 5);
+    this.grantXp(builderId, 5);
 
     return true;
   }
@@ -436,38 +439,30 @@ export class TileConstructionSystem implements System {
       task.tilesPlaced++;
 
       // Emit tile placed event with collaborators
-      world.eventBus.emit({
-        type: 'construction:tile_placed',
-        source: builderId,
-        data: {
-          taskId,
-          tilePosition: { x: tile.x, y: tile.y },
-          tileType: tile.type,
-          materialId: tile.materialId,
-          builderId,
-          collaborators: Array.from(task.activeBuilders),
-        },
-      });
+      this.events.emitGeneric('construction:tile_placed', {
+        taskId,
+        tilePosition: { x: tile.x, y: tile.y },
+        tileType: tile.type,
+        materialId: tile.materialId,
+        builderId,
+        collaborators: Array.from(task.activeBuilders),
+      }, builderId);
 
       // Grant XP for placement (10 XP)
-      this.grantXp(world, builderId, 10);
+      this.grantXp(builderId, 10);
 
       // Build relationships with collaborators
-      this.buildRelationships(world, builderId, task.activeBuilders);
+      this.buildRelationships(builderId, task.activeBuilders);
 
       // Check if entire task is complete
       if (task.tilesPlaced >= task.totalTiles) {
         task.state = 'completed';
         task.completedAt = world.tick;
 
-        world.eventBus.emit({
-          type: 'construction:task_completed',
-          source: 'tile_construction_system',
-          data: {
-            taskId,
-            blueprintId: task.blueprintId,
-            position: task.originPosition,
-          },
+        this.events.emitGeneric('construction:task_completed', {
+          taskId,
+          blueprintId: task.blueprintId,
+          position: task.originPosition,
         });
       }
 
@@ -542,39 +537,30 @@ export class TileConstructionSystem implements System {
   /**
    * Grant XP to a builder.
    */
-  private grantXp(world: World, builderId: string, amount: number): void {
-    world.eventBus.emit({
-      type: 'progression:xp_gained',
-      source: builderId,
-      data: {
-        skill: 'building',
-        amount,
-        builderId,
-        xpGained: amount,
-      },
-    });
+  private grantXp(builderId: string, amount: number): void {
+    this.events.emitGeneric('progression:xp_gained', {
+      skill: 'building',
+      amount,
+      builderId,
+      xpGained: amount,
+    }, builderId);
   }
 
   /**
    * Build relationships between collaborating agents.
    */
   private buildRelationships(
-    world: World,
     builderId: string,
     collaborators: Set<string>
   ): void {
     for (const collaboratorId of collaborators) {
       if (collaboratorId === builderId) continue;
 
-      world.eventBus.emit({
-        type: 'relationship:improved',
-        source: builderId,
-        data: {
-          targetAgent: collaboratorId,
-          reason: 'collaborative_building',
-          amount: 2, // +2 relationship per tile
-        },
-      });
+      this.events.emitGeneric('relationship:improved', {
+        targetAgent: collaboratorId,
+        reason: 'collaborative_building',
+        amount: 2, // +2 relationship per tile
+      }, builderId);
     }
   }
 
@@ -738,27 +724,16 @@ export class TileConstructionSystem implements System {
     this.markTileModified(world, x, y);
 
     // Emit demolition event
-    world.eventBus.emit({
-      type: 'construction:tile_demolished',
-      source: demolisherId ?? 'system',
-      data: {
-        x,
-        y,
-        tileType: 'wall',
-        material,
-      },
-    });
+    this.events.emitGeneric('construction:tile_demolished', {
+      x,
+      y,
+      tileType: 'wall',
+      material,
+    }, demolisherId ?? 'system');
 
     // Award XP for demolition (half of building XP)
     if (demolisherId) {
-      world.eventBus.emit({
-        type: 'progression:xp_gained',
-        source: demolisherId,
-        data: {
-          skill: 'building',
-          amount: 5,
-        },
-      });
+      this.grantXp(demolisherId, 5);
     }
 
     return material;
@@ -778,26 +753,15 @@ export class TileConstructionSystem implements System {
     this.markTileModified(world, x, y);
 
     // Emit demolition event
-    world.eventBus.emit({
-      type: 'construction:tile_demolished',
-      source: demolisherId ?? 'system',
-      data: {
-        x,
-        y,
-        tileType: 'door',
-        material,
-      },
-    });
+    this.events.emitGeneric('construction:tile_demolished', {
+      x,
+      y,
+      tileType: 'door',
+      material,
+    }, demolisherId ?? 'system');
 
     if (demolisherId) {
-      world.eventBus.emit({
-        type: 'progression:xp_gained',
-        source: demolisherId,
-        data: {
-          skill: 'building',
-          amount: 5,
-        },
-      });
+      this.grantXp(demolisherId, 5);
     }
 
     return material;
@@ -817,26 +781,15 @@ export class TileConstructionSystem implements System {
     this.markTileModified(world, x, y);
 
     // Emit demolition event
-    world.eventBus.emit({
-      type: 'construction:tile_demolished',
-      source: demolisherId ?? 'system',
-      data: {
-        x,
-        y,
-        tileType: 'window',
-        material,
-      },
-    });
+    this.events.emitGeneric('construction:tile_demolished', {
+      x,
+      y,
+      tileType: 'window',
+      material,
+    }, demolisherId ?? 'system');
 
     if (demolisherId) {
-      world.eventBus.emit({
-        type: 'progression:xp_gained',
-        source: demolisherId,
-        data: {
-          skill: 'building',
-          amount: 5,
-        },
-      });
+      this.grantXp(demolisherId, 5);
     }
 
     return material;

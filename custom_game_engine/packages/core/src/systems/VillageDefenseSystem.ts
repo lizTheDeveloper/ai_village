@@ -16,7 +16,7 @@ export class VillageDefenseSystem implements System {
 
   private events!: SystemEventManager;
 
-  initialize(eventBus: EventBus): void {
+  initialize(world: World, eventBus: EventBus): void {
     this.events = new SystemEventManager(eventBus, this.id);
   }
 

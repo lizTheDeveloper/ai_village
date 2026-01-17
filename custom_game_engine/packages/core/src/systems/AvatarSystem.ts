@@ -4,7 +4,7 @@
  * Manages avatar manifestation, maintenance, and interactions with mortals.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -58,7 +58,7 @@ export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
 // AvatarSystem
 // ============================================================================
 
-export class AvatarSystem implements System {
+export class AvatarSystem extends BaseSystem {
   public readonly id = 'AvatarSystem';
   public readonly name = 'AvatarSystem';
   public readonly priority = 75;
@@ -66,9 +66,12 @@ export class AvatarSystem implements System {
 
   private config: AvatarConfig;
   private avatars: Map<string, AvatarData> = new Map();
-  private lastUpdate: number = 0;
+
+  protected readonly throttleInterval = 100; // ~5 seconds at 20 TPS
+
 
   constructor(config: Partial<AvatarConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_AVATAR_CONFIG, ...config };
   }
 
@@ -105,17 +108,9 @@ export class AvatarSystem implements System {
     return true;
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update existing avatars
-    this.updateAvatars(world, currentTick);
+    this.updateAvatars(ctx.world, ctx.tick);
   }
 
   /**

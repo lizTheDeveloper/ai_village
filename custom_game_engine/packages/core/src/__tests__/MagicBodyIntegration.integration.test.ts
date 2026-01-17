@@ -61,7 +61,9 @@ describe('Magic + Body Integration Tests', () => {
   function createTestEntity(bodyPlanId: string): Entity {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan(bodyPlanId, 'test_species');
-    (entity as any).addComponent(body);
+    // Cast to EntityImpl to access mutable addComponent method
+    // World.createEntity() returns Entity interface (read-only), but implementation is EntityImpl
+    (entity as import('../ecs/Entity.js').EntityImpl).addComponent(body);
     return entity;
   }
 

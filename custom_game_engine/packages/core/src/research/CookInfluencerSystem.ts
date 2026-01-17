@@ -13,6 +13,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -141,6 +142,7 @@ export class CookInfluencerSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private publicationSystem: PublicationSystem | null = null;
 
   // Tick throttling
@@ -162,6 +164,7 @@ export class CookInfluencerSystem implements System {
 
   public setEventBus(eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   /**
@@ -203,18 +206,12 @@ export class CookInfluencerSystem implements System {
     });
 
     // Emit discovery event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'recipe:discovered' as any,
-        source: 'cook-influencer-system',
-        data: {
-          cookId: cookEntity.id,
-          cookName: agentComp.name,
-          recipeId,
-          recipeName,
-        },
-      });
-    }
+    this.events.emitGeneric('recipe:discovered', {
+      cookId: cookEntity.id,
+      cookName: agentComp.name,
+      recipeId,
+      recipeName,
+    });
   }
 
   /**
@@ -255,23 +252,17 @@ export class CookInfluencerSystem implements System {
     this.publishedRecipes.add(pendingPub.recipeId);
 
     // Emit publication event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'publication:created' as any,
-        source: 'cook-influencer-system',
-        data: {
-          publicationId: publication.id,
-          type: publication.type,
-          category: 'cooking',
-          authorId: pendingPub.cookId,
-          authorName: pendingPub.cookName,
-          title: publication.title,
-          recipeId: pendingPub.recipeId,
-          recipeName: pendingPub.recipeName,
-          techLevel: getWritingTechName(techLevel),
-        },
-      });
-    }
+    this.events.emitGeneric('publication:created', {
+      publicationId: publication.id,
+      type: publication.type,
+      category: 'cooking',
+      authorId: pendingPub.cookId,
+      authorName: pendingPub.cookName,
+      title: publication.title,
+      recipeId: pendingPub.recipeId,
+      recipeName: pendingPub.recipeName,
+      techLevel: getWritingTechName(techLevel),
+    });
 
     return publication;
   }
@@ -389,6 +380,13 @@ export class CookInfluencerSystem implements System {
     return cookingPubs
       .sort((a, b) => b.influence - a.influence)
       .slice(0, limit) as RecipePublication[];
+  }
+
+  /**
+   * Cleanup subscriptions
+   */
+  cleanup(): void {
+    this.events.cleanup();
   }
 }
 

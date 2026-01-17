@@ -26,6 +26,7 @@ import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Degradation configuration
@@ -88,6 +89,9 @@ export class BuildingMaintenanceSystem implements System {
   // Track last condition for threshold detection
   private lastConditions = new Map<string, number>();
 
+  // Event manager for type-safe emissions
+  private events!: SystemEventManager;
+
   /**
    * Set the StateMutatorSystem reference.
    * Called by registerAllSystems during initialization.
@@ -99,18 +103,24 @@ export class BuildingMaintenanceSystem implements System {
   /**
    * Initialize the system
    */
-  public initialize(world: World, _eventBus: EventBus): void {
+  public initialize(world: World, eventBus: EventBus): void {
     if (this.isInitialized) return;
 
+    this.events = new SystemEventManager(eventBus, this.id);
+
     // Subscribe to weather changes
-    world.eventBus.subscribe('weather:changed', (event) => {
-      const data = event.data as { condition?: string; weather?: string };
-      this.currentWeather = data.condition ?? data.weather ?? 'clear';
+    this.events.onGeneric('weather:changed', (data) => {
+      const weatherData = data as { condition?: string; weather?: string };
+      this.currentWeather = weatherData.condition ?? weatherData.weather ?? 'clear';
       // Weather changed - need to recalculate decay rates
       this.lastUpdateTick = 0; // Force update on next tick
     });
 
     this.isInitialized = true;
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   /**
@@ -228,58 +238,46 @@ export class BuildingMaintenanceSystem implements System {
    * Check for condition threshold crossings and emit events
    */
   private checkConditionThresholds(
-    world: World,
+    _world: World,
     buildingId: string,
     buildingType: string,
     oldCondition: number,
     newCondition: number,
     position: PositionComponent,
-    currentTick: number
+    _currentTick: number
   ): void {
     // Only emit events when crossing thresholds (downward)
     if (oldCondition >= DEGRADATION_CONFIG.NEEDS_REPAIR_THRESHOLD &&
         newCondition < DEGRADATION_CONFIG.NEEDS_REPAIR_THRESHOLD) {
-      world.eventBus.emit({
-        type: 'building:needs_repair',
-        source: buildingId,
-        data: {
-          buildingId,
-          buildingType,
-          condition: newCondition,
-          position: { x: position.x, y: position.y },
-          priority: 'low' as const,
-        },
-      });
+      this.events.emitGeneric('building:needs_repair', {
+        buildingId,
+        buildingType,
+        condition: newCondition,
+        position: { x: position.x, y: position.y },
+        priority: 'low' as const,
+      }, buildingId);
     }
 
     if (oldCondition >= DEGRADATION_CONFIG.CRITICAL_THRESHOLD &&
         newCondition < DEGRADATION_CONFIG.CRITICAL_THRESHOLD) {
-      world.eventBus.emit({
-        type: 'building:critical_repair',
-        source: buildingId,
-        data: {
-          buildingId,
-          buildingType,
-          condition: newCondition,
-          position: { x: position.x, y: position.y },
-          priority: 'high' as const,
-        },
-      });
+      this.events.emitGeneric('building:critical_repair', {
+        buildingId,
+        buildingType,
+        condition: newCondition,
+        position: { x: position.x, y: position.y },
+        priority: 'high' as const,
+      }, buildingId);
     }
 
     if (oldCondition >= DEGRADATION_CONFIG.COLLAPSE_THRESHOLD &&
         newCondition < DEGRADATION_CONFIG.COLLAPSE_THRESHOLD) {
-      world.eventBus.emit({
-        type: 'building:collapse_imminent',
-        source: buildingId,
-        data: {
-          buildingId,
-          buildingType,
-          condition: newCondition,
-          position: { x: position.x, y: position.y },
-          priority: 'critical' as const,
-        },
-      });
+      this.events.emitGeneric('building:collapse_imminent', {
+        buildingId,
+        buildingType,
+        condition: newCondition,
+        position: { x: position.x, y: position.y },
+        priority: 'critical' as const,
+      }, buildingId);
     }
   }
 

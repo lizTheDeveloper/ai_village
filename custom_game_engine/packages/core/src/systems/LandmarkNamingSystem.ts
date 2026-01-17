@@ -67,6 +67,10 @@ export class LandmarkNamingSystem extends BaseSystem {
   /** Cooldown duration in ticks (10 minutes at 20 TPS) */
   private readonly NAMING_COOLDOWN_TICKS = 12000;
 
+  /** Throttle interval - only check for landmarks every 2 seconds (40 ticks at 20 TPS) */
+  private readonly LANDMARK_UPDATE_INTERVAL = 40;
+  private lastLandmarkCheckTick = 0;
+
   /**
    * Create a LandmarkNamingSystem.
    *
@@ -82,6 +86,12 @@ export class LandmarkNamingSystem extends BaseSystem {
    * Checks for new discoveries and processes naming responses.
    */
   protected onUpdate(ctx: SystemContext): void {
+    // Throttle updates - landmark discovery doesn't need to be checked every tick
+    if (ctx.tick - this.lastLandmarkCheckTick < this.LANDMARK_UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastLandmarkCheckTick = ctx.tick;
+
     // Get the world-level named landmarks registry
     const worldEntities = ctx.world.query().with(ComponentType.NamedLandmarks).executeEntities();
     let landmarksComponent: NamedLandmarksComponent | undefined;
