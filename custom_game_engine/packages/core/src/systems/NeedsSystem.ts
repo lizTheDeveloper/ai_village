@@ -4,6 +4,8 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
@@ -53,6 +55,17 @@ export class NeedsSystem implements System {
 
   // Reference to StateMutatorSystem (set via setStateMutatorSystem)
   private stateMutator: StateMutatorSystem | null = null;
+
+  // Type-safe event manager
+  private events!: SystemEventManager;
+
+  /**
+   * Initialize the event manager.
+   * Called during world initialization with the event bus.
+   */
+  initialize(world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
 
   /**
    * Set the StateMutatorSystem reference.
@@ -207,15 +220,12 @@ export class NeedsSystem implements System {
       // Emit progressive starvation memories (days 1, 2, 3, 4)
       if (daysAtZeroHunger >= 1 && daysAtZeroHunger <= 4) {
         if (!starvationDayMemoriesIssued.has(daysAtZeroHunger)) {
-          world.eventBus.emit({
-            type: 'need:starvation_day',
-            source: entity.id,
-            data: {
-              agentId: entity.id,
-              dayNumber: daysAtZeroHunger,
-              survivalRelevance: 0.7 + (daysAtZeroHunger * 0.1),
-            },
-          });
+          // Type-safe emission - compile error if data shape is wrong
+          this.events.emit('need:starvation_day', {
+            agentId: entity.id,
+            dayNumber: daysAtZeroHunger,
+            survivalRelevance: 0.7 + (daysAtZeroHunger * 0.1),
+          }, entity.id);
 
           starvationDayMemoriesIssued.add(daysAtZeroHunger);
         }
@@ -236,16 +246,13 @@ export class NeedsSystem implements System {
 
       // Emit energy critical event (once when crossing threshold)
       if (!wasEnergyCritical && isEnergyCritical) {
-        world.eventBus.emit({
-          type: 'need:critical',
-          source: entity.id,
-          data: {
-            agentId: entity.id,
-            needType: 'energy',
-            value: needs.energy,
-            survivalRelevance: 0.7,
-          },
-        });
+        // Type-safe emission - compile error if data shape is wrong
+        this.events.emit('need:critical', {
+          agentId: entity.id,
+          needType: 'energy',
+          value: needs.energy,
+          survivalRelevance: 0.7,
+        }, entity.id);
       }
 
       // Track current critical state for next tick
@@ -253,14 +260,11 @@ export class NeedsSystem implements System {
 
       // Check for death (starvation after 5 game days at 0% hunger)
       if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY) {
-        world.eventBus.emit({
-          type: 'agent:starved',
-          source: entity.id,
-          data: {
-            agentId: entity.id,
-            survivalRelevance: 1.0,
-          },
-        });
+        // Type-safe emission - compile error if data shape is wrong
+        this.events.emit('agent:starved', {
+          agentId: entity.id,
+          survivalRelevance: 1.0,
+        }, entity.id);
       }
     }
 
@@ -291,5 +295,9 @@ export class NeedsSystem implements System {
       currentValue,
       world.tick
     );
+  }
+
+  cleanup(): void {
+    this.events.cleanup(); // Unsubscribes all automatically
   }
 }

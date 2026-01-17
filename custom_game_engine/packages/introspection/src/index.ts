@@ -251,3 +251,11 @@ export * from './schemas/index.js';
 // Scheduler-based render caching for 85-99% hit rates
 // Includes: RenderCache, CacheMetrics
 export * from './cache/index.js';
+
+// ============================================================================
+// Runtime API
+// ============================================================================
+
+// Runtime introspection and entity queries
+// Includes: GameIntrospectionAPI, query options, enriched entity types
+export * from './api/index.js';

@@ -43,14 +43,16 @@ import type { EventBus } from '../events/EventBus.js';
 import type { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GameEventMap, EventType } from '../events/EventMap.js';
 import type { System, SystemMetadata } from './System.js';
+import type { Component } from './Component.js';
 import type {
   SystemId,
   ComponentType,
   EntityId,
   Tick,
-  Component,
 } from '../types.js';
-import type { ChunkSpatialQuery } from '../../world/src/chunks/ChunkSpatialQuery.js';
+// ChunkSpatialQuery is optional - type it as any to avoid package dependency
+// Systems can check if methods exist at runtime
+type ChunkSpatialQuery = any;
 
 // ============================================================================
 // Component Accessor
@@ -347,7 +349,7 @@ export class SystemContextImpl implements SystemContext {
       );
 
       for (const entity of entities) {
-        const pos = entity.getComponent<{ x: number; y: number }>('position');
+        const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
         if (!pos) continue;
 
         const dx = pos.x - center.x;
@@ -377,7 +379,7 @@ export class SystemContextImpl implements SystemContext {
           if (!hasAll) continue;
         }
 
-        const pos = entity.getComponent<{ x: number; y: number }>('position');
+        const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
         if (!pos) continue;
 
         const dx = pos.x - center.x;
@@ -517,20 +519,20 @@ export abstract class BaseSystem implements System {
    * Called once when system is registered.
    * Override onInitialize() instead of this method.
    */
-  initialize(world: World, eventBus: EventBus): void {
+  async initialize(world: World, eventBus: EventBus): Promise<void> {
     this.world = world;
 
     // Import SystemEventManager dynamically to avoid circular deps
-    const { SystemEventManager } = require('../events/TypedEventEmitter.js');
+    const { SystemEventManager } = await import('../events/TypedEventEmitter.js');
     this.events = new SystemEventManager(eventBus, this.id);
 
-    this.onInitialize?.(world, eventBus);
+    await this.onInitialize?.(world, eventBus);
   }
 
   /**
    * Override to add custom initialization logic.
    */
-  protected onInitialize?(world: World, eventBus: EventBus): void;
+  protected onInitialize?(world: World, eventBus: EventBus): void | Promise<void>;
 
   /**
    * Main update loop. Creates SystemContext and delegates to onUpdate().
@@ -596,15 +598,15 @@ export abstract class BaseSystem implements System {
  * Create a SystemContext for use in existing systems.
  * Use this when migrating existing systems incrementally.
  */
-export function createSystemContext(
+export async function createSystemContext(
   world: World,
   systemId: SystemId,
   eventBus: EventBus,
   entities: ReadonlyArray<Entity>,
   deltaTime: number,
   chunkSpatialQuery?: ChunkSpatialQuery
-): SystemContext {
-  const { SystemEventManager } = require('../events/TypedEventEmitter.js');
+): Promise<SystemContext> {
+  const { SystemEventManager } = await import('../events/TypedEventEmitter.js');
   const events = new SystemEventManager(eventBus, systemId);
 
   return new SystemContextImpl(

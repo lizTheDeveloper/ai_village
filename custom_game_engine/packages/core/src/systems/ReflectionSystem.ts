@@ -5,6 +5,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { EventData } from '../events/EventMap.js';
 import { getEpisodicMemory, getSemanticMemory, getReflection } from '../utils/componentHelpers.js';
@@ -22,20 +23,20 @@ export class ReflectionSystem implements System {
   public readonly priority: number = 110;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus;
+  private events!: SystemEventManager;
   private reflectionTriggers: Map<
     string,
     { type: 'daily' | 'deep' | 'post_event'; timestamp: number }
   > = new Map();
 
   constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
     this._setupEventListeners();
   }
 
   private _setupEventListeners(): void {
-    this.eventBus.subscribe('agent:sleep_start', (event) => {
-      const data = event.data as EventData<'agent:sleep_start'>;
+    // Type-safe subscription with auto-cleanup tracking
+    this.events.on('agent:sleep_start', (data) => {
       this.reflectionTriggers.set(data.agentId, {
         type: 'daily',
         timestamp: data.timestamp ?? Date.now(),
@@ -43,8 +44,7 @@ export class ReflectionSystem implements System {
     });
 
     // Deep reflection triggers
-    this.eventBus.subscribe('time:new_week', (event) => {
-      const data = event.data as EventData<'time:new_week'>;
+    this.events.on('time:new_week', (data) => {
       // Trigger deep reflection for all agents
       this.reflectionTriggers.set(data.agentId ?? 'broadcast', {
         type: 'deep',
@@ -52,8 +52,7 @@ export class ReflectionSystem implements System {
       });
     });
 
-    this.eventBus.subscribe('time:season_change', (event) => {
-      const data = event.data as EventData<'time:season_change'>;
+    this.events.on('time:season_change', (data) => {
       // Trigger deep reflection for all agents
       this.reflectionTriggers.set(data.agentId ?? 'broadcast', {
         type: 'deep',
@@ -62,8 +61,7 @@ export class ReflectionSystem implements System {
     });
 
     // Significant event reflection (importance > 0.7)
-    this.eventBus.subscribe('memory:formed', (event) => {
-      const data = event.data as EventData<'memory:formed'>;
+    this.events.on('memory:formed', (data) => {
       const importance = data.importance;
       if (importance > 0.7) {
         this.reflectionTriggers.set(data.agentId, {
@@ -74,8 +72,7 @@ export class ReflectionSystem implements System {
     });
 
     // Idle reflection (30% probability)
-    this.eventBus.subscribe('agent:idle', (event) => {
-      const data = event.data as EventData<'agent:idle'>;
+    this.events.on('agent:idle', (data) => {
       if (Math.random() < 0.3) {
         this.reflectionTriggers.set(data.agentId, {
           type: 'daily',
@@ -86,8 +83,6 @@ export class ReflectionSystem implements System {
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Flush event bus to process triggers
-    this.eventBus.flush();
 
     // Process reflection triggers
     for (const [agentId, trigger] of this.reflectionTriggers.entries()) {
@@ -160,7 +155,6 @@ export class ReflectionSystem implements System {
     }
 
     this.reflectionTriggers.clear();
-    this.eventBus.flush();
   }
 
   private _performDailyReflection(
@@ -246,15 +240,11 @@ export class ReflectionSystem implements System {
       return temp;
     });
 
-    // Emit event
-    this.eventBus.emit({
-      type: 'reflection:completed',
-      source: this.id,
-      data: {
-        agentId: entity.id,
-        reflectionCount: finalReflectionCount,
-        reflectionType: 'daily',
-      },
+    // Type-safe emission - compile error if data shape is wrong
+    this.events.emit('reflection:completed', {
+      agentId: entity.id,
+      reflectionCount: finalReflectionCount,
+      reflectionType: 'daily',
     });
   }
 
@@ -332,16 +322,16 @@ export class ReflectionSystem implements System {
       return temp;
     });
 
-    // Emit event
-    this.eventBus.emit({
-      type: 'reflection:completed',
-      source: this.id,
-      data: {
-        agentId: entity.id,
-        reflectionCount: finalReflectionCount,
-        reflectionType: 'deep',
-      },
+    // Type-safe emission - compile error if data shape is wrong
+    this.events.emit('reflection:completed', {
+      agentId: entity.id,
+      reflectionCount: finalReflectionCount,
+      reflectionType: 'deep',
     });
+  }
+
+  cleanup(): void {
+    this.events.cleanup(); // Unsubscribes all automatically
   }
 
   private _extractThemes(memories: readonly EpisodicMemory[]): string[] {

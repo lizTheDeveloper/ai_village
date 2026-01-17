@@ -1,11 +1,9 @@
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
-import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { NeedsComponent } from '../components/NeedsComponent';
 import { PersonalityComponent } from '../components/PersonalityComponent';
 import { ActionQueue } from '../actions/ActionQueueClass';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 export type IdleBehaviorType =
   | 'reflect'
@@ -31,40 +29,35 @@ interface BehaviorWeights {
  *
  * @dependencies None - Reads personality and needs to select idle actions
  */
-export class IdleBehaviorSystem implements System {
+export class IdleBehaviorSystem extends BaseSystem {
   public readonly id: SystemId = 'idle_behavior';
   public readonly priority = 15; // Run after needs system
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [
+    CT.Needs,
+    CT.Personality,
+    CT.ActionQueue
+  ];
   public readonly dependsOn = [] as const;
 
-  update(world: World): void {
-    // Get all entities
-    const entities = Array.from(world.entities.values());
-
-    for (const entity of entities) {
-      // Skip entities without required components
-      if (!entity.components || !entity.components.has(CT.Needs) ||
-          !entity.components.has(CT.Personality) ||
-          !entity.components.has(CT.ActionQueue)) {
-        continue;
-      }
-
-      const queue = entity.getComponent(CT.ActionQueue) as ActionQueue | null;
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      // Type-safe component access
+      const comps = ctx.components(entity);
+      const queue = comps.optional<ActionQueue>(CT.ActionQueue);
 
       // Skip if entity has queued actions or if queue is missing
       if (!queue || !queue.isEmpty()) {
         continue;
       }
 
-      const needs = entity.getComponent(CT.Needs) as NeedsComponent | null;
-      const personality = entity.getComponent(CT.Personality) as PersonalityComponent | null;
-
-      if (!needs || !personality) {
-        throw new Error(`Entity ${entity.id} missing required component: needs or personality`);
-      }
+      // Require needs and personality (guaranteed by requiredComponents)
+      const { needs, personality } = comps.require(CT.Needs, CT.Personality);
 
       // Select idle behavior based on personality and mood
-      const behavior = this.selectIdleBehavior(personality, needs);
+      const behavior = this.selectIdleBehavior(
+        personality as PersonalityComponent,
+        needs as NeedsComponent
+      );
 
       // Enqueue the selected behavior with low priority
       queue.enqueue({

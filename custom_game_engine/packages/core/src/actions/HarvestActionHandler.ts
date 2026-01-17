@@ -63,7 +63,7 @@ export class HarvestActionHandler implements ActionHandler {
     // Apply skill efficiency bonus
     const actor = world.getEntity(action.actorId);
     if (actor) {
-      const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
+      const skillsComp = actor.getComponent<SkillsComponent>(ComponentType.Skills);
       if (skillsComp) {
         const farmingLevel = skillsComp.levels.farming;
         const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
@@ -106,7 +106,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent<PositionComponent>(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,
@@ -115,7 +115,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventory = actor.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return {
         valid: false,
@@ -133,7 +133,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check plant has PlantComponent
-    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent | undefined;
+    const plant = plantEntity.getComponent<PlantComponent>(ComponentType.Plant);
     if (!plant) {
       return {
         valid: false,
@@ -151,7 +151,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check plant has position
-    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const plantPos = plantEntity.getComponent<PositionComponent>(ComponentType.Position);
     if (!plantPos) {
       return {
         valid: false,
@@ -223,9 +223,9 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Get components
-    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent;
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
-    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent;
+    const plant = plantEntity.getComponent<PlantComponent>(ComponentType.Plant);
+    const inventory = actor.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const plantPos = plantEntity.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant) {
       return {
@@ -245,8 +245,17 @@ export class HarvestActionHandler implements ActionHandler {
       };
     }
 
+    if (!plantPos) {
+      return {
+        success: false,
+        reason: `Plant entity ${action.targetId} has no position component`,
+        effects: [],
+        events: [],
+      };
+    }
+
     // Get agent farming skill from skills component
-    const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
+    const skillsComp = actor.getComponent<SkillsComponent>(ComponentType.Skills);
     const farmingLevel = skillsComp?.levels.farming ?? 0;
     // Convert skill level (0-5) to skill percentage (0-100)
     const farmingSkill = (farmingLevel / SKILL_LEVEL_HARVEST_THRESHOLD) * 100;
@@ -290,19 +299,24 @@ export class HarvestActionHandler implements ActionHandler {
           harvestQuality
         );
         fruitsAdded = fruitsAddedCount;
+        // Cast required: Entity interface doesn't expose mutation methods
         (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterFruit);
-
-        // Update inventory reference for seed addition
-        const currentInventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
 
         // Add seeds to inventory (seeds don't have quality - use regular addToInventory)
         if (seedYield > 0) {
+          // Update inventory reference after fruit addition
+          const currentInventory = actor.getComponent<InventoryComponent>(ComponentType.Inventory);
+          if (!currentInventory) {
+            throw new Error(`Inventory component missing after fruit addition for actor ${action.actorId}`);
+          }
+
           const { inventory: inventoryAfterSeeds, amountAdded: seedsAddedCount } = addToInventory(
             currentInventory,
             seedItemId,
             seedYield
           );
           seedsAdded = seedsAddedCount;
+          // Cast required: Entity interface doesn't expose mutation methods
           (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       } else {
@@ -314,6 +328,7 @@ export class HarvestActionHandler implements ActionHandler {
             seedYield
           );
           seedsAdded = seedsAddedCount;
+          // Cast required: Entity interface doesn't expose mutation methods
           (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       }
@@ -360,9 +375,11 @@ export class HarvestActionHandler implements ActionHandler {
       // Check if harvest destroys the plant or allows regrowth
       if (plant.harvestDestroysPlant) {
         // Destructive harvest (carrots, wheat, etc.) - remove plant from world
+        // Cast required: World interface doesn't expose mutation methods
         (world as WorldMutator).destroyEntity(action.targetId, 'harvested');
       } else {
         // Non-destructive harvest (berry bushes, fruit trees) - reset plant to regrow
+        // Cast required: Entity interface doesn't expose mutation methods
         (plantEntity as EntityImpl).updateComponent<PlantComponent>(ComponentType.Plant, (p) => {
           p.stage = plant.harvestResetStage;
           p.stageProgress = 0;
@@ -379,11 +396,12 @@ export class HarvestActionHandler implements ActionHandler {
         effects: [],
         events,
       };
-    } catch (error: any) {
+    } catch (error) {
       // Inventory full or other error
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add harvest to inventory';
       return {
         success: false,
-        reason: error.message || 'Failed to add harvest to inventory',
+        reason: errorMessage,
         effects: [],
         events: [],
       };

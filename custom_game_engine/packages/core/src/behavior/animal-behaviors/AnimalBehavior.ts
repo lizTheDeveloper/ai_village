@@ -8,6 +8,8 @@ import type { EntityImpl } from '../../ecs/Entity.js';
 import { CT } from '../../types.js';
 import type { World } from '../../ecs/World.js';
 import type { AnimalComponent, AnimalState } from '../../components/AnimalComponent.js';
+import type { MovementComponent } from '../../components/MovementComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
 
 /**
  * Result from executing an animal behavior
@@ -97,7 +99,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
     target: { x: number; y: number },
     speed: number = 1.0
   ): void {
-    const movement = entity.getComponent(CT.Movement);
+    const movement = entity.getComponent<MovementComponent>(CT.Movement);
     if (!movement) {
       throw new Error(
         `Animal ${entity.id} missing required 'movement' component. ` +
@@ -105,7 +107,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
       );
     }
 
-    const position = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
+    const position = entity.getComponent<PositionComponent>(CT.Position);
     if (!position) {
       throw new Error(
         `Animal ${entity.id} missing required 'position' component. ` +
@@ -126,7 +128,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
       velocityY = (dy / dist) * speed;
     }
 
-    entity.updateComponent('movement', (current: any) => ({
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
       ...current,
       targetX: target.x,
       targetY: target.y,
@@ -141,14 +143,14 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
    * @throws Error if entity lacks movement component
    */
   protected stopMovement(entity: EntityImpl): void {
-    const movement = entity.getComponent(CT.Movement);
+    const movement = entity.getComponent<MovementComponent>(CT.Movement);
     if (!movement) {
       throw new Error(
         `Animal ${entity.id} missing required 'movement' component. ` +
         `Ensure MovementComponent is added during spawning.`
       );
     }
-    entity.updateComponent('movement', (current: any) => ({
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
       ...current,
       targetX: 0,
       targetY: 0,
@@ -165,7 +167,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
     target: { x: number; y: number },
     threshold: number = 1.5
   ): boolean {
-    const position = entity.getComponent(CT.Position) as any;
+    const position = entity.getComponent<PositionComponent>(CT.Position);
     if (!position) return false;
 
     return this.distance(position, target) <= threshold;

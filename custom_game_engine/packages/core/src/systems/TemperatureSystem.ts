@@ -1,9 +1,9 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, ITile } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -41,7 +41,7 @@ interface WorldWithTiles extends World {
  * @see TimeSystem (priority 3) - Provides time of day for daily temperature variation
  * @see WeatherSystem (priority 5) - Provides weather modifiers (rain, frost) affecting temperature
  */
-export class TemperatureSystem implements System {
+export class TemperatureSystem extends BaseSystem {
   public readonly id: SystemId = 'temperature';
   public readonly priority: number = 14; // Run after weather (5), before needs (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -56,6 +56,8 @@ export class TemperatureSystem implements System {
    * @see StateMutatorSystem - handles batched health damage from temperature
    */
   public readonly dependsOn = ['time', 'weather', 'state_mutator'] as const;
+
+  // No throttle needed - use parent's default (every tick)
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
   private readonly BASE_TEMP = WORLD_TEMP_BASE; // Default world temperature in °C
@@ -89,7 +91,10 @@ export class TemperatureSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const deltaTime = ctx.deltaTime;
+
     // Calculate world ambient temperature (uses cached time entity)
     this.currentWorldTemp = this.calculateWorldTemperature(world);
 
@@ -112,41 +117,12 @@ export class TemperatureSystem implements System {
     const currentTick = world.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    // Filter entities with required components
-    const temperatureEntities = entities.filter(e =>
-      e.components.has(CT.Temperature) && e.components.has(CT.Position)
-    );
+    // Process each active entity (SimulationScheduler already filtered)
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const posComp = comps.optional<PositionComponent>(CT.Position);
 
-    // Get agent positions for active simulation filtering
-    // Only simulate temperature for entities near agents (within 50 tiles)
-    const ACTIVE_SIMULATION_RADIUS = 50;
-    const ACTIVE_SIMULATION_RADIUS_SQ = ACTIVE_SIMULATION_RADIUS * ACTIVE_SIMULATION_RADIUS;
-
-    const agentPositions = world.query()
-      .with(CT.Agent)
-      .with(CT.Position)
-      .executeEntities()
-      .map(e => (e as EntityImpl).getComponent<PositionComponent>(CT.Position)!);
-
-    // Process each entity with temperature
-    for (const entity of temperatureEntities) {
-      const impl = entity as EntityImpl;
-      const posComp = impl.getComponent<PositionComponent>(CT.Position)!;
-
-      // Skip entities far from all agents (not actively simulated)
-      // Agents always simulate their own temperature
-      const isAgent = entity.components.has(CT.Agent);
-      if (!isAgent && agentPositions.length > 0) {
-        const isNearAgent = agentPositions.some(agentPos => {
-          const dx = posComp.x - agentPos.x;
-          const dy = posComp.y - agentPos.y;
-          return dx * dx + dy * dy <= ACTIVE_SIMULATION_RADIUS_SQ;
-        });
-
-        if (!isNearAgent) {
-          continue; // Skip temperature update for distant entities
-        }
-      }
+      if (!posComp) continue;
 
       // Calculate agent's effective temperature
       let effectiveTemp = this.currentWorldTemp;
@@ -166,7 +142,8 @@ export class TemperatureSystem implements System {
       effectiveTemp += heatBonus;
 
       // Get current temperature component to apply thermal inertia
-      const currentTempComp = impl.getComponent<TemperatureComponent>(CT.Temperature)!;
+      const currentTempComp = comps.optional<TemperatureComponent>(CT.Temperature);
+      if (!currentTempComp) continue;
 
       // Gradually adjust body temperature toward environmental temperature (thermal inertia)
       // Body temperature changes slowly, not instantly
@@ -175,14 +152,14 @@ export class TemperatureSystem implements System {
       const newTemp = currentTempComp.currentTemp + tempChange;
 
       // Update agent temperature with gradual change
-      impl.updateComponent<TemperatureComponent>(CT.Temperature, (current) => ({
+      comps.update<TemperatureComponent>(CT.Temperature, (current) => ({
         ...current,
         currentTemp: newTemp,
         state: this.calculateTemperatureState(newTemp, current),
       }));
 
       // Get updated component after state calculation
-      const updatedTemp = impl.getComponent<TemperatureComponent>(CT.Temperature)!;
+      const updatedTemp = comps.optional<TemperatureComponent>(CT.Temperature)!;
 
       // Check for state transitions and emit events
       this.checkTemperatureEvents(world, entity, updatedTemp);

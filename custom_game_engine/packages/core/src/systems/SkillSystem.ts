@@ -48,6 +48,7 @@ import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
@@ -75,17 +76,19 @@ export class SkillSystem implements System {
   public readonly requiredComponents = [] as const;
 
   private world: World | null = null;
+  private events!: SystemEventManager;
 
   /**
    * Initialize and subscribe to XP-granting events.
    */
-  initialize(world: World, _eventBus: EventBus): void {
+  initialize(world: World, eventBus: EventBus): void {
     this.world = world;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Building XP - use entityId if available (builder reference)
-    world.eventBus.subscribe('building:complete', (event) => {
+    this.events.on('building:complete', (data) => {
       // entityId may contain the builder agent's id
-      const builderId = event.data.entityId;
+      const builderId = data.entityId;
       if (builderId) {
         // Complex buildings give more XP
         const baseXP = 20;
@@ -94,53 +97,53 @@ export class SkillSystem implements System {
     });
 
     // Farming XP - harvest
-    world.eventBus.subscribe('harvest:completed', (event) => {
+    this.events.on('harvest:completed', (data) => {
       const baseXP = 10;
-      this.awardXP(event.data.agentId, 'farming', baseXP, 'harvest:completed');
+      this.awardXP(data.agentId, 'farming', baseXP, 'harvest:completed');
     });
 
     // Farming XP - planting
-    world.eventBus.subscribe('seed:planted', (event) => {
+    this.events.on('seed:planted', (data) => {
       const baseXP = 2;
-      this.awardXP(event.data.actorId, 'farming', baseXP, 'seed:planted');
+      this.awardXP(data.actorId, 'farming', baseXP, 'seed:planted');
     });
 
     // Gathering XP + Farming XP for plant-based resources
-    world.eventBus.subscribe('resource:gathered', (event) => {
-      const amount = event.data.amount ?? 1;
+    this.events.on('resource:gathered', (data) => {
+      const amount = data.amount ?? 1;
       const baseXP = Math.min(10, 2 + Math.floor(amount / 2));
-      this.awardXP(event.data.agentId, 'gathering', baseXP, 'resource:gathered');
+      this.awardXP(data.agentId, 'gathering', baseXP, 'resource:gathered');
 
       // Check if harvesting from a plant (berry bush, etc.) - grants small farming XP
       // This represents learning about plant growth, food sources, and botanical knowledge
-      if (event.data.sourceEntityId) {
-        const sourceEntity = world.getEntity(event.data.sourceEntityId);
+      if (data.sourceEntityId) {
+        const sourceEntity = world.getEntity(data.sourceEntityId);
         if (sourceEntity?.components.has(CT.Plant)) {
           // Smaller XP than gathering - foraging wild plants teaches basic farming concepts
           const farmingXP = Math.min(3, 1 + Math.floor(amount / 5));
-          this.awardXP(event.data.agentId, 'farming', farmingXP, 'resource:gathered:plant');
+          this.awardXP(data.agentId, 'farming', farmingXP, 'resource:gathered:plant');
         }
       }
     });
 
     // Crafting XP (non-food crafting)
-    world.eventBus.subscribe('crafting:completed', (event) => {
+    this.events.on('crafting:completed', (data) => {
       // Base XP scales with quantity
-      const produced = event.data.produced;
+      const produced = data.produced;
       const totalQuantity = produced.reduce((sum: number, p: { amount: number }) => sum + p.amount, 0);
       const baseXP = 5 + Math.floor(totalQuantity * 2);
-      this.awardXP(event.data.agentId, 'crafting', baseXP, 'crafting:completed');
+      this.awardXP(data.agentId, 'crafting', baseXP, 'crafting:completed');
     });
 
     // Cooking XP
-    world.eventBus.subscribe('cooking:completed', (event) => {
-      const baseXP = event.data.xpGained ?? 10;
-      this.awardXP(event.data.agentId, 'cooking', baseXP, 'cooking:completed');
+    this.events.on('cooking:completed', (data) => {
+      const baseXP = data.xpGained ?? 10;
+      this.awardXP(data.agentId, 'cooking', baseXP, 'cooking:completed');
     });
 
     // Social XP - each utterance (small XP per line spoken)
-    world.eventBus.subscribe('conversation:utterance', (event) => {
-      const speakerId = event.data.speaker ?? event.data.speakerId;
+    this.events.on('conversation:utterance', (data) => {
+      const speakerId = data.speaker ?? data.speakerId;
       if (speakerId) {
         const baseXP = 1; // Small XP per line
         this.awardXP(speakerId, 'social', baseXP, 'conversation:utterance');
@@ -148,41 +151,41 @@ export class SkillSystem implements System {
     });
 
     // Social XP - conversation completion bonus
-    world.eventBus.subscribe('conversation:ended', (event) => {
-      const duration = event.data.duration ?? 1;
+    this.events.on('conversation:ended', (data) => {
+      const duration = data.duration ?? 1;
       const baseXP = Math.min(10, 2 + Math.floor(duration / 10));
       // Award to all participants
-      for (const participantId of event.data.participants) {
+      for (const participantId of data.participants) {
         this.awardXP(participantId, 'social', baseXP, 'conversation:ended');
       }
     });
 
     // Exploration XP
-    world.eventBus.subscribe('exploration:milestone', (event) => {
+    this.events.on('exploration:milestone', (data) => {
       const baseXP = 15;
-      this.awardXP(event.data.agentId, 'exploration', baseXP, 'exploration:milestone');
+      this.awardXP(data.agentId, 'exploration', baseXP, 'exploration:milestone');
     });
 
     // Animal Handling XP - taming
-    world.eventBus.subscribe('animal_tamed', (event) => {
+    this.events.on('animal_tamed', (data) => {
       const baseXP = 30;
-      const agentId = event.data.tamerId ?? event.data.agentId;
+      const agentId = data.tamerId ?? data.agentId;
       if (agentId) {
         this.awardXP(agentId, 'animal_handling', baseXP, 'animal_tamed');
       }
     });
 
     // Animal Handling XP - housing
-    world.eventBus.subscribe('agent:housed_animal', (event) => {
+    this.events.on('agent:housed_animal', (data) => {
       const baseXP = 10;
-      this.awardXP(event.data.agentId, 'animal_handling', baseXP, 'agent:housed_animal');
+      this.awardXP(data.agentId, 'animal_handling', baseXP, 'agent:housed_animal');
     });
 
     // === Additional Farming Actions ===
 
     // Farming XP - tilling
-    world.eventBus.subscribe('action:till', (event) => {
-      const agentId = event.data.agentId ?? event.data.actorId;
+    this.events.on('action:till', (data) => {
+      const agentId = data.agentId ?? data.actorId;
       if (agentId) {
         const baseXP = 3;
         this.awardXP(agentId, 'farming', baseXP, 'action:till');
@@ -190,8 +193,8 @@ export class SkillSystem implements System {
     });
 
     // Farming XP - watering
-    world.eventBus.subscribe('action:water', (event) => {
-      const agentId = event.data.agentId;
+    this.events.on('action:water', (data) => {
+      const agentId = data.agentId;
       if (agentId) {
         const baseXP = 2;
         this.awardXP(agentId, 'farming', baseXP, 'action:water');
@@ -199,8 +202,8 @@ export class SkillSystem implements System {
     });
 
     // Farming XP - fertilizing
-    world.eventBus.subscribe('action:fertilize', (event) => {
-      const agentId = event.data.agentId;
+    this.events.on('action:fertilize', (data) => {
+      const agentId = data.agentId;
       if (agentId) {
         const baseXP = 4;
         this.awardXP(agentId, 'farming', baseXP, 'action:fertilize');
@@ -208,10 +211,10 @@ export class SkillSystem implements System {
     });
 
     // Farming XP - gathering seeds
-    world.eventBus.subscribe('seed:gathered', (event) => {
-      const agentId = event.data.agentId ?? event.data.actorId;
+    this.events.on('seed:gathered', (data) => {
+      const agentId = data.agentId ?? data.actorId;
       if (agentId) {
-        const seedCount = event.data.seedCount ?? 1;
+        const seedCount = data.seedCount ?? 1;
         const baseXP = 3 + Math.floor(seedCount / 2);
         this.awardXP(agentId, 'farming', baseXP, 'seed:gathered');
       }
@@ -220,44 +223,44 @@ export class SkillSystem implements System {
     // === Trading / Economy ===
 
     // Social XP - buying (negotiation)
-    world.eventBus.subscribe('trade:buy', (event) => {
+    this.events.on('trade:buy', (data) => {
       const baseXP = 5;
-      this.awardXP(event.data.buyerId, 'social', baseXP, 'trade:buy');
+      this.awardXP(data.buyerId, 'social', baseXP, 'trade:buy');
     });
 
     // Social XP - selling (negotiation)
-    world.eventBus.subscribe('trade:sell', (event) => {
+    this.events.on('trade:sell', (data) => {
       const baseXP = 5;
-      this.awardXP(event.data.sellerId, 'social', baseXP, 'trade:sell');
+      this.awardXP(data.sellerId, 'social', baseXP, 'trade:sell');
     });
 
     // === Exploration ===
 
     // Exploration XP - arriving at navigation destinations
-    world.eventBus.subscribe('navigation:arrived', (event) => {
+    this.events.on('navigation:arrived', (data) => {
       const baseXP = 2;
-      this.awardXP(event.data.agentId, 'exploration', baseXP, 'navigation:arrived');
+      this.awardXP(data.agentId, 'exploration', baseXP, 'navigation:arrived');
     });
 
     // === Social ===
 
     // Social XP - calling meetings (leadership)
-    world.eventBus.subscribe('behavior:goal_achieved', (event) => {
-      if (event.data.behavior === 'call_meeting') {
+    this.events.on('behavior:goal_achieved', (data) => {
+      if (data.behavior === 'call_meeting') {
         const baseXP = 8;
-        this.awardXP(event.data.agentId, 'social', baseXP, 'call_meeting');
+        this.awardXP(data.agentId, 'social', baseXP, 'call_meeting');
       }
-      if (event.data.behavior === 'attend_meeting') {
+      if (data.behavior === 'attend_meeting') {
         const baseXP = 3;
-        this.awardXP(event.data.agentId, 'social', baseXP, 'attend_meeting');
+        this.awardXP(data.agentId, 'social', baseXP, 'attend_meeting');
       }
     });
 
     // === Building ===
 
     // Building XP - construction started (smaller XP, main XP on complete)
-    world.eventBus.subscribe('construction:started', (event) => {
-      const agentId = event.data.entityId;
+    this.events.on('construction:started', (data) => {
+      const agentId = data.entityId;
       if (agentId) {
         const baseXP = 5;
         this.awardXP(agentId, CT.Building, baseXP, 'construction:started');
@@ -306,30 +309,22 @@ export class SkillSystem implements System {
     // Update the component
     (entity as EntityImpl).updateComponent<SkillsComponent>(CT.Skills, () => result.component);
 
-    // Emit XP gain event immediately (handlers may be listening during event processing)
-    this.world.eventBus.emitImmediate({
-      type: 'skill:xp_gain',
-      source: 'skill-system',
-      data: {
-        agentId,
-        skillId,
-        amount: baseXP,
-        source,
-      },
+    // Type-safe emission - compile error if data shape is wrong
+    this.events.emitImmediate('skill:xp_gain', {
+      agentId,
+      skillId,
+      amount: baseXP,
+      source,
     });
 
     // Emit level up event if applicable
     if (result.leveledUp) {
       const oldLevel = (skills.levels[skillId] ?? 0) as SkillLevel;
-      this.world.eventBus.emitImmediate({
-        type: 'skill:level_up',
-        source: 'skill-system',
-        data: {
-          agentId,
-          skillId,
-          oldLevel,
-          newLevel: result.newLevel,
-        },
+      this.events.emitImmediate('skill:level_up', {
+        agentId,
+        skillId,
+        oldLevel,
+        newLevel: result.newLevel,
       });
 
       // Sync agent priorities with new skill levels
@@ -344,14 +339,10 @@ export class SkillSystem implements System {
       }
 
       // Show notification
-      this.world.eventBus.emitImmediate({
-        type: 'notification:show',
-        source: 'skill-system',
-        data: {
-          message: `${SKILL_NAMES[skillId]} increased to ${SKILL_LEVEL_NAMES[result.newLevel]}!`,
-          type: 'success',
-          duration: 3000,
-        },
+      this.events.emitImmediate('notification:show', {
+        message: `${SKILL_NAMES[skillId]} increased to ${SKILL_LEVEL_NAMES[result.newLevel]}!`,
+        type: 'success',
+        duration: 3000,
       });
     }
   }
@@ -380,5 +371,9 @@ export class SkillSystem implements System {
    */
   update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // No per-tick updates - all logic is event-driven
+  }
+
+  cleanup(): void {
+    this.events.cleanup(); // Unsubscribes all automatically
   }
 }

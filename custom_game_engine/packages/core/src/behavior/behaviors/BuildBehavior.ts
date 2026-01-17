@@ -23,6 +23,8 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { BuildingComponent, BuildingType } from '../../components/BuildingComponent.js';
 import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js';
+import type { GameEvent } from '../../events/GameEvent.js';
+import type { EventType } from '../../events/EventMap.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getPosition } from '../../utils/componentHelpers.js';
 import { createPlacementScorer } from '../../services/PlacementScorer.js';
@@ -31,10 +33,23 @@ import { BuildingType as BT } from '../../types/BuildingType.js';
 import { getTileConstructionSystem } from '../../systems/TileConstructionSystem.js';
 import { getTileBasedBlueprintRegistry, calculateDimensions } from '../../buildings/TileBasedBlueprintRegistry.js';
 
-// Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: any | null = null;
+/**
+ * ChunkSpatialQuery interface for efficient nearby entity lookups.
+ * Actual implementation is from @ai-village/world package.
+ */
+interface ChunkSpatialQuery {
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: string[]
+  ): Array<{ entity: EntityImpl; distance: number }>;
+}
 
-export function injectChunkSpatialQueryToBuild(spatialQuery: any): void {
+// Chunk spatial query injection for efficient nearby entity lookups
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToBuild(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
   console.log('[BuildBehavior] ChunkSpatialQuery injected for efficient building lookups');
 }
@@ -99,13 +114,16 @@ export class BuildBehavior extends BaseBehavior {
     this.stopMovement(entity);
 
     // Check if we're waiting for an existing building to complete
-    const waitingForBuildingId = agent.behaviorState?.waitingForBuildingId as string | undefined;
-    if (waitingForBuildingId) {
-      return this.checkBuildingCompletion(entity, world, waitingForBuildingId);
+    const behaviorState = agent.behaviorState;
+    if (behaviorState && 'waitingForBuildingId' in behaviorState && typeof behaviorState.waitingForBuildingId === 'string') {
+      return this.checkBuildingCompletion(entity, world, behaviorState.waitingForBuildingId);
     }
 
     // Get and validate building type
-    let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.Campfire;
+    let buildingType: BuildingType = BT.Campfire;
+    if (behaviorState && 'buildingType' in behaviorState && typeof behaviorState.buildingType === 'string') {
+      buildingType = behaviorState.buildingType as BuildingType;
+    }
 
     // CAMPFIRE DUPLICATE PREVENTION: Before building a campfire, check if one exists nearby
     // This prevents the over-building issue where agents create 85+ campfires
@@ -581,6 +599,19 @@ export function buildBehavior(entity: EntityImpl, world: World): void {
 }
 
 /**
+ * Minimal World interface for delegating to BuildBehavior from BehaviorContext
+ */
+interface MinimalWorldAdapter {
+  tick: number;
+  getEntity(id: string): EntityImpl | undefined;
+  eventBus: {
+    emit<T extends EventType>(
+      event: Omit<GameEvent<T>, 'tick' | 'timestamp'>
+    ): void;
+  };
+}
+
+/**
  * Modern version using BehaviorContext.
  * @example registerBehaviorWithContext('build', buildBehaviorWithContext);
  */
@@ -597,6 +628,7 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
       return ctx.complete('Building not found');
     }
 
+    // Cast required: Entity interface doesn't expose component access methods
     const buildingImpl = buildingEntity as EntityImpl;
     const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
@@ -624,6 +656,7 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     const nearbyBuildings = ctx.getEntitiesInRadius(CAMPFIRE_CHECK_RADIUS, [ComponentType.Building]);
 
     for (const { entity: building } of nearbyBuildings) {
+      // Cast required: Entity interface doesn't expose component access methods
       const buildingImpl = building as EntityImpl;
       const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
@@ -644,7 +677,20 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   }
 
   // Delegate to class for complex building logic
+  // Create minimal World adapter for BuildBehavior compatibility
   const behavior = new BuildBehavior();
-  const world = { tick: ctx.tick, getEntity: (id: string) => ctx.getEntity(id), eventBus: { emit: (e: any) => ctx.emit(e) } } as any;
-  return behavior.execute(ctx.entity, world);
+  const worldAdapter: MinimalWorldAdapter = {
+    tick: ctx.tick,
+    getEntity: (id: string) => {
+      const entity = ctx.getEntity(id);
+      // Cast required: BehaviorContext.getEntity returns Entity, but we need EntityImpl for mutation methods
+      return entity as EntityImpl | undefined;
+    },
+    eventBus: {
+      emit: (e) => ctx.emit(e),
+    },
+  };
+
+  // Cast required: BuildBehavior expects full World interface but only uses tick/getEntity/eventBus
+  return behavior.execute(ctx.entity, worldAdapter as unknown as World);
 }

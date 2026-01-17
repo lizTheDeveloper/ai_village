@@ -61,6 +61,32 @@ Multiverse: The End of Eternity uses large language models to give agents person
 
 ---
 
+## 🚀 Quick Start for Players
+
+**Want to play?**
+
+```bash
+cd custom_game_engine && ./start.sh
+```
+
+Then open http://localhost:3000 in your browser.
+
+**First time?** Read the [PLAYER_GUIDE.md](./PLAYER_GUIDE.md) to learn how to play!
+
+---
+
+## 📖 Player Documentation
+
+**New to the game?** Start here:
+
+- **[PLAYER_GUIDE.md](./PLAYER_GUIDE.md)** - Complete guide to playing the game
+- **[FAQ.md](./FAQ.md)** - Frequently asked questions
+- **[CONTROLS.md](./CONTROLS.md)** - Keyboard and mouse controls
+
+**For developers:** See [custom_game_engine/DOCUMENTATION_INDEX.md](./custom_game_engine/DOCUMENTATION_INDEX.md)
+
+---
+
 ## What Is This?
 
 Multiverse: The End of Eternity is a simulation game where autonomous AI agents:

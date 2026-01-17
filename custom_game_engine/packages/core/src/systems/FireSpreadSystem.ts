@@ -1,9 +1,9 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { BurningComponent } from '../components/BurningComponent.js';
 import { createBurningComponent } from '../components/BurningComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
@@ -160,7 +160,7 @@ const MATERIAL_COMBUSTION: Record<string, MaterialCombustionProperties> = {
  * @see StateMutatorSystem - Batched health damage from burning
  * @see WeatherSystem - Rain extinguishing, wind affecting spread
  */
-export class FireSpreadSystem implements System {
+export class FireSpreadSystem extends BaseSystem {
   public readonly id: SystemId = 'fire_spread';
   public readonly priority: number = 70; // Run after weather (5), before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Burning];
@@ -168,8 +168,7 @@ export class FireSpreadSystem implements System {
   public readonly dependsOn = ['state_mutator', 'weather'] as const;
 
   // Throttle fire updates to every 5 seconds (performance optimization)
-  private readonly UPDATE_INTERVAL = 100; // Ticks (5 seconds at 20 TPS)
-  private lastUpdate = 0;
+  protected readonly throttleInterval = 100; // Ticks (5 seconds at 20 TPS)
 
   // Burning tile tracking
   private burningTiles = new Map<string, BurningTileData>();
@@ -188,12 +187,9 @@ export class FireSpreadSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates to every 5 seconds
-    if (world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdate = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    // Throttling handled by BaseSystem
 
     // Get chunk manager for generation checks
     const worldWithChunks = world as {
@@ -205,27 +201,16 @@ export class FireSpreadSystem implements System {
       ? worldWithChunks.getChunkManager()
       : undefined;
 
-    // Update agent positions for SimulationScheduler
-    world.simulationScheduler.updateAgentPositions(world);
-
-    // Filter to active entities only (near agents)
-    const activeEntities = world.simulationScheduler.filterActiveEntities(
-      entities as Entity[],
-      world.tick
-    );
-
     // Get rain/wind from weather (affects extinguishing and spread)
     const weatherData = this.getWeatherData(world);
 
-    // Process burning entities
-    for (const entity of activeEntities) {
-      if (!entity.components.has(CT.Burning)) continue;
+    // Process burning entities (activeEntities already filtered by SimulationScheduler)
+    for (const entity of ctx.activeEntities) {
+      const comps = ctx.components(entity);
+      const burning = comps.optional<BurningComponent>(CT.Burning);
+      const position = comps.optional<PositionComponent>(CT.Position);
 
-      const impl = entity as EntityImpl;
-      const burning = impl.getComponent<BurningComponent>(CT.Burning)!;
-      const position = impl.getComponent<PositionComponent>(CT.Position);
-
-      if (!position) continue;
+      if (!position || !burning) continue;
 
       // Check for extinguishing conditions
       if (this.shouldExtinguish(burning, weatherData)) {
@@ -234,7 +219,7 @@ export class FireSpreadSystem implements System {
       }
 
       // Update burn duration
-      const newDuration = burning.durationRemaining - this.UPDATE_INTERVAL;
+      const newDuration = burning.durationRemaining - this.throttleInterval;
       if (newDuration <= 0) {
         // Fire burned out naturally
         this.extinguishEntity(world, entity);
@@ -242,7 +227,7 @@ export class FireSpreadSystem implements System {
       }
 
       // Update burning component
-      impl.updateComponent<BurningComponent>(CT.Burning, (current) => ({
+      comps.update<BurningComponent>(CT.Burning, (current) => ({
         ...current,
         durationRemaining: newDuration,
       }));
@@ -524,7 +509,7 @@ export class FireSpreadSystem implements System {
       this.applyTileDamage(tile, burning);
 
       // Decrease duration
-      burning.durationRemaining -= this.UPDATE_INTERVAL;
+      burning.durationRemaining -= this.throttleInterval;
       if (burning.durationRemaining <= 0) {
         toExtinguish.push(key);
       }
