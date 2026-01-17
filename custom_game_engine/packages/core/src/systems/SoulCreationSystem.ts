@@ -351,6 +351,42 @@ export class SoulCreationSystem implements System {
   }
 
   /**
+   * Determine spawn location for soul incarnation.
+   * Priority:
+   * 1. Use context.incarnationLocation if provided
+   * 2. Spawn near parents if they exist
+   * 3. Spawn at world spawn point (0, 0)
+   */
+  private determineSpawnLocation(context: SoulCreationContext): { chunkX: number; chunkY: number; worldX: number; worldY: number } {
+    const CHUNK_SIZE = 32; // Must match world package CHUNK_SIZE
+
+    // Priority 1: Use explicit incarnation location
+    if (context.incarnationLocation) {
+      const worldX = context.incarnationLocation.x;
+      const worldY = context.incarnationLocation.y;
+      return {
+        chunkX: Math.floor(worldX / CHUNK_SIZE),
+        chunkY: Math.floor(worldY / CHUNK_SIZE),
+        worldX,
+        worldY,
+      };
+    }
+
+    // Priority 2: Spawn near parents (not implemented yet - would require parent entity lookup)
+    // TODO: If context.parentSouls provided, look up parent entities and spawn nearby
+
+    // Priority 3: World spawn point
+    const worldX = 0;
+    const worldY = 0;
+    return {
+      chunkX: Math.floor(worldX / CHUNK_SIZE),
+      chunkY: Math.floor(worldY / CHUNK_SIZE),
+      worldX,
+      worldY,
+    };
+  }
+
+  /**
    * Begin a soul creation ceremony
    */
   private startCeremony(world: World, request: SoulCreationRequest): void {
@@ -418,6 +454,23 @@ export class SoulCreationSystem implements System {
       startTick: world.tick,
       completed: false,
     };
+
+    // Pre-generate chunks around spawn location during ceremony
+    // This ensures terrain is ready when the soul incarnates
+    const spawnLocation = this.determineSpawnLocation(request.context);
+    const generator = world.getBackgroundChunkGenerator();
+    if (generator) {
+      generator.queueChunkGrid(
+        spawnLocation.chunkX,
+        spawnLocation.chunkY,
+        3, // 7x7 chunk grid (radius 3 from center = 49 chunks)
+        'HIGH', // High priority - soul creation blocks gameplay
+        'soul_creation'
+      );
+      console.log(
+        `[SoulCreationSystem] Queued 7x7 chunk grid around spawn (${spawnLocation.chunkX}, ${spawnLocation.chunkY}) for background generation`
+      );
+    }
 
     // Emit event that ceremony has begun (for observers)
     world.eventBus.emit({

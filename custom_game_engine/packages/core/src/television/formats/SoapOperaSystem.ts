@@ -14,6 +14,7 @@ import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { Storyline, PlotTwist, StorylineTheme, ShowCharacter } from '../TVShow.js';
 
@@ -151,7 +152,7 @@ export interface StoryArc {
 // ============================================================================
 
 export class SoapOperaManager {
-  private eventBus: EventBus | null = null;
+  private events: SystemEventManager | null = null;
 
   /** Show storylines */
   private storylines: Map<string, Storyline> = new Map();
@@ -173,7 +174,7 @@ export class SoapOperaManager {
   private characterDramaScores: Map<string, number> = new Map();
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'SoapOperaManager');
   }
 
   // ============================================================================

@@ -20,6 +20,22 @@ import type { Entity } from '../../ecs/Entity';
  *
  * See: VOXEL_BUILDING_SYSTEM_PLAN.md Section 4
  */
+
+/**
+ * Test fixture type for blueprint configuration.
+ * Represents the expected configuration object passed to world.createBlueprint().
+ */
+interface BlueprintConfig {
+  id: string;
+  name?: string;
+  layout: string[];
+  defaultWallMaterial?: string;
+  defaultFloorMaterial?: string;
+  defaultDoorMaterial?: string;
+  defaultWindowMaterial?: string;
+  materialOverrides?: Record<string, string>;
+}
+
 describe('Tile-Based Blueprint System', () => {
   let world: WorldImpl;
 
@@ -657,12 +673,14 @@ describe('Tile-Based Blueprint System', () => {
 
     it('should throw if placing blueprint with no wall material specified', () => {
       expect(() => {
-        world.createBlueprint({
+        // Test fixture: Intentionally omit defaultWallMaterial to test error handling
+        const invalidConfig: Omit<BlueprintConfig, 'defaultWallMaterial'> = {
           id: 'invalid',
           layout: ['###', '#.#', '###'],
           defaultFloorMaterial: 'wood_floor',
-          // Missing defaultWallMaterial
-        } as any);
+          // Missing defaultWallMaterial - should trigger error
+        };
+        world.createBlueprint(invalidConfig as BlueprintConfig);
       }).toThrow('Blueprint has walls but no defaultWallMaterial specified');
     });
 

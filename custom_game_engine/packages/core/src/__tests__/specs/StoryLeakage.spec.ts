@@ -474,8 +474,14 @@ describe('Story Leakage System', () => {
     });
 
     it('should throw if creating genre aura with invalid genre', () => {
+      // Test that runtime validation rejects invalid genre types
+      // TypeScript correctly prevents this at compile-time, but we need to test runtime validation
+      // for cases where data might come from external sources (saved games, network, etc.)
+      // Using unknown → string to explicitly bypass type safety for testing
+      const invalidGenre: unknown = 'invalid_genre';
+
       expect(() => {
-        world.createGenreAura('invalid_genre' as any, { x: 10, y: 10, radius: 30 });
+        world.createGenreAura(invalidGenre as string, { x: 10, y: 10, radius: 30 });
       }).toThrow('Unknown genre: invalid_genre');
     });
 

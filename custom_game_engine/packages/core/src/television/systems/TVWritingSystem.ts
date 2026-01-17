@@ -70,7 +70,7 @@ export class TVWritingSystem implements System {
   readonly priority = 63; // After development
   readonly requiredComponents = [ComponentType.TVShow] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastProcessTick: number = 0;
 
   /** Active writing tasks */
@@ -80,7 +80,7 @@ export class TVWritingSystem implements System {
   private scriptGenerator: ((req: ScriptGenerationRequest) => Promise<ScriptGenerationResult>) | null = null;
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   /**
@@ -158,15 +158,11 @@ export class TVWritingSystem implements System {
       case 'draft':
         content.script.productionStatus = 'draft';
         content.script.revisions = 0;
-        this.eventBus?.emit({
-          type: 'tv:script:draft_completed' as any,
-          source: task.writerId,
-          data: {
-            scriptId: task.scriptId,
-            showId: task.showId,
-            writerId: task.writerId,
-          },
-        });
+        this.events.emitGeneric('tv:script:draft_completed', {
+          scriptId: task.scriptId,
+          showId: task.showId,
+          writerId: task.writerId,
+        }, task.writerId);
         break;
 
       case 'revision':
@@ -174,15 +170,11 @@ export class TVWritingSystem implements System {
         if (content.script.revisions >= 2) {
           content.script.productionStatus = 'table_read';
         }
-        this.eventBus?.emit({
-          type: 'tv:script:revised' as any,
-          source: task.writerId,
-          data: {
-            scriptId: task.scriptId,
-            showId: task.showId,
-            revisionNumber: content.script.revisions,
-          },
-        });
+        this.events.emitGeneric('tv:script:revised', {
+          scriptId: task.scriptId,
+          showId: task.showId,
+          revisionNumber: content.script.revisions,
+        }, task.writerId);
         break;
 
       case 'table_read':
@@ -203,15 +195,11 @@ export class TVWritingSystem implements System {
           }
         }
 
-        this.eventBus?.emit({
-          type: 'tv:script:ready_to_film' as any,
-          source: task.showId,
-          data: {
-            scriptId: task.scriptId,
-            showId: task.showId,
-            contentId: task.contentId,
-          },
-        });
+        this.events.emitGeneric('tv:script:ready_to_film', {
+          scriptId: task.scriptId,
+          showId: task.showId,
+          contentId: task.contentId,
+        }, task.showId);
         break;
     }
 
@@ -439,16 +427,12 @@ export class TVWritingSystem implements System {
 
     show.storylines.push(storyline);
 
-    this.eventBus?.emit({
-      type: 'tv:storyline:started' as any,
-      source: showId,
-      data: {
-        showId,
-        storylineId: storyline.id,
-        title,
-        characters,
-      },
-    });
+    this.events.emitGeneric('tv:storyline:started', {
+      showId,
+      storylineId: storyline.id,
+      title,
+      characters,
+    }, showId);
 
     return storyline;
   }
@@ -470,15 +454,11 @@ export class TVWritingSystem implements System {
 
     storyline.status = resolution;
 
-    this.eventBus?.emit({
-      type: 'tv:storyline:ended' as any,
-      source: showId,
-      data: {
-        showId,
-        storylineId,
-        resolution,
-      },
-    });
+    this.events.emitGeneric('tv:storyline:ended', {
+      showId,
+      storylineId,
+      resolution,
+    }, showId);
 
     return true;
   }
@@ -569,8 +549,8 @@ export class TVWritingSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.activeTasks.clear();
     this.scriptGenerator = null;
-    this.eventBus = null;
   }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../../ecs/World.js';
-import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
+import { EntityImpl, createEntityId, type Entity } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { ActionQueue } from '../ActionQueue.js';
 import { ActionRegistry } from '../ActionRegistry.js';
@@ -38,7 +38,14 @@ describe('ActionQueue Time Speed Integration', () => {
     // Create time entity with time component
     timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1)); // dawn, 48s day, 1x speed
-    (world as any)._addEntity(timeEntity);
+
+    // Add entity directly to world using internal method
+    // This is necessary for test setup because we're creating a fully-formed entity
+    // with components rather than using the standard createEntity flow
+    interface WorldInternal {
+      _addEntity(entity: Entity): void;
+    }
+    (world as unknown as WorldInternal)._addEntity(timeEntity);
 
     // Create action registry and queue
     actionRegistry = new ActionRegistry();

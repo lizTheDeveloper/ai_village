@@ -174,6 +174,7 @@ export class SongCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    // Cast to MagicCostType: costType is validated to be a valid cost type by the time it reaches this method
+    return super.getTerminalEffect(costType as MagicCostType, trigger, _caster);
   }
 }

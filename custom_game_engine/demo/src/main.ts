@@ -3668,6 +3668,19 @@ async function main() {
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
+  // Create BackgroundChunkGenerator for asynchronous chunk pre-generation
+  // Used by SoulCreationSystem to pre-generate chunks during soul ceremonies
+  const { BackgroundChunkGenerator } = await import('@ai-village/world');
+  const backgroundChunkGenerator = new BackgroundChunkGenerator(
+    chunkManager,
+    terrainGenerator,
+    2,  // throttleInterval: process 1 chunk every 2 ticks (100ms at 20 TPS)
+    18, // minTPS: pause if TPS drops below 18
+    19  // resumeTPS: resume when TPS recovers to 19+
+  );
+  (gameLoop.world as any).setBackgroundChunkGenerator(backgroundChunkGenerator);
+  console.log('[Main] BackgroundChunkGenerator created (throttle: 2 ticks, pause TPS: <18, resume TPS: 19+)');
+
   // Show Universe Browser Screen - the gateway to the multiverse
   // This screen allows players to:
   // - Create a new universe (leads to UniverseConfigScreen)

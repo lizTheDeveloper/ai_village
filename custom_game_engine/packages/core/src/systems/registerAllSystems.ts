@@ -301,6 +301,9 @@ import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSyste
 // Chunk Loading System
 import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
 
+// Background Chunk Generation System
+import { BackgroundChunkGeneratorSystem } from './BackgroundChunkGeneratorSystem.js';
+
 /**
  * Validate system dependency ordering.
  * Checks if systems declare dependencies on systems that run at same time or later.
@@ -453,6 +456,11 @@ export function registerAllSystems(
     chunkLoadingSystem = new ChunkLoadingSystem(chunkManager, terrainGenerator);
     gameLoop.systemRegistry.register(chunkLoadingSystem);
   }
+
+  // BackgroundChunkGeneratorSystem - Processes background chunk generation queue
+  // Priority 6 (right after ChunkLoadingSystem)
+  // Pre-generates chunks during soul creation, agent spawning, etc.
+  gameLoop.systemRegistry.register(new BackgroundChunkGeneratorSystem());
 
   // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
   // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.
