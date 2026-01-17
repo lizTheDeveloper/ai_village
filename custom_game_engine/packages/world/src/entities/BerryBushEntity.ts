@@ -56,7 +56,8 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
   }));
 
   // Add to world
-  (world as any)._addEntity(entity);
+  // Cast required: WorldMutator interface doesn't expose _addEntity (internal method)
+  (world as WorldImpl)._addEntity(entity);
 
   return entity.id;
 }

@@ -40,6 +40,10 @@ export interface GameEventMap {
     requestedBy: string;
     tick: number;
   };
+  'chunk_prediction_queued': {
+    count: number;
+    tick: number;
+  };
 
   // === Agent Action Events ===
   'agent:action:started': {

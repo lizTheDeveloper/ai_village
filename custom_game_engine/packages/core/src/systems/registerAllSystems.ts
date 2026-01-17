@@ -303,6 +303,7 @@ import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
 
 // Background Chunk Generation System
 import { BackgroundChunkGeneratorSystem } from './BackgroundChunkGeneratorSystem.js';
+import { PredictiveChunkLoadingSystem } from './PredictiveChunkLoadingSystem.js';
 
 /**
  * Validate system dependency ordering.
@@ -461,6 +462,11 @@ export function registerAllSystems(
   // Priority 6 (right after ChunkLoadingSystem)
   // Pre-generates chunks during soul creation, agent spawning, etc.
   gameLoop.systemRegistry.register(new BackgroundChunkGeneratorSystem());
+
+  // PredictiveChunkLoadingSystem - Predicts and queues chunks ahead of moving agents
+  // Priority 7 (after BackgroundChunkGeneratorSystem)
+  // Prevents lag when agents enter new areas by pre-generating chunks in movement direction
+  gameLoop.systemRegistry.register(new PredictiveChunkLoadingSystem());
 
   // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
   // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.

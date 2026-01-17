@@ -55,7 +55,7 @@ export class PredictiveChunkLoadingSystem extends BaseSystem {
       return;
     }
 
-    const chunkManager = ctx.world.chunkManager;
+    const chunkManager = ctx.world.getChunkManager();
     if (!chunkManager) {
       // No chunk manager - cannot check if chunks exist
       return;

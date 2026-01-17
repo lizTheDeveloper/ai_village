@@ -361,7 +361,7 @@ export function executeEffect(
         break;
       }
 
-      const plotLines = soulEntity.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      const plotLines = soulEntity.getComponent<PlotLinesComponent>(ComponentType.PlotLines);
       if (!plotLines) {
         console.warn(`[PlotEffect] Soul ${context.plot.soul_id} has no PlotLines component`);
         break;
@@ -388,7 +388,7 @@ export function executeEffect(
         break;
       }
 
-      const plotLines = soulEntity.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      const plotLines = soulEntity.getComponent<PlotLinesComponent>(ComponentType.PlotLines);
       if (!plotLines) {
         console.warn(`[PlotEffect] Soul ${context.plot.soul_id} has no PlotLines component`);
         break;
@@ -476,7 +476,7 @@ export function captureRelationshipSnapshot(
   const entity = world.getEntity(entityId);
   if (!entity) return;
 
-  const relationship = entity.getComponent('relationship') as RelationshipComponent | undefined;
+  const relationship = entity.getComponent<RelationshipComponent>('relationship');
   if (!relationship) return;
 
   const rel = relationship.relationships.get(targetId);
