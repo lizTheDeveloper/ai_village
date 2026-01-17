@@ -2379,6 +2379,15 @@ export interface GameEventMap {
     proficiency?: number;
   };
 
+  /** Confirmation event when a spell is learned with detailed info */
+  'magic:spell_learned_confirmed': {
+    entityId: EntityId;
+    spellId: string;
+    spellName: string;
+    paradigmId: string;
+    initialProficiency: number;
+  };
+
   /** Mana is granted to an entity */
   'magic:grant_mana': {
     entityId: EntityId;

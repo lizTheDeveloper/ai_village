@@ -54,9 +54,8 @@ export class SpellLearningManager {
     }));
 
     // Emit spell learned confirmation event
-    // (Using generic emit since magic:spell_learned_confirmed not in GameEventMap)
-    (this.world?.eventBus as any)?.emit({
-      type: 'magic:spell_learned_confirmed',
+    this.world?.eventBus.emit<'magic:spell_learned_confirmed'>({
+      type: 'magic:spell_learned_confirmed' as const,
       source: entity.id,
       data: {
         entityId: entity.id,

@@ -88,13 +88,13 @@ export class ExpressionEvaluator {
       }
     }
 
-    let value: any = context;
+    let value: unknown = context;
 
     for (const part of parts) {
       if (value === null || value === undefined) {
         throw new Error(`Undefined variable: ${path}`);
       }
-      value = value[part];
+      value = (value as Record<string, unknown>)[part];
     }
 
     if (typeof value !== 'number' && typeof value !== 'boolean') {
@@ -155,7 +155,9 @@ export class ExpressionEvaluator {
       case '>=':
         return (left as number) >= (right as number);
       default:
-        throw new Error(`Unknown operator: ${(expr as any).op}`);
+        // Type guard ensures we've handled all operators
+        const exhaustiveCheck: never = expr.op;
+        throw new Error(`Unknown operator: ${exhaustiveCheck}`);
     }
   }
 
@@ -176,7 +178,9 @@ export class ExpressionEvaluator {
       case 'not':
         return !operand;
       default:
-        throw new Error(`Unknown unary operator: ${(expr as any).op}`);
+        // Type guard ensures we've handled all unary operators
+        const exhaustiveCheck: never = expr.op;
+        throw new Error(`Unknown unary operator: ${exhaustiveCheck}`);
     }
   }
 
@@ -235,7 +239,9 @@ export class ExpressionEvaluator {
         return this.fn_if_else(expr.args, context, depth);
 
       default:
-        throw new Error(`Unknown function: ${(expr as any).fn}`);
+        // Type guard ensures we've handled all functions
+        const exhaustiveCheck: never = expr.fn;
+        throw new Error(`Unknown function: ${exhaustiveCheck}`);
     }
   }
 
@@ -446,7 +452,7 @@ export class ExpressionEvaluator {
   ): { x: number; y: number } {
     // Handle object literals directly
     if (typeof expr === 'object' && expr !== null && 'x' in expr && 'y' in expr) {
-      const obj = expr as any;
+      const obj = expr as { x: unknown; y: unknown };
       if (typeof obj.x === 'number' && typeof obj.y === 'number') {
         return { x: obj.x, y: obj.y };
       }
@@ -455,15 +461,22 @@ export class ExpressionEvaluator {
     // Handle variable reference to object
     if (typeof expr === 'string') {
       const value = this.resolvePointVariable(expr, context);
-      if (typeof value.x === 'number' && typeof value.y === 'number') {
-        return value;
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        'x' in value &&
+        'y' in value &&
+        typeof (value as { x: unknown }).x === 'number' &&
+        typeof (value as { y: unknown }).y === 'number'
+      ) {
+        return value as { x: number; y: number };
       }
     }
 
     throw new Error('Point must be an object with x and y numeric properties');
   }
 
-  private resolvePointVariable(path: string, context: ExpressionContext): any {
+  private resolvePointVariable(path: string, context: ExpressionContext): unknown {
     // Security: Prevent prototype pollution
     const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
     const parts = path.split('.');
@@ -474,13 +487,13 @@ export class ExpressionEvaluator {
       }
     }
 
-    let value: any = context;
+    let value: unknown = context;
 
     for (const part of parts) {
       if (value === null || value === undefined) {
         throw new Error(`Undefined variable: ${path}`);
       }
-      value = value[part];
+      value = (value as Record<string, unknown>)[part];
     }
 
     return value;
@@ -534,11 +547,16 @@ export class ExpressionEvaluator {
     }
 
     const entity = this.resolvePointVariable(entityPath, context);
-    if (!entity || !Array.isArray(entity.statuses)) {
+    if (
+      !entity ||
+      typeof entity !== 'object' ||
+      !('statuses' in entity) ||
+      !Array.isArray((entity as { statuses?: unknown }).statuses)
+    ) {
       return false;
     }
 
-    return entity.statuses.includes(statusName);
+    return (entity as { statuses: string[] }).statuses.includes(statusName);
   }
 
   private fn_has_component(
@@ -561,11 +579,16 @@ export class ExpressionEvaluator {
     }
 
     const entity = this.resolvePointVariable(entityPath, context);
-    if (!entity || !Array.isArray(entity.components)) {
+    if (
+      !entity ||
+      typeof entity !== 'object' ||
+      !('components' in entity) ||
+      !Array.isArray((entity as { components?: unknown }).components)
+    ) {
       return false;
     }
 
-    return entity.components.includes(componentName);
+    return (entity as { components: string[] }).components.includes(componentName);
   }
 
   private fn_get_stat(args: Expression[], context: ExpressionContext, depth: number): number {
@@ -584,11 +607,18 @@ export class ExpressionEvaluator {
     }
 
     const entity = this.resolvePointVariable(entityPath, context);
-    if (!entity || !entity.stats || typeof entity.stats !== 'object') {
+    if (
+      !entity ||
+      typeof entity !== 'object' ||
+      !('stats' in entity) ||
+      typeof (entity as { stats?: unknown }).stats !== 'object' ||
+      (entity as { stats?: unknown }).stats === null
+    ) {
       throw new Error(`Entity ${entityPath} has no stats`);
     }
 
-    const value = entity.stats[statName];
+    const stats = (entity as { stats: Record<string, unknown> }).stats;
+    const value = stats[statName];
     if (typeof value !== 'number') {
       throw new Error(`Stat ${statName} is not a number`);
     }

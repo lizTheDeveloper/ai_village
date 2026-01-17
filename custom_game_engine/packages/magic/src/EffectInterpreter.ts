@@ -8,6 +8,8 @@ import type {
   DirectionExpression,
   Condition,
   DamageType,
+  EntityContext,
+  BinaryOp,
 } from './EffectExpression.js';
 import { ExpressionEvaluator } from './ExpressionEvaluator.js';
 import type { Entity, World, NeedsComponent, PositionComponent } from '@ai-village/core';
@@ -17,7 +19,36 @@ export interface EffectContext {
   target: Entity;
   world: World;
   tick: number;
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+export interface EffectEvent {
+  type: string;
+  payload: Record<string, unknown>;
+  tick: number;
+}
+
+export interface StatModifier {
+  type: 'stat_modifier' | 'stat_set';
+  stat: string;
+  amount?: number;
+  value?: number;
+  duration?: number;
+  expiresAt?: number;
+}
+
+export interface StatusEffect {
+  type: 'status_effect';
+  status: string;
+  stacks: number;
+  duration: number;
+  expiresAt: number;
+}
+
+export interface DelayedOperation {
+  ticks: number;
+  operations: EffectOperation[];
+  context: EffectContext;
 }
 
 export interface EffectResult {
@@ -28,11 +59,11 @@ export interface EffectResult {
   damageDealt?: number;
   healingDone?: number;
   entitiesSpawned?: number;
-  eventsEmitted?: any[];
-  modifications?: any[];
-  statusesApplied?: any[];
+  eventsEmitted?: EffectEvent[];
+  modifications?: StatModifier[];
+  statusesApplied?: StatusEffect[];
   chainCount?: number;
-  timing?: any;
+  timing?: unknown;
 }
 
 export interface InterpreterOptions {
@@ -65,6 +96,27 @@ const VALID_ENTITY_TYPES = new Set([
   'earth_elemental', 'rat', 'goblin', 'dragon', 'sheep', 'frog', 'chicken', 'statue'
 ]);
 
+// Type aliases for specific operations (extracted from EffectOperation union)
+type ModifyStatOp = Extract<EffectOperation, { op: 'modify_stat' }>;
+type SetStatOp = Extract<EffectOperation, { op: 'set_stat' }>;
+type ApplyStatusOp = Extract<EffectOperation, { op: 'apply_status' }>;
+type RemoveStatusOp = Extract<EffectOperation, { op: 'remove_status' }>;
+type DealDamageOp = Extract<EffectOperation, { op: 'deal_damage' }>;
+type HealOp = Extract<EffectOperation, { op: 'heal' }>;
+type TeleportOp = Extract<EffectOperation, { op: 'teleport' }>;
+type PushOp = Extract<EffectOperation, { op: 'push' }>;
+type PullOp = Extract<EffectOperation, { op: 'pull' }>;
+type SpawnEntityOp = Extract<EffectOperation, { op: 'spawn_entity' }>;
+type SpawnItemOp = Extract<EffectOperation, { op: 'spawn_item' }>;
+type TransformEntityOp = Extract<EffectOperation, { op: 'transform_entity' }>;
+type TransformMaterialOp = Extract<EffectOperation, { op: 'transform_material' }>;
+type EmitEventOp = Extract<EffectOperation, { op: 'emit_event' }>;
+type ChainEffectOp = Extract<EffectOperation, { op: 'chain_effect' }>;
+type TriggerEffectOp = Extract<EffectOperation, { op: 'trigger_effect' }>;
+type ConditionalOp = Extract<EffectOperation, { op: 'conditional' }>;
+type RepeatOp = Extract<EffectOperation, { op: 'repeat' }>;
+type DelayOp = Extract<EffectOperation, { op: 'delay' }>;
+
 /**
  * EffectInterpreter - Safe execution of EffectExpression trees
  *
@@ -91,13 +143,13 @@ export class EffectInterpreter {
   private damageDealt: number = 0;
   private healingDone: number = 0;
   private entitiesSpawned: number = 0;
-  private eventsEmitted: any[] = [];
-  private modifications: any[] = [];
-  private statusesApplied: any[] = [];
+  private eventsEmitted: EffectEvent[] = [];
+  private modifications: StatModifier[] = [];
+  private statusesApplied: StatusEffect[] = [];
   private chainDepth: number = 0;
   private visitedTargets: Set<string> = new Set();
   private effectRegistry: Map<string, EffectExpression> = new Map();
-  private delayedOperations: any[] = [];
+  private delayedOperations: DelayedOperation[] = [];
 
   constructor(options: InterpreterOptions = {}) {
     this.maxOperations = options.maxOperations ?? 1000;
@@ -300,7 +352,9 @@ export class EffectInterpreter {
         this.executeDelay(operation, context, depth);
         break;
       default:
-        throw new Error(`Unknown operation: ${(operation as any).op}`);
+        // Type guard ensures we've handled all operation types
+        const exhaustiveCheck: never = operation;
+        throw new Error(`Unknown operation: ${(exhaustiveCheck as EffectOperation).op}`);
     }
   }
 
@@ -308,7 +362,7 @@ export class EffectInterpreter {
   // STAT OPERATIONS
   // ============================================================================
 
-  private executeModifyStat(operation: any, context: EffectContext): void {
+  private executeModifyStat(operation: ModifyStatOp, context: EffectContext): void {
     this.validateSafeName(operation.stat, 'stat');
 
     if (!VALID_STATS.has(operation.stat)) {
@@ -319,19 +373,19 @@ export class EffectInterpreter {
     const duration = operation.duration ?? 0;
 
     // Add temporary stat modifier component
-    const modifier = {
-      type: 'stat_modifier',
+    const modifier: StatModifier = {
+      type: 'stat_modifier' as const,
       stat: operation.stat,
       amount,
       duration,
       expiresAt: duration > 0 ? context.tick + duration : undefined,
     };
 
-    context.world.addComponent(context.target.id, modifier as any);
+    context.world.addComponent(context.target.id, { ...modifier, version: 1 });
     this.modifications.push(modifier);
   }
 
-  private executeSetStat(operation: any, context: EffectContext): void {
+  private executeSetStat(operation: SetStatOp, context: EffectContext): void {
     this.validateSafeName(operation.stat, 'stat');
 
     if (!VALID_STATS.has(operation.stat)) {
@@ -341,20 +395,20 @@ export class EffectInterpreter {
     const value = this.evaluateExpression(operation.value, context);
 
     // Set stat directly (would need to update appropriate component)
-    const modifier = {
-      type: 'stat_set',
+    const modifier: StatModifier = {
+      type: 'stat_set' as const,
       stat: operation.stat,
       value,
     };
 
-    context.world.addComponent(context.target.id, modifier as any);
+    context.world.addComponent(context.target.id, { ...modifier, version: 1 });
   }
 
   // ============================================================================
   // STATUS EFFECTS
   // ============================================================================
 
-  private executeApplyStatus(operation: any, context: EffectContext): void {
+  private executeApplyStatus(operation: ApplyStatusOp, context: EffectContext): void {
     if (!VALID_STATUSES.has(operation.status)) {
       throw new Error(`Invalid status name: ${operation.status}`);
     }
@@ -362,19 +416,19 @@ export class EffectInterpreter {
     const stacks = operation.stacks ?? 1;
     const duration = operation.duration;
 
-    const statusEffect = {
-      type: 'status_effect',
+    const statusEffect: StatusEffect = {
+      type: 'status_effect' as const,
       status: operation.status,
       stacks,
       duration,
       expiresAt: context.tick + duration,
     };
 
-    context.world.addComponent(context.target.id, statusEffect as any);
+    context.world.addComponent(context.target.id, { ...statusEffect, version: 1 });
     this.statusesApplied.push(statusEffect);
   }
 
-  private executeRemoveStatus(operation: any, context: EffectContext): void {
+  private executeRemoveStatus(operation: RemoveStatusOp, context: EffectContext): void {
     if (!VALID_STATUSES.has(operation.status)) {
       throw new Error(`Invalid status name: ${operation.status}`);
     }
@@ -387,7 +441,7 @@ export class EffectInterpreter {
   // DAMAGE AND HEALING
   // ============================================================================
 
-  private executeDealDamage(operation: any, context: EffectContext): void {
+  private executeDealDamage(operation: DealDamageOp, context: EffectContext): void {
     const amount = this.evaluateExpression(operation.amount, context);
 
     if (amount < 0) {
@@ -407,7 +461,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executeHeal(operation: any, context: EffectContext): void {
+  private executeHeal(operation: HealOp, context: EffectContext): void {
     const amount = this.evaluateExpression(operation.amount, context);
     this.healingDone += amount;
 
@@ -422,7 +476,7 @@ export class EffectInterpreter {
   // MOVEMENT
   // ============================================================================
 
-  private executeTeleport(operation: any, context: EffectContext): void {
+  private executeTeleport(operation: TeleportOp, context: EffectContext): void {
     const destination = this.evaluateLocation(operation.destination, context);
 
     if (!isFinite(destination.x) || !isFinite(destination.y)) {
@@ -441,7 +495,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executePush(operation: any, context: EffectContext): void {
+  private executePush(operation: PushOp, context: EffectContext): void {
     const direction = this.evaluateDirection(operation.direction, context);
     const distance = this.evaluateExpression(operation.distance, context);
 
@@ -454,7 +508,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executePull(operation: any, context: EffectContext): void {
+  private executePull(operation: PullOp, context: EffectContext): void {
     const toward = this.evaluateLocation(operation.toward, context);
     const distance = this.evaluateExpression(operation.distance, context);
 
@@ -476,7 +530,7 @@ export class EffectInterpreter {
   // SPAWNING
   // ============================================================================
 
-  private executeSpawnEntity(operation: any, context: EffectContext): void {
+  private executeSpawnEntity(operation: SpawnEntityOp, context: EffectContext): void {
     const count = Math.floor(this.evaluateExpression(operation.count, context));
 
     if (count < 0) {
@@ -502,7 +556,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executeSpawnItem(operation: any, context: EffectContext): void {
+  private executeSpawnItem(operation: SpawnItemOp, context: EffectContext): void {
     const count = Math.floor(this.evaluateExpression(operation.count, context));
 
     if (count < 0) {
@@ -520,39 +574,41 @@ export class EffectInterpreter {
   // TRANSFORMATION
   // ============================================================================
 
-  private executeTransformEntity(operation: any, context: EffectContext): void {
+  private executeTransformEntity(operation: TransformEntityOp, context: EffectContext): void {
     if (!VALID_ENTITY_TYPES.has(operation.toType)) {
       throw new Error(`Invalid entity type: ${operation.toType}`);
     }
 
     const transformation = {
-      type: 'transformation',
+      type: 'transformation' as const,
       toType: operation.toType,
       duration: operation.duration,
       expiresAt: operation.duration ? context.tick + operation.duration : undefined,
       originalId: context.target.id,
+      version: 1,
     };
 
-    context.world.addComponent(context.target.id, transformation as any);
+    context.world.addComponent(context.target.id, transformation);
   }
 
-  private executeTransformMaterial(operation: any, context: EffectContext): void {
+  private executeTransformMaterial(operation: TransformMaterialOp, context: EffectContext): void {
     // Material transformation logic
     const transformation = {
-      type: 'material_transformation',
+      type: 'material_transformation' as const,
       from: operation.from,
       to: operation.to,
+      version: 1,
     };
 
-    context.world.addComponent(context.target.id, transformation as any);
+    context.world.addComponent(context.target.id, transformation);
   }
 
   // ============================================================================
   // EVENTS
   // ============================================================================
 
-  private executeEmitEvent(operation: any, context: EffectContext): void {
-    const payload: any = {};
+  private executeEmitEvent(operation: EmitEventOp, context: EffectContext): void {
+    const payload: Record<string, unknown> = {};
 
     for (const [key, expr] of Object.entries(operation.payload)) {
       // Handle different payload value types
@@ -598,7 +654,7 @@ export class EffectInterpreter {
   // ============================================================================
 
   private executeChainEffect(
-    operation: any,
+    operation: ChainEffectOp,
     context: EffectContext,
     depth: number
   ): void {
@@ -641,7 +697,7 @@ export class EffectInterpreter {
   }
 
   private executeTriggerEffect(
-    operation: any,
+    operation: TriggerEffectOp,
     context: EffectContext,
     depth: number
   ): void {
@@ -662,7 +718,7 @@ export class EffectInterpreter {
   // ============================================================================
 
   private executeConditional(
-    operation: any,
+    operation: ConditionalOp,
     context: EffectContext,
     depth: number
   ): void {
@@ -675,7 +731,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executeRepeat(operation: any, context: EffectContext, depth: number): void {
+  private executeRepeat(operation: RepeatOp, context: EffectContext, depth: number): void {
     const times = Math.floor(this.evaluateExpression(operation.times, context));
 
     if (times < 0) {
@@ -687,7 +743,7 @@ export class EffectInterpreter {
     }
   }
 
-  private executeDelay(operation: any, context: EffectContext, depth: number): void {
+  private executeDelay(operation: DelayOp, context: EffectContext, depth: number): void {
     // Store delayed operations for later execution
     this.delayedOperations.push({
       ticks: operation.ticks,
@@ -729,7 +785,8 @@ export class EffectInterpreter {
         break;
 
       default:
-        throw new Error(`Unknown target type: ${(selector as any).type}`);
+        // Type guard ensures we've handled all target types
+        throw new Error(`Unknown target type: ${selector.type}`);
     }
 
     // Apply filters
@@ -809,8 +866,8 @@ export class EffectInterpreter {
     // Filter by faction
     if (filter.factions) {
       result = result.filter((entity) => {
-        const identity = entity.getComponent('identity') as any;
-        return identity && filter.factions!.includes(identity.faction);
+        const identity = entity.getComponent('identity') as { faction?: string } | undefined;
+        return identity && identity.faction && filter.factions!.includes(identity.faction);
       });
     }
 
@@ -857,8 +914,26 @@ export class EffectInterpreter {
     return typeof result === 'boolean' ? (result ? 1 : 0) : result;
   }
 
-  private buildEntityContext(entity: Entity): any {
-    if (!entity) return {};
+  private buildEntityContext(entity: Entity): EntityContext {
+    if (!entity) {
+      // Return minimal valid context for missing entity
+      return {
+        id: '',
+        health: 0,
+        maxHealth: 1.0,
+        intelligence: 10,
+        strength: 10,
+        level: 1,
+        statuses: [],
+        components: [],
+        stats: {
+          health: 0,
+          maxHealth: 1.0,
+          intelligence: 10,
+          strength: 10,
+        },
+      };
+    }
 
     const needs = entity.getComponent('needs') as NeedsComponent | undefined;
     const identity = entity.getComponent('identity');
@@ -866,9 +941,10 @@ export class EffectInterpreter {
 
     // Collect all status effects
     const statuses: string[] = [];
-    entity.components?.forEach((comp: any) => {
-      if (comp.type === 'status_effect' && comp.status) {
-        statuses.push(comp.status);
+    entity.components?.forEach((comp: unknown) => {
+      const statusComp = comp as { type?: string; status?: string };
+      if (statusComp.type === 'status_effect' && statusComp.status) {
+        statuses.push(statusComp.status);
       }
     });
 
@@ -903,9 +979,14 @@ export class EffectInterpreter {
 
     // Handle different condition formats
 
-    // 1. Check if condition is an expression itself (test uses `as any`)
-    if ((condition as any).op && (condition as any).left !== undefined) {
-      const result = this.evaluator.evaluate(condition as any, evalContext);
+    // 1. Check if condition is an expression itself (BinaryExpression format)
+    if ('op' in condition && 'left' in condition && condition.left !== undefined) {
+      const expr: Expression = {
+        op: condition.op as BinaryOp,
+        left: condition.left,
+        right: condition.right!,
+      };
+      const result = this.evaluator.evaluate(expr, evalContext);
       return Boolean(result);
     }
 
@@ -915,24 +996,13 @@ export class EffectInterpreter {
       return Boolean(result);
     }
 
-    // 3. Check for op/left/right fields (explicit Condition format)
-    if (condition.op && condition.left !== undefined && condition.right !== undefined) {
-      const expr = {
-        op: condition.op,
-        left: condition.left,
-        right: condition.right,
-      };
-      const result = this.evaluator.evaluate(expr as any, evalContext);
-      return Boolean(result);
-    }
-
-    // 4. Check for function call
+    // 3. Check for function call format
     if (condition.fn && condition.args) {
-      const expr = {
+      const expr: Expression = {
         fn: condition.fn,
         args: condition.args,
       };
-      const result = this.evaluator.evaluate(expr as any, evalContext);
+      const result = this.evaluator.evaluate(expr, evalContext);
       return Boolean(result);
     }
 
@@ -945,26 +1015,24 @@ export class EffectInterpreter {
     context: EffectContext
   ): { x: number; y: number } {
     if (typeof expr === 'object' && 'x' in expr && 'y' in expr) {
-      const obj = expr as any;
-
       // Handle Expression-based coordinates
-      if (typeof obj.x === 'object' || typeof obj.x === 'string') {
+      if (typeof expr.x === 'object' || typeof expr.x === 'string') {
         return {
-          x: this.evaluateExpression(obj.x, context),
-          y: this.evaluateExpression(obj.y, context),
+          x: this.evaluateExpression(expr.x, context),
+          y: this.evaluateExpression(expr.y, context),
         };
       }
 
       // Handle numeric coordinates
-      if (typeof obj.x === 'number' && typeof obj.y === 'number') {
-        if (obj.relative) {
+      if (typeof expr.x === 'number' && typeof expr.y === 'number') {
+        if ('relative' in expr && expr.relative) {
           const pos = this.getEntityPosition(context.caster);
           return {
-            x: pos.x + obj.x,
-            y: pos.y + obj.y,
+            x: pos.x + expr.x,
+            y: pos.y + expr.y,
           };
         }
-        return { x: obj.x, y: obj.y };
+        return { x: expr.x, y: expr.y };
       }
     }
 
@@ -974,28 +1042,33 @@ export class EffectInterpreter {
       return { x: value, y: value };
     }
 
+    // Handle number reference (shouldn't happen based on type, but be safe)
+    if (typeof expr === 'number') {
+      return { x: expr, y: expr };
+    }
+
     throw new Error('Invalid location expression');
   }
 
   private evaluateDirection(expr: DirectionExpression, context: EffectContext): number {
-    if (typeof expr === 'object' && 'angle' in expr) {
-      const obj = expr as any;
-      return (obj.angle ?? 0) * (Math.PI / 180);
-    }
+    if (typeof expr === 'object') {
+      if ('angle' in expr) {
+        return (expr.angle ?? 0) * (Math.PI / 180);
+      }
 
-    if (typeof expr === 'object' && 'fromCaster' in expr) {
-      const casterPos = this.getEntityPosition(context.caster);
-      const targetPos = this.getEntityPosition(context.target);
-      const dx = targetPos.x - casterPos.x;
-      const dy = targetPos.y - casterPos.y;
-      return Math.atan2(dy, dx);
-    }
+      if ('fromCaster' in expr) {
+        const casterPos = this.getEntityPosition(context.caster);
+        const targetPos = this.getEntityPosition(context.target);
+        const dx = targetPos.x - casterPos.x;
+        const dy = targetPos.y - casterPos.y;
+        return Math.atan2(dy, dx);
+      }
 
-    if (typeof expr === 'object' && 'dx' in expr && 'dy' in expr) {
-      const obj = expr as any;
-      const dx = this.evaluateExpression(obj.dx, context);
-      const dy = this.evaluateExpression(obj.dy, context);
-      return Math.atan2(dy, dx);
+      if ('dx' in expr && 'dy' in expr) {
+        const dx = this.evaluateExpression(expr.dx, context);
+        const dy = this.evaluateExpression(expr.dy, context);
+        return Math.atan2(dy, dx);
+      }
     }
 
     if (typeof expr === 'number') {

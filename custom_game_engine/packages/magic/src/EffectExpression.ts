@@ -55,12 +55,35 @@ export type BinaryOp =
 
 export type UnaryOp = '-' | '!' | 'not';
 
+// Entity context for expression evaluation
+export interface EntityContext {
+  id: string;
+  health: number;
+  maxHealth: number;
+  intelligence: number;
+  strength: number;
+  level: number;
+  statuses: string[];
+  components: string[];
+  stats: {
+    health: number;
+    maxHealth: number;
+    intelligence: number;
+    strength: number;
+    [key: string]: number;
+  };
+  needs?: unknown;
+  identity?: unknown;
+  position?: unknown;
+}
+
 // Context for expression evaluation
 export interface ExpressionContext {
-  caster?: any;
-  target?: any;
-  world?: any;
-  [key: string]: any;
+  caster: EntityContext;
+  target: EntityContext;
+  world: unknown;
+  tick: number;
+  [key: string]: unknown;
 }
 
 // ============================================================================

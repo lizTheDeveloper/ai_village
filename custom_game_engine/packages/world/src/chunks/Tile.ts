@@ -370,7 +370,8 @@ export type TerrainType =
   | 'water'
   | 'stone'
   | 'sand'
-  | 'forest';
+  | 'forest'
+  | 'snow';       // Frozen terrain for tundra and high mountain peaks
 
 export type BiomeType =
   | 'plains'
@@ -383,7 +384,10 @@ export type BiomeType =
   | 'wetland'      // Land ↔ Water transition (elevation: -0.3 to 0.05, high moisture)
   | 'foothills'    // Mountains ↔ Plains transition (elevation: 0.35 to 0.5)
   | 'savanna'      // Hot grassland with sparse trees (hot + moderate moisture)
-  | 'woodland';    // Forest ↔ Plains transition (moisture: 0.05 to 0.35)
+  | 'woodland'     // Forest ↔ Plains transition (moisture: 0.05 to 0.35)
+  | 'tundra'       // Frozen arctic terrain (temperature < -0.4, low vegetation)
+  | 'taiga'        // Cold coniferous forest (temperature -0.4 to -0.1, moderate moisture)
+  | 'jungle';      // Tropical rainforest (temperature > 0.3, moisture > 0.5)
 
 /**
  * Create a default tile.
@@ -426,4 +430,5 @@ export const TERRAIN_COLORS: Record<TerrainType, string> = {
   stone: '#6b6b6b',
   sand: '#dcc896',
   forest: '#2d5016',
+  snow: '#e8e8f0',
 };

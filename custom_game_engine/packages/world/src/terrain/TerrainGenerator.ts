@@ -505,6 +505,247 @@ export class TerrainGenerator {
           }
         }
 
+        // === TUNDRA ENTITY PLACEMENT (frozen arctic) ===
+        else if (tile.biome === 'tundra') {
+          // Reconstruct tundra features for entity placement
+          const regionalScale = 0.0005;
+          const detailScale = 0.005;
+
+          // Permafrost polygon patterns
+          const permafrostNoise = this.moistureNoise.octaveNoise(
+            worldX * detailScale * 2,
+            worldY * detailScale * 2,
+            3,
+            0.4
+          );
+
+          // Exposed bedrock detection
+          const bedrockNoise = this.elevationNoise.octaveNoise(
+            worldX * regionalScale * 2,
+            worldY * regionalScale * 2,
+            2,
+            0.6
+          );
+          const isExposedBedrock = bedrockNoise > 0.4 && tile.moisture < 50;
+
+          // Rocks on exposed bedrock - 40% chance
+          if (isExposedBedrock && Math.random() < 0.40) {
+            createRock(world, worldX, worldY);
+          }
+
+          // Scattered rocks on permafrost - 8% chance
+          if (permafrostNoise > 0.3 && Math.random() < 0.08) {
+            createRock(world, worldX, worldY);
+          }
+
+          // Sparse tundra vegetation (lichen, moss, hardy shrubs) - 15% chance
+          if (Math.random() < 0.15) {
+            createFiberPlant(world, worldX, worldY); // Arctic moss/lichen placeholder
+          }
+
+          // Very rare stunted trees in sheltered areas - 2% chance
+          if (tile.moisture > 50 && placementValue > 0.4 && Math.random() < 0.02) {
+            const treeHeight = Math.floor(Math.random() * 2); // Very short trees (0-1)
+            createTree(world, worldX, worldY, treeHeight);
+          }
+        }
+
+        // === TAIGA ENTITY PLACEMENT (cold coniferous forest) ===
+        else if (tile.biome === 'taiga') {
+          // Reconstruct taiga features for entity placement
+          const regionalScale = 0.0005;
+
+          // Bog detection
+          const bogNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale,
+            worldY * regionalScale,
+            3,
+            0.5
+          );
+          const isBog = bogNoise > 0.3 && tile.moisture > 60;
+
+          // Shield rock exposure
+          const shieldNoise = this.elevationNoise.octaveNoise(
+            worldX * 0.000005 * 5,
+            worldY * 0.000005 * 5,
+            2,
+            0.7
+          );
+          const isShieldRock = shieldNoise > 0.4;
+
+          // Conifer density based on terrain type
+          // Note: Type assertion needed because TS narrows out 'forest' from earlier else-if
+          if ((tile.terrain as string) === 'forest') {
+            // Dense conifer stands - 75% tree coverage
+            if (Math.random() < 0.75) {
+              // Primarily spruce and pine (tall, narrow conifers)
+              const treeType = Math.random();
+              if (treeType < 0.6) {
+                // 60% spruce (6-14 voxels)
+                const treeHeight = 6 + Math.floor(Math.random() * 9);
+                createTree(world, worldX, worldY, treeHeight);
+              } else if (treeType < 0.9) {
+                // 30% pine (5-12 voxels)
+                const treeHeight = 5 + Math.floor(Math.random() * 8);
+                createTree(world, worldX, worldY, treeHeight);
+              } else {
+                // 10% birch (4-10 voxels)
+                const treeHeight = 4 + Math.floor(Math.random() * 7);
+                createTree(world, worldX, worldY, treeHeight);
+              }
+            }
+            // Understory plants - 25% chance
+            if (Math.random() < 0.25) {
+              createFiberPlant(world, worldX, worldY); // Ferns, moss
+            }
+            // Berry bushes (lingonberries, cloudberries) - 20% chance
+            if (Math.random() < 0.20) {
+              createBerryBush(world, worldX, worldY);
+            }
+            // Leaf piles - 30% chance
+            if (Math.random() < 0.30) {
+              createLeafPile(world, worldX, worldY);
+            }
+          } else if (isBog) {
+            // Boggy areas - sparse trees, lots of moss
+            // Stunted trees - 15% chance
+            if (Math.random() < 0.15) {
+              const treeHeight = 2 + Math.floor(Math.random() * 4);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Sphagnum moss and sedges - 50% chance
+            if (Math.random() < 0.50) {
+              createFiberPlant(world, worldX, worldY);
+            }
+            // Cloudberries in bogs - 25% chance
+            if (Math.random() < 0.25) {
+              createBerryBush(world, worldX, worldY);
+            }
+          } else if (isShieldRock) {
+            // Rocky outcrops - exposed granite
+            // Rocks - 35% chance
+            if (Math.random() < 0.35) {
+              createRock(world, worldX, worldY);
+            }
+            // Hardy plants in rock crevices - 10% chance
+            if (Math.random() < 0.10) {
+              createFiberPlant(world, worldX, worldY);
+            }
+          } else {
+            // Open taiga grassland
+            // Scattered conifers - 30% chance
+            if (Math.random() < 0.30) {
+              const treeHeight = 4 + Math.floor(Math.random() * 6);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Ground cover - 40% chance
+            if (Math.random() < 0.40) {
+              createFiberPlant(world, worldX, worldY);
+            }
+          }
+        }
+
+        // === JUNGLE ENTITY PLACEMENT (tropical rainforest) ===
+        else if (tile.biome === 'jungle') {
+          // Reconstruct jungle features for entity placement
+          const regionalScale = 0.0005;
+          const detailScale = 0.005;
+
+          // Canopy gap detection
+          const gapNoise = this.temperatureNoise.octaveNoise(
+            worldX * detailScale * 1.5,
+            worldY * detailScale * 1.5,
+            3,
+            0.5
+          );
+          const isCanopyGap = gapNoise > 0.45;
+
+          // Swampy lowland detection
+          const swampNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale * 0.4,
+            worldY * regionalScale * 0.4,
+            2,
+            0.6
+          );
+          const isSwampyLowland = swampNoise > 0.4 && tile.moisture > 80;
+
+          // Floodplain detection
+          const floodNoise = this.moistureNoise.octaveNoise(
+            worldX * regionalScale * 0.6,
+            worldY * regionalScale * 0.6,
+            3,
+            0.5
+          );
+          const isFloodplain = floodNoise > 0.3 && tile.elevation < 1;
+
+          if (isCanopyGap) {
+            // Canopy gaps - dense understory, no tall trees
+            // Dense shrubs and vines - 70% chance
+            if (Math.random() < 0.70) {
+              createFiberPlant(world, worldX, worldY);
+            }
+            // Young trees competing for light - 40% chance
+            if (Math.random() < 0.40) {
+              const treeHeight = 2 + Math.floor(Math.random() * 4);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Fruit trees in gaps - 25% chance
+            if (Math.random() < 0.25) {
+              createBerryBush(world, worldX, worldY); // Tropical fruit placeholder
+            }
+          } else if (isSwampyLowland) {
+            // Swampy jungle - mangrove-like trees
+            // Mangrove/swamp trees - 50% chance
+            if (Math.random() < 0.50) {
+              const treeHeight = 3 + Math.floor(Math.random() * 5);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Aquatic plants - 60% chance
+            if (Math.random() < 0.60) {
+              createFiberPlant(world, worldX, worldY);
+            }
+          } else if (isFloodplain) {
+            // Floodplain - tall trees with buttress roots
+            // Giant trees - 60% chance
+            if (Math.random() < 0.60) {
+              const treeHeight = 10 + Math.floor(Math.random() * 10);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Dense undergrowth - 55% chance
+            if (Math.random() < 0.55) {
+              createFiberPlant(world, worldX, worldY);
+            }
+          } else {
+            // Dense primary jungle
+            // Emergent layer trees (very tall) - 15% chance
+            if (placementValue > 0.4 && Math.random() < 0.15) {
+              const treeHeight = 12 + Math.floor(Math.random() * 8);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Canopy layer trees - 70% chance
+            else if (Math.random() < 0.70) {
+              const treeHeight = 8 + Math.floor(Math.random() * 6);
+              createTree(world, worldX, worldY, treeHeight);
+            }
+            // Dense understory - 80% chance
+            if (Math.random() < 0.80) {
+              createFiberPlant(world, worldX, worldY);
+            }
+            // Leaf litter - 50% chance
+            if (Math.random() < 0.50) {
+              createLeafPile(world, worldX, worldY);
+            }
+            // Tropical fruits - 18% chance
+            if (Math.random() < 0.18) {
+              createBerryBush(world, worldX, worldY);
+            }
+            // Rocks are rare in dense jungle - 3% chance
+            if (placementValue < -0.4 && Math.random() < 0.03) {
+              createRock(world, worldX, worldY);
+            }
+          }
+        }
+
         // === FOOTHILLS PLANT PLACEMENT (mountain → plains transition) ===
         else if (tile.biome === 'foothills') {
           // Foothills: 5-15% tree density at high moisture
@@ -967,6 +1208,222 @@ export class TerrainGenerator {
       }
     }
 
+    // === TUNDRA GEOLOGICAL REALISM ===
+    // Simulates arctic terrain with permafrost patterns, wind erosion, and exposed bedrock.
+    //
+    // Features implemented:
+    // - PERMAFROST POLYGONS: Geometric frost-heave patterns creating subtle elevation changes
+    // - WIND-SWEPT RIDGES: Snow drifts and exposed rock from constant wind erosion
+    // - FROZEN LAKES: Scattered ice-covered depressions (linked to moisture)
+    // - PINGOS: Ice-cored hills (rare, distinctive arctic feature)
+    // - EXPOSED BEDROCK: Rocky outcrops where snow has been scoured away
+    //
+    const isColdRegion = temperature < -0.3;
+
+    if (isColdRegion && elevation > -0.1) {
+      // 1. Permafrost polygon patterns (subtle geometric elevation changes)
+      const permafrostNoise = this.moistureNoise.octaveNoise(
+        worldX * detailScale * 2,
+        worldY * detailScale * 2,
+        3,
+        0.4
+      );
+      const hasPermafrostPolygons = permafrostNoise > 0.3;
+
+      // 2. Wind ridge patterns (elongated features from prevailing winds)
+      const windNoise = this.temperatureNoise.octaveNoise(
+        worldX * regionalScale * 1.5,
+        worldY * regionalScale * 0.5, // Elongated in one direction
+        2,
+        0.5
+      );
+      const isWindRidge = windNoise > 0.35;
+
+      // 3. Pingo detection (ice-cored hills - rare)
+      const pingoNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 0.3,
+        worldY * regionalScale * 0.3,
+        2,
+        0.7
+      );
+      const isPingo = pingoNoise > 0.55 && moisture > 0.0;
+
+      // 4. Exposed bedrock (wind-scoured areas)
+      const bedrockNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 2,
+        worldY * regionalScale * 2,
+        2,
+        0.6
+      );
+      const isExposedBedrock = bedrockNoise > 0.4 && moisture < 0.0;
+
+      // Apply tundra features
+      if (isPingo) {
+        // Pingos create small hills (3-50m in real scale)
+        const pingoHeight = (pingoNoise - 0.55) / 0.45;
+        elevation = elevation + pingoHeight * 0.15;
+      } else if (isWindRidge) {
+        // Wind ridges create elongated snow drifts
+        const ridgeHeight = (windNoise - 0.35) / 0.65;
+        elevation = elevation + ridgeHeight * 0.08;
+      } else if (hasPermafrostPolygons) {
+        // Permafrost polygons create subtle geometric patterns
+        const polygonEffect = Math.sin(permafrostNoise * Math.PI * 4) * 0.03;
+        elevation = elevation + polygonEffect;
+      } else if (isExposedBedrock) {
+        // Exposed bedrock is slightly higher (snow blown away)
+        elevation = elevation + 0.02;
+      }
+    }
+
+    // === TAIGA GEOLOGICAL REALISM ===
+    // Simulates boreal forest terrain with boggy lowlands, rocky ridges, and glacial features.
+    //
+    // Features implemented:
+    // - MUSKEG/BOGS: Waterlogged depressions with sphagnum moss (high moisture areas)
+    // - GLACIAL DRUMLINS: Elongated hills left by ancient glaciers
+    // - ESKERS: Winding ridges of glacial sediment
+    // - ROCKY OUTCROPS: Canadian Shield-style exposed granite
+    // - CONIFER STANDS: Dense patches vs sparse areas
+    //
+    const isTaigaRegion = temperature >= -0.4 && temperature < -0.1 && moisture > -0.2;
+
+    if (isTaigaRegion && elevation > -0.1) {
+      // 1. Muskeg/bog detection (waterlogged areas)
+      const bogNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale,
+        worldY * regionalScale,
+        3,
+        0.5
+      );
+      const isBog = bogNoise > 0.3 && moisture > 0.2;
+
+      // 2. Glacial drumlin patterns (elongated hills)
+      const drumlinNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 0.8,
+        worldY * regionalScale * 0.4, // Elongated
+        3,
+        0.6
+      );
+      const isDrumlin = drumlinNoise > 0.35;
+
+      // 3. Esker ridges (winding glacial features)
+      const eskerNoise = this.temperatureNoise.octaveNoise(
+        worldX * regionalScale * 1.2,
+        worldY * regionalScale * 1.2,
+        4,
+        0.55
+      );
+      const isEsker = Math.abs(eskerNoise) < 0.1;
+
+      // 4. Rocky outcrops (shield rock exposure)
+      const shieldNoise = this.elevationNoise.octaveNoise(
+        worldX * continentalScale * 5,
+        worldY * continentalScale * 5,
+        2,
+        0.7
+      );
+      const isShieldRock = shieldNoise > 0.4;
+
+      // Apply taiga features
+      if (isBog) {
+        // Bogs are depressions with waterlogged soil
+        const bogDepth = (bogNoise - 0.3) / 0.7;
+        elevation = elevation - bogDepth * 0.1;
+      } else if (isEsker) {
+        // Eskers are raised winding ridges
+        const eskerHeight = (0.1 - Math.abs(eskerNoise)) / 0.1;
+        elevation = elevation + eskerHeight * 0.12;
+      } else if (isDrumlin) {
+        // Drumlins are smooth elongated hills
+        const drumlinHeight = (drumlinNoise - 0.35) / 0.65;
+        elevation = elevation + drumlinHeight * 0.1;
+      } else if (isShieldRock) {
+        // Shield rock creates gentle domes
+        elevation = elevation + 0.05;
+      }
+    }
+
+    // === JUNGLE GEOLOGICAL REALISM ===
+    // Simulates tropical rainforest terrain with river floodplains, canopy gaps, and varied topography.
+    //
+    // Features implemented:
+    // - FLOODPLAINS: Low-lying areas near water with rich alluvial soil
+    // - JUNGLE HILLS: Rolling terrain with steep ravines
+    // - CANOPY GAPS: Natural clearings from treefalls
+    // - SWAMPY LOWLANDS: Perpetually wet areas with standing water
+    // - RIVER TERRACES: Stepped terrain from ancient river levels
+    //
+    const isJungleRegion = temperature > 0.25 && moisture > 0.35;
+
+    if (isJungleRegion && elevation > -0.1) {
+      // 1. Floodplain detection (flat, low areas)
+      const floodNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale * 0.6,
+        worldY * regionalScale * 0.6,
+        3,
+        0.5
+      );
+      const isFloodplain = floodNoise > 0.3 && elevation < 0.1;
+
+      // 2. Jungle hills and ravines
+      const hillNoise = this.elevationNoise.octaveNoise(
+        worldX * regionalScale * 1.5,
+        worldY * regionalScale * 1.5,
+        4,
+        0.6
+      );
+      const isJungleHill = hillNoise > 0.25;
+
+      // 3. Ravine/gully patterns (water erosion channels)
+      const ravineNoise = this.moistureNoise.octaveNoise(
+        worldX * detailScale * 0.8,
+        worldY * detailScale * 0.8,
+        4,
+        0.55
+      );
+      const isRavine = Math.abs(ravineNoise) < 0.08;
+
+      // 4. Canopy gap detection (small clearings)
+      const gapNoise = this.temperatureNoise.octaveNoise(
+        worldX * detailScale * 1.5,
+        worldY * detailScale * 1.5,
+        3,
+        0.5
+      );
+      const isCanopyGap = gapNoise > 0.45;
+
+      // 5. Swampy lowland detection
+      const swampNoise = this.moistureNoise.octaveNoise(
+        worldX * regionalScale * 0.4,
+        worldY * regionalScale * 0.4,
+        2,
+        0.6
+      );
+      const isSwampyLowland = swampNoise > 0.4 && moisture > 0.5 && elevation < 0.05;
+
+      // Apply jungle features
+      if (isSwampyLowland) {
+        // Swampy lowlands are slightly below surrounding terrain
+        elevation = elevation - 0.08;
+      } else if (isFloodplain) {
+        // Floodplains are flat and low
+        const flattenStrength = (floodNoise - 0.3) / 0.7;
+        elevation = elevation * (1 - flattenStrength * 0.5);
+      } else if (isRavine) {
+        // Ravines cut through jungle terrain
+        const ravineDepth = (0.08 - Math.abs(ravineNoise)) / 0.08;
+        elevation = elevation - ravineDepth * 0.15;
+      } else if (isJungleHill) {
+        // Jungle hills with steeper terrain
+        const hillHeight = (hillNoise - 0.25) / 0.75;
+        elevation = elevation + hillHeight * 0.2;
+      } else if (isCanopyGap) {
+        // Canopy gaps don't change elevation much, just mark for entity placement
+        elevation = elevation - 0.01;
+      }
+    }
+
     // === DESERT GEOLOGICAL REALISM ===
     // Simulates realistic desert terrain formation through erosion and geological processes.
     //
@@ -1227,6 +1684,11 @@ export class TerrainGenerator {
       foothills: [50, 60],     // Mountain → Plains transition
       savanna: [50, 60],       // Hot grassland
       woodland: [65, 75],      // Forest → Plains transition (good soil)
+      // Cold biomes
+      tundra: [15, 25],        // Frozen permafrost, minimal growth
+      taiga: [40, 55],         // Cold coniferous forest, acidic soil
+      // Tropical biome
+      jungle: [70, 85],        // Rich tropical soil, rapid decomposition
     };
 
     const range = BIOME_FERTILITY_RANGES[biome];
@@ -1346,6 +1808,46 @@ export class TerrainGenerator {
     }
 
     // PRIORITY 5: Temperature/moisture-based biomes (forests, deserts, plains)
+
+    // === COLD BIOMES (temperature < -0.2) ===
+
+    // Tundra - frozen arctic terrain (very cold, any moisture)
+    if (temperature < -0.4) {
+      // Permafrost with sparse vegetation
+      if (moisture > 0.2) {
+        // Wet tundra - marshes and permafrost pools
+        return { terrain: 'snow', biome: 'tundra' };
+      } else if (moisture > -0.2) {
+        // Dry tundra - wind-swept snow and exposed rock
+        return { terrain: 'snow', biome: 'tundra' };
+      } else {
+        // Polar desert - extremely cold and dry
+        return { terrain: 'snow', biome: 'tundra' };
+      }
+    }
+
+    // Taiga (boreal forest) - cold with moderate moisture
+    if (temperature < -0.1 && temperature >= -0.4 && moisture > 0.1) {
+      // Cold coniferous forest
+      return { terrain: 'forest', biome: 'taiga' };
+    }
+
+    // Taiga transition - cold grassland turning to tundra
+    if (temperature < -0.1 && temperature >= -0.4 && moisture <= 0.1 && moisture > -0.2) {
+      return { terrain: 'grass', biome: 'taiga' };
+    }
+
+    // === HOT BIOMES ===
+
+    // Jungle/Rainforest - hot and very wet
+    if (temperature > 0.3 && moisture > 0.5) {
+      return { terrain: 'forest', biome: 'jungle' };
+    }
+
+    // Jungle transition - hot and wet but not quite rainforest
+    if (temperature > 0.25 && moisture > 0.35 && moisture <= 0.5) {
+      return { terrain: 'forest', biome: 'jungle' };
+    }
 
     // Hot and dry = Desert spectrum
     if (temperature > 0.2 && moisture < -0.3) {

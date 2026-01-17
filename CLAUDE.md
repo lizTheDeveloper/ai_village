@@ -2,14 +2,28 @@
 
 > *Dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for philosophy on open source, monetization, and inspirations.*
 
-## Architecture Documentation
+## 📚 Documentation Navigation
 
-**Read `custom_game_engine/` docs first:**
+**NEW:** All documentation is now organized in the master index:
+### **→ [DOCUMENTATION_INDEX.md](./custom_game_engine/DOCUMENTATION_INDEX.md)** ← START HERE
+
+**Quick facts & commands:** [QUICK_REFERENCE.md](./custom_game_engine/QUICK_REFERENCE.md) ⚡
+
+Quick links to essential docs:
+
+### Core Architecture
 - **[ARCHITECTURE_OVERVIEW.md](./custom_game_engine/ARCHITECTURE_OVERVIEW.md)** - ECS, packages, metasystems, data flow
 - **[SYSTEMS_CATALOG.md](./custom_game_engine/SYSTEMS_CATALOG.md)** - 212+ systems with priorities, components, locations
 - **[COMPONENTS_REFERENCE.md](./custom_game_engine/COMPONENTS_REFERENCE.md)** - 125+ component types with fields and examples
 - **[METASYSTEMS_GUIDE.md](./custom_game_engine/METASYSTEMS_GUIDE.md)** - Consciousness, Divinity, Reproduction, Multiverse, Magic, Realms
+
+### Agent Development
 - **[BEHAVIOR_CONTEXT.md](./custom_game_engine/docs/BEHAVIOR_CONTEXT.md)** - Agent behavior API ("pit of success" pattern)
+- **[AGENT_DECISION_STATE_DIAGRAM.md](./custom_game_engine/docs/AGENT_DECISION_STATE_DIAGRAM.md)** - Agent decision flow
+
+### Performance & Quality
+- **[PERFORMANCE.md](./custom_game_engine/PERFORMANCE.md)** - Performance optimization guide
+- **[COMMON_PITFALLS.md](./custom_game_engine/COMMON_PITFALLS.md)** - Common mistakes and solutions
 
 ## Package READMEs
 
