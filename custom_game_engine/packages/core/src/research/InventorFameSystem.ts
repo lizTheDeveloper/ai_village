@@ -19,6 +19,7 @@
 
 import { System, World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ResearchRegistry } from './ResearchRegistry.js';
 import { getClarketechTier, getClarketechTierLabel } from './clarketechResearch.js';
 import { getAcademicPaperSystem } from './AcademicPaperSystem.js';
@@ -752,6 +753,7 @@ export class InventorFameSystem implements System {
 
   private manager: InventorFameManager = new InventorFameManager();
   private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private agentNames: Map<string, string> = new Map();
 
   private readonly NEWS_CHECK_INTERVAL = 100; // Every 5 seconds
@@ -759,12 +761,13 @@ export class InventorFameSystem implements System {
 
   initialize(world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Subscribe to research completion events
-    eventBus.subscribe('research:completed', (event) => {
-      const data = event.data as { researchId?: string; researchers?: string[] };
-      if (data.researchId && data.researchers) {
-        this.handleResearchCompleted(world, data.researchId, data.researchers);
+    this.events.onGeneric('research:completed', (data: unknown) => {
+      const typedData = data as { researchId?: string; researchers?: string[] };
+      if (typedData.researchId && typedData.researchers) {
+        this.handleResearchCompleted(world, typedData.researchId, typedData.researchers);
       }
     });
   }
@@ -793,46 +796,32 @@ export class InventorFameSystem implements System {
 
       // Emit fame events
       for (const inventor of result.inventors) {
-        if (this.eventBus) {
-          this.eventBus.emit({
-            type: 'inventor:fame_gained' as any,
-            source: this.id,
-            data: {
-              agentId: inventor.agentId,
-              agentName: inventor.agentName,
-              fameLevel: inventor.fameLevel,
-              fameTier: inventor.fameTier,
-              researchId,
-            },
-          });
+        this.events.emitGeneric('inventor:fame_gained', {
+          agentId: inventor.agentId,
+          agentName: inventor.agentName,
+          fameLevel: inventor.fameLevel,
+          fameTier: inventor.fameTier,
+          researchId,
+        });
 
-          // Check if new title earned
-          const latestTitle = inventor.titles[inventor.titles.length - 1];
-          if (latestTitle && latestTitle.earnedAt === this.tickCounter) {
-            this.eventBus.emit({
-              type: 'inventor:title_earned' as any,
-              source: this.id,
-              data: {
-                agentId: inventor.agentId,
-                agentName: inventor.agentName,
-                title: latestTitle.name,
-              },
-            });
-          }
+        // Check if new title earned
+        const latestTitle = inventor.titles[inventor.titles.length - 1];
+        if (latestTitle && latestTitle.earnedAt === this.tickCounter) {
+          this.events.emitGeneric('inventor:title_earned', {
+            agentId: inventor.agentId,
+            agentName: inventor.agentName,
+            title: latestTitle.name,
+          });
         }
       }
 
       // Emit news announcement event
-      if (result.announcement && this.eventBus) {
-        this.eventBus.emit({
-          type: 'news:research_announcement' as any,
-          source: this.id,
-          data: {
-            headline: result.announcement.headline,
-            body: result.announcement.body,
-            tier: result.announcement.tier,
-            inventorNames: result.inventors.map((i) => i.agentName),
-          },
+      if (result.announcement) {
+        this.events.emitGeneric('news:research_announcement', {
+          headline: result.announcement.headline,
+          body: result.announcement.body,
+          tier: result.announcement.tier,
+          inventorNames: result.inventors.map((i) => i.agentName),
         });
       }
     } catch {
@@ -871,21 +860,16 @@ export class InventorFameSystem implements System {
       // For now, just mark as broadcasted and emit event
       this.manager.markBroadcasted(news.id);
 
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'news:broadcasted' as any,
-          source: this.id,
-          data: {
-            newsId: news.id,
-            headline: news.headline,
-            medium: 'announcement', // Would be 'tv' or 'radio' if those exist
-          },
-        });
-      }
+      this.events.emitGeneric('news:broadcasted', {
+        newsId: news.id,
+        headline: news.headline,
+        medium: 'announcement', // Would be 'tv' or 'radio' if those exist
+      });
     }
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.manager.reset();
     this.agentNames.clear();
     this.eventBus = null;

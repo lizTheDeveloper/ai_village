@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
+import type { ConstructionTask } from '../../systems/TileConstructionSystem.js';
 
 /**
  * Material Transport and Construction System Specifications
@@ -735,8 +736,23 @@ describe('Material Transport and Construction System', () => {
     it('should throw if claiming task that does not exist', () => {
       const agent = world.createAgent({ position: { x: 10, y: 10 } });
 
+      // Create a minimal valid ConstructionTask object that doesn't exist in world's task registry
+      // Testing error path: task has valid structure but is not registered in the system
+      const nonexistentTask: ConstructionTask = {
+        id: 'nonexistent',
+        blueprintId: 'fake_blueprint',
+        originPosition: { x: 0, y: 0 },
+        rotation: 0,
+        tiles: [],
+        state: 'planned',
+        createdAt: 0,
+        activeBuilders: new Set(),
+        totalTiles: 0,
+        tilesPlaced: 0,
+      };
+
       expect(() => {
-        agent.claimConstructionTask({ id: 'nonexistent' } as any);
+        agent.claimConstructionTask(nonexistentTask);
       }).toThrow('Construction task not found');
     });
 

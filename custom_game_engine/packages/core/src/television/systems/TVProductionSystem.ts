@@ -13,6 +13,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, Production } from '../TVStation.js';
 import type { TVContentComponent, FilmedTake, FilmedScene } from '../TVContent.js';
@@ -75,14 +76,14 @@ export class TVProductionSystem implements System {
   readonly priority = 64; // After writing, before post-production
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastProcessTick: number = 0;
 
   /** Active filming sessions */
   private filmingSessions: Map<string, FilmingSession> = new Map();
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -159,16 +160,12 @@ export class TVProductionSystem implements System {
       session.status = 'filming';
       this.startScene(session, currentTick);
 
-      this.eventBus?.emit({
-        type: 'tv:production:filming_started' as any,
-        source: session.showId,
-        data: {
-          sessionId: session.id,
-          showId: session.showId,
-          contentId: session.contentId,
-          totalScenes: session.totalScenes,
-        },
-      });
+      this.events.emitGeneric('tv:production:filming_started', {
+        sessionId: session.id,
+        showId: session.showId,
+        contentId: session.contentId,
+        totalScenes: session.totalScenes,
+      }, session.showId);
     }
   }
 
@@ -226,15 +223,11 @@ export class TVProductionSystem implements System {
       location: `Set ${session.currentSceneIndex + 1}`,
     };
 
-    this.eventBus?.emit({
-      type: 'tv:production:scene_started' as any,
-      source: session.showId,
-      data: {
-        sessionId: session.id,
-        sceneNumber: session.currentScene.sceneNumber,
-        location: session.currentScene.location,
-      },
-    });
+    this.events.emitGeneric('tv:production:scene_started', {
+      sessionId: session.id,
+      sceneNumber: session.currentScene.sceneNumber,
+      location: session.currentScene.location,
+    }, session.showId);
   }
 
   /**
@@ -261,16 +254,12 @@ export class TVProductionSystem implements System {
 
     session.currentScene.takes.push(take);
 
-    this.eventBus?.emit({
-      type: 'tv:production:take_completed' as any,
-      source: session.showId,
-      data: {
-        sessionId: session.id,
-        sceneNumber: session.currentScene.sceneNumber,
-        takeNumber: take.takeNumber,
-        quality: take.quality,
-      },
-    });
+    this.events.emitGeneric('tv:production:take_completed', {
+      sessionId: session.id,
+      sceneNumber: session.currentScene.sceneNumber,
+      takeNumber: take.takeNumber,
+      quality: take.quality,
+    }, session.showId);
 
     // Decide whether to do another take or move on
     const shouldRetake = quality < 0.7 && session.currentScene.takeNumber < MAX_TAKES_PER_SCENE;
@@ -304,17 +293,13 @@ export class TVProductionSystem implements System {
 
     session.completedScenes.push(filmedScene);
 
-    this.eventBus?.emit({
-      type: 'tv:production:scene_completed' as any,
-      source: session.showId,
-      data: {
-        sessionId: session.id,
-        sceneNumber: session.currentScene.sceneNumber,
-        bestTakeNumber: bestTake.takeNumber,
-        quality: bestTake.quality,
-        totalTakes: session.currentScene.takes.length,
-      },
-    });
+    this.events.emitGeneric('tv:production:scene_completed', {
+      sessionId: session.id,
+      sceneNumber: session.currentScene.sceneNumber,
+      bestTakeNumber: bestTake.takeNumber,
+      quality: bestTake.quality,
+      totalTakes: session.currentScene.takes.length,
+    }, session.showId);
 
     // Move to between scenes
     session.status = 'between_scenes';
@@ -331,18 +316,14 @@ export class TVProductionSystem implements System {
     const avgQuality = session.completedScenes.reduce((sum, s) => sum + s.bestTake.quality, 0) /
       session.completedScenes.length;
 
-    this.eventBus?.emit({
-      type: 'tv:production:wrapped' as any,
-      source: session.showId,
-      data: {
-        sessionId: session.id,
-        showId: session.showId,
-        contentId: session.contentId,
-        scenesFilmed: session.completedScenes.length,
-        averageQuality: avgQuality,
-        totalTick: currentTick - session.startedTick,
-      },
-    });
+    this.events.emitGeneric('tv:production:wrapped', {
+      sessionId: session.id,
+      showId: session.showId,
+      contentId: session.contentId,
+      scenesFilmed: session.completedScenes.length,
+      averageQuality: avgQuality,
+      totalTick: currentTick - session.startedTick,
+    }, session.showId);
 
     // Update production phase
     this.advanceToPostProduction(session);
@@ -354,14 +335,10 @@ export class TVProductionSystem implements System {
   private advanceToPostProduction(session: FilmingSession): void {
     // This would update the Production in TVStationComponent
     // For now, emit an event for other systems to handle
-    this.eventBus?.emit({
-      type: 'tv:production:ready_for_post' as any,
-      source: session.showId,
-      data: {
-        contentId: session.contentId,
-        filmedScenes: session.completedScenes,
-      },
-    });
+    this.events.emitGeneric('tv:production:ready_for_post', {
+      contentId: session.contentId,
+      filmedScenes: session.completedScenes,
+    }, session.showId);
   }
 
   // ============================================================================
@@ -493,18 +470,14 @@ export class TVProductionSystem implements System {
 
     this.filmingSessions.set(session.id, session);
 
-    this.eventBus?.emit({
-      type: 'tv:production:session_created' as any,
-      source: station.buildingId,
-      data: {
-        sessionId: session.id,
-        showId: production.showId,
-        contentId: production.contentId,
-        director,
-        actorCount: actors.length,
-        crewCount: otherCrew.length,
-      },
-    });
+    this.events.emitGeneric('tv:production:session_created', {
+      sessionId: session.id,
+      showId: production.showId,
+      contentId: production.contentId,
+      director,
+      actorCount: actors.length,
+      crewCount: otherCrew.length,
+    }, station.buildingId);
 
     return session;
   }
@@ -540,15 +513,11 @@ export class TVProductionSystem implements System {
 
     this.filmingSessions.set(session.id, session);
 
-    this.eventBus?.emit({
-      type: 'tv:production:live_started' as any,
-      source: stationId,
-      data: {
-        sessionId: session.id,
-        showId,
-        contentId,
-      },
-    });
+    this.events.emitGeneric('tv:production:live_started', {
+      sessionId: session.id,
+      showId,
+      contentId,
+    }, stationId);
 
     return session;
   }

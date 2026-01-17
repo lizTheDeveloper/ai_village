@@ -12,7 +12,6 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
-import type { VisionComponent } from '../components/VisionComponent.js';
 import type { SpatialMemoryComponent, SpatialMemory } from '../components/SpatialMemoryComponent.js';
 import { getSpatialMemoriesByType } from '../components/SpatialMemoryComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -67,9 +66,8 @@ export class LandmarkNamingSystem extends BaseSystem {
   /** Cooldown duration in ticks (10 minutes at 20 TPS) */
   private readonly NAMING_COOLDOWN_TICKS = 12000;
 
-  /** Throttle interval - only check for landmarks every 2 seconds (40 ticks at 20 TPS) */
-  private readonly LANDMARK_UPDATE_INTERVAL = 40;
-  private lastLandmarkCheckTick = 0;
+  /** World reference for event-driven processing */
+  private worldRef: import('../ecs/World.js').World | null = null;
 
   /**
    * Create a LandmarkNamingSystem.
@@ -82,107 +80,159 @@ export class LandmarkNamingSystem extends BaseSystem {
   }
 
   /**
-   * Update the landmark naming system.
-   * Checks for new discoveries and processes naming responses.
+   * Initialize event listeners for sleep-triggered landmark naming.
    */
-  protected onUpdate(ctx: SystemContext): void {
-    // Throttle updates - landmark discovery doesn't need to be checked every tick
-    if (ctx.tick - this.lastLandmarkCheckTick < this.LANDMARK_UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastLandmarkCheckTick = ctx.tick;
+  protected onInitialize(world: import('../ecs/World.js').World, eventBus: import('../events/EventBus.js').EventBus): void {
+    this.worldRef = world;
 
-    // Get the world-level named landmarks registry
-    const worldEntities = ctx.world.query().with(ComponentType.NamedLandmarks).executeEntities();
-    let landmarksComponent: NamedLandmarksComponent | undefined;
-
-    for (const worldEntity of worldEntities) {
-      landmarksComponent = (worldEntity as EntityImpl).getComponent<NamedLandmarksComponent>(
-        ComponentType.NamedLandmarks
-      );
-      if (landmarksComponent) break;
-    }
-
-    // If no landmarks component exists, create one on the first world entity
-    if (!landmarksComponent) {
-      const worldEntity = ctx.world.entities.values().next().value as EntityImpl | undefined;
-      if (worldEntity) {
-        landmarksComponent = new NamedLandmarksComponent();
-        worldEntity.addComponent(landmarksComponent);
-      } else {
-        return; // No world entity to attach to
+    // Subscribe to agent sleep start - this is when agents reflect and name landmarks
+    eventBus.subscribe('agent:sleep_start', (event) => {
+      const agentId = event.data?.agentId as string | undefined;
+      if (agentId) {
+        this.onAgentSleepStart(agentId, world.tick);
       }
-    }
-
-    // Process pending naming responses
-    this.processPendingNamings(ctx, landmarksComponent);
-
-    // Check for new discoveries
-    this.checkForNewDiscoveries(ctx, landmarksComponent);
+    });
   }
 
   /**
-   * Check agents' vision for newly discovered landmarks.
+   * Handle agent starting to sleep - check for landmarks to name.
    */
-  private checkForNewDiscoveries(ctx: SystemContext, landmarksComponent: NamedLandmarksComponent): void {
-    const agents = ctx.world.query()
-      .with(ComponentType.Agent)
-      .with(ComponentType.Vision)
-      .with(ComponentType.SpatialMemory)
-      .with(ComponentType.Personality)
-      .executeEntities();
+  private onAgentSleepStart(agentId: string, tick: number): void {
+    if (!this.worldRef) return;
 
-    for (const agentEntity of agents) {
-      const entity = agentEntity as EntityImpl;
-      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-      const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
-      const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    const entity = this.worldRef.getEntity(agentId) as EntityImpl | undefined;
+    if (!entity) return;
 
-      if (!agent || !vision || !spatialMemory) continue;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    if (!agent || !agent.useLLM) return; // Only LLM agents name landmarks
 
-      // Only LLM agents can name landmarks
-      if (!agent.useLLM) continue;
+    const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    if (!spatialMemory) return;
 
-      // Check naming cooldown
-      const lastNaming = this.namingCooldowns.get(entity.id);
-      if (lastNaming && ctx.tick - lastNaming < this.NAMING_COOLDOWN_TICKS) {
-        continue; // Still on cooldown
-      }
+    // Get or create landmarks registry
+    const landmarksComponent = this.getOrCreateLandmarksComponent(this.worldRef);
+    if (!landmarksComponent) return;
 
-      // Skip if already has a pending naming request
-      if (this.pendingNamings.has(entity.id)) {
+    // Check naming cooldown
+    const lastNaming = this.namingCooldowns.get(entity.id);
+    if (lastNaming && tick - lastNaming < this.NAMING_COOLDOWN_TICKS) {
+      return; // Still on cooldown
+    }
+
+    // Skip if already has a pending naming request
+    if (this.pendingNamings.has(entity.id)) {
+      return;
+    }
+
+    // Check for unnamed landmarks in memory
+    this.checkAgentForLandmarks(entity, spatialMemory, landmarksComponent, tick);
+  }
+
+  /**
+   * Get or create the world-level landmarks component.
+   */
+  private getOrCreateLandmarksComponent(world: import('../ecs/World.js').World): NamedLandmarksComponent | undefined {
+    const worldEntities = world.query().with(ComponentType.NamedLandmarks).executeEntities();
+
+    for (const worldEntity of worldEntities) {
+      const comp = (worldEntity as EntityImpl).getComponent<NamedLandmarksComponent>(ComponentType.NamedLandmarks);
+      if (comp) return comp;
+    }
+
+    // Create on first world entity if not found
+    const firstEntity = world.entities.values().next().value as EntityImpl | undefined;
+    if (firstEntity) {
+      const newComp = new NamedLandmarksComponent();
+      firstEntity.addComponent(newComp);
+      return newComp;
+    }
+    return undefined;
+  }
+
+  /**
+   * Update - only processes pending naming responses (no per-tick queries).
+   */
+  protected onUpdate(ctx: SystemContext): void {
+    // Only process pending LLM responses - no expensive queries
+    if (this.pendingNamings.size === 0) return;
+
+    const landmarksComponent = this.getOrCreateLandmarksComponent(ctx.world);
+    if (!landmarksComponent) return;
+
+    this.processPendingNamings(ctx, landmarksComponent);
+  }
+
+  /**
+   * Check a specific agent for landmarks they discovered but haven't named.
+   */
+  private checkAgentForLandmarks(
+    entity: EntityImpl,
+    spatialMemory: SpatialMemoryComponent,
+    landmarksComponent: NamedLandmarksComponent,
+    tick: number
+  ): void {
+    const recentLandmarks = this.getRecentTerrainLandmarks(spatialMemory, tick);
+
+    for (const landmarkMemory of recentLandmarks) {
+      const featureType = landmarkMemory.metadata?.featureType as string | undefined;
+      if (!featureType || !NAMEABLE_TERRAIN_TYPES.has(featureType)) continue;
+
+      if (landmarksComponent.isNamed(landmarkMemory.x, landmarkMemory.y)) {
+        // Already named - agent learns the existing name
+        const namedLandmark = landmarksComponent.getLandmark(landmarkMemory.x, landmarkMemory.y);
+        if (namedLandmark) {
+          this.learnExistingName(entity, landmarkMemory, namedLandmark.name, tick);
+        }
         continue;
       }
 
-      // Get terrain features from vision (VisionProcessor stores these)
-      // We need to access the actual terrain features seen
-      // For now, check spatial memory for recent terrain landmarks
-      const recentLandmarks = this.getRecentTerrainLandmarks(spatialMemory, ctx.tick);
-
-      for (const landmarkMemory of recentLandmarks) {
-        // Check if this landmark is nameable
-        const featureType = landmarkMemory.metadata?.featureType as string | undefined;
-        if (!featureType || !NAMEABLE_TERRAIN_TYPES.has(featureType)) continue;
-
-        // Check if already named globally
-        if (landmarksComponent.isNamed(landmarkMemory.x, landmarkMemory.y)) {
-          // Already named - agent should learn the existing name
-          const namedLandmark = landmarksComponent.getLandmark(landmarkMemory.x, landmarkMemory.y);
-          if (namedLandmark) {
-            this.learnExistingName(entity, landmarkMemory, namedLandmark.name, ctx.tick);
-          }
-          continue;
-        }
-
-        // Check if agent has already named this landmark in their memory
-        const hasNamed = this.hasAgentNamedLandmark(spatialMemory, landmarkMemory.x, landmarkMemory.y);
-        if (hasNamed) continue;
-
-        // New unnamed landmark! Queue a naming request
-        this.requestLandmarkName(entity, landmarkMemory, ctx);
-        break; // Only name one landmark per update
-      }
+      // Found an unnamed landmark - initiate naming
+      this.requestLandmarkNameOnSleep(entity, landmarkMemory, tick);
+      return; // Only name one landmark per sleep
     }
+  }
+
+  /**
+   * Request a landmark name during agent sleep (event-driven, no SystemContext).
+   */
+  private requestLandmarkNameOnSleep(
+    entity: EntityImpl,
+    landmarkMemory: SpatialMemory,
+    tick: number
+  ): void {
+    const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
+    const memory = entity.getComponent<MemoryComponent>(ComponentType.Memory);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+
+    if (!personality || !memory || !agent) return;
+
+    // Build naming prompt
+    const prompt = this.buildNamingPrompt(entity, landmarkMemory, personality, memory, null);
+
+    // Queue the naming request
+    this.llmQueue.requestDecision(entity.id, prompt).catch(err => {
+      console.error(`[LandmarkNamingSystem] Failed to request name for ${entity.id}:`, err);
+    });
+
+    // Track pending request
+    const featureType = (landmarkMemory.metadata?.featureType as string) || 'unknown';
+    const feature: TerrainFeature = {
+      type: featureType as TerrainFeatureType,
+      x: landmarkMemory.x,
+      y: landmarkMemory.y,
+      elevation: (landmarkMemory.metadata?.elevation as number | undefined) ?? 0,
+      size: (landmarkMemory.metadata?.size as number | undefined) ?? 1,
+      description: landmarkMemory.metadata?.description as string || 'a terrain feature',
+    };
+
+    this.pendingNamings.set(entity.id, {
+      agentId: entity.id,
+      feature,
+      requestedAt: tick,
+    });
+
+    // Set cooldown
+    this.namingCooldowns.set(entity.id, tick);
   }
 
   /**
@@ -207,47 +257,6 @@ export class LandmarkNamingSystem extends BaseSystem {
   }
 
   /**
-   * Request an LLM-generated name for a landmark.
-   */
-  private requestLandmarkName(
-    entity: EntityImpl,
-    landmarkMemory: SpatialMemory,
-    ctx: SystemContext
-  ): void {
-    const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
-    const memory = entity.getComponent<MemoryComponent>(ComponentType.Memory);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-
-    if (!personality || !memory || !agent) return;
-
-    // Build naming prompt
-    const prompt = this.buildNamingPrompt(entity, landmarkMemory, personality, memory, ctx);
-
-    // Queue the naming request
-    // TODO: Add customLLMConfig to AgentComponent if needed
-    this.llmQueue.requestDecision(entity.id, prompt).catch(err => {
-      console.error(`[LandmarkNamingSystem] Failed to request name for ${entity.id}:`, err);
-    });
-
-    // Track pending request
-    const featureType = (landmarkMemory.metadata?.featureType as string) || 'unknown';
-    const feature: TerrainFeature = {
-      type: featureType as TerrainFeatureType,
-      x: landmarkMemory.x,
-      y: landmarkMemory.y,
-      elevation: (landmarkMemory.metadata?.elevation as number | undefined) ?? 0,
-      size: (landmarkMemory.metadata?.size as number | undefined) ?? 1,
-      description: landmarkMemory.metadata?.description as string || 'a terrain feature',
-    };
-
-    this.pendingNamings.set(entity.id, {
-      agentId: entity.id,
-      feature,
-      requestedAt: ctx.tick,
-    });
-  }
-
-  /**
    * Build the LLM prompt for naming a landmark.
    */
   private buildNamingPrompt(
@@ -255,7 +264,7 @@ export class LandmarkNamingSystem extends BaseSystem {
     landmarkMemory: SpatialMemory,
     personality: PersonalityComponent,
     memory: MemoryComponent,
-    __ctx: SystemContext
+    __ctx: SystemContext | null
   ): string {
     const featureType = landmarkMemory.metadata?.featureType || 'terrain feature';
     const description = landmarkMemory.metadata?.description || 'a notable place';

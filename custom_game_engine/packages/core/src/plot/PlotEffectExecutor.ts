@@ -60,7 +60,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const inventory = entity.getComponent('inventory') as InventoryComponent | undefined;
+      const inventory = entity.getComponent<InventoryComponent>('inventory');
       if (!inventory) {
         console.warn(`[PlotEffect] Entity ${context.entityId} has no inventory`);
         break;
@@ -79,7 +79,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const skills = entity.getComponent('skills') as SkillsComponent | undefined;
+      const skills = entity.getComponent<SkillsComponent>('skills');
       if (!skills) {
         console.warn(`[PlotEffect] Entity ${context.entityId} has no skills`);
         break;
@@ -96,7 +96,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const relationship = entity.getComponent('relationship') as RelationshipComponent | undefined;
+      const relationship = entity.getComponent<RelationshipComponent>('relationship');
       if (!relationship) break;
 
       const updated = updateTrust(relationship, effect.agent_id, effect.trust_delta);
@@ -108,7 +108,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const soul = entity.getComponent('soul_identity') as SoulIdentityComponent | undefined;
+      const soul = entity.getComponent<SoulIdentityComponent>('soul_identity');
       if (!soul) {
         console.warn(`[PlotEffect] Entity ${context.entityId} has no soul_identity`);
         break;
@@ -158,7 +158,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const mood = entity.getComponent('mood') as MoodComponent | undefined;
+      const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
       const updated = applyMoodChange(mood, effect.delta, context.personalTick);
@@ -170,7 +170,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      const mood = entity.getComponent('mood') as MoodComponent | undefined;
+      const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
       const currentValue = mood.factors[effect.factor];

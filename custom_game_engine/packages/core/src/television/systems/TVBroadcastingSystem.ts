@@ -13,6 +13,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, TVChannel } from '../TVStation.js';
 import type { TVBroadcastComponent, ProgramSlot, BroadcastEvent } from '../TVBroadcasting.js';
@@ -39,14 +40,14 @@ export class TVBroadcastingSystem implements System {
   readonly priority = 65; // After most game logic
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastScheduleCheck: number = 0;
 
   /** Cache for station -> broadcast component mapping */
   private broadcastComponents: Map<string, TVBroadcastComponent> = new Map();
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -217,17 +218,13 @@ export class TVBroadcastingSystem implements System {
     }
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'tv:broadcast:started',
-      source: station.buildingId,
-      data: {
-        stationId: station.buildingId,
-        channelNumber: channel.channelNumber,
-        contentId,
-        showId,
-        isLive: slot.programType === 'news',
-      },
-    });
+    this.events.emit('tv:broadcast:started', {
+      stationId: station.buildingId,
+      channelNumber: channel.channelNumber,
+      contentId,
+      showId,
+      isLive: slot.programType === 'news',
+    }, station.buildingId);
   }
 
   /**
@@ -254,19 +251,15 @@ export class TVBroadcastingSystem implements System {
       }
 
       // Emit event
-      this.eventBus?.emit({
-        type: 'tv:broadcast:ended',
-        source: station.buildingId,
-        data: {
-          stationId: station.buildingId,
-          channelNumber: channel.channelNumber,
-          contentId: event.contentId,
-          showId: event.showId,
-          peakViewers: event.peakViewers,
-          totalViewers: event.totalViewers,
-          averageRating: event.averageRating,
-        },
-      });
+      this.events.emit('tv:broadcast:ended', {
+        stationId: station.buildingId,
+        channelNumber: channel.channelNumber,
+        contentId: event.contentId,
+        showId: event.showId,
+        peakViewers: event.peakViewers,
+        totalViewers: event.totalViewers,
+        averageRating: event.averageRating,
+      }, station.buildingId);
     }
 
     // Clear channel state
@@ -336,16 +329,12 @@ export class TVBroadcastingSystem implements System {
 
     if (success) {
       const event = broadcast.activeBroadcasts.get(channelNumber);
-      this.eventBus?.emit({
-        type: 'tv:viewer:tuned_in',
-        source: viewerId,
-        data: {
-          viewerId,
-          stationId,
-          channelNumber,
-          contentId: event?.contentId ?? 'unknown',
-        },
-      });
+      this.events.emit('tv:viewer:tuned_in', {
+        viewerId,
+        stationId,
+        channelNumber,
+        contentId: event?.contentId ?? 'unknown',
+      }, viewerId);
     }
 
     return success;
@@ -367,16 +356,12 @@ export class TVBroadcastingSystem implements System {
     const success = tuneOut(broadcast, channelNumber, viewerId);
 
     if (success) {
-      this.eventBus?.emit({
-        type: 'tv:viewer:tuned_out',
-        source: viewerId,
-        data: {
-          viewerId,
-          stationId,
-          channelNumber,
-          watchDuration,
-        },
-      });
+      this.events.emit('tv:viewer:tuned_out', {
+        viewerId,
+        stationId,
+        channelNumber,
+        watchDuration,
+      }, viewerId);
     }
 
     return success;
@@ -402,6 +387,6 @@ export class TVBroadcastingSystem implements System {
 
   cleanup(): void {
     this.broadcastComponents.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }

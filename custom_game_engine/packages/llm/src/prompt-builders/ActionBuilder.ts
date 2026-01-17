@@ -159,9 +159,8 @@ export class ActionBuilder {
       building.push('plan_build - Plan a building project: queues the build and you\'ll automatically gather resources then construct it. Just say what building you want! (Examples: "plan_build storage-chest", "plan_build campfire", "plan_build tent")');
     }
 
-    // EXPLORATION
-    exploration.push('explore - Systematically explore unknown areas to find new resources');
-    exploration.push('navigate - Go to specific coordinates (say "navigate to x,y" or "go to 10,20")');
+    // NOTE: 'explore' and 'navigate' removed - explore is an autonomic idle-triggered behavior, not LLM-chosen
+    // Navigation happens implicitly through other actions (gather, build, follow)
 
     // Advanced farming
     if ((hasSeeds || (vision?.seenResources && vision.seenResources.length > 0)) && farmingSkill >= 1) {

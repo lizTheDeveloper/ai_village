@@ -3,6 +3,22 @@ import { WorldImpl } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 
 /**
+ * Type definitions for Reality Editing System (specification)
+ * These types define the API contract for the future implementation.
+ */
+
+/** Valid edit types for reality editing operations */
+type RealityEditType = 'replace' | 'delete' | 'insert' | 'strikethrough' | 'annotate';
+
+/** Reality edit request structure */
+interface RealityEditRequest {
+  editType: RealityEditType;
+  target: Entity;
+  originalText: string;
+  revisedText: string;
+}
+
+/**
  * Reality Editing System Specifications
  *
  * The idea that reality is written text that can be revised. Editorial magic allows
@@ -596,13 +612,19 @@ describe('Reality Editing System', () => {
     it('should throw if editing reality with invalid edit type', () => {
       const entity = world.createAgent({ position: { x: 10, y: 10 } });
 
+      // Test that runtime validation rejects invalid edit types
+      // TypeScript correctly prevents this at compile-time, but we need to test runtime validation
+      // for cases where data might come from external sources (saved games, network, etc.)
+      // Using unknown → RealityEditRequest to explicitly bypass type safety for testing
+      const invalidEditRequest = {
+        editType: 'invalid',
+        target: entity,
+        originalText: 'test',
+        revisedText: 'test2',
+      } as unknown as RealityEditRequest;
+
       expect(() => {
-        world.editReality({
-          editType: 'invalid' as any,
-          target: entity,
-          originalText: 'test',
-          revisedText: 'test2',
-        });
+        world.editReality(invalidEditRequest);
       }).toThrow('Invalid edit type: invalid');
     });
 

@@ -14,6 +14,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, Production } from '../TVStation.js';
 import type { TVContentComponent, FilmedScene, EditedEpisode } from '../TVContent.js';
@@ -87,7 +88,7 @@ export class TVPostProductionSystem implements System {
   readonly priority = 63; // After production
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastProcessTick: number = 0;
 
   /** Active post-production jobs */
@@ -103,10 +104,10 @@ export class TVPostProductionSystem implements System {
   };
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Subscribe to production wrap events
-    eventBus.subscribe('tv:production:ready_for_post' as any, (_event) => {
+    this.events.onGeneric('tv:production:ready_for_post', (_data) => {
       // Would create a new post-production job here
     });
   }
@@ -200,15 +201,11 @@ export class TVPostProductionSystem implements System {
 
     this.advancePhase(job, 'sound', currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:editing_complete' as any,
-      source: job.showId,
-      data: {
-        jobId: job.id,
-        contentId: job.contentId,
-        quality: job.editingQuality,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:editing_complete', {
+      jobId: job.id,
+      contentId: job.contentId,
+      quality: job.editingQuality,
+    }, job.showId);
   }
 
   /**
@@ -221,16 +218,12 @@ export class TVPostProductionSystem implements System {
 
     this.advancePhase(job, 'vfx', currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:sound_complete' as any,
-      source: job.showId,
-      data: {
-        jobId: job.id,
-        contentId: job.contentId,
-        quality: job.soundQuality,
-        musicCues: job.musicCues.length,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:sound_complete', {
+      jobId: job.id,
+      contentId: job.contentId,
+      quality: job.soundQuality,
+      musicCues: job.musicCues.length,
+    }, job.showId);
   }
 
   /**
@@ -245,16 +238,12 @@ export class TVPostProductionSystem implements System {
 
     this.advancePhase(job, 'color', currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:vfx_complete' as any,
-      source: job.showId,
-      data: {
-        jobId: job.id,
-        contentId: job.contentId,
-        quality: job.vfxQuality,
-        shotsCompleted: job.vfxShots.length,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:vfx_complete', {
+      jobId: job.id,
+      contentId: job.contentId,
+      quality: job.vfxQuality,
+      shotsCompleted: job.vfxShots.length,
+    }, job.showId);
   }
 
   /**
@@ -265,15 +254,11 @@ export class TVPostProductionSystem implements System {
 
     this.advancePhase(job, 'final_review', currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:color_complete' as any,
-      source: job.showId,
-      data: {
-        jobId: job.id,
-        contentId: job.contentId,
-        quality: job.colorQuality,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:color_complete', {
+      jobId: job.id,
+      contentId: job.contentId,
+      quality: job.colorQuality,
+    }, job.showId);
   }
 
   /**
@@ -293,33 +278,25 @@ export class TVPostProductionSystem implements System {
     // Update content with final episode data
     this.finalizeContent(world, job, overallQuality, currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:complete' as any,
-      source: job.showId,
-      data: {
-        jobId: job.id,
-        contentId: job.contentId,
-        showId: job.showId,
-        overallQuality,
-        editingQuality: job.editingQuality,
-        soundQuality: job.soundQuality,
-        vfxQuality: job.vfxQuality,
-        colorQuality: job.colorQuality,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:complete', {
+      jobId: job.id,
+      contentId: job.contentId,
+      showId: job.showId,
+      overallQuality,
+      editingQuality: job.editingQuality,
+      soundQuality: job.soundQuality,
+      vfxQuality: job.vfxQuality,
+      colorQuality: job.colorQuality,
+    }, job.showId);
 
     // Also emit the episode completed event
-    this.eventBus?.emit({
-      type: 'tv:episode:completed',
-      source: job.showId,
-      data: {
-        contentId: job.contentId,
-        showId: job.showId,
-        season: 1, // Would need to get from content
-        episode: 1, // Would need to get from content
-        qualityScore: overallQuality,
-      },
-    });
+    this.events.emit('tv:episode:completed', {
+      contentId: job.contentId,
+      showId: job.showId,
+      season: 1, // Would need to get from content
+      episode: 1, // Would need to get from content
+      qualityScore: overallQuality,
+    }, job.showId);
   }
 
   /**
@@ -595,16 +572,12 @@ export class TVPostProductionSystem implements System {
 
     this.activeJobs.set(job.id, job);
 
-    this.eventBus?.emit({
-      type: 'tv:postproduction:started' as any,
-      source: station.buildingId,
-      data: {
-        jobId: job.id,
-        contentId: production.contentId,
-        showId: production.showId,
-        sceneCount: scenes.length,
-      },
-    });
+    this.events.emitGeneric('tv:postproduction:started', {
+      jobId: job.id,
+      contentId: production.contentId,
+      showId: production.showId,
+      sceneCount: scenes.length,
+    }, station.buildingId);
 
     return job;
   }
@@ -682,6 +655,6 @@ export class TVPostProductionSystem implements System {
 
   cleanup(): void {
     this.activeJobs.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }

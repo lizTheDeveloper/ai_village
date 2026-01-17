@@ -10,4 +10,5 @@ export * from './ChunkSerializer.js';
 export * from './ChunkCache.js';
 export * from './ChunkSpatialQuery.js';
 export * from './ChunkNameRegistry.js';
+export * from './BackgroundChunkGenerator.js';
 export * from './types.js';

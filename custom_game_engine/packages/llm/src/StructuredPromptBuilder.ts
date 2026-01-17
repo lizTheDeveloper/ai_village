@@ -2052,9 +2052,8 @@ export class StructuredPromptBuilder {
       }
     }
 
-    // EXPLORATION
-    exploration.push('explore - Systematically explore unknown areas to find new resources');
-    exploration.push('navigate - Go to specific coordinates (say "navigate to x,y" or "go to 10,20")');
+    // NOTE: 'explore' and 'navigate' removed - explore is an autonomic idle-triggered behavior, not LLM-chosen
+    // Navigation happens implicitly through other actions (gather, build, follow)
 
     // Advanced farming actions (when contextually relevant)
     // Per progressive-skill-reveal-spec.md: requires farming skill 1+

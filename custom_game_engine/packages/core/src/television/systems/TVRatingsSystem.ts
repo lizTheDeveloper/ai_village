@@ -13,6 +13,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent as _TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent } from '../TVShow.js';
@@ -42,18 +43,18 @@ export class TVRatingsSystem implements System {
   readonly priority = 66; // After broadcasting
   readonly requiredComponents = [ComponentType.TVShow] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastEvaluationTick: number = 0;
 
   /** Track shows on cancellation watch */
   private cancellationWatch: Map<string, number> = new Map(); // showId -> warning count
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
 
     // Subscribe to viewer rating events
-    eventBus.subscribe<'tv:viewer:rated'>('tv:viewer:rated', (event) => {
-      this.handleViewerRating(event.data);
+    this.events.on('tv:viewer:rated', (data) => {
+      this.handleViewerRating(data);
     });
   }
 
@@ -159,17 +160,13 @@ export class TVRatingsSystem implements System {
     }
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'tv:viewer:rated',
-      source: viewerId,
-      data: {
-        viewerId,
-        contentId,
-        showId,
-        rating,
-        willWatchNext: reaction.willWatchNext,
-      },
-    });
+    this.events.emit('tv:viewer:rated', {
+      viewerId,
+      contentId,
+      showId,
+      rating,
+      willWatchNext: reaction.willWatchNext,
+    }, viewerId);
 
     return reaction;
   }
@@ -213,15 +210,11 @@ export class TVRatingsSystem implements System {
         renewShow(show);
         this.cancellationWatch.delete(show.showId);
 
-        this.eventBus?.emit({
-          type: 'tv:show:renewed',
-          source: stationId,
-          data: {
-            showId: show.showId,
-            stationId,
-            newSeason: show.currentSeason,
-          },
-        });
+        this.events.emit('tv:show:renewed', {
+          showId: show.showId,
+          stationId,
+          newSeason: show.currentSeason,
+        }, stationId);
       }
       return;
     }
@@ -259,16 +252,12 @@ export class TVRatingsSystem implements System {
     cancelShow(show);
     this.cancellationWatch.delete(show.showId);
 
-    this.eventBus?.emit({
-      type: 'tv:show:cancelled',
-      source: stationId,
-      data: {
-        showId: show.showId,
-        stationId,
-        finalSeason: show.currentSeason,
-        totalEpisodes: show.totalEpisodes,
-      },
-    });
+    this.events.emit('tv:show:cancelled', {
+      showId: show.showId,
+      stationId,
+      finalSeason: show.currentSeason,
+      totalEpisodes: show.totalEpisodes,
+    }, stationId);
   }
 
   /**
@@ -302,16 +291,12 @@ export class TVRatingsSystem implements System {
     const [characterName, catchphrase] = catchphrases[Math.floor(Math.random() * catchphrases.length)]!;
 
     // Emit event for memory system to handle
-    this.eventBus?.emit({
-      type: 'tv:catchphrase:learned',
-      source: viewerId,
-      data: {
-        viewerId,
-        showId: show.showId,
-        characterName,
-        catchphrase,
-      },
-    });
+    this.events.emit('tv:catchphrase:learned', {
+      viewerId,
+      showId: show.showId,
+      characterName,
+      catchphrase,
+    }, viewerId);
   }
 
   /**
@@ -387,6 +372,6 @@ export class TVRatingsSystem implements System {
 
   cleanup(): void {
     this.cancellationWatch.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }

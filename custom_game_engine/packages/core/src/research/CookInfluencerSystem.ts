@@ -16,7 +16,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
-import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import {
   getPublicationSystem,
   type PublicationSystem,
@@ -192,13 +192,13 @@ export class CookInfluencerSystem implements System {
       return;
     }
 
-    const agentComp = cookEntity.getComponent<AgentComponent>(ComponentType.Agent) as any;
-    if (!agentComp) return;
+    const identityComp = cookEntity.getComponent<IdentityComponent>(ComponentType.Identity);
+    if (!identityComp) return;
 
     // Queue for publication
     this.pendingPublications.push({
       cookId: cookEntity.id,
-      cookName: agentComp.name ?? 'Anonymous Cook',
+      cookName: identityComp.name ?? 'Anonymous Cook',
       recipeId,
       recipeName,
       ingredients,
@@ -208,7 +208,7 @@ export class CookInfluencerSystem implements System {
     // Emit discovery event
     this.events.emitGeneric('recipe:discovered', {
       cookId: cookEntity.id,
-      cookName: agentComp.name,
+      cookName: identityComp.name,
       recipeId,
       recipeName,
     });

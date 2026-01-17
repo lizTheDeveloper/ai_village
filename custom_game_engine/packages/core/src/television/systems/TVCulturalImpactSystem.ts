@@ -17,6 +17,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
 
@@ -156,7 +157,7 @@ export interface IconicMoment {
 // ============================================================================
 
 export class CulturalImpactManager {
-  private eventBus: EventBus | null = null;
+  private events: SystemEventManager | null = null;
 
   private catchphrases: Map<string, Catchphrase> = new Map();
   private fashionTrends: Map<string, FashionTrend> = new Map();
@@ -169,7 +170,7 @@ export class CulturalImpactManager {
   private agentFashion: Map<string, Set<string>> = new Map();
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'CulturalImpactManager');
   }
 
   // ============================================================================
@@ -197,15 +198,11 @@ export class CulturalImpactManager {
 
     this.catchphrases.set(catchphrase.id, catchphrase);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:catchphrase_created' as any,
-      source: showId,
-      data: {
-        catchphraseId: catchphrase.id,
-        phrase,
-        character,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:catchphrase_created', {
+      catchphraseId: catchphrase.id,
+      phrase,
+      character,
+    }, showId);
 
     return catchphrase;
   }
@@ -300,16 +297,12 @@ export class CulturalImpactManager {
       dialogueText: `"${catchphrase.phrase}"`,
     });
 
-    this.eventBus?.emit({
-      type: 'tv:culture:catchphrase_memory_formed' as any,
-      source: agentEntity.id,
-      data: {
-        agentId: agentEntity.id,
-        phrase: catchphrase.phrase,
-        character: catchphrase.originCharacter,
-        showId: catchphrase.originShowId,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:catchphrase_memory_formed', {
+      agentId: agentEntity.id,
+      phrase: catchphrase.phrase,
+      character: catchphrase.originCharacter,
+      showId: catchphrase.originShowId,
+    }, agentEntity.id);
   }
 
   private updateCatchphraseStatus(catchphrase: Catchphrase): void {
@@ -378,15 +371,11 @@ export class CulturalImpactManager {
 
     this.fashionTrends.set(trend.id, trend);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:fashion_trend_created' as any,
-      source: showId,
-      data: {
-        trendId: trend.id,
-        name,
-        elements: elements.length,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:fashion_trend_created', {
+      trendId: trend.id,
+      name,
+      elements: elements.length,
+    }, showId);
 
     return trend;
   }
@@ -458,15 +447,11 @@ export class CulturalImpactManager {
 
     this.fanCommunities.set(community.id, community);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:fandom_created' as any,
-      source: showId,
-      data: {
-        communityId: community.id,
-        name,
-        founderId,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:fandom_created', {
+      communityId: community.id,
+      name,
+      founderId,
+    }, showId);
 
     return community;
   }
@@ -514,16 +499,12 @@ export class CulturalImpactManager {
     community.fanTheories.push(theory);
     community.creativity = Math.min(100, community.creativity + 2);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:fan_theory_created' as any,
-      source: community.showId,
-      data: {
-        communityId,
-        theoryId: theory.id,
-        title,
-        authorId,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:fan_theory_created', {
+      communityId,
+      theoryId: theory.id,
+      title,
+      authorId,
+    }, community.showId);
 
     return theory;
   }
@@ -538,15 +519,11 @@ export class CulturalImpactManager {
     theory.confirmed = true;
     community.fanaticism = Math.min(100, community.fanaticism + 10);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:fan_theory_confirmed' as any,
-      source: community.showId,
-      data: {
-        communityId,
-        theoryId,
-        title: theory.title,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:fan_theory_confirmed', {
+      communityId,
+      theoryId,
+      title: theory.title,
+    }, community.showId);
 
     return true;
   }
@@ -579,16 +556,12 @@ export class CulturalImpactManager {
 
     this.celebrities.set(celebrity.id, celebrity);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:celebrity_emerged' as any,
-      source: agentId,
-      data: {
-        celebrityId: celebrity.id,
-        agentName,
-        showId: initialShowId,
-        characterName,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:celebrity_emerged', {
+      celebrityId: celebrity.id,
+      agentName,
+      showId: initialShowId,
+      characterName,
+    }, agentId);
 
     return celebrity;
   }
@@ -605,16 +578,12 @@ export class CulturalImpactManager {
 
     this.updateCelebrityStatus(celebrity);
 
-    this.eventBus?.emit({
-      type: 'tv:culture:fame_increased' as any,
-      source: celebrity.agentId,
-      data: {
-        celebrityId,
-        agentName: celebrity.agentName,
-        newFameLevel: celebrity.fameLevel,
-        reason,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:fame_increased', {
+      celebrityId,
+      agentName: celebrity.agentName,
+      newFameLevel: celebrity.fameLevel,
+      reason,
+    }, celebrity.agentId);
 
     return true;
   }
@@ -714,16 +683,12 @@ export class CulturalImpactManager {
       }
     }
 
-    this.eventBus?.emit({
-      type: 'tv:culture:iconic_moment' as any,
-      source: showId,
-      data: {
-        momentId: moment.id,
-        description,
-        category,
-        characters,
-      },
-    });
+    this.events?.emitGeneric('tv:culture:iconic_moment', {
+      momentId: moment.id,
+      description,
+      category,
+      characters,
+    }, showId);
 
     return moment;
   }
@@ -812,7 +777,8 @@ export class CulturalImpactManager {
     this.iconicMoments.clear();
     this.agentCatchphrases.clear();
     this.agentFashion.clear();
-    this.eventBus = null;
+    this.events?.cleanup();
+    this.events = null;
   }
 }
 
@@ -827,10 +793,12 @@ export class TVCulturalImpactSystem implements System {
 
   private manager = new CulturalImpactManager();
   private lastUpdateTick = 0;
+  private events!: SystemEventManager;
 
   private static readonly UPDATE_INTERVAL = 20 * 60 * 5; // Every 5 minutes
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
     this.manager.setEventBus(eventBus);
   }
 
@@ -851,6 +819,7 @@ export class TVCulturalImpactSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.manager.cleanup();
   }
 }

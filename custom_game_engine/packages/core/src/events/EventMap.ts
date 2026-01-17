@@ -32,6 +32,15 @@ export interface GameEventMap {
   'world:time:season': { season: string; year: number };
   'world:time:year': { year: number };
 
+  // === Chunk Events ===
+  'chunk_background_generated': {
+    chunkX: number;
+    chunkY: number;
+    priority: string;
+    requestedBy: string;
+    tick: number;
+  };
+
   // === Agent Action Events ===
   'agent:action:started': {
     actionId: string;

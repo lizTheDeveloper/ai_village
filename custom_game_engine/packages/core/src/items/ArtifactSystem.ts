@@ -478,6 +478,8 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * ArtifactSystem - Monitors for strange moods and tracks artifacts.
@@ -503,6 +505,7 @@ export class ArtifactSystem implements System {
   readonly priority: number = 600; // After skills, before end-of-tick systems
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  private events!: SystemEventManager;
   private UPDATE_INTERVAL = 1440; // Check once per day (1440 ticks)
   private lastUpdate = 0;
 
@@ -515,6 +518,14 @@ export class ArtifactSystem implements System {
     master: 0,
     legendary: 0,
   };
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     if (world.tick - this.lastUpdate < this.UPDATE_INTERVAL) return;

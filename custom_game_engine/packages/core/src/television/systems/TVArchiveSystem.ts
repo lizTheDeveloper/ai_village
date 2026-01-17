@@ -18,6 +18,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 // =============================================================================
@@ -121,7 +122,7 @@ export class ArchiveManager {
   private collections: Map<string, ArchiveCollection> = new Map();
   private retrospectives: Map<string, RetrospectiveShow> = new Map();
   private preservationRequests: Map<string, PreservationRequest> = new Map();
-  private eventBus: EventBus | null = null;
+  private events: SystemEventManager | null = null;
 
   // Storage thresholds
   private readonly HOT_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -130,7 +131,7 @@ export class ArchiveManager {
   private readonly RETRIEVAL_COST_BASE = 10;
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'ArchiveManager');
   }
 
   // ---------------------------------------------------------------------------
@@ -160,16 +161,12 @@ export class ArchiveManager {
       this.moveToCold(archived);
     }
 
-    this.eventBus?.emit({
-      type: 'tv:content_archived' as any,
-      source: archived.showId,
-      data: {
-        contentId: archived.contentId,
-        showId: archived.showId,
-        tier: archived.storageTier,
-        culturalSignificance: archived.culturalSignificance,
-      },
-    });
+    this.events?.emitGeneric('tv:content_archived', {
+      contentId: archived.contentId,
+      showId: archived.showId,
+      tier: archived.storageTier,
+      culturalSignificance: archived.culturalSignificance,
+    }, archived.showId);
 
     return archived;
   }
@@ -230,14 +227,10 @@ export class ArchiveManager {
   private moveToCold(content: ArchivedContent): void {
     if (content.culturalSignificance < this.MIN_CULTURAL_SIGNIFICANCE_FOR_COLD) {
       // Content not significant enough for cold storage - may be purged
-      this.eventBus?.emit({
-        type: 'tv:content_low_significance' as any,
-        source: content.showId,
-        data: {
-          contentId: content.contentId,
-          significance: content.culturalSignificance,
-        },
-      });
+      this.events?.emitGeneric('tv:content_low_significance', {
+        contentId: content.contentId,
+        significance: content.culturalSignificance,
+      }, content.showId);
     }
 
     content.storageTier = 'cold';
@@ -290,15 +283,11 @@ export class ArchiveManager {
       }
     }
 
-    this.eventBus?.emit({
-      type: 'tv:content_retrieved' as any,
-      source: content.showId,
-      data: {
-        contentId,
-        tier: content.storageTier,
-        retrievalCount: content.retrievalCount,
-      },
-    });
+    this.events?.emitGeneric('tv:content_retrieved', {
+      contentId,
+      tier: content.storageTier,
+      retrievalCount: content.retrievalCount,
+    }, content.showId);
 
     return content;
   }
@@ -364,15 +353,11 @@ export class ArchiveManager {
 
     this.collections.set(collection.id, collection);
 
-    this.eventBus?.emit({
-      type: 'tv:collection_created' as any,
-      source: collection.id,
-      data: {
-        collectionId: collection.id,
-        name,
-        contentCount: collection.contentIds.length,
-      },
-    });
+    this.events?.emitGeneric('tv:collection_created', {
+      collectionId: collection.id,
+      name,
+      contentCount: collection.contentIds.length,
+    }, collection.id);
 
     return collection;
   }
@@ -419,16 +404,12 @@ export class ArchiveManager {
 
     this.retrospectives.set(retrospective.id, retrospective);
 
-    this.eventBus?.emit({
-      type: 'tv:retrospective_scheduled' as any,
-      source: showId,
-      data: {
-        id: retrospective.id,
-        title,
-        type,
-        clipCount: featuredClips.length,
-      },
-    });
+    this.events?.emitGeneric('tv:retrospective_scheduled', {
+      id: retrospective.id,
+      title,
+      type,
+      clipCount: featuredClips.length,
+    }, showId);
 
     return retrospective;
   }
@@ -552,16 +533,12 @@ export class ArchiveManager {
       }
     }
 
-    this.eventBus?.emit({
-      type: 'tv:archive_maintenance' as any,
-      source: 'archive_system',
-      data: {
-        promoted,
-        demoted,
-        purged,
-        totalContent: this.allContent.size,
-      },
-    });
+    this.events?.emitGeneric('tv:archive_maintenance', {
+      promoted,
+      demoted,
+      purged,
+      totalContent: this.allContent.size,
+    }, 'archive_system');
 
     return { promoted, demoted, purged };
   }
@@ -622,7 +599,8 @@ export class ArchiveManager {
     this.collections.clear();
     this.retrospectives.clear();
     this.preservationRequests.clear();
-    this.eventBus = null;
+    this.events?.cleanup();
+    this.events = null;
   }
 }
 
@@ -658,8 +636,10 @@ export class TVArchiveSystem implements System {
   private manager = getArchiveManager();
   private lastMaintenanceTick = 0;
   private readonly MAINTENANCE_INTERVAL = 1000; // Every 1000 ticks
+  private events!: SystemEventManager;
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
     this.manager.setEventBus(eventBus);
   }
 
@@ -675,6 +655,7 @@ export class TVArchiveSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     resetArchiveManager();
   }
 }

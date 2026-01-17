@@ -13,6 +13,7 @@ import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent, ShowFormat, TargetAudience } from '../TVShow.js';
@@ -80,7 +81,7 @@ export class TVDevelopmentSystem implements System {
   readonly priority = 62; // Before production systems
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private lastProcessTick: number = 0;
 
   /** Pending pitch submissions */
@@ -90,7 +91,7 @@ export class TVDevelopmentSystem implements System {
   private writerPitchCount: Map<string, number> = new Map();
 
   initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
