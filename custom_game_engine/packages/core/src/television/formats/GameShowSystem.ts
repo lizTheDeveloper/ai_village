@@ -252,16 +252,12 @@ export class GameShowManager {
 
     this.gameShows.set(gameShow.id, gameShow);
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:created' as any,
-      source: config.showId,
-      data: {
-        gameShowId: gameShow.id,
-        name: config.name,
-        format: config.format,
-        grandPrize: config.grandPrize.name,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:created', {
+      gameShowId: gameShow.id,
+      name: config.name,
+      format: config.format,
+      grandPrize: config.grandPrize.name,
+    }, config.showId);
 
     return gameShow;
   }
@@ -299,15 +295,11 @@ export class GameShowManager {
 
     this.applications.set(application.id, application);
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:application_submitted' as any,
-      source: agentId,
-      data: {
-        applicationId: application.id,
-        showId,
-        agentName,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:application_submitted', {
+      applicationId: application.id,
+      showId,
+      agentName,
+    }, agentId);
 
     return application;
   }
@@ -319,17 +311,13 @@ export class GameShowManager {
     application.status = accepted ? 'accepted' : 'rejected';
     application.auditionScore = score;
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:application_reviewed' as any,
-      source: application.showId,
-      data: {
-        applicationId,
-        agentId: application.agentId,
-        agentName: application.agentName,
-        accepted,
-        score,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:application_reviewed', {
+      applicationId,
+      agentId: application.agentId,
+      agentName: application.agentName,
+      accepted,
+      score,
+    }, application.showId);
 
     return true;
   }
@@ -392,17 +380,13 @@ export class GameShowManager {
 
     this.episodes.set(episode.id, episode);
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:episode_created' as any,
-      source: gameShow.showId,
-      data: {
-        episodeId: episode.id,
-        gameShowId,
-        episodeNumber,
-        seasonNumber,
-        contestantCount: contestants.length,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:episode_created', {
+      episodeId: episode.id,
+      gameShowId,
+      episodeNumber,
+      seasonNumber,
+      contestantCount: contestants.length,
+    }, gameShow.showId);
 
     return episode;
   }
@@ -495,16 +479,12 @@ export class GameShowManager {
 
     const gameShow = this.gameShows.get(episode.gameShowId);
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:episode_started' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        gameShowName: gameShow?.name,
-        contestantCount: episode.contestants.length,
-        roundCount: episode.rounds.length,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:episode_started', {
+      episodeId,
+      gameShowName: gameShow?.name,
+      contestantCount: episode.contestants.length,
+      roundCount: episode.rounds.length,
+    }, episode.showId);
 
     return true;
   }
@@ -556,18 +536,14 @@ export class GameShowManager {
       contestant.incorrectAnswers++;
     }
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:answer_submitted' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        contestantId,
-        contestantName: contestant.agentName,
-        isCorrect,
-        points,
-        responseTime,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:answer_submitted', {
+      episodeId,
+      contestantId,
+      contestantName: contestant.agentName,
+      isCorrect,
+      points,
+      responseTime,
+    }, episode.showId);
 
     return response;
   }
@@ -584,20 +560,16 @@ export class GameShowManager {
 
     challenge.revealed = true;
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:answer_revealed' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        challengeId: challenge.id,
-        correctAnswer: challenge.correctAnswer,
-        respondents: Array.from(challenge.responses.values()).map(r => ({
-          contestantId: r.contestantId,
-          isCorrect: r.isCorrect,
-          points: r.pointsAwarded,
-        })),
-      },
-    });
+    this.events.emitGeneric('tv:game_show:answer_revealed', {
+      episodeId,
+      challengeId: challenge.id,
+      correctAnswer: challenge.correctAnswer,
+      respondents: Array.from(challenge.responses.values()).map(r => ({
+        contestantId: r.contestantId,
+        isCorrect: r.isCorrect,
+        points: r.pointsAwarded,
+      })),
+    }, episode.showId);
 
     return challenge;
   }
@@ -656,19 +628,15 @@ export class GameShowManager {
       }
     }
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:round_ended' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        roundNumber: round.roundNumber,
-        eliminated: round.eliminatedContestants,
-        standings: episode.contestants
-          .filter(c => c.status === 'active')
-          .sort((a, b) => b.score - a.score)
-          .map(c => ({ name: c.agentName, score: c.score })),
-      },
-    });
+    this.events.emitGeneric('tv:game_show:round_ended', {
+      episodeId,
+      roundNumber: round.roundNumber,
+      eliminated: round.eliminatedContestants,
+      standings: episode.contestants
+        .filter(c => c.status === 'active')
+        .sort((a, b) => b.score - a.score)
+        .map(c => ({ name: c.agentName, score: c.score })),
+    }, episode.showId);
 
     // Check for next round or end
     episode.currentRound++;
@@ -773,17 +741,13 @@ export class GameShowManager {
       runnerUp.status = 'runner_up';
     }
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:episode_ended' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        winnerId: winner?.id,
-        winnerName: winner?.agentName,
-        winnerScore: winner?.score,
-        prizeAwarded: episode.prizeAwarded?.name,
-      },
-    });
+    this.events.emitGeneric('tv:game_show:episode_ended', {
+      episodeId,
+      winnerId: winner?.id,
+      winnerName: winner?.agentName,
+      winnerScore: winner?.score,
+      prizeAwarded: episode.prizeAwarded?.name,
+    }, episode.showId);
 
     return true;
   }
@@ -831,16 +795,12 @@ export class GameShowManager {
       remaining -= percentage;
     }
 
-    this.eventBus?.emit({
-      type: 'tv:game_show:lifeline_used' as any,
-      source: episode.showId,
-      data: {
-        episodeId,
-        contestantId,
-        lifeline: 'audience',
-        results: Object.fromEntries(results),
-      },
-    });
+    this.events.emitGeneric('tv:game_show:lifeline_used', {
+      episodeId,
+      contestantId,
+      lifeline: 'audience',
+      results: Object.fromEntries(results),
+    }, episode.showId);
 
     return results;
   }
@@ -903,7 +863,7 @@ export class GameShowManager {
     this.episodes.clear();
     this.applications.clear();
     this.questionBanks.clear();
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }
 

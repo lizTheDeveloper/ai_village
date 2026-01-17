@@ -10,7 +10,7 @@
  * 6. Infant care and nursing
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
@@ -110,20 +110,15 @@ export interface BirthOutcome {
 // The System
 // ============================================================================
 
-export class MidwiferySystem implements System {
+export class MidwiferySystem extends BaseSystem {
   public readonly id: SystemId = 'midwifery';
   public readonly priority = 45; // Run before general NeedsSystem
   public readonly requiredComponents = [] as const;
 
-  private world: World | null = null;
-  private eventBus: EventBus | null = null;
   private reproductionSystem: ReproductionSystem | null = null;
   private lastUpdateTick: Tick = 0;
 
-  public initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.eventBus = eventBus;
-
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
     // Note: world.getSystem may not be available in all contexts (e.g., tests)
     try {
@@ -133,13 +128,13 @@ export class MidwiferySystem implements System {
     }
 
     // Subscribe to conception events
-    this.eventBus.subscribe('conception' as any, (event: any) => {
-      this.handleConception(event.data);
+    this.events.on('conception', (data) => {
+      this.handleConception(data);
     });
   }
 
-  public update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
     const deltaTicks = currentTick - this.lastUpdateTick;
     this.lastUpdateTick = currentTick;
 
@@ -149,11 +144,11 @@ export class MidwiferySystem implements System {
     // Note: This system iterates world.entities directly (not using entities parameter)
     // so it can't benefit from GameLoop's entity filtering. Early-exit optimization is needed.
     // All reproductive components are configured as ALWAYS in SimulationScheduler.
-    const hasPregnancies = world.query().with('pregnancy').executeEntities().length > 0;
-    const hasLabors = world.query().with('labor').executeEntities().length > 0;
-    const hasPostpartum = world.query().with('postpartum').executeEntities().length > 0;
-    const hasInfants = world.query().with('infant').executeEntities().length > 0;
-    const hasNursing = world.query().with('nursing').executeEntities().length > 0;
+    const hasPregnancies = ctx.world.query().with('pregnancy').executeEntities().length > 0;
+    const hasLabors = ctx.world.query().with('labor').executeEntities().length > 0;
+    const hasPostpartum = ctx.world.query().with('postpartum').executeEntities().length > 0;
+    const hasInfants = ctx.world.query().with('infant').executeEntities().length > 0;
+    const hasNursing = ctx.world.query().with('nursing').executeEntities().length > 0;
 
     if (!hasPregnancies && !hasLabors && !hasPostpartum && !hasInfants && !hasNursing) {
       return;
@@ -161,27 +156,27 @@ export class MidwiferySystem implements System {
 
     // Update all pregnant entities
     if (hasPregnancies) {
-      this.updatePregnancies(world, currentTick, deltaTicks);
+      this.updatePregnancies(ctx.world, currentTick, deltaTicks);
     }
 
     // Update all entities in labor
     if (hasLabors) {
-      this.updateLabors(world, currentTick, deltaTicks);
+      this.updateLabors(ctx.world, currentTick, deltaTicks);
     }
 
     // Update postpartum recovery
     if (hasPostpartum) {
-      this.updatePostpartum(world, deltaTicks);
+      this.updatePostpartum(ctx.world, deltaTicks);
     }
 
     // Update infants
     if (hasInfants) {
-      this.updateInfants(world, currentTick, deltaTicks);
+      this.updateInfants(ctx.world, currentTick, deltaTicks);
     }
 
     // Update nursing mothers
     if (hasNursing) {
-      this.updateNursing(world, currentTick, deltaTicks);
+      this.updateNursing(ctx.world, currentTick, deltaTicks);
     }
   }
 
@@ -198,8 +193,6 @@ export class MidwiferySystem implements System {
     conceptionTick: Tick;
     expectedOffspringCount?: number;
   }): void {
-    if (!this.world) return;
-
     const mother = this.world.getEntity(data.pregnantAgentId);
     if (!mother) return;
 
@@ -238,16 +231,12 @@ export class MidwiferySystem implements System {
 
     impl.addComponent(pregnancy);
 
-    this.eventBus?.emit({
-      type: 'midwifery:pregnancy_started',
-      source: data.pregnantAgentId,
-      data: {
-        motherId: data.pregnantAgentId,
-        fatherId: data.otherParentId,
-        expectedDueDate: pregnancy.expectedDueDate,
-        riskFactors: pregnancy.riskFactors,
-      },
-    } as any);
+    this.events.emit('midwifery:pregnancy_started', {
+      motherId: data.pregnantAgentId,
+      fatherId: data.otherParentId,
+      expectedDueDate: pregnancy.expectedDueDate,
+      riskFactors: pregnancy.riskFactors,
+    }, data.pregnantAgentId);
   }
 
   /**

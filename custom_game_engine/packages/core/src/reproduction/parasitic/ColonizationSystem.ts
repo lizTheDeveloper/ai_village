@@ -11,7 +11,7 @@
  * This is the creepy Body Snatchers stuff happening in the background.
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EntityId, Tick, SystemId } from '../../types.js';
@@ -115,7 +115,7 @@ export interface DetectionEvent {
 // System
 // ============================================================================
 
-export class ColonizationSystem implements System {
+export class ColonizationSystem extends BaseSystem {
   public readonly id: SystemId = 'ColonizationSystem';
   public readonly priority = 48; // Run before reproduction systems
   public readonly requiredComponents = [] as const;
@@ -124,23 +124,23 @@ export class ColonizationSystem implements System {
   private lastResistanceAttempt: Map<EntityId, Tick> = new Map();
 
   constructor(config: Partial<ColonizationConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_COLONIZATION_CONFIG,
       ...config,
     };
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const colonization = impl.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
+    for (const entity of ctx.activeEntities) {
+      const colonization = entity.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
 
       if (!colonization) continue;
 
       if (colonization.isColonized) {
-        this.processColonizedHost(world, entity, colonization, currentTick);
+        this.processColonizedHost(ctx.world, entity, colonization, currentTick);
       } else if (colonization.previouslyColonized) {
         this.processRecoveringHost(colonization);
       }

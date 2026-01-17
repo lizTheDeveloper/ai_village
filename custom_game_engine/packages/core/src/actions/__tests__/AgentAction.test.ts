@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseAction, actionToBehavior } from '../AgentAction';
+import type { AgentAction } from '../AgentAction';
 
 describe('AgentAction', () => {
   describe('parseAction', () => {

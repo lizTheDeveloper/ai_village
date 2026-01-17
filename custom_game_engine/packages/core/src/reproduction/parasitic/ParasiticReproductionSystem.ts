@@ -12,7 +12,7 @@
  * - "Courtship" may be simulated for camouflage purposes only
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EntityId, Tick, SystemId } from '../../types.js';
@@ -88,7 +88,7 @@ export interface ColonizationScheduledEvent {
 // System
 // ============================================================================
 
-export class ParasiticReproductionSystem implements System {
+export class ParasiticReproductionSystem extends BaseSystem {
   public readonly id: SystemId = 'ParasiticReproductionSystem';
   public readonly priority = 51; // Run after normal ReproductionSystem
   public readonly requiredComponents = [] as const;
@@ -98,26 +98,26 @@ export class ParasiticReproductionSystem implements System {
   private scheduledColonizations: Map<EntityId, { tick: Tick; collectiveId: string }> = new Map();
 
   constructor(config: Partial<ParasiticReproductionConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_PARASITIC_REPRODUCTION_CONFIG,
       ...config,
     };
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Process each collective entity
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
+    for (const entity of ctx.activeEntities) {
+      const collective = entity.getComponent<CollectiveMindComponent>('collective_mind');
       if (!collective) continue;
 
-      this.processCollective(world, entity.id, collective, currentTick);
+      this.processCollective(ctx.world, entity.id, collective, currentTick);
     }
 
     // Process scheduled colonizations
-    this.processScheduledColonizations(world, currentTick);
+    this.processScheduledColonizations(ctx.world, currentTick);
   }
 
   private processCollective(

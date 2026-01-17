@@ -31,6 +31,13 @@ describe('BackgroundChunkGenerator', () => {
       addEntity: vi.fn(),
       // Mock _addEntity for terrain generation (internal method)
       _addEntity: vi.fn(),
+      // Mock createEntity for animal spawning
+      createEntity: vi.fn(() => ({
+        id: 'test-entity-' + Math.random(),
+        addComponent: vi.fn(),
+        hasComponent: vi.fn(() => false),
+        getComponent: vi.fn(),
+      })),
     } as unknown as World;
   });
 

@@ -9,8 +9,8 @@
  * - Emits awakening events
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, Entity } from '../ecs/index.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { ProtoSapienceComponent } from '../components/ProtoSapienceComponent.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
@@ -25,24 +25,15 @@ import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.j
 import { BeliefComponent } from '../components/BeliefComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 
-export class ConsciousnessEmergenceSystem implements System {
+export class ConsciousnessEmergenceSystem extends BaseSystem {
   readonly id = 'ConsciousnessEmergenceSystem';
   readonly priority = 565;
   readonly requiredComponents = [CT.ProtoSapience, CT.Animal] as const;
 
-  private eventBus: EventBus | null = null;
-  private tickCounter = 0;
-  private readonly UPDATE_INTERVAL = 100; // Every 5 seconds, check for readiness
+  protected readonly throttleInterval = 100; // Every 5 seconds, check for readiness
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       // Skip if already awakened
       if (entity.hasComponent(CT.UpliftedTrait)) continue;
 
@@ -50,20 +41,16 @@ export class ConsciousnessEmergenceSystem implements System {
 
       // Check if ready for sapience
       if (proto.isReadyForSapience()) {
-        this.triggerAwakening(world, entity, proto);
+        this.triggerAwakening(ctx, entity, proto);
       }
     }
-  }
-
-  cleanup(): void {
-    this.eventBus = null;
   }
 
   /**
    * Trigger sapience awakening
    */
   private triggerAwakening(
-    world: World,
+    ctx: SystemContext,
     entity: Entity,
     proto: ProtoSapienceComponent
   ): void {
@@ -71,7 +58,7 @@ export class ConsciousnessEmergenceSystem implements System {
     const species = entity.getComponent(CT.Species) as SpeciesComponent;
 
     // Find associated uplift program
-    const program = this.findUpliftProgram(world, species.speciesId);
+    const program = this.findUpliftProgram(ctx.world, species.speciesId);
 
     if (!program) {
       console.error(`No uplift program found for species ${species.speciesId}`);
@@ -79,7 +66,7 @@ export class ConsciousnessEmergenceSystem implements System {
     }
 
     // Generate awakening moment
-    const awakening = this.generateAwakeningMoment(world, entity, animal, proto, program);
+    const awakening = this.generateAwakeningMoment(ctx, entity, animal, proto, program);
 
     // Create UpliftedTraitComponent
     const upliftedTrait = new UpliftedTraitComponent({
@@ -87,7 +74,7 @@ export class ConsciousnessEmergenceSystem implements System {
       sourceSpeciesId: program.sourceSpeciesId,
       upliftedSpeciesId: program.targetSpeciesId,
       generation: proto.generationBorn,
-      sapientSince: world.tick,
+      sapientSince: ctx.tick,
       awakeningMoment: awakening,
       naturalBorn: proto.generationBorn > program.acceleratedGenerations,
       givenName: animal.name || this.generateUpliftedName(animal, species),
@@ -103,7 +90,7 @@ export class ConsciousnessEmergenceSystem implements System {
     (entity as any).addComponent(upliftedTrait);
 
     // Transform Animal → Agent
-    this.transformToAgent(world, entity, awakening, upliftedTrait);
+    this.transformToAgent(ctx, entity, awakening, upliftedTrait);
 
     // Update program
     program.stage = 'awakening';
@@ -112,17 +99,13 @@ export class ConsciousnessEmergenceSystem implements System {
     );
 
     // Emit awakening event
-    this.eventBus?.emit({
-      type: 'consciousness_awakened' as any,
-      source: this.id,
-      data: {
-        entityId: entity.id,
-        entityName: upliftedTrait.getDisplayName(),
-        programId: program.programId,
-        sourceSpecies: program.sourceSpeciesId,
-        generation: proto.generationBorn,
-        awakening,
-      },
+    this.events.emit('consciousness_awakened' as any, {
+      entityId: entity.id,
+      entityName: upliftedTrait.getDisplayName(),
+      programId: program.programId,
+      sourceSpecies: program.sourceSpeciesId,
+      generation: proto.generationBorn,
+      awakening,
     });
   }
 
@@ -130,7 +113,7 @@ export class ConsciousnessEmergenceSystem implements System {
    * Generate awakening moment
    */
   private generateAwakeningMoment(
-    world: World,
+    ctx: SystemContext,
     entity: Entity,
     _animal: AnimalComponent,
     proto: ProtoSapienceComponent,
@@ -141,7 +124,7 @@ export class ConsciousnessEmergenceSystem implements System {
     const witnesses: string[] = [];
 
     if (position) {
-      const nearby = world.query()
+      const nearby = ctx.world.query()
         .with(CT.Position)
         .with(CT.Agent)
         .executeEntities()
@@ -158,7 +141,7 @@ export class ConsciousnessEmergenceSystem implements System {
 
     // Generate awakening
     const awakening: AwakeningMoment = {
-      tick: world.tick,
+      tick: ctx.tick,
       generation: proto.generationBorn,
       firstThought: this.generateFirstThought(proto),
       firstQuestion: 'What am I?',
@@ -278,7 +261,7 @@ export class ConsciousnessEmergenceSystem implements System {
    * Transform entity from Animal to Agent
    */
   private transformToAgent(
-    world: World,
+    ctx: SystemContext,
     entity: Entity,
     awakening: AwakeningMoment,
     upliftedTrait: UpliftedTraitComponent
@@ -296,7 +279,7 @@ export class ConsciousnessEmergenceSystem implements System {
     episodic.formMemory({
       eventType: 'awakening',
       summary: `The moment of awakening. ${awakening.firstThought}`,
-      timestamp: world.tick,
+      timestamp: ctx.tick,
       location: { x: 0, y: 0 }, // Would get from position
       participants: awakening.witnessIds,
       emotionalValence: awakening.firstEmotion === 'wonder' ? 0.5 : awakening.firstEmotion === 'fear' ? -0.5 : 0,
@@ -323,9 +306,9 @@ export class ConsciousnessEmergenceSystem implements System {
     // Add BeliefComponent with initial belief evidence
     const belief = new BeliefComponent();
     // Record evidence that will form the "I am sapient" belief
-    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
-    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
-    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
+    belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
+    belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
+    belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
     (entity as any).addComponent(belief);
 
     // Mark species as sapient
