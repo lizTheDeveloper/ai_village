@@ -8,6 +8,7 @@ import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { DominanceRankComponent } from '../components/DominanceRankComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 interface AgentComponent extends Component {
   readonly type: 'agent';
@@ -55,9 +56,18 @@ export class DominanceChallengeSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
 
   private eventBus?: EventBus;
+  private events!: SystemEventManager;
 
   constructor(eventBus?: EventBus) {
     this.eventBus = eventBus;
+  }
+
+  initialize(eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -161,17 +171,13 @@ export class DominanceChallengeSystem implements System {
     }));
 
     // Emit event
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'dominance:resolved',
-        source: challenger.id,
-        data: {
-          challengerId: challenger.id,
-          challengedId: incumbent.id,
-          winner: challengerWins ? challenger.id : incumbent.id,
-          hierarchyChanged: true,
-        },
-      });
+    if (this.events) {
+      this.events.emit('dominance:resolved', {
+        challengerId: challenger.id,
+        challengedId: incumbent.id,
+        winner: challengerWins ? challenger.id : incumbent.id,
+        hierarchyChanged: true,
+      }, challenger.id);
     }
 
     // Check for cascade effects

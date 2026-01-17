@@ -6,6 +6,8 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -77,9 +79,18 @@ export class TempleSystem implements System {
   private config: TempleConfig;
   private temples: Map<string, TempleData> = new Map();
   private lastUpdate: number = 0;
+  private events!: SystemEventManager;
 
   constructor(config: Partial<TempleConfig> = {}) {
     this.config = { ...DEFAULT_TEMPLE_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
   }
 
   update(world: World): void {

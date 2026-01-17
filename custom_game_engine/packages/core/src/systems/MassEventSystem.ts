@@ -509,7 +509,7 @@ export class MassEventSystem implements System {
    * Process active events
    */
   private processEvents(_world: World, currentTick: number): void {
-    for (const event of this.events.values()) {
+    for (const event of this.massEvents.values()) {
       if (event.status !== 'active') continue;
 
       // Check if event should end
@@ -518,8 +518,13 @@ export class MassEventSystem implements System {
       if (elapsed >= event.duration) {
         event.status = 'completed';
 
-        // In full implementation, would emit completion event
-        // world.eventBus.emit({ type: 'mass_event_completed', ... });
+        // Emit mass event completed
+        this.events.emitGeneric('mass_event_completed', {
+          eventId: event.id,
+          deityId: event.deityId,
+          eventType: event.type,
+          results: event.results,
+        });
       }
     }
   }
@@ -528,14 +533,14 @@ export class MassEventSystem implements System {
    * Get event
    */
   getEvent(eventId: string): MassEvent | undefined {
-    return this.events.get(eventId);
+    return this.massEvents.get(eventId);
   }
 
   /**
    * Get all events by a deity
    */
   getEventsBy(deityId: string): MassEvent[] {
-    return Array.from(this.events.values())
+    return Array.from(this.massEvents.values())
       .filter(e => e.deityId === deityId);
   }
 
@@ -543,7 +548,7 @@ export class MassEventSystem implements System {
    * Get active events
    */
   getActiveEvents(): MassEvent[] {
-    return Array.from(this.events.values())
+    return Array.from(this.massEvents.values())
       .filter(e => e.status === 'active');
   }
 }

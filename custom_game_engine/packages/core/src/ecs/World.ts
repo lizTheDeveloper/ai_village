@@ -354,6 +354,13 @@ export interface World {
    * Check if a planet exists.
    */
   hasPlanet(planetId: string): boolean;
+
+  /**
+   * Clear all entities from the world.
+   * Used by save/load system to reset world state before deserialization.
+   * WARNING: This is a destructive operation - use only during load operations.
+   */
+  clear(): void;
 }
 
 /**
@@ -1079,6 +1086,18 @@ export class WorldImpl implements WorldMutator {
         }
       }
     }
+  }
+
+  /**
+   * Clear all entities from the world.
+   * Used by save/load system to reset world state before deserialization.
+   * WARNING: This is a destructive operation - use only during load operations.
+   */
+  clear(): void {
+    this._entities.clear();
+    this.chunkIndex.clear();
+    this.doorLocationsCache = null;
+    this._archetypeVersion++; // Invalidate query cache
   }
 
   /**

@@ -431,9 +431,7 @@ export class SaveLoadService {
       }
 
       // Clear existing world
-      // Note: World interface doesn't have clear(), so we access internal API
-      const worldImpl = world as any;  // TODO: Add clear() to World interface
-      worldImpl._entities.clear();
+      world.clear();
 
       // Restore multiverse state
       multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);

@@ -182,7 +182,7 @@ export class IndexedDBSerializer implements ISerializer {
           components: Array.from(entity.components.values()).map((comp) => ({
             type: comp.type,
             version: comp.version,
-            data: comp as any,
+            data: { ...comp } as Readonly<Record<string, unknown>>,
           })),
         })),
         globals: {},

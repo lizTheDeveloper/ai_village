@@ -18,6 +18,8 @@ import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { ThreatDetectionComponent, DetectedThreat, ThreatResponse } from '../components/ThreatDetectionComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
@@ -40,6 +42,15 @@ export class ThreatResponseSystem implements System {
   public readonly name = 'ThreatResponseSystem';
   private readonly UPDATE_INTERVAL = 5; // Every 5 ticks (~0.25 seconds)
   private lastUpdateTick = 0;
+  private events!: SystemEventManager;
+
+  initialize(eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
+  }
+
+  cleanup(): void {
+    this.events.cleanup();
+  }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Throttle updates
