@@ -219,17 +219,13 @@ export class SoapOperaManager {
       this.characterDramaScores.set(char, current + themes.length * 10);
     }
 
-    this.eventBus?.emit({
-      type: 'tv:soap:storyline_created' as any,
-      source: showId,
-      data: {
-        storylineId: storyline.id,
-        title,
-        characters,
-        themes,
-        expectedDuration,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:storyline_created', {
+      storylineId: storyline.id,
+      title,
+      characters,
+      themes,
+      expectedDuration,
+    }, showId);
 
     return storyline;
   }
@@ -263,16 +259,12 @@ export class SoapOperaManager {
     if (progress.episodesRemaining <= 0) {
       storyline.status = 'resolved';
 
-      this.eventBus?.emit({
-        type: 'tv:soap:storyline_resolved' as any,
-        source: storyline.id,
-        data: {
-          storylineId,
-          title: storyline.title,
-          episodeNumber,
-          audienceInvestment: progress.audienceInvestment,
-        },
-      });
+      this.events?.emitGeneric('tv:soap:storyline_resolved', {
+        storylineId,
+        title: storyline.title,
+        episodeNumber,
+        audienceInvestment: progress.audienceInvestment,
+      }, storyline.id);
     }
 
     return progress;
@@ -288,15 +280,11 @@ export class SoapOperaManager {
     progress.episodesRemaining += 2; // Complications extend storylines
     storyline.emotionalIntensity = Math.min(10, storyline.emotionalIntensity + 1);
 
-    this.eventBus?.emit({
-      type: 'tv:soap:complication_added' as any,
-      source: storylineId,
-      data: {
-        storylineId,
-        complication,
-        newDuration: progress.episodesRemaining,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:complication_added', {
+      storylineId,
+      complication,
+      newDuration: progress.episodesRemaining,
+    }, storylineId);
 
     return true;
   }
@@ -335,16 +323,12 @@ export class SoapOperaManager {
 
     this.relationships.set(key, relationship);
 
-    this.eventBus?.emit({
-      type: 'tv:soap:relationship_created' as any,
-      source: showId,
-      data: {
-        characters: [char1, char2],
-        type,
-        secret,
-        startEpisode,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:relationship_created', {
+      characters: [char1, char2],
+      type,
+      secret,
+      startEpisode,
+    }, showId);
 
     return relationship;
   }
@@ -405,15 +389,11 @@ export class SoapOperaManager {
 
     relationship.secret = false;
 
-    this.eventBus?.emit({
-      type: 'tv:soap:secret_revealed' as any,
-      source: 'relationship',
-      data: {
-        characters: [char1, char2],
-        relationshipType: relationship.type,
-        episodeNumber,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:secret_revealed', {
+      characters: [char1, char2],
+      relationshipType: relationship.type,
+      episodeNumber,
+    }, 'relationship');
 
     return true;
   }
@@ -451,17 +431,13 @@ export class SoapOperaManager {
     const twistId = `twist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.pendingTwists.set(twistId, fullTwist);
 
-    this.eventBus?.emit({
-      type: 'tv:soap:twist_scheduled' as any,
-      source: showId,
-      data: {
-        twistId,
-        type: twist.type,
-        impact: twist.impact,
-        scheduledEpisode: twist.scheduledEpisode,
-        affectedCharacters: twist.affectedCharacters,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:twist_scheduled', {
+      twistId,
+      type: twist.type,
+      impact: twist.impact,
+      scheduledEpisode: twist.scheduledEpisode,
+      affectedCharacters: twist.affectedCharacters,
+    }, showId);
 
     return fullTwist;
   }
@@ -479,17 +455,13 @@ export class SoapOperaManager {
       this.characterDramaScores.set(char, current + impactScore[twist.impact]);
     }
 
-    this.eventBus?.emit({
-      type: 'tv:soap:twist_executed' as any,
-      source: twistId,
-      data: {
-        twistId,
-        type: twist.type,
-        impact: twist.impact,
-        episodeNumber,
-        affectedCharacters: twist.affectedCharacters,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:twist_executed', {
+      twistId,
+      type: twist.type,
+      impact: twist.impact,
+      episodeNumber,
+      affectedCharacters: twist.affectedCharacters,
+    }, twistId);
 
     return twist;
   }
@@ -544,18 +516,14 @@ export class SoapOperaManager {
 
     this.episodes.set(episode.id, episode);
 
-    this.eventBus?.emit({
-      type: 'tv:soap:episode_planned' as any,
-      source: showId,
-      data: {
-        episodeId: episode.id,
-        episodeNumber,
-        storylinesAdvanced: storylinesToAdvance.length,
-        sceneCount: episode.scenes.length,
-        tone,
-        isCliffhanger,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:episode_planned', {
+      episodeId: episode.id,
+      episodeNumber,
+      storylinesAdvanced: storylinesToAdvance.length,
+      sceneCount: episode.scenes.length,
+      tone,
+      isCliffhanger,
+    }, showId);
 
     return episode;
   }
@@ -728,16 +696,12 @@ export class SoapOperaManager {
 
     this.storyArcs.set(arc.id, arc);
 
-    this.eventBus?.emit({
-      type: 'tv:soap:arc_created' as any,
-      source: showId,
-      data: {
-        arcId: arc.id,
-        title,
-        theme,
-        storylineCount: mainStorylines.length + supportingStorylines.length,
-      },
-    });
+    this.events?.emitGeneric('tv:soap:arc_created', {
+      arcId: arc.id,
+      title,
+      theme,
+      storylineCount: mainStorylines.length + supportingStorylines.length,
+    }, showId);
 
     return arc;
   }
@@ -803,7 +767,8 @@ export class SoapOperaManager {
     this.episodes.clear();
     this.pendingTwists.clear();
     this.characterDramaScores.clear();
-    this.eventBus = null;
+    this.events?.cleanup();
+    this.events = null;
   }
 }
 
@@ -817,8 +782,10 @@ export class SoapOperaSystem implements System {
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private manager = new SoapOperaManager();
+  private events!: SystemEventManager;
 
   initialize(_world: World, eventBus: EventBus): void {
+    this.events = new SystemEventManager(eventBus, this.id);
     this.manager.setEventBus(eventBus);
   }
 
@@ -831,6 +798,7 @@ export class SoapOperaSystem implements System {
   }
 
   cleanup(): void {
+    this.events.cleanup();
     this.manager.cleanup();
   }
 }

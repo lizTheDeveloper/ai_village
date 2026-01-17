@@ -1,6 +1,7 @@
 import type { WorldMutator } from '@ai-village/core';
 import {
   EntityImpl,
+  WorldImpl,
   createEntityId,
   createPositionComponent,
   createPhysicsComponent,

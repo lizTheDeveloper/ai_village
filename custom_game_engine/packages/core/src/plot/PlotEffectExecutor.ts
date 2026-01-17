@@ -309,7 +309,7 @@ export function executeEffect(
       const entity = world.getEntity(context.entityId);
       if (!entity) break;
 
-      let relationship = entity.getComponent('relationship') as RelationshipComponent | undefined;
+      let relationship = entity.getComponent<RelationshipComponent>('relationship');
       if (!relationship) break;
 
       if (effect.trust_delta !== undefined) {
@@ -334,7 +334,7 @@ export function executeEffect(
         const entity = world.getEntity(context.entityId);
         if (!entity) break;
 
-        let relationship = entity.getComponent('relationship') as RelationshipComponent | undefined;
+        let relationship = entity.getComponent<RelationshipComponent>('relationship');
         if (!relationship) break;
 
         if (effect.initial_trust !== undefined) {
