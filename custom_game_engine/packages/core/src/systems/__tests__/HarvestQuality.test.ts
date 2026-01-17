@@ -212,7 +212,7 @@ describe('Harvest Quality Integration', () => {
 
       // Test each skill level
       for (let skillLevel = 1; skillLevel <= 5; skillLevel++) {
-        skills = { ...skills, levels: { ...skills.levels, farming: skillLevel as any } };
+        skills = { ...skills, levels: { ...skills.levels, farming: skillLevel as SkillLevel } };
         agent.addComponent(skills);
 
         const qualities: number[] = [];

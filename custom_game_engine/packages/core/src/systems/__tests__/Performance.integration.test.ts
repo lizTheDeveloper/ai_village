@@ -201,9 +201,9 @@ describe('Performance Monitoring Integration', () => {
     expect(totalDuration).toBeLessThan(5000); // Should complete 1000 iterations in <5 seconds
 
     // Verify agent still exists and has valid state
-    const needs = agent.getComponent(ComponentType.Needs) as any;
+    const needs = agent.getComponent<NeedsComponent>(ComponentType.Needs);
     expect(needs).toBeDefined();
-    expect(needs.hunger).toBeGreaterThanOrEqual(0);
+    expect(needs?.hunger).toBeGreaterThanOrEqual(0);
   });
 
   it('should handle mixed entity types efficiently', () => {
