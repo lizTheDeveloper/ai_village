@@ -16,6 +16,7 @@
 import type { World } from '../ecs/World.js';
 import type { Checkpoint } from './AutoSaveSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
 
 // LLM Provider interface (to avoid cross-package import)
 interface LLMRequest {
@@ -109,7 +110,7 @@ export class CheckpointNamingService {
     // Get buildings
     const buildings = world.query().with(CT.Building).executeEntities();
     context.buildings = buildings.slice(0, 5).map(b => {
-      const comp = (b as any).getComponent?.(CT.Building);
+      const comp = b.getComponent<BuildingComponent>(CT.Building);
       return comp?.buildingType || 'structure';
     });
 

@@ -468,10 +468,9 @@ export class TradingSystem implements System {
 
   /**
    * Get the market event system from the world
-   * MarketEventSystem is attached to world in main.ts
    */
-  private getMarketEventSystem(world: World): any | undefined {
-    return (world as any).marketEventSystem;
+  private getMarketEventSystem(world: World): import('./MarketEventSystem.js').MarketEventSystem | undefined {
+    return world.getSystem('market_events') as import('./MarketEventSystem.js').MarketEventSystem | undefined;
   }
 
   /**

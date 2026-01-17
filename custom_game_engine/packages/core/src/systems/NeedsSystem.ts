@@ -215,7 +215,7 @@ export class NeedsSystem implements System {
               dayNumber: daysAtZeroHunger,
               survivalRelevance: 0.7 + (daysAtZeroHunger * 0.1),
             },
-          } as any);
+          });
 
           starvationDayMemoriesIssued.add(daysAtZeroHunger);
         }

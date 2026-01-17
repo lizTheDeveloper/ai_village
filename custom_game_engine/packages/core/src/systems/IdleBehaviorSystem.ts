@@ -1,6 +1,7 @@
 import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { NeedsComponent } from '../components/NeedsComponent';
 import { PersonalityComponent } from '../components/PersonalityComponent';
@@ -38,7 +39,7 @@ export class IdleBehaviorSystem implements System {
 
   update(world: World): void {
     // Get all entities
-    const entities = Array.from((world as any).entities.values()) as any[];
+    const entities = Array.from(world.entities.values());
 
     for (const entity of entities) {
       // Skip entities without required components
@@ -59,7 +60,7 @@ export class IdleBehaviorSystem implements System {
       const personality = entity.getComponent(CT.Personality) as PersonalityComponent | null;
 
       if (!needs || !personality) {
-        throw new Error(`Entity ${(entity as any).id} missing required component: needs or personality`);
+        throw new Error(`Entity ${entity.id} missing required component: needs or personality`);
       }
 
       // Select idle behavior based on personality and mood

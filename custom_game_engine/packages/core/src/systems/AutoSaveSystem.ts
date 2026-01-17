@@ -48,16 +48,6 @@ export class AutoSaveSystem implements System {
   private nameGenerationPending: boolean = false;
   private canonEventDetectorAttached: boolean = false;
 
-  /**
-   * Emit a generic event (checkpoint events aren't in GameEventMap yet)
-   */
-  private emitEvent(world: World, type: string, source: string, data: Record<string, unknown>): void {
-    (world.eventBus as unknown as { emit: (e: Record<string, unknown>) => void }).emit({
-      type,
-      source,
-      data,
-    });
-  }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Attach canon event detector on first update
@@ -132,7 +122,10 @@ export class AutoSaveSystem implements System {
         : null;
 
       // Get universe name from world (set by main.ts)
-      const universeName = (world as any)._universeName || 'Universe';
+      // Note: universeId/name are set by multiverse package but not in World interface
+      const universeName = '_universeName' in world
+        ? (world as { _universeName: string })._universeName
+        : 'Universe';
 
       // Generate checkpoint name including universe name
       // Use canon event title if available
@@ -167,9 +160,12 @@ export class AutoSaveSystem implements System {
       // Add to checkpoints list
       this.checkpoints.push(checkpoint);
 
-
       // Emit event for name generation
-      this.emitEvent(world, 'checkpoint:created', 'auto_save', { checkpoint });
+      world.eventBus.emit({
+        type: 'checkpoint:created' as const,
+        source: 'auto_save' as const,
+        data: { checkpoint },
+      });
 
       // Request LLM to generate a poetic name asynchronously
       this.generateCheckpointName(checkpoint, world);
@@ -253,9 +249,12 @@ export class AutoSaveSystem implements System {
     // - Include world stats: population, buildings, resources, major events
     // - Examples: "The Dawn of Copper", "When Trees Spoke", "The First Harvest"
 
-
     // Emit event that can be handled by LLM system
-    this.emitEvent(world, 'checkpoint:name_request', 'auto_save', { checkpoint });
+    world.eventBus.emit({
+      type: 'checkpoint:name_request' as const,
+      source: 'auto_save' as const,
+      data: { checkpoint },
+    });
   }
 
   /**
@@ -286,10 +285,14 @@ export class AutoSaveSystem implements System {
       }
 
       // Emit fork event
-      this.emitEvent(world, 'universe:forked', 'auto_save', {
-        sourceCheckpoint: checkpoint,
-        newUniverseId: checkpoint.universeId,
-        forkPoint: checkpoint.tick,
+      world.eventBus.emit({
+        type: 'universe:forked' as const,
+        source: 'auto_save' as const,
+        data: {
+          sourceCheckpoint: checkpoint,
+          newUniverseId: checkpoint.universeId,
+          forkPoint: checkpoint.tick,
+        },
       });
 
       return true;

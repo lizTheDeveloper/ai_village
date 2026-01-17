@@ -9,8 +9,16 @@ import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
+import type { Prayer } from '../components/SpiritualComponent.js';
 import { AngelAIDecisionProcessor } from './AngelAIDecisionProcessor.js';
 import { isFeatureAvailable, type AngelConfig as DivineAngelConfig, type RestrictionConfig } from '../divinity/UniverseConfig.js';
+
+/**
+ * LLM Provider interface (matches AngelAIDecisionProcessor requirements)
+ */
+interface LLMProvider {
+  generate(prompt: string): Promise<string>;
+}
 
 // ============================================================================
 // Angel Types
@@ -99,32 +107,30 @@ export class AngelSystem implements System {
   private lastUpdate: number = 0;
   private aiProcessor: AngelAIDecisionProcessor;
 
-  constructor(config: Partial<AngelConfig> = {}, llmProvider?: unknown) {
+  constructor(config: Partial<AngelConfig> = {}, llmProvider?: LLMProvider) {
     this.config = { ...DEFAULT_ANGEL_CONFIG, ...config };
-    this.aiProcessor = new AngelAIDecisionProcessor(llmProvider as any);
+    this.aiProcessor = new AngelAIDecisionProcessor(llmProvider);
   }
 
   /**
    * Set LLM provider for angel AI (for dependency injection)
    */
-  setLLMProvider(provider: unknown): void {
-    this.aiProcessor.setLLMProvider(provider as any);
+  setLLMProvider(provider: LLMProvider): void {
+    this.aiProcessor.setLLMProvider(provider);
   }
 
   /**
    * Get the divine angel config from the world's divine config
    */
   private getDivineAngelConfig(world: World): DivineAngelConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
-    return divineConfig?.angels;
+    return world.divineConfig?.angels;
   }
 
   /**
    * Get the restriction config from the world's divine config
    */
   private getRestrictionConfig(world: World): RestrictionConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
-    return divineConfig?.restrictions;
+    return world.divineConfig?.restrictions;
   }
 
   /**
@@ -288,7 +294,7 @@ export class AngelSystem implements System {
     }
 
     // Answer the prayer using AI processor (async, but we don't await - fires and forgets)
-    this.aiProcessor.answerPrayerWithAngel(angel, bestMatch.prayer, world).then((success) => {
+    this.aiProcessor.answerPrayerWithAngel(angel, bestMatch.prayer, bestMatch.agentId, world).then((success) => {
       if (success) {
         // Clear current task on success
         angel.currentTask = undefined;
@@ -339,9 +345,9 @@ export class AngelSystem implements System {
     angel: AngelData,
     believersWithPrayers: Array<{ agentId: string; spiritual: SpiritualComponent }>,
     _world: World
-  ): { agentId: string; prayer: any } | null {
+  ): { agentId: string; prayer: Prayer } | null {
     // Collect all unanswered prayers from all believers
-    const allPrayers: Array<{ agentId: string; prayer: any }> = [];
+    const allPrayers: Array<{ agentId: string; prayer: Prayer }> = [];
 
     for (const { agentId, spiritual } of believersWithPrayers) {
       const unansweredPrayers = spiritual.prayers.filter(p => !p.answered);
@@ -353,7 +359,7 @@ export class AngelSystem implements System {
     if (allPrayers.length === 0) return null;
 
     // Simple scoring to find best match
-    let bestPrayer: { agentId: string; prayer: any } | null = null;
+    let bestPrayer: { agentId: string; prayer: Prayer } | null = null;
     let bestScore = -Infinity;
 
     for (const { agentId, prayer } of allPrayers) {
@@ -371,7 +377,7 @@ export class AngelSystem implements System {
   /**
    * Score how well a prayer matches this angel's purpose
    */
-  private scorePrayerForAngel(angel: AngelData, prayer: any): number {
+  private scorePrayerForAngel(angel: AngelData, prayer: Prayer): number {
     const prayerType = prayer.type;
 
     // Match prayer type to angel purpose

@@ -78,6 +78,8 @@ packages/core/
 │   ├── behavior/                     # Behavior Trees & AI
 │   │   ├── behaviors/                # Agent behaviors (gather, craft, build, etc.)
 │   │   ├── animal-behaviors/         # Animal AI (graze, flee, hunt)
+│   │   ├── BehaviorContext.ts        # "Pit of success" API for behaviors
+│   │   ├── BehaviorRegistry.ts       # Behavior registration and execution
 │   │   └── BehaviorExecutor.ts       # Behavior execution engine
 │   │
 │   ├── events/                       # Event System
@@ -1106,7 +1108,54 @@ gameLoop.systemRegistry.register(new MyNewSystem());
 // 3. Update SYSTEMS_CATALOG.md with system details
 ```
 
-### Pattern 2: Query Optimization
+### Pattern 2: Adding a New Behavior (BehaviorContext)
+
+**Always use BehaviorContext** for new behaviors. See [BEHAVIOR_CONTEXT.md](../../docs/BEHAVIOR_CONTEXT.md) for full API reference.
+
+```typescript
+// 1. Create behavior file in src/behavior/behaviors/
+import type { BehaviorContext, BehaviorResult } from '../BehaviorContext.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+
+/**
+ * MyBehaviorWithContext - Description of what this behavior does
+ */
+export function myBehaviorWithContext(ctx: BehaviorContext): BehaviorResult | void {
+  // Pre-fetched components available: ctx.position, ctx.agent, ctx.needs, etc.
+
+  // Use chunk-optimized spatial queries (not world.query())
+  const nearest = ctx.getNearestEntity([CT.Item], 50);
+  if (!nearest) {
+    return ctx.switchTo('wander');
+  }
+
+  // Move toward target (returns squared distance)
+  const distSq = ctx.moveToward(nearest.entity.getComponent(CT.Position)!);
+
+  // Compare squared distances (not Math.sqrt)
+  if (distSq < 4) {  // Within 2 tiles
+    // Perform action...
+    return ctx.complete('reached_target');
+  }
+
+  // Return void to continue this behavior next tick
+}
+
+// 2. Export from behaviors/index.ts
+export { myBehaviorWithContext } from './MyBehavior.js';
+
+// 3. Register with BehaviorRegistry
+import { registerBehaviorWithContext } from '../BehaviorRegistry.js';
+registerBehaviorWithContext('my_behavior', myBehaviorWithContext);
+```
+
+**Key rules for behaviors:**
+- Use `ctx.getEntitiesInRadius()` or `ctx.getNearestEntity()` (not `world.query()`)
+- Use `CT.ComponentName` enum (not `'component_name'` strings)
+- Compare squared distances: `distSq < 25` (not `Math.sqrt(distSq) < 5`)
+- Name functions with `WithContext` suffix
+
+### Pattern 3: Query Optimization (Systems)
 
 ```typescript
 // ❌ BAD: Multiple queries, query in loop
@@ -1128,7 +1177,7 @@ update(world: World, entities: ReadonlyArray<Entity>): void {
 }
 ```
 
-### Pattern 3: Squared Distance (No Math.sqrt)
+### Pattern 4: Squared Distance (No Math.sqrt)
 
 ```typescript
 // ❌ BAD: Math.sqrt in hot path
@@ -1140,7 +1189,7 @@ const distSq = dx*dx + dy*dy;
 if (distSq < radius*radius) { }
 ```
 
-### Pattern 4: Throttled Systems
+### Pattern 5: Throttled Systems
 
 ```typescript
 export class MySlowSystem implements System {
@@ -1160,7 +1209,7 @@ export class MySlowSystem implements System {
 }
 ```
 
-### Pattern 5: Event Handling
+### Pattern 6: Event Handling
 
 ```typescript
 export class MySystem implements System {
@@ -1190,7 +1239,7 @@ export class MySystem implements System {
 }
 ```
 
-### Pattern 6: Singleton Component Access
+### Pattern 7: Singleton Component Access
 
 ```typescript
 export class MySystem implements System {
@@ -1214,7 +1263,7 @@ export class MySystem implements System {
 }
 ```
 
-### Pattern 7: System Dependencies
+### Pattern 8: System Dependencies
 
 ```typescript
 export class DependentSystem implements System {

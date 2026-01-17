@@ -33,6 +33,7 @@ import {
   globalRecipeRegistry,
   // Skill systems (Phase 4 unified)
   CookingSystem,
+  ExperimentationSystem,
   // Phase 13: Research & Discovery
   registerDefaultResearch,
   // Metrics Collection System (with streaming support)
@@ -790,6 +791,12 @@ async function registerAllSystems(
   cookingSystem.setRecipeRegistry(globalRecipeRegistry);
   // Note: CookingSystem is already registered by coreRegisterAllSystems,
   // but we need to configure it with the recipe registry
+
+  // Set up experimentation system with recipe registry
+  const experimentationSystem = gameLoop.systemRegistry.get('experimentation');
+  if (experimentationSystem instanceof ExperimentationSystem) {
+    experimentationSystem.setRecipeRegistry(globalRecipeRegistry);
+  }
 
   // Set up world references for external access
   (gameLoop.world as any).marketEventSystem = coreResult.marketEventSystem;

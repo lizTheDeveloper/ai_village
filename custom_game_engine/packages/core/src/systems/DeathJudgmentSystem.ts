@@ -392,9 +392,9 @@ export class DeathJudgmentSystem implements System {
     // Get unfinished goals
     const unfinishedGoals: string[] = [];
     if (goals) {
-      for (const goal of (goals as any).goals || []) {
-        if (!goal.completed && goal.priority === 'high') {
-          unfinishedGoals.push(goal.description || goal.type);
+      for (const goal of goals.goals) {
+        if (!goal.completed) {
+          unfinishedGoals.push(goal.description);
         }
       }
     }

@@ -232,6 +232,7 @@ export class AngelAIDecisionProcessor {
   async generateAngelResponse(
     angel: AngelData,
     prayer: Prayer,
+    agentId: string,
     world: World
   ): Promise<AngelResponse | null> {
     if (!this.llmProvider) {
@@ -239,7 +240,6 @@ export class AngelAIDecisionProcessor {
     }
 
     try {
-      const agentId = (prayer as any).agentId || prayer.id;
       const agent = world.getEntity(agentId);
       if (!agent) return null;
 
@@ -457,14 +457,14 @@ Respond with JSON:
   async answerPrayerWithAngel(
     angel: AngelData,
     prayer: Prayer,
+    agentId: string,
     world: World
   ): Promise<boolean> {
     // Generate response
-    const response = await this.generateAngelResponse(angel, prayer, world);
+    const response = await this.generateAngelResponse(angel, prayer, agentId, world);
     if (!response) return false;
 
     // Get agent
-    const agentId = (prayer as any).agentId || prayer.id;
     const agent = world.getEntity(agentId);
     if (!agent) return false;
 

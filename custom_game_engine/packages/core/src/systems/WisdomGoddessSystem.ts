@@ -486,14 +486,12 @@ export class WisdomGoddessSystem implements System {
       affinityChange += 1;
     }
 
-    // Update the relationship (Tick is number type)
-    const updatedRel = updateRelationship(relComp, targetId, currentTick, 3, affinityChange);
-
-    // Replace the component (immutable pattern)
-    // Note: Entity interface doesn't expose mutation methods, but EntityImpl does
-    // This is by design - systems work with mutable entities internally
-    (goddess as EntityImpl).removeComponent('relationship');
-    (goddess as EntityImpl).addComponent(updatedRel);
+    // Update the relationship using atomic component update
+    // EntityImpl cast needed: updateComponent is only available on EntityImpl, not Entity interface
+    const goddessImpl = goddess as EntityImpl;
+    goddessImpl.updateComponent<RelationshipComponent>('relationship', (current) =>
+      updateRelationship(current, targetId, currentTick, 3, affinityChange)
+    );
   }
 
   /**

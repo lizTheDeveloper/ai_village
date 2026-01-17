@@ -9,6 +9,7 @@ import { createInjuryComponent, type InjuryComponent } from '../components/Injur
 import type { EquipmentComponent } from '../components/EquipmentComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { NeedsComponent } from '../components/NeedsComponent.js';
 import { itemRegistry } from '../items/index.js';
 import {
   TICKS_PER_SECOND,
@@ -58,6 +59,14 @@ interface LawsComponent {
   murderIllegal?: boolean;
   assaultIllegal?: boolean;
   selfDefenseLegal?: boolean;
+}
+
+interface EnvironmentComponent {
+  type: 'environment';
+  version: number;
+  terrain?: string;
+  weather?: string;
+  timeOfDay?: string;
 }
 
 interface LLMProvider {
@@ -416,7 +425,7 @@ export class AgentCombatSystem implements System {
     if (envEntities.length > 0) {
       const firstEnvEntity = envEntities[0];
       if (firstEnvEntity) {
-        const env = world.getComponent(firstEnvEntity.id, 'environment') as any;
+        const env = world.getComponent<EnvironmentComponent>(firstEnvEntity.id, 'environment');
         if (env?.terrain) {
           const terrainMod = this.getTerrainModifier(env.terrain);
           attackerPower += terrainMod;
@@ -641,23 +650,17 @@ export class AgentCombatSystem implements System {
       case 'death':
         // Both die (destiny protection doesn't apply to mutual death)
         if (world.hasComponent(attacker.id, 'needs')) {
-          attackerImpl.updateComponent('needs' as any, (needs: any) => {
-            if (typeof needs.clone === 'function') {
-              const updated = needs.clone();
-              updated.health = 0;
-              return updated;
-            }
-            return { ...needs, health: 0 };
+          attackerImpl.updateComponent<NeedsComponent>('needs', (needs) => {
+            const updated = needs.clone();
+            updated.health = 0;
+            return updated;
           });
         }
         if (world.hasComponent(defender.id, 'needs')) {
-          defenderImpl.updateComponent('needs' as any, (needs: any) => {
-            if (typeof needs.clone === 'function') {
-              const updated = needs.clone();
-              updated.health = 0;
-              return updated;
-            }
-            return { ...needs, health: 0 };
+          defenderImpl.updateComponent<NeedsComponent>('needs', (needs) => {
+            const updated = needs.clone();
+            updated.health = 0;
+            return updated;
           });
         }
         break;
@@ -682,7 +685,7 @@ export class AgentCombatSystem implements System {
       location,
     });
 
-    (entity as any).addComponent(injury);
+    entity.addComponent(injury);
   }
 
   private async generateNarrative(

@@ -4,6 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { BiomeType } from '../types/TerrainTypes.js';
+import type { TimeComponent } from './TimeSystem.js';
 
 export interface Tile {
   terrain: string;
@@ -60,8 +61,8 @@ export class SoilSystem implements System {
     const timeEntities = world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as any;
-      const timeComp = timeEntity.getComponent(CT.Time) as any;
+      const timeEntity = timeEntities[0]!; // Safe: length check ensures this exists
+      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
       if (timeComp && timeComp.speedMultiplier) {
         timeSpeedMultiplier = timeComp.speedMultiplier;
       }

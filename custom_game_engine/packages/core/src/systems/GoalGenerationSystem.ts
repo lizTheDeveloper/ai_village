@@ -22,6 +22,7 @@ export class GoalGenerationSystem implements System {
   public readonly dependsOn = [] as const;
 
   private eventBus: EventBus;
+  private world?: World;
   private nextGoalId = 0;
 
   constructor(eventBus: EventBus) {
@@ -29,11 +30,16 @@ export class GoalGenerationSystem implements System {
     this._setupEventListeners();
   }
 
+  initialize(world: World, _eventBus: EventBus): void {
+    this.world = world;
+  }
+
   private _setupEventListeners(): void {
     // Generate goals after reflection
     this.eventBus.subscribe('reflection:completed', (event) => {
       const { agentId } = event.data;
-      const entity = (this.eventBus as any).world?.getEntity(agentId);
+      if (!this.world) return;
+      const entity = this.world.getEntity(agentId);
       if (!entity) return;
 
       const goalsComp = entity.getComponent(CT.Goals) as GoalsComponent | null;
@@ -68,7 +74,8 @@ export class GoalGenerationSystem implements System {
       const agentId = event.source;
       if (!agentId) return;
 
-      const entity = (this.eventBus as any).world?.getEntity(agentId);
+      if (!this.world) return;
+      const entity = this.world.getEntity(agentId);
       if (!entity) return;
 
       const goalsComp = entity.getComponent(CT.Goals) as GoalsComponent | null;

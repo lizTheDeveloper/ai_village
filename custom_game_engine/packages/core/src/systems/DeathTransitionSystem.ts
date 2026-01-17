@@ -11,6 +11,7 @@ import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
 import type { AgentComponent, AgentTier } from '../components/AgentComponent.js';
+import type { DeathJudgmentComponent } from '../components/DeathJudgmentComponent.js';
 import { transitionToRealm } from '../realms/RealmTransition.js';
 import { routeSoulToAfterlife } from '../realms/SoulRoutingService.js';
 import { createAfterlifeComponent, type CauseOfDeath } from '../components/AfterlifeComponent.js';
@@ -73,7 +74,7 @@ export class DeathTransitionSystem implements System {
       const alreadyProcessed = this.processedDeaths.has(entity.id);
 
       // Check if death judgment is in progress
-      const deathJudgment = entity.components.get('death_judgment') as any;
+      const deathJudgment = entity.components.get('death_judgment') as DeathJudgmentComponent | undefined;
       const judgmentInProgress = deathJudgment && deathJudgment.stage !== 'crossing_over';
 
       if (isDead && !alreadyProcessed && !judgmentInProgress) {

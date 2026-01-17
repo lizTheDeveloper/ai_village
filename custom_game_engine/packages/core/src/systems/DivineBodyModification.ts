@@ -19,6 +19,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
+import type { MagicComponent } from '../components/MagicComponent.js';
 import {
   bodyHealingEffectApplier,
   type BodyHealingEffect,
@@ -192,14 +193,14 @@ export class DivineBodyModification implements System {
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return null;
 
-    const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+    const deity = deityEntity.getComponent<DeityComponent>(CT.Deity);
     if (!deity) return null;
 
     // Validate target
     const targetEntity = world.getEntity(targetId);
     if (!targetEntity) return null;
 
-    const body = targetEntity.components.get(CT.Body) as BodyComponent | undefined;
+    const body = targetEntity.getComponent<BodyComponent>(CT.Body);
     if (!body) {
       return this.createFailedModification(
         deityId,
@@ -308,14 +309,14 @@ export class DivineBodyModification implements System {
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return null;
 
-    const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+    const deity = deityEntity.getComponent<DeityComponent>(CT.Deity);
     if (!deity) return null;
 
     // Validate target
     const targetEntity = world.getEntity(targetId);
     if (!targetEntity) return null;
 
-    const body = targetEntity.components.get(CT.Body) as BodyComponent | undefined;
+    const body = targetEntity.getComponent<BodyComponent>(CT.Body);
     if (!body) {
       return this.createFailedModification(
         deityId,
@@ -557,12 +558,23 @@ export class DivineBodyModification implements System {
     };
 
     // Get or create a minimal magic component for the deity
-    const casterMagic = caster.components.get('magic') as any || {
+    const casterMagic = caster.getComponent<MagicComponent>(CT.Magic) || {
       type: 'magic',
-      sources: [],
-      knownSpells: [],
-      paradigmProficiencies: new Map([['divine', 100]]),
+      version: 1,
+      magicUser: true,
+      knownParadigmIds: ['divine'],
       activeParadigmId: 'divine',
+      paradigmState: {},
+      manaPools: [],
+      resourcePools: {},
+      knownSpells: [],
+      activeEffects: [],
+      techniqueProficiency: {},
+      formProficiency: {},
+      totalSpellsCast: 0,
+      totalMishaps: 0,
+      casting: false,
+      primarySource: 'divine',
     };
 
     return {

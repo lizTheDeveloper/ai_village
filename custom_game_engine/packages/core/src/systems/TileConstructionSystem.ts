@@ -13,7 +13,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
-import type { World } from '../ecs/World.js';
+import type { World, ITile } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import {
   type TileBasedBlueprint,
@@ -25,31 +25,65 @@ import {
   getTileBasedBlueprintRegistry,
 } from '../buildings/TileBasedBlueprintRegistry.js';
 
-// Minimal Tile interface for construction purposes
-interface Tile {
-  wall?: {
-    material: WallMaterial;
-    condition: number;
-    insulation: number;
-    constructedAt?: number;
-  };
-  door?: {
-    material: DoorMaterial;
-    state: 'open' | 'closed' | 'locked';
-    constructedAt?: number;
-  };
-  window?: {
-    material: WindowMaterial;
-    condition: number;
-    lightsThrough: boolean;
-    constructedAt?: number;
-  };
-  floor?: string;
-  roof?: {
-    material: RoofMaterial;
-    condition: number;
-    constructedAt?: number;
-  };
+/**
+ * Roof tile structure for voxel buildings.
+ */
+interface IRoofTile {
+  material: RoofMaterial;
+  condition: number;
+  constructedAt?: number;
+}
+
+/**
+ * Extended wall tile with constructedAt field.
+ */
+interface IWallTileWithTimestamp {
+  material: string;
+  condition: number;
+  insulation: number;
+  constructionProgress?: number;
+  constructedAt?: number;
+}
+
+/**
+ * Extended door tile with constructedAt field.
+ */
+interface IDoorTileWithTimestamp {
+  material: string;
+  state: 'open' | 'closed' | 'locked';
+  lastOpened?: number;
+  constructionProgress?: number;
+  constructedAt?: number;
+}
+
+/**
+ * Extended window tile with constructedAt field.
+ */
+interface IWindowTileWithTimestamp {
+  material: string;
+  condition: number;
+  lightsThrough: boolean;
+  constructionProgress?: number;
+  constructedAt?: number;
+}
+
+/**
+ * Extended tile interface with roof support and timestamp fields.
+ * ITile doesn't have roof or constructedAt yet, so we extend it here.
+ */
+interface TileWithRoof extends Omit<ITile, 'wall' | 'door' | 'window'> {
+  wall?: IWallTileWithTimestamp;
+  door?: IDoorTileWithTimestamp;
+  window?: IWindowTileWithTimestamp;
+  roof?: IRoofTile;
+}
+
+/**
+ * World interface extension for tile operations with roof support.
+ */
+interface WorldWithTiles extends World {
+  getTileAt(x: number, y: number): TileWithRoof | undefined;
+  markTileModified?(x: number, y: number): void;
 }
 
 /**
@@ -455,16 +489,16 @@ export class TileConstructionSystem implements System {
     switch (tile.type) {
       case 'wall':
         worldTile.wall = {
-          material: tile.materialId as WallMaterial,
+          material: tile.materialId,
           condition: 100,
-          insulation: this.getWallInsulation(tile.materialId as WallMaterial),
+          insulation: this.getWallInsulation(tile.materialId),
           constructedAt: world.tick,
         };
         break;
 
       case 'door':
         worldTile.door = {
-          material: tile.materialId as DoorMaterial,
+          material: tile.materialId,
           state: 'closed',
           constructedAt: world.tick,
         };
@@ -472,7 +506,7 @@ export class TileConstructionSystem implements System {
 
       case 'window':
         worldTile.window = {
-          material: tile.materialId as WindowMaterial,
+          material: tile.materialId,
           condition: 100,
           lightsThrough: true,
           constructedAt: world.tick,
@@ -490,9 +524,10 @@ export class TileConstructionSystem implements System {
 
   /**
    * Get wall insulation value for a material.
+   * Accepts any string and returns default for unknown materials.
    */
-  private getWallInsulation(material: WallMaterial): number {
-    const insulations: Record<WallMaterial, number> = {
+  private getWallInsulation(material: string): number {
+    const insulations: Record<string, number> = {
       wood: 50,
       stone: 80,
       mud_brick: 60,
@@ -660,22 +695,22 @@ export class TileConstructionSystem implements System {
    * Get world tile at position.
    * Returns undefined if no tile manager available.
    */
-  private getWorldTile(world: World, x: number, y: number): Tile | undefined {
-    // World should have a getTileAt method
-    const worldWithTiles = world as World & {
-      getTileAt?(x: number, y: number): any;
-    };
-    return worldWithTiles.getTileAt?.(x, y) as Tile | undefined;
+  private getWorldTile(world: World, x: number, y: number): TileWithRoof | undefined {
+    // Type guard to check if world has getTileAt method
+    if (!('getTileAt' in world) || typeof (world as WorldWithTiles).getTileAt !== 'function') {
+      return undefined;
+    }
+    return (world as WorldWithTiles).getTileAt(x, y);
   }
 
   /**
    * Mark tile as modified for chunk updates.
    */
   private markTileModified(world: World, x: number, y: number): void {
-    const worldWithTiles = world as World & {
-      markTileModified?(x: number, y: number): void;
-    };
-    worldWithTiles.markTileModified?.(x, y);
+    const worldWithTiles = world as WorldWithTiles;
+    if ('markTileModified' in world && typeof worldWithTiles.markTileModified === 'function') {
+      worldWithTiles.markTileModified(x, y);
+    }
   }
 
   // ============================================================================

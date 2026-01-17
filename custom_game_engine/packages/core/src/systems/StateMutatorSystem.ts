@@ -29,6 +29,13 @@ interface RegisteredDelta extends StateDelta {
 }
 
 /**
+ * Type guard to safely check if a component has a numeric field
+ */
+function hasNumericField(obj: object, field: string): obj is Record<string, number> {
+  return field in obj && typeof (obj as Record<string, unknown>)[field] === 'number';
+}
+
+/**
  * StateMutatorSystem - Batched vector-based state updates
  *
  * Performance optimization for systems that apply small, predictable changes every tick.
@@ -256,13 +263,15 @@ export class StateMutatorSystem implements System {
             continue;
           }
 
-          const currentValue = (component as any)[delta.field];
-          if (typeof currentValue !== 'number') {
+          // Type-safe field access using type guard
+          if (!hasNumericField(component, delta.field)) {
             console.warn(
               `[StateMutator] Field ${delta.field} on ${componentType} is not a number, skipping (source: ${delta.source})`
             );
             continue;
           }
+
+          const currentValue = component[delta.field];
 
           // Calculate delta for this update
           let deltaChange = delta.deltaPerMinute * gameMinutesElapsed;

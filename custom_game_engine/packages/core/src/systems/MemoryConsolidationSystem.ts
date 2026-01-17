@@ -347,7 +347,7 @@ export class MemoryConsolidationSystem implements System {
       // Emit consolidation event
       if (this.eventBus) {
         this.eventBus.emit({
-          type: 'memory:consolidated' as any,
+          type: 'memory:consolidated',
           source: this.id,
           data: {
             agentId: _agentId,

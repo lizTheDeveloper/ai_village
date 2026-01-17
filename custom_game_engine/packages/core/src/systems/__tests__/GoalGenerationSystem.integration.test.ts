@@ -44,10 +44,8 @@ describe('GoalGenerationSystem Integration', () => {
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
-    // Store world reference in eventBus BEFORE creating system
-    // so event handlers can access entities
-    (eventBus as any).world = world;
     goalGenerationSystem = new GoalGenerationSystem(eventBus);
+    goalGenerationSystem.initialize(world, eventBus);
   });
 
   it('should generate a goal after reflection when agent has fewer than 3 goals', () => {
@@ -148,8 +146,8 @@ describe('GoalGenerationSystem Integration', () => {
       // Create fresh world for each trial to avoid interference
       const trialEventBus = new EventBusImpl();
       const trialWorld = new WorldImpl(trialEventBus);
-      (trialEventBus as any).world = trialWorld;
       const trialSystem = new GoalGenerationSystem(trialEventBus);
+      trialSystem.initialize(trialWorld, trialEventBus);
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(new PersonalityComponent({
@@ -463,7 +461,7 @@ describe('GoalGenerationSystem Integration', () => {
       const testEventBus = new EventBusImpl();
       const testWorld = new WorldImpl(testEventBus);
       const testSystem = new GoalGenerationSystem(testEventBus);
-      (testEventBus as any).world = testWorld;
+      testSystem.initialize(testWorld, testEventBus);
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(new PersonalityComponent({

@@ -18,6 +18,7 @@ import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { LLMProvider } from '../types/LLMTypes.js';
 import {
   type DeathBargainComponent,
@@ -333,7 +334,7 @@ export class DeathBargainSystem implements System {
       this.addConversationMessage(world, deathGod, entity, line);
     }
 
-    (entity as any).addComponent(bargain);
+    (entity as EntityImpl).addComponent(bargain);
 
     // Emit event with intervention opportunity
     world.eventBus.emit({
@@ -806,7 +807,9 @@ Answer ONLY with "YES" or "NO".`;
     }
 
     // Remove afterlife component if present
-    (entity as any).removeComponent?.('afterlife');
+    if (entity.hasComponent('afterlife')) {
+      (entity as EntityImpl).removeComponent('afterlife');
+    }
 
     // Apply health penalty if specified
     if (bargain.resurrectConditions?.healthPenalty) {
@@ -835,7 +838,7 @@ Answer ONLY with "YES" or "NO".`;
     }
 
     // Remove death bargain component (challenge complete)
-    (entity as any).removeComponent?.(ComponentType.DeathBargain);
+    (entity as EntityImpl).removeComponent(ComponentType.DeathBargain);
 
     const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
     const resurrectionPsychopompName = deathGodIdentity?.name || 'The God of Death';
@@ -870,7 +873,7 @@ Answer ONLY with "YES" or "NO".`;
     }
 
     // Remove death bargain component
-    (entity as any).removeComponent?.(ComponentType.DeathBargain);
+    (entity as EntityImpl).removeComponent(ComponentType.DeathBargain);
 
     // Get psychopomp name for the event (reuse deathGod from above)
     const deathGodIdentity = deathGod?.getComponent<IdentityComponent>(ComponentType.Identity);
@@ -1388,7 +1391,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     // Ensure hero has conversation component
     if (!hero.getComponent('conversation')) {
       const conv = createConversationComponent(50);
-      (hero as any).addComponent(conv);
+      (hero as EntityImpl).addComponent(conv);
     }
 
     // Set up conversation partnership

@@ -74,6 +74,13 @@ export class CheckpointRetentionPolicy {
   }
 
   /**
+   * Get all retention rules (sorted by priority).
+   */
+  getRules(): readonly RetentionRule[] {
+    return this.rules;
+  }
+
+  /**
    * Initialize default retention rules.
    */
   private initializeDefaultRules(): void {
@@ -147,7 +154,7 @@ export function analyzeRetention(
 
   for (const checkpoint of kept) {
     // Find which rule kept this checkpoint (highest priority)
-    for (const rule of (policy as any).rules) {
+    for (const rule of policy.getRules()) {
       if (rule.shouldKeep(checkpoint, currentDay, canonEvents)) {
         keptByRule.set(rule.name, (keptByRule.get(rule.name) || 0) + 1);
         break;

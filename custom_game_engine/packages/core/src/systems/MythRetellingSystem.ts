@@ -10,6 +10,7 @@ import { tellMyth } from '../components/MythComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 import {
   selectMutation,
   applyMutation,
@@ -131,7 +132,7 @@ export class MythRetellingSystem implements System {
     agent: Entity,
     allAgents: ReadonlyArray<Entity>
   ): Entity[] {
-    const position = agent.components.get(CT.Position);
+    const position = agent.components.get(CT.Position) as PositionComponent | undefined;
     if (!position) return [];
 
     const nearby: Entity[] = [];
@@ -140,11 +141,11 @@ export class MythRetellingSystem implements System {
     for (const other of allAgents) {
       if (other.id === agent.id) continue;
 
-      const otherPos = other.components.get(CT.Position);
+      const otherPos = other.components.get(CT.Position) as PositionComponent | undefined;
       if (!otherPos) continue;
 
-      const dx = (otherPos as any).x - (position as any).x;
-      const dy = (otherPos as any).y - (position as any).y;
+      const dx = otherPos.x - position.x;
+      const dy = otherPos.y - position.y;
       const distSq = dx * dx + dy * dy;
 
       if (distSq <= CONVERSATION_RADIUS * CONVERSATION_RADIUS) {

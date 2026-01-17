@@ -5,6 +5,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
 import type { EntityId } from '../types.js';
+import type { LibraryComponent } from '../components/LibraryComponent.js';
 
 interface BorrowedBook {
   bookId: string;
@@ -202,13 +203,13 @@ export class LibrarySystem implements System {
       return false;
     }
 
-    const libraryComp = library.getComponent(CT.Library);
+    const libraryComp = library.getComponent<LibraryComponent>(CT.Library);
     if (!libraryComp) {
       return false;
     }
 
     // Check if library is public
-    if ((libraryComp as any).isPublic) {
+    if (libraryComp.publicAccess) {
       return true;
     }
 

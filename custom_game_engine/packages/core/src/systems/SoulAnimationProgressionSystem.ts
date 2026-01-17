@@ -13,6 +13,10 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
+import type { AppearanceComponent } from '../components/AppearanceComponent.js';
+import type { GameEventMap } from '../events/EventMap.js';
 
 interface AnimationJob {
   soulId: string;
@@ -34,34 +38,65 @@ export class SoulAnimationProgressionSystem implements System {
 
   onInit(world: World): void {
     // Subscribe to soul creation completion
-    world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
-      this.checkAnimationEligibility(world, event.data);
+    world.eventBus.subscribe<'soul:ceremony_complete'>('soul:ceremony_complete', (event) => {
+      this.checkAnimationEligibilityForNewSoul(world, event.data);
     });
 
     // Subscribe to reincarnation events
-    world.eventBus.subscribe('soul:reincarnated', (event) => {
-      this.checkAnimationEligibility(world, event.data);
+    world.eventBus.subscribe<'soul:reincarnated'>('soul:reincarnated', (event) => {
+      this.checkAnimationEligibilityForReincarnation(world, event.data);
     });
   }
 
   /**
-   * Check if a soul is eligible for animation generation
+   * Check if a newly created soul is eligible for animation generation
    */
-  private checkAnimationEligibility(world: World, eventData: any): void {
+  private checkAnimationEligibilityForNewSoul(
+    world: World,
+    eventData: GameEventMap['soul:ceremony_complete']
+  ): void {
     const soulId = eventData.soulId;
     if (!soulId) return;
 
     const soulEntity = world.getEntity(soulId);
     if (!soulEntity) return;
 
-    const soulIdentity = soulEntity.components.get('soul_identity') as any;
+    const soulIdentity = soulEntity.components.get('soul_identity') as SoulIdentityComponent | undefined;
     if (!soulIdentity) return;
 
-    const incarnationCount = soulIdentity.incarnationHistory?.length || 1;
+    const incarnationCount = soulIdentity.incarnationHistory.length || 1;
 
     // Check if soul needs walking animation
     if (incarnationCount >= this.MIN_INCARNATION_FOR_WALKING) {
       this.requestWalkingAnimation(world, soulId, soulIdentity, incarnationCount);
+    }
+  }
+
+  /**
+   * Check if a reincarnated soul is eligible for animation generation
+   */
+  private checkAnimationEligibilityForReincarnation(
+    world: World,
+    eventData: GameEventMap['soul:reincarnated']
+  ): void {
+    // For reincarnation, we need to find the soul entity via the new agent
+    const newAgentEntity = world.getEntity(eventData.newEntityId);
+    if (!newAgentEntity) return;
+
+    const soulLink = newAgentEntity.components.get('soul_link') as SoulLinkComponent | undefined;
+    if (!soulLink) return;
+
+    const soulEntity = world.getEntity(soulLink.soulEntityId);
+    if (!soulEntity) return;
+
+    const soulIdentity = soulEntity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    if (!soulIdentity) return;
+
+    const incarnationCount = soulIdentity.incarnationHistory.length || 1;
+
+    // Check if soul needs walking animation
+    if (incarnationCount >= this.MIN_INCARNATION_FOR_WALKING) {
+      this.requestWalkingAnimation(world, soulLink.soulEntityId, soulIdentity, incarnationCount);
     }
   }
 
@@ -71,12 +106,13 @@ export class SoulAnimationProgressionSystem implements System {
   private requestWalkingAnimation(
     world: World,
     soulId: string,
-    soulIdentity: any,
+    soulIdentity: SoulIdentityComponent,
     incarnationCount: number
   ): void {
     // Get sprite folder ID from agent's appearance component
     // Note: The agent entity should have appearance with spriteFolderId set
-    const agentId = soulIdentity.currentAgentId || this.findAgentBySoulId(world, soulId);
+    const currentIncarnation = soulIdentity.incarnationHistory[soulIdentity.incarnationHistory.length - 1];
+    const agentId = currentIncarnation ? this.findAgentBySoulId(world, soulId) : null;
     if (!agentId) {
       console.warn(`[SoulAnimation] Cannot find agent for soul ${soulId}`);
       return;
@@ -85,8 +121,8 @@ export class SoulAnimationProgressionSystem implements System {
     const agent = world.getEntity(agentId);
     if (!agent) return;
 
-    const appearance = agent.components.get('appearance') as any;
-    const spriteFolderId = appearance?.spriteFolderId || appearance?.spriteFolder;
+    const appearance = agent.components.get('appearance') as AppearanceComponent | undefined;
+    const spriteFolderId = appearance?.spriteFolderId;
 
     if (!spriteFolderId) {
       console.warn(`[SoulAnimation] No sprite folder for soul ${soulId}`);
@@ -124,13 +160,13 @@ export class SoulAnimationProgressionSystem implements System {
     );
 
     // Emit event for external animation generation (daemon or manual process)
-    world.eventBus.emit({
+    world.eventBus.emit<'soul:animation_requested'>({
       type: 'soul:animation_requested',
       source: 'soul_animation_progression',
       data: {
         soulId,
         spriteFolderId,
-        animationType: 'walking-8-frames',
+        animationType: 'walking-8-frames' as const,
         incarnationCount,
         soulName: soulIdentity.soulName,
       },
@@ -142,8 +178,8 @@ export class SoulAnimationProgressionSystem implements System {
    */
   private findAgentBySoulId(world: World, soulId: string): string | null {
     for (const entity of world.entities.values()) {
-      const soulLink = entity.components.get('soul_link') as any;
-      if (soulLink && soulLink.soulId === soulId) {
+      const soulLink = entity.components.get('soul_link') as SoulLinkComponent | undefined;
+      if (soulLink && soulLink.soulEntityId === soulId) {
         return entity.id;
       }
     }

@@ -183,7 +183,7 @@ export class CookingSystem implements System {
     let skills = entity.getComponent<SkillsComponent>(CT.Skills);
     if (!skills) {
       skills = createSkillsComponent();
-      (entity as any).addComponent(skills);
+      entity.addComponent(skills);
     }
     return skills;
   }
@@ -268,7 +268,7 @@ export class CookingSystem implements System {
    * Happy cooks make better food!
    */
   private getMoodBonus(entity: Entity): number {
-    const mood = entity.components.get(CT.Mood) as MoodComponent | undefined;
+    const mood = entity.getComponent<MoodComponent>(CT.Mood);
     if (!mood) {
       return 0;
     }

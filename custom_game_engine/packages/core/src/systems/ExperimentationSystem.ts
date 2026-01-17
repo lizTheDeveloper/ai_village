@@ -84,6 +84,13 @@ export class ExperimentationSystem implements System {
   private readonly PROCESS_INTERVAL = 60; // Every second at 60 tps
 
   /**
+   * Set the recipe registry for looking up recipes.
+   */
+  public setRecipeRegistry(registry: RecipeRegistry): void {
+    this.recipeRegistry = registry;
+  }
+
+  /**
    * Initialize the system.
    */
   public initialize(world: World, eventBus: EventBus): void {
@@ -93,15 +100,19 @@ export class ExperimentationSystem implements System {
 
     this.eventBus = eventBus;
 
-    // Get recipe registry from world if available
-    if ((world as any).recipeRegistry) {
-      this.recipeRegistry = (world as any).recipeRegistry;
-    }
-
     // Subscribe to experimentation request events
-    eventBus.subscribe('experiment:requested', (event) => {
-      const data = event.data as ExperimentRequest;
-      this.queueExperiment(data);
+    eventBus.subscribe<'experiment:requested'>('experiment:requested', (event) => {
+      // Map event data to ExperimentRequest (now properly typed in EventMap)
+      const request: ExperimentRequest = {
+        agentId: event.data.agentId,
+        ingredients: event.data.ingredients.map(ing => ({
+          itemId: ing.itemId,
+          quantity: ing.quantity,
+        })),
+        recipeType: event.data.recipeType as RecipeType,
+        giftRecipient: event.data.giftRecipient,
+      };
+      this.queueExperiment(request);
     });
 
     this.isInitialized = true;

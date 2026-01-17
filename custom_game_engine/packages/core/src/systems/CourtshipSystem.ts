@@ -18,6 +18,8 @@ import { attemptConception } from '../reproduction/courtship/compatibility';
 import type { CourtshipTactic } from '../reproduction/courtship/types';
 import { getTacticsForSpecies } from '../reproduction/courtship/tactics';
 import type { SpeciesComponent } from '../components/SpeciesComponent';
+import type { PositionComponent } from '../components/PositionComponent';
+import type { ActiveCourtship } from '../reproduction/courtship/types';
 
 export class CourtshipSystem implements System {
   public readonly id: SystemId = 'courtship';
@@ -401,7 +403,7 @@ export class CourtshipSystem implements System {
       .with(CT.Position)
       .executeEntities();
 
-    const agentPos = agent.getComponent(CT.Position);
+    const agentPos = agent.getComponent<PositionComponent>(CT.Position);
     if (!agentPos) return [];
 
     const targets: Entity[] = [];
@@ -423,11 +425,11 @@ export class CourtshipSystem implements System {
       }
 
       // Check if within proximity (simple distance check)
-      const otherPos = otherImpl.getComponent(CT.Position) as any;
+      const otherPos = otherImpl.getComponent<PositionComponent>(CT.Position);
       if (!otherPos) continue;
 
-      const dx = (agentPos as any).x - otherPos.x;
-      const dy = (agentPos as any).y - otherPos.y;
+      const dx = agentPos.x - otherPos.x;
+      const dy = agentPos.y - otherPos.y;
       const distSq = dx * dx + dy * dy;
 
       // Within 10 tiles
@@ -445,7 +447,7 @@ export class CourtshipSystem implements System {
   private selectNextTactic(
     agent: EntityImpl,
     courtship: CourtshipComponent,
-    activeCourtship: any,
+    activeCourtship: ActiveCourtship,
     _world: World
   ): CourtshipTactic | null {
     const species = agent.getComponent<SpeciesComponent>(CT.Species);
@@ -461,7 +463,8 @@ export class CourtshipSystem implements System {
       if (paradigm.forbiddenTactics?.includes(tactic.id)) return false;
 
       // Skip tactics already attempted
-      if (activeCourtship.tacticsAttempted.includes(tactic.id)) return false;
+      if (activeCourtship.tacticsAttempted.some((attempted) => attempted.id === tactic.id))
+        return false;
 
       // Prefer preferred tactics
       if (courtship.preferredTactics.includes(tactic.id)) return true;

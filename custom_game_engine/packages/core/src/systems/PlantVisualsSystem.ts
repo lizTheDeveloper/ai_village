@@ -1,6 +1,7 @@
 import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { PlantComponent, PlantStage } from '../components/PlantComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
@@ -292,7 +293,7 @@ export class PlantVisualsSystem implements System {
         const spriteId = this.getSpriteIdForPlant(plant);
         renderable = createRenderableComponent(spriteId, 'object', true);
         // Add the component to the entity
-        (entity as any).addComponent(renderable);
+        (entity as EntityImpl).addComponent(renderable);
       }
 
       const newSize = this.calculateSizeMultiplier(plant);

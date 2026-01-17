@@ -47,6 +47,7 @@ import {
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 // Perception module
 import { PerceptionProcessor } from '../perception/index.js';
@@ -554,7 +555,7 @@ export class AgentBrainSystem implements System {
             from: fromBehavior,
             to: toBehavior,
             reason: 'decision',
-            layer: (decisionResult as any).layer || 'unknown',
+            layer: ('layer' in decisionResult ? decisionResult.layer : 'unknown') as string,
           },
         });
       }
@@ -705,7 +706,7 @@ export class AgentBrainSystem implements System {
     range: number
   ): Entity[] {
     const startTime = performance.now();
-    const position = entity.getComponent(CT.Position) as any;
+    const position = entity.getComponent<PositionComponent>(CT.Position);
     if (!position) return [];
 
     // Use ChunkSpatialQuery for efficient nearby agent lookups
@@ -754,7 +755,7 @@ export class AgentBrainSystem implements System {
           // Must have Agent component
           if (!impl.components.has(CT.Agent)) continue;
 
-          const otherPos = impl.getComponent(CT.Position) as any;
+          const otherPos = impl.getComponent<PositionComponent>(CT.Position);
           if (!otherPos) continue;
 
           // Manhattan distance early exit

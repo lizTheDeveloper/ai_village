@@ -91,6 +91,8 @@ export * from './RelationshipConversationSystem.js';
 export * from './CookingSystem.js';
 // Skills System
 export * from './SkillSystem.js';
+// Experimentation System - recipe discovery
+export * from './ExperimentationSystem.js';
 // Durability System - tool wear and breaking
 export * from './DurabilitySystem.js';
 // Body Parts System - extensible for multiple species
@@ -228,4 +230,5 @@ export {
   registerAllSystems,
   type SystemRegistrationConfig,
   type SystemRegistrationResult,
+  type PlantSystemsConfig,
 } from './registerAllSystems.js';

@@ -7,6 +7,7 @@ import type { Component } from '../ecs/Component.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import { createInjuryComponent, type InjuryComponent } from '../components/InjuryComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 interface AnimalComponent extends Component {
   readonly type: 'animal';
@@ -330,8 +331,8 @@ export class HuntingSystem implements System {
 
     // Generate LLM narrative
     if (this.llmProvider) {
-      const agentComp = world.getComponent(hunter.id, 'agent');
-      const hunterName = agentComp ? (agentComp as any).name || 'Hunter' : 'Hunter';
+      const identityComp = world.getComponent<IdentityComponent>(hunter.id, 'identity');
+      const hunterName = identityComp?.name || 'Hunter';
 
       this.llmProvider({
         type: 'hunting_narrative',

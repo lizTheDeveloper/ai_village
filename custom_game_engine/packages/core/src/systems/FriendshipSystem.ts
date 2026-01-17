@@ -58,15 +58,15 @@ export class FriendshipSystem implements System {
 
     const socialMemory = entity.getComponent<SocialMemoryComponent>(CT.SocialMemory);
 
-    // Initialize socialMemories if undefined (can happen after deserialization)
-    if (socialMemory && (!socialMemory.socialMemories || !(socialMemory as any)._socialMemories)) {
-      (socialMemory as any)._socialMemories = new Map();
+    // Type guard: Check if component has proper internal structure
+    if (socialMemory && !this.hasSocialMemoriesMap(socialMemory)) {
+      return; // Skip processing if component is malformed
     }
 
     for (const [partnerId, relationship] of relationships.relationships) {
       // Already marked as friend?
       if (socialMemory) {
-        const memory = socialMemory.socialMemories?.get(partnerId);
+        const memory = socialMemory.socialMemories.get(partnerId);
         if (memory?.relationshipType === 'friend') continue;
       }
 
@@ -94,6 +94,12 @@ export class FriendshipSystem implements System {
   ): void {
     if (!socialMemory) return;
 
+    // Check if component has proper methods (can be lost during deserialization)
+    if (typeof socialMemory.recordInteraction !== 'function' ||
+        typeof socialMemory.updateRelationshipType !== 'function') {
+      return;
+    }
+
     const existingMemory = socialMemory.socialMemories.get(partnerId);
     if (!existingMemory) {
       // Record a first interaction to create the memory, then update relationship type
@@ -118,7 +124,7 @@ export class FriendshipSystem implements System {
     if (!partner) return;
 
     const selfIdentity = entity.getComponent<IdentityComponent>(CT.Identity);
-    const partnerIdentity = partner.components.get(CT.Identity) as IdentityComponent | undefined;
+    const partnerIdentity = (partner as EntityImpl).getComponent<IdentityComponent>(CT.Identity);
 
     const selfName = selfIdentity?.name ?? 'Unknown';
     const partnerName = partnerIdentity?.name ?? 'Unknown';
@@ -133,6 +139,15 @@ export class FriendshipSystem implements System {
         agent2Name: partnerName,
       },
     });
+  }
+
+  /**
+   * Type guard: Check if SocialMemoryComponent has valid internal structure.
+   * After deserialization, class methods and private fields may be lost.
+   */
+  private hasSocialMemoriesMap(component: SocialMemoryComponent): boolean {
+    // Check if the component has the internal _socialMemories Map
+    return '_socialMemories' in component && component['_socialMemories' as keyof typeof component] instanceof Map;
   }
 
 }

@@ -488,18 +488,24 @@ export interface GameEventMap {
   'building:menu:closed': Record<string, never>;
   'building:needs_repair': {
     buildingId: EntityId;
+    buildingType: string;
     condition: number;
-    timestamp: number;
+    position: { x: number; y: number };
+    priority: 'low' | 'medium' | 'high' | 'critical';
   };
   'building:critical_repair': {
     buildingId: EntityId;
+    buildingType: string;
     condition: number;
-    timestamp: number;
+    position: { x: number; y: number };
+    priority: 'low' | 'medium' | 'high' | 'critical';
   };
   'building:collapse_imminent': {
     buildingId: EntityId;
+    buildingType: string;
     condition: number;
-    timestamp: number;
+    position: { x: number; y: number };
+    priority: 'low' | 'medium' | 'high' | 'critical';
   };
   'construction:started': {
     buildingId: EntityId;
@@ -792,6 +798,11 @@ export interface GameEventMap {
     agentId: EntityId;
     memoryId: string;
     timestamp?: number;
+  };
+  'memory:consolidated': {
+    agentId: EntityId;
+    summary: string;
+    originalCount: number;
   };
 
   // === Belief & Trust Events ===
@@ -1261,6 +1272,11 @@ export interface GameEventMap {
     entityId?: EntityId;
     needType: 'hunger' | 'energy' | 'health';
     value: number;
+    survivalRelevance?: number;
+  };
+  'need:starvation_day': {
+    agentId: EntityId;
+    dayNumber: number;
     survivalRelevance?: number;
   };
 
@@ -1734,6 +1750,7 @@ export interface GameEventMap {
     agentId: EntityId;
     ingredients: Array<{ itemId: string; quantity: number }>;
     recipeType: string;
+    giftRecipient?: string;
   };
   'experiment:success': {
     recipeId: string;

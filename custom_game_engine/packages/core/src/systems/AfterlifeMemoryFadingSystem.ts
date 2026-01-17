@@ -97,8 +97,6 @@ export class AfterlifeMemoryFadingSystem implements System {
   ): void {
     if (!episodicMemory.episodicMemories) return;
 
-    // Create new memory array with updated clarity
-    const updatedMemories: EpisodicMemory[] = [];
     const toSuppress: string[] = [];
 
     for (const memory of episodicMemory.episodicMemories) {
@@ -109,21 +107,13 @@ export class AfterlifeMemoryFadingSystem implements System {
         if (adjustedClarity < 0.01) {
           toSuppress.push(memory.id);
         } else {
-          // Create new memory object with reduced clarity
-          updatedMemories.push({
-            ...memory,
+          // Update clarity using the proper API
+          episodicMemory.updateMemory(memory.id, {
             clarity: adjustedClarity,
           });
         }
-      } else {
-        // Non-afterlife memory, keep as-is
-        updatedMemories.push(memory);
       }
     }
-
-    // Update component with new memory array by directly accessing private field
-    // This is necessary because EpisodicMemoryComponent doesn't provide a setter
-    (episodicMemory as any)._episodicMemories = updatedMemories;
 
     // Suppress faded memories (they remain in the soul's unconscious)
     // These contribute to wisdom and can be seen by the God of Death

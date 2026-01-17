@@ -76,16 +76,14 @@ export class AvatarSystem implements System {
    * Get the divine avatar config from the world's divine config
    */
   private getDivineAvatarConfig(world: World): DivineAvatarConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
-    return divineConfig?.avatars;
+    return world.divineConfig?.avatars;
   }
 
   /**
    * Get the restriction config from the world's divine config
    */
   private getRestrictionConfig(world: World): RestrictionConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
-    return divineConfig?.restrictions;
+    return world.divineConfig?.restrictions;
   }
 
   /**

@@ -242,15 +242,14 @@ export class BuildingMaintenanceSystem implements System {
       world.eventBus.emit({
         type: 'building:needs_repair',
         source: buildingId,
-        timestamp: currentTick,
         data: {
           buildingId,
           buildingType,
           condition: newCondition,
           position: { x: position.x, y: position.y },
-          priority: 'low',
+          priority: 'low' as const,
         },
-      } as any); // Type assertion for custom event
+      });
     }
 
     if (oldCondition >= DEGRADATION_CONFIG.CRITICAL_THRESHOLD &&
@@ -258,15 +257,14 @@ export class BuildingMaintenanceSystem implements System {
       world.eventBus.emit({
         type: 'building:critical_repair',
         source: buildingId,
-        timestamp: currentTick,
         data: {
           buildingId,
           buildingType,
           condition: newCondition,
           position: { x: position.x, y: position.y },
-          priority: 'high',
+          priority: 'high' as const,
         },
-      } as any); // Type assertion for custom event
+      });
     }
 
     if (oldCondition >= DEGRADATION_CONFIG.COLLAPSE_THRESHOLD &&
@@ -274,15 +272,14 @@ export class BuildingMaintenanceSystem implements System {
       world.eventBus.emit({
         type: 'building:collapse_imminent',
         source: buildingId,
-        timestamp: currentTick,
         data: {
           buildingId,
           buildingType,
           condition: newCondition,
           position: { x: position.x, y: position.y },
-          priority: 'critical',
+          priority: 'critical' as const,
         },
-      } as any); // Type assertion for custom event
+      });
     }
   }
 

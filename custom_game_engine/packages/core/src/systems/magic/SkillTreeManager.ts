@@ -125,15 +125,13 @@ export class SkillTreeManager {
     });
 
     // Emit unlock event (triggers handleSkillNodeUnlocked)
-    // Using generic emit for events not in GameEventMap
-    (this.world?.eventBus as unknown as { emit: (e: Record<string, unknown>) => void })?.emit({
-      type: 'magic:skill_node_unlocked',
+    this.world?.eventBus.emit({
+      type: 'magic:skill_node_unlocked' as const,
       source: entity.id,
       data: {
-        entityId: entity.id,
-        paradigmId,
         nodeId,
-        xpSpent: xpCost,
+        agentId: entity.id,
+        skillTree: paradigmId,
       },
     });
 
@@ -157,15 +155,14 @@ export class SkillTreeManager {
         // Auto-learn the unlocked spell
         this.spellLearning.learnSpell(entity, spellId, effect.baseValue ?? 0);
 
-        // Emit event (using type assertion for custom event)
-        (this.world?.eventBus as any)?.emit({
-          type: 'magic:spell_unlocked_from_skill_tree',
+        // Emit event for spell unlock
+        this.world?.eventBus.emit({
+          type: 'magic:spell_unlocked_from_skill_tree' as const,
           source: entity.id,
           data: {
             spellId,
-            paradigmId,
+            agentId: entity.id,
             nodeId,
-            initialProficiency: effect.baseValue ?? 0,
           },
         });
       }
@@ -185,13 +182,15 @@ export class SkillTreeManager {
     const magic = entity.getComponent<MagicComponent>(CT.Magic);
 
     // Build MagicSkillProgress from the state
+    const unlockedNodes: Record<string, number> = {};
+    for (const nodeId of state.unlockedNodes) {
+      unlockedNodes[nodeId] = 1; // Level 1 for unlocked nodes
+    }
+
     const progress = {
       paradigmId,
       treeVersion: 1,
-      unlockedNodes: state.unlockedNodes.reduce((acc, nodeId) => {
-        acc[nodeId] = 1; // Level 1 for unlocked nodes
-        return acc;
-      }, {} as Record<string, number>),
+      unlockedNodes,
       totalXpEarned: state.xp,
       availableXp: state.xp,
       discoveries: {},
@@ -204,9 +203,9 @@ export class SkillTreeManager {
       agentId: entity.id,
       progress,
       magicComponent: magic ? {
-        paradigmState: magic.paradigmState as Record<string, unknown>,
-        techniqueProficiency: magic.techniqueProficiency as Record<string, number>,
-        formProficiency: magic.formProficiency as Record<string, number>,
+        paradigmState: magic.paradigmState ?? {},
+        techniqueProficiency: magic.techniqueProficiency ?? {},
+        formProficiency: magic.formProficiency ?? {},
         corruption: magic.corruption,
         favorLevel: magic.favorLevel,
         manaPools: magic.manaPools.map(p => ({

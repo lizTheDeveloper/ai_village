@@ -6,6 +6,7 @@ import type { RealmComponent } from '../components/RealmComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { RealmProperties } from '../realms/RealmTypes.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 
 /**
  * RealmManager - Manages all active realms
@@ -30,7 +31,7 @@ export class RealmManager implements System {
       const entity = world.getEntity(entityId);
       if (!entity) continue;
 
-      const realm = entity.components.get('realm') as RealmComponent | undefined;
+      const realm = entity.getComponent<RealmComponent>(CT.Realm);
       if (!realm || !realm.active) continue;
 
       // Skip processing uninhabited realms (performance optimization)
@@ -73,7 +74,7 @@ export class RealmManager implements System {
   /**
    * Get realm entity by ID
    */
-  getRealmEntity(realmId: string, world: World): any | undefined {
+  getRealmEntity(realmId: string, world: World): Entity | undefined {
     const entityId = this.realms.get(realmId);
     if (!entityId) return undefined;
     return world.getEntity(entityId);
@@ -85,7 +86,7 @@ export class RealmManager implements System {
   getRealm(realmId: string, world: World): RealmComponent | undefined {
     const entity = this.getRealmEntity(realmId, world);
     if (!entity) return undefined;
-    return entity.components.get('realm') as RealmComponent | undefined;
+    return entity.getComponent<RealmComponent>(CT.Realm);
   }
 
   /**
@@ -145,7 +146,7 @@ export class RealmManager implements System {
       const entity = world.getEntity(inhabitantId);
       if (!entity) continue;
 
-      const location = entity.components.get('realm_location') as RealmLocationComponent | undefined;
+      const location = entity.getComponent<RealmLocationComponent>(CT.RealmLocation);
       if (location && location.currentRealmId === realmId) {
         // Force return to mortal world
         location.currentRealmId = 'mortal_world';
@@ -191,7 +192,7 @@ export class RealmManager implements System {
       const entity = world.getEntity(inhabitantId);
       if (!entity) continue;
 
-      const agent = entity.components.get('agent') as AgentComponent | undefined;
+      const agent = entity.getComponent<AgentComponent>(CT.Agent);
       if (agent?.useLLM) {
         return true;
       }
@@ -212,7 +213,7 @@ export class RealmManager implements System {
       const entity = world.getEntity(inhabitantId);
       if (!entity) continue;
 
-      const agent = entity.components.get('agent') as AgentComponent | undefined;
+      const agent = entity.getComponent<AgentComponent>(CT.Agent);
       if (agent?.useLLM) {
         count++;
       }

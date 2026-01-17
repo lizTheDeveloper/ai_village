@@ -44,13 +44,11 @@ export class CompanionSystem implements System {
    * Update the companion
    */
   public update(world: World): void {
-    const currentTick = this.getCurrentTick(world);
-
     // Throttle updates
-    if (currentTick - this.lastUpdateTick < this.updateInterval) {
+    if (world.tick - this.lastUpdateTick < this.updateInterval) {
       return;
     }
-    this.lastUpdateTick = currentTick;
+    this.lastUpdateTick = world.tick;
 
     // Ensure companion exists
     if (!this.companionEntityId) {
@@ -66,7 +64,7 @@ export class CompanionSystem implements System {
       return;
     }
 
-    const companionComp = companionEntity.getComponent(CT.Companion) as CompanionComponent | undefined;
+    const companionComp = companionEntity.getComponent<CompanionComponent>(CT.Companion);
     if (!companionComp) {
       console.error('[CompanionSystem] Companion entity missing CompanionComponent');
       return;
@@ -97,20 +95,7 @@ export class CompanionSystem implements System {
     }
 
     // Create new companion
-    const currentTick = this.getCurrentTick(world);
-    const companion = createOphanimimCompanion(world, currentTick);
+    const companion = createOphanimimCompanion(world, world.tick);
     this.companionEntityId = companion.id;
-  }
-
-  /**
-   * Get current game tick
-   */
-  private getCurrentTick(world: World): number {
-    const timeEntities = world.query().with(CT.Time).executeEntities();
-    if (timeEntities.length === 0) {
-      return 0;
-    }
-    const timeComp = timeEntities[0]!.getComponent(CT.Time) as any;
-    return timeComp?.currentTick ?? 0;
   }
 }

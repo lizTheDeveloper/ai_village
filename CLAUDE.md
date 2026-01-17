@@ -9,6 +9,7 @@
 - **[SYSTEMS_CATALOG.md](./custom_game_engine/SYSTEMS_CATALOG.md)** - 212+ systems with priorities, components, locations
 - **[COMPONENTS_REFERENCE.md](./custom_game_engine/COMPONENTS_REFERENCE.md)** - 125+ component types with fields and examples
 - **[METASYSTEMS_GUIDE.md](./custom_game_engine/METASYSTEMS_GUIDE.md)** - Consciousness, Divinity, Reproduction, Multiverse, Magic, Realms
+- **[BEHAVIOR_CONTEXT.md](./custom_game_engine/docs/BEHAVIOR_CONTEXT.md)** - Agent behavior API ("pit of success" pattern)
 
 ## Package READMEs
 

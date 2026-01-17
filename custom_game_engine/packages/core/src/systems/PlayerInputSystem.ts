@@ -1,6 +1,7 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type {
   PlayerControlComponent,
   MovementDirection,
@@ -99,7 +100,7 @@ export class PlayerInputSystem implements System {
     const pendingInteraction = this.getInteractionFromMouse(currentTick);
 
     // Update player control component
-    (playerEntity as any).updateComponent('player_control', (current: PlayerControlComponent) => ({
+    (playerEntity as EntityImpl).updateComponent('player_control', (current: PlayerControlComponent) => ({
       ...current,
       movementCommand,
       pendingInteraction: pendingInteraction || current.pendingInteraction,

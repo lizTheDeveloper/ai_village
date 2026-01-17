@@ -9,15 +9,15 @@
  */
 
 // Load environment variables from .env file
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 import {
   GameLoop,
   BuildingBlueprintRegistry,
-  registerShopBlueprints,
   SoilSystem,
   PlantComponent,
+  WildAnimalSpawningSystem,
   TillActionHandler,
   PlantActionHandler,
   GatherSeedsActionHandler,
@@ -37,14 +37,17 @@ import {
   initializeDefaultRecipes,
   globalRecipeRegistry,
   CookingSystem,
+  ExperimentationSystem,
   registerDefaultResearch,
   MetricsCollectionSystem,
-  LiveEntityAPI,
   registerDefaultMaterials,
   registerAllSystems,
   type SystemRegistrationResult,
   type PlantSystemsConfig,
-} from '../packages/core/src/index.ts';
+  BuildingType,
+} from '@ai-village/core';
+
+import { LiveEntityAPI } from '@ai-village/metrics';
 
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
@@ -52,7 +55,7 @@ import {
   PlantDiscoverySystem,
   PlantDiseaseSystem,
   WildPlantPopulationSystem,
-} from '../packages/botany/src/index.ts';
+} from '@ai-village/botany';
 
 import {
   OllamaProvider,
@@ -62,15 +65,16 @@ import {
   TalkerPromptBuilder,
   ExecutorPromptBuilder,
   type LLMProvider,
-} from '../packages/llm/src/index.ts';
+} from '@ai-village/llm';
 
 import {
-  createLLMAgent,
   getPlantSpecies,
   getWildSpawnableSpecies,
   ChunkManager,
   TerrainGenerator,
-} from '../packages/world/src/index.ts';
+} from '@ai-village/world';
+
+import { createLLMAgent } from '@ai-village/agents';
 
 // ============================================================================
 // HEADLESS GAME LOOP
@@ -79,7 +83,7 @@ import {
 class HeadlessGameLoop {
   private gameLoop: GameLoop;
   private intervalId: ReturnType<typeof setInterval> | null = null;
-  private targetFps = 30;
+  private targetFps = 20; // Match game's 20 TPS
   private lastTime = Date.now();
   private running = false;
 
@@ -117,7 +121,7 @@ class HeadlessGameLoop {
       }
     }, frameTime);
 
-    console.log(`[HeadlessGame] Started at ${this.targetFps} FPS`);
+    console.log(`[HeadlessGame] Started at ${this.targetFps} TPS`);
   }
 
   stop(): void {
@@ -196,6 +200,12 @@ async function setupGameSystems(
   // Note: CookingSystem is already registered by registerAllSystems,
   // but we need to configure it with the recipe registry
 
+  // Set up experimentation system with recipe registry
+  const experimentationSystem = gameLoop.systemRegistry.get('experimentation');
+  if (experimentationSystem instanceof ExperimentationSystem) {
+    experimentationSystem.setRecipeRegistry(globalRecipeRegistry);
+  }
+
   // Set up Live Entity API if metrics is enabled
   const metricsSystem = result.metricsSystem;
   if (metricsSystem) {
@@ -230,41 +240,45 @@ async function setupGameSystems(
 // ENTITY CREATION
 // ============================================================================
 
-function createInitialBuildings(world: WorldMutator) {
-  const campfire = new EntityImpl(createEntityId(), (world as any)._tick);
-  campfire.addComponent(createBuildingComponent('campfire', 1, 100));
+function createInitialBuildings(world: World) {
+  const worldMutator = world as unknown as WorldMutator;
+
+  const campfire = new EntityImpl(createEntityId(), world.tick);
+  campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100));
   campfire.addComponent(createPositionComponent(-3, -3));
-  campfire.addComponent(createRenderableComponent('campfire', 'object'));
-  (world as any)._addEntity(campfire);
+  campfire.addComponent(createRenderableComponent('campfire', 'objects'));
+  (worldMutator as any)._addEntity(campfire);
 
-  const tent = new EntityImpl(createEntityId(), (world as any)._tick);
-  tent.addComponent(createBuildingComponent('tent', 1, 100));
+  const tent = new EntityImpl(createEntityId(), world.tick);
+  tent.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
   tent.addComponent(createPositionComponent(3, -3));
-  tent.addComponent(createRenderableComponent('tent', 'object'));
-  (world as any)._addEntity(tent);
+  tent.addComponent(createRenderableComponent('tent', 'objects'));
+  (worldMutator as any)._addEntity(tent);
 
-  const storage = new EntityImpl(createEntityId(), (world as any)._tick);
-  storage.addComponent(createBuildingComponent('storage-chest', 1, 100));
+  const storage = new EntityImpl(createEntityId(), world.tick);
+  storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
   storage.addComponent(createPositionComponent(0, -5));
-  storage.addComponent(createRenderableComponent('storage-chest', 'object'));
+  storage.addComponent(createRenderableComponent('storage-chest', 'objects'));
   const inv = createInventoryComponent(20, 500);
   inv.slots[0] = { itemId: 'wood', quantity: 50 };
   storage.addComponent(inv);
-  (world as any)._addEntity(storage);
+  (worldMutator as any)._addEntity(storage);
 }
 
-function createInitialAgents(world: WorldMutator, count: number = 5) {
+function createInitialAgents(world: World, count: number = 5) {
+  const worldMutator = world as unknown as WorldMutator;
   const agentIds: string[] = [];
   for (let i = 0; i < count; i++) {
     const x = (i % 3 - 1) * 2 + Math.random() * 0.5;
     const y = (Math.floor(i / 3) - 0.5) * 2 + Math.random() * 0.5;
-    const agentId = createLLMAgent(world, x, y, 2.0);
+    const agentId = createLLMAgent(worldMutator, x, y, 2.0);
     agentIds.push(agentId);
   }
   return agentIds;
 }
 
-function createInitialPlants(world: WorldMutator) {
+function createInitialPlants(world: World) {
+  const worldMutator = world as unknown as WorldMutator;
   const wildSpecies = getWildSpawnableSpecies();
   for (let i = 0; i < 25; i++) {
     const x = -15 + Math.random() * 30;
@@ -272,7 +286,7 @@ function createInitialPlants(world: WorldMutator) {
     const species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)]!;
     const stage = 'mature';
 
-    const plantEntity = new EntityImpl(createEntityId(), (world as any)._tick);
+    const plantEntity = new EntityImpl(createEntityId(), world.tick);
     const plantComponent = new PlantComponent({
       speciesId: species.id,
       position: { x, y },
@@ -290,12 +304,12 @@ function createInitialPlants(world: WorldMutator) {
     (plantComponent as any).entityId = plantEntity.id;
     plantEntity.addComponent(plantComponent);
     plantEntity.addComponent(createPositionComponent(x, y));
-    plantEntity.addComponent(createRenderableComponent(species.id, 'plant'));
-    (world as any)._addEntity(plantEntity);
+    plantEntity.addComponent(createRenderableComponent(species.id, 'terrain'));
+    (worldMutator as any)._addEntity(plantEntity);
   }
 }
 
-function createInitialAnimals(world: WorldMutator, spawning: WildAnimalSpawningSystem) {
+function createInitialAnimals(world: World, spawning: WildAnimalSpawningSystem) {
   const animals = [
     { species: 'chicken', position: { x: 3, y: 2 } },
     { species: 'sheep_white', position: { x: -4, y: 3 } },
@@ -367,7 +381,7 @@ async function setupLLMProvider(): Promise<{
     const resp = await fetch('http://localhost:11434/api/tags');
     if (resp.ok) {
       console.log('[HeadlessGame] Using Ollama');
-      const provider = new OllamaProvider({ model: 'qwen3:1.7b' });
+      const provider = new OllamaProvider('qwen3:1.7b');
       return {
         provider,
         queue: new LLMDecisionQueue(provider, 3),
@@ -412,7 +426,6 @@ async function main() {
   const blueprintRegistry = new BuildingBlueprintRegistry();
   blueprintRegistry.registerDefaults();
   blueprintRegistry.registerExampleBuildings();
-  // Note: registerShopBlueprints() is already called by registerDefaults()
   (baseGameLoop.world as any).buildingRegistry = blueprintRegistry;
 
   // Create ChunkManager and TerrainGenerator for terrain handling

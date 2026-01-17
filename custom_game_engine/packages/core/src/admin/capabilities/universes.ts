@@ -23,8 +23,19 @@ const universesCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        // Delegate to metrics server's headless list
-        return { universes: [], message: 'Delegate to /api/headless/list' };
+        try {
+          const response = await fetch(`${context.baseUrl}/api/headless/list`);
+          if (!response.ok) {
+            return { error: `Failed to fetch: ${response.status}` };
+          }
+          const data = await response.json();
+          return {
+            universes: data.games || [],
+            total: data.total || 0,
+          };
+        } catch (err) {
+          return { error: `Failed to connect: ${err instanceof Error ? err.message : 'unknown'}` };
+        }
       },
     }),
 
@@ -36,7 +47,24 @@ const universesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: true, description: 'Session ID of the universe' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universe' };
+        const session = params.session as string;
+        try {
+          const response = await fetch(`${context.baseUrl}/api/headless/list`);
+          if (!response.ok) {
+            return { error: `Failed to fetch: ${response.status}` };
+          }
+          const data = await response.json();
+          const universe = (data.games || []).find((g: any) => g.sessionId === session);
+          if (!universe) {
+            return { error: `Universe not found: ${session}` };
+          }
+          return {
+            universe,
+            dashboardUrl: `${context.baseUrl}/dashboard?session=${session}`,
+          };
+        } catch (err) {
+          return { error: `Failed to connect: ${err instanceof Error ? err.message : 'unknown'}` };
+        }
       },
     }),
 
@@ -102,7 +130,30 @@ const universesCapability = defineCapability({
         { name: 'seed', type: 'string', required: false, description: 'Random seed for deterministic generation' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/headless/spawn' };
+        try {
+          const response = await fetch(`${context.baseUrl}/api/headless/spawn`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: params.name || undefined,
+              agentCount: params.agentCount || 5,
+            }),
+          });
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            return { success: false, error: err.error || `HTTP ${response.status}` };
+          }
+          const data = await response.json();
+          return {
+            success: true,
+            sessionId: data.sessionId,
+            agentCount: data.agentCount,
+            status: data.status,
+            dashboardUrl: data.dashboardUrl,
+          };
+        } catch (err) {
+          return { success: false, error: `Failed to spawn: ${err instanceof Error ? err.message : 'unknown'}` };
+        }
       },
     }),
 
@@ -116,7 +167,53 @@ const universesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: true, description: 'Session ID to stop' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/headless/stop' };
+        try {
+          const response = await fetch(`${context.baseUrl}/api/headless/stop`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: params.session }),
+          });
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            return { success: false, error: err.error || `HTTP ${response.status}` };
+          }
+          const data = await response.json();
+          return {
+            success: true,
+            sessionId: data.sessionId,
+            message: data.message || 'Universe stopped',
+          };
+        } catch (err) {
+          return { success: false, error: `Failed to stop: ${err instanceof Error ? err.message : 'unknown'}` };
+        }
+      },
+    }),
+
+    defineAction({
+      id: 'stop-all-universes',
+      name: 'Stop All Universes',
+      description: 'Stop all running headless game universes',
+      dangerous: true,
+      requiresConfirmation: true,
+      params: [],
+      handler: async (params, gameClient, context) => {
+        try {
+          const response = await fetch(`${context.baseUrl}/api/headless/stop-all`, {
+            method: 'POST',
+          });
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            return { success: false, error: err.error || `HTTP ${response.status}` };
+          }
+          const data = await response.json();
+          return {
+            success: true,
+            stopped: data.stopped,
+            count: data.count,
+          };
+        } catch (err) {
+          return { success: false, error: `Failed to stop all: ${err instanceof Error ? err.message : 'unknown'}` };
+        }
       },
     }),
 
@@ -130,7 +227,12 @@ const universesCapability = defineCapability({
         { name: 'newName', type: 'string', required: false, description: 'Name for the new universe' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/fork' };
+        // Fork requires the save/load service which runs in the game client
+        // For now, return instructions
+        return {
+          success: false,
+          message: 'Fork requires a running game client. Use the Time Travel panel in the game UI.',
+        };
       },
     }),
   ],

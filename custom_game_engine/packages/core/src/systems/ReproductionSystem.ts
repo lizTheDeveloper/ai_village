@@ -400,7 +400,9 @@ export class ReproductionSystem implements System {
       id: `hereditary_${mod.type}_${tick}`,
       name: `Hereditary ${mod.type}`,
       source: 'genetic',
-      effects: { hereditaryTrait: { type: mod.type } } as any,
+      effects: {
+        propertyModified: { property: 'hereditaryTrait', value: { type: mod.type } }
+      },
       permanent: true,
       createdAt: tick,
     });

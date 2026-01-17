@@ -175,15 +175,23 @@ export class ExecutorPromptBuilder {
   /**
    * Check if there's a campfire in the agent's current chunk.
    * Returns true if a campfire (complete or in-progress) exists in the same chunk.
-   * This is much more efficient than querying all entities.
    *
-   * IMPORTANT: Also checks for agents currently building campfires to prevent
-   * simultaneous duplicate construction (addresses LLM context visibility issue).
+   * Uses O(1) chunk cache lookup when ChunkSpatialQuery is available (fast path),
+   * falls back to entity scanning if not (compatibility mode).
+   *
+   * IMPORTANT: Checks both completed buildings AND agents currently building campfires
+   * to prevent simultaneous duplicate construction.
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
     const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
+    // FAST PATH: O(1) lookup using ChunkSpatialQuery
+    if (chunkSpatialQuery) {
+      return chunkSpatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
+    }
+
+    // FALLBACK: Scan entities (for compatibility/tests)
     // Safety check: getChunkManager might not exist in test mocks
     if (typeof world.getChunkManager !== 'function') return false;
 

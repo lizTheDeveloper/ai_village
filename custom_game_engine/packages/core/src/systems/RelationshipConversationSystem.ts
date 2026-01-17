@@ -14,29 +14,13 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { SystemId, ComponentType } from '../types.js';
+import type { SystemId, ComponentType, EntityId } from '../types.js';
+import type { GameEvent } from '../events/GameEvent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
 import type { TopicId } from '../components/InterestsComponent.js';
-
-/**
- * Event data for conversation:ended events.
- */
-interface ConversationEndedEventData {
-  conversationId?: string;
-  participants?: string[];
-  agent1: string;
-  agent2: string;
-  duration?: number;
-  topics?: TopicId[];
-  topicsDiscussed?: TopicId[];
-  depth?: number;
-  messageCount?: number;
-  quality?: number;
-  overallQuality?: number;
-}
 
 export class RelationshipConversationSystem implements System {
   public readonly id: SystemId = 'relationship_conversation';
@@ -48,8 +32,8 @@ export class RelationshipConversationSystem implements System {
   init(world: World): void {
     this.world = world;
 
-    // Listen for conversation:ended events
-    world.eventBus.on('conversation:ended', (event: any) => {
+    // Listen for conversation:ended events - properly typed via EventMap
+    world.eventBus.on<'conversation:ended'>('conversation:ended', (event) => {
       this.handleConversationEnded(event.data);
     });
   }
@@ -58,13 +42,26 @@ export class RelationshipConversationSystem implements System {
     // This system is event-driven, no per-tick updates needed
   }
 
-  private handleConversationEnded(data: ConversationEndedEventData): void {
+  /**
+   * Handle conversation:ended events using EventMap-typed data.
+   * EventMap defines: conversationId, participants, duration, agent1?, agent2?, topics?, depth?, messageCount?, quality?
+   */
+  private handleConversationEnded(data: GameEvent<'conversation:ended'>['data']): void {
     if (!this.world) return;
 
-    const agent1Id = data.agent1;
-    const agent2Id = data.agent2;
-    const topics = data.topicsDiscussed ?? data.topics ?? [];
-    const qualityScore = data.overallQuality ?? data.quality ?? 0.5;
+    // EventMap has agent1? and agent2? as optional EntityId
+    if (!data.agent1 || !data.agent2) {
+      console.warn('[RelationshipConversationSystem] Conversation ended without agent1/agent2:', data);
+      return;
+    }
+
+    const agent1Id: EntityId = data.agent1;
+    const agent2Id: EntityId = data.agent2;
+
+    // EventMap has topics?: string[], but we treat them as TopicId (string union).
+    // This is safe because ConversationSystem emits TopicId values, but EventMap uses string[] for flexibility.
+    const topics: TopicId[] = (data.topics ?? []) as TopicId[];
+    const qualityScore = data.quality ?? 0.5;
     const depth = data.depth ?? 0.5;
 
     const entity1 = this.world.getEntity(agent1Id);
@@ -84,17 +81,23 @@ export class RelationshipConversationSystem implements System {
       overallQuality: qualityScore,
     };
 
+    // Cast Entity → EntityImpl: World.getEntity() returns public Entity interface,
+    // but internal methods require EntityImpl for component mutation access.
+    // This is safe because World stores EntityImpl instances.
+    const entityImpl1 = entity1 as EntityImpl;
+    const entityImpl2 = entity2 as EntityImpl;
+
     // Update relationships bidirectionally
-    this.updateRelationship(entity1 as EntityImpl, entity2 as EntityImpl, quality);
-    this.updateRelationship(entity2 as EntityImpl, entity1 as EntityImpl, quality);
+    this.updateRelationship(entityImpl1, entityImpl2, quality);
+    this.updateRelationship(entityImpl2, entityImpl1, quality);
 
     // Record known enthusiasts for discussed topics
-    this.recordEnthusiasts(entity1 as EntityImpl, entity2 as EntityImpl, topics, quality);
-    this.recordEnthusiasts(entity2 as EntityImpl, entity1 as EntityImpl, topics, quality);
+    this.recordEnthusiasts(entityImpl1, entityImpl2, topics, quality);
+    this.recordEnthusiasts(entityImpl2, entityImpl1, topics, quality);
 
     // Learn about partner's interests
-    this.learnInterests(entity1 as EntityImpl, entity2 as EntityImpl, topics);
-    this.learnInterests(entity2 as EntityImpl, entity1 as EntityImpl, topics);
+    this.learnInterests(entityImpl1, entityImpl2, topics);
+    this.learnInterests(entityImpl2, entityImpl1, topics);
   }
 
   private updateRelationship(
@@ -184,9 +187,13 @@ export class RelationshipConversationSystem implements System {
     const socialMemory = learner.getComponent<SocialMemoryComponent>(CT.SocialMemory);
     if (!socialMemory) return;
 
-    // Initialize socialMemories if undefined (can happen after deserialization)
-    if (!socialMemory.socialMemories || !(socialMemory as any)._socialMemories) {
-      (socialMemory as any)._socialMemories = new Map();
+    // Type guard: Check if component has proper internal structure
+    // After deserialization, the private _socialMemories Map might not exist
+    if (!this.hasSocialMemoriesMap(socialMemory)) {
+      console.warn(
+        `[RelationshipConversationSystem] SocialMemoryComponent for ${learner.id} missing internal Map (deserialization issue)`
+      );
+      return;
     }
 
     // Check existing memory to avoid duplicates
@@ -207,8 +214,22 @@ export class RelationshipConversationSystem implements System {
             confidence: 0.7,
             source: 'conversation',
           });
+        } else {
+          console.warn(
+            `[RelationshipConversationSystem] SocialMemoryComponent for ${learner.id} missing learnAboutAgent method (deserialization issue)`
+          );
         }
       }
     }
+  }
+
+  /**
+   * Type guard: Check if SocialMemoryComponent has valid internal structure.
+   * After deserialization, class methods and private fields may be lost.
+   */
+  private hasSocialMemoriesMap(component: SocialMemoryComponent): boolean {
+    // Check if the component has the internal _socialMemories Map
+    // We use 'in' operator to check property existence without type casting
+    return '_socialMemories' in component && component['_socialMemories' as keyof typeof component] instanceof Map;
   }
 }

@@ -487,8 +487,7 @@ export function forcedSleepBehaviorWithContext(ctx: BehaviorContext): ContextBeh
   if (!circadian.isSleeping) {
     const quality = 0.5; // Poor quality when collapsed
 
-    ctx.updateComponent<CircadianComponent>(CT.Circadian, (current) => ({
-      ...current,
+    safeUpdateComponent<CircadianComponent>(ctx.entity, CT.Circadian, () => ({
       isSleeping: true,
       sleepStartTime: ctx.tick,
       sleepLocationId: null,
@@ -620,8 +619,7 @@ function startSleepingWithContext(ctx: BehaviorContext, location: Entity | null)
   }
 
   // Update circadian component
-  ctx.updateComponent<CircadianComponent>(CT.Circadian, (current) => ({
-    ...current,
+  safeUpdateComponent<CircadianComponent>(ctx.entity, CT.Circadian, () => ({
     isSleeping: true,
     sleepStartTime: ctx.tick,
     sleepLocationId: location ? location.id : null,

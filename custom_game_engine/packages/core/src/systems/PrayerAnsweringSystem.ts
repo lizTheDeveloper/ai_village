@@ -61,7 +61,7 @@ export class PrayerAnsweringSystem implements System {
    */
   private getPrayerConfig(): PrayerConfig | undefined {
     if (!this.world) return undefined;
-    const divineConfig = (this.world as any).divineConfig;
+    const divineConfig = this.world.divineConfig;
     return divineConfig?.powers?.prayers;
   }
 

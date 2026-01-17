@@ -163,15 +163,13 @@ export class DominanceChallengeSystem implements System {
     // Emit event
     if (this.eventBus) {
       this.eventBus.emit({
-        type: 'dominance:resolved' as any,
+        type: 'dominance:resolved',
         source: challenger.id,
         data: {
           challengerId: challenger.id,
-          incumbentId: incumbent.id,
-          method,
-          victor: challengerWins ? challenger.id : incumbent.id,
-          oldChallengerRank: challengerRank.rank,
-          oldIncumbentRank: incumbentRank.rank,
+          challengedId: incumbent.id,
+          winner: challengerWins ? challenger.id : incumbent.id,
+          hierarchyChanged: true,
         },
       });
     }
@@ -370,13 +368,11 @@ export class DominanceChallengeSystem implements System {
       // Emit victory event
       if (this.eventBus) {
         this.eventBus.emit({
-          type: 'dominance:challenge' as any,
+          type: 'dominance:challenge',
           source: challenger.id,
           data: {
             challengerId: challenger.id,
-            incumbentId: incumbent.id,
-            victor: challenger.id,
-            loserFate,
+            challengedId: incumbent.id,
             method,
           },
         });
@@ -417,13 +413,11 @@ export class DominanceChallengeSystem implements System {
       // Emit defeat event
       if (this.eventBus) {
         this.eventBus.emit({
-          type: 'dominance:challenge' as any,
+          type: 'dominance:challenge',
           source: challenger.id,
           data: {
             challengerId: challenger.id,
-            incumbentId: incumbent.id,
-            victor: incumbent.id,
-            loserFate: challengerFate,
+            challengedId: incumbent.id,
             method,
           },
         });
@@ -488,13 +482,11 @@ export class DominanceChallengeSystem implements System {
         // Emit cascade effect event
         if (this.eventBus) {
           this.eventBus.emit({
-            type: 'dominance:cascade' as any,
+            type: 'dominance:cascade',
             source: entity.id,
             data: {
-              affectedAgentId: entity.id,
-              effect: 'may_challenge',
-              originalChallengeId: challenger.id,
-              probability: opportunityChance,
+              triggeredBy: challenger.id,
+              affectedAgents: [entity.id],
             },
           });
         }

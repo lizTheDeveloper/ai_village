@@ -52,8 +52,13 @@ export class SocialMemoryComponent extends ComponentBase {
 
   /**
    * Get all social memories (readonly)
+   * Initializes the map if it's undefined (can happen after deserialization)
    */
   get socialMemories(): ReadonlyMap<string, SocialMemory> {
+    // Defensive: ensure map exists (handles deserialization edge cases)
+    if (!this._socialMemories) {
+      this._socialMemories = new Map();
+    }
     return this._socialMemories;
   }
 

@@ -119,7 +119,7 @@ export class ConversionWarfareSystem implements System {
    * Get the restriction config from the world's divine config
    */
   private getRestrictionConfig(world: World): RestrictionConfig | undefined {
-    const divineConfig = (world as any).divineConfig;
+    const divineConfig = world.divineConfig;
     return divineConfig?.restrictions;
   }
 

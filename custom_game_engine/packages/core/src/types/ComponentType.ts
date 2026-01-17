@@ -193,6 +193,7 @@ export enum ComponentType {
   Incarnation = 'incarnation',
   SoulLink = 'soul_link',
   SoulCreationEvent = 'soul_creation_event',
+  Realm = 'realm',
   RealmLocation = 'realm_location',
   CurrentLifeMemory = 'current_life_memory',
   VeilOfForgetting = 'veil_of_forgetting',

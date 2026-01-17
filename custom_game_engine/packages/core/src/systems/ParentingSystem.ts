@@ -10,6 +10,7 @@ import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType';
 import type { ParentingComponent, ParentingResponsibility } from '../components/ParentingComponent';
 import type { NeedsComponent } from '../components/NeedsComponent';
+import type { PositionComponent } from '../components/PositionComponent';
 import { EntityImpl } from '../ecs/Entity';
 
 /**
@@ -116,8 +117,8 @@ export class ParentingSystem implements System {
     responsibility.childWellbeingAssessment = wellbeing;
 
     // Update last check-in if parent is nearby
-    const parentPos = (parent as EntityImpl).getComponent(CT.Position) as any;
-    const childPos = (child as EntityImpl).getComponent(CT.Position) as any;
+    const parentPos = (parent as EntityImpl).getComponent<PositionComponent>(CT.Position);
+    const childPos = (child as EntityImpl).getComponent<PositionComponent>(CT.Position);
 
     if (parentPos && childPos) {
       const dx = parentPos.x - childPos.x;

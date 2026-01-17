@@ -15,6 +15,7 @@ import { SpellEffectExecutor } from '../../magic/SpellEffectExecutor.js';
 import { SpellRegistry, type SpellDefinition } from '../../magic/SpellRegistry.js';
 import { costCalculatorRegistry } from '../../magic/costs/CostCalculatorRegistry.js';
 import { createDefaultContext, type CastingContext } from '../../magic/costs/CostCalculator.js';
+import { getCoreParadigm } from '../../magic/CoreParadigms.js';
 import type { CooldownManager } from './CooldownManager.js';
 import type { ManaManager } from './ManaManager.js';
 import type { SpellLearningManager } from './SpellLearningManager.js';
@@ -134,8 +135,14 @@ export class SpellCaster {
           // Still allow casting - player chose to risk it
         }
 
+        // Get full paradigm definition
+        const paradigm = getCoreParadigm(paradigmId);
+        if (!paradigm) {
+          throw new Error(`Paradigm '${paradigmId}' not found in core paradigms`);
+        }
+
         // Deduct costs using paradigm calculator
-        const result = calculator.deductCosts(costs, magic, { id: paradigmId } as any);
+        const result = calculator.deductCosts(costs, magic, paradigm);
         deductionSuccess = result.success;
         terminal = result.terminal;
 
