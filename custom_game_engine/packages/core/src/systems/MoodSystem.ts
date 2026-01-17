@@ -479,9 +479,10 @@ export class MoodSystem implements System {
    */
   private calculatePhysicalScore(needs: NeedsComponent): number {
     // Average of hunger, energy, health - each contributes
-    const hungerScore = (needs.hunger - 50) * 2; // -100 to +100
-    const energyScore = (needs.energy - 50) * 1; // -50 to +50 (less impact)
-    const healthScore = (needs.health - 50) * 2; // -100 to +100
+    // NeedsComponent uses 0-1 scale, convert to 0-100 for scoring
+    const hungerScore = (needs.hunger * 100 - 50) * 2; // -100 to +100
+    const energyScore = (needs.energy * 100 - 50) * 1; // -50 to +50 (less impact)
+    const healthScore = (needs.health * 100 - 50) * 2; // -100 to +100
 
     // Weighted average
     return (hungerScore * 0.4 + energyScore * 0.2 + healthScore * 0.4);

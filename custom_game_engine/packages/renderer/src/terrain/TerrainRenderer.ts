@@ -32,8 +32,17 @@ export class TerrainRenderer {
 
   /**
    * Render a single chunk.
+   *
+   * Handles ungenerated chunks gracefully by skipping rendering.
+   * This can happen when camera scrolls faster than background generation.
    */
   renderChunk(chunk: Chunk, camera: Camera): void {
+    // Skip rendering ungenerated chunks
+    // This prevents rendering empty/placeholder tiles before generation completes
+    if (!chunk.generated) {
+      return;
+    }
+
     for (let localY = 0; localY < CHUNK_SIZE; localY++) {
       for (let localX = 0; localX < CHUNK_SIZE; localX++) {
         const worldX = (chunk.x * CHUNK_SIZE + localX) * this.tileSize;

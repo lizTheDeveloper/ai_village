@@ -55,6 +55,13 @@ export class ChunkLoadingSystem extends BaseSystem {
     }
   }
 
+  /**
+   * Load chunks in viewport (visual mode).
+   *
+   * Strategy: Queue chunks for background generation (LOW priority).
+   * This allows smooth camera scrolling without lag spikes.
+   * Falls back to immediate generation if BackgroundChunkGenerator is unavailable.
+   */
   private loadChunksInViewport(
     world: World,
     viewport: { x: number; y: number; width: number; height: number }
@@ -64,11 +71,35 @@ export class ChunkLoadingSystem extends BaseSystem {
 
     const { loaded } = this.chunkManager.updateLoadedChunks(cameraTileX, cameraTileY);
 
+    const generator = world.getBackgroundChunkGenerator();
+
     for (const chunk of loaded) {
-      this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
+      if (!chunk.generated) {
+        if (generator) {
+          // Background generation (LOW priority for camera scroll)
+          // Smooth, lag-free experience when chunks are ready in advance
+          generator.queueChunk({
+            chunkX: chunk.x,
+            chunkY: chunk.y,
+            priority: 'LOW',
+            requestedBy: 'camera_scroll'
+          });
+        } else {
+          // Fallback: Generate immediately if no background generator
+          // This ensures terrain always appears, even without BackgroundChunkGenerator
+          this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
+        }
+      }
     }
   }
 
+  /**
+   * Load chunks around agents (headless mode).
+   *
+   * Strategy: Queue chunks for background generation (LOW priority).
+   * Headless mode doesn't need immediate generation since there's no visual feedback.
+   * Falls back to immediate generation if BackgroundChunkGenerator is unavailable.
+   */
   private loadChunksAroundAgents(ctx: SystemContext): void {
     // Throttle headless chunk loading - agents don't move fast enough to need every tick
     if (ctx.tick - this.lastHeadlessUpdateTick < this.HEADLESS_UPDATE_INTERVAL) {
@@ -78,6 +109,7 @@ export class ChunkLoadingSystem extends BaseSystem {
 
     // For headless: ensure chunks exist around all agents
     const agents = ctx.world.query().with('agent', 'position').executeEntities();
+    const generator = ctx.world.getBackgroundChunkGenerator();
 
     for (const agent of agents) {
       const pos = agent.getComponent<PositionComponent>('position');
@@ -95,7 +127,18 @@ export class ChunkLoadingSystem extends BaseSystem {
           if (!this.chunkManager.hasChunk(cx, cy)) {
             const chunk = this.chunkManager.getChunk(cx, cy);
             if (chunk && !chunk.generated) {
-              this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
+              if (generator) {
+                // Background generation (LOW priority for headless mode)
+                generator.queueChunk({
+                  chunkX: cx,
+                  chunkY: cy,
+                  priority: 'LOW',
+                  requestedBy: 'headless_agent'
+                });
+              } else {
+                // Fallback: Generate immediately if no background generator
+                this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
+              }
             }
           }
         }

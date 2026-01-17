@@ -307,6 +307,19 @@ export class Renderer {
       for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
         if (!this.chunkManager.hasChunk(chunkX, chunkY)) continue;
         const chunk = this.chunkManager.getChunk(chunkX, chunkY);
+
+        // Emergency fallback: If chunk is visible but not generated, generate it immediately
+        // This only happens if user scrolls faster than background generation
+        // Prevents missing terrain at the cost of a minor lag spike
+        if (!chunk.generated) {
+          console.warn(
+            `[Renderer] Emergency chunk generation for visible chunk (${chunkX}, ${chunkY}). ` +
+            `This indicates camera scrolled faster than background generation. ` +
+            `Consider increasing BackgroundChunkGenerator throttle or adding more predictive loading.`
+          );
+          this.terrainGenerator.generateChunk(chunk, world);
+        }
+
         this.terrainRenderer.renderChunk(chunk, this.camera);
       }
     }

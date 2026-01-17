@@ -546,8 +546,6 @@ export class MemoryFormationSystem implements System {
     }
 
     // PERFORMANCE FIX: Reduced "alwaysRememberEvents" to only truly critical events
-    // Removed frequent events: agent:harvested, resource:gathered, items:deposited, need:critical
-    // These will still be remembered if they meet importance thresholds below
     // NOTE: need:critical removed - caused spam of identical "hunger low" entries
     // Starvation day events go through importance filtering to avoid spam
     const alwaysRememberEvents = [
@@ -557,6 +555,7 @@ export class MemoryFormationSystem implements System {
       'conversation:started',
       'information:shared',
       'agent:sleep_start',
+      'agent:ate',  // Basic survival action - memorable
       'test:event',
       // Divine power events - always memorable
       'divine_power:whisper',
@@ -564,6 +563,12 @@ export class MemoryFormationSystem implements System {
       'divine_power:dream_hint',
       'divine_power:clear_vision',
     ];
+
+    // Give gathering/harvesting events a 10% chance to be remembered (prevents total memory blackout)
+    const sometimesRememberEvents = ['resource:gathered', 'agent:harvested', 'items:deposited'];
+    if (sometimesRememberEvents.includes(eventType) && Math.random() < 0.1) {
+      return true;
+    }
 
     if (alwaysRememberEvents.includes(eventType)) {
       return true;

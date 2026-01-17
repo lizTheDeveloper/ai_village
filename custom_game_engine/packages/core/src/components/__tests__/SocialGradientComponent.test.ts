@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SocialGradientComponent } from '../SocialGradientComponent';
+import type { ResourceType } from '../ResourceComponent';
 
 describe('SocialGradientComponent', () => {
   let component: SocialGradientComponent;
@@ -223,8 +224,9 @@ describe('SocialGradientComponent', () => {
 
     it('should throw error for invalid resource type', () => {
       expect(() => {
+        const invalidResource: unknown = '';
         component.addGradient({
-          resourceType: '' as any,
+          resourceType: invalidResource as ResourceType,
           bearing: 45,
           distance: 30,
           confidence: 0.8,

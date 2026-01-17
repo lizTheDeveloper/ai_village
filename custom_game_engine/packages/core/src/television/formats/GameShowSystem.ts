@@ -13,6 +13,7 @@ import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 // ============================================================================
@@ -198,7 +199,7 @@ export interface ChallengeResponse {
 // ============================================================================
 
 export class GameShowManager {
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
 
   private gameShows: Map<string, GameShow> = new Map();
   private episodes: Map<string, GameShowEpisode> = new Map();
@@ -208,7 +209,7 @@ export class GameShowManager {
   private questionBanks: Map<string, GameChallenge[]> = new Map();
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'GameShowSystem');
   }
 
   // ============================================================================

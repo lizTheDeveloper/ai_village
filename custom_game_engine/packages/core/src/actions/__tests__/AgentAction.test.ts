@@ -85,7 +85,8 @@ describe('AgentAction', () => {
 
     it('should return undefined for unmapped action types', () => {
       // Unknown actions should not default to idle - return undefined
-      const behavior = actionToBehavior({ type: 'unknown_action' as any });
+      const invalidType: unknown = 'unknown_action';
+      const behavior = actionToBehavior({ type: invalidType as string } as AgentAction);
       expect(behavior).toBeUndefined();
     });
   });

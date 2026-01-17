@@ -123,10 +123,12 @@ describe('Tilling Action', () => {
       // This will require implementation to extract position from context
       // For now, test that parseAction returns an action with position field
       const response = "till at position 5,10";
-      const action = parseAction(response) as any;
+      const action = parseAction(response);
 
       expect(action?.type).toBe('till');
-      expect(action?.position).toBeDefined();
+      if (action && action.type === 'till') {
+        expect(action.position).toBeDefined();
+      }
     });
   });
 

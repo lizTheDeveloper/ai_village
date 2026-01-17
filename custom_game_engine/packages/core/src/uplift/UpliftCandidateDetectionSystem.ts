@@ -12,8 +12,8 @@
  * NOT YET INTEGRATED - Standalone implementation for testing
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, Entity } from '../ecs/index.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { UpliftCandidateComponent, type CognitiveMetrics } from '../components/UpliftCandidateComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
@@ -43,51 +43,41 @@ const BASE_GENERATION_ESTIMATES: Record<string, number> = {
   'basic': 100,                // 0.3+ baseline (insects, simple mammals)
 };
 
-export class UpliftCandidateDetectionSystem implements System {
+export class UpliftCandidateDetectionSystem extends BaseSystem {
   readonly id = 'UpliftCandidateDetectionSystem';
   readonly priority = 555;
   readonly requiredComponents = [] as const; // Queries all animals
 
-  private eventBus: EventBus | null = null;
-  private tickCounter = 0;
-  private readonly UPDATE_INTERVAL = 1000; // Every 50 seconds
+  protected readonly throttleInterval = 1000; // Every 50 seconds
 
   // Cache for species population counts
   private speciesPopulationCache: Map<string, number> = new Map();
   private cacheExpiry = 0;
   private readonly CACHE_DURATION = 2000; // 100 seconds
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Only run if consciousness studies tech is unlocked
-    if (!this.isTechnologyUnlocked(world)) return;
+    if (!this.isTechnologyUnlocked(ctx.world)) return;
 
     // Refresh population cache if expired
-    if (this.tickCounter > this.cacheExpiry) {
-      this.refreshPopulationCache(world);
-      this.cacheExpiry = this.tickCounter + this.CACHE_DURATION;
+    if (ctx.tick > this.cacheExpiry) {
+      this.refreshPopulationCache(ctx.world);
+      this.cacheExpiry = ctx.tick + this.CACHE_DURATION;
     }
 
     // Get all animals without UpliftCandidate component
-    const unevaluatedAnimals = world.query()
+    const unevaluatedAnimals = ctx.world.query()
       .with(CT.Animal)
       .with(CT.Species)
       .without(CT.UpliftCandidate)
       .executeEntities();
 
     for (const animal of unevaluatedAnimals) {
-      this.evaluateAnimal(world, animal);
+      this.evaluateAnimal(ctx, animal);
     }
   }
 
-  cleanup(): void {
-    this.eventBus = null;
+  protected onCleanup(): void {
     this.speciesPopulationCache.clear();
   }
 
@@ -122,7 +112,7 @@ export class UpliftCandidateDetectionSystem implements System {
   /**
    * Evaluate an animal for uplift potential
    */
-  private evaluateAnimal(world: World, animal: Entity): void {
+  private evaluateAnimal(ctx: SystemContext, animal: Entity): void {
     const animalComp = animal.getComponent(CT.Animal) as AnimalComponent;
     const species = animal.getComponent(CT.Species) as SpeciesComponent;
 
@@ -175,23 +165,19 @@ export class UpliftCandidateDetectionSystem implements System {
       estimatedGenerations,
       estimatedYears,
       evaluated: true,
-      evaluatedAt: world.tick,
+      evaluatedAt: ctx.tick,
       recommended: upliftPotential >= 50 && populationSize >= EVALUATION_THRESHOLDS.MIN_POPULATION,
     });
 
     (animal as any).addComponent(candidate);
 
     // Emit event
-    this.eventBus?.emit({
-      type: 'uplift_candidate_detected' as any,
-      source: this.id,
-      data: {
-        entityId: animal.id,
-        speciesId: species.speciesId,
-        upliftPotential,
-        preSapient,
-        estimatedGenerations,
-      },
+    this.events.emit('uplift_candidate_detected' as any, {
+      entityId: animal.id,
+      speciesId: species.speciesId,
+      upliftPotential,
+      preSapient,
+      estimatedGenerations,
     });
   }
 
