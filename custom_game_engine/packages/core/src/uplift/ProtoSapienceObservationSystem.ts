@@ -13,8 +13,8 @@
  * NOT YET INTEGRATED - Standalone implementation for testing
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World, Entity } from '../ecs/index.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import {
   ProtoSapienceComponent,
@@ -46,14 +46,12 @@ type ObservationTest =
   | 'communication_pattern'    // Consistent sound/gesture patterns?
   | 'problem_solving';         // Novel problem-solving?
 
-export class ProtoSapienceObservationSystem implements System {
+export class ProtoSapienceObservationSystem extends BaseSystem {
   readonly id = 'ProtoSapienceObservationSystem';
   readonly priority = 562;
   readonly requiredComponents = [CT.Animal] as const;
 
-  private eventBus: EventBus | null = null;
-  private tickCounter = 0;
-  private readonly UPDATE_INTERVAL = 100; // Every 5 seconds
+  protected readonly throttleInterval = 100; // Every 5 seconds
 
   // Track ongoing tests
   private activeTests: Map<string, ObservationTest> = new Map();
@@ -61,31 +59,23 @@ export class ProtoSapienceObservationSystem implements System {
   // Communication pattern tracking
   private observedPatterns: Map<string, Map<string, number>> = new Map();
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Get all active uplift programs
-    const programs = this.getActivePrograms(world);
+    const programs = this.getActivePrograms(ctx.world);
 
     for (const programEntity of programs) {
       const program = programEntity.getComponent(CT.UpliftProgram) as UpliftProgramComponent;
 
       // Get animals in this program's breeding population
-      const animals = this.getProgramAnimals(world, program);
+      const animals = this.getProgramAnimals(ctx.world, program);
 
       for (const animal of animals) {
-        this.observeAnimal(world, animal, program);
+        this.observeAnimal(ctx, animal, program);
       }
     }
   }
 
-  cleanup(): void {
-    this.eventBus = null;
+  protected onCleanup(): void {
     this.activeTests.clear();
     this.observedPatterns.clear();
   }
@@ -93,7 +83,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Observe a single animal for proto-sapient behaviors
    */
-  private observeAnimal(world: World, animal: Entity, program: UpliftProgramComponent): void {
+  private observeAnimal(ctx: SystemContext, animal: Entity, program: UpliftProgramComponent): void {
     // Create or get ProtoSapienceComponent
     let proto: ProtoSapienceComponent;
 
@@ -112,25 +102,25 @@ export class ProtoSapienceObservationSystem implements System {
     }
 
     // Check for behavior emergence based on intelligence
-    this.checkBehaviorEmergence(world, animal, proto, program);
+    this.checkBehaviorEmergence(ctx, animal, proto, program);
 
     // Run behavioral tests periodically
-    if (this.tickCounter % 500 === 0) { // Every 25 seconds
-      this.runBehavioralTests(world, animal, proto);
+    if (ctx.tick % 500 === 0) { // Every 25 seconds
+      this.runBehavioralTests(ctx, animal, proto);
     }
 
     // Update communication patterns
-    this.observeCommunication(world, animal, proto);
+    this.observeCommunication(ctx, animal, proto);
 
     // Check for cultural transmission
-    this.observeCulturalTransmission(world, animal, proto, program);
+    this.observeCulturalTransmission(ctx, animal, proto, program);
   }
 
   /**
    * Check if new behaviors should emerge based on intelligence
    */
   private checkBehaviorEmergence(
-    world: World,
+    ctx: SystemContext,
     animal: Entity,
     proto: ProtoSapienceComponent,
     program: UpliftProgramComponent
@@ -140,17 +130,13 @@ export class ProtoSapienceObservationSystem implements System {
     // Tool use emergence
     if (!proto.usesTools && proto.intelligence >= EMERGENCE_THRESHOLDS.TOOL_USE) {
       proto.usesTools = true;
-      this.recordToolUse(world, animal, proto, 'stick', 'food_extraction');
+      this.recordToolUse(ctx, animal, proto, 'stick', 'food_extraction');
 
-      this.eventBus?.emit({
-        type: 'proto_sapience_milestone' as any,
-        source: this.id,
-        data: {
-          entityId: animal.id,
-          milestone: 'first_tool_use',
-          generation: program.currentGeneration,
-          intelligence: proto.intelligence,
-        },
+      this.events.emit('proto_sapience_milestone' as any, {
+        entityId: animal.id,
+        milestone: 'first_tool_use',
+        generation: program.currentGeneration,
+        intelligence: proto.intelligence,
       });
     }
 
@@ -158,15 +144,11 @@ export class ProtoSapienceObservationSystem implements System {
     if (!proto.createsTools && proto.intelligence >= EMERGENCE_THRESHOLDS.TOOL_CREATION) {
       proto.createsTools = true;
 
-      this.eventBus?.emit({
-        type: 'proto_sapience_milestone' as any,
-        source: this.id,
-        data: {
-          entityId: animal.id,
-          milestone: 'first_tool_creation',
-          generation: program.currentGeneration,
-          intelligence: proto.intelligence,
-        },
+      this.events.emit('proto_sapience_milestone' as any, {
+        entityId: animal.id,
+        milestone: 'first_tool_creation',
+        generation: program.currentGeneration,
+        intelligence: proto.intelligence,
       });
     }
 
@@ -175,15 +157,11 @@ export class ProtoSapienceObservationSystem implements System {
       proto.hasProtocolanguage = true;
       proto.vocabularySize = 5; // Start with 5 basic "words"
 
-      this.eventBus?.emit({
-        type: 'proto_sapience_milestone' as any,
-        source: this.id,
-        data: {
-          entityId: animal.id,
-          milestone: 'proto_language_emergence',
-          generation: program.currentGeneration,
-          intelligence: proto.intelligence,
-        },
+      this.events.emit('proto_sapience_milestone' as any, {
+        entityId: animal.id,
+        milestone: 'proto_language_emergence',
+        generation: program.currentGeneration,
+        intelligence: proto.intelligence,
       });
     }
 
@@ -191,15 +169,11 @@ export class ProtoSapienceObservationSystem implements System {
     if (!proto.abstractThinking && proto.intelligence >= EMERGENCE_THRESHOLDS.ABSTRACT_THINKING) {
       proto.abstractThinking = true;
 
-      this.eventBus?.emit({
-        type: 'proto_sapience_milestone' as any,
-        source: this.id,
-        data: {
-          entityId: animal.id,
-          milestone: 'abstract_thinking',
-          generation: program.currentGeneration,
-          intelligence: proto.intelligence,
-        },
+      this.events.emit('proto_sapience_milestone' as any, {
+        entityId: animal.id,
+        milestone: 'abstract_thinking',
+        generation: program.currentGeneration,
+        intelligence: proto.intelligence,
       });
     }
   }

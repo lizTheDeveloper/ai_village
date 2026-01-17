@@ -357,16 +357,12 @@ export class MidwiferySystem extends BaseSystem {
 
     mother.addComponent(labor);
 
-    this.eventBus?.emit({
-      type: 'midwifery:labor_started',
-      source: mother.id,
-      data: {
-        motherId: mother.id,
-        premature: labor.premature,
-        riskFactors: labor.riskFactors,
-        fetalPosition: labor.fetalPosition,
-      },
-    } as any);
+    this.events.emit('midwifery:labor_started', {
+      motherId: mother.id,
+      premature: labor.premature,
+      riskFactors: labor.riskFactors,
+      fetalPosition: labor.fetalPosition,
+    }, mother.id);
   }
 
   // =========================================================================
@@ -468,15 +464,11 @@ export class MidwiferySystem extends BaseSystem {
     const complication = labor.addComplication(selected);
     complication.onset = currentTick;
 
-    this.eventBus?.emit({
-      type: 'midwifery:complication',
-      source: mother.id,
-      data: {
-        motherId: mother.id,
-        complication: selected,
-        severity: complication.severity,
-      },
-    } as any);
+    this.events.emit('midwifery:complication', {
+      motherId: mother.id,
+      complication: selected,
+      severity: complication.severity,
+    }, mother.id);
   }
 
   /**
@@ -487,8 +479,6 @@ export class MidwiferySystem extends BaseSystem {
     labor: LaborComponent,
     currentTick: Tick
   ): void {
-    if (!this.world) return;
-
     const pregnancy = mother.getComponent<PregnancyComponent>('pregnancy');
     const fatherId = pregnancy?.fatherId ?? '';
     const offspringCount = pregnancy?.expectedOffspringCount ?? 1;
@@ -558,27 +548,19 @@ export class MidwiferySystem extends BaseSystem {
       gestationalAgeWeeks: labor.gestationalAgeWeeks,
     };
 
-    this.eventBus?.emit({
-      type: 'midwifery:birth',
-      source: mother.id,
-      data: outcome,
-    } as any);
+    this.events.emit('midwifery:birth', outcome, mother.id);
 
     // Also emit the standard birth event for canon tracking
-    this.eventBus?.emit({
-      type: 'birth',
-      source: mother.id,
-      data: {
-        motherId: mother.id,
-        fatherId,
-        childId: childIds[0],
-        childIds,
-        gestationalAge: labor.gestationalAgeWeeks,
-        birthWeight: labor.premature ? 'low' : 'normal',
-        complications: labor.complications.map(c => c.type),
-        attendedBy: labor.attendingMidwifeId,
-      },
-    } as any);
+    this.events.emit('birth', {
+      motherId: mother.id,
+      fatherId,
+      childId: childIds[0],
+      childIds,
+      gestationalAge: labor.gestationalAgeWeeks,
+      birthWeight: labor.premature ? 'low' : 'normal',
+      complications: labor.complications.map(c => c.type),
+      attendedBy: labor.attendingMidwifeId,
+    }, mother.id);
 
     // Remove pregnancy and labor components
     mother.removeComponent('pregnancy');
@@ -595,8 +577,6 @@ export class MidwiferySystem extends BaseSystem {
     gestationalAgeWeeks: number,
     bornAt: Tick
   ): Entity | null {
-    if (!this.world) return null;
-
     // Get father entity
     const father = this.world.getEntity(fatherId);
 
@@ -690,25 +670,17 @@ export class MidwiferySystem extends BaseSystem {
     labor: LaborComponent,
     cause: string
   ): void {
-    this.eventBus?.emit({
-      type: 'midwifery:maternal_death',
-      source: mother.id,
-      data: {
-        motherId: mother.id,
-        cause,
-        complications: labor.complications.map(c => c.type),
-      },
-    } as any);
+    this.events.emit('midwifery:maternal_death', {
+      motherId: mother.id,
+      cause,
+      complications: labor.complications.map(c => c.type),
+    }, mother.id);
 
     // Emit death event
-    this.eventBus?.emit({
-      type: 'death',
-      source: mother.id,
-      data: {
-        entityId: mother.id,
-        cause: `childbirth_${cause}`,
-      },
-    } as any);
+    this.events.emit('death', {
+      entityId: mother.id,
+      cause: `childbirth_${cause}`,
+    }, mother.id);
 
     // The actual death handling should be done by the death system
   }
@@ -717,23 +689,15 @@ export class MidwiferySystem extends BaseSystem {
    * Handle infant death
    */
   private handleInfantDeath(child: Entity, cause: string): void {
-    this.eventBus?.emit({
-      type: 'midwifery:infant_death',
-      source: child.id,
-      data: {
-        childId: child.id,
-        cause,
-      },
-    } as any);
+    this.events.emit('midwifery:infant_death', {
+      childId: child.id,
+      cause,
+    }, child.id);
 
-    this.eventBus?.emit({
-      type: 'death',
-      source: child.id,
-      data: {
-        entityId: child.id,
-        cause: `stillbirth_${cause}`,
-      },
-    } as any);
+    this.events.emit('death', {
+      entityId: child.id,
+      cause: `stillbirth_${cause}`,
+    }, child.id);
   }
 
   // =========================================================================
@@ -766,11 +730,7 @@ export class MidwiferySystem extends BaseSystem {
       if (updatedPostpartum.fullyRecovered) {
         impl.removeComponent('postpartum');
 
-        this.eventBus?.emit({
-          type: 'midwifery:recovery_complete',
-          source: entity.id,
-          data: { motherId: entity.id },
-        } as any);
+        this.events.emit('midwifery:recovery_complete', { motherId: entity.id }, entity.id);
       }
     }
   }
@@ -839,11 +799,7 @@ export class MidwiferySystem extends BaseSystem {
       if (updatedInfant.hasMaturated()) {
         impl.removeComponent('infant');
 
-        this.eventBus?.emit({
-          type: 'midwifery:infant_matured',
-          source: entity.id,
-          data: { childId: entity.id, ageDays: infant.ageDays },
-        } as any);
+        this.events.emit('midwifery:infant_matured', { childId: entity.id, ageDays: infant.ageDays }, entity.id);
       }
     }
   }
@@ -880,8 +836,6 @@ export class MidwiferySystem extends BaseSystem {
    * Have a midwife attend a birth
    */
   public attendBirth(midwifeId: string, motherId: string): boolean {
-    if (!this.world) return false;
-
     const mother = this.world.getEntity(motherId);
     if (!mother) return false;
 
@@ -896,15 +850,11 @@ export class MidwiferySystem extends BaseSystem {
 
     labor.setAttendance(midwifeId, skillLevel);
 
-    this.eventBus?.emit({
-      type: 'midwifery:midwife_attending',
-      source: midwifeId,
-      data: {
-        midwifeId,
-        motherId,
-        skillLevel,
-      },
-    } as any);
+    this.events.emit('midwifery:midwife_attending', {
+      midwifeId,
+      motherId,
+      skillLevel,
+    }, midwifeId);
 
     return true;
   }
@@ -913,8 +863,6 @@ export class MidwiferySystem extends BaseSystem {
    * Perform a prenatal checkup
    */
   public prenatalCheckup(midwifeId: string, motherId: string): PrenatalCheckup | null {
-    if (!this.world) return null;
-
     const mother = this.world.getEntity(motherId);
     if (!mother) return null;
 
@@ -985,15 +933,11 @@ export class MidwiferySystem extends BaseSystem {
       return updated;
     });
 
-    this.eventBus?.emit({
-      type: 'midwifery:prenatal_checkup',
-      source: midwifeId,
-      data: {
-        midwifeId,
-        motherId,
-        checkup,
-      },
-    } as any);
+    this.events.emit('midwifery:prenatal_checkup', {
+      midwifeId,
+      motherId,
+      checkup,
+    }, midwifeId);
 
     return checkup;
   }
@@ -1006,8 +950,6 @@ export class MidwiferySystem extends BaseSystem {
     motherId: string,
     complicationType: BirthComplication
   ): boolean {
-    if (!this.world) return false;
-
     const mother = this.world.getEntity(motherId);
     if (!mother) return false;
 
@@ -1021,16 +963,12 @@ export class MidwiferySystem extends BaseSystem {
 
     const success = labor.treatComplication(complicationType, midwifeId, skillLevel, hasSupplies);
 
-    this.eventBus?.emit({
-      type: 'midwifery:complication_treated',
-      source: midwifeId,
-      data: {
-        midwifeId,
-        motherId,
-        complication: complicationType,
-        success,
-      },
-    } as any);
+    this.events.emit('midwifery:complication_treated', {
+      midwifeId,
+      motherId,
+      complication: complicationType,
+      success,
+    }, midwifeId);
 
     return success;
   }
@@ -1039,8 +977,6 @@ export class MidwiferySystem extends BaseSystem {
    * Assign a wet nurse to an infant
    */
   public assignWetNurse(wetNurseId: string, infantId: string): boolean {
-    if (!this.world) return false;
-
     const infant = this.world.getEntity(infantId);
     const wetNurse = this.world.getEntity(wetNurseId);
 

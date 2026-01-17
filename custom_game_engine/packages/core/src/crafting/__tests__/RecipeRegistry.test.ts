@@ -36,13 +36,13 @@ describe('RecipeRegistry', () => {
     });
 
     it('should throw when registering recipe with missing required field', () => {
-      const invalidRecipe = {
+      const invalidRecipe: Omit<Recipe, 'category' | 'description' | 'ingredients' | 'output' | 'craftingTime' | 'xpGain' | 'stationRequired' | 'skillRequirements' | 'researchRequirements'> = {
         id: 'incomplete',
         name: 'Incomplete Recipe'
         // Missing ingredients, output, etc.
-      } as any;
+      };
 
-      expect(() => registry.registerRecipe(invalidRecipe)).toThrow('missing required field');
+      expect(() => registry.registerRecipe(invalidRecipe as Recipe)).toThrow('missing required field');
     });
 
     it('should throw when registering duplicate recipe ID', () => {

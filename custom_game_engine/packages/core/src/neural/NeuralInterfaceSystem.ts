@@ -11,7 +11,7 @@
  * tried to read the terms of service." - Anonymous Sysadmin
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -335,26 +335,18 @@ export const BCI_PAPER_TITLES: string[] = [
  * Neural Interface System
  * Manages BCIs, VR sessions, and mind uploads
  */
-export class NeuralInterfaceSystem implements System {
+export class NeuralInterfaceSystem extends BaseSystem {
   public readonly id: SystemId = 'neural_interface';
   public readonly priority: number = 165;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 50;
 
   // Active VR sessions
   private vrSessions: Map<string, VRSession> = new Map();
 
   // Uploaded minds
   private uploadedMinds: Map<string, UploadedMind> = new Map();
-
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 50;
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
 
   /**
    * Install a neural implant in an agent
@@ -381,18 +373,12 @@ export class NeuralInterfaceSystem implements System {
       sideEffects: [],
     };
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'neural:implant_installed' as any,
-        source: 'neural-interface-system',
-        data: {
-          agentId: agentEntity.id,
-          implantId: implant.id,
-          implantType,
-          model: implant.model,
-        },
-      });
-    }
+    this.events.emit('neural:implant_installed', {
+      agentId: agentEntity.id,
+      implantId: implant.id,
+      implantType,
+      model: implant.model,
+    }, agentEntity.id);
 
     return implant;
   }
@@ -428,19 +414,13 @@ export class NeuralInterfaceSystem implements System {
 
     this.vrSessions.set(session.id, session);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:session_started' as any,
-        source: 'neural-interface-system',
-        data: {
-          sessionId: session.id,
-          environment,
-          hostId: hostEntity.id,
-          participantCount: session.participantIds.length,
-          timeDilation: session.timeDilation,
-        },
-      });
-    }
+    this.events.emit('vr:session_started', {
+      sessionId: session.id,
+      environment,
+      hostId: hostEntity.id,
+      participantCount: session.participantIds.length,
+      timeDilation: session.timeDilation,
+    }, hostEntity.id);
 
     return session;
   }
@@ -454,17 +434,11 @@ export class NeuralInterfaceSystem implements System {
 
     session.endedAt = world.tick;
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:session_ended' as any,
-        source: 'neural-interface-system',
-        data: {
-          sessionId,
-          duration: session.endedAt - session.startedAt,
-          participantCount: session.participantIds.length,
-        },
-      });
-    }
+    this.events.emit('vr:session_ended', {
+      sessionId,
+      duration: session.endedAt - session.startedAt,
+      participantCount: session.participantIds.length,
+    }, session.hostId);
 
     this.vrSessions.delete(sessionId);
   }
@@ -496,18 +470,12 @@ export class NeuralInterfaceSystem implements System {
 
     this.uploadedMinds.set(mind.id, mind);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'neural:mind_uploaded' as any,
-        source: 'neural-interface-system',
-        data: {
-          mindId: mind.id,
-          originalAgentId: agentEntity.id,
-          originalName: mind.originalName,
-          substrate: targetSubstrate,
-        },
-      });
-    }
+    this.events.emit('neural:mind_uploaded', {
+      mindId: mind.id,
+      originalAgentId: agentEntity.id,
+      originalName: mind.originalName,
+      substrate: targetSubstrate,
+    }, agentEntity.id);
 
     return mind;
   }
@@ -533,17 +501,11 @@ export class NeuralInterfaceSystem implements System {
 
     this.uploadedMinds.set(fork.id, fork);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'neural:mind_forked' as any,
-        source: 'neural-interface-system',
-        data: {
-          originalMindId: mindId,
-          forkMindId: fork.id,
-          totalForks: original.forkCount,
-        },
-      });
-    }
+    this.events.emit('neural:mind_forked', {
+      originalMindId: mindId,
+      forkMindId: fork.id,
+      totalForks: original.forkCount,
+    });
 
     return fork;
   }
@@ -558,17 +520,11 @@ export class NeuralInterfaceSystem implements System {
     proficiency: number
   ): boolean {
     // This would integrate with actual skill system
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'neural:skill_downloaded' as any,
-        source: 'neural-interface-system',
-        data: {
-          agentId: agentEntity.id,
-          skillName,
-          proficiency,
-        },
-      });
-    }
+    this.events.emit('neural:skill_downloaded', {
+      agentId: agentEntity.id,
+      skillName,
+      proficiency,
+    }, agentEntity.id);
     return true;
   }
 
@@ -584,16 +540,11 @@ export class NeuralInterfaceSystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    if (world.tick - this.lastUpdateTick < NeuralInterfaceSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update uploaded minds
     for (const mind of this.uploadedMinds.values()) {
       // Accumulate subjective runtime based on time rate
-      mind.subjectiveRuntime += NeuralInterfaceSystem.UPDATE_INTERVAL * mind.subjectiveTimeRate;
+      mind.subjectiveRuntime += this.throttleInterval * mind.subjectiveTimeRate;
 
       // Existential crisis slowly increases over time
       if (mind.existentialCrisisLevel < 1) {
@@ -602,18 +553,12 @@ export class NeuralInterfaceSystem implements System {
 
       // Emit periodic existential thoughts for high-crisis minds
       if (mind.existentialCrisisLevel > 0.7 && Math.random() < 0.01) {
-        if (this.eventBus) {
-          this.eventBus.emit({
-            type: 'neural:existential_thought' as any,
-            source: 'neural-interface-system',
-            data: {
-              mindId: mind.id,
-              originalName: mind.originalName,
-              thought: this.getExistentialThought(),
-              crisisLevel: mind.existentialCrisisLevel,
-            },
-          });
-        }
+        this.events.emit('neural:existential_thought', {
+          mindId: mind.id,
+          originalName: mind.originalName,
+          thought: this.getExistentialThought(),
+          crisisLevel: mind.existentialCrisisLevel,
+        });
       }
     }
   }

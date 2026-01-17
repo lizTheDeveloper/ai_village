@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TrustNetworkComponent } from '../TrustNetworkComponent';
+import { TrustNetworkComponent, VerificationResult } from '../TrustNetworkComponent';
 
 describe('TrustNetworkComponent', () => {
   let component: TrustNetworkComponent;
@@ -119,7 +119,8 @@ describe('TrustNetworkComponent', () => {
 
     it('should throw error for invalid verification result type', () => {
       expect(() => {
-        component.recordVerification('agent-123', 'invalid' as any, 100);
+        const invalidType: unknown = 'invalid';
+        component.recordVerification('agent-123', invalidType as VerificationResult, 100);
       }).toThrow('verification result');
     });
 

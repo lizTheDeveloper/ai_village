@@ -13,6 +13,7 @@ import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 // ============================================================================
@@ -115,12 +116,12 @@ export interface FieldReporter {
 // ============================================================================
 
 export class NewsDeskManager {
-  private eventBus: EventBus | null = null;
+  private events!: SystemEventManager;
   private desks: Map<string, NewsDesk> = new Map();
   private pendingStories: NewsStory[] = [];
 
   setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
+    this.events = new SystemEventManager(eventBus, 'NewsroomSystem');
   }
 
   // ============================================================================
@@ -212,17 +213,13 @@ export class NewsDeskManager {
     reporter.assignedStoryId = storyId;
     story.fieldReporterId = agentId;
 
-    this.eventBus?.emit({
-      type: 'tv:news:reporter_dispatched' as any,
-      source: desk.showId,
-      data: {
-        deskId,
-        reporterId: agentId,
-        reporterName: reporter.name,
-        storyId,
-        headline: story.headline,
-      },
-    });
+    this.events.emitGeneric('tv:news:reporter_dispatched', {
+      deskId,
+      reporterId: agentId,
+      reporterName: reporter.name,
+      storyId,
+      headline: story.headline,
+    }, desk.showId);
 
     return true;
   }
@@ -247,16 +244,12 @@ export class NewsDeskManager {
 
     reporter.status = 'reporting_live';
 
-    this.eventBus?.emit({
-      type: 'tv:news:live_report_started' as any,
-      source: desk.showId,
-      data: {
-        deskId,
-        reporterId: agentId,
-        reporterName: reporter.name,
-        storyId: reporter.assignedStoryId,
-      },
-    });
+    this.events.emitGeneric('tv:news:live_report_started', {
+      deskId,
+      reporterId: agentId,
+      reporterName: reporter.name,
+      storyId: reporter.assignedStoryId,
+    }, desk.showId);
 
     return true;
   }
@@ -290,16 +283,12 @@ export class NewsDeskManager {
 
     this.pendingStories.push(fullStory);
 
-    this.eventBus?.emit({
-      type: 'tv:news:story_submitted' as any,
-      source: 'newsroom',
-      data: {
-        storyId: fullStory.id,
-        headline: fullStory.headline,
-        category: fullStory.category,
-        priority: fullStory.priority,
-      },
-    });
+    this.events.emitGeneric('tv:news:story_submitted', {
+      storyId: fullStory.id,
+      headline: fullStory.headline,
+      category: fullStory.category,
+      priority: fullStory.priority,
+    }, 'newsroom');
 
     return fullStory;
   }
@@ -373,16 +362,12 @@ export class NewsDeskManager {
     desk.segmentSchedule = this.generateSegmentSchedule(desk);
     desk.currentSegment = desk.segmentSchedule[0] ?? null;
 
-    this.eventBus?.emit({
-      type: 'tv:news:broadcast_started' as any,
-      source: desk.showId,
-      data: {
-        deskId,
-        stationId: desk.stationId,
-        anchors: desk.anchors,
-        storyCount: desk.storyQueue.length,
-      },
-    });
+    this.events.emitGeneric('tv:news:broadcast_started', {
+      deskId,
+      stationId: desk.stationId,
+      anchors: desk.anchors,
+      storyCount: desk.storyQueue.length,
+    }, desk.showId);
 
     return true;
   }
@@ -474,16 +459,12 @@ export class NewsDeskManager {
 
     desk.currentSegment = desk.segmentSchedule[nextIndex] ?? null;
 
-    this.eventBus?.emit({
-      type: 'tv:news:segment_changed' as any,
-      source: desk.showId,
-      data: {
-        deskId,
-        segmentId: desk.currentSegment?.id,
-        segmentName: desk.currentSegment?.name,
-        segmentType: desk.currentSegment?.type,
-      },
-    });
+    this.events.emitGeneric('tv:news:segment_changed', {
+      deskId,
+      segmentId: desk.currentSegment?.id,
+      segmentName: desk.currentSegment?.name,
+      segmentType: desk.currentSegment?.type,
+    }, desk.showId);
 
     return desk.currentSegment;
   }
@@ -504,16 +485,12 @@ export class NewsDeskManager {
 
     const duration = currentTick - (desk.broadcastStartTick ?? currentTick);
 
-    this.eventBus?.emit({
-      type: 'tv:news:broadcast_ended' as any,
-      source: desk.showId,
-      data: {
-        deskId,
-        stationId: desk.stationId,
-        storiesCovered: desk.coveredStories.length,
-        durationTicks: duration,
-      },
-    });
+    this.events.emitGeneric('tv:news:broadcast_ended', {
+      deskId,
+      stationId: desk.stationId,
+      storiesCovered: desk.coveredStories.length,
+      durationTicks: duration,
+    }, desk.showId);
 
     desk.broadcastStartTick = undefined;
     desk.coveredStories = [];
@@ -528,7 +505,7 @@ export class NewsDeskManager {
   cleanup(): void {
     this.desks.clear();
     this.pendingStories = [];
-    this.eventBus = null;
+    this.events.cleanup();
   }
 }
 

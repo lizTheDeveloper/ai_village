@@ -14,7 +14,7 @@
  *   - Dr. Marcus Webb, Holographic Medical School
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -339,12 +339,12 @@ export const TRAINING_ACHIEVEMENTS: Array<{
  * VR Training System
  * Manages virtual reality training programs and sessions
  */
-export class VRTrainingSystem implements System {
+export class VRTrainingSystem extends BaseSystem {
   public readonly id: SystemId = 'vr_training';
   public readonly priority: number = 166;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 20;
 
   // Registered training programs
   private programs: Map<string, TrainingProgram> = new Map();
@@ -352,17 +352,10 @@ export class VRTrainingSystem implements System {
   // Active training sessions
   private sessions: Map<string, TrainingSession> = new Map();
 
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 20;
-
   constructor() {
+    super();
     // Register default training programs
     this.registerDefaultPrograms();
-  }
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
   }
 
   /**
@@ -438,19 +431,13 @@ export class VRTrainingSystem implements System {
 
     this.programs.set(program.id, program);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:program_created' as any,
-        source: 'vr-training-system',
-        data: {
-          programId: program.id,
-          name,
-          category,
-          difficulty,
-          creatorId: creatorEntity.id,
-        },
-      });
-    }
+    this.events.emit('vr:program_created', {
+      programId: program.id,
+      name,
+      category,
+      difficulty,
+      creatorId: creatorEntity.id,
+    }, creatorEntity.id);
 
     return program;
   }
@@ -485,19 +472,13 @@ export class VRTrainingSystem implements System {
 
     this.sessions.set(session.id, session);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:session_started' as any,
-        source: 'vr-training-system',
-        data: {
-          sessionId: session.id,
-          programId,
-          programName: program.name,
-          traineeId: traineeEntity.id,
-          difficulty: program.difficulty,
-        },
-      });
-    }
+    this.events.emit('vr:session_started', {
+      sessionId: session.id,
+      programId,
+      programName: program.name,
+      traineeId: traineeEntity.id,
+      difficulty: program.difficulty,
+    }, traineeEntity.id);
 
     return session;
   }
@@ -523,18 +504,12 @@ export class VRTrainingSystem implements System {
     ];
     session.instructorNotes.push(notes[Math.floor(Math.random() * notes.length)]!);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:simulated_death' as any,
-        source: 'vr-training-system',
-        data: {
-          sessionId,
-          traineeId: session.traineeId,
-          causeOfDeath,
-          deathCount: session.simulatedDeaths,
-        },
-      });
-    }
+    this.events.emit('vr:simulated_death', {
+      sessionId,
+      traineeId: session.traineeId,
+      causeOfDeath,
+      deathCount: session.simulatedDeaths,
+    }, session.traineeId);
   }
 
   /**
@@ -578,20 +553,14 @@ export class VRTrainingSystem implements System {
       }
     }
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'vr:session_completed' as any,
-        source: 'vr-training-system',
-        data: {
-          sessionId,
-          traineeId: session.traineeId,
-          programId: session.programId,
-          performanceRating,
-          simulatedDeaths: session.simulatedDeaths,
-          achievements: achievements.map(a => a.id),
-        },
-      });
-    }
+    this.events.emit('vr:session_completed', {
+      sessionId,
+      traineeId: session.traineeId,
+      programId: session.programId,
+      performanceRating,
+      simulatedDeaths: session.simulatedDeaths,
+      achievements: achievements.map(a => a.id),
+    }, session.traineeId);
 
     this.sessions.delete(sessionId);
     return achievements;
@@ -612,12 +581,7 @@ export class VRTrainingSystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    if (world.tick - this.lastUpdateTick < VRTrainingSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update active sessions
     for (const session of this.sessions.values()) {
       const program = this.programs.get(session.programId);
@@ -625,7 +589,7 @@ export class VRTrainingSystem implements System {
 
       // Accumulate simulated time
       session.simulatedTimeElapsed +=
-        VRTrainingSystem.UPDATE_INTERVAL * program.timeDilation;
+        this.throttleInterval * program.timeDilation;
 
       // Random skill progress
       for (const skill of program.skills) {
