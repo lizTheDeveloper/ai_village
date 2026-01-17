@@ -3,7 +3,7 @@ import { WorldImpl, type Entity } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { HarvestActionHandler } from '../../actions/HarvestActionHandler';
 import { createInventoryComponent, getItemCount, removeFromInventory, type InventoryComponent } from '../../components/InventoryComponent';
-import { createSkillsComponent, recordTaskCompletion, type SkillsComponent } from '../../components/SkillsComponent';
+import { createSkillsComponent, recordTaskCompletion, type SkillsComponent, type SkillLevel } from '../../components/SkillsComponent';
 import { PlantComponent } from '../../components/PlantComponent';
 import { createPositionComponent } from '../../components/PositionComponent';
 import type { Action } from '../../actions/Action.js';

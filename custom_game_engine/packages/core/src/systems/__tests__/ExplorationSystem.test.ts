@@ -222,8 +222,9 @@ describe('ExplorationSystem', () => {
       const explorationState = createExplorationStateComponent({
         explorationRadius: 64,
       });
-      // Set invalid mode directly
-      (explorationState as any).mode = 'invalid';
+      // Set invalid mode directly - using unknown pattern for type safety
+      const invalidMode: unknown = 'invalid';
+      explorationState.mode = invalidMode as 'frontier' | 'spiral' | 'none';
       entityImpl.addComponent(explorationState);
 
       expect(() => {
