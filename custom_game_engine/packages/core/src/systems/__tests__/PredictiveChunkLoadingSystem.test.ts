@@ -101,10 +101,10 @@ describe('PredictiveChunkLoadingSystem', () => {
     const dirX = 1;
     const dirY = 0;
 
-    const perpX = -dirY; // = 0
+    const perpX = -dirY; // = 0 (or -0 in JavaScript)
     const perpY = dirX;  // = 1
 
-    expect(perpX).toBe(0);
+    expect(Math.abs(perpX)).toBe(0); // Use abs to handle -0 vs +0
     expect(perpY).toBe(1);
 
     // For direction (0.6, 0.8), perpendicular is (-0.8, 0.6)

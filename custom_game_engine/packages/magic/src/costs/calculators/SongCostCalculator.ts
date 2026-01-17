@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /**
  * Cost calculator for the Song/Bardic magic paradigm.
