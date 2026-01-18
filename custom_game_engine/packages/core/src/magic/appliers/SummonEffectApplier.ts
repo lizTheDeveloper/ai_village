@@ -16,8 +16,6 @@ import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
-import type { EntityImpl } from '../../ecs/EntityImpl.js';
-import type { WorldImpl } from '../../ecs/WorldImpl.js';
 
 /**
  * SummonEffectApplier implementation.
@@ -95,8 +93,9 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        // Cast to EntityImpl: Entity interface doesn't expose mutation methods
-        (summonedEntity as EntityImpl).addComponent(positionComponent);
+        // Architectural note: Entity interface doesn't expose addComponent for readonly access pattern
+        // EntityImpl has the mutation methods - this cast is required for entity modification
+        (summonedEntity as { addComponent: (c: any) => void }).addComponent(positionComponent);
 
         // Set owner if controllable
         if (effect.controllable) {
@@ -187,8 +186,9 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         // Check if entity still exists before destroying
         const entity = world.getEntity(summonId);
         if (entity) {
-          // Cast to WorldImpl: World interface doesn't expose destroyEntity method
-          (world as WorldImpl).destroyEntity(summonId, 'summon_expired');
+          // Architectural note: World interface doesn't expose destroyEntity for readonly access pattern
+          // WorldImpl has the mutation methods - this cast is required for entity destruction
+          (world as { destroyEntity: (id: string, reason: string) => void }).destroyEntity(summonId, 'summon_expired');
         }
       } catch (error) {
         // Entity might have already been destroyed - that's fine

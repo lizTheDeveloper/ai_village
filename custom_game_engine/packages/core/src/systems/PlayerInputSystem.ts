@@ -28,6 +28,7 @@ export class PlayerInputSystem extends BaseSystem {
   public readonly id = 'player_input' as const;
   public readonly priority = 4; // Very high priority - run before PossessionSystem
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical player responsiveness
 
   private keysPressed: Set<string> = new Set();
   private mouseClick: { x: number; y: number; button: number } | null = null;

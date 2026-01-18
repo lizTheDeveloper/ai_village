@@ -22,6 +22,7 @@ import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 import { createDamageEffect } from '../SpellEffect.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { EquipmentSlotsComponent } from '../../components/EquipmentSlotsComponent.js';
 import type { ArmorTrait } from '../../items/traits/ArmorTrait.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
@@ -296,10 +297,12 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
           if (itemDef && itemDef.traits?.armor) {
             const armorTrait = itemDef.traits.armor as ArmorTrait;
             // Type guard for resistances - they may not exist on all armor
-            const resistance = armorTrait.resistances && damageType in armorTrait.resistances
-              ? armorTrait.resistances[damageType]
-              : 0;
-            totalResistance += resistance;
+            if (armorTrait.resistances) {
+              const resistanceValue = armorTrait.resistances[damageType];
+              if (resistanceValue !== undefined) {
+                totalResistance += resistanceValue;
+              }
+            }
           }
         }
       }

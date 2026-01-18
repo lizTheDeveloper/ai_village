@@ -1642,6 +1642,53 @@ export interface GameEventMap {
     reason: string;
   };
 
+  // === Squadron Events (Ship-Fleet Hierarchy) ===
+  /** Ship joined a squadron */
+  'squadron:ship_joined': {
+    squadronId: string;
+    shipId: string;
+  };
+
+  /** Ship left a squadron */
+  'squadron:ship_left': {
+    squadronId: string;
+    shipId: string;
+  };
+
+  /** Ship missing from squadron */
+  'squadron:ship_missing': {
+    squadronId: string;
+    missingShipId: string;
+  };
+
+  /** Squadron disbanding (too few ships) */
+  'squadron:disbanding': {
+    squadronId: string;
+    reason: string;
+    remainingShips: number;
+  };
+
+  /** Squadron formed */
+  'squadron:formed': {
+    squadronId: string;
+    name: string;
+    shipIds: string[];
+    commanderId?: string;
+  };
+
+  /** Squadron disbanded */
+  'squadron:disbanded': {
+    squadronId: string;
+    reason: string;
+  };
+
+  /** Squadron lost a ship in combat/accident */
+  'squadron:ship_lost': {
+    squadronId: string;
+    shipId: string;
+    reason: 'combat' | 'accident' | 'decoherence' | 'unknown';
+  };
+
   // === Action Events (additional) ===
   'action:fertilize': {
     x: number;

@@ -56,8 +56,7 @@ export class TemperatureSystem extends BaseSystem {
    * @see StateMutatorSystem - handles batched health damage from temperature
    */
   public readonly dependsOn = ['time', 'weather', 'state_mutator'] as const;
-
-  // No throttle needed - use parent's default (every tick)
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds for responsive temperature changes
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
   private readonly BASE_TEMP = WORLD_TEMP_BASE; // Default world temperature in °C

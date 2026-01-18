@@ -1010,6 +1010,7 @@ export class AcademicPaperSystem extends BaseSystem {
   readonly id = 'AcademicPaperSystem';
   readonly priority = 56; // Between ResearchSystem (55) and InventorFameSystem (54)
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds for paper processing
 
   private manager: AcademicPaperManager = new AcademicPaperManager();
   private tickCounter = 0;

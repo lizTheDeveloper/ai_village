@@ -41,7 +41,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const appliedValues: Record<string, number | string> = {};
+    const appliedValues: Record<string, number> = {};
 
     // Store original form for restoration
     // Note: Using type guard pattern since appearance component structure is dynamic

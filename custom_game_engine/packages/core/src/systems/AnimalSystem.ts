@@ -20,7 +20,8 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 export class AnimalSystem extends BaseSystem {
   public readonly id: SystemId = CT.Animal;
   public readonly priority: number = 15;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal, CT.Position];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second for animal updates
 
   /**
    * Systems that must run before this one.

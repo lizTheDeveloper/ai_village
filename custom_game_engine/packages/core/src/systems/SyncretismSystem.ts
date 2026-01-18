@@ -92,6 +92,7 @@ export class SyncretismSystem extends BaseSystem {
   public readonly id = 'SyncretismSystem';
   public readonly priority = 77;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 200; // Every 10 seconds (VERY_SLOW)
 
   private config: SyncretismConfig;
   private syncretisms: Map<string, SyncretismData> = new Map();

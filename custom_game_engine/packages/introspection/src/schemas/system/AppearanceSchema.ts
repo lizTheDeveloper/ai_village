@@ -215,17 +215,28 @@ export const AppearanceSchema = autoRegister(
 
     validate: (data: unknown): data is AppearanceComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'appearance' &&
-        typeof comp.species === 'string' &&
-        typeof comp.gender === 'string' &&
-        typeof comp.hairColor === 'string' &&
-        typeof comp.skinTone === 'string' &&
-        typeof comp.eyeColor === 'string' &&
-        typeof comp.build === 'string' &&
-        typeof comp.clothingType === 'string'
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in comp) || comp.type !== 'appearance') return false;
+
+      // Check required string fields
+      if (!('species' in comp) || typeof comp.species !== 'string') return false;
+      if (!('gender' in comp) || typeof comp.gender !== 'string') return false;
+      if (!('hairColor' in comp) || typeof comp.hairColor !== 'string') return false;
+      if (!('skinTone' in comp) || typeof comp.skinTone !== 'string') return false;
+      if (!('eyeColor' in comp) || typeof comp.eyeColor !== 'string') return false;
+      if (!('build' in comp) || typeof comp.build !== 'string') return false;
+      if (!('clothingType' in comp) || typeof comp.clothingType !== 'string') return false;
+      if (!('spriteStatus' in comp) || typeof comp.spriteStatus !== 'string') return false;
+
+      // Check required numeric fields
+      if (!('height' in comp) || typeof comp.height !== 'number') return false;
+
+      // Check optional fields
+      if ('spriteFolderId' in comp && comp.spriteFolderId !== undefined && typeof comp.spriteFolderId !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => ({
