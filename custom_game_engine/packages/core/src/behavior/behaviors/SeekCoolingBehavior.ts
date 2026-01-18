@@ -68,7 +68,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
     interface TemperatureComponent {
-      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold' | 'warm';
     }
     const temperature = entity.getComponent(ComponentType.Temperature) as TemperatureComponent | undefined;
 
@@ -636,7 +636,7 @@ const MIN_ESCAPE_DISTANCE = 20; // Minimum distance before picking new escape di
  */
 export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
   interface TemperatureComponent {
-    state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+    state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold' | 'warm';
   }
   const temperature = ctx.getComponent(CT.Temperature) as TemperatureComponent | undefined;
 

@@ -246,19 +246,22 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
 
     // Apply shield/ward to target's magic component
     // Create magic component if it doesn't exist (defensive programming)
-    let magic = target.components.get('magic') as any;
-    if (!magic) {
-      magic = {
-        type: 'magic',
+    let magic = target.components.get('magic');
+    if (!magic || magic.type !== 'magic') {
+      const newMagic = {
+        type: 'magic' as const,
         protectionShields: [],
         activeEffects: [],
       };
-      world.addComponent(target.id, magic);
+      world.addComponent(target.id, newMagic);
+      magic = newMagic;
     }
 
     // Store protection shield data
-    if (!magic.protectionShields) {
-      magic.protectionShields = [];
+    const magicRecord = magic as Record<string, unknown>;
+    const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
+    if (!shields) {
+      magicRecord.protectionShields = [];
     }
 
     const shieldData = {
@@ -274,11 +277,14 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };
 
-    magic.protectionShields.push(shieldData);
+    ((magicRecord.protectionShields as Array<Record<string, unknown>>)).push(shieldData);
 
     // Add to active effects list for tracking
-    if (!magic.activeEffects.includes(effect.id)) {
-      magic.activeEffects.push(effect.id);
+    const activeEffects = magicRecord.activeEffects as string[] | undefined;
+    if (activeEffects && !activeEffects.includes(effect.id)) {
+      activeEffects.push(effect.id);
+    } else if (!activeEffects) {
+      magicRecord.activeEffects = [effect.id];
     }
 
     return {
@@ -302,30 +308,39 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     target: Entity,
     _world: World
   ): void {
-    const magic = target.components.get('magic') as any;
-    if (!magic || !magic.protectionShields) {
+    const magic = target.components.get('magic');
+    if (!magic || magic.type !== 'magic') {
+      return;
+    }
+
+    const magicRecord = magic as Record<string, unknown>;
+    const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
+    if (!shields) {
       return;
     }
 
     // Find and remove the shield by effect ID and applied time
-    const index = magic.protectionShields.findIndex(
-      (shield: any) =>
+    const index = shields.findIndex(
+      (shield) =>
         shield.effectId === activeEffect.effectId &&
         shield.appliedAt === activeEffect.appliedAt
     );
 
     if (index !== -1) {
-      magic.protectionShields.splice(index, 1);
+      shields.splice(index, 1);
     }
 
     // Remove from active effects list if no more shields with this effect ID
-    const hasMore = magic.protectionShields.some(
-      (shield: any) => shield.effectId === activeEffect.effectId
+    const hasMore = shields.some(
+      (shield) => shield.effectId === activeEffect.effectId
     );
     if (!hasMore) {
-      const effectIndex = magic.activeEffects.indexOf(activeEffect.effectId);
-      if (effectIndex !== -1) {
-        magic.activeEffects.splice(effectIndex, 1);
+      const activeEffects = magicRecord.activeEffects as string[] | undefined;
+      if (activeEffects) {
+        const effectIndex = activeEffects.indexOf(activeEffect.effectId);
+        if (effectIndex !== -1) {
+          activeEffects.splice(effectIndex, 1);
+        }
       }
     }
   }
@@ -358,7 +373,7 @@ export function registerStandardAppliers(): void {
   const executor = SpellEffectExecutor.getInstance();
 
   // Make idempotent - only register if not already registered
-  const appliers = [
+  const applierInstances = [
     new DamageEffectApplier(),
     new HealingEffectApplier(),
     new ProtectionEffectApplier(),
@@ -368,19 +383,29 @@ export function registerStandardAppliers(): void {
     new SummonEffectApplier(),
     new TransformEffectApplier(),
     new CreationEffectApplier(),
-    DispelEffectApplier,
     new PerceptionEffectApplier(),
-    MentalEffectApplier,
     new TemporalEffectApplier(),
-    TeleportEffectApplier,
-    EnvironmentalEffectApplier,
     new SoulEffectApplier(),
     new ParadigmEffectApplier(),
   ];
 
-  for (const applier of appliers) {
+  const applierClasses = [
+    DispelEffectApplier,
+    MentalEffectApplier,
+    TeleportEffectApplier,
+    EnvironmentalEffectApplier,
+  ];
+
+  for (const applier of applierInstances) {
     if (!executor.hasApplier(applier.category)) {
-      executor.registerApplier(applier as any);
+      executor.registerApplier(applier);
+    }
+  }
+
+  for (const ApplierClass of applierClasses) {
+    const instance = new ApplierClass();
+    if (!executor.hasApplier(instance.category)) {
+      executor.registerApplier(instance);
     }
   }
 }

@@ -332,7 +332,10 @@ function handleFindBuilding(ctx: BehaviorContext, state: Record<string, unknown>
   interface WorldWithSystems {
     getSystem?: (name: string) => unknown;
   }
-  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research');
+  interface ResearchSystemLike {
+    isAgentAtResearchBuilding(world: World, agentId: string): boolean;
+  }
+  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research') as ResearchSystemLike | undefined;
 
   if (!researchSystem) {
     return ctx.complete('No research system available');
@@ -348,7 +351,7 @@ function handleFindBuilding(ctx: BehaviorContext, state: Record<string, unknown>
   // Find nearest research building
   const buildings = ctx.getEntitiesInRadius(MAX_BUILDING_SEARCH_DISTANCE, [CT.Building, CT.Position]);
 
-  let nearestBuilding: { entity: any; position: { x: number; y: number } } | null = null;
+  let nearestBuilding: { entity: import('../../ecs/Entity.js').Entity; position: { x: number; y: number } } | null = null;
   let nearestDistance = Infinity;
 
   for (const { entity: buildingEntity, position: buildingPos, distance } of buildings) {
@@ -423,7 +426,11 @@ function handleConductResearch(ctx: BehaviorContext, state: Record<string, unkno
   interface WorldWithSystems {
     getSystem?: (name: string) => unknown;
   }
-  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research');
+  interface ResearchSystemLike {
+    isAgentAtResearchBuilding(world: World, agentId: string): boolean;
+    getAvailableResearch(world: World): Array<{ id: string }>;
+  }
+  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research') as ResearchSystemLike | undefined;
 
   if (!researchSystem) {
     return ctx.complete('No research system available');
@@ -472,7 +479,7 @@ function handleConductResearch(ctx: BehaviorContext, state: Record<string, unkno
 
   // Research ongoing - ResearchSystem handles progress accumulation
   // Stay at building for a while (600 ticks = ~30 seconds at 20 TPS)
-  const ticksElapsed = ctx.tick - (state.startedTick ?? ctx.tick);
+  const ticksElapsed = ctx.tick - ((state.startedTick as number | undefined) ?? ctx.tick);
   if (ticksElapsed > 600) {
     // Research session complete
     ctx.updateState({ phase: 'complete' });

@@ -15,26 +15,26 @@ type GameClientWithWorld = {
 };
 
 type IntrospectionAPI = {
-  getEntity(entityId: unknown, options?: unknown): Promise<unknown>;
+  getEntity(entityId: unknown, options?: unknown): Promise<Record<string, unknown>>;
   queryEntities(query: unknown): Promise<unknown[]>;
-  getComponentSchema(type: unknown): unknown;
+  getComponentSchema(type: unknown): Record<string, unknown>;
   listSchemas(options?: unknown): unknown[];
-  getSkills(entityId: unknown): Promise<unknown>;
+  getSkills(entityId: unknown): Promise<Record<string, unknown>>;
   listBuildings(options?: unknown): Promise<unknown[]>;
   listBlueprints(options?: unknown): unknown[];
   getMutationHistory(options?: unknown): Promise<unknown[]>;
-  getCacheStats(): unknown;
-  getEconomicMetrics(options?: unknown): Promise<unknown>;
-  getEnvironmentalState(bounds?: unknown): Promise<unknown>;
-  mutateField(mutation: unknown): Promise<unknown>;
-  mutateBatch(mutations: unknown[]): Promise<unknown>;
-  undo(count: number): Promise<unknown>;
-  redo(count: number): Promise<unknown>;
-  placeBuilding(config: unknown): Promise<unknown>;
-  grantSkillXP(entityId: string, skill: string, amount: number): Promise<unknown>;
-  triggerBehavior(config: unknown): Promise<unknown>;
+  getCacheStats(): Record<string, unknown>;
+  getEconomicMetrics(options?: unknown): Promise<Record<string, unknown>>;
+  getEnvironmentalState(bounds?: unknown): Promise<Record<string, unknown>>;
+  mutateField(mutation: unknown): Promise<{ success: boolean; error?: string }>;
+  mutateBatch(mutations: unknown[]): Promise<{ success: boolean; error?: string }>;
+  undo(count: number): Promise<{ success: boolean; error?: string }>;
+  redo(count: number): Promise<{ success: boolean; error?: string }>;
+  placeBuilding(config: unknown): Promise<{ success: boolean; error?: string }>;
+  grantSkillXP(entityId: string, skill: string, amount: number): Promise<{ success: boolean; error?: string }>;
+  triggerBehavior(config: unknown): Promise<{ success: boolean; error?: string }>;
   createSnapshot(entityIds: string[], metadata?: unknown): Promise<string>;
-  restoreSnapshot(snapshotId: string): Promise<unknown>;
+  restoreSnapshot(snapshotId: string): Promise<{ success: boolean; error?: string }>;
 };
 
 const introspectionCapability = defineCapability({

@@ -393,13 +393,13 @@ export class ChatRoomSystem extends BaseSystem {
     console.error(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
 
     // Emit event for UI
-    this.events.emit('chat:message_sent' as any, {
+    this.events.emit('chat:message_sent', {
       roomId,
       messageId: message.id,
       senderId,
       senderName,
       content,
-    } as any);
+    });
 
     return message;
   }
@@ -436,7 +436,7 @@ export class ChatRoomSystem extends BaseSystem {
       room.pinnedMessages.push(messageId);
 
       const pinner = world.getEntity(pinnerId);
-      const identity = pinner?.components.get(ComponentType.Identity) as any;
+      const identity = pinner?.getComponent<IdentityComponent>(ComponentType.Identity);
       const name = identity?.name ?? 'Unknown';
 
       room.pendingNotifications.push({
@@ -558,7 +558,7 @@ export class ChatRoomSystem extends BaseSystem {
 
     return room.config.membership.members.map(id => {
       const entity = world.getEntity(id);
-      const identity = entity?.components.get(ComponentType.Identity) as any;
+      const identity = entity?.getComponent<IdentityComponent>(ComponentType.Identity);
       return {
         id,
         name: identity?.name ?? 'Unknown',

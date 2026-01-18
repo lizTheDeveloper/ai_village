@@ -334,7 +334,7 @@ export function tradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorR
     return ctx.complete('No itemId specified in behaviorState');
   }
 
-  if (!state.quantity || state.quantity <= 0) {
+  if (!state.quantity || (state.quantity as number) <= 0) {
     return ctx.complete('Invalid quantity in behaviorState');
   }
 
@@ -363,7 +363,7 @@ export function tradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorR
 function handleFindShop(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   // If shopId already specified, validate it and move to next phase
   if (state.shopId) {
-    const shop = ctx.getEntity(state.shopId);
+    const shop = ctx.getEntity(state.shopId as string);
     if (shop && shop.components.has(CT.Shop)) {
       ctx.updateState({ phase: 'move_to_shop' });
       return;
@@ -387,8 +387,8 @@ function handleFindShop(ctx: BehaviorContext, state: Record<string, unknown>): C
     // Check if shop is suitable for this trade
     if (state.tradeType === 'buy') {
       // For buying, shop must have stock
-      const stockQuantity = getStockQuantity(shop, state.itemId);
-      if (stockQuantity < (state.quantity || 1)) {
+      const stockQuantity = getStockQuantity(shop, state.itemId as string);
+      if (stockQuantity < ((state.quantity as number) || 1)) {
         continue; // Not enough stock
       }
     }
@@ -402,7 +402,7 @@ function handleFindShop(ctx: BehaviorContext, state: Record<string, unknown>): C
 
   if (!bestShop) {
     // No shop found
-    return ctx.complete(`No shop found for ${state.tradeType} ${state.itemId}`);
+    return ctx.complete(`No shop found for ${state.tradeType as string} ${state.itemId as string}`);
   }
 
   // Found shop, move to it
@@ -413,7 +413,7 @@ function handleFindShop(ctx: BehaviorContext, state: Record<string, unknown>): C
 }
 
 function handleMoveToShop(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
-  const shopId = state.shopId;
+  const shopId = state.shopId as string | undefined;
   if (!shopId) {
     // Lost target, restart
     ctx.updateState({ phase: 'find_shop' });
@@ -459,8 +459,12 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
     getSystem?: (name: string) => unknown;
     tradingSystem?: TradingSystem;
   }
+  interface TradingSystemLike {
+    buyFromShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
+    sellToShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
+  }
   const worldWithSystems = world as unknown as WorldWithSystems;
-  const tradingSystem = worldWithSystems.getSystem?.('trading') ?? worldWithSystems.tradingSystem;
+  const tradingSystem = (worldWithSystems.getSystem?.('trading') ?? worldWithSystems.tradingSystem) as TradingSystemLike | undefined;
 
   if (!tradingSystem) {
     return ctx.complete('Trading system not available');
@@ -474,17 +478,17 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
       result = tradingSystem.buyFromShop(
         world,
         ctx.entity.id,
-        state.shopId,
-        state.itemId,
-        state.quantity
+        state.shopId as string,
+        state.itemId as string,
+        state.quantity as number
       );
     } else {
       result = tradingSystem.sellToShop(
         world,
         ctx.entity.id,
-        state.shopId,
-        state.itemId,
-        state.quantity
+        state.shopId as string,
+        state.itemId as string,
+        state.quantity as number
       );
     }
 
@@ -496,7 +500,7 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
     // Trade successful
     ctx.updateState({ phase: 'complete' });
     return ctx.complete(
-      `Successfully ${state.tradeType === 'buy' ? 'bought' : 'sold'} ${state.quantity}x ${state.itemId}`
+      `Successfully ${state.tradeType === 'buy' ? 'bought' : 'sold'} ${state.quantity as number}x ${state.itemId as string}`
     );
   } catch (error) {
     return ctx.complete(`Trade error: ${(error as Error).message}`);

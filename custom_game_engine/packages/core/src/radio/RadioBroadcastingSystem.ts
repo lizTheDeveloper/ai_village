@@ -65,11 +65,11 @@ export class RadioBroadcastingSystem extends BaseSystem {
       station.totalBroadcastHours += 1 / (20 * 60 * 60); // Convert ticks to hours
 
       // Emit listener count periodically
-      this.events.emit('radio:listener_update' as any, {
+      this.events.emit<'radio:listener_update'>('radio:listener_update', {
         stationId: station.config.callSign,
         listenerCount: station.listenersCount,
         showName: station.currentShow?.name,
-      } as any, station.config.callSign);
+      }, station.config.callSign);
     }
 
     // Update listener engagement
@@ -80,12 +80,12 @@ export class RadioBroadcastingSystem extends BaseSystem {
     const show = this.manager.endShow(station.config.callSign);
     if (!show) return;
 
-    this.events.emit('radio:show_ended' as any, {
+    this.events.emit<'radio:show_ended'>('radio:show_ended', {
       stationId: station.config.callSign,
       showName: show.name,
       peakListeners: show.peakListeners,
       totalListeners: show.currentListeners,
-    } as any, station.config.callSign);
+    }, station.config.callSign);
   }
 
   private updateListeners(ctx: SystemContext): void {
@@ -161,11 +161,11 @@ export class RadioBroadcastingSystem extends BaseSystem {
 
     this.manager.updateListeners(stationId, station.listenersCount + 1);
 
-    this.events.emit('radio:listener_tuned_in' as any, {
+    this.events.emit<'radio:listener_tuned_in'>('radio:listener_tuned_in', {
       agentId,
       stationId: station.config.callSign,
       listenerCount: station.listenersCount,
-    } as any, agentId);
+    }, agentId);
 
     return true;
   }
@@ -184,11 +184,11 @@ export class RadioBroadcastingSystem extends BaseSystem {
 
     this.listeners.delete(agentId);
 
-    this.events.emit('radio:listener_tuned_out' as any, {
+    this.events.emit<'radio:listener_tuned_out'>('radio:listener_tuned_out', {
       agentId,
       stationId: listener.stationId,
       listenDuration: listener.tuningDuration,
-    } as any, agentId);
+    }, agentId);
 
     return true;
   }
@@ -218,12 +218,12 @@ export class RadioBroadcastingSystem extends BaseSystem {
     );
 
     if (show) {
-      this.events.emit('radio:show_started' as any, {
+      this.events.emit<'radio:show_started'>('radio:show_started', {
         stationId,
         showName,
         djName: dj.djName,
         format,
-      } as any, stationId);
+      }, stationId);
     }
 
     return show;
@@ -273,12 +273,12 @@ export class RadioBroadcastingSystem extends BaseSystem {
       });
     }
 
-    this.events.emit('radio:catchphrase_said' as any, {
+    this.events.emit<'radio:catchphrase_said'>('radio:catchphrase_said', {
       stationId,
       djName: dj.djName,
       catchphrase,
       listenerCount: station.listenersCount,
-    } as any, stationId);
+    }, stationId);
   }
 
   /**
@@ -322,13 +322,13 @@ export class RadioBroadcastingSystem extends BaseSystem {
           survivalRelevance: 0.0,
         });
 
-        this.events.emit('radio:song_discovered' as any, {
+        this.events.emit<'radio:song_discovered'>('radio:song_discovered', {
           agentId,
           trackId: track.id,
           trackTitle: track.title,
           artist: track.artist,
           stationId: station.config.callSign,
-        } as any, agentId);
+        }, agentId);
       }
     }
   }

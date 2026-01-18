@@ -303,7 +303,7 @@ export class PlantBehavior extends BaseBehavior {
         if (!tile) continue;
 
         // Check if this tile is tilled and has plantability
-        if (tile.tilled && tile.plantability > 0) {
+        if (tile.tilled && (tile.plantability ?? 0) > 0) {
           // Check no existing plant at this location
           const existingPlant = this.hasPlantAt(world, checkX, checkY);
           if (existingPlant) continue;
@@ -837,12 +837,12 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   for (const { entity: plantEntity, distance } of nearbyPlants) {
     const plantImpl = plantEntity as EntityImpl;
-    interface PlantWithHydration {
+    interface PlantWithHydration extends Component {
       stage?: string;
       _hydration?: number;
       hydration?: number;
     }
-    const plant = plantImpl.getComponent<PlantWithHydration>(ComponentType.Plant);
+    const plant = plantImpl.getComponent(ComponentType.Plant) as PlantWithHydration | undefined;
     const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
@@ -893,11 +893,7 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   const plantEntity = ctx.getEntity(nearestDryPlant.plantId);
   if (plantEntity) {
     const plantImpl = plantEntity as EntityImpl;
-    interface PlantWithHydration {
-      _hydration?: number;
-      hydration?: number;
-    }
-    plantImpl.updateComponent<PlantWithHydration>(ComponentType.Plant, (plant) => ({
+    plantImpl.updateComponent(ComponentType.Plant, (plant: Component) => ({
       ...plant,
       _hydration: Math.min(100, (plant._hydration ?? plant.hydration ?? 50) + 20),
     }));
@@ -927,13 +923,13 @@ export function harvestBehaviorWithContext(ctx: import('../BehaviorContext.js').
 
   for (const { entity: plantEntity, distance } of nearbyPlants) {
     const plantImpl = plantEntity as EntityImpl;
-    interface PlantWithHarvest {
+    interface PlantWithHarvest extends Component {
       stage?: string;
       fruitCount?: number;
       seedsProduced?: number;
       speciesId: string;
     }
-    const plant = plantImpl.getComponent<PlantWithHarvest>(ComponentType.Plant);
+    const plant = plantImpl.getComponent(ComponentType.Plant) as PlantWithHarvest | undefined;
     const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;

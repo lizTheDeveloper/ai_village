@@ -236,8 +236,8 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     const finalAbsorption = absorptionValue.value * context.powerMultiplier;
 
     // Apply shield/ward to target's magic component
-    const magic = target.components.get('magic') as any;
-    if (!magic) {
+    const magic = target.components.get('magic');
+    if (!magic || magic.type !== 'magic') {
       return {
         success: false,
         effectId: effect.id,
@@ -252,8 +252,9 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     }
 
     // Store protection shield data
-    if (!magic.protectionShields) {
-      magic.protectionShields = [];
+    const shields = (magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
+    if (!shields) {
+      (magic as Record<string, unknown>).protectionShields = [];
     }
 
     const shieldData = {
@@ -269,11 +270,14 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };
 
-    magic.protectionShields.push(shieldData);
+    ((magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>>).push(shieldData);
 
     // Add to active effects list for tracking
-    if (!magic.activeEffects.includes(effect.id)) {
-      magic.activeEffects.push(effect.id);
+    const activeEffects = (magic as Record<string, unknown>).activeEffects as string[] | undefined;
+    if (activeEffects && !activeEffects.includes(effect.id)) {
+      activeEffects.push(effect.id);
+    } else if (!activeEffects) {
+      (magic as Record<string, unknown>).activeEffects = [effect.id];
     }
 
     return {
@@ -297,30 +301,38 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     target: Entity,
     _world: World
   ): void {
-    const magic = target.components.get('magic') as any;
-    if (!magic || !magic.protectionShields) {
+    const magic = target.components.get('magic');
+    if (!magic || magic.type !== 'magic') {
+      return;
+    }
+
+    const shields = (magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
+    if (!shields) {
       return;
     }
 
     // Find and remove the shield by effect ID and applied time
-    const index = magic.protectionShields.findIndex(
-      (shield: any) =>
+    const index = shields.findIndex(
+      (shield) =>
         shield.effectId === activeEffect.effectId &&
         shield.appliedAt === activeEffect.appliedAt
     );
 
     if (index !== -1) {
-      magic.protectionShields.splice(index, 1);
+      shields.splice(index, 1);
     }
 
     // Remove from active effects list if no more shields with this effect ID
-    const hasMore = magic.protectionShields.some(
-      (shield: any) => shield.effectId === activeEffect.effectId
+    const hasMore = shields.some(
+      (shield) => shield.effectId === activeEffect.effectId
     );
     if (!hasMore) {
-      const effectIndex = magic.activeEffects.indexOf(activeEffect.effectId);
-      if (effectIndex !== -1) {
-        magic.activeEffects.splice(effectIndex, 1);
+      const activeEffects = (magic as Record<string, unknown>).activeEffects as string[] | undefined;
+      if (activeEffects) {
+        const effectIndex = activeEffects.indexOf(activeEffect.effectId);
+        if (effectIndex !== -1) {
+          activeEffects.splice(effectIndex, 1);
+        }
       }
     }
   }

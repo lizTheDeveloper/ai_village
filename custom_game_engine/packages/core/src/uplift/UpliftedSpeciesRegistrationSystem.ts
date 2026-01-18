@@ -298,7 +298,7 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
     // Usually stays same category unless adjustment is significant
     if (adjustment > 1.5) {
       // Upgrade one category
-      const upgrades: Record<string, string> = {
+      const upgrades: Record<string, 'tiny' | 'small' | 'medium' | 'large' | 'huge' | 'colossal'> = {
         'tiny': 'small',
         'small': 'medium',
         'medium': 'large',
@@ -306,7 +306,7 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
         'huge': 'colossal',
         'colossal': 'colossal',
       };
-      return upgrades[sourceCategory] as any || sourceCategory;
+      return upgrades[sourceCategory] || sourceCategory;
     }
 
     return sourceCategory;

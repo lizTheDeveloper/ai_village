@@ -4457,6 +4457,61 @@ export interface GameEventMap {
     intensity?: number;
   };
 
+  // === Radio Broadcasting Events ===
+  /** Radio listener count updated */
+  'radio:listener_update': {
+    stationId: string;
+    listenerCount: number;
+    showName?: string;
+  };
+
+  /** Radio show ended */
+  'radio:show_ended': {
+    stationId: string;
+    showName: string;
+    peakListeners: number;
+    totalListeners: number;
+  };
+
+  /** Listener tuned into radio station */
+  'radio:listener_tuned_in': {
+    agentId: string;
+    stationId: string;
+    listenerCount: number;
+  };
+
+  /** Listener tuned out of radio station */
+  'radio:listener_tuned_out': {
+    agentId: string;
+    stationId: string;
+    listenDuration: number;
+  };
+
+  /** Radio show started */
+  'radio:show_started': {
+    stationId: string;
+    showName: string;
+    djName: string;
+    format: 'music' | 'talk' | 'news' | 'sports' | 'variety';
+  };
+
+  /** DJ said catchphrase */
+  'radio:catchphrase_said': {
+    stationId: string;
+    djName: string;
+    catchphrase: string;
+    listenerCount: number;
+  };
+
+  /** Agent discovered new song on radio */
+  'radio:song_discovered': {
+    agentId: string;
+    trackId: string;
+    trackTitle: string;
+    artist: string;
+    stationId: string;
+  };
+
   // === Test Events ===
   /** Test event for development */
   'test:event': {
