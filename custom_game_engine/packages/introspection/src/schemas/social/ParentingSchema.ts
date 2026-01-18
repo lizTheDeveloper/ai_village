@@ -291,25 +291,47 @@ export const ParentingSchema = autoRegister(
 
     validate: (data): data is ParentingComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const p = data as any;
+      const p = data as Record<string, unknown>;
 
-      return (
-        p.type === 'parenting' &&
-        Array.isArray(p.responsibilities) &&
-        typeof p.parentingDrive === 'number' &&
-        p.parentingDrive >= 0 &&
-        p.parentingDrive <= 1 &&
-        typeof p.driveLevel === 'string' &&
-        typeof p.timeSinceLastCare === 'number' &&
-        typeof p.parentingSkill === 'number' &&
-        p.parentingSkill >= 0 &&
-        p.parentingSkill <= 1 &&
-        typeof p.reputation === 'object' &&
-        typeof p.desiresChildren === 'boolean' &&
-        typeof p.desiredChildCount === 'number' &&
-        typeof p.parentingStyle === 'object' &&
-        typeof p.careProvider === 'string'
-      );
+      // Check type field
+      if (!('type' in p) || p.type !== 'parenting') return false;
+
+      // Check responsibilities field
+      if (!('responsibilities' in p) || !Array.isArray(p.responsibilities)) return false;
+
+      // Check parentingDrive field
+      if (!('parentingDrive' in p) || typeof p.parentingDrive !== 'number') return false;
+      if (p.parentingDrive < 0 || p.parentingDrive > 1) return false;
+
+      // Check driveLevel field
+      if (!('driveLevel' in p) || typeof p.driveLevel !== 'string') return false;
+
+      // Check timeSinceLastCare field
+      if (!('timeSinceLastCare' in p) || typeof p.timeSinceLastCare !== 'number') return false;
+
+      // Check parentingSkill field
+      if (!('parentingSkill' in p) || typeof p.parentingSkill !== 'number') return false;
+      if (p.parentingSkill < 0 || p.parentingSkill > 1) return false;
+
+      // Check reputation field
+      if (!('reputation' in p) || typeof p.reputation !== 'object' || p.reputation === null) return false;
+
+      // Check desiresChildren field
+      if (!('desiresChildren' in p) || typeof p.desiresChildren !== 'boolean') return false;
+
+      // Check desiredChildCount field
+      if (!('desiredChildCount' in p) || typeof p.desiredChildCount !== 'number') return false;
+
+      // Check parentingStyle field
+      if (!('parentingStyle' in p) || typeof p.parentingStyle !== 'object' || p.parentingStyle === null) return false;
+
+      // Check careProvider field
+      if (!('careProvider' in p) || typeof p.careProvider !== 'string') return false;
+
+      // Check optional notes field
+      if ('notes' in p && p.notes !== undefined && typeof p.notes !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => ({

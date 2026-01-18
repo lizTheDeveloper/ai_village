@@ -32,7 +32,7 @@ export class GovernanceDataSystem extends BaseSystem {
   public readonly id: SystemId = 'governance_data';
   public readonly priority: number = 50; // Run late, after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 200; // Check every 10 seconds (governance is very slow-changing)
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private deathLog: DeathRecord[] = [];
   private birthLog: BirthRecord[] = [];
@@ -113,13 +113,13 @@ export class GovernanceDataSystem extends BaseSystem {
   /**
    * Update all governance buildings with latest data.
    * Performance:
-   * - Throttled: Only checks every 200 ticks (10 seconds) to reduce per-tick overhead
+   * - Throttled: Only checks every 100 ticks (5 seconds) to reduce per-tick overhead
    * - Event-driven: Within throttle window, only updates when TimeSystem emits 'time:day_changed'
    * - Early exit if no governance buildings exist
    * - Single query for all agents, passed to all methods
    */
   protected onUpdate(ctx: SystemContext): void {
-    // Performance: Throttling handled by BaseSystem (200 ticks)
+    // Performance: Throttling handled by BaseSystem (100 ticks = 5 seconds)
     // Only update when flagged by day change event
     if (!this.needsUpdate) {
       return;

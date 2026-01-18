@@ -21,9 +21,13 @@ describe('GovernanceDataSystem Integration', () => {
   let world: WorldImpl;
   let system: GovernanceDataSystem;
 
+  // Use tick value that passes throttle check (system has throttleInterval = 100)
+  const TEST_TICK = 100;
+
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
+    (world as any)._tick = TEST_TICK; // Set world tick to pass throttle
     system = new GovernanceDataSystem();
     system.initialize(world, eventBus);
   });
@@ -44,7 +48,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify population count
       const townHallComp = townHall.getComponent<TownHallComponent>('town_hall');
@@ -64,7 +68,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(townHall);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify delayed data quality
       const townHallComp = townHall.getComponent<TownHallComponent>('town_hall');
@@ -82,7 +86,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(townHall);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify unavailable data quality
       const townHallComp = townHall.getComponent<TownHallComponent>('town_hall');
@@ -109,7 +113,7 @@ describe('GovernanceDataSystem Integration', () => {
       });
 
       // Run system to populate TownHall component from death log
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify death recorded
       const townHallComp = townHall.getComponent<TownHallComponent>('town_hall');
@@ -142,7 +146,7 @@ describe('GovernanceDataSystem Integration', () => {
       });
 
       // Run system to populate CensusBureau component from death log
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify census data
       const bureauComp = bureau.getComponent<CensusBureauComponent>('census_bureau');
@@ -167,7 +171,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify high extinction risk due to low population
       const bureauComp = bureau.getComponent<CensusBureauComponent>('census_bureau');
@@ -184,7 +188,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(bureau);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify real-time data quality when staffed
       const bureauComp = bureau.getComponent<CensusBureauComponent>('census_bureau');
@@ -202,7 +206,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(bureau);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify stale data quality when unstaffed
       const bureauComp = bureau.getComponent<CensusBureauComponent>('census_bureau');
@@ -257,7 +261,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(criticalAgent);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify health categorization
       const clinicComp = clinic.getComponent<HealthClinicComponent>('health_clinic');
@@ -300,7 +304,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(healthyAgent);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify malnutrition count
       const clinicComp = clinic.getComponent<HealthClinicComponent>('health_clinic');
@@ -345,7 +349,7 @@ describe('GovernanceDataSystem Integration', () => {
       });
 
       // Run system to populate HealthClinic component from death log
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify mortality breakdown
       const clinicComp = clinic.getComponent<HealthClinicComponent>('health_clinic');
@@ -380,7 +384,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify recommended staff calculation
       const clinicComp = clinic.getComponent<HealthClinicComponent>('health_clinic');
@@ -397,7 +401,7 @@ describe('GovernanceDataSystem Integration', () => {
       (world as any)._addEntity(clinic);
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify full data quality with staff
       const clinicComp = clinic.getComponent<HealthClinicComponent>('health_clinic');
@@ -503,7 +507,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Run system
-      system.update(world, [], 0);
+      system.update(world, [], TEST_TICK);
 
       // Verify both TownHalls updated independently
       const th1Comp = townHall1.getComponent<TownHallComponent>('town_hall');

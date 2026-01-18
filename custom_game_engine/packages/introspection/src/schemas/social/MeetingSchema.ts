@@ -172,18 +172,34 @@ export const MeetingSchema = autoRegister(
 
     validate: (data): data is MeetingComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const m = data as any;
+      const m = data as Record<string, unknown>;
 
-      return (
-        m.type === 'meeting' &&
-        typeof m.callerId === 'string' &&
-        typeof m.topic === 'string' &&
-        typeof m.location === 'object' &&
-        typeof m.calledAt === 'number' &&
-        typeof m.duration === 'number' &&
-        Array.isArray(m.attendees) &&
-        typeof m.status === 'string'
-      );
+      // Check type field
+      if (!('type' in m) || m.type !== 'meeting') return false;
+
+      // Check required string fields
+      if (!('callerId' in m) || typeof m.callerId !== 'string') return false;
+      if (!('topic' in m) || typeof m.topic !== 'string') return false;
+
+      // Check location object
+      if (!('location' in m) || typeof m.location !== 'object' || m.location === null) return false;
+      const location = m.location as Record<string, unknown>;
+      if (!('x' in location) || typeof location.x !== 'number') return false;
+      if (!('y' in location) || typeof location.y !== 'number') return false;
+
+      // Check timing fields
+      if (!('calledAt' in m) || typeof m.calledAt !== 'number') return false;
+      if (!('duration' in m) || typeof m.duration !== 'number') return false;
+
+      // Check attendees array
+      if (!('attendees' in m) || !Array.isArray(m.attendees)) return false;
+      if (!m.attendees.every((id) => typeof id === 'string')) return false;
+
+      // Check status enum
+      if (!('status' in m) || typeof m.status !== 'string') return false;
+      if (!['calling', 'active', 'ended'].includes(m.status)) return false;
+
+      return true;
     },
 
     createDefault: () => ({

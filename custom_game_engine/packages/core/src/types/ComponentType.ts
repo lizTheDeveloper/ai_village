@@ -96,6 +96,8 @@ export enum ComponentType {
   // Economy & Trade
   Currency = 'currency',
   MarketState = 'market_state',
+  ShippingLane = 'shipping_lane',
+  TradeCaravan = 'trade_caravan',
 
   // Research & Technology
   ResearchState = 'research_state',
