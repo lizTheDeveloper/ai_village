@@ -76,7 +76,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
       if (!powerComp.isPowered) {
         // Insufficient power - charging interrupted
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'reality_anchor:charging_interrupted',
           source: anchorId,
           data: {
@@ -92,7 +92,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
       if (anchor.powerLevel >= 1.0) {
         anchor.status = 'ready';
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'reality_anchor:ready',
           source: anchorId,
           data: {},
@@ -137,7 +137,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
     // Check for partial power (25-100% efficiency) - handle this first
     if (powerComp.efficiency < 1.0 && powerComp.efficiency >= 0.25) {
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'reality_anchor:power_insufficient',
         source: anchorId,
         data: {
@@ -167,7 +167,7 @@ export class RealityAnchorSystem extends BaseSystem {
       }
     } else if (powerComp.efficiency < 0.25) {
       // Critical power loss - field collapses
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'reality_anchor:power_loss',
         source: anchorId,
         data: {
@@ -245,7 +245,7 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.mortalizedGods.add(godId);
 
     // Emit event
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'reality_anchor:god_mortalized',
       source: anchorId,
       data: {
@@ -257,7 +257,7 @@ export class RealityAnchorSystem extends BaseSystem {
     // Check if this is the Supreme Creator
     const godEntity = world.getEntity(godId);
     if (godEntity?.components.has(CT.SupremeCreator)) {
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'reality_anchor:creator_mortalized',
         source: anchorId,
         data: {
@@ -282,7 +282,7 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.mortalizedGods.delete(godId);
 
     // Emit event
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'reality_anchor:god_restored',
       source: anchorId,
       data: {
@@ -311,7 +311,7 @@ export class RealityAnchorSystem extends BaseSystem {
         anchor.status = 'overloading';
         anchor.overloadCountdown = 600; // 30 seconds at 20 TPS
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'reality_anchor:overloading',
           source: anchorId,
           data: {
@@ -338,7 +338,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
     // Release all mortalized gods
     for (const godId of anchor.mortalizedGods) {
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'reality_anchor:god_restored',
         source: anchorId,
         data: {
@@ -351,7 +351,7 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.mortalizedGods.clear();
     anchor.entitiesInField.clear();
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'reality_anchor:field_collapse',
       source: anchorId,
       data: {
@@ -395,7 +395,7 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.status = 'active';
     anchor.lastActivatedAt = world.tick;
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'reality_anchor:activated',
       source: anchorId,
       data: {

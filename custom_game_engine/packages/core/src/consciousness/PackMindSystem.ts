@@ -1070,17 +1070,13 @@ export class PackMindSystem extends BaseSystem {
     // Update formation
     this.updateFormation(pack);
 
-    this.events.emitGeneric({
-      type: 'pack:body_lost' as any,
-      source: 'pack-mind-system',
-      data: {
-        packId,
-        lostBodyId: bodyEntityId,
-        lostBodyName: lostBody.name,
-        remainingBodies: pack.bodyCount,
-        minBodies,
-        griefThought,
-      },
+    this.events.emitGeneric('pack:body_lost', {
+      packId,
+      lostBodyId: bodyEntityId,
+      lostBodyName: lostBody.name,
+      remainingBodies: pack.bodyCount,
+      minBodies,
+      griefThought,
     });
 
     // Check for pack dissolution based on species rules
@@ -1090,15 +1086,11 @@ export class PackMindSystem extends BaseSystem {
 
     if (noBodies || singleBodyDeath || belowMinimum) {
       this.packs.delete(packId);
-      this.events.emitGeneric({
-        type: 'pack:dissolved' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          packName: pack.name,
-          totalBodiesLost: pack.bodiesLost,
-          reason: noBodies ? 'no_bodies' : singleBodyDeath ? 'cannot_survive_alone' : 'below_minimum',
-        },
+      this.events.emitGeneric('pack:dissolved', {
+        packId,
+        packName: pack.name,
+        totalBodiesLost: pack.bodiesLost,
+        reason: noBodies ? 'no_bodies' : singleBodyDeath ? 'cannot_survive_alone' : 'below_minimum',
       });
     }
 

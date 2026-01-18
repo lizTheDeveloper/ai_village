@@ -93,7 +93,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const body = target.components.get('body') as BodyComponent | undefined;
+    const body = target.getComponent<BodyComponent>('body');
 
     if (!body) {
       return {
@@ -109,7 +109,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       };
     }
 
-    const appliedValues: Record<string, any> = {};
+    const appliedValues: Record<string, number | string> = {};
     const source: ModificationSource = effect.modificationSource || 'magic';
 
     // Store original body for restoration (deep copy)
