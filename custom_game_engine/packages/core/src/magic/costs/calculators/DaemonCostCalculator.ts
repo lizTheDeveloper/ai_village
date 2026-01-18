@@ -217,7 +217,7 @@ export class DaemonCostCalculator extends BaseCostCalculator {
   /**
    * Separation trauma is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'separation_trauma' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'separation_trauma' || super.isCumulativeCost(costType);
   }
 }

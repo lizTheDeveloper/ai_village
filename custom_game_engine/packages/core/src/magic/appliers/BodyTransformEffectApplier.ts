@@ -453,7 +453,11 @@ export const enhanceArmsEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Magically strengthen and enhance arms.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 600, // 10 minutes
+  dispellable: true,
+  stackable: false,
   modifyBodyParts: {
     partType: 'arm',
     healthModifier: 50,
@@ -462,7 +466,7 @@ export const enhanceArmsEffect: BodyTransformEffect = {
   transformType: 'form',
   tags: ['transform', 'enhance', 'arms', 'strength'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Enlarge - increases body size
