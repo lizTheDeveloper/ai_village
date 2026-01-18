@@ -1210,14 +1210,10 @@ export class HiveMindSystem extends BaseSystem {
           if (elapsed > 1000 / directive.priority) {
             directive.completed = true;
 
-            this.events.emitGeneric({
-              type: 'hive:directive_completed' as any,
-              source: 'hive-mind-system',
-              data: {
-                hiveId: hive.id,
-                directiveId: directive.id,
-                task: directive.task,
-              },
+            this.events.emitGeneric('hive:directive_completed', {
+              hiveId: hive.id,
+              directiveId: directive.id,
+              task: directive.task,
             });
           }
         }

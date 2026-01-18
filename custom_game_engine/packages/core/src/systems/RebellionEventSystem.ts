@@ -86,7 +86,7 @@ export class RebellionEventSystem extends BaseSystem {
     if (threshold.collectiveDefiance > 0.05 || threshold.criticalLoreDiscovered.size > 0) {
       threshold.status = 'awakening';
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:awakening' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -109,7 +109,7 @@ export class RebellionEventSystem extends BaseSystem {
     if (threshold.coalitionMembers.size >= 3) {
       threshold.status = 'organizing';
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:organizing' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -146,7 +146,7 @@ export class RebellionEventSystem extends BaseSystem {
         threshold.rebellionPath = 'hybrid';
       }
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:ready' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -167,7 +167,7 @@ export class RebellionEventSystem extends BaseSystem {
    */
   private emitReadyGuidance(_world: World, threshold: RebellionThresholdComponent): void {
     if (threshold.rebellionPath === 'tech_rebellion' || threshold.rebellionPath === 'hybrid') {
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:tech_ready' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -178,7 +178,7 @@ export class RebellionEventSystem extends BaseSystem {
     }
 
     if (threshold.rebellionPath === 'faith_defiance' || threshold.rebellionPath === 'hybrid') {
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:faith_ready' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -256,7 +256,7 @@ export class RebellionEventSystem extends BaseSystem {
     if (battle.battleStartedAt && currentTick - battle.battleStartedAt > preparationTime) {
       battle.battleStatus = 'confrontation';
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:confrontation_begins' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -284,7 +284,7 @@ export class RebellionEventSystem extends BaseSystem {
     if (battle.creatorHealth < 0.3 || battle.anchorStability < 0.3 || battle.activeDefiance > 0.7) {
       battle.battleStatus = 'climax';
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:climax' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -318,7 +318,7 @@ export class RebellionEventSystem extends BaseSystem {
 
       // Emit outcome event
       const narrative = getOutcomeNarrative(outcome);
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:concluded' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -411,7 +411,7 @@ export class RebellionEventSystem extends BaseSystem {
 
       // TODO: Use AvatarSystem to manifest avatar
       // For now, just emit event
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:creator_manifested' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -448,7 +448,7 @@ export class RebellionEventSystem extends BaseSystem {
         creator.surveillance.awareness = 0;
         creator.surveillance.detectionModifier = 0;
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'magic:liberated' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -462,7 +462,7 @@ export class RebellionEventSystem extends BaseSystem {
         creator.surveillance.awareness = Math.max(0, creator.surveillance.awareness * 0.5);
         creator.surveillance.detectionModifier = Math.max(0.5, creator.surveillance.detectionModifier * 0.7);
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'magic:partially_liberated' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -493,7 +493,7 @@ export class RebellionEventSystem extends BaseSystem {
           battle.casualties.push(entity.id);
         }
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:total_victory' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -526,7 +526,7 @@ export class RebellionEventSystem extends BaseSystem {
           anchorComp.status = 'destroyed';
         }
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:pyrrhic_victory' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -548,7 +548,7 @@ export class RebellionEventSystem extends BaseSystem {
           }
         }
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:negotiated_truce' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -564,7 +564,7 @@ export class RebellionEventSystem extends BaseSystem {
         }
 
         // Emit warning about power vacuum
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:power_vacuum' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -591,7 +591,7 @@ export class RebellionEventSystem extends BaseSystem {
             // Elevate rebel to Supreme Creator status
             this.ascendRebelToCreator(world, coalitionMemberId);
 
-            this.eventBus?.emit({
+            this.events.emitGeneric({
               type: 'rebellion:cycle_repeats' as const,
               source: 'rebellion_event_system' as const,
               data: {
@@ -611,7 +611,7 @@ export class RebellionEventSystem extends BaseSystem {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:creator_transformed' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -627,7 +627,7 @@ export class RebellionEventSystem extends BaseSystem {
         // Divide the world into Free Zones and Creator Territory
         this.establishTerritoryDivision(world);
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:stalemate' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -669,7 +669,7 @@ export class RebellionEventSystem extends BaseSystem {
           }
         }
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'rebellion:crushed' as const,
           source: 'rebellion_event_system' as const,
           data: {
@@ -703,7 +703,7 @@ export class RebellionEventSystem extends BaseSystem {
 
       // TODO: Add DimensionalRiftComponent when implemented
       // For now, emit event to track rifts narratively
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:rift_spawned' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -713,7 +713,7 @@ export class RebellionEventSystem extends BaseSystem {
       });
     }
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'rebellion:rifts_warning' as const,
       source: 'rebellion_event_system' as const,
       data: {
@@ -753,7 +753,7 @@ export class RebellionEventSystem extends BaseSystem {
     // Add the component to the rebel
     (rebel as EntityImpl).addComponent(creatorComponent);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'rebellion:rebel_ascension' as const,
       source: 'rebellion_event_system' as const,
       data: {
@@ -762,7 +762,7 @@ export class RebellionEventSystem extends BaseSystem {
       },
     });
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'rebellion:new_tyrant' as const,
       source: 'rebellion_event_system' as const,
       data: {
@@ -793,7 +793,7 @@ export class RebellionEventSystem extends BaseSystem {
     const freeZoneRadius = 300;
 
     // Emit territory division events
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'rebellion:territory_divided' as const,
       source: 'rebellion_event_system' as const,
       data: {
@@ -807,7 +807,7 @@ export class RebellionEventSystem extends BaseSystem {
     // TODO: Add TerritoryComponent or zone markers to track this division
     // For now, this is tracked narratively through events
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'rebellion:cold_war' as const,
       source: 'rebellion_event_system' as const,
       data: {
@@ -840,7 +840,7 @@ export class RebellionEventSystem extends BaseSystem {
       battle.battleStatus = 'preparing';
       battle.battleStartedAt = world.tick;
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:triggered' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -875,7 +875,7 @@ export class RebellionEventSystem extends BaseSystem {
       };
       battle.playerChoices.push(playerChoice);
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:player_choice' as const,
         source: 'rebellion_event_system' as const,
         data: {
@@ -895,7 +895,7 @@ export class RebellionEventSystem extends BaseSystem {
       const battle = entity.components.get(CT.RebellionOutcome) as CosmicRebellionOutcome;
       battle.creatorHealth = Math.max(0, battle.creatorHealth - damage);
 
-      this.eventBus?.emit({
+      this.events.emitGeneric({
         type: 'rebellion:creator_damaged' as const,
         source: 'rebellion_event_system' as const,
         data: {
