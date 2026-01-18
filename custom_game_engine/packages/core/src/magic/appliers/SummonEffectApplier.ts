@@ -188,7 +188,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         if (entity) {
           // Architectural note: World interface doesn't expose destroyEntity for readonly access pattern
           // WorldImpl has the mutation methods - this cast is required for entity destruction
-          (world as { destroyEntity: (id: string, reason: string) => void }).destroyEntity(summonId, 'summon_expired');
+          (world as unknown as { destroyEntity: (id: string, reason: string) => void }).destroyEntity(summonId, 'summon_expired');
         }
       } catch (error) {
         // Entity might have already been destroyed - that's fine
