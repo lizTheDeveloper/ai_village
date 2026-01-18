@@ -18,7 +18,7 @@ import type { PlantComponent } from '../components/PlantComponent.js';
 import type { ConversationComponent } from '../components/ConversationComponent.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
 import { isHungry } from '../components/NeedsComponent.js';
-import { isInConversation, startConversation } from '../components/ConversationComponent.js';
+import { isInConversation, startConversation, ensureConversationComponent } from '../components/ConversationComponent.js';
 import { calculateFarmingContext, calculateFarmingUtilities, shouldFarm } from './FarmingUtilityCalculator.js';
 import { calculateStorageStats, suggestBuildingFromStorage } from '../utils/StorageContext.js';
 import { suggestSpells } from './SpellUtilityCalculator.js';
@@ -311,9 +311,11 @@ export class ScriptedDecisionProcessor {
     const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
     if (!targetAgent) return null;
     const targetImpl = targetAgent as EntityImpl;
-    const targetConversation = targetImpl.getComponent<ConversationComponent>(ComponentType.Conversation);
+    // Ensure both entities have conversation components
+    const myConversation = ensureConversationComponent(entity, 10);
+    const targetConversation = ensureConversationComponent(targetImpl, 10);
     // Only start conversation if target is not already talking
-    if (!targetConversation || isInConversation(targetConversation)) return null;
+    if (isInConversation(targetConversation)) return null;
     // Start conversation for both agents (set up ConversationComponent)
     entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
       startConversation(current, targetAgent.id, world.tick)

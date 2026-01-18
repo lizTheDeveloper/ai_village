@@ -213,7 +213,14 @@ export class ChatRoomSystem extends BaseSystem {
    * Find entities matching a criteria string
    */
   private findEntitiesMatchingCriteria(world: World, criteria: string): Entity[] {
-    const [type, value] = criteria.split(':');
+    const parts = criteria.split(':');
+    const type = parts[0];
+    const value = parts[1];
+
+    if (!value) {
+      console.error(`[ChatRoomSystem] Invalid criteria format: ${criteria}`);
+      return [];
+    }
 
     if (type === 'tag') {
       // Find entities with specific tag
@@ -226,26 +233,12 @@ export class ChatRoomSystem extends BaseSystem {
         });
     }
 
-    if (type === 'family') {
-      // Find entities in a family
-      return world.query()
-        .with(ComponentType.Agent)
-        .executeEntities()
-        .filter(entity => {
-          const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-          return agent?.familyId === value;
-        });
-    }
-
-    if (type === 'guild') {
-      // Find entities in a guild
-      return world.query()
-        .with(ComponentType.Agent)
-        .executeEntities()
-        .filter(entity => {
-          const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-          return agent?.guildId === value;
-        });
+    // Note: family and guild criteria are not yet implemented in AgentComponent
+    // These would require adding familyId/guildId fields to AgentComponent
+    // For now, these criteria return empty arrays
+    if (type === 'family' || type === 'guild') {
+      console.error(`[ChatRoomSystem] ${type} criteria not yet implemented - requires ${type}Id field in AgentComponent`);
+      return [];
     }
 
     return [];

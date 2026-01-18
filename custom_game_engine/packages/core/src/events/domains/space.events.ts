@@ -1,0 +1,212 @@
+/**
+ * Space, fleet, and interstellar events.
+ */
+import type { EntityId } from '../../types.js';
+
+export interface SpaceEvents {
+  // === Station Events ===
+
+  /** Station fuel running low */
+  'station:fuel_low': {
+    stationId: EntityId;
+    entityId?: EntityId;
+    buildingType?: string;
+    currentFuel?: number;
+    fuelRemaining: number;
+  };
+
+  /** Station fuel depleted */
+  'station:fuel_empty': {
+    stationId: EntityId;
+    entityId?: EntityId;
+    buildingType?: string;
+  };
+
+  // === Planet Events ===
+
+  /** Planet registered in multiverse */
+  'planet:registered': {
+    planetId: string;
+    planetName: string;
+    planetType: string;
+    isActive: boolean;
+  };
+
+  /** Planet unregistered from multiverse */
+  'planet:unregistered': {
+    planetId: string;
+  };
+
+  /** Planet activated as current world */
+  'planet:activated': {
+    planetId: string;
+    previousPlanetId?: string;
+    planetName: string;
+    planetType: string;
+  };
+
+  /** Entity arrived at planet */
+  'planet:entity_arrived': {
+    entityId: EntityId;
+    planetId: string;
+    previousPlanetId?: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage' | 'spawn';
+  };
+
+  /** Entity departed from planet */
+  'planet:entity_departed': {
+    entityId: EntityId;
+    planetId: string;
+    destinationPlanetId: string;
+    travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage';
+  };
+
+  // === Spaceship Construction Events ===
+
+  /** Spaceship construction initiated (request) */
+  'spaceship:construction:start': {
+    shipyardId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+  };
+
+  /** Spaceship construction started (response) */
+  'spaceship:construction:started': {
+    projectId: string;
+    shipyardId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+    estimatedTicks: number;
+    estimatedHours: number;
+  };
+
+  /** Spaceship construction progress update */
+  'spaceship:construction:progress': {
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    progress: number;
+    milestone: number;
+    ticksRemaining: number;
+  };
+
+  /** Spaceship construction completed */
+  'spaceship:construction:complete': {
+    projectId: string;
+    spaceshipEntityId: string;
+    shipType: string;
+    shipName: string;
+    builderId: string;
+    buildTime: number;
+    ticksElapsed: number;
+  };
+
+  /** Spaceship construction failed */
+  'spaceship:construction:failed': {
+    shipyardId: string;
+    shipType: string;
+    reason: string;
+    required?: string;
+    actual?: string;
+  };
+
+  /** Spaceship construction cancel request */
+  'spaceship:construction:cancel': {
+    projectId: string;
+  };
+
+  /** Spaceship construction cancelled (response) */
+  'spaceship:construction:cancelled': {
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    shipyardId: string;
+    builderId: string;
+  };
+
+  // === Fleet Events ===
+
+  /** Squadron joined a fleet */
+  'fleet:squadron_joined': {
+    fleetId: string;
+    squadronId: string;
+  };
+
+  /** Squadron left a fleet */
+  'fleet:squadron_left': {
+    fleetId: string;
+    squadronId: string;
+  };
+
+  /** Squadron missing from fleet */
+  'fleet:squadron_missing': {
+    fleetId: string;
+    missingSquadronId: string;
+  };
+
+  /** Fleet disbanding (too few squadrons) */
+  'fleet:disbanding': {
+    fleetId: string;
+    reason: string;
+    remainingSquadrons: number;
+  };
+
+  /** Fleet running low on supplies */
+  'fleet:low_supply': {
+    fleetId: string;
+    supplyLevel: number;
+  };
+
+  // === Shipping Lane Events ===
+
+  /** Caravan departed on shipping lane */
+  'lane:caravan_departed': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    originId: string;
+    destinationId: string;
+  };
+
+  /** Caravan arrived at destination */
+  'lane:caravan_arrived': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    destinationId: string;
+    travelTime: number;
+  };
+
+  /** Hazard encountered on shipping lane */
+  'lane:hazard_encountered': {
+    caravanId: string;
+    laneId: string;
+    hazardType: 'pirates' | 'weather' | 'monsters' | 'passage_instability';
+    outcome: 'survived' | 'damaged' | 'destroyed';
+  };
+
+  /** Shipping lane blocked */
+  'lane:blocked': {
+    laneId: string;
+    caravanId?: string;
+  };
+
+  /** Shipping lane abandoned due to lack of use */
+  'lane:abandoned': {
+    laneId: string;
+    ticksSinceLastUse: number;
+  };
+
+  /** Caravan lost (lane disappeared, etc) */
+  'lane:caravan_lost': {
+    caravanId: string;
+    reason: string;
+  };
+}
+
+export type SpaceEventType = keyof SpaceEvents;
+export type SpaceEventData = SpaceEvents[SpaceEventType];

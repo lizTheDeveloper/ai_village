@@ -85,3 +85,24 @@ export function createCourtshipComponent(speciesId: string = 'human'): Courtship
     lastCourtshipAttempt: -10000, // Start off-cooldown (far in the past)
   });
 }
+
+/**
+ * Ensure an entity has a courtship component, adding it lazily if needed.
+ * This should be called when an entity becomes actively seeking courtship.
+ *
+ * @param entity - The entity to ensure has a courtship component
+ * @param speciesId - The species ID to use for creating the component
+ * @returns The courtship component (existing or newly created)
+ */
+export function ensureCourtshipComponent(
+  entity: any,
+  speciesId: string
+): CourtshipComponent {
+  const CT = { Courtship: 'courtship' as const };
+  let comp = entity.getComponent<CourtshipComponent>(CT.Courtship);
+  if (!comp) {
+    comp = createCourtshipComponent(speciesId);
+    entity.addComponent(comp);
+  }
+  return comp;
+}

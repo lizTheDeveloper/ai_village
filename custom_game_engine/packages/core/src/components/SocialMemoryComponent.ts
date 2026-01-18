@@ -255,7 +255,7 @@ export class SocialMemoryComponent extends ComponentBase {
  * @returns The existing or newly created SocialMemoryComponent
  */
 export function ensureSocialMemoryComponent(entity: any): SocialMemoryComponent {
-  let comp = entity.getComponent<SocialMemoryComponent>('social_memory');
+  let comp = entity.getComponent('social_memory') as SocialMemoryComponent | undefined;
   if (!comp) {
     comp = new SocialMemoryComponent();
     entity.addComponent(comp);

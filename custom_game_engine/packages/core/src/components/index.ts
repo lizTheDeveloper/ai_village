@@ -37,7 +37,7 @@ export * from './ConversationComponent.js';
 export { createConversationComponent } from './ConversationComponent.js';
 export type { ConversationComponent } from './ConversationComponent.js';
 export * from './RelationshipComponent.js';
-export { createRelationshipComponent } from './RelationshipComponent.js';
+export { createRelationshipComponent, ensureRelationshipComponent } from './RelationshipComponent.js';
 export type { RelationshipComponent } from './RelationshipComponent.js';
 export * from './JealousyComponent.js';
 export { createJealousyComponent, JealousyComponent } from './JealousyComponent.js';

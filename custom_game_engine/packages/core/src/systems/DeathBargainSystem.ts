@@ -34,7 +34,7 @@ import type { SkillsComponent } from '../components/SkillsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
 import type { TagsComponent } from '../components/TagsComponent.js';
-import { createConversationComponent } from '../components/ConversationComponent.js';
+import { ensureConversationComponent } from '../components/ConversationComponent.js';
 import type { ConversationComponent, ConversationMessage } from '../components/ConversationComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { RiddleGenerator, type HeroContext } from '../divinity/RiddleGenerator.js';
@@ -1389,15 +1389,9 @@ Respond with ONLY a number between 0.0 and 1.0.`;
     deathGod: Entity,
     hero: Entity
   ): void {
-    // Ensure hero has conversation component
-    if (!hero.getComponent('conversation')) {
-      const conv = createConversationComponent(50);
-      (hero as EntityImpl).addComponent(conv);
-    }
-
-    // Set up conversation partnership
+    // Ensure both entities have conversation components
+    const heroConv = ensureConversationComponent(hero, 50);
     const godConv = deathGod.getComponent<ConversationComponent>('conversation');
-    const heroConv = hero.getComponent<ConversationComponent>('conversation');
 
     if (godConv) {
       godConv.partnerId = hero.id;
@@ -1406,12 +1400,11 @@ Respond with ONLY a number between 0.0 and 1.0.`;
       godConv.lastMessageAt = world.tick;
     }
 
-    if (heroConv) {
-      heroConv.partnerId = deathGod.id;
-      heroConv.isActive = true;
-      heroConv.startedAt = world.tick;
-      heroConv.lastMessageAt = world.tick;
-    }
+    // heroConv is guaranteed to exist from ensureConversationComponent
+    heroConv.partnerId = deathGod.id;
+    heroConv.isActive = true;
+    heroConv.startedAt = world.tick;
+    heroConv.lastMessageAt = world.tick;
   }
 
   /**

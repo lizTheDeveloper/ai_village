@@ -119,7 +119,7 @@ export class ThreatIndicatorRenderer {
         continue;
       }
 
-      const position = entity.components.get('position') as any;
+      const position = entity.components.get('position') as PositionComponent | undefined;
       if (!position) {
         continue;
       }
@@ -150,7 +150,7 @@ export class ThreatIndicatorRenderer {
    * Render threat indicator at entity location
    */
   public renderThreatIndicator(entity: Entity, x: number, y: number, severity: string): void {
-    const position = entity.components.get('position') as any;
+    const position = entity.components.get('position') as PositionComponent | undefined;
     if (!position) {
       throw new Error('Cannot render threat indicator: entity missing position component');
     }
@@ -214,8 +214,8 @@ export class ThreatIndicatorRenderer {
       return;
     }
 
-    const playerPos = playerEntity.components.get('position') as any;
-    const threatPos = entity.components.get('position') as any;
+    const playerPos = playerEntity.components.get('position') as PositionComponent | undefined;
+    const threatPos = entity.components.get('position') as PositionComponent | undefined;
 
     if (!playerPos || !threatPos) {
       return;
@@ -252,7 +252,7 @@ export class ThreatIndicatorRenderer {
     viewHeight: number,
     severity: string
   ): void {
-    const position = entity.components.get('position') as any;
+    const position = entity.components.get('position') as PositionComponent | undefined;
     if (!position) {
       throw new Error('Cannot render off-screen arrow: entity missing position component');
     }

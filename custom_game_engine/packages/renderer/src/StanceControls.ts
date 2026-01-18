@@ -1,4 +1,4 @@
-import type { EventBus, Entity } from '@ai-village/core';
+import type { EventBus, Entity, Component } from '@ai-village/core';
 
 /**
  * StanceControls - UI controls for setting combat stances
@@ -49,17 +49,17 @@ export class StanceControls {
     if (entities.length === 0) {
       this.currentStance = 'passive';
     } else if (entities.length === 1 && entities[0]) {
-      const conflict = entities[0].components.get('conflict') as any;
-      if (conflict && conflict.stance) {
-        this.currentStance = conflict.stance;
+      const conflict = entities[0].components.get('conflict') as Component | undefined;
+      if (conflict && (conflict as { stance?: string }).stance) {
+        this.currentStance = (conflict as { stance: string }).stance;
       }
     } else {
       // Check if all entities have the same stance
       const stances = new Set<string>();
       for (const entity of entities) {
-        const conflict = entity.components.get('conflict') as any;
-        if (conflict && conflict.stance) {
-          stances.add(conflict.stance);
+        const conflict = entity.components.get('conflict') as Component | undefined;
+        if (conflict && (conflict as { stance?: string }).stance) {
+          stances.add((conflict as { stance: string }).stance);
         }
       }
 
@@ -104,7 +104,7 @@ export class StanceControls {
 
     // Emit event to update entities
     this.eventBus.emit({
-      type: 'ui:stance:changed' as any,
+      type: 'ui:stance:changed',
       source: 'stance-controls',
       data: {
         entityIds: this.selectedEntities.map(e => e.id),
