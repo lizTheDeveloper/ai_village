@@ -864,19 +864,15 @@ export class HiveMindSystem extends BaseSystem {
 
     this.hives.set(hive.id, hive);
 
-    this.events.emitGeneric({
-      type: 'hive:created' as any,
-      source: 'hive-mind-system',
-      data: {
-        hiveId: hive.id,
-        hiveName: name,
-        speciesId,
-        speciesName: speciesConfig.speciesName,
-        queenId: queenEntity.id,
-        centerX,
-        centerY,
-        telepathyRange: speciesConfig.telepathyRange,
-      },
+    this.events.emitGeneric('hive:created', {
+      hiveId: hive.id,
+      hiveName: name,
+      speciesId,
+      speciesName: speciesConfig.speciesName,
+      queenId: queenEntity.id,
+      centerX,
+      centerY,
+      telepathyRange: speciesConfig.telepathyRange,
     });
 
     return hive;
@@ -910,15 +906,11 @@ export class HiveMindSystem extends BaseSystem {
     hive.workersByCerebrate.set(cerebrateEntity.id, []);
     hive.population++;
 
-    this.events.emitGeneric({
-      type: 'hive:cerebrate_added' as any,
-      source: 'hive-mind-system',
-      data: {
-        hiveId,
-        cerebrateId: cerebrateEntity.id,
-        totalCerebrates: hive.cerebrateIds.length,
-        maxCerebrates: maxCerebrates === 'unlimited' ? 'unlimited' : maxCerebrates,
-      },
+    this.events.emitGeneric('hive:cerebrate_added', {
+      hiveId,
+      cerebrateId: cerebrateEntity.id,
+      totalCerebrates: hive.cerebrateIds.length,
+      maxCerebrates: maxCerebrates === 'unlimited' ? 'unlimited' : maxCerebrates,
     });
 
     return true;
@@ -998,17 +990,13 @@ export class HiveMindSystem extends BaseSystem {
       hive.workersByCerebrate.set(assignedCerebrateId, workers);
     }
 
-    this.events.emitGeneric({
-      type: 'hive:worker_added' as any,
-      source: 'hive-mind-system',
-      data: {
-        hiveId,
-        workerId: workerEntity.id,
-        role,
-        assignedCerebrate: assignedCerebrateId,
-        inRange,
-        totalWorkers: hive.workerIds.length,
-      },
+    this.events.emitGeneric('hive:worker_added', {
+      hiveId,
+      workerId: workerEntity.id,
+      role,
+      assignedCerebrate: assignedCerebrateId,
+      inRange,
+      totalWorkers: hive.workerIds.length,
     });
 
     return true;
