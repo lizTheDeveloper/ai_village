@@ -17,12 +17,16 @@ export class ChunkLoadingSystem extends BaseSystem {
   readonly priority = 5; // Run early, after TimeSystem
   readonly requiredComponents: string[] = [];
 
+  // Throttle to every 10 ticks (500ms at 20 TPS) for visual mode
+  // Camera scrolling doesn't need every-tick updates
+  protected readonly throttleInterval = 10;
+
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
   private viewportProvider: (() => { x: number; y: number; width: number; height: number } | null) | null = null;
   private tileSize = 16;
 
-  /** Throttling for headless mode - agents don't move fast enough to need every-tick checks */
+  /** Additional throttling for headless mode - agents don't move fast enough to need every-tick checks */
   private lastHeadlessUpdateTick = 0;
   private readonly HEADLESS_UPDATE_INTERVAL = 20; // 1 second at 20 TPS
 

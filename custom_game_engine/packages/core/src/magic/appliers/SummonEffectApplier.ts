@@ -13,8 +13,10 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
+import type { EntityImpl } from '../../ecs/EntityImpl.js';
 
 /**
  * SummonEffectApplier implementation.
@@ -32,7 +34,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     const appliedValues: Record<string, number> = {};
 
     // Get caster position for spawn location
-    const casterPosComp = caster.components.get('position');
+    const casterPosComp = caster.getComponent<PositionComponent>('position');
     if (!casterPosComp) {
       return {
         success: false,
@@ -49,9 +51,9 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
     // Extract position values from component
     const casterPos = {
-      x: (casterPosComp as any).x ?? 0,
-      y: (casterPosComp as any).y ?? 0,
-      z: (casterPosComp as any).z ?? 0,
+      x: casterPosComp.x,
+      y: casterPosComp.y,
+      z: casterPosComp.z ?? 0,
     };
 
     // Calculate summon parameters

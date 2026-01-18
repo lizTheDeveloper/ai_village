@@ -60,6 +60,7 @@ export class PredatorAttackSystem extends BaseSystem {
   public readonly id: SystemId = 'predator_attack';
   public readonly priority = 47;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 30; // 1.5s - responsive combat without every-tick overhead
 
   protected onUpdate(ctx: SystemContext): void {
     // Find all predators (wild animals with danger > 5)

@@ -351,7 +351,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
    * Apply damage to target's health.
    */
   private applyDamageToTarget(target: Entity, damage: number): number {
-    const needs = target.components.get('needs') as NeedsComponent | undefined;
+    const needs = target.getComponent<NeedsComponent>('needs');
     if (!needs) {
       // No health component, can't apply damage
       return 0;

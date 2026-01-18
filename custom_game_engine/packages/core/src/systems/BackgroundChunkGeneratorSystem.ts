@@ -39,6 +39,9 @@ export class BackgroundChunkGeneratorSystem extends BaseSystem {
   readonly priority = 6; // Right after ChunkLoadingSystem (priority 5)
   readonly requiredComponents: string[] = []; // Event-driven, no components
 
+  // Throttle to every 10 ticks (500ms at 20 TPS) - generator has internal throttling too
+  protected readonly throttleInterval = 10;
+
   protected onUpdate(ctx: SystemContext): void {
     const generator = ctx.world.getBackgroundChunkGenerator();
     if (!generator) {

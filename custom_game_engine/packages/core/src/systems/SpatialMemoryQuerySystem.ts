@@ -15,6 +15,7 @@ export class SpatialMemoryQuerySystem extends BaseSystem {
   public readonly id: SystemId = 'spatial_memory_query';
   public readonly priority: number = 105; // After MemoryFormation, before BeliefFormation
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 20; // Every 1 second - memory indexing can be batched
 
   // Future: Add event bus support for memory indexing events
   private lastProcessedMemoryCount: Map<string, number> = new Map();

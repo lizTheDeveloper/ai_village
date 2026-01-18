@@ -33,9 +33,9 @@ export class TechnologyUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'technology_unlock';
   public readonly priority: number = 16; // Run after building system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds - tech unlocks are rare events
 
   private systemRegistry: ISystemRegistry;
-  private lastCheckedTick: number = 0;
   private checkedBuildings: Set<string> = new Set(); // Track which buildings we've already processed
 
   // Cache cities to avoid repeated queries
@@ -49,6 +49,7 @@ export class TechnologyUnlockSystem extends BaseSystem {
 
   /**
    * Update - scan for newly completed buildings.
+   * Throttled to every 100 ticks (5 seconds) via throttleInterval.
    */
   protected onUpdate(ctx: SystemContext): void {
     // Get the global technology unlock singleton
@@ -64,12 +65,8 @@ export class TechnologyUnlockSystem extends BaseSystem {
       return;
     }
 
-    // Periodically scan for completed buildings (in case event was missed)
-    if (ctx.tick - this.lastCheckedTick >= 100) {
-      // Every 5 seconds
-      this.scanForNewBuildings(ctx.world, unlock);
-      this.lastCheckedTick = ctx.tick;
-    }
+    // Scan for completed buildings (throttled by BaseSystem)
+    this.scanForNewBuildings(ctx.world, unlock);
   }
 
 
