@@ -19,6 +19,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Deity domain alignments */
 interface DeityAlignment {
@@ -282,7 +283,7 @@ export class DivineCostCalculator extends BaseCostCalculator {
    * Override terminal effect for divine-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -303,13 +304,13 @@ export class DivineCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, caster);
+    return super.getTerminalEffect(costType, trigger, caster);
   }
 
   /**
    * Override cumulative check - karma is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'karma' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'karma' || super.isCumulativeCost(costType);
   }
 }

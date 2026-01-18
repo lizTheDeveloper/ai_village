@@ -50,6 +50,49 @@ export class PrayerAnsweringSystem extends BaseSystem {
   }
 
   /**
+   * Safely remove a prayer from the queue (handles deserialized plain objects)
+   */
+  private _removePrayer(deityComp: DeityComponent, prayerId: string): void {
+    if (typeof deityComp.removePrayer === 'function') {
+      deityComp.removePrayer(prayerId);
+    } else if (deityComp.prayerQueue) {
+      const index = deityComp.prayerQueue.findIndex(p => p.prayerId === prayerId);
+      if (index !== -1) {
+        deityComp.prayerQueue.splice(index, 1);
+      }
+    }
+  }
+
+  /**
+   * Safely spend belief (handles deserialized plain objects)
+   */
+  private _spendBelief(deityComp: DeityComponent, amount: number): boolean {
+    if (typeof deityComp.spendBelief === 'function') {
+      return deityComp.spendBelief(amount);
+    } else if (deityComp.belief && deityComp.belief.currentBelief >= amount) {
+      deityComp.belief.currentBelief -= amount;
+      deityComp.belief.totalBeliefSpent = (deityComp.belief.totalBeliefSpent || 0) + amount;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Safely answer a prayer (handles deserialized plain objects)
+   */
+  private _answerPrayer(deityComp: DeityComponent, prayerId: string, cost: number): boolean {
+    if (typeof deityComp.answerPrayer === 'function') {
+      return deityComp.answerPrayer(prayerId, cost);
+    }
+    // Manual implementation for plain objects
+    if (!this._spendBelief(deityComp, cost)) {
+      return false;
+    }
+    this._removePrayer(deityComp, prayerId);
+    return true;
+  }
+
+  /**
    * Get the prayer config from the world's divine config
    */
   private getPrayerConfig(world: World): PrayerConfig | undefined {
@@ -121,8 +164,8 @@ export class PrayerAnsweringSystem extends BaseSystem {
       return;
     }
 
-    // Get next prayer
-    const nextPrayer = deityComp.getNextPrayer();
+    // Get next prayer (access directly - method may not exist after deserialization)
+    const nextPrayer = deityComp.prayerQueue?.[0];
     if (!nextPrayer) return;
 
     // Find the agent who prayed

@@ -477,12 +477,16 @@ export const enlargeEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Increase body size dramatically.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 600,
+  dispellable: true,
+  stackable: false,
   transformType: 'size',
   newSize: 'large',
   tags: ['transform', 'size', 'enlarge'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Reduce - decreases body size
@@ -493,12 +497,16 @@ export const reduceEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Shrink body size dramatically.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 600,
+  dispellable: true,
+  stackable: false,
   transformType: 'size',
   newSize: 'small',
   tags: ['transform', 'size', 'reduce'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Polymorph - full body transformation
@@ -509,12 +517,16 @@ export const polymorphEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Transform into a completely different form.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 1800,
+  dispellable: true,
+  stackable: false,
   transformType: 'form',
   newBodyPlan: 'avian_winged',  // Default, can be specified per cast
   tags: ['transform', 'polymorph', 'powerful'],
   modificationSource: 'magic',
-} as any;
+};
 
 // ============================================================================
 // Registration

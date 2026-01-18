@@ -10,7 +10,7 @@
  * 6. Infant care and nursing
  */
 
-import type { System } from '@ai-village/core';
+import { BaseSystem, type SystemContext } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityImpl } from '@ai-village/core';
@@ -110,20 +110,15 @@ export interface BirthOutcome {
 // The System
 // ============================================================================
 
-export class MidwiferySystem implements System {
+export class MidwiferySystem extends BaseSystem {
   public readonly id: SystemId = 'midwifery';
   public readonly priority = 45; // Run before general NeedsSystem
   public readonly requiredComponents = [] as const;
 
-  private world: World | null = null;
-  private eventBus: EventBus | null = null;
   private reproductionSystem: ReproductionSystem | null = null;
   private lastUpdateTick: Tick = 0;
 
-  public initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.eventBus = eventBus;
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
     // Note: world.getSystem may not be available in all contexts (e.g., tests)
     try {
@@ -132,33 +127,33 @@ export class MidwiferySystem implements System {
       this.reproductionSystem = null;
     }
 
-    // Subscribe to conception events
-    this.eventBus.subscribe('conception' as any, (event: any) => {
+    // Subscribe to conception events using the events manager
+    this.events.subscribe('conception' as any, (event: any) => {
       this.handleConception(event.data);
     });
   }
 
-  public update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
     const deltaTicks = currentTick - this.lastUpdateTick;
     this.lastUpdateTick = currentTick;
 
     if (deltaTicks <= 0) return;
 
     // Update all pregnant entities
-    this.updatePregnancies(world, currentTick, deltaTicks);
+    this.updatePregnancies(ctx.world, currentTick, deltaTicks);
 
     // Update all entities in labor
-    this.updateLabors(world, currentTick, deltaTicks);
+    this.updateLabors(ctx.world, currentTick, deltaTicks);
 
     // Update postpartum recovery
-    this.updatePostpartum(world, deltaTicks);
+    this.updatePostpartum(ctx.world, deltaTicks);
 
     // Update infants
-    this.updateInfants(world, currentTick, deltaTicks);
+    this.updateInfants(ctx.world, currentTick, deltaTicks);
 
     // Update nursing mothers
-    this.updateNursing(world, currentTick, deltaTicks);
+    this.updateNursing(ctx.world, currentTick, deltaTicks);
   }
 
   // =========================================================================

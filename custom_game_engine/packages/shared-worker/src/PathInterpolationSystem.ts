@@ -7,7 +7,8 @@
  * This system runs ONLY in windows (view-only mode), not in the worker.
  */
 
-import type { World, Entity, System } from '@ai-village/core';
+import type { World, Entity } from '@ai-village/core';
+import { BaseSystem, type SystemContext } from '@ai-village/core';
 import type {
   PathPrediction,
   PathInterpolatorComponent,
@@ -21,14 +22,14 @@ import { predictPosition } from './path-prediction-types.js';
  *
  * Priority: 5 (before rendering, after state sync)
  */
-export class PathInterpolationSystem implements System {
-  readonly id = 'path_interpolation' as const;
-  readonly priority = 5;
-  readonly requiredComponents = ['path_interpolator', 'position'] as const;
+export class PathInterpolationSystem extends BaseSystem {
+  public readonly id = 'path_interpolation' as const;
+  public readonly priority = 5;
+  public readonly requiredComponents = ['path_interpolator', 'position'] as const;
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
-      this.interpolate(entity, world);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.interpolate(entity, ctx.world);
     }
   }
 
