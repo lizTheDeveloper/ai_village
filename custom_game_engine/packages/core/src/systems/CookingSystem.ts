@@ -72,6 +72,7 @@ export class CookingSystem extends BaseSystem {
   public readonly id = 'cooking' as const;
   public readonly priority = 56; // Just after CraftingSystem (55)
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval: number = 50; // Update every 50 ticks (2.5 seconds)
 
   private recipeRegistry: RecipeRegistry | null = null;
 

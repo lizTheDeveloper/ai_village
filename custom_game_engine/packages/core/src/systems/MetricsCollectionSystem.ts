@@ -44,7 +44,7 @@ export class MetricsCollectionSystem extends BaseSystem {
   public readonly priority: number = 999; // Run last to capture all events
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  protected readonly throttleInterval = 0; // Run every tick
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private collector!: MetricsCollector;
   private config: MetricsCollectionConfig;

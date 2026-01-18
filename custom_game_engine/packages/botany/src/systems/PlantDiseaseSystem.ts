@@ -69,6 +69,10 @@ export class PlantDiseaseSystem extends BaseSystem {
    * @see PlantSystem - provides plant health, stage, and genetics data for disease/pest calculations
    */
   public readonly dependsOn = ['plant'] as const;
+
+  /** Throttle to every 5 seconds (100 ticks at 20 TPS) */
+  protected readonly throttleInterval = 100;
+
   private config: PlantDiseaseSystemConfig;
   private speciesLookup: ((id: string) => PlantSpecies | undefined) | null = null;
 

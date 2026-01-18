@@ -246,7 +246,10 @@ export class MidwiferySystem extends BaseSystem {
    * Update all pregnancies
    */
   private updatePregnancies(world: World, currentTick: Tick, deltaTicks: number): void {
-    for (const entity of world.entities.values()) {
+    // Use cached query instead of iterating all entities
+    const pregnantEntities = world.query().with('pregnancy').executeEntities();
+
+    for (const entity of pregnantEntities) {
       const impl = entity as EntityImpl;
       const pregnancy = impl.getComponent<PregnancyComponent>('pregnancy');
 
@@ -376,7 +379,10 @@ export class MidwiferySystem extends BaseSystem {
    * Update all active labors
    */
   private updateLabors(world: World, currentTick: Tick, deltaTicks: number): void {
-    for (const entity of world.entities.values()) {
+    // Use cached query instead of iterating all entities
+    const laboringEntities = world.query().with('labor').executeEntities();
+
+    for (const entity of laboringEntities) {
       const impl = entity as EntityImpl;
       const labor = impl.getComponent<LaborComponent>('labor');
 
@@ -713,7 +719,10 @@ export class MidwiferySystem extends BaseSystem {
   private updatePostpartum(world: World, deltaTicks: number): void {
     const deltaDays = deltaTicks / (20 * 60 * 24); // Rough conversion
 
-    for (const entity of world.entities.values()) {
+    // Use cached query instead of iterating all entities
+    const postpartumEntities = world.query().with('postpartum').executeEntities();
+
+    for (const entity of postpartumEntities) {
       const impl = entity as EntityImpl;
       const postpartum = impl.getComponent<PostpartumComponent>('postpartum');
 
@@ -744,7 +753,10 @@ export class MidwiferySystem extends BaseSystem {
   private updateNursing(world: World, currentTick: Tick, deltaTicks: number): void {
     const deltaDays = deltaTicks / (20 * 60 * 24);
 
-    for (const entity of world.entities.values()) {
+    // Use cached query instead of iterating all entities
+    const nursingEntities = world.query().with('nursing').executeEntities();
+
+    for (const entity of nursingEntities) {
       const impl = entity as EntityImpl;
       const nursing = impl.getComponent<NursingComponent>('nursing');
 
@@ -777,7 +789,10 @@ export class MidwiferySystem extends BaseSystem {
   private updateInfants(world: World, currentTick: Tick, deltaTicks: number): void {
     const deltaDays = deltaTicks / (20 * 60 * 24);
 
-    for (const entity of world.entities.values()) {
+    // Use cached query instead of iterating all entities
+    const infantEntities = world.query().with('infant').executeEntities();
+
+    for (const entity of infantEntities) {
       const impl = entity as EntityImpl;
       const infant = impl.getComponent<InfantComponent>('infant');
 

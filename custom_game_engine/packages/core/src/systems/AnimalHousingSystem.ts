@@ -42,22 +42,22 @@ export class AnimalHousingSystem extends BaseSystem {
 
     // Update cleanliness daily
     if (currentTime - this.lastCleanlinessUpdate >= this.CLEANLINESS_UPDATE_INTERVAL) {
-      this.updateCleanliness(ctx.world);
+      this.updateCleanliness(ctx);
       this.lastCleanlinessUpdate = currentTime;
     }
 
     // Apply housing effects to animals
-    this.applyHousingEffects(ctx.world);
+    this.applyHousingEffects(ctx);
 
     // Validate housing assignments
-    this.validateHousingAssignments(ctx.world);
+    this.validateHousingAssignments(ctx);
   }
 
   /**
    * Update cleanliness for all animal housing buildings (daily)
    */
-  private updateCleanliness(world: World): void {
-    for (const entity of world.entities.values()) {
+  private updateCleanliness(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const building = impl.getComponent<BuildingComponent>(CT.Building);
 
@@ -89,7 +89,7 @@ export class AnimalHousingSystem extends BaseSystem {
 
       // Emit events based on cleanliness thresholds
       if (newCleanliness < CLEANLINESS_WARNING && building.cleanliness >= CLEANLINESS_WARNING) {
-        world.eventBus.emit({
+        ctx.world.eventBus.emit({
           type: 'housing:dirty',
           source: entity.id,
           data: {
@@ -106,8 +106,8 @@ export class AnimalHousingSystem extends BaseSystem {
   /**
    * Apply housing effects to animals (comfort, stress reduction, etc.)
    */
-  private applyHousingEffects(world: World): void {
-    for (const entity of world.entities.values()) {
+  private applyHousingEffects(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const animal = impl.getComponent<AnimalComponent>(CT.Animal);
 
@@ -116,7 +116,7 @@ export class AnimalHousingSystem extends BaseSystem {
       }
 
       // Get housing building
-      const housingEntity = world.entities.get(animal.housingBuildingId);
+      const housingEntity = ctx.world.entities.get(animal.housingBuildingId);
       if (!housingEntity) {
         // Housing no longer exists - unhouse animal
         impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
@@ -158,12 +158,12 @@ export class AnimalHousingSystem extends BaseSystem {
   /**
    * Validate housing assignments and update occupancy lists
    */
-  private validateHousingAssignments(world: World): void {
+  private validateHousingAssignments(ctx: SystemContext): void {
     // Build map of housing -> animals
     const housingOccupancy = new Map<string, string[]>();
 
     // Scan all animals for housing assignments
-    for (const entity of world.entities.values()) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const animal = impl.getComponent<AnimalComponent>(CT.Animal);
 
@@ -177,7 +177,7 @@ export class AnimalHousingSystem extends BaseSystem {
     }
 
     // Update building occupancy lists
-    for (const entity of world.entities.values()) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const building = impl.getComponent<BuildingComponent>(CT.Building);
 
@@ -199,7 +199,7 @@ export class AnimalHousingSystem extends BaseSystem {
 
         // Emit capacity event if full
         if (actualOccupants.length >= building.animalCapacity) {
-          world.eventBus.emit({
+          ctx.world.eventBus.emit({
             type: 'housing:full',
             source: entity.id,
             data: {

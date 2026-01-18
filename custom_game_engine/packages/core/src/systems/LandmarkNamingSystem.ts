@@ -139,8 +139,10 @@ export class LandmarkNamingSystem extends BaseSystem {
       if (comp) return comp;
     }
 
-    // Create on first world entity if not found
-    const firstEntity = world.entities.values().next().value as EntityImpl | undefined;
+    // Create on first available entity if not found
+    // Use query to get any entity rather than iterating all entities
+    const allEntities = world.query().executeEntities();
+    const firstEntity = allEntities[0] as EntityImpl | undefined;
     if (firstEntity) {
       const newComp = new NamedLandmarksComponent();
       firstEntity.addComponent(newComp);

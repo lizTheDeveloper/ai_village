@@ -48,6 +48,7 @@ export class DurabilitySystem extends BaseSystem {
   public readonly id: SystemId = 'durability';
   public readonly priority: number = 56; // After CraftingSystem (55)
   public readonly requiredComponents = [] as const; // Manual processing, not entity-based
+  protected readonly throttleInterval: number = 100; // Update every 100 ticks (5 seconds)
 
   private eventBus: EventBus | null = null;
 

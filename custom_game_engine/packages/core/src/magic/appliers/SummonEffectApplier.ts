@@ -17,6 +17,7 @@ import type { PositionComponent } from '../../components/PositionComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 import type { EntityImpl } from '../../ecs/EntityImpl.js';
+import type { WorldImpl } from '../../ecs/WorldImpl.js';
 
 /**
  * SummonEffectApplier implementation.
@@ -94,7 +95,8 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        (summonedEntity as any).addComponent(positionComponent);
+        // Cast to EntityImpl: Entity interface doesn't expose mutation methods
+        (summonedEntity as EntityImpl).addComponent(positionComponent);
 
         // Set owner if controllable
         if (effect.controllable) {
@@ -185,8 +187,8 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         // Check if entity still exists before destroying
         const entity = world.getEntity(summonId);
         if (entity) {
-          // Use WorldImpl to destroy entity - World interface doesn't expose this
-          (world as any).destroyEntity(summonId, 'summon_expired');
+          // Cast to WorldImpl: World interface doesn't expose destroyEntity method
+          (world as WorldImpl).destroyEntity(summonId, 'summon_expired');
         }
       } catch (error) {
         // Entity might have already been destroyed - that's fine

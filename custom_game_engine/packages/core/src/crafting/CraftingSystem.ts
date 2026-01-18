@@ -57,6 +57,7 @@ export class CraftingSystem extends BaseSystem {
   public readonly id = 'crafting' as const;
   public readonly priority = 55; // After BuildingSystem (50), before MemorySystem (100)
   public readonly requiredComponents = [] as const; // Process queues manually, not entity-based
+  protected readonly throttleInterval: number = 50; // Update every 50 ticks (2.5 seconds)
 
   private queues: Map<EntityId, AgentCraftingQueue> = new Map();
   private readonly MAX_QUEUE_SIZE = 10;

@@ -29,6 +29,9 @@ export class WildAnimalSpawningSystem extends BaseSystem {
   public readonly priority: number = 90;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  /** Throttle to every 10 seconds (200 ticks at 20 TPS) for periodic spawn checks */
+  protected readonly throttleInterval = 200;
+
   private spawnedChunks: Set<string> = new Set();
 
   protected onUpdate(_ctx: SystemContext): void {

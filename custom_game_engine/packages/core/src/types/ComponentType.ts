@@ -68,6 +68,7 @@ export enum ComponentType {
   BuildingHarmony = 'building_harmony',
   TownHall = 'town_hall',
   CensusBureau = 'census_bureau',
+  VillageGovernance = 'village_governance',
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',

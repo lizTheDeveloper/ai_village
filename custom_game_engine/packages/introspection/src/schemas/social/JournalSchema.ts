@@ -103,12 +103,38 @@ export const JournalSchema = autoRegister(
 
     validate: (data): data is JournalComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const j = data as any;
+      const j = data as Record<string, unknown>;
 
-      return (
-        j.type === 'journal' &&
-        Array.isArray(j.entries)
-      );
+      // Check required fields: type and entries
+      if (!('type' in j) || j.type !== 'journal') return false;
+      if (!('entries' in j) || !Array.isArray(j.entries)) return false;
+
+      // Validate each entry in the array
+      for (const entry of j.entries) {
+        if (typeof entry !== 'object' || entry === null) return false;
+        const e = entry as Record<string, unknown>;
+
+        // Required fields
+        if (!('id' in e) || typeof e.id !== 'string') return false;
+        if (!('text' in e) || typeof e.text !== 'string') return false;
+        if (!('timestamp' in e) || typeof e.timestamp !== 'number') return false;
+        if (!('memoryIds' in e) || !Array.isArray(e.memoryIds)) return false;
+        if (!('topics' in e) || !Array.isArray(e.topics)) return false;
+        if (!('discoverable' in e) || typeof e.discoverable !== 'boolean') return false;
+        if (!('privacy' in e) || (e.privacy !== 'public' && e.privacy !== 'private')) return false;
+
+        // Validate memoryIds array items
+        for (const memoryId of e.memoryIds) {
+          if (typeof memoryId !== 'string') return false;
+        }
+
+        // Validate topics array items
+        for (const topic of e.topics) {
+          if (typeof topic !== 'string') return false;
+        }
+      }
+
+      return true;
     },
 
     createDefault: () => ({

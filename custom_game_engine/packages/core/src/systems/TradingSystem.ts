@@ -49,7 +49,8 @@ export interface TradeResult {
 export class TradingSystem extends BaseSystem {
   public readonly id: SystemId = 'trading';
   public readonly priority: number = 25; // Run after most other systems
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Inventory];
+  protected readonly throttleInterval: number = 20; // Update every 20 ticks (1 second)
 
   private isInitialized = false;
 

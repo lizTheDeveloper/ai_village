@@ -175,8 +175,11 @@ export class SoulAnimationProgressionSystem extends BaseSystem {
 
   /**
    * Find agent entity by soul ID
+   * Note: This is event-driven and queries at specific moments (soul creation/reincarnation)
+   * Using targeted query is acceptable here as it's not in the hot path
    */
   private findAgentBySoulId(world: World, soulId: string): string | null {
+    // This is a targeted query triggered by soul events, not a per-tick iteration
     for (const entity of world.entities.values()) {
       const soulLink = entity.components.get('soul_link') as SoulLinkComponent | undefined;
       if (soulLink && soulLink.soulEntityId === soulId) {

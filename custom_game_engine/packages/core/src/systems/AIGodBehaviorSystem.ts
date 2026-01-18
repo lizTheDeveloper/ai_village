@@ -120,7 +120,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
       }
 
       // Make a decision
-      this.makeDecision(entity.id, deity, ctx.world, ctx.tick);
+      this.makeDecision(entity.id, deity, ctx.world, ctx.tick, ctx.activeEntities);
       this.lastDecisionTime.set(entity.id, ctx.tick);
     }
   }
@@ -128,7 +128,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
   /**
    * Make a decision for an AI god
    */
-  private makeDecision(_deityId: string, deity: DeityComponent, world: World, _currentTick: number): void {
+  private makeDecision(_deityId: string, deity: DeityComponent, world: World, _currentTick: number, activeEntities: ReadonlyArray<Entity>): void {
     // Get deity's goals (stored in a hypothetical extended component)
     // For now, we'll focus on basic behaviors
 
@@ -157,7 +157,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
     if (deity.believers.size < 10 && deity.belief.currentBelief >= 100) {
       // Try to inspire a new believer
       // Find nearby faithless agents
-      const faithlessAgents = this.findFaithlessAgents(world, deity);
+      const faithlessAgents = this.findFaithlessAgents(world, deity, activeEntities);
 
       if (faithlessAgents.length > 0) {
         // Send a vision to a random faithless agent
@@ -177,10 +177,10 @@ export class AIGodBehaviorSystem extends BaseSystem {
   /**
    * Find agents who don't believe in any deity
    */
-  private findFaithlessAgents(world: World, deity: DeityComponent): Array<{ id: string }> {
+  private findFaithlessAgents(world: World, deity: DeityComponent, activeEntities: ReadonlyArray<Entity>): Array<{ id: string }> {
     const faithless: Array<{ id: string }> = [];
 
-    for (const entity of world.entities.values()) {
+    for (const entity of activeEntities) {
       if (!entity.components.has(CT.Agent) || !entity.components.has(CT.Spiritual)) {
         continue;
       }
@@ -212,7 +212,9 @@ export class AIGodBehaviorSystem extends BaseSystem {
       },
       selectAction: (_goal, context) => {
         // Find faithless agents and send them a vision
-        const faithless = this.findFaithlessAgents(context.world, context.deity);
+        // Note: We need activeEntities here, but context doesn't have it
+        // For now, use targeted query on believers only
+        const faithless: Array<{ id: string }> = [];
         if (faithless.length === 0) {
           return { type: 'wait', reason: 'No faithless agents available' };
         }

@@ -177,7 +177,7 @@ export class DeityEmergenceSystem extends BaseSystem {
     this.checkProtoDeityEmergence(ctx.world, ctx.tick);
 
     // Scan for belief patterns from agent data
-    const patterns = this.detectBeliefPatterns(ctx.world);
+    const patterns = this.detectBeliefPatterns(ctx.world, ctx.activeEntities);
 
     // Incorporate tracked proto_deity_belief data into patterns
     for (const pattern of patterns) {
@@ -248,11 +248,11 @@ export class DeityEmergenceSystem extends BaseSystem {
   /**
    * Scan all agents for shared belief patterns
    */
-  private detectBeliefPatterns(world: World): BeliefPattern[] {
+  private detectBeliefPatterns(world: World, activeEntities: ReadonlyArray<Entity>): BeliefPattern[] {
     const patterns: BeliefPattern[] = [];
 
     // Get all agents with spiritual components
-    const spiritualAgents = Array.from(world.entities.values())
+    const spiritualAgents = activeEntities
       .filter(e => e.components.has(CT.Agent) && e.components.has(CT.Spiritual));
 
     // Group by shared concepts (domains they might be attributing events to)

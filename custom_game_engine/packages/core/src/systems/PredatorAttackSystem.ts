@@ -59,25 +59,25 @@ interface TerritoryComponent extends Component {
 export class PredatorAttackSystem extends BaseSystem {
   public readonly id: SystemId = 'predator_attack';
   public readonly priority = 47;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 30; // 1.5s - responsive combat without every-tick overhead
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'] as const;
+
+  /** Throttle to every 1 second (20 ticks at 20 TPS) */
+  protected readonly throttleInterval = 20;
 
   protected onUpdate(ctx: SystemContext): void {
-    // Find all predators (wild animals with danger > 5)
+    // ctx.activeEntities are already filtered to animals via scheduler
+    // We need to further filter for predators (danger >= 5)
     const predators: Entity[] = [];
-    const agents: Entity[] = [];
 
     for (const entity of ctx.activeEntities) {
-      if (ctx.world.hasComponent(entity.id, 'animal')) {
-        const animal = ctx.world.getComponent<AnimalComponent>(entity.id, 'animal');
-        if (animal && animal.danger >= 5) {
-          predators.push(entity);
-        }
-      }
-      if (ctx.world.hasComponent(entity.id, 'agent')) {
-        agents.push(entity);
+      const animal = ctx.world.getComponent<AnimalComponent>(entity.id, 'animal');
+      if (animal && animal.danger >= 5) {
+        predators.push(entity);
       }
     }
+
+    // Get all agents for target checking (separate query since we need all agents, not just visible)
+    const agents = ctx.world.query().with('agent').executeEntities();
 
     // Process each predator
     for (const predator of predators) {

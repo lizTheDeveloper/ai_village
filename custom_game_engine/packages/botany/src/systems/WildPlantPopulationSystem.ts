@@ -63,6 +63,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   public readonly dependsOn = [] as const;
 
+  /** Throttle to every 10 seconds (200 ticks at 20 TPS) */
+  protected readonly throttleInterval = 200;
+
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
   private config: PopulationConfig;
 
