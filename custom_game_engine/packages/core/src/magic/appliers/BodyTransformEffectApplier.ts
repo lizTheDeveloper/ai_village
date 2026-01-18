@@ -237,7 +237,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       };
       body.modifications.push(mod);
     } catch (error) {
-      appliedValues.error = `Failed to polymorph: ${error}`;
+      appliedValues.polymorphFailed = 1;
     }
   }
 
@@ -246,7 +246,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['addBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, number | string | string[]>
+    appliedValues: Record<string, number>
   ): void {
     if (!spec) return;
 
@@ -277,7 +277,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       addedParts.push(partId);
     }
 
-    appliedValues.partsAdded = addedParts;
+    appliedValues.partsAdded = addedParts.length;
 
     // Track as modification
     const mod: GlobalBodyModification = {
@@ -298,7 +298,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['removeBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, number | string | string[]>
+    appliedValues: Record<string, number>
   ): void {
     if (!spec) return;
 
@@ -313,7 +313,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       }
     }
 
-    appliedValues.partsRemoved = removedParts;
+    appliedValues.partsRemoved = removedParts.length;
 
     // Track as modification
     if (removedParts.length > 0) {
@@ -336,7 +336,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['modifyBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, number | string | string[]>
+    appliedValues: Record<string, number>
   ): void {
     if (!spec) return;
 

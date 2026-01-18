@@ -61,7 +61,7 @@ export type {
 // ============================================================================
 
 export { RenormalizationEngine } from './renormalization/RenormalizationEngine.js';
-export { TIER_CONSTANTS } from './renormalization/TierConstants.js';
+export { TIME_SCALE, TIER_LEVEL_INDEX } from './renormalization/TierConstants.js';
 
 // ============================================================================
 // Simulation Controller
@@ -82,10 +82,10 @@ export { HierarchyDOMRenderer } from './renderers/HierarchyDOMRenderer.js';
 export type {
   ResearchPaper,
   ResearchField,
-  ScientistTier,
+  Scientist,
 } from './research/ResearchTypes.js';
 
-export { ScientistEmergence } from './research/ScientistEmergence.js';
+export { ScientistEmergenceSystem } from './research/ScientistEmergence.js';
 
 // ============================================================================
 // Mock Data Generator (for testing)
