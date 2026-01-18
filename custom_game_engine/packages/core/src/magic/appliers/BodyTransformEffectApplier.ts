@@ -247,7 +247,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['addBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, any>
+    appliedValues: Record<string, number | string | string[]>
   ): void {
     if (!spec) return;
 
@@ -299,7 +299,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['removeBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, any>
+    appliedValues: Record<string, number | string | string[]>
   ): void {
     if (!spec) return;
 

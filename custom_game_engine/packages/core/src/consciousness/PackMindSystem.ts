@@ -1163,17 +1163,13 @@ export class PackMindSystem extends BaseSystem {
 
     this.updateFormation(pack);
 
-    this.events.emitGeneric({
-      type: 'pack:body_added' as any,
-      source: 'pack-mind-system',
-      data: {
-        packId,
-        bodyId: bodyEntity.id,
-        bodyName: newBody.name,
-        inRange,
-        totalBodies: pack.bodyCount,
-        maxBodies: maxBodies === 'unlimited' ? 'unlimited' : maxBodies,
-      },
+    this.events.emitGeneric('pack:body_added', {
+      packId,
+      bodyId: bodyEntity.id,
+      bodyName: newBody.name,
+      inRange,
+      totalBodies: pack.bodyCount,
+      maxBodies: maxBodies === 'unlimited' ? 'unlimited' : maxBodies,
     });
 
     return true;

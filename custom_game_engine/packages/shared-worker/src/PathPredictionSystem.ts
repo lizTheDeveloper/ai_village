@@ -34,14 +34,14 @@ interface DirtyForSyncComponent {
  *
  * Priority: 50 (after movement systems, before rendering)
  */
-export class PathPredictionSystem implements System {
-  readonly id = 'path_prediction' as const;
-  readonly priority = 50;
-  readonly requiredComponents = ['position'] as const;
+export class PathPredictionSystem extends BaseSystem {
+  public readonly id = 'path_prediction' as const;
+  public readonly priority = 50;
+  public readonly requiredComponents = ['position'] as const;
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
-      this.updatePrediction(entity as EntityImpl, world);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.updatePrediction(entity as EntityImpl, ctx.world);
     }
   }
 
