@@ -54,7 +54,7 @@ export type BuildingFunction =
   | { type: 'mood_aura'; moodBonus: number; radius: number }
   | { type: 'automation'; tasks: string[] }
   | { type: 'governance'; governanceType: string }
-  | { type: 'healing'; healingRate: number }
+  | { type: 'healing'; healingRate: number; conditions?: string[] }
   | { type: 'social_hub'; radius: number }
   | { type: 'vision_extension'; radiusBonus: number }
   | { type: 'job_board' }

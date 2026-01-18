@@ -1,13 +1,12 @@
 import type {
-  System,
   SystemId,
   ComponentType,
-  World,
   Entity,
-  EventBus,
   ExplorationStateComponent,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType as CT,
   EntityImpl,
   getAgent,
@@ -18,12 +17,11 @@ import {
  * ExplorationSystem manages frontier and spiral exploration algorithms
  * Updates ExplorationState and sets steering targets for agents
  */
-export class ExplorationSystem implements System {
+export class ExplorationSystem extends BaseSystem {
   public readonly id: SystemId = 'exploration';
   public readonly priority: number = 25; // After AISystem, before Steering
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.ExplorationState] as const;
 
-  private eventBus?: EventBus;
   private lastCoverageMilestone: Map<string, number> = new Map();
 
   /**
@@ -33,17 +31,10 @@ export class ExplorationSystem implements System {
     return entity.getComponent<ExplorationStateComponent>(CT.ExplorationState) ?? null;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Get entities with ExplorationState
-    const explorers = entities.filter(e => e.components.has(CT.ExplorationState));
-
-    for (const entity of explorers) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       try {
-        this._updateExploration(entity, world, deltaTime);
+        this._updateExploration(entity, ctx.world, ctx.tick);
       } catch (error) {
         // Per CLAUDE.md, re-throw with context
         throw new Error(`ExplorationSystem failed for entity ${entity.id}: ${error}`);
@@ -51,7 +42,7 @@ export class ExplorationSystem implements System {
     }
   }
 
-  private _updateExploration(entity: Entity, _world: World, currentTick: number): void {
+  private _updateExploration(entity: Entity, world: SystemContext['world'], currentTick: number): void {
     const impl = entity as EntityImpl;
     if (!impl.hasComponent(CT.ExplorationState)) {
       throw new Error('ExplorationSystem requires ExplorationState component');

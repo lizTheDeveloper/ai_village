@@ -106,14 +106,15 @@ export const EquipmentSlotsSchema = autoRegister(
 
     validate: (data): data is EquipmentSlotsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const e = data as any;
+      const e = data as Record<string, unknown>;
 
-      return (
-        e.type === 'equipment_slots' &&
-        typeof e.slots === 'object' &&
-        typeof e.canDualWield === 'boolean' &&
-        typeof e.locked === 'boolean'
-      );
+      if (!('type' in e) || e.type !== 'equipment_slots') return false;
+      if (!('slots' in e) || typeof e.slots !== 'object' || e.slots === null) return false;
+      if (!('canDualWield' in e) || typeof e.canDualWield !== 'boolean') return false;
+      if (!('locked' in e) || typeof e.locked !== 'boolean') return false;
+      if ('lockReason' in e && e.lockReason !== undefined && typeof e.lockReason !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => ({

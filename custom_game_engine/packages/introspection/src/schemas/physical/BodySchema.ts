@@ -210,15 +210,22 @@ export const BodySchema = autoRegister(
 
     validate: (data: unknown): data is BodyComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.bodyPlanId === 'string' &&
-        typeof comp.parts === 'object' &&
-        typeof comp.overallHealth === 'number' &&
-        typeof comp.totalPain === 'number' &&
-        typeof comp.consciousness === 'boolean' &&
-        Array.isArray(comp.modifications)
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Required type field
+      if (!('type' in comp) || comp.type !== 'body') return false;
+
+      // Required fields
+      if (!('bodyPlanId' in comp) || typeof comp.bodyPlanId !== 'string') return false;
+      if (!('parts' in comp) || typeof comp.parts !== 'object' || comp.parts === null) return false;
+      if (!('overallHealth' in comp) || typeof comp.overallHealth !== 'number') return false;
+      if (!('totalPain' in comp) || typeof comp.totalPain !== 'number') return false;
+      if (!('bloodLoss' in comp) || typeof comp.bloodLoss !== 'number') return false;
+      if (!('consciousness' in comp) || typeof comp.consciousness !== 'boolean') return false;
+      if (!('size' in comp) || typeof comp.size !== 'string') return false;
+      if (!('modifications' in comp) || !Array.isArray(comp.modifications)) return false;
+
+      return true;
     },
 
     createDefault: () => ({

@@ -3249,6 +3249,613 @@ class TradeFederationSystem implements System {
 
 ---
 
+## Universe Configuration → Planet Mapping
+
+### Spectrum Preset → Starting Universe Configuration
+
+**Each magic spectrum preset determines which planets spawn and the starting homeworld:**
+
+```typescript
+/**
+ * Maps MagicSpectrumConfig presets to planet configuration
+ * From: packages/magic/src/ParadigmSpectrum.ts SPECTRUM_PRESETS
+ * To: packages/world/src/planet/PlanetTypes.ts PlanetType
+ */
+const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
+  /**
+   * MUNDANE - No magic, pure science fiction
+   * Only scientifically plausible planets
+   */
+  mundane: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      // Rocky worlds
+      'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
+      'volcanic', 'carbon', 'iron',
+      // Exotic but scientific
+      'tidally_locked', 'hycean', 'rogue', 'gas_dwarf', 'moon',
+    ],
+    excludedPlanetTypes: ['magical', 'corrupted', 'fungal', 'crystal'],
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'Earth-Prime',
+      biomeProfile: 'earth_standard',
+      description: 'A familiar world where science and reason prevail.',
+    },
+  },
+
+  /**
+   * LOW_FANTASY - Rare, subtle magic (Game of Thrones early seasons)
+   * Mostly scientific + corrupted (rare, distant threats)
+   */
+  low_fantasy: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
+      'volcanic', 'carbon', 'iron', 'tidally_locked', 'moon',
+      'corrupted',  // The Other, distant horrors
+    ],
+    excludedPlanetTypes: ['magical', 'fungal'],  // Too overt
+    rarityCurve: {
+      corrupted: 0.05,  // Very rare (5% of spawnable systems)
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'The Realm',
+      biomeProfile: 'temperate_feudal',
+      description: 'A world where magic is whispered, not spoken.',
+    },
+  },
+
+  /**
+   * CLASSIC_FANTASY - D&D style (Forgotten Realms)
+   * All planet types available, fantasy planets common
+   */
+  classic_fantasy: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      // All scientific
+      'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
+      'volcanic', 'carbon', 'iron', 'tidally_locked', 'hycean',
+      'rogue', 'gas_dwarf', 'moon',
+      // All fantasy
+      'magical', 'corrupted', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: [],  // Everything available
+    rarityCurve: {
+      magical: 0.15,     // Fairly common
+      corrupted: 0.10,   // Uncommon
+      fungal: 0.08,      // Alien realms
+      crystal: 0.12,     // Mystical
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'The Prime Material',
+      biomeProfile: 'high_fantasy',
+      hasFloatingIslands: false,  // Unlocked via magic later
+      description: 'A world where magic is commonplace and adventure awaits.',
+    },
+  },
+
+  /**
+   * MYTHIC - Gods walk among mortals (Greek Mythology)
+   * Fantasy planets very common, divine realms
+   */
+  mythic: {
+    startingPlanet: 'magical',  // Start on a magical world!
+    availablePlanetTypes: [
+      'terrestrial', 'desert', 'ice', 'ocean', 'volcanic', 'moon',
+      'magical', 'corrupted', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: ['carbon', 'iron', 'hycean', 'gas_dwarf'],  // Too scientific
+    rarityCurve: {
+      magical: 0.40,     // Very common (divine presence)
+      corrupted: 0.15,   // Titan prisons, underworld entries
+      crystal: 0.10,     // Temples, oracle sites
+    },
+    startingPlanetConfig: {
+      type: 'magical',
+      name: 'Mount of the Gods',
+      biomeProfile: 'olympian',
+      hasFloatingIslands: true,
+      description: 'A world where gods and mortals share the same sky.',
+    },
+  },
+
+  /**
+   * SHINTO_ANIMISM - Everything has a spirit (Japanese folklore)
+   * Balanced planets, spirits everywhere
+   */
+  shinto_animism: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      'terrestrial', 'super_earth', 'ocean', 'ice', 'volcanic', 'moon',
+      'magical', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: ['corrupted', 'carbon', 'iron'],  // No "evil" or harsh science
+    rarityCurve: {
+      magical: 0.25,     // Spirit realms
+      fungal: 0.20,      // Kodama forests, yokai domains
+      crystal: 0.15,     // Sacred mountains
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'The Land of Eight Islands',
+      biomeProfile: 'shinto_islands',
+      description: 'A world where every tree, stone, and stream holds a spirit.',
+    },
+  },
+
+  /**
+   * HARD_MAGIC - Systematic, rule-based (Mistborn, Name of the Wind)
+   * Scientific planets + crystal (magic as systematic science)
+   */
+  hard_magic: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
+      'volcanic', 'carbon', 'iron', 'tidally_locked', 'hycean',
+      'rogue', 'gas_dwarf', 'moon',
+      'crystal',  // Allomancy metals, sympathy sources
+    ],
+    excludedPlanetTypes: ['magical', 'corrupted', 'fungal'],  // Too "soft"
+    rarityCurve: {
+      crystal: 0.20,  // Important for magic system components
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'The Studied Realm',
+      biomeProfile: 'temperate_academic',
+      description: 'A world where magic follows rules as strict as physics.',
+    },
+  },
+
+  /**
+   * LITERARY_SURREALISM - Words are real, metaphors come true
+   * High fantasy planets, reality is flexible
+   */
+  literary_surrealism: {
+    startingPlanet: 'magical',
+    availablePlanetTypes: [
+      'terrestrial', 'ocean', 'ice',
+      'magical', 'corrupted', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: ['carbon', 'iron', 'gas_dwarf', 'hycean'],  // Too grounded
+    rarityCurve: {
+      magical: 0.50,     // Reality itself is narrative
+      fungal: 0.25,      // Dreamscapes
+      corrupted: 0.20,   // Nightmares made real
+      crystal: 0.15,     // Crystallized ideas
+    },
+    startingPlanetConfig: {
+      type: 'magical',
+      name: 'The Inklands',
+      biomeProfile: 'narrative',
+      hasFloatingIslands: true,
+      description: 'A world where words have weight and stories walk.',
+    },
+  },
+
+  /**
+   * WILD_MAGIC - Chaotic, unpredictable (Xanth-style)
+   * Everything possible, chaos reigns
+   */
+  wild_magic: {
+    startingPlanet: 'fungal',  // Alien and unpredictable
+    availablePlanetTypes: [
+      'terrestrial', 'desert', 'ice', 'ocean', 'volcanic',
+      'magical', 'corrupted', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: ['super_earth', 'carbon', 'iron', 'hycean'],  // Too predictable
+    rarityCurve: {
+      magical: 0.30,
+      corrupted: 0.25,
+      fungal: 0.30,
+      crystal: 0.20,
+    },
+    // All fantasy planets more common than normal
+    startingPlanetConfig: {
+      type: 'fungal',
+      name: 'The Chaos Bloom',
+      biomeProfile: 'chaotic',
+      hasGiantMushrooms: true,
+      description: 'A world where reality flickers like a candle in the wind.',
+    },
+  },
+
+  /**
+   * DEAD_MAGIC - Magic once existed but is gone
+   * Mostly scientific + corrupted ruins
+   */
+  dead_magic: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      'terrestrial', 'super_earth', 'desert', 'ice', 'volcanic',
+      'carbon', 'iron', 'moon', 'rogue',
+      'corrupted',  // Remnants of magical cataclysm
+    ],
+    excludedPlanetTypes: ['magical', 'fungal', 'crystal', 'hycean'],  // Magic is dead
+    rarityCurve: {
+      corrupted: 0.15,  // Scars of the old magic
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'The Ashlands',
+      biomeProfile: 'post_magical',
+      corruptionLevel: 0.2,  // Lingering taint
+      description: 'A world where magic died, and only echoes remain.',
+    },
+  },
+
+  /**
+   * AI_VILLAGE (default) - Rich magic with multiple traditions
+   * Full palette, balanced for gameplay
+   */
+  ai_village: {
+    startingPlanet: 'terrestrial',
+    availablePlanetTypes: [
+      // All types available
+      'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
+      'volcanic', 'carbon', 'iron', 'tidally_locked', 'hycean',
+      'rogue', 'gas_dwarf', 'moon',
+      'magical', 'corrupted', 'fungal', 'crystal',
+    ],
+    excludedPlanetTypes: [],
+    rarityCurve: {
+      magical: 0.12,
+      corrupted: 0.08,
+      fungal: 0.10,
+      crystal: 0.10,
+    },
+    startingPlanetConfig: {
+      type: 'terrestrial',
+      name: 'Homeworld',
+      biomeProfile: 'ai_village_balanced',
+      description: 'A world of villages, magic, and endless possibility.',
+    },
+  },
+};
+
+interface UniversePlanetConfig {
+  startingPlanet: PlanetType;
+  availablePlanetTypes: PlanetType[];
+  excludedPlanetTypes: PlanetType[];
+  rarityCurve?: Record<PlanetType, number>;  // Spawn probability for rare types
+  startingPlanetConfig: Partial<PlanetConfig>;
+}
+```
+
+### Scenario Preset → Starting Planet Characteristics
+
+**Scenario presets modify the starting planet's biome and resources:**
+
+```typescript
+/**
+ * Maps scenario presets to starting planet modifications
+ * From: packages/renderer/src/UniverseConfigScreen.ts SCENARIO_PRESETS
+ */
+const SCENARIO_TO_PLANET_MODS: Record<string, ScenarioPlanetMods> = {
+  /**
+   * The Awakening - Fresh start, cooperative survival
+   * Standard biomes, moderate resources
+   */
+  'cooperative-survival': {
+    biomeMods: {
+      preferredBiomes: ['forest', 'grassland', 'coastal'],
+      avoidBiomes: ['desert', 'tundra', 'volcanic_waste'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 1.0,  // Standard
+      startingResourcesNearby: ['berry_bush', 'flint_node', 'clay_deposit'],
+    },
+    terrainMods: {
+      moistureOffset: 0,
+      temperatureOffset: 0,
+      elevationScale: 1.0,
+    },
+    startDescription: 'You awaken together in a gentle land, ready to build.',
+  },
+
+  /**
+   * Paradise Found - Unlimited resources, no struggle
+   * Lush biomes, abundant everything
+   */
+  'garden-abundance': {
+    biomeMods: {
+      preferredBiomes: ['temperate_rainforest', 'tropical_forest', 'fertile_valley'],
+      avoidBiomes: ['desert', 'tundra', 'volcanic_waste', 'corrupted'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 3.0,  // Triple resources
+      startingResourcesNearby: [
+        'fruit_tree', 'berry_bush', 'vegetable_patch',
+        'fresh_spring', 'herb_garden', 'honey_hive',
+      ],
+      noHostileEntities: true,
+    },
+    terrainMods: {
+      moistureOffset: 0.3,       // More water
+      temperatureOffset: 0.1,   // Warmer
+      elevationScale: 0.8,      // Gentler terrain
+    },
+    specialFeatures: {
+      perpetualSpring: true,     // Always good weather
+      naturalShelters: true,     // Caves, overhangs nearby
+    },
+    startDescription: 'You awaken in paradise. What will you create?',
+  },
+
+  /**
+   * Research Mission - Scientific expedition
+   * Varied biomes for cataloging, moderate danger
+   */
+  'scientific-expedition': {
+    biomeMods: {
+      preferredBiomes: ['varied'],  // All biomes represented nearby
+      avoidBiomes: ['corrupted'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 0.8,  // Slightly scarce (need to explore)
+      startingResourcesNearby: ['research_sample', 'geological_deposit', 'flora_specimen'],
+    },
+    terrainMods: {
+      elevationScale: 1.2,  // More terrain variety for exploration
+    },
+    specialFeatures: {
+      biomeVariety: true,       // Multiple biomes within starting area
+      uniqueSpecimens: true,    // Rare flora/fauna to discover
+    },
+    startDescription: 'The expedition has landed. Begin your survey.',
+  },
+
+  /**
+   * The Long Dark - Hostile wilderness survival
+   * Harsh biomes, scarce resources, danger
+   */
+  'hostile-wilderness': {
+    biomeMods: {
+      preferredBiomes: ['tundra', 'taiga', 'frozen_coast', 'rocky_highlands'],
+      avoidBiomes: ['tropical', 'temperate_rainforest', 'fertile'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 0.4,  // Scarce
+      startingResourcesNearby: ['sparse_berries', 'deadwood'],
+    },
+    terrainMods: {
+      moistureOffset: -0.1,      // Drier (frozen water)
+      temperatureOffset: -0.4,   // Much colder
+      elevationScale: 1.3,       // Rugged terrain
+    },
+    specialFeatures: {
+      hostileCreatures: true,    // Predators nearby
+      harshWeather: true,        // Blizzards, long nights
+      survivalPressure: 'high',
+    },
+    startDescription: 'The cold bites deep. Survival is not guaranteed.',
+  },
+
+  /**
+   * After the Fall - Post-apocalyptic survival
+   * Corrupted/blighted terrain, ruins, scarcity
+   */
+  'last-survivors': {
+    biomeMods: {
+      preferredBiomes: ['ash_waste', 'corrupted_forest', 'ruined_settlement', 'blighted_land'],
+      avoidBiomes: ['pristine_forest', 'paradise'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 0.3,  // Very scarce
+      startingResourcesNearby: ['salvage', 'contaminated_water', 'canned_goods'],
+    },
+    terrainMods: {
+      corruptionLevel: 0.3,      // Lingering corruption
+      temperatureOffset: 0.2,    // Nuclear/magical winter fading
+    },
+    specialFeatures: {
+      ruinsNearby: true,         // Ancient structures to explore
+      radiationZones: true,      // Dangerous but valuable areas
+      mutatedCreatures: true,
+    },
+    startDescription: 'The old world is gone. You are what remains.',
+  },
+
+  /**
+   * Forgotten Selves - Amnesia mystery
+   * Any terrain, artifacts scattered nearby
+   */
+  'amnesia-mystery': {
+    biomeMods: {
+      preferredBiomes: ['any'],  // Random biome
+      avoidBiomes: [],
+    },
+    resourceMods: {
+      abundanceMultiplier: 1.0,
+      startingResourcesNearby: ['strange_artifact', 'journal_fragment', 'mysterious_key'],
+    },
+    specialFeatures: {
+      mysteryArtifacts: true,    // Clue items scattered
+      memorySites: true,         // Locations that trigger flashbacks
+      hiddenHistory: true,
+    },
+    startDescription: 'Who are you? Where is this place? The answers lie hidden.',
+  },
+
+  /**
+   * The Garden - Divine experiment
+   * Perfect starting conditions, divine presence
+   */
+  'divine-experiment': {
+    biomeMods: {
+      preferredBiomes: ['paradise_garden', 'sacred_grove', 'blessed_meadow'],
+      avoidBiomes: ['corrupted', 'volcanic', 'frozen'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 2.0,
+      startingResourcesNearby: ['forbidden_fruit', 'sacred_spring', 'wisdom_tree'],
+    },
+    terrainMods: {
+      moistureOffset: 0.2,
+      temperatureOffset: 0.1,
+    },
+    specialFeatures: {
+      divinePresence: true,      // Gods are watching
+      moralChoices: true,        // Temptation, rules to follow or break
+      sacredBoundaries: true,    // Areas you're told not to enter
+    },
+    startDescription: 'You were placed here by powers beyond your understanding.',
+  },
+
+  /**
+   * The Dreaming - Surreal dream realm
+   * Magical/fungal terrain, reality is fluid
+   */
+  'dream-realm': {
+    biomeMods: {
+      preferredBiomes: ['dream_forest', 'surreal_landscape', 'floating_isle', 'mushroom_glade'],
+      avoidBiomes: ['mundane', 'scientific'],
+    },
+    resourceMods: {
+      abundanceMultiplier: 1.5,  // Dreams are generous
+      startingResourcesNearby: ['dream_fragment', 'nightmare_shard', 'lucid_crystal'],
+    },
+    terrainMods: {
+      hasFloatingIslands: true,
+      hasGiantMushrooms: true,
+    },
+    specialFeatures: {
+      realityFlux: true,         // Terrain can shift
+      dreamLogic: true,          // Physics are suggestions
+      wakeUpRisk: true,          // Can you wake up?
+    },
+    startDescription: 'Is this real? Does it matter? The dream continues.',
+  },
+};
+
+interface ScenarioPlanetMods {
+  biomeMods: {
+    preferredBiomes: string[];
+    avoidBiomes: string[];
+  };
+  resourceMods: {
+    abundanceMultiplier: number;
+    startingResourcesNearby: string[];
+    noHostileEntities?: boolean;
+  };
+  terrainMods?: {
+    moistureOffset?: number;
+    temperatureOffset?: number;
+    elevationScale?: number;
+    corruptionLevel?: number;
+    hasFloatingIslands?: boolean;
+    hasGiantMushrooms?: boolean;
+  };
+  specialFeatures?: Record<string, boolean | string>;
+  startDescription: string;
+}
+```
+
+### Combining Spectrum + Scenario
+
+**Universe creation combines both configurations:**
+
+```typescript
+/**
+ * Create starting planet from spectrum preset + scenario
+ */
+function createStartingPlanet(
+  spectrumPreset: string,
+  scenarioPreset: string,
+  universeSeed: string
+): PlanetConfig {
+  const spectrumConfig = SPECTRUM_TO_PLANETS[spectrumPreset];
+  const scenarioMods = SCENARIO_TO_PLANET_MODS[scenarioPreset];
+
+  // Base planet from spectrum
+  const basePlanet = spectrumConfig.startingPlanetConfig;
+
+  // Apply scenario modifications
+  const planet: PlanetConfig = {
+    id: `planet:homeworld`,
+    name: basePlanet.name || 'Homeworld',
+    type: basePlanet.type || spectrumConfig.startingPlanet,
+    seed: hashSeed(universeSeed, 'homeworld'),
+
+    // Terrain parameters (spectrum defaults + scenario mods)
+    temperatureOffset: (basePlanet.temperatureOffset ?? 0) +
+                       (scenarioMods.terrainMods?.temperatureOffset ?? 0),
+    temperatureScale: 1.0,
+    moistureOffset: (basePlanet.moistureOffset ?? 0) +
+                    (scenarioMods.terrainMods?.moistureOffset ?? 0),
+    moistureScale: 1.0,
+    elevationOffset: 0,
+    elevationScale: scenarioMods.terrainMods?.elevationScale ?? 1.0,
+    seaLevel: -0.3,
+
+    // Biomes (filtered by scenario preferences)
+    allowedBiomes: getFilteredBiomes(
+      basePlanet.biomeProfile,
+      scenarioMods.biomeMods.preferredBiomes,
+      scenarioMods.biomeMods.avoidBiomes
+    ),
+
+    // Special features
+    hasFloatingIslands: basePlanet.hasFloatingIslands ||
+                        scenarioMods.terrainMods?.hasFloatingIslands,
+    hasGiantMushrooms: basePlanet.hasGiantMushrooms ||
+                       scenarioMods.terrainMods?.hasGiantMushrooms,
+    corruptionLevel: scenarioMods.terrainMods?.corruptionLevel,
+
+    // Metadata
+    description: scenarioMods.startDescription,
+  };
+
+  return planet;
+}
+
+/**
+ * Get available planet types for universe exploration
+ */
+function getAvailablePlanetsForUniverse(
+  spectrumPreset: string
+): { type: PlanetType; rarity: number }[] {
+  const config = SPECTRUM_TO_PLANETS[spectrumPreset];
+
+  return config.availablePlanetTypes.map(type => ({
+    type,
+    rarity: config.rarityCurve?.[type] ?? (
+      // Default rarities for planet types
+      ['terrestrial', 'desert', 'ice', 'ocean'].includes(type) ? 1.0 :  // Common
+      ['volcanic', 'moon', 'super_earth'].includes(type) ? 0.5 :         // Uncommon
+      ['tidally_locked', 'carbon', 'iron', 'hycean'].includes(type) ? 0.2 :  // Rare
+      ['rogue', 'gas_dwarf'].includes(type) ? 0.1 :                      // Very rare
+      0.15  // Fantasy defaults
+    ),
+  }));
+}
+```
+
+### Example: Universe Creation Flow
+
+```
+Player chooses:
+  - Spectrum: "mythic" (gods walk among mortals)
+  - Scenario: "divine-experiment" (the Garden)
+
+Result:
+  - Starting planet: magical type (from mythic)
+  - Modified with: paradise garden biomes, divine presence (from scenario)
+  - Available planets: magical (40%), corrupted (15%), crystal (10%)
+  - Excluded: carbon, iron, hycean, gas_dwarf (too scientific)
+
+Starting conditions:
+  - Lush magical terrain with sacred groves
+  - Forbidden fruit, wisdom trees nearby
+  - Gods actively watching
+  - Moral choices affect divine favor
+```
+
+---
+
 ## Summary
 
 This spec defines a **4-tier trade hierarchy** scaling from individual routes to galactic federations:

@@ -176,14 +176,17 @@ export const GeneticSchema = autoRegister(
 
     validate: (data: unknown): data is GeneticComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        Array.isArray(comp.genome) &&
-        Array.isArray(comp.hereditaryModifications) &&
-        typeof comp.mutationRate === 'number' &&
-        typeof comp.geneticHealth === 'number' &&
-        typeof comp.generation === 'number'
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'genetic') return false;
+      if (!('genome' in comp) || !Array.isArray(comp.genome)) return false;
+      if (!('hereditaryModifications' in comp) || !Array.isArray(comp.hereditaryModifications)) return false;
+      if (!('mutationRate' in comp) || typeof comp.mutationRate !== 'number') return false;
+      if (!('geneticHealth' in comp) || typeof comp.geneticHealth !== 'number') return false;
+      if (!('inbreedingCoefficient' in comp) || typeof comp.inbreedingCoefficient !== 'number') return false;
+      if (!('generation' in comp) || typeof comp.generation !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => {

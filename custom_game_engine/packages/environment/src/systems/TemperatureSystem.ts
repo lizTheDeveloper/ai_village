@@ -1,9 +1,6 @@
 import type {
-  System,
   SystemId,
   ComponentType,
-  World,
-  Entity,
   ITile,
   TemperatureComponent,
   PositionComponent,
@@ -13,6 +10,9 @@ import type {
 } from '@ai-village/core';
 import {
   ComponentType as CT,
+  BaseSystem,
+  type SystemContext,
+  type ComponentAccessor,
   EntityImpl,
   HEALTH_DAMAGE_RATE,
   WORLD_TEMP_BASE,
@@ -34,7 +34,7 @@ const WALL_INSULATION: Record<string, number> = {
 };
 
 /** Extended world interface with tile access */
-interface WorldWithTiles extends World {
+interface WorldWithTiles {
   getTileAt(x: number, y: number): ITile | undefined;
 }
 

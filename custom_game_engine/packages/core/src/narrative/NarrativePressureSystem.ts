@@ -11,6 +11,7 @@
  */
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World } from '../ecs/World.js';
 import type {
   OutcomeAttractor,
   AttractorSource,

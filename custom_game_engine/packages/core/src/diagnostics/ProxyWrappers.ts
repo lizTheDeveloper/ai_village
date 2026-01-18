@@ -164,9 +164,12 @@ export function wrapWorld(world: World): World {
       // Wrap methods that return entities to auto-wrap them
       if (typeof value === 'function' && (prop === 'getEntity' || prop === 'addEntity')) {
         // Wrapper function preserves 'this' context from caller or uses target
-        // Note: 'this' type is intentionally unknown as we're wrapping arbitrary methods
+        // Cast to Function necessary here: we're creating a generic wrapper for multiple
+        // method signatures (getEntity, addEntity). TypeScript can't infer a single type
+        // that matches all possible World methods.
+        const originalMethod = value as Function;
         return function(this: unknown, ...args: unknown[]): unknown {
-          const result = value.apply(this || target, args);
+          const result = originalMethod.apply(this || target, args);
           // Type guard: check if result looks like an Entity
           if (result && typeof result === 'object' && 'id' in result) {
             return wrapEntity(result as Entity);
