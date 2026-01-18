@@ -1,5 +1,5 @@
-import type { System, SystemId, ComponentType, World, Entity } from '@ai-village/core';
-import { ComponentType as CT, EntityImpl, multiverseCoordinator, DAWN_START_HOUR, DAY_START_HOUR, DUSK_START_HOUR, NIGHT_START_HOUR, GAME_DAY_SECONDS } from '@ai-village/core';
+import type { SystemId, ComponentType } from '@ai-village/core';
+import { ComponentType as CT, BaseSystem, type SystemContext, EntityImpl, multiverseCoordinator, DAWN_START_HOUR, DAY_START_HOUR, DUSK_START_HOUR, NIGHT_START_HOUR, GAME_DAY_SECONDS } from '@ai-village/core';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
 
@@ -76,7 +76,7 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
  * This system must run before all other systems as it provides the fundamental
  * time tracking that other systems depend on for their calculations.
  */
-export class TimeSystem implements System {
+export class TimeSystem extends BaseSystem {
   public readonly id: SystemId = 'time';
   public readonly priority: number = 3; // Run early, before Weather (priority 5)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
@@ -99,11 +99,11 @@ export class TimeSystem implements System {
     this.universeId = universeId;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get time scale from MultiverseCoordinator if registered
     const universe = multiverseCoordinator.getUniverse(this.universeId);
     const timeScale = universe?.config.timeScale ?? 1.0;
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const time = impl.getComponent<TimeComponent>(CT.Time);
       if (!time) continue;
@@ -115,7 +115,7 @@ export class TimeSystem implements System {
       const effectiveDayLength = time.dayLength / effectiveTimeScale;
 
       // Calculate hours elapsed (deltaTime is in seconds)
-      const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
+      const hoursElapsed = (ctx.deltaTime / effectiveDayLength) * 24;
 
       // Update time of day (wrap at 24)
       let newTimeOfDay = time.timeOfDay + hoursElapsed;
@@ -129,24 +129,16 @@ export class TimeSystem implements System {
         const currentWeek = Math.floor((newDay - 1) / 7);
 
         // Emit day change event
-        world.eventBus.emit({
-          type: 'time:day_changed',
-          source: entity.id,
-          data: {
-            day: newDay,
-            newDay,
-          },
-        });
+        ctx.emit('time:day_changed', {
+          day: newDay,
+          newDay,
+        }, entity.id);
 
         // Emit week change event if week changed
         if (currentWeek > previousWeek) {
-          world.eventBus.emit({
-            type: 'time:new_week',
-            source: entity.id,
-            data: {
-              week: currentWeek,
-            },
-          });
+          ctx.emit('time:new_week', {
+            week: currentWeek,
+          }, entity.id);
         }
 
         this.lastDay = newDay;
@@ -167,15 +159,11 @@ export class TimeSystem implements System {
 
       // Emit phase change event if phase changed
       if (this.lastPhase !== null && this.lastPhase !== newPhase) {
-        world.eventBus.emit({
-          type: 'time:phase_changed',
-          source: entity.id,
-          data: {
-            phase: newPhase,
-            oldPhase: this.lastPhase,
-            newPhase,
-          },
-        });
+        ctx.emit('time:phase_changed', {
+          phase: newPhase,
+          oldPhase: this.lastPhase,
+          newPhase,
+        }, entity.id);
       }
 
       this.lastPhase = newPhase;

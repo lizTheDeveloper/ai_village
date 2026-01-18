@@ -341,7 +341,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Process snow moisture increase for outdoor tiles
    */
-  public applySnow(world: World, tile: Tile, x: number, y: number, intensity: number): void {
+  public applySnow(world: any, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
     // Snow adds 20 moisture * intensity
