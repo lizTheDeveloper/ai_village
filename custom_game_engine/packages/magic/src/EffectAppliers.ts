@@ -250,15 +250,16 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     if (!magic || magic.type !== 'magic') {
       const newMagic = {
         type: 'magic' as const,
+        version: 1,
         protectionShields: [],
         activeEffects: [],
       };
       world.addComponent(target.id, newMagic);
-      magic = newMagic;
+      magic = target.components.get('magic')!;
     }
 
     // Store protection shield data
-    const magicRecord = magic as Record<string, unknown>;
+    const magicRecord = magic as unknown as Record<string, unknown>;
     const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
     if (!shields) {
       magicRecord.protectionShields = [];
@@ -277,7 +278,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };
 
-    ((magicRecord.protectionShields as Array<Record<string, unknown>>)).push(shieldData);
+    (magicRecord.protectionShields as Array<Record<string, unknown>>).push(shieldData);
 
     // Add to active effects list for tracking
     const activeEffects = magicRecord.activeEffects as string[] | undefined;
@@ -313,7 +314,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       return;
     }
 
-    const magicRecord = magic as Record<string, unknown>;
+    const magicRecord = magic as unknown as Record<string, unknown>;
     const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
     if (!shields) {
       return;
@@ -373,7 +374,7 @@ export function registerStandardAppliers(): void {
   const executor = SpellEffectExecutor.getInstance();
 
   // Make idempotent - only register if not already registered
-  const applierInstances = [
+  const applierInstances: EffectApplier<any>[] = [
     new DamageEffectApplier(),
     new HealingEffectApplier(),
     new ProtectionEffectApplier(),
@@ -387,25 +388,15 @@ export function registerStandardAppliers(): void {
     new TemporalEffectApplier(),
     new SoulEffectApplier(),
     new ParadigmEffectApplier(),
-  ];
-
-  const applierClasses = [
-    DispelEffectApplier,
-    MentalEffectApplier,
-    TeleportEffectApplier,
-    EnvironmentalEffectApplier,
+    new DispelEffectApplier(),
+    new MentalEffectApplier(),
+    new TeleportEffectApplier(),
+    new EnvironmentalEffectApplier(),
   ];
 
   for (const applier of applierInstances) {
     if (!executor.hasApplier(applier.category)) {
       executor.registerApplier(applier);
-    }
-  }
-
-  for (const ApplierClass of applierClasses) {
-    const instance = new ApplierClass();
-    if (!executor.hasApplier(instance.category)) {
-      executor.registerApplier(instance);
     }
   }
 }

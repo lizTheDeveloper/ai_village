@@ -7,6 +7,7 @@
 
 import type { IWindowPanel } from '../../IWindowPanel.js';
 import type { World, Entity, MagicComponent, MagicSkillProgress, EvaluationContext } from '@ai-village/magic';
+import type { EventBus } from '@ai-village/core';
 import { MagicSkillTreeRegistry } from '@ai-village/magic';
 import { evaluateNode, type NodeEvaluationResult } from '@ai-village/magic';
 import { ParadigmTreeView } from './ParadigmTreeView.js';
@@ -551,8 +552,8 @@ export class SkillTreePanel implements IWindowPanel {
         }
 
         // Emit event
-        const eventBus = world.getEventBus();
-        (eventBus as any).emit({
+        const eventBus = world.getEventBus() as EventBus;
+        eventBus.emit({
           type: 'magic:skill_node_unlocked',
           entityId: this.selectedEntity.id,
           paradigmId: activeParadigmId,
@@ -561,7 +562,7 @@ export class SkillTreePanel implements IWindowPanel {
         });
 
         // Apply effects via SkillTreeManager
-        const skillTreeManager = (world as any).getSkillTreeManager?.();
+        const skillTreeManager = (world as any).getSkillTreeManager?.() as any;
         if (skillTreeManager) {
           skillTreeManager.unlockSkillNode(this.selectedEntity, activeParadigmId, nodeId, evaluation.xpCost);
           skillTreeManager.applyNodeEffects(this.selectedEntity, activeParadigmId, nodeId);
@@ -581,8 +582,8 @@ export class SkillTreePanel implements IWindowPanel {
         }
 
         // Emit error notification
-        const eventBus = world.getEventBus();
-        (eventBus as any).emit({
+        const eventBus = world.getEventBus() as EventBus;
+        eventBus.emit({
           type: 'ui:notification',
           message: `Failed to unlock node: ${error.message}`,
           level: 'error'
@@ -601,8 +602,8 @@ export class SkillTreePanel implements IWindowPanel {
       }
 
       // Emit notification
-      const eventBus = world.getEventBus();
-      (eventBus as any).emit({
+      const eventBus = world.getEventBus() as EventBus;
+      eventBus.emit({
         type: 'ui:notification',
         message,
         level: 'error'

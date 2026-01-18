@@ -395,7 +395,7 @@ function handleMoveToBuilding(ctx: BehaviorContext, state: Record<string, unknow
     return ctx.complete('No target building ID');
   }
 
-  const targetBuilding = ctx.getEntity(targetId);
+  const targetBuilding = ctx.getEntity(targetId as string);
   if (!targetBuilding) {
     // Building no longer exists, restart
     ctx.updateState({ phase: 'find_building', targetBuildingId: undefined });

@@ -12,6 +12,7 @@
 
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
+import type { Component } from '../../ecs/Component.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';

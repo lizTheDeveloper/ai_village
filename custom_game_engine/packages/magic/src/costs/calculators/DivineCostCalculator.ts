@@ -19,6 +19,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { MagicCostType } from '@ai-village/core';
 
 /** Deity domain alignments */
 interface DeityAlignment {

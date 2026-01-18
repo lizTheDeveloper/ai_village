@@ -18,6 +18,7 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import type { World, WorldMutator } from '../../ecs/World.js';
 import { EntityImpl } from '../../ecs/Entity.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { SkillsComponent, SkillLevel } from '../../components/SkillsComponent.js';
 import { getQualityMultiplier, getSpecializationBonus } from '../../components/SkillsComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
