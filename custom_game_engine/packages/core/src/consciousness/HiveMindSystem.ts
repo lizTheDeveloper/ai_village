@@ -1229,18 +1229,14 @@ export class HiveMindSystem extends BaseSystem {
 
       // Emit periodic hive status
       if (ctx.tick % 500 === 0) {
-        this.events.emitGeneric({
-          type: 'hive:status_update' as any,
-          source: 'hive-mind-system',
-          data: {
-            hiveId: hive.id,
-            hiveName: hive.name,
-            population: hive.population,
-            coherence: hive.coherence,
-            mood: hive.collectiveMood,
-            activeDirectives: hive.directives.filter((d) => !d.completed).length,
-            queenThought: this.getQueenThought(),
-          },
+        this.events.emitGeneric('hive:status_update', {
+          hiveId: hive.id,
+          hiveName: hive.name,
+          population: hive.population,
+          coherence: hive.coherence,
+          mood: hive.collectiveMood,
+          activeDirectives: hive.directives.filter((d) => !d.completed).length,
+          queenThought: this.getQueenThought(),
         });
       }
     }

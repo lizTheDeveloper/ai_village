@@ -256,15 +256,35 @@ export const ConflictSchema = autoRegister(
 
     validate: (data): data is ConflictComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const c = data as any;
+      const c = data as Record<string, unknown>;
 
-      return (
-        c.type === 'conflict' &&
-        typeof c.conflictType === 'string' &&
-        typeof c.target === 'string' &&
-        typeof c.state === 'string' &&
-        typeof c.startTime === 'number'
-      );
+      // Required fields
+      if (!('type' in c) || c.type !== 'conflict') return false;
+      if (!('conflictType' in c) || typeof c.conflictType !== 'string') return false;
+      if (!('target' in c) || typeof c.target !== 'string') return false;
+      if (!('state' in c) || typeof c.state !== 'string') return false;
+      if (!('startTime' in c) || typeof c.startTime !== 'number') return false;
+
+      // Optional fields with type guards
+      if ('version' in c && c.version !== undefined && typeof c.version !== 'number') return false;
+      if ('endTime' in c && c.endTime !== undefined && typeof c.endTime !== 'number') return false;
+      if ('huntingState' in c && c.huntingState !== undefined && typeof c.huntingState !== 'string') return false;
+      if ('cause' in c && c.cause !== undefined && typeof c.cause !== 'string') return false;
+      if ('surprise' in c && c.surprise !== undefined && typeof c.surprise !== 'boolean') return false;
+      if ('modifiers' in c && c.modifiers !== undefined && !Array.isArray(c.modifiers)) return false;
+      if ('attackerPower' in c && c.attackerPower !== undefined && typeof c.attackerPower !== 'number') return false;
+      if ('defenderPower' in c && c.defenderPower !== undefined && typeof c.defenderPower !== 'number') return false;
+      if ('outcome' in c && c.outcome !== undefined && typeof c.outcome !== 'string') return false;
+      if ('winner' in c && c.winner !== undefined && typeof c.winner !== 'string') return false;
+      if ('combatants' in c && c.combatants !== undefined && !Array.isArray(c.combatants)) return false;
+      if ('trigger' in c && c.trigger !== undefined && typeof c.trigger !== 'string') return false;
+      if ('metadata' in c && c.metadata !== undefined && (typeof c.metadata !== 'object' || c.metadata === null)) return false;
+      if ('method' in c && c.method !== undefined && typeof c.method !== 'string') return false;
+      if ('targetFollower' in c && c.targetFollower !== undefined && typeof c.targetFollower !== 'string') return false;
+      if ('consequence' in c && c.consequence !== undefined && typeof c.consequence !== 'string') return false;
+      if ('lethal' in c && c.lethal !== undefined && typeof c.lethal !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: () => ({

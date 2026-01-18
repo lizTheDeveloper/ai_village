@@ -238,15 +238,53 @@ export const SkillsSchema = autoRegister(
 
     validate: (data): data is SkillsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const s = data as any;
+      const s = data as Record<string, unknown>;
 
-      return (
-        s.type === 'skills' &&
-        typeof s.levels === 'object' &&
-        typeof s.experience === 'object' &&
-        typeof s.totalExperience === 'object' &&
-        typeof s.affinities === 'object'
-      );
+      // Check type field
+      if (!('type' in s) || s.type !== 'skills') return false;
+
+      // Check version field
+      if (!('version' in s) || typeof s.version !== 'number') return false;
+
+      // Check required levels field
+      if (!('levels' in s) || typeof s.levels !== 'object' || s.levels === null) {
+        return false;
+      }
+
+      // Check required experience field
+      if (!('experience' in s) || typeof s.experience !== 'object' || s.experience === null) {
+        return false;
+      }
+
+      // Check required totalExperience field
+      if (
+        !('totalExperience' in s) ||
+        typeof s.totalExperience !== 'object' ||
+        s.totalExperience === null
+      ) {
+        return false;
+      }
+
+      // Check required affinities field
+      if (!('affinities' in s) || typeof s.affinities !== 'object' || s.affinities === null) {
+        return false;
+      }
+
+      // Check optional domains field
+      if ('domains' in s && s.domains !== undefined) {
+        if (typeof s.domains !== 'object' || s.domains === null) {
+          return false;
+        }
+      }
+
+      // Check optional magicProgress field
+      if ('magicProgress' in s && s.magicProgress !== undefined) {
+        if (typeof s.magicProgress !== 'object' || s.magicProgress === null) {
+          return false;
+        }
+      }
+
+      return true;
     },
 
     createDefault: () => {

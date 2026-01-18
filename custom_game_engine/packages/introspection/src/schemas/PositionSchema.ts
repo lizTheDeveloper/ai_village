@@ -181,21 +181,39 @@ export const PositionSchema = autoRegister(
     },
 
     validate: (data): data is PositionComponent => {
-      const d = data as any;
-      return (
-        d &&
-        d.type === 'position' &&
-        typeof d.x === 'number' &&
-        typeof d.y === 'number' &&
-        typeof d.z === 'number' &&
-        typeof d.chunkX === 'number' &&
-        typeof d.chunkY === 'number' &&
-        !isNaN(d.x) &&
-        !isNaN(d.y) &&
-        !isNaN(d.z) &&
-        !isNaN(d.chunkX) &&
-        !isNaN(d.chunkY)
-      );
+      const d = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in d) || d.type !== 'position') {
+        return false;
+      }
+
+      // Check required x coordinate
+      if (!('x' in d) || typeof d.x !== 'number' || isNaN(d.x)) {
+        return false;
+      }
+
+      // Check required y coordinate
+      if (!('y' in d) || typeof d.y !== 'number' || isNaN(d.y)) {
+        return false;
+      }
+
+      // Check required z coordinate
+      if (!('z' in d) || typeof d.z !== 'number' || isNaN(d.z)) {
+        return false;
+      }
+
+      // Check required chunkX coordinate
+      if (!('chunkX' in d) || typeof d.chunkX !== 'number' || isNaN(d.chunkX)) {
+        return false;
+      }
+
+      // Check required chunkY coordinate
+      if (!('chunkY' in d) || typeof d.chunkY !== 'number' || isNaN(d.chunkY)) {
+        return false;
+      }
+
+      return true;
     },
 
     createDefault: () => ({

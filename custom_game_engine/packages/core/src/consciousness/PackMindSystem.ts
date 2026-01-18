@@ -923,20 +923,16 @@ export class PackMindSystem extends BaseSystem {
 
     this.packs.set(pack.id, pack);
 
-    this.events.emitGeneric({
-      type: 'pack:created' as any,
-      source: 'pack-mind-system',
-      data: {
-        packId: pack.id,
-        packName: name,
-        speciesId,
-        speciesName: speciesConfig.speciesName,
-        bodyCount: pack.bodyCount,
-        maxBodies: speciesConfig.maxBodies,
-        coherenceRange: speciesConfig.coherenceRange,
-        centerX,
-        centerY,
-      },
+    this.events.emitGeneric('pack:created', {
+      packId: pack.id,
+      packName: name,
+      speciesId,
+      speciesName: speciesConfig.speciesName,
+      bodyCount: pack.bodyCount,
+      maxBodies: speciesConfig.maxBodies,
+      coherenceRange: speciesConfig.coherenceRange,
+      centerX,
+      centerY,
     });
 
     return pack;
