@@ -14,9 +14,8 @@
  * new tyrant themselves.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World, WorldMutator } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -28,29 +27,17 @@ import { SupremeCreatorComponent } from '../components/SupremeCreatorComponent.j
 import { calculateRebellionReadiness, checkRebellionThresholds } from '../components/RebellionThresholdComponent.js';
 import { determineOutcome, getOutcomeNarrative } from '../components/CosmicRebellionOutcome.js';
 
-export class RebellionEventSystem implements System {
+export class RebellionEventSystem extends BaseSystem {
   public readonly id: SystemId = 'rebellion_event';
   public readonly priority = 19; // After reality anchor system
   public readonly requiredComponents = [CT.RebellionThreshold] as const;
 
-  private eventBus: EventBus | null = null;
-
   /** Update interval (ticks) */
-  private readonly UPDATE_INTERVAL = 100; // Every 5 seconds at 20 TPS
-  private lastUpdate = 0;
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
-  public initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  public update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
+    const world = ctx.world;
 
     // Find rebellion threshold tracker (singleton)
     for (const entity of world.query().with(CT.RebellionThreshold).executeEntities()) {

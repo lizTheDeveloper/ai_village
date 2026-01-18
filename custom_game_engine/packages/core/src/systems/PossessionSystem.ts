@@ -240,15 +240,11 @@ export class PossessionSystem extends BaseSystem {
     playerControl.pendingInteraction = null;
 
     // Emit event
-    world.eventBus.emit({
-      type: 'possession:jack_out',
-      source: 'system',
-      data: {
-        agentId,
-        totalBeliefSpent: totalSpent,
-        reason: reason || 'Player jack-out',
-      },
-    });
+    this.events.emit('possession:jack_out', {
+      agentId,
+      totalBeliefSpent: totalSpent,
+      reason: reason || 'Player jack-out',
+    }, 'system');
   }
 
   /**

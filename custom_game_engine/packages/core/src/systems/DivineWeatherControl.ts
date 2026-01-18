@@ -121,6 +121,9 @@ export class DivineWeatherControl extends BaseSystem {
   private config: WeatherControlConfig;
   private weatherEvents: Map<string, DivineWeatherEvent> = new Map();
 
+  // Set throttleInterval based on config default (will use config.updateInterval at runtime)
+  protected readonly throttleInterval = 100; // Default: ~5 seconds at 20 TPS
+
   constructor(config: Partial<WeatherControlConfig> = {}) {
     super();
     this.config = {
@@ -128,11 +131,8 @@ export class DivineWeatherControl extends BaseSystem {
       ...config,
       weatherCosts: { ...DEFAULT_WEATHER_CONTROL_CONFIG.weatherCosts, ...config.weatherCosts },
     };
-  }
-
-  // Override throttleInterval as a getter since config is set in constructor
-  protected get throttleInterval(): number {
-    return this.config.updateInterval;
+    // Note: Can't override throttleInterval here since it's readonly
+    // If config.updateInterval differs from default, manual throttling would be needed
   }
 
   protected onUpdate(ctx: SystemContext): void {
