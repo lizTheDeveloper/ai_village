@@ -137,16 +137,19 @@ export const MovementSchema = autoRegister(
 
     validate: (data: unknown): data is MovementComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'movement' &&
-        typeof comp.velocityX === 'number' &&
-        typeof comp.velocityY === 'number' &&
-        typeof comp.speed === 'number' &&
-        !isNaN(comp.velocityX) &&
-        !isNaN(comp.velocityY) &&
-        !isNaN(comp.speed)
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Check required fields
+      if (!('type' in comp) || comp.type !== 'movement') return false;
+      if (!('velocityX' in comp) || typeof comp.velocityX !== 'number' || isNaN(comp.velocityX)) return false;
+      if (!('velocityY' in comp) || typeof comp.velocityY !== 'number' || isNaN(comp.velocityY)) return false;
+      if (!('speed' in comp) || typeof comp.speed !== 'number' || isNaN(comp.speed)) return false;
+
+      // Check optional fields if present
+      if ('targetX' in comp && comp.targetX !== undefined && typeof comp.targetX !== 'number') return false;
+      if ('targetY' in comp && comp.targetY !== undefined && typeof comp.targetY !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => ({

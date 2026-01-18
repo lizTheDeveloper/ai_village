@@ -96,15 +96,20 @@ export const PhysicsSchema = autoRegister(
 
     validate: (data: unknown): data is PhysicsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'physics' &&
-        typeof comp.solid === 'boolean' &&
-        typeof comp.width === 'number' &&
-        typeof comp.height === 'number' &&
-        comp.width > 0 &&
-        comp.height > 0
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Required type field
+      if (!('type' in comp) || comp.type !== 'physics') return false;
+
+      // Required fields
+      if (!('solid' in comp) || typeof comp.solid !== 'boolean') return false;
+      if (!('width' in comp) || typeof comp.width !== 'number') return false;
+      if (!('height' in comp) || typeof comp.height !== 'number') return false;
+
+      // Validation constraints
+      if (comp.width <= 0 || comp.height <= 0) return false;
+
+      return true;
     },
 
     createDefault: () => ({

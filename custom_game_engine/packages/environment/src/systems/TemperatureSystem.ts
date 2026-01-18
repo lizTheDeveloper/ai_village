@@ -257,7 +257,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Calculate world ambient temperature based on time and season
    */
-  private calculateWorldTemperature(world: World): number {
+  private calculateWorldTemperature(world: any): number {
     // Use cached time entity ID (performance optimization)
     let timeOfDay = 12; // Default noon if no time entity
 
@@ -294,7 +294,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Get temperature modifier from current weather
    */
-  private getWeatherModifier(world: World): number {
+  private getWeatherModifier(world: any): number {
     // Use cached weather entity ID (performance optimization)
     if (!this.weatherEntityId) {
       // Find and cache weather entity
@@ -322,7 +322,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Refresh building cache (called once every N ticks, not every frame!)
    */
-  private refreshBuildingCache(world: World): void {
+  private refreshBuildingCache(world: any): void {
     this.buildingCache = [];
 
     const buildingEntities = world.query().with(CT.Building).with(CT.Position).executeEntities();
@@ -347,7 +347,7 @@ export class TemperatureSystem extends BaseSystem {
    * Checks both legacy entity-based buildings AND tile-based walls.
    */
   private calculateBuildingEffect(
-    world: World,
+    world: any,
     position: PositionComponent
   ): { insulation: number; baseTemp: number } | null {
     // Use cached buildings (refreshed every N ticks, not every frame!)
@@ -547,7 +547,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Check for temperature state changes and emit events
    */
-  private checkTemperatureEvents(world: World, entity: Entity, tempComp: TemperatureComponent): void {
+  private checkTemperatureEvents(ctx: SystemContext, entity: any, tempComp: TemperatureComponent): void {
     const wasDangerous = this.previousDangerousStates.get(entity.id) || false;
     const isDangerous = tempComp.state === 'dangerously_cold' || tempComp.state === 'dangerously_hot';
 
@@ -555,29 +555,21 @@ export class TemperatureSystem extends BaseSystem {
       // Entered dangerous temperature range
       const needsComp = entity.components.get('needs') as NeedsComponent | undefined;
       const health = needsComp?.health ?? 100;
-      world.eventBus.emit({
-        type: 'temperature:danger',
-        source: entity.id,
-        data: {
-          agentId: entity.id,
-          entityId: entity.id,
-          temperature: tempComp.currentTemp,
-          health: health,
-          state: tempComp.state,
-        },
-      });
-    } else if (!isDangerous && wasDangerous) {
-      // Exited dangerous temperature range
-      world.eventBus.emit({
-        type: 'temperature:comfortable',
-        source: entity.id,
-        data: {
+      ctx.emit('temperature:danger', {
         agentId: entity.id,
         entityId: entity.id,
-          temperature: tempComp.currentTemp,
-          state: tempComp.state,
-        },
-      });
+        temperature: tempComp.currentTemp,
+        health: health,
+        state: tempComp.state,
+      }, entity.id);
+    } else if (!isDangerous && wasDangerous) {
+      // Exited dangerous temperature range
+      ctx.emit('temperature:comfortable', {
+        agentId: entity.id,
+        entityId: entity.id,
+        temperature: tempComp.currentTemp,
+        state: tempComp.state,
+      }, entity.id);
     }
 
     this.previousDangerousStates.set(entity.id, isDangerous);

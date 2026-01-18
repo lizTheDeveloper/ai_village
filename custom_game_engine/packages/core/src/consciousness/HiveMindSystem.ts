@@ -1108,20 +1108,18 @@ export class HiveMindSystem extends BaseSystem {
 
     hive.directives.push(directive);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'hive:directive_issued' as any,
-        source: 'hive-mind-system',
-        data: {
-          hiveId,
-          directiveId: directive.id,
-          task,
-          priority,
-          assignedCount: directive.assignedWorkers.length,
-          reasoning,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'hive:directive_issued' as any,
+      source: 'hive-mind-system',
+      data: {
+        hiveId,
+        directiveId: directive.id,
+        task,
+        priority,
+        assignedCount: directive.assignedWorkers.length,
+        reasoning,
+      },
+    });
 
     return directive;
   }
@@ -1211,17 +1209,12 @@ export class HiveMindSystem extends BaseSystem {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    if (world.tick - this.lastUpdateTick < HiveMindSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update each hive
     for (const hive of Array.from(this.hives.values())) {
       // Decay collective memories
       hive.collectiveMemory = hive.collectiveMemory.filter((memory) => {
-        memory.importance -= memory.decayRate * HiveMindSystem.UPDATE_INTERVAL;
+        memory.importance -= memory.decayRate * this.throttleInterval;
         return memory.importance > 0.01;
       });
 
@@ -1229,50 +1222,46 @@ export class HiveMindSystem extends BaseSystem {
       for (const directive of hive.directives) {
         if (!directive.completed) {
           // Simple completion check based on time
-          const elapsed = world.tick - directive.issuedAt;
+          const elapsed = ctx.tick - directive.issuedAt;
           if (elapsed > 1000 / directive.priority) {
             directive.completed = true;
 
-            if (this.eventBus) {
-              this.eventBus.emit({
-                type: 'hive:directive_completed' as any,
-                source: 'hive-mind-system',
-                data: {
-                  hiveId: hive.id,
-                  directiveId: directive.id,
-                  task: directive.task,
-                },
-              });
-            }
+            this.events.emitGeneric({
+              type: 'hive:directive_completed' as any,
+              source: 'hive-mind-system',
+              data: {
+                hiveId: hive.id,
+                directiveId: directive.id,
+                task: directive.task,
+              },
+            });
           }
         }
       }
 
       // Clean up old completed directives
       hive.directives = hive.directives.filter(
-        (d) => !d.completed || world.tick - d.issuedAt < 500
+        (d) => !d.completed || ctx.tick - d.issuedAt < 500
       );
 
       // Update hive mood based on state
       this.updateHiveMood(hive);
 
       // Emit periodic hive status
-      if (world.tick % 500 === 0) {
-        if (this.eventBus) {
-          this.eventBus.emit({
-            type: 'hive:status_update' as any,
-            source: 'hive-mind-system',
-            data: {
-              hiveId: hive.id,
-              hiveName: hive.name,
-              population: hive.population,
-              coherence: hive.coherence,
-              mood: hive.collectiveMood,
-              activeDirectives: hive.directives.filter((d) => !d.completed).length,
-              queenThought: this.getQueenThought(),
-            },
-          });
-        }
+      if (ctx.tick % 500 === 0) {
+        this.events.emitGeneric({
+          type: 'hive:status_update' as any,
+          source: 'hive-mind-system',
+          data: {
+            hiveId: hive.id,
+            hiveName: hive.name,
+            population: hive.population,
+            coherence: hive.coherence,
+            mood: hive.collectiveMood,
+            activeDirectives: hive.directives.filter((d) => !d.completed).length,
+            queenThought: this.getQueenThought(),
+          },
+        });
       }
     }
   }

@@ -19,7 +19,7 @@
  * - Body loss = stat penalty, not personality change
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -837,28 +837,20 @@ export const FORMATION_ANNOUNCEMENTS: Record<PackFormation, string[]> = {
  * Pack Mind System
  * Manages distributed consciousness across multiple bodies
  */
-export class PackMindSystem implements System {
+export class PackMindSystem extends BaseSystem {
   public readonly id: SystemId = 'pack_mind';
   public readonly priority: number = 161;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 10;
 
   // Active pack minds
   private packs: Map<string, PackMind> = new Map();
-
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 10;
 
   // Formation spacing
   private static readonly CLUSTER_SPACING = 2;
   private static readonly LINE_SPACING = 3;
   private static readonly SPREAD_SPACING = 8;
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
 
   /**
    * Create a new pack mind

@@ -208,16 +208,38 @@ export const SeedSchema = autoRegister(
 
     validate: (data): data is SeedComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const s = data as any;
+      const s = data as Record<string, unknown>;
 
-      return (
-        s.type === 'seed' &&
-        typeof s.speciesId === 'string' &&
-        typeof s.genetics === 'object' &&
-        typeof s.viability === 'number' &&
-        s.viability >= 0 &&
-        s.viability <= 1
-      );
+      // Required type field
+      if (!('type' in s) || s.type !== 'seed') return false;
+
+      // Required fields with type checks
+      if (!('id' in s) || typeof s.id !== 'string') return false;
+      if (!('speciesId' in s) || typeof s.speciesId !== 'string') return false;
+      if (!('genetics' in s) || typeof s.genetics !== 'object' || s.genetics === null) return false;
+      if (!('generation' in s) || typeof s.generation !== 'number') return false;
+      if (!('parentPlantIds' in s) || !Array.isArray(s.parentPlantIds)) return false;
+      if (!('viability' in s) || typeof s.viability !== 'number') return false;
+      if (s.viability < 0 || s.viability > 1) return false;
+      if (!('vigor' in s) || typeof s.vigor !== 'number') return false;
+      if (!('quality' in s) || typeof s.quality !== 'number') return false;
+      if (!('ageInDays' in s) || typeof s.ageInDays !== 'number') return false;
+      if (!('dormant' in s) || typeof s.dormant !== 'boolean') return false;
+      if (!('sourceType' in s) || typeof s.sourceType !== 'string') return false;
+      if (!('isHybrid' in s) || typeof s.isHybrid !== 'boolean') return false;
+
+      // Optional fields - only validate type if present
+      if ('dormancyRequirements' in s && s.dormancyRequirements !== undefined) {
+        if (typeof s.dormancyRequirements !== 'object' || s.dormancyRequirements === null) return false;
+      }
+      if ('harvestMetadata' in s && s.harvestMetadata !== undefined) {
+        if (typeof s.harvestMetadata !== 'object' || s.harvestMetadata === null) return false;
+      }
+      if ('hybridParentSpecies' in s && s.hybridParentSpecies !== undefined) {
+        if (!Array.isArray(s.hybridParentSpecies)) return false;
+      }
+
+      return true;
     },
 
     createDefault: () => ({
