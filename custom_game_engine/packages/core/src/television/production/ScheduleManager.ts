@@ -183,8 +183,8 @@ export class ScheduleManager {
 
     this.schedules.set(productionId, schedule);
 
-    this.eventBus?.emit({
-      type: 'tv:schedule:created' as any,
+    this.eventBus?.emit<'tv:schedule:created'>({
+      type: 'tv:schedule:created',
       source: showId,
       data: {
         scheduleId: schedule.id,
@@ -271,8 +271,8 @@ export class ScheduleManager {
 
     schedule.status = 'confirmed';
 
-    this.eventBus?.emit({
-      type: 'tv:schedule:confirmed' as any,
+    this.eventBus?.emit<'tv:schedule:confirmed'>({
+      type: 'tv:schedule:confirmed',
       source: schedule.showId,
       data: {
         scheduleId: schedule.id,
@@ -300,8 +300,8 @@ export class ScheduleManager {
       firstDayMilestone.status = 'completed';
     }
 
-    this.eventBus?.emit({
-      type: 'tv:schedule:started' as any,
+    this.eventBus?.emit<'tv:schedule:started'>({
+      type: 'tv:schedule:started',
       source: schedule.showId,
       data: {
         scheduleId: schedule.id,
@@ -328,8 +328,8 @@ export class ScheduleManager {
       booking.status = 'completed';
     });
 
-    this.eventBus?.emit({
-      type: 'tv:schedule:completed' as any,
+    this.eventBus?.emit<'tv:schedule:completed'>({
+      type: 'tv:schedule:completed',
       source: schedule.showId,
       data: {
         scheduleId: schedule.id,
@@ -667,8 +667,8 @@ export class ScheduleManager {
       milestone.status = 'completed'; // Late but done
     }
 
-    this.eventBus?.emit({
-      type: 'tv:milestone:completed' as any,
+    this.eventBus?.emit<'tv:milestone:completed'>({
+      type: 'tv:milestone:completed',
       source: schedule.showId,
       data: {
         productionId,

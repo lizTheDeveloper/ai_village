@@ -366,6 +366,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
           milestone: 'cultural_tradition_emerged',
           tradition: proto.traditions[0],
           generation: program.currentGeneration,
+          intelligence: proto.intelligence,
         });
       }
     }

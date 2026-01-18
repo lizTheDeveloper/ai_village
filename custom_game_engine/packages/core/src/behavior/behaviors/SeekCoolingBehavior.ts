@@ -27,9 +27,19 @@ import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 // Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: any | null = null;
+interface ChunkSpatialQuery {
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: string[],
+    options?: { limit?: number }
+  ): Array<{ entity: Entity; distance: number }>;
+}
 
-export function injectChunkSpatialQueryToSeekCooling(spatialQuery: any): void {
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToSeekCooling(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
   console.log('[SeekCoolingBehavior] ChunkSpatialQuery injected for efficient cooling source lookups');
 }
@@ -57,7 +67,10 @@ export class SeekCoolingBehavior extends BaseBehavior {
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const temperature = entity.getComponent(ComponentType.Temperature) as any;
+    interface TemperatureComponent {
+      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+    }
+    const temperature = entity.getComponent(ComponentType.Temperature) as TemperatureComponent | undefined;
 
     if (!temperature) {
       // No temperature component
@@ -167,7 +180,12 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
   private findWaterSources(world: World, position: PositionComponent): CoolingSource[] {
     const sources: CoolingSource[] = [];
-    const chunks = (world as any).chunkManager;
+    interface WorldWithChunks {
+      chunkManager?: {
+        getChunk(x: number, y: number): { getTile(x: number, y: number): { terrain: string; fluid?: { type: string; depth: number } } } | undefined;
+      };
+    }
+    const chunks = (world as unknown as WorldWithChunks).chunkManager;
 
     if (!chunks) return sources;
 
@@ -265,13 +283,17 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const { entity: plant, distance } of plantsInRadius) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent(ComponentType.Plant) as any;
+        interface PlantWithShade {
+          providesShade?: boolean;
+          shadeRadius?: number;
+        }
+        const plantComp = plantImpl.getComponent(ComponentType.Plant) as PlantWithShade | undefined;
         const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
         if (!plantComp || !plantPos) continue;
 
         // Check if plant provides shade (e.g., tall trees)
-        if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+        if (plantComp.providesShade && (plantComp.shadeRadius ?? 0) > 0) {
           sources.push({
             type: 'shade',
             position: { x: plantPos.x, y: plantPos.y },
@@ -322,7 +344,11 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const plant of plants) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent(ComponentType.Plant) as any;
+        interface PlantWithShade {
+          providesShade?: boolean;
+          shadeRadius?: number;
+        }
+        const plantComp = plantImpl.getComponent(ComponentType.Plant) as PlantWithShade | undefined;
         const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
         if (!plantComp || !plantPos) continue;
@@ -333,7 +359,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
         if (distance > this.SEARCH_RADIUS) continue;
 
         // Check if plant provides shade (e.g., tall trees)
-        if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+        if (plantComp.providesShade && (plantComp.shadeRadius ?? 0) > 0) {
           sources.push({
             type: 'shade',
             position: { x: plantPos.x, y: plantPos.y },
@@ -363,9 +389,13 @@ export class SeekCoolingBehavior extends BaseBehavior {
       }
 
       // Check if it's a plant (tree) with shade
-      const plantComp = entityImpl.getComponent(ComponentType.Plant) as any;
+      interface PlantWithShade {
+        providesShade?: boolean;
+        shadeRadius?: number;
+      }
+      const plantComp = entityImpl.getComponent(ComponentType.Plant) as PlantWithShade | undefined;
       if (plantComp && plantComp.providesShade) {
-        return !!(plantComp.shadeRadius && source.distance <= plantComp.shadeRadius);
+        return !!((plantComp.shadeRadius ?? 0) > 0 && source.distance <= (plantComp.shadeRadius ?? 0));
       }
 
       return false;
@@ -542,7 +572,10 @@ export class SeekCoolingBehavior extends BaseBehavior {
     } else {
       // No heat sources detected but still hot - just move in a random direction
       // This handles cases where heat comes from non-building sources
-      const temperature = entity.getComponent(ComponentType.Temperature) as any;
+      interface TemperatureComponent {
+        state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+      }
+      const temperature = entity.getComponent(ComponentType.Temperature) as TemperatureComponent | undefined;
       if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
         // Use persistent escape direction here too
         const state = this.getState(entity);
@@ -602,7 +635,10 @@ const MIN_ESCAPE_DISTANCE = 20; // Minimum distance before picking new escape di
  * @example registerBehaviorWithContext('seek_cooling', seekCoolingBehaviorWithContext);
  */
 export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const temperature = ctx.getComponent(CT.Temperature) as any;
+  interface TemperatureComponent {
+    state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+  }
+  const temperature = ctx.getComponent(CT.Temperature) as TemperatureComponent | undefined;
 
   if (!temperature) {
     return ctx.complete('No temperature component');
@@ -687,7 +723,12 @@ function findBestCoolingSourceWithContext(ctx: BehaviorContext): CoolingSource |
 
 function findWaterSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
   const sources: CoolingSource[] = [];
-  const chunks = (ctx as any).world?.chunkManager;
+  interface WorldWithChunks {
+    chunkManager?: {
+      getChunk(x: number, y: number): { getTile(x: number, y: number): { terrain: string; fluid?: { type: string; depth: number } } } | undefined;
+    };
+  }
+  const chunks = (ctx as unknown as { world?: WorldWithChunks }).world?.chunkManager;
 
   if (!chunks) return sources;
 
@@ -770,12 +811,16 @@ function findShadeSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
 
   for (const { entity: plant, distance, position } of plantsInRadius) {
     const plantImpl = plant as EntityImpl;
-    const plantComp = plantImpl.getComponent(CT.Plant) as any;
+    interface PlantWithShade {
+      providesShade?: boolean;
+      shadeRadius?: number;
+    }
+    const plantComp = plantImpl.getComponent(CT.Plant) as PlantWithShade | undefined;
 
     if (!plantComp) continue;
 
     // Check if plant provides shade (e.g., tall trees)
-    if (plantComp.providesShade && plantComp.shadeRadius > 0) {
+    if (plantComp.providesShade && (plantComp.shadeRadius ?? 0) > 0) {
       sources.push({
         type: 'shade',
         position,
@@ -801,9 +846,13 @@ function isInCoolingRangeWithContext(ctx: BehaviorContext, source: CoolingSource
       return !!(buildingComp && source.distance <= buildingComp.shadeRadius);
     }
 
-    const plantComp = entityImpl.getComponent(CT.Plant) as any;
+    interface PlantWithShade {
+      providesShade?: boolean;
+      shadeRadius?: number;
+    }
+    const plantComp = entityImpl.getComponent(CT.Plant) as PlantWithShade | undefined;
     if (plantComp && plantComp.providesShade) {
-      return !!(plantComp.shadeRadius && source.distance <= plantComp.shadeRadius);
+      return !!((plantComp.shadeRadius ?? 0) > 0 && source.distance <= (plantComp.shadeRadius ?? 0));
     }
 
     return false;
@@ -906,7 +955,10 @@ function fleeHeatSourcesWithContext(ctx: BehaviorContext): void {
     }
   } else {
     // No heat sources detected but still hot
-    const temperature = ctx.getComponent(CT.Temperature) as any;
+    interface TemperatureComponent {
+      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
+    }
+    const temperature = ctx.getComponent(CT.Temperature) as TemperatureComponent | undefined;
     if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
       let escapeAngle = ctx.getState<number>('escapeAngle');
       const escapeStartX = ctx.getState<number>('escapeStartX');

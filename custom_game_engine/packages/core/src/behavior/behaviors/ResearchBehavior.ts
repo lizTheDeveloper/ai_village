@@ -268,7 +268,11 @@ export class ResearchBehavior extends BaseBehavior {
    * Get ResearchSystem from world
    */
   private getResearchSystem(world: World): ResearchSystem | null {
-    return (world as any).getSystem?.('research') as ResearchSystem | null;
+    interface WorldWithSystems {
+      getSystem?: (name: string) => unknown;
+    }
+    const system = (world as unknown as WorldWithSystems).getSystem?.('research');
+    return (system as ResearchSystem) ?? null;
   }
 
   /**
@@ -300,7 +304,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
  * @example registerBehaviorWithContext('research', researchBehaviorWithContext);
  */
 export function researchBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState() as Record<string, unknown>;
   const phase = state.phase ?? 'find_building';
 
   // Execute phase
@@ -322,10 +326,13 @@ export function researchBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
   }
 }
 
-function handleFindBuilding(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleFindBuilding(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   // Get research system
-  const world = (ctx as any).world;
-  const researchSystem = (world as any).getSystem?.('research');
+  const world = (ctx as unknown as { world: World }).world;
+  interface WorldWithSystems {
+    getSystem?: (name: string) => unknown;
+  }
+  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research');
 
   if (!researchSystem) {
     return ctx.complete('No research system available');
@@ -351,10 +358,15 @@ function handleFindBuilding(ctx: BehaviorContext, state: any): ContextBehaviorRe
     if (!buildingComp || !buildingComp.isComplete) continue;
 
     // Check if this is a research building
-    const blueprint = (world as any).buildingRegistry?.tryGet(buildingComp.buildingType);
+    interface WorldWithRegistry {
+      buildingRegistry?: {
+        tryGet(type: string): { functionality: Array<{ type: string }> } | undefined;
+      };
+    }
+    const blueprint = (world as unknown as WorldWithRegistry).buildingRegistry?.tryGet(buildingComp.buildingType);
     if (!blueprint) continue;
 
-    const hasResearch = blueprint.functionality.some((f: any) => f.type === 'research');
+    const hasResearch = blueprint.functionality.some((f) => f.type === 'research');
     if (!hasResearch) continue;
 
     if (distance < nearestDistance) {
@@ -374,7 +386,7 @@ function handleFindBuilding(ctx: BehaviorContext, state: any): ContextBehaviorRe
   });
 }
 
-function handleMoveToBuilding(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleMoveToBuilding(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   const targetId = state.targetBuildingId;
   if (!targetId) {
     return ctx.complete('No target building ID');
@@ -405,10 +417,13 @@ function handleMoveToBuilding(ctx: BehaviorContext, state: any): ContextBehavior
   });
 }
 
-function handleConductResearch(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleConductResearch(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   // Get research system
-  const world = (ctx as any).world;
-  const researchSystem = (world as any).getSystem?.('research');
+  const world = (ctx as unknown as { world: World }).world;
+  interface WorldWithSystems {
+    getSystem?: (name: string) => unknown;
+  }
+  const researchSystem = (world as unknown as WorldWithSystems).getSystem?.('research');
 
   if (!researchSystem) {
     return ctx.complete('No research system available');

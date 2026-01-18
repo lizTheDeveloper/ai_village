@@ -126,7 +126,7 @@ export class ChatRoomSystem extends BaseSystem {
     // Create new room
     const entity = world.createEntity();
     const room = createChatRoomComponent(config, world.tick);
-    (entity as any).addComponent(room);
+    entity.addComponent(room);
 
     this.roomEntities.set(config.id, entity.id);
     this.knownMembers.set(config.id, new Set());
@@ -218,8 +218,8 @@ export class ChatRoomSystem extends BaseSystem {
         .with(ComponentType.Tags)
         .executeEntities()
         .filter(entity => {
-          const tags = entity.components.get(ComponentType.Tags) as any;
-          return tags?.tags?.includes(value);
+          const tags = entity.getComponent<TagsComponent>(ComponentType.Tags);
+          return tags?.tags?.includes(value) ?? false;
         });
     }
 
@@ -229,7 +229,7 @@ export class ChatRoomSystem extends BaseSystem {
         .with(ComponentType.Agent)
         .executeEntities()
         .filter(entity => {
-          const agent = entity.components.get(ComponentType.Agent) as any;
+          const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
           return agent?.familyId === value;
         });
     }
@@ -240,7 +240,7 @@ export class ChatRoomSystem extends BaseSystem {
         .with(ComponentType.Agent)
         .executeEntities()
         .filter(entity => {
-          const agent = entity.components.get(ComponentType.Agent) as any;
+          const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
           return agent?.guildId === value;
         });
     }
@@ -252,7 +252,7 @@ export class ChatRoomSystem extends BaseSystem {
    * Handle a member joining
    */
   private handleMemberJoin(_world: World, room: ChatRoomComponent, entity: Entity): void {
-    const identity = entity.components.get(ComponentType.Identity) as any;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
     const name = identity?.name ?? 'Unknown';
 
     // Don't duplicate
@@ -279,7 +279,7 @@ export class ChatRoomSystem extends BaseSystem {
 
       // Try to get name from world (entity might be gone)
       const entity = world.getEntity(entityId);
-      const identity = entity?.components.get(ComponentType.Identity) as any;
+      const identity = entity?.getComponent<IdentityComponent>(ComponentType.Identity);
       const name = identity?.name ?? 'Unknown';
 
       // Create notification
@@ -363,7 +363,7 @@ export class ChatRoomSystem extends BaseSystem {
       return null;
     }
 
-    const identity = sender.components.get(ComponentType.Identity) as any;
+    const identity = sender.getComponent<IdentityComponent>(ComponentType.Identity);
     const senderName = identity?.name ?? 'Unknown';
 
     // Create message

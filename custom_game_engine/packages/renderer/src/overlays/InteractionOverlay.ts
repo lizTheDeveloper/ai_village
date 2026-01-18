@@ -6,6 +6,8 @@ import type {
   BuildingComponent,
   TemperatureComponent,
   SteeringComponent,
+  MovementComponent,
+  Component,
 } from '@ai-village/core';
 import type { Camera } from '../Camera.js';
 
@@ -196,29 +198,31 @@ export class InteractionOverlay {
 
     // 2. Check agent.behaviorState.target (used by NavigateBehavior)
     if (targetX === undefined || targetY === undefined) {
-      const agent = entity.getComponent('agent') as any;
-      if (agent?.behaviorState?.target) {
-        targetX = agent.behaviorState.target.x;
-        targetY = agent.behaviorState.target.y;
+      const agent = entity.getComponent('agent') as AgentComponent | undefined;
+      const target = agent?.behaviorState?.target as { x: number; y: number } | undefined;
+      if (target) {
+        targetX = target.x;
+        targetY = target.y;
       }
     }
 
     // 3. Check agent.behaviorState.destination (alternative target field)
     if (targetX === undefined || targetY === undefined) {
-      const agent = entity.getComponent('agent') as any;
-      if (agent?.behaviorState?.destination) {
-        targetX = agent.behaviorState.destination.x;
-        targetY = agent.behaviorState.destination.y;
+      const agent = entity.getComponent('agent') as AgentComponent | undefined;
+      const destination = agent?.behaviorState?.destination as { x: number; y: number } | undefined;
+      if (destination) {
+        targetX = destination.x;
+        targetY = destination.y;
       }
     }
 
     // 4. Check movement component for targetX/targetY (used by BaseBehavior.moveToward)
     if (targetX === undefined || targetY === undefined) {
-      const movement = entity.getComponent('movement') as any;
+      const movement = entity.getComponent('movement') as MovementComponent | undefined;
       // Check for target coordinates - hasTarget flag is optional
       if (movement && typeof movement.targetX === 'number' && typeof movement.targetY === 'number') {
-        // Only use if hasTarget is true OR if coordinates are non-zero (active target)
-        if (movement.hasTarget || (movement.targetX !== 0 || movement.targetY !== 0)) {
+        // Only use if coordinates are non-zero (active target)
+        if (movement.targetX !== 0 || movement.targetY !== 0) {
           targetX = movement.targetX;
           targetY = movement.targetY;
         }
@@ -227,47 +231,50 @@ export class InteractionOverlay {
 
     // 5. Check pending_action for navigation targets
     if (targetX === undefined || targetY === undefined) {
-      const pendingAction = entity.getComponent('pending_action') as any;
-      if (pendingAction?.targetPos) {
-        targetX = pendingAction.targetPos.x;
-        targetY = pendingAction.targetPos.y;
-      } else if (pendingAction?.target) {
-        targetX = pendingAction.target.x;
-        targetY = pendingAction.target.y;
+      const pendingAction = entity.getComponent('pending_action') as Component | undefined;
+      const targetPos = (pendingAction as any)?.targetPos as { x: number; y: number } | undefined;
+      const target = (pendingAction as any)?.target as { x: number; y: number } | undefined;
+      if (targetPos) {
+        targetX = targetPos.x;
+        targetY = targetPos.y;
+      } else if (target) {
+        targetX = target.x;
+        targetY = target.y;
       }
     }
 
     // 6. If still no target, check action queue for targetPos
     if (targetX === undefined || targetY === undefined) {
-      const actionQueue = entity.getComponent('action_queue') as any;
+      const actionQueue = entity.getComponent('action_queue') as Component | undefined;
 
       if (actionQueue) {
         // Try to access queue data - the structure might vary
-        let actions: any[] = [];
+        let actions: unknown[] = [];
 
-        if (typeof actionQueue.peek === 'function') {
-          const current = actionQueue.peek();
+        if (typeof (actionQueue as any).peek === 'function') {
+          const current = (actionQueue as any).peek();
           if (current) actions = [current];
-        } else if (Array.isArray(actionQueue.queue)) {
-          actions = actionQueue.queue;
-        } else if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
+        } else if (Array.isArray((actionQueue as any).queue)) {
+          actions = (actionQueue as any).queue;
+        } else if (typeof (actionQueue as any).isEmpty === 'function' && !(actionQueue as any).isEmpty()) {
           // Last resort: try internal queue property
           actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
         }
 
         if (actions.length > 0) {
-          const currentAction = actions[0];
-          if (currentAction?.targetPos) {
-            targetX = currentAction.targetPos.x;
-            targetY = currentAction.targetPos.y;
+          const currentAction = actions[0] as any;
+          const targetPos = currentAction?.targetPos as { x: number; y: number } | undefined;
+          if (targetPos) {
+            targetX = targetPos.x;
+            targetY = targetPos.y;
           }
         }
       }
     }
 
     // DEBUG: Log all target sources we checked
-    const agent = entity.getComponent('agent') as any;
-    const movement = entity.getComponent('movement') as any;
+    const agent = entity.getComponent('agent') as AgentComponent | undefined;
+    const movement = entity.getComponent('movement') as MovementComponent | undefined;
     console.log('[PathViz] Target search for', entity.id.substring(0, 8), ':', {
       behavior: agent?.behavior,
       steeringTarget: steering?.target,

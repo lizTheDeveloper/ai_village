@@ -167,8 +167,8 @@ export class CastingManager {
 
     this.castingCalls.set(call.id, call);
 
-    this.eventBus?.emit({
-      type: 'tv:casting:call_opened' as any,
+    this.eventBus?.emit<'tv:casting:call_opened'>({
+      type: 'tv:casting:call_opened',
       source: showId,
       data: {
         callId: call.id,
@@ -218,8 +218,8 @@ export class CastingManager {
       call.status = 'auditioning';
     }
 
-    this.eventBus?.emit({
-      type: 'tv:casting:audition_submitted' as any,
+    this.eventBus?.emit<'tv:casting:audition_submitted'>({
+      type: 'tv:casting:audition_submitted',
       source: agentId,
       data: {
         auditionId: audition.id,
@@ -323,8 +323,8 @@ export class CastingManager {
       availability: 'available',
     });
 
-    this.eventBus?.emit({
-      type: 'tv:casting:role_cast' as any,
+    this.eventBus?.emit<'tv:casting:role_cast'>({
+      type: 'tv:casting:role_cast',
       source: call.showId,
       data: {
         callId: castingCallId,
@@ -389,8 +389,8 @@ export class CastingManager {
 
     this.contracts.set(contract.id, contract);
 
-    this.eventBus?.emit({
-      type: 'tv:contract:signed' as any,
+    this.eventBus?.emit<'tv:contract:signed'>({
+      type: 'tv:contract:signed',
       source: showId,
       data: {
         contractId: contract.id,
@@ -419,8 +419,8 @@ export class CastingManager {
     contract.optionSeasons--;
     contract.compensation = Math.round(contract.compensation * 1.15); // 15% raise
 
-    this.eventBus?.emit({
-      type: 'tv:contract:renewed' as any,
+    this.eventBus?.emit<'tv:contract:renewed'>({
+      type: 'tv:contract:renewed',
       source: contract.showId,
       data: {
         contractId,
@@ -449,8 +449,8 @@ export class CastingManager {
       if (index >= 0) cast.splice(index, 1);
     }
 
-    this.eventBus?.emit({
-      type: 'tv:contract:terminated' as any,
+    this.eventBus?.emit<'tv:contract:terminated'>({
+      type: 'tv:contract:terminated',
       source: contract.showId,
       data: {
         contractId,

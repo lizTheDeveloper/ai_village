@@ -144,7 +144,7 @@ export class MeditateBehavior extends BaseBehavior {
       }));
 
       // Emit internal monologue event (using untyped emit for custom event)
-      const eventBus = world.eventBus as { emit: (event: unknown) => void };
+      const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
       eventBus.emit({
         type: 'agent:internal_monologue',
         source: 'meditate_behavior',
@@ -194,7 +194,7 @@ export class MeditateBehavior extends BaseBehavior {
     }));
 
     // Emit event (using untyped emit for custom event)
-    const eventBus = world.eventBus as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
     eventBus.emit({
       type: 'agent:meditation_started',
       source: 'meditate_behavior',
@@ -252,7 +252,7 @@ export class MeditateBehavior extends BaseBehavior {
       // Generate and deliver vision
       const vision = this.generateVision(entity, spiritual, position, world, currentTick);
       const updatedSpiritual = receiveVision(spiritual, vision, 10);
-      (entity as any).addComponent(updatedSpiritual);
+      entity.addComponent(updatedSpiritual);
 
       // Thought about receiving vision
       const thought = VISION_RECEIVED_THOUGHTS[Math.floor(Math.random() * VISION_RECEIVED_THOUGHTS.length)]!;
@@ -262,7 +262,7 @@ export class MeditateBehavior extends BaseBehavior {
       }));
 
       // Emit vision event (using untyped emit for custom event)
-      const eventBus = world.eventBus as { emit: (event: unknown) => void };
+      const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
       eventBus.emit({
         type: 'vision:received',
         source: 'meditate_behavior',
@@ -285,7 +285,7 @@ export class MeditateBehavior extends BaseBehavior {
     }
 
     // Emit meditation complete event (using untyped emit for custom event)
-    const completeEventBus = world.eventBus as { emit: (event: unknown) => void };
+    const completeEventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
     completeEventBus.emit({
       type: 'agent:meditation_complete',
       source: 'meditate_behavior',
@@ -512,7 +512,7 @@ function completeMeditationWithContext(
     // Generate and deliver vision
     const vision = generateVisionWithContext(ctx, spiritual);
     const updatedSpiritual = receiveVision(spiritual, vision, 10);
-    (ctx.entity as any).addComponent(updatedSpiritual);
+    (ctx.entity as EntityImpl).addComponent(updatedSpiritual);
 
     // Thought about receiving vision
     const thought = VISION_RECEIVED_THOUGHTS[Math.floor(Math.random() * VISION_RECEIVED_THOUGHTS.length)]!;
@@ -591,12 +591,14 @@ function generateVisionWithContext(
 
 function getSacredSiteSystemFromMeditationContext(ctx: BehaviorContext): SacredSiteSystem | null {
   // Access world through entity's internal reference
-  const world = (ctx.entity as any).world;
+  const entityImpl = ctx.entity as EntityImpl;
+  const world = (entityImpl as unknown as { world?: World }).world;
   if (!world) return null;
 
   const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
   if (systems instanceof Map) {
-    return systems.get('sacred_site') as SacredSiteSystem | null;
+    const system = systems.get('sacred_site');
+    return system instanceof SacredSiteSystem ? system : null;
   }
   return null;
 }

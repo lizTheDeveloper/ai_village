@@ -293,11 +293,16 @@ export class TradeBehavior extends BaseBehavior {
    */
   private getTradingSystem(world: World): TradingSystem | null {
     // The trading system should be accessible via world property
-    const system = (world as any).getSystem?.('trading');
+    interface WorldWithSystems {
+      getSystem?: (name: string) => unknown;
+      tradingSystem?: TradingSystem;
+    }
+    const worldWithSystems = world as unknown as WorldWithSystems;
+    const system = worldWithSystems.getSystem?.('trading');
     if (system) {
       return system as TradingSystem;
     }
-    return (world as any).tradingSystem ?? null;
+    return worldWithSystems.tradingSystem ?? null;
   }
 }
 
@@ -322,7 +327,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
  * @example registerBehaviorWithContext('trade', tradeBehaviorWithContext);
  */
 export function tradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState() as Record<string, unknown>;
 
   // Validate required state
   if (!state.itemId) {
@@ -355,7 +360,7 @@ export function tradeBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorR
   }
 }
 
-function handleFindShop(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleFindShop(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   // If shopId already specified, validate it and move to next phase
   if (state.shopId) {
     const shop = ctx.getEntity(state.shopId);
@@ -407,7 +412,7 @@ function handleFindShop(ctx: BehaviorContext, state: any): ContextBehaviorResult
   });
 }
 
-function handleMoveToShop(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleMoveToShop(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   const shopId = state.shopId;
   if (!shopId) {
     // Lost target, restart
@@ -441,7 +446,7 @@ function handleMoveToShop(ctx: BehaviorContext, state: any): ContextBehaviorResu
   });
 }
 
-function handleExecuteTrade(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>): ContextBehaviorResult | void {
   ctx.stopMovement();
 
   if (!state.shopId || !state.itemId || !state.quantity || !state.tradeType) {
@@ -449,8 +454,13 @@ function handleExecuteTrade(ctx: BehaviorContext, state: any): ContextBehaviorRe
   }
 
   // Get trading system - access via the entity's world reference
-  const world = (ctx as any).world;
-  const tradingSystem = (world as any).getSystem?.('trading') ?? (world as any).tradingSystem;
+  const world = (ctx as unknown as { world: World }).world;
+  interface WorldWithSystems {
+    getSystem?: (name: string) => unknown;
+    tradingSystem?: TradingSystem;
+  }
+  const worldWithSystems = world as unknown as WorldWithSystems;
+  const tradingSystem = worldWithSystems.getSystem?.('trading') ?? worldWithSystems.tradingSystem;
 
   if (!tradingSystem) {
     return ctx.complete('Trading system not available');

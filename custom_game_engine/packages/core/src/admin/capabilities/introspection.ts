@@ -72,7 +72,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.components) {
           options.components = (params.components as string).split(',').map(c => c.trim());
         }
@@ -110,7 +110,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const query: any = {};
+        const query: Record<string, unknown> = {};
         if (params.componentFilters) {
           query.componentFilters = (params.componentFilters as string).split(',').map(c => c.trim());
         }
@@ -184,7 +184,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.category) {
           options.category = params.category;
         }
@@ -246,7 +246,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.owner) {
           options.owner = params.owner;
         }
@@ -287,7 +287,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.category) {
           options.category = params.category;
         }
@@ -320,7 +320,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.entityId) {
           options.entityId = params.entityId;
         }
@@ -422,7 +422,7 @@ const introspectionCapability = defineCapability({
           return { error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        const options: any = {};
+        const options: Record<string, unknown> = {};
         if (params.resources) {
           options.resources = (params.resources as string).split(',').map(r => r.trim());
         }
@@ -541,7 +541,7 @@ const introspectionCapability = defineCapability({
           return { success: false, error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        let mutations: any[];
+        let mutations: unknown[];
         try {
           mutations = JSON.parse(params.mutationsJson as string);
           if (!Array.isArray(mutations)) {
@@ -812,8 +812,9 @@ const introspectionCapability = defineCapability({
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
-        const snapshots = (world as any).snapshots || [];
-        const index = snapshots.findIndex((s: any) => s.id === params.snapshotId);
+        type Snapshot = { id: string };
+        const snapshots = world.snapshots || [];
+        const index = snapshots.findIndex((s) => typeof s === 'object' && s !== null && 'id' in s && (s as Snapshot).id === params.snapshotId);
 
         if (index === -1) {
           return { success: false, error: `Snapshot not found: ${params.snapshotId}` };
@@ -836,9 +837,10 @@ const introspectionCapability = defineCapability({
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
-        const snapshots = (world as any).snapshots || [];
+        type MutableWorld = { snapshots?: unknown[] };
+        const snapshots = world.snapshots || [];
         const count = snapshots.length;
-        (world as any).snapshots = [];
+        (world as MutableWorld).snapshots = [];
 
         return { success: true, deletedCount: count };
       },
