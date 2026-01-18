@@ -273,7 +273,7 @@ export class SoilSystem extends BaseSystem {
    * Process moisture decay for a tile
    */
   public decayMoisture(
-    world: World,
+    world: any,
     tile: Tile,
     x: number,
     y: number,
@@ -317,7 +317,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Process rain moisture increase for outdoor tiles
    */
-  public applyRain(world: World, tile: Tile, x: number, y: number, intensity: number): void {
+  public applyRain(world: any, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
     // Rain adds 40 moisture * intensity
