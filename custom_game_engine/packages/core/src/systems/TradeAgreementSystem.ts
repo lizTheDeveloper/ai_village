@@ -18,7 +18,7 @@
  * - Strict validation - agreements must be valid, parties must exist
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -60,13 +60,14 @@ const UPDATE_INTERVAL = 100;
 /**
  * System for managing formal trade agreements
  */
-export class TradeAgreementSystem implements System {
+export class TradeAgreementSystem extends BaseSystem {
   public readonly id: SystemId = 'trade_agreement';
   public readonly priority: number = 26; // Run after TradingSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  protected readonly throttleInterval = UPDATE_INTERVAL;
+
   private isInitialized = false;
-  private lastUpdateTick = 0;
 
   /** Reference to multiverse coordinator for cross-universe operations */
   private _coordinatorRef?: MultiverseCoordinator;
@@ -77,7 +78,7 @@ export class TradeAgreementSystem implements System {
   /**
    * Initialize the system
    */
-  public initialize(_world: World, _eventBus: EventBus): void {
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
@@ -108,30 +109,24 @@ export class TradeAgreementSystem implements System {
   /**
    * Update - process active agreements, escrow releases, and causal events
    */
-  public update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Throttle updates
-    if (currentTick - this.lastUpdateTick < UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Get all civilization entities with trade agreement components
-    const civEntities = world.query().with('trade_agreement').executeEntities();
+    const civEntities = ctx.world.query().with('trade_agreement').executeEntities();
 
     for (const entity of civEntities) {
       const tradeComp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
       if (!tradeComp) continue;
 
       // Process causal event queue
-      this.processCausalEventQueue(world, entity, tradeComp, currentTick);
+      this.processCausalEventQueue(ctx.world, entity, tradeComp, currentTick);
 
       // Process active agreements
-      this.processActiveAgreements(world, entity, tradeComp, currentTick);
+      this.processActiveAgreements(ctx.world, entity, tradeComp, currentTick);
 
       // Process escrow releases
-      this.processEscrowReleases(world, entity, tradeComp, currentTick);
+      this.processEscrowReleases(ctx.world, entity, tradeComp, currentTick);
 
       // Update time coordinate
       this.advanceTimeCoordinate(entity, tradeComp);

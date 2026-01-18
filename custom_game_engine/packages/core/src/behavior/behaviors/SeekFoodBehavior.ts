@@ -759,7 +759,7 @@ function tryEatFromNearbyPlant(ctx: BehaviorContext): InteractionResult | null {
     if (plant.fruitCount <= 0) continue;
 
     // Try to eat from this plant
-    const result = eatFromPlant(ctx.entity, plantEntity, ctx as any);
+    const result = eatFromPlant(ctx.entity, plantEntity, ctx.world);
     if (result.success) {
       return result;
     }
@@ -792,7 +792,7 @@ function tryEatFromNearbyStorage(ctx: BehaviorContext): InteractionResult | null
     if (!hasFood) continue;
 
     // Try to eat from this storage
-    const result = eatFromStorage(ctx.entity, buildingEntity, ctx as any);
+    const result = eatFromStorage(ctx.entity, buildingEntity, ctx.world);
     if (result.success) {
       return result;
     }

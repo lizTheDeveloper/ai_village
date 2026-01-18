@@ -16,6 +16,7 @@ import type {
   BodyComponent,
   BodyPart as BodyComponentBodyPart,
   Injury as BodyComponentInjury,
+  BodyPartType,
 } from '@ai-village/core';
 import { getPartsByType, getBodyPart } from '@ai-village/core';
 import { getBodyPlan } from '@ai-village/core';
@@ -39,7 +40,7 @@ export interface BodyHealingEffect extends HealingEffect {
   targetBodyPart?: string;  // Part ID or type (e.g., 'arm', 'left_arm_1')
 
   /** Heal all parts of a specific type */
-  targetBodyPartType?: string;  // e.g., 'arm' heals all arms
+  targetBodyPartType?: BodyPartType;  // e.g., 'arm' heals all arms
 
   /** Mend fractures on target part */
   mendsFractures?: boolean;
@@ -124,7 +125,7 @@ export class BodyHealingEffectApplier implements EffectApplier<BodyHealingEffect
       }
     } else if (effect.targetBodyPartType) {
       // Heal all parts of a type
-      targetParts = getPartsByType(body, effect.targetBodyPartType as any) as BodyComponentBodyPart[];
+      targetParts = getPartsByType(body, effect.targetBodyPartType);
     } else {
       // Heal all parts (distribute healing)
       targetParts = Object.values(body.parts) as BodyComponentBodyPart[];

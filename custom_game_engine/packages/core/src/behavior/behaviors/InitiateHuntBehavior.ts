@@ -90,7 +90,8 @@ export class InitiateHuntBehavior extends BaseBehavior {
       startTime: world.tick,
     });
 
-    (entity as any).addComponent(conflict);
+    // EntityImpl cast required: Entity interface doesn't expose mutation methods
+    (entity as EntityImpl).addComponent(conflict);
 
     // TODO: Add hunting event types to EventMap
     // Emit event for narrative/logging
@@ -140,10 +141,8 @@ export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBe
     return ctx.complete(`Hunt target ${targetId} not found`);
   }
 
-  const targetEntity = target as EntityImpl;
-
   // Check if target is an animal
-  if (!targetEntity.hasComponent(CT.Animal)) {
+  if (!ctx.world.hasComponent(targetId, CT.Animal)) {
     return ctx.complete(`Cannot hunt ${targetId} - not an animal`);
   }
 
@@ -165,7 +164,8 @@ export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBe
     startTime: ctx.tick,
   });
 
-  (ctx.entity as any).addComponent(conflict);
+  // EntityImpl cast required: Entity interface doesn't expose mutation methods
+  (ctx.entity as EntityImpl).addComponent(conflict);
 
   // TODO: Add hunting event types to EventMap
   // Emit event for narrative/logging

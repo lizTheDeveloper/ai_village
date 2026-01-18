@@ -4,10 +4,8 @@
  * Manages temples, their belief generation, and sacred site mechanics.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -70,31 +68,22 @@ export interface TempleData {
 // TempleSystem
 // ============================================================================
 
-export class TempleSystem implements System {
+export class TempleSystem extends BaseSystem {
   public readonly id = 'TempleSystem';
-  public readonly name = 'TempleSystem';
   public readonly priority = 85;
   public readonly requiredComponents = [];
 
   private config: TempleConfig;
   private temples: Map<string, TempleData> = new Map();
   private lastUpdate: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<TempleConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_TEMPLE_CONFIG, ...config };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Only update periodically
     if (currentTick - this.lastUpdate < this.config.updateInterval) {
@@ -105,7 +94,7 @@ export class TempleSystem implements System {
 
     // Find all temple buildings
     // Note: Temple building type may not exist yet - this is a placeholder
-    const templeBuildings = Array.from(world.entities.values())
+    const templeBuildings = Array.from(ctx.world.entities.values())
       .filter(e => {
         const building = e.components.get(CT.Building) as BuildingComponent | undefined;
         // Check for temple-related building types when they exist
@@ -119,12 +108,12 @@ export class TempleSystem implements System {
       // Get or create temple data
       let temple = this.temples.get(templeEntity.id);
       if (!temple) {
-        temple = this.createTempleData(templeEntity.id, building, world);
+        temple = this.createTempleData(templeEntity.id, building, ctx.world);
         this.temples.set(templeEntity.id, temple);
       }
 
       // Process temple worship
-      this.processTempleWorship(temple, world, currentTick);
+      this.processTempleWorship(temple, ctx.world, currentTick);
     }
   }
 

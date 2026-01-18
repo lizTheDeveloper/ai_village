@@ -178,33 +178,36 @@ export const ExplorationStateSchema = autoRegister(
     },
 
     validate: (data): data is ExplorationStateComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'exploration_state') return false;
+      if (!('type' in d) || d.type !== 'exploration_state') return false;
 
-      if (d.mode !== undefined && !['frontier', 'spiral', 'none'].includes(d.mode)) {
-        return false;
+      if ('mode' in d && d.mode !== undefined) {
+        if (typeof d.mode !== 'string' || !['frontier', 'spiral', 'none'].includes(d.mode)) {
+          return false;
+        }
       }
 
-      if (d.currentTarget !== undefined) {
+      if ('currentTarget' in d && d.currentTarget !== undefined) {
         if (typeof d.currentTarget !== 'object' || d.currentTarget === null) return false;
-        if (typeof d.currentTarget.x !== 'number' || typeof d.currentTarget.y !== 'number') {
-          return false;
-        }
+        const target = d.currentTarget as Record<string, unknown>;
+        if (!('x' in target) || typeof target.x !== 'number') return false;
+        if (!('y' in target) || typeof target.y !== 'number') return false;
       }
 
-      if (d.homeBase !== undefined) {
+      if ('homeBase' in d && d.homeBase !== undefined) {
         if (typeof d.homeBase !== 'object' || d.homeBase === null) return false;
-        if (typeof d.homeBase.x !== 'number' || typeof d.homeBase.y !== 'number') {
-          return false;
-        }
+        const home = d.homeBase as Record<string, unknown>;
+        if (!('x' in home) || typeof home.x !== 'number') return false;
+        if (!('y' in home) || typeof home.y !== 'number') return false;
       }
 
-      if (typeof d.explorationRadius !== 'number' || d.explorationRadius < 0) {
+      if (!('explorationRadius' in d) || typeof d.explorationRadius !== 'number' || d.explorationRadius < 0) {
         throw new RangeError(`Invalid explorationRadius: ${d.explorationRadius} (must be >= 0)`);
       }
 
-      if (typeof d.exploredSectorCount !== 'number' || d.exploredSectorCount < 0) {
+      if (!('exploredSectorCount' in d) || typeof d.exploredSectorCount !== 'number' || d.exploredSectorCount < 0) {
         throw new RangeError(`Invalid exploredSectorCount: ${d.exploredSectorCount} (must be >= 0)`);
       }
 

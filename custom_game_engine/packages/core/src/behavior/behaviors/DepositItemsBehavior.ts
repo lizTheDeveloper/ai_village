@@ -23,6 +23,9 @@ import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 import { CHUNK_SIZE } from '../../types.js';
 
+import type { GameEvent } from '../../events/GameEvent.js';
+import type { EventType } from '../../events/EventMap.js';
+
 /**
  * Minimal interface representing what performDeposit needs from World.
  * This allows the method to work with both World objects and BehaviorContext.
@@ -30,7 +33,9 @@ import { CHUNK_SIZE } from '../../types.js';
 interface DepositWorldLike {
   gameTime: { day: number };
   eventBus: {
-    emit(event: { type: string; source?: string; data?: unknown }): void;
+    emit<T extends EventType = EventType>(
+      event: Omit<GameEvent<T>, 'tick' | 'timestamp'> | Omit<GameEvent<T>, 'tick' | 'timestamp' | 'source'>
+    ): void;
   };
 }
 

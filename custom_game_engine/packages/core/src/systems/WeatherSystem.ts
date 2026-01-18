@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -13,7 +13,7 @@ import type { WeatherType } from '../components/WeatherComponent.js';
  * Dependencies:
  * @see TimeSystem (priority 3) - Provides time tracking for weather duration and transitions
  */
-export class WeatherSystem implements System {
+export class WeatherSystem extends BaseSystem {
   public readonly id: SystemId = CT.Weather;
   public readonly priority: number = 5; // Run early, before temperature system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Weather];
@@ -28,8 +28,8 @@ export class WeatherSystem implements System {
   private readonly MIN_WEATHER_DURATION = 60; // Minimum 60 seconds per weather state
   private previousWeatherType: WeatherType | null = null;
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const weather = impl.getComponent<WeatherComponent>(CT.Weather);
 
@@ -39,7 +39,7 @@ export class WeatherSystem implements System {
       }
 
       // Tick down duration
-      const newDuration = Math.max(0, weather.duration - deltaTime);
+      const newDuration = Math.max(0, weather.duration - ctx.deltaTime);
 
       impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
         ...current,
@@ -47,8 +47,8 @@ export class WeatherSystem implements System {
       }));
 
       // Check if weather should transition
-      if (newDuration <= 0 || Math.random() < this.WEATHER_TRANSITION_CHANCE * deltaTime) {
-        this.transitionWeather(world, entity, impl);
+      if (newDuration <= 0 || Math.random() < this.WEATHER_TRANSITION_CHANCE * ctx.deltaTime) {
+        this.transitionWeather(ctx.world, entity, impl);
       }
     }
   }

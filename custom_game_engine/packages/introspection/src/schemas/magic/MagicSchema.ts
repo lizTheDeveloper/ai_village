@@ -117,8 +117,32 @@ export const MagicSchema = autoRegister(
 
     validate: (data: unknown): data is MagicComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return Array.isArray(comp.manaPools) && Array.isArray(comp.knownSpells);
+      const comp = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in comp) || comp.type !== 'magic') return false;
+
+      // Check required boolean fields
+      if (!('magicUser' in comp) || typeof comp.magicUser !== 'boolean') return false;
+      if (!('casting' in comp) || typeof comp.casting !== 'boolean') return false;
+
+      // Check required array fields
+      if (!('knownParadigmIds' in comp) || !Array.isArray(comp.knownParadigmIds)) return false;
+      if (!('manaPools' in comp) || !Array.isArray(comp.manaPools)) return false;
+      if (!('knownSpells' in comp) || !Array.isArray(comp.knownSpells)) return false;
+      if (!('activeEffects' in comp) || !Array.isArray(comp.activeEffects)) return false;
+
+      // Check required object fields
+      if (!('paradigmState' in comp) || typeof comp.paradigmState !== 'object' || comp.paradigmState === null) return false;
+      if (!('resourcePools' in comp) || typeof comp.resourcePools !== 'object' || comp.resourcePools === null) return false;
+      if (!('techniqueProficiency' in comp) || typeof comp.techniqueProficiency !== 'object' || comp.techniqueProficiency === null) return false;
+      if (!('formProficiency' in comp) || typeof comp.formProficiency !== 'object' || comp.formProficiency === null) return false;
+
+      // Check required number fields
+      if (!('totalSpellsCast' in comp) || typeof comp.totalSpellsCast !== 'number') return false;
+      if (!('totalMishaps' in comp) || typeof comp.totalMishaps !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => ({

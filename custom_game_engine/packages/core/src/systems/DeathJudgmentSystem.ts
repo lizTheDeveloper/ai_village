@@ -1,6 +1,4 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -19,6 +17,7 @@ import {
   calculateInitialTether,
   type DeathJudgmentComponent,
 } from '../components/DeathJudgmentComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * DeathJudgmentSystem - Handles psychopomp conversations with dying souls
@@ -31,14 +30,15 @@ import {
  *
  * Priority: 109 (runs before DeathTransitionSystem at 110)
  */
-export class DeathJudgmentSystem implements System {
+export class DeathJudgmentSystem extends BaseSystem {
   readonly id: SystemId = 'death_judgment';
   readonly priority: number = 109;
   readonly requiredComponents = ['needs', 'realm_location'] as const;
 
   private processedDeaths: Set<string> = new Set();
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const entities = ctx.activeEntities;
     for (const entity of entities) {
       const needs = entity.components.get('needs') as NeedsComponent | undefined;
       const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
@@ -50,14 +50,14 @@ export class DeathJudgmentSystem implements System {
       const alreadyProcessed = this.processedDeaths.has(entity.id);
 
       if (isDead && !alreadyProcessed) {
-        this.initiateJudgment(world, entity);
+        this.initiateJudgment(ctx.world, entity);
         this.processedDeaths.add(entity.id);
       }
 
       // Process ongoing judgment conversations
       const judgment = entity.components.get('death_judgment') as DeathJudgmentComponent | undefined;
       if (judgment && judgment.stage !== 'crossing_over') {
-        this.updateJudgment(world, entity, judgment);
+        this.updateJudgment(ctx.world, entity, judgment);
       }
 
       // Clean up processed deaths for resurrected entities
@@ -70,7 +70,7 @@ export class DeathJudgmentSystem implements System {
   /**
    * Initiate judgment conversation for a newly dead entity
    */
-  private initiateJudgment(world: World, entity: Entity): void {
+  private initiateJudgment(world: { tick: number; eventBus: { emit: (event: any) => void }; getEntity: (id: string) => Entity | undefined }, entity: Entity): void {
     const impl = entity as EntityImpl;
 
     // Skip if entity already has judgment component
@@ -136,7 +136,7 @@ export class DeathJudgmentSystem implements System {
   /**
    * Update an ongoing judgment conversation
    */
-  private updateJudgment(world: World, entity: Entity, judgment: DeathJudgmentComponent): void {
+  private updateJudgment(world: { tick: number; eventBus: { emit: (event: any) => void } }, entity: Entity, judgment: DeathJudgmentComponent): void {
     const impl = entity as EntityImpl;
     const currentTick = world.tick;
 
@@ -198,7 +198,7 @@ export class DeathJudgmentSystem implements System {
   /**
    * Generate psychopomp greeting (first exchange)
    */
-  private generatePsychopompGreeting(world: World, entity: Entity, judgment: DeathJudgmentComponent): void {
+  private generatePsychopompGreeting(world: { tick: number; eventBus: { emit: (event: any) => void } }, entity: Entity, judgment: DeathJudgmentComponent): void {
     const impl = entity as EntityImpl;
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
     const name = identity?.name ?? 'Soul';
@@ -246,7 +246,7 @@ export class DeathJudgmentSystem implements System {
    * Generate soul's response
    * In full implementation, this would use LLM for LLM-controlled agents
    */
-  private generateSoulResponse(world: World, entity: Entity, judgment: DeathJudgmentComponent): void {
+  private generateSoulResponse(world: { tick: number; eventBus: { emit: (event: any) => void } }, entity: Entity, judgment: DeathJudgmentComponent): void {
     const impl = entity as EntityImpl;
 
     // Template-based response for now (would be LLM-driven in full implementation)
@@ -309,7 +309,7 @@ export class DeathJudgmentSystem implements System {
   /**
    * Generate psychopomp's response
    */
-  private generatePsychopompResponse(world: World, entity: Entity, judgment: DeathJudgmentComponent): void {
+  private generatePsychopompResponse(world: { tick: number; eventBus: { emit: (event: any) => void } }, entity: Entity, judgment: DeathJudgmentComponent): void {
     const impl = entity as EntityImpl;
     const exchangeCount = judgment.exchanges.length;
     let response = '';
@@ -363,7 +363,7 @@ export class DeathJudgmentSystem implements System {
   /**
    * Gather context about the deceased for conversation
    */
-  private gatherDeathContext(world: World, entity: Entity): {
+  private gatherDeathContext(world: { getEntity: (id: string) => Entity | undefined }, entity: Entity): {
     causeOfDeath: CauseOfDeath;
     ageName: string;
     unfinishedGoals: string[];

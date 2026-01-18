@@ -224,14 +224,36 @@ export const DeitySchema = autoRegister(
 
     validate: (data: unknown): data is DeityComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.identity === 'object' &&
-        typeof comp.belief === 'object' &&
-        comp.believers instanceof Set &&
-        Array.isArray(comp.prayerQueue) &&
-        Array.isArray(comp.myths)
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in comp) || comp.type !== 'deity') return false;
+
+      // Check identity object
+      if (!('identity' in comp) || typeof comp.identity !== 'object' || comp.identity === null) return false;
+
+      // Check belief object
+      if (!('belief' in comp) || typeof comp.belief !== 'object' || comp.belief === null) return false;
+
+      // Check believers set
+      if (!('believers' in comp) || !(comp.believers instanceof Set)) return false;
+
+      // Check sacredSites set
+      if (!('sacredSites' in comp) || !(comp.sacredSites instanceof Set)) return false;
+
+      // Check prayerQueue array
+      if (!('prayerQueue' in comp) || !Array.isArray(comp.prayerQueue)) return false;
+
+      // Check sentVisions array
+      if (!('sentVisions' in comp) || !Array.isArray(comp.sentVisions)) return false;
+
+      // Check myths array
+      if (!('myths' in comp) || !Array.isArray(comp.myths)) return false;
+
+      // Check controller string
+      if (!('controller' in comp) || typeof comp.controller !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => {

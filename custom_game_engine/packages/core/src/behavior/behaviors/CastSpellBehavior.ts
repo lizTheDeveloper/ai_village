@@ -21,7 +21,7 @@ import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { SpellCastingService } from '../../magic/SpellCastingService.js';
-import { SpellRegistry } from '../../magic/SpellRegistry.js';
+import { SpellRegistry, type SpellDefinition } from '../../magic/SpellRegistry.js';
 
 /** Max distance to search for spell targets */
 const MAX_TARGET_SEARCH_DISTANCE = 50;
@@ -332,7 +332,7 @@ export class CastSpellBehavior extends BaseBehavior {
   private findSuitableTarget(
     entity: EntityImpl,
     world: World,
-    spell: any,
+    spell: SpellDefinition,
     position: PositionComponent
   ): EntityImpl | null {
     // Get spell effect category to determine target selection
@@ -449,7 +449,7 @@ export function castSpellBehaviorWithContext(ctx: BehaviorContext): ContextBehav
     return ctx.complete('Entity cannot use magic');
   }
 
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState() as CastSpellState;
   const phase = state.phase ?? 'validate';
 
   // Execute phase
@@ -471,7 +471,7 @@ export function castSpellBehaviorWithContext(ctx: BehaviorContext): ContextBehav
   }
 }
 
-function validateSpellCtx(ctx: BehaviorContext, state: any, magic: MagicComponent): ContextBehaviorResult | void {
+function validateSpellCtx(ctx: BehaviorContext, state: CastSpellState, magic: MagicComponent): ContextBehaviorResult | void {
   const spellId = state.spellId;
   if (!spellId) {
     return ctx.complete('No spell specified in behaviorState.spellId');
@@ -508,7 +508,7 @@ function validateSpellCtx(ctx: BehaviorContext, state: any, magic: MagicComponen
   ctx.updateState({ phase: 'find_target' });
 }
 
-function findTargetCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function findTargetCtx(ctx: BehaviorContext, state: CastSpellState): ContextBehaviorResult | void {
   const spellRegistry = SpellRegistry.getInstance();
   const spellId = state.spellId!;
   const spell = spellRegistry.getSpell(spellId)!;
@@ -548,7 +548,7 @@ function findTargetCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult 
   });
 }
 
-function moveToRangeCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function moveToRangeCtx(ctx: BehaviorContext, state: CastSpellState): ContextBehaviorResult | void {
   const spellRegistry = SpellRegistry.getInstance();
   const spellId = state.spellId!;
   const spell = spellRegistry.getSpell(spellId)!;
@@ -593,7 +593,7 @@ function moveToRangeCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult
   });
 }
 
-function castSpellCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function castSpellCtx(ctx: BehaviorContext, state: CastSpellState): ContextBehaviorResult | void {
   ctx.stopMovement();
 
   const spellId = state.spellId!;
@@ -614,12 +614,11 @@ function castSpellCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult |
   }
 
   // Execute spell cast
-  const world = (ctx as any).world;
   const castingService = SpellCastingService.getInstance();
   const result = castingService.castSpell(
     spellId,
     ctx.entity,
-    world,
+    ctx.world,
     ctx.tick,
     {
       target: targetEntity ?? ctx.entity,
@@ -661,7 +660,7 @@ function castSpellCtx(ctx: BehaviorContext, state: any): ContextBehaviorResult |
   );
 }
 
-function findSuitableTargetCtx(ctx: BehaviorContext, spell: any): EntityImpl | null {
+function findSuitableTargetCtx(ctx: BehaviorContext, spell: SpellDefinition): EntityImpl | null {
   const effectId = spell.effectId;
 
   // Healing/buff spells: target self or injured allies

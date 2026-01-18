@@ -9,11 +9,9 @@
  * Only plot-relevant, milestone, and meaningful choice events go to silver thread.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { SilverThreadComponent, SignificantEventType } from './SilverThreadComponent.js';
@@ -26,22 +24,12 @@ import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
 /**
  * System priority: 106 (after MemoryConsolidationSystem at 105)
  */
-export class SoulConsolidationSystem implements System {
+export class SoulConsolidationSystem extends BaseSystem {
   readonly id = 'soul_consolidation' as const;
   readonly priority = 106;
   readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system only processes during sleep events, not every tick
     // It subscribes to 'sleep_start' events from SleepSystem
   }

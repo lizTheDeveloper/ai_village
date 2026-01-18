@@ -2,6 +2,8 @@ import type { World } from '@ai-village/core';
 import type { ChunkManager } from './ChunkManager.js';
 import type { TerrainGenerator } from '../terrain/TerrainGenerator.js';
 import type { Chunk } from './Chunk.js';
+import type { ChunkGenerationWorkerPool } from '../workers/ChunkGenerationWorkerPool.js';
+import { CHUNK_SIZE } from './Chunk.js';
 
 /**
  * Priority levels for chunk generation
@@ -97,6 +99,9 @@ export class BackgroundChunkGenerator {
   private readonly resumeTPS: number;
   private isPaused: boolean = false;
 
+  // Optional worker pool for background generation
+  private workerPool?: ChunkGenerationWorkerPool;
+
   /**
    * Create a background chunk generator.
    *
@@ -105,19 +110,22 @@ export class BackgroundChunkGenerator {
    * @param throttleInterval - Ticks between chunk generation (default: 2 = 100ms at 20 TPS)
    * @param minTPS - Pause generation if TPS drops below this (default: 18)
    * @param resumeTPS - Resume generation when TPS recovers to this (default: 19)
+   * @param workerPool - Optional worker pool for background generation
    */
   constructor(
     chunkManager: ChunkManager,
     terrainGenerator: TerrainGenerator,
     throttleInterval: number = 2,
     minTPS: number = 18,
-    resumeTPS: number = 19
+    resumeTPS: number = 19,
+    workerPool?: ChunkGenerationWorkerPool
   ) {
     this.chunkManager = chunkManager;
     this.terrainGenerator = terrainGenerator;
     this.throttleInterval = throttleInterval;
     this.minTPS = minTPS;
     this.resumeTPS = resumeTPS;
+    this.workerPool = workerPool;
   }
 
   /**
@@ -251,30 +259,96 @@ export class BackgroundChunkGenerator {
         return;
       }
 
-      // Generate terrain
-      this.terrainGenerator.generateChunk(chunk, world);
+      // Use worker pool if available, otherwise generate synchronously
+      if (this.workerPool) {
+        // Async worker generation - generate tiles in worker thread
+        this.workerPool
+          .generateChunk(request.chunkX, request.chunkY)
+          .then((tiles) => {
+            // Apply tiles from worker to chunk
+            chunk.tiles = tiles;
 
-      // Link neighbors (if ChunkManager supports it)
-      if (typeof this.chunkManager.linkChunkNeighbors === 'function') {
-        this.chunkManager.linkChunkNeighbors(chunk);
-        this.chunkManager.updateCrossChunkNeighbors(chunk);
+            // Place entities on main thread (requires world access)
+            this.terrainGenerator.placeEntities(chunk, world);
+
+            // Spawn animals in chunk
+            const chunkBiome = this.terrainGenerator.determineChunkBiome(chunk);
+            this.terrainGenerator.animalSpawner.spawnAnimalsInChunk(world, {
+              x: chunk.x,
+              y: chunk.y,
+              biome: chunkBiome,
+              size: CHUNK_SIZE,
+            });
+
+            // Spawn god-crafted content if available
+            if (this.terrainGenerator.godCraftedSpawner) {
+              this.terrainGenerator.godCraftedSpawner.spawnContentInChunk(world, {
+                x: chunk.x,
+                y: chunk.y,
+                biome: chunkBiome,
+                size: CHUNK_SIZE,
+              });
+            }
+
+            // Mark chunk as generated
+            chunk.generated = true;
+
+            // Link neighbors (if ChunkManager supports it)
+            if (typeof this.chunkManager.linkChunkNeighbors === 'function') {
+              this.chunkManager.linkChunkNeighbors(chunk);
+              this.chunkManager.updateCrossChunkNeighbors(chunk);
+            }
+
+            // Emit event for metrics/debugging
+            world.eventBus.emit({
+              type: 'chunk_background_generated',
+              source: 'BackgroundChunkGenerator',
+              data: {
+                chunkX: request.chunkX,
+                chunkY: request.chunkY,
+                priority: request.priority,
+                requestedBy: request.requestedBy,
+                tick: currentTick,
+              },
+            });
+
+            // Remove from progress tracking
+            this.removeFromProgress(request.chunkX, request.chunkY);
+          })
+          .catch((error) => {
+            console.error(
+              `[BackgroundChunkGenerator] Worker generation failed for chunk (${request.chunkX}, ${request.chunkY}):`,
+              error
+            );
+            // Remove from progress to allow retry
+            this.removeFromProgress(request.chunkX, request.chunkY);
+          });
+      } else {
+        // Fallback: Synchronous generation (existing behavior)
+        this.terrainGenerator.generateChunk(chunk, world);
+
+        // Link neighbors (if ChunkManager supports it)
+        if (typeof this.chunkManager.linkChunkNeighbors === 'function') {
+          this.chunkManager.linkChunkNeighbors(chunk);
+          this.chunkManager.updateCrossChunkNeighbors(chunk);
+        }
+
+        // Emit event for metrics/debugging
+        world.eventBus.emit({
+          type: 'chunk_background_generated',
+          source: 'BackgroundChunkGenerator',
+          data: {
+            chunkX: request.chunkX,
+            chunkY: request.chunkY,
+            priority: request.priority,
+            requestedBy: request.requestedBy,
+            tick: currentTick,
+          },
+        });
+
+        // Remove from progress tracking
+        this.removeFromProgress(request.chunkX, request.chunkY);
       }
-
-      // Emit event for metrics/debugging
-      world.eventBus.emit({
-        type: 'chunk_background_generated',
-        source: 'BackgroundChunkGenerator',
-        data: {
-          chunkX: request.chunkX,
-          chunkY: request.chunkY,
-          priority: request.priority,
-          requestedBy: request.requestedBy,
-          tick: currentTick,
-        },
-      });
-
-      // Remove from progress tracking
-      this.removeFromProgress(request.chunkX, request.chunkY);
 
       // Update last process tick
       this.lastProcessTick = currentTick;
@@ -389,6 +463,7 @@ export class BackgroundChunkGenerator {
  * @param throttleInterval - Ticks between chunk generation (default: 2)
  * @param minTPS - Pause generation if TPS drops below this (default: 18)
  * @param resumeTPS - Resume generation when TPS recovers to this (default: 19)
+ * @param workerPool - Optional worker pool for background generation
  * @returns BackgroundChunkGenerator instance
  */
 export function createBackgroundChunkGenerator(
@@ -396,13 +471,15 @@ export function createBackgroundChunkGenerator(
   terrainGenerator: TerrainGenerator,
   throttleInterval: number = 2,
   minTPS: number = 18,
-  resumeTPS: number = 19
+  resumeTPS: number = 19,
+  workerPool?: ChunkGenerationWorkerPool
 ): BackgroundChunkGenerator {
   return new BackgroundChunkGenerator(
     chunkManager,
     terrainGenerator,
     throttleInterval,
     minTPS,
-    resumeTPS
+    resumeTPS,
+    workerPool
   );
 }

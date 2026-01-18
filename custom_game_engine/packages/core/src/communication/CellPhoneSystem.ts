@@ -23,9 +23,10 @@
  * - Became extension of identity
  */
 
-import { System, World, Entity } from '../ecs/index.js';
+import { World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 // =============================================================================
 // TYPES
@@ -819,43 +820,37 @@ export class CellPhoneManager {
 // CELL PHONE SYSTEM
 // =============================================================================
 
-export class CellPhoneSystem implements System {
+export class CellPhoneSystem extends BaseSystem {
   readonly id = 'CellPhoneSystem';
   readonly priority = 67;
   readonly requiredComponents = [] as const;
 
   private manager: CellPhoneManager = new CellPhoneManager();
-  private eventBus: EventBus | null = null;
+  private lastCallTimeoutCheck = 0;
+  private lastSignalUpdate = 0;
 
   private readonly UPDATE_INTERVAL = 20; // Every second
   private readonly SIGNAL_UPDATE_INTERVAL = 100; // Every 5 seconds
-  private tickCounter = 0;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process timeouts on active calls
-    if (this.tickCounter % this.UPDATE_INTERVAL === 0) {
-      this.processCallTimeouts(world);
+    if (ctx.tick - this.lastCallTimeoutCheck >= this.UPDATE_INTERVAL) {
+      this.processCallTimeouts(ctx);
+      this.lastCallTimeoutCheck = ctx.tick;
     }
 
     // Update signal strength less frequently
-    if (this.tickCounter % this.SIGNAL_UPDATE_INTERVAL === 0) {
-      this.updateAllSignals(world);
+    if (ctx.tick - this.lastSignalUpdate >= this.SIGNAL_UPDATE_INTERVAL) {
+      this.updateAllSignals(ctx);
+      this.lastSignalUpdate = ctx.tick;
     }
   }
 
-  private processCallTimeouts(_world: World): void {
+  private processCallTimeouts(ctx: SystemContext): void {
     // Missed call after 60 ticks (3 seconds) of ringing
-    const currentTick = this.tickCounter;
-
     for (const call of Array.from(this.manager['activeCalls'].values())) {
       if (call.status === 'ringing') {
-        if (currentTick - call.startedAt > 60) {
+        if (ctx.tick - call.startedAt > 60) {
           call.status = 'missed';
           this.manager['endCallInternal'](call);
         }
@@ -863,8 +858,8 @@ export class CellPhoneSystem implements System {
     }
   }
 
-  private updateAllSignals(world: World): void {
-    const agents = world.query().with(CT.Agent, CT.Position).executeEntities();
+  private updateAllSignals(ctx: SystemContext): void {
+    const agents = ctx.world.query().with(CT.Agent, CT.Position).executeEntities();
 
     for (const agent of agents) {
       const posComp = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
@@ -885,9 +880,8 @@ export class CellPhoneSystem implements System {
     }
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.reset();
-    this.eventBus = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -908,18 +902,12 @@ export class CellPhoneSystem implements System {
   ): CellPhone {
     const phone = this.manager.createPhone(agentId, agentName, generation);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'cell_phone_issued' as any,
-        source: this.id,
-        data: {
-          phoneId: phone.id,
-          phoneNumber: phone.phoneNumber,
-          agentId,
-          generation: phone.generation,
-        },
-      });
-    }
+    this.events.emit('cell_phone_issued' as any, {
+      phoneId: phone.id,
+      phoneNumber: phone.phoneNumber,
+      agentId,
+      generation: phone.generation,
+    } as any);
 
     return phone;
   }
@@ -937,16 +925,12 @@ export class CellPhoneSystem implements System {
 
     const call = this.manager.makeCall(phone.id, receiverNumber, currentTick);
 
-    if (call && this.eventBus) {
-      this.eventBus.emit({
-        type: 'cell_phone_call_started' as any,
-        source: this.id,
-        data: {
-          callId: call.id,
-          caller: callerId,
-          receiver: call.receiverId,
-        },
-      });
+    if (call) {
+      this.events.emit('cell_phone_call_started' as any, {
+        callId: call.id,
+        caller: callerId,
+        receiver: call.receiverId,
+      } as any);
     }
 
     return call;
@@ -971,17 +955,13 @@ export class CellPhoneSystem implements System {
       currentTick
     );
 
-    if (message && this.eventBus) {
-      this.eventBus.emit({
-        type: 'cell_phone_text_sent' as any,
-        source: this.id,
-        data: {
-          messageId: message.id,
-          sender: senderId,
-          receiverNumber,
-          hasMedia: message.hasMedia,
-        },
-      });
+    if (message) {
+      this.events.emit('cell_phone_text_sent' as any, {
+        messageId: message.id,
+        sender: senderId,
+        receiverNumber,
+        hasMedia: message.hasMedia,
+      } as any);
     }
 
     return message;
@@ -993,13 +973,9 @@ export class CellPhoneSystem implements System {
   advanceTechnology(newGeneration: CellPhoneGeneration): void {
     this.manager.setCurrentGeneration(newGeneration);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'cell_network_upgraded' as any,
-        source: this.id,
-        data: { generation: newGeneration },
-      });
-    }
+    this.events.emit('cell_network_upgraded' as any, {
+      generation: newGeneration,
+    } as any);
   }
 }
 

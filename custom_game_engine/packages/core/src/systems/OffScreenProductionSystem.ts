@@ -14,9 +14,7 @@
  * 4. Resume full simulation
  */
 
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { System } from '../ecs/System.js';
 import type { ChunkProductionStateComponent, ProductionRate } from '../components/ChunkProductionStateComponent.js';
 import type { AssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
 import type { MachineConnectionComponent } from '../components/MachineConnectionComponent.js';
@@ -26,39 +24,31 @@ import {
   fastForwardProduction,
 } from '../components/ChunkProductionStateComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
-export class OffScreenProductionSystem implements System {
+export class OffScreenProductionSystem extends BaseSystem {
   public readonly id = 'off_screen_production';
   public readonly priority = 49; // Before automation systems (50+)
   public readonly requiredComponents = [] as const; // Processes all entities, filters internally
 
   // Configuration
   private readonly TICKS_PER_HOUR = 72000; // 20 tps * 3600 seconds
-  private readonly UPDATE_INTERVAL = 20; // Check every second at 20 TPS
+  protected readonly throttleInterval = 20; // Check every second at 20 TPS
 
-  private ticksSinceUpdate = 0;
   private chunkStates = new Map<string, ChunkProductionStateComponent>();
 
   /**
    * Main update loop
    */
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.ticksSinceUpdate++;
-
-    // Only check every UPDATE_INTERVAL ticks
-    if (this.ticksSinceUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.ticksSinceUpdate = 0;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process each chunk
     for (const [chunkId, state] of this.chunkStates) {
       if (state.isOnScreen) {
         // Chunk is on-screen, resume full simulation
-        this.resumeFullSimulation(world, chunkId, state);
+        this.resumeFullSimulation(ctx.world, chunkId, state);
       } else {
         // Chunk is off-screen, fast-forward production
-        this.updateOffScreenProduction(world, chunkId, state);
+        this.updateOffScreenProduction(ctx.world, chunkId, state);
       }
     }
   }
@@ -165,7 +155,7 @@ export class OffScreenProductionSystem implements System {
    * Update off-screen production (fast-forward)
    */
   private updateOffScreenProduction(
-    world: World,
+    world: { tick: number },
     _chunkId: string,
     state: ChunkProductionStateComponent
   ): void {
@@ -193,7 +183,7 @@ export class OffScreenProductionSystem implements System {
    * Resume full simulation for on-screen chunk
    */
   private resumeFullSimulation(
-    world: World,
+    world: { tick: number },
     _chunkId: string,
     state: ChunkProductionStateComponent
   ): void {

@@ -474,12 +474,9 @@ export function recordArtifactEvent(
 // Artifact System Implementation (Simplified)
 // ============================================================================
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * ArtifactSystem - Monitors for strange moods and tracks artifacts.
@@ -500,14 +497,12 @@ import { SystemEventManager } from '../events/TypedEventEmitter.js';
  * Currently logs skill-based probability calculations. Full artifact creation
  * logic will be implemented when component management infrastructure is ready.
  */
-export class ArtifactSystem implements System {
+export class ArtifactSystem extends BaseSystem {
   readonly id: SystemId = 'artifact' as SystemId;
   readonly priority: number = 600; // After skills, before end-of-tick systems
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private events!: SystemEventManager;
-  private UPDATE_INTERVAL = 1440; // Check once per day (1440 ticks)
-  private lastUpdate = 0;
+  protected readonly throttleInterval = 1440; // Check once per day (1440 ticks)
 
   private artifactsCreated = 0;
   private skillLevelStats = {
@@ -519,17 +514,8 @@ export class ArtifactSystem implements System {
     legendary: 0,
   };
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    if (world.tick - this.lastUpdate < this.UPDATE_INTERVAL) return;
-    this.lastUpdate = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
 
     // Reset stats
     this.skillLevelStats = {

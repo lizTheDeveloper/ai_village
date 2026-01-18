@@ -44,12 +44,10 @@
  * Based on skill-system/spec.md Phase 1
  */
 
-import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
 import {
@@ -70,20 +68,15 @@ import { syncPrioritiesWithSkills } from '../components/AgentComponent.js';
 /**
  * SkillSystem manages skill progression through XP gain.
  */
-export class SkillSystem implements System {
+export class SkillSystem extends BaseSystem {
   public readonly id = 'skill' as const;
   public readonly priority = 200; // Run after most game systems
   public readonly requiredComponents = [] as const;
 
-  private world: World | null = null;
-  private events!: SystemEventManager;
-
   /**
    * Initialize and subscribe to XP-granting events.
    */
-  initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
 
     // Building XP - use entityId if available (builder reference)
     this.events.on('building:complete', (data) => {
@@ -281,10 +274,6 @@ export class SkillSystem implements System {
     baseXP: number,
     source: string
   ): void {
-    if (!this.world) {
-      throw new Error('SkillSystem not initialized');
-    }
-
     const entity = this.world.getEntity(agentId);
     if (!entity) {
       return; // Entity may have been destroyed
@@ -369,11 +358,7 @@ export class SkillSystem implements System {
    * System update - no per-tick processing needed.
    * All XP gain is event-driven.
    */
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick updates - all logic is event-driven
-  }
-
-  cleanup(): void {
-    this.events.cleanup(); // Unsubscribes all automatically
   }
 }

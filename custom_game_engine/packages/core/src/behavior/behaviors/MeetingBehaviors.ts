@@ -75,7 +75,8 @@ export class CallMeetingBehavior extends BaseBehavior {
       DEFAULT_MEETING_DURATION
     );
 
-    (entity as any).addComponent(meeting);
+    // EntityImpl cast required: Entity interface doesn't expose addComponent mutation method
+    entity.addComponent(meeting);
 
     // Announce the meeting through speech
     const callerName = identity?.name || 'Someone';
@@ -244,7 +245,8 @@ export function callMeetingBehaviorWithContext(ctx: BehaviorContext): ContextBeh
       DEFAULT_MEETING_DURATION
     );
 
-    (ctx.entity as any).addComponent(newMeeting);
+    // EntityImpl cast required: ctx.entity is EntityImpl, addComponent is a mutation method
+    ctx.entity.addComponent(newMeeting);
 
     // Announce the meeting through speech
     const callerName = identity?.name || 'Someone';

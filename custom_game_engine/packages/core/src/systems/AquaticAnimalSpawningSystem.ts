@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -32,14 +32,14 @@ import type { OceanBiomeZone } from '@ai-village/world';
  * - AnimalSystem: Manages aquatic animals after creation
  * - AgentSwimmingSystem: Handles depth-based mechanics
  */
-export class AquaticAnimalSpawningSystem implements System {
+export class AquaticAnimalSpawningSystem extends BaseSystem {
   public readonly id: SystemId = 'aquatic_animal_spawning';
   public readonly priority: number = 91;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private spawnedChunks: Set<string> = new Set();
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick updates needed
     // Spawning is handled via spawnAquaticAnimalsInChunk() method
   }

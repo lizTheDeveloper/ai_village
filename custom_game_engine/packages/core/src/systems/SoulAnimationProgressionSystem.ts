@@ -10,9 +10,9 @@
  * - Future: Idle, combat, and action animations at higher incarnation counts
  */
 
-import type { System } from '../ecs/System.js';
-import type { SystemId } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { AppearanceComponent } from '../components/AppearanceComponent.js';
@@ -28,15 +28,15 @@ interface AnimationJob {
   status: 'pending' | 'generating' | 'complete' | 'failed';
 }
 
-export class SoulAnimationProgressionSystem implements System {
-  readonly id: SystemId = 'soul_animation_progression';
+export class SoulAnimationProgressionSystem extends BaseSystem {
+  readonly id = 'soul_animation_progression';
   readonly priority = 905; // Run after PixelLabSpriteGenerationSystem (900)
   readonly requiredComponents = [] as const; // Event-driven
 
   private animationJobs: Map<string, AnimationJob> = new Map();
   private readonly MIN_INCARNATION_FOR_WALKING = 10;
 
-  onInit(world: World): void {
+  protected async onInitialize(world: World, _eventBus: EventBus): Promise<void> {
     // Subscribe to soul creation completion
     world.eventBus.subscribe<'soul:ceremony_complete'>('soul:ceremony_complete', (event) => {
       this.checkAnimationEligibilityForNewSoul(world, event.data);
@@ -196,7 +196,7 @@ export class SoulAnimationProgressionSystem implements System {
     return false;
   }
 
-  update(_world: World, _entities: readonly import('../ecs/Entity.js').Entity[], _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // System is event-driven, no per-tick updates needed
   }
 }

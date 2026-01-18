@@ -1,9 +1,8 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GoalCategory, PersonalGoal } from '../components/GoalsComponent.js';
 import { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { GoalsComponent } from '../components/GoalsComponent.js';
@@ -16,23 +15,16 @@ import { GoalDescriptionLibrary } from './GoalDescriptionLibrary.js';
  *
  * @dependencies None - Event-driven system that responds to reflection and action completion
  */
-export class GoalGenerationSystem implements System {
+export class GoalGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'goal_generation';
   public readonly priority: number = 115; // After reflection system
   public readonly requiredComponents = [] as const;
   public readonly dependsOn = [] as const;
 
-  private events!: SystemEventManager;
-  private world?: World;
   private nextGoalId = 0;
 
-  constructor(eventBus: EventBus) {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected onInitialize(world: World, eventBus: EventBus): void {
     this._setupEventListeners();
-  }
-
-  initialize(world: World, _eventBus: EventBus): void {
-    this.world = world;
   }
 
   private _setupEventListeners(): void {
@@ -81,7 +73,7 @@ export class GoalGenerationSystem implements System {
     });
   }
 
-  update(_world: World): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system is event-driven, no per-frame updates needed
   }
 
@@ -409,10 +401,6 @@ export class GoalGenerationSystem implements System {
         });
       }
     }
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 
   // Action type checkers

@@ -1,7 +1,5 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { VerificationResult, VerificationRecord } from '../components/TrustNetworkComponent.js';
@@ -11,31 +9,29 @@ import {
   VERIFICATION_RANGE,
   CLAIM_AGE_THRESHOLD,
 } from '../constants/index.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * VerificationSystem checks resource claims and updates trust scores
  * Detects: correct, stale, misidentified, false_report, unreliable patterns
  */
-export class VerificationSystem implements System {
+export class VerificationSystem extends BaseSystem {
   public readonly id: SystemId = 'verification';
   public readonly priority: number = 35; // After exploration/steering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  protected readonly throttleInterval: number = 40; // Only run every 2 seconds (at 20 TPS)
+
   private eventBus?: EventBus;
   private readonly verificationRange: number = VERIFICATION_RANGE; // Tiles
-  private lastUpdateTick: number = 0;
-  private readonly updateInterval: number = 40; // Only run every 2 seconds (at 20 TPS)
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: any, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
 
-  update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    // Throttle: Verification doesn't need to happen every frame
-    if (currentTick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const entities = ctx.activeEntities;
+    const currentTick = ctx.tick;
     // Get agents with social gradients (potential verifiers)
     const verifiers = entities.filter(e =>
       e.components.has(CT.Agent) &&

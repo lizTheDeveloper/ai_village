@@ -14,6 +14,7 @@
  */
 
 import type { World } from '../ecs/World.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import type { UniverseSnapshot } from '../persistence/types.js';
 import type { CanonEventType } from '../metrics/CanonEventRecorder.js';
@@ -101,6 +102,9 @@ export class TimelineManager {
   /** Map of universe IDs to their attached worlds */
   private attachedWorlds: Map<string, World> = new Map();
 
+  /** Map of universe IDs to their event managers */
+  private eventManagers: Map<string, SystemEventManager> = new Map();
+
   constructor(config?: Partial<TimelineConfig>) {
     this.config = {
       intervalThresholds: config?.intervalThresholds ?? DEFAULT_INTERVAL_THRESHOLDS,
@@ -123,12 +127,12 @@ export class TimelineManager {
 
     this.attachedWorlds.set(universeId, world);
 
-    // Subscribe to canon events
-    const eventBus = world.eventBus;
+    // Create event manager for this universe
+    const events = new SystemEventManager(world.eventBus, `timeline_manager_${universeId}`);
+    this.eventManagers.set(universeId, events);
 
     // Death events
-    eventBus.subscribe('agent:died', (event) => {
-      const data = event.data as { entityId: string; name: string; causeOfDeath: string };
+    events.onGeneric('agent:died', (data: any) => {
       this.onCanonEvent(
         universeId,
         world,
@@ -139,8 +143,7 @@ export class TimelineManager {
     });
 
     // Birth events
-    eventBus.subscribe('agent:birth', (event) => {
-      const data = event.data as { agentId: string; name: string; generation: number };
+    events.onGeneric('agent:birth', (data: any) => {
       this.onCanonEvent(
         universeId,
         world,
@@ -151,8 +154,7 @@ export class TimelineManager {
     });
 
     // Soul creation events
-    eventBus.subscribe('soul:ceremony_complete', (event) => {
-      const data = event.data as { soulId: string; purpose: string };
+    events.onGeneric('soul:ceremony_complete', (data: any) => {
       this.onCanonEvent(
         universeId,
         world,
@@ -163,8 +165,7 @@ export class TimelineManager {
     });
 
     // Time milestone events
-    eventBus.subscribe('time:day_changed', (event) => {
-      const data = event.data as { day: number };
+    events.onGeneric('time:day_changed', (data: any) => {
       // Check for significant milestones (30, 90, 180, 365 days)
       const milestones = [30, 90, 180, 365, 730, 1095];
       if (milestones.includes(data.day)) {
@@ -185,6 +186,11 @@ export class TimelineManager {
    */
   detachFromWorld(universeId: string): void {
     this.attachedWorlds.delete(universeId);
+    const events = this.eventManagers.get(universeId);
+    if (events) {
+      events.cleanup();
+      this.eventManagers.delete(universeId);
+    }
   }
 
   /**

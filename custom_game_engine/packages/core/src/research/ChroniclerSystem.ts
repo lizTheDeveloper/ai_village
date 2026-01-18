@@ -9,11 +9,10 @@
  *   - The Archivist's Lament
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -255,18 +254,13 @@ export const CHRONICLE_CLOSINGS: string[] = [
  * Chronicler System
  * Manages village historians and historical record-keeping
  */
-export class ChroniclerSystem implements System {
+export class ChroniclerSystem extends BaseSystem {
   public readonly id: SystemId = 'chronicler';
   public readonly priority: number = 177; // After research systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 200; // Every 10 seconds at 20 TPS
 
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private publicationSystem: PublicationSystem | null = null;
-
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 200; // Every 10 seconds at 20 TPS
 
   // Event collection
   private pendingEvents: HistoricalEvent[] = [];
@@ -277,9 +271,7 @@ export class ChroniclerSystem implements System {
   private chronicleVolume: number = 1;
   private static readonly CHRONICLE_PERIOD = 12000; // ~10 minutes per chronicle volume
 
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
     this.setupEventListeners();
   }
 
@@ -465,27 +457,21 @@ export class ChroniclerSystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < ChroniclerSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Initialize chronicle period
     if (this.currentChronicleStart === 0) {
-      this.currentChronicleStart = world.tick;
+      this.currentChronicleStart = ctx.tick;
     }
 
     // Check if it's time to publish a chronicle
-    if (world.tick - this.currentChronicleStart >= ChroniclerSystem.CHRONICLE_PERIOD) {
+    if (ctx.tick - this.currentChronicleStart >= ChroniclerSystem.CHRONICLE_PERIOD) {
       // Only publish if there are notable events
       const notableEvents = this.pendingEvents.filter(
         (e) => e.significance !== 'minor'
       );
 
       if (notableEvents.length >= 3) {
-        const chronicler = this.findChronicler(world);
+        const chronicler = this.findChronicler(ctx.world);
         if (chronicler) {
           const agentComp = chronicler.getComponent<AgentComponent>(ComponentType.Agent) as any;
           this.publishChronicle(
@@ -494,13 +480,13 @@ export class ChroniclerSystem implements System {
               name: agentComp?.name ?? 'Village Chronicler',
             },
             this.pendingEvents,
-            { from: this.currentChronicleStart, to: world.tick }
+            { from: this.currentChronicleStart, to: ctx.tick }
           );
         }
       }
 
       // Start new chronicle period
-      this.currentChronicleStart = world.tick;
+      this.currentChronicleStart = ctx.tick;
       this.pendingEvents = [];
       this.chronicleVolume++;
     }
@@ -537,8 +523,8 @@ export class ChroniclerSystem implements System {
   /**
    * Cleanup subscriptions
    */
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Base class handles events.cleanup()
   }
 }
 

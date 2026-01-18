@@ -203,19 +203,30 @@ export const DeathBargainSchema = autoRegister(
 
     validate: (data): data is DeathBargainComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
       return (
+        'type' in d &&
         d.type === 'death_bargain' &&
+        'challengeType' in d &&
         typeof d.challengeType === 'string' &&
+        'challengeDescription' in d &&
         typeof d.challengeDescription === 'string' &&
+        'deathGodDialogue' in d &&
         Array.isArray(d.deathGodDialogue) &&
+        'deathGodName' in d &&
         typeof d.deathGodName === 'string' &&
+        'status' in d &&
         typeof d.status === 'string' &&
+        'attempts' in d &&
         typeof d.attempts === 'number' &&
+        'maxAttempts' in d &&
         typeof d.maxAttempts === 'number' &&
+        'deathTick' in d &&
         typeof d.deathTick === 'number' &&
+        'deathLocation' in d &&
         typeof d.deathLocation === 'object' &&
+        'causeOfDeath' in d &&
         typeof d.causeOfDeath === 'string'
       );
     },

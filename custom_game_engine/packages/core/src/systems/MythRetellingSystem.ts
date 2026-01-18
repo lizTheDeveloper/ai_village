@@ -1,5 +1,4 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -25,31 +24,34 @@ import {
  * Each retelling can introduce mutations (including attribution changes).
  * This creates theological diversity and conflict in multi-deity environments.
  */
-export class MythRetellingSystem implements System {
-  public readonly id: SystemId = 'myth_retelling';
-  public readonly priority: number = 119; // After myth generation
-  public readonly requiredComponents = [];
+export class MythRetellingSystem extends BaseSystem {
+  public readonly id = 'myth_retelling';
+  public readonly priority = 119; // After myth generation
+  public readonly requiredComponents = [] as const;
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected async onInitialize(_world: World, eventBus: EventBus): Promise<void> {
     // Listen for attribution events
     eventBus.subscribe('myth:attribution_changed', (event) => {
       console.log('[MythRetellingSystem] Myth attribution changed:', event.data);
     });
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
     // Find agents with spiritual beliefs
-    const believers = entities.filter(e =>
-      e.components.has(CT.Agent) &&
-      e.components.has(CT.Spiritual)
-    );
+    const believers = ctx.world.query()
+      .with(CT.Agent)
+      .with(CT.Spiritual)
+      .executeEntities();
 
     if (believers.length === 0) return;
 
     // Get all deities for context
-    const deities = entities.filter(e => e.components.has(CT.Deity));
+    const deities = ctx.world.query()
+      .with(CT.Deity)
+      .executeEntities();
     const deityInfo = deities.map(d => {
       const deity = d.components.get(CT.Deity) as DeityComponent;
       return {
@@ -94,7 +96,7 @@ export class MythRetellingSystem implements System {
         deities,
         deityInfo,
         currentTick,
-        world
+        ctx.world
       );
 
       // Update cooldown

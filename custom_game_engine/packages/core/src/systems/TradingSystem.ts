@@ -13,14 +13,13 @@
  * - Strict validation - shops must be open, have stock, etc.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { ShopComponent } from '../components/ShopComponent.js';
 import type { CurrencyComponent } from '../components/CurrencyComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
@@ -47,29 +46,27 @@ export interface TradeResult {
 /**
  * System that handles economic transactions between entities
  */
-export class TradingSystem implements System {
+export class TradingSystem extends BaseSystem {
   public readonly id: SystemId = 'trading';
   public readonly priority: number = 25; // Run after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private isInitialized = false;
-  private events!: SystemEventManager;
 
   /**
    * Initialize the system
    */
-  public initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
-    this.events = new SystemEventManager(eventBus, this.id);
     this.isInitialized = true;
   }
 
   /**
    * Update is currently not used - all trading is event-driven
    */
-  public update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // Trading is handled through direct method calls, not in update loop
   }
 
@@ -224,16 +221,18 @@ export class TradingSystem implements System {
         this.updateMarketStats(world, marketState, itemId, 'buy', quantity, unitPrice);
       }
 
-      // Emit trade event
-      this.events.emit('trade:buy', {
-        buyerId,
-        sellerId: shop.ownerId,
-        shopId: shopEntityId,
-        itemId,
-        quantity,
-        totalPrice,
-        unitPrice,
-      }, buyerId);
+      // Emit trade event via world's event bus
+      if (this.events) {
+        this.events.emit('trade:buy', {
+          buyerId,
+          sellerId: shop.ownerId,
+          shopId: shopEntityId,
+          itemId,
+          quantity,
+          totalPrice,
+          unitPrice,
+        }, buyerId);
+      }
 
       return {
         success: true,
@@ -419,16 +418,18 @@ export class TradingSystem implements System {
         this.updateMarketStats(world, marketState, itemId, 'sell', quantity, unitPrice);
       }
 
-      // Emit trade event
-      this.events.emit('trade:sell', {
-        sellerId,
-        buyerId: shop.ownerId,
-        shopId: shopEntityId,
-        itemId,
-        quantity,
-        totalPrice,
-        unitPrice,
-      }, sellerId);
+      // Emit trade event via world's event bus
+      if (this.events) {
+        this.events.emit('trade:sell', {
+          sellerId,
+          buyerId: shop.ownerId,
+          shopId: shopEntityId,
+          itemId,
+          quantity,
+          totalPrice,
+          unitPrice,
+        }, sellerId);
+      }
 
       return {
         success: true,
@@ -534,7 +535,7 @@ export class TradingSystem implements System {
     return nearestShop;
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Custom cleanup if needed
   }
 }

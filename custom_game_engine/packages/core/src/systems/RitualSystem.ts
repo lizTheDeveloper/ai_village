@@ -4,7 +4,7 @@
  * Manages ritual performance, scheduling, and belief generation from ceremonies.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -54,9 +54,8 @@ export const DEFAULT_RITUAL_CONFIG: RitualConfig = {
 // RitualSystem
 // ============================================================================
 
-export class RitualSystem implements System {
+export class RitualSystem extends BaseSystem {
   public readonly id = 'RitualSystem';
-  public readonly name = 'RitualSystem';
   public readonly priority = 83;
   public readonly requiredComponents = [];
 
@@ -66,11 +65,12 @@ export class RitualSystem implements System {
   private lastCheck: number = 0;
 
   constructor(config: Partial<RitualConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_RITUAL_CONFIG, ...config };
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Only check periodically
     if (currentTick - this.lastCheck < this.config.checkInterval) {
@@ -80,7 +80,7 @@ export class RitualSystem implements System {
     this.lastCheck = currentTick;
 
     // Check for rituals that should occur
-    this.performScheduledRituals(world, currentTick);
+    this.performScheduledRituals(ctx.world, currentTick);
   }
 
   /**

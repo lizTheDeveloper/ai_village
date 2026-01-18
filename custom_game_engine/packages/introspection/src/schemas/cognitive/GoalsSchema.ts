@@ -67,8 +67,13 @@ export const GoalsSchema = autoRegister(
 
     validate: (data: unknown): data is GoalsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return Array.isArray(comp.goals);
+      const comp = data as Record<string, unknown>;
+
+      // Validate required fields
+      if (!('type' in comp) || comp.type !== 'goals') return false;
+      if (!('goals' in comp) || !Array.isArray(comp.goals)) return false;
+
+      return true;
     },
 
     createDefault: () => ({

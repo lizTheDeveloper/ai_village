@@ -19,10 +19,13 @@ import type { ConversationComponent } from '../../components/ConversationCompone
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import type { SteeringComponent } from '../../components/SteeringComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { isInConversation, addMessage, startConversation } from '../../components/ConversationComponent.js';
 import { updateRelationship, shareMemory } from '../../components/RelationshipComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory, getSpatialMemoriesByType } from '../../components/SpatialMemoryComponent.js';
+import type { MemoryComponent } from '../../components/MemoryComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
@@ -61,11 +64,15 @@ export class TalkBehavior extends BaseBehavior {
     // This happens when 'talk' behavior is selected via priority-based decision
     // with a partnerId in behaviorState, but conversation isn't active yet
     if (conversation && !isInConversation(conversation) && agent?.behaviorState?.partnerId) {
-      let targetPartnerId = agent.behaviorState.partnerId as string;
+      const partnerIdValue = agent.behaviorState.partnerId;
+      if (typeof partnerIdValue !== 'string') {
+        return { complete: true, reason: 'Invalid partnerId type' };
+      }
+      let targetPartnerId = partnerIdValue;
 
       // Resolve 'nearest' to actual agent ID
       if (targetPartnerId === 'nearest') {
-        const position = entity.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
+        const position = entity.getComponent<PositionComponent>(ComponentType.Position);
         if (position) {
           const nearbyAgents = world
             .query()
@@ -75,7 +82,7 @@ export class TalkBehavior extends BaseBehavior {
             .executeEntities()
             .filter((other) => {
               if (other.id === entity.id) return false;
-              const otherConv = other.components.get(ComponentType.Conversation) as ConversationComponent | undefined;
+              const otherConv = (other as EntityImpl).getComponent<ConversationComponent>(ComponentType.Conversation);
               return otherConv && !isInConversation(otherConv);
             });
 
@@ -84,7 +91,7 @@ export class TalkBehavior extends BaseBehavior {
             let closest = nearbyAgents[0];
             let closestDist = Infinity;
             for (const other of nearbyAgents) {
-              const otherPos = other.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
+              const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
               if (!otherPos) continue;
               const dist = Math.hypot(otherPos.x - position.x, otherPos.y - position.y);
               if (dist < closestDist) {
@@ -103,14 +110,14 @@ export class TalkBehavior extends BaseBehavior {
       const partner = world.getEntity(targetPartnerId);
 
       if (partner) {
-        const partnerConversation = partner.components.get(ComponentType.Conversation) as ConversationComponent | undefined;
-        const partnerAgent = partner.components.get(ComponentType.Agent) as AgentComponent | undefined;
+        const partnerImpl = partner as EntityImpl;
+        const partnerConversation = partnerImpl.getComponent<ConversationComponent>(ComponentType.Conversation);
 
         // Only start if partner is available (not already talking to someone else)
         if (partnerConversation && !isInConversation(partnerConversation)) {
           // Calculate conversation center (midpoint between the two agents) for spatial stickiness
-          const myPos = entity.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
-          const partnerPos = partner.components.get(ComponentType.Position) as { x: number; y: number } | undefined;
+          const myPos = entity.getComponent<PositionComponent>(ComponentType.Position);
+          const partnerPos = partnerImpl.getComponent<PositionComponent>(ComponentType.Position);
 
           let centerX: number | undefined;
           let centerY: number | undefined;
@@ -124,7 +131,8 @@ export class TalkBehavior extends BaseBehavior {
           entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
             startConversation(current, targetPartnerId, world.tick, entity.id, centerX, centerY)
           );
-          (partner as EntityImpl).updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
+          // Cast required: partner from world.getEntity() returns Entity, need EntityImpl for mutation
+          partnerImpl.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
             startConversation(current, entity.id, world.tick, partner.id, centerX, centerY)
           );
 
@@ -136,7 +144,8 @@ export class TalkBehavior extends BaseBehavior {
             }
             return current;
           });
-          (partner as EntityImpl).updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
+          // Cast required: partner from world.getEntity() returns Entity, need EntityImpl for mutation
+          partnerImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
             if (current.tier === 'autonomic') {
               return enableInteractionLLM(current, world.tick);
             }
@@ -145,7 +154,8 @@ export class TalkBehavior extends BaseBehavior {
 
           // Set up conversation partner in behaviorState - but DO NOT change behavior
           // Talk is not a mode that supersedes other modes - talking happens alongside doing things
-          (partner as EntityImpl).updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+          // Cast required: partner from world.getEntity() returns Entity, need EntityImpl for mutation
+          partnerImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             // DO NOT change behavior - keep current behavior
             behaviorState: { ...current.behaviorState, conversationPartnerId: entity.id },
@@ -202,15 +212,14 @@ export class TalkBehavior extends BaseBehavior {
     }
 
     // Apply spatial stickiness: steer toward conversation center instead of stopping completely
-    if (activeConversation.conversationCenterX !== undefined && activeConversation.conversationCenterY !== undefined) {
-      entity.updateComponent(ComponentType.Steering, (current: any) => ({
+    const centerX = activeConversation.conversationCenterX;
+    const centerY = activeConversation.conversationCenterY;
+    if (centerX !== undefined && centerY !== undefined) {
+      entity.updateComponent<SteeringComponent>(ComponentType.Steering, (current) => ({
         ...current,
         behavior: 'arrive',
-        target: {
-          x: activeConversation.conversationCenterX,
-          y: activeConversation.conversationCenterY,
-        },
-        arrivalRadius: 8, // Allow agents to move around within ~8 tiles of center
+        target: { x: centerX, y: centerY },
+        slowingRadius: 8, // Allow agents to move around within ~8 tiles of center
       }));
     } else {
       // No conversation center set, stop moving (fallback for old conversations)
@@ -226,7 +235,8 @@ export class TalkBehavior extends BaseBehavior {
 
     // Update social memory (record this interaction for both parties)
     if (socialMemory) {
-      const partnerIdentity = activePartner.components.get(ComponentType.Identity) as IdentityComponent | undefined;
+      const activePartnerImpl = activePartner as EntityImpl;
+      const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(ComponentType.Identity);
       const partnerName = partnerIdentity?.name || 'someone';
 
       socialMemory.recordInteraction({
@@ -240,7 +250,8 @@ export class TalkBehavior extends BaseBehavior {
     }
 
     // Also record for partner
-    const partnerSocialMemory = activePartner.components.get(ComponentType.SocialMemory) as SocialMemoryComponent | undefined;
+    const activePartnerImpl = activePartner as EntityImpl;
+    const partnerSocialMemory = activePartnerImpl.getComponent<SocialMemoryComponent>(ComponentType.SocialMemory);
     if (partnerSocialMemory) {
       const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
       const myName = myIdentity?.name || 'someone';
@@ -257,17 +268,17 @@ export class TalkBehavior extends BaseBehavior {
 
     // Chance to speak
     if (Math.random() < SPEAK_CHANCE) {
-      this.speak(entity, activePartner as EntityImpl, activeConversation, world);
+      this.speak(entity, activePartnerImpl, activeConversation, world);
     }
 
     // Chance to share a memory about food location
     if (Math.random() < SHARE_MEMORY_CHANCE && spatialMemory && relationship) {
-      this.shareResourceMemory(entity, activePartner as EntityImpl, spatialMemory, relationship, world, partnerId);
+      this.shareResourceMemory(entity, activePartnerImpl, spatialMemory, relationship, world, partnerId);
     }
 
     // Chance to share a named landmark
     if (Math.random() < SHARE_MEMORY_CHANCE && spatialMemory && relationship) {
-      this.shareLandmarkName(entity, activePartner as EntityImpl, spatialMemory, world, partnerId);
+      this.shareLandmarkName(entity, activePartnerImpl, spatialMemory, world, partnerId);
     }
   }
 
@@ -377,7 +388,11 @@ export class TalkBehavior extends BaseBehavior {
     const sharedLandmark = landmarkMemories[0];
     if (!sharedLandmark || !sharedLandmark.metadata?.name) return;
 
-    const landmarkName = sharedLandmark.metadata.name as string;
+    // Type guard to ensure name is a string
+    const nameValue = sharedLandmark.metadata.name;
+    if (typeof nameValue !== 'string') return;
+    const landmarkName = nameValue;
+
     const featureType = sharedLandmark.metadata.featureType || 'place';
 
     // Add this named landmark to partner's spatial memory
@@ -400,17 +415,19 @@ export class TalkBehavior extends BaseBehavior {
       );
 
       // Add to partner's episodic memory
-      const partnerMemory = partner.getComponent(ComponentType.Memory);
+      const partnerMemory = partner.getComponent<MemoryComponent>(ComponentType.Memory);
       const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
       const myName = myIdentity?.name || 'someone';
 
-      if (partnerMemory && 'addMemory' in partnerMemory) {
-        (partnerMemory as any).addMemory({
+      // Type guard: check if partnerMemory has addMemory method
+      if (partnerMemory && 'addMemory' in partnerMemory && typeof partnerMemory.addMemory === 'function') {
+        partnerMemory.addMemory({
           id: `learned_landmark_${landmarkName}_${world.tick}`,
           type: 'knowledge',
           content: `${myName} told me about ${featureType} called "${landmarkName}"`,
-          createdAt: world.tick,
           importance: 70,
+          timestamp: world.tick,
+          location: { x: sharedLandmark.x, y: sharedLandmark.y },
         });
       }
 
@@ -460,7 +477,11 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
 
   // Check if we need to start a new conversation
   if (conversation && !isInConversation(conversation) && ctx.agent.behaviorState?.partnerId) {
-    let targetPartnerId = ctx.agent.behaviorState.partnerId as string;
+    const partnerIdValue = ctx.agent.behaviorState.partnerId;
+    if (typeof partnerIdValue !== 'string') {
+      return ctx.complete('Invalid partnerId type');
+    }
+    let targetPartnerId = partnerIdValue;
 
     // Resolve 'nearest' to actual agent ID
     if (targetPartnerId === 'nearest') {
@@ -490,7 +511,7 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     // Only start if partner is available
     if (partnerConversation && !isInConversation(partnerConversation)) {
       // Calculate conversation center
-      const partnerPos = partnerImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      const partnerPos = partnerImpl.getComponent<PositionComponent>(CT.Position);
       let centerX: number | undefined;
       let centerY: number | undefined;
 
@@ -566,15 +587,14 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
   }
 
   // Apply spatial stickiness: steer toward conversation center
-  if (activeConversation.conversationCenterX !== undefined && activeConversation.conversationCenterY !== undefined) {
-    ctx.updateComponent(CT.Steering, (current: any) => ({
+  const centerX = activeConversation.conversationCenterX;
+  const centerY = activeConversation.conversationCenterY;
+  if (centerX !== undefined && centerY !== undefined) {
+    ctx.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
       ...current,
       behavior: 'arrive',
-      target: {
-        x: activeConversation.conversationCenterX,
-        y: activeConversation.conversationCenterY,
-      },
-      arrivalRadius: 8,
+      target: { x: centerX, y: centerY },
+      slowingRadius: 8,
     }));
   } else {
     // No conversation center set, stop moving
@@ -590,7 +610,8 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
 
   // Update social memory
   if (socialMemory) {
-    const partnerIdentity = (activePartner as EntityImpl).getComponent<IdentityComponent>(CT.Identity);
+    const activePartnerImpl = activePartner as EntityImpl;
+    const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(CT.Identity);
     const partnerName = partnerIdentity?.name || 'someone';
 
     socialMemory.recordInteraction({
@@ -604,7 +625,8 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
   }
 
   // Also record for partner
-  const partnerSocialMemory = (activePartner as EntityImpl).getComponent<SocialMemoryComponent>(CT.SocialMemory);
+  const activePartnerImpl = activePartner as EntityImpl;
+  const partnerSocialMemory = activePartnerImpl.getComponent<SocialMemoryComponent>(CT.SocialMemory);
   if (partnerSocialMemory) {
     const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
     const myName = myIdentity?.name || 'someone';
@@ -628,7 +650,7 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     );
 
     // Partner also adds conversation to their component
-    (activePartner as EntityImpl).updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+    activePartnerImpl.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
       addMessage(current, ctx.entity.id, message, ctx.tick)
     );
 
@@ -653,7 +675,7 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
 
     if (foodMemories.length > 0) {
       const sharedMemory = foodMemories[0]!;
-      const partnerSpatialMemory = (activePartner as EntityImpl).getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+      const partnerSpatialMemory = activePartnerImpl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
 
       if (partnerSpatialMemory) {
         addSpatialMemory(
@@ -696,9 +718,13 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     if (landmarkMemories.length > 0) {
       const sharedLandmark = landmarkMemories[0]!;
       if (sharedLandmark.metadata?.name) {
-        const landmarkName = sharedLandmark.metadata.name as string;
+        // Type guard to ensure name is a string
+        const nameValue = sharedLandmark.metadata.name;
+        if (typeof nameValue !== 'string') return;
+        const landmarkName = nameValue;
+
         const featureType = sharedLandmark.metadata.featureType || 'place';
-        const partnerSpatialMemory = (activePartner as EntityImpl).getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
+        const partnerSpatialMemory = activePartnerImpl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
 
         if (partnerSpatialMemory) {
           addSpatialMemory(
@@ -717,17 +743,19 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
           );
 
           // Add to partner's episodic memory
-          const partnerMemory = (activePartner as EntityImpl).getComponent(CT.Memory);
+          const partnerMemory = activePartnerImpl.getComponent<MemoryComponent>(CT.Memory);
           const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
           const myName = myIdentity?.name || 'someone';
 
-          if (partnerMemory && 'addMemory' in partnerMemory) {
-            (partnerMemory as any).addMemory({
+          // Type guard: check if partnerMemory has addMemory method
+          if (partnerMemory && 'addMemory' in partnerMemory && typeof partnerMemory.addMemory === 'function') {
+            partnerMemory.addMemory({
               id: `learned_landmark_${landmarkName}_${ctx.tick}`,
               type: 'knowledge',
               content: `${myName} told me about ${featureType} called "${landmarkName}"`,
-              createdAt: ctx.tick,
               importance: 70,
+              timestamp: ctx.tick,
+              location: { x: sharedLandmark.x, y: sharedLandmark.y },
             });
           }
 

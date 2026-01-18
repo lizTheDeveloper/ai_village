@@ -1,6 +1,7 @@
-import type { System, World, Entity } from '../ecs/index.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { World } from '../ecs/World.js';
 
 /**
  * PlanetaryCurrentsSystem - Large-scale ocean circulation ("complex flow for big things")
@@ -41,14 +42,12 @@ import type { EventBus } from '../events/EventBus.js';
  * - Triggers FluidDynamicsSystem dirty flags when currents shift
  * - Uses world.latitude for Coriolis calculations
  */
-export class PlanetaryCurrentsSystem implements System {
+export class PlanetaryCurrentsSystem extends BaseSystem {
   public readonly id: SystemId = 'planetary_currents';
   public readonly priority: number = 17; // After terrain (15), fluid dynamics (16), before swimming (18)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  // Slow update for planetary-scale phenomena
-  private lastUpdateTick = 0;
-  private readonly UPDATE_INTERVAL = 72000; // 1 game hour at 20 TPS (60 min × 60 sec × 20 TPS)
+  protected readonly throttleInterval = 72000; // 1 game hour at 20 TPS (60 min × 60 sec × 20 TPS)
 
   // Tide simulation state
   private moonPhase = 0; // 0-1 (0 = new moon, 0.5 = full moon)
@@ -58,24 +57,18 @@ export class PlanetaryCurrentsSystem implements System {
   private lastUpdateTime = 0;
   private regionsProcessed = 0;
 
-  initialize(_world: World, _eventBus: EventBus): void {
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // TODO: Subscribe to time:day events for tide updates
     // TODO: Subscribe to celestial:moon events for moon phase/distance
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Throttle to once per game hour (planetary timescale)
-    if (currentTick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     const startTime = performance.now();
 
     // Get world interface
-    const worldWithTiles = world as {
+    const worldWithTiles = ctx.world as {
       getTileAt?: (x: number, y: number, z?: number) => OceanTile | undefined;
       setTileAt?: (x: number, y: number, z: number, tile: OceanTile) => void;
       latitude?: (x: number, y: number) => number; // Latitude for Coriolis
@@ -199,14 +192,12 @@ export class PlanetaryCurrentsSystem implements System {
     moonDistance: number;
     lastUpdateTime: number;
     regionsProcessed: number;
-    nextUpdateTick: number;
   } {
     return {
       moonPhase: this.moonPhase,
       moonDistance: this.moonDistance,
       lastUpdateTime: this.lastUpdateTime,
       regionsProcessed: this.regionsProcessed,
-      nextUpdateTick: this.lastUpdateTick + this.UPDATE_INTERVAL,
     };
   }
 }

@@ -195,7 +195,7 @@ Checkpoint Name:`;
 
         // Emit event with generated name
         world.eventBus.emit({
-          type: 'checkpoint:named',
+          type: 'checkpoint:named' as const,
           source: 'naming_service',
           data: {
             checkpointKey: checkpoint.key,

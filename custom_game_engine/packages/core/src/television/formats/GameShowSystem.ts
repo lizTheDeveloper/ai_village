@@ -10,9 +10,8 @@
  */
 
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
-import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
@@ -871,14 +870,14 @@ export class GameShowManager {
 // GAME SHOW SYSTEM
 // ============================================================================
 
-export class GameShowSystem implements System {
+export class GameShowSystem extends BaseSystem {
   readonly id = 'GameShowSystem';
   readonly priority = 72;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private manager = new GameShowManager();
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -886,11 +885,11 @@ export class GameShowSystem implements System {
     return this.manager;
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // Game show system is primarily event-driven
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.cleanup();
   }
 }

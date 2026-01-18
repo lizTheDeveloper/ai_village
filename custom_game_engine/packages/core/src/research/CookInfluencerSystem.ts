@@ -9,11 +9,9 @@
  *   - The Unwritten History of Culinary Documentation
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
@@ -136,18 +134,13 @@ function generateFlavorNotes(): string {
  * Cook Influencer System
  * Manages cook publications based on available writing technology
  */
-export class CookInfluencerSystem implements System {
+export class CookInfluencerSystem extends BaseSystem {
   public readonly id: SystemId = 'cook_influencer';
   public readonly priority: number = 176; // After research, before general updates
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private publicationSystem: PublicationSystem | null = null;
-
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 100; // Every 5 seconds at 20 TPS
 
   // Track published recipes to avoid duplicates
   private publishedRecipes: Set<string> = new Set();
@@ -161,11 +154,6 @@ export class CookInfluencerSystem implements System {
     ingredients: Array<{ item: string; quantity: string }>;
     discoveredAt: number;
   }> = [];
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
 
   /**
    * Initialize the publication system
@@ -181,7 +169,7 @@ export class CookInfluencerSystem implements System {
    * Called when a cook discovers a new recipe
    */
   public onRecipeDiscovered(
-    world: World,
+    world: { tick: number; getEntity: (id: string) => any },
     cookEntity: Entity,
     recipeId: string,
     recipeName: string,
@@ -339,17 +327,11 @@ export class CookInfluencerSystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < CookInfluencerSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process pending publications
     // Cooks take time to write up their recipes
     const readyForPublication = this.pendingPublications.filter(
-      (p) => world.tick - p.discoveredAt > 300 // ~15 seconds delay
+      (p) => ctx.tick - p.discoveredAt > 300 // ~15 seconds delay
     );
 
     for (const pending of readyForPublication) {
@@ -385,8 +367,8 @@ export class CookInfluencerSystem implements System {
   /**
    * Cleanup subscriptions
    */
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Base class handles events.cleanup()
   }
 }
 

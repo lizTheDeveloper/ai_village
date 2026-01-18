@@ -13,10 +13,10 @@
  * These memories stick with agents for decades, just like real TV catchphrases.
  */
 
-import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import type { Entity } from '../../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
@@ -786,19 +786,16 @@ export class CulturalImpactManager {
 // TV CULTURAL IMPACT SYSTEM
 // ============================================================================
 
-export class TVCulturalImpactSystem implements System {
+export class TVCulturalImpactSystem extends BaseSystem {
   readonly id = 'TVCulturalImpactSystem';
   readonly priority = 75;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private manager = new CulturalImpactManager();
-  private lastUpdateTick = 0;
-  private events!: SystemEventManager;
 
-  private static readonly UPDATE_INTERVAL = 20 * 60 * 5; // Every 5 minutes
+  protected readonly throttleInterval = 20 * 60 * 5; // Every 5 minutes
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -806,20 +803,12 @@ export class TVCulturalImpactSystem implements System {
     return this.manager;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdateTick < TVCulturalImpactSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(_ctx: SystemContext): void {
     // Decay catchphrase popularity over time
     this.manager.spreadCatchphrases(0.5);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.manager.cleanup();
   }
 }

@@ -89,8 +89,12 @@ export const MemorySchema = autoRegister(
 
     validate: (data: unknown): data is MemoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return Array.isArray(comp.memories);
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'memory') return false;
+      if (!('memories' in comp) || !Array.isArray(comp.memories)) return false;
+
+      return true;
     },
 
     createDefault: () => ({

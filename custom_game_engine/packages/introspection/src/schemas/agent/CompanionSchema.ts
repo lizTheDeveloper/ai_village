@@ -203,15 +203,19 @@ export const CompanionSchema = autoRegister(
 
     validate: (data: unknown): data is CompanionComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.evolutionTier === 'number' &&
-        typeof comp.currentEmotion === 'string' &&
-        typeof comp.trustScore === 'number' &&
-        typeof comp.needs === 'object' &&
-        Array.isArray(comp.playerMemories) &&
-        Array.isArray(comp.companionMemories)
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'companion') return false;
+      if (!('evolutionTier' in comp) || typeof comp.evolutionTier !== 'number') return false;
+      if (!('currentEmotion' in comp) || typeof comp.currentEmotion !== 'string') return false;
+      if (!('trustScore' in comp) || typeof comp.trustScore !== 'number') return false;
+      if (!('needs' in comp) || typeof comp.needs !== 'object' || comp.needs === null) return false;
+      if (!('playerMemories' in comp) || !Array.isArray(comp.playerMemories)) return false;
+      if (!('companionMemories' in comp) || !Array.isArray(comp.companionMemories)) return false;
+      if (!('sessionCount' in comp) || typeof comp.sessionCount !== 'number') return false;
+      if (!('positiveInteractions' in comp) || typeof comp.positiveInteractions !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => {

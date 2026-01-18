@@ -15,6 +15,7 @@ import type { World } from '../../ecs/World.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
+import type { TemperatureComponent } from '../../components/TemperatureComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
@@ -31,7 +32,7 @@ export class SeekWarmthBehavior extends BaseBehavior {
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const temperature = entity.getComponent(ComponentType.Temperature) as any;
+    const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
 
     if (!temperature) {
       // No temperature component
@@ -103,13 +104,9 @@ export class SeekWarmthBehavior extends BaseBehavior {
     const inHeatRange = heatSourceComp.providesHeat && heatSource.distance <= heatSourceComp.heatRadius;
     const inWarmInterior = heatSourceComp.interior && heatSource.distance <= heatSourceComp.interiorRadius;
 
-    if ((inHeatRange || inWarmInterior) && temperature.state === 'comfortable') {
-      // Warmed up - complete behavior
-      this.stopAllMovement(entity);
-      this.complete(entity);
-      return { complete: true, reason: 'Warmed up in heat range' };
-    } else if (inHeatRange || inWarmInterior) {
-      // In heat range but still cold - stay and wait to warm up
+    if (inHeatRange || inWarmInterior) {
+      // In heat range - stay and wait to warm up
+      // Note: Temperature state will be updated by TemperatureSystem, and we'll complete on next tick
       this.stopAllMovement(entity);
     } else {
       // Move towards the heat source
@@ -177,7 +174,7 @@ const SEARCH_INTERVAL = 100; // Re-search every 5 seconds (100 ticks at 20 TPS)
  * @example registerBehaviorWithContext('seek_warmth', seekWarmthBehaviorWithContext);
  */
 export function seekWarmthBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const temperature = ctx.getComponent(CT.Temperature) as any;
+  const temperature = ctx.getComponent<TemperatureComponent>(CT.Temperature);
 
   if (!temperature) {
     return ctx.complete('No temperature component');
@@ -239,11 +236,9 @@ export function seekWarmthBehaviorWithContext(ctx: BehaviorContext): ContextBeha
   const inHeatRange = heatSourceComp.providesHeat && heatSource.distance <= heatSourceComp.heatRadius;
   const inWarmInterior = heatSourceComp.interior && heatSource.distance <= heatSourceComp.interiorRadius;
 
-  if ((inHeatRange || inWarmInterior) && temperature.state === 'comfortable') {
-    ctx.stopMovement();
-    return ctx.complete('Warmed up in heat range');
-  } else if (inHeatRange || inWarmInterior) {
-    // In heat range but still cold - stay and wait to warm up
+  if (inHeatRange || inWarmInterior) {
+    // In heat range - stay and wait to warm up
+    // Note: Temperature state will be updated by TemperatureSystem, and we'll complete on next tick
     ctx.stopMovement();
   } else {
     // Move towards the heat source

@@ -14,7 +14,7 @@
  * - Dynamic riddle generation based on hero's life
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -65,11 +65,11 @@ interface ChatRoomMember {
 
 // System registry type for accessing other systems
 interface SystemRegistry {
-  get(systemId: string): System | undefined;
+  get(systemId: string): unknown;
 }
 
 // Chat room system type
-interface ChatRoomSystem extends System {
+interface ChatRoomSystem {
   getRoomMembers(world: World, roomId: string): ChatRoomMember[] | undefined;
   sendSystemMessage(world: World, roomId: string, message: string): void;
   getRoom(world: World, roomId: string): ChatRoom | undefined;
@@ -107,7 +107,7 @@ interface EpisodicMemoryComponent {
 /**
  * DeathBargainSystem - Offers dying heroes a chance to return
  */
-export class DeathBargainSystem implements System {
+export class DeathBargainSystem extends BaseSystem {
   readonly id: SystemId = 'death_bargain';
   readonly priority: number = 120; // After death transition
   readonly requiredComponents = [ComponentType.DeathBargain] as const;
@@ -140,11 +140,11 @@ export class DeathBargainSystem implements System {
     this.useGeneratedRiddles = enabled;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Note: This method is intentionally synchronous for ECS compatibility
     // Async operations (generateChallenge, evaluateResponse) fire-and-forget
     // They update component state asynchronously, which is picked up in future ticks
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const bargain = entity.getComponent<DeathBargainComponent>(ComponentType.DeathBargain);
       if (!bargain) continue;
 
@@ -157,22 +157,22 @@ export class DeathBargainSystem implements System {
 
       if (bargain.status === 'accepted' && bargain.challengeDescription === '') {
         // Generate the challenge (async, updates component when done)
-        this.generateChallenge(world, entity, bargain);
+        this.generateChallenge(ctx.world, entity, bargain);
       }
 
       if (bargain.status === 'in_progress' && bargain.heroResponse) {
         // Evaluate hero's answer (async, updates component when done)
-        this.evaluateResponse(world, entity, bargain);
+        this.evaluateResponse(ctx.world, entity, bargain);
       }
 
       if (bargain.status === 'succeeded') {
         // Resurrect the hero
-        this.resurrectHero(world, entity, bargain);
+        this.resurrectHero(ctx.world, entity, bargain);
       }
 
       if (bargain.status === 'failed') {
         // Final death
-        this.finalDeath(world, entity, bargain);
+        this.finalDeath(ctx.world, entity, bargain);
       }
     }
   }

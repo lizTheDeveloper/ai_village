@@ -30,7 +30,7 @@
  * - BehaviorRegistry: Executes chosen behaviors (gather, build, wander, etc.)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -129,7 +129,7 @@ export function injectChunkSpatialQueryForBrain(spatialQuery: any): void {
  *
  * Priority: 10 (same as AISystem, runs before movement at 20)
  */
-export class AgentBrainSystem implements System {
+export class AgentBrainSystem extends BaseSystem {
   public readonly id: SystemId = 'agent-brain';
   public readonly priority: number = 10;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -154,6 +154,7 @@ export class AgentBrainSystem implements System {
     behaviorRegistry?: BehaviorRegistry,
     scheduledProcessor?: ScheduledDecisionProcessor
   ) {
+    super();
     this.perception = new PerceptionProcessor();
 
     // Use ScheduledDecisionProcessor if provided (new scheduler-based approach)
@@ -274,14 +275,14 @@ export class AgentBrainSystem implements System {
   /**
    * Main update loop.
    */
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     const startTime = performance.now();
     let perceptionTime = 0;
     let decisionTime = 0;
     let executionTime = 0;
     let thinkingAgents = 0;
 
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       let agent = impl.getComponent<AgentComponent>(CT.Agent);
 
@@ -302,31 +303,31 @@ export class AgentBrainSystem implements System {
       }
 
       // Check think interval with dynamic staggering
-      const shouldThink = this.shouldThink(impl, agent, world);
+      const shouldThink = this.shouldThink(impl, agent, ctx.world);
       if (!shouldThink) continue;
 
       thinkingAgents++;
 
       // Update last think time
-      this.updateThinkTime(impl, world.tick);
+      this.updateThinkTime(impl, ctx.tick);
 
       // Re-fetch agent component after updating think time
       agent = impl.getComponent<AgentComponent>(CT.Agent)!;
 
       // Phase 1: Perception
       const p1 = performance.now();
-      this.perception.processAll(impl, world);
+      this.perception.processAll(impl, ctx.world);
       perceptionTime += performance.now() - p1;
 
       // Phase 2: Decision
       const p2 = performance.now();
-      const decisionResult = this.processDecision(impl, world, agent);
+      const decisionResult = this.processDecision(impl, ctx.world, agent);
       decisionTime += performance.now() - p2;
 
       // Phase 3: Execution
       if (decisionResult.execute) {
         const p3 = performance.now();
-        this.behaviors.execute(decisionResult.behavior, impl, world);
+        this.behaviors.execute(decisionResult.behavior, impl, ctx.world);
         executionTime += performance.now() - p3;
       }
     }

@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -7,7 +7,6 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * ResourceGatheringSystem handles resource regeneration.
@@ -21,7 +20,7 @@ import { SystemEventManager } from '../events/TypedEventEmitter.js';
  * Updates delta rates once per game minute instead of every tick.
  * Achieves 1200× performance improvement for 250k+ resource entities.
  */
-export class ResourceGatheringSystem implements System {
+export class ResourceGatheringSystem extends BaseSystem {
   public readonly id: SystemId = 'resource-gathering';
   public readonly priority: number = 5; // Run early, before AI decisions
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Resource];
@@ -32,10 +31,9 @@ export class ResourceGatheringSystem implements System {
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
   private deltaCleanups = new Map<string, () => void>();
-  private events!: SystemEventManager;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected onInitialize(_world: World, eventBus: EventBus): void {
+    // Events initialized by BaseSystem
   }
 
   setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
@@ -45,17 +43,16 @@ export class ResourceGatheringSystem implements System {
   /** Run every 20 ticks (1 second at 20 TPS) - kept for discrete event checks */
   private static readonly UPDATE_INTERVAL = 20;
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.stateMutator) {
       throw new Error('[ResourceGatheringSystem] StateMutatorSystem not set');
     }
 
-    const currentTick = world.tick;
+    const currentTick = ctx.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    // Performance: Use SimulationScheduler to skip resources far from agents
-    // Resources near active areas regenerate, distant ones are paused
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+    // activeEntities already filtered by SimulationScheduler via SystemContext
+    const activeEntities = ctx.activeEntities;
 
     // Early exit if no active resources
     if (activeEntities.length === 0) {
@@ -110,7 +107,7 @@ export class ResourceGatheringSystem implements System {
         const isNowFull = resource.amount >= resource.maxAmount;
 
         if (wasNotFull && isNowFull) {
-          this.events.emit('resource:regenerated', {
+          ctx.emit('resource:regenerated', {
             resourceId: entity.id,
             resourceType: resource.resourceType,
             amount: resource.amount,
@@ -156,9 +153,8 @@ export class ResourceGatheringSystem implements System {
     this.deltaCleanups.set(entity.id, cleanup);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-    // Also cleanup all delta registrations
+  protected onCleanup(): void {
+    // Cleanup all delta registrations
     for (const cleanup of this.deltaCleanups.values()) {
       cleanup();
     }

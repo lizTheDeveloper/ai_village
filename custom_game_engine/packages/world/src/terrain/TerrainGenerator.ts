@@ -43,8 +43,10 @@ export class TerrainGenerator {
   private moistureNoise: PerlinNoise;
   private temperatureNoise: PerlinNoise;
   private seed: string;
-  private animalSpawner: WildAnimalSpawningSystem;
-  private godCraftedSpawner?: GodCraftedDiscoverySystem;
+  /** Public so BackgroundChunkGenerator can access for entity spawning */
+  public animalSpawner: WildAnimalSpawningSystem;
+  /** Public so BackgroundChunkGenerator can access for entity spawning */
+  public godCraftedSpawner?: GodCraftedDiscoverySystem;
 
   // Planet configuration (optional - defaults to terrestrial)
   private planetConfig?: PlanetConfig;
@@ -458,8 +460,10 @@ export class TerrainGenerator {
 
   /**
    * Place trees and rocks in a chunk.
+   *
+   * Public so BackgroundChunkGenerator can call after worker-generated tiles.
    */
-  private placeEntities(chunk: Chunk, world: WorldMutator): void {
+  placeEntities(chunk: Chunk, world: WorldMutator): void {
     const placementNoise = new PerlinNoise(this.hashString(this.seed) + 5000);
 
     for (let localY = 0; localY < CHUNK_SIZE; localY++) {
@@ -2315,8 +2319,10 @@ export class TerrainGenerator {
   /**
    * Determine the dominant biome in a chunk for animal spawning.
    * Counts biome occurrences and returns the most common one.
+   *
+   * Public so BackgroundChunkGenerator can call after worker-generated tiles.
    */
-  private determineChunkBiome(chunk: Chunk): BiomeType {
+  determineChunkBiome(chunk: Chunk): BiomeType {
     const biomeCounts = new Map<BiomeType, number>();
 
     for (let localY = 0; localY < CHUNK_SIZE; localY++) {

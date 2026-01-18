@@ -1,11 +1,8 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity, EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
-import type { EventData } from '../events/EventMap.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import type { EpisodicMemory, EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import type { JournalComponent } from '../components/JournalComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -14,22 +11,14 @@ import type { PersonalityComponent } from '../components/PersonalityComponent.js
 /**
  * JournalingSystem handles personality-driven journaling behavior
  */
-export class JournalingSystem implements System {
-  public readonly id: SystemId = 'journaling';
-  public readonly priority: number = 115;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+export class JournalingSystem extends BaseSystem {
+  readonly id: SystemId = 'journaling';
+  readonly priority: number = 115;
+  readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus;
-  private events!: SystemEventManager;
   private idleAgents: Set<string> = new Set();
 
-  constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
-  }
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(_world: World): void {
     this.events.on('agent:idle', (data) => {
       if (data.agentId) {
         this.idleAgents.add(data.agentId);
@@ -39,13 +28,10 @@ export class JournalingSystem implements System {
     // 'agent:resting' event removed - not in EventMap
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Flush event bus first to process any queued idle/resting events
-    this.eventBus.flush();
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process idle agents
     for (const agentId of this.idleAgents) {
-      const entity = world.getEntity(agentId);
+      const entity = ctx.world.getEntity(agentId);
       if (!entity) {
         throw new Error(`Agent ${agentId} not found (idle trigger)`);
       }
@@ -73,7 +59,6 @@ export class JournalingSystem implements System {
     }
 
     this.idleAgents.clear();
-    this.eventBus.flush();
   }
 
   private _shouldJournal(personality: PersonalityComponent | undefined): boolean {
@@ -168,9 +153,5 @@ export class JournalingSystem implements System {
     }
 
     return Array.from(topics);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

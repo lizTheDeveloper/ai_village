@@ -51,8 +51,15 @@ export class CraftActionHandler implements ActionHandler {
    * - Level 5: 25% speed bonus (Master crafter)
    */
   getDuration(action: Action, world: World): number {
-    const recipeId = action.parameters.recipeId as string | undefined;
-    const quantity = (action.parameters.quantity as number) ?? 1;
+    // Type guard for recipeId parameter
+    const recipeId = typeof action.parameters.recipeId === 'string'
+      ? action.parameters.recipeId
+      : undefined;
+
+    // Type guard for quantity parameter
+    const quantity = typeof action.parameters.quantity === 'number'
+      ? action.parameters.quantity
+      : 1;
 
     if (!recipeId) {
       return 0;
@@ -71,7 +78,7 @@ export class CraftActionHandler implements ActionHandler {
       // Apply skill efficiency bonus
       const actor = world.getEntity(action.actorId);
       if (actor) {
-        const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
+        const skillsComp = actor.getComponent<SkillsComponent>(ComponentType.Skills);
         if (skillsComp) {
           const craftingLevel = skillsComp.levels.crafting;
           const skillBonus = getEfficiencyBonus(craftingLevel); // 0-25%
@@ -98,8 +105,10 @@ export class CraftActionHandler implements ActionHandler {
    * 6. Actor has required ingredients
    */
   validate(action: Action, world: World): ValidationResult {
-    // Check recipe ID
-    const recipeId = action.parameters.recipeId as string | undefined;
+    // Check recipe ID with type guard
+    const recipeId = typeof action.parameters.recipeId === 'string'
+      ? action.parameters.recipeId
+      : undefined;
     if (!recipeId) {
       return {
         valid: false,
@@ -117,7 +126,7 @@ export class CraftActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent<PositionComponent>(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,
@@ -126,7 +135,7 @@ export class CraftActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventory = actor.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return {
         valid: false,
@@ -167,7 +176,7 @@ export class CraftActionHandler implements ActionHandler {
 
     // Check skill requirements
     if (recipe.skillRequirements && recipe.skillRequirements.length > 0) {
-      const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
+      const skillsComp = actor.getComponent<SkillsComponent>(ComponentType.Skills);
       for (const req of recipe.skillRequirements) {
         const agentLevel = skillsComp?.levels[req.skill as keyof typeof skillsComp.levels] ?? 0;
         if (agentLevel < req.level) {
@@ -180,7 +189,9 @@ export class CraftActionHandler implements ActionHandler {
     }
 
     // Check ingredients
-    const quantity = (action.parameters.quantity as number) ?? 1;
+    const quantity = typeof action.parameters.quantity === 'number'
+      ? action.parameters.quantity
+      : 1;
     const availability = craftingSystem.checkIngredientAvailability(world, action.actorId, recipe);
 
     for (const ing of availability) {
@@ -208,8 +219,15 @@ export class CraftActionHandler implements ActionHandler {
    * 3. Return success (actual crafting handled by CraftingSystem.update())
    */
   execute(action: Action, world: World): ActionResult {
-    const recipeId = action.parameters.recipeId as string | undefined;
-    const quantity = (action.parameters.quantity as number) ?? 1;
+    // Type guard for recipeId parameter
+    const recipeId = typeof action.parameters.recipeId === 'string'
+      ? action.parameters.recipeId
+      : undefined;
+
+    // Type guard for quantity parameter
+    const quantity = typeof action.parameters.quantity === 'number'
+      ? action.parameters.quantity
+      : 1;
 
     if (!recipeId) {
       return {
@@ -277,10 +295,10 @@ export class CraftActionHandler implements ActionHandler {
         effects: [],
         events,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        reason: error.message || 'Failed to queue crafting job',
+        reason: error instanceof Error ? error.message : 'Failed to queue crafting job',
         effects: [],
         events: [],
       };
@@ -346,13 +364,33 @@ export class CraftActionHandler implements ActionHandler {
 
   /**
    * Get the crafting system from the world.
+   *
+   * Uses World.getSystem() which is part of the World interface.
+   * Falls back to direct property access for legacy compatibility.
    */
   private getCraftingSystem(world: World): CraftingSystem | null {
-    const system = (world as any).getSystem?.('crafting');
-    if (system) {
+    // Primary: Use getSystem() from World interface
+    const system = world.getSystem('crafting');
+    if (system && 'queueJob' in system && 'getRecipeRegistry' in system) {
+      // Type guard: Verify it has CraftingSystem methods
       return system as CraftingSystem;
     }
-    return (world as any).craftingSystem ?? null;
+
+    // Fallback: Direct property access (legacy)
+    // This is needed because some World implementations attach systems as properties
+    if ('craftingSystem' in world) {
+      const directSystem = world.craftingSystem;
+      if (
+        directSystem &&
+        typeof directSystem === 'object' &&
+        'queueJob' in directSystem &&
+        'getRecipeRegistry' in directSystem
+      ) {
+        return directSystem as CraftingSystem;
+      }
+    }
+
+    return null;
   }
 
 }

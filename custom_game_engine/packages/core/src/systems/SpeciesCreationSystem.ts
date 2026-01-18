@@ -10,7 +10,7 @@
  * - Creating mythical creatures
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -108,7 +108,7 @@ export const DEFAULT_SPECIES_CREATION_CONFIG: SpeciesCreationConfig = {
 // SpeciesCreationSystem
 // ============================================================================
 
-export class SpeciesCreationSystem implements System {
+export class SpeciesCreationSystem extends BaseSystem {
   public readonly id = 'SpeciesCreationSystem';
   public readonly name = 'SpeciesCreationSystem';
   public readonly priority = 71;
@@ -119,6 +119,7 @@ export class SpeciesCreationSystem implements System {
   private lastUpdate: number = 0;
 
   constructor(config: Partial<SpeciesCreationConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_SPECIES_CREATION_CONFIG,
       ...config,
@@ -126,8 +127,8 @@ export class SpeciesCreationSystem implements System {
     };
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     if (currentTick - this.lastUpdate < this.config.updateInterval) {
       return;
@@ -136,7 +137,7 @@ export class SpeciesCreationSystem implements System {
     this.lastUpdate = currentTick;
 
     // Update species populations
-    this.updateSpeciesPopulations(world);
+    this.updateSpeciesPopulations(ctx.world);
   }
 
   /**

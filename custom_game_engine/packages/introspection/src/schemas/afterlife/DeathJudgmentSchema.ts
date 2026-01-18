@@ -206,28 +206,28 @@ export const DeathJudgmentSchema = autoRegister(
 
     validate: (data): data is DeathJudgmentComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
-      return (
-        d.type === 'death_judgment' &&
-        typeof d.stage === 'string' &&
-        typeof d.conversationStartTick === 'number' &&
-        typeof d.lastExchangeTick === 'number' &&
-        typeof d.psychopompName === 'string' &&
-        Array.isArray(d.exchanges) &&
-        typeof d.currentExchangeIndex === 'number' &&
-        typeof d.judgedPeace === 'number' &&
-        typeof d.judgedTether === 'number' &&
-        typeof d.coherenceModifier === 'number' &&
-        typeof d.causeOfDeath === 'string' &&
-        typeof d.ageName === 'string' &&
-        Array.isArray(d.unfinishedGoals) &&
-        Array.isArray(d.importantRelationships) &&
-        Array.isArray(d.notableDeeds) &&
-        Array.isArray(d.sins) &&
-        typeof d.awaitingSoulResponse === 'boolean' &&
-        typeof d.awaitingPsychopompResponse === 'boolean'
-      );
+      if (!('type' in d) || d.type !== 'death_judgment') return false;
+      if (!('stage' in d) || typeof d.stage !== 'string') return false;
+      if (!('conversationStartTick' in d) || typeof d.conversationStartTick !== 'number') return false;
+      if (!('lastExchangeTick' in d) || typeof d.lastExchangeTick !== 'number') return false;
+      if (!('psychopompName' in d) || typeof d.psychopompName !== 'string') return false;
+      if (!('exchanges' in d) || !Array.isArray(d.exchanges)) return false;
+      if (!('currentExchangeIndex' in d) || typeof d.currentExchangeIndex !== 'number') return false;
+      if (!('judgedPeace' in d) || typeof d.judgedPeace !== 'number') return false;
+      if (!('judgedTether' in d) || typeof d.judgedTether !== 'number') return false;
+      if (!('coherenceModifier' in d) || typeof d.coherenceModifier !== 'number') return false;
+      if (!('causeOfDeath' in d) || typeof d.causeOfDeath !== 'string') return false;
+      if (!('ageName' in d) || typeof d.ageName !== 'string') return false;
+      if (!('unfinishedGoals' in d) || !Array.isArray(d.unfinishedGoals)) return false;
+      if (!('importantRelationships' in d) || !Array.isArray(d.importantRelationships)) return false;
+      if (!('notableDeeds' in d) || !Array.isArray(d.notableDeeds)) return false;
+      if (!('sins' in d) || !Array.isArray(d.sins)) return false;
+      if (!('awaitingSoulResponse' in d) || typeof d.awaitingSoulResponse !== 'boolean') return false;
+      if (!('awaitingPsychopompResponse' in d) || typeof d.awaitingPsychopompResponse !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: (): DeathJudgmentComponent => ({

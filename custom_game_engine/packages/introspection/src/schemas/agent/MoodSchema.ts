@@ -202,18 +202,20 @@ export const MoodSchema = autoRegister(
 
     validate: (data: unknown): data is MoodComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'mood' &&
-        typeof comp.currentMood === 'number' &&
-        typeof comp.baselineMood === 'number' &&
-        typeof comp.emotionalState === 'string' &&
-        typeof comp.factors === 'object' &&
-        Array.isArray(comp.favorites) &&
-        Array.isArray(comp.comfortFoods) &&
-        comp.currentMood >= -100 &&
-        comp.currentMood <= 100
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'mood') return false;
+      if (!('currentMood' in comp) || typeof comp.currentMood !== 'number') return false;
+      if (!('baselineMood' in comp) || typeof comp.baselineMood !== 'number') return false;
+      if (!('emotionalState' in comp) || typeof comp.emotionalState !== 'string') return false;
+      if (!('factors' in comp) || typeof comp.factors !== 'object' || comp.factors === null) return false;
+      if (!('favorites' in comp) || !Array.isArray(comp.favorites)) return false;
+      if (!('comfortFoods' in comp) || !Array.isArray(comp.comfortFoods)) return false;
+
+      // Range validation
+      if (comp.currentMood < -100 || comp.currentMood > 100) return false;
+
+      return true;
     },
 
     createDefault: () => ({

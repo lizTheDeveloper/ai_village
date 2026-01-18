@@ -12,11 +12,12 @@
  * - Canon event detection (deaths, births, marriages, first achievements)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import { saveLoadService, type CanonEvent as ServerCanonEvent } from '../persistence/SaveLoadService.js';
 import { canonEventDetector, type CanonEvent as LocalCanonEvent } from './CanonEventDetector.js';
@@ -38,7 +39,7 @@ export interface Checkpoint {
   magicLawsHash: string;
 }
 
-export class AutoSaveSystem implements System {
+export class AutoSaveSystem extends BaseSystem {
   public readonly id: SystemId = 'auto_save';
   public readonly priority: number = 999; // Run last
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
@@ -48,16 +49,17 @@ export class AutoSaveSystem implements System {
   private nameGenerationPending: boolean = false;
   private canonEventDetectorAttached: boolean = false;
 
+  protected onInitialize(world: World, _eventBus: EventBus): void {
+    // Attach canon event detector on initialization
+    canonEventDetector.attachToWorld(world);
+    this.canonEventDetectorAttached = true;
+  }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Attach canon event detector on first update
-    if (!this.canonEventDetectorAttached) {
-      canonEventDetector.attachToWorld(world);
-      this.canonEventDetectorAttached = true;
-    }
+  protected onUpdate(ctx: SystemContext): void {
+    const { activeEntities, world } = ctx;
 
     // Find time entity
-    const timeEntity = entities[0];
+    const timeEntity = activeEntities[0];
     if (!timeEntity) return;
 
     const impl = timeEntity as EntityImpl;
@@ -161,11 +163,7 @@ export class AutoSaveSystem implements System {
       this.checkpoints.push(checkpoint);
 
       // Emit event for name generation
-      world.eventBus.emit({
-        type: 'checkpoint:created' as const,
-        source: 'auto_save' as const,
-        data: { checkpoint },
-      });
+      this.events.emitGeneric('checkpoint:created', { checkpoint });
 
       // Request LLM to generate a poetic name asynchronously
       this.generateCheckpointName(checkpoint, world);
@@ -250,11 +248,7 @@ export class AutoSaveSystem implements System {
     // - Examples: "The Dawn of Copper", "When Trees Spoke", "The First Harvest"
 
     // Emit event that can be handled by LLM system
-    world.eventBus.emit({
-      type: 'checkpoint:name_request' as const,
-      source: 'auto_save' as const,
-      data: { checkpoint },
-    });
+    this.events.emitGeneric('checkpoint:name_request', { checkpoint });
   }
 
   /**
@@ -285,14 +279,10 @@ export class AutoSaveSystem implements System {
       }
 
       // Emit fork event
-      world.eventBus.emit({
-        type: 'universe:forked' as const,
-        source: 'auto_save' as const,
-        data: {
-          sourceCheckpoint: checkpoint,
-          newUniverseId: checkpoint.universeId,
-          forkPoint: checkpoint.tick,
-        },
+      this.events.emitGeneric('universe:forked', {
+        sourceCheckpoint: checkpoint,
+        newUniverseId: checkpoint.universeId,
+        forkPoint: checkpoint.tick,
       });
 
       return true;

@@ -10,10 +10,17 @@
  * 1. For each agent with Position + Velocity:
  *    - Skip if velocity is near zero (< 0.1)
  *    - Calculate normalized movement direction
- *    - Predict chunks 1-5 steps ahead in movement direction
+ *    - Calculate dynamic prediction distance based on speed (2-12 chunks)
+ *    - Predict chunks ahead in movement direction
  *    - Also check 1 chunk to left/right of path (for turning)
  * 2. Queue ungenerated chunks with MEDIUM priority
  * 3. Deduplicate chunk requests within update
+ *
+ * Dynamic Prediction Scaling:
+ * - Slow agents (0.1-0.5 tiles/tick): 2-3 chunks ahead
+ * - Medium agents (0.5-1.0): 3-5 chunks ahead
+ * - Fast agents (1.0-2.0): 5-10 chunks ahead
+ * - Very fast agents (2.0+): 10-12 chunks ahead (capped)
  *
  * Performance:
  * - Throttled to every 20 ticks (1 second at 20 TPS)
@@ -23,9 +30,13 @@
  *
  * @example
  * ```typescript
- * // Agent moving east at velocity (2, 0)
- * // Current position: (100, 50) in chunk (3, 1)
- * // System predicts chunks: (4,1), (5,1), (6,1), (7,1), (8,1)
+ * // Slow agent at (100, 50) with velocity (0.3, 0)
+ * // Speed = 0.3, prediction = 2 chunks
+ * // System predicts chunks: (4,1), (5,1)
+ *
+ * // Fast agent at (100, 50) with velocity (2, 0)
+ * // Speed = 2.0, prediction = 10 chunks
+ * // System predicts chunks: (4,1), (5,1), ..., (13,1)
  * // Also checks lateral: (4,0), (4,2) for turning
  * ```
  */
@@ -44,7 +55,9 @@ export class PredictiveChunkLoadingSystem extends BaseSystem {
   protected readonly throttleInterval = 20;
 
   // Prediction configuration
-  private readonly PREDICTION_DISTANCE = 5; // Look 5 chunks ahead
+  private static readonly MIN_PREDICTION_DISTANCE = 2; // Minimum chunks ahead for slow agents
+  private static readonly MAX_PREDICTION_DISTANCE = 12; // Maximum chunks ahead for fast agents
+  private static readonly SPEED_SCALE_FACTOR = 5; // How much speed affects prediction distance
   private readonly LATERAL_CHECK_DISTANCE = 1; // Check 1 chunk left/right
   private readonly MIN_VELOCITY_THRESHOLD = 0.1; // Ignore near-stationary agents
 
@@ -91,6 +104,12 @@ export class PredictiveChunkLoadingSystem extends BaseSystem {
   /**
    * Predict chunks for a single agent based on movement direction.
    *
+   * Uses dynamic prediction distance that scales with agent speed:
+   * - Slow agents (0.1-0.5 tiles/tick): 2-3 chunks ahead
+   * - Medium agents (0.5-1.0): 3-5 chunks ahead
+   * - Fast agents (1.0-2.0): 5-10 chunks ahead
+   * - Very fast agents (2.0+): 10-12 chunks ahead (capped)
+   *
    * @param position - Agent position component
    * @param velocity - Agent velocity component
    * @param generator - Background chunk generator
@@ -108,24 +127,34 @@ export class PredictiveChunkLoadingSystem extends BaseSystem {
   ): void {
     const { vx, vy } = velocity;
 
-    // Calculate velocity magnitude
-    const magnitude = Math.sqrt(vx * vx + vy * vy);
+    // Calculate velocity magnitude (speed in tiles/tick)
+    const speed = Math.sqrt(vx * vx + vy * vy);
 
     // Skip stationary or near-stationary agents
-    if (magnitude < this.MIN_VELOCITY_THRESHOLD) {
+    if (speed < this.MIN_VELOCITY_THRESHOLD) {
       return;
     }
 
+    // Calculate dynamic prediction distance based on speed
+    // Faster agents need more chunks ahead to prevent lag
+    const predictionDistance = Math.min(
+      PredictiveChunkLoadingSystem.MAX_PREDICTION_DISTANCE,
+      Math.max(
+        PredictiveChunkLoadingSystem.MIN_PREDICTION_DISTANCE,
+        Math.ceil(speed * PredictiveChunkLoadingSystem.SPEED_SCALE_FACTOR)
+      )
+    );
+
     // Normalize direction vector
-    const dirX = vx / magnitude;
-    const dirY = vy / magnitude;
+    const dirX = vx / speed;
+    const dirY = vy / speed;
 
     // Calculate current chunk coordinates
     const currentChunkX = position.chunkX;
     const currentChunkY = position.chunkY;
 
     // Predict chunks along movement direction
-    for (let step = 1; step <= this.PREDICTION_DISTANCE; step++) {
+    for (let step = 1; step <= predictionDistance; step++) {
       // Calculate predicted world position
       const predictedX = position.x + dirX * CHUNK_SIZE * step;
       const predictedY = position.y + dirY * CHUNK_SIZE * step;

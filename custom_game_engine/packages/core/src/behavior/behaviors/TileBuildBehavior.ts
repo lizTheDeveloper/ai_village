@@ -252,15 +252,27 @@ export class TileBuildBehavior extends BaseBehavior {
    * Get build state from agent.
    */
   private getBuildState(agent: AgentComponent): TileBuildState | null {
-    const state = agent.behaviorState as Partial<TileBuildState>;
-    if (!state.taskId || state.tileIndex === undefined) {
+    const state = agent.behaviorState;
+
+    // Type guard: check required fields exist
+    if (
+      !state ||
+      typeof state !== 'object' ||
+      !('taskId' in state) ||
+      typeof state.taskId !== 'string' ||
+      !('tileIndex' in state) ||
+      typeof state.tileIndex !== 'number'
+    ) {
       return null;
     }
+
     return {
-      buildState: state.buildState ?? 'moving_to_tile',
+      buildState: ('buildState' in state && typeof state.buildState === 'string' &&
+                   (state.buildState === 'moving_to_tile' || state.buildState === 'building' || state.buildState === 'complete')
+                   ? state.buildState as BuildState : 'moving_to_tile'),
       taskId: state.taskId,
       tileIndex: state.tileIndex,
-      workProgress: state.workProgress ?? 0,
+      workProgress: ('workProgress' in state && typeof state.workProgress === 'number' ? state.workProgress : 0),
     };
   }
 
@@ -271,9 +283,17 @@ export class TileBuildBehavior extends BaseBehavior {
     entity: EntityImpl,
     state: TileBuildState
   ): void {
+    // Convert TileBuildState to Record<string, unknown> for behaviorState
+    const behaviorState: Record<string, unknown> = {
+      buildState: state.buildState,
+      taskId: state.taskId,
+      tileIndex: state.tileIndex,
+      workProgress: state.workProgress,
+    };
+
     entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
-      behaviorState: state as unknown as Record<string, unknown>,
+      behaviorState,
     }));
   }
 }
@@ -295,13 +315,28 @@ import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '.
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
+ * Type guard for TileBuildState.
+ */
+function isTileBuildState(state: Record<string, unknown>): state is TileBuildState & Record<string, unknown> {
+  return (
+    typeof state.taskId === 'string' &&
+    typeof state.tileIndex === 'number' &&
+    (state.buildState === undefined ||
+     state.buildState === 'moving_to_tile' ||
+     state.buildState === 'building' ||
+     state.buildState === 'complete') &&
+    (state.workProgress === undefined || typeof state.workProgress === 'number')
+  );
+}
+
+/**
  * Modern version using BehaviorContext.
  * @example registerBehaviorWithContext('tile_build', tileBuildBehaviorWithContext);
  */
 export function tileBuildBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState();
 
-  if (!state.taskId || state.tileIndex === undefined) {
+  if (!isTileBuildState(state)) {
     return ctx.complete('No build state set');
   }
 
@@ -328,7 +363,11 @@ export function tileBuildBehaviorWithContext(ctx: BehaviorContext): ContextBehav
   }
 }
 
-function handleBuildMovingToTile(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+function handleBuildMovingToTile(
+  ctx: BehaviorContext,
+  state: TileBuildState & Record<string, unknown>,
+  task: ConstructionTask
+): ContextBehaviorResult | void {
   const tile = task.tiles[state.tileIndex];
   if (!tile) {
     return ctx.complete('Tile not found');
@@ -360,7 +399,11 @@ function handleBuildMovingToTile(ctx: BehaviorContext, state: any, task: Constru
   ctx.moveToward(tilePosition, { arrivalDistance: 1.5 });
 }
 
-function handleBuildBuilding(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+function handleBuildBuilding(
+  ctx: BehaviorContext,
+  state: TileBuildState & Record<string, unknown>,
+  task: ConstructionTask
+): ContextBehaviorResult | void {
   const tile = task.tiles[state.tileIndex];
   if (!tile) {
     return ctx.complete('Tile not found');
@@ -379,10 +422,9 @@ function handleBuildBuilding(ctx: BehaviorContext, state: any, task: Constructio
   const buildSpeed = BASE_BUILD_SPEED * speedMultiplier;
 
   // Advance construction
-  const world = (ctx as any).world;
   const constructionSystem = getTileConstructionSystem();
   const completed = constructionSystem.advanceProgress(
-    world,
+    ctx.world,
     state.taskId,
     state.tileIndex,
     ctx.entity.id,

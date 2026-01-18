@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -6,7 +6,6 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
 import type { GuardDutyComponent } from '../components/GuardDutyComponent.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
-import type { EventBus } from '../events/EventBus.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 interface PositionComponent extends Component {
@@ -42,46 +41,32 @@ interface AlertComponent extends Component {
  * - Emits alerts to other guards
  * - Selects appropriate responses
  */
-export class GuardDutySystem implements System {
+export class GuardDutySystem extends BaseSystem {
   public readonly id: SystemId = 'guard_duty';
   public readonly priority = 48;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['guard_duty'];
 
-  private eventBus?: EventBus;
-  private events!: SystemEventManager;
   private readonly ALERTNESS_DECAY_RATE = 0.0001; // Per millisecond
   private readonly THREAT_CHECK_INTERVAL = 5000; // 5 seconds
   private readonly LOW_ALERTNESS_THRESHOLD = 0.2;
 
-  constructor(eventBus?: EventBus) {
-    this.eventBus = eventBus;
-  }
-
-  initialize(world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
-      const duty = world.getComponent<GuardDutyComponent>(entity.id, 'guard_duty');
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const duty = ctx.world.getComponent<GuardDutyComponent>(entity.id, 'guard_duty');
       if (!duty) continue;
 
       // Validate assignment - skip if invalid
       if (!this.validateAssignment(duty)) continue;
 
       // Decay alertness
-      this.decayAlertness(entity, duty, deltaTime);
+      this.decayAlertness(entity, duty, ctx.deltaTime);
 
       // Perform threat checks
-      this.performThreatCheck(world, entity, duty, entities);
+      this.performThreatCheck(ctx.world, entity, duty, ctx.activeEntities);
 
       // Update patrol position if needed
       if (duty.assignmentType === 'patrol') {
-        this.updatePatrol(world, entity, duty);
+        this.updatePatrol(ctx.world, entity, duty);
       }
     }
   }
@@ -126,12 +111,10 @@ export class GuardDutySystem implements System {
 
     // Emit low alertness warning
     if (newAlertness < this.LOW_ALERTNESS_THRESHOLD && duty.alertness >= this.LOW_ALERTNESS_THRESHOLD) {
-      if (this.events) {
-        this.events.emit('guard:alertness_low', {
-          guardId: entity.id,
-          alertness: newAlertness,
-        }, entity.id);
-      }
+      this.events.emit('guard:alertness_low', {
+        guardId: entity.id,
+        alertness: newAlertness,
+      }, entity.id);
     }
   }
 
@@ -258,15 +241,13 @@ export class GuardDutySystem implements System {
     }
 
     // Emit threat detected event
-    if (this.events) {
-      this.events.emit('guard:threat_detected', {
-        guardId: guard.id,
-        threatId: threat.entity.id,
-        threatLevel: threat.threatLevel,
-        distance: threat.distance,
-        location: watchLocation,
-      }, guard.id);
-    }
+    this.events.emit('guard:threat_detected', {
+      guardId: guard.id,
+      threatId: threat.entity.id,
+      threatLevel: threat.threatLevel,
+      distance: threat.distance,
+      location: watchLocation,
+    }, guard.id);
 
     // Add alert component to guard
     const guardImpl = guard as EntityImpl;
@@ -320,13 +301,11 @@ export class GuardDutySystem implements System {
     threat: Entity,
     response: 'alert_others' | 'intercept' | 'observe' | 'flee'
   ): void {
-    if (this.events) {
-      this.events.emit('guard:response', {
-        guardId: guard.id,
-        threatId: threat.id,
-        response,
-      }, guard.id);
-    }
+    this.events.emit('guard:response', {
+      guardId: guard.id,
+      threatId: threat.id,
+      response,
+    }, guard.id);
 
     // Actual response implementation would depend on other systems
     // For now, just emit the event

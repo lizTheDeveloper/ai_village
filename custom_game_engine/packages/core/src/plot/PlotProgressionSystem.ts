@@ -10,11 +10,9 @@
  * - Plot completion triggers
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
@@ -42,22 +40,13 @@ import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem
 /**
  * System priority: 86 (runs after assignment at 85, after NarrativePressure at 80)
  */
-export class PlotProgressionSystem implements System {
+export class PlotProgressionSystem extends BaseSystem {
   readonly id = 'plot_progression' as const;
   readonly priority = 86;
   readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
     // Find all souls with active plots
     const souls = world.query()
       .with(ComponentType.SoulIdentity)

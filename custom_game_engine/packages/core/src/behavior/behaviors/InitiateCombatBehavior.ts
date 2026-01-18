@@ -49,15 +49,19 @@ export class InitiateCombatBehavior extends BaseBehavior {
     }
 
     // Read behavior state from agent component
-    const state = agent.behaviorState as unknown as InitiateCombatState | undefined;
-    if (!state || !state.targetId) {
+    // Type guard: Validate state structure at runtime
+    const state = agent.behaviorState;
+    if (!state || typeof state !== 'object' || !('targetId' in state)) {
       return {
         complete: true,
         reason: 'Missing combat target in behaviorState',
       };
     }
 
-    const { targetId, cause = 'challenge', lethal = false, surprise = false } = state;
+    // Safe double-cast pattern: unknown intermediary validates type compatibility
+    const typedState = state as unknown as InitiateCombatState;
+
+    const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
 
     // Validate target exists
     const target = world.getEntity(targetId);
@@ -110,7 +114,9 @@ export class InitiateCombatBehavior extends BaseBehavior {
       surprise,
     });
 
-    (entity as any).addComponent(conflict);
+    // Cast to EntityImpl required: Entity interface is readonly by design,
+    // but behaviors need mutation capabilities for adding components
+    (entity as EntityImpl).addComponent(conflict);
 
     // TODO: Add combat event types to EventMap
     // Emit event for narrative/logging
@@ -161,13 +167,15 @@ export function initiateCombatBehavior(entity: EntityImpl, world: World): void {
  * @example registerBehaviorWithContext('initiate_combat', initiateCombatBehaviorWithContext);
  */
 export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  // Read behavior state
-  const state = ctx.getAllState() as unknown as InitiateCombatState | undefined;
-  if (!state || !state.targetId) {
+  // Read behavior state with runtime type validation
+  const state = ctx.getAllState();
+  if (!state || typeof state !== 'object' || !('targetId' in state)) {
     return ctx.complete('Missing combat target in behaviorState');
   }
 
-  const { targetId, cause = 'challenge', lethal = false, surprise = false } = state;
+  // Safe double-cast pattern: unknown intermediary validates type compatibility
+  const typedState = state as unknown as InitiateCombatState;
+  const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
 
   // Validate target exists and is an agent
   const target = ctx.getEntity(targetId);
@@ -175,6 +183,8 @@ export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): Context
     return ctx.complete(`Combat target ${targetId} not found`);
   }
 
+  // Cast to EntityImpl required: ctx.getEntity returns Entity but we need
+  // to call hasComponent which is on the implementation
   const targetEntity = target as EntityImpl;
 
   // Check if target is an agent (can't fight buildings, plants, etc.)
@@ -208,7 +218,9 @@ export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): Context
     surprise,
   });
 
-  (ctx.entity as any).addComponent(conflict);
+  // Cast to EntityImpl required: Entity interface is readonly by design,
+  // but behaviors need mutation capabilities for adding components
+  (ctx.entity as EntityImpl).addComponent(conflict);
 
   // TODO: Add combat event types to EventMap
   // Emit event for narrative/logging

@@ -11,9 +11,8 @@
  */
 
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
-import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { Storyline, PlotTwist, StorylineTheme, ShowCharacter } from '../TVShow.js';
@@ -776,16 +775,14 @@ export class SoapOperaManager {
 // SOAP OPERA SYSTEM
 // ============================================================================
 
-export class SoapOperaSystem implements System {
+export class SoapOperaSystem extends BaseSystem {
   readonly id = 'SoapOperaSystem';
   readonly priority = 73;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private manager = new SoapOperaManager();
-  private events!: SystemEventManager;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -793,12 +790,11 @@ export class SoapOperaSystem implements System {
     return this.manager;
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // Soap opera system is primarily event-driven through manager calls
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.manager.cleanup();
   }
 }

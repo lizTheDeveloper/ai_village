@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -18,17 +18,13 @@ import {
   calculateConversationQuality,
   type ConversationQuality,
 } from '../conversation/ConversationQuality.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
-export class CommunicationSystem implements System {
+export class CommunicationSystem extends BaseSystem {
   public readonly id: SystemId = 'communication';
   public readonly priority: number = 15; // Run after AI (10), before movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.Conversation,
   ];
-
-  private events!: SystemEventManager;
 
   // Satisfaction amounts for quality-based social need updates
   private static readonly CONTACT_SATISFACTION = 0.3; // Any conversation satisfies contact need
@@ -40,13 +36,9 @@ export class CommunicationSystem implements System {
   private static readonly MIN_JOIN_RADIUS = 20; // Introverted agents (extraversion = 0) join from 20 tiles
   private static readonly MAX_JOIN_RADIUS = 30; // Extraverted agents (extraversion = 1) join from 30 tiles
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // First pass: Check for agents who might want to join conversations based on personality
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
 
       // Skip sleeping agents - they can't join conversations
@@ -59,11 +51,11 @@ export class CommunicationSystem implements System {
       if (conversation && isInConversation(conversation)) continue;
 
       // Try to join nearby conversations based on personality
-      this.tryJoinNearbyConversation(impl, _world);
+      this.tryJoinNearbyConversation(impl, ctx.world);
     }
 
     // Second pass: Manage active conversations
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
 
@@ -73,10 +65,10 @@ export class CommunicationSystem implements System {
       if (!partnerId) continue;
 
       // Check if partner still exists
-      const partner = _world.getEntity(partnerId);
+      const partner = ctx.world.getEntity(partnerId);
       if (!partner) {
         // Partner no longer exists, end conversation
-        this.endConversationForEntity(impl, null, _world, 0);
+        this.endConversationForEntity(impl, null, ctx.world, 0);
         continue;
       }
 
@@ -285,9 +277,5 @@ export class CommunicationSystem implements System {
         interest.lastDiscussed = currentTick;
       }
     }
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

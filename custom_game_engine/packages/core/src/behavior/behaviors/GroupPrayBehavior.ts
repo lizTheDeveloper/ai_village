@@ -121,11 +121,10 @@ export class GroupPrayBehavior extends BaseBehavior {
         lastThought: call,
       }));
 
-      // Emit call to prayer event (using untyped emit for custom event)
-      const eventBus = world.eventBus as { emit: (event: unknown) => void };
-      eventBus.emit({
-        type: 'group_prayer:call',
-        source: 'group_pray_behavior',
+      // Emit call to prayer event
+      world.eventBus.emit({
+        type: 'group_prayer:call' as const,
+        source: 'group_pray_behavior' as const,
         data: {
           leaderId: entity.id,
           location: { x: position.x, y: position.y },
@@ -164,13 +163,12 @@ export class GroupPrayBehavior extends BaseBehavior {
         prayerStarted: currentTick,
       });
 
-      // Notify participants (using untyped emit for custom event)
-      const eventBus = world.eventBus as { emit: (event: unknown) => void };
+      // Notify participants
       for (const participant of participants) {
         if (participant.id !== entity.id) {
-          eventBus.emit({
-            type: 'group_prayer:joined',
-            source: 'group_pray_behavior',
+          world.eventBus.emit({
+            type: 'group_prayer:joined' as const,
+            source: 'group_pray_behavior' as const,
             data: {
               participantId: participant.id,
               leaderId: entity.id,
@@ -222,11 +220,10 @@ export class GroupPrayBehavior extends BaseBehavior {
         }));
         this.updateState(entity, { lastUtterance: currentTick });
 
-        // Emit spoken prayer (using untyped emit for custom event fields)
-        const eventBus = world.eventBus as { emit: (event: unknown) => void };
-        eventBus.emit({
-          type: 'agent:speak',
-          source: 'group_pray_behavior',
+        // Emit spoken prayer
+        world.eventBus.emit({
+          type: 'agent:speak' as const,
+          source: 'group_pray_behavior' as const,
           data: {
             agentId: entity.id,
             text: prayer,
@@ -272,8 +269,9 @@ export class GroupPrayBehavior extends BaseBehavior {
     };
 
     // Record prayer for leader
+    // Cast required: Entity interface doesn't expose mutation methods
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-    (entity as any).addComponent(updatedSpiritual);
+    (entity as EntityImpl).addComponent(updatedSpiritual);
 
     // Calculate vision chance
     const visionChance = GROUP_PRAYER_CONFIG.BASE_VISION_CHANCE +
@@ -281,11 +279,10 @@ export class GroupPrayBehavior extends BaseBehavior {
 
     const receivedGroupVision = Math.random() < visionChance;
 
-    // Emit group prayer complete event (using untyped emit for custom event)
-    const eventBus = world.eventBus as { emit: (event: unknown) => void };
-    eventBus.emit({
-      type: 'group_prayer:complete',
-      source: 'group_pray_behavior',
+    // Emit group prayer complete event
+    world.eventBus.emit({
+      type: 'group_prayer:complete' as const,
+      source: 'group_pray_behavior' as const,
       data: {
         leaderId: entity.id,
         participants,
@@ -299,9 +296,9 @@ export class GroupPrayBehavior extends BaseBehavior {
 
     // If vision received, emit vision event
     if (receivedGroupVision && state.isLeader) {
-      eventBus.emit({
-        type: 'group_vision:received',
-        source: 'group_pray_behavior',
+      world.eventBus.emit({
+        type: 'group_vision:received' as const,
+        source: 'group_pray_behavior' as const,
         data: {
           participants,
           deityId: entity.getComponent<SpiritualComponent>(ComponentType.Spiritual)?.believedDeity,
@@ -351,9 +348,9 @@ export class GroupPrayBehavior extends BaseBehavior {
       if (agent.id === leader.id) continue;
       if (participants.length >= GROUP_PRAYER_CONFIG.MAX_PARTICIPANTS) break;
 
-      const agentPos = agent.components.get(ComponentType.Position) as PositionComponent | undefined;
-      const spiritual = agent.components.get(ComponentType.Spiritual) as SpiritualComponent | undefined;
-      const agentComp = agent.components.get(ComponentType.Agent) as AgentComponent | undefined;
+      const agentPos = agent.getComponent<PositionComponent>(ComponentType.Position);
+      const spiritual = agent.getComponent<SpiritualComponent>(ComponentType.Spiritual);
+      const agentComp = agent.getComponent<AgentComponent>(ComponentType.Agent);
 
       if (!agentPos || !spiritual || !agentComp) continue;
 
@@ -391,23 +388,21 @@ export class GroupPrayBehavior extends BaseBehavior {
       const participant = world.getEntity(participantId);
       if (!participant) continue;
 
-      const relationships = participant.components.get(ComponentType.Relationship) as RelationshipComponent | undefined;
+      const relationships = participant.getComponent<RelationshipComponent>(ComponentType.Relationship);
       if (!relationships) continue;
 
       // Improve relationships with other participants
       for (const otherId of participants) {
         if (otherId === participantId) continue;
 
-        // Emit relationship improvement event (using untyped emit for custom event)
-        const eventBus = world.eventBus as { emit: (event: unknown) => void };
-        eventBus.emit({
-          type: 'relationship:improved',
-          source: 'group_pray_behavior',
+        // Emit relationship improvement event (from participant's perspective)
+        world.eventBus.emit({
+          type: 'relationship:improved' as const,
+          source: 'group_pray_behavior' as const,
           data: {
-            agent1: participantId,
-            agent2: otherId,
+            targetAgent: otherId,
             reason: 'shared_prayer',
-            delta: 0.05, // Small but meaningful improvement
+            amount: 0.05, // Small but meaningful improvement
           },
         });
       }
@@ -584,8 +579,9 @@ function completeGroupPrayerWithContext(
   };
 
   // Record prayer for leader
+  // Cast required: Entity interface doesn't expose mutation methods
   const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-  (ctx.entity as any).addComponent(updatedSpiritual);
+  (ctx.entity as EntityImpl).addComponent(updatedSpiritual);
 
   // Calculate vision chance
   const visionChance = GROUP_PRAYER_CONFIG.BASE_VISION_CHANCE +
@@ -629,13 +625,13 @@ function completeGroupPrayerWithContext(
     for (const otherId of participants) {
       if (otherId === participantId) continue;
 
+      // Emit relationship improvement event (from participant's perspective)
       ctx.emit({
         type: 'relationship:improved',
         data: {
-          agent1: participantId,
-          agent2: otherId,
+          targetAgent: otherId,
           reason: 'shared_prayer',
-          delta: 0.05,
+          amount: 0.05,
         },
       });
     }

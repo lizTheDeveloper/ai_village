@@ -5,31 +5,19 @@
  * Can be removed after all saves have been migrated.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type { ComponentType } from '../types.js';
-import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { RoofMaterial, WallMaterial, Tile } from '@ai-village/world';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
-export class RoofRepairSystem implements System {
-  id = 'roof_repair' as const;
-  priority = 950;
+export class RoofRepairSystem extends BaseSystem {
+  readonly id = 'roof_repair' as const;
+  readonly priority = 950;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   private hasRun = false;
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
 
   /**
    * Check if a chunk is generated before calling getTileAt.
@@ -50,7 +38,8 @@ export class RoofRepairSystem implements System {
     return chunk?.generated === true;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
     // Only run once per session
     if (this.hasRun) return;
     this.hasRun = true;

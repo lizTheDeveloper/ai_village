@@ -421,14 +421,21 @@ export const AgentSchema = autoRegister(
 
     validate: (data: unknown): data is AgentComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
+      const comp = data as Record<string, unknown>;
       return (
+        'type' in comp &&
         comp.type === 'agent' &&
+        'behavior' in comp &&
         typeof comp.behavior === 'string' &&
+        'behaviorState' in comp &&
         typeof comp.behaviorState === 'object' &&
+        'thinkInterval' in comp &&
         typeof comp.thinkInterval === 'number' &&
+        'lastThinkTick' in comp &&
         typeof comp.lastThinkTick === 'number' &&
+        'useLLM' in comp &&
         typeof comp.useLLM === 'boolean' &&
+        'llmCooldown' in comp &&
         typeof comp.llmCooldown === 'number'
       );
     },

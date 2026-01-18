@@ -269,28 +269,51 @@ export const CombatStatsSchema = autoRegister(
     },
 
     validate: (data): data is CombatStatsComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'combat_stats') return false;
-      if (typeof d.combatSkill !== 'number' || d.combatSkill < 0 || d.combatSkill > 100) {
+      if (!('type' in d) || d.type !== 'combat_stats') return false;
+      if (!('combatSkill' in d) || typeof d.combatSkill !== 'number' || d.combatSkill < 0 || d.combatSkill > 100) {
         throw new RangeError(`Invalid combatSkill: ${d.combatSkill} (must be 0-100)`);
       }
 
       // Validate optional skills
-      const optionalSkills = ['huntingSkill', 'stealthSkill', 'displaySkill', 'resourceHolding', 'craftingSkill', 'socialSkill'];
-      for (const skill of optionalSkills) {
-        if (d[skill] !== undefined) {
-          if (typeof d[skill] !== 'number' || d[skill] < 0 || d[skill] > 100) {
-            throw new RangeError(`Invalid ${skill}: ${d[skill]} (must be 0-100)`);
-          }
+      if ('huntingSkill' in d && d.huntingSkill !== undefined) {
+        if (typeof d.huntingSkill !== 'number' || d.huntingSkill < 0 || d.huntingSkill > 100) {
+          throw new RangeError(`Invalid huntingSkill: ${d.huntingSkill} (must be 0-100)`);
+        }
+      }
+      if ('stealthSkill' in d && d.stealthSkill !== undefined) {
+        if (typeof d.stealthSkill !== 'number' || d.stealthSkill < 0 || d.stealthSkill > 100) {
+          throw new RangeError(`Invalid stealthSkill: ${d.stealthSkill} (must be 0-100)`);
+        }
+      }
+      if ('displaySkill' in d && d.displaySkill !== undefined) {
+        if (typeof d.displaySkill !== 'number' || d.displaySkill < 0 || d.displaySkill > 100) {
+          throw new RangeError(`Invalid displaySkill: ${d.displaySkill} (must be 0-100)`);
+        }
+      }
+      if ('resourceHolding' in d && d.resourceHolding !== undefined) {
+        if (typeof d.resourceHolding !== 'number' || d.resourceHolding < 0 || d.resourceHolding > 100) {
+          throw new RangeError(`Invalid resourceHolding: ${d.resourceHolding} (must be 0-100)`);
+        }
+      }
+      if ('craftingSkill' in d && d.craftingSkill !== undefined) {
+        if (typeof d.craftingSkill !== 'number' || d.craftingSkill < 0 || d.craftingSkill > 100) {
+          throw new RangeError(`Invalid craftingSkill: ${d.craftingSkill} (must be 0-100)`);
+        }
+      }
+      if ('socialSkill' in d && d.socialSkill !== undefined) {
+        if (typeof d.socialSkill !== 'number' || d.socialSkill < 0 || d.socialSkill > 100) {
+          throw new RangeError(`Invalid socialSkill: ${d.socialSkill} (must be 0-100)`);
         }
       }
 
       // Validate optional equipment
-      if (d.weapon !== undefined && d.weapon !== null && typeof d.weapon !== 'string') {
+      if ('weapon' in d && d.weapon !== undefined && d.weapon !== null && typeof d.weapon !== 'string') {
         return false;
       }
-      if (d.armor !== undefined && d.armor !== null && typeof d.armor !== 'string') {
+      if ('armor' in d && d.armor !== undefined && d.armor !== null && typeof d.armor !== 'string') {
         return false;
       }
 

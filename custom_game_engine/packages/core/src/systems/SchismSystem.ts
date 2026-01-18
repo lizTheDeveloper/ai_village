@@ -9,10 +9,8 @@
  * - Charismatic leader promotes alternative interpretation
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -84,31 +82,22 @@ export const DEFAULT_SCHISM_CONFIG: SchismConfig = {
 // SchismSystem
 // ============================================================================
 
-export class SchismSystem implements System {
+export class SchismSystem extends BaseSystem {
   public readonly id = 'SchismSystem';
-  public readonly name = 'SchismSystem';
   public readonly priority = 76;
   public readonly requiredComponents = [];
 
   private config: SchismConfig;
   private schisms: Map<string, SchismData> = new Map();
   private lastCheck: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<SchismConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_SCHISM_CONFIG, ...config };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     if (currentTick - this.lastCheck < this.config.checkInterval) {
       return;
@@ -117,7 +106,7 @@ export class SchismSystem implements System {
     this.lastCheck = currentTick;
 
     // Check each deity for potential schisms
-    this.checkForSchisms(world, currentTick);
+    this.checkForSchisms(ctx.world, currentTick);
   }
 
   /**

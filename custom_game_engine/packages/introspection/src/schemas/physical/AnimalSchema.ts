@@ -392,23 +392,41 @@ export const AnimalSchema = autoRegister(
     },
 
     validate: (data): data is AnimalComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'animal') return false;
-      if (typeof d.speciesId !== 'string') return false;
-      if (typeof d.name !== 'string') return false;
-      if (typeof d.age !== 'number' || d.age < 0) return false;
-      if (!['baby', 'juvenile', 'adult', 'elder'].includes(d.lifeStage)) return false;
-      if (typeof d.health !== 'number' || d.health < 0 || d.health > 100) {
-        throw new RangeError(`Invalid health: ${d.health} (must be 0-100)`);
+      // Required Component base fields
+      if (!('type' in d) || d.type !== 'animal') return false;
+      if (!('version' in d) || d.version !== 1) return false;
+      if (!('id' in d) || typeof d.id !== 'string') return false;
+
+      // Required AnimalComponent fields
+      if (!('speciesId' in d) || typeof d.speciesId !== 'string') return false;
+      if (!('name' in d) || typeof d.name !== 'string') return false;
+      if (!('position' in d) || typeof d.position !== 'object' || d.position === null) return false;
+      if (!('age' in d) || typeof d.age !== 'number' || d.age < 0) return false;
+      if (!('lifeStage' in d) || !['baby', 'juvenile', 'adult', 'elder'].includes(d.lifeStage as string)) return false;
+      if (!('health' in d) || typeof d.health !== 'number' || d.health < 0 || d.health > 100) {
+        throw new RangeError(`Invalid health: ${('health' in d) ? d.health : 'undefined'} (must be 0-100)`);
       }
-      if (typeof d.hunger !== 'number' || d.hunger < 0 || d.hunger > 100) {
-        throw new RangeError(`Invalid hunger: ${d.hunger} (must be 0-100)`);
+      if (!('size' in d) || typeof d.size !== 'number') return false;
+      if (!('state' in d) || !['idle', 'grazing', 'drinking', 'sleeping', 'fleeing', 'following'].includes(d.state as string)) return false;
+      if (!('hunger' in d) || typeof d.hunger !== 'number' || d.hunger < 0 || d.hunger > 100) {
+        throw new RangeError(`Invalid hunger: ${('hunger' in d) ? d.hunger : 'undefined'} (must be 0-100)`);
       }
-      if (typeof d.wild !== 'boolean') return false;
-      if (typeof d.bondLevel !== 'number' || d.bondLevel < 0 || d.bondLevel > 100) {
-        throw new RangeError(`Invalid bondLevel: ${d.bondLevel} (must be 0-100)`);
+      if (!('thirst' in d) || typeof d.thirst !== 'number' || d.thirst < 0 || d.thirst > 100) return false;
+      if (!('energy' in d) || typeof d.energy !== 'number' || d.energy < 0 || d.energy > 100) return false;
+      if (!('stress' in d) || typeof d.stress !== 'number' || d.stress < 0 || d.stress > 100) return false;
+      if (!('mood' in d) || typeof d.mood !== 'number' || d.mood < 0 || d.mood > 100) return false;
+      if (!('wild' in d) || typeof d.wild !== 'boolean') return false;
+      if (!('bondLevel' in d) || typeof d.bondLevel !== 'number' || d.bondLevel < 0 || d.bondLevel > 100) {
+        throw new RangeError(`Invalid bondLevel: ${('bondLevel' in d) ? d.bondLevel : 'undefined'} (must be 0-100)`);
       }
+      if (!('trustLevel' in d) || typeof d.trustLevel !== 'number' || d.trustLevel < 0 || d.trustLevel > 100) return false;
+
+      // Optional fields
+      if ('ownerId' in d && d.ownerId !== undefined && typeof d.ownerId !== 'string') return false;
+      if ('housingBuildingId' in d && d.housingBuildingId !== undefined && typeof d.housingBuildingId !== 'string') return false;
 
       return true;
     },

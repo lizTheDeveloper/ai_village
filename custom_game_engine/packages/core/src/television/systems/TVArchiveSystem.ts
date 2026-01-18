@@ -14,10 +14,9 @@
  * - Cultural heritage preservation
  */
 
-import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
@@ -628,7 +627,7 @@ export function resetArchiveManager(): void {
 // SYSTEM
 // =============================================================================
 
-export class TVArchiveSystem implements System {
+export class TVArchiveSystem extends BaseSystem {
   readonly id = 'TVArchiveSystem';
   readonly priority = 76;
   readonly requiredComponents = [ComponentType.TVStation] as const;
@@ -636,14 +635,12 @@ export class TVArchiveSystem implements System {
   private manager = getArchiveManager();
   private lastMaintenanceTick = 0;
   private readonly MAINTENANCE_INTERVAL = 1000; // Every 1000 ticks
-  private events!: SystemEventManager;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     this.lastMaintenanceTick++;
 
     // Periodic maintenance
@@ -654,8 +651,7 @@ export class TVArchiveSystem implements System {
     }
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     resetArchiveManager();
   }
 }

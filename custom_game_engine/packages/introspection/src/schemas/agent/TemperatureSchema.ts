@@ -197,14 +197,15 @@ export const TemperatureSchema = autoRegister(
     },
 
     validate: (data): data is TemperatureComponent => {
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'temperature') return false;
-      if (typeof d.currentTemp !== 'number') return false;
-      if (typeof d.comfortMin !== 'number') return false;
-      if (typeof d.comfortMax !== 'number') return false;
-      if (typeof d.toleranceMin !== 'number') return false;
-      if (typeof d.toleranceMax !== 'number') return false;
+      if (!('type' in d) || d.type !== 'temperature') return false;
+      if (!('currentTemp' in d) || typeof d.currentTemp !== 'number') return false;
+      if (!('comfortMin' in d) || typeof d.comfortMin !== 'number') return false;
+      if (!('comfortMax' in d) || typeof d.comfortMax !== 'number') return false;
+      if (!('toleranceMin' in d) || typeof d.toleranceMin !== 'number') return false;
+      if (!('toleranceMax' in d) || typeof d.toleranceMax !== 'number') return false;
+      if (!('state' in d) || typeof d.state !== 'string') return false;
 
       // Validate logical ranges
       if (d.toleranceMin > d.comfortMin) {

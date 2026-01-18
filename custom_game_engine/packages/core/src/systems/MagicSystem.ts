@@ -12,7 +12,7 @@
  * Part of Phase 30: Magic System
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { SystemId } from '../types.js';
@@ -46,12 +46,11 @@ import type { MagicParadigm } from '../magic/MagicParadigm.js';
  *
  * Priority: 15 (after AgentBrain at 10, before Movement at 20)
  */
-export class MagicSystem implements System {
+export class MagicSystem extends BaseSystem {
   public readonly id: SystemId = 'magic';
   public readonly priority = 15;
   public readonly requiredComponents = [CT.Magic] as const;
 
-  private world: World | null = null;
   private initialized = false;
 
   // Cooldown tracking: entityId -> { spellId -> tickWhenAvailable }
@@ -66,9 +65,7 @@ export class MagicSystem implements System {
   // StateMutatorSystem for gradual effects
   private stateMutatorSystem: StateMutatorSystem | null = null;
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Initialize magic infrastructure (effect appliers, registries, etc.)
     if (!this.initialized) {
       // Pass world to enable terminal effect handling
@@ -322,18 +319,17 @@ export class MagicSystem implements System {
   /**
    * Update - process mana regeneration, cooldowns, and active effects
    */
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      this.processMagicEntity(impl, world, deltaTime);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.processMagicEntity(entity, ctx.world, ctx.deltaTime);
     }
 
     // Process active spell casts (multi-tick spells)
-    this.tickAllActiveCasts(world);
+    this.tickAllActiveCasts(ctx.world);
 
     // Process active spell effects (duration, ticks, expiration)
     if (this.effectExecutor) {
-      this.effectExecutor.processTick(world, world.tick);
+      this.effectExecutor.processTick(ctx.world, ctx.tick);
     }
   }
 

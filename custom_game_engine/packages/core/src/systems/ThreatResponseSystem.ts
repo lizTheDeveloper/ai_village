@@ -14,11 +14,10 @@
  * - Stand ground: Even match + moderate courage
  */
 
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { System } from '../ecs/System.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { ThreatDetectionComponent, DetectedThreat, ThreatResponse } from '../components/ThreatDetectionComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -35,32 +34,17 @@ import {
 } from '../components/ThreatDetectionComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
-export class ThreatResponseSystem implements System {
+export class ThreatResponseSystem extends BaseSystem {
   public readonly id = 'threat-response';
   public readonly priority = 900; // Late priority, after most game logic
   public readonly requiredComponents = ['threat_detection', 'position', 'personality'] as const;
   public readonly name = 'ThreatResponseSystem';
-  private readonly UPDATE_INTERVAL = 5; // Every 5 ticks (~0.25 seconds)
-  private lastUpdateTick = 0;
-  private events!: SystemEventManager;
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
+  protected readonly throttleInterval = 5; // Every 5 ticks (~0.25 seconds)
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
-    for (const entity of entities) {
-      this.processEntity(entity, world);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.processEntity(entity, ctx.world);
     }
   }
 

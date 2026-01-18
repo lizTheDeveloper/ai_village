@@ -16,17 +16,15 @@
  * - Tracks maintenance priority
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
-import type { EventBus } from '../events/EventBus.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Degradation configuration
@@ -66,7 +64,7 @@ const DEGRADATION_CONFIG = {
 /**
  * BuildingMaintenanceSystem - Degrade buildings and emit repair events
  */
-export class BuildingMaintenanceSystem implements System {
+export class BuildingMaintenanceSystem extends BaseSystem {
   public readonly id: SystemId = 'building_maintenance';
   public readonly priority: number = 120; // Run after most building-related systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
@@ -76,9 +74,8 @@ export class BuildingMaintenanceSystem implements System {
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
-  private lastUpdateTick: number = 0;
   private currentWeather: string = 'clear';
-  private isInitialized = false;
+  private lastRateUpdateTick: number = 0;
 
   // Reference to StateMutatorSystem (set via setStateMutatorSystem)
   private stateMutator: StateMutatorSystem | null = null;
@@ -88,9 +85,6 @@ export class BuildingMaintenanceSystem implements System {
 
   // Track last condition for threshold detection
   private lastConditions = new Map<string, number>();
-
-  // Event manager for type-safe emissions
-  private events!: SystemEventManager;
 
   /**
    * Set the StateMutatorSystem reference.
@@ -103,30 +97,22 @@ export class BuildingMaintenanceSystem implements System {
   /**
    * Initialize the system
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) return;
-
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Subscribe to weather changes
     this.events.onGeneric('weather:changed', (data) => {
       const weatherData = data as { condition?: string; weather?: string };
       this.currentWeather = weatherData.condition ?? weatherData.weather ?? 'clear';
       // Weather changed - need to recalculate decay rates
-      this.lastUpdateTick = 0; // Force update on next tick
+      this.lastRateUpdateTick = 0; // Force update on next tick
     });
-
-    this.isInitialized = true;
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 
   /**
    * Update building conditions
    */
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const entities = ctx.activeEntities;
     // Check if StateMutatorSystem has been set
     if (!this.stateMutator) {
       throw new Error('[BuildingMaintenanceSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
@@ -135,7 +121,7 @@ export class BuildingMaintenanceSystem implements System {
     const currentTick = world.tick ?? 0;
 
     // Performance: Only update decay rates once per game hour
-    const shouldUpdateRates = currentTick - this.lastUpdateTick >= DEGRADATION_CONFIG.UPDATE_INTERVAL;
+    const shouldUpdateRates = currentTick - this.lastRateUpdateTick >= DEGRADATION_CONFIG.UPDATE_INTERVAL;
 
     // Get weather multiplier
     const weatherMultiplier = DEGRADATION_CONFIG.WEATHER_MULTIPLIERS[this.currentWeather] ?? 1.0;
@@ -209,7 +195,7 @@ export class BuildingMaintenanceSystem implements System {
 
     // Mark rates as updated
     if (shouldUpdateRates) {
-      this.lastUpdateTick = currentTick;
+      this.lastRateUpdateTick = currentTick;
     }
   }
 

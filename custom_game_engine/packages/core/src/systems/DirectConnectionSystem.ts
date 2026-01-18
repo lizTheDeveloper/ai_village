@@ -1,11 +1,10 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { MachineConnectionComponent, MachineSlot } from '../components/MachineConnectionComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * DirectConnectionSystem - Transfers items between adjacent machines
@@ -17,7 +16,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
  *
  * Part of automation system (AUTOMATION_LOGISTICS_SPEC.md Part 3)
  */
-export class DirectConnectionSystem implements System {
+export class DirectConnectionSystem extends BaseSystem {
   public readonly id: SystemId = 'direct_connection';
   public readonly priority: number = 52; // Before BeltSystem
   public readonly requiredComponents = [CT.MachineConnection, CT.Position] as const;
@@ -25,7 +24,9 @@ export class DirectConnectionSystem implements System {
   /** Position -> Entity map, rebuilt once per update for O(1) lookups */
   private positionIndex: Map<string, Entity> = new Map();
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const entities = ctx.activeEntities;
+
     // Build position index once per update - O(n) instead of O(n²)
     this.rebuildPositionIndex(entities);
 

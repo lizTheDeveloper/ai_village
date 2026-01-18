@@ -1,11 +1,7 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { SpiritualComponent, PrayerType, PrayerUrgency, Prayer } from '../components/SpiritualComponent.js';
 import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -28,37 +24,36 @@ import type { Deity } from '../divinity/DeityTypes.js';
  *
  * Prayers generate more belief than passive faith (spec: 0.1 vs 0.01 belief/hour)
  */
-export class PrayerSystem implements System {
+export class PrayerSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer';
   public readonly priority: number = 116; // After belief generation
-  public readonly requiredComponents = [];
+  public readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
   private prayerIdCounter: number = 0;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Find all agents with spiritual components
-    const believers = entities.filter(e =>
-      e.components.has(CT.Spiritual) &&
-      e.components.has(CT.Personality)
-    );
+    const believers: EntityImpl[] = [];
+    const deities: EntityImpl[] = [];
 
-    // Find all deities
-    const deities = entities.filter(e => e.components.has(CT.Deity));
+    for (const entity of ctx.activeEntities) {
+      if (entity.components.has(CT.Spiritual) && entity.components.has(CT.Personality)) {
+        believers.push(entity);
+      }
+      if (entity.components.has(CT.Deity)) {
+        deities.push(entity);
+      }
+    }
 
     for (const believer of believers) {
-      this._checkForPrayer(believer, deities, currentTick);
+      this._checkForPrayer(believer, deities, ctx.tick);
     }
   }
 
   /**
    * Check if agent should pray and generate prayer if so
    */
-  private _checkForPrayer(entity: Entity, deities: ReadonlyArray<Entity>, currentTick: number): void {
+  private _checkForPrayer(entity: EntityImpl, deities: ReadonlyArray<EntityImpl>, currentTick: number): void {
     const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
     const personality = entity.components.get(CT.Personality) as PersonalityComponent;
 
@@ -78,7 +73,7 @@ export class PrayerSystem implements System {
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
 
     // Update component
-    (entity as EntityImpl).addComponent(updatedSpiritual);
+    entity.addComponent(updatedSpiritual);
 
     // Handle prayer routing based on whether agent has a specific deity
     if (!spiritual.believedDeity || this._isPrayerToSpirit(prayer)) {
@@ -122,9 +117,9 @@ export class PrayerSystem implements System {
    * Called when prayer target is ambiguous (e.g., "the river spirit", "the forest god").
    */
   private _resolveAmbiguousPrayer(
-    entity: Entity,
+    entity: EntityImpl,
     prayer: Prayer,
-    nearbyEntities: ReadonlyArray<Entity>,
+    nearbyEntities: ReadonlyArray<EntityImpl>,
     currentTick: number
   ): void {
     // Extract nearby spirits and deities for cosmology resolution
@@ -180,7 +175,7 @@ export class PrayerSystem implements System {
         if (spiritComp) {
           // Add respect to spirit
           spiritComp.totalRespect = (spiritComp.totalRespect ?? 0) + resolution.respectGenerated;
-          (spirit as EntityImpl).addComponent(spiritComp);
+          spirit.addComponent(spiritComp);
         }
       }
     }
@@ -215,7 +210,7 @@ export class PrayerSystem implements System {
    * Generate a prayer based on agent's current situation
    */
   private _generatePrayer(
-    entity: Entity,
+    entity: EntityImpl,
     spiritual: SpiritualComponent,
     currentTick: number
   ): Prayer {
@@ -327,9 +322,5 @@ export class PrayerSystem implements System {
       urgency: 'routine',
       content: chosen.content,
     };
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

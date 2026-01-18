@@ -13,10 +13,11 @@
  * based on entity tags, family, guild, etc.
  */
 
-import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
+import type { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import {
   type ChatRoomComponent,
   type ChatRoomConfig,
@@ -29,7 +30,7 @@ import {
   DIVINE_CHAT_CONFIG,
 } from './ChatRoom.js';
 
-export class ChatRoomSystem implements System {
+export class ChatRoomSystem extends BaseSystem {
   readonly id = 'chat_room' as const;
   readonly priority: number = 50;
   readonly requiredComponents = [] as const;
@@ -44,22 +45,22 @@ export class ChatRoomSystem implements System {
   private initialized: boolean = false;
 
   // Performance: Throttle membership updates - don't need to check every tick
-  private readonly MEMBERSHIP_UPDATE_INTERVAL = 100; // Check every 5 seconds (100 ticks at 20 TPS)
+  protected readonly throttleInterval = 100; // Check every 5 seconds (100 ticks at 20 TPS)
   private lastMembershipUpdate = 0;
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Initialize permanent rooms on first update
     if (!this.initialized) {
-      this.initializePermanentRooms(world);
+      this.initializePermanentRooms(ctx.world);
       this.initialized = true;
     }
 
     // Performance: Throttle membership updates to avoid expensive queries every tick
-    const shouldUpdateMembership = (world.tick - this.lastMembershipUpdate) >= this.MEMBERSHIP_UPDATE_INTERVAL;
+    const shouldUpdateMembership = (ctx.tick - this.lastMembershipUpdate) >= this.throttleInterval;
 
     // Update all criteria-based rooms
     for (const [roomId, entityId] of this.roomEntities) {
-      const entity = world.getEntity(entityId);
+      const entity = ctx.world.getEntity(entityId);
       if (!entity) {
         this.roomEntities.delete(roomId);
         continue;
@@ -70,7 +71,7 @@ export class ChatRoomSystem implements System {
 
       // Only auto-update criteria-based rooms (and only when interval has passed)
       if (room.config.membership.type === 'criteria_based' && shouldUpdateMembership) {
-        this.updateCriteriaMembership(world, room);
+        this.updateCriteriaMembership(ctx.world, room);
       }
 
       // Update active state
@@ -84,12 +85,12 @@ export class ChatRoomSystem implements System {
         console.error(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
       }
 
-      room.lastActivityTick = world.tick;
+      room.lastActivityTick = ctx.tick;
     }
 
     // Update last membership update tick
     if (shouldUpdateMembership) {
-      this.lastMembershipUpdate = world.tick;
+      this.lastMembershipUpdate = ctx.tick;
     }
   }
 
@@ -389,16 +390,12 @@ export class ChatRoomSystem implements System {
     console.error(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
 
     // Emit event for UI
-    world.eventBus.emit({
-      type: 'chat:message_sent',
-      source: 'chat_room_system',
-      data: {
-        roomId,
-        messageId: message.id,
-        senderId,
-        senderName,
-        content,
-      },
+    this.events.emit('chat:message_sent' as any, {
+      roomId,
+      messageId: message.id,
+      senderId,
+      senderName,
+      content,
     } as any);
 
     return message;
@@ -586,5 +583,11 @@ export class ChatRoomSystem implements System {
     for (const notification of room.pendingNotifications) {
       notification.displayed = true;
     }
+  }
+
+  protected onCleanup(): void {
+    this.roomEntities.clear();
+    this.knownMembers.clear();
+    this.initialized = false;
   }
 }

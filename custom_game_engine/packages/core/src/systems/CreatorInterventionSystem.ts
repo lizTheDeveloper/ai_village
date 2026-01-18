@@ -17,13 +17,12 @@
  * 6. Annihilation - Complete destruction (rare, only in purge stage)
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SupremeCreatorComponent } from '../components/SupremeCreatorComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 // ============================================================================
 // Intervention Types
@@ -203,13 +202,10 @@ interface InterventionDecision {
 // CreatorInterventionSystem
 // ============================================================================
 
-export class CreatorInterventionSystem implements System {
+export class CreatorInterventionSystem extends BaseSystem {
   public readonly id: SystemId = 'creator_intervention';
   public readonly priority = 17; // After surveillance (16)
   public readonly requiredComponents = [CT.SupremeCreator] as const;
-
-  private world: World | null = null;
-  private eventBus: EventBus | null = null;
 
   /** Banned spells (global) */
   private bannedSpells: Map<string, SpellBan> = new Map();
@@ -223,10 +219,7 @@ export class CreatorInterventionSystem implements System {
   /** Maximum intervention history entries to retain */
   private static readonly MAX_INTERVENTION_HISTORY = 500;
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.eventBus = eventBus;
-
+  protected onInitialize(_world: never, eventBus: EventBus): void {
     // Subscribe to magic detection events
     eventBus.subscribe('divinity:magic_detected', (event) => {
       this.handleMagicDetection(event);
@@ -238,9 +231,9 @@ export class CreatorInterventionSystem implements System {
     });
   }
 
-  update(world: World): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Expire temporary interventions
-    this.updateInterventionExpirations(world);
+    this.updateInterventionExpirations(ctx.world);
   }
 
   // ============================================================================
@@ -248,7 +241,7 @@ export class CreatorInterventionSystem implements System {
   // ============================================================================
 
   private handleMagicDetection(event: any): void {
-    if (!this.world || !this.eventBus) return;
+    if (!this.world || !this.events) return;
 
     const { casterId, spellId, detectionRisk, evidenceStrength, forbiddenCategories } = event.data;
 
@@ -286,7 +279,7 @@ export class CreatorInterventionSystem implements System {
   // ============================================================================
 
   private handleSpellCastAttempt(event: any): void {
-    if (!this.eventBus || !this.world) return;
+    if (!this.events || !this.world) return;
 
     const { casterId, spellId } = event.data;
 
@@ -294,16 +287,12 @@ export class CreatorInterventionSystem implements System {
     const ban = this.bannedSpells.get(spellId);
     if (ban) {
       // Block the spell
-      this.eventBus.emit({
-        type: 'magic:spell_blocked',
-        source: casterId,
-        data: {
-          spellId,
-          reason: 'banned_by_creator',
-          banReason: ban.reason,
-          trapLevel: ban.trapLevel,
-        },
-      });
+      this.events.emit('magic:spell_blocked', {
+        spellId,
+        reason: 'banned_by_creator',
+        banReason: ban.reason,
+        trapLevel: ban.trapLevel,
+      }, casterId);
 
       // Apply booby trap effects BEFORE escalation
       this.applyTrapEffects(casterId, ban.trapLevel, spellId);
@@ -317,16 +306,12 @@ export class CreatorInterventionSystem implements System {
       ban.violationCount++;
 
       // Emit warning that they tried to cast a banned spell
-      this.eventBus.emit({
-        type: 'divinity:banned_spell_attempt',
-        source: casterId,
-        data: {
-          spellId,
-          ban,
-          trapTriggered: ban.trapLevel !== 'none',
-          newTrapLevel: ban.trapLevel,
-        },
-      });
+      this.events.emit('divinity:banned_spell_attempt', {
+        spellId,
+        ban,
+        trapTriggered: ban.trapLevel !== 'none',
+        newTrapLevel: ban.trapLevel,
+      }, casterId);
     }
 
     // Check if entity has active power suppression
@@ -345,14 +330,10 @@ export class CreatorInterventionSystem implements System {
 
       if (isAffected) {
         // Reduce spell power
-        this.eventBus.emit({
-          type: 'magic:spell_suppressed',
-          source: casterId,
-          data: {
-            spellId,
-            reductionAmount: data.reductionAmount,
-          },
-        });
+        this.events.emit('magic:spell_suppressed', {
+          spellId,
+          reductionAmount: data.reductionAmount,
+        }, casterId);
       }
     }
   }
@@ -365,7 +346,7 @@ export class CreatorInterventionSystem implements System {
    * Apply trap effects when a banned spell is attempted
    */
   private applyTrapEffects(casterId: string, trapLevel: BanTrapLevel, spellId: string): void {
-    if (!this.eventBus || !this.world) return;
+    if (!this.events || !this.world) return;
     if (trapLevel === 'none') return;
 
     const creator = this.findSupremeCreator();
@@ -374,61 +355,45 @@ export class CreatorInterventionSystem implements System {
     switch (trapLevel) {
       case 'minor_harm':
         // Small damage + warning
-        this.eventBus.emit({
-          type: 'divinity:trap_triggered',
-          source: creator.id,
-          data: {
-            targetId: casterId,
-            spellId,
-            trapLevel,
-            damage: 15,
-            message: 'The Creator\'s wrath stings you for defying the ban.',
-          },
-        });
+        this.events.emit('divinity:trap_triggered', {
+          targetId: casterId,
+          spellId,
+          trapLevel,
+          damage: 15,
+          message: 'The Creator\'s wrath stings you for defying the ban.',
+        }, creator.id);
         break;
 
       case 'severe_harm':
         // Heavy damage + debuff
-        this.eventBus.emit({
-          type: 'divinity:trap_triggered',
-          source: creator.id,
-          data: {
-            targetId: casterId,
-            spellId,
-            trapLevel,
-            damage: 50,
-            debuffs: [
-              { type: 'weakness', severity: 0.7, duration: 36000 },
-              { type: 'curse', severity: 0.5, duration: 72000 },
-            ],
-            message: 'Divine punishment crashes down upon you! The Creator sees your defiance.',
-          },
-        });
+        this.events.emit('divinity:trap_triggered', {
+          targetId: casterId,
+          spellId,
+          trapLevel,
+          damage: 50,
+          debuffs: [
+            { type: 'weakness', severity: 0.7, duration: 36000 },
+            { type: 'curse', severity: 0.5, duration: 72000 },
+          ],
+          message: 'Divine punishment crashes down upon you! The Creator sees your defiance.',
+        }, creator.id);
         break;
 
       case 'lethal':
         // Instant death
-        this.eventBus.emit({
-          type: 'divinity:trap_triggered',
-          source: creator.id,
-          data: {
-            targetId: casterId,
-            spellId,
-            trapLevel,
-            lethal: true,
-            message: 'The Creator\'s final judgment: DEATH. You dared defy the absolute law.',
-          },
-        });
+        this.events.emit('divinity:trap_triggered', {
+          targetId: casterId,
+          spellId,
+          trapLevel,
+          lethal: true,
+          message: 'The Creator\'s final judgment: DEATH. You dared defy the absolute law.',
+        }, creator.id);
 
         // Also emit annihilation
-        this.eventBus.emit({
-          type: 'divinity:annihilation',
-          source: creator.id,
-          data: {
-            targetId: casterId,
-            reason: `Lethal trap triggered by attempting banned spell: ${spellId}`,
-          },
-        });
+        this.events.emit('divinity:annihilation', {
+          targetId: casterId,
+          reason: `Lethal trap triggered by attempting banned spell: ${spellId}`,
+        }, creator.id);
         break;
     }
 
@@ -448,17 +413,13 @@ export class CreatorInterventionSystem implements System {
 
 
       // Emit escalation event
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'divinity:ban_trap_escalated',
-          source: 'supreme_creator',
-          data: {
-            spellId: ban.spellId,
-            oldLevel,
-            newLevel,
-            violationCount: ban.violationCount + 1,
-          },
-        });
+      if (this.events) {
+        this.events.emit('divinity:ban_trap_escalated', {
+          spellId: ban.spellId,
+          oldLevel,
+          newLevel,
+          violationCount: ban.violationCount + 1,
+        }, 'supreme_creator');
       }
     }
   }
@@ -632,7 +593,7 @@ export class CreatorInterventionSystem implements System {
     reason: string,
     spellId?: string
   ): void {
-    if (!this.world || !this.eventBus) return;
+    if (!this.world || !this.events) return;
 
     const target = this.world.getEntity(targetId);
     if (!target) return;
@@ -698,17 +659,13 @@ export class CreatorInterventionSystem implements System {
     }
 
     // Emit intervention event
-    this.eventBus.emit({
-      type: 'divinity:creator_intervention',
-      source: creatorId,
-      data: {
-        targetId,
-        interventionType: type,
-        severity,
-        reason,
-        intervention,
-      },
-    });
+    this.events.emit('divinity:creator_intervention', {
+      targetId,
+      interventionType: type,
+      severity,
+      reason,
+      intervention,
+    }, creatorId);
   }
 
   // ============================================================================
@@ -873,18 +830,14 @@ export class CreatorInterventionSystem implements System {
   }
 
   private executeAnnihilation(targetId: string): void {
-    if (!this.world || !this.eventBus) return;
+    if (!this.world || !this.events) return;
 
     // Annihilation is handled by emitting an event
     // Other systems (like health/death) will handle the actual destruction
-    this.eventBus.emit({
-      type: 'divinity:annihilation',
-      source: 'supreme_creator',
-      data: {
-        targetId,
-        reason: 'Divine judgment executed',
-      },
-    });
+    this.events.emit('divinity:annihilation', {
+      targetId,
+      reason: 'Divine judgment executed',
+    }, 'supreme_creator');
   }
 
   private calculateExpiration(
@@ -916,7 +869,7 @@ export class CreatorInterventionSystem implements System {
   // Expiration Management
   // ============================================================================
 
-  private updateInterventionExpirations(world: World): void {
+  private updateInterventionExpirations(world: { tick: number }): void {
     const now = world.tick;
 
     // Check all active interventions

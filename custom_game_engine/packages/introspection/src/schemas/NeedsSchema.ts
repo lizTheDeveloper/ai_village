@@ -371,24 +371,38 @@ export const NeedsSchema = autoRegister(
 
     validate: (data): data is NeedsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const n = data as any;
+      const n = data as Record<string, unknown>;
 
-      return (
-        n.type === 'needs' &&
-        typeof n.hunger === 'number' &&
-        typeof n.energy === 'number' &&
-        typeof n.health === 'number' &&
-        typeof n.thirst === 'number' &&
-        typeof n.temperature === 'number' &&
-        typeof n.social === 'number' &&
-        typeof n.socialContact === 'number' &&
-        typeof n.socialDepth === 'number' &&
-        typeof n.socialBelonging === 'number' &&
-        typeof n.stimulation === 'number' &&
-        typeof n.hungerDecayRate === 'number' &&
-        typeof n.energyDecayRate === 'number' &&
-        typeof n.ticksAtZeroHunger === 'number'
-      );
+      // Required type field
+      if (!('type' in n) || n.type !== 'needs') return false;
+
+      // Physical needs (required)
+      if (!('hunger' in n) || typeof n.hunger !== 'number') return false;
+      if (!('energy' in n) || typeof n.energy !== 'number') return false;
+      if (!('health' in n) || typeof n.health !== 'number') return false;
+      if (!('thirst' in n) || typeof n.thirst !== 'number') return false;
+      if (!('temperature' in n) || typeof n.temperature !== 'number') return false;
+
+      // Social needs (required)
+      if (!('social' in n) || typeof n.social !== 'number') return false;
+      if (!('socialContact' in n) || typeof n.socialContact !== 'number') return false;
+      if (!('socialDepth' in n) || typeof n.socialDepth !== 'number') return false;
+      if (!('socialBelonging' in n) || typeof n.socialBelonging !== 'number') return false;
+
+      // Mental needs (required)
+      if (!('stimulation' in n) || typeof n.stimulation !== 'number') return false;
+
+      // Decay rates (required)
+      if (!('hungerDecayRate' in n) || typeof n.hungerDecayRate !== 'number') return false;
+      if (!('energyDecayRate' in n) || typeof n.energyDecayRate !== 'number') return false;
+
+      // Starvation tracking (required)
+      if (!('ticksAtZeroHunger' in n) || typeof n.ticksAtZeroHunger !== 'number') return false;
+
+      // Optional fields - starvationDayMemoriesIssued and bodyParts
+      // No validation needed for optional fields
+
+      return true;
     },
 
     createDefault: () => ({

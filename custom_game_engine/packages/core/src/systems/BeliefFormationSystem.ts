@@ -1,10 +1,7 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { BeliefType, EvidenceType } from '../components/BeliefComponent.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../utils/componentHelpers.js';
@@ -13,29 +10,17 @@ import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../util
  * BeliefFormationSystem detects patterns in episodic memories and forms beliefs
  * Tracks: character beliefs (trustworthiness), world beliefs (resource patterns), social beliefs
  */
-export class BeliefFormationSystem implements System {
+export class BeliefFormationSystem extends BaseSystem {
   public readonly id: SystemId = 'belief_formation';
   public readonly priority: number = 110; // After memory systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval: number = 100; // Only run every 5 seconds (at 20 TPS)
 
-  private events!: SystemEventManager;
   private readonly patternThreshold: number = 3; // Require 3 observations to form belief
-  private lastUpdateTick: number = 0;
-  private readonly updateInterval: number = 100; // Only run every 5 seconds (at 20 TPS)
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    // Throttle: Only check every 5 seconds for sleeping agents
-    if (currentTick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // OPTIMIZATION: Belief formation only happens during sleep (memory consolidation)
-    const believers = entities.filter(e =>
+    const believers = ctx.activeEntities.filter(e =>
       e.components.has(CT.Belief) &&
       e.components.has(CT.EpisodicMemory) &&
       e.components.has(CT.Agent)
@@ -47,7 +32,7 @@ export class BeliefFormationSystem implements System {
 
         // Only process beliefs during sleep (when brain consolidates memories)
         if (agent && agent.behavior === 'forced_sleep') {
-          this._updateBeliefs(entity, entities, currentTick);
+          this._updateBeliefs(entity, ctx.activeEntities, ctx.tick);
         }
       } catch (error) {
         throw new Error(`BeliefFormationSystem failed for entity ${entity.id}: ${error}`);
@@ -224,10 +209,6 @@ export class BeliefFormationSystem implements System {
         currentTick
       );
     }
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 
   // Future: Add _checkSelfBeliefs method for epistemic humility features

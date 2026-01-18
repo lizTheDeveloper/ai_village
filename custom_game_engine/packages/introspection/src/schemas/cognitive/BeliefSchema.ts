@@ -84,8 +84,12 @@ export const BeliefSchema = autoRegister(
 
     validate: (data: unknown): data is BeliefComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return Array.isArray(comp.allBeliefs);
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'belief') return false;
+      if (!('allBeliefs' in comp) || !Array.isArray(comp.allBeliefs)) return false;
+
+      return true;
     },
 
     createDefault: () => ({

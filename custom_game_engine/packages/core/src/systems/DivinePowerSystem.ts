@@ -9,12 +9,9 @@
  * - Avatar manifestation
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent, Vision } from '../components/SpiritualComponent.js';
@@ -70,17 +67,14 @@ export interface DivinePowerRequest {
 /**
  * DivinePowerSystem - Processes divine power executions
  */
-export class DivinePowerSystem implements System {
+export class DivinePowerSystem extends BaseSystem {
   public readonly id = 'divine_power';
   public readonly priority: number = 120; // After belief generation
-  public readonly requiredComponents: ReadonlyArray<string> = [];
+  public readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
   private pendingPowers: DivinePowerRequest[] = [];
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(): void {
     // Listen for divine power requests from UI
     this.events.onGeneric('divine_power:request', (data: unknown) => {
       // Type guard: ensure data has required DivinePowerRequest fields
@@ -90,16 +84,12 @@ export class DivinePowerSystem implements System {
     });
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, _entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Process pending power requests
     while (this.pendingPowers.length > 0) {
       const request = this.pendingPowers.shift();
       if (request) {
-        this._executePower(world, request, currentTick);
+        this._executePower(ctx.world, request, ctx.tick);
       }
     }
   }
@@ -184,8 +174,8 @@ export class DivinePowerSystem implements System {
   /**
    * Get the power config from the world's divine config
    */
-  private getPowerConfig(world: World): PowerConfig | undefined {
-    const divineConfig = world.divineConfig;
+  private getPowerConfig(): PowerConfig | undefined {
+    const divineConfig = this.world.divineConfig;
     return divineConfig?.powers;
   }
 
@@ -195,10 +185,9 @@ export class DivinePowerSystem implements System {
   private getEffectiveCost(
     baseCost: number,
     powerType: DivinePowerType,
-    world: World,
     isOffDomain: boolean = false
   ): number {
-    const powerConfig = this.getPowerConfig(world);
+    const powerConfig = this.getPowerConfig();
     if (!powerConfig) {
       return baseCost; // No config, use base cost
     }
@@ -220,7 +209,7 @@ export class DivinePowerSystem implements System {
     }
 
     // Check if power is available in this universe
-    const powerConfig = this.getPowerConfig(world);
+    const powerConfig = this.getPowerConfig();
     if (powerConfig && !isPowerAvailable(request.powerType as DivinePowerType, powerConfig)) {
       throw new Error(`Power '${request.powerType}' is disabled in this universe`);
     }
@@ -283,7 +272,7 @@ export class DivinePowerSystem implements System {
     currentTick: number
   ): void {
     const baseCost = 5;
-    const cost = this.getEffectiveCost(baseCost, 'whisper', world);
+    const cost = this.getEffectiveCost(baseCost, 'whisper');
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for whisper');
@@ -357,7 +346,7 @@ export class DivinePowerSystem implements System {
     currentTick: number
   ): void {
     const baseCost = 8;
-    const cost = this.getEffectiveCost(baseCost, 'subtle_sign', world);
+    const cost = this.getEffectiveCost(baseCost, 'subtle_sign');
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for subtle sign');
@@ -434,7 +423,7 @@ export class DivinePowerSystem implements System {
     currentTick: number
   ): void {
     const baseCost = 10;
-    const cost = this.getEffectiveCost(baseCost, 'dream_hint', world);
+    const cost = this.getEffectiveCost(baseCost, 'dream_hint');
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for dream hint');
@@ -507,7 +496,7 @@ export class DivinePowerSystem implements System {
     currentTick: number
   ): void {
     const baseCost = 50;
-    const cost = this.getEffectiveCost(baseCost, 'clear_vision', world);
+    const cost = this.getEffectiveCost(baseCost, 'clear_vision');
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for clear vision');
@@ -582,7 +571,7 @@ export class DivinePowerSystem implements System {
   ): void {
     const baseBaseCost = 100;
     // Apply universe config multiplier to base cost
-    const baseCost = this.getEffectiveCost(baseBaseCost, 'minor_miracle', world);
+    const baseCost = this.getEffectiveCost(baseBaseCost, 'minor_miracle');
     const miracleType = request.params?.type ?? 'warmth';
     const targetId = request.targetId;
 
@@ -686,7 +675,7 @@ export class DivinePowerSystem implements System {
     currentTick: number
   ): void {
     const baseCost = 75;
-    const cost = this.getEffectiveCost(baseCost, 'bless_individual', world);
+    const cost = this.getEffectiveCost(baseCost, 'bless_individual');
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for blessing');

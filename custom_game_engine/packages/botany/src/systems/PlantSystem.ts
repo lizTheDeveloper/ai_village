@@ -138,34 +138,38 @@ export class PlantSystem extends BaseSystem {
    */
   private registerEventListeners(): void {
     // Weather events
-    this.events.subscribe('weather:rain', (event) => {
-      const intensity = event.data?.intensity as string | undefined;
+    this.events.subscribe('weather:rain', (event: unknown) => {
+      const e = event as { data?: { intensity?: string } };
+      const intensity = e.data?.intensity;
       this.weatherRainIntensity = intensity || 'light';
     });
 
-    this.events.subscribe('weather:frost', (event) => {
-      const temperature = event.data?.temperature as number | undefined;
+    this.events.subscribe('weather:frost', (event: unknown) => {
+      const e = event as { data?: { temperature?: number } };
+      const temperature = e.data?.temperature;
       this.weatherFrostTemperature = temperature ?? -2;
     });
 
-    this.events.subscribe('weather:changed', (_event) => {
+    this.events.subscribe('weather:changed', (_event: unknown) => {
       // Weather changed event doesn't include temperature
       // Temperature updates come from weather:frost event
     });
 
     // Soil events
-    this.events.subscribe('soil:moistureChanged', (event) => {
-      const x = event.data.x;
-      const y = event.data.y;
-      const newMoisture = event.data.newMoisture;
+    this.events.subscribe('soil:moistureChanged', (event: unknown) => {
+      const e = event as { data: { x: number; y: number; newMoisture: number } };
+      const x = e.data.x;
+      const y = e.data.y;
+      const newMoisture = e.data.newMoisture;
       const key = `${x},${y}`;
       this.soilMoistureChanges.set(key, newMoisture);
     });
 
-    this.events.subscribe('soil:depleted', (event) => {
-      const x = event.data.x;
-      const y = event.data.y;
-      const nutrientLevel = event.data.nutrientLevel;
+    this.events.subscribe('soil:depleted', (event: unknown) => {
+      const e = event as { data: { x: number; y: number; nutrientLevel: number } };
+      const x = e.data.x;
+      const y = e.data.y;
+      const nutrientLevel = e.data.nutrientLevel;
       const key = `${x},${y}`;
       this.soilNutrientChanges.set(key, nutrientLevel);
     });
@@ -305,7 +309,7 @@ export class PlantSystem extends BaseSystem {
     // Filter entities using SimulationScheduler - only process visible plants
     // Note: Planted crops are handled specially below (always simulate)
     const visibleEntities = world.simulationScheduler.filterActiveEntities(
-      entities as Entity[],
+      entities as unknown as Entity[],
       world.tick
     );
 
@@ -340,7 +344,7 @@ export class PlantSystem extends BaseSystem {
         const species = this.getSpecies(plant.speciesId);
 
         // Get environment for this plant
-        const environment = this.getEnvironment(plant.position, world);
+        const environment = this.getEnvironment(plant.position, world as any);
 
         // Apply weather effects (every frame for immediate response)
         this.applyWeatherEffects(plant, environment);
@@ -356,12 +360,12 @@ export class PlantSystem extends BaseSystem {
 
         // Hourly updates - stage progress and event emission
         if (shouldUpdate) {
-          this.updatePlantHourly(plant, species, environment, world, entity.id, hoursToProcess);
+          this.updatePlantHourly(plant, species, environment, world as any, entity.id, hoursToProcess);
         }
 
         // Check for stage transition
         if (plant.stageProgress >= 1.0) {
-          this.attemptStageTransition(plant, species, environment, world, entity.id);
+          this.attemptStageTransition(plant, species, environment, world as any, entity.id);
         }
 
         // Check for death
@@ -390,7 +394,7 @@ export class PlantSystem extends BaseSystem {
     // MIDNIGHT FRUIT REGENERATION: All plants regenerate fruit once per day at midnight
     // This runs only when the day has just changed (midnight)
     if (this.dayStarted) {
-      this.regenerateFruitAtMidnight(entities, world);
+      this.regenerateFruitAtMidnight(entities, world as any);
     }
 
     // Reset accumulated time and flags after update
@@ -484,17 +488,13 @@ export class PlantSystem extends BaseSystem {
         const previousHealth = plant.health;
         plant.health -= frostDamage;
 
-        this.events.emit(
-          'plant:healthChanged',
-          
-          {
+        this.events.emit('plant:healthChanged', {
             plantId: entityId,
             oldHealth: previousHealth,
             newHealth: plant.health,
             reason: 'frost',
             entityId: entityId
-          }
-        });
+          });
       }
     }
 
@@ -648,17 +648,13 @@ export class PlantSystem extends BaseSystem {
 
     // Emit health warning if critical (even if health changed via StateMutatorSystem)
     if (plant.health < 50 && plant.health !== previousHealth && healthChangeCauses.length > 0) {
-      this.events.emit(
-        'plant:healthChanged',
-        
-        {
+      this.events.emit('plant:healthChanged', {
           plantId: entityId,
           oldHealth: previousHealth,
           newHealth: plant.health,
           reason: healthChangeCauses.join(', '),
           entityId: entityId
-        }
-      });
+        });
     }
 
     // Check if dead
@@ -673,16 +669,12 @@ export class PlantSystem extends BaseSystem {
     plant.stageProgress += hourlyGrowth;
 
     // Emit nutrient consumption
-    this.events.emit(
-      'plant:nutrientConsumption',
-      
-      {
+    this.events.emit('plant:nutrientConsumption', {
         x: plant.position.x,
         y: plant.position.y,
         consumed: hourlyGrowth * PLANT_CONSTANTS.NUTRIENT_CONSUMPTION_MULTIPLIER,
         position: plant.position
-      }
-    });
+      });
 
     // Stage-specific updates
     this.handleStageSpecificUpdates(plant, species, world, entityId);
@@ -806,17 +798,13 @@ export class PlantSystem extends BaseSystem {
     this.executeTransitionEffects(plant, transition, species, world);
 
     // Emit stage change event
-    this.events.emit(
-      'plant:stageChanged',
-      
-      {
+    this.events.emit('plant:stageChanged', {
         plantId: entityId,
         speciesId: species.id,
         from: previousStage,
         to: plant.stage,
         entityId: entityId
-      }
-    });
+      });
   }
 
   /**
@@ -893,15 +881,11 @@ export class PlantSystem extends BaseSystem {
           // Add to existing seeds (for perennial plants that cycle back to mature)
           plant.seedsProduced += calculatedSeeds;
 
-          this.events.emit(
-            'plant:mature',
-            
-            {
+          this.events.emit('plant:mature', {
               plantId: entityId,
               speciesId: plant.speciesId,
               position: plant.position
-            }
-          });
+            });
           break;
         }
 
@@ -910,16 +894,12 @@ export class PlantSystem extends BaseSystem {
           break;
 
         case 'return_nutrients_to_soil':
-          this.events.emit(
-            'plant:nutrientReturn',
-            
-            {
+          this.events.emit('plant:nutrientReturn', {
               x: plant.position.x,
               y: plant.position.y,
               returned: 20,
               position: plant.position
-            }
-          });
+            });
           break;
 
         case 'remove_plant':
@@ -991,18 +971,14 @@ export class PlantSystem extends BaseSystem {
 
       plant.seedsDropped.push(dropPos);
 
-      this.events.emit(
-        type: 'seed:dispersed',
-        
-        {
+      this.events.emit('seed:dispersed', {
           plantId: entityId,
           speciesId: species.id,
           seedCount: 1,
           positions: [dropPos],
           position: dropPos,
           seed // Include the seed object in the event data
-        }
-      });
+        });
     }
 
     // CRITICAL: Consume the seeds that were dispersed
@@ -1069,16 +1045,12 @@ export class PlantSystem extends BaseSystem {
     }
 
     // Emit event for germination - world manager will create plant entity
-    this.events.emit(
-      type: 'seed:germinated',
-      
-      {
+    this.events.emit('seed:germinated', {
         seedId: seed.id,
         speciesId: seed.speciesId,
         position,
         generation: seed.generation
-      }
-    });
+      });
 
     return true;
   }
@@ -1241,18 +1213,14 @@ export class PlantSystem extends BaseSystem {
 
     // Emit event if significant companion effects are active
     if (benefitCount > 0 || harmCount > 0) {
-      this.events.emit(
-        'plant:companionEffect',
-        
-        {
+      this.events.emit('plant:companionEffect', {
           plantId: entityId,
           speciesId: species.id,
           position: plant.position,
           benefitCount,
           harmCount,
           modifier
-        }
-      });
+        });
     }
 
     return modifier;
@@ -1376,17 +1344,13 @@ export class PlantSystem extends BaseSystem {
         const entityId = this.plantEntityIds.get(plant) || entity.id;
         plantsRegenerated++;
 
-        this.events.emit(
-          'plant:fruitRegenerated',
-          
-          {
+        this.events.emit('plant:fruitRegenerated', {
             plantId: entityId,
             speciesId: plant.speciesId,
             fruitAdded: plant.fruitCount - previousFruit,
             totalFruit: plant.fruitCount,
             position: plant.position
-          }
-        });
+          });
       }
       } catch (error) {
         // Skip plants with invalid species or other errors

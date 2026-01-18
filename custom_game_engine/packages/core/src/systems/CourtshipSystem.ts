@@ -5,14 +5,12 @@
  * Runs every tick to process courtship attempts, evaluate responses, and trigger conception.
  */
 
-import type { System } from '../ecs/System';
-import type { SystemId, ComponentType } from '../types';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { ComponentType } from '../types';
 import { ComponentType as CT } from '../types/ComponentType';
-import type { World } from '../ecs/World';
-import type { Entity } from '../ecs/Entity';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity';
-import type { EventBus } from '../events/EventBus';
-import { SystemEventManager } from '../events/TypedEventEmitter';
 import type { CourtshipComponent } from '../reproduction/courtship/CourtshipComponent';
 import type { SexualityComponent } from '../reproduction/SexualityComponent';
 import { CourtshipStateMachine } from '../reproduction/courtship/CourtshipStateMachine';
@@ -23,32 +21,19 @@ import type { SpeciesComponent } from '../components/SpeciesComponent';
 import type { PositionComponent } from '../components/PositionComponent';
 import type { ActiveCourtship } from '../reproduction/courtship/types';
 
-export class CourtshipSystem implements System {
-  public readonly id: SystemId = 'courtship';
-  public readonly priority: number = 18; // After AI (10), before Movement (20)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Courtship];
-
-  private stateMachine = new CourtshipStateMachine();
-  private events!: SystemEventManager;
+export class CourtshipSystem extends BaseSystem {
+  public readonly id = 'courtship' as const;
+  public readonly priority = 18; // After AI (10), before Movement (20)
+  public readonly requiredComponents = [CT.Courtship] as const;
 
   // Throttle: Run courtship checks every 5 ticks (reduces CPU load)
-  private static readonly UPDATE_INTERVAL = 5;
-  private tickCounter = 0;
+  protected readonly throttleInterval = 5;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
+  private stateMachine = new CourtshipStateMachine();
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    this.tickCounter++;
-    if (this.tickCounter % CourtshipSystem.UPDATE_INTERVAL !== 0) {
-      return;
-    }
-
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const courtship = impl.getComponent<CourtshipComponent>(CT.Courtship);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const courtship = entity.getComponent<CourtshipComponent>(CT.Courtship);
 
       if (!courtship) {
         throw new Error(`Entity ${entity.id} missing required courtship component`);
@@ -57,27 +42,27 @@ export class CourtshipSystem implements System {
       // Process based on current state
       switch (courtship.state) {
         case 'idle':
-          this.processIdleState(impl, courtship, world);
+          this.processIdleState(entity, courtship, ctx.world);
           break;
 
         case 'interested':
-          this.processInterestedState(impl, courtship, world);
+          this.processInterestedState(entity, courtship, ctx.world);
           break;
 
         case 'courting':
-          this.processCourtingState(impl, courtship, world);
+          this.processCourtingState(entity, courtship, ctx.world);
           break;
 
         case 'being_courted':
-          this.processBeingCourtedState(impl, courtship, world);
+          this.processBeingCourtedState(entity, courtship, ctx.world);
           break;
 
         case 'consenting':
-          this.processConsentingState(impl, courtship, world);
+          this.processConsentingState(entity, courtship, ctx.world);
           break;
 
         case 'mating':
-          this.processMatingState(impl, courtship, world);
+          this.processMatingState(entity, courtship, ctx.world);
           break;
       }
     }
@@ -473,7 +458,4 @@ export class CourtshipSystem implements System {
     return suitableTactics[Math.floor(Math.random() * suitableTactics.length)] ?? null;
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
 }

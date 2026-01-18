@@ -209,15 +209,24 @@ export const UpliftCandidateSchema = autoRegister(
 
     validate: (data): data is UpliftCandidateComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const u = data as any;
+      const u = data as Record<string, unknown>;
 
-      return (
-        u.type === 'uplift_candidate' &&
-        typeof u.upliftPotential === 'number' &&
-        typeof u.preSapient === 'boolean' &&
-        typeof u.cognitiveMetrics === 'object' &&
-        typeof u.evaluated === 'boolean'
-      );
+      if (!('type' in u) || u.type !== 'uplift_candidate') return false;
+      if (!('upliftPotential' in u) || typeof u.upliftPotential !== 'number') return false;
+      if (!('preSapient' in u) || typeof u.preSapient !== 'boolean') return false;
+      if (!('cognitiveMetrics' in u) || typeof u.cognitiveMetrics !== 'object' || u.cognitiveMetrics === null) return false;
+      if (!('socialStructure' in u) || typeof u.socialStructure !== 'string') return false;
+      if (!('groupSize' in u) || typeof u.groupSize !== 'number') return false;
+      if (!('geneticHealth' in u) || typeof u.geneticHealth !== 'number') return false;
+      if (!('populationSize' in u) || typeof u.populationSize !== 'number') return false;
+      if (!('inbreedingRisk' in u) || typeof u.inbreedingRisk !== 'number') return false;
+      if (!('estimatedGenerations' in u) || typeof u.estimatedGenerations !== 'number') return false;
+      if (!('estimatedYears' in u) || typeof u.estimatedYears !== 'number') return false;
+      if (!('evaluated' in u) || typeof u.evaluated !== 'boolean') return false;
+      if (!('evaluatedAt' in u) || typeof u.evaluatedAt !== 'number') return false;
+      if (!('recommended' in u) || typeof u.recommended !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: () => ({

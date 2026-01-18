@@ -97,17 +97,30 @@ export const DivineChatSchema = autoRegister(
       },
     },
 
-    createDefault: (): DivineChatComponent => ({
-      type: 'divine_chat',
-      version: 1,
-      chatRoom: {
-        messages: [],
-        participants: [],
-        created: Date.now(),
-      } as any,
-      isActive: false,
-      lastMessageTick: 0,
-      lastUpdateTick: 0,
-    }),
+    createDefault: (): DivineChatComponent => {
+      const now = Date.now();
+      return {
+        type: 'divine_chat',
+        version: 1,
+        chatRoom: {
+          id: `chat_${now}`,
+          active: false,
+          presentDeityIds: [],
+          absentDeityIds: [],
+          messages: [],
+          currentRound: 0,
+          roundStartedAt: now,
+          playerTurn: true,
+          playerHasSpoken: false,
+          respondedThisRound: [],
+          pendingNotifications: [],
+          activePrivateDMs: [],
+          lastActivityAt: now,
+        },
+        isActive: false,
+        lastMessageTick: 0,
+        lastUpdateTick: 0,
+      };
+    },
   })
 );

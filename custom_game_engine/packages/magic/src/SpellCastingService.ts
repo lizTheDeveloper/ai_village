@@ -15,6 +15,7 @@ import type { Entity } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { MagicComponent } from '@ai-village/core';
 import type { SpiritualComponent } from '@ai-village/core';
+import type { NeedsComponent } from '@ai-village/core';
 import type { SpellDefinition } from './SpellRegistry.js';
 import type { EffectApplicationResult } from './SpellEffect.js';
 import { SpellRegistry } from './SpellRegistry.js';
@@ -412,7 +413,7 @@ export class SpellCastingService {
           magic.corruption = Math.min(100, magic.corruption + 5);
           consequences.push('corruption_increase:+5');
         }
-        const needs = caster.components.get('needs') as any;
+        const needs = caster.getComponent<NeedsComponent>(ComponentType.Needs);
         if (needs) {
           needs.health = Math.max(0, needs.health - 0.1);
           consequences.push('health_drain:-0.1');

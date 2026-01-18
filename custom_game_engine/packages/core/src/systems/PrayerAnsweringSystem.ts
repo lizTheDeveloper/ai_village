@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -25,15 +25,12 @@ import type { PrayerConfig } from '../divinity/UniverseConfig.js';
  * - Player-controlled deities auto-answer prayers when they have enough belief
  * - In the future, this will be UI-driven player choice
  */
-export class PrayerAnsweringSystem implements System {
+export class PrayerAnsweringSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer_answering';
   public readonly priority: number = 117; // After prayer generation
   public readonly requiredComponents = [];
 
-  private eventBus?: EventBus;
-  private world?: World;
-  private lastUpdateTick: number = 0;
-  private readonly updateInterval: number = 20; // Update once per second at 20 TPS
+  protected readonly throttleInterval = 20; // Update once per second at 20 TPS
 
   // Prayer answering cost (from spec)
   private readonly ANSWER_PRAYER_COST = 75;
@@ -48,28 +45,23 @@ export class PrayerAnsweringSystem implements System {
   private divineBodyMod: DivineBodyModification;
 
   constructor() {
+    super();
     this.divineBodyMod = new DivineBodyModification({ believersOnly: true });
-  }
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.world = _world;
   }
 
   /**
    * Get the prayer config from the world's divine config
    */
-  private getPrayerConfig(): PrayerConfig | undefined {
-    if (!this.world) return undefined;
-    const divineConfig = this.world.divineConfig;
+  private getPrayerConfig(world: World): PrayerConfig | undefined {
+    const divineConfig = world.divineConfig;
     return divineConfig?.powers?.prayers;
   }
 
   /**
    * Get the prayer timeout in ticks (converts from game hours in config)
    */
-  private getPrayerTimeout(): number {
-    const prayerConfig = this.getPrayerConfig();
+  private getPrayerTimeout(world: World): number {
+    const prayerConfig = this.getPrayerConfig(world);
     if (prayerConfig?.prayerExpiryTime) {
       // Convert game hours to ticks (20 TPS * 60 seconds * 60 minutes = 72000 ticks per hour)
       // But we're running at a compressed timescale, so 6 game hours = 7200 ticks (100x compression)
@@ -81,24 +73,18 @@ export class PrayerAnsweringSystem implements System {
   /**
    * Get the faith penalty for ignored prayers
    */
-  private getIgnoredPrayerFaithPenalty(): number {
-    const prayerConfig = this.getPrayerConfig();
+  private getIgnoredPrayerFaithPenalty(world: World): number {
+    const prayerConfig = this.getPrayerConfig(world);
     return prayerConfig?.ignoredPrayerFaithPenalty ?? 0.02;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    // Throttle: Only update once per second
-    if (currentTick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Find all deities
-    const deities = entities.filter(e => e.components.has(CT.Deity));
+    const deities = ctx.activeEntities.filter(e => e.components.has(CT.Deity));
 
     // Process each deity's prayer queue
     for (const deity of deities) {
-      this._processDeityPrayers(deity, entities, currentTick, world);
+      this._processDeityPrayers(deity, ctx.activeEntities, ctx.tick, ctx.world);
     }
   }
 
@@ -116,7 +102,7 @@ export class PrayerAnsweringSystem implements System {
     }
 
     // Check for timed-out prayers
-    this._checkTimeoutPrayers(deityEntity, deityComp, allEntities, currentTick);
+    this._checkTimeoutPrayers(deityEntity, deityComp, allEntities, currentTick, world);
   }
 
   /**
@@ -177,18 +163,12 @@ export class PrayerAnsweringSystem implements System {
       }
 
       // Emit event
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'prayer:answered',
-          source: 'prayer_answering',
-          data: {
-            deityId: deityEntity.id,
-            agentId: nextPrayer.agentId,
-            prayerId: nextPrayer.prayerId,
-            responseType: 'sign',
-          },
-        });
-      }
+      this.events.emitGeneric('prayer:answered', {
+        deityId: deityEntity.id,
+        agentId: nextPrayer.agentId,
+        prayerId: nextPrayer.prayerId,
+        responseType: 'sign',
+      }, 'prayer_answering');
     }
   }
 
@@ -255,19 +235,13 @@ export class PrayerAnsweringSystem implements System {
       (agent as EntityImpl).addComponent(updatedSpiritual);
 
       // Emit event
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'prayer:answered',
-          source: 'prayer_answering',
-          data: {
-            deityId: deityEntity.id,
-            agentId: agent.id,
-            prayerId,
-            responseType: 'vision',
-            healingApplied: true,
-          },
-        });
-      }
+      this.events.emitGeneric('prayer:answered', {
+        deityId: deityEntity.id,
+        agentId: agent.id,
+        prayerId,
+        responseType: 'vision',
+        healingApplied: true,
+      }, 'prayer_answering');
 
       return true;
     }
@@ -282,11 +256,12 @@ export class PrayerAnsweringSystem implements System {
     _deityEntity: Entity,
     deityComp: DeityComponent,
     allEntities: ReadonlyArray<Entity>,
-    currentTick: number
+    currentTick: number,
+    world: World
   ): void {
     // Get timeout from config
-    const prayerTimeout = this.getPrayerTimeout();
-    const faithPenalty = this.getIgnoredPrayerFaithPenalty();
+    const prayerTimeout = this.getPrayerTimeout(world);
+    const faithPenalty = this.getIgnoredPrayerFaithPenalty(world);
 
     const timedOutPrayers = deityComp.prayerQueue.filter(
       p => currentTick - p.timestamp > prayerTimeout

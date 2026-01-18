@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Pollution sources that reduce purity */
 type PollutionSource = 'death' | 'blood' | 'disease' | 'corruption' | 'violation';
@@ -174,6 +175,7 @@ export class ShintoCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    // Type assertion is safe: costType comes from SpellCost.type which is MagicCostType
+    return super.getTerminalEffect(costType as MagicCostType, trigger, _caster);
   }
 }

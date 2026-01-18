@@ -7,10 +7,10 @@
  * Part of Phase 5 of the AISystem decomposition (work-order: ai-system-refactor)
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../../types.js';
 import type { World } from '../../ecs/World.js';
-import type { Entity, EntityImpl } from '../../ecs/Entity.js';
+import type { EntityImpl } from '../../ecs/Entity.js';
 import type { AnimalComponent, AnimalState } from '../../components/AnimalComponent.js';
 import type { IAnimalBehavior, AnimalBehaviorResult } from './AnimalBehavior.js';
 
@@ -38,15 +38,15 @@ export interface BehaviorRegistry {
  *
  * @dependencies None - Behavior selection system that reads animal state
  */
-export class AnimalBrainSystem implements System {
+export class AnimalBrainSystem extends BaseSystem {
   public readonly id: SystemId = 'animal-brain';
   public readonly priority: number = 12;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal', 'position', 'movement'];
-  public readonly dependsOn = [] as const;
 
   private readonly registry: BehaviorRegistry;
 
   constructor() {
+    super();
     // Initialize behavior registry with all available behaviors
     const behaviors = new Map<AnimalState, IAnimalBehavior>();
 
@@ -69,8 +69,8 @@ export class AnimalBrainSystem implements System {
     };
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (!animal) {
         continue;
@@ -82,7 +82,7 @@ export class AnimalBrainSystem implements System {
       }
 
       // Process this animal's behavior
-      this.processAnimalBehavior(entity as EntityImpl, world, animal);
+      this.processAnimalBehavior(entity, ctx.world, animal);
     }
   }
 

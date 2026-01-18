@@ -111,12 +111,14 @@ export const SpatialMemorySchema = autoRegister(
 
     validate: (data: unknown): data is SpatialMemoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        Array.isArray(comp.memories) &&
-        typeof comp.maxMemories === 'number' &&
-        typeof comp.decayRate === 'number'
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'spatial_memory') return false;
+      if (!('memories' in comp) || !Array.isArray(comp.memories)) return false;
+      if (!('maxMemories' in comp) || typeof comp.maxMemories !== 'number') return false;
+      if (!('decayRate' in comp) || typeof comp.decayRate !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => {

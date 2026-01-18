@@ -11,10 +11,8 @@
  * - Festivals and celebrations
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -142,18 +140,17 @@ export const DEFAULT_MASS_EVENT_CONFIG: MassEventConfig = {
 // MassEventSystem
 // ============================================================================
 
-export class MassEventSystem implements System {
+export class MassEventSystem extends BaseSystem {
   public readonly id = 'MassEventSystem';
-  public readonly name = 'MassEventSystem';
   public readonly priority = 73;
   public readonly requiredComponents = [];
 
   private config: MassEventConfig;
   private massEvents: Map<string, MassEvent> = new Map();
   private lastUpdate: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<MassEventConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_MASS_EVENT_CONFIG,
       ...config,
@@ -161,16 +158,8 @@ export class MassEventSystem implements System {
     };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     if (currentTick - this.lastUpdate < this.config.updateInterval) {
       return;
@@ -179,7 +168,7 @@ export class MassEventSystem implements System {
     this.lastUpdate = currentTick;
 
     // Process active events
-    this.processEvents(world, currentTick);
+    this.processEvents(ctx.world, currentTick);
   }
 
   /**

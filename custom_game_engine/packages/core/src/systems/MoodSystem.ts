@@ -11,14 +11,13 @@
  * Part of Phase 2: Core Mood System
  */
 
-import type { System } from '../ecs/System.js';
-import type { SystemId, ComponentType } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -46,20 +45,13 @@ import {
 /**
  * MoodSystem manages agent emotional states.
  */
-export class MoodSystem implements System {
-  public readonly id: SystemId = CT.Mood;
-  public readonly priority: number = 48; // After NeedsSystem (40), before behavior systems
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent];
-
-  private isInitialized = false;
-  private events!: SystemEventManager;
-  private world: World | null = null;
+export class MoodSystem extends BaseSystem {
+  public readonly id = CT.Mood;
+  public readonly priority = 48; // After NeedsSystem (40), before behavior systems
+  public readonly requiredComponents = [CT.Agent] as const;
 
   /** How often to fully update mood (in ticks) */
-  private readonly UPDATE_INTERVAL = 60; // Every second at 60 tps
-
-  /** Tick counter for update intervals */
-  private tickCount = 0;
+  protected readonly throttleInterval = 60; // Every second at 60 tps
 
   /** Distance threshold for detecting social meals */
   private readonly SOCIAL_MEAL_DISTANCE = 5;
@@ -75,18 +67,9 @@ export class MoodSystem implements System {
   /**
    * Initialize the system.
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) {
-      return;
-    }
-
-    this.world = world;
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected override onInitialize(world: World, eventBus: EventBus): void {
     // Subscribe to events that affect mood
     this.setupEventListeners();
-
-    this.isInitialized = true;
   }
 
   /**
@@ -359,27 +342,13 @@ export class MoodSystem implements System {
   /**
    * Main update loop.
    */
-  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Skip if not initialized (events not set up yet)
-    if (!this.events) {
-      return;
-    }
-
-    this.tickCount++;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process pending mood boosts immediately
-    this.processPendingBoosts(world);
+    this.processPendingBoosts(ctx.world);
 
-    // Full mood update at intervals
-    if (this.tickCount % this.UPDATE_INTERVAL !== 0) {
-      return;
-    }
-
-    // Use SimulationScheduler to only process active entities
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-
-    for (const entity of activeEntities) {
-      this.updateAgentMood(entity as EntityImpl, world);
+    // Full mood update handled by throttleInterval
+    for (const entity of ctx.activeEntities) {
+      this.updateAgentMood(entity, ctx.world);
     }
   }
 
@@ -628,8 +597,8 @@ export class MoodSystem implements System {
     });
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected override onCleanup(): void {
+    // Cleanup handled by BaseSystem
   }
 
   /**

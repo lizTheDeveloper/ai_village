@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -24,14 +24,14 @@ import { getSpawnableSpecies, getAnimalSpecies, type AnimalSpecies } from '../da
  * - AnimalSystem: Will manage spawned animals after creation
  * - TemperatureSystem: Applies temperature comfort to spawned animals
  */
-export class WildAnimalSpawningSystem implements System {
+export class WildAnimalSpawningSystem extends BaseSystem {
   public readonly id: SystemId = 'wild_animal_spawning';
   public readonly priority: number = 90;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private spawnedChunks: Set<string> = new Set();
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick updates needed
     // Spawning is handled via spawnAnimalsInChunk() method
   }

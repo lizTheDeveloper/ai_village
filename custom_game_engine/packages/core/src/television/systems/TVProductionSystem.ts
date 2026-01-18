@@ -9,11 +9,10 @@
  * - Live recording for news/talk shows
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
-import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, Production } from '../TVStation.js';
 import type { TVContentComponent, FilmedTake, FilmedScene } from '../TVContent.js';
@@ -71,40 +70,26 @@ export interface PerformanceRating {
 // SYSTEM
 // ============================================================================
 
-export class TVProductionSystem implements System {
+export class TVProductionSystem extends BaseSystem {
   readonly id = 'tv_production' as const;
   readonly priority = 64; // After writing, before post-production
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private events!: SystemEventManager;
-  private lastProcessTick: number = 0;
+  protected readonly throttleInterval = FILMING_INTERVAL;
 
   /** Active filming sessions */
   private filmingSessions: Map<string, FilmingSession> = new Map();
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only process periodically
-    if (currentTick - this.lastProcessTick < FILMING_INTERVAL) {
-      return;
-    }
-
-    this.lastProcessTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process active filming sessions
-    this.processFilmingSessions(world, currentTick);
+    this.processFilmingSessions(ctx.world, ctx.tick);
 
     // Check for productions ready to film
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const station = entity.components.get(ComponentType.TVStation) as TVStationComponent | undefined;
       if (!station) continue;
 
-      this.checkProductionsForFilming(world, station, currentTick);
+      this.checkProductionsForFilming(ctx.world, station, ctx.tick);
     }
   }
 
@@ -597,8 +582,7 @@ export class TVProductionSystem implements System {
       .filter(s => s.status !== 'wrapped');
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.filmingSessions.clear();
-    this.events.cleanup();
   }
 }

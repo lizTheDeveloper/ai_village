@@ -413,8 +413,8 @@ export function prayBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
         agentId: ctx.entity.id,
         deityId: spiritual.believedDeity ?? 'unknown',
         prayerType: type,
-        answered: false,
-        duration: duration,
+        urgency: urgency,
+        prayerId: prayer.id,
       },
     });
 

@@ -13,11 +13,10 @@
  * Priority: 155 (after EmotionalNavigationSystem at 150)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import type {
@@ -35,7 +34,7 @@ import {
 // System
 // ============================================================================
 
-export class SpaceshipManagementSystem implements System {
+export class SpaceshipManagementSystem extends BaseSystem {
   public readonly id: SystemId = 'spaceship_management' as SystemId;
   public readonly priority: number = 155;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Spaceship];
@@ -46,32 +45,25 @@ export class SpaceshipManagementSystem implements System {
     writesComponents: [CT.HeartChamber, CT.EmotionTheater, CT.MemoryHall, CT.MeditationChamber],
   };
 
-  private static readonly UPDATE_INTERVAL = 5; // Every 0.25 seconds at 20 TPS
-  private lastUpdateTick = 0;
+  protected readonly throttleInterval = 5; // Every 0.25 seconds at 20 TPS
 
-  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const tick = world.tick;
-
-    // Throttle updates
-    if (tick - this.lastUpdateTick < SpaceshipManagementSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const tick = ctx.tick;
 
     // Process each spaceship
-    for (const shipEntity of entities) {
+    for (const shipEntity of ctx.activeEntities) {
       const ship = shipEntity.getComponent<SpaceshipComponent>(CT.Spaceship);
       if (!ship) continue;
 
       // Process ship components
-      this.processHeartChambers(world, ship, tick);
-      this.processEmotionTheaters(world, ship, tick);
-      this.processMemoryHalls(world, ship, tick);
-      this.processMeditationChambers(world, ship, tick);
+      this.processHeartChambers(ctx.world, ship, tick);
+      this.processEmotionTheaters(ctx.world, ship, tick);
+      this.processMemoryHalls(ctx.world, ship, tick);
+      this.processMeditationChambers(ctx.world, ship, tick);
     }
 
     // Also process orphaned ship components (not yet linked to ships)
-    this.processOrphanedComponents(world, tick);
+    this.processOrphanedComponents(ctx.world, tick);
   }
 
   /**

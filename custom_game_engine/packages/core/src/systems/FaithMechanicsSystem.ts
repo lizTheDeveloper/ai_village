@@ -8,13 +8,10 @@
  * - Natural faith drift toward baseline
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SpiritualComponent, Prayer, Doubt } from '../components/SpiritualComponent.js';
-import type { EntityImpl } from '../ecs/Entity.js';
+import type { EntityImpl, Entity } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
 
 const CT = {
   Agent: 'agent',
@@ -57,44 +54,32 @@ const DEFAULT_CONFIG: FaithConfig = {
 /**
  * FaithMechanicsSystem processes faith changes over time.
  */
-export class FaithMechanicsSystem implements System {
+export class FaithMechanicsSystem extends BaseSystem {
   public readonly id = 'faith_mechanics';
   public readonly priority: number = 85; // After prayer system, before decision making
-  public readonly requiredComponents: ReadonlyArray<string> = [];
+  public readonly requiredComponents = [] as const;
 
   private config: FaithConfig;
-  private lastUpdate: number = 0;
-  private events!: SystemEventManager;
+  protected readonly throttleInterval: number;
 
   constructor(config: Partial<FaithConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.throttleInterval = this.config.updateInterval;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  public update(world: World): void {
-    const currentTick = world.tick;
-
-    // Only update at intervals
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process all agents with spiritual components
-    for (const entity of world.entities.values()) {
+    for (const entity of ctx.world.entities.values()) {
       if (!entity.components.has(CT.Spiritual)) continue;
 
       const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
       if (!spiritual) continue;
 
       // Process faith mechanics
-      this.processFaithDecay(entity, spiritual, currentTick);
+      this.processFaithDecay(entity, spiritual, ctx.tick);
       this.processBaselineDrift(entity, spiritual);
-      this.processCrisisOfFaith(entity, spiritual, currentTick);
+      this.processCrisisOfFaith(entity, spiritual, ctx.tick);
     }
   }
 
@@ -239,7 +224,7 @@ export class FaithMechanicsSystem implements System {
   /**
    * Get faith mechanics statistics for debugging
    */
-  public getStats(world: World): {
+  public getStats(): {
     totalBelievers: number;
     averageFaith: number;
     inCrisis: number;
@@ -251,7 +236,7 @@ export class FaithMechanicsSystem implements System {
     let totalPrayers = 0;
     let totalUnanswered = 0;
 
-    for (const entity of world.entities.values()) {
+    for (const entity of this.world.entities.values()) {
       if (!entity.components.has(CT.Spiritual)) continue;
 
       const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
@@ -270,9 +255,5 @@ export class FaithMechanicsSystem implements System {
       inCrisis,
       unansweredPrayerRatio: totalPrayers > 0 ? totalUnanswered / totalPrayers : 0,
     };
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

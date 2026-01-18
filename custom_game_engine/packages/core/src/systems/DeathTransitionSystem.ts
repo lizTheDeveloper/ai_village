@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -15,12 +15,12 @@ import type { DeathJudgmentComponent } from '../components/DeathJudgmentComponen
 import { transitionToRealm } from '../realms/RealmTransition.js';
 import { routeSoulToAfterlife } from '../realms/SoulRoutingService.js';
 import { createAfterlifeComponent, type CauseOfDeath } from '../components/AfterlifeComponent.js';
-import { DeathBargainSystem } from './DeathBargainSystem.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /** Agent tiers that get full afterlife experience */
 const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
+
+// Import for type only
+import type { DeathBargainSystem } from './DeathBargainSystem.js';
 
 /**
  * DeathTransitionSystem - Handles transitioning dead entities to the Underworld
@@ -33,14 +33,13 @@ const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
  * This implements the core "death portal" mechanic where dying automatically
  * sends entities to the Underworld.
  */
-export class DeathTransitionSystem implements System {
+export class DeathTransitionSystem extends BaseSystem {
   readonly id: SystemId = 'death_transition';
   readonly priority: number = 110;  // Run after needs/combat systems
   readonly requiredComponents = ['needs'] as const;  // Only require needs - realm_location is optional
 
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
-  private events!: SystemEventManager;
 
   /**
    * Set the death bargain system for hero resurrection challenges
@@ -49,13 +48,9 @@ export class DeathTransitionSystem implements System {
     this.deathBargainSystem = system;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Check for newly dead entities
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const needs = entity.components.get('needs') as NeedsComponent | undefined;
       if (!needs) continue;
 
@@ -85,7 +80,7 @@ export class DeathTransitionSystem implements System {
       const judgmentInProgress = deathJudgment && deathJudgment.stage !== 'crossing_over';
 
       if (isDead && !alreadyProcessed && !judgmentInProgress) {
-        this.handleDeath(world, entity.id, realmLocation);
+        this.handleDeath(ctx.world, entity.id, realmLocation);
         this.processedDeaths.add(entity.id);
       }
 
@@ -403,9 +398,5 @@ export class DeathTransitionSystem implements System {
    */
   hasProcessedDeath(entityId: string): boolean {
     return this.processedDeaths.has(entityId);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

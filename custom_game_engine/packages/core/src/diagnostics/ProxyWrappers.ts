@@ -56,7 +56,11 @@ export function wrapEntity(entity: Entity): Entity {
           stackTrace: captureStackTrace(),
           context: {
             suggestions,
-            entityComponents: Array.from((target as any).components?.keys() || [])
+            // Access Entity internal structure with type guard for diagnostics
+            entityComponents: ('components' in target &&
+                              target.components instanceof Map)
+              ? Array.from(target.components.keys())
+              : []
           }
         });
       }
@@ -81,7 +85,11 @@ export function wrapEntity(entity: Entity): Entity {
         });
       }
 
-      (target as any)[prop] = value;
+      // Dynamic property assignment - necessary for Proxy set trap
+      // Type guard ensures we only assign to valid object properties
+      if (typeof prop === 'string' || typeof prop === 'symbol') {
+        (target as Record<string | symbol, any>)[prop] = value;
+      }
       return true;
     }
   });
@@ -155,8 +163,10 @@ export function wrapWorld(world: World): World {
 
       // Wrap methods that return entities to auto-wrap them
       if (typeof value === 'function' && (prop === 'getEntity' || prop === 'addEntity')) {
-        return function(this: any, ...args: any[]) {
-          const result = (value as Function).apply(this || target, args);
+        // Wrapper function preserves 'this' context from caller or uses target
+        return function(this: World, ...args: unknown[]): unknown {
+          const result = value.apply(this || target, args);
+          // Type guard: check if result looks like an Entity
           if (result && typeof result === 'object' && 'id' in result) {
             return wrapEntity(result as Entity);
           }
@@ -208,8 +218,12 @@ export function wrapObject<T extends object>(
 
 /**
  * Find similar property names (for typo suggestions)
+ *
+ * @param obj - Object to search for similar properties (intentionally generic for diagnostics)
+ * @param prop - Property name to find matches for
+ * @returns Array of up to 3 similar property names
  */
-function findSimilarProperties(obj: any, prop: string): string[] {
+function findSimilarProperties(obj: object, prop: string): string[] {
   const available = Object.keys(obj);
   const propLower = prop.toLowerCase();
 

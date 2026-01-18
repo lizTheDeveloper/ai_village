@@ -309,29 +309,51 @@ export const AfterlifeSchema = autoRegister(
 
     validate: (data): data is AfterlifeComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const a = data as any;
+      const a = data as Record<string, unknown>;
 
       return (
+        'type' in a &&
         a.type === 'afterlife' &&
+        'coherence' in a &&
         typeof a.coherence === 'number' &&
+        'tether' in a &&
         typeof a.tether === 'number' &&
+        'peace' in a &&
         typeof a.peace === 'number' &&
+        'solitude' in a &&
         typeof a.solitude === 'number' &&
+        'causeOfDeath' in a &&
         typeof a.causeOfDeath === 'string' &&
+        'deathTick' in a &&
         typeof a.deathTick === 'number' &&
+        'deathLocation' in a &&
         typeof a.deathLocation === 'object' &&
+        a.deathLocation !== null &&
+        'unfinishedGoals' in a &&
         Array.isArray(a.unfinishedGoals) &&
+        'unresolvedRelationships' in a &&
         Array.isArray(a.unresolvedRelationships) &&
+        'descendants' in a &&
         Array.isArray(a.descendants) &&
+        'isShade' in a &&
         typeof a.isShade === 'boolean' &&
+        'hasPassedOn' in a &&
         typeof a.hasPassedOn === 'boolean' &&
+        'isRestless' in a &&
         typeof a.isRestless === 'boolean' &&
+        'isAncestorKami' in a &&
         typeof a.isAncestorKami === 'boolean' &&
+        'wantsToReincarnate' in a &&
         typeof a.wantsToReincarnate === 'boolean' &&
+        'timesRemembered' in a &&
         typeof a.timesRemembered === 'number' &&
+        'lastRememberedTick' in a &&
         typeof a.lastRememberedTick === 'number' &&
+        'visitsFromLiving' in a &&
         typeof a.visitsFromLiving === 'number' &&
-        typeof a.offeringsReceived === 'object'
+        'offeringsReceived' in a &&
+        typeof a.offeringsReceived === 'object' &&
+        a.offeringsReceived !== null
       );
     },
 

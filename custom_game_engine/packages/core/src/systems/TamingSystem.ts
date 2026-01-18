@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -29,29 +29,15 @@ export type { TamingMethod, InteractionType };
  * - AnimalBrainSystem: AI for tamed animals may differ from wild
  * - AgentBrainSystem: Agents decide when to attempt taming
  */
-export class TamingSystem implements System {
+export class TamingSystem extends BaseSystem {
   public readonly id: SystemId = 'taming';
   public readonly priority: number = 70;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
 
-  private world: World | null = null;
-  private events!: SystemEventManager;
-
-  // Initialize event manager
-  initialize(world: World): void {
-    this.events = new SystemEventManager(world.eventBus, this.id);
-  }
-
   // This system doesn't update every tick, it responds to taming attempts
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    this.world = world;
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick updates needed
     // All taming logic is handled via attemptTaming() method
-  }
-
-  // Cleanup event subscriptions
-  cleanup(): void {
-    this.events.cleanup();
   }
 
   /**
@@ -120,12 +106,16 @@ export class TamingSystem implements System {
       animal.stress = Math.max(0, animal.stress - 30); // Reduce stress
 
       // Emit tamed event
-      this.events.emit('animal_tamed', {
-        animalId: animal.id,
-        tamerId: agentId,
-        agentId,
-        method,
-      }, agentId);
+      world.eventBus.emit({
+        type: 'animal_tamed',
+        source: agentId,
+        data: {
+          animalId: animal.id,
+          tamerId: agentId,
+          agentId,
+          method,
+        },
+      });
 
       return {
         success: true,
@@ -211,13 +201,17 @@ export class TamingSystem implements System {
 
     if (oldLevel && newLevel && oldLevel.name !== newLevel.name) {
       // Emit bond level changed event
-      this.events.emit('bond_level_changed', {
-        animalId: animal.id,
-        agentId,
-        oldLevel: oldLevel.name,
-        newLevel: newLevel.name,
-        bondLevel: animal.bondLevel,
-      }, agentId);
+      world.eventBus.emit({
+        type: 'bond_level_changed',
+        source: agentId,
+        data: {
+          animalId: animal.id,
+          agentId,
+          oldLevel: oldLevel.name,
+          newLevel: newLevel.name,
+          bondLevel: animal.bondLevel,
+        },
+      });
     }
 
     return {
@@ -239,10 +233,14 @@ export class TamingSystem implements System {
   }
 
   /**
-   * Set world reference (for tests that don't call update())
+   * Set world reference (for compatibility with behaviors that create instances)
+   * @deprecated Use initialize() instead
    */
   public setWorld(world: World): void {
-    this.world = world;
+    // Call initialize for backwards compatibility
+    this.initialize(world, world.eventBus).catch(err => {
+      console.error('TamingSystem initialization failed:', err);
+    });
   }
 
   /**
@@ -254,10 +252,6 @@ export class TamingSystem implements System {
     method: TamingMethod,
     itemOffered?: string
   ): number {
-    if (!this.world) {
-      throw new Error('TamingSystem not initialized - call setWorld() or update() first');
-    }
-
     const entity = this.world.getEntity(entityId);
     if (!entity) {
       throw new Error(`Entity ${entityId} not found`);
@@ -318,10 +312,6 @@ export class TamingSystem implements System {
     method: TamingMethod,
     itemOffered?: string
   ): { success: boolean; reason: string; trustGain?: number } {
-    if (!this.world) {
-      throw new Error('TamingSystem not initialized - call update() first');
-    }
-
     const entity = this.world.getEntity(entityId);
     if (!entity) {
       throw new Error(`Entity ${entityId} not found`);
@@ -343,10 +333,6 @@ export class TamingSystem implements System {
     agentId: string,
     interactionType: InteractionType
   ): { success: boolean; bondGain: number; reason?: string } {
-    if (!this.world) {
-      throw new Error('TamingSystem not initialized - call update() first');
-    }
-
     const entity = this.world.getEntity(entityId);
     if (!entity) {
       throw new Error(`Entity ${entityId} not found`);
@@ -364,10 +350,6 @@ export class TamingSystem implements System {
    * Get bond category for entity (wrapper method for tests that use entityId)
    */
   public getBondCategory(entityId: string): string {
-    if (!this.world) {
-      throw new Error('TamingSystem not initialized - call update() first');
-    }
-
     const entity = this.world.getEntity(entityId);
     if (!entity) {
       throw new Error(`Entity ${entityId} not found`);

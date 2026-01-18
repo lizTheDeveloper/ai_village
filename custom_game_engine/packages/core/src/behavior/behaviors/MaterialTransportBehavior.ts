@@ -14,7 +14,7 @@
  * Per CLAUDE.md: No silent fallbacks - throws/fails on errors.
  */
 
-import type { EntityImpl } from '../../ecs/Entity.js';
+import type { Entity, EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { InventoryComponent, InventorySlot } from '../../components/InventoryComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
@@ -551,15 +551,14 @@ export function materialTransportBehaviorWithContext(ctx: BehaviorContext): Cont
     return ctx.complete('Missing required components');
   }
 
-  const state = ctx.getAllState() as any;
+  const state = ctx.getAllState() as Partial<MaterialTransportState>;
   const transportState = state.transportState ?? 'finding_storage';
 
   if (!state.taskId || !state.materialId || state.tileIndex === undefined) {
     return ctx.complete('No transport state set');
   }
 
-  // Get the construction system
-  const world = (ctx as any).world;
+  // Get the construction system (world is now a readonly property of BehaviorContext)
   const constructionSystem = getTileConstructionSystem();
   const task = constructionSystem.getTask(state.taskId);
 
@@ -576,21 +575,21 @@ export function materialTransportBehaviorWithContext(ctx: BehaviorContext): Cont
       return handleTransportMovingToStorage(ctx, state);
 
     case 'picking_up':
-      return handleTransportPickingUp(ctx, state, world);
+      return handleTransportPickingUp(ctx, state);
 
     case 'transporting':
       return handleTransporting(ctx, state, task);
 
     case 'delivering':
-      return handleTransportDelivering(ctx, state, task, world);
+      return handleTransportDelivering(ctx, state, task);
 
     case 'complete':
       return checkForMoreTransportWork(ctx, state, task);
   }
 }
 
-function handleTransportFindingStorage(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
-  const tile = task.tiles[state.tileIndex];
+function handleTransportFindingStorage(ctx: BehaviorContext, state: Partial<MaterialTransportState>, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex!];
   if (!tile) {
     return ctx.complete('Tile not found');
   }
@@ -598,7 +597,7 @@ function handleTransportFindingStorage(ctx: BehaviorContext, state: any, task: C
   // Find storage with required material
   const storages = ctx.getEntitiesInRadius(100, [CT.Inventory, CT.Position]);
 
-  let closestStorage: { entity: any; position: { x: number; y: number } } | null = null;
+  let closestStorage: { entity: Entity; position: { x: number; y: number } } | null = null;
   let closestDistance = Infinity;
 
   for (const { entity: storage, distance } of storages) {
@@ -611,7 +610,7 @@ function handleTransportFindingStorage(ctx: BehaviorContext, state: any, task: C
 
     // Check if has the material
     const hasItem = inv.slots.some(
-      (slot: any) => slot.itemId === tile.materialId && slot.quantity > 0
+      (slot: InventorySlot) => slot.itemId === tile.materialId && slot.quantity > 0
     );
 
     if (!hasItem) continue;
@@ -642,7 +641,7 @@ function handleTransportFindingStorage(ctx: BehaviorContext, state: any, task: C
   });
 }
 
-function handleTransportMovingToStorage(ctx: BehaviorContext, state: any): ContextBehaviorResult | void {
+function handleTransportMovingToStorage(ctx: BehaviorContext, state: Partial<MaterialTransportState>): ContextBehaviorResult | void {
   if (!state.storagePosition) {
     ctx.updateState({ transportState: 'finding_storage' });
     return;
@@ -658,7 +657,7 @@ function handleTransportMovingToStorage(ctx: BehaviorContext, state: any): Conte
   ctx.moveToward(state.storagePosition, { arrivalDistance: 1.5 });
 }
 
-function handleTransportPickingUp(ctx: BehaviorContext, state: any, world: any): ContextBehaviorResult | void {
+function handleTransportPickingUp(ctx: BehaviorContext, state: Partial<MaterialTransportState>): ContextBehaviorResult | void {
   if (!state.storageEntityId) {
     ctx.updateState({ transportState: 'finding_storage' });
     return;
@@ -671,8 +670,8 @@ function handleTransportPickingUp(ctx: BehaviorContext, state: any, world: any):
   });
 }
 
-function handleTransporting(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
-  const tile = task.tiles[state.tileIndex];
+function handleTransporting(ctx: BehaviorContext, state: Partial<MaterialTransportState>, task: ConstructionTask): ContextBehaviorResult | void {
+  const tile = task.tiles[state.tileIndex!];
   if (!tile) {
     return ctx.complete('Tile not found');
   }
@@ -689,13 +688,13 @@ function handleTransporting(ctx: BehaviorContext, state: any, task: Construction
   ctx.moveToward(tilePosition, { arrivalDistance: 1.5 });
 }
 
-function handleTransportDelivering(ctx: BehaviorContext, state: any, task: ConstructionTask, world: any): ContextBehaviorResult | void {
-  // Deliver material to construction system
+function handleTransportDelivering(ctx: BehaviorContext, state: Partial<MaterialTransportState>, task: ConstructionTask): ContextBehaviorResult | void {
+  // Deliver material to construction system (using ctx.world from BehaviorContext)
   const constructionSystem = getTileConstructionSystem();
   constructionSystem.deliverMaterial(
-    world,
-    state.taskId,
-    state.tileIndex,
+    ctx.world,
+    state.taskId!,
+    state.tileIndex!,
     ctx.entity.id,
     1
   );
@@ -707,7 +706,7 @@ function handleTransportDelivering(ctx: BehaviorContext, state: any, task: Const
   });
 }
 
-function checkForMoreTransportWork(ctx: BehaviorContext, state: any, task: ConstructionTask): ContextBehaviorResult | void {
+function checkForMoreTransportWork(ctx: BehaviorContext, state: Partial<MaterialTransportState>, task: ConstructionTask): ContextBehaviorResult | void {
   const constructionSystem = getTileConstructionSystem();
 
   // Find next tile needing materials

@@ -12,14 +12,11 @@
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World, WorldMutator } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { TagsComponent } from '../components/TagsComponent.js';
@@ -186,13 +183,10 @@ const SHIP_CONFIGS: Record<SpaceshipType, ShipTypeConfig> = {
 /**
  * SpaceshipConstructionSystem manages spaceship construction at shipyards.
  */
-export class SpaceshipConstructionSystem implements System {
+export class SpaceshipConstructionSystem extends BaseSystem {
   public readonly id: SystemId = 'spaceship_construction';
   public readonly priority: number = 156; // After SpaceshipManagementSystem (155)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
-
-  private isInitialized = false;
-  private events!: SystemEventManager;
+  public readonly requiredComponents = [CT.Building] as const;
 
   /** Active construction projects indexed by project ID */
   private activeProjects = new Map<string, SpaceshipConstructionProject>();
@@ -201,18 +195,12 @@ export class SpaceshipConstructionSystem implements System {
   private projectsByShipyard = new Map<string, string>();
 
   /**
-   * Initialize the system and register event listeners.
+   * Initialize event listeners.
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) {
-      return;
-    }
-
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(): void {
     // Listen for construction requests
     this.events.on('spaceship:construction:start', (data) => {
-      this.handleConstructionStart(world, data as {
+      this.handleConstructionStart(this.world, data as {
         shipyardId: string;
         shipType: SpaceshipType;
         shipName: string;
@@ -222,23 +210,21 @@ export class SpaceshipConstructionSystem implements System {
 
     // Listen for construction cancellation
     this.events.on('spaceship:construction:cancel', (data) => {
-      this.handleConstructionCancel(world, data as { projectId: string });
+      this.handleConstructionCancel(this.world, data as { projectId: string });
     });
-
-    this.isInitialized = true;
   }
 
   /**
    * Update construction progress for all active projects.
    */
-  public update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Process active construction projects
     for (const [projectId, project] of this.activeProjects) {
       // Check if shipyard still exists
-      const shipyard = world.getEntity(project.shipyardId);
+      const shipyard = ctx.world.getEntity(project.shipyardId);
       if (!shipyard) {
         // Shipyard destroyed - cancel project
-        this.cancelProject(world, projectId, 'shipyard_destroyed');
+        this.cancelProject(ctx.world, projectId, 'shipyard_destroyed');
         continue;
       }
 
@@ -255,13 +241,13 @@ export class SpaceshipConstructionSystem implements System {
 
       // Check for completion
       if (project.progress >= 100) {
-        this.completeConstruction(world, project);
+        this.completeConstruction(ctx.world, project);
       } else {
         // Emit progress event every 25%
         const prevProgress = Math.floor((project.progress - progressPerTick) / 25) * 25;
         const currProgress = Math.floor(project.progress / 25) * 25;
         if (currProgress > prevProgress) {
-          world.eventBus.emit({
+          ctx.world.eventBus.emit({
             type: 'spaceship:construction:progress',
             source: project.shipyardId,
             data: {
@@ -354,7 +340,7 @@ export class SpaceshipConstructionSystem implements System {
     };
 
     // Create spaceship entity (initially in construction state)
-    const spaceshipEntity = this.createSpaceshipEntity(world, project, shipyard);
+    const spaceshipEntity = this.createSpaceshipEntity(world, project, shipyard as EntityImpl);
     project.spaceshipEntityId = spaceshipEntity.id;
 
     // Register project
@@ -411,16 +397,15 @@ export class SpaceshipConstructionSystem implements System {
   private createSpaceshipEntity(
     world: World,
     project: SpaceshipConstructionProject,
-    shipyard: Entity
-  ): Entity {
+    shipyard: EntityImpl
+  ): EntityImpl {
     const shipyardPos = shipyard.getComponent<PositionComponent>(CT.Position);
 
     // Create spaceship entity
-    const spaceship = world.createEntity();
-    const spaceshipImpl = spaceship as EntityImpl;
+    const spaceship = world.createEntity() as EntityImpl;
 
     // Add position (at shipyard, will be moved when launched)
-    spaceshipImpl.addComponent(
+    spaceship.addComponent(
       createPositionComponent(
         shipyardPos?.x ?? 0,
         shipyardPos?.y ?? 0
@@ -428,7 +413,7 @@ export class SpaceshipConstructionSystem implements System {
     );
 
     // Add spaceship component
-    spaceshipImpl.addComponent(
+    spaceship.addComponent(
       createSpaceshipComponent(
         project.shipType,
         project.shipName
@@ -436,17 +421,17 @@ export class SpaceshipConstructionSystem implements System {
     );
 
     // Add renderable (construction sprite) - use 'building' layer
-    spaceshipImpl.addComponent(
+    spaceship.addComponent(
       createRenderableComponent('ship_construction', 'building')
     );
 
     // Add inventory for ship storage
-    spaceshipImpl.addComponent(
+    spaceship.addComponent(
       createInventoryComponent(50)
     );
 
     // Add tags using spread syntax
-    spaceshipImpl.addComponent(
+    spaceship.addComponent(
       createTagsComponent(
         'spaceship',
         'under_construction',
@@ -531,9 +516,8 @@ export class SpaceshipConstructionSystem implements System {
     shipId: string,
     componentType: 'heart_chamber' | 'emotion_theater' | 'memory_hall' | 'meditation_chamber',
     shipName: string
-  ): Entity {
-    const componentEntity = world.createEntity();
-    const entityImpl = componentEntity as EntityImpl;
+  ): EntityImpl {
+    const entityImpl = world.createEntity() as EntityImpl;
 
     switch (componentType) {
       case 'heart_chamber':
@@ -559,7 +543,7 @@ export class SpaceshipConstructionSystem implements System {
       )
     );
 
-    return componentEntity;
+    return entityImpl;
   }
 
   /**
@@ -585,7 +569,7 @@ export class SpaceshipConstructionSystem implements System {
 
     // Remove the incomplete spaceship entity
     if (project.spaceshipEntityId) {
-      (world as WorldMutator).destroyEntity(project.spaceshipEntityId, 'construction_cancelled');
+      (world as import('../ecs/World.js').WorldMutator).destroyEntity(project.spaceshipEntityId, 'construction_cancelled');
     }
 
     // Clear tracking

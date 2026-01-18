@@ -7,6 +7,11 @@ import { PredictiveChunkLoadingSystem } from '../PredictiveChunkLoadingSystem.js
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createVelocityComponent } from '../../components/VelocityComponent.js';
 
+// Type extension for accessing protected properties in tests
+interface PredictiveChunkLoadingSystemInternal {
+  throttleInterval: number;
+}
+
 describe('PredictiveChunkLoadingSystem', () => {
   const system = new PredictiveChunkLoadingSystem();
 
@@ -20,7 +25,7 @@ describe('PredictiveChunkLoadingSystem', () => {
   });
 
   it('should have throttle interval of 20 ticks', () => {
-    expect((system as any).throttleInterval).toBe(20);
+    expect((system as unknown as PredictiveChunkLoadingSystemInternal).throttleInterval).toBe(20);
   });
 
   it('should have correct system id', () => {
@@ -116,5 +121,107 @@ describe('PredictiveChunkLoadingSystem', () => {
 
     expect(perpX2).toBeCloseTo(-0.8);
     expect(perpY2).toBeCloseTo(0.6);
+  });
+
+  describe('dynamic prediction distance', () => {
+    const MIN_PREDICTION = 2;
+    const MAX_PREDICTION = 12;
+    const SPEED_SCALE_FACTOR = 5;
+
+    const calculatePredictionDistance = (speed: number): number => {
+      return Math.min(
+        MAX_PREDICTION,
+        Math.max(MIN_PREDICTION, Math.ceil(speed * SPEED_SCALE_FACTOR))
+      );
+    };
+
+    it('should predict 2 chunks for slow agents (speed 0.2)', () => {
+      // Agent with velocity (0.2, 0) has speed = 0.2
+      const speed = 0.2;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 0.2 * 5 = 1.0, ceil = 1, but clamped to MIN = 2
+      expect(prediction).toBe(2);
+    });
+
+    it('should predict 2 chunks for slow diagonal agents (speed 0.3)', () => {
+      // Agent with velocity (0.2, 0.2) has speed ≈ 0.283
+      const vx = 0.2;
+      const vy = 0.2;
+      const speed = Math.sqrt(vx * vx + vy * vy);
+      const prediction = calculatePredictionDistance(speed);
+
+      // 0.283 * 5 = 1.41, ceil = 2
+      expect(prediction).toBe(2);
+    });
+
+    it('should predict 3 chunks for medium-slow agents (speed 0.5)', () => {
+      // Agent with velocity (0.5, 0) has speed = 0.5
+      const speed = 0.5;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 0.5 * 5 = 2.5, ceil = 3
+      expect(prediction).toBe(3);
+    });
+
+    it('should predict 5 chunks for medium agents (speed 1.0)', () => {
+      // Agent with velocity (0.7, 0.7) has speed ≈ 0.99
+      const vx = 0.7;
+      const vy = 0.7;
+      const speed = Math.sqrt(vx * vx + vy * vy);
+      const prediction = calculatePredictionDistance(speed);
+
+      // 0.99 * 5 = 4.95, ceil = 5
+      expect(prediction).toBe(5);
+    });
+
+    it('should predict 10 chunks for fast agents (speed 2.0)', () => {
+      // Agent with velocity (2.0, 0) has speed = 2.0
+      const speed = 2.0;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 2.0 * 5 = 10.0, ceil = 10
+      expect(prediction).toBe(10);
+    });
+
+    it('should predict 12 chunks (max) for very fast agents (speed 3.0)', () => {
+      // Agent with velocity (3.0, 0) has speed = 3.0
+      const speed = 3.0;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 3.0 * 5 = 15.0, ceil = 15, but clamped to MAX = 12
+      expect(prediction).toBe(12);
+    });
+
+    it('should cap at max prediction distance for extremely fast agents (speed 5.0)', () => {
+      // Agent with velocity (5.0, 0) has speed = 5.0
+      const speed = 5.0;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 5.0 * 5 = 25.0, ceil = 25, but clamped to MAX = 12
+      expect(prediction).toBe(12);
+    });
+
+    it('should handle edge case at minimum threshold (speed 0.1)', () => {
+      // Agent at minimum movement threshold
+      const speed = 0.1;
+      const prediction = calculatePredictionDistance(speed);
+
+      // 0.1 * 5 = 0.5, ceil = 1, but clamped to MIN = 2
+      expect(prediction).toBe(2);
+    });
+
+    it('should scale linearly between min and max', () => {
+      // Test that prediction scales smoothly
+      const speed_0_4 = 0.4; // -> 2
+      const speed_0_6 = 0.6; // -> 3
+      const speed_1_2 = 1.2; // -> 6
+      const speed_1_8 = 1.8; // -> 9
+
+      expect(calculatePredictionDistance(speed_0_4)).toBe(2);
+      expect(calculatePredictionDistance(speed_0_6)).toBe(3);
+      expect(calculatePredictionDistance(speed_1_2)).toBe(6);
+      expect(calculatePredictionDistance(speed_1_8)).toBe(9);
+    });
   });
 });

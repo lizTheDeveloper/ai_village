@@ -1,14 +1,13 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { DominanceRankComponent } from '../components/DominanceRankComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 interface AgentComponent extends Component {
   readonly type: 'agent';
@@ -50,29 +49,20 @@ type DominanceOutcomeType = 'demotion' | 'exile' | 'death' | 'subordinate';
  * - Updates hierarchy immediately
  * - Checks for cascade effects
  */
-export class DominanceChallengeSystem implements System {
+export class DominanceChallengeSystem extends BaseSystem {
   public readonly id: SystemId = 'dominance_challenge';
   public readonly priority = 49;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
 
   private eventBus?: EventBus;
-  private events!: SystemEventManager;
 
-  constructor(eventBus?: EventBus) {
+  protected onInitialize(world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    for (const entity of entities) {
-      const conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict');
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const conflict = ctx.world.getComponent<ConflictComponent>(entity.id, 'conflict');
       if (!conflict || conflict.conflictType !== 'dominance_challenge') {
         continue;
       }
@@ -83,7 +73,7 @@ export class DominanceChallengeSystem implements System {
       }
 
       // Resolve the challenge
-      this.resolveChallenge(world, entity, conflict, entities);
+      this.resolveChallenge(ctx.world, entity, conflict, ctx.activeEntities);
     }
   }
 
@@ -171,14 +161,12 @@ export class DominanceChallengeSystem implements System {
     }));
 
     // Emit event
-    if (this.events) {
-      this.events.emit('dominance:resolved', {
-        challengerId: challenger.id,
-        challengedId: incumbent.id,
-        winner: challengerWins ? challenger.id : incumbent.id,
-        hierarchyChanged: true,
-      }, challenger.id);
-    }
+    this.events.emit('dominance:resolved', {
+      challengerId: challenger.id,
+      challengedId: incumbent.id,
+      winner: challengerWins ? challenger.id : incumbent.id,
+      hierarchyChanged: true,
+    }, challenger.id);
 
     // Check for cascade effects
     this.checkCascadeEffects(world, challenger, incumbent, allEntities, challengerWins);

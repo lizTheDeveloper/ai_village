@@ -267,7 +267,14 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     const actualHealing = newValue - currentValue;
 
     if (actualHealing > 0) {
-      (needs as any)[resource] = newValue;
+      // Type-safe assignment using type guard
+      if (resource === 'health') {
+        needs.health = newValue;
+      } else if (resource === 'mana') {
+        needs.mana = newValue;
+      } else if (resource === 'stamina') {
+        needs.stamina = newValue;
+      }
       appliedValues[resource] = actualHealing;
     }
 

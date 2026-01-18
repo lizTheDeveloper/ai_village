@@ -25,6 +25,8 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { GameEvent } from '../events/GameEvent.js';
+import type { EventType } from '../events/EventMap.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { CHUNK_SIZE } from '../types.js';
 import { getSharedChunkSpatialQuery } from './behaviors/BaseBehavior.js';
@@ -78,6 +80,9 @@ export interface BehaviorContext {
 
   /** The entity executing this behavior */
   readonly entity: EntityImpl;
+
+  /** The world instance (for services that require it) */
+  readonly world: World;
 
   /** Current game tick */
   readonly tick: number;
@@ -274,9 +279,27 @@ export interface BehaviorContext {
   // ============================================================================
 
   /**
-   * Emit an event.
+   * Emit an event with type-safe event data.
+   *
+   * @param event - Event to emit (source defaults to entity.id but can be overridden)
+   *
+   * @example
+   * ctx.emit<'agent:action:started'>({
+   *   type: 'agent:action:started' as const,
+   *   data: { actionId: 'abc', actionType: 'gather' }
+   * });
+   *
+   * @example
+   * // Override source for behavior tracking
+   * ctx.emit({
+   *   type: 'agent:internal_monologue' as const,
+   *   source: 'practice_skill_behavior' as const,
+   *   data: { agentId: ctx.entity.id, monologue: '...' }
+   * });
    */
-  emit(event: { type: string; source?: string; data?: unknown }): void;
+  emit<T extends EventType = EventType>(
+    event: Omit<GameEvent<T>, 'tick' | 'timestamp'> | Omit<GameEvent<T>, 'tick' | 'timestamp' | 'source'>
+  ): void;
 
   // ============================================================================
   // World Access (limited, read-only where possible)
@@ -316,6 +339,7 @@ export interface BehaviorResult {
  */
 export class BehaviorContextImpl implements BehaviorContext {
   readonly entity: EntityImpl;
+  readonly world: World;
   readonly tick: number;
   readonly position: Readonly<PositionComponent>;
   readonly agent: Readonly<AgentComponent>;
@@ -324,8 +348,7 @@ export class BehaviorContextImpl implements BehaviorContext {
   readonly needs: Readonly<NeedsComponent> | null;
   readonly gameTime: { day: number; hour: number; season: string };
 
-  private readonly world: World;
-  private readonly spatialQuery: any | null;
+  private readonly spatialQuery: ReturnType<typeof getSharedChunkSpatialQuery> | null;
 
   constructor(entity: EntityImpl, world: World) {
     this.entity = entity;
@@ -615,11 +638,16 @@ export class BehaviorContextImpl implements BehaviorContext {
   // Event Emission
   // ============================================================================
 
-  emit(event: { type: string; source?: string; data?: unknown }): void {
-    this.world.eventBus.emit({
-      type: event.type as any,
-      source: event.source ?? this.entity.id,
-      data: event.data as any,
+  emit<T extends EventType = EventType>(
+    event: Omit<GameEvent<T>, 'tick' | 'timestamp'> | Omit<GameEvent<T>, 'tick' | 'timestamp' | 'source'>
+  ): void {
+    // Use type guard to check if source is provided
+    const source = 'source' in event ? event.source : this.entity.id;
+
+    this.world.eventBus.emit<T>({
+      type: event.type,
+      source,
+      data: event.data,
     });
   }
 

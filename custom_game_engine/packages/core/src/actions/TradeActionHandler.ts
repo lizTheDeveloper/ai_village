@@ -65,39 +65,41 @@ export class TradeActionHandler implements ActionHandler {
    * 7. For sell: actor has items, shop has funds
    */
   validate(action: Action, world: World): ValidationResult {
-    // Check required parameters
-    const shopId = action.parameters.shopId as string | undefined;
-    const itemId = action.parameters.itemId as string | undefined;
-    const quantity = action.parameters.quantity as number | undefined;
-    const subtype = action.parameters.subtype as string | undefined;
-
-    if (!shopId) {
+    // Check required parameters with type guards
+    if (typeof action.parameters.shopId !== 'string') {
       return {
         valid: false,
-        reason: 'trade action requires shopId parameter',
+        reason: 'trade action requires shopId parameter (string)',
       };
     }
+    const shopId = action.parameters.shopId;
 
-    if (!itemId) {
+    if (typeof action.parameters.itemId !== 'string') {
       return {
         valid: false,
-        reason: 'trade action requires itemId parameter',
+        reason: 'trade action requires itemId parameter (string)',
       };
     }
+    const itemId = action.parameters.itemId;
 
-    if (!quantity || quantity <= 0) {
+    if (typeof action.parameters.quantity !== 'number' || action.parameters.quantity <= 0) {
       return {
         valid: false,
-        reason: 'trade action requires positive quantity parameter',
+        reason: 'trade action requires positive quantity parameter (number)',
       };
     }
+    const quantity = action.parameters.quantity;
 
-    if (!subtype || (subtype !== 'buy' && subtype !== 'sell')) {
+    if (
+      typeof action.parameters.subtype !== 'string' ||
+      (action.parameters.subtype !== 'buy' && action.parameters.subtype !== 'sell')
+    ) {
       return {
         valid: false,
         reason: 'trade action requires subtype parameter ("buy" or "sell")',
       };
     }
+    const subtype = action.parameters.subtype;
 
     // Check actor exists
     const actor = world.getEntity(action.actorId);
@@ -109,7 +111,7 @@ export class TradeActionHandler implements ActionHandler {
     }
 
     // Check actor has required components
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent<PositionComponent>(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,
@@ -117,7 +119,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventory = actor.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return {
         valid: false,
@@ -125,7 +127,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const currency = actor.components.get(ComponentType.Currency) as CurrencyComponent | undefined;
+    const currency = actor.getComponent<CurrencyComponent>(ComponentType.Currency);
     if (!currency) {
       return {
         valid: false,
@@ -142,7 +144,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const shop = shopEntity.components.get(ComponentType.Shop) as ShopComponent | undefined;
+    const shop = shopEntity.getComponent<ShopComponent>(ComponentType.Shop);
     if (!shop) {
       return {
         valid: false,
@@ -150,7 +152,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const shopPos = shopEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const shopPos = shopEntity.getComponent<PositionComponent>(ComponentType.Position);
     if (!shopPos) {
       return {
         valid: false,
@@ -185,10 +187,25 @@ export class TradeActionHandler implements ActionHandler {
    * 3. Return success/failure based on result
    */
   execute(action: Action, world: World): ActionResult {
-    const shopId = action.parameters.shopId as string;
-    const itemId = action.parameters.itemId as string;
-    const quantity = action.parameters.quantity as number;
-    const subtype = action.parameters.subtype as 'buy' | 'sell';
+    // Validate parameters with type guards (already validated in validate(), but checked again for safety)
+    if (
+      typeof action.parameters.shopId !== 'string' ||
+      typeof action.parameters.itemId !== 'string' ||
+      typeof action.parameters.quantity !== 'number' ||
+      (action.parameters.subtype !== 'buy' && action.parameters.subtype !== 'sell')
+    ) {
+      return {
+        success: false,
+        reason: 'Invalid parameters for trade action',
+        effects: [],
+        events: [],
+      };
+    }
+
+    const shopId = action.parameters.shopId;
+    const itemId = action.parameters.itemId;
+    const quantity = action.parameters.quantity;
+    const subtype = action.parameters.subtype;
 
     // Get trading system
     const tradingSystem = this.getTradingSystem(world);
@@ -228,10 +245,11 @@ export class TradeActionHandler implements ActionHandler {
         effects: [],
         events,
       };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Trade execution failed';
       return {
         success: false,
-        reason: error.message || 'Trade execution failed',
+        reason: errorMessage,
         effects: [],
         events: [],
       };
@@ -240,12 +258,24 @@ export class TradeActionHandler implements ActionHandler {
 
   /**
    * Get the trading system from the world.
+   *
+   * Uses World.getSystem() which is the standard way to access systems.
+   * Type guard ensures we get the correct system type.
    */
   private getTradingSystem(world: World): TradingSystem | null {
-    const system = (world as any).getSystem?.('trading');
-    if (system) {
+    const system = world.getSystem('trading');
+
+    // Type guard: TradingSystem must have buyFromShop and sellToShop methods
+    if (
+      system &&
+      'buyFromShop' in system &&
+      typeof system.buyFromShop === 'function' &&
+      'sellToShop' in system &&
+      typeof system.sellToShop === 'function'
+    ) {
       return system as TradingSystem;
     }
-    return (world as any).tradingSystem ?? null;
+
+    return null;
   }
 }

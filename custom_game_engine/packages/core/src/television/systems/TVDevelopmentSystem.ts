@@ -9,11 +9,10 @@
  * - Show creation from approved concepts
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
-import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent, ShowFormat, TargetAudience } from '../TVShow.js';
@@ -76,13 +75,12 @@ export interface GreenlightDecision {
 // SYSTEM
 // ============================================================================
 
-export class TVDevelopmentSystem implements System {
+export class TVDevelopmentSystem extends BaseSystem {
   readonly id = 'tv_development' as const;
   readonly priority = 62; // Before production systems
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private events!: SystemEventManager;
-  private lastProcessTick: number = 0;
+  protected readonly throttleInterval = PITCH_PROCESSING_INTERVAL;
 
   /** Pending pitch submissions */
   private pendingPitches: Map<string, PitchSubmission> = new Map();
@@ -90,29 +88,16 @@ export class TVDevelopmentSystem implements System {
   /** Track which writers have active pitches */
   private writerPitchCount: Map<string, number> = new Map();
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only process periodically
-    if (currentTick - this.lastProcessTick < PITCH_PROCESSING_INTERVAL) {
-      return;
-    }
-
-    this.lastProcessTick = currentTick;
-
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const station = entity.components.get(ComponentType.TVStation) as TVStationComponent | undefined;
       if (!station) continue;
 
       // Process pending pitches for this station
-      this.processPendingPitches(world, station, currentTick);
+      this.processPendingPitches(ctx.world, station, ctx.tick);
 
       // Check if station needs new content
-      this.checkContentNeeds(world, station, currentTick);
+      this.checkContentNeeds(ctx.world, station, ctx.tick);
     }
   }
 
@@ -574,8 +559,7 @@ export class TVDevelopmentSystem implements System {
       .filter(p => p.writerId === writerId);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.pendingPitches.clear();
     this.writerPitchCount.clear();
   }

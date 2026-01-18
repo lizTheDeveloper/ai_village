@@ -1,6 +1,7 @@
 import { defineComponent } from '../../types/ComponentSchema.js';
 import { autoRegister } from '../../registry/autoRegister.js';
 import type { LoreFragmentComponent } from '@ai-village/core';
+import { ComponentType } from '@ai-village/core';
 
 export const LoreFragmentSchema = autoRegister(
   defineComponent<LoreFragmentComponent>({
@@ -183,7 +184,7 @@ export const LoreFragmentSchema = autoRegister(
     },
 
     createDefault: (): LoreFragmentComponent => ({
-      type: 'lore_frag',
+      type: ComponentType.LoreFrag,
       version: 1,
       fragmentId: crypto.randomUUID(),
       title: 'Untitled Fragment',
@@ -193,6 +194,6 @@ export const LoreFragmentSchema = autoRegister(
       importance: 'trivial',
       hasBeenRead: false,
       tags: [],
-    } as any),
+    }),
   })
 );

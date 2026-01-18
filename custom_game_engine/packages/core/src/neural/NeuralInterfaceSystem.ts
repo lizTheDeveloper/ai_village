@@ -17,6 +17,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 // ============================================================================
 // NEURAL INTERFACE TYPES
@@ -451,13 +452,13 @@ export class NeuralInterfaceSystem extends BaseSystem {
     agentEntity: Entity,
     targetSubstrate: string
   ): UploadedMind | null {
-    const agentComp = agentEntity.getComponent(ComponentType.Agent) as any;
-    if (!agentComp) return null;
+    const identityComp = agentEntity.getComponent<IdentityComponent>(ComponentType.Identity);
+    if (!identityComp) return null;
 
     const mind: UploadedMind = {
       id: `mind_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       originalAgentId: agentEntity.id,
-      originalName: agentComp.name ?? 'Unknown',
+      originalName: identityComp.name,
       uploadedAt: world.tick,
       hostingSubstrate: targetSubstrate,
       processingAllocation: 1000,
@@ -501,11 +502,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
     this.uploadedMinds.set(fork.id, fork);
 
-    this.events.emit('neural:mind_forked' as any, {
+    this.events.emitGeneric('neural:mind_forked', {
       originalMindId: mindId,
       forkMindId: fork.id,
       totalForks: original.forkCount,
-    } as any);
+    });
 
     return fork;
   }
@@ -520,11 +521,11 @@ export class NeuralInterfaceSystem extends BaseSystem {
     proficiency: number
   ): boolean {
     // This would integrate with actual skill system
-    this.events.emit('neural:skill_downloaded' as any, {
+    this.events.emitGeneric('neural:skill_downloaded', {
       agentId: agentEntity.id,
       skillName,
       proficiency,
-    } as any, agentEntity.id);
+    }, agentEntity.id);
     return true;
   }
 
@@ -553,12 +554,12 @@ export class NeuralInterfaceSystem extends BaseSystem {
 
       // Emit periodic existential thoughts for high-crisis minds
       if (mind.existentialCrisisLevel > 0.7 && Math.random() < 0.01) {
-        this.events.emit('neural:existential_thought' as any, {
+        this.events.emitGeneric('neural:existential_thought', {
           mindId: mind.id,
           originalName: mind.originalName,
           thought: this.getExistentialThought(),
           crisisLevel: mind.existentialCrisisLevel,
-        } as any);
+        });
       }
     }
   }

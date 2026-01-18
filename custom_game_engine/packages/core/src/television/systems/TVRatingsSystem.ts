@@ -9,11 +9,10 @@
  * - Catchphrase spreading
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
-import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent as _TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent } from '../TVShow.js';
@@ -38,40 +37,28 @@ const CANCELLATION_WARNING_RATING = 4.0;
 /** Rating threshold for immediate cancellation */
 const IMMEDIATE_CANCEL_RATING = 2.5;
 
-export class TVRatingsSystem implements System {
+export class TVRatingsSystem extends BaseSystem {
   readonly id = 'tv_ratings' as const;
   readonly priority = 66; // After broadcasting
   readonly requiredComponents = [ComponentType.TVShow] as const;
 
-  private events!: SystemEventManager;
-  private lastEvaluationTick: number = 0;
+  protected readonly throttleInterval = EVALUATION_INTERVAL;
 
   /** Track shows on cancellation watch */
   private cancellationWatch: Map<string, number> = new Map(); // showId -> warning count
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Subscribe to viewer rating events
     this.events.on('tv:viewer:rated', (data) => {
       this.handleViewerRating(data);
     });
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only evaluate periodically
-    if (currentTick - this.lastEvaluationTick < EVALUATION_INTERVAL) {
-      return;
-    }
-
-    this.lastEvaluationTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Group shows by station for evaluation
     const showsByStation = new Map<string, TVShowComponent[]>();
 
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const show = entity.components.get(ComponentType.TVShow) as TVShowComponent | undefined;
       if (!show) continue;
 
@@ -85,7 +72,7 @@ export class TVRatingsSystem implements System {
 
     // Evaluate shows by station
     showsByStation.forEach((shows, stationId) => {
-      this.evaluateStationShows(world, stationId, shows);
+      this.evaluateStationShows(ctx.world, stationId, shows);
     });
   }
 
@@ -370,8 +357,7 @@ export class TVRatingsSystem implements System {
     return new Map(this.cancellationWatch);
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.cancellationWatch.clear();
-    this.events.cleanup();
   }
 }

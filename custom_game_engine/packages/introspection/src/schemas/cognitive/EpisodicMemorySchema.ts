@@ -95,11 +95,13 @@ export const EpisodicMemorySchema = autoRegister(
 
     validate: (data: unknown): data is EpisodicMemoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        Array.isArray(comp.episodicMemories) &&
-        Array.isArray(comp.suppressedMemories)
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'episodic_memory') return false;
+      if (!('episodicMemories' in comp) || !Array.isArray(comp.episodicMemories)) return false;
+      if (!('suppressedMemories' in comp) || !Array.isArray(comp.suppressedMemories)) return false;
+
+      return true;
     },
 
     createDefault: () => {

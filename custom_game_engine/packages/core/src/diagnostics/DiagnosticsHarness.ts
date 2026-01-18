@@ -24,6 +24,11 @@ export interface DiagnosticIssue {
   count: number;  // How many times this exact issue occurred
 }
 
+// Extend Window interface for diagnostics flag
+interface WindowWithDiagnostics extends Window {
+  __DIAGNOSTICS_ENABLED__?: boolean;
+}
+
 export class DiagnosticsHarness {
   private static instance: DiagnosticsHarness | null = null;
   private enabled: boolean = false;
@@ -35,7 +40,7 @@ export class DiagnosticsHarness {
   private constructor() {
     // Check environment variables (Node.js/tests) or window flag (browser)
     const envEnabled = typeof process !== 'undefined' && process.env?.DIAGNOSTICS_MODE === 'true';
-    const windowEnabled = typeof window !== 'undefined' && (window as any).__DIAGNOSTICS_ENABLED__;
+    const windowEnabled = typeof window !== 'undefined' && (window as WindowWithDiagnostics).__DIAGNOSTICS_ENABLED__;
     this.enabled = envEnabled || windowEnabled || false;
   }
 
@@ -49,7 +54,7 @@ export class DiagnosticsHarness {
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     if (typeof window !== 'undefined') {
-      (window as any).__DIAGNOSTICS_ENABLED__ = enabled;
+      (window as WindowWithDiagnostics).__DIAGNOSTICS_ENABLED__ = enabled;
     }
     console.log(`[DiagnosticsHarness] ${enabled ? 'Enabled' : 'Disabled'}`);
   }

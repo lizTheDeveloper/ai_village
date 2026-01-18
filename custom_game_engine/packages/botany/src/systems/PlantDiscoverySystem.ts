@@ -1,5 +1,4 @@
 import type {
-  System,
   SystemId,
   ComponentType as CT,
   World,
@@ -11,8 +10,11 @@ import type {
   MemoryComponent,
   Memory,
   PositionComponent,
+  EventBus,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType,
   EntityImpl,
   PlantKnowledgeComponent,
@@ -49,7 +51,7 @@ export interface PlantEffect {
  *
  * @dependencies None - Event-driven system that responds to plant consumption/use
  */
-export class PlantDiscoverySystem implements System {
+export class PlantDiscoverySystem extends BaseSystem {
   public readonly id: SystemId = 'plant_discovery' as SystemId;
   public readonly priority: number = 45; // After consumption, before memory formation
   public readonly requiredComponents: ReadonlyArray<CT> = [ComponentType.Agent];
@@ -57,6 +59,10 @@ export class PlantDiscoverySystem implements System {
 
   /** Species registry for looking up plant properties */
   private speciesRegistry: Map<string, PlantSpecies> = new Map();
+
+  protected onInitialize(): void {
+    // Event-driven system - no initialization needed
+  }
 
   /**
    * Register plant species for lookup
@@ -74,7 +80,7 @@ export class PlantDiscoverySystem implements System {
     return this.speciesRegistry.get(speciesId);
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // This system primarily responds to events rather than ticking
     // Discovery happens when agents perform specific actions (eat, apply, etc.)
   }

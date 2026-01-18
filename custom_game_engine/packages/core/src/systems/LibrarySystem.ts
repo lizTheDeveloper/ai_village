@@ -1,10 +1,9 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EntityId } from '../types.js';
 import type { LibraryComponent } from '../components/LibraryComponent.js';
 
@@ -36,12 +35,10 @@ interface ReadingSession {
  * - Enforce access control
  * - Emit library events
  */
-export class LibrarySystem implements System {
+export class LibrarySystem extends BaseSystem {
   public readonly id: SystemId = 'library';
   public readonly priority = 45;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Library];
-  private eventBus: CoreEventBus;
-  private events!: SystemEventManager;
 
   // Borrowed books tracking (bookId → BorrowedBook)
   private borrowedBooks: Map<string, BorrowedBook> = new Map();
@@ -49,16 +46,8 @@ export class LibrarySystem implements System {
   // Active reading sessions
   private readingSessions: Map<string, ReadingSession> = new Map();
 
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
-  }
-
-  initialize(_world: World, eventBus: CoreEventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  public update(world: World, _entities: Entity[], _deltaTime: number): void {
-    const currentTick = this.getCurrentTick(world);
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = this.getCurrentTick(ctx.world);
 
     // Check for overdue books
     for (const borrowed of this.borrowedBooks.values()) {
@@ -69,7 +58,7 @@ export class LibrarySystem implements System {
 
     // Process active reading sessions
     for (const [sessionId, session] of this.readingSessions.entries()) {
-      session.duration += _deltaTime;
+      session.duration += ctx.deltaTime;
 
       // End sessions after some time (could be configurable)
       if (session.duration >= 3600) {
@@ -267,9 +256,5 @@ export class LibrarySystem implements System {
 
   public onRemoveEntity(_world: World, _entity: Entity): void {
     // Clean up library data
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

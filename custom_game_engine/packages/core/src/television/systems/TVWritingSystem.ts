@@ -9,11 +9,10 @@
  * - Integration with ScriptGenerator for LLM-powered content
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
-import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent, Storyline, PlotTwist } from '../TVShow.js';
@@ -65,23 +64,18 @@ export interface EpisodePlan {
 // SYSTEM
 // ============================================================================
 
-export class TVWritingSystem implements System {
+export class TVWritingSystem extends BaseSystem {
   readonly id = 'tv_writing' as const;
   readonly priority = 63; // After development
   readonly requiredComponents = [ComponentType.TVShow] as const;
 
-  private events!: SystemEventManager;
-  private lastProcessTick: number = 0;
+  protected readonly throttleInterval = WRITING_INTERVAL;
 
   /** Active writing tasks */
   private activeTasks: Map<string, WritingTask> = new Map();
 
   /** Script generation callback (set by ScriptGenerator) */
   private scriptGenerator: ((req: ScriptGenerationRequest) => Promise<ScriptGenerationResult>) | null = null;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
 
   /**
    * Register the script generator
@@ -90,26 +84,17 @@ export class TVWritingSystem implements System {
     this.scriptGenerator = generator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only process periodically
-    if (currentTick - this.lastProcessTick < WRITING_INTERVAL) {
-      return;
-    }
-
-    this.lastProcessTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process active writing tasks
-    this.processWritingTasks(world, currentTick);
+    this.processWritingTasks(ctx.world, ctx.tick);
 
     // Check for shows needing new scripts
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const show = entity.components.get(ComponentType.TVShow) as TVShowComponent | undefined;
       if (!show) continue;
 
       if (show.status === 'in_production' || show.status === 'airing') {
-        this.checkScriptNeeds(world, show, currentTick);
+        this.checkScriptNeeds(ctx.world, show, ctx.tick);
       }
     }
   }
@@ -548,8 +533,7 @@ export class TVWritingSystem implements System {
       .filter(t => t.writerId === writerId);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.activeTasks.clear();
     this.scriptGenerator = null;
   }

@@ -9,11 +9,10 @@
  * - Event emission for ratings/cultural impact
  */
 
-import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
-import { SystemEventManager } from '../../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, TVChannel } from '../TVStation.js';
 import type { TVBroadcastComponent, ProgramSlot, BroadcastEvent } from '../TVBroadcasting.js';
@@ -35,46 +34,41 @@ const TICKS_PER_MINUTE = 20 * 60;
 /** How often to check schedule (every game minute) */
 const SCHEDULE_CHECK_INTERVAL = TICKS_PER_MINUTE;
 
-export class TVBroadcastingSystem implements System {
+export class TVBroadcastingSystem extends BaseSystem {
   readonly id = 'tv_broadcasting' as const;
   readonly priority = 65; // After most game logic
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
-  private events!: SystemEventManager;
   private lastScheduleCheck: number = 0;
 
   /** Cache for station -> broadcast component mapping */
   private broadcastComponents: Map<string, TVBroadcastComponent> = new Map();
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Only check schedule periodically
     const shouldCheckSchedule = currentTick - this.lastScheduleCheck >= SCHEDULE_CHECK_INTERVAL;
 
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const station = entity.components.get(ComponentType.TVStation) as TVStationComponent | undefined;
       if (!station) continue;
 
       // Get or create broadcast component
       let broadcast = this.broadcastComponents.get(station.buildingId);
       if (!broadcast) {
-        const newBroadcast = this.getOrCreateBroadcastComponent(world, station);
+        const newBroadcast = this.getOrCreateBroadcastComponent(ctx.world, station);
         if (!newBroadcast) continue;
         broadcast = newBroadcast;
       }
 
       // Check for schedule changes
       if (shouldCheckSchedule) {
-        this.updateBroadcastSchedule(world, station, broadcast, currentTick);
+        this.updateBroadcastSchedule(ctx.world, station, broadcast, currentTick);
       }
 
       // Update active broadcasts
-      this.updateActiveBroadcasts(world, station, broadcast, currentTick);
+      this.updateActiveBroadcasts(ctx.world, station, broadcast, currentTick);
     }
 
     if (shouldCheckSchedule) {
@@ -385,8 +379,7 @@ export class TVBroadcastingSystem implements System {
     return broadcast.currentViewers.get(channelNumber)?.size ?? 0;
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.broadcastComponents.clear();
-    this.events.cleanup();
   }
 }

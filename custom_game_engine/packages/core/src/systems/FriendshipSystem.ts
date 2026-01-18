@@ -12,47 +12,34 @@
  * Emits 'friendship:formed' events for narrative/UI purposes.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { SystemId, ComponentType } from '../types.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import type { ComponentType } from '../types.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 
-export class FriendshipSystem implements System {
-  public readonly id: SystemId = 'friendship';
-  public readonly priority: number = 17; // After RelationshipConversationSystem (16)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [
+export class FriendshipSystem extends BaseSystem {
+  public readonly id = 'friendship' as const;
+  public readonly priority = 17; // After RelationshipConversationSystem (16)
+  public readonly requiredComponents = [
     CT.Agent,
     CT.Relationship,
-  ];
+  ] as const;
 
   // Throttle updates - friendships don't form instantly
-  private static readonly UPDATE_INTERVAL = 500; // Check every ~25 seconds (20 tps)
-  private tickCounter = 0;
+  protected readonly throttleInterval = 500; // Check every ~25 seconds (20 tps)
 
   // Thresholds for friendship detection
   private static readonly FRIENDSHIP_FAMILIARITY = 60;
   private static readonly FRIENDSHIP_AFFINITY = 40;
   private static readonly FRIENDSHIP_INTERACTIONS = 10;
 
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % FriendshipSystem.UPDATE_INTERVAL !== 0) return;
-
-    for (const entity of entities) {
-      this.checkForNewFriendships(entity as EntityImpl, world);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      this.checkForNewFriendships(entity, ctx.world);
     }
   }
 
@@ -150,7 +137,4 @@ export class FriendshipSystem implements System {
     return '_socialMemories' in component && component['_socialMemories' as keyof typeof component] instanceof Map;
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
 }

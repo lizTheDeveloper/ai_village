@@ -10,9 +10,8 @@
  */
 
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
-import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
@@ -513,18 +512,17 @@ export class NewsDeskManager {
 // NEWSROOM SYSTEM
 // ============================================================================
 
-export class NewsroomSystem implements System {
+export class NewsroomSystem extends BaseSystem {
   readonly id = 'NewsroomSystem';
   readonly priority = 70;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private deskManager = new NewsDeskManager();
-  private lastUpdateTick = 0;
 
   /** Update every 60 ticks (3 seconds) for non-critical updates */
-  private static readonly UPDATE_INTERVAL = 60;
+  protected readonly throttleInterval = 60;
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.deskManager.setEventBus(eventBus);
   }
 
@@ -532,15 +530,7 @@ export class NewsroomSystem implements System {
     return this.deskManager;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Throttle non-critical updates
-    if (currentTick - this.lastUpdateTick < NewsroomSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Decay story freshness
     this.deskManager.decayStoryFreshness();
 
@@ -548,7 +538,7 @@ export class NewsroomSystem implements System {
     this.deskManager.distributePendingStories();
 
     // Process world events for news stories
-    this.scanWorldForNews(world, currentTick);
+    this.scanWorldForNews(ctx.world, ctx.tick);
   }
 
   /**
@@ -581,7 +571,7 @@ export class NewsroomSystem implements System {
     }
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.deskManager.cleanup();
   }
 }

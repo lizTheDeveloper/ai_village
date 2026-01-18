@@ -190,9 +190,10 @@ describe.skip('Quality Economy Integration', () => {
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 50);
       agent.addComponent(result.inventory);
 
-      // Try to sell without specifying quality
+      // Try to sell without specifying quality - test validation of undefined quality parameter
+      const noQuality: unknown = undefined;
       expect(() => {
-        tradingSystem.sellItem(world, agent.id, shop.id, 'wheat', 10, undefined as any);
+        tradingSystem.sellItem(world, agent.id, shop.id, 'wheat', 10, noQuality as number);
       }).toThrow('Quality must be specified for trading');
     });
 

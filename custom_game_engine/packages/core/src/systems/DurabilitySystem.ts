@@ -1,11 +1,10 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import type { ToolTrait } from '../items/traits/ToolTrait.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * Usage type for tool wear tracking.
@@ -45,13 +44,12 @@ export interface ToolWearOptions {
  *
  * Per CLAUDE.md: No silent fallbacks, throws on errors.
  */
-export class DurabilitySystem implements System {
+export class DurabilitySystem extends BaseSystem {
   public readonly id: SystemId = 'durability';
   public readonly priority: number = 56; // After CraftingSystem (55)
   public readonly requiredComponents = [] as const; // Manual processing, not entity-based
 
   private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
 
   // Track which tools have emitted low durability warnings (prevent spam)
   private lowDurabilityWarningsEmitted: Set<string> = new Set();
@@ -64,25 +62,11 @@ export class DurabilitySystem implements System {
   }
 
   /**
-   * Initialize event manager
-   */
-  initialize(world: World): void {
-    this.events = new SystemEventManager(world.eventBus, this.id);
-  }
-
-  /**
    * DurabilitySystem doesn't process entities per-tick.
    * Durability is applied on-demand via applyToolWear().
    */
-  update(_world: World, _entities: ReadonlyArray<any>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick processing needed
-  }
-
-  /**
-   * Cleanup event subscriptions
-   */
-  cleanup(): void {
-    this.events.cleanup();
   }
 
   /**
@@ -143,35 +127,37 @@ export class DurabilitySystem implements System {
     instance.condition = Math.max(0, instance.condition - durabilityLoss);
 
     // Emit tool_used event
-    this.events.emit('tool_used', {
-      itemInstanceId,
-      durabilityLost: durabilityLoss,
-      remainingCondition: instance.condition,
-      usageType,
-    }, agentId || 'durability-system');
-
-    // Check for low durability warning (crossing 20% threshold)
-    if (previousCondition > 20 && instance.condition <= 20) {
-      if (!this.lowDurabilityWarningsEmitted.has(itemInstanceId)) {
-        this.lowDurabilityWarningsEmitted.add(itemInstanceId);
-        this.events.emit('tool_low_durability', {
-          itemInstanceId,
-          condition: instance.condition,
-          agentId: agentId,
-          toolType: toolTrait.toolType,
-        }, agentId || 'durability-system');
-      }
-    }
-
-    // Check if tool broke (crossed 0 threshold)
-    if (previousCondition > 0 && instance.condition === 0) {
-      this.events.emit('tool_broken', {
+    if (this.events) {
+      this.events.emit('tool_used', {
         itemInstanceId,
-        toolType: toolTrait.toolType,
-        agentId: agentId,
+        durabilityLost: durabilityLoss,
+        remainingCondition: instance.condition,
+        usageType,
       }, agentId || 'durability-system');
-      // Remove from low durability tracking (it's broken now)
-      this.lowDurabilityWarningsEmitted.delete(itemInstanceId);
+
+      // Check for low durability warning (crossing 20% threshold)
+      if (previousCondition > 20 && instance.condition <= 20) {
+        if (!this.lowDurabilityWarningsEmitted.has(itemInstanceId)) {
+          this.lowDurabilityWarningsEmitted.add(itemInstanceId);
+          this.events.emit('tool_low_durability', {
+            itemInstanceId,
+            condition: instance.condition,
+            agentId: agentId,
+            toolType: toolTrait.toolType,
+          }, agentId || 'durability-system');
+        }
+      }
+
+      // Check if tool broke (crossed 0 threshold)
+      if (previousCondition > 0 && instance.condition === 0) {
+        this.events.emit('tool_broken', {
+          itemInstanceId,
+          toolType: toolTrait.toolType,
+          agentId: agentId,
+        }, agentId || 'durability-system');
+        // Remove from low durability tracking (it's broken now)
+        this.lowDurabilityWarningsEmitted.delete(itemInstanceId);
+      }
     }
   }
 

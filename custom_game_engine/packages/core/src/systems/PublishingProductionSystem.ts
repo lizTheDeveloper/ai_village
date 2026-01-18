@@ -1,8 +1,6 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus as CoreEventBus } from '../events/EventBus.js';
 import type { EntityId } from '../types.js';
 
 interface ProductionJob {
@@ -36,28 +34,23 @@ interface ProductionJob {
  * - Track production progress
  * - Emit production events
  */
-export class PublishingProductionSystem implements System {
+export class PublishingProductionSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_production';
   public readonly priority = 44;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  private eventBus: CoreEventBus;
 
   // Active production jobs
   private activeJobs: Map<string, ProductionJob> = new Map();
   private nextJobId = 1;
 
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
-  }
-
-  public update(world: World, _entities: Entity[], deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Process active jobs
     for (const [jobId, job] of this.activeJobs.entries()) {
-      job.progress += deltaTime;
+      job.progress += ctx.deltaTime;
 
       // Check if job is complete
       if (job.progress >= job.duration) {
-        this.completeJob(jobId, job, world);
+        this.completeJob(jobId, job, ctx.world);
       }
     }
   }
@@ -85,15 +78,11 @@ export class PublishingProductionSystem implements System {
 
     this.activeJobs.set(jobId, job);
 
-    this.eventBus.emit({
-      type: 'publishing:scribe_started',
-      source: this.id,
-      data: {
-        jobId,
-        scribeId,
-        workshopId,
-        sourceBookId,
-      },
+    this.events.emitGeneric('publishing:scribe_started', {
+      jobId,
+      scribeId,
+      workshopId,
+      sourceBookId,
     });
 
     return jobId;
@@ -122,15 +111,11 @@ export class PublishingProductionSystem implements System {
 
     this.activeJobs.set(jobId, job);
 
-    this.eventBus.emit({
-      type: 'publishing:binding_started',
-      source: this.id,
-      data: {
-        jobId,
-        binderId,
-        workshopId,
-        manuscriptId,
-      },
+    this.events.emitGeneric('publishing:binding_started', {
+      jobId,
+      binderId,
+      workshopId,
+      manuscriptId,
     });
 
     return jobId;
@@ -160,16 +145,12 @@ export class PublishingProductionSystem implements System {
 
     this.activeJobs.set(jobId, job);
 
-    this.eventBus.emit({
-      type: 'publishing:printing_started',
-      source: this.id,
-      data: {
-        jobId,
-        printerId,
-        pressId,
-        manuscriptId,
-        copies,
-      },
+    this.events.emitGeneric('publishing:printing_started', {
+      jobId,
+      printerId,
+      pressId,
+      manuscriptId,
+      copies,
     });
 
     return jobId;
@@ -198,15 +179,11 @@ export class PublishingProductionSystem implements System {
 
     this.activeJobs.set(jobId, job);
 
-    this.eventBus.emit({
-      type: 'publishing:biography_started',
-      source: this.id,
-      data: {
-        jobId,
-        writerId,
-        subjectId,
-        subjectName,
-      },
+    this.events.emitGeneric('publishing:biography_started', {
+      jobId,
+      writerId,
+      subjectId,
+      subjectName,
     });
 
     return jobId;
@@ -221,60 +198,44 @@ export class PublishingProductionSystem implements System {
 
     switch (job.type) {
       case 'scribe':
-        this.eventBus.emit({
-          type: 'publishing:scribe_completed',
-          source: this.id,
-          data: {
-            jobId,
-            scribeId: job.workerId,
-            workshopId: job.workshopId,
-            bookCopied: job.data.sourceBookId!,
-            quality,
-          },
+        this.events.emitGeneric('publishing:scribe_completed', {
+          jobId,
+          scribeId: job.workerId,
+          workshopId: job.workshopId,
+          bookCopied: job.data.sourceBookId!,
+          quality,
         });
         break;
 
       case 'binding':
-        this.eventBus.emit({
-          type: 'publishing:binding_completed',
-          source: this.id,
-          data: {
-            jobId,
-            binderId: job.workerId,
-            workshopId: job.workshopId,
-            bookId: `book_${jobId}`,
-            quality,
-          },
+        this.events.emitGeneric('publishing:binding_completed', {
+          jobId,
+          binderId: job.workerId,
+          workshopId: job.workshopId,
+          bookId: `book_${jobId}`,
+          quality,
         });
         break;
 
       case 'printing':
-        this.eventBus.emit({
-          type: 'publishing:printing_completed',
-          source: this.id,
-          data: {
-            jobId,
-            printerId: job.workerId,
-            pressId: job.workshopId,
-            booksProduced: job.data.copies || 1,
-            quality,
-          },
+        this.events.emitGeneric('publishing:printing_completed', {
+          jobId,
+          printerId: job.workerId,
+          pressId: job.workshopId,
+          booksProduced: job.data.copies || 1,
+          quality,
         });
         break;
 
       case 'biography':
         const pages = Math.floor(Math.random() * 50 + 50); // 50-100 pages
-        this.eventBus.emit({
-          type: 'publishing:biography_completed',
-          source: this.id,
-          data: {
-            jobId,
-            writerId: job.workerId,
-            subjectId: job.data.subjectId!,
-            bookId: `biography_${jobId}`,
-            quality,
-            pages,
-          },
+        this.events.emitGeneric('publishing:biography_completed', {
+          jobId,
+          writerId: job.workerId,
+          subjectId: job.data.subjectId!,
+          bookId: `biography_${jobId}`,
+          quality,
+          pages,
         });
         break;
     }
@@ -309,7 +270,4 @@ export class PublishingProductionSystem implements System {
   public getAllJobs(): ProductionJob[] {
     return Array.from(this.activeJobs.values());
   }
-
-  public onAddEntity(_world: World, _entity: Entity): void {}
-  public onRemoveEntity(_world: World, _entity: Entity): void {}
 }

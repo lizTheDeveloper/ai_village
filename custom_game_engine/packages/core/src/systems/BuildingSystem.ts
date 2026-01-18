@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { BuildingType as BT } from '../types/BuildingType.js';
@@ -15,7 +15,6 @@ import { createShopComponent, type ShopType } from '../components/ShopComponent.
 import type { GameEvent } from '../events/GameEvent.js';
 import { createTownHallComponent } from '../components/TownHallComponent.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { createCensusBureauComponent } from '../components/CensusBureauComponent.js';
 import { createWarehouseComponent } from '../components/WarehouseComponent.js';
 import { createWeatherStationComponent } from '../components/WeatherStationComponent.js';
@@ -44,13 +43,12 @@ import { createTagsComponent } from '../components/TagsComponent.js';
  *
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
  */
-export class BuildingSystem implements System {
+export class BuildingSystem extends BaseSystem {
   public readonly id: SystemId = 'building';
   public readonly priority: number = 16; // Run after Needs (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
 
   private isInitialized = false;
-  private events!: SystemEventManager;
 
   /**
    * Blueprint registry for looking up building definitions with layouts.
@@ -99,13 +97,10 @@ export class BuildingSystem implements System {
    * Initialize the system and register event listeners.
    * Called once when system is registered.
    */
-  public initialize(world: World, eventBus: EventBus): void {
+  protected onInitialize(world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
-
-    // Initialize SystemEventManager
-    this.events = new SystemEventManager(eventBus, this.id);
 
     // Listen for construction started to track builderId
     this.events.on('construction:started', (data) => {
@@ -597,10 +592,9 @@ export class BuildingSystem implements System {
     });
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process all buildings
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const building = impl.getComponent<BuildingComponent>(CT.Building);
       const position = impl.getComponent<PositionComponent>(CT.Position);
@@ -614,13 +608,13 @@ export class BuildingSystem implements System {
 
       // Handle buildings under construction
       if (!building.isComplete && building.progress < 100) {
-        this.advanceConstruction(world, impl, building, position, deltaTime);
+        this.advanceConstruction(ctx.world, impl, building, position, ctx.deltaTime);
         continue;
       }
 
       // Handle fuel consumption for completed buildings with active recipes
       if (building.isComplete && building.fuelRequired && building.activeRecipe) {
-        this.consumeFuel(world, impl, building, deltaTime);
+        this.consumeFuel(ctx.world, impl, building, ctx.deltaTime);
       }
     }
   }
@@ -1118,7 +1112,7 @@ export class BuildingSystem implements System {
     return time;
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Custom cleanup if needed
   }
 }

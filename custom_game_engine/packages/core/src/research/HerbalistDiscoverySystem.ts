@@ -8,11 +8,10 @@
  * Then someone noticed, and now we have dissertations." - Anonymous Botanist
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -208,27 +207,17 @@ export function generateBotanicalPaper(discovery: PlantDiscovery): BotanicalPape
  * Herbalist Discovery System
  * Manages botanical research and paper publication for herbalists
  */
-export class HerbalistDiscoverySystem implements System {
+export class HerbalistDiscoverySystem extends BaseSystem {
   public readonly id: SystemId = 'herbalist_discovery';
   public readonly priority: number = 175; // After gathering, before regular research
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private paperSystem: AcademicPaperSystem | null = null;
-
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 100; // Every 5 seconds at 20 TPS
 
   // Discovery tracking
   private discoveredSpecies: Set<string> = new Set();
   private pendingPublications: PlantDiscovery[] = [];
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
 
   /**
    * Initialize the paper system
@@ -370,17 +359,11 @@ export class HerbalistDiscoverySystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < HerbalistDiscoverySystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process pending publications
     // Herbalists take time to write up their findings (simulate research period)
     const readyForPublication = this.pendingPublications.filter(
-      (d) => !d.paperPublished && world.tick - d.discoveredAt > 500 // ~25 seconds delay
+      (d) => !d.paperPublished && ctx.tick - d.discoveredAt > 500 // ~25 seconds delay
     );
 
     for (const discovery of readyForPublication) {
@@ -417,8 +400,8 @@ export class HerbalistDiscoverySystem implements System {
   /**
    * Cleanup subscriptions
    */
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Base class handles events.cleanup()
   }
 }
 

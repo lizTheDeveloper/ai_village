@@ -11,12 +11,11 @@
  * - Creating landmarks (mountains, valleys)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 // ============================================================================
 // Terrain Modification Types
@@ -108,18 +107,17 @@ export const DEFAULT_TERRAIN_POWER_CONFIG: TerrainPowerConfig = {
 // TerrainModificationSystem
 // ============================================================================
 
-export class TerrainModificationSystem implements System {
+export class TerrainModificationSystem extends BaseSystem {
   public readonly id = 'TerrainModificationSystem';
-  public readonly name = 'TerrainModificationSystem';
   public readonly priority = 70;
   public readonly requiredComponents = [];
 
   private config: TerrainPowerConfig;
   private modifications: Map<string, TerrainModification> = new Map();
   private lastUpdate: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<TerrainPowerConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_TERRAIN_POWER_CONFIG,
       ...config,
@@ -127,16 +125,8 @@ export class TerrainModificationSystem implements System {
     };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     if (currentTick - this.lastUpdate < this.config.updateInterval) {
       return;
@@ -145,7 +135,7 @@ export class TerrainModificationSystem implements System {
     this.lastUpdate = currentTick;
 
     // Process ongoing terrain modifications
-    this.processModifications(world, currentTick);
+    this.processModifications(ctx.world, currentTick);
   }
 
   /**
@@ -196,14 +186,16 @@ export class TerrainModificationSystem implements System {
     this.applyModification(world, modification);
 
     // Emit terrain modified event (using generic since not in EventMap)
-    this.events.emitGeneric('terrain_modified', {
-      modificationId: modification.id,
-      deityId,
-      type,
-      location,
-      radius,
-      magnitude,
-    });
+    if (this.events) {
+      this.events.emitGeneric('terrain_modified', {
+        modificationId: modification.id,
+        deityId,
+        type,
+        location,
+        radius,
+        magnitude,
+      });
+    }
 
     return modification;
   }

@@ -5,11 +5,10 @@
  * Different species have different parenting behaviors.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType';
 import type { EventBus } from '../events/EventBus';
-import { SystemEventManager } from '../events/TypedEventEmitter';
 import type { ParentingComponent, ParentingResponsibility } from '../components/ParentingComponent';
 import type { NeedsComponent } from '../components/NeedsComponent';
 import type { PositionComponent } from '../components/PositionComponent';
@@ -41,33 +40,24 @@ export const DEFAULT_PARENTING_CONFIG: ParentingSystemConfig = {
 /**
  * System that manages parenting drives and child wellbeing
  */
-export class ParentingSystem implements System {
+export class ParentingSystem extends BaseSystem {
   public readonly id = 'parenting' as const;
   public readonly priority = 500; // Run after needs/mood systems
   public readonly requiredComponents = [CT.Parenting] as const;
 
   public readonly name = 'ParentingSystem';
   private config: ParentingSystemConfig;
-  private lastUpdate: number = 0;
-  private events!: SystemEventManager;
+  protected readonly throttleInterval: number;
 
   constructor(config: Partial<ParentingSystemConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_PARENTING_CONFIG, ...config };
+    this.throttleInterval = this.config.updateInterval;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  public update(world: World, _entities: ReadonlyArray<import('../ecs/Entity.js').Entity>, _deltaTime: number): void {
-    // Only update at intervals to reduce CPU load
-    if (world.tick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-    this.lastUpdate = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Find all entities with parenting responsibilities
-    const parents = world.query().with(CT.Parenting).executeEntities();
+    const parents = ctx.world.query().with(CT.Parenting).executeEntities();
 
     for (const parent of parents) {
       const parentingComp = (parent as EntityImpl).getComponent<ParentingComponent>(CT.Parenting);
@@ -77,7 +67,7 @@ export class ParentingSystem implements System {
 
       // Update each child's wellbeing assessment
       for (const responsibility of parentingComp.responsibilities) {
-        this.updateChildWellbeing(world, parent as EntityImpl, responsibility);
+        this.updateChildWellbeing(ctx.world, parent as EntityImpl, responsibility);
       }
 
       // Increment time since last care
@@ -87,7 +77,7 @@ export class ParentingSystem implements System {
       parentingComp.updateDriveLevel();
 
       // Check for neglect and emit warnings
-      this.checkForNeglect(world, parent as EntityImpl, parentingComp);
+      this.checkForNeglect(ctx.world, parent as EntityImpl, parentingComp);
     }
   }
 
@@ -313,7 +303,4 @@ export class ParentingSystem implements System {
     }, parentId);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
 }

@@ -23,9 +23,10 @@
  * 5. Research complete! All 3 papers now part of Advanced AI's bibliography
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ResearchRegistry } from './ResearchRegistry.js';
 import type { ResearchDefinition, ResearchField } from './types.js';
 
@@ -1005,19 +1006,15 @@ export class AcademicPaperManager {
 // ACADEMIC PAPER SYSTEM
 // =============================================================================
 
-export class AcademicPaperSystem implements System {
+export class AcademicPaperSystem extends BaseSystem {
   readonly id = 'AcademicPaperSystem';
   readonly priority = 56; // Between ResearchSystem (55) and InventorFameSystem (54)
   readonly requiredComponents = [] as const;
 
   private manager: AcademicPaperManager = new AcademicPaperManager();
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private tickCounter = 0;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected async onInitialize(_world: World, eventBus: EventBus): Promise<void> {
 
     // Subscribe to research progress events
     this.events.onGeneric('research:progress', (data: unknown) => {
@@ -1040,15 +1037,13 @@ export class AcademicPaperSystem implements System {
     // This handler can be expanded to auto-publish based on progress milestones
   }
 
-  update(_world: World, _entities: Entity[], _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     this.tickCounter++;
     // Periodic updates if needed
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.manager.reset();
-    this.eventBus = null;
   }
 
   // ---------------------------------------------------------------------------

@@ -146,11 +146,12 @@ export class TerminalEffectHandler {
   private handleDeath(entity: EntityImpl, cause: string): TerminalEffectResult {
     const agentName = this.getAgentName(entity);
 
-    // Set health to 0 via needs - using addComponent to replace
+    // Set health to 0 via needs component
     const needs = entity.components.get(CT.Needs);
     if (needs && typeof needs === 'object' && 'health' in needs) {
+      // Entity already typed as EntityImpl in parameter, can call addComponent directly
       const updatedNeeds = { ...needs, health: 0 };
-      (entity as any).addComponent(updatedNeeds);
+      entity.addComponent(updatedNeeds);
     }
 
     this.emitEvent('magic:death', entity.id, {

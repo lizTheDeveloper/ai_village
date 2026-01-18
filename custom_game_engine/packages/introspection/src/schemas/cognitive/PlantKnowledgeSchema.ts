@@ -127,14 +127,14 @@ export const PlantKnowledgeSchema = autoRegister(
 
     validate: (data): data is PlantKnowledgeComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const p = data as any;
+      const p = data as Record<string, unknown>;
 
-      return (
-        p.type === 'plant_knowledge' &&
-        typeof p.knowledge === 'object' &&
-        Array.isArray(p.encounteredPlants) &&
-        typeof p.herbalistSkill === 'number'
-      );
+      if (!('type' in p) || p.type !== 'plant_knowledge') return false;
+      if (!('knowledge' in p) || typeof p.knowledge !== 'object' || p.knowledge === null) return false;
+      if (!('encounteredPlants' in p) || !Array.isArray(p.encounteredPlants)) return false;
+      if (!('herbalistSkill' in p) || typeof p.herbalistSkill !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => ({

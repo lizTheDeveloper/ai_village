@@ -13,6 +13,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 
 /**
@@ -32,6 +33,29 @@ export interface HearingResult {
   heardSpeech: HeardSpeech[];
 }
 
+/**
+ * Spatial query result from ChunkSpatialQuery.
+ * Matches the interface from @ai-village/world package.
+ */
+interface SpatialQueryResult {
+  entity: Entity;
+  distance: number;
+}
+
+/**
+ * Minimal interface for ChunkSpatialQuery service from @ai-village/world.
+ * Used for efficient spatial entity queries.
+ */
+interface ChunkSpatialQuery {
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: string[],
+    options?: { excludeIds?: Set<string> }
+  ): SpatialQueryResult[];
+}
+
 /** Default hearing range in tiles */
 const DEFAULT_HEARING_RANGE = 50;
 
@@ -39,13 +63,13 @@ const DEFAULT_HEARING_RANGE = 50;
  * Chunk spatial query service injected at runtime from @ai-village/world.
  * Used for efficient spatial entity queries.
  */
-let chunkSpatialQuery: any | null = null; // ChunkSpatialQuery from @ai-village/world
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
 /**
  * Inject chunk spatial query service from @ai-village/world.
  * Called by the application bootstrap.
  */
-export function injectChunkSpatialQueryForHearing(spatialQuery: any): void {
+export function injectChunkSpatialQueryForHearing(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
 }
 
@@ -144,7 +168,7 @@ export class HearingProcessor {
 
         // Check if agent has recent speech
         if (otherAgentComp.recentSpeech) {
-          const identity = otherImpl.getComponent(ComponentType.Identity) as any;
+          const identity = otherImpl.getComponent<IdentityComponent>(ComponentType.Identity);
           const speakerName = identity?.name || 'Someone';
 
           heardSpeech.push({
@@ -176,7 +200,7 @@ export class HearingProcessor {
 
         // Within hearing range and has recent speech
         if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
-          const identity = otherImpl.getComponent(ComponentType.Identity) as any;
+          const identity = otherImpl.getComponent<IdentityComponent>(ComponentType.Identity);
           const speakerName = identity?.name || 'Someone';
 
           heardSpeech.push({
@@ -224,7 +248,7 @@ export class HearingProcessor {
         }
       );
 
-      return agentsInRadius.map(({ entity }: any) => entity);
+      return agentsInRadius.map((result: SpatialQueryResult) => result.entity);
     } else {
       // Fallback to global query
       const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();

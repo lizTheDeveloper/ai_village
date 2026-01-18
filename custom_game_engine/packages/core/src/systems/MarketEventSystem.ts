@@ -12,12 +12,9 @@
  * - Strict validation - events must have valid types, durations, etc.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import {
   MARKET_EVENT_CHECK_INTERVAL,
   MARKET_EVENT_CHANCE,
@@ -52,13 +49,11 @@ export interface ActiveMarketEvent {
 /**
  * System that generates and manages random market events
  */
-export class MarketEventSystem implements System {
-  public readonly id: SystemId = 'market_events';
-  public readonly priority: number = 24; // Run before TradingSystem (25)
-  public readonly requiredComponents: ReadonlyArray<string> = [];
+export class MarketEventSystem extends BaseSystem {
+  readonly id: SystemId = 'market_events';
+  readonly priority: number = 24; // Run before TradingSystem (25)
+  readonly requiredComponents: ReadonlyArray<string> = [];
 
-  private eventBus!: EventBus;
-  private events!: SystemEventManager;
   private activeEvents: ActiveMarketEvent[] = [];
   private lastEventCheck = 0;
   private eventCheckInterval = MARKET_EVENT_CHECK_INTERVAL; // Check every 2 minutes at 20 TPS (120 seconds)
@@ -66,26 +61,10 @@ export class MarketEventSystem implements System {
   private nextEventId = 1;
 
   /**
-   * Initialize the system
-   */
-  public initialize(_world: World, eventBus: EventBus): void {
-    // System is initialized via constructor with eventBus
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  /**
-   * Cleanup event subscriptions
-   */
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  /**
    * Update the system - check for expired events and generate new ones
    */
-  public update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Remove expired events
     const expiredEvents = this.activeEvents.filter(
@@ -106,7 +85,7 @@ export class MarketEventSystem implements System {
     // Periodically check for new events
     if (currentTick - this.lastEventCheck >= this.eventCheckInterval) {
       this.lastEventCheck = currentTick;
-      this.checkForRandomEvents(world, currentTick);
+      this.checkForRandomEvents(ctx.world, currentTick);
     }
   }
 

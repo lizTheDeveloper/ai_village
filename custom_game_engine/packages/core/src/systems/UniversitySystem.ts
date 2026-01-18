@@ -14,14 +14,13 @@
  * - Combined: 4.5x (both unlocked)
  */
 
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { UniversityComponent, ResearchProject } from '../components/UniversityComponent.js';
 import { startResearch, completeResearch, proposeResearch } from '../components/UniversityComponent.js';
 import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
@@ -87,26 +86,24 @@ function topicToResearchId(topic: string): string {
 /**
  * UniversitySystem manages university operations
  */
-export class UniversitySystem implements System {
+export class UniversitySystem extends BaseSystem {
   public readonly id: SystemId = 'university';
   public readonly priority = 46; // After library (45)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
 
   private eventBus: CoreEventBus;
-  private events!: SystemEventManager;
   private readonly RESEARCH_PROGRESS_PER_TICK = 0.1; // Base research speed
-  private lastUpdateTick: number = 0;
+  private lastStatsTick: number = 0;
 
   constructor(eventBus: CoreEventBus) {
+    super();
     this.eventBus = eventBus;
   }
 
-  initialize(_world: World, eventBus: CoreEventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  public update(world: World, entities: Entity[], _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const entities = ctx.activeEntities;
+    const currentTick = ctx.tick;
 
     // Get global technology unlock component for research multipliers
     const unlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
@@ -133,13 +130,13 @@ export class UniversitySystem implements System {
       this.processResearch(world, impl, university, currentTick);
 
       // Emit university statistics periodically (every 10 seconds)
-      if (currentTick - this.lastUpdateTick >= 200) {
+      if (currentTick - this.lastStatsTick >= 200) {
         this.emitUniversityStats(impl.id, university, currentTick);
       }
     }
 
-    if (currentTick - this.lastUpdateTick >= 200) {
-      this.lastUpdateTick = currentTick;
+    if (currentTick - this.lastStatsTick >= 200) {
+      this.lastStatsTick = currentTick;
     }
   }
 
@@ -331,9 +328,5 @@ export class UniversitySystem implements System {
     });
 
     return projectId;
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

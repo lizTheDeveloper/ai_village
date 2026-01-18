@@ -9,6 +9,7 @@
  */
 
 import type { MultiverseCoordinator } from './MultiverseCoordinator.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type {
   NetworkMessage,
   RemotePassage,
@@ -55,6 +56,9 @@ interface UniverseSubscription {
 
 export class MultiverseNetworkManager {
   private multiverseCoordinator: MultiverseCoordinator;
+
+  // Event managers per universe
+  private eventManagers: Map<string, SystemEventManager> = new Map();
 
   // WebSocket connections
   private wsServer: WebSocketServer | null = null;
@@ -524,15 +528,12 @@ export class MultiverseNetworkManager {
             });
 
             // Emit event for UI notification
-            sourceUniverse.world.eventBus.emit({
-              type: 'possession:cross_universe_jackout',
-              source: 'multiverse-network-manager',
-              data: {
-                deityId: deityEntity.id,
-                entityId,
-                entityName: (entity.components.get('agent') as any)?.name || 'Unknown',
-                targetUniverseId: passage.to.universeId,
-              },
+            const events = this.getOrCreateEventManager(passage.from.universeId, sourceUniverse.world);
+            events.emitGeneric('possession:cross_universe_jackout', {
+              deityId: deityEntity.id,
+              entityId,
+              entityName: (entity.components.get('agent') as any)?.name || 'Unknown',
+              targetUniverseId: passage.to.universeId,
             });
           } else {
             // Multiverse deity possessing across universes in same multiverse
@@ -1233,6 +1234,28 @@ export class MultiverseNetworkManager {
   // ============================================================================
   // Utility Methods
   // ============================================================================
+
+  /**
+   * Get or create event manager for a universe
+   */
+  private getOrCreateEventManager(universeId: string, world: any): SystemEventManager {
+    let events = this.eventManagers.get(universeId);
+    if (!events) {
+      events = new SystemEventManager(world.eventBus, `multiverse_network_${universeId}`);
+      this.eventManagers.set(universeId, events);
+    }
+    return events;
+  }
+
+  /**
+   * Cleanup event managers
+   */
+  cleanup(): void {
+    for (const events of this.eventManagers.values()) {
+      events.cleanup();
+    }
+    this.eventManagers.clear();
+  }
 
   /**
    * Wait for acknowledgment

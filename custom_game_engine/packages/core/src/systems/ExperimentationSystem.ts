@@ -14,7 +14,7 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid state.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -67,21 +67,18 @@ export interface ExperimentRequest {
 /**
  * ExperimentationSystem handles agent recipe experimentation.
  */
-export class ExperimentationSystem implements System {
+export class ExperimentationSystem extends BaseSystem {
   public readonly id: SystemId = 'experimentation';
   public readonly priority: number = 70; // After crafting systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position, CT.Inventory];
 
-  private isInitialized = false;
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 60; // Every second at 60 tps
+
   private recipeRegistry: RecipeRegistry | null = null;
   private pendingExperiments: ExperimentRequest[] = [];
 
   /** Maximum distance from crafting station to experiment */
   private readonly MAX_STATION_DISTANCE = 2;
-
-  /** Tick interval for processing experiments (limit LLM calls) */
-  private readonly PROCESS_INTERVAL = 60; // Every second at 60 tps
 
   /**
    * Set the recipe registry for looking up recipes.
@@ -93,13 +90,7 @@ export class ExperimentationSystem implements System {
   /**
    * Initialize the system.
    */
-  public initialize(world: World, eventBus: EventBus): void {
-    if (this.isInitialized) {
-      return;
-    }
-
-    this.eventBus = eventBus;
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Subscribe to experimentation request events
     eventBus.subscribe<'experiment:requested'>('experiment:requested', (event) => {
       // Map event data to ExperimentRequest (now properly typed in EventMap)
@@ -114,8 +105,6 @@ export class ExperimentationSystem implements System {
       };
       this.queueExperiment(request);
     });
-
-    this.isInitialized = true;
   }
 
   /**
@@ -134,18 +123,13 @@ export class ExperimentationSystem implements System {
   /**
    * Main update loop.
    */
-  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Decrease cooldowns for all agents with recipe discovery
-    this.updateCooldowns(entities);
+    this.updateCooldowns(ctx.activeEntities);
 
-    // Only process experiments periodically to limit LLM calls
-    if (world.tick % this.PROCESS_INTERVAL !== 0) {
-      return;
-    }
-
-    // Process pending experiments
+    // Process pending experiments (already throttled via throttleInterval)
     if (this.pendingExperiments.length > 0) {
-      this.processNextExperiment(world);
+      this.processNextExperiment(ctx.world);
     }
   }
 
@@ -184,27 +168,19 @@ export class ExperimentationSystem implements System {
     // Validate agent can experiment
     const discovery = this.getOrCreateDiscoveryComponent(agent);
     if (!canExperiment(discovery)) {
-      this.eventBus?.emit({
-        type: 'experiment:failed',
-        source: request.agentId,
-        data: {
-          reason: 'cooldown',
-          message: 'Still recovering from last experiment',
-        },
-      });
+      this.events.emitGeneric('experiment:failed', {
+        reason: 'cooldown',
+        message: 'Still recovering from last experiment',
+      }, request.agentId);
       return;
     }
 
     // Check if this combination was already tried
     if (wasAlreadyTried(discovery, request.ingredients)) {
-      this.eventBus?.emit({
-        type: 'experiment:failed',
-        source: request.agentId,
-        data: {
-          reason: 'already_tried',
-          message: 'This combination was already tried and failed',
-        },
-      });
+      this.events.emitGeneric('experiment:failed', {
+        reason: 'already_tried',
+        message: 'This combination was already tried and failed',
+      }, request.agentId);
       return;
     }
 
@@ -217,14 +193,10 @@ export class ExperimentationSystem implements System {
     for (const ing of request.ingredients) {
       const has = this.getItemCount(inventory, ing.itemId);
       if (has < ing.quantity) {
-        this.eventBus?.emit({
-          type: 'experiment:failed',
-          source: request.agentId,
-          data: {
-            reason: 'missing_ingredients',
-            message: `Missing ${ing.quantity - has}x ${ing.itemId}`,
-          },
-        });
+        this.events.emitGeneric('experiment:failed', {
+          reason: 'missing_ingredients',
+          message: `Missing ${ing.quantity - has}x ${ing.itemId}`,
+        }, request.agentId);
         return;
       }
     }
@@ -232,14 +204,10 @@ export class ExperimentationSystem implements System {
     // Validate agent is at appropriate station
     const station = this.findNearbyStation(world, agent, request.recipeType);
     if (!station) {
-      this.eventBus?.emit({
-        type: 'experiment:failed',
-        source: request.agentId,
-        data: {
-          reason: 'no_station',
-          message: `No ${this.getStationForType(request.recipeType)} nearby`,
-        },
-      });
+      this.events.emitGeneric('experiment:failed', {
+        reason: 'no_station',
+        message: `No ${this.getStationForType(request.recipeType)} nearby`,
+      }, request.agentId);
       return;
     }
 
@@ -323,84 +291,60 @@ export class ExperimentationSystem implements System {
 
         if (approvalResult.queued) {
           // Queued for divine approval - emit pending event
-          this.eventBus?.emit({
-            type: 'experiment:pending_approval',
-            source: request.agentId,
-            data: {
-              pendingId: approvalResult.creation.id,
-              itemId: result.item.id,
-              displayName: result.item.displayName,
-              message: 'Awaiting divine blessing...',
-              creativityScore: result.creativityScore,
-            },
-          });
+          this.events.emitGeneric('experiment:pending_approval', {
+            pendingId: approvalResult.creation.id,
+            itemId: result.item.id,
+            displayName: result.item.displayName,
+            message: 'Awaiting divine blessing...',
+            creativityScore: result.creativityScore,
+          }, request.agentId);
         } else if (approvalResult.rejectionReason) {
           // AI deity rejected the creation after scrutiny
-          this.eventBus?.emit({
-            type: 'experiment:rejected',
-            source: request.agentId,
-            data: {
-              itemId: result.item.id,
-              displayName: result.item.displayName,
-              message: approvalResult.rejectionReason,
-            },
-          });
+          this.events.emitGeneric('experiment:rejected', {
+            itemId: result.item.id,
+            displayName: result.item.displayName,
+            message: approvalResult.rejectionReason,
+          }, request.agentId);
         } else {
           // Approved immediately (god or AI deity auto-approved)
           this.registerApprovedCreation(approvalResult.creation);
 
           // Emit success event
-          this.eventBus?.emit({
-            type: 'experiment:success',
-            source: request.agentId,
-            data: {
-              recipeId: result.recipe.id,
-              itemId: result.item.id,
-              displayName: result.item.displayName,
-              message: approvalResult.bypassedAsGod
-                ? 'Divine creation manifested!'
-                : approvalResult.autoApproved
-                  ? 'Blessed by the gods!'
-                  : result.message,
-              creativityScore: result.creativityScore,
-              autoApproved: true,
-            },
-          });
+          this.events.emitGeneric('experiment:success', {
+            recipeId: result.recipe.id,
+            itemId: result.item.id,
+            displayName: result.item.displayName,
+            message: approvalResult.bypassedAsGod
+              ? 'Divine creation manifested!'
+              : approvalResult.autoApproved
+                ? 'Blessed by the gods!'
+                : result.message,
+            creativityScore: result.creativityScore,
+            autoApproved: true,
+          }, request.agentId);
 
           // Also emit recipe discovered event
-          this.eventBus?.emit({
-            type: 'recipe:discovered',
-            source: request.agentId,
-            data: {
-              recipeId: result.recipe.id,
-              discoverer: agentName,
-              recipeType: request.recipeType,
-            },
-          });
+          this.events.emitGeneric('recipe:discovered', {
+            recipeId: result.recipe.id,
+            discoverer: agentName,
+            recipeType: request.recipeType,
+          }, request.agentId);
         }
       } else {
         // Emit failure event
-        this.eventBus?.emit({
-          type: 'experiment:failed',
-          source: request.agentId,
-          data: {
-            reason: 'no_result',
-            message: result.message,
-            creativityScore: result.creativityScore,
-          },
-        });
+        this.events.emitGeneric('experiment:failed', {
+          reason: 'no_result',
+          message: result.message,
+          creativityScore: result.creativityScore,
+        }, request.agentId);
       }
     } catch (error) {
       console.error('[ExperimentationSystem] Experiment error:', error);
 
-      this.eventBus?.emit({
-        type: 'experiment:failed',
-        source: request.agentId,
-        data: {
-          reason: 'error',
-          message: 'The experiment went wrong!',
-        },
-      });
+      this.events.emitGeneric('experiment:failed', {
+        reason: 'error',
+        message: 'The experiment went wrong!',
+      }, request.agentId);
     }
   }
 
@@ -634,54 +578,38 @@ export class ExperimentationSystem implements System {
         // Only emit recipe-specific events for recipe creations
         if (result.creation.creationType === 'recipe' && result.creation.recipe && result.creation.item) {
           // Emit success event
-          this.eventBus?.emit({
-            type: 'experiment:success',
-            source: result.creation.creatorId,
-            data: {
-              recipeId: result.creation.recipe.id,
-              itemId: result.creation.item.id,
-              displayName: result.creation.item.displayName,
-              message: 'The gods have blessed your creation!',
-              creativityScore: result.creation.creativityScore,
-            },
-          });
+          this.events.emitGeneric('experiment:success', {
+            recipeId: result.creation.recipe.id,
+            itemId: result.creation.item.id,
+            displayName: result.creation.item.displayName,
+            message: 'The gods have blessed your creation!',
+            creativityScore: result.creation.creativityScore,
+          }, result.creation.creatorId);
 
           // Also emit recipe discovered event
-          this.eventBus?.emit({
-            type: 'recipe:discovered',
-            source: result.creation.creatorId,
-            data: {
-              recipeId: result.creation.recipe.id,
-              discoverer: result.creation.creatorName,
-              recipeType: result.creation.recipeType || 'recipe',
-            },
-          });
+          this.events.emitGeneric('recipe:discovered', {
+            recipeId: result.creation.recipe.id,
+            discoverer: result.creation.creatorName,
+            recipeType: result.creation.recipeType || 'recipe',
+          }, result.creation.creatorId);
         } else if (result.creation.creationType === 'technology' && result.creation.technology) {
           // Emit technology discovered event
-          this.eventBus?.emit({
-            type: 'research:discovered',
-            source: result.creation.creatorId,
-            data: {
-              technologyId: result.creation.technology.id,
-              name: result.creation.technology.name,
-              field: result.creation.researchField,
-              discoverer: result.creation.creatorName,
-              message: 'The gods have blessed your research!',
-            },
-          });
+          this.events.emitGeneric('research:discovered', {
+            technologyId: result.creation.technology.id,
+            name: result.creation.technology.name,
+            field: result.creation.researchField,
+            discoverer: result.creation.creatorName,
+            message: 'The gods have blessed your research!',
+          }, result.creation.creatorId);
         } else if (result.creation.creationType === 'effect' && result.creation.spell) {
           // Emit spell discovered event
-          this.eventBus?.emit({
-            type: 'magic:discovered',
-            source: result.creation.creatorId,
-            data: {
-              spellId: result.creation.spell.id,
-              name: result.creation.spell.name,
-              paradigm: result.creation.paradigmId,
-              discoverer: result.creation.creatorName,
-              message: 'The gods have blessed your magic!',
-            },
-          });
+          this.events.emitGeneric('magic:discovered', {
+            spellId: result.creation.spell.id,
+            name: result.creation.spell.name,
+            paradigm: result.creation.paradigmId,
+            discoverer: result.creation.creatorName,
+            message: 'The gods have blessed your magic!',
+          }, result.creation.creatorId);
         }
       }
     } else {
@@ -702,15 +630,11 @@ export class ExperimentationSystem implements System {
           displayName = result.creation.spell?.name || 'Unknown spell';
         }
 
-        this.eventBus?.emit({
-          type: 'experiment:rejected',
-          source: result.creation.creatorId,
-          data: {
-            itemId,
-            displayName,
-            message: 'The gods do not favor this creation.',
-          },
-        });
+        this.events.emitGeneric('experiment:rejected', {
+          itemId,
+          displayName,
+          message: 'The gods do not favor this creation.',
+        }, result.creation.creatorId);
       }
     }
   }

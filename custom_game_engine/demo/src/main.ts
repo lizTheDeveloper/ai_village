@@ -3670,16 +3670,26 @@ async function main() {
 
   // Create BackgroundChunkGenerator for asynchronous chunk pre-generation
   // Used by SoulCreationSystem to pre-generate chunks during soul ceremonies
-  const { BackgroundChunkGenerator } = await import('@ai-village/world');
+  const { BackgroundChunkGenerator, ChunkGenerationWorkerPool } = await import('@ai-village/world');
+
+  // Create worker pool for background chunk generation (2 workers)
+  const workerPool = new ChunkGenerationWorkerPool(
+    2,  // Number of workers
+    'phase8-demo',  // Seed
+    undefined  // No planet config for demo
+  );
+  console.log('[Main] ChunkGenerationWorkerPool created (2 workers)');
+
   const backgroundChunkGenerator = new BackgroundChunkGenerator(
     chunkManager,
     terrainGenerator,
     2,  // throttleInterval: process 1 chunk every 2 ticks (100ms at 20 TPS)
     18, // minTPS: pause if TPS drops below 18
-    19  // resumeTPS: resume when TPS recovers to 19+
+    19, // resumeTPS: resume when TPS recovers to 19+
+    workerPool  // Worker pool for background generation
   );
   (gameLoop.world as any).setBackgroundChunkGenerator(backgroundChunkGenerator);
-  console.log('[Main] BackgroundChunkGenerator created (throttle: 2 ticks, pause TPS: <18, resume TPS: 19+)');
+  console.log('[Main] BackgroundChunkGenerator created (throttle: 2 ticks, pause TPS: <18, resume TPS: 19+, with worker pool)');
 
   // Show Universe Browser Screen - the gateway to the multiverse
   // This screen allows players to:

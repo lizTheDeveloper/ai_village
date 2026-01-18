@@ -3,6 +3,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
@@ -146,7 +147,7 @@ export class AgentSwimmingSystem extends BaseSystem {
 
     // SINGLE-PASS OPTIMIZATION: Process all agents in one loop
     // Combines water detection + underwater processing
-    for (const entity of activeEntities) {
+    for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       const position = impl.getComponent<PositionComponent>(CT.Position);
       const movement = impl.getComponent<MovementComponent>(CT.Movement);

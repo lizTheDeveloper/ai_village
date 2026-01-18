@@ -13,7 +13,7 @@
  * - Cultural impact through viral features
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -796,17 +796,16 @@ export function resetAppManager(): void {
 // SYSTEM
 // =============================================================================
 
-export class AppSystem implements System {
+export class AppSystem extends BaseSystem {
   readonly id = 'AppSystem';
   readonly priority = 72;
   readonly requiredComponents = [] as const;
 
+  protected readonly throttleInterval = 20 * 60; // Every minute
+
   private manager = getAppManager();
-  private lastUpdateTick = 0;
 
-  private static readonly UPDATE_INTERVAL = 20 * 60; // Every minute
-
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -814,14 +813,7 @@ export class AppSystem implements System {
     return this.manager;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdateTick < AppSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(_ctx: SystemContext): void {
     // Update active user counts and growth rates
     this.updateAppMetrics();
 
@@ -873,7 +865,7 @@ export class AppSystem implements System {
     }
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     resetAppManager();
   }
 }

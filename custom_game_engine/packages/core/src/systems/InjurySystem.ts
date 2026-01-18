@@ -1,4 +1,3 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -6,6 +5,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { InjuryComponent } from '../components/InjuryComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 interface MovementComponent {
   type: 'movement';
@@ -31,13 +31,15 @@ interface EpisodicMemoryComponent {
  * - Handles healing over time
  * - Requires treatment for major/critical injuries
  */
-export class InjurySystem implements System {
+export class InjurySystem extends BaseSystem {
   public readonly id: SystemId = 'injury';
   public readonly priority = 25; // After combat, before movement
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['injury'];
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const world = ctx.world;
+      const deltaTime = ctx.deltaTime;
       const injury = world.getComponent<InjuryComponent>(entity.id, 'injury');
       if (!injury) continue;
 
@@ -188,10 +190,7 @@ export class InjurySystem implements System {
 
     // Update component with new rates
     entityImpl.updateComponent<NeedsComponent>('needs', (currentNeeds) => {
-      // Handle both class instances (with clone()) and plain objects (from serialization)
-      const updated = typeof currentNeeds.clone === 'function'
-        ? currentNeeds.clone()
-        : { ...currentNeeds };
+      const updated = currentNeeds.clone();
       updated.hungerDecayRate = (currentNeeds.hungerDecayRate || 1.0) * hungerRateMultiplier;
       updated.energyDecayRate = (currentNeeds.energyDecayRate || 1.0) * energyRateMultiplier;
       return updated;

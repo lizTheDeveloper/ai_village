@@ -1,12 +1,10 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId, ComponentType } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { BuildingType as BT } from '../types/BuildingType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import { EntityImpl, type Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { CircadianComponent, DreamContent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -57,10 +55,10 @@ const WEIRD_DREAM_ELEMENTS = [
  * - Apply sleep quality modifiers
  * - Handle wake conditions
  */
-export class SleepSystem implements System {
-  public readonly id: SystemId = 'sleep';
-  public readonly priority: number = 12; // After Needs (priority 15), before Memory (100)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Circadian, CT.Needs];
+export class SleepSystem extends BaseSystem {
+  public readonly id = 'sleep' as const;
+  public readonly priority = 12; // After Needs (priority 15), before Memory (100)
+  public readonly requiredComponents = [CT.Circadian, CT.Needs] as const;
 
   /**
    * Systems that must run before this one.
@@ -76,11 +74,6 @@ export class SleepSystem implements System {
     sleepDrive?: () => void;
     energyRecovery?: () => void;
   }>();
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
 
   /**
    * Set the StateMutatorSystem reference (called during system registration)
@@ -89,16 +82,15 @@ export class SleepSystem implements System {
     this.stateMutator = stateMutator;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.stateMutator) {
       throw new Error('[SleepSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
     }
 
-    const currentTick = world.tick;
-    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+    const shouldUpdateDeltas = ctx.tick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
     // Get time component from world entity (should be only one)
-    const timeEntities = world.query().with(CT.Time).executeEntities();
+    const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
     let timeOfDay = 12; // Default noon if no time entity
     let hoursElapsed = 0;
 
@@ -111,14 +103,13 @@ export class SleepSystem implements System {
         // This ensures sleep drive accumulates correctly at different time speeds
         const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
         // Calculate hours elapsed based on deltaTime and effective day length
-        hoursElapsed = (deltaTime / effectiveDayLength) * 24;
+        hoursElapsed = (ctx.deltaTime / effectiveDayLength) * 24;
       }
     }
 
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const circadian = getCircadian(impl);
-      const needs = getNeeds(impl);
+    for (const entity of ctx.activeEntities) {
+      const circadian = getCircadian(entity);
+      const needs = getNeeds(entity);
 
       if (!circadian || !needs) continue;
 
@@ -129,13 +120,13 @@ export class SleepSystem implements System {
 
       // Process sleep (discrete events: dreams, wake checks)
       if (circadian.isSleeping) {
-        this.processSleep(impl, circadian, needs, hoursElapsed, world);
+        this.processSleep(entity, circadian, needs, hoursElapsed, ctx.world);
       }
     }
 
     // Mark delta rates as updated
     if (shouldUpdateDeltas) {
-      this.lastDeltaUpdateTick = currentTick;
+      this.lastDeltaUpdateTick = ctx.tick;
     }
   }
 
@@ -492,7 +483,4 @@ export class SleepSystem implements System {
     }, entity.id);
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
 }

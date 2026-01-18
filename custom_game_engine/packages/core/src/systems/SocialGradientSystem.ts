@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -18,36 +18,33 @@ import {
  * SocialGradientSystem listens for agent speech and parses gradient information
  * Updates SocialGradientComponent with trust-weighted directional hints
  */
-export class SocialGradientSystem implements System {
+export class SocialGradientSystem extends BaseSystem {
   public readonly id: SystemId = CT.SocialGradient;
   public readonly priority: number = 22; // After AISystem, before Exploration
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  protected readonly throttleInterval: number = 20; // Only run once per second (at 20 TPS)
+
   // Future: Add event bus support for gradient events
   private lastProcessedMessageCount: Map<string, number> = new Map();
-  private lastUpdateTick: number = 0;
-  private readonly updateInterval: number = 20; // Only run once per second (at 20 TPS)
   private pendingProcessing = new Set<string>(); // Set for O(1) lookup - queue of agent IDs waiting to be processed
   private readonly maxProcessPerUpdate: number = 2; // Process max 2 agents per update (round-robin)
 
-  initialize(_world: World, _eventBus: EventBus): void {
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Future: Subscribe to speech events via event bus
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    // Throttle: Only run once per second instead of 20x per second
-    if (world.tick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const { activeEntities, tick } = ctx;
+
     // Apply gradient decay to all entities
-    const gradientsEntities = entities.filter(e => e.components.has(CT.SocialGradient));
+    const gradientsEntities = activeEntities.filter(e => e.components.has(CT.SocialGradient));
 
     for (const entity of gradientsEntities) {
       try {
         const socialGradient = getSocialGradient(entity);
         if (socialGradient) {
-          socialGradient.applyDecay(currentTick);
+          socialGradient.applyDecay(tick);
         }
       } catch (error) {
         throw new Error(`SocialGradientSystem decay failed for entity ${entity.id}: ${error}`);
@@ -56,7 +53,7 @@ export class SocialGradientSystem implements System {
 
     // OPTIMIZATION: Only process speech when agents have NEW messages
     // Round-robin scheduling: Queue agents with new messages, process limited number per update
-    const agents = entities.filter(e =>
+    const agents = activeEntities.filter(e =>
       e.components.has(CT.Agent) &&
       e.components.has(CT.Conversation)
     );
@@ -82,7 +79,7 @@ export class SocialGradientSystem implements System {
     }
 
     // Build entity lookup map for O(1) access by ID
-    const entityById = new Map(entities.map(e => [e.id, e]));
+    const entityById = new Map(activeEntities.map(e => [e.id, e]));
 
     // Step 2: Process up to maxProcessPerUpdate agents from the queue (round-robin)
     const processCount = Math.min(this.maxProcessPerUpdate, this.pendingProcessing.size);
@@ -101,7 +98,7 @@ export class SocialGradientSystem implements System {
         if (!conversation) continue;
 
         // Process this agent's speech
-        this._processSpeech(agent, entities, world, currentTick);
+        this._processSpeech(agent, activeEntities, ctx.world, tick);
 
         // Update the message count to mark as processed
         this.lastProcessedMessageCount.set(speakerId, conversation.messages.length);

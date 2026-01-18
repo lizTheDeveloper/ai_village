@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -36,45 +36,30 @@ const BELIEF_RATES_PER_HOUR: Record<BeliefActivity, number> = {
  * - Belief accumulates in deity entities
  * - Deities experience decay without active worship
  */
-export class BeliefGenerationSystem implements System {
+export class BeliefGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'belief_generation';
   public readonly priority: number = 115; // After belief formation
   public readonly requiredComponents = [];
 
-  private eventBus?: EventBus;
-  private lastUpdateTick: number = 0;
-  private readonly updateInterval: number = 20; // Update once per second at 20 TPS
-  private world?: World;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.world = _world;
-  }
+  protected readonly throttleInterval: number = 20; // Update once per second at 20 TPS
 
   /**
    * Get the belief economy config from the world's divine config
    */
   private getBeliefEconomyConfig(): BeliefEconomyConfig | undefined {
-    if (!this.world) return undefined;
     const divineConfig = this.world.divineConfig;
     return divineConfig?.beliefEconomy;
   }
 
-  update(_world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    const currentTick = _world.tick;
-
-    // Throttle: Only update once per second
-    if (currentTick - this.lastUpdateTick < this.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const { activeEntities, tick } = ctx;
 
     // Find all deities
-    const deities = entities.filter(e => e.components.has(CT.Deity));
+    const deities = activeEntities.filter(e => e.components.has(CT.Deity));
 
     // Process each deity
     for (const deity of deities) {
-      this._processDeity(deity, entities, currentTick);
+      this._processDeity(deity, activeEntities, tick);
     }
   }
 
@@ -136,10 +121,10 @@ export class BeliefGenerationSystem implements System {
 
     // Update belief generation rate
     if (typeof deityComp.updateBeliefRate === 'function') {
-      deityComp.updateBeliefRate(totalBeliefGenerated * this.updateInterval);
+      deityComp.updateBeliefRate(totalBeliefGenerated * this.throttleInterval);
     } else {
       // Fallback: directly update rate
-      deityComp.belief.beliefPerTick = totalBeliefGenerated * this.updateInterval;
+      deityComp.belief.beliefPerTick = totalBeliefGenerated * this.throttleInterval;
       deityComp.belief.peakBeliefRate = Math.max(deityComp.belief.peakBeliefRate, deityComp.belief.beliefPerTick);
     }
 
@@ -160,16 +145,12 @@ export class BeliefGenerationSystem implements System {
     }
 
     // Emit event if belief was generated
-    if (totalBeliefGenerated > 0 && this.eventBus) {
-      this.eventBus.emit({
-        type: 'belief:generated',
-        source: 'belief_generation',
-        data: {
-          deityId: deityEntity.id,
-          amount: totalBeliefGenerated,
-          believers: believers.length,
-          currentBelief: deityComp.belief.currentBelief,
-        },
+    if (totalBeliefGenerated > 0) {
+      this.events.emit('belief:generated', {
+        deityId: deityEntity.id,
+        amount: totalBeliefGenerated,
+        believers: believers.length,
+        currentBelief: deityComp.belief.currentBelief,
       });
     }
   }

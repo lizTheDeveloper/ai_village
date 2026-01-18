@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
@@ -13,19 +13,19 @@ import type { RealmLocationComponent } from '../components/RealmLocationComponen
  *
  * This system runs early to update time tracking before other systems process entities.
  */
-export class RealmTimeSystem implements System {
+export class RealmTimeSystem extends BaseSystem {
   readonly id: SystemId = 'realm_time';
   readonly priority: number = 5;  // Run very early
   readonly requiredComponents = ['realm_location'] as const;
 
-  update(_world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Update time tracking for each entity based on their current realm
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
       if (!realmLocation) continue;
 
       // Apply time dilation to update total time in realm
-      const adjustedDelta = deltaTime * realmLocation.timeDilation;
+      const adjustedDelta = ctx.deltaTime * realmLocation.timeDilation;
       realmLocation.totalTimeInRealm += adjustedDelta;
     }
   }

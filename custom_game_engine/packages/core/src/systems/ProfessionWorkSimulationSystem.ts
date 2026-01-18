@@ -16,7 +16,7 @@
  * - Outputs cached in CityDirector for performance
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -73,38 +73,35 @@ export const DEFAULT_PROFESSION_WORK_CONFIG: ProfessionWorkConfig = {
  *
  * Priority: 151 (after CityDirectorSystem at 45, before end of loop)
  */
-export class ProfessionWorkSimulationSystem implements System {
+export class ProfessionWorkSimulationSystem extends BaseSystem {
   public readonly id: SystemId = 'profession_work_simulation';
   public readonly priority: number = 151;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private config: ProfessionWorkConfig;
   private eventBus: EventBus | null = null;
-  private lastUpdateTick: number = 0;
   private lastAggregationTick: number = 0;
 
+  protected readonly throttleInterval: number;
+
   constructor(config: Partial<ProfessionWorkConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_PROFESSION_WORK_CONFIG, ...config };
+    this.throttleInterval = this.config.updateInterval;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
 
   /**
    * Main update loop.
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only update periodically (5 second intervals)
-    if (currentTick - this.lastUpdateTick < this.config.updateInterval) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Get time component for work shift checks
-    const timeEntity = this.getTimeEntity(world);
+    const timeEntity = this.getTimeEntity(ctx.world);
     if (!timeEntity) {
       return; // No time system, skip
     }
@@ -118,10 +115,10 @@ export class ProfessionWorkSimulationSystem implements System {
     const dayOfWeek = this.getDayOfWeek(currentTick);
 
     // Check city crisis states (affects all profession work)
-    const cityCrisisMap = this.checkCityCrises(world);
+    const cityCrisisMap = this.checkCityCrises(ctx.world);
 
     // Process all agents with professions
-    const professionAgents = world
+    const professionAgents = ctx.world
       .query()
       .with(CT.Agent)
       .with(CT.Profession)
@@ -172,17 +169,17 @@ export class ProfessionWorkSimulationSystem implements System {
 
       // Update work progress (slower in minor crisis)
       const crisisSlowdown = crisisLevel === 'minor' ? 0.5 : 1.0;
-      this.updateProfessionWork(world, impl, profession, currentTick, crisisSlowdown);
+      this.updateProfessionWork(ctx.world, impl, profession, currentTick, crisisSlowdown);
     }
 
     // Aggregate outputs to CityDirector periodically (every game hour)
     if (currentTick - this.lastAggregationTick >= this.config.aggregationInterval) {
-      this.aggregateOutputsToDirectors(world, currentTick);
+      this.aggregateOutputsToDirectors(ctx.world, currentTick);
       this.lastAggregationTick = currentTick;
     }
 
     // Update field reporter navigation (sends reporters to story locations)
-    updateReporterBehaviors(world, currentTick);
+    updateReporterBehaviors(ctx.world, currentTick);
   }
 
   /**
@@ -778,7 +775,7 @@ export class ProfessionWorkSimulationSystem implements System {
     return true; // Needs are met, can work
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.eventBus = null;
   }
 }

@@ -5,7 +5,7 @@
  * and interact with the world autonomously.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -82,26 +82,26 @@ export interface GoalContext {
 // AIGodBehaviorSystem
 // ============================================================================
 
-export class AIGodBehaviorSystem implements System {
+export class AIGodBehaviorSystem extends BaseSystem {
   public readonly id = 'AIGodBehaviorSystem';
-  public readonly name = 'AIGodBehaviorSystem';
   public readonly priority = 90;
   public readonly requiredComponents = [CT.Deity]; // Let ECS filter deity entities
+
+  protected readonly throttleInterval = 2400; // ~2 minutes at 20 TPS
 
   private config: AIGodConfig;
   private lastDecisionTime: Map<string, number> = new Map();
   private strategies: Map<DeityGoalType, GoalStrategy> = new Map();
 
   constructor(config: Partial<AIGodConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_AI_GOD_CONFIG, ...config };
     this.initializeStrategies();
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>): void {
-    const currentTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process deity entities (already filtered by requiredComponents)
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const deity = entity.components.get(CT.Deity) as DeityComponent;
 
       // Only process AI-controlled deities
@@ -110,7 +110,7 @@ export class AIGodBehaviorSystem implements System {
       }
       // Check if enough time has passed
       const lastDecision = this.lastDecisionTime.get(entity.id) || 0;
-      if (currentTick - lastDecision < this.config.decisionInterval) {
+      if (ctx.tick - lastDecision < this.config.decisionInterval) {
         continue;
       }
 
@@ -120,8 +120,8 @@ export class AIGodBehaviorSystem implements System {
       }
 
       // Make a decision
-      this.makeDecision(entity.id, deity, world, currentTick);
-      this.lastDecisionTime.set(entity.id, currentTick);
+      this.makeDecision(entity.id, deity, ctx.world, ctx.tick);
+      this.lastDecisionTime.set(entity.id, ctx.tick);
     }
   }
 

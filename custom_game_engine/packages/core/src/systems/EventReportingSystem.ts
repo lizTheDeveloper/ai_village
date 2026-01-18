@@ -13,7 +13,7 @@
 
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EventBus, GameEvent } from '../events/EventBus.js';
 import type { EventType } from '../events/EventMap.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -40,7 +40,7 @@ interface EventScore {
 /**
  * EventReportingSystem - Converts world events into news stories.
  */
-export class EventReportingSystem implements System {
+export class EventReportingSystem extends BaseSystem {
   readonly id = 'EventReportingSystem';
   readonly priority = 75;  // After NewsroomSystem (70)
   readonly requiredComponents = [] as const;
@@ -54,9 +54,8 @@ export class EventReportingSystem implements System {
 
   /** Update interval (check for reporter assignments every 60 ticks = 3 seconds) */
   private static readonly UPDATE_INTERVAL = 60;
-  private lastUpdateTick = 0;
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
     this.setupEventListeners();
   }
@@ -451,17 +450,11 @@ export class EventReportingSystem implements System {
     }
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected readonly throttleInterval = EventReportingSystem.UPDATE_INTERVAL;
 
-    // Throttle updates
-    if (currentTick - this.lastUpdateTick < EventReportingSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Check for reporters that should be navigating to stories
-    this.updateReporterNavigation(world, currentTick);
+    this.updateReporterNavigation(ctx.world, ctx.tick);
   }
 
   /**
@@ -550,7 +543,7 @@ export class EventReportingSystem implements System {
 
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     // Unsubscribe from all events
     for (const unsubscribe of this.eventListeners) {
       unsubscribe();

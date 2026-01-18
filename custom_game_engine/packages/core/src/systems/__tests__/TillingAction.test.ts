@@ -454,8 +454,10 @@ describe('Tilling Action', () => {
 
   describe('Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks', () => {
     it('should throw when tile is null/undefined', () => {
+      // Testing null validation: use unknown pattern per CLAUDE.md type safety guidelines
+      const invalidTile: unknown = null;
       expect(() => {
-        soilSystem.tillTile(world, null as any, 5, 5);
+        soilSystem.tillTile(world, invalidTile as Tile, 5, 5);
       }).toThrow();
     });
 

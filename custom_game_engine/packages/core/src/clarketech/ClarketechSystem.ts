@@ -31,8 +31,7 @@
  * - Reversed-engineered (from discoveries)
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 // =============================================================================
 // TYPES
@@ -977,32 +976,22 @@ export class ClarketechManager {
 // CLARKETECH SYSTEM
 // =============================================================================
 
-export class ClarketechSystem implements System {
+export class ClarketechSystem extends BaseSystem {
   readonly id = 'ClarketechSystem';
   readonly priority = 60;
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // Every 5 seconds
 
   private manager: ClarketechManager = new ClarketechManager();
-  private eventBus: EventBus | null = null;
 
-  private readonly UPDATE_INTERVAL = 100; // Every 5 seconds
-  private tickCounter = 0;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(_world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Progress active research
     for (const [techId, research] of this.manager['research']) {
-      const result = this.manager.progressResearch(techId, 10, this.tickCounter);
+      const result = this.manager.progressResearch(techId, 10, ctx.tick);
 
-      if (result.completed && this.eventBus) {
+      if (result.completed) {
         const tech = this.manager.getTechnology(techId);
-        this.eventBus.emit({
+        ctx.events.emitGeneric({
           type: 'clarketech_discovered' as any,
           source: this.id,
           data: {
@@ -1014,8 +1003,8 @@ export class ClarketechSystem implements System {
         });
       }
 
-      if (result.breakthrough && this.eventBus) {
-        this.eventBus.emit({
+      if (result.breakthrough) {
+        ctx.events.emitGeneric({
           type: 'clarketech_breakthrough' as any,
           source: this.id,
           data: { techId },
@@ -1024,9 +1013,8 @@ export class ClarketechSystem implements System {
     }
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.reset();
-    this.eventBus = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -1051,9 +1039,9 @@ export class ClarketechSystem implements System {
       currentTick
     );
 
-    if (research && this.eventBus) {
+    if (research) {
       const tech = this.manager.getTechnology(techId);
-      this.eventBus.emit({
+      this.events.emitGeneric({
         type: 'clarketech_research_started' as any,
         source: this.id,
         data: {
@@ -1083,19 +1071,17 @@ export class ClarketechSystem implements System {
       currentTick
     );
 
-    if (this.eventBus) {
-      const tech = this.manager.getTechnology(techId);
-      this.eventBus.emit({
-        type: 'clarketech_artifact_found' as any,
-        source: this.id,
-        data: {
-          artifactId: artifact.id,
-          origin,
-          techHint: tech?.category,
-          discoverer: discovererId,
-        },
-      });
-    }
+    const tech = this.manager.getTechnology(techId);
+    this.events.emitGeneric({
+      type: 'clarketech_artifact_found' as any,
+      source: this.id,
+      data: {
+        artifactId: artifact.id,
+        origin,
+        techHint: tech?.category,
+        discoverer: discovererId,
+      },
+    });
 
     return artifact;
   }
@@ -1116,7 +1102,7 @@ export function getClarketechSystem(): ClarketechSystem {
 
 export function resetClarketechSystem(): void {
   if (systemInstance) {
-    systemInstance.cleanup();
+    systemInstance['onCleanup']?.();
     systemInstance = null;
   }
 }

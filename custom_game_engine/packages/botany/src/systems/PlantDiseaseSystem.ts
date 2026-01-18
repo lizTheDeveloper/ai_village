@@ -139,25 +139,29 @@ export class PlantDiseaseSystem extends BaseSystem {
    */
   private setupEventListeners(): void {
     // Listen for weather updates
-    this.events.subscribe('weather:changed', (event) => {
-      const { weatherType } = event.data;
+    this.events.subscribe('weather:changed', (event: unknown) => {
+      const e = event as { data: { weatherType: string } };
+      const { weatherType } = e.data;
       this.currentEnvironment.isRaining = weatherType === 'rain' || weatherType === 'storm';
     });
 
     // Listen for time updates
-    this.events.subscribe('world:time:hour', (event) => {
-      const { hour } = event.data;
+    this.events.subscribe('world:time:hour', (event: unknown) => {
+      const e = event as { data: { hour: number } };
+      const { hour } = e.data;
       this.currentEnvironment.isNight = hour < 6 || hour > 20;
     });
 
     // Listen for season changes
-    this.events.subscribe('world:time:season', (event) => {
-      this.currentEnvironment.season = event.data.season;
+    this.events.subscribe('world:time:season', (event: unknown) => {
+      const e = event as { data: { season: string } };
+      this.currentEnvironment.season = e.data.season;
     });
 
     // Listen for treatment applications
-    this.events.subscribe('plant:treated', (event) => {
-      const { entityId, treatmentId, treatmentType } = event.data;
+    this.events.subscribe('plant:treated', (event: unknown) => {
+      const e = event as { data: { entityId: string; treatmentId: string; treatmentType: string } };
+      const { entityId, treatmentId, treatmentType } = e.data;
       this.applyTreatmentFromEvent(entityId, treatmentId, treatmentType);
     });
   }
@@ -179,7 +183,7 @@ export class PlantDiseaseSystem extends BaseSystem {
     const activeEntities = ctx.activeEntities;
 
     // Get current game day for tracking
-    const gameDay = this.getCurrentGameDay(world);
+    const gameDay = this.getCurrentGameDay(world as any);
 
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
@@ -202,15 +206,15 @@ export class PlantDiseaseSystem extends BaseSystem {
       this.checkDiseaseOutbreak(plant, entityId, category, gameDay);
 
       // Check for new pest infestations
-      this.checkPestInfestation(plant, entityId, category, gameDay, world);
+      this.checkPestInfestation(plant, entityId, category, gameDay, world as any);
 
       // Disease spread
       if (this.config.enableSpread) {
-        this.spreadDiseases(plant, entityId, world, gameDay, activeEntities);
+        this.spreadDiseases(plant, entityId, world as any, gameDay, activeEntities);
       }
 
       // Pest migration
-      this.migratePests(plant, entityId, world, gameDay, activeEntities);
+      this.migratePests(plant, entityId, world as any, gameDay, activeEntities);
     }
   }
 
@@ -243,15 +247,11 @@ export class PlantDiseaseSystem extends BaseSystem {
           diseaseState.incubating = false;
           diseaseState.spreading = true;
 
-          this.events.emit(
-            'plant:diseaseSymptoms',
-            
-            
-              entityId,
-              diseaseId: disease.id,
-              diseaseName: disease.name,
-              severity: diseaseState.severity
-            }
+          this.events.emit('plant:diseaseSymptoms', {
+            entityId,
+            diseaseId: disease.id,
+            diseaseName: disease.name,
+            severity: diseaseState.severity
           });
         }
         continue; // No damage during incubation
@@ -269,14 +269,10 @@ export class PlantDiseaseSystem extends BaseSystem {
 
       // Check for plant death
       if (plant.health <= disease.lethalHealthThreshold) {
-        this.events.emit(
-          'plant:diedFromDisease',
-          
-          
-            entityId,
-            diseaseId: disease.id,
-            diseaseName: disease.name
-          }
+        this.events.emit('plant:diedFromDisease', {
+          entityId,
+          diseaseId: disease.id,
+          diseaseName: disease.name
         });
         plant.stage = 'dead';
         plant.health = 0;
@@ -288,14 +284,10 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (plant.genetics.diseaseResistance >= 80 && Math.random() < 0.05) {
         toRemove.push(i);
 
-        this.events.emit(
-          'plant:diseaseRecovered',
-          
-          
-            entityId,
-            diseaseId: disease.id,
-            diseaseName: disease.name
-          }
+        this.events.emit('plant:diseaseRecovered', {
+          entityId,
+          diseaseId: disease.id,
+          diseaseName: disease.name
         });
       }
     }
@@ -360,14 +352,10 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (pestState.population <= 0) {
         toRemove.push(i);
 
-        this.events.emit(
-          'plant:pestsGone',
-          
-          
-            entityId,
-            pestId: pest.id,
-            pestName: pest.name
-          }
+        this.events.emit('plant:pestsGone', {
+          entityId,
+          pestId: pest.id,
+          pestName: pest.name
         });
       }
     }
@@ -445,15 +433,11 @@ export class PlantDiseaseSystem extends BaseSystem {
 
     plant.diseases.push(diseaseState);
 
-    this.events.emit(
-      'plant:diseaseContracted',
-      
-      
-        entityId,
-        diseaseId: selectedDisease.id,
-        diseaseName: selectedDisease.name,
-        incubationDays: selectedDisease.incubationDays
-      }
+    this.events.emit('plant:diseaseContracted', {
+      entityId,
+      diseaseId: selectedDisease.id,
+      diseaseName: selectedDisease.name,
+      incubationDays: selectedDisease.incubationDays
     });
   }
 
@@ -531,15 +515,11 @@ export class PlantDiseaseSystem extends BaseSystem {
 
     plant.pests.push(pestState);
 
-    this.events.emit(
-      'plant:pestInfestation',
-      
-      
-        entityId,
-        pestId: selectedPest.id,
-        pestName: selectedPest.name,
-        population: pestState.population
-      }
+    this.events.emit('plant:pestInfestation', {
+      entityId,
+      pestId: selectedPest.id,
+      pestName: selectedPest.name,
+      population: pestState.population
     });
   }
 
@@ -638,15 +618,11 @@ export class PlantDiseaseSystem extends BaseSystem {
 
           targetPlant.diseases.push(newDiseaseState);
 
-          this.events.emit(
-            'plant:diseaseSpread',
-            
-            
-              fromEntityId: entityId,
-              toEntityId: impl.id,
-              diseaseId: disease.id,
-              diseaseName: disease.name
-            }
+          this.events.emit('plant:diseaseSpread', {
+            fromEntityId: entityId,
+            toEntityId: impl.id,
+            diseaseId: disease.id,
+            diseaseName: disease.name
           });
         }
       }
@@ -717,16 +693,12 @@ export class PlantDiseaseSystem extends BaseSystem {
             controlled: false
           });
 
-          this.events.emit(
-            'plant:pestMigrated',
-            
-            
-              fromEntityId: entityId,
-              toEntityId: impl.id,
-              pestId: pest.id,
-              pestName: pest.name,
-              population: migratingCount
-            }
+          this.events.emit('plant:pestMigrated', {
+            fromEntityId: entityId,
+            toEntityId: impl.id,
+            pestId: pest.id,
+            pestName: pest.name,
+            population: migratingCount
           });
         }
 
@@ -758,15 +730,11 @@ export class PlantDiseaseSystem extends BaseSystem {
               plant.diseases.splice(idx, 1);
             }
 
-            this.events.emit(
-              'plant:diseaseTreated',
-              
-              
-                entityId,
-                diseaseId: disease.id,
-                diseaseName: disease.name,
-                treatmentId
-              }
+            this.events.emit('plant:diseaseTreated', {
+              entityId,
+              diseaseId: disease.id,
+              diseaseName: disease.name,
+              treatmentId
             });
 
             return { success: true, message: `Successfully treated ${disease.name}` };
@@ -795,15 +763,11 @@ export class PlantDiseaseSystem extends BaseSystem {
               plant.pests.splice(idx, 1);
             }
 
-            this.events.emit(
-              'plant:pestsEliminated',
-              
-              
-                entityId,
-                pestId: pest.id,
-                pestName: pest.name,
-                treatmentId
-              }
+            this.events.emit('plant:pestsEliminated', {
+              entityId,
+              pestId: pest.id,
+              pestName: pest.name,
+              treatmentId
             });
 
             return { success: true, message: `Eliminated ${pest.name} infestation` };

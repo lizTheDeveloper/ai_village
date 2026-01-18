@@ -215,15 +215,20 @@ export const BiographySchema = autoRegister(
 
     validate: (data: unknown): data is BiographyComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.title === 'string' &&
-        typeof comp.subjectName === 'string' &&
-        typeof comp.field === 'string' &&
-        typeof comp.peakSkill === 'number' &&
-        Array.isArray(comp.achievements) &&
-        typeof comp.careerPath === 'object'
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'biography') return false;
+      if (!('title' in comp) || typeof comp.title !== 'string') return false;
+      if (!('subjectName' in comp) || typeof comp.subjectName !== 'string') return false;
+      if (!('field' in comp) || typeof comp.field !== 'string') return false;
+      if (!('peakSkill' in comp) || typeof comp.peakSkill !== 'number') return false;
+      if (!('achievements' in comp) || !Array.isArray(comp.achievements)) return false;
+      if (!('readersCount' in comp) || typeof comp.readersCount !== 'number') return false;
+      if (!('inspirationBonus' in comp) || typeof comp.inspirationBonus !== 'number') return false;
+      if (!('careerPath' in comp) || typeof comp.careerPath !== 'object' || comp.careerPath === null) return false;
+      if (!('summary' in comp) || typeof comp.summary !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => {

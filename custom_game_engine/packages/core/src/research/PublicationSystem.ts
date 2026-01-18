@@ -10,11 +10,8 @@
  *   - Anonymous Scribe, shortly before the invention of papyrus
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 
@@ -588,26 +585,17 @@ export class PublicationManager {
 /**
  * Publication System - Manages writing technology and publication creation
  */
-export class PublicationSystem implements System {
+export class PublicationSystem extends BaseSystem {
   public readonly id: SystemId = 'publication';
   public readonly priority: number = 180;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 200; // Every 10 seconds at 20 TPS
 
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private manager: PublicationManager;
 
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 200; // Every 10 seconds at 20 TPS
-
   constructor() {
+    super();
     this.manager = new PublicationManager();
-  }
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
   }
 
   /**
@@ -750,13 +738,7 @@ export class PublicationSystem implements System {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Throttle updates
-    if (world.tick - this.lastUpdateTick < PublicationSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Could do periodic things here like:
     // - Spread influence of popular publications
     // - Age out old publications
@@ -766,8 +748,8 @@ export class PublicationSystem implements System {
   /**
    * Cleanup subscriptions
    */
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Base class handles events.cleanup()
   }
 }
 

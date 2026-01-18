@@ -13,3 +13,5 @@ export * from './alien-generation/index.js';
 export * from './research-papers/index.js';
 export * from './systems/index.js';
 export * from './planet/index.js';
+export * from './workers/chunk-generation-types.js';
+export { ChunkGenerationWorkerPool } from './workers/ChunkGenerationWorkerPool.js';

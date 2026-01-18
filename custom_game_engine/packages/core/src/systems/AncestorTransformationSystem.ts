@@ -17,10 +17,9 @@
  * - Sets taboos based on personality
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
@@ -76,15 +75,14 @@ const DEATH_TABOOS: Record<string, string[]> = {
   'exposure': ['abandoning_travelers', 'refusing_shelter'],
 };
 
-export class AncestorTransformationSystem implements System {
-  public readonly id: SystemId = 'ancestor_transformation';
-  public readonly priority: number = 115;  // After AfterlifeNeedsSystem
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
+export class AncestorTransformationSystem extends BaseSystem {
+  readonly id: SystemId = 'ancestor_transformation';
+  readonly priority: number = 115;  // After AfterlifeNeedsSystem
+  readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const afterlife = impl.getComponent<AfterlifeComponent>('afterlife');
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const afterlife = entity.getComponent<AfterlifeComponent>('afterlife');
 
       if (!afterlife) continue;
 
@@ -101,7 +99,7 @@ export class AncestorTransformationSystem implements System {
       if (!qualifies) continue;
 
       // Transform into Ancestor Kami
-      this.transformToAncestorKami(world, impl, afterlife);
+      this.transformToAncestorKami(ctx.world, entity, afterlife);
     }
   }
 

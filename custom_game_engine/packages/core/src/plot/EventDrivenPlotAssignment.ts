@@ -8,13 +8,12 @@
  * Runs infrequently (every ~10 real seconds) since emotional changes are slow.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type {
   PlotTrigger,
   PlotTriggerEvent,
@@ -64,13 +63,13 @@ interface RecentDeath {
  * Checks entity conditions and assigns plots when triggers match.
  * Uses cooldowns to prevent re-triggering the same condition.
  */
-export class EventDrivenPlotAssignmentSystem implements System {
+export class EventDrivenPlotAssignmentSystem extends BaseSystem {
   public readonly id: SystemId = 'event_driven_plot_assignment';
   public readonly priority: number = 150; // After mood/relationship systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   /** Run every 200 ticks = 10 seconds real time at 20 TPS */
-  private static readonly UPDATE_INTERVAL = 200;
+  protected readonly throttleInterval = 200;
 
   /** Default cooldown between same trigger = 1000 ticks (50 sec) */
   private static readonly DEFAULT_COOLDOWN = 1000;
@@ -81,7 +80,6 @@ export class EventDrivenPlotAssignmentSystem implements System {
   /** Distance in tiles for "nearby" death detection */
   private static readonly NEARBY_DEATH_DISTANCE = 10;
 
-  private events!: SystemEventManager;
   private conditionCooldowns: Map<string, ConditionCooldown> = new Map();
 
   /** Relationship baselines by entity ID for change detection */
@@ -90,9 +88,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
   /** Recent deaths for on_death_nearby trigger */
   private recentDeaths: RecentDeath[] = [];
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Subscribe to death events for on_death_nearby trigger
     // Using onGeneric since the event data structure differs from GameEventMap
     this.events.onGeneric('agent:died', (data) => {
@@ -113,15 +109,9 @@ export class EventDrivenPlotAssignmentSystem implements System {
     });
   }
 
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    // Only run every UPDATE_INTERVAL ticks
-    if (currentTick % EventDrivenPlotAssignmentSystem.UPDATE_INTERVAL !== 0) {
-      return;
-    }
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const currentTick = ctx.tick;
 
     // Get all templates with triggers (cached if registry hasn't changed)
     const templatesWithTriggers = plotLineRegistry.getAllTemplates()
@@ -132,7 +122,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
     }
 
     // Find agents with PlotLines component
-    const agentsWithPlotLines = entities.filter(e =>
+    const agentsWithPlotLines = ctx.activeEntities.filter(e =>
       e.components.has(CT.Agent) &&
       e.components.has(CT.PlotLines) &&
       e.components.has(CT.SoulIdentity)
@@ -160,7 +150,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
     }
 
     // Periodic cleanup of old cooldowns (every 10 updates = ~100 seconds)
-    if (currentTick % (EventDrivenPlotAssignmentSystem.UPDATE_INTERVAL * 10) === 0) {
+    if (currentTick % (this.throttleInterval * 10) === 0) {
       this._cleanupOldCooldowns(currentTick);
     }
   }
@@ -769,8 +759,7 @@ export class EventDrivenPlotAssignmentSystem implements System {
   /**
    * Cleanup on system destruction
    */
-  destroy(): void {
-    this.cleanup();
+  protected onCleanup(): void {
     this.conditionCooldowns.clear();
     this.relationshipBaselines.clear();
     this.recentDeaths = [];

@@ -148,14 +148,16 @@ export const IncarnationSchema = autoRegister(
 
     validate: (data: unknown): data is IncarnationComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        Array.isArray(comp.currentBindings) &&
-        typeof comp.state === 'string' &&
-        Array.isArray(comp.incarnationHistory) &&
-        typeof comp.canConcurrentIncarnate === 'boolean' &&
-        typeof comp.maxConcurrentIncarnations === 'number'
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'incarnation') return false;
+      if (!('currentBindings' in comp) || !Array.isArray(comp.currentBindings)) return false;
+      if (!('state' in comp) || typeof comp.state !== 'string') return false;
+      if (!('incarnationHistory' in comp) || !Array.isArray(comp.incarnationHistory)) return false;
+      if (!('canConcurrentIncarnate' in comp) || typeof comp.canConcurrentIncarnate !== 'boolean') return false;
+      if (!('maxConcurrentIncarnations' in comp) || typeof comp.maxConcurrentIncarnations !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => {

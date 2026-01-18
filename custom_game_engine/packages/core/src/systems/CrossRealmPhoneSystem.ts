@@ -9,9 +9,9 @@
  * - Auto-answer and DND logic
  */
 
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { System } from '../ecs/System.js';
 import type { CrossRealmPhoneComponent } from '../components/CrossRealmPhoneComponent.js';
 import type { HilbertTimeCoordinate } from '../trade/HilbertTime.js';
 import {
@@ -40,7 +40,7 @@ export interface CrossRealmPhoneSystemConfig {
   debug: boolean;
 }
 
-export class CrossRealmPhoneSystem implements System {
+export class CrossRealmPhoneSystem extends BaseSystem {
   public readonly id = 'cross_realm_phone_system';
   public readonly priority = 800; // Late priority, after most game logic
   public readonly requiredComponents = ['cross_realm_phone'] as const;
@@ -55,6 +55,7 @@ export class CrossRealmPhoneSystem implements System {
   private config: CrossRealmPhoneSystemConfig;
 
   constructor(config: Partial<CrossRealmPhoneSystemConfig> = {}) {
+    super();
     this.config = {
       chargingStationRate: 100,
       ambientChargeRate: 1,
@@ -64,26 +65,22 @@ export class CrossRealmPhoneSystem implements System {
     };
   }
 
-  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Use SimulationScheduler to filter active entities
-    // cross_realm_phone is configured as ALWAYS, so this will return all phones
-    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-
+  protected onUpdate(ctx: SystemContext): void {
     // Early exit if no phones exist and no pending calls
-    if (activeEntities.length === 0 && this.pendingCalls.length === 0) {
+    if (ctx.activeEntities.length === 0 && this.pendingCalls.length === 0) {
       return;
     }
 
-    const currentTick = this.getCurrentTick(world);
+    const currentTick = this.getCurrentTick(ctx.world);
 
     // Build phone directory from entities
-    this.updatePhoneDirectory(world);
+    this.updatePhoneDirectory(ctx.world);
 
     // Process pending calls
-    this.processPendingCalls(world, currentTick);
+    this.processPendingCalls(ctx.world, currentTick);
 
     // Update all phones
-    for (const entity of activeEntities) {
+    for (const entity of ctx.activeEntities) {
       const phoneComp = entity.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
 
       // Handle charging

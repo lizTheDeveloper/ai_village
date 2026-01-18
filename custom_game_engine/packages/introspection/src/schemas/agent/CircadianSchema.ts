@@ -176,18 +176,24 @@ export const CircadianSchema = autoRegister(
 
     validate: (data: unknown): data is CircadianComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'circadian' &&
-        typeof comp.sleepDrive === 'number' &&
-        typeof comp.preferredSleepTime === 'number' &&
-        typeof comp.isSleeping === 'boolean' &&
-        typeof comp.sleepQuality === 'number' &&
-        comp.sleepDrive >= 0 &&
-        comp.sleepDrive <= 100 &&
-        comp.sleepQuality >= 0 &&
-        comp.sleepQuality <= 1
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'circadian') return false;
+      if (!('sleepDrive' in comp) || typeof comp.sleepDrive !== 'number') return false;
+      if (!('preferredSleepTime' in comp) || typeof comp.preferredSleepTime !== 'number') return false;
+      if (!('isSleeping' in comp) || typeof comp.isSleeping !== 'boolean') return false;
+      if (!('sleepLocationId' in comp) || (comp.sleepLocationId !== null && typeof comp.sleepLocationId !== 'string')) return false;
+      if (!('sleepQuality' in comp) || typeof comp.sleepQuality !== 'number') return false;
+      if (!('sleepStartTime' in comp) || (comp.sleepStartTime !== null && typeof comp.sleepStartTime !== 'number')) return false;
+      if (!('lastSleepLocationId' in comp) || (comp.lastSleepLocationId !== null && typeof comp.lastSleepLocationId !== 'string')) return false;
+      if (!('hasDreamedThisSleep' in comp) || typeof comp.hasDreamedThisSleep !== 'boolean') return false;
+      if (!('sleepDurationHours' in comp) || typeof comp.sleepDurationHours !== 'number') return false;
+
+      // Range validations
+      if (comp.sleepDrive < 0 || comp.sleepDrive > 100) return false;
+      if (comp.sleepQuality < 0 || comp.sleepQuality > 1) return false;
+
+      return true;
     },
 
     createDefault: () => ({

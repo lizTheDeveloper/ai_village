@@ -4,7 +4,7 @@
  * Manages priest ordination, roles, and religious leadership.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -79,9 +79,8 @@ export const DEFAULT_PRIESTHOOD_CONFIG: PriesthoodConfig = {
 // PriesthoodSystem
 // ============================================================================
 
-export class PriesthoodSystem implements System {
+export class PriesthoodSystem extends BaseSystem {
   public readonly id = 'PriesthoodSystem';
-  public readonly name = 'PriesthoodSystem';
   public readonly priority = 84;
   public readonly requiredComponents = [];
 
@@ -90,11 +89,12 @@ export class PriesthoodSystem implements System {
   private lastCheck: number = 0;
 
   constructor(config: Partial<PriesthoodConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_PRIESTHOOD_CONFIG, ...config };
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Only check periodically
     if (currentTick - this.lastCheck < this.config.checkInterval) {
@@ -104,10 +104,10 @@ export class PriesthoodSystem implements System {
     this.lastCheck = currentTick;
 
     // Find believers who could become priests
-    this.checkForNewPriests(world, currentTick);
+    this.checkForNewPriests(ctx.world, currentTick);
 
     // Update existing priests
-    this.updatePriests(world, currentTick);
+    this.updatePriests(ctx.world, currentTick);
   }
 
   /**

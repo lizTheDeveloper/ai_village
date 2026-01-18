@@ -9,7 +9,6 @@
  * - Set bonus detection
  */
 
-import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { SystemId } from '../types.js';
@@ -21,7 +20,7 @@ import { itemRegistry } from '../items/index.js';
 import type { StatBonusTrait } from '../items/traits/StatBonusTrait.js';
 import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * Weekly wear amount for armor and clothing.
@@ -30,7 +29,7 @@ import { SystemEventManager } from '../events/TypedEventEmitter.js';
  */
 const WEEKLY_WEAR_AMOUNT = 1;
 
-export class EquipmentSystem implements System {
+export class EquipmentSystem extends BaseSystem {
   public readonly id: SystemId = 'equipment';
   public readonly priority = 15;  // After movement, before combat
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -50,8 +49,7 @@ export class EquipmentSystem implements System {
   private tickCounter = 0;
 
   private eventBus: EventBus | null = null;
-  private world: World | null = null;
-  private events!: SystemEventManager;
+  private worldRef: World | null = null;
 
   /**
    * Initialize the system with an event bus for scheduled degradation.
@@ -63,10 +61,9 @@ export class EquipmentSystem implements System {
   }
 
   /**
-   * Initialize event manager
+   * Subscribe to time events for scheduled degradation.
    */
-  initialize(world: World): void {
-    this.events = new SystemEventManager(world.eventBus, this.id);
+  protected onInitialize(): void {
     this._setupEventListeners();
   }
 
@@ -78,22 +75,15 @@ export class EquipmentSystem implements System {
 
     // Degrade armor and clothing every 7 in-game days
     this.events.onGeneric('time:new_week', () => {
-      if (this.world) {
-        this.degradeAllEquipment(this.world);
+      if (this.worldRef) {
+        this.degradeAllEquipment(this.worldRef);
       }
     });
   }
 
-  /**
-   * Cleanup event subscriptions
-   */
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Cache world reference for event handlers
-    this.world = world;
+    this.worldRef = ctx.world;
     this.tickCounter++;
 
     // During warmup, always update (for tests and initialization)
@@ -104,6 +94,8 @@ export class EquipmentSystem implements System {
     if (!shouldUpdate) {
       return;
     }
+
+    const entities = ctx.activeEntities;
 
     for (const entity of entities) {
       const equipment = entity.components.get('equipment') as EquipmentComponent;

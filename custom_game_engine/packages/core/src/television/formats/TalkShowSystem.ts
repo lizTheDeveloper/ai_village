@@ -10,9 +10,8 @@
  */
 
 import type { World } from '../../ecs/World.js';
-import type { Entity } from '../../ecs/Entity.js';
-import type { System } from '../../ecs/System.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
@@ -624,14 +623,14 @@ export class TalkShowManager {
 // TALK SHOW SYSTEM
 // ============================================================================
 
-export class TalkShowSystem implements System {
+export class TalkShowSystem extends BaseSystem {
   readonly id = 'TalkShowSystem';
   readonly priority = 71;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
   private manager = new TalkShowManager();
 
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -639,12 +638,12 @@ export class TalkShowSystem implements System {
     return this.manager;
   }
 
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // Talk show system is primarily driven by events and manager calls
     // rather than per-tick updates
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.cleanup();
   }
 }

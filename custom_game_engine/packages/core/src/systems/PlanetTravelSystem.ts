@@ -15,7 +15,7 @@
  * Priority: 350 (after movement, before cognition)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -39,7 +39,7 @@ import { updatePlanetLocation } from '../components/PlanetLocationComponent.js';
 // System
 // ============================================================================
 
-export class PlanetTravelSystem implements System {
+export class PlanetTravelSystem extends BaseSystem {
   public readonly id: SystemId = CT.PlanetTravel;
   public readonly priority: number = 350;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
@@ -49,14 +49,14 @@ export class PlanetTravelSystem implements System {
     writesComponents: [CT.PlanetTravel, CT.PlanetLocation, CT.PlanetPortal, CT.Position],
   };
 
-  public update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const tick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const tick = ctx.tick;
 
     // Update all planet portals (cooldowns, stability)
-    this.updatePortals(world);
+    this.updatePortals(ctx.world);
 
     // Process all entities with active travel
-    this.processTravelers(world, tick);
+    this.processTravelers(ctx.world, tick);
   }
 
   /**
@@ -212,14 +212,10 @@ export class PlanetTravelSystem implements System {
 
           // Emit portal instability warning if applicable
           if (useResult.unstable) {
-            world.eventBus.emit({
-              type: 'portal_unstable',
-              source: entity.id,
-              data: {
-                portalId: portal.portalId,
-                entityId: entity.id,
-              },
-            });
+            this.events.emitGeneric('portal_unstable', {
+              portalId: portal.portalId,
+              entityId: entity.id,
+            }, entity.id);
           }
         }
       }
@@ -259,28 +255,20 @@ export class PlanetTravelSystem implements System {
       );
 
       // Emit travel complete event
-      world.eventBus.emit({
-        type: 'planet_travel_complete',
-        source: entity.id,
-        data: {
-          entityId: entity.id,
-          fromPlanetId: travel.originPlanetId,
-          toPlanetId: travel.destinationPlanetId,
-          travelMethod: travel.travelMethod,
-        },
-      });
+      this.events.emitGeneric('planet_travel_complete', {
+        entityId: entity.id,
+        fromPlanetId: travel.originPlanetId,
+        toPlanetId: travel.destinationPlanetId,
+        travelMethod: travel.travelMethod,
+      }, entity.id);
 
       // Check if this is a new planet discovery
       if (isNewPlanet) {
-        world.eventBus.emit({
-          type: 'planet_discovered',
-          source: entity.id,
-          data: {
-            entityId: entity.id,
-            planetId: travel.destinationPlanetId,
-            discoveryMethod: travel.travelMethod,
-          },
-        });
+        this.events.emitGeneric('planet_discovered', {
+          entityId: entity.id,
+          planetId: travel.destinationPlanetId,
+          discoveryMethod: travel.travelMethod,
+        }, entity.id);
       }
     }
 
@@ -297,16 +285,12 @@ export class PlanetTravelSystem implements System {
     travel: PlanetTravelComponent
   ): void {
     // Emit failure event
-    world.eventBus.emit({
-      type: 'planet_travel_failed',
-      source: entity.id,
-      data: {
-        entityId: entity.id,
-        fromPlanetId: travel.originPlanetId,
-        toPlanetId: travel.destinationPlanetId,
-        reason: travel.failureReason,
-      },
-    });
+    this.events.emitGeneric('planet_travel_failed', {
+      entityId: entity.id,
+      fromPlanetId: travel.originPlanetId,
+      toPlanetId: travel.destinationPlanetId,
+      reason: travel.failureReason,
+    }, entity.id);
 
     // Remove travel component
     entity.removeComponent(CT.PlanetTravel);

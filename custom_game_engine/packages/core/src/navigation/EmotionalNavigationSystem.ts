@@ -5,11 +5,8 @@
  * Ships navigate by guiding crew through emotional state transitions.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { SpaceshipComponent } from './SpaceshipComponent.js';
@@ -18,40 +15,18 @@ import type { SpaceshipComponent } from './SpaceshipComponent.js';
 // System Implementation
 // ============================================================================
 
-export class EmotionalNavigationSystem implements System {
+export class EmotionalNavigationSystem extends BaseSystem {
   public readonly id: SystemId = 'emotional_navigation' as SystemId;
   public readonly priority: number = 150;
-  public readonly requiredComponents: ReadonlyArray<typeof CT[keyof typeof CT]> = [
+  public readonly requiredComponents = [
     CT.Spaceship,
     CT.Position,
-  ];
+  ] as const;
 
-  private events!: SystemEventManager;
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 20; // Every 1 second at 20 TPS
+  protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
-  public initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  public cleanup(): void {
-    this.events.cleanup();
-  }
-
-  public update(
-    world: World,
-    entities: ReadonlyArray<Entity>,
-    _deltaTime: number
-  ): void {
-    const currentTick = world.tick;
-    
-    // Throttle updates
-    if (currentTick - this.lastUpdateTick < EmotionalNavigationSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const spaceship = entity.getComponent('spaceship') as SpaceshipComponent;
       if (!spaceship) continue;
 
@@ -60,7 +35,7 @@ export class EmotionalNavigationSystem implements System {
         continue;
       }
 
-      this.processShipNavigation(world, entity, spaceship);
+      this.processShipNavigation(ctx.world, entity, spaceship);
     }
   }
 

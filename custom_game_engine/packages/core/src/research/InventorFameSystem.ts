@@ -17,9 +17,9 @@
  * Lead authors get primary credit, co-authors share recognition.
  */
 
-import { System, World, Entity } from '../ecs/index.js';
-import { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ResearchRegistry } from './ResearchRegistry.js';
 import { getClarketechTier, getClarketechTierLabel } from './clarketechResearch.js';
 import { getAcademicPaperSystem } from './AcademicPaperSystem.js';
@@ -746,22 +746,17 @@ export class InventorFameManager {
 // INVENTOR FAME SYSTEM
 // =============================================================================
 
-export class InventorFameSystem implements System {
+export class InventorFameSystem extends BaseSystem {
   readonly id = 'InventorFameSystem';
   readonly priority = 54; // Just after ResearchSystem (55)
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // Every 5 seconds
 
   private manager: InventorFameManager = new InventorFameManager();
-  private eventBus: EventBus | null = null;
-  private events!: SystemEventManager;
   private agentNames: Map<string, string> = new Map();
-
-  private readonly NEWS_CHECK_INTERVAL = 100; // Every 5 seconds
   private tickCounter = 0;
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
 
     // Subscribe to research completion events
     this.events.onGeneric('research:completed', (data: unknown) => {
@@ -843,13 +838,11 @@ export class InventorFameSystem implements System {
     }
   }
 
-  update(_world: World, _entities: Entity[], _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     this.tickCounter++;
 
-    // Periodically check for unbroadcasted news
-    if (this.tickCounter % this.NEWS_CHECK_INTERVAL === 0) {
-      this.broadcastPendingNews();
-    }
+    // Broadcast pending news (already throttled by throttleInterval)
+    this.broadcastPendingNews();
   }
 
   private broadcastPendingNews(): void {
@@ -868,11 +861,9 @@ export class InventorFameSystem implements System {
     }
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
     this.manager.reset();
     this.agentNames.clear();
-    this.eventBus = null;
   }
 
   // ---------------------------------------------------------------------------

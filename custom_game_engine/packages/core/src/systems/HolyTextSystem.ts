@@ -4,7 +4,7 @@
  * Generates holy texts that canonize myths and shape deity identity.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -46,9 +46,8 @@ export const DEFAULT_HOLY_TEXT_CONFIG: HolyTextConfig = {
 // HolyTextSystem
 // ============================================================================
 
-export class HolyTextSystem implements System {
+export class HolyTextSystem extends BaseSystem {
   public readonly id = 'HolyTextSystem';
-  public readonly name = 'HolyTextSystem';
   public readonly priority = 82;
   public readonly requiredComponents = [];
 
@@ -57,11 +56,12 @@ export class HolyTextSystem implements System {
   private lastCheck: number = 0;
 
   constructor(config: Partial<HolyTextConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_HOLY_TEXT_CONFIG, ...config };
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Only check periodically
     if (currentTick - this.lastCheck < this.config.checkInterval) {
@@ -71,7 +71,7 @@ export class HolyTextSystem implements System {
     this.lastCheck = currentTick;
 
     // Check if any deity needs canonical texts
-    this.checkForTextGeneration(world, currentTick);
+    this.checkForTextGeneration(ctx.world, currentTick);
   }
 
   /**

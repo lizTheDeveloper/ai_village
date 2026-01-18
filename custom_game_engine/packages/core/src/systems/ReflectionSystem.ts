@@ -1,13 +1,11 @@
-import type { System } from '../ecs/System.js';
-import type { SystemId, ComponentType } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
-import type { EventData } from '../events/EventMap.js';
 import { getEpisodicMemory, getSemanticMemory, getReflection } from '../utils/componentHelpers.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
@@ -18,19 +16,17 @@ const ONE_DAY_MS = 86400000;
 /**
  * ReflectionSystem handles agent reflections on their experiences
  */
-export class ReflectionSystem implements System {
-  public readonly id: SystemId = CT.Reflection;
-  public readonly priority: number = 110;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+export class ReflectionSystem extends BaseSystem {
+  public readonly id = CT.Reflection;
+  public readonly priority = 110;
+  public readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
   private reflectionTriggers: Map<
     string,
     { type: 'daily' | 'deep' | 'post_event'; timestamp: number }
   > = new Map();
 
-  constructor(eventBus: EventBus) {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected async onInitialize(_world: World, _eventBus: EventBus): Promise<void> {
     this._setupEventListeners();
   }
 
@@ -82,13 +78,12 @@ export class ReflectionSystem implements System {
     });
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process reflection triggers
     for (const [agentId, trigger] of this.reflectionTriggers.entries()) {
       // Handle 'broadcast' triggers - apply to all agents with reflection components
       if (agentId === 'broadcast') {
-        const agents = world.query()
+        const agents = ctx.world.query()
           .with(CT.Agent)
           .with(CT.EpisodicMemory)
           .with(CT.SemanticMemory)
@@ -115,7 +110,7 @@ export class ReflectionSystem implements System {
         continue;
       }
 
-      const entity = world.getEntity(agentId);
+      const entity = ctx.world.getEntity(agentId);
       if (!entity) {
         // Skip if agent no longer exists (may have been removed)
         continue;
@@ -328,10 +323,6 @@ export class ReflectionSystem implements System {
       reflectionCount: finalReflectionCount,
       reflectionType: 'deep',
     });
-  }
-
-  cleanup(): void {
-    this.events.cleanup(); // Unsubscribes all automatically
   }
 
   private _extractThemes(memories: readonly EpisodicMemory[]): string[] {

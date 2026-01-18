@@ -8,11 +8,10 @@
  * 4. Managing research capacity (max concurrent projects per university)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { UniversityComponent } from '../components/UniversityComponent.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
@@ -65,7 +64,7 @@ export const DEFAULT_RESEARCH_MANAGEMENT_CONFIG: UniversityResearchManagementCon
   researchersPerProject: 3,
 };
 
-export class UniversityResearchManagementSystem implements System {
+export class UniversityResearchManagementSystem extends BaseSystem {
   public readonly id: SystemId = 'university_research_management';
   public readonly priority = 47; // After UniversitySystem (46)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
@@ -75,6 +74,7 @@ export class UniversityResearchManagementSystem implements System {
   private universitySystem: UniversitySystem | null = null;
 
   constructor(config: Partial<UniversityResearchManagementConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_RESEARCH_MANAGEMENT_CONFIG, ...config };
   }
 
@@ -86,32 +86,31 @@ export class UniversityResearchManagementSystem implements System {
     this.universitySystem = system;
   }
 
-  public update(world: World, entities: Entity[], _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Process each university
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const university = impl.getComponent<UniversityComponent>(CT.University);
+    for (const entity of ctx.activeEntities) {
+      const university = entity.getComponent<UniversityComponent>(CT.University);
 
       if (!university) {
         continue;
       }
 
       // Check if it's time to consider new research
-      const lastCheck = this.lastProposalCheck.get(impl.id) || 0;
+      const lastCheck = this.lastProposalCheck.get(entity.id) || 0;
       if (currentTick - lastCheck < this.config.minProposalInterval) {
         continue;
       }
 
-      this.lastProposalCheck.set(impl.id, currentTick);
+      this.lastProposalCheck.set(entity.id, currentTick);
 
       // Count active research projects
       const activeCount = university.activeProjects.filter(p => p.status === 'active' || p.status === 'approved').length;
 
       // Only propose new research if below capacity
       if (activeCount < this.config.maxConcurrentProjects) {
-        this.proposeNewResearch(world, impl, university);
+        this.proposeNewResearch(ctx.world, entity, university);
       }
     }
   }

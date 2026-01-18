@@ -11,11 +11,10 @@
  * This creates emergent gameplay: agents must plan harvesting strategy.
  * Cut from top = safe but slow. Cut from base = fast but dangerous.
  */
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { VoxelResourceComponent } from '../components/VoxelResourceComponent.js';
 import { isVoxelUnstable, isVoxelDepleted } from '../components/VoxelResourceComponent.js';
@@ -24,8 +23,6 @@ import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createResourceComponent } from '../components/ResourceComponent.js';
-import type { EventBus as CoreEventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { materialRegistry } from '../materials/MaterialRegistry.js';
 
 /**
@@ -67,27 +64,15 @@ export function getMaterialHardness(materialId: string): number {
  * TreeFellingSystem manages the falling physics of voxel resources
  * when their structural stability is compromised.
  */
-export class TreeFellingSystem implements System {
-  public readonly id: SystemId = 'tree_felling';
-  public readonly priority: number = 45; // After gathering, before cleanup
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VoxelResource, CT.Position];
+export class TreeFellingSystem extends BaseSystem {
+  readonly id: SystemId = 'tree_felling';
+  readonly priority: number = 45; // After gathering, before cleanup
+  readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VoxelResource, CT.Position];
 
-  private eventBus: CoreEventBus;
-  private events!: SystemEventManager;
-
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
-  }
-
-  initialize(_world: World, eventBus: CoreEventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const voxel = impl.getComponent<VoxelResourceComponent>(CT.VoxelResource);
-      const pos = impl.getComponent<PositionComponent>(CT.Position);
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
+      const voxel = entity.getComponent<VoxelResourceComponent>(CT.VoxelResource);
+      const pos = entity.getComponent<PositionComponent>(CT.Position);
 
       if (!voxel || !pos) continue;
 
@@ -96,12 +81,12 @@ export class TreeFellingSystem implements System {
 
       // Check if structure should start falling
       if (!voxel.isFalling && isVoxelUnstable(voxel)) {
-        this.startFalling(impl, voxel, pos, world);
+        this.startFalling(entity, voxel, pos, ctx.world);
       }
 
       // Process falling structures
       if (voxel.isFalling) {
-        this.processFall(impl, voxel, pos, world);
+        this.processFall(entity, voxel, pos, ctx.world);
       }
     }
   }
@@ -198,7 +183,7 @@ export class TreeFellingSystem implements System {
     }, entity.id);
 
     // Create visual falling effect (short-lived animation entity)
-    this.createFallingAnimation(world, pos, voxel, fallPos);
+    this.createFallingAnimation(world, pos, voxel, fallPos, entity.id);
 
     // Remove the original entity
     (world as WorldMutator).destroyEntity(entity.id, 'voxel_resource_fell');
@@ -254,7 +239,8 @@ export class TreeFellingSystem implements System {
     world: World,
     startPos: PositionComponent,
     voxel: VoxelResourceComponent,
-    endPos: { x: number; y: number }
+    endPos: { x: number; y: number },
+    sourceId: string
   ): void {
     const mutator = world as WorldMutator;
     const animEntity = mutator.createEntity();
@@ -286,11 +272,7 @@ export class TreeFellingSystem implements System {
       entityId: animEntity.id,
       startPosition: { x: startPos.x, y: startPos.y },
       endPosition: endPos,
-    }, animEntity.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
+    }, sourceId);
   }
 }
 

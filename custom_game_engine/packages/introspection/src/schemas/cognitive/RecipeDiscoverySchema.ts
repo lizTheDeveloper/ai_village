@@ -172,15 +172,19 @@ export const RecipeDiscoverySchema = autoRegister(
 
     validate: (data): data is RecipeDiscoveryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const r = data as any;
+      const r = data as Record<string, unknown>;
 
-      return (
-        r.type === 'recipe_discovery' &&
-        typeof r.totalExperiments === 'number' &&
-        typeof r.successfulDiscoveries === 'number' &&
-        Array.isArray(r.discoveries) &&
-        typeof r.specializations === 'object'
-      );
+      if (!('type' in r) || r.type !== 'recipe_discovery') return false;
+      if (!('totalExperiments' in r) || typeof r.totalExperiments !== 'number') return false;
+      if (!('successfulDiscoveries' in r) || typeof r.successfulDiscoveries !== 'number') return false;
+      if (!('totalCreativityScore' in r) || typeof r.totalCreativityScore !== 'number') return false;
+      if (!('discoveries' in r) || !Array.isArray(r.discoveries)) return false;
+      if (!('recentExperiments' in r) || !Array.isArray(r.recentExperiments)) return false;
+      if (!('failedCombinations' in r)) return false;
+      if (!('experimentCooldown' in r) || typeof r.experimentCooldown !== 'number') return false;
+      if (!('specializations' in r) || typeof r.specializations !== 'object' || r.specializations === null) return false;
+
+      return true;
     },
 
     createDefault: () => ({

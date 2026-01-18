@@ -10,9 +10,7 @@
  * Phase 3 focus: Integration with plot stages for plot-sourced attractors.
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type {
   OutcomeAttractor,
   AttractorSource,
@@ -25,7 +23,7 @@ import { createOutcomeAttractor, plotStageAttractorId } from './NarrativePressur
 /**
  * Priority: 80 (runs before plot systems at 85-86)
  */
-export class NarrativePressureSystem implements System {
+export class NarrativePressureSystem extends BaseSystem {
   static readonly PRIORITY = 80;
   readonly id = 'narrative_pressure' as const;
   readonly priority = NarrativePressureSystem.PRIORITY;
@@ -45,8 +43,8 @@ export class NarrativePressureSystem implements System {
   // System Lifecycle
   // ============================================================================
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = this.getCurrentTick(world);
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Clear pressure cache if tick changed
     if (currentTick !== this.pressureCacheTick) {
@@ -58,7 +56,7 @@ export class NarrativePressureSystem implements System {
     this.applyDecay(currentTick);
 
     // Update convergence for each attractor
-    this.updateConvergence(world);
+    this.updateConvergence(ctx.world);
   }
 
   // ============================================================================
@@ -250,20 +248,6 @@ export class NarrativePressureSystem implements System {
   // ============================================================================
   // Private Helpers
   // ============================================================================
-
-  private getCurrentTick(world: World): number {
-    // Try to get tick from Time entity
-    try {
-      const timeEntities = world.query().with('time' as any).executeEntities();
-      if (timeEntities.length > 0) {
-        const timeComponent = timeEntities[0]?.getComponent('time' as any) as any;
-        return timeComponent?.tick ?? 0;
-      }
-    } catch {
-      // Fallback
-    }
-    return 0;
-  }
 
   private getSourceKey(source: AttractorSource): string {
     switch (source.type) {

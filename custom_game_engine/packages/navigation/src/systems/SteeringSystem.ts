@@ -1,9 +1,7 @@
 import type {
-  System,
   SystemId,
   ComponentType,
   World,
-  Entity,
   Position,
   SteeringBehavior,
   SteeringComponent,
@@ -11,8 +9,11 @@ import type {
   PositionComponent,
   PhysicsComponent,
   BuildingComponent,
+  Entity,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType as CT,
   EntityImpl,
   getSteering,
@@ -42,7 +43,7 @@ type Vector2 = Position;
  * - ChunkSystem: Uses spatial chunks for efficient nearby entity queries
  * - PathfindingSystem: Fallback for stuck detection (future integration)
  */
-export class SteeringSystem implements System {
+export class SteeringSystem extends BaseSystem {
   public readonly id: SystemId = CT.Steering;
   public readonly priority: number = 15; // After AISystem (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -54,18 +55,18 @@ export class SteeringSystem implements System {
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Update agent positions in scheduler
-    world.simulationScheduler.updateAgentPositions(world);
+    ctx.world.simulationScheduler.updateAgentPositions(ctx.world);
 
     // Get entities with steering component
     // NOTE: We don't filter steering entities themselves (agents always need to steer)
     // but obstacle filtering happens in _avoidObstacles using spatial queries
-    // entities parameter is already filtered by requiredComponents
+    // activeEntities parameter is already filtered by requiredComponents
 
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       try {
-        this._updateSteering(entity, world, deltaTime);
+        this._updateSteering(entity, ctx.world, ctx.deltaTime);
       } catch (error) {
         // Per CLAUDE.md, re-throw with context
         throw new Error(`SteeringSystem failed for entity ${entity.id}: ${error}`);

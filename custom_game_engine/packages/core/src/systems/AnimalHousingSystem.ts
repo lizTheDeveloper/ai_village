@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -29,7 +29,7 @@ import {
  * Note: TemperatureSystem (priority 20) applies temperature effects on animals
  * inside buildings. This system focuses on cleanliness and occupancy management.
  */
-export class AnimalHousingSystem implements System {
+export class AnimalHousingSystem extends BaseSystem {
   public readonly id: SystemId = 'animal-housing';
   public readonly priority: number = 51; // Run after BuildingSystem (50)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
@@ -37,20 +37,20 @@ export class AnimalHousingSystem implements System {
   private lastCleanlinessUpdate = 0;
   private readonly CLEANLINESS_UPDATE_INTERVAL = CLEANLINESS_UPDATE_INTERVAL; // Daily in seconds
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     const currentTime = Date.now() / 1000;
 
     // Update cleanliness daily
     if (currentTime - this.lastCleanlinessUpdate >= this.CLEANLINESS_UPDATE_INTERVAL) {
-      this.updateCleanliness(world);
+      this.updateCleanliness(ctx.world);
       this.lastCleanlinessUpdate = currentTime;
     }
 
     // Apply housing effects to animals
-    this.applyHousingEffects(world);
+    this.applyHousingEffects(ctx.world);
 
     // Validate housing assignments
-    this.validateHousingAssignments(world);
+    this.validateHousingAssignments(ctx.world);
   }
 
   /**

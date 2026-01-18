@@ -14,9 +14,10 @@
  * - Walkie Talkie: Many-to-many within range, no infrastructure
  */
 
-import { System, World, Entity } from '../ecs/index.js';
+import { World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 // =============================================================================
 // TYPES
@@ -552,27 +553,18 @@ export class WalkieTalkieManager {
 // WALKIE TALKIE SYSTEM
 // =============================================================================
 
-export class WalkieTalkieSystem implements System {
+export class WalkieTalkieSystem extends BaseSystem {
   readonly id = 'WalkieTalkieSystem';
   readonly priority = 68;
   readonly requiredComponents = [] as const;
 
+  protected readonly throttleInterval = 20; // Every 20 ticks (1 second at 20 TPS)
+
   private manager: WalkieTalkieManager = new WalkieTalkieManager();
-  private eventBus: EventBus | null = null;
 
-  private readonly UPDATE_INTERVAL = 20; // Every 20 ticks (1 second at 20 TPS)
-  private tickCounter = 0;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, _entities: Entity[], _deltaTime: number): void {
-    this.tickCounter++;
-    if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Update device positions from agent positions
-    const agents = world.query().with(CT.Agent, CT.Position).executeEntities();
+    const agents = ctx.world.query().with(CT.Agent, CT.Position).executeEntities();
 
     for (const agent of agents) {
       const agentComp = agent.getComponent(CT.Agent);
@@ -591,9 +583,8 @@ export class WalkieTalkieSystem implements System {
     }
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.reset();
-    this.eventBus = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -616,17 +607,11 @@ export class WalkieTalkieSystem implements System {
   ): WalkieTalkieDevice {
     const device = this.manager.createDevice(agentId, agentName, model, x, y);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'walkie_talkie_issued' as any,
-        source: this.id,
-        data: {
-          deviceId: device.id,
-          agentId,
-          model,
-        },
-      });
-    }
+    this.events.emit('walkie_talkie_issued' as any, {
+      deviceId: device.id,
+      agentId,
+      model,
+    } as any);
 
     return device;
   }
@@ -644,18 +629,14 @@ export class WalkieTalkieSystem implements System {
 
     const transmission = this.manager.transmit(device.id, message, currentTick);
 
-    if (transmission && this.eventBus) {
-      this.eventBus.emit({
-        type: 'walkie_talkie_transmission' as any,
-        source: this.id,
-        data: {
-          transmissionId: transmission.id,
-          senderId: agentId,
-          channel: transmission.channel,
-          message,
-          receiverCount: transmission.receivedBy.length,
-        },
-      });
+    if (transmission) {
+      this.events.emit('walkie_talkie_transmission' as any, {
+        transmissionId: transmission.id,
+        senderId: agentId,
+        channel: transmission.channel,
+        message,
+        receiverCount: transmission.receivedBy.length,
+      } as any);
     }
 
     return transmission;

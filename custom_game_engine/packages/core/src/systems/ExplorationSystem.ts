@@ -1,10 +1,8 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
 import { getAgent, getPosition } from '../utils/componentHelpers.js';
 
 import { ExplorationStateComponent } from '../components/ExplorationStateComponent.js';
@@ -13,12 +11,11 @@ import { ExplorationStateComponent } from '../components/ExplorationStateCompone
  * ExplorationSystem manages frontier and spiral exploration algorithms
  * Updates ExplorationState and sets steering targets for agents
  */
-export class ExplorationSystem implements System {
+export class ExplorationSystem extends BaseSystem {
   public readonly id: SystemId = 'exploration';
   public readonly priority: number = 25; // After AISystem, before Steering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus?: EventBus;
   private lastCoverageMilestone: Map<string, number> = new Map();
 
   /**
@@ -28,17 +25,13 @@ export class ExplorationSystem implements System {
     return entity.getComponent<ExplorationStateComponent>(CT.ExplorationState) ?? null;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get entities with ExplorationState
-    const explorers = entities.filter(e => e.components.has(CT.ExplorationState));
+    const explorers = ctx.activeEntities.filter(e => e.components.has(CT.ExplorationState));
 
     for (const entity of explorers) {
       try {
-        this._updateExploration(entity, world, deltaTime);
+        this._updateExploration(entity, ctx);
       } catch (error) {
         // Per CLAUDE.md, re-throw with context
         throw new Error(`ExplorationSystem failed for entity ${entity.id}: ${error}`);
@@ -46,7 +39,7 @@ export class ExplorationSystem implements System {
     }
   }
 
-  private _updateExploration(entity: Entity, _world: World, currentTick: number): void {
+  private _updateExploration(entity: Entity, ctx: SystemContext): void {
     const impl = entity as EntityImpl;
     if (!impl.hasComponent(CT.ExplorationState)) {
       throw new Error('ExplorationSystem requires ExplorationState component');
@@ -65,13 +58,13 @@ export class ExplorationSystem implements System {
 
     // Mark current sector as explored using the component's method
     const currentSector = this.worldToSector(position);
-    explorationState.markSectorExplored(currentSector.x, currentSector.y, currentTick);
+    explorationState.markSectorExplored(currentSector.x, currentSector.y, ctx.tick);
 
     // Update exploration radius based on settlement size - removed getGlobalState (doesn't exist)
     // This can be added later if needed via a proper global state system
 
     // Check for coverage milestones
-    this._checkCoverageMilestones(entity, _world);
+    this._checkCoverageMilestones(entity, ctx);
 
     // Execute exploration mode - validate if present
     const mode = explorationState.mode;
@@ -84,9 +77,9 @@ export class ExplorationSystem implements System {
       }
 
       if (mode === 'frontier') {
-        this._frontierExploration(entity, currentTick);
+        this._frontierExploration(entity);
       } else if (mode === 'spiral') {
-        this._spiralExploration(entity, currentTick);
+        this._spiralExploration(entity);
       }
       // mode === 'none' does nothing
     }
@@ -96,7 +89,7 @@ export class ExplorationSystem implements System {
   /**
    * Frontier exploration - explore edges of known territory
    */
-  private _frontierExploration(entity: Entity, _currentTick: number): void {
+  private _frontierExploration(entity: Entity): void {
     const impl = entity as EntityImpl;
     const explorationState = this.getExplorationState(impl);
     if (!explorationState) {
@@ -150,7 +143,7 @@ export class ExplorationSystem implements System {
   /**
    * Spiral exploration - spiral outward from home base
    */
-  private _spiralExploration(entity: Entity, _currentTick: number): void {
+  private _spiralExploration(entity: Entity): void {
     const impl = entity as EntityImpl;
     const explorationState = this.getExplorationState(impl);
     if (!explorationState) {
@@ -286,9 +279,7 @@ export class ExplorationSystem implements System {
   /**
    * Check and emit coverage milestone events
    */
-  private _checkCoverageMilestones(entity: Entity, _world: World): void {
-    if (!this.eventBus) return;
-
+  private _checkCoverageMilestones(entity: Entity, ctx: SystemContext): void {
     const coverage = this.calculateCoverage(entity);
     const lastMilestone = this.lastCoverageMilestone.get(entity.id) ?? 0;
 
@@ -301,7 +292,7 @@ export class ExplorationSystem implements System {
         if (!agentComp || !posComp) {
           throw new Error(`ExplorationSystem: Entity ${entity.id} missing required components for milestone event`);
         }
-        this.eventBus.emitImmediate({
+        ctx.events.emitGeneric({
           type: 'exploration:milestone',
           source: 'exploration',
           data: {

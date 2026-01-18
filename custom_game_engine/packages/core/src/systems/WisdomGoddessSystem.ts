@@ -8,11 +8,11 @@
  * - "[Goddess Name] has joined the chat"
  */
 
-import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ComponentType, EntityId } from '../types.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import { TICKS_PER_HOUR } from '../constants/TimeConstants.js';
 import { pendingApprovalRegistry, type PendingCreation } from '../crafting/PendingApprovalRegistry.js';
 import {
@@ -54,7 +54,7 @@ const DEFAULT_CONFIG: SystemConfig = {
   processPerTick: 1, // Process one creation per tick for drama
 };
 
-export class WisdomGoddessSystem implements System {
+export class WisdomGoddessSystem extends BaseSystem {
   public readonly id = 'wisdom_goddess_system';
   public readonly priority = 900; // Low priority - runs after most systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = []; // Global system, no entity requirements
@@ -83,6 +83,7 @@ export class WisdomGoddessSystem implements System {
   }> = [];
 
   constructor(config: Partial<SystemConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
@@ -93,8 +94,9 @@ export class WisdomGoddessSystem implements System {
     this.chatRoomSystem = chatSystem;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = Number(world.tick);
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const currentTick = Number(ctx.tick);
 
     // Subscribe to chat events once
     if (!this.subscribedToEvents) {

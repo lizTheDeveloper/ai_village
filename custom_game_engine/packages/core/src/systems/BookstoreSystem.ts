@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -33,11 +33,10 @@ interface BookstoreData {
  * - Track revenue and sales
  * - Emit bookstore events
  */
-export class BookstoreSystem implements System {
-  public readonly id: SystemId = 'bookstore';
-  public readonly priority = 46;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Bookstore];
-  private eventBus: CoreEventBus;
+export class BookstoreSystem extends BaseSystem {
+  readonly id: SystemId = 'bookstore';
+  readonly priority = 46;
+  readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Bookstore];
 
   // Bookstore data (bookstoreId → BookstoreData)
   private bookstores: Map<EntityId, BookstoreData> = new Map();
@@ -45,15 +44,11 @@ export class BookstoreSystem implements System {
   // Revenue milestones for tracking
   private revenueMilestones = [100, 500, 1000, 5000, 10000];
 
-  constructor(eventBus: CoreEventBus) {
-    this.eventBus = eventBus;
-  }
-
-  public update(world: World, entities: Entity[], _deltaTime: number): void {
-    const currentTick = this.getCurrentTick(world);
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = this.getCurrentTick(ctx.world);
 
     // Process each bookstore
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const bookstoreId = entity.id;
       let bookstore = this.bookstores.get(bookstoreId);
 
@@ -90,14 +85,10 @@ export class BookstoreSystem implements System {
     const item = bookstore.inventory.get(bookId);
     if (!item || item.stock < quantity) {
       // Out of stock
-      this.eventBus.emit({
-        type: 'bookstore:out_of_stock',
-        source: this.id,
-        data: {
-          bookstoreId,
-          bookId,
-          customerId: buyerId,
-        },
+      this.events.emit('bookstore:out_of_stock', {
+        bookstoreId,
+        bookId,
+        customerId: buyerId,
       });
       return false;
     }
@@ -109,16 +100,12 @@ export class BookstoreSystem implements System {
     item.revenue += totalPrice;
     bookstore.totalRevenue += totalPrice;
 
-    this.eventBus.emit({
-      type: 'bookstore:purchase',
-      source: this.id,
-      data: {
-        bookstoreId,
-        buyerId,
-        bookId,
-        price: item.price,
-        quantity,
-      },
+    this.events.emit('bookstore:purchase', {
+      bookstoreId,
+      buyerId,
+      bookId,
+      price: item.price,
+      quantity,
     });
 
     // Check for revenue milestones
@@ -176,15 +163,11 @@ export class BookstoreSystem implements System {
     item.stock += quantity;
     const newStock = item.stock;
 
-    this.eventBus.emit({
-      type: 'bookstore:restocked',
-      source: this.id,
-      data: {
-        bookstoreId,
-        bookId,
-        quantityAdded: quantity,
-        newStock,
-      },
+    this.events.emit('bookstore:restocked', {
+      bookstoreId,
+      bookId,
+      quantityAdded: quantity,
+      newStock,
     });
   }
 
@@ -222,14 +205,10 @@ export class BookstoreSystem implements System {
         bookstore.totalRevenue - milestone < 100
       ) {
         // Just crossed milestone
-        this.eventBus.emit({
-          type: 'bookstore:revenue_milestone',
-          source: this.id,
-          data: {
-            bookstoreId: bookstore.bookstoreId,
-            totalRevenue: bookstore.totalRevenue,
-            milestone,
-          },
+        this.events.emit('bookstore:revenue_milestone', {
+          bookstoreId: bookstore.bookstoreId,
+          totalRevenue: bookstore.totalRevenue,
+          milestone,
         });
       }
     }

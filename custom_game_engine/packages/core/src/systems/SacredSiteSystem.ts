@@ -14,14 +14,12 @@
  * - Bonus to spiritual aptitude when praying/meditating at site
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Represents a sacred site in the world
@@ -107,25 +105,18 @@ interface PrayerCluster {
   answerRate: number;
 }
 
-export class SacredSiteSystem implements System {
+export class SacredSiteSystem extends BaseSystem {
   public readonly id: SystemId = 'sacred_site';
   public readonly priority: number = 118; // After PrayerAnsweringSystem (117)
   public readonly requiredComponents = [];
 
-  private eventBus?: EventBus;
-  private events!: SystemEventManager;
-  private world?: World;
   private sites: Map<string, SacredSite> = new Map();
   private siteIdCounter: number = 0;
 
   // Track prayer locations for emergent site discovery
   private recentPrayers: PrayerRecord[] = [];
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.eventBus = eventBus;
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(world: World, eventBus: EventBus): void {
     // Listen for prayer events
     this.events.on('prayer:offered', (data) => {
       this.handlePrayerOffered(data);
@@ -147,19 +138,12 @@ export class SacredSiteSystem implements System {
     });
   }
 
-  /**
-   * Cleanup event subscriptions
-   */
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World, _entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Clean up old prayer records
-    this.cleanupOldPrayers(currentTick);
+    this.cleanupOldPrayers(ctx.tick);
 
     // Check for emergent sacred sites
-    this.checkForEmergentSites(world, currentTick);
+    this.checkForEmergentSites(ctx.world, ctx.tick);
 
     // Update site statistics
     this.updateSiteStatistics();
@@ -258,8 +242,6 @@ export class SacredSiteSystem implements System {
   private handlePrayerOffered(
     data: { agentId: string; deityId: string; prayerType: string; urgency: string; prayerId: string }
   ): void {
-    if (!this.world) return;
-
     const prayerId = data.prayerId;
     // Get agent position (prayer:offered doesn't include position)
     let position: { x: number; y: number } | undefined;

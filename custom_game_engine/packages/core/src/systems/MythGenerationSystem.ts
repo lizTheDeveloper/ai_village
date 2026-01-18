@@ -1,11 +1,10 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { Myth, TraitImplication, MythologyComponent } from '../components/MythComponent.js';
 import { createMythologyComponent, addMyth, tellMyth } from '../components/MythComponent.js';
@@ -48,7 +47,7 @@ interface PendingLLMMyth {
  * - Spreads myths to nearby agents
  * - Tracks myth status (oral, recorded, canonical)
  */
-export class MythGenerationSystem implements System {
+export class MythGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'myth_generation';
   public readonly priority: number = 118; // After prayer answering
   public readonly requiredComponents = [];
@@ -57,15 +56,13 @@ export class MythGenerationSystem implements System {
   private pendingMyths: PendingMyth[] = [];
   private pendingLLMMyths = new Map<string, PendingLLMMyth>();
   private llmQueue: LLMDecisionQueue;
-  private events!: SystemEventManager;
 
   constructor(llmQueue: LLMDecisionQueue) {
+    super();
     this.llmQueue = llmQueue;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Listen for divine events that create myths
     this.events.on('prayer:answered', (data) => {
       this._onPrayerAnswered(data);
@@ -76,7 +73,10 @@ export class MythGenerationSystem implements System {
     // this.events.on('vision:sent', ...)
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const entities = ctx.activeEntities;
+    const currentTick = ctx.tick;
     // Ensure all deities have mythology components
     const deities = entities.filter(e => e.components.has(CT.Deity));
 
@@ -472,9 +472,5 @@ export class MythGenerationSystem implements System {
     }
 
     return nearby;
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

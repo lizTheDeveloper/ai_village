@@ -14,11 +14,11 @@
  * Players can observe ceremonies as they happen (disembodied voices).
  */
 
-import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl, createEntityId } from '../ecs/Entity.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type {
   SoulCreationContext,
   SoulCreationResult,
@@ -72,7 +72,7 @@ interface ActiveCeremony {
 /**
  * SoulCreationSystem - Creates souls through divine ceremony
  */
-export class SoulCreationSystem implements System {
+export class SoulCreationSystem extends BaseSystem {
   readonly id: SystemId = 'soul_creation';
   readonly priority: number = 5; // Run early
   readonly requiredComponents = [] as const; // Event-driven
@@ -291,7 +291,9 @@ export class SoulCreationSystem implements System {
     }
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+
     // If ceremony in progress and not completed, continue it
     if (this.activeCeremony && !this.activeCeremony.completed) {
       // Only start a new turn if one isn't already in progress

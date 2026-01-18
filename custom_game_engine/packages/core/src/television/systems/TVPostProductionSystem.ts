@@ -10,10 +10,10 @@
  * - Content delivery preparation
  */
 
-import type { System } from '../../ecs/System.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, Production } from '../TVStation.js';
@@ -83,13 +83,10 @@ export interface VFXShot {
 // SYSTEM
 // ============================================================================
 
-export class TVPostProductionSystem implements System {
+export class TVPostProductionSystem extends BaseSystem {
   readonly id = 'tv_post_production' as const;
   readonly priority = 63; // After production
   readonly requiredComponents = [ComponentType.TVStation] as const;
-
-  private events!: SystemEventManager;
-  private lastProcessTick: number = 0;
 
   /** Active post-production jobs */
   private activeJobs: Map<string, PostProductionJob> = new Map();
@@ -103,34 +100,25 @@ export class TVPostProductionSystem implements System {
     final_review: 20 * 60 * 5, // 5 game minutes
   };
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
+  protected readonly throttleInterval = POST_PRODUCTION_INTERVAL;
 
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Subscribe to production wrap events
     this.events.onGeneric('tv:production:ready_for_post', (_data) => {
       // Would create a new post-production job here
     });
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Only process periodically
-    if (currentTick - this.lastProcessTick < POST_PRODUCTION_INTERVAL) {
-      return;
-    }
-
-    this.lastProcessTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process active jobs
-    this.processActiveJobs(world, currentTick);
+    this.processActiveJobs(ctx.world, ctx.tick);
 
     // Check for productions in post-production phase
-    for (const entity of entities) {
+    for (const entity of ctx.activeEntities) {
       const station = entity.components.get(ComponentType.TVStation) as TVStationComponent | undefined;
       if (!station) continue;
 
-      this.checkProductionsForPostProduction(world, station, currentTick);
+      this.checkProductionsForPostProduction(ctx.world, station, ctx.tick);
     }
   }
 
@@ -653,8 +641,7 @@ export class TVPostProductionSystem implements System {
       .filter(j => j.phase === phase);
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.activeJobs.clear();
-    this.events.cleanup();
   }
 }

@@ -99,11 +99,13 @@ export const SemanticMemorySchema = autoRegister(
 
     validate: (data: unknown): data is SemanticMemoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        Array.isArray(comp.beliefs) &&
-        Array.isArray(comp.knowledge)
-      );
+      const comp = data as Record<string, unknown>;
+
+      if (!('type' in comp) || comp.type !== 'semantic_memory') return false;
+      if (!('beliefs' in comp) || !Array.isArray(comp.beliefs)) return false;
+      if (!('knowledge' in comp) || !Array.isArray(comp.knowledge)) return false;
+
+      return true;
     },
 
     createDefault: () => {

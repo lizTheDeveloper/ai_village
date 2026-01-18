@@ -555,7 +555,7 @@ export function registerAllSystems(
   // AGENT CORE
   // ============================================================================
   gameLoop.systemRegistry.register(new IdleBehaviorSystem());
-  gameLoop.systemRegistry.register(new GoalGenerationSystem(eventBus));
+  gameLoop.systemRegistry.register(new GoalGenerationSystem());
 
   // Always register AgentBrainSystem - it works without LLM (uses scripted behaviors)
   // NEW: If scheduledProcessor provided, use scheduler-based approach for intelligent layer selection
@@ -591,8 +591,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new MemoryFormationSystem(eventBus));
   gameLoop.systemRegistry.register(new MemoryConsolidationSystem());
   gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
-  gameLoop.systemRegistry.register(new ReflectionSystem(eventBus));
-  gameLoop.systemRegistry.register(new JournalingSystem(eventBus));
+  gameLoop.systemRegistry.register(new ReflectionSystem());
+  gameLoop.systemRegistry.register(new JournalingSystem());
   gameLoop.systemRegistry.register(new BeliefFormationSystem());
   gameLoop.systemRegistry.register(new BeliefGenerationSystem());
 
@@ -655,7 +655,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(resourceGatheringSystem);
 
   // Tile-Based Voxel Building (Phase 3-4)
-  gameLoop.systemRegistry.register(new TreeFellingSystem(eventBus));
+  gameLoop.systemRegistry.register(new TreeFellingSystem());
   // Use singleton to ensure behaviors use same instance
   gameLoop.systemRegistry.register(getTileConstructionSystem());
   // Door system for auto-open/close mechanics
@@ -718,7 +718,7 @@ export function registerAllSystems(
   const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
   gameLoop.systemRegistry.register(technologyUnlockSystem);
 
-  const cityBuildingGenerationSystem = new CityBuildingGenerationSystem(eventBus);
+  const cityBuildingGenerationSystem = new CityBuildingGenerationSystem();
   gameLoop.systemRegistry.register(cityBuildingGenerationSystem);
 
   const professionWorkSimulationSystem = new ProfessionWorkSimulationSystem();
@@ -727,13 +727,13 @@ export function registerAllSystems(
   const eventReportingSystem = new EventReportingSystem();
   gameLoop.systemRegistry.register(eventReportingSystem);
 
-  const publishingProductionSystem = new PublishingProductionSystem(eventBus);
+  const publishingProductionSystem = new PublishingProductionSystem();
   gameLoop.systemRegistry.register(publishingProductionSystem);
 
-  const librarySystem = new LibrarySystem(eventBus);
+  const librarySystem = new LibrarySystem();
   gameLoop.systemRegistry.register(librarySystem);
 
-  const bookstoreSystem = new BookstoreSystem(eventBus);
+  const bookstoreSystem = new BookstoreSystem();
   gameLoop.systemRegistry.register(bookstoreSystem);
 
   const universitySystem = new UniversitySystem(eventBus);
@@ -853,12 +853,11 @@ export function registerAllSystems(
   // ============================================================================
   // HuntingSystem now extends BaseSystem and handles event bus in onInitialize
   gameLoop.systemRegistry.register(new HuntingSystem());
-  // PredatorAttackSystem, DominanceChallengeSystem, and AgentCombatSystem use the full EventBus type
-  gameLoop.systemRegistry.register(new PredatorAttackSystem(eventBus));
-  gameLoop.systemRegistry.register(new AgentCombatSystem(undefined, eventBus));
-  gameLoop.systemRegistry.register(new DominanceChallengeSystem(eventBus));
+  gameLoop.systemRegistry.register(new PredatorAttackSystem());
+  gameLoop.systemRegistry.register(new AgentCombatSystem());
+  gameLoop.systemRegistry.register(new DominanceChallengeSystem());
   gameLoop.systemRegistry.register(new InjurySystem());
-  gameLoop.systemRegistry.register(new GuardDutySystem(eventBus));
+  gameLoop.systemRegistry.register(new GuardDutySystem());
   gameLoop.systemRegistry.register(new VillageDefenseSystem());
   gameLoop.systemRegistry.register(new ThreatResponseSystem());
 

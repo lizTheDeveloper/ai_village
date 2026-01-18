@@ -229,15 +229,64 @@ export const UpliftedTraitSchema = autoRegister(
 
     validate: (data): data is UpliftedTraitComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const u = data as any;
+      const u = data as Record<string, unknown>;
 
-      return (
-        u.type === 'uplifted_trait' &&
-        typeof u.programId === 'string' &&
-        typeof u.sourceSpeciesId === 'string' &&
-        typeof u.generation === 'number' &&
-        typeof u.givenName === 'string'
-      );
+      if (!('type' in u) || u.type !== 'uplifted_trait') return false;
+      if (!('version' in u) || typeof u.version !== 'number') return false;
+
+      if (!('programId' in u) || typeof u.programId !== 'string') return false;
+      if (!('sourceSpeciesId' in u) || typeof u.sourceSpeciesId !== 'string') return false;
+      if (!('upliftedSpeciesId' in u) || typeof u.upliftedSpeciesId !== 'string') return false;
+      if (!('generation' in u) || typeof u.generation !== 'number') return false;
+      if (!('sapientSince' in u) || typeof u.sapientSince !== 'number') return false;
+
+      // Optional awakeningMoment
+      if ('awakeningMoment' in u && u.awakeningMoment !== undefined) {
+        if (typeof u.awakeningMoment !== 'object' || u.awakeningMoment === null) return false;
+        const awakening = u.awakeningMoment as Record<string, unknown>;
+        if (!('tick' in awakening) || typeof awakening.tick !== 'number') return false;
+        if (!('generation' in awakening) || typeof awakening.generation !== 'number') return false;
+        if (!('firstThought' in awakening) || typeof awakening.firstThought !== 'string') return false;
+        if (!('firstQuestion' in awakening) || typeof awakening.firstQuestion !== 'string') return false;
+        if (!('firstEmotion' in awakening) || typeof awakening.firstEmotion !== 'string') return false;
+        if (!('firstWord' in awakening) || typeof awakening.firstWord !== 'string') return false;
+        if (!('witnessIds' in awakening) || !Array.isArray(awakening.witnessIds)) return false;
+        if (!awakening.witnessIds.every((item) => typeof item === 'string')) return false;
+      }
+
+      if (!('naturalBorn' in u) || typeof u.naturalBorn !== 'boolean') return false;
+      if (!('givenName' in u) || typeof u.givenName !== 'string') return false;
+
+      // Optional chosenName
+      if ('chosenName' in u && u.chosenName !== undefined && typeof u.chosenName !== 'string') return false;
+
+      if (!('understandsOrigin' in u) || typeof u.understandsOrigin !== 'boolean') return false;
+
+      if (!('attitude' in u) || typeof u.attitude !== 'string') return false;
+      const validAttitudes = ['grateful', 'resentful', 'neutral', 'conflicted', 'reverent', 'rebellious'];
+      if (!validAttitudes.includes(u.attitude as string)) return false;
+
+      if (!('retainedInstincts' in u) || !Array.isArray(u.retainedInstincts)) return false;
+      if (!u.retainedInstincts.every((item) => typeof item === 'string')) return false;
+
+      if (!('enhancedAbilities' in u) || !Array.isArray(u.enhancedAbilities)) return false;
+      if (!u.enhancedAbilities.every((item) => typeof item === 'string')) return false;
+
+      if (!('legalStatus' in u) || typeof u.legalStatus !== 'string') return false;
+      const validLegalStatuses = ['citizen', 'ward', 'property', 'undefined'];
+      if (!validLegalStatuses.includes(u.legalStatus as string)) return false;
+
+      if (!('culturalIdentity' in u) || typeof u.culturalIdentity !== 'string') return false;
+      const validCulturalIdentities = ['uplifter', 'source_species', 'hybrid', 'new'];
+      if (!validCulturalIdentities.includes(u.culturalIdentity as string)) return false;
+
+      // Optional leadScientistId
+      if ('leadScientistId' in u && u.leadScientistId !== undefined && typeof u.leadScientistId !== 'string') return false;
+
+      // Optional creatorRelationship
+      if ('creatorRelationship' in u && u.creatorRelationship !== undefined && typeof u.creatorRelationship !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => ({

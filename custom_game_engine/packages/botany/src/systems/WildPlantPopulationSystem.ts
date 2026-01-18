@@ -1,5 +1,4 @@
 import type {
-  System,
   SystemId,
   ComponentType,
   World,
@@ -9,11 +8,11 @@ import type {
   EventBus,
 } from '@ai-village/core';
 import {
+  BaseSystem,
+  type SystemContext,
   ComponentType as CT,
   EntityImpl,
 } from '@ai-village/core';
-
-type CoreEventBus = EventBus;
 
 /**
  * Ecology parameters for wild plant populations
@@ -58,12 +57,12 @@ export interface BiomeDistribution {
  * - Seed bank simulation
  * - Seasonal population dynamics
  */
-export class WildPlantPopulationSystem implements System {
+export class WildPlantPopulationSystem extends BaseSystem {
   public readonly id: SystemId = 'wild_plant_population' as SystemId;
   public readonly priority: number = 15; // Before PlantSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly dependsOn = [] as const;
 
-  private eventBus: CoreEventBus;
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
   private config: PopulationConfig;
 
@@ -83,8 +82,8 @@ export class WildPlantPopulationSystem implements System {
   private accumulatedTime: number = 0;
   private readonly UPDATE_INTERVAL = 24; // Update once per game day
 
-  constructor(eventBus: CoreEventBus, config?: Partial<PopulationConfig>) {
-    this.eventBus = eventBus;
+  constructor(config?: Partial<PopulationConfig>) {
+    super();
     this.config = {
       maxDensity: 10,        // Max 10 plants per chunk
       minPopulation: 2,       // Keep at least 2 per biome type
@@ -92,7 +91,9 @@ export class WildPlantPopulationSystem implements System {
       crowdingRadius: 2,      // Plants need 2 tiles of space
       ...config
     };
+  }
 
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
     this.registerEventListeners();
   }
 
@@ -159,16 +160,18 @@ export class WildPlantPopulationSystem implements System {
    */
   private registerEventListeners(): void {
     // Listen for seed dispersal events
-    this.eventBus.subscribe('seed:dispersed', (event) => {
-      const { speciesId, position } = event.data;
+    this.events.subscribe('seed:dispersed', (event: unknown) => {
+      const e = event as { data: { speciesId: string; position?: { x: number; y: number } } };
+      const { speciesId, position } = e.data;
       if (position) {
         this.addToSeedBank(speciesId, position);
       }
     });
 
     // Listen for plant death events
-    this.eventBus.subscribe('plant:died', (event) => {
-      const { speciesId } = event.data;
+    this.events.subscribe('plant:died', (event: unknown) => {
+      const e = event as { data: { speciesId: string } };
+      const { speciesId } = e.data;
       // When plants die, their seeds may enter the seed bank
       const species = this.speciesLookup?.(speciesId);
       if (species) {
@@ -215,7 +218,10 @@ export class WildPlantPopulationSystem implements System {
     return `${chunkX},${chunkY}`;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+    const deltaTime = ctx.deltaTime;
+
     // Accumulate time (assuming game runs at ~60fps with deltaTime in seconds)
     this.accumulatedTime += deltaTime;
 
@@ -229,16 +235,16 @@ export class WildPlantPopulationSystem implements System {
     world.simulationScheduler.updateAgentPositions(world);
 
     // Update plant counts per chunk (only for visible chunks)
-    this.updateChunkCounts(world);
+    this.updateChunkCounts(world as any);
 
     // Age seed bank entries
     this.ageSeedBank();
 
     // Try to germinate seeds from bank
-    this.germinateSeedBank(world);
+    this.germinateSeedBank(world as any);
 
     // Natural spawning in low-density areas
-    this.checkNaturalSpawning(world);
+    this.checkNaturalSpawning(world as any);
   }
 
   /**
@@ -251,7 +257,7 @@ export class WildPlantPopulationSystem implements System {
 
     // Filter to only visible plants (near agents) using SimulationScheduler
     const visiblePlants = world.simulationScheduler.filterActiveEntities(
-      plants as Entity[],
+      plants as unknown as Entity[],
       world.tick
     );
 
@@ -397,15 +403,11 @@ export class WildPlantPopulationSystem implements System {
       if (!species) continue;
 
       // Emit spawn event
-      this.eventBus.emit({
-        type: 'wild_plant:spawn',
-        source: 'wild-plant-population',
-        data: {
-          speciesId: species.id,
-          position: { x, y },
-          biome
-        }
-      });
+      this.events.emit('wild_plant:spawn', {
+        speciesId: species.id,
+        position: { x, y },
+        biome
+      } as any);
     }
   }
 
@@ -452,16 +454,12 @@ export class WildPlantPopulationSystem implements System {
    * Emit germination event for world to handle
    */
   private emitGerminationEvent(seed: SeedBankEntry): void {
-    this.eventBus.emit({
-      type: 'seed:germinated',
-      source: 'wild-plant-population',
-      data: {
-        seedId: `seedbank_${Date.now()}`,
-        speciesId: seed.speciesId,
-        position: seed.position,
-        generation: 0
-      }
-    });
+    this.events.emit('seed:germinated', {
+      seedId: `seedbank_${Date.now()}`,
+      speciesId: seed.speciesId,
+      position: seed.position,
+      generation: 0
+    } as any);
   }
 
   /**

@@ -253,22 +253,54 @@ export const CookingSkillSchema = autoRegister(
     },
 
     validate: (data): data is CookingSkillComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'cooking_skill') return false;
-      if (typeof d.level !== 'number' || d.level < 1 || d.level > 100) {
-        throw new RangeError(`Invalid level: ${d.level} (must be 1-100)`);
+      if (!('type' in d) || d.type !== 'cooking_skill') return false;
+      if (!('version' in d) || typeof d.version !== 'number') return false;
+
+      if (!('level' in d) || typeof d.level !== 'number' || d.level < 1 || d.level > 100) {
+        throw new RangeError(`Invalid level: ${('level' in d) ? d.level : 'undefined'} (must be 1-100)`);
       }
-      if (typeof d.totalXp !== 'number' || d.totalXp < 0) {
-        throw new RangeError(`Invalid totalXp: ${d.totalXp} (must be >= 0)`);
+      if (!('totalXp' in d) || typeof d.totalXp !== 'number' || d.totalXp < 0) {
+        throw new RangeError(`Invalid totalXp: ${('totalXp' in d) ? d.totalXp : 'undefined'} (must be >= 0)`);
       }
-      if (typeof d.experience !== 'object' || d.experience === null) return false;
-      if (typeof d.specializations !== 'object' || d.specializations === null) return false;
-      if (!Array.isArray(d.knownRecipes)) return false;
-      if (typeof d.recipeExperience !== 'object' || d.recipeExperience === null) return false;
-      if (typeof d.dishesCooked !== 'number' || d.dishesCooked < 0) {
-        throw new RangeError(`Invalid dishesCooked: ${d.dishesCooked} (must be >= 0)`);
+
+      if (!('experience' in d) || typeof d.experience !== 'object' || d.experience === null) return false;
+      const exp = d.experience as Record<string, unknown>;
+      if (!('simple' in exp) || typeof exp.simple !== 'number') return false;
+      if (!('intermediate' in exp) || typeof exp.intermediate !== 'number') return false;
+      if (!('advanced' in exp) || typeof exp.advanced !== 'number') return false;
+      if (!('masterwork' in exp) || typeof exp.masterwork !== 'number') return false;
+
+      if (!('specializations' in d) || typeof d.specializations !== 'object' || d.specializations === null) return false;
+      const specs = d.specializations as Record<string, unknown>;
+      if (!('baking' in specs) || typeof specs.baking !== 'number') return false;
+      if (!('grilling' in specs) || typeof specs.grilling !== 'number') return false;
+      if (!('stewing' in specs) || typeof specs.stewing !== 'number') return false;
+      if (!('preservation' in specs) || typeof specs.preservation !== 'number') return false;
+
+      if (!('knownRecipes' in d) || !Array.isArray(d.knownRecipes)) return false;
+      if (!d.knownRecipes.every((item) => typeof item === 'string')) return false;
+
+      if (!('recipeExperience' in d) || typeof d.recipeExperience !== 'object' || d.recipeExperience === null) return false;
+      const recExp = d.recipeExperience as Record<string, unknown>;
+      for (const key in recExp) {
+        const entry = recExp[key];
+        if (typeof entry !== 'object' || entry === null) return false;
+        const entryObj = entry as Record<string, unknown>;
+        if (!('timesMade' in entryObj) || typeof entryObj.timesMade !== 'number') return false;
+        if (!('qualityBonus' in entryObj) || typeof entryObj.qualityBonus !== 'number') return false;
+        if (!('bestQuality' in entryObj) || typeof entryObj.bestQuality !== 'number') return false;
+        if (!('lastMade' in entryObj) || typeof entryObj.lastMade !== 'number') return false;
       }
+
+      if (!('dishesCooked' in d) || typeof d.dishesCooked !== 'number' || d.dishesCooked < 0) {
+        throw new RangeError(`Invalid dishesCooked: ${('dishesCooked' in d) ? d.dishesCooked : 'undefined'} (must be >= 0)`);
+      }
+
+      // Optional field
+      if ('signatureDish' in d && d.signatureDish !== undefined && typeof d.signatureDish !== 'string') return false;
 
       return true;
     },

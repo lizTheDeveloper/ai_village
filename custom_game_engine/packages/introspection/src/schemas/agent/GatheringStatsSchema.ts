@@ -175,29 +175,30 @@ export const GatheringStatsSchema = autoRegister(
     },
 
     validate: (data): data is GatheringStatsComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'gathering_stats') return false;
-      if (typeof d.lastResetDay !== 'number' || d.lastResetDay < 0) {
+      if (!('type' in d) || d.type !== 'gathering_stats') return false;
+      if (!('lastResetDay' in d) || typeof d.lastResetDay !== 'number' || d.lastResetDay < 0) {
         throw new RangeError(`Invalid lastResetDay: ${d.lastResetDay} (must be >= 0)`);
       }
 
       // Validate records are objects
-      if (typeof d.today !== 'object' || d.today === null || Array.isArray(d.today)) {
+      if (!('today' in d) || typeof d.today !== 'object' || d.today === null || Array.isArray(d.today)) {
         return false;
       }
-      if (typeof d.allTime !== 'object' || d.allTime === null || Array.isArray(d.allTime)) {
+      if (!('allTime' in d) || typeof d.allTime !== 'object' || d.allTime === null || Array.isArray(d.allTime)) {
         return false;
       }
-      if (typeof d.depositedToday !== 'object' || d.depositedToday === null || Array.isArray(d.depositedToday)) {
+      if (!('depositedToday' in d) || typeof d.depositedToday !== 'object' || d.depositedToday === null || Array.isArray(d.depositedToday)) {
         return false;
       }
-      if (typeof d.depositedAllTime !== 'object' || d.depositedAllTime === null || Array.isArray(d.depositedAllTime)) {
+      if (!('depositedAllTime' in d) || typeof d.depositedAllTime !== 'object' || d.depositedAllTime === null || Array.isArray(d.depositedAllTime)) {
         return false;
       }
 
       // Validate record values are numbers
-      const validateRecord = (record: Record<string, any>) => {
+      const validateRecord = (record: Record<string, unknown>) => {
         for (const value of Object.values(record)) {
           if (typeof value !== 'number' || value < 0) {
             return false;
@@ -206,10 +207,10 @@ export const GatheringStatsSchema = autoRegister(
         return true;
       };
 
-      if (!validateRecord(d.today)) return false;
-      if (!validateRecord(d.allTime)) return false;
-      if (!validateRecord(d.depositedToday)) return false;
-      if (!validateRecord(d.depositedAllTime)) return false;
+      if (!validateRecord(d.today as Record<string, unknown>)) return false;
+      if (!validateRecord(d.allTime as Record<string, unknown>)) return false;
+      if (!validateRecord(d.depositedToday as Record<string, unknown>)) return false;
+      if (!validateRecord(d.depositedAllTime as Record<string, unknown>)) return false;
 
       return true;
     },

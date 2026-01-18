@@ -10,10 +10,8 @@
  * - Natural domain synergy
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -90,31 +88,22 @@ export const DEFAULT_SYNCRETISM_CONFIG: SyncretismConfig = {
 // SyncretismSystem
 // ============================================================================
 
-export class SyncretismSystem implements System {
+export class SyncretismSystem extends BaseSystem {
   public readonly id = 'SyncretismSystem';
-  public readonly name = 'SyncretismSystem';
   public readonly priority = 77;
   public readonly requiredComponents = [];
 
   private config: SyncretismConfig;
   private syncretisms: Map<string, SyncretismData> = new Map();
   private lastCheck: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<SyncretismConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_SYNCRETISM_CONFIG, ...config };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     if (currentTick - this.lastCheck < this.config.checkInterval) {
       return;
@@ -123,7 +112,7 @@ export class SyncretismSystem implements System {
     this.lastCheck = currentTick;
 
     // Check for syncretism opportunities
-    this.checkForSyncretism(world, currentTick);
+    this.checkForSyncretism(ctx.world, currentTick);
   }
 
   /**

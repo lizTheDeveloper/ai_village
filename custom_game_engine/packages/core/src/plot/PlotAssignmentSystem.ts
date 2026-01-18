@@ -9,11 +9,9 @@
  * - Event-driven (specific events trigger assignment)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
@@ -44,25 +42,16 @@ const DEFAULT_SCALE_LIMITS: ScaleLimits = {
 /**
  * System priority: 85 (runs before progression at 86)
  */
-export class PlotAssignmentSystem implements System {
+export class PlotAssignmentSystem extends BaseSystem {
   readonly id = 'plot_assignment' as const;
   readonly priority = 85;
   readonly requiredComponents = [] as const;
 
-  private events!: SystemEventManager;
   private tickCounter = 0;
   private readonly assignmentInterval = 100; // Check every 100 ticks
   private readonly scaleLimits: ScaleLimits = DEFAULT_SCALE_LIMITS;
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(_ctx: SystemContext): void {
     this.tickCounter++;
 
     // Only run periodic checks every N ticks

@@ -1,8 +1,9 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import {
   DAWN_START_HOUR,
@@ -88,7 +89,7 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
  * This system must run before all other systems as it provides the fundamental
  * time tracking that other systems depend on for their calculations.
  */
-export class TimeSystem implements System {
+export class TimeSystem extends BaseSystem {
   public readonly id: SystemId = 'time';
   public readonly priority: number = 3; // Run early, before Weather (priority 5)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
@@ -111,11 +112,13 @@ export class TimeSystem implements System {
     this.universeId = universeId;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const { activeEntities, deltaTime } = ctx;
+
     // Get time scale from MultiverseCoordinator if registered
     const universe = multiverseCoordinator.getUniverse(this.universeId);
     const timeScale = universe?.config.timeScale ?? 1.0;
-    for (const entity of entities) {
+    for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const time = impl.getComponent<TimeComponent>(CT.Time);
       if (!time) continue;
@@ -141,24 +144,16 @@ export class TimeSystem implements System {
         const currentWeek = Math.floor((newDay - 1) / 7);
 
         // Emit day change event
-        world.eventBus.emit({
-          type: 'time:day_changed',
-          source: entity.id,
-          data: {
-            day: newDay,
-            newDay,
-          },
-        });
+        ctx.emit('time:day_changed', {
+          day: newDay,
+          newDay,
+        }, entity.id);
 
         // Emit week change event if week changed
         if (currentWeek > previousWeek) {
-          world.eventBus.emit({
-            type: 'time:new_week',
-            source: entity.id,
-            data: {
-              week: currentWeek,
-            },
-          });
+          ctx.emit('time:new_week', {
+            week: currentWeek,
+          }, entity.id);
         }
 
         this.lastDay = newDay;
@@ -179,15 +174,11 @@ export class TimeSystem implements System {
 
       // Emit phase change event if phase changed
       if (this.lastPhase !== null && this.lastPhase !== newPhase) {
-        world.eventBus.emit({
-          type: 'time:phase_changed',
-          source: entity.id,
-          data: {
-            phase: newPhase,
-            oldPhase: this.lastPhase,
-            newPhase,
-          },
-        });
+        ctx.emit('time:phase_changed', {
+          phase: newPhase,
+          oldPhase: this.lastPhase,
+          newPhase,
+        }, entity.id);
       }
 
       this.lastPhase = newPhase;

@@ -5,7 +5,7 @@
  * Listens for soul:created events and enqueues sprite generation jobs.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { AppearanceComponent } from '../components/AppearanceComponent.js';
@@ -32,16 +32,16 @@ const MIRROR_MAP: Record<string, string> = {
   'south-west': 'south-east', // South-West = flip South-East
 };
 
-export class PixelLabSpriteGenerationSystem implements System {
+export class PixelLabSpriteGenerationSystem extends BaseSystem {
   readonly id: SystemId = 'pixellab_sprite_generation';
   readonly priority = 900; // Run late, after other systems
   readonly requiredComponents = [] as const; // Event-driven
 
-  private pendingJobs: Map<string, PendingSpriteJob> = new Map();
-  private readonly POLL_INTERVAL = 60; // Check job status every 60 ticks (3 seconds at 20 TPS)
-  private lastPollTick = 0;
+  protected readonly throttleInterval = 60; // Check job status every 60 ticks (3 seconds at 20 TPS)
 
-  onInit(world: World): void {
+  private pendingJobs: Map<string, PendingSpriteJob> = new Map();
+
+  protected onInitialize(world: World): void {
     // Subscribe to agent birth events
     world.eventBus.subscribe<'agent:birth'>('agent:birth', (event: GameEvent<'agent:birth'>) => {
       this.enqueueSpriteGeneration(world, event.data);
@@ -347,21 +347,14 @@ export class PixelLabSpriteGenerationSystem implements System {
     }
   }
 
-  update(world: World): void {
-    // Poll job statuses periodically
-    if (world.tick - this.lastPollTick < this.POLL_INTERVAL) {
-      return;
-    }
-
-    this.lastPollTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     if (this.pendingJobs.size === 0) {
       return;
     }
 
     // Check status of all pending jobs
     for (const [, job] of this.pendingJobs.entries()) {
-      this.checkJobStatus(world, job).catch(error => {
+      this.checkJobStatus(ctx.world, job).catch(error => {
         console.error(`[PixelLabSprite] Error checking job ${job.characterId}:`, error);
       });
     }

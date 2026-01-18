@@ -9,7 +9,7 @@
  * - Product placement deals
  */
 
-import type { System } from '../../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
@@ -583,17 +583,16 @@ export class AdvertisingManager {
 // TV ADVERTISING SYSTEM
 // ============================================================================
 
-export class TVAdvertisingSystem implements System {
+export class TVAdvertisingSystem extends BaseSystem {
   readonly id = 'TVAdvertisingSystem';
   readonly priority = 68;
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
+  protected readonly throttleInterval = 20 * 60; // Every minute
+
   private manager = new AdvertisingManager();
-  private lastUpdateTick = 0;
 
-  private static readonly UPDATE_INTERVAL = 20 * 60; // Every minute
-
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.manager.setEventBus(eventBus);
   }
 
@@ -601,18 +600,11 @@ export class TVAdvertisingSystem implements System {
     return this.manager;
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdateTick < TVAdvertisingSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(_ctx: SystemContext): void {
     // Could add automatic sponsor AI here
   }
 
-  cleanup(): void {
+  protected onCleanup(): void {
     this.manager.cleanup();
   }
 }

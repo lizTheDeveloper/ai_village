@@ -1,9 +1,7 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
 import type { ResourceType } from '../components/ResourceComponent.js';
 import type { SpatialMemoryComponent, ResourceLocationMemory } from '../components/SpatialMemoryComponent.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
@@ -13,7 +11,7 @@ import { getPosition, getSpatialMemory, getEpisodicMemory } from '../utils/compo
  * SpatialMemoryQuerySystem synchronizes between EpisodicMemory and SpatialMemory
  * Extracts resource location memories and indexes them for spatial queries
  */
-export class SpatialMemoryQuerySystem implements System {
+export class SpatialMemoryQuerySystem extends BaseSystem {
   public readonly id: SystemId = 'spatial_memory_query';
   public readonly priority: number = 105; // After MemoryFormation, before BeliefFormation
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
@@ -21,20 +19,16 @@ export class SpatialMemoryQuerySystem implements System {
   // Future: Add event bus support for memory indexing events
   private lastProcessedMemoryCount: Map<string, number> = new Map();
 
-  initialize(_world: World, _eventBus: EventBus): void {
-    // Future: Subscribe to memory formation events
-  }
-
-  update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get entities with both spatial and episodic memory
-    const memoryEntities = entities.filter(e =>
+    const memoryEntities = ctx.activeEntities.filter(e =>
       e.components.has(CT.SpatialMemory) &&
       e.components.has(CT.EpisodicMemory)
     );
 
     for (const entity of memoryEntities) {
       try {
-        this._syncMemories(entity, currentTick);
+        this._syncMemories(entity, ctx.tick);
       } catch (error) {
         throw new Error(`SpatialMemoryQuerySystem failed for entity ${entity.id}: ${error}`);
       }

@@ -24,14 +24,13 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid state.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
@@ -63,13 +62,12 @@ interface ResearchBuildingBonus {
 /**
  * ResearchSystem handles research mechanics.
  */
-export class ResearchSystem implements System {
+export class ResearchSystem extends BaseSystem {
   public readonly id: SystemId = 'research';
   public readonly priority: number = 55; // After BuildingSystem (16), before most others
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position];
 
   private isInitialized = false;
-  private events!: SystemEventManager;
   private blueprintRegistry: BuildingBlueprintRegistry | null = null;
   private researchRegistry: ResearchRegistry | null = null;
   private paperSystem: AcademicPaperSystem | null = null;
@@ -92,12 +90,11 @@ export class ResearchSystem implements System {
   /**
    * Initialize the system.
    */
-  public initialize(world: World, eventBus: EventBus): void {
+  protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
     if (this.isInitialized) {
       return;
     }
 
-    this.events = new SystemEventManager(eventBus, this.id);
     this.researchRegistry = ResearchRegistry.getInstance();
     this.paperSystem = getAcademicPaperSystem();
 
@@ -176,25 +173,25 @@ export class ResearchSystem implements System {
   /**
    * Main update loop.
    */
-  public update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    const researchState = this.getOrCreateResearchState(world);
+  protected onUpdate(ctx: SystemContext): void {
+    const researchState = this.getOrCreateResearchState(ctx.world);
     if (!researchState || researchState.inProgress.size === 0) {
       return;
     }
 
     // Get all research buildings
-    const researchBuildings = this.getResearchBuildings(world);
+    const researchBuildings = this.getResearchBuildings(ctx.world);
 
     // Find agents that are researching (at research buildings)
-    const researchingAgents = this.findResearchingAgents(entities, researchBuildings);
+    const researchingAgents = this.findResearchingAgents(ctx.activeEntities, researchBuildings);
 
     // Process research progress
     if (researchingAgents.length > 0) {
-      this.processResearchProgress(world, researchState, researchingAgents, researchBuildings, deltaTime);
+      this.processResearchProgress(ctx.world, researchState, researchingAgents, researchBuildings, ctx.deltaTime);
     }
 
     // Log status periodically
-    if (world.tick % this.LOG_INTERVAL === 0 && researchState.inProgress.size > 0) {
+    if (ctx.tick % this.LOG_INTERVAL === 0 && researchState.inProgress.size > 0) {
       this.logResearchStatus(researchState);
     }
   }
@@ -716,7 +713,7 @@ export class ResearchSystem implements System {
     return this.paperSystem?.getAuthorMetrics(agentId) || null;
   }
 
-  cleanup(): void {
-    this.events.cleanup();
+  protected onCleanup(): void {
+    // Custom cleanup if needed
   }
 }

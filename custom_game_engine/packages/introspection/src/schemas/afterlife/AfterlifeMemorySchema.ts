@@ -152,17 +152,17 @@ export const AfterlifeMemorySchema = autoRegister(
 
     validate: (data): data is AfterlifeMemoryComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const a = data as any;
+      const a = data as Record<string, unknown>;
 
-      return (
-        a.type === 'afterlife_memory' &&
-        (a.afterlifeMemoryIds instanceof Set || Array.isArray(a.afterlifeMemoryIds)) &&
-        typeof a.retainsIntoAdulthood === 'boolean' &&
-        typeof a.clarityMultiplier === 'number' &&
-        typeof a.fadingStartAge === 'number' &&
-        typeof a.completeFadingAge === 'number' &&
-        typeof a.fadingComplete === 'boolean'
-      );
+      if (!('type' in a) || a.type !== 'afterlife_memory') return false;
+      if (!('afterlifeMemoryIds' in a) || !(a.afterlifeMemoryIds instanceof Set || Array.isArray(a.afterlifeMemoryIds))) return false;
+      if (!('retainsIntoAdulthood' in a) || typeof a.retainsIntoAdulthood !== 'boolean') return false;
+      if (!('clarityMultiplier' in a) || typeof a.clarityMultiplier !== 'number') return false;
+      if (!('fadingStartAge' in a) || typeof a.fadingStartAge !== 'number') return false;
+      if (!('completeFadingAge' in a) || typeof a.completeFadingAge !== 'number') return false;
+      if (!('fadingComplete' in a) || typeof a.fadingComplete !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: (): AfterlifeMemoryComponent => ({

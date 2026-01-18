@@ -3,7 +3,8 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import type { Entity } from '../ecs/Entity.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { TownHallComponent, AgentRecord, DeathRecord, BirthRecord } from '../components/TownHallComponent.js';
 import type { CensusBureauComponent } from '../components/CensusBureauComponent.js';
@@ -49,25 +50,27 @@ export class GovernanceDataSystem extends BaseSystem {
 
     // Listen for death events
     this.events.subscribe('agent:starved', (event) => {
-      if (event.data) {
+      const e = event as { data?: { agentId: string }; timestamp?: number };
+      if (e.data) {
         // Per CLAUDE.md: No silent fallbacks - require all fields
-        if (!event.timestamp) {
-          throw new Error(`Death event (agent:starved) for agent ${event.data.agentId} missing required 'timestamp' field`);
+        if (!e.timestamp) {
+          throw new Error(`Death event (agent:starved) for agent ${e.data.agentId} missing required 'timestamp' field`);
         }
-        this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp);
+        this.recordDeath(world, e.data.agentId, 'starvation', e.timestamp);
       }
     });
 
     this.events.subscribe('agent:collapsed', (event) => {
-      if (event.data) {
+      const e = event as { data?: { agentId: string; reason: string }; timestamp?: number };
+      if (e.data) {
         // Per CLAUDE.md: No silent fallbacks - require all fields
-        if (!event.data.reason) {
-          throw new Error(`Death event (agent:collapsed) for agent ${event.data.agentId} missing required 'reason' field`);
+        if (!e.data.reason) {
+          throw new Error(`Death event (agent:collapsed) for agent ${e.data.agentId} missing required 'reason' field`);
         }
-        if (!event.timestamp) {
-          throw new Error(`Death event (agent:collapsed) for agent ${event.data.agentId} missing required 'timestamp' field`);
+        if (!e.timestamp) {
+          throw new Error(`Death event (agent:collapsed) for agent ${e.data.agentId} missing required 'timestamp' field`);
         }
-        this.recordDeath(world, event.data.agentId, event.data.reason, event.timestamp);
+        this.recordDeath(world, e.data.agentId, e.data.reason, e.timestamp);
       }
     });
 
@@ -81,7 +84,8 @@ export class GovernanceDataSystem extends BaseSystem {
     // Find agent name from identity component
     const entities = world.query().with(CT.Identity).executeEntities();
     const agent = entities.find(e => e.id === agentId);
-    const identityComp = agent ? (agent as EntityImpl).getComponent<IdentityComponent>(CT.Identity) : null;
+    const agentImpl = agent as EntityImpl | undefined;
+    const identityComp = agentImpl ? agentImpl.getComponent<IdentityComponent>(CT.Identity) : null;
 
     // Per CLAUDE.md: No silent fallbacks - require identity component with name
     if (!identityComp) {
@@ -180,8 +184,8 @@ export class GovernanceDataSystem extends BaseSystem {
       const agentRecords: AgentRecord[] = [];
 
       for (const agentEntity of agents) {
-        const agentImpl = agentEntity as EntityImpl;
-        const identity = agentImpl.getComponent<IdentityComponent>(CT.Identity);
+        const agentEntityImpl = agentEntity as EntityImpl;
+        const identity = agentEntityImpl.getComponent<IdentityComponent>(CT.Identity);
         if (identity) {
           agentRecords.push({
             id: agentEntity.id,
@@ -351,8 +355,8 @@ export class GovernanceDataSystem extends BaseSystem {
       const totalAgents = agents.length;
 
       for (const agentEntity of agents) {
-        const agentImpl = agentEntity as EntityImpl;
-        const needs = agentImpl.getComponent<NeedsComponent>(CT.Needs);
+        const agentEntityImpl = agentEntity as EntityImpl;
+        const needs = agentEntityImpl.getComponent<NeedsComponent>(CT.Needs);
 
         if (needs) {
           // Health based on hunger/energy

@@ -10,13 +10,10 @@
  * 4. Establishment: Full deity, accumulating power
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import { EntityImpl, type Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { World } from '../ecs/World.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { DeityComponent, type DivineDomain } from '../components/DeityComponent.js';
@@ -112,27 +109,25 @@ export interface AgentPerception {
 // DeityEmergenceSystem
 // ============================================================================
 
-export class DeityEmergenceSystem implements System {
+export class DeityEmergenceSystem extends BaseSystem {
   public readonly id = 'DeityEmergenceSystem';
-  public readonly name = 'DeityEmergenceSystem';
   public readonly priority = 100;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents = [] as const;
 
   private config: EmergenceConfig;
-  private lastCheck: number = 0;
-  private events!: SystemEventManager;
+  protected readonly throttleInterval: number;
 
   // Track belief contributions from proto_deity_belief events
   // Key is inferred concept (or 'unknown' if no concept detected)
   private protoDeityBeliefs: Map<string, ProtoDeityBelief> = new Map();
 
   constructor(config: Partial<EmergenceConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_EMERGENCE_CONFIG, ...config };
+    this.throttleInterval = this.config.checkInterval;
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-
+  protected onInitialize(): void {
     // Subscribe to proto_deity_belief events from PrayerSystem
     // These are emitted when prayers cannot be routed to an existing deity
     // and might contribute to emerging a new one
@@ -177,21 +172,12 @@ export class DeityEmergenceSystem implements System {
     tracked.lastContribution = data.timestamp;
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    // Only check periodically
-    if (currentTick - this.lastCheck < this.config.checkInterval) {
-      return;
-    }
-
-    this.lastCheck = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // First, check if any proto_deity_beliefs have accumulated enough to trigger emergence
-    this.checkProtoDeityEmergence(world, currentTick);
+    this.checkProtoDeityEmergence(ctx.world, ctx.tick);
 
     // Scan for belief patterns from agent data
-    const patterns = this.detectBeliefPatterns(world);
+    const patterns = this.detectBeliefPatterns(ctx.world);
 
     // Incorporate tracked proto_deity_belief data into patterns
     for (const pattern of patterns) {
@@ -211,14 +197,14 @@ export class DeityEmergenceSystem implements System {
     // Check if any patterns meet emergence threshold
     for (const pattern of patterns) {
       if (this.shouldEmerge(pattern)) {
-        this.emergeDeity(world, pattern, currentTick);
+        this.emergeDeity(ctx.world, pattern, ctx.tick);
         // Clear tracked data for this concept after emergence
         this.protoDeityBeliefs.delete(pattern.concept);
       }
     }
 
     // Clean up stale proto-deity beliefs (older than 10 minutes at 20 TPS)
-    const staleThreshold = currentTick - 12000;
+    const staleThreshold = ctx.tick - 12000;
     for (const [concept, tracked] of this.protoDeityBeliefs) {
       if (tracked.lastContribution < staleThreshold) {
         this.protoDeityBeliefs.delete(concept);
@@ -740,9 +726,5 @@ export class DeityEmergenceSystem implements System {
     };
 
     return defaultNames[domain];
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
   }
 }

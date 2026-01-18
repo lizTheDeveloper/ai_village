@@ -1,4 +1,3 @@
-import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -7,6 +6,7 @@ import type { EventBus } from '../events/EventBus.js';
 import type { GameEventMap, EventType } from '../events/EventMap.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * Base interface for memory trigger events - fields common to all events.
@@ -77,7 +77,7 @@ interface PendingBroadcast {
 /**
  * MemoryFormationSystem automatically forms episodic memories based on events
  */
-export class MemoryFormationSystem implements System {
+export class MemoryFormationSystem extends BaseSystem {
   public readonly id: SystemId = 'memory_formation';
   public readonly priority: number = 100;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
@@ -86,7 +86,7 @@ export class MemoryFormationSystem implements System {
   private static readonly MAX_MEMORIES_PER_AGENT_PER_GAME_HOUR = 20;
   private static readonly TICKS_PER_GAME_HOUR = 600; // 10 ticks/min * 60 min
 
-  private eventBus: EventBus;
+  private eventBus!: EventBus;
   private pendingMemories: Map<string, PendingMemory[]> = new Map();
   private requiredAgents: Set<string> = new Set(); // Agents that MUST exist (not from conversation)
   private pendingBroadcasts: PendingBroadcast[] = [];
@@ -96,6 +96,7 @@ export class MemoryFormationSystem implements System {
   private memoryFormationTimes: Map<string, number[]> = new Map();
 
   constructor(eventBus: EventBus) {
+    super();
     this.eventBus = eventBus;
     this._setupEventListeners();
   }
@@ -369,7 +370,9 @@ export class MemoryFormationSystem implements System {
     }
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
+    const world = ctx.world;
+
     // Flush event bus first to process any queued events
     this.eventBus.flush();
 

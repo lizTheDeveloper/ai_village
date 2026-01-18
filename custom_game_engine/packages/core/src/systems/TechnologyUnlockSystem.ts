@@ -7,7 +7,7 @@
  * - Special unlocks trigger additional mechanics (universities, internet, etc.)
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
@@ -29,27 +29,26 @@ import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
 /**
  * TechnologyUnlockSystem watches for new buildings and unlocks them globally.
  */
-export class TechnologyUnlockSystem implements System {
+export class TechnologyUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'technology_unlock';
   public readonly priority: number = 16; // Run after building system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: CoreEventBus;
   private systemRegistry: ISystemRegistry;
   private lastCheckedTick: number = 0;
   private checkedBuildings: Set<string> = new Set(); // Track which buildings we've already processed
 
   constructor(eventBus: CoreEventBus, systemRegistry: ISystemRegistry) {
-    this.eventBus = eventBus;
+    super();
     this.systemRegistry = systemRegistry;
   }
 
   /**
    * Update - scan for newly completed buildings.
    */
-  public update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get the global technology unlock singleton
-    const unlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
+    const unlockEntities = ctx.world.query().with(CT.TechnologyUnlock).executeEntities();
     if (unlockEntities.length === 0) {
       // No unlock tracker yet - nothing to do
       return;
@@ -62,10 +61,10 @@ export class TechnologyUnlockSystem implements System {
     }
 
     // Periodically scan for completed buildings (in case event was missed)
-    if (world.tick - this.lastCheckedTick >= 100) {
+    if (ctx.tick - this.lastCheckedTick >= 100) {
       // Every 5 seconds
-      this.scanForNewBuildings(world, unlock);
-      this.lastCheckedTick = world.tick;
+      this.scanForNewBuildings(ctx.world, unlock);
+      this.lastCheckedTick = ctx.tick;
     }
   }
 
@@ -221,14 +220,10 @@ export class TechnologyUnlockSystem implements System {
     unlockBuilding(unlock, buildingType, world.tick, cityId);
 
     // Emit unlock event
-    this.eventBus.emit({
-      type: 'technology:building_unlocked',
-      source: this.id,
-      data: {
-        buildingType,
-        cityId,
-        tick: world.tick,
-      },
+    this.events.emit('technology:building_unlocked', {
+      buildingType,
+      cityId,
+      tick: world.tick,
     });
 
     // Enable systems that require this technology

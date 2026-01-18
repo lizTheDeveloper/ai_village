@@ -10,7 +10,7 @@
  * Based on: openspec/specs/microgenerators/spec.md REQ-6
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type {
@@ -43,11 +43,10 @@ export interface ChunkSpawnInfo {
 /**
  * System that places god-crafted content during chunk generation
  */
-export class GodCraftedDiscoverySystem implements System {
+export class GodCraftedDiscoverySystem extends BaseSystem {
   readonly id = 'god_crafted_discovery';
-  readonly dependencies = [];
   readonly priority = 100; // Run after most other systems
-  readonly requiredComponents = []; // No per-tick entity processing
+  readonly requiredComponents = [] as const; // No per-tick entity processing
 
   /** Universe ID for this system instance */
   private universeId: string = 'universe:main';
@@ -67,15 +66,16 @@ export class GodCraftedDiscoverySystem implements System {
     universeId?: string;
     seed?: number;
   }) {
+    super();
     if (options?.spawnRate !== undefined) this.spawnRate = options.spawnRate;
     if (options?.maxPowerLevel !== undefined) this.maxPowerLevel = options.maxPowerLevel;
     if (options?.universeId) this.universeId = options.universeId;
     if (options?.seed !== undefined) this.seed = options.seed;
   }
 
-  update(world: World): void {
+  protected onUpdate(_ctx: SystemContext): void {
     // No per-tick logic - content spawns during chunk generation
-    // This method exists to satisfy System interface
+    // This method exists to satisfy BaseSystem interface
   }
 
   /**

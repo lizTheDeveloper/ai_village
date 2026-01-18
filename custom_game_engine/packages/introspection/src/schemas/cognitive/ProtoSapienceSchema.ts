@@ -227,14 +227,15 @@ export const ProtoSapienceSchema = autoRegister(
 
     validate: (data): data is ProtoSapienceComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const p = data as any;
+      const p = data as Record<string, unknown>;
 
-      return (
-        p.type === 'proto_sapience' &&
-        typeof p.intelligence === 'number' &&
-        typeof p.usesTools === 'boolean' &&
-        typeof p.hasProtocolanguage === 'boolean'
-      );
+      // Validate required fields
+      if (!('type' in p) || p.type !== 'proto_sapience') return false;
+      if (!('intelligence' in p) || typeof p.intelligence !== 'number') return false;
+      if (!('usesTools' in p) || typeof p.usesTools !== 'boolean') return false;
+      if (!('hasProtocolanguage' in p) || typeof p.hasProtocolanguage !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: () => ({

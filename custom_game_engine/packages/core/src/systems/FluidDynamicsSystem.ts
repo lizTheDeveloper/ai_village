@@ -1,8 +1,9 @@
-import type { System, World, Entity } from '../ecs/index.js';
+import type { Entity } from '../ecs/index.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Tile } from '@ai-village/world';
 import { get3DNeighbors } from '@ai-village/world';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
  * FluidDynamicsSystem - Dwarf Fortress-style water flow with slow updates
@@ -35,14 +36,13 @@ import { get3DNeighbors } from '@ai-village/world';
  * - Runs after TerrainModificationSystem (priority 15)
  * - Runs before AgentSwimmingSystem (priority 18)
  */
-export class FluidDynamicsSystem implements System {
+export class FluidDynamicsSystem extends BaseSystem {
   public readonly id: SystemId = 'fluid_dynamics';
   public readonly priority: number = 16; // After terrain mod (15), before swimming (18)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   // Dwarf Fortress-style slow updates (once per game minute)
-  private lastUpdateTick = 0;
-  private readonly UPDATE_INTERVAL = 1200; // 1 minute = 60 seconds × 20 TPS
+  protected readonly throttleInterval = 1200; // 1 minute = 60 seconds × 20 TPS
 
   // Dirty flags: tiles that need flow simulation
   // Format: "x,y,z" string keys for O(1) lookup
@@ -55,7 +55,7 @@ export class FluidDynamicsSystem implements System {
   /**
    * Initialize event listeners for terrain modifications
    */
-  initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: never, eventBus: EventBus): void {
     // Mark tiles dirty when terrain is modified
     eventBus.subscribe('terrain:modified', (event) => {
       const z = event.data.z ?? 0;
@@ -72,21 +72,13 @@ export class FluidDynamicsSystem implements System {
     });
   }
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
-
-    // Throttle to once per game minute (Dwarf Fortress approach)
-    if (currentTick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Performance tracking
     const startTime = performance.now();
     let tilesProcessed = 0;
 
     // Get world tile accessor
-    const worldWithTiles = world as {
+    const worldWithTiles = ctx.world as {
       getTileAt?: (x: number, y: number, z?: number) => Tile | undefined;
       setTileAt?: (x: number, y: number, z: number, tile: Tile) => void;
     };
@@ -366,7 +358,7 @@ export class FluidDynamicsSystem implements System {
     tilesProcessedLastUpdate: number;
     estimatedCostPerTick: number;
   } {
-    const estimatedCostPerTick = this.dirtyTiles.size / this.UPDATE_INTERVAL * 0.001; // ms
+    const estimatedCostPerTick = this.dirtyTiles.size / this.throttleInterval * 0.001; // ms
 
     return {
       dirtyTileCount: this.dirtyTiles.size,
@@ -380,7 +372,7 @@ export class FluidDynamicsSystem implements System {
    * Initialize dirty flags for existing water tiles on game load
    * Call this after loading a saved game
    */
-  initializeWaterTiles(world: World): void {
+  initializeWaterTiles(world: { getTileAt?: (x: number, y: number, z?: number) => Tile | undefined; getChunkManager?: () => { getLoadedChunks: () => Array<{ x: number; y: number; tiles: Tile[] }> } }): void {
     const worldWithTiles = world as {
       getTileAt?: (x: number, y: number, z?: number) => Tile | undefined;
       getChunkManager?: () => {

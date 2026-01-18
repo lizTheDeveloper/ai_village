@@ -14,8 +14,6 @@
  * burst out but gets crushed whenever it's discovered.
  */
 
-import type { System } from '../ecs/System.js';
-import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SystemId } from '../types.js';
@@ -24,6 +22,7 @@ import type { SupremeCreatorComponent } from '../components/SupremeCreatorCompon
 import type { DeityComponent } from '../components/DeityComponent.js';
 import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { calculateDetectionChance, triggersImmediateIntervention } from '../magic/MagicDetectionSystem.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 // ============================================================================
 // Detection Event Types
@@ -85,13 +84,10 @@ export interface SurveillanceStats {
 // CreatorSurveillanceSystem
 // ============================================================================
 
-export class CreatorSurveillanceSystem implements System {
+export class CreatorSurveillanceSystem extends BaseSystem {
   public readonly id: SystemId = 'creator_surveillance';
   public readonly priority = 16; // Right after MagicSystem (15)
   public readonly requiredComponents = [CT.SupremeCreator] as const;
-
-  private world: World | null = null;
-  private eventBus: EventBus | null = null;
 
   /** Surveillance statistics */
   private stats: SurveillanceStats = {
@@ -103,13 +99,9 @@ export class CreatorSurveillanceSystem implements System {
   };
 
   /** Check interval for surveillance sweeps (ticks) */
-  private readonly CHECK_INTERVAL = 600; // Every 30 seconds at 20 TPS
-  private lastCheckTick = 0;
+  protected readonly throttleInterval = 600; // Every 30 seconds at 20 TPS
 
-  initialize(world: World, eventBus: EventBus): void {
-    this.world = world;
-    this.eventBus = eventBus;
-
+  protected onInitialize(_world: never, eventBus: EventBus): void {
     // Subscribe to spell cast events
     eventBus.subscribe('magic:spell_cast', (event) => {
       this.monitorSpellCast(event);
@@ -117,12 +109,9 @@ export class CreatorSurveillanceSystem implements System {
 
   }
 
-  update(world: World): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Periodic surveillance sweeps
-    if (world.tick - this.lastCheckTick >= this.CHECK_INTERVAL) {
-      this.performSurveillanceSweep(world);
-      this.lastCheckTick = world.tick;
-    }
+    this.performSurveillanceSweep(ctx.world);
 
     // Update alert levels based on recent activity
     this.updateAlertLevel();
@@ -194,19 +183,15 @@ export class CreatorSurveillanceSystem implements System {
     this.recordDetection(detectionEvent, creatorComp);
 
     // Emit detection event
-    if (finalDetected && this.eventBus) {
-      this.eventBus.emit({
-        type: 'divinity:magic_detected',
-        source: creator.id,
-        data: {
-          casterId,
-          spellId,
-          detectionRisk: spell.creatorDetection.detectionRisk,
-          evidenceStrength: detectionEvent.evidenceStrength,
-          forbiddenCategories: spell.creatorDetection.forbiddenCategories,
-          forced: forcedDetection,
-        },
-      });
+    if (finalDetected && this.events) {
+      this.events.emit('divinity:magic_detected', {
+        casterId,
+        spellId,
+        detectionRisk: spell.creatorDetection.detectionRisk,
+        evidenceStrength: detectionEvent.evidenceStrength,
+        forbiddenCategories: spell.creatorDetection.forbiddenCategories,
+        forced: forcedDetection,
+      }, creator.id);
 
     }
   }
@@ -279,7 +264,7 @@ export class CreatorSurveillanceSystem implements System {
    * Perform periodic surveillance sweep
    * Spy gods report suspicious activity, paranoia naturally increases
    */
-  private performSurveillanceSweep(world: World): void {
+  private performSurveillanceSweep(world: { getEntity: (id: string) => Entity | undefined }): void {
     const creator = this.findSupremeCreator();
     if (!creator) return;
 
@@ -301,7 +286,7 @@ export class CreatorSurveillanceSystem implements System {
   /**
    * Process reports from spy gods
    */
-  private processSpyGodReports(world: World, creator: SupremeCreatorComponent): void {
+  private processSpyGodReports(world: { getEntity: (id: string) => Entity | undefined }, creator: SupremeCreatorComponent): void {
     for (const spyGodId of creator.surveillance.spyGods) {
       const spyGod = world.getEntity(spyGodId);
       if (!spyGod) {
@@ -377,19 +362,15 @@ export class CreatorSurveillanceSystem implements System {
     }
 
     // Emit alert level change event if changed
-    if (newAlert !== this.stats.alertLevel && this.eventBus) {
+    if (newAlert !== this.stats.alertLevel && this.events) {
       const creator = this.findSupremeCreator();
       if (creator) {
-        this.eventBus.emit({
-          type: 'divinity:surveillance_alert',
-          source: creator.id,
-          data: {
-            oldLevel: this.stats.alertLevel,
-            newLevel: newAlert,
-            recentDetections,
-            criticalDetections,
-          },
-        });
+        this.events.emit('divinity:surveillance_alert', {
+          oldLevel: this.stats.alertLevel,
+          newLevel: newAlert,
+          recentDetections,
+          criticalDetections,
+        }, creator.id);
       }
 
       this.stats.alertLevel = newAlert;

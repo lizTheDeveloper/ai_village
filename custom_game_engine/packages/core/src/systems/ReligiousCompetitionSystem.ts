@@ -10,10 +10,8 @@
  * - Economic competition for resources
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 
@@ -83,9 +81,8 @@ export const DEFAULT_COMPETITION_CONFIG: CompetitionConfig = {
 // ReligiousCompetitionSystem
 // ============================================================================
 
-export class ReligiousCompetitionSystem implements System {
+export class ReligiousCompetitionSystem extends BaseSystem {
   public readonly id = 'ReligiousCompetitionSystem';
-  public readonly name = 'ReligiousCompetitionSystem';
   public readonly priority = 78;
   public readonly requiredComponents = [];
 
@@ -93,33 +90,25 @@ export class ReligiousCompetitionSystem implements System {
   private competitions: Map<string, CompetitionData> = new Map();
   private lastUpdate: number = 0;
   private lastCheck: number = 0;
-  private events!: SystemEventManager;
 
   constructor(config: Partial<CompetitionConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_COMPETITION_CONFIG, ...config };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
 
     // Update existing competitions
     if (currentTick - this.lastUpdate >= this.config.updateInterval) {
       this.lastUpdate = currentTick;
-      this.updateCompetitions(world, currentTick);
+      this.updateCompetitions(ctx.world, currentTick);
     }
 
     // Check for new competitions
     if (currentTick - this.lastCheck >= this.config.checkInterval) {
       this.lastCheck = currentTick;
-      this.checkForNewCompetitions(world, currentTick);
+      this.checkForNewCompetitions(ctx.world, currentTick);
     }
   }
 

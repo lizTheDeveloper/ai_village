@@ -10,7 +10,7 @@
  * - Counter-conversion efforts
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -100,18 +100,18 @@ export const DEFAULT_CONVERSION_CONFIG: ConversionConfig = {
 // ConversionWarfareSystem
 // ============================================================================
 
-export class ConversionWarfareSystem implements System {
+export class ConversionWarfareSystem extends BaseSystem {
   public readonly id = 'ConversionWarfareSystem';
-  public readonly name = 'ConversionWarfareSystem';
   public readonly priority = 79;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 300; // ~15 seconds at 20 TPS
 
   private config: ConversionConfig;
   private campaigns: Map<string, ConversionCampaign> = new Map();
   private attempts: ConversionAttempt[] = [];
-  private lastUpdate: number = 0;
 
   constructor(config: Partial<ConversionConfig> = {}) {
+    super();
     this.config = { ...DEFAULT_CONVERSION_CONFIG, ...config };
   }
 
@@ -134,17 +134,9 @@ export class ConversionWarfareSystem implements System {
     return true;
   }
 
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process active campaigns
-    this.processCampaigns(world, currentTick);
+    this.processCampaigns(ctx.world, ctx.tick);
   }
 
   /**

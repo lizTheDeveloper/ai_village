@@ -11,12 +11,9 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid input.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World, ITile } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { EventBus } from '../events/EventBus.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import {
   type TileBasedBlueprint,
   parseLayout,
@@ -162,7 +159,7 @@ export interface ConstructionTask {
 /**
  * TileConstructionSystem - Manages tile-based construction.
  */
-export class TileConstructionSystem implements System {
+export class TileConstructionSystem extends BaseSystem {
   public readonly id: SystemId = 'tile_construction';
   public readonly priority: number = 18; // After movement, before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
@@ -172,17 +169,6 @@ export class TileConstructionSystem implements System {
 
   /** Task counter for unique IDs */
   private taskCounter = 0;
-
-  /** Event manager for type-safe emissions */
-  private events!: SystemEventManager;
-
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
 
   /**
    * Create a new construction task from a blueprint or blueprint ID.
@@ -663,9 +649,9 @@ export class TileConstructionSystem implements System {
    * System update - periodic maintenance tasks.
    * The actual construction work is done by behaviors calling advanceProgress.
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Clean up completed/cancelled tasks after some time
-    const now = world.tick;
+    const now = ctx.tick;
     for (const [taskId, task] of this.tasks) {
       if (task.state === 'completed' || task.state === 'cancelled') {
         // Remove tasks that completed more than 5 minutes ago (6000 ticks at 20 TPS)

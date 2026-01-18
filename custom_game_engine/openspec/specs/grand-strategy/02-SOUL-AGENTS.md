@@ -2164,17 +2164,18 @@ Amortized: 1300 ops / 100 ticks = 13 ops/tick
 
 | Soul Agents | Memory | Headless CPU | Awakening | Status |
 |-------------|--------|--------------|-----------|--------|
-| 100 | 6 MB | 10 ops/tick | 130 ops | ✅ Trivial |
-| 1,000 | 60 MB | 100 ops/tick | 1300 ops | ✅ Comfortable |
-| 10,000 | 600 MB | 1000 ops/tick | 13000 ops | ⚠️ Noticeable |
-| 100,000 | 6 GB | 10000 ops/tick | 130000 ops | ❌ Too heavy |
+| 50 | 3 MB | 5 ops/tick | 65 ops | ✅ Trivial |
+| 100 | 6 MB | 10 ops/tick | 130 ops | ✅ Comfortable |
+| 250 | 15 MB | 25 ops/tick | 325 ops | ✅ Good |
+| 500 | 30 MB | 50 ops/tick | 650 ops | ⚠️ Maximum |
 
-**Recommended maximum: 10,000 soul agents**
-- Above 10K, consider:
-  - Hibernating least-attached soul agents
-  - Compressing core memories more aggressively
-  - Reducing headless update frequency
-  - Culling dormant soul agents after many generations
+**Recommended maximum: 500 soul agents**
+- Soul agents are *meaningful named characters* with player attachment
+- 500 souls across millennia allows ~10-20 per generation with ancestry tracking
+- Above 500, consider:
+  - Ascending oldest soul agents to deity/ancestral spirit status
+  - Archiving ancient souls to disk (load on-demand)
+  - Being more selective about soul agent promotion
 
 ---
 
@@ -2273,7 +2274,7 @@ Soul Agents are the key innovation enabling **cross-scale storytelling** in the 
 - O(1) headless simulation per soul agent
 - ~60 KB memory per soul agent
 - 500x cheaper than full ECS for inactive tiers
-- Supports 1,000-10,000 soul agents comfortably
+- Supports up to 500 soul agents (setting-configurable cap)
 
 **Integration:**
 - Extends existing soul system (SoulIdentity, Incarnation, SoulRepository)
