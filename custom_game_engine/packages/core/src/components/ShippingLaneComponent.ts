@@ -25,6 +25,7 @@ import type { EntityId } from '../types.js';
  */
 export interface ShippingLaneComponent {
   readonly type: 'shipping_lane';
+  readonly version: number;
 
   // ============================================================================
   // Identity

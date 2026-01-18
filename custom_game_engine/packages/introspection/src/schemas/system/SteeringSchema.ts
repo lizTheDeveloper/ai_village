@@ -150,10 +150,36 @@ export const SteeringSchema = autoRegister(
 
     validate: (data: unknown): data is SteeringComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return typeof comp.behavior === 'string'
-        && typeof comp.maxSpeed === 'number'
-        && typeof comp.maxForce === 'number';
+      const x = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in x) || x.type !== 'steering') return false;
+
+      // Check required fields
+      if (!('behavior' in x) || typeof x.behavior !== 'string') return false;
+      if (!('maxSpeed' in x) || typeof x.maxSpeed !== 'number') return false;
+      if (!('maxForce' in x) || typeof x.maxForce !== 'number') return false;
+      if (!('slowingRadius' in x) || typeof x.slowingRadius !== 'number') return false;
+      if (!('arrivalTolerance' in x) || typeof x.arrivalTolerance !== 'number') return false;
+
+      // Validate behavior enum
+      const validBehaviors = ['seek', 'arrive', 'obstacle_avoidance', 'wander', 'combined', 'none'];
+      if (!validBehaviors.includes(x.behavior)) return false;
+
+      // Check optional target field
+      if ('target' in x && x.target !== undefined) {
+        if (typeof x.target !== 'object' || x.target === null) return false;
+        const target = x.target as Record<string, unknown>;
+        if (!('x' in target) || typeof target.x !== 'number') return false;
+        if (!('y' in target) || typeof target.y !== 'number') return false;
+      }
+
+      // Check optional deadZone field
+      if ('deadZone' in x && x.deadZone !== undefined) {
+        if (typeof x.deadZone !== 'number') return false;
+      }
+
+      return true;
     },
 
     createDefault: () => ({

@@ -141,8 +141,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     if (effect.newSize) {
       const oldSize = body.size;
       body.size = effect.newSize;
-      appliedValues.oldSize = oldSize;
-      appliedValues.newSize = effect.newSize;
+      appliedValues.sizeChanged = 1;
 
       // Track as modification
       const mod: GlobalBodyModification = {
@@ -385,7 +384,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       modifiedParts.push(part.id);
     }
 
-    appliedValues.partsModified = modifiedParts;
+    appliedValues.partsModified = modifiedParts.length;
   }
 }
 

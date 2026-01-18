@@ -121,7 +121,7 @@ export class ShippingLaneSystem extends BaseSystem {
     }
 
     // Update flow rate based on active caravans
-    const newFlowRate = this.calculateFlowRate(lane, world);
+    const newFlowRate = this.calculateFlowRate(updatedLane, world);
     if (Math.abs(newFlowRate - lane.flowRate) > 0.01) {
       updatedLane.flowRate = newFlowRate;
       needsUpdate = true;
@@ -169,7 +169,7 @@ export class ShippingLaneSystem extends BaseSystem {
     let totalFlow = 0;
 
     for (const caravanId of lane.activeCaravans) {
-      const caravanEntity = world.getEntityById(caravanId);
+      const caravanEntity = world.getEntity(caravanId);
       if (!caravanEntity) continue;
 
       const caravan = caravanEntity.getComponent<TradeCaravanComponent>('trade_caravan');
@@ -262,7 +262,7 @@ export class ShippingLaneSystem extends BaseSystem {
 
     // Check for hazard encounters
     const hazardResult = this.checkHazardEncounter(lane, caravan, world);
-    if (hazardResult.encountered) {
+    if (hazardResult.encountered && hazardResult.hazardType && hazardResult.outcome) {
       updatedCaravan.status = hazardResult.outcome === 'destroyed' ? 'lost' : 'attacked';
       needsUpdate = true;
 

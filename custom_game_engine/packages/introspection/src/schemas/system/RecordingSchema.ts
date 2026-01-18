@@ -295,24 +295,57 @@ export const RecordingSchema = autoRegister(
 
     validate: (data): data is RecordingComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const r = data as any;
+      const r = data as Record<string, unknown>;
 
-      return (
-        r.type === 'recording' &&
-        typeof r.mediaType === 'string' &&
-        typeof r.category === 'string' &&
-        typeof r.status === 'string' &&
-        typeof r.quality === 'number' &&
-        typeof r.location === 'object' &&
-        typeof r.recordedBy === 'string' &&
-        typeof r.reporterName === 'string' &&
-        typeof r.startedTick === 'number' &&
-        typeof r.durationTicks === 'number' &&
-        Array.isArray(r.subjectIds) &&
-        Array.isArray(r.subjectNames) &&
-        typeof r.equipmentQuality === 'number' &&
-        typeof r.fileSizeKB === 'number'
-      );
+      // Required: type field
+      if (!('type' in r) || r.type !== 'recording') return false;
+
+      // Required: mediaType
+      if (!('mediaType' in r) || typeof r.mediaType !== 'string') return false;
+
+      // Required: category
+      if (!('category' in r) || typeof r.category !== 'string') return false;
+
+      // Required: status
+      if (!('status' in r) || typeof r.status !== 'string') return false;
+
+      // Required: quality
+      if (!('quality' in r) || typeof r.quality !== 'number') return false;
+
+      // Required: location (object)
+      if (!('location' in r) || typeof r.location !== 'object' || r.location === null) return false;
+
+      // Required: recordedBy
+      if (!('recordedBy' in r) || typeof r.recordedBy !== 'string') return false;
+
+      // Required: reporterName
+      if (!('reporterName' in r) || typeof r.reporterName !== 'string') return false;
+
+      // Required: startedTick
+      if (!('startedTick' in r) || typeof r.startedTick !== 'number') return false;
+
+      // Required: durationTicks
+      if (!('durationTicks' in r) || typeof r.durationTicks !== 'number') return false;
+
+      // Required: subjectIds (array)
+      if (!('subjectIds' in r) || !Array.isArray(r.subjectIds)) return false;
+
+      // Required: subjectNames (array)
+      if (!('subjectNames' in r) || !Array.isArray(r.subjectNames)) return false;
+
+      // Required: equipmentQuality
+      if (!('equipmentQuality' in r) || typeof r.equipmentQuality !== 'number') return false;
+
+      // Required: fileSizeKB
+      if (!('fileSizeKB' in r) || typeof r.fileSizeKB !== 'number') return false;
+
+      // Optional: description (string)
+      if ('description' in r && r.description !== undefined && typeof r.description !== 'string') return false;
+
+      // Optional: transcript (string)
+      if ('transcript' in r && r.transcript !== undefined && typeof r.transcript !== 'string') return false;
+
+      return true;
     },
 
     createDefault: (): RecordingComponent => ({

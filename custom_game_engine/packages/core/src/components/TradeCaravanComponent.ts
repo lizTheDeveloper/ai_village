@@ -26,6 +26,7 @@ import type { EntityId } from '../types.js';
  */
 export interface TradeCaravanComponent {
   readonly type: 'trade_caravan';
+  readonly version: number;
 
   // ============================================================================
   // Identity

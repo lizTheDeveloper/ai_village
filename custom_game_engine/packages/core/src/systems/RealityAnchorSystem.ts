@@ -76,14 +76,10 @@ export class RealityAnchorSystem extends BaseSystem {
 
       if (!powerComp.isPowered) {
         // Insufficient power - charging interrupted
-        this.events.emitGeneric({
-          type: 'reality_anchor:charging_interrupted',
-          source: anchorId,
-          data: {
+        this.events.emitGeneric('reality_anchor:charging_interrupted', {
             message: 'Reality Anchor charging interrupted: Insufficient power',
             powerLevel: anchor.powerLevel,
-          },
-        });
+          }, 'anchorId');
         return;
       }
 
@@ -92,11 +88,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
       if (anchor.powerLevel >= 1.0) {
         anchor.status = 'ready';
-        this.events.emitGeneric({
-          type: 'reality_anchor:ready',
-          source: anchorId,
-          data: {},
-        });
+        this.events.emitGeneric('reality_anchor:ready', {}, 'anchorId');
       }
     }
 
@@ -137,14 +129,10 @@ export class RealityAnchorSystem extends BaseSystem {
 
     // Check for partial power (25-100% efficiency) - handle this first
     if (powerComp.efficiency < 1.0 && powerComp.efficiency >= 0.25) {
-      this.events.emitGeneric({
-        type: 'reality_anchor:power_insufficient',
-        source: anchorId,
-        data: {
+      this.events.emitGeneric('reality_anchor:power_insufficient', {
           message: 'WARNING: Reality Anchor receiving partial power - field unstable!',
           efficiency: powerComp.efficiency,
-        },
-      });
+        }, 'anchorId');
 
       // Field becomes unstable but doesn't collapse immediately
       // If efficiency < 0.5, start countdown to collapse
@@ -167,14 +155,10 @@ export class RealityAnchorSystem extends BaseSystem {
       }
     } else if (powerComp.efficiency < 0.25) {
       // Critical power loss - field collapses
-      this.events.emitGeneric({
-        type: 'reality_anchor:power_loss',
-        source: anchorId,
-        data: {
+      this.events.emitGeneric('reality_anchor:power_loss', {
           message: 'Reality Anchor power loss: Field collapsing!',
           efficiency: powerComp.efficiency,
-        },
-      });
+        }, 'anchorId');
 
       this.fieldCollapse(world, anchorId, anchor, 'Insufficient power');
       return;
@@ -245,26 +229,18 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.mortalizedGods.add(godId);
 
     // Emit event
-    this.events.emitGeneric({
-      type: 'reality_anchor:god_mortalized',
-      source: anchorId,
-      data: {
+    this.events.emitGeneric('reality_anchor:god_mortalized', {
         godId,
         message: 'Divine intervention fails. The god has become mortal.',
-      },
-    });
+      }, 'anchorId');
 
     // Check if this is the Supreme Creator
     const godEntity = world.getEntity(godId);
     if (godEntity?.components.has(CT.SupremeCreator)) {
-      this.events.emitGeneric({
-        type: 'reality_anchor:creator_mortalized',
-        source: anchorId,
-        data: {
+      this.events.emitGeneric('reality_anchor:creator_mortalized', {
           godId,
           message: 'The Supreme Creator has entered the field. It bleeds. It can be killed.',
-        },
-      });
+        }, 'anchorId');
     }
   }
 
@@ -282,14 +258,10 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.mortalizedGods.delete(godId);
 
     // Emit event
-    this.events.emitGeneric({
-      type: 'reality_anchor:god_restored',
-      source: anchorId,
-      data: {
+    this.events.emitGeneric('reality_anchor:god_restored', {
         godId,
         message: 'Divine power restored. The god has left the field.',
-      },
-    });
+      }, 'anchorId');
   }
 
   /**
@@ -311,14 +283,10 @@ export class RealityAnchorSystem extends BaseSystem {
         anchor.status = 'overloading';
         anchor.overloadCountdown = 600; // 30 seconds at 20 TPS
 
-        this.events.emitGeneric({
-          type: 'reality_anchor:overloading',
-          source: anchorId,
-          data: {
+        this.events.emitGeneric('reality_anchor:overloading', {
             message: 'WARNING: Reality anchor overloading! Field collapse imminent!',
             countdown: anchor.overloadCountdown,
-          },
-        });
+          }, 'anchorId');
       }
     }
   }
@@ -338,27 +306,19 @@ export class RealityAnchorSystem extends BaseSystem {
 
     // Release all mortalized gods
     for (const godId of anchor.mortalizedGods) {
-      this.events.emitGeneric({
-        type: 'reality_anchor:god_restored',
-        source: anchorId,
-        data: {
+      this.events.emitGeneric('reality_anchor:god_restored', {
           godId,
           message: 'Field collapse! Divine power restored!',
-        },
-      });
+        }, 'anchorId');
     }
 
     anchor.mortalizedGods.clear();
     anchor.entitiesInField.clear();
 
-    this.events.emitGeneric({
-      type: 'reality_anchor:field_collapse',
-      source: anchorId,
-      data: {
+    this.events.emitGeneric('reality_anchor:field_collapse', {
         message: `Reality Anchor field collapsed: ${reason}`,
         reason,
-      },
-    });
+      }, 'anchorId');
   }
 
   /**
@@ -395,13 +355,9 @@ export class RealityAnchorSystem extends BaseSystem {
     anchor.status = 'active';
     anchor.lastActivatedAt = world.tick;
 
-    this.events.emitGeneric({
-      type: 'reality_anchor:activated',
-      source: anchorId,
-      data: {
+    this.events.emitGeneric('reality_anchor:activated', {
         message: 'Reality anchor activated. Divine intervention nullified within field.',
-      },
-    });
+      }, 'anchorId');
 
     return true;
   }

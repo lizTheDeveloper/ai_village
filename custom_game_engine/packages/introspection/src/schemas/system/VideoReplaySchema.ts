@@ -167,23 +167,33 @@ export const VideoReplaySchema = autoRegister(
 
     validate: (data): data is VideoReplayComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const v = data as any;
+      const v = data as Record<string, unknown>;
 
-      return (
-        v.type === 'video_replay' &&
-        typeof v.recordingId === 'string' &&
-        typeof v.recordedBy === 'string' &&
-        typeof v.recordedByName === 'string' &&
-        typeof v.startTick === 'number' &&
-        Array.isArray(v.frames) &&
-        typeof v.frameInterval === 'number' &&
-        typeof v.maxFrames === 'number' &&
-        typeof v.status === 'string' &&
-        typeof v.metadata === 'object' &&
-        typeof v.metadata.durationTicks === 'number' &&
-        typeof v.metadata.entityCount === 'number' &&
-        typeof v.metadata.quality === 'number'
-      );
+      // Check required type field
+      if (!('type' in v) || v.type !== 'video_replay') return false;
+
+      // Check required string fields
+      if (!('recordingId' in v) || typeof v.recordingId !== 'string') return false;
+      if (!('recordedBy' in v) || typeof v.recordedBy !== 'string') return false;
+      if (!('recordedByName' in v) || typeof v.recordedByName !== 'string') return false;
+      if (!('status' in v) || typeof v.status !== 'string') return false;
+
+      // Check required number fields
+      if (!('startTick' in v) || typeof v.startTick !== 'number') return false;
+      if (!('frameInterval' in v) || typeof v.frameInterval !== 'number') return false;
+      if (!('maxFrames' in v) || typeof v.maxFrames !== 'number') return false;
+
+      // Check frames array
+      if (!('frames' in v) || !Array.isArray(v.frames)) return false;
+
+      // Check metadata object and its required fields
+      if (!('metadata' in v) || typeof v.metadata !== 'object' || v.metadata === null) return false;
+      const metadata = v.metadata as Record<string, unknown>;
+      if (!('durationTicks' in metadata) || typeof metadata.durationTicks !== 'number') return false;
+      if (!('entityCount' in metadata) || typeof metadata.entityCount !== 'number') return false;
+      if (!('quality' in metadata) || typeof metadata.quality !== 'number') return false;
+
+      return true;
     },
 
     createDefault: (): VideoReplayComponent => ({
