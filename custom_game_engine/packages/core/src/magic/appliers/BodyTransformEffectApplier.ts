@@ -109,7 +109,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       };
     }
 
-    const appliedValues: Record<string, number | string | string[]> = {};
+    const appliedValues: Record<string, number> = {};
     const source: ModificationSource = effect.modificationSource || 'magic';
 
     // Store original body for restoration (deep copy)
@@ -207,7 +207,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     newPlan: string,
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, number | string | string[]>
+    appliedValues: Record<string, number>
   ): void {
     const oldPlanId = body.bodyPlanId;
 
@@ -221,8 +221,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       body.bloodType = newBody.bloodType;
       body.skeletonType = newBody.skeletonType;
 
-      appliedValues.oldBodyPlan = oldPlanId;
-      appliedValues.newBodyPlan = newPlan;
+      appliedValues.polymorphApplied = 1;
       appliedValues.partsChanged = Object.keys(newBody.parts).length;
 
       // Track as modification

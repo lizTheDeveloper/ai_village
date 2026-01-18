@@ -78,9 +78,10 @@ export class TechnologyUnlockSystem extends BaseSystem {
     const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
 
     // Cache cities query (only rebuild when count changes)
-    const currentCityCount = world.query().with(CT.CityDirector).count();
+    const cityEntities = world.query().with(CT.CityDirector).executeEntities();
+    const currentCityCount = cityEntities.length;
     if (currentCityCount !== this.lastCityCount) {
-      this.cachedCities = world.query().with(CT.CityDirector).executeEntities();
+      this.cachedCities = cityEntities;
       this.lastCityCount = currentCityCount;
     }
     const cities = this.cachedCities;
