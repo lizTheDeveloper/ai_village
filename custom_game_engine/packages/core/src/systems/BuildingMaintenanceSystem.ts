@@ -203,6 +203,11 @@ export class BuildingMaintenanceSystem extends BaseSystem {
    * Get durability modifier for a building type
    */
   private getDurabilityModifier(buildingType: string): number {
+    // Handle undefined/null building type
+    if (!buildingType) {
+      return DEGRADATION_CONFIG.BUILDING_DURABILITY['wood'] ?? 1.0;
+    }
+
     // Check for specific building type
     if (DEGRADATION_CONFIG.BUILDING_DURABILITY[buildingType]) {
       return DEGRADATION_CONFIG.BUILDING_DURABILITY[buildingType]!;

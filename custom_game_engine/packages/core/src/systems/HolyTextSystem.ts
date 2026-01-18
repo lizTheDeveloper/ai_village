@@ -50,10 +50,10 @@ export class HolyTextSystem extends BaseSystem {
   public readonly id = 'HolyTextSystem';
   public readonly priority = 82;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private config: HolyTextConfig;
   private holyTexts: Map<string, HolyTextData> = new Map();
-  private lastCheck: number = 0;
 
   constructor(config: Partial<HolyTextConfig> = {}) {
     super();
@@ -62,13 +62,6 @@ export class HolyTextSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-
-    // Only check periodically
-    if (currentTick - this.lastCheck < this.config.checkInterval) {
-      return;
-    }
-
-    this.lastCheck = currentTick;
 
     // Check if any deity needs canonical texts
     this.checkForTextGeneration(ctx.world, currentTick);

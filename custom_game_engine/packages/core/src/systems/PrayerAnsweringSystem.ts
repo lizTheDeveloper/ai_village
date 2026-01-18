@@ -172,14 +172,14 @@ export class PrayerAnsweringSystem extends BaseSystem {
     const agent = allEntities.find(e => e.id === nextPrayer.agentId);
     if (!agent) {
       // Agent no longer exists, remove prayer
-      deityComp.removePrayer(nextPrayer.prayerId);
+      this._removePrayer(deityComp, nextPrayer.prayerId);
       return;
     }
 
     // Get the full prayer from the agent's spiritual component
     const spiritual = agent.components.get(CT.Spiritual) as SpiritualComponent;
     if (!spiritual) {
-      deityComp.removePrayer(nextPrayer.prayerId);
+      this._removePrayer(deityComp, nextPrayer.prayerId);
       return;
     }
 
@@ -193,7 +193,7 @@ export class PrayerAnsweringSystem extends BaseSystem {
     }
 
     // Answer the prayer with a sign (default behavior)
-    if (deityComp.answerPrayer(nextPrayer.prayerId, this.ANSWER_PRAYER_COST)) {
+    if (this._answerPrayer(deityComp, nextPrayer.prayerId, this.ANSWER_PRAYER_COST)) {
       // Update agent's spiritual component
       if (spiritual) {
         const updatedSpiritual = answerPrayerOnAgent(
@@ -262,11 +262,11 @@ export class PrayerAnsweringSystem extends BaseSystem {
 
     if (result && result.result === 'success') {
       // Healing successful - mark prayer as answered
-      deityComp.removePrayer(prayerId);
+      this._removePrayer(deityComp, prayerId);
 
       // Spend the additional belief cost (beyond what healBody already spent)
       // Note: DivineBodyModification has its own cost, we're just adding the prayer overhead
-      deityComp.spendBelief(this.ANSWER_PRAYER_COST);
+      this._spendBelief(deityComp, this.ANSWER_PRAYER_COST);
 
       // Update agent's spiritual component
       const updatedSpiritual = answerPrayerOnAgent(
@@ -315,7 +315,7 @@ export class PrayerAnsweringSystem extends BaseSystem {
       const agent = allEntities.find(e => e.id === prayer.agentId);
       if (!agent) {
         // Agent no longer exists, remove prayer
-        deityComp.removePrayer(prayer.prayerId);
+        this._removePrayer(deityComp, prayer.prayerId);
         continue;
       }
 
@@ -332,7 +332,7 @@ export class PrayerAnsweringSystem extends BaseSystem {
       }
 
       // Remove from queue
-      deityComp.removePrayer(prayer.prayerId);
+      this._removePrayer(deityComp, prayer.prayerId);
     }
   }
 }

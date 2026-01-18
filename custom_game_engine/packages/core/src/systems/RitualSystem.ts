@@ -58,11 +58,11 @@ export class RitualSystem extends BaseSystem {
   public readonly id = 'RitualSystem';
   public readonly priority = 83;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private config: RitualConfig;
   private rituals: Map<string, RitualData> = new Map();
   private scheduledRituals: Map<string, number> = new Map(); // ritual ID -> next occurrence
-  private lastCheck: number = 0;
 
   constructor(config: Partial<RitualConfig> = {}) {
     super();
@@ -71,13 +71,6 @@ export class RitualSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-
-    // Only check periodically
-    if (currentTick - this.lastCheck < this.config.checkInterval) {
-      return;
-    }
-
-    this.lastCheck = currentTick;
 
     // Check for rituals that should occur
     this.performScheduledRituals(ctx.world, currentTick);

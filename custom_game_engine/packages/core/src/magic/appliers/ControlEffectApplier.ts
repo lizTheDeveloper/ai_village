@@ -260,7 +260,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
     if (effect.rooted) {
       result.appliedValues['rooted'] = 1;
       // Immediately stop movement if rooted
-      const velocity = target.components.get('velocity') as VelocityComponent | undefined;
+      const velocity = target.getComponent<VelocityComponent>('velocity');
       if (velocity) {
         velocity.vx = 0;
         velocity.vy = 0;
@@ -280,7 +280,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
         level: Math.floor(Math.log2(context.casterMagic.totalSpellsCast + 1)),
       });
       result.appliedValues['dotDamage'] = dotValue.value;
-      result.appliedValues['dotType'] = effect.dotType as any;
+      result.appliedValues['dotType'] = effect.dotType;
     }
 
     return result;
@@ -405,10 +405,10 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
 
   private applyDoTDamage(target: Entity, damage: number, _damageType: string): void {
     // Apply damage to target's health
-    const needs = target.components.get('needs') as NeedsComponent | undefined;
+    const needs = target.getComponent<NeedsComponent>('needs');
     if (needs && 'health' in needs) {
-      const currentHealth = (needs as any).health ?? 100;
-      (needs as any).health = Math.max(0, currentHealth - damage);
+      const currentHealth = needs.health;
+      needs.health = Math.max(0, currentHealth - damage);
     }
   }
 }

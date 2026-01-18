@@ -85,11 +85,11 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   public readonly id = 'ReligiousCompetitionSystem';
   public readonly priority = 78;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private config: CompetitionConfig;
   private competitions: Map<string, CompetitionData> = new Map();
-  private lastUpdate: number = 0;
-  private lastCheck: number = 0;
+  private lastCheckForNewCompetitions: number = 0;
 
   constructor(config: Partial<CompetitionConfig> = {}) {
     super();
@@ -99,15 +99,12 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
-    // Update existing competitions
-    if (currentTick - this.lastUpdate >= this.config.updateInterval) {
-      this.lastUpdate = currentTick;
-      this.updateCompetitions(ctx.world, currentTick);
-    }
+    // Update existing competitions every throttle interval (100 ticks)
+    this.updateCompetitions(ctx.world, currentTick);
 
-    // Check for new competitions
-    if (currentTick - this.lastCheck >= this.config.checkInterval) {
-      this.lastCheck = currentTick;
+    // Check for new competitions less frequently (every 4800 ticks)
+    if (currentTick - this.lastCheckForNewCompetitions >= this.config.checkInterval) {
+      this.lastCheckForNewCompetitions = currentTick;
       this.checkForNewCompetitions(ctx.world, currentTick);
     }
   }

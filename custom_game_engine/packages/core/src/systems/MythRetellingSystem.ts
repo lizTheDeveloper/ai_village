@@ -28,6 +28,7 @@ export class MythRetellingSystem extends BaseSystem {
   public readonly id = 'myth_retelling';
   public readonly priority = 119; // After myth generation
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
 

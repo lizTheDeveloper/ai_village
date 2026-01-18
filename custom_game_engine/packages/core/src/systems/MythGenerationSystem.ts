@@ -51,6 +51,7 @@ export class MythGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'myth_generation';
   public readonly priority: number = 118; // After prayer answering
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 50; // Every 2.5 seconds at 20 TPS (check for LLM responses)
 
   private mythIdCounter: number = 0;
   private pendingMyths: PendingMyth[] = [];

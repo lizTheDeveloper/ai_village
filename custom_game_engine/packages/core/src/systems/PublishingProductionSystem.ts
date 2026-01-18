@@ -38,6 +38,7 @@ export class PublishingProductionSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_production';
   public readonly priority = 44;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 20; // Every 1 second at 20 TPS (production job updates)
 
   // Active production jobs
   private activeJobs: Map<string, ProductionJob> = new Map();

@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /**
  * Cost calculator for the Dream/Oneiromancy magic paradigm.
@@ -162,7 +163,7 @@ export class DreamCostCalculator extends BaseCostCalculator {
    * Override terminal effect for dream-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     _caster: MagicComponent
   ): TerminalEffect {
@@ -187,13 +188,13 @@ export class DreamCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    return super.getTerminalEffect(costType, trigger, _caster);
   }
 
   /**
    * Fatigue is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'fatigue' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'fatigue' || super.isCumulativeCost(costType);
   }
 }

@@ -4,7 +4,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { InjuryComponent } from '../components/InjuryComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
-import type { NeedsComponent } from '../components/NeedsComponent.js';
+import { NeedsComponent } from '../components/NeedsComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 interface MovementComponent {
@@ -190,7 +190,10 @@ export class InjurySystem extends BaseSystem {
 
     // Update component with new rates
     entityImpl.updateComponent<NeedsComponent>('needs', (currentNeeds) => {
-      const updated = currentNeeds.clone();
+      // Handle both class instances (with clone method) and plain deserialized objects
+      const updated = typeof currentNeeds.clone === 'function'
+        ? currentNeeds.clone()
+        : new NeedsComponent(currentNeeds);
       updated.hungerDecayRate = (currentNeeds.hungerDecayRate || 1.0) * hungerRateMultiplier;
       updated.energyDecayRate = (currentNeeds.energyDecayRate || 1.0) * energyRateMultiplier;
       return updated;

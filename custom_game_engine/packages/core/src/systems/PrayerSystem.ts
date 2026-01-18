@@ -28,6 +28,7 @@ export class PrayerSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer';
   public readonly priority: number = 116; // After belief generation
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
   private prayerIdCounter: number = 0;
 

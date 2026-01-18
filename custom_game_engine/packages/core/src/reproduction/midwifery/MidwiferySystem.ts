@@ -115,6 +115,9 @@ export class MidwiferySystem extends BaseSystem {
   public readonly priority = 45; // Run before general NeedsSystem
   public readonly requiredComponents = [] as const;
 
+  // Throttle to every 5 seconds (100 ticks at 20 TPS) - reproduction is slow-changing
+  protected readonly throttleInterval = 100;
+
   private reproductionSystem: ReproductionSystem | null = null;
   private midwiferyLastUpdate: Tick = 0;
 
