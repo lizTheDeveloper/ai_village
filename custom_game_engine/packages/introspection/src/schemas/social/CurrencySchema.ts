@@ -99,12 +99,17 @@ export const CurrencySchema = autoRegister(
 
     validate: (data: unknown): data is CurrencyComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.balance === 'number' &&
-        Array.isArray(comp.transactionHistory) &&
-        typeof comp.maxHistorySize === 'number'
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Check component type
+      if (!('type' in comp) || comp.type !== 'currency') return false;
+
+      // Check required fields with typeof guards
+      if (!('balance' in comp) || typeof comp.balance !== 'number') return false;
+      if (!('transactionHistory' in comp) || !Array.isArray(comp.transactionHistory)) return false;
+      if (!('maxHistorySize' in comp) || typeof comp.maxHistorySize !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => {

@@ -1344,18 +1344,14 @@ export class PackMindSystem extends BaseSystem {
 
       // Periodic status emit
       if (ctx.tick % 500 === 0) {
-        this.events.emitGeneric({
-          type: 'pack:status_update' as any,
-          source: 'pack-mind-system',
-          data: {
-            packId: pack.id,
-            packName: pack.name,
-            bodyCount: pack.bodyCount,
-            isCoherent: pack.isCoherent,
-            formation: pack.formation,
-            emotion: pack.sharedEmotion,
-            thought: this.getPackThought(),
-          },
+        this.events.emitGeneric('pack:status_update', {
+          packId: pack.id,
+          packName: pack.name,
+          bodyCount: pack.bodyCount,
+          isCoherent: pack.isCoherent,
+          formation: pack.formation,
+          emotion: pack.sharedEmotion,
+          thought: this.getPackThought(),
         });
       }
     }

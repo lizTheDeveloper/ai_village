@@ -203,39 +203,53 @@ export const ConversationSchema = autoRegister(
     },
 
     validate: (data): data is ConversationComponent => {
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'conversation') return false;
+      // Check type field
+      if (!('type' in d) || d.type !== 'conversation') return false;
 
+      // Check partnerId (nullable string)
+      if (!('partnerId' in d)) return false;
       if (d.partnerId !== null && typeof d.partnerId !== 'string') {
         return false;
       }
 
-      if (!Array.isArray(d.messages)) return false;
+      // Check messages array
+      if (!('messages' in d) || !Array.isArray(d.messages)) return false;
 
-      // Validate messages
+      // Validate each message object
       for (const msg of d.messages) {
         if (typeof msg !== 'object' || msg === null) return false;
-        if (typeof msg.speakerId !== 'string') return false;
-        if (typeof msg.message !== 'string') return false;
-        if (typeof msg.tick !== 'number' || msg.tick < 0) {
-          throw new RangeError(`Invalid message tick: ${msg.tick} (must be >= 0)`);
+
+        const msgObj = msg as Record<string, unknown>;
+
+        if (!('speakerId' in msgObj) || typeof msgObj.speakerId !== 'string') return false;
+        if (!('message' in msgObj) || typeof msgObj.message !== 'string') return false;
+        if (!('tick' in msgObj) || typeof msgObj.tick !== 'number' || msgObj.tick < 0) {
+          throw new RangeError(`Invalid message tick: ${msgObj.tick} (must be >= 0)`);
         }
       }
 
-      if (typeof d.maxMessages !== 'number' || d.maxMessages < 1 || d.maxMessages > 100) {
+      // Check maxMessages
+      if (!('maxMessages' in d) || typeof d.maxMessages !== 'number') return false;
+      if (d.maxMessages < 1 || d.maxMessages > 100) {
         throw new RangeError(`Invalid maxMessages: ${d.maxMessages} (must be 1-100)`);
       }
 
-      if (typeof d.startedAt !== 'number' || d.startedAt < 0) {
+      // Check startedAt
+      if (!('startedAt' in d) || typeof d.startedAt !== 'number') return false;
+      if (d.startedAt < 0) {
         throw new RangeError(`Invalid startedAt: ${d.startedAt} (must be >= 0)`);
       }
 
-      if (typeof d.lastMessageAt !== 'number' || d.lastMessageAt < 0) {
+      // Check lastMessageAt
+      if (!('lastMessageAt' in d) || typeof d.lastMessageAt !== 'number') return false;
+      if (d.lastMessageAt < 0) {
         throw new RangeError(`Invalid lastMessageAt: ${d.lastMessageAt} (must be >= 0)`);
       }
 
-      if (typeof d.isActive !== 'boolean') return false;
+      // Check isActive
+      if (!('isActive' in d) || typeof d.isActive !== 'boolean') return false;
 
       return true;
     },

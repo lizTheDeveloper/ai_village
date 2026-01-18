@@ -403,7 +403,11 @@ export const growWingsEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Magically grow wings, granting the ability to fly.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 3600, // 1 hour at 60 ticks/sec
+  dispellable: true,
+  stackable: false,
   addBodyParts: {
     type: 'wing',
     count: 2,
@@ -413,7 +417,7 @@ export const growWingsEffect: BodyTransformEffect = {
   transformType: 'form',
   tags: ['transform', 'wings', 'flight'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Extra Arms - adds 2 extra arms
@@ -424,7 +428,11 @@ export const extraArmsEffect: BodyTransformEffect = {
   category: 'transform',
   description: 'Grow two additional arms, improving manipulation capabilities.',
   targetType: 'single',
+  targetFilter: 'any',
+  range: 10,
   duration: 1800, // 30 minutes
+  dispellable: true,
+  stackable: false,
   addBodyParts: {
     type: 'arm',
     count: 2,
@@ -434,7 +442,7 @@ export const extraArmsEffect: BodyTransformEffect = {
   transformType: 'form',
   tags: ['transform', 'arms', 'manipulation'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Enhance Arms - makes arms stronger and more durable

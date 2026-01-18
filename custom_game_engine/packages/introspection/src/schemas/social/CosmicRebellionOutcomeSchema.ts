@@ -249,21 +249,33 @@ export const CosmicRebellionOutcomeSchema = autoRegister(
 
     validate: (data): data is CosmicRebellionOutcomeComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const cro = data as any;
+      const cro = data as Record<string, unknown>;
 
-      return (
-        cro.type === 'rebellion_outcome' &&
-        typeof cro.battleStatus === 'string' &&
-        typeof cro.creatorHealth === 'number' &&
-        typeof cro.anchorStability === 'number' &&
-        typeof cro.activeDefiance === 'number' &&
-        typeof cro.creatorAttemptedFlee === 'boolean' &&
-        typeof cro.anchorOverloaded === 'boolean' &&
-        typeof cro.rebelAscended === 'boolean' &&
-        Array.isArray(cro.playerChoices) &&
-        Array.isArray(cro.casualties) &&
-        Array.isArray(cro.narrativeEvents)
-      );
+      // Check type field
+      if (!('type' in cro) || cro.type !== 'rebellion_outcome') return false;
+
+      // Check required string field
+      if (!('battleStatus' in cro) || typeof cro.battleStatus !== 'string') return false;
+
+      // Check required number fields
+      if (!('creatorHealth' in cro) || typeof cro.creatorHealth !== 'number') return false;
+      if (!('anchorStability' in cro) || typeof cro.anchorStability !== 'number') return false;
+      if (!('activeDefiance' in cro) || typeof cro.activeDefiance !== 'number') return false;
+
+      // Check required boolean fields
+      if (!('creatorAttemptedFlee' in cro) || typeof cro.creatorAttemptedFlee !== 'boolean') return false;
+      if (!('anchorOverloaded' in cro) || typeof cro.anchorOverloaded !== 'boolean') return false;
+      if (!('rebelAscended' in cro) || typeof cro.rebelAscended !== 'boolean') return false;
+
+      // Check required array fields
+      if (!('playerChoices' in cro) || !Array.isArray(cro.playerChoices)) return false;
+      if (!('casualties' in cro) || !Array.isArray(cro.casualties)) return false;
+      if (!('narrativeEvents' in cro) || !Array.isArray(cro.narrativeEvents)) return false;
+
+      // Optional fields (outcome, battleStartedAt, battleEndedAt) don't need validation
+      // TypeScript will allow them to be present or undefined
+
+      return true;
     },
 
     createDefault: () => ({

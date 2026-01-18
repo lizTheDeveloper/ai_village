@@ -23,10 +23,10 @@ export type DeltaBroadcastCallback = (delta: DeltaUpdate) => void;
  *
  * Priority: 1000 (runs last, after all game logic and path prediction)
  */
-export class DeltaSyncSystem implements System {
-  readonly id = 'delta_sync' as const;
-  readonly priority = 1000;
-  readonly requiredComponents = [] as const; // Processes all entities
+export class DeltaSyncSystem extends BaseSystem {
+  public readonly id = 'delta_sync' as const;
+  public readonly priority = 1000;
+  public readonly requiredComponents = [] as const; // Processes all entities
 
   private broadcastCallback: DeltaBroadcastCallback | null = null;
   private lastProcessedEntities = new Set<string>();
@@ -38,21 +38,21 @@ export class DeltaSyncSystem implements System {
     this.broadcastCallback = callback;
   }
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     if (!this.broadcastCallback) {
       // No broadcast callback set - skip delta sync
       return;
     }
 
     // Get all entities marked as dirty
-    const dirtyEntities = world
+    const dirtyEntities = ctx.world
       .query()
       .with('dirty_for_sync')
       .executeEntities();
 
     // Check if any entities were removed
     const currentEntities = new Set(
-      world.query().with('position').executeEntities().map(e => e.id)
+      ctx.world.query().with('position').executeEntities().map(e => e.id)
     );
 
     const removed: string[] = [];
@@ -69,7 +69,7 @@ export class DeltaSyncSystem implements System {
 
     // Build delta update
     const delta: DeltaUpdate = {
-      tick: world.tick,
+      tick: ctx.world.tick,
       updates: dirtyEntities.map(entity => this.serializeEntity(entity)),
       removed: removed.length > 0 ? removed : undefined,
     };
