@@ -207,7 +207,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     newPlan: string,
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, any>
+    appliedValues: Record<string, number | string>
   ): void {
     const oldPlanId = body.bodyPlanId;
 

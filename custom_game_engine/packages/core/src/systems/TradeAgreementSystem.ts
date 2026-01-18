@@ -87,7 +87,7 @@ export class TradeAgreementSystem extends BaseSystem {
 
     // Subscribe to passage collapse events
     eventBus.on('passage:collapsed', (event) => {
-      this.handlePassageCollapsed(_world, event.passageId);
+      this.handlePassageCollapsed(_world, event.data.passageId);
     });
   }
 
@@ -1189,10 +1189,11 @@ export class TradeAgreementSystem extends BaseSystem {
             violations: [
               ...agreement.violations,
               {
-                type: 'passage_collapsed',
-                description: `Passage '${passageId}' collapsed, breaking trade route`,
-                reportedBy: comp.civilizationId,
+                termIndex: -1, // All terms affected by passage collapse
+                violatorId: comp.civilizationId,
                 tick: BigInt(world.tick),
+                reason: `Passage '${passageId}' collapsed, breaking trade route`,
+                penalty: 'Agreement terminated due to force majeure',
               },
             ],
           };
