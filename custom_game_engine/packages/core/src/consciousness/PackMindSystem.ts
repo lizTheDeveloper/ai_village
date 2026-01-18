@@ -1016,15 +1016,11 @@ export class PackMindSystem extends BaseSystem {
     const announcements = FORMATION_ANNOUNCEMENTS[formation];
     const announcement = announcements[Math.floor(Math.random() * announcements.length)]!;
 
-    this.events.emitGeneric({
-      type: 'pack:formation_changed' as any,
-      source: 'pack-mind-system',
-      data: {
-        packId,
-        oldFormation,
-        newFormation: formation,
-        announcement,
-      },
+    this.events.emitGeneric('pack:formation_changed', {
+      packId,
+      oldFormation,
+      newFormation: formation,
+      announcement,
     });
 
     return true;

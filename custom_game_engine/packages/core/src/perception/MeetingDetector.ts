@@ -12,6 +12,8 @@ import type { World } from '../ecs/World.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { MeetingComponent } from '../components/MeetingComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 
 /**

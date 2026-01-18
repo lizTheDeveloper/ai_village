@@ -14,9 +14,8 @@
  * This is the tech path's ultimate weapon against the Supreme Creator.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { RealityAnchorComponent } from '../components/RealityAnchorComponent.js';
@@ -24,29 +23,17 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
 import type { PowerComponent } from '../components/PowerComponent.js';
 
-export class RealityAnchorSystem implements System {
+export class RealityAnchorSystem extends BaseSystem {
   public readonly id: SystemId = 'reality_anchor';
   public readonly priority = 18; // After intervention system
   public readonly requiredComponents = [CT.RealityAnchor] as const;
 
-  private eventBus: EventBus | null = null;
-
   /** Update interval (ticks) */
-  private readonly UPDATE_INTERVAL = 20; // Once per second at 20 TPS
-  private lastUpdate = 0;
+  protected readonly throttleInterval = 20; // Once per second at 20 TPS
 
-  public initialize(_world: World, eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
-
-  public update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
+    const world = ctx.world;
 
     // Process each reality anchor
     for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
