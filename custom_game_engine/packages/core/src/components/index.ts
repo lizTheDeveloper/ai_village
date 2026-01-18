@@ -127,7 +127,9 @@ export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicD
 export * from './ResearchStateComponent.js';
 // Technology unlock tracker
 export { createTechnologyUnlockComponent, unlockBuilding, unlockTechnology, isBuildingUnlocked, isTechnologyUnlocked, setPlayerCity, isPlayerCity, getAvailableBuildings as getUnlockedBuildingsForCity, getResearchMultiplier, getBuildingEra, BUILDING_ERAS } from './TechnologyUnlockComponent.js';
-export type { TechnologyUnlockComponent, TechnologyEra, BuildingUnlock, TechnologyUnlock } from './TechnologyUnlockComponent.js';
+export type { TechnologyUnlockComponent, TechnologyEra as BuildingTechnologyEra, BuildingUnlock, TechnologyUnlock } from './TechnologyUnlockComponent.js';
+export { createTechnologyEraComponent, getEraMetadata, getEraIndex, getEraByIndex, getNextEra, getPreviousEra, isTechnologyUnlocked as isTechUnlockedInEra, unlockTechnology as unlockTechInEra, calculateStability, updateCollapseRisk, recordEraTransition, ERA_METADATA } from './TechnologyEraComponent.js';
+export type { TechnologyEraComponent, TechnologyEra, TechBreakthrough, EraTransition, EraMetadata } from './TechnologyEraComponent.js';
 // Mood system
 export * from './MoodComponent.js';
 // Automation system (Phase 38)
@@ -764,6 +766,14 @@ export type { SquadronComponent, SquadronFormation, SquadronMissionType } from '
 export * from './FleetComponent.js';
 export { createFleetComponent, FleetComponentSchema } from './FleetComponent.js';
 export type { FleetComponent, FleetMissionType } from './FleetComponent.js';
+
+export * from './ArmadaComponent.js';
+export { createArmadaComponent, ArmadaComponentSchema } from './ArmadaComponent.js';
+export type { ArmadaComponent, ArmadaDoctrine, ArmadaCampaignType } from './ArmadaComponent.js';
+
+export * from './NavyComponent.js';
+export { createNavyComponent, NavyComponentSchema } from './NavyComponent.js';
+export type { NavyComponent, NavyStrategicPosture } from './NavyComponent.js';
 
 // Trade & Logistics (Grand Strategy Layer)
 export * from './ShippingLaneComponent.js';

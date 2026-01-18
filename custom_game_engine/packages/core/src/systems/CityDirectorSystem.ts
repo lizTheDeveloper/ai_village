@@ -75,6 +75,8 @@ export class CityDirectorSystem extends BaseSystem {
   public readonly id: SystemId = 'city_director';
   public readonly priority: number = 45; // Run after governance, before agent brain
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when city_director components exist (O(1) activation check)
+  public readonly activationComponents = ['city_director'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // City planning is slow-changing state - run every 5 seconds
 
   private config: CityDirectorSystemConfig;

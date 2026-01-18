@@ -15,6 +15,8 @@ export class JournalingSystem extends BaseSystem {
   readonly id: SystemId = 'journaling';
   readonly priority: number = 115;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when journal components exist (O(1) activation check)
+  readonly activationComponents = ['journal'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private idleAgents: Set<string> = new Set();

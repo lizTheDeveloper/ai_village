@@ -23,6 +23,8 @@ export class CompanionSystem extends BaseSystem {
   public readonly id = 'companion_system';
   public readonly priority = 950; // Low priority - runs after most systems
   public readonly requiredComponents = []; // Global system
+  // Only run when companion components exist (O(1) activation check)
+  public readonly activationComponents = ['companion'] as const;
   public enabled = true;
 
   protected readonly throttleInterval = 60; // Update every 3 seconds (60 ticks at 20 TPS)

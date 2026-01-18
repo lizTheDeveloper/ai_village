@@ -29,6 +29,8 @@ export class MythRetellingSystem extends BaseSystem {
   public readonly id = 'myth_retelling';
   public readonly priority = 119; // After myth generation
   public readonly requiredComponents = [CT.Agent, CT.Spiritual] as const;
+  // Only run when spiritual components exist (O(1) activation check)
+  public readonly activationComponents = ['spiritual'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick

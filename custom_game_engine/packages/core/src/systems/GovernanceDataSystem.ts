@@ -33,6 +33,8 @@ export class GovernanceDataSystem extends BaseSystem {
   public readonly id: SystemId = 'governance_data';
   public readonly priority: number = 50; // Run late, after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when governance building components exist (O(1) activation check)
+  public readonly activationComponents = ['town_hall', 'census_bureau', 'warehouse', 'weather_station', 'health_clinic'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private deathLog: DeathRecord[] = [];

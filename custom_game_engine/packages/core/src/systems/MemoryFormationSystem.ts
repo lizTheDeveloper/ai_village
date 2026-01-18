@@ -81,6 +81,8 @@ export class MemoryFormationSystem extends BaseSystem {
   public readonly id: SystemId = 'memory_formation';
   public readonly priority: number = 100;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when episodic_memory components exist (O(1) activation check)
+  public readonly activationComponents = ['episodic_memory'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds (memories don't need immediate formation)
 
   // Performance optimization: rate limit memory formation

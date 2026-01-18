@@ -642,8 +642,12 @@ export function registerAllSystems(
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT
   // ============================================================================
+  // Navy management (priority 70): Nation-scale naval forces
+  // Armada management (priority 75): Multi-fleet campaign forces (3-10 fleets)
   // Fleet management (priority 80): Strategic fleet groups (3-10 squadrons)
   // Squadron management (priority 85): Tactical ship squadrons (3-10 ships)
+  gameLoop.systemRegistry.register(new NavySystem());
+  gameLoop.systemRegistry.register(new ArmadaSystem());
   gameLoop.systemRegistry.register(new FleetSystem());
   gameLoop.systemRegistry.register(new SquadronSystem());
 
@@ -736,6 +740,9 @@ export function registerAllSystems(
 
   const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
   gameLoop.systemRegistry.register(technologyUnlockSystem);
+
+  const technologyEraSystem = new TechnologyEraSystem();
+  gameLoop.systemRegistry.register(technologyEraSystem);
 
   const cityBuildingGenerationSystem = new CityBuildingGenerationSystem();
   gameLoop.systemRegistry.register(cityBuildingGenerationSystem);

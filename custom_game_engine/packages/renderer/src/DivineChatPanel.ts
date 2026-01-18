@@ -13,7 +13,7 @@
  * Works with ChatRoomSystem's 'chat_room' component.
  */
 
-import type { World } from '@ai-village/core';
+import type { World, DeityComponent, IdentityComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
@@ -153,7 +153,7 @@ export class DivineChatPanel implements IWindowPanel {
 
     // Find player-controlled deity
     for (const entity of world.entities.values()) {
-      const deityComp = entity.components.get('deity') as any;
+      const deityComp = entity.components.get('deity') as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;
         return;
@@ -193,7 +193,7 @@ export class DivineChatPanel implements IWindowPanel {
   private getDeityName(world: World, deityId: string): string {
     const entity = world.getEntity(deityId);
     if (entity) {
-      const identity = entity.components.get('identity') as any;
+      const identity = entity.components.get('identity') as IdentityComponent | undefined;
       return identity?.name || 'Unknown God';
     }
     return 'Unknown God';

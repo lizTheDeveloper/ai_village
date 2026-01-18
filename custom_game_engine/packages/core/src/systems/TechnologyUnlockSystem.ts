@@ -34,6 +34,8 @@ export class TechnologyUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'technology_unlock';
   public readonly priority: number = 16; // Run after building system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when technology_unlock components exist (O(1) activation check)
+  public readonly activationComponents = ['technology_unlock'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds - tech unlocks are rare events
 
   private systemRegistry: ISystemRegistry;

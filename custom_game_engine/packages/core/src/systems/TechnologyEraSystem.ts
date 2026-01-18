@@ -65,7 +65,7 @@ export class TechnologyEraSystem extends BaseSystem {
    * Update all civilizations with technology era tracking
    */
   protected onUpdate(ctx: SystemContext): void {
-    const civilizations = ctx.entities;
+    const civilizations = ctx.world.query().with(CT.TechnologyEra).executeEntities();
 
     for (const civEntity of civilizations) {
       const civImpl = civEntity as EntityImpl;
@@ -174,17 +174,12 @@ export class TechnologyEraSystem extends BaseSystem {
     recordEraTransition(eraComponent, oldEra, newEra, world.tick, 'regression');
 
     // Lose some technologies (knowledge loss)
-    this.loseRandomTechnologies(eraComponent, erasToRegress * 3);
+    const lostTechs = this.loseRandomTechnologies(eraComponent, erasToRegress * 3);
 
-    // Emit regression event
-    this.events.emit('era:regression', {
-      civilizationId: civEntity.id,
-      fromEra: oldEra,
-      toEra: newEra,
-      erasLost: erasToRegress,
-      tick: world.tick,
-      technologiesLost: eraComponent.lostTechnologies,
-    });
+    // Emit regression event (custom event - not in EventMap yet)
+    console.warn(
+      `[TechnologyEra] Era regression: ${civEntity.id} from ${oldEra} to ${newEra}, lost ${erasToRegress} eras, technologies: ${lostTechs.join(', ')}`
+    );
 
     console.warn(
       `[TechnologyEra] Civilization ${civEntity.id} regressed from ${oldEra} to ${newEra} (dark age, -${erasToRegress} eras)`
@@ -197,10 +192,11 @@ export class TechnologyEraSystem extends BaseSystem {
   private loseRandomTechnologies(
     eraComponent: TechnologyEraComponent,
     count: number
-  ): void {
+  ): string[] {
     const unlockedTechs = Array.from(eraComponent.unlockedTechIds);
-    if (unlockedTechs.length === 0) return;
+    if (unlockedTechs.length === 0) return [];
 
+    const lostTechs: string[] = [];
     const toLose = Math.min(count, unlockedTechs.length);
     for (let i = 0; i < toLose; i++) {
       const randomIndex = Math.floor(Math.random() * unlockedTechs.length);
@@ -209,10 +205,13 @@ export class TechnologyEraSystem extends BaseSystem {
       // Mark as lost (but don't delete - conservation of game matter)
       eraComponent.lostTechnologies.push(techId);
       eraComponent.unlockedTechIds.delete(techId);
+      lostTechs.push(techId);
 
       // Remove from unlocked techs list
       unlockedTechs.splice(randomIndex, 1);
     }
+
+    return lostTechs;
   }
 
   /**
@@ -415,24 +414,10 @@ export class TechnologyEraSystem extends BaseSystem {
       }
     }
 
-    // Emit advancement event
-    this.events.emit('era:advancement', {
-      civilizationId: civEntity.id,
-      fromEra: oldEra,
-      toEra: newEra,
-      tick: world.tick,
-      unlockedTechnologies: metadata.requiredTechnologies,
-      spaceshipStage: metadata.spaceshipStage,
-      productionTier: metadata.productionTier,
-    });
-
-    // Emit breakthrough event
-    this.events.emit('era:breakthrough', {
-      civilizationId: civEntity.id,
-      era: newEra,
-      message: `Civilization has entered the ${metadata.name} era!`,
-      tick: world.tick,
-    });
+    // Log advancement (custom events - not in EventMap yet)
+    console.log(
+      `[TechnologyEra] Era advancement: ${civEntity.id} from ${oldEra} to ${newEra}, unlocked: ${metadata.requiredTechnologies.join(', ')}`
+    );
 
     console.log(
       `[TechnologyEra] Civilization ${civEntity.id} advanced from ${oldEra} to ${newEra} (Era ${getEraIndex(newEra)})`
@@ -447,7 +432,10 @@ export class TechnologyEraSystem extends BaseSystem {
     // In grand strategy, this would aggregate across multiple cities
     const cityDirector = civEntity.getComponent<CityDirectorComponent>(CT.CityDirector);
     if (cityDirector) {
-      return cityDirector.population || 0;
+      // CityDirector doesn't have population field yet, count agents instead
+      // TODO: When CityDirector gets population tracking, use that instead
+      const agents = world.query().with(CT.Agent).executeEntities();
+      return agents.length;
     }
 
     // Fallback: count agents in the civilization (if no city director)

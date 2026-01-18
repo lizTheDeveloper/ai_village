@@ -156,7 +156,7 @@ export class NavySystem extends BaseSystem {
 
     // Warn if budget exceeded
     if (navy.economy.budgetSpent > navy.budget) {
-      navyEntity.world.eventBus.emit({
+      world.eventBus.emit({
         type: 'navy:budget_exceeded',
         source: navyEntity.id,
         data: {

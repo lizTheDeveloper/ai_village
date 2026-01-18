@@ -46,6 +46,8 @@ export class MemoryConsolidationSystem extends BaseSystem {
   public readonly id: SystemId = 'memory_consolidation';
   public readonly priority: number = 105;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when episodic_memory components exist (O(1) activation check)
+  public readonly activationComponents = ['episodic_memory'] as const;
   protected readonly throttleInterval = 1000; // Update every 1000 ticks (50 seconds)
 
   private consolidationTriggers: Set<string> = new Set();

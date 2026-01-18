@@ -26,6 +26,8 @@ export class SquadronSystem extends BaseSystem {
   public readonly id: SystemId = 'squadron_management' as SystemId;
   public readonly priority: number = 85;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Squadron];
+  // Only run when squadron components exist (O(1) activation check)
+  public readonly activationComponents = ['squadron'] as const;
   public readonly metadata = {
     category: 'infrastructure',
     description: 'Manages tactical ship squadrons and formations',

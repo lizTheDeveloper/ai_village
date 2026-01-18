@@ -113,6 +113,8 @@ export class DeityEmergenceSystem extends BaseSystem {
   public readonly id = 'DeityEmergenceSystem';
   public readonly priority = 100;
   public readonly requiredComponents = [] as const;
+  // Only run when spiritual components exist (need believers to form new deities)
+  public readonly activationComponents = ['spiritual'] as const;
 
   private config: EmergenceConfig;
   protected readonly throttleInterval: number;

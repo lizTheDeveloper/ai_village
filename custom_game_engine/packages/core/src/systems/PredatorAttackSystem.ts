@@ -61,6 +61,8 @@ export class PredatorAttackSystem extends BaseSystem {
   public readonly id: SystemId = 'predator_attack';
   public readonly priority = 47;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'] as const;
+  // Only run when animal components exist (O(1) activation check)
+  public readonly activationComponents = ['animal'] as const;
 
   /** Throttle to every 1 second (20 ticks at 20 TPS) */
   protected readonly throttleInterval = THROTTLE.NORMAL;

@@ -10,7 +10,7 @@
  * - Prayer queue display
  */
 
-import type { World } from '@ai-village/core';
+import type { World, DeityComponent, IdentityComponent, SpiritualComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 import { DivineParameterModal, type DivineParameterResult } from './DivineParameterModal.js';
 
@@ -176,7 +176,7 @@ export class DivinePowersPanel implements IWindowPanel {
 
     // Find player-controlled deity
     for (const entity of world.entities.values()) {
-      const deityComp = entity.components.get('deity') as any;
+      const deityComp = entity.components.get('deity') as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;
 
@@ -197,8 +197,8 @@ export class DivinePowersPanel implements IWindowPanel {
         for (const believerId of believerIds) {
           const believerEntity = world.entities.get(believerId);
           if (believerEntity) {
-            const identity = believerEntity.components?.get('identity') as any;
-            const spiritual = believerEntity.components?.get('spiritual') as any;
+            const identity = believerEntity.components?.get('identity') as IdentityComponent | undefined;
+            const spiritual = believerEntity.components?.get('spiritual') as SpiritualComponent | undefined;
             believerList.push({
               id: believerId,
               name: identity?.name || 'Unknown',
