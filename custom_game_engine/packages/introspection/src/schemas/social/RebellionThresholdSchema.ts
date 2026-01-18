@@ -290,24 +290,31 @@ export const RebellionThresholdSchema = autoRegister(
 
     validate: (data): data is RebellionThresholdComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const rt = data as any;
+      const rt = data as Record<string, unknown>;
 
-      return (
-        rt.type === 'rebellion_threshold' &&
-        typeof rt.status === 'string' &&
-        typeof rt.rebellionReadiness === 'number' &&
-        typeof rt.collectiveDefiance === 'number' &&
-        typeof rt.defiantCount === 'number' &&
-        typeof rt.totalPopulation === 'number' &&
-        Array.isArray(rt.criticalLoreDiscovered) &&
-        typeof rt.markedSinners === 'number' &&
-        typeof rt.silencedEntities === 'number' &&
-        typeof rt.creatorParanoia === 'number' &&
-        typeof rt.creatorOverextension === 'number' &&
-        typeof rt.realityAnchorProgress === 'number' &&
-        typeof rt.realityAnchorOperational === 'boolean' &&
-        Array.isArray(rt.coalitionMembers)
-      );
+      // Required fields
+      if (!('type' in rt) || rt.type !== 'rebellion_threshold') return false;
+      if (!('status' in rt) || typeof rt.status !== 'string') return false;
+      if (!('rebellionReadiness' in rt) || typeof rt.rebellionReadiness !== 'number') return false;
+      if (!('collectiveDefiance' in rt) || typeof rt.collectiveDefiance !== 'number') return false;
+      if (!('defiantCount' in rt) || typeof rt.defiantCount !== 'number') return false;
+      if (!('totalPopulation' in rt) || typeof rt.totalPopulation !== 'number') return false;
+      if (!('criticalLoreDiscovered' in rt) || !Array.isArray(rt.criticalLoreDiscovered)) return false;
+      if (!('markedSinners' in rt) || typeof rt.markedSinners !== 'number') return false;
+      if (!('silencedEntities' in rt) || typeof rt.silencedEntities !== 'number') return false;
+      if (!('creatorParanoia' in rt) || typeof rt.creatorParanoia !== 'number') return false;
+      if (!('creatorOverextension' in rt) || typeof rt.creatorOverextension !== 'number') return false;
+      if (!('realityAnchorProgress' in rt) || typeof rt.realityAnchorProgress !== 'number') return false;
+      if (!('realityAnchorOperational' in rt) || typeof rt.realityAnchorOperational !== 'boolean') return false;
+      if (!('coalitionMembers' in rt) || !Array.isArray(rt.coalitionMembers)) return false;
+
+      // Optional fields
+      if ('realityAnchorId' in rt && rt.realityAnchorId !== undefined && typeof rt.realityAnchorId !== 'string') return false;
+      if ('thresholdMetAt' in rt && rt.thresholdMetAt !== undefined && typeof rt.thresholdMetAt !== 'number') return false;
+      if ('rebellionTriggeredAt' in rt && rt.rebellionTriggeredAt !== undefined && typeof rt.rebellionTriggeredAt !== 'number') return false;
+      if ('rebellionPath' in rt && rt.rebellionPath !== undefined && typeof rt.rebellionPath !== 'string') return false;
+
+      return true;
     },
 
     createDefault: () => ({

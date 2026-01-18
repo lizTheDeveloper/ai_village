@@ -41,20 +41,29 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const appliedValues: Record<string, any> = {};
+    const appliedValues: Record<string, number | string> = {};
 
     // Store original form for restoration
-    const appearance = target.components.get('appearance') as any;
+    // Note: Using type guard pattern since appearance component structure is dynamic
+    const appearance = target.components.get('appearance');
     if (appearance && !this.originalForms.has(target.id)) {
-      this.originalForms.set(target.id, { ...appearance });
+      const stored: StoredAppearance = {};
+      if ('form' in appearance) stored.form = appearance.form as string;
+      if ('size' in appearance) stored.size = appearance.size as number;
+      if ('material' in appearance) stored.material = appearance.material as string;
+      if ('alignment' in appearance) stored.alignment = appearance.alignment as string;
+      if ('species' in appearance) stored.species = appearance.species as string;
+      this.originalForms.set(target.id, stored);
     }
 
     // Apply transformation based on type
     switch (effect.transformType) {
       case 'form': {
         // Polymorph - change entity's form
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        targetAppearance.form = effect.targetState;
+        const targetAppearance = target.components.get('appearance');
+        if (targetAppearance && 'form' in targetAppearance) {
+          (targetAppearance as { form: string }).form = effect.targetState;
+        }
 
         appliedValues.newForm = effect.targetState;
         appliedValues.oldForm = this.originalForms.get(target.id)?.form || 'unknown';
@@ -63,20 +72,24 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
 
       case 'size': {
         // Enlarge/Reduce
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        const originalSize = targetAppearance.size || 1.0;
-        const sizeMultiplier = parseFloat(effect.targetState) || 1.0;
-        targetAppearance.size = originalSize * sizeMultiplier;
+        const targetAppearance = target.components.get('appearance');
+        if (targetAppearance && 'size' in targetAppearance) {
+          const originalSize = (targetAppearance as { size: number }).size || 1.0;
+          const sizeMultiplier = parseFloat(effect.targetState) || 1.0;
+          (targetAppearance as { size: number }).size = originalSize * sizeMultiplier;
 
-        appliedValues.sizeMultiplier = sizeMultiplier;
-        appliedValues.newSize = targetAppearance.size;
+          appliedValues.sizeMultiplier = sizeMultiplier;
+          appliedValues.newSize = originalSize * sizeMultiplier;
+        }
         break;
       }
 
       case 'material': {
         // Petrify, Gaseous Form, etc.
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        targetAppearance.material = effect.targetState;
+        const targetAppearance = target.components.get('appearance');
+        if (targetAppearance && 'material' in targetAppearance) {
+          (targetAppearance as { material: string }).material = effect.targetState;
+        }
 
         appliedValues.newMaterial = effect.targetState;
         appliedValues.oldMaterial = this.originalForms.get(target.id)?.material || 'flesh';
@@ -149,10 +162,24 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     // Restore original form
     const originalForm = this.originalForms.get(target.id);
     if (originalForm) {
-      const appearance = target.components.get('appearance') as any;
+      const appearance = target.components.get('appearance');
       if (appearance) {
-        // Restore all original appearance properties
-        Object.assign(appearance, originalForm);
+        // Restore all original appearance properties using type guards
+        if (originalForm.form !== undefined && 'form' in appearance) {
+          (appearance as { form: string }).form = originalForm.form;
+        }
+        if (originalForm.size !== undefined && 'size' in appearance) {
+          (appearance as { size: number }).size = originalForm.size;
+        }
+        if (originalForm.material !== undefined && 'material' in appearance) {
+          (appearance as { material: string }).material = originalForm.material;
+        }
+        if (originalForm.alignment !== undefined && 'alignment' in appearance) {
+          (appearance as { alignment: string }).alignment = originalForm.alignment;
+        }
+        if (originalForm.species !== undefined && 'species' in appearance) {
+          (appearance as { species: string }).species = originalForm.species;
+        }
       }
       this.originalForms.delete(target.id);
     }

@@ -210,6 +210,8 @@ export enum ComponentType {
 
   // Navigation & β-space
   Spaceship = 'spaceship',
+  Squadron = 'squadron',  // Ship-fleet hierarchy: 3-10 ships
+  Fleet = 'fleet',        // Ship-fleet hierarchy: 3-10 squadrons
   RainbowPlanet = 'rainbow_planet',  // Quantum superposition of planetary histories (Rainbow Mars)
 
   // Planet Travel

@@ -753,3 +753,9 @@ export type {
 export * from './DivineChatComponent.js';
 export type { DivineChatComponent } from './DivineChatComponent.js';
 export { createDivineChatComponent } from './DivineChatComponent.js';
+
+// Trade & Logistics (Grand Strategy Layer)
+export * from './ShippingLaneComponent.js';
+export type { ShippingLaneComponent, LaneHazard } from './ShippingLaneComponent.js';
+export * from './TradeCaravanComponent.js';
+export type { TradeCaravanComponent, CargoItem } from './TradeCaravanComponent.js';

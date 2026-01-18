@@ -109,7 +109,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
       };
     }
 
-    const appliedValues: Record<string, number | string> = {};
+    const appliedValues: Record<string, number | string | string[]> = {};
     const source: ModificationSource = effect.modificationSource || 'magic';
 
     // Store original body for restoration (deep copy)
@@ -415,6 +415,8 @@ export const growWingsEffect: BodyTransformEffect = {
     health: 120,
   },
   transformType: 'form',
+  targetState: 'winged',
+  reversible: true,
   tags: ['transform', 'wings', 'flight'],
   modificationSource: 'magic',
 };

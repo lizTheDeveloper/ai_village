@@ -80,12 +80,39 @@ export const SocialGradientSchema = autoRegister(
 
     validate: (data): data is SocialGradientComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const sg = data as any;
+      const x = data as Record<string, unknown>;
 
-      return (
-        sg.type === 'social_gradient' &&
-        Array.isArray(sg.gradients)
-      );
+      // Validate type field
+      if (!('type' in x) || x.type !== 'social_gradient') return false;
+
+      // Validate gradients array
+      if (!('gradients' in x) || !Array.isArray(x.gradients)) return false;
+
+      // Validate each gradient object
+      for (const gradient of x.gradients) {
+        if (typeof gradient !== 'object' || gradient === null) return false;
+        const g = gradient as Record<string, unknown>;
+
+        // Required fields
+        if (!('id' in g) || typeof g.id !== 'string') return false;
+        if (!('resourceType' in g) || typeof g.resourceType !== 'string') return false;
+        if (!('bearing' in g) || typeof g.bearing !== 'number') return false;
+        if (!('distance' in g) || typeof g.distance !== 'number') return false;
+        if (!('confidence' in g) || typeof g.confidence !== 'number') return false;
+        if (!('sourceAgentId' in g) || typeof g.sourceAgentId !== 'string') return false;
+        if (!('tick' in g) || typeof g.tick !== 'number') return false;
+        if (!('strength' in g) || typeof g.strength !== 'number') return false;
+
+        // Optional claimPosition field
+        if ('claimPosition' in g && g.claimPosition !== undefined) {
+          if (typeof g.claimPosition !== 'object' || g.claimPosition === null) return false;
+          const pos = g.claimPosition as Record<string, unknown>;
+          if (!('x' in pos) || typeof pos.x !== 'number') return false;
+          if (!('y' in pos) || typeof pos.y !== 'number') return false;
+        }
+      }
+
+      return true;
     },
 
     createDefault: () => ({

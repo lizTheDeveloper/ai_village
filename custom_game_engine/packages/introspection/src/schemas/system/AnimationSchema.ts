@@ -130,16 +130,24 @@ export const AnimationSchema = autoRegister(
 
     validate: (data: unknown): data is AnimationComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        comp.type === 'animation' &&
-        Array.isArray(comp.frames) &&
-        typeof comp.currentFrame === 'number' &&
-        typeof comp.frameTime === 'number' &&
-        typeof comp.frameDuration === 'number' &&
-        typeof comp.loop === 'boolean' &&
-        typeof comp.playing === 'boolean'
-      );
+      const comp = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in comp) || comp.type !== 'animation') return false;
+
+      // Check required array field
+      if (!('frames' in comp) || !Array.isArray(comp.frames)) return false;
+
+      // Check required number fields
+      if (!('currentFrame' in comp) || typeof comp.currentFrame !== 'number') return false;
+      if (!('frameTime' in comp) || typeof comp.frameTime !== 'number') return false;
+      if (!('frameDuration' in comp) || typeof comp.frameDuration !== 'number') return false;
+
+      // Check required boolean fields
+      if (!('loop' in comp) || typeof comp.loop !== 'boolean') return false;
+      if (!('playing' in comp) || typeof comp.playing !== 'boolean') return false;
+
+      return true;
     },
 
     createDefault: () => ({
