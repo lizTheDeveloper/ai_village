@@ -234,7 +234,7 @@ export class TradeAgreementSystem extends BaseSystem {
       crossRealmMetadata:
         scope !== 'local' && scope !== 'inter_village'
           ? {
-              passageIds: [],
+              passageIds, // Use validated passage IDs
               escrowEntities: [],
               timeSyncMode: 'relative',
               trustLevel,
