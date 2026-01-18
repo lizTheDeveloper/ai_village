@@ -21,6 +21,8 @@ export class AnimalSystem extends BaseSystem {
   public readonly id: SystemId = CT.Animal;
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal, CT.Position];
+  // Only run when animal components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Animal] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second for animal updates
 
   /**

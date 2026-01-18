@@ -841,7 +841,6 @@ export class DivinePowersPanel implements IWindowPanel {
     const parametricPowers = ['whisper', 'dream_hint', 'clear_vision', 'subtle_sign'];
 
     if (parametricPowers.includes(powerId)) {
-      console.log('[DivinePowersPanel] Showing parameter modal for power:', powerId);
       // Show parameter modal
       this.parameterModal.show({
         powerType: powerId,
@@ -849,11 +848,9 @@ export class DivinePowersPanel implements IWindowPanel {
         deityId: this.playerDeityId,
         availableTargets: this.deityState.believerList,
         onConfirm: (params: DivineParameterResult) => {
-          console.log('[DivinePowersPanel] Modal confirmed with params:', params);
           this.executePowerWithParameters(powerId, power, params);
         },
         onCancel: () => {
-          console.log('[DivinePowersPanel] Modal cancelled');
           // User cancelled - deselect the power to return to full list
           this.selectedPowerId = null;
         },

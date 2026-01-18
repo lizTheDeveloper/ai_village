@@ -144,10 +144,6 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         'exploration',
         'location'
       );
-
-      console.log(
-        `[GodCraftedDiscovery] Spawned ${content.type} in chunk (${chunkInfo.x}, ${chunkInfo.y}) at (${worldX}, ${worldY})`
-      );
     }
   }
 

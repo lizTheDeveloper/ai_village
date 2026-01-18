@@ -180,7 +180,6 @@ export class LLMSettingsPanel implements IWindowPanel {
         toSave.apiKey = btoa(toSave.apiKey);
       }
       localStorage.setItem(LLM_SETTINGS_KEY, JSON.stringify(toSave));
-      console.log('[LLMSettingsPanel] Settings saved');
     } catch (e) {
       console.warn('[LLMSettingsPanel] Failed to save settings:', e);
     }

@@ -40,6 +40,10 @@ export class TVBroadcastingSystem extends BaseSystem {
   readonly id = 'tv_broadcasting' as const;
   readonly priority = 65; // After most game logic
   readonly requiredComponents = [ComponentType.TVStation] as const;
+
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
+
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private lastScheduleCheck: number = 0;

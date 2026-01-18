@@ -407,9 +407,6 @@ export class LLMScheduler {
       // Track metrics: cooldown hit
       this.metrics.cooldownHits[selection.layer]++;
 
-      console.log(
-        `[LLMScheduler] ${agent.id} layer ${selection.layer} on cooldown (${waitMs}ms remaining)`
-      );
       return null;
     }
 
@@ -426,10 +423,6 @@ export class LLMScheduler {
 
       // Track metrics: successful call
       this.metrics.successfulCalls++;
-
-      console.log(
-        `[LLMScheduler] ${agent.id} → ${selection.layer} (${selection.reason})`
-      );
 
       return {
         layer: selection.layer,
@@ -541,9 +534,7 @@ export class LLMScheduler {
       this.agentStates.delete(agentId);
     }
 
-    if (toDelete.length > 0) {
-      console.log(`[LLMScheduler] Cleaned up ${toDelete.length} old agent states`);
-    }
+    // Cleanup complete
   }
 
   /**

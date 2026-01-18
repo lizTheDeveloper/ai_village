@@ -47,6 +47,8 @@ export class BuildingSystem extends BaseSystem {
   public readonly id: SystemId = 'building';
   public readonly priority: number = 16; // Run after Needs (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
+  // Only run when building components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Building] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private isInitialized = false;

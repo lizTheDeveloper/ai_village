@@ -19,6 +19,8 @@ export class PortalSystem extends BaseSystem {
   readonly id: SystemId = 'portal_system';
   readonly priority: number = 55;
   readonly requiredComponents = ['portal', 'position'] as const;
+  // Only run when portal components exist (O(1) activation check)
+  readonly activationComponents = ['portal'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private nearbyEntities: Map<string, Set<string>> = new Map();  // portalId -> Set of nearby entityIds

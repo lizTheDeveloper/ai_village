@@ -211,7 +211,6 @@ function loadGameData(event: Event): void {
   const genetics = agent.components?.genetic;
   if (genetics) {
     // Could use genetic traits to influence colors
-    console.log('Agent genetics:', genetics);
   }
 
   generate();

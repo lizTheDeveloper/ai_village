@@ -50,9 +50,6 @@ export async function migrateLocalSaves(
     throw new Error('Storage backend is null. Make sure saveLoadService has a storage backend configured.');
   }
 
-  console.log(`[Migration] Starting migration for player: ${playerId}`);
-  console.log(`[Migration] Storage backend type: ${storage.constructor?.name || 'unknown'}`);
-
   // Set player ID for server operations
   multiverseClient.setPlayerId(playerId);
 
@@ -76,7 +73,6 @@ export async function migrateLocalSaves(
   const saves = await storage.list();
   progress.totalSaves = saves.length;
 
-  console.log(`[Migration] Found ${saves.length} local saves to process`);
   onProgress?.(progress);
 
   // Filter by timestamp if specified
@@ -84,27 +80,19 @@ export async function migrateLocalSaves(
     ? saves.filter(s => s.lastSavedAt >= sinceTimestamp)
     : saves;
 
-  console.log(`[Migration] ${savesToMigrate.length} saves match criteria`);
-
   // Group saves by universe ID
   const savesByUniverse = new Map<string, Array<{ key: string; save: SaveFile }>>();
 
-  console.log(`[Migration] Starting to group saves by universe...`);
-  let groupedCount = 0;
   for (const saveMetadata of savesToMigrate) {
-    groupedCount++;
-    console.log(`[Migration] Loading save ${groupedCount}/${savesToMigrate.length}: ${saveMetadata.key}`);
     try {
       const saveFile = await storage.load(saveMetadata.key);
       if (!saveFile) {
-        console.log(`[Migration]   -> null save, skipping`);
         progress.skipped++;
         continue;
       }
 
       // Extract universe ID from save file
       const universeId = saveFile.universes[0]?.identity?.id || 'universe:unknown';
-      console.log(`[Migration]   -> universe: ${universeId}`);
 
       if (!savesByUniverse.has(universeId)) {
         savesByUniverse.set(universeId, []);
@@ -122,22 +110,11 @@ export async function migrateLocalSaves(
     progress.processed++;
     onProgress?.(progress);
   }
-  console.log(`[Migration] Finished grouping all saves`);
-
-  console.log(`[Migration] Grouped into ${savesByUniverse.size} universes`);
-  for (const [uid, saves] of savesByUniverse) {
-    console.log(`[Migration]   - ${uid}: ${saves.length} saves`);
-  }
 
   // Process each universe
-  console.log(`[Migration] === Starting universe processing phase ===`);
-  let universeCount = 0;
   for (const [universeId, universeSaves] of savesByUniverse) {
-    universeCount++;
-    console.log(`[Migration] Processing universe ${universeCount}/${savesByUniverse.size}: ${universeId} with ${universeSaves.length} saves`);
 
     if (dryRun) {
-      console.log(`[Migration] [DRY RUN] Would create universe: ${universeId}`);
       progress.uploaded += universeSaves.length;
       continue;
     }
@@ -145,23 +122,17 @@ export async function migrateLocalSaves(
     try {
       // Check if universe exists on server
       let serverUniverseId = universeId;
-      console.log(`[Migration]   Checking if universe exists on server...`);
       const existing = await multiverseClient.getUniverse(universeId);
-      console.log(`[Migration]   Server check result: ${existing ? 'EXISTS' : 'NOT FOUND'}`);
 
       if (!existing) {
         // Create universe on server with the same ID
         const universeName = universeSaves[0]?.save.universes[0]?.identity?.name || 'Migrated Universe';
-        console.log(`[Migration]   Creating universe "${universeName}" on server...`);
         const created = await multiverseClient.createUniverse({
           name: universeName,
           isPublic: true,
           id: universeId, // Use the same ID as local
         });
         serverUniverseId = created.id;
-        console.log(`[Migration]   Created universe on server: ${serverUniverseId}`);
-      } else {
-        console.log(`[Migration]   Using existing universe: ${serverUniverseId}`);
       }
 
       progress.universesMapped.set(universeId, serverUniverseId);
@@ -174,17 +145,11 @@ export async function migrateLocalSaves(
       });
 
       // Upload snapshots in batches
-      const totalBatches = Math.ceil(universeSaves.length / batchSize);
-      console.log(`[Migration]   Starting upload of ${universeSaves.length} saves in ${totalBatches} batches`);
       for (let i = 0; i < universeSaves.length; i += batchSize) {
         const batch = universeSaves.slice(i, i + batchSize);
-        const batchNum = Math.floor(i / batchSize) + 1;
-        console.log(`[Migration]   Batch ${batchNum}/${totalBatches} starting (${batch.length} saves)`);
 
         const batchResults = await Promise.allSettled(batch.map(async ({ key, save }) => {
           const tick = parseInt(save.universes[0]?.time?.universeTick || '0', 10);
-          const saveSize = JSON.stringify(save).length;
-          console.log(`[Migration]     -> Uploading ${key} (tick ${tick}, ${Math.round(saveSize / 1024)}KB)`);
 
           try {
             // Determine save type from filename
@@ -195,39 +160,31 @@ export async function migrateLocalSaves(
             });
 
             progress.uploaded++;
-            console.log(`[Migration]     -> SUCCESS: tick ${tick}`);
             return { success: true, key };
           } catch (error: any) {
             // Skip duplicate ticks (already uploaded)
             if (error.message?.includes('already exists')) {
               progress.skipped++;
-              console.log(`[Migration]     -> DUPLICATE: tick ${tick} already exists`);
               return { success: true, key, duplicate: true };
             } else {
               progress.errors.push({ saveKey: key, error: error.message });
               progress.failed++;
-              console.warn(`[Migration]     -> FAILED: ${key}: ${error.message}`);
               return { success: false, key, error: error.message };
             }
           }
         }));
 
-        console.log(`[Migration]   Batch ${batchNum} complete: ${batchResults.filter(r => r.status === 'fulfilled').length}/${batch.length} finished`);
         onProgress?.(progress);
 
         // Small delay between batches to avoid overwhelming server
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      console.log(`[Migration]   Finished processing universe ${universeId}`);
     } catch (error: any) {
       console.error(`[Migration] Failed to process universe ${universeId}:`, error.message);
       progress.errors.push({ saveKey: `universe:${universeId}`, error: error.message });
       progress.failed++;
     }
   }
-  console.log(`[Migration] === Universe processing phase complete ===`);
-
-  console.log(`[Migration] Complete! Uploaded: ${progress.uploaded}, Skipped: ${progress.skipped}, Failed: ${progress.failed}`);
 
   return progress;
 }

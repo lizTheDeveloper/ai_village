@@ -62,8 +62,6 @@ export class UniverseClient {
 
       this.port.start();
       this.connected = true;
-
-      console.log('[UniverseClient] Connected to SharedWorker');
     } catch (error) {
       console.error('[UniverseClient] Failed to connect:', error);
       throw error;
@@ -83,8 +81,6 @@ export class UniverseClient {
     this.connected = false;
     this.connectionId = null;
     this.state = null;
-
-    console.log('[UniverseClient] Disconnected');
   }
 
   /**
@@ -273,7 +269,6 @@ export class UniverseClient {
         this.connectionId = message.connectionId;
         this.state = message.state;
         this.notifyListeners();
-        console.log(`[UniverseClient] Initialized with connection ID: ${this.connectionId}`);
         break;
 
       case 'tick':

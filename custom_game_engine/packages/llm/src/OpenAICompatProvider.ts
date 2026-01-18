@@ -137,12 +137,10 @@ export class OpenAICompatProvider implements LLMProvider {
    */
   private async ensureCapabilitiesKnown(): Promise<void> {
     if (this.needsDiscovery && !this.discoveredCapabilities) {
-      console.log(`[OpenAICompatProvider] Unknown model "${this.model}", running capability discovery...`);
       this.discoveredCapabilities = await modelCapabilityDiscovery.getOrDiscoverCapabilities(
         this,
         this.model
       );
-      console.log(`[OpenAICompatProvider] Discovered capabilities:`, this.discoveredCapabilities);
     }
   }
 

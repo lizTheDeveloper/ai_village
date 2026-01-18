@@ -68,6 +68,8 @@ export class BuildingMaintenanceSystem extends BaseSystem {
   public readonly id: SystemId = 'building_maintenance';
   public readonly priority: number = 120; // Run after most building-related systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
+  // Only run when building components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Building] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**

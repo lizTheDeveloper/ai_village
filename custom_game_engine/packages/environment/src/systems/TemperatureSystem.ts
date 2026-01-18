@@ -43,7 +43,6 @@ let chunkSpatialQuery: any | null = null;
 
 export function injectChunkSpatialQueryToTemperature(spatialQuery: any): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[TemperatureSystem] ChunkSpatialQuery injected for efficient proximity checks');
 }
 
 /**

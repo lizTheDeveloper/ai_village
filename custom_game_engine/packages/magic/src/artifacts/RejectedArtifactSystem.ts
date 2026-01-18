@@ -199,11 +199,6 @@ export class RejectedArtifactSystem {
 
     this.world.addComponent(entity.id, component);
 
-    console.log(
-      `[RejectedArtifactSystem] Preserved rejected effect: ${effect.name || 'unnamed'} ` +
-      `(danger: ${danger}, realm: ${realm}, retrievable: ${retrievable})`
-    );
-
     return entity;
   }
 
@@ -238,11 +233,6 @@ export class RejectedArtifactSystem {
     };
 
     this.world.addComponent(entity.id, component);
-
-    console.log(
-      `[RejectedArtifactSystem] Preserved corrupted effect: ${effect?.name || 'unnamed'} ` +
-      `(errors: ${validationErrors.length}, recoverable: ${component.recoverable})`
-    );
 
     return entity;
   }
@@ -515,7 +505,6 @@ export class RejectedArtifactSystem {
 
     // Check if retrievable
     if (!component.retrievable) {
-      console.log(`[RejectedArtifactSystem] Artifact ${artifactId} is not retrievable`);
       return { success: false };
     }
 
@@ -525,9 +514,6 @@ export class RejectedArtifactSystem {
     );
 
     if (missingItems.length > 0) {
-      console.log(
-        `[RejectedArtifactSystem] Missing recovery items: ${missingItems.join(', ')}`
-      );
       return { success: false, missingItems };
     }
 
@@ -545,10 +531,6 @@ export class RejectedArtifactSystem {
       originalRejectionReason: component.rejectionReason,
       dangerLevel: component.dangerLevel,
     } as Component);
-
-    console.log(
-      `[RejectedArtifactSystem] Recovered artifact ${artifactId}: ${effect.name || 'unnamed'}`
-    );
 
     return { success: true, effect };
   }

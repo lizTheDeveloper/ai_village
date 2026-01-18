@@ -29,6 +29,8 @@ export class NeedsSystem extends BaseSystem {
   public readonly id: SystemId = 'needs';
   public readonly priority: number = 15; // Run after AI (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
+  // Only run when needs components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Needs] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**

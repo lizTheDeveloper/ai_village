@@ -128,13 +128,13 @@ class UI {
   private setupSimulatorEvents(): void {
     this.simulator.on('tick', () => this.update());
     this.simulator.on('day', (day: number) => {
-      console.log(`Day ${day}`);
+      // Day event handler
     });
     this.simulator.on('month', (month: number) => {
-      console.log(`Month ${month}`);
+      // Month event handler
     });
     this.simulator.on('decision', (reasoning: any) => {
-      console.log('[CityDirector]', reasoning);
+      // Decision event handler
     });
   }
 
@@ -253,8 +253,6 @@ class UI {
 // =============================================================================
 
 (async () => {
-  console.log('🏙️ Initializing City Simulator...');
-
   // Get preset from URL query param (default: 'basic')
   const params = new URLSearchParams(window.location.search);
   const preset = (params.get('preset') as 'basic' | 'large-city' | 'population-growth') || 'basic';
@@ -272,14 +270,4 @@ class UI {
   // Expose for debugging
   (window as any).simulator = simulator;
   (window as any).ui = ui;
-
-  console.log('✅ City Simulator initialized!');
-  console.log(`- Preset: ${preset}`);
-  console.log('- Real ECS with game systems');
-  console.log('- Real agents, buildings, resources');
-  console.log('- CityManager making strategic decisions');
-  console.log('\nAvailable presets (add ?preset=NAME to URL):');
-  console.log('  - basic: 50 agents, farm + storage, minimal systems');
-  console.log('  - large-city: 200 agents, 9 storage buildings, full economy');
-  console.log('  - population-growth: 20 agents, reproduction systems enabled');
 })();

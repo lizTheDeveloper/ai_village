@@ -203,7 +203,7 @@ export class TerrainFeatureAnalyzer {
     const centerTile = getTileAt(x, y);
     if (!centerTile) return 0;
 
-    const centerElevation = (centerTile as any).elevation ?? 0;
+    const centerElevation = centerTile.elevation ?? 0;
 
     // Calculate mean elevation of neighborhood
     let sum = 0;
@@ -215,7 +215,7 @@ export class TerrainFeatureAnalyzer {
 
         const neighbor = getTileAt(x + dx, y + dy);
         if (neighbor) {
-          sum += (neighbor as any).elevation ?? 0;
+          sum += neighbor.elevation ?? 0;
           count++;
         }
       }
@@ -248,7 +248,7 @@ export class TerrainFeatureAnalyzer {
     const center = getTileAt(x, y);
     if (!center) return 0;
 
-    const centerElevation = (center as any).elevation ?? 0;
+    const centerElevation = center.elevation ?? 0;
 
     // Get neighbors for gradient calculation
     const east = getTileAt(x + 1, y);
@@ -256,10 +256,10 @@ export class TerrainFeatureAnalyzer {
     const north = getTileAt(x, y - 1);
     const south = getTileAt(x, y + 1);
 
-    const eastElev = east ? ((east as any).elevation ?? 0) : centerElevation;
-    const westElev = west ? ((west as any).elevation ?? 0) : centerElevation;
-    const northElev = north ? ((north as any).elevation ?? 0) : centerElevation;
-    const southElev = south ? ((south as any).elevation ?? 0) : centerElevation;
+    const eastElev = east ? (east.elevation ?? 0) : centerElevation;
+    const westElev = west ? (west.elevation ?? 0) : centerElevation;
+    const northElev = north ? (north.elevation ?? 0) : centerElevation;
+    const southElev = south ? (south.elevation ?? 0) : centerElevation;
 
     // Calculate gradients
     const dzdx = (eastElev - westElev) / 2;
@@ -293,7 +293,7 @@ export class TerrainFeatureAnalyzer {
     tpi: number,
     slope: number
   ): TerrainFeature | null {
-    const elevation = (tile as any).elevation ?? 0;
+    const elevation = tile.elevation ?? 0;
 
     // Cliff: Only very steep slopes (> 40°) to avoid reporting every steep tile
     if (slope > 40 && Math.abs(tpi) > 3) {

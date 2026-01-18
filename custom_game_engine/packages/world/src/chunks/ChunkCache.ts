@@ -250,7 +250,7 @@ export function clearChunkCache(cache: ChunkCache): void {
  * @param cache - Chunk cache
  * @param world - World instance (needed to query entity components for building types)
  */
-export function recalculateChunkStats(cache: ChunkCache, world?: any): void {
+export function recalculateChunkStats(cache: ChunkCache, world?: { getEntity(id: string): { components: Map<string, unknown> } | undefined }): void {
   let totalEntities = 0;
   const entityTypes = {
     agents: 0,
@@ -276,7 +276,7 @@ export function recalculateChunkStats(cache: ChunkCache, world?: any): void {
           const entity = world.getEntity(entityId);
           if (!entity) continue;
 
-          const agentComp = entity.components.get('agent') as any;
+          const agentComp = entity.components.get('agent') as { behavior: string; behaviorState?: { buildingType?: string } } | undefined;
           if (agentComp?.behavior === 'build' && agentComp.behaviorState?.buildingType) {
             const buildingType = agentComp.behaviorState.buildingType;
             pendingBuilds.set(buildingType, (pendingBuilds.get(buildingType) || 0) + 1);
@@ -292,7 +292,7 @@ export function recalculateChunkStats(cache: ChunkCache, world?: any): void {
           const entity = world.getEntity(entityId);
           if (!entity) continue;
 
-          const buildingComp = entity.components.get('building') as any;
+          const buildingComp = entity.components.get('building') as { buildingType?: string } | undefined;
           if (buildingComp?.buildingType) {
             const buildingType = buildingComp.buildingType;
             buildingTypes.set(buildingType, (buildingTypes.get(buildingType) || 0) + 1);

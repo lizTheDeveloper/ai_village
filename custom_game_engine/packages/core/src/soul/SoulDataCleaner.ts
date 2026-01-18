@@ -118,7 +118,7 @@ export function cleanSoulData(soul: Entity): boolean {
  */
 export function cleanAllSoulsInWorld(world: World): number {
   const souls = world.query()
-    .with('soul_identity' as any)
+    .with('soul_identity')
     .executeEntities();
 
   let cleanedCount = 0;
@@ -149,7 +149,7 @@ export function scanForCorruptedSouls(world: World): Array<{
   destinyCorrupted: boolean;
 }> {
   const souls = world.query()
-    .with('soul_identity' as any)
+    .with('soul_identity')
     .executeEntities();
 
   const corrupted: Array<{

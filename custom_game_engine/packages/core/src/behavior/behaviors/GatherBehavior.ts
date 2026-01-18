@@ -66,7 +66,6 @@ let chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
 export function injectChunkSpatialQueryToGather(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[GatherBehavior] ChunkSpatialQuery injected for efficient resource/plant lookups');
 }
 
 /**
@@ -196,8 +195,6 @@ export class GatherBehavior extends BaseBehavior {
             resourceType: undefined, // Clear preferred type
           },
         }));
-        // Debug: Agent couldn't find preferred resource, falling back to any available
-        // console.log(`[GatherBehavior] Cleared preferredType (${preferredType}) - will try any available resource`);
         // Don't complete yet - try again next tick with any resource type
         return;
       }
@@ -982,8 +979,6 @@ export class GatherBehavior extends BaseBehavior {
         GATHER_MAX_RANGE,
         [ComponentType.Plant]
       );
-
-      console.log('[GatherBehavior] findNearestPlantWithFruit: ChunkSpatialQuery returned', plantsInRadius.length, 'plants within', GATHER_MAX_RANGE, 'of', position.x.toFixed(1), position.y.toFixed(1));
 
       for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
         const plantImpl = plant as EntityImpl;

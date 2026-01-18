@@ -25,6 +25,8 @@ export class CommunicationSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.Conversation,
   ];
+  // Only run when conversation components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Conversation] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   // Satisfaction amounts for quality-based social need updates

@@ -95,8 +95,6 @@ export class PersistenceService {
           lastUpdated: now,
         });
       });
-
-      console.log(`[Persistence] Saved at tick ${state.tick}`);
     } catch (error) {
       console.error('[Persistence] Failed to save state:', error);
       throw error;
@@ -179,8 +177,6 @@ export class PersistenceService {
       await this.db.events.clear();
       await this.db.snapshots.clear();
     });
-
-    console.log('[Persistence] Database cleared');
   }
 
   /**

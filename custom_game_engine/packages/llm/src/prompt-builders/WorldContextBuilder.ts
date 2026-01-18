@@ -27,7 +27,6 @@ let chunkSpatialQuery: any | null = null;
 
 export function injectChunkSpatialQueryToWorldContextBuilder(spatialQuery: any): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[WorldContextBuilder] ChunkSpatialQuery injected for O(1) campfire detection');
 }
 
 /**

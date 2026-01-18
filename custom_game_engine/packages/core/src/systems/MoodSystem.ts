@@ -49,6 +49,8 @@ export class MoodSystem extends BaseSystem {
   public readonly id = CT.Mood;
   public readonly priority = 48; // After NeedsSystem (40), before behavior systems
   public readonly requiredComponents = [CT.Agent] as const;
+  // Only run when agent components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Agent] as const;
 
   /** How often to fully update mood (in ticks) */
   protected readonly throttleInterval = 60; // Every second at 60 tps

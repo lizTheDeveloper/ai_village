@@ -33,6 +33,8 @@ export class TamingSystem extends BaseSystem {
   public readonly id: SystemId = 'taming';
   public readonly priority: number = 70;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
+  // Only run when animal components exist (O(1) activation check)
+  public readonly activationComponents = ['animal'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   // This system doesn't update every tick, it responds to taming attempts

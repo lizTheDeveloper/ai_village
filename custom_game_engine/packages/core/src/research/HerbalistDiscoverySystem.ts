@@ -259,7 +259,7 @@ export class HerbalistDiscoverySystem extends BaseSystem {
       this.discoveredSpecies.add(speciesId);
     }
 
-    const agentComp = agentEntity.getComponent<AgentComponent>(ComponentType.Agent) as any;
+    const agentComp = agentEntity.getComponent<AgentComponent>(ComponentType.Agent);
     if (!agentComp) return null;
 
     const discovery: PlantDiscovery = {
@@ -313,7 +313,7 @@ export class HerbalistDiscoverySystem extends BaseSystem {
     const coAuthorIds: string[] = [];
     const coAuthorNames: string[] = [];
     for (const e of coDiscoverers) {
-      const agent = e.getComponent<AgentComponent>(ComponentType.Agent) as any;
+      const agent = e.getComponent<AgentComponent>(ComponentType.Agent);
       if (agent) {
         coAuthorIds.push(e.id);
         coAuthorNames.push(agent.name ?? 'Unknown');

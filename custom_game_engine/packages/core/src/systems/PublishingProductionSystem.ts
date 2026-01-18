@@ -39,6 +39,8 @@ export class PublishingProductionSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_production';
   public readonly priority = 44;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no publishing workshops exist in world
+  public readonly activationComponents = ['publishing_workshop'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // SLOW - 5 seconds (production job updates)
 
   // Active production jobs

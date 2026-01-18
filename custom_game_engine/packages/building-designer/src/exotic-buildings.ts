@@ -583,9 +583,9 @@ function generateHive(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
     species: 'custom',
     layout,
     materials: {
-      wall: 'stone' as any,  // Will use exotic material in renderer
-      floor: 'stone' as any,
-      door: 'stone' as any,
+      wall: 'stone',  // Will use exotic material in renderer
+      floor: 'stone',
+      door: 'stone',
     },
     functionality: [
       { type: 'sleeping', params: { beds: cells } },
@@ -635,9 +635,9 @@ function generateSpire(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
     layout: groundFloor,
     floors: upperFloors,
     materials: {
-      wall: 'stone' as any,
-      floor: 'stone' as any,
-      door: 'stone' as any,
+      wall: 'stone',
+      floor: 'stone',
+      door: 'stone',
     },
     functionality: [
       { type: 'research', params: { bonus: 1.5 + floorCount * 0.2 } },
@@ -754,9 +754,9 @@ function generateTesseract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
       layout: paddedInner,
     }],
     materials: {
-      wall: 'glass' as any,
-      floor: 'stone' as any,
-      door: 'metal' as any,
+      wall: 'glass',
+      floor: 'stone',
+      door: 'metal',
     },
     functionality: [
       { type: 'research', params: { bonus: 3.0, fields: ['dimensional', 'arcane'] } },
@@ -873,9 +873,9 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
     species: 'medium',
     layout: phaseLayouts[0], // Current visible layout
     materials: {
-      wall: 'glass' as any,
-      floor: 'tile' as any,
-      door: 'metal' as any,
+      wall: 'glass',
+      floor: 'tile',
+      door: 'metal',
     },
     functionality: [
       { type: 'research', params: { bonus: 4.0, fields: ['dimensional', 'temporal', 'arcane'] } },
@@ -1006,9 +1006,9 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
     species: 'medium',
     layout: stateLayouts[0], // Most probable state shown by default
     materials: {
-      wall: 'glass' as any,
-      floor: 'tile' as any,
-      door: 'metal' as any,
+      wall: 'glass',
+      floor: 'tile',
+      door: 'metal',
     },
     functionality: [
       { type: 'research', params: { bonus: 5.0, fields: ['dimensional', 'quantum', 'probability'] } },
@@ -1105,9 +1105,9 @@ function generateInfiniteRoom(spec: ExoticBuildingSpec): HigherDimensionalBuildi
       layout: interior,
     }],
     materials: {
-      wall: 'wood' as any,
-      floor: 'wood' as any,
-      door: 'wood' as any,
+      wall: 'wood',
+      floor: 'wood',
+      door: 'wood',
     },
     functionality: [
       { type: 'storage', params: { capacity: interiorSize * interiorSize } },
@@ -1199,9 +1199,9 @@ function generateUniverseGate(spec: ExoticBuildingSpec): HigherDimensionalBuildi
     species: 'medium',
     layout,
     materials: {
-      wall: 'metal' as any,
-      floor: 'tile' as any,
-      door: 'metal' as any,
+      wall: 'metal',
+      floor: 'tile',
+      door: 'metal',
     },
     functionality: [
       { type: 'research', params: { bonus: 3.0, fields: ['dimensional', 'multiverse'] } },
@@ -1275,6 +1275,9 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
       layout[portalY] = replaceAt(layout[portalY], portalX, TILE_SYMBOLS.VOID);
     }
 
+    const visualEffects: Array<'swirling_void' | 'starfield' | 'prismatic' | 'shadow_gate'> =
+      ['swirling_void', 'starfield', 'prismatic', 'shadow_gate'];
+
     portals.push({
       id: `portal_${i}`,
       name: `Gate ${i + 1}`,
@@ -1284,7 +1287,7 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
       anchored: false,
       traversalCost: 500,
       traversable: false,
-      visualEffect: ['swirling_void', 'starfield', 'prismatic', 'shadow_gate'][i % 4] as any,
+      visualEffect: visualEffects[i % 4],
     });
   }
 
@@ -1303,9 +1306,9 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
     species: 'medium',
     layout,
     materials: {
-      wall: 'glass' as any,
-      floor: 'tile' as any,
-      door: 'metal' as any,
+      wall: 'glass',
+      floor: 'tile',
+      door: 'metal',
     },
     functionality: [
       { type: 'research', params: { bonus: 5.0, fields: ['dimensional', 'multiverse', 'cosmology'] } },
@@ -1385,9 +1388,9 @@ function generatePocketCabin(spec: ExoticBuildingSpec): HigherDimensionalBuildin
       layout: interior,
     }],
     materials: {
-      wall: 'wood' as any,
-      floor: 'wood' as any,
-      door: 'wood' as any,
+      wall: 'wood',
+      floor: 'wood',
+      door: 'wood',
     },
     functionality: [
       { type: 'sleeping', params: { beds: 2 } },
@@ -1474,9 +1477,9 @@ function generatePocketManor(spec: ExoticBuildingSpec): HigherDimensionalBuildin
       layout: interior,
     }],
     materials: {
-      wall: 'stone' as any,
-      floor: 'wood' as any,
-      door: 'wood' as any,
+      wall: 'stone',
+      floor: 'wood',
+      door: 'wood',
     },
     functionality: [
       { type: 'sleeping', params: { beds: 8 } },
@@ -1575,9 +1578,9 @@ function generatePocketRealm(spec: ExoticBuildingSpec): HigherDimensionalBuildin
       layout: interior,
     }],
     materials: {
-      wall: 'stone' as any,
-      floor: 'stone' as any,
-      door: 'metal' as any,
+      wall: 'stone',
+      floor: 'stone',
+      door: 'metal',
     },
     functionality: [
       { type: 'sleeping', params: { beds: 50 } },
@@ -1847,9 +1850,9 @@ function createExoticBuilding(spec: ExoticBuildingSpec, layout: string[], descri
     species: 'medium',
     layout,
     materials: {
-      wall: 'stone' as any,
-      floor: 'stone' as any,
-      door: 'stone' as any,
+      wall: 'stone',
+      floor: 'stone',
+      door: 'stone',
     },
     functionality: [{ type: 'mood_aura', params: { bonus: 5 } }],
     capacity: 10,

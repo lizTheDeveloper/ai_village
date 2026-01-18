@@ -126,9 +126,6 @@ export class FallbackProvider implements LLMProvider {
         if (now - state.lastFailure >= this.retryAfterMs) {
           state.disabled = false;
           state.failureCount = 0;
-          if (this.logFallbacks) {
-            console.log(`[FallbackProvider] Re-enabling ${state.provider.getProviderId()} after cooldown`);
-          }
         }
       }
 

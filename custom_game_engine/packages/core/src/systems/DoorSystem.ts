@@ -31,6 +31,8 @@ export class DoorSystem extends BaseSystem {
   public readonly id: SystemId = 'door';
   public readonly priority: number = 19; // Run before MovementSystem (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Position, CT.Agent];
+  // Only run when agent components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Agent] as const;
   protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   /**

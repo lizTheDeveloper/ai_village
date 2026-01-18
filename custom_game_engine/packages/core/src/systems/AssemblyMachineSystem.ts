@@ -25,6 +25,8 @@ export class AssemblyMachineSystem extends BaseSystem {
   public readonly id: SystemId = 'assembly_machine';
   public readonly priority: number = 54; // After belt/power systems
   public readonly requiredComponents = [CT.AssemblyMachine, CT.MachineConnection] as const;
+  // Only run when assembly_machine components exist (O(1) activation check)
+  public readonly activationComponents = [CT.AssemblyMachine] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   public readonly dependsOn = ['state_mutator'] as const;

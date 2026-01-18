@@ -74,7 +74,8 @@ export class PathPredictionSystem extends BaseSystem {
       ticksElapsed
     );
 
-    const deviation = calculateDeviation(position as any, predictedPos);
+    const positionData = position as { x: number; y: number };
+    const deviation = calculateDeviation(positionData, predictedPos);
 
     if (deviation > prediction.deviationThreshold) {
       // Movement changed significantly - update prediction
@@ -112,13 +113,14 @@ export class PathPredictionSystem extends BaseSystem {
 
     // Check for steering behavior
     const steering = entity.getComponent('steering');
-    if (steering && (steering as any).target) {
+    if (steering && 'target' in steering && steering.target) {
       return this.createSteeringPrediction(entity, position, velocity, steering, world);
     }
 
     // Check for velocity (linear movement)
-    if (velocity && (Math.abs((velocity as any).x) > 0.01 || Math.abs((velocity as any).y) > 0.01)) {
-      return this.createLinearPrediction(entity, position, velocity, world);
+    const velocityData = velocity as { vx: number; vy: number } | undefined;
+    if (velocityData && (Math.abs(velocityData.vx) > 0.01 || Math.abs(velocityData.vy) > 0.01)) {
+      return this.createLinearPrediction(entity, position, velocityData, world);
     }
 
     // Default: stationary
@@ -130,13 +132,14 @@ export class PathPredictionSystem extends BaseSystem {
    */
   private createLinearPrediction(
     entity: EntityImpl,
-    position: any,
-    velocity: any,
+    position: unknown,
+    velocity: { vx: number; vy: number },
     world: World
   ): PathPredictionComponent {
+    const posData = position as { x: number; y: number };
     const prediction: LinearPath = {
       type: 'linear',
-      velocity: { x: (velocity as any).x, y: (velocity as any).y },
+      velocity: { x: velocity.vx, y: velocity.vy },
       duration: 100, // Re-sync every 5 seconds (100 ticks at 20 TPS)
     };
 
@@ -144,7 +147,7 @@ export class PathPredictionSystem extends BaseSystem {
       type: 'path_prediction',
       version: 1,
       prediction,
-      lastSentPosition: { x: (position as any).x, y: (position as any).y },
+      lastSentPosition: { x: posData.x, y: posData.y },
       lastSentTick: world.tick,
       deviationThreshold: 1.0, // 1 pixel deviation triggers update
     };
@@ -155,17 +158,21 @@ export class PathPredictionSystem extends BaseSystem {
    */
   private createWanderPrediction(
     entity: EntityImpl,
-    position: any,
-    velocity: any,
-    wander: any,
+    position: unknown,
+    velocity: unknown,
+    wander: unknown,
     world: World
   ): PathPredictionComponent {
+    const posData = position as { x: number; y: number };
+    const velData = velocity as { vx: number; vy: number };
+    const wanderData = wander as { wanderRadius?: number; wanderDistance?: number; wanderJitter?: number };
+
     const prediction: WanderPath = {
       type: 'wander',
-      currentVelocity: { x: (velocity as any).x, y: (velocity as any).y },
-      wanderRadius: (wander as any).wanderRadius || 3.0,
-      wanderDistance: (wander as any).wanderDistance || 6.0,
-      wanderJitter: (wander as any).wanderJitter || 1.0,
+      currentVelocity: { x: velData.vx, y: velData.vy },
+      wanderRadius: wanderData.wanderRadius ?? 3.0,
+      wanderDistance: wanderData.wanderDistance ?? 6.0,
+      wanderJitter: wanderData.wanderJitter ?? 1.0,
       seed: this.hashEntityId(entity.id), // Deterministic seed from entity ID
     };
 
@@ -173,7 +180,7 @@ export class PathPredictionSystem extends BaseSystem {
       type: 'path_prediction',
       version: 1,
       prediction,
-      lastSentPosition: { x: (position as any).x, y: (position as any).y },
+      lastSentPosition: { x: posData.x, y: posData.y },
       lastSentTick: world.tick,
       deviationThreshold: 2.0, // Wander is less predictable, higher threshold
     };
@@ -184,24 +191,28 @@ export class PathPredictionSystem extends BaseSystem {
    */
   private createSteeringPrediction(
     entity: EntityImpl,
-    position: any,
-    velocity: any,
-    steering: any,
+    position: unknown,
+    velocity: unknown,
+    steering: unknown,
     world: World
   ): PathPredictionComponent {
+    const posData = position as { x: number; y: number };
+    const velData = velocity ? (velocity as { vx: number; vy: number }) : undefined;
+    const steeringData = steering as { target: { x: number; y: number }; maxSpeed?: number; arrivalRadius?: number };
+
     const prediction: SteeringPath = {
       type: 'steering',
-      target: { x: (steering as any).target.x, y: (steering as any).target.y },
-      maxSpeed: (steering as any).maxSpeed || 2.0,
-      arrivalRadius: (steering as any).arrivalRadius || 5.0,
-      currentVelocity: velocity ? { x: (velocity as any).x, y: (velocity as any).y } : undefined,
+      target: { x: steeringData.target.x, y: steeringData.target.y },
+      maxSpeed: steeringData.maxSpeed ?? 2.0,
+      arrivalRadius: steeringData.arrivalRadius ?? 5.0,
+      currentVelocity: velData ? { x: velData.vx, y: velData.vy } : undefined,
     };
 
     return {
       type: 'path_prediction',
       version: 1,
       prediction,
-      lastSentPosition: { x: (position as any).x, y: (position as any).y },
+      lastSentPosition: { x: posData.x, y: posData.y },
       lastSentTick: world.tick,
       deviationThreshold: 1.0, // Steering is predictable
     };
@@ -212,9 +223,10 @@ export class PathPredictionSystem extends BaseSystem {
    */
   private createStationaryPrediction(
     entity: EntityImpl,
-    position: any,
+    position: unknown,
     world: World
   ): PathPredictionComponent {
+    const posData = position as { x: number; y: number };
     const prediction: StationaryPath = {
       type: 'stationary',
       duration: 200, // Re-sync every 10 seconds to check if still stationary
@@ -224,7 +236,7 @@ export class PathPredictionSystem extends BaseSystem {
       type: 'path_prediction',
       version: 1,
       prediction,
-      lastSentPosition: { x: (position as any).x, y: (position as any).y },
+      lastSentPosition: { x: posData.x, y: posData.y },
       lastSentTick: world.tick,
       deviationThreshold: 0.1, // Very small threshold - stationary means stationary
     };

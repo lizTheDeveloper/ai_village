@@ -75,6 +75,9 @@ export class TVProductionSystem extends BaseSystem {
   readonly priority = 64; // After writing, before post-production
   readonly requiredComponents = [ComponentType.TVStation] as const;
 
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
+
   protected readonly throttleInterval = FILMING_INTERVAL;
 
   /** Active filming sessions */

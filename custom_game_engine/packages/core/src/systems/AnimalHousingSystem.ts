@@ -33,6 +33,8 @@ export class AnimalHousingSystem extends BaseSystem {
   public readonly id: SystemId = 'animal-housing';
   public readonly priority: number = 51; // Run after BuildingSystem (50)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
+  // Only run when building components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Building] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   private lastCleanlinessUpdate = 0;

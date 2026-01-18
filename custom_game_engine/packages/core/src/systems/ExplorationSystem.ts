@@ -14,7 +14,9 @@ import { ExplorationStateComponent } from '../components/ExplorationStateCompone
 export class ExplorationSystem extends BaseSystem {
   public readonly id: SystemId = 'exploration';
   public readonly priority: number = 25; // After AISystem, before Steering
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.ExplorationState];
+  // Only run when exploration_state components exist (O(1) activation check)
+  public readonly activationComponents = [CT.ExplorationState] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private lastCoverageMilestone: Map<string, number> = new Map();

@@ -12,7 +12,152 @@
  * - Spiritual: Shinto
  */
 
-import type { MagicParadigm } from './MagicParadigm.js';
+import type {
+  MagicParadigm,
+  MagicSource,
+  MagicCost,
+  MagicChannel,
+  MagicLaw,
+  MagicRisk,
+  AcquisitionDefinition,
+  ForbiddenCombination,
+  ResonantCombination,
+  ForeignMagicConfig,
+} from './MagicParadigm.js';
+
+// ============================================================================
+// HELPER FUNCTIONS FOR CREATING PROPER OBJECTS
+// ============================================================================
+
+/**
+ * Create a properly-typed MagicCost with sensible defaults.
+ */
+function createCost(
+  type: MagicCost['type'],
+  options: {
+    canBeTerminal?: boolean;
+    cumulative?: boolean;
+    recoverable?: boolean;
+    recoveryMethod?: MagicCost['recoveryMethod'];
+    visibility?: MagicCost['visibility'];
+  } = {}
+): MagicCost {
+  return {
+    type,
+    canBeTerminal: options.canBeTerminal ?? false,
+    cumulative: options.cumulative ?? false,
+    recoverable: options.recoverable ?? true,
+    recoveryMethod: options.recoveryMethod ?? 'rest',
+    visibility: options.visibility ?? 'hidden',
+  };
+}
+
+/**
+ * Create a properly-typed MagicChannel with sensible defaults.
+ */
+function createChannel(
+  type: MagicChannel['type'],
+  requirement: MagicChannel['requirement'],
+  options: {
+    canBeMastered?: boolean;
+    proficiencyBonus?: number;
+    blockEffect?: MagicChannel['blockEffect'];
+    description?: string;
+  } = {}
+): MagicChannel {
+  return {
+    type,
+    requirement,
+    canBeMastered: options.canBeMastered ?? true,
+    proficiencyBonus: options.proficiencyBonus,
+    blockEffect: options.blockEffect ?? (requirement === 'required' ? 'prevents_casting' : 'no_effect'),
+    description: options.description,
+  };
+}
+
+/**
+ * Create a properly-typed MagicLaw with sensible defaults.
+ */
+function createLaw(
+  type: MagicLaw['type'],
+  strictness: MagicLaw['strictness'],
+  circumventable: boolean,
+  options: {
+    id?: string;
+    name?: string;
+    violationConsequence?: string;
+    circumventionCostMultiplier?: number;
+    description?: string;
+  } = {}
+): MagicLaw {
+  return {
+    id: options.id ?? `${type}_law`,
+    name: options.name ?? type,
+    type,
+    strictness,
+    canBeCircumvented: circumventable,
+    violationConsequence: options.violationConsequence,
+    circumventionCostMultiplier: options.circumventionCostMultiplier,
+    description: options.description,
+  };
+}
+
+/**
+ * Create a properly-typed MagicRisk with sensible defaults.
+ */
+function createRisk(
+  trigger: MagicRisk['trigger'],
+  consequence: MagicRisk['consequence'],
+  severity: MagicRisk['severity'],
+  probability: number,
+  mitigatable: boolean,
+  options: {
+    mitigationSkill?: string;
+    description?: string;
+  } = {}
+): MagicRisk {
+  return {
+    trigger,
+    consequence,
+    severity,
+    probability,
+    mitigatable,
+    mitigationSkill: options.mitigationSkill,
+    description: options.description,
+  };
+}
+
+/**
+ * Create a properly-typed AcquisitionDefinition with sensible defaults.
+ */
+function createAcquisition(
+  method: AcquisitionDefinition['method'],
+  rarity: AcquisitionDefinition['rarity'],
+  options: {
+    voluntary?: boolean;
+    prerequisites?: string[];
+    grantsAccess?: string[];
+    startingProficiency?: number;
+    description?: string;
+  } = {}
+): AcquisitionDefinition {
+  return {
+    method,
+    rarity,
+    voluntary: options.voluntary ?? true,
+    prerequisites: options.prerequisites,
+    grantsAccess: options.grantsAccess ?? [],
+    startingProficiency: options.startingProficiency ?? 5,
+    description: options.description,
+  };
+}
+
+/**
+ * Create a properly-typed ForeignMagicConfig from a simple effect string.
+ */
+function createForeignMagicConfig(effect: ForeignMagicConfig['effect']): ForeignMagicConfig {
+  return { effect };
+}
 
 // ============================================================================
 // FICTION-INSPIRED PARADIGMS
@@ -49,43 +194,43 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
   ],
 
   costs: [
-    { type: 'stamina', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'sanity', baseAmount: 5, powerMultiplier: 1.5 }, // Mental strain
-  ] as any[],
+    createCost('stamina', { canBeTerminal: false }),
+    createCost('sanity', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'focus', requirement: 'required' }, // Alar (mental discipline)
-    { name: 'material', requirement: 'required' }, // Need linked objects
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('focus', 'required'),
+    createChannel('material', 'required'),
+  ],
 
   laws: [
-    { type: 'similarity', strength: 'absolute', circumventable: false },
-    { type: 'conservation', strength: 'absolute', circumventable: false },
-    { type: 'contagion', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('similarity', 'absolute', false),
+    createLaw('conservation', 'absolute', false),
+    createLaw('contagion', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'backlash', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'overuse', consequence: 'burnout', severity: 'moderate', probability: 0.2, mitigatable: true },
-    { trigger: 'paradox', consequence: 'feedback_loop', severity: 'catastrophic', probability: 0.1, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'backlash', 'severe', 0.3, true),
+    createRisk('overuse', 'burnout', 'moderate', 0.2, true),
+    createRisk('paradox', 'bleed_through', 'catastrophic', 0.1, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'apprenticeship', rarity: 'common' },
-  ] as any[],
+    createAcquisition('study', 'common', { grantsAccess: ['sympathy_source'] }),
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['sympathy_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'transform', 'control'],
   availableForms: ['fire', 'water', 'earth', 'air', 'body', 'mind'],
 
   forbiddenCombinations: [
     { technique: 'create', form: 'spirit', reason: 'Cannot create sympathy with souls' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'control', form: 'fire', bonusEffect: 'Heat transfer through links', powerMultiplier: 1.5 },
-  ] as any[],
+  ],
 
   powerScaling: 'logarithmic',
   powerCeiling: 100,
@@ -98,7 +243,7 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['academic'],
   conflictingParadigms: ['pact', 'divine'],
-  foreignMagicEffect: 'weakened' as any,
+  foreignMagicEffect: createForeignMagicConfig('weakened'),
 };
 
 /**
@@ -120,61 +265,63 @@ export const ALLOMANCY_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'metal_source',
+      name: 'Metal Reserves',
       type: 'material',
       regeneration: 'consumption',
       detectability: 'undetectable',
-      storable: true, // Metal vials
-      transferable: true, // Can share metals
-      stealable: false, // Must ingest
+      storable: true,
+      transferable: true,
+      stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'material', baseAmount: 1, powerMultiplier: 3.0 }, // Metal consumed
-    { type: 'stamina', baseAmount: 5, powerMultiplier: 1.5 }, // Flaring cost
-  ] as any[],
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+    createCost('stamina', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'consumption', requirement: 'required' }, // Must swallow metal
-    { name: 'will', requirement: 'required' }, // Must mentally "burn"
-  ] as any[],
+    createChannel('consumption', 'required'),
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'equivalent_exchange', strength: 'absolute', circumventable: false },
-    { type: 'conservation', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('equivalent_exchange', 'absolute', false),
+    createLaw('conservation', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'exhaustion', severity: 'moderate', probability: 0.4, mitigatable: true },
-    { trigger: 'corruption', consequence: 'metal_poisoning', severity: 'severe', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'exhaustion', 'moderate', 0.4, true),
+    createRisk('corruption', 'sickness', 'severe', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'bloodline', rarity: 'rare' },
-    { method: 'gift', rarity: 'very_rare' }, // From Preservation/Harmony
-  ] as any[],
+    createAcquisition('bloodline', 'rare', { voluntary: false, grantsAccess: ['metal_source'] }),
+    createAcquisition('gift', 'legendary', { voluntary: false, grantsAccess: ['metal_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'control', 'enhance', 'perceive'],
-  availableForms: ['body', 'mind', 'void'], // Simplified - each metal is specific
+  availableForms: ['body', 'mind', 'void'],
 
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'enhance', form: 'body', bonusEffect: 'Pewter strength', powerMultiplier: 2.0 },
     { technique: 'perceive', form: 'mind', bonusEffect: 'Tin senses', powerMultiplier: 2.0 },
-  ] as any[],
+  ],
 
-  powerScaling: 'step', // Each metal is distinct power level
-  powerCeiling: 200, // Mistborn are extremely powerful
+  powerScaling: 'step',
+  powerCeiling: 200,
   allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
   allowsEnchantment: false,
   persistsAfterDeath: false,
-  allowsTeaching: false, // Must be born with it
+  allowsTeaching: false,
   allowsScrolls: false,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: [],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -196,68 +343,70 @@ export const DREAM_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'dream_source',
+      name: 'Dream Energy',
       type: 'emotional',
       regeneration: 'rest',
       detectability: 'undetectable',
       storable: false,
       transferable: false,
-      stealable: true, // Can steal dream energy
+      stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'sanity', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'memory', baseAmount: 5, powerMultiplier: 1.5 },
-    { type: 'time', baseAmount: 8, powerMultiplier: 1.0 }, // Hours asleep
-  ] as any[],
+    createCost('sanity', { canBeTerminal: true, cumulative: true }),
+    createCost('memory', { canBeTerminal: false, cumulative: true }),
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'dream', requirement: 'required' },
-    { name: 'meditation', requirement: 'enhancing' },
-    { name: 'emotion', requirement: 'enhancing' },
-  ] as any[],
+    createChannel('dream', 'required'),
+    createChannel('meditation', 'enhancing'),
+    createChannel('emotion', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'belief', strength: 'strong', circumventable: true },
-    { type: 'narrative', strength: 'strong', circumventable: false },
-    { type: 'witness', strength: 'weak', circumventable: true },
-  ] as any[],
+    createLaw('belief', 'strong', true),
+    createLaw('narrative', 'strong', false),
+    createLaw('witness', 'weak', true),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'cannot_wake', severity: 'catastrophic', probability: 0.15, mitigatable: true },
-    { trigger: 'failure', consequence: 'nightmare_intrusion', severity: 'severe', probability: 0.3, mitigatable: false },
-    { trigger: 'exhaustion', consequence: 'reality_confusion', severity: 'moderate', probability: 0.4, mitigatable: true },
-  ] as any[],
+    createRisk('overuse', 'coma', 'catastrophic', 0.15, true),
+    createRisk('failure', 'spectre_creation', 'severe', 0.3, false),
+    createRisk('exhaustion', 'memory_loss', 'moderate', 0.4, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'meditation', rarity: 'uncommon' },
-    { method: 'awakening', rarity: 'rare' },
-    { method: 'contract', rarity: 'rare' }, // Deal with dream entities
-  ] as any[],
+    createAcquisition('meditation', 'uncommon', { grantsAccess: ['dream_source'] }),
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['dream_source'] }),
+    createAcquisition('contract', 'rare', { grantsAccess: ['dream_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'perceive', 'control'],
   availableForms: ['mind', 'image', 'spirit'],
 
   forbiddenCombinations: [
     { technique: 'destroy', form: 'spirit', reason: 'Cannot permanently destroy dream selves' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'create', form: 'image', bonusEffect: 'Vivid dream constructs', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
   powerCeiling: 150,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 2.0, // Shared dreams are powerful
+  groupCastingMultiplier: 2.0,
   allowsEnchantment: false,
-  persistsAfterDeath: true, // Dreams persist
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: false,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['emotional'],
   conflictingParadigms: ['academic'],
-  foreignMagicEffect: 'weakened' as any,
+  foreignMagicEffect: createForeignMagicConfig('weakened'),
 };
 
 /**
@@ -279,43 +428,45 @@ export const SONG_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'song_source',
+      name: 'Musical Knowledge',
       type: 'knowledge',
       regeneration: 'rest',
-      detectability: 'obvious', // Music is heard
-      storable: true, // Song sheets
-      transferable: true, // Can teach songs
-      stealable: true, // Can memorize songs
+      detectability: 'obvious',
+      storable: true,
+      transferable: true,
+      stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'stamina', baseAmount: 15, powerMultiplier: 2.0 }, // Vocal strain
-    { type: 'time', baseAmount: 3, powerMultiplier: 1.5 }, // Performance duration
-  ] as any[],
+    createCost('stamina', { canBeTerminal: false }),
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'musical', requirement: 'required' },
-    { name: 'verbal', requirement: 'required' },
-    { name: 'emotion', requirement: 'enhancing' },
-  ] as any[],
+    createChannel('musical', 'required'),
+    createChannel('verbal', 'required'),
+    createChannel('emotion', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'resonance', strength: 'absolute', circumventable: false },
-    { type: 'narrative', strength: 'strong', circumventable: false },
-    { type: 'witness', strength: 'weak', circumventable: true },
-  ] as any[],
+    createLaw('resonance', 'absolute', false),
+    createLaw('narrative', 'strong', false),
+    createLaw('witness', 'weak', true),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'discordance', severity: 'moderate', probability: 0.3, mitigatable: true },
-    { trigger: 'overuse', consequence: 'voice_loss', severity: 'severe', probability: 0.2, mitigatable: true },
-    { trigger: 'critical_failure', consequence: 'cacophony_wave', severity: 'catastrophic', probability: 0.1, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'wild_surge', 'moderate', 0.3, true),
+    createRisk('overuse', 'silence', 'severe', 0.2, true),
+    createRisk('critical_failure', 'bleed_through', 'catastrophic', 0.1, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'apprenticeship', rarity: 'common' },
-    { method: 'gift', rarity: 'rare' }, // Natural talent
-  ] as any[],
+    createAcquisition('study', 'common', { grantsAccess: ['song_source'] }),
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['song_source'] }),
+    createAcquisition('gift', 'rare', { voluntary: false, grantsAccess: ['song_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'enhance', 'protect', 'control'],
   availableForms: ['mind', 'body', 'image', 'air', 'water'],
@@ -324,20 +475,20 @@ export const SONG_PARADIGM: MagicParadigm = {
   resonantCombinations: [
     { technique: 'enhance', form: 'mind', bonusEffect: 'Inspiring anthem', powerMultiplier: 1.6 },
     { technique: 'control', form: 'air', bonusEffect: 'Wind symphony', powerMultiplier: 1.4 },
-  ] as any[],
+  ],
 
   powerScaling: 'logarithmic',
   powerCeiling: 120,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 2.5, // Choirs are very powerful
-  allowsEnchantment: true, // Musical instruments
-  persistsAfterDeath: true, // Songs outlive singers
+  groupCastingMultiplier: 2.5,
+  allowsEnchantment: true,
+  persistsAfterDeath: true,
   allowsTeaching: true,
-  allowsScrolls: true, // Sheet music
+  allowsScrolls: true,
   foreignMagicPolicy: 'tolerant',
   compatibleParadigms: ['emotional', 'academic'],
   conflictingParadigms: ['silence'],
-  foreignMagicEffect: 'complementary' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -359,40 +510,42 @@ export const RUNE_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'rune_source',
+      name: 'Runic Knowledge',
       type: 'knowledge',
-      regeneration: 'none', // Runes are permanent once made
+      regeneration: 'none',
       detectability: 'obvious',
       storable: true,
       transferable: true,
-      stealable: true, // Can copy runes
+      stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'material', baseAmount: 5, powerMultiplier: 2.0 }, // Carving materials
-    { type: 'time', baseAmount: 10, powerMultiplier: 2.5 }, // Precise work
-  ] as any[],
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'glyph', requirement: 'required' },
-    { name: 'material', requirement: 'required' },
-    { name: 'focus', requirement: 'required' },
-  ] as any[],
+    createChannel('glyph', 'required'),
+    createChannel('material', 'required'),
+    createChannel('focus', 'required'),
+  ],
 
   laws: [
-    { type: 'true_names', strength: 'absolute', circumventable: false },
-    { type: 'conservation', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('true_names', 'absolute', false),
+    createLaw('conservation', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'rune_explosion', severity: 'severe', probability: 0.4, mitigatable: true },
-    { trigger: 'paradox', consequence: 'wild_magic', severity: 'catastrophic', probability: 0.15, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'backlash', 'severe', 0.4, true),
+    createRisk('paradox', 'wild_surge', 'catastrophic', 0.15, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'awakening', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('study', 'common', { grantsAccess: ['rune_source'] }),
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['rune_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'protect', 'enhance'],
   availableForms: ['fire', 'water', 'earth', 'air', 'body', 'mind'],
@@ -400,20 +553,20 @@ export const RUNE_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'protect', form: 'body', bonusEffect: 'Warding runes', powerMultiplier: 1.7 },
-  ] as any[],
+  ],
 
   powerScaling: 'step',
   powerCeiling: 100,
   allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
-  allowsEnchantment: true, // Runic items
+  allowsEnchantment: true,
   persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['academic'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 // ============================================================================
@@ -439,63 +592,65 @@ export const DEBT_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'debt_source',
+      name: 'Owed Favors',
       type: 'social',
-      regeneration: 'none', // Must create new debts
+      regeneration: 'none',
       detectability: 'subtle',
-      storable: true, // Debts persist
-      transferable: true, // Can trade debts
-      stealable: false, // Debts are binding
+      storable: true,
+      transferable: true,
+      stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'favor', baseAmount: 1, powerMultiplier: 3.0 },
-    { type: 'oath', baseAmount: 1, powerMultiplier: 2.0 },
-  ] as any[],
+    createCost('favor', { canBeTerminal: true, recoverable: false }),
+    createCost('oath', { canBeTerminal: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'verbal', requirement: 'required' }, // Spoken agreements
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('verbal', 'required'),
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'oath_binding', strength: 'absolute', circumventable: false },
-    { type: 'equivalent_exchange', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('oath_binding', 'absolute', false),
+    createLaw('equivalent_exchange', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'debt', consequence: 'debt_called', severity: 'catastrophic', probability: 0.3, mitigatable: false },
-    { trigger: 'overuse', consequence: 'social_ruin', severity: 'severe', probability: 0.2, mitigatable: true },
-  ] as any[],
+    createRisk('debt', 'debt_called', 'catastrophic', 0.3, false),
+    createRisk('overuse', 'attention_gained', 'severe', 0.2, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'contract', rarity: 'common' },
-    { method: 'bloodline', rarity: 'uncommon' }, // Fae heritage
-  ] as any[],
+    createAcquisition('contract', 'common', { grantsAccess: ['debt_source'] }),
+    createAcquisition('bloodline', 'uncommon', { voluntary: false, grantsAccess: ['debt_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'control', 'perceive'],
   availableForms: ['mind', 'body', 'spirit'],
 
   forbiddenCombinations: [
     { technique: 'destroy', form: 'spirit', reason: 'Cannot destroy souls owed to you' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'control', form: 'mind', bonusEffect: 'Debt compulsion', powerMultiplier: 2.0 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
   powerCeiling: 200,
   allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
   allowsEnchantment: true,
-  persistsAfterDeath: true, // Debts outlive
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: false,
   foreignMagicPolicy: 'predatory',
   compatibleParadigms: ['pact'],
   conflictingParadigms: ['divine'],
-  foreignMagicEffect: 'consumes' as any,
+  foreignMagicEffect: createForeignMagicConfig('weakened'),
 };
 
 /**
@@ -517,6 +672,8 @@ export const BUREAUCRATIC_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'bureaucratic_source',
+      name: 'Official Authority',
       type: 'knowledge',
       regeneration: 'none',
       detectability: 'obvious',
@@ -524,56 +681,56 @@ export const BUREAUCRATIC_PARADIGM: MagicParadigm = {
       transferable: true,
       stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'time', baseAmount: 20, powerMultiplier: 3.0 }, // Bureaucracy is SLOW
-    { type: 'material', baseAmount: 10, powerMultiplier: 1.5 }, // Ink, paper, stamps
-    { type: 'sanity', baseAmount: 5, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+    createCost('sanity', { canBeTerminal: false, cumulative: true }),
+  ],
 
   channels: [
-    { name: 'glyph', requirement: 'required' }, // Written forms
-    { name: 'material', requirement: 'required' }, // Official paper
-    { name: 'focus', requirement: 'required' }, // Attention to detail
-  ] as any[],
+    createChannel('glyph', 'required'),
+    createChannel('material', 'required'),
+    createChannel('focus', 'required'),
+  ],
 
   laws: [
-    { type: 'true_names', strength: 'absolute', circumventable: false }, // Correct names on forms
-    { type: 'equivalent_exchange', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('true_names', 'absolute', false),
+    createLaw('equivalent_exchange', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'form_rejection', severity: 'minor', probability: 0.6, mitigatable: true },
-    { trigger: 'paradox', consequence: 'audit', severity: 'catastrophic', probability: 0.1, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'mishap', 'minor', 0.6, true),
+    createRisk('paradox', 'attention_gained', 'catastrophic', 0.1, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'apprenticeship', rarity: 'common' }, // Clerks teaching clerks
-  ] as any[],
+    createAcquisition('study', 'common', { grantsAccess: ['bureaucratic_source'] }),
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['bureaucratic_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'perceive'],
   availableForms: ['body', 'mind', 'image'],
 
   forbiddenCombinations: [
     { technique: 'destroy', form: 'spirit', reason: 'No form exists for soul destruction' },
-  ] as any[],
+  ],
 
   resonantCombinations: [],
 
   powerScaling: 'logarithmic',
-  powerCeiling: 80, // Not very powerful, but very reliable
+  powerCeiling: 80,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 1.2, // Committees
+  groupCastingMultiplier: 1.2,
   allowsEnchantment: true,
-  persistsAfterDeath: true, // Files are forever
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'requires_permit',
   compatibleParadigms: ['academic'],
   conflictingParadigms: ['chaos', 'wild'],
-  foreignMagicEffect: 'regulated' as any,
+  foreignMagicEffect: createForeignMagicConfig('weakened'),
 };
 
 /**
@@ -595,39 +752,41 @@ export const LUCK_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'luck_source',
+      name: 'Fortune',
       type: 'temporal',
-      regeneration: 'passive', // Luck regenerates over time
+      regeneration: 'passive',
       detectability: 'subtle',
       storable: false,
-      transferable: true, // Can give luck away
-      stealable: true, // Can steal luck
+      transferable: true,
+      stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'luck', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'karma', baseAmount: 5, powerMultiplier: 3.0 }, // Future debt
-  ] as any[],
+    createCost('luck', { canBeTerminal: false, cumulative: true }),
+    createCost('karma', { canBeTerminal: true, cumulative: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'equivalent_exchange', strength: 'absolute', circumventable: false },
-    { type: 'balance', strength: 'absolute', circumventable: false },
-    { type: 'entropy', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('equivalent_exchange', 'absolute', false),
+    createLaw('balance', 'absolute', false),
+    createLaw('entropy', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'catastrophic_misfortune', severity: 'catastrophic', probability: 0.5, mitigatable: false },
-    { trigger: 'debt', consequence: 'fate_backlash', severity: 'severe', probability: 0.4, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'death', 'catastrophic', 0.5, false),
+    createRisk('debt', 'backlash', 'severe', 0.4, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'rare' },
-    { method: 'contract', rarity: 'uncommon' }, // Deal with fate entities
-  ] as any[],
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['luck_source'] }),
+    createAcquisition('contract', 'uncommon', { grantsAccess: ['luck_source'] }),
+  ],
 
   availableTechniques: ['enhance', 'perceive', 'protect'],
   availableForms: ['mind', 'body'],
@@ -635,20 +794,20 @@ export const LUCK_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'enhance', form: 'body', bonusEffect: 'Improbable dodges', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
   powerCeiling: 150,
-  allowsGroupCasting: false, // Luck is personal
+  allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
-  allowsEnchantment: true, // Lucky charms
+  allowsEnchantment: true,
   persistsAfterDeath: false,
   allowsTeaching: false,
   allowsScrolls: false,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: [],
   conflictingParadigms: ['fate', 'divine'],
-  foreignMagicEffect: 'interferes' as any,
+  foreignMagicEffect: createForeignMagicConfig('backfires'),
 };
 
 /**
@@ -670,38 +829,40 @@ export const THRESHOLD_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'threshold_source',
+      name: 'Liminal Energy',
       type: 'ambient',
-      regeneration: 'none', // Must find new thresholds
+      regeneration: 'none',
       detectability: 'subtle',
       storable: false,
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'mana', baseAmount: 15, powerMultiplier: 2.0 },
-  ] as any[],
+    createCost('mana', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'material', requirement: 'required' }, // Must touch threshold
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('material', 'required'),
+  ],
 
   laws: [
-    { type: 'threshold', strength: 'absolute', circumventable: false },
-    { type: 'consent', strength: 'strong', circumventable: true }, // Invitation matters
-  ] as any[],
+    createLaw('threshold', 'absolute', false),
+    createLaw('consent', 'strong', true),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'stuck_between', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'critical_failure', consequence: 'lost_in_transition', severity: 'catastrophic', probability: 0.15, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'trapped', 'severe', 0.3, true),
+    createRisk('critical_failure', 'trapped', 'catastrophic', 0.15, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'uncommon' },
-    { method: 'study', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('awakening', 'uncommon', { voluntary: false, grantsAccess: ['threshold_source'] }),
+    createAcquisition('study', 'rare', { grantsAccess: ['threshold_source'] }),
+  ],
 
   availableTechniques: ['create', 'control', 'perceive', 'summon'],
   availableForms: ['space', 'spirit', 'void'],
@@ -710,20 +871,20 @@ export const THRESHOLD_PARADIGM: MagicParadigm = {
   resonantCombinations: [
     { technique: 'summon', form: 'spirit', bonusEffect: 'Gateway summoning', powerMultiplier: 2.0 },
     { technique: 'control', form: 'space', bonusEffect: 'Portal creation', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'step',
   powerCeiling: 120,
   allowsGroupCasting: true,
   groupCastingMultiplier: 1.5,
-  allowsEnchantment: true, // Enchanted doors
+  allowsEnchantment: true,
   persistsAfterDeath: false,
   allowsTeaching: true,
   allowsScrolls: false,
   foreignMagicPolicy: 'gateway',
   compatibleParadigms: ['spatial'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'filters_through' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -745,40 +906,42 @@ export const BELIEF_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'belief_source',
+      name: 'Collective Faith',
       type: 'social',
-      regeneration: 'prayer', // Believers sustain you
+      regeneration: 'prayer',
       detectability: 'obvious',
       storable: false,
       transferable: false,
-      stealable: true, // Can convert believers
+      stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'faith', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'attention', baseAmount: 5, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('belief', { canBeTerminal: true, cumulative: true, recoverable: false }),
+    createCost('attention', { canBeTerminal: false, cumulative: true }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'prayer', requirement: 'enhancing' },
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('prayer', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'belief', strength: 'absolute', circumventable: false },
-    { type: 'narrative', strength: 'strong', circumventable: false },
-    { type: 'witness', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('belief', 'absolute', false),
+    createLaw('narrative', 'strong', false),
+    createLaw('witness', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'faith_crisis', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'attention', consequence: 'heresy_movement', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'attention_gained', 'severe', 0.3, true),
+    createRisk('attention', 'possession', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'prayer', rarity: 'common' },
-    { method: 'awakening', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('prayer', 'common', { grantsAccess: ['belief_source'] }),
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['belief_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'enhance'],
   availableForms: ['mind', 'spirit', 'image', 'body'],
@@ -786,20 +949,20 @@ export const BELIEF_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'create', form: 'spirit', bonusEffect: 'Tulpa creation', powerMultiplier: 2.0 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
-  powerCeiling: 300, // Extremely powerful with many believers
+  powerCeiling: 300,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 3.0, // Mass belief is very powerful
+  groupCastingMultiplier: 3.0,
   allowsEnchantment: true,
-  persistsAfterDeath: true, // Ideas outlive originators
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'absorbs',
   compatibleParadigms: ['divine'],
   conflictingParadigms: ['academic'],
-  foreignMagicEffect: 'adapts_to_belief' as any,
+  foreignMagicEffect: createForeignMagicConfig('transforms'),
 };
 
 /**
@@ -821,49 +984,51 @@ export const CONSUMPTION_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'consumption_source',
+      name: 'Consumed Essence',
       type: 'material',
       regeneration: 'consumption',
       detectability: 'obvious',
       storable: false,
-      transferable: true, // Can share food
+      transferable: true,
       stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'material', baseAmount: 5, powerMultiplier: 2.0 },
-    { type: 'stamina', baseAmount: 10, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+    createCost('stamina', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'consumption', requirement: 'required' },
-  ] as any[],
+    createChannel('consumption', 'required'),
+  ],
 
   laws: [
-    { type: 'contagion', strength: 'absolute', circumventable: false },
-    { type: 'equivalent_exchange', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('contagion', 'absolute', false),
+    createLaw('equivalent_exchange', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'permanent_transformation', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'corruption', consequence: 'digestion_failure', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'mutation', 'severe', 0.3, true),
+    createRisk('corruption', 'sickness', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'uncommon' },
-    { method: 'bloodline', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('awakening', 'uncommon', { voluntary: false, grantsAccess: ['consumption_source'] }),
+    createAcquisition('bloodline', 'rare', { voluntary: false, grantsAccess: ['consumption_source'] }),
+  ],
 
   availableTechniques: ['transform', 'enhance', 'perceive'],
   availableForms: ['body', 'animal', 'plant', 'fire', 'water', 'earth', 'air'],
 
   forbiddenCombinations: [
     { technique: 'transform', form: 'spirit', reason: 'Cannot digest souls' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'enhance', form: 'body', bonusEffect: 'Predator strength', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'linear',
   powerCeiling: 100,
@@ -876,7 +1041,7 @@ export const CONSUMPTION_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['nature', 'blood_magic'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -898,37 +1063,39 @@ export const SILENCE_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'silence_source',
+      name: 'Silence',
       type: 'ambient',
       regeneration: 'passive',
-      detectability: 'undetectable', // Silent by nature
+      detectability: 'undetectable',
       storable: false,
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'mana', baseAmount: 10, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('mana', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'meditation', requirement: 'required' },
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('meditation', 'required'),
+  ],
 
   laws: [
-    { type: 'secrecy', strength: 'absolute', circumventable: false }, // Cannot speak of it
-  ] as any[],
+    createLaw('secrecy', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'permanent_silence', severity: 'severe', probability: 0.3, mitigatable: false },
-    { trigger: 'failure', consequence: 'deafness', severity: 'moderate', probability: 0.2, mitigatable: true },
-  ] as any[],
+    createRisk('overuse', 'silence', 'severe', 0.3, false),
+    createRisk('failure', 'sickness', 'moderate', 0.2, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'meditation', rarity: 'uncommon' },
-    { method: 'gift', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('meditation', 'uncommon', { grantsAccess: ['silence_source'] }),
+    createAcquisition('gift', 'rare', { voluntary: false, grantsAccess: ['silence_source'] }),
+  ],
 
   availableTechniques: ['destroy', 'protect', 'perceive', 'control'],
   availableForms: ['mind', 'air', 'void'],
@@ -936,20 +1103,20 @@ export const SILENCE_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'destroy', form: 'air', bonusEffect: 'Sound nullification', powerMultiplier: 2.0 },
-  ] as any[],
+  ],
 
   powerScaling: 'logarithmic',
   powerCeiling: 100,
-  allowsGroupCasting: false, // Silence is solitary
+  allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
   allowsEnchantment: true,
   persistsAfterDeath: false,
-  allowsTeaching: false, // Cannot speak to teach
-  allowsScrolls: false, // Cannot write about it
+  allowsTeaching: false,
+  allowsScrolls: false,
   foreignMagicPolicy: 'hostile',
   compatibleParadigms: [],
   conflictingParadigms: ['song_magic', 'verbal'],
-  foreignMagicEffect: 'mutes' as any,
+  foreignMagicEffect: createForeignMagicConfig('fails'),
 };
 
 /**
@@ -971,6 +1138,8 @@ export const PARADOX_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'paradox_source',
+      name: 'Void',
       type: 'void',
       regeneration: 'none',
       detectability: 'beacon',
@@ -978,31 +1147,31 @@ export const PARADOX_PARADIGM: MagicParadigm = {
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'sanity', baseAmount: 20, powerMultiplier: 3.0 },
-    { type: 'corruption', baseAmount: 10, powerMultiplier: 2.0 },
-  ] as any[],
+    createCost('sanity', { canBeTerminal: true, cumulative: true, recoverable: false }),
+    createCost('corruption', { canBeTerminal: true, cumulative: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'paradox', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('paradox', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'paradox', consequence: 'reality_tear', severity: 'catastrophic', probability: 0.5, mitigatable: false },
-    { trigger: 'failure', consequence: 'madness', severity: 'severe', probability: 0.4, mitigatable: false },
-    { trigger: 'critical_failure', consequence: 'paradox_spirit', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('paradox', 'bleed_through', 'catastrophic', 0.5, false),
+    createRisk('failure', 'death', 'severe', 0.4, false),
+    createRisk('critical_failure', 'paradox_spirit', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'very_rare' },
-    { method: 'stolen', rarity: 'very_rare' },
-  ] as any[],
+    createAcquisition('awakening', 'legendary', { voluntary: false, grantsAccess: ['paradox_source'] }),
+    createAcquisition('stolen', 'legendary', { grantsAccess: ['paradox_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'transform'],
   availableForms: ['void', 'time', 'space'],
@@ -1011,17 +1180,17 @@ export const PARADOX_PARADIGM: MagicParadigm = {
   resonantCombinations: [],
 
   powerScaling: 'exponential',
-  powerCeiling: 500, // Extremely powerful but extremely dangerous
+  powerCeiling: 500,
   allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
   allowsEnchantment: false,
   persistsAfterDeath: false,
-  allowsTeaching: false, // Too dangerous
+  allowsTeaching: false,
   allowsScrolls: false,
   foreignMagicPolicy: 'annihilates',
   compatibleParadigms: [],
   conflictingParadigms: ['all'],
-  foreignMagicEffect: 'destroys' as any,
+  foreignMagicEffect: createForeignMagicConfig('fails'),
 };
 
 /**
@@ -1043,63 +1212,65 @@ export const ECHO_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'echo_source',
+      name: 'Temporal Echoes',
       type: 'temporal',
-      regeneration: 'none', // Past is finite
+      regeneration: 'none',
       detectability: 'subtle',
       storable: true,
       transferable: true,
       stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'memory', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'time', baseAmount: 5, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('memory', { canBeTerminal: false, cumulative: true }),
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'meditation', requirement: 'enhancing' },
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('meditation', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'contagion', strength: 'strong', circumventable: false },
-    { type: 'cycles', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('contagion', 'strong', false),
+    createLaw('cycles', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'lost_in_past', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'failure', consequence: 'echo_loop', severity: 'moderate', probability: 0.2, mitigatable: true },
-  ] as any[],
+    createRisk('overuse', 'trapped', 'severe', 0.3, true),
+    createRisk('failure', 'echo', 'moderate', 0.2, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'meditation', rarity: 'uncommon' },
-    { method: 'awakening', rarity: 'rare' },
-  ] as any[],
+    createAcquisition('meditation', 'uncommon', { grantsAccess: ['echo_source'] }),
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['echo_source'] }),
+  ],
 
   availableTechniques: ['perceive', 'create', 'transform'],
   availableForms: ['mind', 'image', 'time'],
 
   forbiddenCombinations: [
     { technique: 'destroy', form: 'time', reason: 'Cannot erase the past' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'perceive', form: 'time', bonusEffect: 'Perfect recall', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'linear',
   powerCeiling: 100,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 1.5, // Shared memories
+  groupCastingMultiplier: 1.5,
   allowsEnchantment: true,
-  persistsAfterDeath: true, // Memories persist
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['temporal'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -1121,38 +1292,40 @@ export const GAME_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'game_source',
+      name: 'Wagers',
       type: 'social',
       regeneration: 'none',
       detectability: 'obvious',
       storable: false,
-      transferable: true, // Can bet stakes
-      stealable: false, // Must win fairly
+      transferable: true,
+      stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'oath', baseAmount: 10, powerMultiplier: 2.0 },
-  ] as any[],
+    createCost('oath', { canBeTerminal: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'verbal', requirement: 'required' }, // Must agree to rules
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('verbal', 'required'),
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'oath_binding', strength: 'absolute', circumventable: false },
-    { type: 'consent', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('oath_binding', 'absolute', false),
+    createLaw('consent', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'lose_stakes', severity: 'catastrophic', probability: 0.5, mitigatable: false },
-    { trigger: 'overreach', consequence: 'eternal_game', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'debt_called', 'catastrophic', 0.5, false),
+    createRisk('overreach', 'trapped', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'uncommon' },
-    { method: 'contract', rarity: 'common' },
-  ] as any[],
+    createAcquisition('awakening', 'uncommon', { voluntary: false, grantsAccess: ['game_source'] }),
+    createAcquisition('contract', 'common', { grantsAccess: ['game_source'] }),
+  ],
 
   availableTechniques: ['create', 'control', 'perceive'],
   availableForms: ['mind', 'spirit'],
@@ -1160,20 +1333,20 @@ export const GAME_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'perceive', form: 'mind', bonusEffect: 'Read opponent', powerMultiplier: 1.6 },
-  ] as any[],
+  ],
 
   powerScaling: 'step',
   powerCeiling: 200,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 2.0, // Team games
-  allowsEnchantment: true, // Game pieces
-  persistsAfterDeath: true, // Games outlive players
+  groupCastingMultiplier: 2.0,
+  allowsEnchantment: true,
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['debt_magic', 'fae'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -1195,40 +1368,42 @@ export const CRAFT_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'craft_source',
+      name: 'Creative Intent',
       type: 'knowledge',
       regeneration: 'none',
       detectability: 'subtle',
-      storable: true, // In finished items
+      storable: true,
       transferable: true,
-      stealable: false, // Must craft yourself
+      stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'material', baseAmount: 15, powerMultiplier: 2.0 },
-    { type: 'time', baseAmount: 20, powerMultiplier: 2.5 },
-    { type: 'stamina', baseAmount: 10, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+    createCost('time', { canBeTerminal: false, recoverable: false }),
+    createCost('stamina', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'material', requirement: 'required' },
-    { name: 'focus', requirement: 'required' },
-  ] as any[],
+    createChannel('material', 'required'),
+    createChannel('focus', 'required'),
+  ],
 
   laws: [
-    { type: 'equivalent_exchange', strength: 'strong', circumventable: false },
-    { type: 'resonance', strength: 'strong', circumventable: false },
-  ] as any[],
+    createLaw('equivalent_exchange', 'strong', false),
+    createLaw('resonance', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'cursed_item', severity: 'moderate', probability: 0.2, mitigatable: true },
-    { trigger: 'overuse', consequence: 'craft_obsession', severity: 'severe', probability: 0.15, mitigatable: true },
-  ] as any[],
+    createRisk('failure', 'curse', 'moderate', 0.2, true),
+    createRisk('overuse', 'addiction_worsens', 'severe', 0.15, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'apprenticeship', rarity: 'common' },
-    { method: 'study', rarity: 'common' },
-  ] as any[],
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['craft_source'] }),
+    createAcquisition('study', 'common', { grantsAccess: ['craft_source'] }),
+  ],
 
   availableTechniques: ['create', 'enhance', 'protect'],
   availableForms: ['body', 'fire', 'water', 'earth', 'air'],
@@ -1237,20 +1412,20 @@ export const CRAFT_PARADIGM: MagicParadigm = {
   resonantCombinations: [
     { technique: 'create', form: 'earth', bonusEffect: 'Dwarven metalwork', powerMultiplier: 1.8 },
     { technique: 'enhance', form: 'body', bonusEffect: 'Masterwork weapons', powerMultiplier: 1.6 },
-  ] as any[],
+  ],
 
   powerScaling: 'linear',
   powerCeiling: 120,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 1.5, // Workshops
+  groupCastingMultiplier: 1.5,
   allowsEnchantment: true,
-  persistsAfterDeath: true, // Artifacts outlive makers
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['academic', 'rune'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -1272,39 +1447,41 @@ export const COMMERCE_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'commerce_source',
+      name: 'Trade Agreements',
       type: 'social',
       regeneration: 'none',
       detectability: 'subtle',
-      storable: true, // In currency
+      storable: true,
       transferable: true,
-      stealable: false, // Must trade fairly
+      stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'gold', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'oath', baseAmount: 5, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('gold', { canBeTerminal: false, recoverable: false }),
+    createCost('oath', { canBeTerminal: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'verbal', requirement: 'required' }, // Negotiation
-    { name: 'material', requirement: 'required' }, // Currency
-  ] as any[],
+    createChannel('verbal', 'required'),
+    createChannel('material', 'required'),
+  ],
 
   laws: [
-    { type: 'equivalent_exchange', strength: 'absolute', circumventable: false },
-    { type: 'consent', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('equivalent_exchange', 'absolute', false),
+    createLaw('consent', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'market_crash', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'overreach', consequence: 'bankruptcy', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('failure', 'backlash', 'severe', 0.3, true),
+    createRisk('overreach', 'debt_called', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'apprenticeship', rarity: 'common' },
-    { method: 'study', rarity: 'common' },
-  ] as any[],
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['commerce_source'] }),
+    createAcquisition('study', 'common', { grantsAccess: ['commerce_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'perceive'],
   availableForms: ['mind', 'body', 'image'],
@@ -1312,12 +1489,12 @@ export const COMMERCE_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'perceive', form: 'mind', bonusEffect: 'Read market', powerMultiplier: 1.5 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
   powerCeiling: 150,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 2.0, // Merchant guilds
+  groupCastingMultiplier: 2.0,
   allowsEnchantment: true,
   persistsAfterDeath: false,
   allowsTeaching: true,
@@ -1325,7 +1502,7 @@ export const COMMERCE_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'trades_with',
   compatibleParadigms: ['debt_magic'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'trade_for' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 // ============================================================================
@@ -1351,38 +1528,40 @@ export const LUNAR_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'lunar_source',
+      name: 'Moonlight',
       type: 'ambient',
       regeneration: 'passive',
       detectability: 'obvious',
-      storable: true, // Moonlight can be bottled
+      storable: true,
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'mana', baseAmount: 10, powerMultiplier: 1.5 },
-    { type: 'sanity', baseAmount: 5, powerMultiplier: 2.0 }, // Moon madness
-  ] as any[],
+    createCost('mana', { canBeTerminal: false }),
+    createCost('sanity', { canBeTerminal: false, cumulative: true }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'meditation', requirement: 'enhancing' },
-  ] as any[],
+    createChannel('will', 'required'),
+    createChannel('meditation', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'cycles', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('cycles', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'moon_madness', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'emotional', consequence: 'transformation', severity: 'catastrophic', probability: 0.1, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'mutation', 'severe', 0.3, true),
+    createRisk('emotional', 'mutation', 'catastrophic', 0.1, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'uncommon' },
-    { method: 'bloodline', rarity: 'rare' }, // Lycanthropy
-  ] as any[],
+    createAcquisition('awakening', 'uncommon', { voluntary: false, grantsAccess: ['lunar_source'] }),
+    createAcquisition('bloodline', 'rare', { voluntary: false, grantsAccess: ['lunar_source'] }),
+  ],
 
   availableTechniques: ['create', 'transform', 'enhance', 'control'],
   availableForms: ['water', 'mind', 'body', 'animal'],
@@ -1391,10 +1570,10 @@ export const LUNAR_PARADIGM: MagicParadigm = {
   resonantCombinations: [
     { technique: 'transform', form: 'body', bonusEffect: 'Lycanthropy', powerMultiplier: 2.5 },
     { technique: 'control', form: 'water', bonusEffect: 'Tide manipulation', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'step',
-  powerCeiling: 200, // At full moon
+  powerCeiling: 200,
   allowsGroupCasting: true,
   groupCastingMultiplier: 2.0,
   allowsEnchantment: true,
@@ -1404,7 +1583,7 @@ export const LUNAR_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['nature', 'cycles'],
   conflictingParadigms: ['solar'],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -1426,6 +1605,8 @@ export const SEASONAL_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'seasonal_source',
+      name: 'Seasonal Energy',
       type: 'ambient',
       regeneration: 'passive',
       detectability: 'subtle',
@@ -1433,28 +1614,28 @@ export const SEASONAL_PARADIGM: MagicParadigm = {
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'mana', baseAmount: 10, powerMultiplier: 1.5 },
-  ] as any[],
+    createCost('mana', { canBeTerminal: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'cycles', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('cycles', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'seasonal_lock', severity: 'catastrophic', probability: 0.2, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'trapped', 'catastrophic', 0.2, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'uncommon' },
-    { method: 'bloodline', rarity: 'rare' }, // Fae heritage
-  ] as any[],
+    createAcquisition('awakening', 'uncommon', { voluntary: false, grantsAccess: ['seasonal_source'] }),
+    createAcquisition('bloodline', 'rare', { voluntary: false, grantsAccess: ['seasonal_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'transform', 'enhance'],
   availableForms: ['plant', 'fire', 'water', 'earth', 'air', 'body'],
@@ -1465,7 +1646,7 @@ export const SEASONAL_PARADIGM: MagicParadigm = {
     { technique: 'create', form: 'fire', bonusEffect: 'Summer heat', powerMultiplier: 1.8 },
     { technique: 'destroy', form: 'plant', bonusEffect: 'Autumn harvest', powerMultiplier: 1.6 },
     { technique: 'destroy', form: 'body', bonusEffect: 'Winter death', powerMultiplier: 1.8 },
-  ] as any[],
+  ],
 
   powerScaling: 'step',
   powerCeiling: 150,
@@ -1478,7 +1659,7 @@ export const SEASONAL_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['nature', 'fae'],
   conflictingParadigms: [],
-  foreignMagicEffect: 'coexistent' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 /**
@@ -1500,37 +1681,39 @@ export const AGE_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'age_source',
+      name: 'Lifespan',
       type: 'temporal',
-      regeneration: 'none', // Cannot regain lost years
+      regeneration: 'none',
       detectability: 'obvious',
       storable: false,
-      transferable: true, // Can steal/give years
+      transferable: true,
       stealable: true,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'lifespan', baseAmount: 1, powerMultiplier: 5.0 }, // Years of life
-  ] as any[],
+    createCost('lifespan', { canBeTerminal: true, cumulative: true, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-  ] as any[],
+    createChannel('will', 'required'),
+  ],
 
   laws: [
-    { type: 'equivalent_exchange', strength: 'absolute', circumventable: false },
-    { type: 'balance', strength: 'absolute', circumventable: false },
-  ] as any[],
+    createLaw('equivalent_exchange', 'absolute', false),
+    createLaw('balance', 'absolute', false),
+  ],
 
   risks: [
-    { trigger: 'overuse', consequence: 'rapid_aging', severity: 'catastrophic', probability: 0.4, mitigatable: false },
-    { trigger: 'failure', consequence: 'death', severity: 'catastrophic', probability: 0.3, mitigatable: false },
-  ] as any[],
+    createRisk('overuse', 'aging', 'catastrophic', 0.4, false),
+    createRisk('failure', 'death', 'catastrophic', 0.3, false),
+  ],
 
   acquisitionMethods: [
-    { method: 'awakening', rarity: 'rare' },
-    { method: 'contract', rarity: 'very_rare' },
-  ] as any[],
+    createAcquisition('awakening', 'rare', { voluntary: false, grantsAccess: ['age_source'] }),
+    createAcquisition('contract', 'legendary', { grantsAccess: ['age_source'] }),
+  ],
 
   availableTechniques: ['create', 'destroy', 'transform', 'enhance'],
   availableForms: ['time', 'body', 'mind'],
@@ -1538,20 +1721,20 @@ export const AGE_PARADIGM: MagicParadigm = {
   forbiddenCombinations: [],
   resonantCombinations: [
     { technique: 'transform', form: 'body', bonusEffect: 'Age reversal', powerMultiplier: 3.0 },
-  ] as any[],
+  ],
 
   powerScaling: 'exponential',
-  powerCeiling: 300, // Extremely powerful
-  allowsGroupCasting: false, // Cannot share lifespan easily
+  powerCeiling: 300,
+  allowsGroupCasting: false,
   groupCastingMultiplier: 1.0,
   allowsEnchantment: true,
   persistsAfterDeath: false,
-  allowsTeaching: false, // Too dangerous
+  allowsTeaching: false,
   allowsScrolls: false,
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: [],
   conflictingParadigms: ['divine', 'nature'],
-  foreignMagicEffect: 'temporal_interference' as any,
+  foreignMagicEffect: createForeignMagicConfig('backfires'),
 };
 
 // ============================================================================
@@ -1577,6 +1760,8 @@ export const SHINTO_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'shinto_source',
+      name: 'Kami Favor',
       type: 'ancestral',
       regeneration: 'ritual',
       detectability: 'subtle',
@@ -1584,61 +1769,61 @@ export const SHINTO_PARADIGM: MagicParadigm = {
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'favor', baseAmount: 5, powerMultiplier: 1.5 },
-    { type: 'material', baseAmount: 10, powerMultiplier: 2.0 }, // Offerings
-  ] as any[],
+    createCost('favor', { canBeTerminal: false }),
+    createCost('material', { canBeTerminal: false, recoverable: false }),
+  ],
 
   channels: [
-    { name: 'prayer', requirement: 'required' },
-    { name: 'material', requirement: 'required' }, // Offerings
-    { name: 'glyph', requirement: 'enhancing' }, // Talismans
-  ] as any[],
+    createChannel('prayer', 'required'),
+    createChannel('material', 'required'),
+    createChannel('glyph', 'enhancing'),
+  ],
 
   laws: [
-    { type: 'consent', strength: 'absolute', circumventable: false }, // Kami must agree
-    { type: 'sacrifice', strength: 'strong', circumventable: false },
-    { type: 'threshold', strength: 'strong', circumventable: false }, // Torii gates
-  ] as any[],
+    createLaw('consent', 'absolute', false),
+    createLaw('sacrifice', 'strong', false),
+    createLaw('threshold', 'strong', false),
+  ],
 
   risks: [
-    { trigger: 'divine_anger', consequence: 'curse', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'failure', consequence: 'spiritual_pollution', severity: 'moderate', probability: 0.2, mitigatable: true },
-  ] as any[],
+    createRisk('divine_anger', 'curse', 'severe', 0.3, true),
+    createRisk('failure', 'sickness', 'moderate', 0.2, true),
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'apprenticeship', rarity: 'common' }, // Shrine maidens, priests
-    { method: 'bloodline', rarity: 'uncommon' }, // Descended from kami
-  ] as any[],
+    createAcquisition('study', 'common', { grantsAccess: ['shinto_source'] }),
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['shinto_source'] }),
+    createAcquisition('bloodline', 'uncommon', { voluntary: false, grantsAccess: ['shinto_source'] }),
+  ],
 
   availableTechniques: ['create', 'protect', 'perceive', 'enhance', 'summon'],
   availableForms: ['water', 'earth', 'plant', 'animal', 'spirit', 'body'],
 
   forbiddenCombinations: [
     { technique: 'destroy', form: 'spirit', reason: 'Cannot destroy kami' },
-  ] as any[],
+  ],
 
   resonantCombinations: [
     { technique: 'protect', form: 'body', bonusEffect: 'Omamori charm', powerMultiplier: 1.6 },
     { technique: 'summon', form: 'spirit', bonusEffect: 'Kami invocation', powerMultiplier: 2.0 },
     { technique: 'perceive', form: 'spirit', bonusEffect: 'See kami', powerMultiplier: 1.5 },
-  ] as any[],
+  ],
 
   powerScaling: 'logarithmic',
   powerCeiling: 120,
   allowsGroupCasting: true,
-  groupCastingMultiplier: 1.8, // Festival rituals
-  allowsEnchantment: true, // Talismans, blessed items
-  persistsAfterDeath: true, // Become kami yourself
+  groupCastingMultiplier: 1.8,
+  allowsEnchantment: true,
+  persistsAfterDeath: true,
   allowsTeaching: true,
   allowsScrolls: true,
   foreignMagicPolicy: 'tolerant',
   compatibleParadigms: ['ancestral', 'nature', 'threshold'],
   conflictingParadigms: ['void', 'blood_magic'],
-  foreignMagicEffect: 'spirit_mediates' as any,
+  foreignMagicEffect: createForeignMagicConfig('works_normally'),
 };
 
 // ============================================================================

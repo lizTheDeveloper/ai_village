@@ -96,12 +96,16 @@ export class DeltaSyncSystem extends BaseSystem {
     const dirtyFlag = entity.getComponent('dirty_for_sync');
 
     // Determine if we need to send full component data
-    const isNew = dirtyFlag && (dirtyFlag as any).reason === 'new';
+    const dirtyData = dirtyFlag as { reason: 'new' | 'path_changed' | 'forced' } | undefined;
+    const isNew = dirtyData && dirtyData.reason === 'new';
+
+    const posData = position as { x: number; y: number } | undefined;
+    const predictionData = pathPrediction as { prediction: unknown } | undefined;
 
     const update: DeltaUpdate['updates'][0] = {
       entityId: entity.id,
-      position: position ? { x: (position as any).x, y: (position as any).y } : { x: 0, y: 0 },
-      prediction: pathPrediction ? (pathPrediction as any).prediction : null,
+      position: posData ? { x: posData.x, y: posData.y } : { x: 0, y: 0 },
+      prediction: predictionData ? predictionData.prediction : null,
     };
 
     // For new entities or forced updates, include full component data

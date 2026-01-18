@@ -2296,8 +2296,6 @@ export class DevPanel implements IWindowPanel {
       }
     }
 
-    console.log(`[DevPanel] ✅ Placed fully-built: ${blueprint.name} at (${originX}, ${originY}) - ${parsedTiles.length} tiles`);
-    console.log(`[DevPanel] Tile details:`, parsedTiles.map(t => `${t.type}@(${t.x},${t.y})`).slice(0, 5));
     this.log(`Placed fully-built: ${blueprint.name} at (${originX}, ${originY}) - ${parsedTiles.length} tiles`);
   }
 

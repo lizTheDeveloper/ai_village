@@ -27,6 +27,8 @@ export class InterestsSystem extends BaseSystem {
   public readonly id: SystemId = CT.Interests;
   public readonly priority: number = 46; // After basic needs, before mood
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Interests];
+  // Only run when interests components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Interests] as const;
   protected readonly throttleInterval = 100; // Every 2 game hours (100 ticks at 20 tps)
 
   /** Base rate of hunger growth per update cycle (0-1 scale) */

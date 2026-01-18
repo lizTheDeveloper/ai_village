@@ -54,6 +54,23 @@ import {
 
 import { TerrainGenerator, ChunkManager } from '@ai-village/world';
 import { createWanderingAgent } from '@ai-village/agents';
+import type { Entity } from '@ai-village/core';
+
+// =============================================================================
+// INTERNAL TYPE EXTENSIONS
+// =============================================================================
+
+// Internal World API type for _addEntity and _worldEntityId
+interface WorldInternal extends World {
+  _addEntity(entity: Entity): void;
+  _worldEntityId: string;
+}
+
+// GameLoop with public tick method
+interface GameLoopWithTick extends GameLoop {
+  tick(deltaTime: number): void;
+  world: World;
+}
 
 // =============================================================================
 // TYPES
@@ -170,8 +187,6 @@ export class HeadlessCitySimulator {
     // Register systems based on preset
     this.registerSystemsForPreset();
 
-    console.log(`[HeadlessSimulator] Initialized with preset: ${this.preset}`);
-
     // Initialize city manager with manual control enabled
     this.cityManager = new CityManager({
       decisionInterval: 14400,  // 1 day
@@ -207,8 +222,6 @@ export class HeadlessCitySimulator {
       enableAutoSave: false, // Disable auto-save
       plantSystems,
     });
-
-    console.log('[HeadlessSimulator] Registered full game systems (headless)');
   }
 
   // ---------------------------------------------------------------------------
@@ -234,7 +247,6 @@ export class HeadlessCitySimulator {
       maxSnapshots: 50,  // Limit to 50 snapshots (vs default 100)
       maxAge: 24 * 60 * 60 * 1000,  // 24 hours - daily cleanup
     });
-    console.log('[HeadlessSimulator] Configured Timeline: sparse snapshots (1min, 5min, 10min, then hourly) with 24hr retention');
 
     // Create world entities
     const world = this.gameLoop.world;
@@ -273,7 +285,6 @@ export class HeadlessCitySimulator {
     });
 
     // Spawn initial population
-    console.log(`[HeadlessSimulator] Spawning ${initialPopulation} agents...`);
     for (let i = 0; i < initialPopulation!; i++) {
       // For large-city preset, spread agents across entire city
       const spawnRadius = this.preset === 'large-city' ? 80 : 20;
@@ -293,14 +304,10 @@ export class HeadlessCitySimulator {
       }
     }
 
-    console.log(`[HeadlessSimulator] Initialized ${this.preset} preset with ${initialPopulation} agents`);
-
     // Run initial stabilization (following test pattern)
-    console.log('[HeadlessSimulator] Running initial stabilization...');
     for (let i = 0; i < 1000; i++) {
       (this.gameLoop as any).tick(0.05);
     }
-    console.log('[HeadlessSimulator] Stabilization complete');
 
     // Force initial stats update so UI shows correct values immediately
     this.cityManager.tick(this.gameLoop.world);
@@ -526,7 +533,6 @@ export class HeadlessCitySimulator {
         storage.addComponent(inventory);
         (world as any)._addEntity(storage);
       }
-      console.log(`  Created 9 storage buildings with ${foodPerStorage} food each`);
     } else {
       // Basic/population-growth: Single storage near center
       const storage = new EntityImpl(createEntityId(), 0);
@@ -549,7 +555,6 @@ export class HeadlessCitySimulator {
       shelter.addComponent(createPositionComponent(cityCenter.x + 5, cityCenter.y + 5));
       shelter.addComponent(createRenderableComponent('bedroll', 'object'));
       (world as any)._addEntity(shelter);
-      console.log('  Created shelter (bedroll placeholder)');
     }
 
     // Initial shelter
@@ -558,9 +563,6 @@ export class HeadlessCitySimulator {
     shelter.addComponent(createPositionComponent(cityCenter.x - 3, cityCenter.y));
     shelter.addComponent(createRenderableComponent('bedroll', 'object'));
     (world as any)._addEntity(shelter);
-
-    const buildingCount = this.preset === 'large-city' ? 11 : (this.preset === 'basic' ? 4 : 3);
-    console.log(`  Created ${buildingCount} initial buildings for ${this.preset} preset`);
   }
 
   private createResources(world: World, bounds: { minX: number; maxX: number; minY: number; maxY: number }): void {
@@ -629,7 +631,5 @@ export class HeadlessCitySimulator {
       food.addComponent(createRenderableComponent('blueberry-bush', 'object'));
       (world as any)._addEntity(food);
     }
-
-    console.log('  Created 30 trees, 20 stone deposits, 15 berry bushes');
   }
 }

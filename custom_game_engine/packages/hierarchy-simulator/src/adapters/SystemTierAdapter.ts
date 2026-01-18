@@ -38,10 +38,46 @@ export interface SystemResourceSummary {
   habitableCount: number;
 }
 
+// ============================================================================
+// Frozen Lookup Tables and Constants
+// ============================================================================
+
+interface StarParams {
+  mass: number;
+  luminosity: number;
+  sqrtLuminosity: number; // Precomputed sqrt for performance
+}
+
+const STAR_PARAMS: Readonly<Record<string, StarParams>> = Object.freeze({
+  O: { mass: 50, luminosity: 500000, sqrtLuminosity: 707.1067811865476 },
+  B: { mass: 8, luminosity: 10000, sqrtLuminosity: 100 },
+  A: { mass: 2, luminosity: 50, sqrtLuminosity: 7.0710678118654755 },
+  F: { mass: 1.3, luminosity: 3, sqrtLuminosity: 1.7320508075688772 },
+  G: { mass: 1.0, luminosity: 1.0, sqrtLuminosity: 1.0 },
+  K: { mass: 0.7, luminosity: 0.3, sqrtLuminosity: 0.5477225575051661 },
+  M: { mass: 0.3, luminosity: 0.05, sqrtLuminosity: 0.2236067977499789 },
+});
+
+// Habitable zone constants (precomputed)
+const HZ_INNER_MULTIPLIER = 0.95;
+const HZ_OUTER_MULTIPLIER = 1.37;
+
+// Tech level thresholds
+const TECH_SPACEFARING = 7;
+const TECH_FTL_CAPABLE = 9;
+
+// Climate normalization constant
+const CLIMATE_NORM = 0.01; // 1/100
+
 /**
  * Adapter for managing AbstractSystem with multiple planets.
  */
 export class SystemTierAdapter {
+  // Cache for orbital distance calculations
+  private static orbitalDistanceCache = new Map<string, number>();
+
+  // Cache for habitable zone calculations
+  private static habitableZoneCache = new Map<string, AbstractPlanet[]>();
   /**
    * Create an AbstractSystem from multiple Planet instances.
    *
@@ -104,14 +140,26 @@ export class SystemTierAdapter {
    *
    * Returns AbstractPlanet children that fall within the habitable zone
    * based on their inferred orbital distance.
+   *
+   * Results are cached for performance during zoom operations.
    */
   static getPlanetsInHabitableZone(abstractSystem: AbstractSystem): AbstractPlanet[] {
     if (!abstractSystem) {
       throw new Error('SystemTierAdapter.getPlanetsInHabitableZone: abstractSystem parameter is required');
     }
 
+    // Cache key based on system ID and children hash
+    const cacheKey = `${abstractSystem.id}_${abstractSystem.children.length}`;
+    const cached = this.habitableZoneCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
     const habitableZone = abstractSystem.habitableZone;
     const planets: AbstractPlanet[] = [];
+
+    // Cache habitable zone bounds for loop
+    const hzInner = habitableZone.inner;
+    const hzOuter = habitableZone.outer;
+    const luminosity = abstractSystem.star.luminosity;
 
     for (const child of abstractSystem.children) {
       if (child.tier !== 'planet') {
@@ -121,17 +169,15 @@ export class SystemTierAdapter {
       const abstractPlanet = child as AbstractPlanet;
 
       // Infer orbital distance from planet temperature
-      const orbitalDistance = this.inferOrbitalDistance(
-        abstractPlanet,
-        abstractSystem.star.luminosity
-      );
+      const orbitalDistance = this.inferOrbitalDistance(abstractPlanet, luminosity);
 
       // Check if in habitable zone
-      if (orbitalDistance >= habitableZone.inner && orbitalDistance <= habitableZone.outer) {
+      if (orbitalDistance >= hzInner && orbitalDistance <= hzOuter) {
         planets.push(abstractPlanet);
       }
     }
 
+    this.habitableZoneCache.set(cacheKey, planets);
     return planets;
   }
 
@@ -139,6 +185,7 @@ export class SystemTierAdapter {
    * Get aggregated resource summary for entire star system.
    *
    * Sums resources across all planets, asteroid belts, and orbital infrastructure.
+   * Single-pass optimization: Combines planet filtering, habitable zone checks, and resource aggregation.
    */
   static getSystemResources(abstractSystem: AbstractSystem): SystemResourceSummary {
     if (!abstractSystem) {
@@ -153,7 +200,12 @@ export class SystemTierAdapter {
     let planetCount = 0;
     let habitableCount = 0;
 
-    // Aggregate from planets
+    // Cache habitable zone bounds outside loop
+    const hzInner = abstractSystem.habitableZone.inner;
+    const hzOuter = abstractSystem.habitableZone.outer;
+    const luminosity = abstractSystem.star.luminosity;
+
+    // Single pass through children
     for (const child of abstractSystem.children) {
       if (child.tier !== 'planet') {
         continue;
@@ -163,31 +215,26 @@ export class SystemTierAdapter {
       const abstractPlanet = child as AbstractPlanet;
 
       // Check if habitable
-      const orbitalDistance = this.inferOrbitalDistance(
-        abstractPlanet,
-        abstractSystem.star.luminosity
-      );
-      if (
-        orbitalDistance >= abstractSystem.habitableZone.inner &&
-        orbitalDistance <= abstractSystem.habitableZone.outer
-      ) {
+      const orbitalDistance = this.inferOrbitalDistance(abstractPlanet, luminosity);
+      if (orbitalDistance >= hzInner && orbitalDistance <= hzOuter) {
         habitableCount++;
       }
 
-      // Add planet resources
-      const resources = PlanetTierAdapter.getResourceSummary(abstractPlanet);
-      totalWater += resources.water;
-      totalMetals += resources.metals;
-      totalRareEarths += resources.rare_earths;
-      totalFossilFuels += resources.fossil_fuels;
-      totalGeothermalEnergy += resources.geothermal_energy;
+      // Add planet resources (inline to avoid function call and intermediate object)
+      const resourceMap = abstractPlanet.planetaryStats.resourceAbundance;
+      totalWater += resourceMap.get('water') ?? 0;
+      totalMetals += resourceMap.get('metals') ?? 0;
+      totalRareEarths += resourceMap.get('rare_earths') ?? 0;
+      totalFossilFuels += resourceMap.get('fossil_fuels') ?? 0;
+      totalGeothermalEnergy += resourceMap.get('geothermal_energy') ?? 0;
     }
 
-    // Add asteroid belt resources
+    // Add asteroid belt resources (separate loop for clarity)
     for (const belt of abstractSystem.asteroidBelts) {
-      totalMetals += belt.resourceYield.get('metals') ?? 0;
-      totalRareEarths += belt.resourceYield.get('rare_minerals') ?? 0;
-      totalWater += belt.resourceYield.get('water_ice') ?? 0;
+      const beltYield = belt.resourceYield;
+      totalMetals += beltYield.get('metals') ?? 0;
+      totalRareEarths += beltYield.get('rare_minerals') ?? 0;
+      totalWater += beltYield.get('water_ice') ?? 0;
     }
 
     return {
@@ -265,23 +312,13 @@ export class SystemTierAdapter {
 
   /**
    * Update star parameters based on spectral type.
+   * Uses precomputed sqrt(luminosity) for performance.
    */
   private static updateStarParameters(
     abstractSystem: AbstractSystem,
     starType: 'O' | 'B' | 'A' | 'F' | 'G' | 'K' | 'M'
   ): void {
-    // Stellar parameters by type (simplified from main sequence)
-    const params: Record<string, { mass: number; luminosity: number }> = {
-      O: { mass: 50, luminosity: 500000 },
-      B: { mass: 8, luminosity: 10000 },
-      A: { mass: 2, luminosity: 50 },
-      F: { mass: 1.3, luminosity: 3 },
-      G: { mass: 1.0, luminosity: 1.0 }, // Sun-like
-      K: { mass: 0.7, luminosity: 0.3 },
-      M: { mass: 0.3, luminosity: 0.05 },
-    };
-
-    const param = params[starType];
+    const param = STAR_PARAMS[starType];
     if (!param) {
       throw new Error(`SystemTierAdapter.updateStarParameters: invalid star type ${starType}`);
     }
@@ -289,16 +326,17 @@ export class SystemTierAdapter {
     abstractSystem.star.mass = param.mass;
     abstractSystem.star.luminosity = param.luminosity;
 
-    // Recalculate habitable zone
-    const sqrtL = Math.sqrt(param.luminosity);
+    // Use precomputed sqrt for habitable zone (avoids Math.sqrt call)
+    const sqrtL = param.sqrtLuminosity;
     abstractSystem.habitableZone = {
-      inner: 0.95 * sqrtL,
-      outer: 1.37 * sqrtL,
+      inner: HZ_INNER_MULTIPLIER * sqrtL,
+      outer: HZ_OUTER_MULTIPLIER * sqrtL,
     };
   }
 
   /**
    * Sync system-level statistics from child planets.
+   * Single-pass optimization: Aggregates all stats in one loop.
    */
   private static syncSystemStats(abstractSystem: AbstractSystem): void {
     let totalPopulation = 0;
@@ -306,15 +344,19 @@ export class SystemTierAdapter {
     let spacefaringCount = 0;
     let ftlCapableCount = 0;
 
+    // Single pass through children
     for (const child of abstractSystem.children) {
       totalPopulation += child.getTotalPopulation();
-      maxTechLevel = Math.max(maxTechLevel, child.tech.level);
 
-      if (child.tech.level >= 7) {
-        spacefaringCount++;
-      }
-      if (child.tech.level >= 9) {
+      const techLevel = child.tech.level;
+      maxTechLevel = Math.max(maxTechLevel, techLevel);
+
+      // Combined threshold checks (avoid double-checking same condition)
+      if (techLevel >= TECH_FTL_CAPABLE) {
         ftlCapableCount++;
+        spacefaringCount++; // FTL implies spacefaring
+      } else if (techLevel >= TECH_SPACEFARING) {
+        spacefaringCount++;
       }
     }
 
@@ -331,32 +373,36 @@ export class SystemTierAdapter {
    * Infer orbital distance from planet temperature characteristics.
    *
    * Uses climate zones to estimate how far the planet is from its star.
+   * Cached for performance during repeated habitable zone checks.
    */
   private static inferOrbitalDistance(
     abstractPlanet: AbstractPlanet,
     starLuminosity: number
   ): number {
+    // Cache key: planet ID + luminosity
+    const cacheKey = `${abstractPlanet.id}_${starLuminosity}`;
+    const cached = this.orbitalDistanceCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
     const climateZones = abstractPlanet.planetaryStats.climateZones;
 
-    // High tropical/desert = hot planet = close to star
-    // High polar/ice = cold planet = far from star
-    const heatIndex = (climateZones.tropical + climateZones.desert) / 100;
-    const coldIndex = climateZones.polar / 100;
+    // Combine operations: (a + b) / 100 = (a + b) * 0.01
+    const heatIndex = (climateZones.tropical + climateZones.desert) * CLIMATE_NORM;
+    const coldIndex = climateZones.polar * CLIMATE_NORM;
 
     // Temperature gradient: -1 (very cold) to +1 (very hot)
     const temperatureGradient = heatIndex - coldIndex;
 
     // Map temperature to orbital distance
     // Hot planets: 0.5 AU, Temperate: 1.0 AU, Cold: 2.0 AU (scaled by luminosity)
-    const sqrtL = Math.sqrt(starLuminosity);
-    const baseDistance = 1.0 * sqrtL; // Earth-equivalent at 1 AU for Sun-like star
+    const sqrtL = Math.sqrt(starLuminosity); // Only sqrt we can't precompute (dynamic luminosity)
+    const baseDistance = sqrtL; // 1.0 * sqrtL
 
-    // Adjust based on temperature
-    // temperatureGradient = +1 -> 0.5x distance
-    // temperatureGradient = 0 -> 1.0x distance
-    // temperatureGradient = -1 -> 2.0x distance
+    // Combine operations: 1.0 - (gradient * 0.5) = 1.0 - gradient * 0.5
     const distanceMultiplier = 1.0 - (temperatureGradient * 0.5);
 
-    return baseDistance * distanceMultiplier;
+    const result = baseDistance * distanceMultiplier;
+    this.orbitalDistanceCache.set(cacheKey, result);
+    return result;
   }
 }

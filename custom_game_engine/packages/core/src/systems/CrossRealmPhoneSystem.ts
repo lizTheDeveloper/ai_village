@@ -74,8 +74,9 @@ export class CrossRealmPhoneSystem extends BaseSystem {
 
     const currentTick = this.getCurrentTick(ctx.world);
 
-    // Build phone directory from entities
-    this.updatePhoneDirectory(ctx.world);
+    // Build phone directory from already-filtered active entities
+    // (avoids redundant world.query() since requiredComponents matches)
+    this.updatePhoneDirectory(ctx.activeEntities);
 
     // Process pending calls
     this.processPendingCalls(ctx.world, currentTick);
@@ -250,10 +251,10 @@ export class CrossRealmPhoneSystem extends BaseSystem {
   // Private Helpers
   // ==========================================================================
 
-  private updatePhoneDirectory(world: World): void {
+  private updatePhoneDirectory(entities: ReadonlyArray<Entity>): void {
     this.phoneDirectory.clear();
 
-    for (const entity of world.query().with('cross_realm_phone').executeEntities()) {
+    for (const entity of entities) {
       const phoneComp = entity.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
       this.phoneDirectory.set(phoneComp.phone.address.deviceId, entity);
     }

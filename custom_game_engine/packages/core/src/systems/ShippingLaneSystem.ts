@@ -45,6 +45,9 @@ export class ShippingLaneSystem extends BaseSystem {
   public readonly priority: number = 160;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  // Lazy activation: Skip entire system when no shipping lanes or caravans exist in world
+  public readonly activationComponents = ['shipping_lane', 'trade_caravan'] as const;
+
   protected readonly throttleInterval = UPDATE_INTERVAL;
 
   private isInitialized = false;

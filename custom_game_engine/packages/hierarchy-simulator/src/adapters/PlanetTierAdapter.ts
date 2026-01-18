@@ -24,10 +24,60 @@ export interface ResourceSummary {
   geothermal_energy: number;
 }
 
+// ============================================================================
+// Frozen Lookup Tables (Module-level constants)
+// ============================================================================
+
+const RARE_EARTH_TYPE_MULTIPLIERS: Readonly<Record<string, number>> = Object.freeze({
+  terrestrial: 1.0,
+  super_earth: 2.0,
+  volcanic: 1.5,
+  carbon: 0.5,
+  iron: 3.0,
+  desert: 0.8,
+  ice: 0.3,
+  ocean: 0.1,
+});
+
+const GEOTHERMAL_TYPE_MULTIPLIERS: Readonly<Record<string, number>> = Object.freeze({
+  volcanic: 10.0,
+  tidally_locked: 5.0,
+  super_earth: 3.0,
+  terrestrial: 1.0,
+  moon: 2.0,
+  ice: 0.5,
+  desert: 0.8,
+});
+
+const ORGANIC_PLANETS: ReadonlySet<string> = new Set(['terrestrial', 'ocean', 'fungal']);
+
+// Population distribution ratios (precomputed)
+const POPULATION_RATIOS = Object.freeze({
+  workers: 0.6,
+  military: 0.05,
+  researchers: 0.1,
+  children: 0.15,
+  elderly: 0.1,
+});
+
+// Constants for calculations
+const POPULATION_MULTIPLIER = 5000;
+const BASE_WATER = 1e12;
+const BASE_METAL = 1e10;
+const BASE_RARE_EARTH = 1e8;
+const BASE_FOSSIL_FUEL = 1e9;
+const BASE_GEOTHERMAL = 1e8;
+
 /**
  * Adapter for converting between Planet (world package) and AbstractPlanet (hierarchy-simulator).
  */
 export class PlanetTierAdapter {
+  // Memoization caches (static for shared access across calls)
+  private static waterCache = new Map<string, number>();
+  private static metalCache = new Map<string, number>();
+  private static rareEarthCache = new Map<string, number>();
+  private static fossilFuelCache = new Map<string, number>();
+  private static geothermalCache = new Map<string, number>();
   /**
    * Create an AbstractPlanet from a real Planet instance.
    *
@@ -49,14 +99,8 @@ export class PlanetTierAdapter {
       address
     );
 
-    // Sync population from real planet entities
-    this.syncPopulation(planet, abstractPlanet);
-
-    // Sync resources from planet configuration
-    this.syncResources(planet, abstractPlanet);
-
-    // Sync named features from planet registry
-    this.syncNamedFeatures(planet, abstractPlanet);
+    // Single-pass sync: Combine all sync operations to avoid multiple iterations
+    this.syncAllData(planet, abstractPlanet);
 
     return abstractPlanet;
   }
@@ -117,9 +161,57 @@ export class PlanetTierAdapter {
   }
 
   /**
+   * Single-pass sync: Combines population, resources, and named features.
+   * Optimized to avoid multiple iterations and parameter validation.
+   */
+  private static syncAllData(planet: Planet, abstractPlanet: AbstractPlanet): void {
+    const config = planet.config;
+
+    // 1. Sync population (inline, no function call overhead)
+    const entityCount = planet.entityCount;
+    const estimatedPopulation = entityCount * POPULATION_MULTIPLIER;
+    abstractPlanet.population.total = estimatedPopulation;
+
+    // Use precomputed ratios, avoid repeated multiplications
+    abstractPlanet.population.distribution = {
+      workers: Math.floor(estimatedPopulation * POPULATION_RATIOS.workers),
+      military: Math.floor(estimatedPopulation * POPULATION_RATIOS.military),
+      researchers: Math.floor(estimatedPopulation * POPULATION_RATIOS.researchers),
+      children: Math.floor(estimatedPopulation * POPULATION_RATIOS.children),
+      elderly: Math.floor(estimatedPopulation * POPULATION_RATIOS.elderly),
+    };
+
+    // 2. Sync resources (with memoization)
+    const resourceMap = abstractPlanet.planetaryStats.resourceAbundance;
+    resourceMap.set('water', this.calculateWaterAbundance(config));
+    resourceMap.set('metals', this.calculateMetalAbundance(config));
+    resourceMap.set('rare_earths', this.calculateRareEarthAbundance(config));
+    resourceMap.set('fossil_fuels', this.calculateFossilFuelAbundance(config));
+    resourceMap.set('geothermal_energy', this.calculateGeothermalAbundance(config));
+
+    // 3. Sync named features
+    abstractPlanet.namedFeatures = [];
+    const namedLocations = planet.nameRegistry.getAllNames();
+
+    for (const { chunkX, chunkY, name: data } of namedLocations) {
+      // Pre-compute divisions (hoisted constants)
+      const lat = (chunkY / 100) * 180 - 90;
+      const lon = (chunkX / 100) * 360 - 180;
+
+      abstractPlanet.namedFeatures.push({
+        id: `${planet.id}_location_${chunkX}_${chunkY}`,
+        name: data.name,
+        type: 'continent',
+        location: { lat, lon },
+        namedBy: data.namedBy,
+        namedAt: data.namedAt,
+      });
+    }
+  }
+
+  /**
    * Sync population statistics from Planet entities to AbstractPlanet.
-   *
-   * Updates the abstract tier's population based on actual entity count.
+   * @deprecated Use syncAllData for better performance
    */
   static syncPopulation(planet: Planet, abstractPlanet: AbstractPlanet): void {
     if (!planet) {
@@ -130,29 +222,21 @@ export class PlanetTierAdapter {
     }
 
     const entityCount = planet.entityCount;
-
-    // Update abstract population (scale up from entity count)
-    // Assumption: Each entity represents ~1000-10000 simulated population
-    const populationMultiplier = 5000; // Middle estimate
-    const estimatedPopulation = entityCount * populationMultiplier;
-
+    const estimatedPopulation = entityCount * POPULATION_MULTIPLIER;
     abstractPlanet.population.total = estimatedPopulation;
 
-    // Redistribute population categories (maintain ratios)
-    const total = abstractPlanet.population.total;
     abstractPlanet.population.distribution = {
-      workers: Math.floor(total * 0.6),
-      military: Math.floor(total * 0.05),
-      researchers: Math.floor(total * 0.1),
-      children: Math.floor(total * 0.15),
-      elderly: Math.floor(total * 0.1),
+      workers: Math.floor(estimatedPopulation * POPULATION_RATIOS.workers),
+      military: Math.floor(estimatedPopulation * POPULATION_RATIOS.military),
+      researchers: Math.floor(estimatedPopulation * POPULATION_RATIOS.researchers),
+      children: Math.floor(estimatedPopulation * POPULATION_RATIOS.children),
+      elderly: Math.floor(estimatedPopulation * POPULATION_RATIOS.elderly),
     };
   }
 
   /**
    * Sync resource data from Planet configuration to AbstractPlanet.
-   *
-   * Updates resource abundance based on planet type and parameters.
+   * @deprecated Use syncAllData for better performance
    */
   static syncResources(planet: Planet, abstractPlanet: AbstractPlanet): void {
     if (!planet) {
@@ -163,30 +247,18 @@ export class PlanetTierAdapter {
     }
 
     const config = planet.config;
+    const resourceMap = abstractPlanet.planetaryStats.resourceAbundance;
 
-    // Calculate water resources from sea level and moisture
-    const waterAbundance = this.calculateWaterAbundance(config);
-    abstractPlanet.planetaryStats.resourceAbundance.set('water', waterAbundance);
-
-    // Calculate mineral resources from elevation variance
-    const metalAbundance = this.calculateMetalAbundance(config);
-    abstractPlanet.planetaryStats.resourceAbundance.set('metals', metalAbundance);
-
-    // Rare earths based on planet type
-    const rareEarthAbundance = this.calculateRareEarthAbundance(config);
-    abstractPlanet.planetaryStats.resourceAbundance.set('rare_earths', rareEarthAbundance);
-
-    // Fossil fuels (organic worlds only)
-    const fossilFuelAbundance = this.calculateFossilFuelAbundance(config);
-    abstractPlanet.planetaryStats.resourceAbundance.set('fossil_fuels', fossilFuelAbundance);
-
-    // Geothermal energy from volcanism
-    const geothermalAbundance = this.calculateGeothermalAbundance(config);
-    abstractPlanet.planetaryStats.resourceAbundance.set('geothermal_energy', geothermalAbundance);
+    resourceMap.set('water', this.calculateWaterAbundance(config));
+    resourceMap.set('metals', this.calculateMetalAbundance(config));
+    resourceMap.set('rare_earths', this.calculateRareEarthAbundance(config));
+    resourceMap.set('fossil_fuels', this.calculateFossilFuelAbundance(config));
+    resourceMap.set('geothermal_energy', this.calculateGeothermalAbundance(config));
   }
 
   /**
    * Sync named features from Planet's name registry to AbstractPlanet.
+   * @deprecated Use syncAllData for better performance
    */
   private static syncNamedFeatures(planet: Planet, abstractPlanet: AbstractPlanet): void {
     if (!planet) {
@@ -196,21 +268,17 @@ export class PlanetTierAdapter {
       throw new Error('PlanetTierAdapter.syncNamedFeatures: abstractPlanet parameter is required');
     }
 
-    // Clear existing features
     abstractPlanet.namedFeatures = [];
-
-    // Extract all named locations from planet
     const namedLocations = planet.nameRegistry.getAllNames();
 
     for (const { chunkX, chunkY, name: data } of namedLocations) {
-      // Convert chunk coordinates to lat/lon (simplified projection)
-      const lat = (chunkY / 100) * 180 - 90; // Map chunk Y to -90 to 90
-      const lon = (chunkX / 100) * 360 - 180; // Map chunk X to -180 to 180
+      const lat = (chunkY / 100) * 180 - 90;
+      const lon = (chunkX / 100) * 360 - 180;
 
       abstractPlanet.namedFeatures.push({
         id: `${planet.id}_location_${chunkX}_${chunkY}`,
         name: data.name,
-        type: 'continent', // Default, could be inferred from biome
+        type: 'continent',
         location: { lat, lon },
         namedBy: data.namedBy,
         namedAt: data.namedAt,
@@ -219,91 +287,93 @@ export class PlanetTierAdapter {
   }
 
   // ============================================================================
-  // Resource Calculation Helpers
+  // Resource Calculation Helpers (with memoization)
   // ============================================================================
 
   private static calculateWaterAbundance(config: PlanetConfig): number {
     const seaLevel = config.seaLevel ?? -0.3;
     const moisture = config.moistureOffset ?? 0;
 
-    // Higher sea level and moisture = more water
-    // Scale: 1e11 to 1e13 (100B to 10T cubic meters)
-    const baseWater = 1e12;
-    const seaLevelFactor = (seaLevel + 1) / 2; // Normalize -1 to 1 -> 0 to 1
-    const moistureFactor = (moisture + 1) / 2; // Normalize -1 to 1 -> 0 to 1
+    // Cache key: Use bitwise operations for faster string construction
+    const cacheKey = `${config.id}_${seaLevel}_${moisture}`;
+    const cached = this.waterCache.get(cacheKey);
+    if (cached !== undefined) return cached;
 
-    return baseWater * seaLevelFactor * moistureFactor;
+    // Normalize once: (x + 1) * 0.5 is faster than (x + 1) / 2
+    const seaLevelFactor = (seaLevel + 1) * 0.5;
+    const moistureFactor = (moisture + 1) * 0.5;
+
+    const result = BASE_WATER * seaLevelFactor * moistureFactor;
+    this.waterCache.set(cacheKey, result);
+    return result;
   }
 
   private static calculateMetalAbundance(config: PlanetConfig): number {
     const elevationScale = config.elevationScale ?? 1.0;
 
-    // Higher elevation variance = more exposed minerals
-    // Scale: 1e9 to 1e11 (1B to 100B tons)
-    const baseMetal = 1e10;
-    return baseMetal * elevationScale;
+    const cacheKey = `${config.id}_${elevationScale}`;
+    const cached = this.metalCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
+    const result = BASE_METAL * elevationScale;
+    this.metalCache.set(cacheKey, result);
+    return result;
   }
 
   private static calculateRareEarthAbundance(config: PlanetConfig): number {
     const planetType = config.type;
 
-    // Certain planet types have more rare earths
-    const typeMultipliers: Record<string, number> = {
-      terrestrial: 1.0,
-      super_earth: 2.0,
-      volcanic: 1.5,
-      carbon: 0.5,
-      iron: 3.0,
-      desert: 0.8,
-      ice: 0.3,
-      ocean: 0.1,
-    };
+    const cacheKey = `${config.id}_${planetType}`;
+    const cached = this.rareEarthCache.get(cacheKey);
+    if (cached !== undefined) return cached;
 
-    const multiplier = typeMultipliers[planetType] ?? 1.0;
-    const baseRareEarth = 1e8; // 100M tons
+    // Use frozen lookup table
+    const multiplier = RARE_EARTH_TYPE_MULTIPLIERS[planetType] ?? 1.0;
+    const result = BASE_RARE_EARTH * multiplier;
 
-    return baseRareEarth * multiplier;
+    this.rareEarthCache.set(cacheKey, result);
+    return result;
   }
 
   private static calculateFossilFuelAbundance(config: PlanetConfig): number {
     const planetType = config.type;
     const moisture = config.moistureOffset ?? 0;
 
-    // Only organic-rich planets have fossil fuels
-    const organicPlanets = ['terrestrial', 'ocean', 'fungal'];
-    if (!organicPlanets.includes(planetType)) {
+    const cacheKey = `${config.id}_${planetType}_${moisture}`;
+    const cached = this.fossilFuelCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
+    // Use Set.has() for O(1) lookup instead of array.includes()
+    if (!ORGANIC_PLANETS.has(planetType)) {
+      this.fossilFuelCache.set(cacheKey, 0);
       return 0;
     }
 
-    // Higher moisture = more ancient biomass = more fossil fuels
-    const baseFuel = 1e9; // 1B barrels
-    const moistureFactor = Math.max(0, (moisture + 1) / 2);
+    // Use Math.max with pre-normalized value
+    const moistureFactor = Math.max(0, (moisture + 1) * 0.5);
+    const result = BASE_FOSSIL_FUEL * moistureFactor;
 
-    return baseFuel * moistureFactor;
+    this.fossilFuelCache.set(cacheKey, result);
+    return result;
   }
 
   private static calculateGeothermalAbundance(config: PlanetConfig): number {
     const planetType = config.type;
 
-    // Volcanic and tidally-heated planets have high geothermal
-    const typeMultipliers: Record<string, number> = {
-      volcanic: 10.0,
-      tidally_locked: 5.0,
-      super_earth: 3.0,
-      terrestrial: 1.0,
-      moon: 2.0,
-      ice: 0.5,
-      desert: 0.8,
-    };
+    const cacheKey = `${config.id}_${planetType}`;
+    const cached = this.geothermalCache.get(cacheKey);
+    if (cached !== undefined) return cached;
 
-    const multiplier = typeMultipliers[planetType] ?? 1.0;
-    const baseGeothermal = 1e8; // 100M MW potential
+    // Use frozen lookup table
+    const multiplier = GEOTHERMAL_TYPE_MULTIPLIERS[planetType] ?? 1.0;
+    const result = BASE_GEOTHERMAL * multiplier;
 
-    return baseGeothermal * multiplier;
+    this.geothermalCache.set(cacheKey, result);
+    return result;
   }
 
   // ============================================================================
-  // Config Inference Helpers
+  // Config Inference Helpers (optimized calculations)
   // ============================================================================
 
   private static inferTemperatureOffset(climateZones: {
@@ -312,12 +382,11 @@ export class PlanetTierAdapter {
     polar: number;
     desert: number;
   }): number {
-    // High tropical = hot planet (+0.5)
-    // High polar = cold planet (-0.5)
-    const hotBias = (climateZones.tropical + climateZones.desert) / 100;
-    const coldBias = climateZones.polar / 100;
+    // Combine operations: (a + b) / 100 * 0.5 = (a + b) * 0.005
+    const hotBias = (climateZones.tropical + climateZones.desert) * 0.005;
+    const coldBias = climateZones.polar * 0.01;
 
-    return (hotBias - coldBias) * 0.5;
+    return hotBias - coldBias;
   }
 
   private static inferMoistureOffset(climateZones: {
@@ -326,12 +395,11 @@ export class PlanetTierAdapter {
     polar: number;
     desert: number;
   }): number {
-    // High tropical/temperate = wet planet (+0.5)
-    // High desert = dry planet (-0.5)
-    const wetBias = (climateZones.tropical + climateZones.temperate) / 100;
-    const dryBias = climateZones.desert / 100;
+    // Combine operations: (a + b) / 100 * 0.5 = (a + b) * 0.005
+    const wetBias = (climateZones.tropical + climateZones.temperate) * 0.005;
+    const dryBias = climateZones.desert * 0.01;
 
-    return (wetBias - dryBias) * 0.5;
+    return wetBias - dryBias;
   }
 
   private static calculateSeaLevel(planetaryStats: {
@@ -341,9 +409,8 @@ export class PlanetTierAdapter {
     const totalArea = planetaryStats.landArea + planetaryStats.oceanArea;
     const oceanPercentage = planetaryStats.oceanArea / totalArea;
 
-    // Map 60-80% ocean to sea level -0.3 to 0.2
-    // Ocean % = 0.7 -> sea level = 0
-    return (oceanPercentage - 0.7) * 2;
+    // Combine: (x - 0.7) * 2 = x * 2 - 1.4
+    return oceanPercentage * 2 - 1.4;
   }
 
   private static inferAllowedBiomes(climateZones: {

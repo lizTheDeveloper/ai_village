@@ -468,7 +468,7 @@ export class UniverseBrowserScreen {
     // Create the timeline view
     this.timelineView = new MultiverseTimelineView(this.timelineContainer, {
       onSelectSnapshot: (universeId, snapshot) => {
-        console.log('[TimelineView] Selected:', universeId, snapshot);
+        // Snapshot selected
       },
       onForkFromSnapshot: async (universeId, snapshot) => {
         const universe = this.serverUniverses.find(u => u.id === universeId);
@@ -1025,7 +1025,6 @@ export class UniverseBrowserScreen {
       }
 
       const result = await response.json();
-      console.log('[UniverseBrowser] Created fork:', result);
 
       // Show success and ask if user wants to load the new universe
       const loadNow = window.confirm(

@@ -39,6 +39,8 @@ export class SteeringSystem extends BaseSystem {
     CT.Position,
     CT.Velocity,
   ];
+  // Only run when steering components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Steering] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   // Track stuck agents for pathfinding fallback

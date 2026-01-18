@@ -39,7 +39,6 @@ let chunkSpatialQuery: any | null = null;
 
 export function injectChunkSpatialQueryToSeekFood(spatialQuery: any): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[SeekFoodBehavior] ChunkSpatialQuery injected for efficient food lookups');
 }
 
 /** Default hunger restored if item not in registry */
@@ -108,15 +107,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     // No food available nearby - move toward nearest food source
     const nearestFood = this.findNearestFoodSource(entity, world);
 
-    // DEBUG: Log food search result
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    console.log('[SeekFood] Agent', entity.id.substring(0, 8), 'at',
-      position ? `(${Math.floor(position.x)}, ${Math.floor(position.y)})` : 'unknown',
-      '- nearestFood:', nearestFood ? `${nearestFood.type} at (${Math.floor(nearestFood.position.x)}, ${Math.floor(nearestFood.position.y)}) dist=${Math.floor(nearestFood.distance)}` : 'NONE');
-
     if (nearestFood) {
       // Move toward the food source
-      console.log('[SeekFood] Calling moveToward to', nearestFood.position);
       this.moveToward(entity, nearestFood.position, { arrivalDistance: 2 });
       return; // Continue moving
     }
@@ -144,8 +136,6 @@ export class SeekFoodBehavior extends BaseBehavior {
         const closestMemory = sortedMemories[0];
         if (closestMemory && closestMemory.distance > 5) {
           // Navigate toward remembered food location
-          console.log('[SeekFood] No food nearby, navigating to remembered food at',
-            `(${closestMemory.memory.x}, ${closestMemory.memory.y})`, 'dist=', Math.floor(closestMemory.distance));
           this.moveToward(entity, { x: closestMemory.memory.x, y: closestMemory.memory.y }, { arrivalDistance: 5 });
           return;
         }
@@ -211,7 +201,6 @@ export class SeekFoodBehavior extends BaseBehavior {
     for (let ring = 0; ring <= MAX_CHUNK_RINGS; ring++) {
       const foodInRing = this.searchChunkRing(world, position, centerChunkX, centerChunkY, ring);
       if (foodInRing) {
-        console.log(`[SeekFood] Found food in ring ${ring}: ${foodInRing.type} at (${Math.floor(foodInRing.position.x)}, ${Math.floor(foodInRing.position.y)})`);
         return foodInRing;
       }
     }

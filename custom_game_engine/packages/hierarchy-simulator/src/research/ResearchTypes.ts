@@ -18,7 +18,7 @@ export interface ResearchPaper {
 
   // Requirements
   prerequisites: string[];  // Other paper IDs
-  requiredGuilds: Record<ResearchField, number>;  // Field -> number of guilds
+  requiredGuilds: Partial<Record<ResearchField, number>>;  // Field -> number of guilds
   requiredSpecialists: Record<number, number>;  // Tier -> count (e.g., tier-100: 10000)
   estimatedYears: number;  // Centuries for high-tier papers
 
@@ -190,7 +190,7 @@ export class PaperTitleGenerator {
   }
 
   generatePaperRequirements(tier: number): {
-    requiredGuilds: Record<ResearchField, number>;
+    requiredGuilds: Partial<Record<ResearchField, number>>;
     requiredSpecialists: Record<number, number>;
     estimatedYears: number;
   } {
@@ -199,7 +199,7 @@ export class PaperTitleGenerator {
     const baseSpecialists = Math.pow(tier, 2);
     const baseYears = Math.pow(tier, 2.5);
 
-    const requiredGuilds: Record<ResearchField, number> = {} as any;
+    const requiredGuilds: Partial<Record<ResearchField, number>> = {};
     const numFields = Math.min(tier, 3); // High-tier papers cross disciplines
     const fields = this.getRandomFields(numFields);
 

@@ -38,13 +38,33 @@ export class FleetSystem extends BaseSystem {
 
   protected readonly throttleInterval = 40; // Every 2 seconds at 20 TPS
 
+  // PERF: Cache squadron lookups to avoid repeated queries
+  private squadronCache: Map<string, EntityImpl> = new Map();
+
+  // PERF: Reusable objects to avoid allocations in hot paths
+  private workingStats = {
+    totalShips: 0,
+    totalCrew: 0,
+    weightedCoherence: 0,
+    fleetStrength: 0,
+  };
+
+  // PERF: Reuse Map for ship type breakdown to avoid object allocations
+  private shipTypeMap: Map<string, number> = new Map();
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+
+    // PERF: Build squadron cache once per update instead of querying per fleet
+    this.rebuildSquadronCache(ctx.world);
 
     // Process each fleet
     for (const fleetEntity of ctx.activeEntities) {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
+
+      // PERF: Early exit for empty fleets
+      if (fleet.squadronIds.length === 0) continue;
 
       // Update fleet aggregate stats from squadrons
       this.updateFleetStats(ctx.world, fleetEntity as EntityImpl, fleet, tick);
@@ -55,7 +75,23 @@ export class FleetSystem extends BaseSystem {
   }
 
   /**
+   * PERF: Rebuild squadron entity cache once per update
+   * Avoids O(n*m) query complexity (n fleets * m squadrons)
+   */
+  private rebuildSquadronCache(world: World): void {
+    this.squadronCache.clear();
+    const squadronEntities = world.query().with(CT.Squadron).executeEntities();
+    for (const entity of squadronEntities) {
+      const squadron = entity.getComponent<SquadronComponent>(CT.Squadron);
+      if (squadron) {
+        this.squadronCache.set(squadron.squadronId, entity as EntityImpl);
+      }
+    }
+  }
+
+  /**
    * Update fleet aggregate statistics from member squadrons
+   * PERF: Uses cached squadron lookups and reusable working objects
    */
   private updateFleetStats(
     world: World,
@@ -63,21 +99,20 @@ export class FleetSystem extends BaseSystem {
     fleet: FleetComponent,
     tick: number
   ): void {
-    let totalShips = 0;
-    let totalCrew = 0;
-    let weightedCoherence = 0;
-    let fleetStrength = 0;
-    const shipTypeBreakdown: Record<string, number> = {};
+    // PERF: Reset working stats instead of allocating new objects
+    const stats = this.workingStats;
+    stats.totalShips = 0;
+    stats.totalCrew = 0;
+    stats.weightedCoherence = 0;
+    stats.fleetStrength = 0;
+
+    // PERF: Clear and reuse Map instead of allocating object
+    this.shipTypeMap.clear();
 
     // Gather stats from all squadrons
     for (const squadronId of fleet.squadronIds) {
-      const squadronEntity = world.query()
-        .with(CT.Squadron)
-        .executeEntities()
-        .find(e => {
-          const s = e.getComponent<SquadronComponent>(CT.Squadron);
-          return s?.squadronId === squadronId;
-        });
+      // PERF: Use cached squadron lookup instead of query
+      const squadronEntity = this.squadronCache.get(squadronId);
 
       if (!squadronEntity) {
         // Squadron missing - emit warning
@@ -98,34 +133,40 @@ export class FleetSystem extends BaseSystem {
       const squadronShipCount = squadron.shipIds.length;
       const squadronCrewCount = squadron.totalCrew;
 
-      totalShips += squadronShipCount;
-      totalCrew += squadronCrewCount;
+      stats.totalShips += squadronShipCount;
+      stats.totalCrew += squadronCrewCount;
 
       // Weight coherence by squadron crew size
-      weightedCoherence += squadron.averageCoherence * squadronCrewCount;
+      stats.weightedCoherence += squadron.averageCoherence * squadronCrewCount;
 
       // Fleet strength is sum of squadron combat strengths
-      fleetStrength += squadron.combatStrength;
+      stats.fleetStrength += squadron.combatStrength;
 
-      // Aggregate ship type breakdown
+      // PERF: Aggregate ship types using Map (faster than object literal)
       for (const [shipType, count] of Object.entries(squadron.shipTypeBreakdown)) {
-        shipTypeBreakdown[shipType] = (shipTypeBreakdown[shipType] || 0) + count;
+        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
 
     // Calculate fleet coherence (weighted average by crew size)
-    const fleetCoherence = totalCrew > 0 ? weightedCoherence / totalCrew : 0;
+    const fleetCoherence = stats.totalCrew > 0 ? stats.weightedCoherence / stats.totalCrew : 0;
 
     // Apply supply penalty to strength and coherence
     const supplyPenalty = fleet.supplyLevel;
-    const adjustedStrength = fleetStrength * supplyPenalty;
+    const adjustedStrength = stats.fleetStrength * supplyPenalty;
     const adjustedCoherence = fleetCoherence * supplyPenalty;
 
-    // Update fleet component
+    // PERF: Convert Map to object only once at the end
+    const shipTypeBreakdown: Record<string, number> = {};
+    for (const [type, count] of this.shipTypeMap) {
+      shipTypeBreakdown[type] = count;
+    }
+
+    // PERF: Batch all component updates in single call
     fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      totalShips,
-      totalCrew,
+      totalShips: stats.totalShips,
+      totalCrew: stats.totalCrew,
       fleetCoherence: adjustedCoherence,
       fleetStrength: adjustedStrength,
       shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,

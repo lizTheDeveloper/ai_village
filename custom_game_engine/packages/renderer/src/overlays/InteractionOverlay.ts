@@ -272,20 +272,6 @@ export class InteractionOverlay {
       }
     }
 
-    // DEBUG: Log all target sources we checked
-    const agent = entity.getComponent('agent') as AgentComponent | undefined;
-    const movement = entity.getComponent('movement') as MovementComponent | undefined;
-    console.log('[PathViz] Target search for', entity.id.substring(0, 8), ':', {
-      behavior: agent?.behavior,
-      steeringTarget: steering?.target,
-      behaviorStateTarget: agent?.behaviorState?.target,
-      behaviorStateDest: agent?.behaviorState?.destination,
-      movementHasTarget: movement?.hasTarget,
-      movementTargetX: movement?.targetX,
-      movementTargetY: movement?.targetY,
-      finalTarget: targetX !== undefined ? { x: targetX, y: targetY } : 'none',
-    });
-
     // No target found
     if (targetX === undefined || targetY === undefined) {
       return;

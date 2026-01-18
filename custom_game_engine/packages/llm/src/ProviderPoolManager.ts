@@ -57,11 +57,6 @@ export class ProviderPoolManager {
       this.queues.set(providerName, queue);
       this.fallbackChains.set(providerName, providerConfig.fallbackChain);
     }
-
-    console.log(
-      `[ProviderPoolManager] Initialized with ${this.queues.size} providers:`,
-      Array.from(this.queues.keys()).join(', ')
-    );
   }
 
   /**
@@ -122,9 +117,6 @@ export class ProviderPoolManager {
           }
 
           try {
-            console.log(
-              `[ProviderPoolManager] Trying fallback: ${fallbackProvider} for agent ${agentId}`
-            );
             const response = await fallbackQueue.enqueue(
               request,
               agentId,
@@ -143,9 +135,6 @@ export class ProviderPoolManager {
         // All fallbacks exhausted, wait and retry primary
         if (attempt < this.maxRetries) {
           const waitMs = 1000; // 1 second
-          console.log(
-            `[ProviderPoolManager] All providers rate limited, waiting ${waitMs}ms and retrying (attempt ${attempt + 1}/${this.maxRetries})`
-          );
 
           await this.sleep(waitMs);
           return this.execute(queueName, request, agentId, sessionId, attempt + 1);

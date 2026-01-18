@@ -42,11 +42,6 @@ export class ChunkSerializer {
     const chunks = chunkManager.getLoadedChunks();
     const generatedChunks = chunks.filter(c => c.generated);
 
-    console.log(
-      `[ChunkSerializer] Serializing ${generatedChunks.length} generated chunks ` +
-      `(${chunks.length} total loaded)`
-    );
-
     const serializedChunks: Record<string, SerializedChunk> = {};
     const chunkIndex: ChunkIndexEntry[] = [];
     const perChunkChecksums: Record<string, string> = {};
@@ -86,7 +81,6 @@ export class ChunkSerializer {
       },
     };
 
-    console.log(`[ChunkSerializer] Terrain snapshot created`);
     return snapshot;
   }
 
@@ -306,10 +300,6 @@ export class ChunkSerializer {
     snapshot: TerrainSnapshot,
     chunkManager: ChunkManager
   ): Promise<void> {
-    console.log(
-      `[ChunkSerializer] Deserializing ${snapshot.generatedChunkCount} chunks`
-    );
-
     // Verify overall checksum
     const actualChecksum = computeChecksumSync(snapshot.chunks);
     if (actualChecksum !== snapshot.checksums.overall) {
@@ -342,7 +332,8 @@ export class ChunkSerializer {
         const chunk = this.deserializeChunk(serializedChunk);
 
         // Add to chunk manager (access internal Map directly)
-        (chunkManager as any).chunks.set(key, chunk);
+        // ChunkManager.chunks is private Map<string, Chunk>
+        (chunkManager as { chunks: Map<string, Chunk> }).chunks.set(key, chunk);
 
       } catch (error) {
         console.error(
@@ -358,13 +349,9 @@ export class ChunkSerializer {
           error as Error
         );
 
-        (chunkManager as any).chunks.set(key, corruptedChunk);
+        (chunkManager as { chunks: Map<string, Chunk> }).chunks.set(key, corruptedChunk);
       }
     }
-
-    console.log(
-      `[ChunkSerializer] Loaded ${chunkManager.getChunkCount()} chunks`
-    );
   }
 
   /**
@@ -386,7 +373,7 @@ export class ChunkSerializer {
         tiles = this.deserializeFull(compressedTiles.data as SerializedTile[]);
         break;
       default:
-        throw new Error(`Unknown encoding: ${(compressedTiles as any).encoding}`);
+        throw new Error(`Unknown encoding: ${(compressedTiles as { encoding: string }).encoding}`);
     }
 
     // Validate tile count
@@ -462,12 +449,12 @@ export class ChunkSerializer {
    */
   private deserializeTile(data: SerializedTile): Tile {
     return {
-      terrain: data.terrain as any,
+      terrain: data.terrain,
       floor: data.floor,
       elevation: data.elevation ?? 0,
       moisture: data.moisture ?? 50,
       fertility: data.fertility ?? 50,
-      biome: data.biome as any,
+      biome: data.biome,
       wall: data.wall,
       door: data.door,
       window: data.window,
@@ -501,7 +488,8 @@ export class ChunkSerializer {
     }
 
     // Store corruption info in first tile (hacky but preserves data)
-    (tiles[0] as any)._corruption = {
+    // Using type extension for corruption metadata
+    (tiles[0] as Tile & { _corruption?: unknown })._corruption = {
       corrupted: true,
       reason: error.message,
       chunkCoords: { x, y },

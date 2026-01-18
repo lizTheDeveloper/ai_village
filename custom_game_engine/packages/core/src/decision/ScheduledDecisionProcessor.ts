@@ -127,8 +127,8 @@ export class ScheduledDecisionProcessor {
     }
 
     try {
-      // Cast world to any to handle World interface vs test helper class mismatch
-      const decision = await this.scheduler.requestDecision(entity, world as any);
+      // RequestDecision expects EntityImpl and World from the scheduler's perspective
+      const decision = await this.scheduler.requestDecision(entity, world);
 
       if (!decision) {
         // On cooldown or scheduler unavailable
@@ -173,7 +173,7 @@ export class ScheduledDecisionProcessor {
         changed: true,
         behavior: parsed.behavior,
         behaviorState: parsed.behaviorState || {},
-        source: decision.layer as any, // Cast DecisionLayer to source type
+        source: decision.layer as 'talker' | 'executor',
         layer: decision.layer,
         reason: decision.reason,
       };
@@ -311,7 +311,7 @@ export class ScheduledDecisionProcessor {
         changed: true,
         behavior: parsed.behavior,
         behaviorState: parsed.behaviorState || {},
-        source: layer as any,
+        source: layer as 'talker' | 'executor',
         layer: layer,
         reason: `Decision from ${layer} layer`,
       };
@@ -319,7 +319,7 @@ export class ScheduledDecisionProcessor {
 
     // No ready decision - request a new one if needed (fire-and-forget)
     // Select which layer should handle this decision
-    const layerSelection = this.scheduler.selectLayer(entity as any, world);
+    const layerSelection = this.scheduler.selectLayer(entity, world);
 
     // Check if layer is ready (cooldown)
     if (!this.scheduler.isLayerReady(entity.id, layerSelection.layer)) {
@@ -327,7 +327,7 @@ export class ScheduledDecisionProcessor {
     }
 
     // Build prompt for selected layer
-    const prompt = this.scheduler.buildPrompt(layerSelection.layer, entity as any, world);
+    const prompt = this.scheduler.buildPrompt(layerSelection.layer, entity, world);
 
     // Store which layer we're requesting (so we can label it when the response comes back)
     this.pendingLayerSelection.set(entity.id, layerSelection.layer);
@@ -343,7 +343,11 @@ export class ScheduledDecisionProcessor {
     });
 
     // Mark that we've invoked this layer (for cooldown tracking)
-    const state = (this.scheduler as any).getAgentState(entity.id);
+    // Access internal getAgentState method (scheduler should expose this or we track cooldown differently)
+    interface SchedulerWithState extends LLMScheduler {
+      getAgentState(entityId: string): { lastInvocation: Record<DecisionLayer, number> };
+    }
+    const state = (this.scheduler as SchedulerWithState).getAgentState(entity.id);
     state.lastInvocation[layerSelection.layer] = Date.now();
 
     return { changed: false, source: 'none' };
@@ -470,10 +474,9 @@ export class ScheduledDecisionProcessor {
     };
 
     // Add the goal (raw data check since it might not be a class instance)
-    const goalsArray = (goalsComp as any).goals as PersonalGoal[];
+    const goalsArray = goalsComp.goals;
     if (goalsArray.length < 5) {
       goalsArray.push(newGoal);
-      console.log(`[ScheduledDecisionProcessor] Added goal for ${entity.id}: ${goal.description}`);
     }
   }
 

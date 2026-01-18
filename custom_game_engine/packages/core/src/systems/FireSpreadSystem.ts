@@ -164,6 +164,8 @@ export class FireSpreadSystem extends BaseSystem {
   public readonly id: SystemId = 'fire_spread';
   public readonly priority: number = 70; // Run after weather (5), before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Burning];
+  // Only run when burning components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Burning] as const;
 
   public readonly dependsOn = ['state_mutator', 'weather'] as const;
 

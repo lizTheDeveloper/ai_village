@@ -137,6 +137,8 @@ export class AgentBrainSystem extends BaseSystem {
     CT.Position,
     CT.Movement,
   ];
+  // Only run when agent components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Agent] as const;
   protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   private perception: PerceptionProcessor;

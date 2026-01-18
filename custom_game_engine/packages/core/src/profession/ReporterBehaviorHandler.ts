@@ -31,7 +31,10 @@ export function updateReporterBehaviors(world: World, _currentTick: number): voi
   const deskManager = newsroomSystem.getDeskManager();
 
   // Get all news desks
-  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+  interface DeskManagerInternal {
+    desks: Map<string, NewsDesk>;
+  }
+  const desks = Array.from((deskManager as unknown as DeskManagerInternal).desks.values());
 
   for (const desk of desks) {
     for (const reporter of desk.fieldReporters) {
@@ -112,13 +115,16 @@ function setReporterNavigation(
  * Check if an agent is a field reporter.
  */
 export function isFieldReporter(entity: EntityImpl): boolean {
-  const profession = entity.getComponent<ProfessionComponent>('profession' as any);
+  const profession = entity.getComponent<ProfessionComponent>('profession');
   if (!profession) return false;
 
   // Check if this agent is registered as a field reporter in any news desk
   const newsroomSystem = getNewsroomSystem();
   const deskManager = newsroomSystem.getDeskManager();
-  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+  interface DeskManagerInternal {
+    desks: Map<string, NewsDesk>;
+  }
+  const desks = Array.from((deskManager as unknown as DeskManagerInternal).desks.values());
 
   for (const desk of desks) {
     const isReporter = desk.fieldReporters.some(
@@ -140,7 +146,10 @@ export function getReporterAssignment(reporterId: string): {
 } | null {
   const newsroomSystem = getNewsroomSystem();
   const deskManager = newsroomSystem.getDeskManager();
-  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+  interface DeskManagerInternal {
+    desks: Map<string, NewsDesk>;
+  }
+  const desks = Array.from((deskManager as unknown as DeskManagerInternal).desks.values());
 
   for (const desk of desks) {
     const reporter = desk.fieldReporters.find((r: FieldReporter) => r.agentId === reporterId);

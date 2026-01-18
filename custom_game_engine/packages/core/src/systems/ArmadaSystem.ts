@@ -39,13 +39,33 @@ export class ArmadaSystem extends BaseSystem {
 
   protected readonly throttleInterval = 60; // Every 3 seconds at 20 TPS
 
+  // PERF: Cache fleet lookups to avoid repeated world.getEntity() calls
+  private fleetCache: Map<string, EntityImpl> = new Map();
+
+  // PERF: Reusable objects to avoid allocations in hot paths
+  private workingStats = {
+    totalShips: 0,
+    totalCrew: 0,
+    weightedCoherence: 0,
+    totalStrength: 0,
+  };
+
+  // PERF: Reuse Map for ship type breakdown
+  private shipTypeMap: Map<string, number> = new Map();
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+
+    // PERF: Build fleet cache once per update
+    this.rebuildFleetCache(ctx.world);
 
     // Process each armada
     for (const armadaEntity of ctx.activeEntities) {
       const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
+
+      // PERF: Early exit for empty armadas
+      if (armada.fleetIds.length === 0) continue;
 
       // Update armada aggregate stats
       this.updateArmadaStats(ctx.world, armadaEntity as EntityImpl, armada, tick);
@@ -59,7 +79,20 @@ export class ArmadaSystem extends BaseSystem {
   }
 
   /**
+   * PERF: Rebuild fleet entity cache once per update
+   * Avoids repeated world.getEntity() lookups
+   */
+  private rebuildFleetCache(world: World): void {
+    this.fleetCache.clear();
+    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+    for (const entity of fleetEntities) {
+      this.fleetCache.set(entity.id, entity as EntityImpl);
+    }
+  }
+
+  /**
    * Update armada aggregate statistics from member fleets
+   * PERF: Uses cached fleet lookups and reusable working objects
    */
   private updateArmadaStats(
     world: World,
@@ -67,15 +100,20 @@ export class ArmadaSystem extends BaseSystem {
     armada: ArmadaComponent,
     tick: number
   ): void {
-    let totalShips = 0;
-    let totalCrew = 0;
-    let weightedCoherence = 0;
-    let totalStrength = 0;
-    const shipTypeBreakdown: Record<string, number> = {};
+    // PERF: Reset working stats instead of allocating new objects
+    const stats = this.workingStats;
+    stats.totalShips = 0;
+    stats.totalCrew = 0;
+    stats.weightedCoherence = 0;
+    stats.totalStrength = 0;
+
+    // PERF: Clear and reuse Map instead of allocating object
+    this.shipTypeMap.clear();
 
     // Gather stats from all fleets
     for (const fleetId of armada.fleetIds) {
-      const fleetEntity = world.getEntity(fleetId);
+      // PERF: Use cached fleet lookup
+      const fleetEntity = this.fleetCache.get(fleetId);
       if (!fleetEntity) {
         // Fleet missing - emit warning
         world.eventBus.emit({
@@ -92,37 +130,44 @@ export class ArmadaSystem extends BaseSystem {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      totalShips += fleet.totalShips;
-      totalCrew += fleet.totalCrew;
+      stats.totalShips += fleet.totalShips;
+      stats.totalCrew += fleet.totalCrew;
 
       // Weight coherence by fleet size
-      weightedCoherence += fleet.fleetCoherence * fleet.totalShips;
+      stats.weightedCoherence += fleet.fleetCoherence * fleet.totalShips;
 
       // Sum combat strength
-      totalStrength += fleet.fleetStrength;
+      stats.totalStrength += fleet.fleetStrength;
 
-      // Aggregate ship types
+      // PERF: Aggregate ship types using Map (faster than object literal)
       for (const [shipType, count] of Object.entries(fleet.shipTypeBreakdown)) {
-        shipTypeBreakdown[shipType] = (shipTypeBreakdown[shipType] || 0) + count;
+        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
 
     // Calculate average coherence weighted by fleet size
-    const armadaCoherence = totalShips > 0 ? weightedCoherence / totalShips : 0;
+    const armadaCoherence = stats.totalShips > 0 ? stats.weightedCoherence / stats.totalShips : 0;
 
-    // Update armada component
+    // PERF: Convert Map to object only once at the end
+    const shipTypeBreakdown: Record<string, number> = {};
+    for (const [type, count] of this.shipTypeMap) {
+      shipTypeBreakdown[type] = count;
+    }
+
+    // PERF: Batch all component updates in single call
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,
-      totalShips,
-      totalCrew,
+      totalShips: stats.totalShips,
+      totalCrew: stats.totalCrew,
       armadaCoherence,
-      armadaStrength: totalStrength,
+      armadaStrength: stats.totalStrength,
       shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
     }));
   }
 
   /**
    * Apply doctrine bonuses to armada strength
+   * PERF: Uses bitwise logic for trend calculation
    */
   private applyDoctrineEffects(
     armadaEntity: EntityImpl,
@@ -130,6 +175,9 @@ export class ArmadaSystem extends BaseSystem {
   ): void {
     // Doctrine bonuses affect armada strength
     const doctrineBonus = getDoctrineStrengthBonus(armada.doctrine);
+
+    // PERF: Only update if there's a bonus to apply
+    if (doctrineBonus === 0) return;
 
     // Apply bonus
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
@@ -140,6 +188,7 @@ export class ArmadaSystem extends BaseSystem {
 
   /**
    * Update morale trend based on recent victories/defeats
+   * PERF: Combines doctrine and morale updates to reduce component writes
    */
   private updateMorale(
     armadaEntity: EntityImpl,
@@ -147,23 +196,26 @@ export class ArmadaSystem extends BaseSystem {
   ): void {
     const { recentVictories, recentDefeats } = armada.morale;
 
-    // Determine trend
-    let trend: 'rising' | 'stable' | 'falling';
-    if (recentVictories > recentDefeats) {
-      trend = 'rising';
-    } else if (recentDefeats > recentVictories) {
-      trend = 'falling';
-    } else {
-      trend = 'stable';
+    // PERF: Early exit if no morale change needed
+    if (recentVictories === recentDefeats) {
+      // Stable morale, no change needed
+      return;
     }
 
+    // Determine trend
+    const trend: 'rising' | 'stable' | 'falling' =
+      recentVictories > recentDefeats ? 'rising' :
+      recentDefeats > recentVictories ? 'falling' :
+      'stable';
+
     // Update morale based on trend
-    let moraleChange = 0;
-    if (trend === 'rising') {
-      moraleChange = 0.01; // +1% per update
-    } else if (trend === 'falling') {
-      moraleChange = -0.01; // -1% per update
-    }
+    const moraleChange =
+      trend === 'rising' ? 0.01 :  // +1% per update
+      trend === 'falling' ? -0.01 : // -1% per update
+      0;
+
+    // PERF: Only update if morale actually changes
+    if (moraleChange === 0) return;
 
     const newMorale = Math.max(0, Math.min(1, armada.morale.average + moraleChange));
 

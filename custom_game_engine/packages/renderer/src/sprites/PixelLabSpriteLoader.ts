@@ -386,8 +386,8 @@ export class PixelLabSpriteLoader {
       }),
     })
       .then(res => res.json())
-      .then(result => {
-        console.log(`[AnimGen] Queued ${animationName} for ${folderId}:`, result.message);
+      .then(() => {
+        // Animation generation queued successfully
       })
       .catch(err => {
         console.error(`[AnimGen] Failed to queue ${animationName} for ${folderId}:`, err);
@@ -459,7 +459,6 @@ export class PixelLabSpriteLoader {
 
       if (foundAnyFrames && animMap.size > 0) {
         character.animations.set(animName, animMap);
-        console.log(`[PixelLabLoader] Loaded ${animName} animation for ${character.id} (${animMap.size} directions)`);
         // Clear generation request since we now have the animation
         this.generationRequests.delete(`${character.id}:${animName}`);
         return true;

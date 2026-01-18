@@ -35,7 +35,16 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     const appliedValues: Record<string, any> = {};
 
     // Create appearance component if missing (defensive programming)
-    let appearance = target.components.get('appearance') as any;
+    interface AppearanceComponent {
+      type: 'appearance';
+      form: string;
+      size: number;
+      material: string;
+      alignment?: string;
+      species?: string;
+    }
+
+    let appearance = target.components.get('appearance') as AppearanceComponent | undefined;
     if (!appearance) {
       appearance = { type: 'appearance', form: 'default', size: 1.0, material: 'flesh' };
       world.addComponent(target.id, appearance);
@@ -51,48 +60,51 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
       case 'form': {
         // Polymorph - change entity's form
         // Support both 'targetState' and 'newForm' properties
-        const newForm = (effect as any).targetState || (effect as any).newForm;
+        const effectWithExtras = effect as TransformEffect & { newForm?: string };
+        const newForm = effect.targetState || effectWithExtras.newForm;
         if (newForm) {
           appearance.form = newForm;
           appliedValues.newForm = newForm;
-          appliedValues.oldForm = this.originalForms.get(target.id)?.form || 'unknown';
+          const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
+          appliedValues.oldForm = originalForm?.form || 'unknown';
         }
         break;
       }
 
       case 'size': {
         // Enlarge/Reduce
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        const originalSize = targetAppearance.size || 1.0;
+        const originalSize = appearance.size || 1.0;
         const sizeMultiplier = parseFloat(effect.targetState) || 1.0;
-        targetAppearance.size = originalSize * sizeMultiplier;
+        appearance.size = originalSize * sizeMultiplier;
 
         appliedValues.sizeMultiplier = sizeMultiplier;
-        appliedValues.newSize = targetAppearance.size;
+        appliedValues.newSize = appearance.size;
         break;
       }
 
       case 'material': {
         // Petrify, Gaseous Form, etc.
-        const targetAppearance = (target.components.get('appearance') as any) || {};
-        targetAppearance.material = effect.targetState;
+        appearance.material = effect.targetState;
 
         appliedValues.newMaterial = effect.targetState;
-        appliedValues.oldMaterial = this.originalForms.get(target.id)?.material || 'flesh';
+        const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
+        appliedValues.oldMaterial = originalForm?.material || 'flesh';
         break;
       }
 
       case 'alignment': {
         // Alignment change
         appliedValues.newAlignment = effect.targetState;
-        appliedValues.oldAlignment = this.originalForms.get(target.id)?.alignment || 'neutral';
+        const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
+        appliedValues.oldAlignment = originalForm?.alignment || 'neutral';
         break;
       }
 
       case 'species': {
         // Species change (polymorph)
         appliedValues.newSpecies = effect.targetState;
-        appliedValues.oldSpecies = this.originalForms.get(target.id)?.species || 'unknown';
+        const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
+        appliedValues.oldSpecies = originalForm?.species || 'unknown';
         break;
       }
 
@@ -148,7 +160,15 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     // Restore original form
     const originalForm = this.originalForms.get(target.id);
     if (originalForm) {
-      const appearance = target.components.get('appearance') as any;
+      interface AppearanceComponent {
+        type: 'appearance';
+        form: string;
+        size: number;
+        material: string;
+        alignment?: string;
+        species?: string;
+      }
+      const appearance = target.components.get('appearance') as AppearanceComponent | undefined;
       if (appearance) {
         // Restore all original appearance properties
         Object.assign(appearance, originalForm);

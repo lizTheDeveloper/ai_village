@@ -59,6 +59,8 @@ export class SleepSystem extends BaseSystem {
   public readonly id = 'sleep' as const;
   public readonly priority = 12; // After Needs (priority 15), before Memory (100)
   public readonly requiredComponents = [CT.Circadian, CT.Needs] as const;
+  // Only run when circadian components exist (O(1) activation check)
+  public readonly activationComponents = ['circadian'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**

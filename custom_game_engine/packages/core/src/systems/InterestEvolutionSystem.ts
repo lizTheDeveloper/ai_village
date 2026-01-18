@@ -161,12 +161,12 @@ export class InterestEvolutionSystem extends BaseSystem {
   protected onInitialize(): void {
     // Listen for experience triggers
     // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
-    // Using on with string literal types for forward compatibility
-    this.events.on('agent:death' as any, (_data, event) => this.handleExperience(event, this.world));
-    this.events.on('deity:miracle' as any, (_data, event) => this.handleExperience(event, this.world));
+    // Using onGeneric for forward compatibility with events not yet in EventMap
+    this.events.onGeneric('agent:death', (_data, event) => this.handleExperience(event, this.world));
+    this.events.onGeneric('deity:miracle', (_data, event) => this.handleExperience(event, this.world));
     this.events.on('building:completed', (_data, event) => this.handleExperience(event, this.world));
     this.events.on('agent:born', (_data, event) => this.handleExperience(event, this.world));
-    this.events.on('prayer:answered' as any, (_data, event) => this.handleExperience(event, this.world));
+    this.events.onGeneric('prayer:answered', (_data, event) => this.handleExperience(event, this.world));
 
     // Listen for skill increases
     this.events.on('skill:level_up', (_data, event) => this.handleSkillGrowth(event, this.world));
@@ -418,7 +418,7 @@ export class InterestEvolutionSystem extends BaseSystem {
    * Emit interest mutation event
    */
   private emitMutationEvent(
-    world: any,
+    world: World,
     agent: EntityImpl,
     interest: Interest,
     eventType: InterestMutationEvent,
@@ -427,7 +427,8 @@ export class InterestEvolutionSystem extends BaseSystem {
   ): void {
     const identity = agent.getComponent<IdentityComponent>(CT.Identity);
 
-    this.events.emit(eventType as any, {
+    // Emit as generic event since interest mutation events not yet in EventMap
+    this.events.emitGeneric(eventType, {
       agentId: agent.id,
       agentName: identity?.name || 'Unknown',
       topic: interest.topic,
@@ -435,7 +436,7 @@ export class InterestEvolutionSystem extends BaseSystem {
       newIntensity: interest.intensity,
       source: interest.source,
       trigger,
-    } as any, agent.id);
+    });
   }
 
   /**

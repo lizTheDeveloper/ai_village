@@ -37,24 +37,94 @@ export class SquadronSystem extends BaseSystem {
 
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
+  // ========================================================================
+  // Performance Optimizations - Reusable Objects
+  // ========================================================================
+
+  /**
+   * Ship entity cache - prevents repeated world.getEntity() calls
+   * Rebuilt each update cycle with only the ships we need
+   */
+  private shipEntityCache: Map<string, EntityImpl | null> = new Map();
+
+  /**
+   * Reusable stats object - avoids allocation on every squadron update
+   * Reset before each use
+   */
+  private workingStats = {
+    totalCrew: 0,
+    weightedCoherence: 0,
+    combatStrength: 0,
+  };
+
+  /**
+   * Reusable ship type map - avoids creating new Record<> every update
+   * Cleared and reused instead of creating new object
+   */
+  private shipTypeMap: Map<string, number> = new Map();
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+
+    // Performance: Pre-cache all ship entities needed this tick
+    // This prevents O(n) world.getEntity() calls inside the squadron loop
+    this.rebuildShipCache(ctx.world, ctx.activeEntities);
 
     // Process each squadron
     for (const squadronEntity of ctx.activeEntities) {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
+      // Performance: Early exit for empty squadrons
+      if (squadron.shipIds.length === 0) continue;
+
       // Update squadron aggregate stats
       this.updateSquadronStats(ctx.world, squadronEntity as EntityImpl, squadron, tick);
 
-      // Check for formation bonuses
+      // Check for formation bonuses (pure computation, no DOM or allocations)
       this.applyFormationEffects(squadron);
     }
   }
 
   /**
+   * Build cache of all ship entities referenced by active squadrons
+   * This prevents repeated world.getEntity() lookups in the hot path
+   */
+  private rebuildShipCache(world: World, squadrons: ReadonlyArray<EntityImpl>): void {
+    this.shipEntityCache.clear();
+
+    // Collect all unique ship IDs from all squadrons
+    for (const squadronEntity of squadrons) {
+      const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+      if (!squadron) continue;
+
+      for (const shipId of squadron.shipIds) {
+        // Only lookup each ship once, even if it appears in multiple squadrons
+        if (!this.shipEntityCache.has(shipId)) {
+          const entity = world.getEntity(shipId);
+          this.shipEntityCache.set(shipId, entity as EntityImpl | null);
+        }
+      }
+    }
+  }
+
+  /**
+   * Reset reusable stats object to zero
+   * Performance: Avoids object allocation in hot path
+   */
+  private resetWorkingStats(): void {
+    this.workingStats.totalCrew = 0;
+    this.workingStats.weightedCoherence = 0;
+    this.workingStats.combatStrength = 0;
+  }
+
+  /**
    * Update squadron aggregate statistics from member ships
+   * Performance optimizations:
+   * - Uses cached ship entities (no repeated world.getEntity())
+   * - Reuses workingStats object (no allocation)
+   * - Reuses shipTypeMap (no Record<> creation)
+   * - Single component update at end (batched write)
    */
   private updateSquadronStats(
     world: World,
@@ -62,14 +132,14 @@ export class SquadronSystem extends BaseSystem {
     squadron: SquadronComponent,
     tick: number
   ): void {
-    let totalCrew = 0;
-    let weightedCoherence = 0;
-    let combatStrength = 0;
-    const shipTypeBreakdown: Record<string, number> = {};
+    // Performance: Reset reusable objects instead of allocating new ones
+    this.resetWorkingStats();
+    this.shipTypeMap.clear();
 
-    // Gather stats from all ships
+    // Gather stats from all ships using cached entities
     for (const shipId of squadron.shipIds) {
-      const shipEntity = world.getEntity(shipId);
+      // Performance: Use cached entity lookup instead of world.getEntity()
+      const shipEntity = this.shipEntityCache.get(shipId);
       if (!shipEntity) {
         // Ship missing - emit warning
         world.eventBus.emit({
@@ -87,28 +157,36 @@ export class SquadronSystem extends BaseSystem {
       if (!ship) continue;
 
       const crewCount = ship.crew.member_ids.length;
-      totalCrew += crewCount;
+      this.workingStats.totalCrew += crewCount;
 
       // Weight coherence by crew size
-      weightedCoherence += ship.crew.coherence * crewCount;
+      this.workingStats.weightedCoherence += ship.crew.coherence * crewCount;
 
       // Combat strength (simplified: based on hull mass and integrity)
-      combatStrength += ship.hull.mass * ship.hull.integrity;
+      this.workingStats.combatStrength += ship.hull.mass * ship.hull.integrity;
 
-      // Track ship types
+      // Track ship types - Performance: Use Map for O(1) lookups
       const shipType = ship.ship_type;
-      shipTypeBreakdown[shipType] = (shipTypeBreakdown[shipType] || 0) + 1;
+      this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + 1);
     }
 
     // Calculate average coherence weighted by crew size
-    const averageCoherence = totalCrew > 0 ? weightedCoherence / totalCrew : 0;
+    const averageCoherence = this.workingStats.totalCrew > 0
+      ? this.workingStats.weightedCoherence / this.workingStats.totalCrew
+      : 0;
 
-    // Update squadron component
+    // Convert Map to Record for component storage
+    const shipTypeBreakdown: Record<string, number> = {};
+    for (const [type, count] of this.shipTypeMap) {
+      shipTypeBreakdown[type] = count;
+    }
+
+    // Performance: Single batched component update (not multiple writes)
     squadronEntity.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
       ...s,
-      totalCrew,
+      totalCrew: this.workingStats.totalCrew,
       averageCoherence,
-      combatStrength,
+      combatStrength: this.workingStats.combatStrength,
       shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
     }));
   }
@@ -194,19 +272,22 @@ export function getFormationStrengthBonus(formation: SquadronComponent['formatio
 
 /**
  * Add a ship to a squadron
+ * Performance: Query done once before loop, array mutated efficiently
  */
 export function addShipToSquadron(
   world: World,
   squadronId: string,
   shipId: string
 ): { success: boolean; reason?: string } {
-  const squadronEntity = world.query()
+  // Performance: Cache query results before processing
+  const squadronEntities = world.query()
     .with(CT.Squadron)
-    .executeEntities()
-    .find(e => {
-      const s = e.getComponent<SquadronComponent>(CT.Squadron);
-      return s?.squadronId === squadronId;
-    });
+    .executeEntities();
+
+  const squadronEntity = squadronEntities.find(e => {
+    const s = e.getComponent<SquadronComponent>(CT.Squadron);
+    return s?.squadronId === squadronId;
+  });
 
   if (!squadronEntity) {
     return { success: false, reason: 'Squadron not found' };
@@ -217,6 +298,7 @@ export function addShipToSquadron(
     return { success: false, reason: 'Entity is not a squadron' };
   }
 
+  // Performance: Early returns for validation
   if (squadron.shipIds.length >= 10) {
     return { success: false, reason: 'Squadron already has maximum 10 ships' };
   }
@@ -227,6 +309,7 @@ export function addShipToSquadron(
 
   // Add ship to squadron
   const impl = squadronEntity as EntityImpl;
+  // Performance: Create new array once (spread is ok here - not in hot loop)
   impl.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
     ...s,
     shipIds: [...s.shipIds, shipId],
@@ -247,19 +330,22 @@ export function addShipToSquadron(
 
 /**
  * Remove a ship from a squadron
+ * Performance: Query done once before loop
  */
 export function removeShipFromSquadron(
   world: World,
   squadronId: string,
   shipId: string
 ): { success: boolean; reason?: string } {
-  const squadronEntity = world.query()
+  // Performance: Cache query results before processing
+  const squadronEntities = world.query()
     .with(CT.Squadron)
-    .executeEntities()
-    .find(e => {
-      const s = e.getComponent<SquadronComponent>(CT.Squadron);
-      return s?.squadronId === squadronId;
-    });
+    .executeEntities();
+
+  const squadronEntity = squadronEntities.find(e => {
+    const s = e.getComponent<SquadronComponent>(CT.Squadron);
+    return s?.squadronId === squadronId;
+  });
 
   if (!squadronEntity) {
     return { success: false, reason: 'Squadron not found' };
@@ -270,6 +356,7 @@ export function removeShipFromSquadron(
     return { success: false, reason: 'Entity is not a squadron' };
   }
 
+  // Performance: Early returns for validation
   if (!squadron.shipIds.includes(shipId)) {
     return { success: false, reason: 'Ship not in squadron' };
   }

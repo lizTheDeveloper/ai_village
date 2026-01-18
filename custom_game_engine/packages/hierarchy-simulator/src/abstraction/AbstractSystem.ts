@@ -216,9 +216,10 @@ export class AbstractSystem extends AbstractTierBase {
     // Asteroid belt mining
     for (const belt of this.asteroidBelts) {
       if (belt.miningStations > 0) {
-        for (const [resource, yield_] of belt.resourceYield) {
-          const currentStock = this.economy.stockpiles.get(resource as any) || 0;
-          this.economy.stockpiles.set(resource as any, currentStock + yield_ * belt.miningStations * deltaTime * 0.01);
+        for (const [resourceName, yield_] of belt.resourceYield) {
+          // Belt resources are generic strings; map them to economy stockpiles
+          const currentStock = this.economy.stockpiles.get(resourceName) || 0;
+          this.economy.stockpiles.set(resourceName, currentStock + yield_ * belt.miningStations * deltaTime * 0.01);
         }
       }
     }

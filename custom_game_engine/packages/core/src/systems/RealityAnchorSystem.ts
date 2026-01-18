@@ -33,10 +33,9 @@ export class RealityAnchorSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-    const world = ctx.world;
 
     // Process each reality anchor
-    for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
+    for (const anchor of ctx.activeEntities) {
       const anchorComp = anchor.getComponent<RealityAnchorComponent>(CT.RealityAnchor);
       const position = anchor.getComponent<PositionComponent>(CT.Position);
 
@@ -44,7 +43,7 @@ export class RealityAnchorSystem extends BaseSystem {
         continue;
       }
 
-      this.updateAnchor(world, anchor.id, anchorComp, position, currentTick);
+      this.updateAnchor(ctx, anchor.id, anchorComp, position, currentTick);
     }
   }
 
@@ -52,12 +51,14 @@ export class RealityAnchorSystem extends BaseSystem {
    * Update a single reality anchor
    */
   private updateAnchor(
-    world: World,
+    ctx: SystemContext,
     anchorId: string,
     anchor: RealityAnchorComponent,
     position: PositionComponent,
     currentTick: number
   ): void {
+    const world = ctx.world;
+
     // Skip if destroyed
     if (anchor.status === 'destroyed') {
       return;
@@ -94,7 +95,7 @@ export class RealityAnchorSystem extends BaseSystem {
 
     // Handle active field
     if (anchor.status === 'active') {
-      this.maintainField(world, anchorId, anchor, position, currentTick);
+      this.maintainField(ctx, anchorId, anchor, position, currentTick);
     }
 
     // Handle overload
@@ -111,12 +112,14 @@ export class RealityAnchorSystem extends BaseSystem {
    * Maintain active reality anchor field
    */
   private maintainField(
-    world: World,
+    ctx: SystemContext,
     anchorId: string,
     anchor: RealityAnchorComponent,
     position: PositionComponent,
     currentTick: number
   ): void {
+    const world = ctx.world;
+
     // Check if anchor has sufficient power
     const anchorEntity = world.getEntity(anchorId);
     const powerComp = anchorEntity?.getComponent<PowerComponent>(CT.Power);
@@ -171,25 +174,21 @@ export class RealityAnchorSystem extends BaseSystem {
     const previousEntities = new Set(anchor.entitiesInField);
     anchor.entitiesInField.clear();
 
-    // Check all entities for proximity
-    for (const entity of world.query().executeEntities()) {
-      const entityPos = entity.getComponent<PositionComponent>(CT.Position);
-      if (!entityPos) {
-        continue;
-      }
+    // Use chunk-based spatial query instead of scanning all entities
+    // This is O(nearby) instead of O(all entities in world)
+    const nearbyEntities = ctx.getNearbyEntities(
+      position,
+      anchor.fieldRadius,
+      [CT.Position] // Get all entities with position in radius
+    );
 
-      const dx = entityPos.x - position.x;
-      const dy = entityPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+    for (const { entity } of nearbyEntities) {
+      anchor.entitiesInField.add(entity.id);
 
-      if (distance <= anchor.fieldRadius) {
-        anchor.entitiesInField.add(entity.id);
-
-        // Check if this is a deity
-        const deity = entity.getComponent<DeityComponent>(CT.Deity);
-        if (deity && !previousEntities.has(entity.id)) {
-          this.godEnteredField(world, anchorId, anchor, entity.id, deity, currentTick);
-        }
+      // Check if this is a deity
+      const deity = entity.getComponent<DeityComponent>(CT.Deity);
+      if (deity && !previousEntities.has(entity.id)) {
+        this.godEnteredField(world, anchorId, anchor, entity.id, deity, currentTick);
       }
     }
 

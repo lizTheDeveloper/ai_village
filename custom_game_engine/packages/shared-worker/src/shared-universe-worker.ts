@@ -87,11 +87,9 @@ class UniverseWorker {
     const savedState = await this.persistence.loadState();
 
     if (savedState) {
-      console.log(`[UniverseWorker] Loading saved state from tick ${savedState.tick}`);
       this.loadState(savedState);
       this.tick = savedState.tick;
     } else {
-      console.log('[UniverseWorker] No saved state, starting fresh');
       this.tick = 0;
     }
 
@@ -342,8 +340,6 @@ class UniverseWorker {
     }
 
     this.tick = state.tick;
-
-    console.log(`[UniverseWorker] Loaded state with ${Object.keys(state.world.entities).length} entities`);
   }
 
   /**
@@ -379,8 +375,6 @@ class UniverseWorker {
     };
 
     port.start();
-
-    console.log(`[UniverseWorker] New connection: ${id} (total: ${this.connections.size})`);
   }
 
   /**
@@ -391,7 +385,6 @@ class UniverseWorker {
     if (conn) {
       conn.connected = false;
       this.connections.delete(id);
-      console.log(`[UniverseWorker] Removed connection: ${id} (remaining: ${this.connections.size})`);
     }
   }
 
@@ -411,7 +404,6 @@ class UniverseWorker {
 
       case 'subscribe':
         conn.subscribedDomains = new Set(message.domains);
-        console.log(`[UniverseWorker] Connection ${connectionId} subscribed to:`, message.domains);
         break;
 
       case 'request-snapshot':
@@ -422,17 +414,14 @@ class UniverseWorker {
 
       case 'pause':
         this.paused = true;
-        console.log('[UniverseWorker] Paused');
         break;
 
       case 'resume':
         this.paused = false;
-        console.log('[UniverseWorker] Resumed');
         break;
 
       case 'set-speed':
         this.config.speedMultiplier = message.speed;
-        console.log(`[UniverseWorker] Speed set to ${message.speed}x`);
         break;
 
       case 'set-viewport':
@@ -491,8 +480,6 @@ class UniverseWorker {
     agent.addComponent({
       type: 'agent',
     });
-
-    console.log(`[UniverseWorker] Spawned agent "${name}" at (${x}, ${y})`);
   }
 
   /**

@@ -265,7 +265,7 @@ export class CanonEventRecorder {
       .with(CT.Relationship)
       .execute()
       .filter((id) => {
-        const rel = world.getComponent(id, CT.Relationship) as any;
+        const rel = world.getComponent(id, CT.Relationship) as { type?: string; isMarried?: boolean } | undefined;
         return rel?.type === 'union' || rel?.isMarried;
       }).length;
 
@@ -278,7 +278,7 @@ export class CanonEventRecorder {
     }>();
 
     for (const agent of ensouledAgents) {
-      const agentComp = agent.getComponent(CT.Agent) as any;
+      const agentComp = agent.getComponent(CT.Agent) as { name?: string; generation?: number } | undefined;
       const generation = agentComp?.generation ?? 0;
 
       // Find founder (generation 0 ancestor)
@@ -303,11 +303,11 @@ export class CanonEventRecorder {
     // Track reincarnation chains
     const reincarnationChains: GenealogicalContext['reincarnationChains'] = [];
     for (const agent of ensouledAgents) {
-      const soulComp = agent.getComponent(CT.SoulIdentity) as any;
-      const incarnationComp = agent.getComponent(CT.Incarnation) as any;
+      const soulComp = agent.getComponent(CT.SoulIdentity) as { soulId?: string } | undefined;
+      const incarnationComp = agent.getComponent(CT.Incarnation) as { previousLives?: unknown[] } | undefined;
 
       if (incarnationComp?.previousLives && incarnationComp.previousLives.length > 0) {
-        const agentComp = agent.getComponent(CT.Agent) as any;
+        const agentComp = agent.getComponent(CT.Agent) as { name?: string; birthTick?: number } | undefined;
         reincarnationChains.push({
           originalSoulId: soulComp?.soulId ?? agent.id,
           incarnations: [
@@ -357,7 +357,7 @@ export class CanonEventRecorder {
     for (const agentId of options.agentIds ?? []) {
       const entity = world.getEntity(agentId);
       if (entity && this.isEnsouled(entity)) {
-        const agentComp = entity.getComponent(CT.Agent) as any;
+        const agentComp = entity.getComponent(CT.Agent) as { name?: string } | undefined;
         agentNames.push(agentComp?.name ?? 'Unknown');
       }
     }
@@ -472,7 +472,7 @@ export class CanonEventRecorder {
     const timeEntities = world.query().with(CT.Time).execute();
     if (timeEntities.length === 0) return 0;
 
-    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as any;
+    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as { tick?: number } | undefined;
     return timeComp?.tick ?? 0;
   }
 
@@ -483,7 +483,7 @@ export class CanonEventRecorder {
     const timeEntities = world.query().with(CT.Time).execute();
     if (timeEntities.length === 0) return 1;
 
-    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as any;
+    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as { day?: number } | undefined;
     return timeComp?.day ?? 1;
   }
 }

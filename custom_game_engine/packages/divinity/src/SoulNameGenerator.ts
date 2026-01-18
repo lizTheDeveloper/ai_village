@@ -121,7 +121,6 @@ export class SoulNameGenerator {
    */
   setSoulRepository(repository: any): void {
     this.soulRepositorySystem = repository;
-    console.log('[SoulNameGenerator] Connected to soul repository');
   }
 
   /**
@@ -268,8 +267,6 @@ Name:`;
       const namesWithSameLetter = allExistingNames.filter((n: string) =>
         n.charAt(0).toUpperCase() === firstLetter
       );
-
-      console.log(`[SoulNameGenerator] Name "${name}" already exists. Retrying with context about ${firstLetter}-names...`);
 
       const retryPrompt = `The name "${name}" is already taken.
 

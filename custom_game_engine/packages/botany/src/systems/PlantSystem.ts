@@ -344,7 +344,7 @@ export class PlantSystem extends BaseSystem {
         const species = this.getSpecies(plant.speciesId);
 
         // Get environment for this plant
-        const environment = this.getEnvironment(plant.position, world as any);
+        const environment = this.getEnvironment(plant.position, world);
 
         // Apply weather effects (every frame for immediate response)
         this.applyWeatherEffects(plant, environment);
@@ -360,12 +360,12 @@ export class PlantSystem extends BaseSystem {
 
         // Hourly updates - stage progress and event emission
         if (shouldUpdate) {
-          this.updatePlantHourly(plant, species, environment, world as any, entity.id, hoursToProcess);
+          this.updatePlantHourly(plant, species, environment, world, entity.id, hoursToProcess);
         }
 
         // Check for stage transition
         if (plant.stageProgress >= 1.0) {
-          this.attemptStageTransition(plant, species, environment, world as any, entity.id);
+          this.attemptStageTransition(plant, species, environment, world, entity.id);
         }
 
         // Check for death
@@ -394,7 +394,7 @@ export class PlantSystem extends BaseSystem {
     // MIDNIGHT FRUIT REGENERATION: All plants regenerate fruit once per day at midnight
     // This runs only when the day has just changed (midnight)
     if (this.dayStarted) {
-      this.regenerateFruitAtMidnight(entities, world as any);
+      this.regenerateFruitAtMidnight(entities, world);
     }
 
     // Reset accumulated time and flags after update

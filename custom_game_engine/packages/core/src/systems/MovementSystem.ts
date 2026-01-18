@@ -51,6 +51,8 @@ export class MovementSystem extends BaseSystem {
     CT.Movement,
     CT.Position,
   ];
+  // Only run when movement components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Movement] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   /**

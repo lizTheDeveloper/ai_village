@@ -34,7 +34,6 @@ export class IndexedDBStorage implements StorageBackend {
     this.initAttempts++;
 
     this.initPromise = new Promise((resolve, reject) => {
-      console.log(`[IndexedDB] Opening database: ${this.dbName} (attempt ${this.initAttempts}/${this.MAX_INIT_ATTEMPTS})`);
       const request = indexedDB.open(this.dbName, 1);
 
       // Add timeout to prevent hanging indefinitely
@@ -52,7 +51,6 @@ export class IndexedDBStorage implements StorageBackend {
               new Promise<void>((resolveDelete, rejectDelete) => {
                 const deleteRequest = indexedDB.deleteDatabase(this.dbName);
                 deleteRequest.onsuccess = () => {
-                  console.log(`[IndexedDB] Database deleted successfully`);
                   resolveDelete();
                 };
                 deleteRequest.onerror = () => {
@@ -91,24 +89,20 @@ export class IndexedDBStorage implements StorageBackend {
 
       request.onsuccess = () => {
         clearTimeout(timeout);
-        console.log(`[IndexedDB] Database opened successfully`);
         this.db = request.result;
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
-        console.log(`[IndexedDB] Upgrading database schema`);
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Create saves store
         if (!db.objectStoreNames.contains(this.storeName)) {
-          console.log(`[IndexedDB] Creating object store: ${this.storeName}`);
           db.createObjectStore(this.storeName, { keyPath: 'key' });
         }
 
         // Create metadata store
         if (!db.objectStoreNames.contains(this.metadataStore)) {
-          console.log(`[IndexedDB] Creating metadata store: ${this.metadataStore}`);
           const metaStore = db.createObjectStore(this.metadataStore, {
             keyPath: 'key',
           });

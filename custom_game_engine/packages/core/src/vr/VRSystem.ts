@@ -203,7 +203,11 @@ export class VRSystem extends BaseSystem {
     fidelity: number
   ): void {
     // Get mood component
-    const mood = entity.getComponent('mood') as any;
+    interface MoodComponent {
+      currentMood: number;
+      emotionalState: string;
+    }
+    const mood = entity.getComponent<MoodComponent>('mood');
     if (!mood) return;
 
     // Emotional influence strength based on fidelity and progress
@@ -239,7 +243,10 @@ export class VRSystem extends BaseSystem {
     }
 
     // Update mood component (cast to EntityImpl to access mutator methods)
-    (entity as any).updateComponent('mood', () => mood);
+    interface EntityWithUpdate {
+      updateComponent<T>(type: string, updater: (current: T) => T): void;
+    }
+    (entity as unknown as EntityWithUpdate).updateComponent('mood', () => mood);
   }
 
   /**

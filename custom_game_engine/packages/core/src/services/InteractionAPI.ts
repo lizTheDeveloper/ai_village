@@ -374,7 +374,10 @@ export class InteractionAPI {
     }
 
     // Get species definition to check for harvestResetStage
-    const species = (world as any).plantSpeciesLookup?.(plant.speciesId);
+    interface WorldWithPlantLookup extends World {
+      plantSpeciesLookup?: (speciesId: string) => { harvestResetStage?: string; harvestDestroysPlant?: boolean } | undefined;
+    }
+    const species = (world as WorldWithPlantLookup).plantSpeciesLookup?.(plant.speciesId);
     const newFruitCount = Math.max(0, plant.fruitCount - 1);
 
     // Consume one fruit from the plant
@@ -555,7 +558,7 @@ export class InteractionAPI {
     }
 
     const itemImpl = itemEntity as EntityImpl;
-    const item = itemImpl.getComponent(ComponentType.Item) as any;
+    const item = itemImpl.getComponent<{ itemId: string; quantity?: number }>(ComponentType.Item);
     if (!item) {
       return { success: false, message: 'Target is not an item' };
     }

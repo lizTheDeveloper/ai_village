@@ -28,7 +28,6 @@ let chunkSpatialQuery: any | null = null;
 
 export function injectChunkSpatialQueryToRepair(spatialQuery: any): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[RepairBehavior] ChunkSpatialQuery injected');
 }
 
 /**

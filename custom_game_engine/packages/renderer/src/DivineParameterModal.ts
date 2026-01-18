@@ -144,23 +144,19 @@ export class DivineParameterModal {
    * Show the modal for a specific divine power
    */
   show(config: DivineParameterConfig): void {
-    console.log('[DivineParameterModal] Showing modal for power:', config.powerType);
     this.currentConfig = config;
     this.selectedTargetId = null;
     this.inputMessage = '';
     this.selectedSignType = null;
 
     this.container.style.display = 'flex';
-    console.log('[DivineParameterModal] Container display set to flex');
     this.render();
-    console.log('[DivineParameterModal] Render complete');
   }
 
   /**
    * Hide and cancel
    */
   cancel(): void {
-    console.log('[DivineParameterModal] Cancel clicked');
     try {
       if (this.currentConfig?.onCancel) {
         this.currentConfig.onCancel();
@@ -175,7 +171,6 @@ export class DivineParameterModal {
    * Hide modal
    */
   hide(): void {
-    console.log('[DivineParameterModal] Hiding modal');
     this.container.style.display = 'none';
     this.currentConfig = null;
   }
@@ -184,7 +179,6 @@ export class DivineParameterModal {
    * Confirm and return parameters
    */
   confirm(): void {
-    console.log('[DivineParameterModal] Confirm clicked');
     if (!this.currentConfig) {
       console.warn('[DivineParameterModal] No config, cannot confirm');
       return;
@@ -196,8 +190,6 @@ export class DivineParameterModal {
       signType: this.selectedSignType ?? undefined,
       params: {},
     };
-
-    console.log('[DivineParameterModal] Result:', result);
 
     // Add power-specific params
     if (this.currentConfig.powerType === 'subtle_sign' && this.selectedSignType) {
@@ -529,9 +521,7 @@ export class DivineParameterModal {
     const confirmBtn = document.getElementById('divine-param-confirm');
 
     if (cancelBtn) {
-      console.log('[DivineParameterModal] Cancel button found, attaching listener');
       cancelBtn.addEventListener('click', (e) => {
-        console.log('[DivineParameterModal] Cancel button clicked');
         e.preventDefault();
         e.stopPropagation();
         this.cancel();
@@ -551,9 +541,7 @@ export class DivineParameterModal {
     }
 
     if (confirmBtn) {
-      console.log('[DivineParameterModal] Confirm button found, attaching listener');
       confirmBtn.addEventListener('click', (e) => {
-        console.log('[DivineParameterModal] Confirm button clicked');
         e.preventDefault();
         e.stopPropagation();
         this.confirm();

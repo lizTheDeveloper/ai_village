@@ -164,8 +164,6 @@ async function loadFrameAnimation(animationId: string, folderPath: string): Prom
       loop: metadata.loop !== false,
       metadata,
     });
-
-    console.log(`[SpriteRenderer] Loaded frame animation: ${animationId} (${frames.length} frames @ ${metadata.fps}fps)`);
   } catch (err) {
     console.error(`[SpriteRenderer] Failed to load frame animation ${animationId}:`, err);
   } finally {

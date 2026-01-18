@@ -48,6 +48,8 @@ export class PowerGridSystem extends BaseSystem {
   public readonly id: SystemId = 'power_grid';
   public readonly priority: number = 50; // Before other automation systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Power, CT.Position];
+  // Only run when power components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Power] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private networks: Map<string, PowerNetwork> = new Map();

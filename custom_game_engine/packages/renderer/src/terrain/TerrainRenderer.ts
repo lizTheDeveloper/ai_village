@@ -143,12 +143,6 @@ export class TerrainRenderer {
 
         // Render wall tiles
         if (tileWithBuilding.wall) {
-          // Debug: Log first wall detected (only once per session)
-          if (!this.hasLoggedWallRender) {
-            this.hasLoggedWallRender = true;
-            console.log(`[Renderer] ✅ Detected wall tile at world (${chunk.x * CHUNK_SIZE + localX}, ${chunk.y * CHUNK_SIZE + localY})`, tileWithBuilding.wall);
-          }
-
           const wall = tileWithBuilding.wall;
           const progress = wall.constructionProgress ?? 100;
           const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;

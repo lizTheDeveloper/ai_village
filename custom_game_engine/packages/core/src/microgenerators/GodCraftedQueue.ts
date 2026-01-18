@@ -149,10 +149,6 @@ export class GodCraftedQueue {
       discoveredAt: discovery.discoveredAt,
       discoveredBy,
     };
-
-    console.log(
-      `[GodCraftedQueue] Discovered: ${entry.content.type} by ${discoveredBy} in universe ${universeId}`
-    );
   }
 
   /**
@@ -304,8 +300,6 @@ export class GodCraftedQueue {
         this.tagIndex.get(tag)!.add(entry.entryId);
       }
     }
-
-    console.log(`[GodCraftedQueue] Deserialized ${data.entries.length} entries`);
   }
 
   // =========================================================================

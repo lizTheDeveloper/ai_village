@@ -267,8 +267,6 @@ export class MultiverseClient {
       const compressedData = await compress(jsonData);
       const compressedSize = compressedData.length;
 
-      console.log(`[MultiverseClient] Compressed ${(originalSize / 1024).toFixed(0)}KB -> ${(compressedSize / 1024).toFixed(0)}KB (${((1 - compressedSize / originalSize) * 100).toFixed(0)}% reduction)`);
-
       body = JSON.stringify({
         compressedSnapshot: compressedData,
         tick,

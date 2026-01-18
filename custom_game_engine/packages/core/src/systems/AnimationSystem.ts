@@ -15,6 +15,8 @@ export class AnimationSystem extends BaseSystem {
   readonly id = 'animation' as const;
   readonly priority = 100;
   readonly requiredComponents = ['animation', 'renderable'] as const;
+  // Only run when animation components exist (O(1) activation check)
+  readonly activationComponents = ['animation'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onUpdate(ctx: SystemContext): void {

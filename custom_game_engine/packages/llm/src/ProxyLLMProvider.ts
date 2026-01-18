@@ -97,7 +97,6 @@ export class ProxyLLMProvider implements LLMProvider {
 
       if (now < nextAllowedAt) {
         const waitMs = nextAllowedAt - now;
-        console.log(`[ProxyLLMProvider] Waiting ${waitMs}ms for ${provider} cooldown`);
         await this.sleep(waitMs);
       }
 
@@ -137,7 +136,6 @@ export class ProxyLLMProvider implements LLMProvider {
           // If we haven't exceeded retries, wait and retry
           if (retryCount < maxRetries) {
             retryCount++;
-            console.log(`[ProxyLLMProvider] Rate limited by server. Waiting ${waitMs}ms and retrying (${retryCount}/${maxRetries})...`);
             await this.sleep(waitMs);
             continue; // Retry the request
           } else {

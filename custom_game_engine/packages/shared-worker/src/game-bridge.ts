@@ -84,7 +84,6 @@ export class GameBridge {
     // Register path interpolation system (runs locally in window)
     const pathInterpolator = new PathInterpolationSystem();
     this.viewSystemRegistry.register(pathInterpolator);
-    console.log('[GameBridge] Registered PathInterpolationSystem for client-side prediction');
 
     // Create GameLoop-compatible interface
     const self = this;
@@ -114,16 +113,12 @@ export class GameBridge {
         self.setSpeed(speed);
       },
     };
-
-    console.log('[GameBridge] Created view-only interface (NO LOCAL SIMULATION)');
   }
 
   /**
    * Initialize the bridge and connect to SharedWorker
    */
   async init(): Promise<void> {
-    console.log('[GameBridge] Initializing...');
-
     // Connect to SharedWorker
     this.universeClient.connect();
 
@@ -147,8 +142,6 @@ export class GameBridge {
     if (!this.universeClient.isConnected()) {
       throw new Error('[GameBridge] Failed to connect to SharedWorker after 5 seconds');
     }
-
-    console.log('[GameBridge] Connected to SharedWorker - window is VIEW ONLY');
   }
 
   /**

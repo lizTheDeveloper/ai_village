@@ -231,9 +231,6 @@ export class BackgroundChunkGenerator {
         }
         return;
       } else if (currentTPS >= this.resumeTPS && this.isPaused) {
-        console.log(
-          `[BackgroundChunkGenerator] Resuming generation - TPS recovered to ${currentTPS.toFixed(1)}`
-        );
         this.isPaused = false;
       }
     }

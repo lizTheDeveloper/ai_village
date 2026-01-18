@@ -174,9 +174,6 @@ export class CooldownCalculator {
    */
   setCustomRateLimit(apiKeyHash: string, rateLimit: RateLimitConfig): void {
     this.rateLimits.customKeys.set(apiKeyHash, rateLimit);
-    console.log(
-      `[CooldownCalculator] Set custom rate limit for key ${apiKeyHash}: ${rateLimit.requestsPerMinute} RPM`
-    );
   }
 
   /**
@@ -187,8 +184,5 @@ export class CooldownCalculator {
    */
   updateProviderRateLimit(provider: string, rateLimit: RateLimitConfig): void {
     this.rateLimits[provider] = rateLimit;
-    console.log(
-      `[CooldownCalculator] Updated rate limit for ${provider}: ${rateLimit.requestsPerMinute} RPM`
-    );
   }
 }

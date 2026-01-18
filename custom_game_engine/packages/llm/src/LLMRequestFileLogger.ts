@@ -108,8 +108,6 @@ export class LLMRequestFileLogger {
 
       fs.appendFileSync(this.currentLogFile, lines, 'utf8');
 
-      console.log(`[LLMRequestFileLogger] Flushed ${this.writeQueue.length} entries to ${this.currentLogFile}`);
-
       // Clear queue
       this.writeQueue = [];
     } catch (error) {
@@ -133,10 +131,7 @@ export class LLMRequestFileLogger {
    */
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-    if (enabled) {
-      console.log('[LLMRequestFileLogger] Logging enabled');
-    } else {
-      console.log('[LLMRequestFileLogger] Logging disabled');
+    if (!enabled) {
       this.flush(); // Flush any pending entries
     }
   }

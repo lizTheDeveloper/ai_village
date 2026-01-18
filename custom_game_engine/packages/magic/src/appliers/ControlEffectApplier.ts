@@ -24,6 +24,11 @@ import type { VelocityComponent } from '@ai-village/core';
 import type { PositionComponent } from '@ai-village/core';
 import type { NeedsComponent } from '@ai-village/core';
 import type { AgentComponent } from '@ai-village/core';
+import type {
+  StatusEffectsComponent,
+  BehaviorComponent,
+  NeedsComponentWithHealth,
+} from '../types/ComponentTypes.js';
 
 // ============================================================================
 // Effect State Storage
@@ -280,7 +285,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
         level: Math.floor(Math.log2(context.casterMagic.totalSpellsCast + 1)),
       });
       result.appliedValues['dotDamage'] = dotValue.value;
-      result.appliedValues['dotType'] = effect.dotType as any;
+      result.appliedValues['dotType'] = effect.dotType;
     }
 
     return result;
@@ -407,8 +412,9 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
     // Apply damage to target's health
     const needs = target.components.get('needs') as NeedsComponent | undefined;
     if (needs && 'health' in needs) {
-      const currentHealth = (needs as any).health ?? 100;
-      (needs as any).health = Math.max(0, currentHealth - damage);
+      const needsWithHealth = needs as unknown as NeedsComponentWithHealth;
+      const currentHealth = needsWithHealth.health ?? 100;
+      needsWithHealth.health = Math.max(0, currentHealth - damage);
     }
   }
 }
@@ -459,10 +465,16 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
         this.stopMovement(target);
         // Create status_effects component if missing
         if (!target.components.get('status_effects')) {
-          world.addComponent(target.id, { type: 'status_effects', isStunned: true } as any);
+          const newStatusEffects: StatusEffectsComponent = {
+            type: 'status_effects' as const,
+            isStunned: true
+          };
+          world.addComponent(target.id, newStatusEffects);
         } else {
-          const statusEffects = target.components.get('status_effects') as any;
-          statusEffects.isStunned = true;
+          const statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
+          if (statusEffects) {
+            statusEffects.isStunned = true;
+          }
         }
         break;
 

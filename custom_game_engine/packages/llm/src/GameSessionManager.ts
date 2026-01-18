@@ -42,10 +42,6 @@ export class GameSessionManager {
       lastRequestTime: 0,
       requestCount: 0,
     });
-
-    console.log(
-      `[GameSessionManager] Registered session: ${sessionId} (total: ${this.sessions.size})`
-    );
   }
 
   /**
@@ -132,9 +128,6 @@ export class GameSessionManager {
 
     for (const sessionId of staleSessions) {
       this.sessions.delete(sessionId);
-      console.log(
-        `[GameSessionManager] Removed stale session: ${sessionId} (total: ${this.sessions.size})`
-      );
     }
   }
 
@@ -144,11 +137,7 @@ export class GameSessionManager {
    * @param sessionId - Session to remove
    */
   removeSession(sessionId: string): void {
-    if (this.sessions.delete(sessionId)) {
-      console.log(
-        `[GameSessionManager] Removed session: ${sessionId} (total: ${this.sessions.size})`
-      );
-    }
+    this.sessions.delete(sessionId);
   }
 
   /**

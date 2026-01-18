@@ -855,7 +855,7 @@ function generateGridCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   grid[Math.floor(centerY)][Math.floor(centerX)] = 'T';  // Town hall / temple
 
   // Compile stats
-  const districtCounts: Record<DistrictType, number> = {} as any;
+  const districtCounts: Partial<Record<DistrictType, number>> = {};
   for (const plot of plots) {
     districtCounts[plot.districtType] = (districtCounts[plot.districtType] || 0) + 1;
   }
@@ -874,7 +874,7 @@ function generateGridCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     stats: {
       totalBuildings: plots.filter(p => p.building).length,
       totalPlots: plots.length,
-      districtCounts,
+      districtCounts: districtCounts as Record<DistrictType, number>,
       streetLength: Math.round(streetLength),
     },
   };
@@ -1024,9 +1024,9 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   }
 
   // 2. Create Voronoi-like regions using simple nearest-seed assignment
-  const regionMap: number[][] = createEmptyGrid(width, height, '-1' as any).map(row =>
-    row.map(() => -1)
-  ) as unknown as number[][];
+  const regionMap: number[][] = Array.from({ length: height }, () =>
+    Array.from({ length: width }, () => -1)
+  );
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -1216,7 +1216,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   }
 
   // Compile stats
-  const districtCounts: Record<DistrictType, number> = {} as any;
+  const districtCounts: Partial<Record<DistrictType, number>> = {};
   for (const plot of plots) {
     districtCounts[plot.districtType] = (districtCounts[plot.districtType] || 0) + 1;
   }
@@ -1229,7 +1229,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     stats: {
       totalBuildings: plots.filter(p => p.building).length,
       totalPlots: plots.length,
-      districtCounts,
+      districtCounts: districtCounts as Record<DistrictType, number>,
       streetLength: 0,  // Complex to calculate for organic
     },
   };
@@ -1488,7 +1488,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   // (In real implementation, would be separate layer)
 
   // Compile stats
-  const districtCounts: Record<DistrictType, number> = {} as any;
+  const districtCounts: Partial<Record<DistrictType, number>> = {};
   for (const plot of plots) {
     districtCounts[plot.districtType] = (districtCounts[plot.districtType] || 0) + 1;
   }
@@ -1501,7 +1501,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     stats: {
       totalBuildings: plots.length,
       totalPlots: plots.length,
-      districtCounts,
+      districtCounts: districtCounts as Record<DistrictType, number>,
       streetLength: 0,  // No streets, flight lanes instead
     },
   };
@@ -1835,7 +1835,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
   const totalSanityDrain = plots.reduce((sum, p) => sum + p.sanityDrain, 0);
 
   // Compile stats
-  const districtCounts: Record<DistrictType, number> = {} as any;
+  const districtCounts: Partial<Record<DistrictType, number>> = {};
   for (const plot of plots) {
     districtCounts[plot.districtType] = (districtCounts[plot.districtType] || 0) + 1;
   }
@@ -1848,7 +1848,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
     stats: {
       totalBuildings: plots.length,
       totalPlots: plots.length,
-      districtCounts,
+      districtCounts: districtCounts as Record<DistrictType, number>,
       streetLength: loopCount,  // Loops, not length
     },
   };

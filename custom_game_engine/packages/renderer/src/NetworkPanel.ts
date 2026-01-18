@@ -648,7 +648,6 @@ export class NetworkPanel implements IWindowPanel {
 
     try {
       const peerId = await this.networkManager.connectToPeer(address);
-      console.log(`[NetworkPanel] Connected to peer: ${peerId}`);
 
       this.connectAddressInput.value = '';
       this.updateState();
@@ -686,8 +685,6 @@ export class NetworkPanel implements IWindowPanel {
         viewMode: 'observe',
         interactionMode: 'limited',
       });
-
-      console.log('[NetworkPanel] Remote passage created');
 
       this.showPassageDialog = false;
       this.passageUniverseIdInput.value = '';

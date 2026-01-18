@@ -129,7 +129,7 @@ export class AgentDebugLogger {
     const tick = this.getCurrentTick(world);
 
     // Position (required field)
-    const position = entity.getComponent('position') as any;
+    const position = entity.getComponent<{ x: number; y: number }>('position');
     const entry: AgentDebugEntry = {
       timestamp: Date.now(),
       tick,
@@ -138,7 +138,7 @@ export class AgentDebugLogger {
     };
 
     // Identity
-    const identity = entity.getComponent('identity') as any;
+    const identity = entity.getComponent<{ name?: string }>('identity');
     if (identity) {
       entry.agentName = identity.name;
     }
@@ -154,7 +154,7 @@ export class AgentDebugLogger {
     }
 
     // Target (check multiple sources)
-    const steering = entity.getComponent('steering') as any;
+    const steering = entity.getComponent<{ target?: { x: number; y: number } }>('steering');
     if (steering?.target) {
       entry.target = {
         x: steering.target.x,
@@ -163,7 +163,7 @@ export class AgentDebugLogger {
       };
     } else {
       // Check action queue for target
-      const actionQueue = entity.getComponent('action_queue') as any;
+      const actionQueue = entity.getComponent('action_queue');
       if (actionQueue) {
         const actions = this.extractActions(actionQueue);
         if (actions.length > 0 && actions[0]?.targetPos) {
@@ -177,14 +177,23 @@ export class AgentDebugLogger {
     }
 
     // Movement
-    const movement = entity.getComponent('movement') as any;
+    const movement = entity.getComponent<{ velocityX: number; velocityY: number; speed: number }>('movement');
     if (movement) {
       entry.velocity = { x: movement.velocityX, y: movement.velocityY };
       entry.speed = movement.speed;
     }
 
     // Behavior
-    const agent = entity.getComponent('agent') as any;
+    interface AgentDebugData {
+      behavior: string;
+      behaviorQueue?: Array<{ behavior: string; label?: string; priority?: string; targetPos?: { x: number; y: number } }>;
+      personalGoal?: string;
+      mediumTermGoal?: string;
+      groupGoal?: string;
+      lastThought?: string;
+      assignedBed?: string;
+    }
+    const agent = entity.getComponent<AgentDebugData>('agent');
     if (agent) {
       entry.behavior = agent.behavior;
 
@@ -221,7 +230,7 @@ export class AgentDebugLogger {
       if (agent.assignedBed && position) {
         const bedEntity = world.getEntity(agent.assignedBed);
         if (bedEntity) {
-          const bedPos = bedEntity.getComponent('position') as any;
+          const bedPos = bedEntity.getComponent<{ x: number; y: number }>('position');
           if (bedPos) {
             entry.home = { x: bedPos.x, y: bedPos.y };
             const dx = position.x - bedPos.x;
@@ -233,11 +242,11 @@ export class AgentDebugLogger {
     }
 
     // Action queue
-    const actionQueue = entity.getComponent('action_queue') as any;
+    const actionQueue = entity.getComponent('action_queue');
     if (actionQueue) {
       const actions = this.extractActions(actionQueue);
       if (actions.length > 0) {
-        entry.actionQueue = actions.map((a: any) => ({
+        entry.actionQueue = actions.map((a: { type: string; priority?: number; targetPos?: { x: number; y: number }; targetId?: string }) => ({
           type: a.type,
           priority: a.priority,
           targetPos: a.targetPos,
@@ -247,7 +256,7 @@ export class AgentDebugLogger {
     }
 
     // Needs
-    const needs = entity.getComponent('needs') as any;
+    const needs = entity.getComponent<{ hunger: number; energy: number; health: number }>('needs');
     if (needs) {
       entry.needs = {
         hunger: needs.hunger,
@@ -257,7 +266,22 @@ export class AgentDebugLogger {
     }
 
     // LLM Interactions (for benchmarking)
-    const llmHistory = entity.getComponent('llm_history') as any;
+    interface LLMHistoryDebugData {
+      getLastAnyInteraction?: () => {
+        timestamp: number;
+        layer: 'talker' | 'executor';
+        prompt?: string;
+        response?: {
+          thinking?: string;
+          action?: unknown;
+          rawResponse?: unknown;
+          speaking?: string;
+        };
+        success: boolean;
+        error?: string;
+      } | null;
+    }
+    const llmHistory = entity.getComponent<LLMHistoryDebugData>('llm_history');
     if (llmHistory) {
       const lastInteraction = llmHistory.getLastAnyInteraction?.();
       if (lastInteraction) {
@@ -317,7 +341,11 @@ export class AgentDebugLogger {
     }
 
     if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
-      return (actionQueue as any)._queue || (actionQueue as any).actions || [];
+      interface QueueWithInternals {
+        _queue?: unknown[];
+        actions?: unknown[];
+      }
+      return (actionQueue as QueueWithInternals)._queue || (actionQueue as QueueWithInternals).actions || [];
     }
 
     return [];
@@ -330,7 +358,7 @@ export class AgentDebugLogger {
     const timeEntities = world.query().with('time').executeEntities();
     const firstTimeEntity = timeEntities[0];
     if (firstTimeEntity) {
-      const time = firstTimeEntity.getComponent('time') as any;
+      const time = firstTimeEntity.getComponent<{ tick?: number }>('time');
       return time?.tick || 0;
     }
     return 0;

@@ -40,13 +40,33 @@ export class NavySystem extends BaseSystem {
 
   protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
+  // PERF: Cache armada and fleet lookups to avoid repeated world.getEntity() calls
+  private armadaCache: Map<string, EntityImpl> = new Map();
+  private fleetCache: Map<string, EntityImpl> = new Map();
+
+  // PERF: Reusable objects to avoid allocations in hot paths
+  private workingStats = {
+    totalShips: 0,
+    totalCrew: 0,
+    totalStrength: 0,
+  };
+
+  // PERF: Reuse Map for ship type breakdown
+  private shipTypeMap: Map<string, number> = new Map();
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+
+    // PERF: Build entity caches once per update
+    this.rebuildEntityCaches(ctx.world);
 
     // Process each navy
     for (const navyEntity of ctx.activeEntities) {
       const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
       if (!navy) continue;
+
+      // PERF: Early exit for empty navies
+      if (navy.armadaIds.length === 0 && navy.reserveFleetIds.length === 0) continue;
 
       // Update navy aggregate stats
       this.updateNavyStats(ctx.world, navyEntity as EntityImpl, navy, tick);
@@ -57,7 +77,27 @@ export class NavySystem extends BaseSystem {
   }
 
   /**
+   * PERF: Rebuild entity caches once per update
+   * Avoids repeated world.getEntity() lookups
+   */
+  private rebuildEntityCaches(world: World): void {
+    this.armadaCache.clear();
+    this.fleetCache.clear();
+
+    const armadaEntities = world.query().with(CT.Armada).executeEntities();
+    for (const entity of armadaEntities) {
+      this.armadaCache.set(entity.id, entity as EntityImpl);
+    }
+
+    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+    for (const entity of fleetEntities) {
+      this.fleetCache.set(entity.id, entity as EntityImpl);
+    }
+  }
+
+  /**
    * Update navy aggregate statistics from armadas and reserve fleets
+   * PERF: Uses cached entity lookups and reusable working objects
    */
   private updateNavyStats(
     world: World,
@@ -65,14 +105,19 @@ export class NavySystem extends BaseSystem {
     navy: NavyComponent,
     tick: number
   ): void {
-    let totalShips = 0;
-    let totalCrew = 0;
-    let totalStrength = 0;
-    const shipTypeBreakdown: Record<string, number> = {};
+    // PERF: Reset working stats instead of allocating new objects
+    const stats = this.workingStats;
+    stats.totalShips = 0;
+    stats.totalCrew = 0;
+    stats.totalStrength = 0;
+
+    // PERF: Clear and reuse Map instead of allocating object
+    this.shipTypeMap.clear();
 
     // Gather stats from all armadas
     for (const armadaId of navy.armadaIds) {
-      const armadaEntity = world.getEntity(armadaId);
+      // PERF: Use cached armada lookup
+      const armadaEntity = this.armadaCache.get(armadaId);
       if (!armadaEntity) {
         // Armada missing - emit warning
         world.eventBus.emit({
@@ -89,40 +134,47 @@ export class NavySystem extends BaseSystem {
       const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
 
-      totalShips += armada.totalShips;
-      totalCrew += armada.totalCrew;
-      totalStrength += armada.armadaStrength;
+      stats.totalShips += armada.totalShips;
+      stats.totalCrew += armada.totalCrew;
+      stats.totalStrength += armada.armadaStrength;
 
-      // Aggregate ship types
+      // PERF: Aggregate ship types using Map (faster than object literal)
       for (const [shipType, count] of Object.entries(armada.shipTypeBreakdown)) {
-        shipTypeBreakdown[shipType] = (shipTypeBreakdown[shipType] || 0) + count;
+        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
 
     // Gather stats from reserve fleets
     for (const fleetId of navy.reserveFleetIds) {
-      const fleetEntity = world.getEntity(fleetId);
+      // PERF: Use cached fleet lookup
+      const fleetEntity = this.fleetCache.get(fleetId);
       if (!fleetEntity) continue;
 
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      totalShips += fleet.totalShips;
-      totalCrew += fleet.totalCrew;
-      totalStrength += fleet.fleetStrength;
+      stats.totalShips += fleet.totalShips;
+      stats.totalCrew += fleet.totalCrew;
+      stats.totalStrength += fleet.fleetStrength;
 
-      // Aggregate ship types
+      // PERF: Aggregate ship types using Map
       for (const [shipType, count] of Object.entries(fleet.shipTypeBreakdown)) {
-        shipTypeBreakdown[shipType] = (shipTypeBreakdown[shipType] || 0) + count;
+        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
 
-    // Update navy component
+    // PERF: Convert Map to object only once at the end
+    const shipTypeBreakdown: Record<string, number> = {};
+    for (const [type, count] of this.shipTypeMap) {
+      shipTypeBreakdown[type] = count;
+    }
+
+    // PERF: Batch all component updates in single call
     navyEntity.updateComponent<NavyComponent>(CT.Navy, (n) => ({
       ...n,
-      totalShips,
-      totalCrew,
-      navyStrength: totalStrength,
+      totalShips: stats.totalShips,
+      totalCrew: stats.totalCrew,
+      navyStrength: stats.totalStrength,
       shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
     }));
   }

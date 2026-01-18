@@ -66,6 +66,8 @@ export class AgentSwimmingSystem extends BaseSystem {
     CT.Movement,
     CT.Needs,
   ];
+  // Only run when agent components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Agent] as const;
 
   // Throttling: Update every 40 ticks (2 seconds at 20 TPS)
   protected readonly throttleInterval = 40;

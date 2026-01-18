@@ -37,6 +37,8 @@ export class BookstoreSystem extends BaseSystem {
   readonly id: SystemId = 'bookstore';
   readonly priority = 46;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Bookstore];
+  // Only run when bookstore components exist (O(1) activation check)
+  readonly activationComponents = [CT.Bookstore] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   // Bookstore data (bookstoreId → BookstoreData)

@@ -32,6 +32,19 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
 import { TIME_SCALE_LIMITS } from '../components/TimeCompressionComponent.js';
 
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Ticks per century for era tracking (1 tick = 1 minute game-time) */
+const TICKS_PER_CENTURY = 525600 * 100; // 52,560,000 ticks per century
+
+/** Time scale threshold for statistical mode (above 1000x) */
+const STATISTICAL_MODE_THRESHOLD = 1000;
+
+/** Ticks per year for time jump calculations */
+const TICKS_PER_YEAR = 525600;
+
 /**
  * TimeCompressionSystem - Control simulation speed across cosmic scales
  *
@@ -50,66 +63,88 @@ export class TimeCompressionSystem extends BaseSystem {
    */
   public readonly dependsOn = ['time'] as const;
 
+  // ========== Cached State (Performance Optimization) ==========
+
+  /** Cached TimeCompression entity ID (singleton pattern) */
+  private timeCompressionEntityId: string | null = null;
+
+  /** Last era value for change detection */
   private lastEra: number = 0;
 
+  /** Last statistical mode for change detection */
+  private lastStatisticalMode: boolean = false;
+
   protected onUpdate(ctx: SystemContext): void {
-    const { activeEntities, world, tick } = ctx;
+    const { world, tick } = ctx;
 
-    for (const entity of activeEntities) {
-      const impl = entity as EntityImpl;
-      const compression = impl.getComponent<TimeCompressionComponent>(CT.TimeCompression);
+    // Cache singleton entity ID on first run
+    if (this.timeCompressionEntityId === null) {
+      const entities = world.query().with(CT.TimeCompression).executeEntities();
+      if (entities.length === 0) return; // No time compression entity
+      this.timeCompressionEntityId = entities[0]!.id;
+    }
 
-      if (!compression) {
-        continue;
-      }
+    // Get entity (cached lookup)
+    const entity = world.getEntity(this.timeCompressionEntityId);
+    if (!entity) {
+      this.timeCompressionEntityId = null; // Reset cache if entity was removed
+      return;
+    }
 
-      // Skip if paused
-      if (compression.isPaused) {
-        continue;
-      }
+    const impl = entity as EntityImpl;
+    const compression = impl.getComponent<TimeCompressionComponent>(CT.TimeCompression);
 
-      // Check for time jump in progress
-      if (compression.jumpInProgress && compression.targetTick !== null) {
-        this.processTimeJump(ctx, impl, compression);
-        continue;
-      }
+    if (!compression) {
+      return;
+    }
 
-      // Update era tracking (1 era = 100 years = 525,600,000 ticks at 1 tick/minute)
-      const ticksPerCentury = 525600 * 100; // 52,560,000 ticks per century
-      const currentEra = Math.floor(Number(tick) / ticksPerCentury);
+    // Early exit: Skip if paused
+    if (compression.isPaused) {
+      return;
+    }
 
-      if (currentEra !== this.lastEra) {
-        // Era changed
-        impl.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
-          ...current,
-          currentEra,
-        }));
+    // Early exit: Check for time jump in progress
+    if (compression.jumpInProgress && compression.targetTick !== null) {
+      this.processTimeJump(ctx, impl, compression);
+      return;
+    }
 
-        // Emit era change event
-        ctx.emit('time:era_changed', {
-          era: currentEra,
-          previousEra: this.lastEra,
-          tick: Number(tick),
-        }, entity.id);
+    // Update era tracking (optimized with pre-computed constant)
+    const currentEra = Math.floor(Number(tick) / TICKS_PER_CENTURY);
 
-        this.lastEra = currentEra;
-      }
+    if (currentEra !== this.lastEra) {
+      // Era changed
+      impl.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
+        ...current,
+        currentEra,
+      }));
 
-      // Update statistical mode based on time scale
-      // Above 1000x, transition to statistical simulation
-      const shouldBeStatistical = compression.currentTimeScale > 1000;
-      if (shouldBeStatistical !== compression.statisticalMode) {
-        impl.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
-          ...current,
-          statisticalMode: shouldBeStatistical,
-        }));
+      // Emit era change event
+      ctx.emit('time:era_changed', {
+        era: currentEra,
+        previousEra: this.lastEra,
+        tick: Number(tick),
+      }, entity.id);
 
-        // Emit mode change event
-        ctx.emit('time:simulation_mode_changed', {
-          mode: shouldBeStatistical ? 'statistical' : 'ecs',
-          timeScale: compression.currentTimeScale,
-        }, entity.id);
-      }
+      this.lastEra = currentEra;
+    }
+
+    // Update statistical mode based on time scale (optimized threshold comparison)
+    const shouldBeStatistical = compression.currentTimeScale > STATISTICAL_MODE_THRESHOLD;
+
+    if (shouldBeStatistical !== this.lastStatisticalMode) {
+      impl.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
+        ...current,
+        statisticalMode: shouldBeStatistical,
+      }));
+
+      // Emit mode change event
+      ctx.emit('time:simulation_mode_changed', {
+        mode: shouldBeStatistical ? 'statistical' : 'ecs',
+        timeScale: compression.currentTimeScale,
+      }, entity.id);
+
+      this.lastStatisticalMode = shouldBeStatistical;
     }
   }
 
@@ -129,9 +164,8 @@ export class TimeCompressionSystem extends BaseSystem {
     const currentTick = ctx.tick;
     const targetTick = compression.targetTick;
 
-    // Calculate years to jump
-    const ticksPerYear = 525600; // 1 tick = 1 minute game-time
-    const yearsToJump = Number(targetTick - currentTick) / ticksPerYear;
+    // Calculate years to jump (use pre-computed constant)
+    const yearsToJump = Number(targetTick - currentTick) / TICKS_PER_YEAR;
 
     // Emit jump started event (only once)
     if (compression.jumpInProgress && currentTick < targetTick) {
@@ -206,9 +240,8 @@ export class TimeCompressionSystem extends BaseSystem {
       throw new Error(`Target tick ${targetTick} must be greater than current tick ${currentTick}`);
     }
 
-    // Calculate years to jump
-    const ticksPerYear = 525600;
-    const yearsToJump = Number(targetTick - currentTick) / ticksPerYear;
+    // Calculate years to jump (use pre-computed constant)
+    const yearsToJump = Number(targetTick - currentTick) / TICKS_PER_YEAR;
 
     // Recommended maximum: 10,000-year jumps (from spec)
     if (yearsToJump > 10000) {

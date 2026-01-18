@@ -83,8 +83,6 @@ export async function setupGameSystems(
   gameLoop: GameLoop,
   config: GameSetupConfig
 ): Promise<GameSetupResult> {
-  console.log(`[GameSetup] Initializing game systems (session: ${config.sessionId})`);
-
   // 1. Register default materials and recipes before system registration
   registerDefaultMaterials();
   initializeDefaultRecipes(globalRecipeRegistry);
@@ -141,14 +139,11 @@ export async function setupGameSystems(
       liveEntityAPI.setTalkerPromptBuilder(talkerPromptBuilder);
       liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
       liveEntityAPI.attach(streamClient);
-      console.log('[GameSetup] Live Entity API attached');
     }
   }
 
   // 8. Initialize governance data system
   result.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
-
-  console.log('[GameSetup] All systems initialized successfully');
 
   return {
     soilSystem: result.soilSystem,

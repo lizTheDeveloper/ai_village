@@ -46,8 +46,190 @@ import type {
   BlueprintInfo,
 } from '../types/IntrospectionTypes.js';
 
-// MetricsStreamClient type (avoid importing to prevent circular dependency)
-type MetricsStreamClient = any;
+/**
+ * MetricsStreamClient interface (minimal definition to avoid circular dependency)
+ */
+interface MetricsStreamClient {
+  // Minimal interface - actual implementation has more methods
+  on?: (event: string, handler: (data: unknown) => void) => void;
+  emit?: (event: string, data: unknown) => void;
+}
+
+/**
+ * MetricsAPI interface (minimal definition to avoid circular dependency)
+ */
+interface MetricsAPILike {
+  trackEvent?: (eventName: string, data: Record<string, unknown>) => void;
+}
+
+/**
+ * LiveEntityAPI interface (minimal definition to avoid circular dependency)
+ */
+interface LiveEntityAPILike {
+  attach?: (client: MetricsStreamClient) => void;
+}
+
+/**
+ * BuildingRegistry interface (minimal definition to avoid circular dependency)
+ */
+interface BuildingRegistryLike {
+  tryGet(blueprintId: string): BlueprintLike | undefined;
+  getAll(): BlueprintLike[];
+  getByCategory(category: string): BlueprintLike[];
+}
+
+/**
+ * Blueprint interface (minimal definition)
+ */
+interface BlueprintLike {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  width: number;
+  height: number;
+  floors?: unknown[];
+  resourceCost: Array<{ resourceId: string; amountRequired: number }>;
+  skillRequired?: { skill: string; level: number };
+}
+
+/**
+ * UndoStack interface for mutation history access
+ */
+interface UndoStackLike {
+  undoStack?: MutationCommandLike[];
+  redoStack?: MutationCommandLike[];
+}
+
+/**
+ * MutationCommand interface for undo/redo
+ */
+interface MutationCommandLike {
+  entityId: string;
+  componentType: string;
+  fieldName: string;
+  oldValue: unknown;
+  newValue: unknown;
+}
+
+/**
+ * MutationService instance interface
+ */
+interface MutationServiceInstanceLike {
+  undoStack?: UndoStackLike;
+}
+
+/**
+ * Skills component interface (for skill XP operations)
+ */
+interface SkillsComponentLike {
+  type: 'skills';
+  levels: Record<string, number>;
+  experience?: Record<string, number>;
+  totalExperience?: Record<string, number>;
+  affinities?: Record<string, number>;
+}
+
+/**
+ * Agent component interface (for behavior operations)
+ */
+interface AgentComponentLike {
+  type: 'agent';
+  behaviorQueue?: Array<{
+    behavior: string;
+    behaviorState?: Record<string, unknown>;
+    priority?: string;
+    repeats?: number;
+    currentRepeat?: number;
+    label?: string;
+    startedAt?: number;
+  }>;
+  currentQueueIndex?: number;
+  behaviorCompleted?: boolean;
+}
+
+/**
+ * Building component interface
+ */
+interface BuildingComponentLike {
+  type: 'building';
+  name?: string;
+  category?: string;
+  ownerId?: string;
+  progress?: number;
+  createdAt?: number;
+}
+
+/**
+ * Position component interface
+ */
+interface PositionComponentLike {
+  type: 'position';
+  x: number;
+  y: number;
+}
+
+/**
+ * Weather component interface
+ */
+interface WeatherComponentLike {
+  type: 'weather';
+  weatherType?: string;
+  intensity?: number;
+}
+
+/**
+ * Temperature component interface
+ */
+interface TemperatureComponentLike {
+  type: 'temperature';
+  ambient?: number;
+}
+
+/**
+ * Time component interface
+ */
+interface TimeComponentLike {
+  type: 'time';
+  timeOfDay?: number;
+  day?: number;
+  lightLevel?: number;
+}
+
+/**
+ * Market state component interface
+ */
+interface MarketStateComponentLike {
+  type: 'market_state';
+  itemStats?: Map<string, ItemStatsLike>;
+}
+
+interface ItemStatsLike {
+  averagePrice?: number;
+  priceHistory?: number[];
+  recentSales?: number;
+  recentPurchases?: number;
+}
+
+/**
+ * Currency component interface
+ */
+interface CurrencyComponentLike {
+  type: 'currency';
+  transactions?: Array<{ type: string; [key: string]: unknown }>;
+}
+
+/**
+ * Chunk system interface
+ */
+interface ChunkSystemLike {
+  getTile?: (x: number, y: number) => TileLike | undefined;
+}
+
+interface TileLike {
+  moisture?: number;
+  fertility?: number;
+}
 
 /**
  * Query options for filtering entities
@@ -141,9 +323,9 @@ export class GameIntrospectionAPI {
   private world: World;
   private componentRegistry: typeof ComponentRegistry;
   private mutationService: typeof MutationService;
-  private metricsAPI: any; // MetricsAPI type (avoid circular dependency)
-  private liveEntityAPI: any; // LiveEntityAPI type (avoid circular dependency)
-  private buildingRegistry: any; // BuildingBlueprintRegistry type (avoid circular dependency)
+  private metricsAPI: MetricsAPILike;
+  private liveEntityAPI: LiveEntityAPILike;
+  private buildingRegistry: BuildingRegistryLike | undefined;
   private cache: IntrospectionCache<EnrichedEntity>;
 
   // Entity watching
@@ -158,9 +340,9 @@ export class GameIntrospectionAPI {
     world: World,
     componentRegistry: typeof ComponentRegistry,
     mutationService: typeof MutationService,
-    metricsAPI: any,
-    liveEntityAPI: any,
-    buildingRegistry?: any
+    metricsAPI: MetricsAPILike,
+    liveEntityAPI: LiveEntityAPILike,
+    buildingRegistry?: BuildingRegistryLike
   ) {
     this.world = world;
     this.componentRegistry = componentRegistry;
@@ -291,9 +473,7 @@ export class GameIntrospectionAPI {
 
     // Apply SimulationScheduler filtering if requested
     if (query.activeOnly) {
-      const scheduler = (this.world as any).simulationScheduler as
-        | SimulationScheduler
-        | undefined;
+      const scheduler = this.world.simulationScheduler;
       if (scheduler) {
         entities = scheduler.filterActiveEntities(Array.from(entities), this.world.tick);
       }
@@ -501,20 +681,22 @@ export class GameIntrospectionAPI {
 
     // Access the private instance to get undo/redo stacks
     // We need to access the internal state, which requires reflection
-    const mutationServiceInstance = (this.mutationService as any).getInstance?.();
+    const mutationServiceInstance = (this.mutationService as typeof MutationService & {
+      getInstance?: () => MutationServiceInstanceLike;
+    }).getInstance?.();
     if (!mutationServiceInstance) {
       // If we can't access the instance, return empty history
       return history;
     }
 
-    const undoStack = mutationServiceInstance.undoStack as any;
+    const undoStack = mutationServiceInstance.undoStack;
     if (!undoStack) {
       return history;
     }
 
     // Get commands from both undo and redo stacks
-    const undoCommands = (undoStack.undoStack || []) as any[];
-    const redoCommands = (undoStack.redoStack || []) as any[];
+    const undoCommands = undoStack.undoStack || [];
+    const redoCommands = undoStack.redoStack || [];
 
     // Process undo stack (not undone)
     for (const command of undoCommands) {
@@ -709,8 +891,21 @@ export class GameIntrospectionAPI {
       };
     }
 
-    // Cast to any to access dynamic skill properties
-    const skills = skillsComponent as any;
+    // Type guard to ensure we have a skills component
+    if (!this.isSkillsComponent(skillsComponent)) {
+      return {
+        success: false,
+        skill,
+        previousLevel: 0,
+        newLevel: 0,
+        previousXP: 0,
+        newXP: 0,
+        leveledUp: false,
+        error: `Entity ${entityId} has malformed skills component`,
+      };
+    }
+
+    const skills = skillsComponent;
 
     // Validate skill exists
     if (!skills.levels || !(skill in skills.levels)) {
@@ -872,8 +1067,8 @@ export class GameIntrospectionAPI {
     }
 
     // Extract skills component
-    const skillsComponent = enriched.components.skills as any;
-    if (!skillsComponent) {
+    const skillsComponent = enriched.components.skills;
+    if (!skillsComponent || !this.isSkillsComponent(skillsComponent)) {
       throw new Error(`Entity ${entityId} has no skills component`);
     }
 
@@ -927,21 +1122,9 @@ export class GameIntrospectionAPI {
       }
 
       // Verify entity has agent component (required for behaviors)
-      const agent = entity.getComponent('agent') as {
-        behaviorQueue?: Array<{
-          behavior: string;
-          behaviorState?: Record<string, unknown>;
-          priority?: string;
-          repeats?: number;
-          currentRepeat?: number;
-          label?: string;
-          startedAt?: number;
-        }>;
-        currentQueueIndex?: number;
-        behaviorCompleted?: boolean;
-      } | undefined;
+      const agentComponent = entity.getComponent('agent');
 
-      if (!agent) {
+      if (!agentComponent || !this.isAgentComponent(agentComponent)) {
         return {
           success: false,
           behavior: request.behavior,
@@ -975,6 +1158,8 @@ export class GameIntrospectionAPI {
           };
         }
       }
+
+      const agent = agentComponent;
 
       // Initialize behavior queue if it doesn't exist
       if (!agent.behaviorQueue) {
@@ -1093,16 +1278,16 @@ export class GameIntrospectionAPI {
 
         // Check for buildings or blocking entities
         const collisions = existingEntities.entities
-          .filter((entity: any) => {
+          .filter((entity) => {
             // Check if entity has building or blocking component
             return entity.components.building || entity.components.blocking;
           })
-          .map((entity: any) => {
-            const pos = entity.components.position as { x: number; y: number };
+          .map((entity) => {
+            const pos = entity.components.position;
             return {
               entityId: entity.id,
               type: entity.components.building ? 'building' : 'entity',
-              position: pos,
+              position: pos as { x: number; y: number },
             };
           });
 
@@ -1116,7 +1301,7 @@ export class GameIntrospectionAPI {
       }
 
       // Emit placement event (handled by BuildingSystem)
-      const eventBus = (this.world as any).eventBus;
+      const eventBus = this.world.eventBus;
       if (!eventBus) {
         return {
           success: false,
@@ -1200,11 +1385,11 @@ export class GameIntrospectionAPI {
 
       // Map entities to BuildingInfo
       const buildings = result.entities
-        .map((entity: any): BuildingInfo | null => {
-          const buildingComp = entity.components.building as any;
-          const positionComp = entity.components.position as { x: number; y: number };
+        .map((entity): BuildingInfo | null => {
+          const buildingComp = entity.components.building;
+          const positionComp = entity.components.position;
 
-          if (!buildingComp || !positionComp) {
+          if (!buildingComp || !positionComp || !this.isBuildingComponent(buildingComp) || !this.isPositionComponent(positionComp)) {
             return null;
           }
 
@@ -1231,11 +1416,11 @@ export class GameIntrospectionAPI {
             category: buildingComp.category || 'unknown',
             position: positionComp,
             owner: buildingComp.ownerId,
-            state: buildingComp.progress >= 100 ? 'active' : 'under_construction',
+            state: (buildingComp.progress ?? 0) >= 100 ? 'active' : 'under_construction',
             createdAt: buildingComp.createdAt || 0,
           };
         })
-        .filter((b: any): b is BuildingInfo => b !== null);
+        .filter((b): b is BuildingInfo => b !== null);
 
       return buildings;
     } catch (error) {
@@ -1272,7 +1457,7 @@ export class GameIntrospectionAPI {
         blueprints = this.buildingRegistry.getByCategory(options.category);
       }
 
-      return blueprints.map((blueprint: any) => ({
+      return blueprints.map((blueprint) => ({
         id: blueprint.id,
         name: blueprint.name,
         category: blueprint.category,
@@ -1282,7 +1467,7 @@ export class GameIntrospectionAPI {
           height: blueprint.height,
           depth: blueprint.floors?.length || 1,
         },
-        costs: blueprint.resourceCost.reduce((acc: Record<string, number>, cost: any) => {
+        costs: blueprint.resourceCost.reduce((acc: Record<string, number>, cost) => {
           acc[cost.resourceId] = cost.amountRequired;
           return acc;
         }, {}),
@@ -1400,7 +1585,7 @@ export class GameIntrospectionAPI {
 
       // Get old value before mutation
       const component = entity.getComponent(mutation.componentType);
-      const oldValue = component ? (component as any)[mutation.field] : undefined;
+      const oldValue = component ? (component as Record<string, unknown>)[mutation.field] : undefined;
 
       // Count caches before invalidation
       const cacheStatsBefore = this.cache.getStats();
@@ -1408,7 +1593,7 @@ export class GameIntrospectionAPI {
       // Apply mutation via MutationService (handles validation, undo, events)
       // Note: MutationService defines its own Entity interface which is compatible
       const mutationResult = MutationService.mutate(
-        entity as any, // Type cast needed due to interface mismatch
+        entity as Parameters<typeof MutationService.mutate>[0],
         mutation.componentType,
         mutation.field,
         mutation.value,
@@ -1841,8 +2026,13 @@ export class GameIntrospectionAPI {
           continue;
         }
 
-        // Cast to any for mutation methods (EntityImpl)
-        const entityImpl = entity as any;
+        // Type-safe entity mutation interface
+        interface EntityMutator {
+          removeComponent(componentType: string): void;
+          addComponent(component: Component): void;
+        }
+
+        const entityImpl = entity as unknown as EntityMutator;
 
         // Remove all current components
         const currentComponentTypes = Array.from(entity.components.keys());
@@ -2143,16 +2333,16 @@ export class GameIntrospectionAPI {
     };
 
     if (weatherEntities.length > 0 && weatherEntities[0]) {
-      const weather = weatherEntities[0].components.get('weather') as any;
-      if (weather) {
+      const weatherComp = weatherEntities[0].components.get('weather');
+      if (weatherComp && this.isWeatherComponent(weatherComp)) {
         weatherData = {
           temperature: 20, // Default, will be overridden by temperature component
-          precipitation: weather.weatherType === 'rain' ? weather.intensity || 0.5 : 0,
-          windSpeed: weather.weatherType === 'storm' ? (weather.intensity || 0.5) * 20 : 5,
+          precipitation: weatherComp.weatherType === 'rain' ? weatherComp.intensity || 0.5 : 0,
+          windSpeed: weatherComp.weatherType === 'storm' ? (weatherComp.intensity || 0.5) * 20 : 5,
           windDirection: 0, // Not tracked in current system
-          cloudCover: weather.weatherType === 'fog' ? weather.intensity || 0.8 :
-                     weather.weatherType === 'clear' ? 0 : 0.5,
-          type: weather.weatherType || 'clear',
+          cloudCover: weatherComp.weatherType === 'fog' ? weatherComp.intensity || 0.8 :
+                     weatherComp.weatherType === 'clear' ? 0 : 0.5,
+          type: weatherComp.weatherType || 'clear',
         };
       }
     }
@@ -2160,9 +2350,9 @@ export class GameIntrospectionAPI {
     // Get temperature from temperature component
     const tempEntities = this.world.query().with('temperature' as ComponentType).executeEntities();
     if (tempEntities.length > 0 && tempEntities[0]) {
-      const temp = tempEntities[0].components.get('temperature') as any;
-      if (temp && typeof temp.ambient === 'number') {
-        weatherData.temperature = temp.ambient;
+      const tempComp = tempEntities[0].components.get('temperature');
+      if (tempComp && this.isTemperatureComponent(tempComp) && typeof tempComp.ambient === 'number') {
+        weatherData.temperature = tempComp.ambient;
       }
     }
 
@@ -2177,14 +2367,14 @@ export class GameIntrospectionAPI {
     };
 
     if (timeEntities.length > 0 && timeEntities[0]) {
-      const time = timeEntities[0].components.get('time') as any;
-      if (time) {
+      const timeComp = timeEntities[0].components.get('time');
+      if (timeComp && this.isTimeComponent(timeComp)) {
         timeData = {
           tick: this.world.tick,
-          timeOfDay: time.timeOfDay || 12,
-          day: time.day || 1,
-          season: this.calculateSeason(time.day || 1),
-          moonPhase: ((time.day || 1) % 28) / 28, // 28-day lunar cycle
+          timeOfDay: timeComp.timeOfDay || 12,
+          day: timeComp.day || 1,
+          season: this.calculateSeason(timeComp.day || 1),
+          moonPhase: ((timeComp.day || 1) % 28) / 28, // 28-day lunar cycle
         };
       }
     }
@@ -2199,7 +2389,7 @@ export class GameIntrospectionAPI {
     if (bounds) {
       // Query chunk system for tiles in bounds
       const chunkSystem = this.world.getSystem('chunk');
-      if (chunkSystem && typeof (chunkSystem as any).getTile === 'function') {
+      if (chunkSystem && this.isChunkSystem(chunkSystem)) {
         let moistureSum = 0;
         let fertilitySum = 0;
         let tempSum = 0;
@@ -2208,7 +2398,7 @@ export class GameIntrospectionAPI {
         // Sample tiles in bounds (every 5 units to avoid too many queries)
         for (let x = bounds.minX; x <= bounds.maxX; x += 5) {
           for (let y = bounds.minY; y <= bounds.maxY; y += 5) {
-            const tile = (chunkSystem as any).getTile(x, y);
+            const tile = chunkSystem.getTile?.(x, y);
             if (tile) {
               if (typeof tile.moisture === 'number') {
                 moistureSum += tile.moisture / 100; // Normalize to 0-1
@@ -2231,8 +2421,8 @@ export class GameIntrospectionAPI {
       }
 
       // Calculate light levels based on time of day
-      const timeComponent = timeEntities[0]?.components.get('time') as any;
-      if (timeComponent) {
+      const timeComponent = timeEntities[0]?.components.get('time');
+      if (timeComponent && this.isTimeComponent(timeComponent)) {
         const lightLevel = timeComponent.lightLevel || this.calculateLightLevel(timeComponent.timeOfDay || 12);
         result.light = {
           sunlight: lightLevel,

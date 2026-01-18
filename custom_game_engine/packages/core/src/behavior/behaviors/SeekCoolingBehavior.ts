@@ -41,7 +41,6 @@ let chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
 export function injectChunkSpatialQueryToSeekCooling(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[SeekCoolingBehavior] ChunkSpatialQuery injected for efficient cooling source lookups');
 }
 
 interface CoolingSource {

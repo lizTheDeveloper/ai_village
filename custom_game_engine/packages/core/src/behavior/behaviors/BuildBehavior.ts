@@ -51,7 +51,6 @@ let chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
 export function injectChunkSpatialQueryToBuild(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[BuildBehavior] ChunkSpatialQuery injected for efficient building lookups');
 }
 
 interface WorldWithBuilding extends World {

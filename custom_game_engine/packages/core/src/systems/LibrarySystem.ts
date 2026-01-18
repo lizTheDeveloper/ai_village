@@ -39,6 +39,8 @@ export class LibrarySystem extends BaseSystem {
   public readonly id: SystemId = 'library';
   public readonly priority = 45;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Library];
+  // Only run when library components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Library] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   // Borrowed books tracking (bookId → BorrowedBook)

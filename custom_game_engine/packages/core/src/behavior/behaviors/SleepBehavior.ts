@@ -28,7 +28,6 @@ let chunkSpatialQuery: any | null = null;
 
 export function injectChunkSpatialQueryToSleep(spatialQuery: any): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[SleepBehavior] ChunkSpatialQuery injected for efficient bed lookups');
 }
 
 /**

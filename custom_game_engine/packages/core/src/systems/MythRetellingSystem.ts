@@ -38,7 +38,7 @@ export class MythRetellingSystem extends BaseSystem {
   protected async onInitialize(_world: World, eventBus: EventBus): Promise<void> {
     // Listen for attribution events
     eventBus.subscribe('myth:attribution_changed', (event) => {
-      console.log('[MythRetellingSystem] Myth attribution changed:', event.data);
+      // Attribution change event received
     });
   }
 
@@ -203,8 +203,6 @@ export class MythRetellingSystem extends BaseSystem {
       // Apply mutation
       mutationResult = applyMutation(myth, mutationType, context);
       finalMyth = mutationResult.mutatedMyth;
-
-      console.log(`[MythRetellingSystem] Myth "${myth.title}" mutated (${mutationType}): ${mutationResult.changeDescription}`);
     } else {
       // No mutation
       finalMyth = {

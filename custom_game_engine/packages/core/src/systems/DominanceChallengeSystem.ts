@@ -53,6 +53,8 @@ export class DominanceChallengeSystem extends BaseSystem {
   public readonly id: SystemId = 'dominance_challenge';
   public readonly priority = 49;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
+  // Only run when conflict components exist (O(1) activation check)
+  public readonly activationComponents = ['conflict'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private eventBus?: EventBus;

@@ -128,10 +128,9 @@ export class ChunkSpatialQuery {
           const entity = this.world.getEntity(entityId);
           if (!entity) continue;
 
-          const impl = entity as EntityImpl;
           // Check if entity has any of the requested component types
           for (const componentType of componentTypes) {
-            if (impl.hasComponent(componentType)) {
+            if (entity.hasComponent(componentType)) {
               candidateIds.add(entityId);
               break; // Only add once even if has multiple matching components
             }
@@ -154,8 +153,7 @@ export class ChunkSpatialQuery {
       if (!entity) continue;
 
       // Get position
-      const impl = entity as EntityImpl;
-      const position = impl.getComponent<PositionComponent>('position' as ComponentType);
+      const position = entity.getComponent<PositionComponent>('position');
       if (!position) continue;
 
       // Calculate distance
@@ -341,8 +339,7 @@ export class ChunkSpatialQuery {
           const entity = this.world.getEntity(entityId);
           if (!entity) continue;
 
-          const impl = entity as EntityImpl;
-          const position = impl.getComponent<PositionComponent>('position' as ComponentType);
+          const position = entity.getComponent<PositionComponent>('position');
           if (!position) continue;
 
           // Check distance (using squared distance)
@@ -389,8 +386,7 @@ export class ChunkSpatialQuery {
           const entity = this.world.getEntity(entityId);
           if (!entity) continue;
 
-          const impl = entity as EntityImpl;
-          const position = impl.getComponent<PositionComponent>('position' as ComponentType);
+          const position = entity.getComponent<PositionComponent>('position');
           if (!position) continue;
 
           // Check distance (using squared distance)

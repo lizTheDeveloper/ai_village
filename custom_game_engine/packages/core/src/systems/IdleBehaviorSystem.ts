@@ -37,6 +37,8 @@ export class IdleBehaviorSystem extends BaseSystem {
     CT.Personality,
     CT.ActionQueue
   ];
+  // Only run when action_queue components exist (O(1) activation check)
+  public readonly activationComponents = [CT.ActionQueue] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
   public readonly dependsOn = [] as const;
 

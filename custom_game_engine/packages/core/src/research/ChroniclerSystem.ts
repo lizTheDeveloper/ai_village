@@ -441,7 +441,7 @@ export class ChroniclerSystem extends BaseSystem {
 
     for (const agent of agents) {
       // Check for chronicler component
-      const chroniclerComp = agent.getComponent('chronicler' as any);
+      const chroniclerComp = agent.getComponent<ChroniclerComponent>('chronicler');
       if (chroniclerComp) {
         return agent;
       }
@@ -473,7 +473,7 @@ export class ChroniclerSystem extends BaseSystem {
       if (notableEvents.length >= 3) {
         const chronicler = this.findChronicler(ctx.world);
         if (chronicler) {
-          const agentComp = chronicler.getComponent<AgentComponent>(ComponentType.Agent) as any;
+          const agentComp = chronicler.getComponent<AgentComponent>(ComponentType.Agent);
           this.publishChronicle(
             {
               id: chronicler.id,

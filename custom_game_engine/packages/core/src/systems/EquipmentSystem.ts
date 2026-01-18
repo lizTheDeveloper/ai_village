@@ -36,6 +36,8 @@ export class EquipmentSystem extends BaseSystem {
     ComponentType.Equipment,
     ComponentType.Body,
   ];
+  // Only run when equipment components exist (O(1) activation check)
+  public readonly activationComponents = [ComponentType.Equipment] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**

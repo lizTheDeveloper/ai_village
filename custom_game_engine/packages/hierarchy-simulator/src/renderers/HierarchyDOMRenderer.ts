@@ -512,15 +512,9 @@ export class HierarchyDOMRenderer {
         if (!tierId) return;
 
         if (action === 'zoom-in') {
-          const constraints = this.controller.zoomIn(tierId);
-          if (constraints) {
-            console.log(`[Zoom In] ${tierId}: Target pop ${constraints.targetPopulation}, Tech ${constraints.techLevel}`);
-          }
+          this.controller.zoomIn(tierId);
         } else if (action === 'zoom-out') {
-          const summary = this.controller.zoomOut(tierId);
-          if (summary) {
-            console.log(`[Zoom Out] ${tierId}: Pop ${summary.population}, Believers ${summary.belief.totalBelievers}`);
-          }
+          this.controller.zoomOut(tierId);
         }
         return;
       }

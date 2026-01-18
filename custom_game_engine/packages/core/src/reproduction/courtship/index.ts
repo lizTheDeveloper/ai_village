@@ -102,7 +102,11 @@ export function ensureCourtshipComponent(
   let comp = entity.getComponent<CourtshipComponent>(CT.Courtship);
   if (!comp) {
     comp = createCourtshipComponent(speciesId);
-    (entity as any).addComponent(comp);
+    // Entity interface with addComponent method
+    interface EntityWithAddComponent {
+      addComponent(component: CourtshipComponent): void;
+    }
+    (entity as unknown as EntityWithAddComponent).addComponent(comp);
   }
   return comp;
 }

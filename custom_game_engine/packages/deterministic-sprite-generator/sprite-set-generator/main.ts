@@ -585,7 +585,6 @@ btnStartGeneration.addEventListener('click', () => {
   btnRegenerateCurrent.style.display = 'none'; // Hide regenerate when continuing
 
   const resuming = state.currentPartIndex > 0;
-  console.log(`[Sprite Wizard] Generation ${resuming ? 'resumed' : 'started'}`);
 
   generateNextPart();
 });
@@ -597,7 +596,6 @@ btnPauseGeneration.addEventListener('click', () => {
   btnPauseGeneration.style.display = 'none';
 
   currentPartName.textContent = 'Paused (current part will finish first)';
-  console.log('[Sprite Wizard] Generation paused');
 });
 
 btnRegenerateCurrent.addEventListener('click', async () => {
@@ -708,7 +706,6 @@ async function generateNextPart() {
       btnPauseGeneration.style.display = 'none';
       btnRegenerateCurrent.style.display = 'inline-block';
       currentPartName.textContent = `First torso complete! Review style and regenerate if needed, then click Continue.`;
-      console.log('[Sprite Wizard] Auto-paused after first torso for review');
       return;
     }
 
@@ -759,9 +756,6 @@ btnExportSheet.addEventListener('click', () => {
 });
 
 // Initialize
-console.log('Sprite Set Generator loaded');
-console.log('Available art styles:', Object.keys(ART_STYLES));
-
 // Load custom art styles from localStorage
 loadCustomArtStyles();
 

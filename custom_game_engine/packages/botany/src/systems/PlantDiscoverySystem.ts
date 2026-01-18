@@ -18,6 +18,9 @@ import {
   ComponentType,
   EntityImpl,
   PlantKnowledgeComponent,
+  type KnownMedicinalProperties,
+  type KnownMagicalProperties,
+  type KnownCraftingProperties,
 } from '@ai-village/core';
 
 /**
@@ -236,7 +239,7 @@ export class PlantDiscoverySystem extends BaseSystem {
       const unknownAilments = knownMedicinal === 'unknown'
         ? medicinal.treats
         : medicinal.treats.filter(a =>
-            !(knownMedicinal as any)?.knownTreats?.includes(a)
+            !knownMedicinal.knownTreats?.includes(a)
           );
 
       if (unknownAilments && unknownAilments.length > 0) {
@@ -257,8 +260,8 @@ export class PlantDiscoverySystem extends BaseSystem {
     // Chance to discover preparation methods
     const preparation = medicinal.preparation;
     if (preparation && preparation.length > 0 && Math.random() < discoveryChance * 0.5) {
-      const currentPrep = knownMedicinal !== 'unknown' && (knownMedicinal as any)?.knownPreparations
-        ? (knownMedicinal as any).knownPreparations
+      const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
+        ? knownMedicinal.knownPreparations
         : [];
       const unknownPrep = preparation.filter(p => !currentPrep.includes(p));
 
@@ -292,8 +295,8 @@ export class PlantDiscoverySystem extends BaseSystem {
 
           // Chance to discover side effects when they happen
           if (Math.random() < discoveryChance) {
-            const currentEffects = knownMedicinal !== 'unknown' && (knownMedicinal as any)?.knownSideEffects
-              ? (knownMedicinal as any).knownSideEffects
+            const currentEffects = knownMedicinal !== 'unknown' && knownMedicinal.knownSideEffects
+              ? knownMedicinal.knownSideEffects
               : [];
             if (!currentEffects.includes(effect.type)) {
               knowledge.discoverProperty(
@@ -323,7 +326,7 @@ export class PlantDiscoverySystem extends BaseSystem {
         });
 
         // Discover that overuse is toxic
-        if (knownMedicinal !== 'unknown' && !(knownMedicinal as any)?.knowsToxicity) {
+        if (knownMedicinal !== 'unknown' && !knownMedicinal.knowsToxicity) {
           knowledge.discoverProperty(
             plantSpeciesId,
             'medicinal',
@@ -357,7 +360,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Chance to discover magic type
     if (Math.random() < magicDiscoveryChance) {
-      if (knownMagical === 'unknown' || !(knownMagical as any)?.knownMagicType) {
+      if (knownMagical === 'unknown' || !knownMagical.knownMagicType) {
         knowledge.discoverProperty(
           plantSpeciesId,
           'magical',
@@ -381,8 +384,8 @@ export class PlantDiscoverySystem extends BaseSystem {
 
         // Chance to discover specific effects
         if (Math.random() < magicDiscoveryChance * 0.8) {
-          const currentEffects = knownMagical !== 'unknown' && (knownMagical as any)?.knownEffects
-            ? (knownMagical as any).knownEffects
+          const currentEffects = knownMagical !== 'unknown' && knownMagical.knownEffects
+            ? knownMagical.knownEffects
             : [];
           if (!currentEffects.includes(effect.type)) {
             knowledge.discoverProperty(
@@ -429,7 +432,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Check if this plant has medicinal properties that work with this application
     const medicinalPrep = props.medicinal?.preparation;
-    if (props.medicinal && medicinalPrep?.includes(applicationMethod as any)) {
+    if (props.medicinal && medicinalPrep?.includes(applicationMethod)) {
       const appEffectiveness = props.medicinal.effectiveness ?? 0.5;
       effects.push({
         type: 'healing',
@@ -442,8 +445,8 @@ export class PlantDiscoverySystem extends BaseSystem {
       if (Math.random() < discoveryChance) {
         const existing = knowledge.getKnowledge(plantSpeciesId);
         const knownMedicinal = existing?.medicinal;
-        const currentPrep = knownMedicinal !== 'unknown' && (knownMedicinal as any)?.knownPreparations
-          ? (knownMedicinal as any).knownPreparations
+        const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
+          ? knownMedicinal.knownPreparations
           : [];
         if (!currentPrep.includes(applicationMethod)) {
           knowledge.discoverProperty(
@@ -499,7 +502,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Discover dye properties
     if (crafting.dye && Math.random() < discoveryChance) {
-      if (knownCrafting === 'unknown' || !(knownCrafting as any)?.knownDyeColor) {
+      if (knownCrafting === 'unknown' || !knownCrafting.knownDyeColor) {
         knowledge.discoverProperty(
           plantSpeciesId,
           'crafting',
@@ -519,7 +522,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Discover fiber properties
     if (crafting.fiber && Math.random() < discoveryChance) {
-      if (knownCrafting === 'unknown' || !(knownCrafting as any)?.knowsFiber) {
+      if (knownCrafting === 'unknown' || !knownCrafting.knowsFiber) {
         knowledge.discoverProperty(
           plantSpeciesId,
           'crafting',
@@ -533,7 +536,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Discover scent properties
     if (crafting.scent?.profile && Math.random() < discoveryChance * 1.5) { // Scent is more easily noticed
-      if (knownCrafting === 'unknown' || !(knownCrafting as any)?.knownScent) {
+      if (knownCrafting === 'unknown' || !knownCrafting.knownScent) {
         knowledge.discoverProperty(
           plantSpeciesId,
           'crafting',

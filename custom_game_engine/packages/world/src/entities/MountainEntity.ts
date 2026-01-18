@@ -1,4 +1,4 @@
-import type { WorldMutator } from '@ai-village/core';
+import type { WorldMutator, PositionComponent, TagsComponent } from '@ai-village/core';
 import {
   EntityImpl,
   createEntityId,
@@ -21,8 +21,8 @@ export function createMountain(world: WorldMutator, x: number, y: number, z: num
     .executeEntities();
 
   for (const existing of existingEntities) {
-    const pos = existing.getComponent('position') as any;
-    const tags = existing.getComponent('tags') as any;
+    const pos = existing.getComponent<PositionComponent>('position');
+    const tags = existing.getComponent<TagsComponent>('tags');
 
     if (pos && tags &&
         Math.abs(pos.x - x) < 0.1 && Math.abs(pos.y - y) < 0.1 &&
@@ -47,8 +47,8 @@ export function createMountain(world: WorldMutator, x: number, y: number, z: num
   // Tags
   entity.addComponent(createTagsComponent('mountain', 'obstacle', 'terrain', 'landmark'));
 
-  // Add to world
-  (world as any)._addEntity(entity);
+  // Add to world (WorldMutator._addEntity is internal)
+  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

@@ -38,7 +38,6 @@ let chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
 export function injectChunkSpatialQueryToFarmBehaviors(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
-  console.log('[FarmBehaviors] ChunkSpatialQuery injected for efficient plant lookups');
 }
 
 /** Search radius for tillable tiles */

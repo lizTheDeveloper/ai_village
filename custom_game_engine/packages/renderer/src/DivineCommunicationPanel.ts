@@ -638,8 +638,6 @@ export class DivineCommunicationPanel implements IWindowPanel {
       },
     });
 
-    console.log(`[DivineCommunication] Sent ${this.messageType} to ${this.targetFollowerId}: "${this.messageContent}"`);
-
     // Clear message after sending
     this.messageContent = '';
   }

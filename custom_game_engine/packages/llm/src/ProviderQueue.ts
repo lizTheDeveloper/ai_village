@@ -99,9 +99,6 @@ export class ProviderQueue {
       // Check if rate limited
       if (this.rateLimited && Date.now() < this.rateLimitUntil) {
         const waitMs = this.rateLimitUntil - Date.now();
-        console.log(
-          `[ProviderQueue:${this.provider.getProviderId()}] Rate limited, waiting ${waitMs}ms`
-        );
 
         // Schedule retry after rate limit expires
         setTimeout(() => {
@@ -114,9 +111,6 @@ export class ProviderQueue {
       // Clear rate limit if expired
       if (this.rateLimited && Date.now() >= this.rateLimitUntil) {
         this.rateLimited = false;
-        console.log(
-          `[ProviderQueue:${this.provider.getProviderId()}] Rate limit expired, resuming`
-        );
       }
 
       // No queued requests
@@ -156,10 +150,6 @@ export class ProviderQueue {
           // Re-queue the request (will be retried after rate limit expires)
           queuedRequest.retryCount++;
           this.queue.unshift(queuedRequest);
-
-          console.log(
-            `[ProviderQueue:${this.provider.getProviderId()}] Re-queued request for agent ${queuedRequest.agentId} (retry ${queuedRequest.retryCount})`
-          );
         } else {
           // Non-rate-limit error, reject
           queuedRequest.reject(error);
@@ -242,10 +232,6 @@ export class ProviderQueue {
     // Use provided retry-after, or default to 1 second
     const waitMs = retryAfterMs ?? 1000;
     this.rateLimitUntil = Date.now() + waitMs;
-
-    console.log(
-      `[ProviderQueue:${this.provider.getProviderId()}] Rate limited until ${new Date(this.rateLimitUntil).toISOString()} (${waitMs}ms)`
-    );
   }
 
   /**

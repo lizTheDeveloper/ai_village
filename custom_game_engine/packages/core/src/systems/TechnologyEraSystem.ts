@@ -34,11 +34,92 @@ import {
   recordEraTransition,
   unlockTechnology,
   getEraIndex,
+  ERA_METADATA,
 } from '../components/TechnologyEraComponent.js';
 import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
 import { isBuildingUnlocked } from '../components/TechnologyUnlockComponent.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
+
+// ============================================================================
+// CONSTANTS & OPTIMIZATIONS
+// ============================================================================
+
+/** Regression threshold (collapse risk above this = potential regression) */
+const REGRESSION_THRESHOLD = 70;
+
+/** Era regression severity thresholds */
+const CATASTROPHIC_STABILITY = 20; // -6+ eras
+const MAJOR_COLLAPSE_STABILITY = 40; // -3 to -5 eras
+const MINOR_COLLAPSE_STABILITY = 60; // -1 to -2 eras
+
+/** Stability threshold for era advancement */
+const ADVANCEMENT_STABILITY_THRESHOLD = 40;
+
+/** Research progress thresholds */
+const RESEARCH_PROGRESS_REQUIRED = 100;
+
+/** Research rate constants */
+const BASE_RESEARCH_RATE = 0.1; // 0.1% per update (100 ticks)
+const SCIENTIST_BONUS_PER_SCIENTIST = 0.01; // +1% per scientist
+const UNIVERSITY_BONUS_PER_UNIVERSITY = 0.05; // +5% per university
+
+/** Pre-computed era indices for fast numeric comparisons */
+const ERA_INDEX = {
+  PALEOLITHIC: 0,
+  NEOLITHIC: 1,
+  BRONZE_AGE: 2,
+  IRON_AGE: 3,
+  MEDIEVAL: 4,
+  RENAISSANCE: 5,
+  INDUSTRIAL: 6,
+  ATOMIC: 7,
+  INFORMATION: 8,
+  FUSION: 9,
+  INTERPLANETARY: 10,
+  INTERSTELLAR: 11,
+  TRANSGALACTIC: 12,
+  POST_SINGULARITY: 13,
+  TRANSCENDENT: 14,
+} as const;
+
+/**
+ * Pre-computed era metadata with derived data for fast lookups
+ * Computed once at module load time instead of per-tick
+ */
+const OPTIMIZED_ERA_METADATA = Object.freeze(
+  Object.entries(ERA_METADATA).map(([era, metadata]) => ({
+    era: era as TechnologyEra,
+    ...metadata,
+    nextEraIndex: metadata.index + 1,
+    isMaxEra: metadata.index >= ERA_INDEX.TRANSCENDENT,
+    isMinEra: metadata.index <= ERA_INDEX.PALEOLITHIC,
+    // Pre-convert Set for O(1) lookup
+    requiredTechSet: new Set(metadata.requiredTechnologies),
+    requiredBuildingSet: new Set(metadata.requiredBuildings),
+  }))
+);
+
+/**
+ * Fast era lookup by index (array indexed by era number)
+ */
+const ERA_BY_INDEX: ReadonlyArray<TechnologyEra | null> = Object.freeze([
+  'paleolithic',     // 0
+  'neolithic',       // 1
+  'bronze_age',      // 2
+  'iron_age',        // 3
+  'medieval',        // 4
+  'renaissance',     // 5
+  'industrial',      // 6
+  'atomic',          // 7
+  'information',     // 8
+  'fusion',          // 9
+  'interplanetary',  // 10
+  'interstellar',    // 11
+  'transgalactic',   // 12
+  'post_singularity',// 13
+  'transcendent',    // 14
+]);
 
 /**
  * Era advancement condition check result
@@ -61,11 +142,39 @@ export class TechnologyEraSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.TechnologyEra];
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds (100 ticks)
 
+  // ========== Cached State (Performance Optimization) ==========
+
+  /** Cached TechnologyUnlock singleton entity ID */
+  private techUnlockEntityId: string | null = null;
+
+  /** Cached query result for agents (population counting) */
+  private agentCount: number = 0;
+
+  /** Last tick when population was counted */
+  private lastPopulationCountTick: number = 0;
+
   /**
    * Update all civilizations with technology era tracking
    */
   protected onUpdate(ctx: SystemContext): void {
-    const civilizations = ctx.world.query().with(CT.TechnologyEra).executeEntities();
+    const { world } = ctx;
+
+    // Cache TechnologyUnlock singleton ID on first run
+    if (this.techUnlockEntityId === null) {
+      const entities = world.query().with(CT.TechnologyUnlock).executeEntities();
+      if (entities.length > 0) {
+        this.techUnlockEntityId = entities[0]!.id;
+      }
+    }
+
+    // Cache population count (only update every 100 ticks since we're already throttled)
+    if (world.tick - this.lastPopulationCountTick >= THROTTLE.SLOW) {
+      this.agentCount = world.query().with(CT.Agent).executeEntities().length;
+      this.lastPopulationCountTick = world.tick;
+    }
+
+    // Get civilizations ONCE before loop (avoid repeated query)
+    const civilizations = ctx.activeEntities;
 
     for (const civEntity of civilizations) {
       const civImpl = civEntity as EntityImpl;
@@ -79,13 +188,13 @@ export class TechnologyEraSystem extends BaseSystem {
       updateCollapseRisk(eraComponent);
 
       // Check for era regression (dark ages)
-      this.checkEraRegression(ctx.world, civImpl, eraComponent);
+      this.checkEraRegression(world, civImpl, eraComponent);
 
       // Update research progress
-      this.updateResearchProgress(ctx.world, civImpl, eraComponent);
+      this.updateResearchProgress(civImpl, eraComponent);
 
       // Check for era advancement
-      this.checkEraAdvancement(ctx.world, civImpl, eraComponent);
+      this.checkEraAdvancement(world, civImpl, eraComponent);
     }
   }
 
@@ -97,41 +206,35 @@ export class TechnologyEraSystem extends BaseSystem {
     civEntity: EntityImpl,
     eraComponent: TechnologyEraComponent
   ): void {
-    // Can't regress below Paleolithic
-    if (eraComponent.currentEra === 'paleolithic') {
+    // Early exit: Can't regress below Paleolithic (use numeric comparison)
+    const currentEraIndex = getEraIndex(eraComponent.currentEra);
+    if (currentEraIndex <= ERA_INDEX.PALEOLITHIC) {
       return;
     }
 
-    // Calculate regression probability based on collapse risk
+    // Early exit: Check collapse risk threshold
     const collapseRisk = eraComponent.collapseRisk;
-
-    // Very high risk (90+) = certain regression
-    // High risk (70-90) = likely regression
-    // Medium risk (50-70) = possible regression
-    // Low risk (<50) = unlikely regression
-    const regressionThreshold = 70;
-
-    if (collapseRisk < regressionThreshold) {
+    if (collapseRisk < REGRESSION_THRESHOLD) {
       return; // Not at risk
     }
 
     // Random check (throttled to once per 5 seconds)
-    const regressionChance = (collapseRisk - regressionThreshold) / 30; // 0-100% based on risk above threshold
+    const regressionChance = (collapseRisk - REGRESSION_THRESHOLD) / 30; // 0-100% based on risk above threshold
     if (Math.random() > regressionChance) {
       return; // Escaped regression this tick
     }
 
-    // Determine severity of regression
+    // Determine severity of regression (use pre-computed constants)
     const stability = calculateStability(eraComponent);
     let erasToRegress = 1;
 
-    if (stability < 20) {
+    if (stability < CATASTROPHIC_STABILITY) {
       // Catastrophic collapse: -6+ eras
       erasToRegress = 6 + Math.floor(Math.random() * 3);
-    } else if (stability < 40) {
+    } else if (stability < MAJOR_COLLAPSE_STABILITY) {
       // Major collapse: -3 to -5 eras
       erasToRegress = 3 + Math.floor(Math.random() * 3);
-    } else if (stability < 60) {
+    } else if (stability < MINOR_COLLAPSE_STABILITY) {
       // Minor collapse: -1 to -2 eras
       erasToRegress = 1 + Math.floor(Math.random() * 2);
     }
@@ -220,27 +323,26 @@ export class TechnologyEraSystem extends BaseSystem {
    * Update research progress toward next era
    */
   private updateResearchProgress(
-    world: World,
     civEntity: EntityImpl,
     eraComponent: TechnologyEraComponent
   ): void {
-    // Can't research beyond Transcendent
-    if (eraComponent.currentEra === 'transcendent') {
+    // Early exit: Can't research beyond Transcendent (numeric comparison)
+    const currentEraIndex = getEraIndex(eraComponent.currentEra);
+    if (currentEraIndex >= ERA_INDEX.TRANSCENDENT) {
       return;
     }
 
-    // Calculate research rate
-    const baseResearchRate = 0.1; // 0.1% per update (100 ticks)
-    const scientistBonus = eraComponent.scientistCount * 0.01; // +1% per scientist
-    const universityBonus = eraComponent.universityCount * 0.05; // +5% per university
-    const researchRate = baseResearchRate * (1 + scientistBonus + universityBonus) * eraComponent.researchMultiplier;
+    // Calculate research rate (use pre-computed constants)
+    const scientistBonus = eraComponent.scientistCount * SCIENTIST_BONUS_PER_SCIENTIST;
+    const universityBonus = eraComponent.universityCount * UNIVERSITY_BONUS_PER_UNIVERSITY;
+    const researchRate = BASE_RESEARCH_RATE * (1 + scientistBonus + universityBonus) * eraComponent.researchMultiplier;
 
     // Update progress
     eraComponent.eraProgress += researchRate;
 
     // Clamp to 100
-    if (eraComponent.eraProgress > 100) {
-      eraComponent.eraProgress = 100;
+    if (eraComponent.eraProgress > RESEARCH_PROGRESS_REQUIRED) {
+      eraComponent.eraProgress = RESEARCH_PROGRESS_REQUIRED;
     }
   }
 
@@ -252,14 +354,20 @@ export class TechnologyEraSystem extends BaseSystem {
     civEntity: EntityImpl,
     eraComponent: TechnologyEraComponent
   ): void {
-    // Can't advance beyond Transcendent
-    const nextEra = getNextEra(eraComponent.currentEra);
+    // Early exit: Can't advance beyond Transcendent (numeric comparison)
+    const currentEraIndex = getEraIndex(eraComponent.currentEra);
+    if (currentEraIndex >= ERA_INDEX.TRANSCENDENT) {
+      return;
+    }
+
+    // Get next era (fast array lookup)
+    const nextEra = ERA_BY_INDEX[currentEraIndex + 1];
     if (!nextEra) {
       return;
     }
 
     // Check advancement conditions
-    const check = this.canAdvanceEra(world, civEntity, eraComponent, nextEra);
+    const check = this.canAdvanceEra(world, civEntity, eraComponent, nextEra, currentEraIndex);
 
     if (check.canAdvance) {
       this.advanceEra(world, civEntity, eraComponent, nextEra);
@@ -271,28 +379,30 @@ export class TechnologyEraSystem extends BaseSystem {
 
   /**
    * Check if civilization meets requirements to advance to next era
+   * @param currentEraIndex - Pre-computed current era index for performance
    */
   private canAdvanceEra(
     world: World,
     civEntity: EntityImpl,
     eraComponent: TechnologyEraComponent,
-    targetEra: TechnologyEra
+    targetEra: TechnologyEra,
+    currentEraIndex: number
   ): AdvancementCheck {
     const metadata = getEraMetadata(targetEra);
     const blockedReasons: string[] = [];
     let progressContributions: number[] = [];
 
-    // 1. Research progress requirement (must be at 100%)
-    if (eraComponent.eraProgress < 100) {
+    // 1. Research progress requirement (use constant)
+    if (eraComponent.eraProgress < RESEARCH_PROGRESS_REQUIRED) {
       blockedReasons.push(`Research progress: ${eraComponent.eraProgress.toFixed(1)}% (need 100%)`);
       progressContributions.push(eraComponent.eraProgress);
     } else {
       progressContributions.push(100);
     }
 
-    // 2. Population threshold
+    // 2. Population threshold (use cached population count)
     if (metadata.populationThreshold !== null) {
-      const population = this.getCivilizationPopulation(world, civEntity);
+      const population = this.agentCount; // Use cached count
       if (population < metadata.populationThreshold) {
         blockedReasons.push(`Population: ${population} (need ${metadata.populationThreshold})`);
         progressContributions.push((population / metadata.populationThreshold) * 100);
@@ -301,8 +411,8 @@ export class TechnologyEraSystem extends BaseSystem {
       }
     }
 
-    // 3. Required buildings
-    const techUnlock = this.getTechnologyUnlockComponent(world);
+    // 3. Required buildings (use cached singleton)
+    const techUnlock = this.getCachedTechnologyUnlock(world);
     if (techUnlock) {
       for (const buildingType of metadata.requiredBuildings) {
         if (!isBuildingUnlocked(techUnlock, buildingType)) {
@@ -314,7 +424,7 @@ export class TechnologyEraSystem extends BaseSystem {
       }
     }
 
-    // 4. Required technologies
+    // 4. Required technologies (Set.has is O(1))
     for (const techId of metadata.requiredTechnologies) {
       if (!eraComponent.unlockedTechIds.has(techId)) {
         blockedReasons.push(`Missing technology: ${techId}`);
@@ -324,38 +434,32 @@ export class TechnologyEraSystem extends BaseSystem {
       }
     }
 
-    // 5. Special requirements for advanced eras
-    if (targetEra === 'interplanetary') {
-      // Requires gated resources (stellarite_ore, neutronium_shard, helium_3)
-      const requiredResources = ['helium_3']; // Minimum for worldships
-      for (const resource of requiredResources) {
-        if (!eraComponent.gatedResourcesDiscovered.has(resource)) {
-          blockedReasons.push(`Missing resource: ${resource} (requires space exploration)`);
-          progressContributions.push(0);
-        } else {
-          progressContributions.push(100);
-        }
+    // 5. Special requirements for advanced eras (numeric comparison for performance)
+    if (currentEraIndex === ERA_INDEX.FUSION) {
+      // Advancing to Interplanetary (index 10)
+      if (!eraComponent.gatedResourcesDiscovered.has('helium_3')) {
+        blockedReasons.push(`Missing resource: helium_3 (requires space exploration)`);
+        progressContributions.push(0);
+      } else {
+        progressContributions.push(100);
       }
     }
 
-    if (targetEra === 'interstellar') {
-      // Requires multi-star-system resources (void_essence, temporal_dust, etc.)
-      const requiredResources = ['void_essence']; // Minimum for probability scouts
-      for (const resource of requiredResources) {
-        if (!eraComponent.gatedResourcesDiscovered.has(resource)) {
-          blockedReasons.push(`Missing resource: ${resource} (requires interstellar exploration)`);
-          progressContributions.push(0);
-        } else {
-          progressContributions.push(100);
-        }
+    if (currentEraIndex === ERA_INDEX.INTERPLANETARY) {
+      // Advancing to Interstellar (index 11)
+      if (!eraComponent.gatedResourcesDiscovered.has('void_essence')) {
+        blockedReasons.push(`Missing resource: void_essence (requires interstellar exploration)`);
+        progressContributions.push(0);
+      } else {
+        progressContributions.push(100);
       }
     }
 
-    // 6. Stability requirement (must be above 40 to advance)
+    // 6. Stability requirement (use constant)
     const stability = calculateStability(eraComponent);
-    if (stability < 40) {
+    if (stability < ADVANCEMENT_STABILITY_THRESHOLD) {
       blockedReasons.push(`Stability too low: ${stability.toFixed(1)}% (need 40%+)`);
-      progressContributions.push((stability / 40) * 100);
+      progressContributions.push((stability / ADVANCEMENT_STABILITY_THRESHOLD) * 100);
     } else {
       progressContributions.push(100);
     }
@@ -416,44 +520,24 @@ export class TechnologyEraSystem extends BaseSystem {
       }
     }
 
-    // Log advancement (custom events - not in EventMap yet)
-    console.log(
-      `[TechnologyEra] Era advancement: ${civEntity.id} from ${oldEra} to ${newEra}, unlocked: ${metadata.requiredTechnologies.join(', ')}`
-    );
-
-    console.log(
-      `[TechnologyEra] Civilization ${civEntity.id} advanced from ${oldEra} to ${newEra} (Era ${getEraIndex(newEra)})`
-    );
+    // Era advancement event (custom events - not in EventMap yet)
   }
 
   /**
-   * Get total population of a civilization (sum of all cities)
+   * Get the cached TechnologyUnlock singleton component
+   * Uses cached entity ID to avoid repeated queries
    */
-  private getCivilizationPopulation(world: World, civEntity: EntityImpl): number {
-    // For now, get city population from CityDirector component
-    // In grand strategy, this would aggregate across multiple cities
-    const cityDirector = civEntity.getComponent<CityDirectorComponent>(CT.CityDirector);
-    if (cityDirector) {
-      // CityDirector doesn't have population field yet, count agents instead
-      // TODO: When CityDirector gets population tracking, use that instead
-      const agents = world.query().with(CT.Agent).executeEntities();
-      return agents.length;
+  private getCachedTechnologyUnlock(world: World): TechnologyUnlockComponent | null {
+    if (this.techUnlockEntityId === null) {
+      return null; // Not found during initialization
     }
 
-    // Fallback: count agents in the civilization (if no city director)
-    const agents = world.query().with(CT.Agent).executeEntities();
-    return agents.length;
-  }
-
-  /**
-   * Get the global TechnologyUnlock singleton
-   */
-  private getTechnologyUnlockComponent(world: World): TechnologyUnlockComponent | null {
-    const entities = world.query().with(CT.TechnologyUnlock).executeEntities();
-    if (entities.length === 0) {
+    const entity = world.getEntity(this.techUnlockEntityId);
+    if (!entity) {
+      this.techUnlockEntityId = null; // Reset cache if entity was removed
       return null;
     }
-    const entity = entities[0] as EntityImpl;
-    return entity.getComponent<TechnologyUnlockComponent>(CT.TechnologyUnlock) || null;
+
+    return (entity as EntityImpl).getComponent<TechnologyUnlockComponent>(CT.TechnologyUnlock) || null;
   }
 }

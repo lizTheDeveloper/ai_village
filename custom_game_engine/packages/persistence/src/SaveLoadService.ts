@@ -99,7 +99,6 @@ export class SaveLoadService {
       // Register player with server
       try {
         await multiverseClient.registerPlayer();
-        console.log(`[SaveLoad] Server sync enabled for player: ${playerId}`);
       } catch (error) {
         console.warn('[SaveLoad] Failed to register player, sync will still work:', error);
       }
@@ -117,7 +116,6 @@ export class SaveLoadService {
    */
   disableServerSync(): void {
     this.serverSyncEnabled = false;
-    console.log('[SaveLoad] Server sync disabled');
   }
 
   /**
@@ -311,7 +309,6 @@ export class SaveLoadService {
             id: universeId, // Pass the client's universe ID to keep them in sync
           });
           serverUniverseId = created.id;
-          console.log(`[SaveLoad] Created universe on server: ${serverUniverseId}`);
         }
 
         // Upload snapshot to server
@@ -322,11 +319,6 @@ export class SaveLoadService {
             type: options.type ?? (options.canonEvent ? 'canonical' : 'manual'),
             canonEvent: options.canonEvent,
           }
-        );
-
-        console.log(
-          `[SaveLoad] Synced to server: tick ${snapshotEntry.tick}, ` +
-          `type ${snapshotEntry.type}${options.canonEvent ? `, event: ${options.canonEvent.title}` : ''}`
         );
       } catch (error) {
         // Log but don't fail - local save succeeded
@@ -513,7 +505,6 @@ export class SaveLoadService {
           tick,
           forkName
         );
-        console.log(`[SaveLoad] Created fork: ${forkedUniverse.id} (${forkName})`);
 
         // Update the save file's universe ID to the new fork
         if (saveFile.universes[0]) {
@@ -546,11 +537,6 @@ export class SaveLoadService {
 
       this.totalPlayTime = saveFile.header.playTime;
       this.playStartTime = Date.now();
-
-      console.log(
-        `[SaveLoad] Loaded from server: ${universeId} at tick ${tick}` +
-        (forkName ? ` (forked as "${forkName}")` : '')
-      );
 
       return {
         success: true,

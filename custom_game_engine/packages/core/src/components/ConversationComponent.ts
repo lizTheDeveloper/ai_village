@@ -174,13 +174,15 @@ export function ensureConversationComponent(
   entity: Entity,
   maxMessages: number = 10
 ): ConversationComponent {
-  // Import EntityImpl inline to avoid circular dependency
-  const EntityImpl = (entity as any).constructor;
+  // Entity interface with addComponent method
+  interface EntityWithAddComponent extends Entity {
+    addComponent(component: ConversationComponent): void;
+  }
 
   let comp = entity.getComponent<ConversationComponent>('conversation');
   if (!comp) {
     comp = createConversationComponent(maxMessages);
-    (entity as any).addComponent(comp);
+    (entity as EntityWithAddComponent).addComponent(comp);
   }
   return comp;
 }
