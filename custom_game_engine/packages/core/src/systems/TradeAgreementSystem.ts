@@ -53,6 +53,7 @@ import type { MultiverseCoordinator } from '../multiverse/MultiverseCoordinator.
 import { MayorNegotiator, createCivilizationContext } from '../trade/MayorNegotiator.js';
 import type { CivilizationContext } from '../trade/MayorNegotiator.js';
 import type { LLMProvider } from '../types/LLMTypes.js';
+import type { PassageComponent } from '../components/PassageComponent.js';
 
 // Interval for processing agreements (every 5 seconds at 20 TPS)
 const UPDATE_INTERVAL = 100;
@@ -78,11 +79,16 @@ export class TradeAgreementSystem extends BaseSystem {
   /**
    * Initialize the system
    */
-  protected onInitialize(_world: World, _eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     if (this.isInitialized) {
       return;
     }
     this.isInitialized = true;
+
+    // Subscribe to passage collapse events
+    eventBus.on('passage:collapsed', (event) => {
+      this.handlePassageCollapsed(_world, event.passageId);
+    });
   }
 
   /**

@@ -139,8 +139,8 @@ export class MeetingDetector {
       if (agent.id === selfId) continue;
 
       const impl = agent as EntityImpl;
-      const identity = impl.getComponent(ComponentType.Identity) as any;
-      const meeting = impl.getComponent(ComponentType.Meeting) as any;
+      const identity = impl.getComponent<IdentityComponent>(ComponentType.Identity);
+      const meeting = impl.getComponent<MeetingComponent>(ComponentType.Meeting);
 
       // Check if this agent has a meeting and their name matches the speaker
       if (meeting && identity?.name === speakerName) {

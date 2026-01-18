@@ -67,7 +67,7 @@ export class ExplorationSystem extends BaseSystem {
     // This can be added later if needed via a proper global state system
 
     // Check for coverage milestones
-    this._checkCoverageMilestones(entity, _world);
+    this._checkCoverageMilestones(entity, world);
 
     // Execute exploration mode - validate if present
     const mode = explorationState.mode;
