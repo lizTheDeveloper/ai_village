@@ -126,7 +126,7 @@ export const SquadronComponentSchema: ComponentSchema<SquadronComponent> = {
   fields: [
     { name: 'squadronId', type: 'string', required: true },
     { name: 'name', type: 'string', required: true },
-    { name: 'shipIds', type: 'array', required: true },
+    { name: 'shipIds', type: 'stringArray', required: true },
     { name: 'flagshipId', type: 'string', required: true },
     { name: 'commanderAgentId', type: 'string', required: false },
     { name: 'totalCrew', type: 'number', required: true },

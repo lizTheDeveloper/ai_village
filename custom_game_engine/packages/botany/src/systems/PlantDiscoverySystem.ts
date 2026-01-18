@@ -54,7 +54,7 @@ export interface PlantEffect {
 export class PlantDiscoverySystem extends BaseSystem {
   public readonly id: SystemId = 'plant_discovery' as SystemId;
   public readonly priority: number = 45; // After consumption, before memory formation
-  public readonly requiredComponents: ReadonlyArray<CT> = [ComponentType.Agent, CT.Position];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [ComponentType.Agent, ComponentType.Position];
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
   public readonly dependsOn = [] as const;
 

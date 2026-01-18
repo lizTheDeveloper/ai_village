@@ -18,7 +18,7 @@ export class PlantVisualsSystem extends BaseSystem {
   readonly id = 'plant_visuals' as const;
   readonly priority = 300;
   // Only require 'plant' - we'll add 'renderable' if missing
-  readonly requiredComponents = ['plant', CT.Position] as const;
+  readonly requiredComponents = ['plant', 'position'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**
