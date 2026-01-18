@@ -1,4 +1,4 @@
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type {
@@ -25,7 +25,7 @@ import {
  * - Force jack-out when belief runs out or agent dies
  * - Update camera to follow possessed agent
  */
-export class PossessionSystem implements System {
+export class PossessionSystem extends BaseSystem {
   public readonly id = 'possession' as const;
   public readonly priority = 5; // High priority - runs before AgentBrainSystem
   public readonly requiredComponents = [] as const;
@@ -33,8 +33,9 @@ export class PossessionSystem implements System {
   private readonly maxPossessionTicks = 12000; // 10 minutes at 20 TPS
   private readonly baseCostPerTick = 0.1; // Base belief cost
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
+    const world = ctx.world;
 
     // Get player control entity (should be singleton deity entity)
     const playerControlEntities = world

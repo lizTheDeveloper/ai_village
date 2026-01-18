@@ -121,10 +121,6 @@ export class DivineWeatherControl extends BaseSystem {
   private config: WeatherControlConfig;
   private weatherEvents: Map<string, DivineWeatherEvent> = new Map();
 
-  protected get throttleInterval(): number {
-    return this.config.updateInterval;
-  }
-
   constructor(config: Partial<WeatherControlConfig> = {}) {
     super();
     this.config = {
@@ -132,6 +128,11 @@ export class DivineWeatherControl extends BaseSystem {
       ...config,
       weatherCosts: { ...DEFAULT_WEATHER_CONTROL_CONFIG.weatherCosts, ...config.weatherCosts },
     };
+  }
+
+  // Override throttleInterval as a getter since config is set in constructor
+  protected get throttleInterval(): number {
+    return this.config.updateInterval;
   }
 
   protected onUpdate(ctx: SystemContext): void {

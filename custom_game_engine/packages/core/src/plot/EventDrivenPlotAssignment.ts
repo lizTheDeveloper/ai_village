@@ -236,8 +236,8 @@ export class EventDrivenPlotAssignmentSystem extends BaseSystem {
 
       case 'on_trauma': {
         if (!mood?.stress?.recentTraumas) return undefined;
-        // Check for traumas in the last UPDATE_INTERVAL * 2 ticks
-        const recentWindow = EventDrivenPlotAssignmentSystem.UPDATE_INTERVAL * 2;
+        // Check for traumas in the last throttleInterval * 2 ticks
+        const recentWindow = this.throttleInterval * 2;
         const recentTraumas = mood.stress.recentTraumas.filter(
           (t: Trauma) => currentTick - t.timestamp < recentWindow
         );
