@@ -54,7 +54,7 @@ export class ContextSection {
     }
 
     // Check copy button
-    const copyBounds = (this as any).copyButtonBounds;
+    const copyBounds = this.copyButtonBounds;
     if (copyBounds) {
       if (
         canvasX >= copyBounds.x &&
@@ -68,7 +68,7 @@ export class ContextSection {
     }
 
     // Check config button
-    const configBounds = (this as any).configButtonBounds;
+    const configBounds = this.configButtonBounds;
     if (!configBounds) {
       return false;
     }
@@ -185,7 +185,7 @@ export class ContextSection {
     ctx.fillText('⚙ Configure LLM', buttonX + 8, buttonY + 14);
 
     // Store config button bounds for click detection
-    (this as any).configButtonBounds = {
+    this.configButtonBounds = {
       x: buttonX,
       y: buttonY,
       width: buttonWidth,
@@ -206,7 +206,7 @@ export class ContextSection {
     ctx.fillText('📋 Copy', copyButtonX + 10, copyButtonY + 14);
 
     // Store copy button bounds for click detection
-    (this as any).copyButtonBounds = {
+    this.copyButtonBounds = {
       x: copyButtonX,
       y: copyButtonY,
       width: copyButtonWidth,
@@ -264,7 +264,7 @@ export class ContextSection {
       tabX += tabWidth + tabPadding;
     }
 
-    (this as any).tabButtonsBounds = tabButtonsBounds;
+    this.tabButtonsBounds = tabButtonsBounds;
     currentY += tabHeight + 8;
 
     // Prompt type description

@@ -620,6 +620,80 @@ export interface MiscEvents {
     generation: string;
   };
 
+  // === Emotion Theater Events ===
+  'emotion_theater_session_started': {
+    scenarioId: string;
+    scenarioName: string;
+    participantIds: string[];
+    targetEmotion: string;
+  };
+
+  'emotion_theater_session_complete': {
+    scenarioId: string;
+    scenarioName: string;
+    participantIds: string[];
+    targetEmotion: string;
+  };
+
+  'emotion_theater_session_ended': {
+    reason: string;
+    participantIds: string[];
+  };
+
+  // === Memory Hall Events ===
+  'memory_replay_complete': {
+    memoryId: string;
+    memoryTitle: string;
+    viewerIds: string[];
+  };
+
+  'memory_recording_stopped': {
+    reason: string;
+    duration: number;
+  };
+
+  // === Meditation Chamber Events ===
+  'meditation_session_complete': {
+    technique: string;
+    participantIds: string[];
+    duration: number;
+  };
+
+  // === Taming & Bond Events ===
+  'bond_level_changed': {
+    animalId: EntityId;
+    agentId: EntityId;
+    oldLevel: string;
+    newLevel: string;
+    bondLevel: number;
+  };
+
+  // === Uplift & Consciousness Events ===
+  'consciousness_awakened': {
+    entityId: EntityId;
+    entityName: string;
+    programId: string;
+    sourceSpecies: string;
+    generation: number;
+    awakening: {
+      tick: number;
+      generation: number;
+      firstThought: string;
+      firstQuestion: string;
+      firstEmotion: string;
+      firstWord: string;
+      witnessIds: string[];
+    };
+  };
+
+  'proto_sapience_milestone': {
+    entityId: EntityId;
+    milestone: 'first_tool_use' | 'first_tool_creation' | 'proto_language_emergence' | 'abstract_thinking' | 'mirror_test_passed' | 'cultural_tradition_emerged';
+    generation?: number;
+    intelligence: number;
+    tradition?: string;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

@@ -2004,11 +2004,11 @@ export class DevPanel implements IWindowPanel {
 
         // Grant XP to a random skill
         const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-        const currentLevel = (skills.levels as any)[randomSkill] || 0;
+        const currentLevel = skills.levels[randomSkill] || 0;
         const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
         // Update the skill component
-        (this.world as any).updateComponent(agent.id, CT.Skills, (current: SkillsComponent) => ({
+        this.world.updateComponent(agent.id, CT.Skills, (current: SkillsComponent) => ({
           ...current,
           levels: {
             ...current.levels,
@@ -2211,7 +2211,7 @@ export class DevPanel implements IWindowPanel {
     if (!this.world || !this.selectedBlueprintId) return;
 
     // Get TileConstructionSystem from world
-    const tileConstructionSystem = (this.world as any).getSystem?.('tile_construction');
+    const tileConstructionSystem = this.world.getSystem?.('tile_construction');
     if (!tileConstructionSystem) {
       throw new Error('TileConstructionSystem not found in world');
     }
@@ -2249,7 +2249,7 @@ export class DevPanel implements IWindowPanel {
     const parsedTiles = parseLayout(blueprint, originX, originY, 0);
 
     // Get world getTileAt method
-    const worldWithTiles = this.world as any;
+    const worldWithTiles = this.world;
     if (typeof worldWithTiles.getTileAt !== 'function') {
       throw new Error('World does not have getTileAt method');
     }
@@ -2345,11 +2345,11 @@ export class DevPanel implements IWindowPanel {
       }
 
       const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-      const currentLevel = (skills.levels as any)[randomSkill] || 0;
+      const currentLevel = skills.levels[randomSkill] || 0;
       const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
       // Update the skill component
-      (this.world as any).updateComponent(agentId, CT.Skills, (current: SkillsComponent) => ({
+      this.world.updateComponent(agentId, CT.Skills, (current: SkillsComponent) => ({
         ...current,
         levels: {
           ...current.levels,
@@ -2431,7 +2431,7 @@ export class DevPanel implements IWindowPanel {
         case 'fast_forward_100':
           // Advance the world 100 ticks
           for (let i = 0; i < 100; i++) {
-            (this.world as any).advanceTick();
+            this.world.advanceTick();
           }
           this.log('Advanced world by 100 ticks');
           break;
@@ -2439,7 +2439,7 @@ export class DevPanel implements IWindowPanel {
         case 'fast_forward_1000':
           // Advance the world 1000 ticks
           for (let i = 0; i < 1000; i++) {
-            (this.world as any).advanceTick();
+            this.world.advanceTick();
           }
           this.log('Advanced world by 1000 ticks');
           break;
@@ -2452,7 +2452,7 @@ export class DevPanel implements IWindowPanel {
               return tags?.tags.includes('dead');
             });
           for (const entity of deadEntities) {
-            (this.world as any).destroyEntity(entity.id, 'dev_tools_cleanup');
+            this.world.destroyEntity(entity.id, 'dev_tools_cleanup');
           }
           this.log(`Removed ${deadEntities.length} dead bodies`);
           break;
@@ -2461,7 +2461,7 @@ export class DevPanel implements IWindowPanel {
           // Set all agents' needs to satisfied
           const agents = this.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
           for (const agent of agents) {
-            (this.world as any).updateComponent(agent.id, CT.Needs, (needs: any) => ({
+            this.world.updateComponent(agent.id, CT.Needs, (needs: any) => ({
               ...needs,
               hunger: 0,
               thirst: 0,
@@ -2476,7 +2476,7 @@ export class DevPanel implements IWindowPanel {
           // Set hunger and thirst to 0
           const hungryAgents = this.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
           for (const agent of hungryAgents) {
-            (this.world as any).updateComponent(agent.id, CT.Needs, (needs: any) => ({
+            this.world.updateComponent(agent.id, CT.Needs, (needs: any) => ({
               ...needs,
               hunger: 0,
               thirst: 0,

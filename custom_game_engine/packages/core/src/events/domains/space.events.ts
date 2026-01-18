@@ -61,6 +61,17 @@ export interface SpaceEvents {
     travelMethod: 'portal' | 'spacecraft' | 'ritual' | 'passage';
   };
 
+  /** Entity started traveling between planets */
+  'planet_travel_started': {
+    entityId: EntityId;
+    fromPlanetId: string;
+    toPlanetId: string;
+    travelMethod: 'portal' | 'spacecraft';
+    portalId?: string;
+    shipId?: string;
+    crewCount?: number;
+  };
+
   // === Spaceship Construction Events ===
 
   /** Spaceship construction initiated (request) */
@@ -124,6 +135,23 @@ export interface SpaceEvents {
     shipName: string;
     shipyardId: string;
     builderId: string;
+  };
+
+  // === Spaceship Operation Events ===
+
+  /** Spaceship jump window opened */
+  'spaceship_jump_window_open': {
+    shipId: string;
+    coherence: number;
+    windowDuration: number;
+  };
+
+  /** Spaceship beta jump executed */
+  'spaceship_beta_jump_executed': {
+    destinationPlanetId: string;
+    coherence: number;
+    crewCount: number;
+    syncTime: number;
   };
 
   // === Fleet Events ===
@@ -192,6 +220,32 @@ export interface SpaceEvents {
   'navy:armada_missing': {
     navyId: string;
     missingArmadaId: string;
+  };
+
+  /** Navy budget exceeded */
+  'navy:budget_exceeded': {
+    navyId: string;
+    budgetSpent: number;
+    budget: number;
+    overspend: number;
+  };
+
+  /** Armada joined a navy */
+  'navy:armada_joined': {
+    navyId: string;
+    armadaId: string;
+  };
+
+  /** Armada left a navy */
+  'navy:armada_left': {
+    navyId: string;
+    armadaId: string;
+  };
+
+  /** Fleet added to navy reserves */
+  'navy:fleet_added_to_reserves': {
+    navyId: string;
+    fleetId: string;
   };
 
   // === Shipping Lane Events ===
