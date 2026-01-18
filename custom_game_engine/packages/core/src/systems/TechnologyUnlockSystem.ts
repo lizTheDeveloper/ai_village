@@ -38,6 +38,10 @@ export class TechnologyUnlockSystem extends BaseSystem {
   private lastCheckedTick: number = 0;
   private checkedBuildings: Set<string> = new Set(); // Track which buildings we've already processed
 
+  // Cache cities to avoid repeated queries
+  private cachedCities: ReadonlyArray<Entity> = [];
+  private lastCityCount: number = 0;
+
   constructor(eventBus: CoreEventBus, systemRegistry: ISystemRegistry) {
     super();
     this.systemRegistry = systemRegistry;
@@ -76,20 +80,26 @@ export class TechnologyUnlockSystem extends BaseSystem {
     // Get all completed buildings
     const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
 
-    // Get all cities
-    const cities = world.query().with(CT.CityDirector).executeEntities();
+    // Cache cities query (only rebuild when count changes)
+    const currentCityCount = world.query().with(CT.CityDirector).count();
+    if (currentCityCount !== this.lastCityCount) {
+      this.cachedCities = world.query().with(CT.CityDirector).executeEntities();
+      this.lastCityCount = currentCityCount;
+    }
+    const cities = this.cachedCities;
 
     for (const buildingEntity of buildings) {
       const buildingImpl = buildingEntity as EntityImpl;
+
+      // Skip if already checked (BEFORE getting components)
+      if (this.checkedBuildings.has(buildingImpl.id)) {
+        continue;
+      }
+
       const building = buildingImpl.getComponent<BuildingComponent>(CT.Building);
       const pos = buildingImpl.getComponent<PositionComponent>(CT.Position);
 
       if (!building || !pos || !building.isComplete) {
-        continue;
-      }
-
-      // Skip if already checked
-      if (this.checkedBuildings.has(buildingImpl.id)) {
         continue;
       }
 
@@ -137,20 +147,20 @@ export class TechnologyUnlockSystem extends BaseSystem {
     for (const entity of publishingCompanies) {
       const entityImpl = entity as EntityImpl;
 
-      // Skip if already checked
+      // Skip if already checked (BEFORE getting components)
       if (this.checkedBuildings.has(entityImpl.id)) {
-        continue;
-      }
-
-      // Check if already unlocked
-      if (isBuildingUnlocked(unlock, 'publishing_company')) {
-        this.checkedBuildings.add(entityImpl.id);
         continue;
       }
 
       // Find which city this is in (would need position component)
       const pos = entityImpl.getComponent<PositionComponent>(CT.Position);
       if (!pos) {
+        continue;
+      }
+
+      // Check if already unlocked
+      if (isBuildingUnlocked(unlock, 'publishing_company')) {
+        this.checkedBuildings.add(entityImpl.id);
         continue;
       }
 
@@ -175,19 +185,19 @@ export class TechnologyUnlockSystem extends BaseSystem {
     for (const entity of newspapers) {
       const entityImpl = entity as EntityImpl;
 
-      // Skip if already checked
+      // Skip if already checked (BEFORE getting components)
       if (this.checkedBuildings.has(entityImpl.id)) {
+        continue;
+      }
+
+      const pos = entityImpl.getComponent<PositionComponent>(CT.Position);
+      if (!pos) {
         continue;
       }
 
       // Check if already unlocked
       if (isBuildingUnlocked(unlock, 'newspaper')) {
         this.checkedBuildings.add(entityImpl.id);
-        continue;
-      }
-
-      const pos = entityImpl.getComponent<PositionComponent>(CT.Position);
-      if (!pos) {
         continue;
       }
 

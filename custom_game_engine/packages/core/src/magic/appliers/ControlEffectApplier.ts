@@ -587,7 +587,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
   }
 
   private stopMovement(target: Entity): void {
-    const velocity = target.components.get('velocity') as VelocityComponent | undefined;
+    const velocity = target.getComponent<VelocityComponent>('velocity');
     if (velocity) {
       velocity.vx = 0;
       velocity.vy = 0;
@@ -600,9 +600,9 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     force: number,
     direction: 'away' | 'toward' | 'up' | 'down'
   ): void {
-    const targetPos = target.components.get('position') as PositionComponent | undefined;
-    const sourcePos = source.components.get('position') as PositionComponent | undefined;
-    const velocity = target.components.get('velocity') as VelocityComponent | undefined;
+    const targetPos = target.getComponent<PositionComponent>('position');
+    const sourcePos = source.getComponent<PositionComponent>('position');
+    const velocity = target.getComponent<VelocityComponent>('velocity');
 
     if (!targetPos || !sourcePos || !velocity) return;
 
@@ -625,7 +625,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
   }
 
   private applyLevitate(target: Entity, height: number): void {
-    const position = target.components.get('position') as PositionComponent | undefined;
+    const position = target.getComponent<PositionComponent>('position');
     if (position) {
       // Set z-level to levitation height
       position.z = height;
@@ -633,10 +633,10 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
   }
 
   private applyFear(target: Entity, source: Entity): void {
-    const targetPos = target.components.get('position') as PositionComponent | undefined;
-    const sourcePos = source.components.get('position') as PositionComponent | undefined;
-    const velocity = target.components.get('velocity') as VelocityComponent | undefined;
-    const agent = target.components.get('agent') as AgentComponent | undefined;
+    const targetPos = target.getComponent<PositionComponent>('position');
+    const sourcePos = source.getComponent<PositionComponent>('position');
+    const velocity = target.getComponent<VelocityComponent>('velocity');
+    const agent = target.getComponent<AgentComponent>('agent');
 
     if (!targetPos || !sourcePos || !velocity) return;
 
@@ -652,8 +652,11 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     }
 
     // Set behavior to flee if agent component exists
+    // Note: AgentComponent doesn't have currentBehavior - this is handled by BehaviorComponent
+    // This code is legacy and should be refactored to use BehaviorComponent
     if (agent && 'currentBehavior' in agent) {
-      (agent as any).currentBehavior = 'flee';
+      // Type guard ensures safe access to dynamic property
+      (agent as { currentBehavior: string }).currentBehavior = 'flee';
     }
   }
 }

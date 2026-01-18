@@ -102,12 +102,22 @@ export const DominanceRankSchema = autoRegister(
 
     validate: (data: unknown): data is DominanceRankComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
-      return (
-        typeof comp.rank === 'number' &&
-        Array.isArray(comp.subordinates) &&
-        typeof comp.canChallengeAbove === 'boolean'
-      );
+      const x = data as Record<string, unknown>;
+
+      // Check type field
+      if (!('type' in x) || x.type !== 'dominance_rank') return false;
+
+      // Check required fields
+      if (!('rank' in x) || typeof x.rank !== 'number') return false;
+      if (!('subordinates' in x) || !Array.isArray(x.subordinates)) return false;
+      if (!('canChallengeAbove' in x) || typeof x.canChallengeAbove !== 'boolean') return false;
+
+      // Validate subordinates array items
+      for (const item of x.subordinates) {
+        if (typeof item !== 'string') return false;
+      }
+
+      return true;
     },
 
     createDefault: () => {

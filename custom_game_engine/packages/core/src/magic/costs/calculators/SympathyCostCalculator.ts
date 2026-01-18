@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /** Link quality affects efficiency */
 type LinkQuality = 'poor' | 'moderate' | 'good' | 'excellent' | 'perfect';

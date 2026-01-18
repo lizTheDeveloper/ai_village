@@ -18,6 +18,7 @@ import {
   type TerminalEffect,
 } from '../CostCalculator.js';
 import type { ComposedSpell, MagicComponent } from '../../../components/MagicComponent.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 
 /**
  * Cost calculator for the True Name/Deep Grammar magic paradigm.
@@ -145,7 +146,7 @@ export class NameCostCalculator extends BaseCostCalculator {
    * Override terminal effect for name-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     caster: MagicComponent
   ): TerminalEffect {
@@ -163,14 +164,14 @@ export class NameCostCalculator extends BaseCostCalculator {
           cause: 'Consumed by entities drawn to your voice',
         };
       default:
-        return super.getTerminalEffect(costType as any, trigger, caster);
+        return super.getTerminalEffect(costType, trigger, caster);
     }
   }
 
   /**
    * Override cumulative check - attention is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'attention' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'attention' || super.isCumulativeCost(costType);
   }
 }

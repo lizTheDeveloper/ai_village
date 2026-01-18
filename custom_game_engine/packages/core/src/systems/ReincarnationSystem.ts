@@ -14,7 +14,7 @@
  * - speciesConstraint: same, similar, any, karmic
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';

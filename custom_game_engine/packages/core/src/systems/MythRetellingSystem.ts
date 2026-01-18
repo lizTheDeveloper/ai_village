@@ -27,7 +27,7 @@ import {
 export class MythRetellingSystem extends BaseSystem {
   public readonly id = 'myth_retelling';
   public readonly priority = 119; // After myth generation
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents = [CT.Agent, CT.Spiritual] as const;
   protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
@@ -41,11 +41,9 @@ export class MythRetellingSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-    // Find agents with spiritual beliefs
-    const believers = ctx.world.query()
-      .with(CT.Agent)
-      .with(CT.Spiritual)
-      .executeEntities();
+    // Use pre-filtered active entities (already filtered by SimulationScheduler)
+    // Only process visible/nearby agents - myth retelling is a proximity-based interaction
+    const believers = ctx.activeEntities;
 
     if (believers.length === 0) return;
 

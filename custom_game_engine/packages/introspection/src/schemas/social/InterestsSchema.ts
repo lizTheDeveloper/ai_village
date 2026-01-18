@@ -158,17 +158,50 @@ export const InterestsSchema = autoRegister(
 
     validate: (data): data is InterestsComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const i = data as any;
+      const i = data as Record<string, unknown>;
 
-      return (
-        i.type === 'interests' &&
-        Array.isArray(i.interests) &&
-        typeof i.depthHunger === 'number' &&
-        i.depthHunger >= 0 &&
-        i.depthHunger <= 1 &&
-        Array.isArray(i.avoidTopics) &&
-        typeof i.maxInterests === 'number'
-      );
+      // Check required type field
+      if (!('type' in i) || i.type !== 'interests') return false;
+
+      // Check interests array
+      if (!('interests' in i) || !Array.isArray(i.interests)) return false;
+
+      // Validate each interest object
+      for (const interest of i.interests) {
+        if (typeof interest !== 'object' || interest === null) return false;
+        const int = interest as Record<string, unknown>;
+
+        if (!('topic' in int) || typeof int.topic !== 'string') return false;
+        if (!('category' in int) || typeof int.category !== 'string') return false;
+        if (!('intensity' in int) || typeof int.intensity !== 'number') return false;
+        if (!('source' in int) || typeof int.source !== 'string') return false;
+        if (!('lastDiscussed' in int) || (int.lastDiscussed !== null && typeof int.lastDiscussed !== 'number')) return false;
+        if (!('discussionHunger' in int) || typeof int.discussionHunger !== 'number') return false;
+        if (!('knownEnthusiasts' in int) || !Array.isArray(int.knownEnthusiasts)) return false;
+
+        // Validate knownEnthusiasts array items
+        for (const enthusiast of int.knownEnthusiasts) {
+          if (typeof enthusiast !== 'string') return false;
+        }
+
+        // question is optional
+        if ('question' in int && int.question !== undefined && typeof int.question !== 'string') return false;
+      }
+
+      // Check depthHunger
+      if (!('depthHunger' in i) || typeof i.depthHunger !== 'number') return false;
+      if (i.depthHunger < 0 || i.depthHunger > 1) return false;
+
+      // Check avoidTopics array
+      if (!('avoidTopics' in i) || !Array.isArray(i.avoidTopics)) return false;
+      for (const topic of i.avoidTopics) {
+        if (typeof topic !== 'string') return false;
+      }
+
+      // Check maxInterests
+      if (!('maxInterests' in i) || typeof i.maxInterests !== 'number') return false;
+
+      return true;
     },
 
     createDefault: () => ({
