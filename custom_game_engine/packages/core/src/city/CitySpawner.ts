@@ -589,7 +589,7 @@ export async function spawnCity(
   const cityId = cityEntity.id;
 
   // Calculate city bounds (estimate based on grid size)
-  const gridSize = Math.ceil(Math.sqrt(template.buildings.reduce((sum: number, b: any) => sum + b.count, 0)));
+  const gridSize = Math.ceil(Math.sqrt(template.buildings.reduce((sum: number, b: { type: string; count: number }) => sum + b.count, 0)));
   const spacing = 12;
   const radius = gridSize * spacing / 2;
   const bounds = {
@@ -601,7 +601,7 @@ export async function spawnCity(
 
   // Add CityDirector component using helper
   const cityDirector = createCityDirectorComponent(cityId, cityName, bounds, useLLM);
-  (cityEntity as any).addComponent(cityDirector);
+  (cityEntity as EntityImpl).addComponent(cityDirector);
 
   const spawnedBuildingIds: string[] = [];
   const spawnedAgentIds: string[] = [];
@@ -665,14 +665,14 @@ export async function spawnCity(
 
     // Set agent's profession if they have a profession component
     const professionComponent = agentEntity.components.get('profession');
-    if (professionComponent && typeof professionComponent === 'object') {
-      (professionComponent as any).currentProfession = profession;
+    if (professionComponent && typeof professionComponent === 'object' && 'currentProfession' in professionComponent) {
+      (professionComponent as { currentProfession: string }).currentProfession = profession;
     }
 
     // Mark agent as belonging to this city
     const identity = agentEntity.components.get('identity');
-    if (identity && typeof identity === 'object') {
-      (identity as any).cityId = cityId;
+    if (identity && typeof identity === 'object' && 'cityId' in identity) {
+      (identity as { cityId: string }).cityId = cityId;
     }
   }
 

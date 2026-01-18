@@ -11,6 +11,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
 import {
   type TargetResult,
   rememberLocation,
@@ -91,7 +92,7 @@ export class BuildingTargeting {
     if (!position || !vision) return null;
 
     // Buildings are typically in seenBuildings or we need to check all visible entities
-    const seenBuildings = (vision as any).seenBuildings || [];
+    const seenBuildings = vision.seenBuildings || [];
     let nearest: BuildingTarget | null = null;
     let nearestDist = Infinity;
 
@@ -128,7 +129,7 @@ export class BuildingTargeting {
       if (!buildingEntity) continue;
 
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent(ComponentType.Building) as any;
+      const building = impl.getComponent<BuildingComponent>(ComponentType.Building);
       const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!building || !buildingPos) continue;
@@ -137,26 +138,28 @@ export class BuildingTargeting {
       if (options.buildingType && building.buildingType !== options.buildingType) continue;
 
       // Check completion
-      const isComplete = building.constructionProgress >= 1.0;
+      const isComplete = building.progress >= 100;
       if (options.completed && !isComplete) continue;
 
       // Check warmth
       if (options.providesWarmth) {
-        const providesWarmth = building.warmthBonus > 0 || building.insulation > 0;
+        const providesWarmth = building.heatAmount > 0 || building.baseTemperature > 0 || building.insulation > 0;
         if (!providesWarmth) continue;
       }
 
       // Check capacity (for storage buildings)
       if (options.hasCapacity) {
-        const capacity = building.capacity || 0;
-        const currentItems = building.storedItems?.length || 0;
-        if (currentItems >= capacity) continue;
+        // BuildingComponent doesn't track stored items, only capacity
+        // Assume building with capacity > 0 has capacity available
+        if (building.storageCapacity <= 0) continue;
       }
 
       // Check crafting type
       if (options.craftingType) {
-        const craftingTypes = building.craftingTypes || [];
-        if (!craftingTypes.includes(options.craftingType)) continue;
+        // BuildingComponent doesn't have craftingTypes array
+        // This would need to be implemented in the component
+        // For now, skip this check
+        continue;
       }
 
       // Calculate distance
@@ -171,13 +174,13 @@ export class BuildingTargeting {
           entity: buildingEntity,
           buildingType: building.buildingType,
           isComplete,
-          constructionProgress: building.constructionProgress || 0,
+          constructionProgress: building.progress,
           distance: dist,
           position: { x: buildingPos.x, y: buildingPos.y },
-          capacity: building.capacity,
-          currentItems: building.storedItems?.length || 0,
-          providesWarmth: building.warmthBonus > 0 || building.insulation > 0,
-          warmthBonus: building.warmthBonus || 0,
+          capacity: building.storageCapacity,
+          currentItems: 0, // BuildingComponent doesn't track current items
+          providesWarmth: building.heatAmount > 0 || building.baseTemperature > 0 || building.insulation > 0,
+          warmthBonus: building.heatAmount + building.baseTemperature,
         };
         nearestDist = dist;
       }
@@ -208,7 +211,7 @@ export class BuildingTargeting {
     if (!position || !vision) return [];
 
     const results: BuildingTarget[] = [];
-    const seenBuildings = (vision as any).seenBuildings || [];
+    const seenBuildings = vision.seenBuildings || [];
 
     // Fallback: query all buildings in vision range
     const candidates = [...seenBuildings];
@@ -240,30 +243,28 @@ export class BuildingTargeting {
       if (!buildingEntity) continue;
 
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent(ComponentType.Building) as any;
+      const building = impl.getComponent<BuildingComponent>(ComponentType.Building);
       const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!building || !buildingPos) continue;
 
       if (options.buildingType && building.buildingType !== options.buildingType) continue;
 
-      const isComplete = building.constructionProgress >= 1.0;
+      const isComplete = building.progress >= 100;
       if (options.completed && !isComplete) continue;
 
       if (options.providesWarmth) {
-        const providesWarmth = building.warmthBonus > 0 || building.insulation > 0;
+        const providesWarmth = building.heatAmount > 0 || building.baseTemperature > 0 || building.insulation > 0;
         if (!providesWarmth) continue;
       }
 
       if (options.hasCapacity) {
-        const capacity = building.capacity || 0;
-        const currentItems = building.storedItems?.length || 0;
-        if (currentItems >= capacity) continue;
+        if (building.storageCapacity <= 0) continue;
       }
 
       if (options.craftingType) {
-        const craftingTypes = building.craftingTypes || [];
-        if (!craftingTypes.includes(options.craftingType)) continue;
+        // BuildingComponent doesn't have craftingTypes array
+        continue;
       }
 
       const dist = this.distance(position, buildingPos);
@@ -273,13 +274,13 @@ export class BuildingTargeting {
         entity: buildingEntity,
         buildingType: building.buildingType,
         isComplete,
-        constructionProgress: building.constructionProgress || 0,
+        constructionProgress: building.progress,
         distance: dist,
         position: { x: buildingPos.x, y: buildingPos.y },
-        capacity: building.capacity,
-        currentItems: building.storedItems?.length || 0,
-        providesWarmth: building.warmthBonus > 0 || building.insulation > 0,
-        warmthBonus: building.warmthBonus || 0,
+        capacity: building.storageCapacity,
+        currentItems: 0, // BuildingComponent doesn't track current items
+        providesWarmth: building.heatAmount > 0 || building.baseTemperature > 0 || building.insulation > 0,
+        warmthBonus: building.heatAmount + building.baseTemperature,
       });
     }
 

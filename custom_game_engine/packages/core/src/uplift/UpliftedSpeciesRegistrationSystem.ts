@@ -116,7 +116,7 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
     program.targetSpeciesId = upliftedSpecies.speciesId;
 
     // Emit event
-    this.events.emit('uplifted_species_registered' as any, {
+    this.events.emit('uplifted_species_registered', {
       speciesId: upliftedSpecies.speciesId,
       speciesName: upliftedSpecies.speciesName,
       programId: program.programId,

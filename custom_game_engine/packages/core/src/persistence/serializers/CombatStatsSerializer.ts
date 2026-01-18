@@ -26,17 +26,26 @@ export class CombatStatsSerializer extends BaseComponentSerializer<CombatStatsCo
   }
 
   protected deserializeData(data: unknown): CombatStatsComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('CombatStatsComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.combatSkill !== 'number') {
+      throw new Error('CombatStatsComponent.combatSkill must be number');
+    }
+
     return createCombatStatsComponent({
       combatSkill: d.combatSkill,
-      huntingSkill: d.huntingSkill,
-      stealthSkill: d.stealthSkill,
-      displaySkill: d.displaySkill,
-      resourceHolding: d.resourceHolding,
-      craftingSkill: d.craftingSkill,
-      socialSkill: d.socialSkill,
-      weapon: d.weapon,
-      armor: d.armor,
+      huntingSkill: typeof d.huntingSkill === 'number' ? d.huntingSkill : undefined,
+      stealthSkill: typeof d.stealthSkill === 'number' ? d.stealthSkill : undefined,
+      displaySkill: typeof d.displaySkill === 'number' ? d.displaySkill : undefined,
+      resourceHolding: typeof d.resourceHolding === 'number' ? d.resourceHolding : undefined,
+      craftingSkill: typeof d.craftingSkill === 'number' ? d.craftingSkill : undefined,
+      socialSkill: typeof d.socialSkill === 'number' ? d.socialSkill : undefined,
+      weapon: typeof d.weapon === 'string' ? d.weapon : undefined,
+      armor: typeof d.armor === 'string' ? d.armor : undefined,
     });
   }
 
@@ -44,8 +53,8 @@ export class CombatStatsSerializer extends BaseComponentSerializer<CombatStatsCo
     if (typeof data !== 'object' || data === null) {
       throw new Error('CombatStatsComponent data must be object');
     }
-    const d = data as any;
-    if (d.combatSkill === undefined) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.combatSkill !== 'number') {
       throw new Error('CombatStatsComponent missing required combatSkill');
     }
     return true;

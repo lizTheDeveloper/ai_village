@@ -180,7 +180,7 @@ export class PrayBehavior extends BaseBehavior {
 
     // Record prayer in spiritual component
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-    (entity as any).addComponent(updatedSpiritual);
+    entity.addComponent(updatedSpiritual);
 
     this.updateState(entity, {
       prayerStarted: currentTick,
@@ -196,7 +196,7 @@ export class PrayBehavior extends BaseBehavior {
     }));
 
     // Emit prayer event (using untyped emit for custom event)
-    const eventBus = world.eventBus as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
     eventBus.emit({
       type: 'prayer:offered',
       source: 'pray_behavior',
@@ -237,7 +237,7 @@ export class PrayBehavior extends BaseBehavior {
     }
 
     // Emit completion event (using untyped emit for custom event)
-    const eventBus = world.eventBus as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
     eventBus.emit({
       type: 'prayer:complete',
       source: 'pray_behavior',
@@ -395,7 +395,7 @@ export function prayBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
 
     // Record prayer in spiritual component
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-    (ctx.entity as any).addComponent(updatedSpiritual);
+    (ctx.entity as EntityImpl).addComponent(updatedSpiritual);
 
     ctx.updateState({
       prayerStarted: ctx.tick,
@@ -534,12 +534,14 @@ function generatePrayerFromTemplate(
 
 function getSacredSiteSystemFromContext(ctx: BehaviorContext): SacredSiteSystem | null {
   // Access world through entity's internal reference
-  const world = (ctx.entity as any).world;
+  const entityImpl = ctx.entity as EntityImpl;
+  const world = (entityImpl as unknown as { world?: World }).world;
   if (!world) return null;
 
   const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
   if (systems instanceof Map) {
-    return systems.get('sacred_site') as SacredSiteSystem | null;
+    const system = systems.get('sacred_site');
+    return system instanceof SacredSiteSystem ? system : null;
   }
   return null;
 }

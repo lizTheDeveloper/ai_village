@@ -30,7 +30,7 @@ export class PrayerAnsweringSystem extends BaseSystem {
   public readonly priority: number = 117; // After prayer generation
   public readonly requiredComponents = [];
 
-  protected readonly throttleInterval = 20; // Update once per second at 20 TPS
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds (prayers don't need instant answers)
 
   // Prayer answering cost (from spec)
   private readonly ANSWER_PRAYER_COST = 75;

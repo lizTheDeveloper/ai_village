@@ -200,6 +200,17 @@ export class GameLoop {
     for (const system of systems) {
       const systemStart = performance.now();
 
+      // Skip systems whose activation components don't exist in the world (O(1) check)
+      if (system.activationComponents && system.activationComponents.length > 0) {
+        const hasActivation = system.activationComponents.some(
+          componentType => this._world.hasComponentType(componentType)
+        );
+        if (!hasActivation) {
+          // System has nothing to do - skip entirely
+          continue;
+        }
+      }
+
       try {
         // Get entities that match this system's requirements (cached)
         let entities: ReadonlyArray<Entity>;

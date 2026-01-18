@@ -3254,6 +3254,58 @@ export interface GameEventMap {
     tick: number;
   };
 
+  // === Province Governance Events ===
+  /** Province election completed */
+  'province:election_completed': {
+    provinceId: string;
+    provinceName: string;
+    newGovernor?: string;
+    tick: number;
+  };
+
+  /** Province economic update (significant change) */
+  'province:economic_update': {
+    provinceId: string;
+    provinceName: string;
+    taxRevenue: number;
+    maintenanceCost: number;
+    netRevenue: number;
+    tick: number;
+  };
+
+  /** Province stability critical - rebellion warning */
+  'province:rebellion_warning': {
+    provinceId: string;
+    provinceName: string;
+    stability: number;
+    factors: string[];
+    tick: number;
+  };
+
+  /** Province policy completed */
+  'province:policy_completed': {
+    provinceId: string;
+    provinceName: string;
+    policy: string;
+    category: string;
+    tick: number;
+  };
+
+  /** City rebelled against province */
+  'province:city_rebelled': {
+    provinceId: string;
+    provinceName: string;
+    cityId: string;
+    tick: number;
+  };
+
+  /** City added to province */
+  'province:city_added': {
+    provinceId: string;
+    cityId: string;
+    cityName: string;
+  };
+
   // === Guard Duty Events ===
   /** Guard alertness dropped below threshold */
   'guard:alertness_low': {
@@ -4287,11 +4339,48 @@ export interface GameEventMap {
   /** Chat message sent */
   'chat:message_sent': {
     roomId: string;
+    messageId?: string;
     senderId: string;
     senderName?: string;
     message?: string;
     content?: string;
     timestamp?: number;
+  };
+
+  // Walkie talkie events
+  'walkie_talkie_issued': {
+    deviceId: string;
+    agentId: string;
+    model: string;
+  };
+  'walkie_talkie_transmission': {
+    transmissionId: string;
+    senderId: string;
+    channel: number;
+    message: string;
+    receiverCount: number;
+  };
+
+  // Cell phone events
+  'cell_phone_issued': {
+    phoneId: string;
+    phoneNumber: string;
+    agentId: string;
+    generation: string;
+  };
+  'cell_phone_call_started': {
+    callId: string;
+    caller: string;
+    receiver: string;
+  };
+  'cell_phone_text_sent': {
+    messageId: string;
+    sender: string;
+    receiverNumber: string;
+    hasMedia: boolean;
+  };
+  'cell_network_upgraded': {
+    generation: string;
   };
 
   // === Memory Events ===

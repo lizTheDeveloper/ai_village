@@ -6,6 +6,7 @@ import type { ResourceType } from '../components/ResourceComponent.js';
 import type { SpatialMemoryComponent, ResourceLocationMemory } from '../components/SpatialMemoryComponent.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getPosition, getSpatialMemory, getEpisodicMemory } from '../utils/componentHelpers.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * SpatialMemoryQuerySystem synchronizes between EpisodicMemory and SpatialMemory
@@ -15,7 +16,7 @@ export class SpatialMemoryQuerySystem extends BaseSystem {
   public readonly id: SystemId = 'spatial_memory_query';
   public readonly priority: number = 105; // After MemoryFormation, before BeliefFormation
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 20; // Every 1 second - memory indexing can be batched
+  protected readonly throttleInterval = THROTTLE.NORMAL; // Every 1 second - memory indexing can be batched
 
   // Future: Add event bus support for memory indexing events
   private lastProcessedMemoryCount: Map<string, number> = new Map();

@@ -431,7 +431,7 @@ export class MultiverseNetworkManager {
     }
 
     // Serialize entity
-    const serializedEntity = await (worldSerializer as any).serializeEntity(
+    const serializedEntity = await (worldSerializer as { serializeEntity(entity: Entity): Promise<unknown> }).serializeEntity(
       entity
     );
 

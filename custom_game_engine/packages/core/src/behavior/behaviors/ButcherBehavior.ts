@@ -101,7 +101,11 @@ export class ButcherBehavior extends BaseBehavior {
     }
 
     // Get animal component for species/size info
-    const animal = world.getComponent(targetId, CT.Animal) as any;
+    interface AnimalComponentWithDanger {
+      danger?: number;
+      species?: string;
+    }
+    const animal = world.getComponent(targetId, CT.Animal) as AnimalComponentWithDanger | undefined;
     if (!animal) {
       return {
         complete: true,
@@ -123,9 +127,16 @@ export class ButcherBehavior extends BaseBehavior {
     const meatQuantity = baseMeatQuantity + qualityBonus;
 
     // Add products to inventory
-    const inventory = entity.getComponent(CT.Inventory) as any;
+    interface InventorySlot {
+      itemId: string;
+      quantity: number;
+    }
+    interface SimpleInventory {
+      slots: InventorySlot[];
+    }
+    const inventory = entity.getComponent(CT.Inventory) as SimpleInventory | undefined;
     if (inventory) {
-      entity.updateComponent(CT.Inventory, (inv: any) => ({
+      entity.updateComponent(CT.Inventory, (inv: SimpleInventory) => ({
         ...inv,
         slots: [
           ...inv.slots,
@@ -273,7 +284,7 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
   const { targetId, reason = 'food' } = state;
 
   // Access world through internal property (temporary until BehaviorContext exposes needed APIs)
-  const world = (ctx as any).world as World;
+  const world = (ctx as unknown as { world: World }).world;
 
   // Check for nearby butchering table
   const buildingTargeting = new BuildingTargeting();
@@ -309,7 +320,11 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
   }
 
   // Get animal component for species/size info
-  const animal = targetEntity.getComponent(CT.Animal) as any;
+  interface AnimalComponentWithDanger {
+    danger?: number;
+    species?: string;
+  }
+  const animal = targetEntity.getComponent(CT.Animal) as AnimalComponentWithDanger | undefined;
   if (!animal) {
     return ctx.complete('Animal component missing');
   }
@@ -329,7 +344,14 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
 
   // Add products to inventory
   if (ctx.inventory) {
-    ctx.updateComponent(CT.Inventory, (inv: any) => ({
+    interface InventorySlot {
+      itemId: string;
+      quantity: number;
+    }
+    interface SimpleInventory {
+      slots: InventorySlot[];
+    }
+    ctx.updateComponent(CT.Inventory, (inv: SimpleInventory) => ({
       ...inv,
       slots: [
         ...inv.slots,
@@ -341,7 +363,7 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
   }
 
   // Remove the animal entity from the world
-  (world as WorldMutator).destroyEntity(targetId, 'butchered');
+  (world as unknown as WorldMutator).destroyEntity(targetId, 'butchered');
 
   // Emit crafting:completed event for CookingSystem integration
   // This allows CookingSystem to track butchering XP and specialization

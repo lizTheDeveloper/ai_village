@@ -8,10 +8,10 @@
  * - Integration tests
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl, createEntityId } from '../ecs/Entity.js';
-import { createBuildingComponent } from '../components/BuildingComponent.js';
+import { createBuildingComponent, type BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 
@@ -154,7 +154,7 @@ export class CityManager {
     const population = agents.length;
     const autonomicCount = agents.filter(a => {
       const agent = a.getComponent('agent');
-      return agent && !(agent as any).usesLLM;
+      return agent && !('useLLM' in agent && (agent as { useLLM: boolean }).useLLM);
     }).length;
     const llmCount = population - autonomicCount;
 
@@ -218,10 +218,10 @@ export class CityManager {
 
     let sumX = 0, sumY = 0;
     agents.forEach(agent => {
-      const pos = agent.getComponent('position') as any;
-      if (pos) {
-        sumX += pos.x;
-        sumY += pos.y;
+      const pos = agent.getComponent('position');
+      if (pos && typeof pos === 'object' && 'x' in pos && 'y' in pos) {
+        sumX += (pos as { x: number; y: number }).x;
+        sumY += (pos as { x: number; y: number }).y;
       }
     });
     const centerX = sumX / agents.length;
@@ -234,13 +234,14 @@ export class CityManager {
         const tentEntity = new EntityImpl(createEntityId(), world.tick);
         const angle = Math.random() * Math.PI * 2;
         const distance = 5 + Math.random() * 5;
-        tentEntity.addComponent(createBuildingComponent('tent' as any, 1, 100));
+        tentEntity.addComponent(createBuildingComponent('tent' as BuildingType, 1, 100));
         tentEntity.addComponent(createPositionComponent(
           centerX + Math.cos(angle) * distance,
           centerY + Math.sin(angle) * distance
         ));
         tentEntity.addComponent(createRenderableComponent('tent', 'object'));
-        (world as any)._addEntity(tentEntity);
+        // WorldMutator is the writable interface
+        (world as WorldMutator)._addEntity(tentEntity);
         console.log('[CityManager] Built tent for growing population');
       }
     } else if (focus === 'survival' && stats.woodSupply >= 5) {
@@ -249,13 +250,14 @@ export class CityManager {
         const farmEntity = new EntityImpl(createEntityId(), world.tick);
         const angle = Math.random() * Math.PI * 2;
         const distance = 8 + Math.random() * 5;
-        farmEntity.addComponent(createBuildingComponent('farm-plot' as any, 1, 100));
+        farmEntity.addComponent(createBuildingComponent('farm-plot' as BuildingType, 1, 100));
         farmEntity.addComponent(createPositionComponent(
           centerX + Math.cos(angle) * distance,
           centerY + Math.sin(angle) * distance
         ));
         farmEntity.addComponent(createRenderableComponent('farm-plot', 'object'));
-        (world as any)._addEntity(farmEntity);
+        // WorldMutator is the writable interface
+        (world as WorldMutator)._addEntity(farmEntity);
         console.log('[CityManager] Built farm-plot for survival');
       }
     }
@@ -265,18 +267,25 @@ export class CityManager {
     const agents = world.query().with('agent').executeEntities();
 
     for (const agent of agents) {
-      const agentComp = agent.getComponent('agent') as any;
-      if (!agentComp) continue;
+      const agentComp = agent.getComponent('agent');
+      if (!agentComp || typeof agentComp !== 'object') continue;
+
+      type AgentWithPriorities = {
+        effectivePriorities?: StrategicPriorities;
+        skillWeights?: StrategicPriorities;
+      };
+
+      const typedAgent = agentComp as AgentWithPriorities;
 
       // Blend city priorities (40%) with agent's personal skill weights (60%)
-      agentComp.effectivePriorities = {
-        gathering: (priorities.gathering * 0.4) + ((agentComp.skillWeights?.gathering ?? 0.2) * 0.6),
-        building: (priorities.building * 0.4) + ((agentComp.skillWeights?.building ?? 0.2) * 0.6),
-        farming: (priorities.farming * 0.4) + ((agentComp.skillWeights?.farming ?? 0.2) * 0.6),
-        social: (priorities.social * 0.4) + ((agentComp.skillWeights?.social ?? 0.2) * 0.6),
-        exploration: (priorities.exploration * 0.4) + ((agentComp.skillWeights?.exploration ?? 0.2) * 0.6),
-        rest: (priorities.rest * 0.4) + ((agentComp.skillWeights?.rest ?? 0.2) * 0.6),
-        magic: (priorities.magic * 0.4) + ((agentComp.skillWeights?.magic ?? 0.2) * 0.6),
+      typedAgent.effectivePriorities = {
+        gathering: (priorities.gathering * 0.4) + ((typedAgent.skillWeights?.gathering ?? 0.2) * 0.6),
+        building: (priorities.building * 0.4) + ((typedAgent.skillWeights?.building ?? 0.2) * 0.6),
+        farming: (priorities.farming * 0.4) + ((typedAgent.skillWeights?.farming ?? 0.2) * 0.6),
+        social: (priorities.social * 0.4) + ((typedAgent.skillWeights?.social ?? 0.2) * 0.6),
+        exploration: (priorities.exploration * 0.4) + ((typedAgent.skillWeights?.exploration ?? 0.2) * 0.6),
+        rest: (priorities.rest * 0.4) + ((typedAgent.skillWeights?.rest ?? 0.2) * 0.6),
+        magic: (priorities.magic * 0.4) + ((typedAgent.skillWeights?.magic ?? 0.2) * 0.6),
       };
     }
   }
@@ -429,13 +438,15 @@ export class CityManager {
   private calculateHousingCapacity(buildings: readonly Entity[]): number {
     let capacity = 0;
     for (const building of buildings) {
-      const buildingComp = building.getComponent('building') as any;
-      if (!buildingComp) continue;
+      const buildingComp = building.getComponent('building');
+      if (!buildingComp || typeof buildingComp !== 'object' || !('buildingType' in buildingComp)) continue;
+
+      const typedBuilding = buildingComp as { buildingType: string };
 
       // Count housing buildings
-      if (buildingComp.buildingType === 'tent') capacity += 2;
-      else if (buildingComp.buildingType === 'wooden-hut') capacity += 4;
-      else if (buildingComp.buildingType === 'stone-house') capacity += 8;
+      if (typedBuilding.buildingType === 'tent') capacity += 2;
+      else if (typedBuilding.buildingType === 'wooden-hut') capacity += 4;
+      else if (typedBuilding.buildingType === 'stone-house') capacity += 8;
     }
     return capacity;
   }
@@ -443,9 +454,9 @@ export class CityManager {
   private calculateStorageCapacity(buildings: readonly Entity[]): number {
     let capacity = 0;
     for (const building of buildings) {
-      const inventory = building.getComponent('inventory') as any;
-      if (inventory?.maxWeight) {
-        capacity += inventory.maxWeight;
+      const inventory = building.getComponent('inventory');
+      if (inventory && typeof inventory === 'object' && 'maxWeight' in inventory) {
+        capacity += (inventory as { maxWeight: number }).maxWeight;
       }
     }
     return capacity;
@@ -454,13 +465,15 @@ export class CityManager {
   private countProductionBuildings(buildings: readonly Entity[]): number {
     let count = 0;
     for (const building of buildings) {
-      const buildingComp = building.getComponent('building') as any;
-      if (!buildingComp) continue;
+      const buildingComp = building.getComponent('building');
+      if (!buildingComp || typeof buildingComp !== 'object' || !('buildingType' in buildingComp)) continue;
+
+      const buildingType = (buildingComp as { buildingType?: string }).buildingType;
 
       // Count farms and workshops
-      if (buildingComp.buildingType?.includes('farm') ||
-          buildingComp.buildingType?.includes('workshop') ||
-          buildingComp.buildingType?.includes('forge')) {
+      if (buildingType?.includes('farm') ||
+          buildingType?.includes('workshop') ||
+          buildingType?.includes('forge')) {
         count++;
       }
     }
@@ -482,13 +495,17 @@ export class CityManager {
   private calculateResourceStock(world: World, resource: string): number {
     let total = 0;
 
+    type InventorySlot = { itemId: string; quantity: number };
+    type InventoryComponent = { slots: (InventorySlot | null)[] };
+
     // Count in storage buildings
     const buildings = world.query().with('building').with('inventory').executeEntities();
     for (const building of buildings) {
-      const inventory = building.getComponent('inventory') as any;
-      if (!inventory?.slots) continue;
+      const inventory = building.getComponent('inventory');
+      if (!inventory || typeof inventory !== 'object' || !('slots' in inventory)) continue;
 
-      for (const slot of inventory.slots) {
+      const typedInventory = inventory as InventoryComponent;
+      for (const slot of typedInventory.slots) {
         if (slot && slot.itemId === resource) {
           total += slot.quantity;
         }
@@ -498,10 +515,11 @@ export class CityManager {
     // Count in agent inventories
     const agents = world.query().with('agent').with('inventory').executeEntities();
     for (const agent of agents) {
-      const inventory = agent.getComponent('inventory') as any;
-      if (!inventory?.slots) continue;
+      const inventory = agent.getComponent('inventory');
+      if (!inventory || typeof inventory !== 'object' || !('slots' in inventory)) continue;
 
-      for (const slot of inventory.slots) {
+      const typedInventory = inventory as InventoryComponent;
+      for (const slot of typedInventory.slots) {
         if (slot && slot.itemId === resource) {
           total += slot.quantity;
         }

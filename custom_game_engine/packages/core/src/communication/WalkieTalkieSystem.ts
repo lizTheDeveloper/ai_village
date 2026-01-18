@@ -558,7 +558,7 @@ export class WalkieTalkieSystem extends BaseSystem {
   readonly priority = 68;
   readonly requiredComponents = [] as const;
 
-  protected readonly throttleInterval = 20; // Every 20 ticks (1 second at 20 TPS)
+  protected readonly throttleInterval = 50; // MEDIUM - 2.5 seconds (communication can be slightly delayed)
 
   private manager: WalkieTalkieManager = new WalkieTalkieManager();
 

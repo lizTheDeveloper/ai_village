@@ -12,8 +12,10 @@
 import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
+import { EntityImpl } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import type { TVStationComponent } from '../TVStation.js';
 import type { TVShowComponent, ShowFormat, TargetAudience } from '../TVShow.js';
 import { createTVShowComponent, createShowCharacter } from '../TVShow.js';
@@ -124,7 +126,7 @@ export class TVDevelopmentSystem extends BaseSystem {
     const writerEntity = world.getEntity(writerId);
     if (!writerEntity) return null;
 
-    const identity = writerEntity.components.get(ComponentType.Identity) as any;
+    const identity = writerEntity.components.get(ComponentType.Identity) as IdentityComponent | undefined;
     const writerName = identity?.name ?? 'Unknown Writer';
 
     // Create pitch
@@ -315,7 +317,9 @@ export class TVDevelopmentSystem extends BaseSystem {
     };
 
     // Add component to entity
-    (showEntity as any).addComponent(show);
+    if (showEntity instanceof EntityImpl) {
+      showEntity.addComponent(show);
+    }
 
     // Add to station's active shows
     station.activeShows.push(show.showId);
@@ -334,7 +338,9 @@ export class TVDevelopmentSystem extends BaseSystem {
       currentTick,
       { season: 1, episodeNumber: 1 }
     );
-    (contentEntity as any).addComponent(content);
+    if (contentEntity instanceof EntityImpl) {
+      contentEntity.addComponent(content);
+    }
 
     // Create script for pilot
     const script = createTVScript(

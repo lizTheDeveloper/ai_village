@@ -289,6 +289,8 @@ import { AutonomicSystem } from '../decision/AutonomicSystem.js';
 
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
+import { VillageGovernanceSystem } from './VillageGovernanceSystem.js';
+import { ProvinceGovernanceSystem } from './ProvinceGovernanceSystem.js';
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
 import { CityDirectorSystem } from './CityDirectorSystem.js';
 
@@ -983,6 +985,8 @@ export function registerAllSystems(
   const governanceDataSystem = new GovernanceDataSystem();
   gameLoop.systemRegistry.register(governanceDataSystem);
   gameLoop.systemRegistry.register(new CityDirectorSystem());
+  gameLoop.systemRegistry.register(new VillageGovernanceSystem());
+  gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
 
   // ============================================================================
   // METRICS (Optional)

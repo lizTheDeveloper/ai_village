@@ -8,6 +8,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 // ============================================================================
 // Holy Text Types
@@ -50,7 +51,7 @@ export class HolyTextSystem extends BaseSystem {
   public readonly id = 'HolyTextSystem';
   public readonly priority = 82;
   public readonly requiredComponents = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private config: HolyTextConfig;
   private holyTexts: Map<string, HolyTextData> = new Map();

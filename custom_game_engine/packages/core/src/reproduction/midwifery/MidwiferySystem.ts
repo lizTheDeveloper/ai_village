@@ -18,6 +18,7 @@ import type { EventBus } from '../../events/EventBus.js';
 import type { SystemId, Tick } from '../../types.js';
 import { ReproductionSystem } from '../../systems/ReproductionSystem.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import { THROTTLE } from '../../ecs/SystemThrottleConfig.js';
 
 import {
   PregnancyComponent,
@@ -116,7 +117,7 @@ export class MidwiferySystem extends BaseSystem {
   public readonly requiredComponents = [] as const;
 
   // Throttle to every 5 seconds (100 ticks at 20 TPS) - reproduction is slow-changing
-  protected readonly throttleInterval = 100;
+  protected readonly throttleInterval = THROTTLE.SLOW;
 
   private reproductionSystem: ReproductionSystem | null = null;
   private midwiferyLastUpdate: Tick = 0;

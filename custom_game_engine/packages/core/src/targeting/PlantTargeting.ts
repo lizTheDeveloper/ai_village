@@ -11,6 +11,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
+import type { PlantComponent } from '../components/PlantComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import {  type TargetResult,
   rememberLocation,
@@ -94,7 +95,7 @@ export class PlantTargeting {
       if (!plantEntity) continue;
 
       const impl = plantEntity as EntityImpl;
-      const plant = impl.getComponent(ComponentType.Plant) as any;
+      const plant = impl.getComponent<PlantComponent>(ComponentType.Plant);
       const plantPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
@@ -175,7 +176,7 @@ export class PlantTargeting {
       if (!plantEntity) continue;
 
       const impl = plantEntity as EntityImpl;
-      const plant = impl.getComponent(ComponentType.Plant) as any;
+      const plant = impl.getComponent<PlantComponent>(ComponentType.Plant);
       const plantPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;

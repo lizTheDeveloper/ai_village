@@ -41,7 +41,7 @@ export class BeliefGenerationSystem extends BaseSystem {
   public readonly priority: number = 115; // After belief formation
   public readonly requiredComponents = [];
 
-  protected readonly throttleInterval: number = 20; // Update once per second at 20 TPS
+  protected readonly throttleInterval: number = 200; // VERY_SLOW - 10 seconds (belief generation is a slow process)
 
   /**
    * Get the belief economy config from the world's divine config

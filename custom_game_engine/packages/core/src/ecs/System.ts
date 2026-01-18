@@ -45,6 +45,19 @@ export interface System {
   /** Components required for this system to process an entity */
   readonly requiredComponents: ReadonlyArray<ComponentType>;
 
+  /**
+   * Components that must exist in the world for this system to run.
+   * If specified and none of these components exist anywhere, the system is skipped entirely.
+   * This is an O(1) check that prevents systems from running when they have no work to do.
+   *
+   * Different from requiredComponents:
+   * - requiredComponents: Filter which entities to process
+   * - activationComponents: Whether to call update() at all
+   *
+   * Example: PossessionSystem only needs to run when player_control components exist.
+   */
+  readonly activationComponents?: ReadonlyArray<ComponentType>;
+
   /** Optional metadata for discoverability */
   readonly metadata?: SystemMetadata;
 

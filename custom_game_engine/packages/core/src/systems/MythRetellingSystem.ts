@@ -16,6 +16,7 @@ import {
   type MutationContext,
   type MutationResult,
 } from '../divinity/MythMutationTypes.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * MythRetellingSystem - Handles automatic myth spreading and mutation
@@ -28,7 +29,7 @@ export class MythRetellingSystem extends BaseSystem {
   public readonly id = 'myth_retelling';
   public readonly priority = 119; // After myth generation
   public readonly requiredComponents = [CT.Agent, CT.Spiritual] as const;
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
 

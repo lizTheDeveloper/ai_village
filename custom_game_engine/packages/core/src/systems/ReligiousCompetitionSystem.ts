@@ -14,6 +14,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 // ============================================================================
 // Competition Types
@@ -85,7 +86,7 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   public readonly id = 'ReligiousCompetitionSystem';
   public readonly priority = 78;
   public readonly requiredComponents = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private config: CompetitionConfig;
   private competitions: Map<string, CompetitionData> = new Map();

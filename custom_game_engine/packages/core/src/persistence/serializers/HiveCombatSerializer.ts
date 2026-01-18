@@ -23,14 +23,29 @@ export class HiveCombatSerializer extends BaseComponentSerializer<HiveCombatComp
   }
 
   protected deserializeData(data: unknown): HiveCombatComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('HiveCombatComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.hiveId !== 'string') {
+      throw new Error('HiveCombatComponent.hiveId must be string');
+    }
+    if (typeof d.queen !== 'string') {
+      throw new Error('HiveCombatComponent.queen must be string');
+    }
+    if (!Array.isArray(d.workers)) {
+      throw new Error('HiveCombatComponent.workers must be array');
+    }
+
     return createHiveCombatComponent({
       hiveId: d.hiveId,
       queen: d.queen,
-      workers: d.workers,
-      objective: d.objective,
-      queenDead: d.queenDead,
-      collapseTriggered: d.collapseTriggered,
+      workers: d.workers as string[],
+      objective: typeof d.objective === 'string' ? d.objective : undefined,
+      queenDead: typeof d.queenDead === 'boolean' ? d.queenDead : undefined,
+      collapseTriggered: typeof d.collapseTriggered === 'boolean' ? d.collapseTriggered : undefined,
     });
   }
 
@@ -38,8 +53,8 @@ export class HiveCombatSerializer extends BaseComponentSerializer<HiveCombatComp
     if (typeof data !== 'object' || data === null) {
       throw new Error('HiveCombatComponent data must be object');
     }
-    const d = data as any;
-    if (!d.hiveId || !d.queen || !d.workers) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.hiveId !== 'string' || typeof d.queen !== 'string' || !Array.isArray(d.workers)) {
       throw new Error('HiveCombatComponent missing required fields');
     }
     return true;

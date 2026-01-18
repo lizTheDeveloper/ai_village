@@ -11,6 +11,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
+import type { ResourceComponent } from '../components/ResourceComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import {  type TargetResult,
   getRememberedLocation,
@@ -81,7 +82,7 @@ export class ResourceTargeting {
       if (!resourceEntity) continue;
 
       const impl = resourceEntity as EntityImpl;
-      const resource = impl.getComponent(ComponentType.Resource) as any;
+      const resource = impl.getComponent<ResourceComponent>(ComponentType.Resource);
       const resourcePos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!resource || !resourcePos) continue;
@@ -151,7 +152,7 @@ export class ResourceTargeting {
       if (!resourceEntity) continue;
 
       const impl = resourceEntity as EntityImpl;
-      const resource = impl.getComponent(ComponentType.Resource) as any;
+      const resource = impl.getComponent<ResourceComponent>(ComponentType.Resource);
       const resourcePos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!resource || !resourcePos) continue;

@@ -51,8 +51,15 @@ export class WorldSerializer {
     // Get time component if it exists
     const timeEntities = world.query().with('time').execute();
     const timeEntityId = timeEntities[0];
+
+    interface TimeComponentData {
+      day?: number;
+      timeOfDay?: number;
+      phase?: 'dawn' | 'day' | 'dusk' | 'night';
+    }
+
     const timeComponent = timeEntityId
-      ? world.getComponent(timeEntityId, 'time') as any
+      ? world.getComponent(timeEntityId, 'time') as TimeComponentData | undefined
       : undefined;
 
     const snapshot: UniverseSnapshot = {
@@ -119,11 +126,15 @@ export class WorldSerializer {
     const deserializedEntities = await this.deserializeEntities(snapshot.entities);
 
     // Add entities to world
-    // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
     // CRITICAL: Use _addEntity instead of _entities.set() to properly update the spatial chunk index
     // Without this, findNearestResources() returns empty arrays and NPCs can't find food/resources
+    // Type assertion: WorldImpl has _addEntity as an internal method
+    interface WorldImplInternal {
+      _addEntity(entity: Entity): void;
+    }
+
     for (const entity of deserializedEntities) {
-      (worldImpl as any)._addEntity(entity);
+      (worldImpl as unknown as WorldImplInternal)._addEntity(entity);
     }
 
     // Deserialize world state (terrain, weather, etc.)
@@ -131,9 +142,9 @@ export class WorldSerializer {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
         // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-        // Cast to any to avoid type conflicts between local and package TerrainSnapshot/ChunkManager
+        // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
         const { chunkSerializer } = await import('@ai-village/world');
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -259,7 +270,13 @@ export class WorldSerializer {
     for (const componentData of data.components) {
       try {
         const component = componentSerializerRegistry.deserialize(componentData) as Component;
-        (entity as any).addComponent(component);
+
+        // Type assertion: EntityImpl has addComponent as an internal method
+        interface EntityImplInternal {
+          addComponent(component: Component): void;
+        }
+
+        (entity as unknown as EntityImplInternal).addComponent(component);
       } catch (error) {
         console.error(
           `[WorldSerializer] Failed to deserialize component ${componentData.type} ` +
@@ -282,11 +299,10 @@ export class WorldSerializer {
     const chunkManager = worldImpl.getChunkManager();
 
     // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-    // Cast to any to avoid type conflicts between local and package ChunkManager
     let terrain = null;
     if (chunkManager) {
       const { chunkSerializer } = await import('@ai-village/world');
-      terrain = chunkSerializer.serializeChunks(chunkManager as any);
+      terrain = chunkSerializer.serializeChunks(chunkManager);
     }
 
     // Serialize zones using ZoneManager

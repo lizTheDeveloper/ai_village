@@ -54,6 +54,8 @@ export { WildAnimalSpawningSystem } from './systems/index.js';
 export type { PossessionStatus } from './systems/PossessionSystem.js';
 // System helper base classes
 export { ThrottledSystem, FilteredSystem, ThrottledFilteredSystem } from './ecs/SystemHelpers.js';
+// System throttle configuration
+export { THROTTLE } from './ecs/SystemThrottleConfig.js';
 export * from './factories/index.js';
 
 // ============================================================================

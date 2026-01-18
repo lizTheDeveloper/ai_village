@@ -10,9 +10,11 @@
 
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType } from '../types/ComponentType.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
-import { createPositionComponent } from '../components/PositionComponent.js';
-import { createTagsComponent } from '../components/TagsComponent.js';
+import { createPositionComponent, type PositionComponent } from '../components/PositionComponent.js';
+import { createTagsComponent, type TagsComponent } from '../components/TagsComponent.js';
 import { createRelationshipComponent } from '../components/RelationshipComponent.js';
 import { createEpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createConversationComponent } from '../components/ConversationComponent.js';
@@ -54,11 +56,11 @@ export function createGoddessOfWisdom(
 
   // Identity - Goddess of Wisdom
   const identity = createIdentityComponent(config.name);
-  (entity as any).addComponent(identity);
+  (entity as EntityImpl).addComponent(identity);
 
   // Position - manifests at research/discovery location
   const position = createPositionComponent(location.x, location.y);
-  (entity as any).addComponent(position);
+  (entity as EntityImpl).addComponent(position);
 
   // Tags - mark as deity and wisdom goddess
   const tags = createTagsComponent(
@@ -71,24 +73,24 @@ export function createGoddessOfWisdom(
     `origin:${config.origin}`, // Track cultural origin
     `scrutiny_style:${config.scrutinyStyle}`
   );
-  (entity as any).addComponent(tags);
+  (entity as EntityImpl).addComponent(tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getWisdomGoddessSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as any).addComponent(renderable);
+  (entity as EntityImpl).addComponent(renderable);
 
   // Episodic Memory - remembers all discoveries and judgments
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as any).addComponent(memory);
+  (entity as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with researchers and inventors
   const relationships = createRelationshipComponent();
-  (entity as any).addComponent(relationships);
+  (entity as EntityImpl).addComponent(relationships);
 
   // Conversation - can engage in dialogue about discoveries
   const conversation = createConversationComponent(100);
-  (entity as any).addComponent(conversation);
+  (entity as EntityImpl).addComponent(conversation);
 
   return entity;
 }
@@ -97,8 +99,8 @@ export function createGoddessOfWisdom(
  * Check if an entity is the Goddess of Wisdom
  */
 export function isGoddessOfWisdom(entity: Entity): boolean {
-  const tags = entity.components.get('tags') as any;
-  return tags?.tags?.has('wisdom_goddess') ?? false;
+  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
+  return tags?.tags?.includes('wisdom_goddess') ?? false;
 }
 
 /**
@@ -106,7 +108,7 @@ export function isGoddessOfWisdom(entity: Entity): boolean {
  */
 export function findGoddessOfWisdom(world: World): Entity | null {
   const entities = world.query()
-    .with('tags' as any)
+    .with(ComponentType.Tags)
     .executeEntities();
 
   for (const entity of entities) {
@@ -122,7 +124,7 @@ export function findGoddessOfWisdom(world: World): Entity | null {
  * Move Goddess of Wisdom to a new location
  */
 export function moveGoddessOfWisdom(entity: Entity, location: { x: number; y: number }): void {
-  const position = entity.components.get('position') as any;
+  const position = entity.components.get(ComponentType.Position) as PositionComponent | undefined;
   if (position) {
     position.x = location.x;
     position.y = location.y;
@@ -133,7 +135,7 @@ export function moveGoddessOfWisdom(entity: Entity, location: { x: number; y: nu
  * Get the scrutiny style of the wisdom goddess
  */
 export function getScrutinyStyle(entity: Entity): 'strict' | 'encouraging' | 'curious' | 'pragmatic' {
-  const tags = entity.components.get('tags') as any;
+  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
   if (!tags?.tags) return 'pragmatic';
 
   for (const tag of tags.tags) {

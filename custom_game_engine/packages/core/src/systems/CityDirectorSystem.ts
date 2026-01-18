@@ -32,6 +32,7 @@ import {
   inferFocusFromStats,
   isAgentInCity,
 } from '../components/CityDirectorComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * Response format expected from the City Director LLM.
@@ -74,7 +75,7 @@ export class CityDirectorSystem extends BaseSystem {
   public readonly id: SystemId = 'city_director';
   public readonly priority: number = 45; // Run after governance, before agent brain
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 100; // City planning is slow-changing state - run every 5 seconds
+  protected readonly throttleInterval = THROTTLE.SLOW; // City planning is slow-changing state - run every 5 seconds
 
   private config: CityDirectorSystemConfig;
   private lastStatsUpdate: number = 0;

@@ -11,12 +11,14 @@
 
 import type { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
+import { EntityImpl } from '../../ecs/Entity.js';
 import type { EventBus } from '../../events/EventBus.js';
 import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, TVChannel } from '../TVStation.js';
 import type { TVBroadcastComponent, ProgramSlot, BroadcastEvent } from '../TVBroadcasting.js';
 import type { TVContentComponent } from '../TVContent.js';
+import type { TimeComponent } from '../../systems/TimeSystem.js';
 import {
   createBroadcastEvent,
   startBroadcast,
@@ -109,7 +111,9 @@ export class TVBroadcastingSystem extends BaseSystem {
         averageViewership: 0,
       };
 
-      (buildingEntity as any).addComponent(broadcast);
+      if (buildingEntity instanceof EntityImpl) {
+        buildingEntity.addComponent(broadcast);
+      }
     }
 
     this.broadcastComponents.set(station.buildingId, broadcast);
@@ -129,12 +133,12 @@ export class TVBroadcastingSystem extends BaseSystem {
     const timeEntity = world.query().with(ComponentType.Time).executeEntities()[0];
     if (!timeEntity) return;
 
-    const time = timeEntity.components.get(ComponentType.Time) as any;
+    const time = timeEntity.components.get(ComponentType.Time) as TimeComponent | undefined;
     if (!time) return;
 
     const currentDay = this.getDayOfWeek(time.day);
-    const currentHour = time.hour;
-    const currentMinute = time.minute ?? 0;
+    const currentHour = Math.floor(time.timeOfDay);
+    const currentMinute = Math.floor((time.timeOfDay % 1) * 60);
 
     // Check each channel
     for (const channel of station.channels) {

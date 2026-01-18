@@ -13,6 +13,7 @@ import type { WeatherStationComponent } from '../components/WeatherStationCompon
 import type { HealthClinicComponent } from '../components/HealthClinicComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * GovernanceDataSystem populates governance building components with data.
@@ -32,7 +33,7 @@ export class GovernanceDataSystem extends BaseSystem {
   public readonly id: SystemId = 'governance_data';
   public readonly priority: number = 50; // Run late, after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private deathLog: DeathRecord[] = [];
   private birthLog: BirthRecord[] = [];

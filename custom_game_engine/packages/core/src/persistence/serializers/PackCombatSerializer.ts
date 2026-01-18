@@ -22,13 +22,28 @@ export class PackCombatSerializer extends BaseComponentSerializer<PackCombatComp
   }
 
   protected deserializeData(data: unknown): PackCombatComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('PackCombatComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.packId !== 'string') {
+      throw new Error('PackCombatComponent.packId must be string');
+    }
+    if (!Array.isArray(d.bodiesInPack)) {
+      throw new Error('PackCombatComponent.bodiesInPack must be array');
+    }
+    if (typeof d.coherence !== 'number') {
+      throw new Error('PackCombatComponent.coherence must be number');
+    }
+
     return createPackCombatComponent({
       packId: d.packId,
-      bodiesInPack: d.bodiesInPack,
+      bodiesInPack: d.bodiesInPack as string[],
       coherence: d.coherence,
-      coordinationBonus: d.coordinationBonus,
-      dissolved: d.dissolved,
+      coordinationBonus: typeof d.coordinationBonus === 'number' ? d.coordinationBonus : undefined,
+      dissolved: typeof d.dissolved === 'boolean' ? d.dissolved : undefined,
     });
   }
 
@@ -36,8 +51,8 @@ export class PackCombatSerializer extends BaseComponentSerializer<PackCombatComp
     if (typeof data !== 'object' || data === null) {
       throw new Error('PackCombatComponent data must be object');
     }
-    const d = data as any;
-    if (!d.packId || !d.bodiesInPack || d.coherence === undefined) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.packId !== 'string' || !Array.isArray(d.bodiesInPack) || typeof d.coherence !== 'number') {
       throw new Error('PackCombatComponent missing required fields');
     }
     return true;

@@ -20,11 +20,23 @@ export class ManchiSerializer extends BaseComponentSerializer<ManchiComponent> {
   }
 
   protected deserializeData(data: unknown): ManchiComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('ManchiComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.lordId !== 'string') {
+      throw new Error('ManchiComponent.lordId must be string');
+    }
+    if (typeof d.loyaltyStrength !== 'number') {
+      throw new Error('ManchiComponent.loyaltyStrength must be number');
+    }
+
     return createManchiComponent({
       lordId: d.lordId,
       loyaltyStrength: d.loyaltyStrength,
-      canSurrender: d.canSurrender,
+      canSurrender: typeof d.canSurrender === 'boolean' ? d.canSurrender : undefined,
     });
   }
 
@@ -32,8 +44,8 @@ export class ManchiSerializer extends BaseComponentSerializer<ManchiComponent> {
     if (typeof data !== 'object' || data === null) {
       throw new Error('ManchiComponent data must be object');
     }
-    const d = data as any;
-    if (!d.lordId || d.loyaltyStrength === undefined) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.lordId !== 'string' || typeof d.loyaltyStrength !== 'number') {
       throw new Error('ManchiComponent missing required fields');
     }
     return true;

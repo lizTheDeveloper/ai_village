@@ -16,6 +16,33 @@ import { rememberLocation, getRememberedLocation, forgetLocation } from '../serv
 import { getMovement, getPosition, getVision, getAnimal, getAgent, getResource } from '../utils/componentHelpers.js';
 
 /**
+ * Extended AnimalComponent with threat-related properties (future functionality).
+ * These properties are not yet implemented in AnimalComponent.
+ */
+interface AnimalComponentWithThreatProperties extends AnimalComponent {
+  isPredator?: boolean;
+  preySpecies?: string[];
+  threatLevel?: number;
+}
+
+/**
+ * Extended AgentComponent with hostility properties (future functionality).
+ * These properties are not yet implemented in AgentComponent.
+ */
+interface AgentComponentWithHostility extends AgentComponent {
+  isHostile?: boolean;
+}
+
+/**
+ * Extended ResourceComponent with hazard properties (future functionality).
+ * These properties are not yet implemented in ResourceComponent.
+ */
+interface ResourceComponentWithHazard extends ResourceComponent {
+  isHazard?: boolean;
+  dangerLevel?: number;
+}
+
+/**
  * Options for threat targeting
  */
 export interface ThreatTargetingOptions {
@@ -319,23 +346,15 @@ export class ThreatTargeting {
     observer: EntityImpl,
     options: ThreatTargetingOptions
   ): { threatType: string; threatLevel: number; isMoving: boolean; velocity?: { x: number; y: number } } | null {
-    // TODO: AnimalComponent, AgentComponent, and ResourceComponent don't currently define
-    // all threat-related properties (isPredator, isHostile, etc.).
-    // This is future functionality that needs proper typing when implemented.
-
     // Check for predator component (animals)
     const animal = getAnimal(potentialThreat);
     if (animal) {
       // Get observer's species to check predator/prey relationships
       const observerAnimal = getAnimal(observer);
-      const animalAny = animal as AnimalComponent & {
-        isPredator?: boolean;
-        preySpecies?: string[];
-        threatLevel?: number;
-      };
-      const observerAnimalAny = observerAnimal as AnimalComponent & { speciesId?: string } | null;
+      const animalWithThreat = animal as AnimalComponentWithThreatProperties;
+      const observerWithSpecies = observerAnimal as AnimalComponent | null;
 
-      if (observerAnimalAny && animalAny.isPredator && animalAny.preySpecies?.includes(observerAnimalAny.speciesId || '')) {
+      if (observerWithSpecies && animalWithThreat.isPredator && animalWithThreat.preySpecies?.includes(observerWithSpecies.speciesId)) {
         if (options.threatTypes && !options.threatTypes.includes('predator')) {
           return null;
         }

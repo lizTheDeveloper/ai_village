@@ -3,6 +3,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * PublishingUnlockSystem monitors research progress and grants technologies
@@ -20,7 +21,7 @@ export class PublishingUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_unlock';
   public readonly priority = 15; // Early, to detect unlocks quickly
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS (mostly event-driven)
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS (mostly event-driven)
 
   // Track published papers (paper ID → publication tick)
   private publishedPapers: Set<string> = new Set();

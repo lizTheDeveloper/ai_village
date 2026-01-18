@@ -69,6 +69,7 @@ export enum ComponentType {
   TownHall = 'town_hall',
   CensusBureau = 'census_bureau',
   VillageGovernance = 'village_governance',
+  ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',

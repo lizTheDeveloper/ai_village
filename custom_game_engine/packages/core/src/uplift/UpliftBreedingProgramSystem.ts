@@ -126,7 +126,7 @@ export class UpliftBreedingProgramSystem extends BaseSystem {
     program.populationSize = newBreedingPop.length;
 
     // Emit event
-    this.events.emit('uplift_generation_advanced' as any, {
+    this.events.emit('uplift_generation_advanced', {
       programId: program.programId,
       generation: program.currentGeneration,
       intelligence: program.currentIntelligence,
@@ -279,7 +279,7 @@ export class UpliftBreedingProgramSystem extends BaseSystem {
 
     // Emit event if stage changed
     if (prevStage !== program.stage) {
-      this.events.emit('uplift_stage_changed' as any, {
+      this.events.emit('uplift_stage_changed', {
         programId: program.programId,
         previousStage: prevStage,
         newStage: program.stage,
@@ -313,7 +313,7 @@ export class UpliftBreedingProgramSystem extends BaseSystem {
    * Handle population extinction
    */
   private handlePopulationExtinction(ctx: SystemContext, program: UpliftProgramComponent): void {
-    this.events.emit('uplift_population_extinct' as any, {
+    this.events.emit('uplift_population_extinct', {
       programId: program.programId,
       generation: program.currentGeneration,
       reason: 'breeding_population_died',

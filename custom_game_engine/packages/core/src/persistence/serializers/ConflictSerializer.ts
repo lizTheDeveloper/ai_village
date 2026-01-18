@@ -36,27 +36,45 @@ export class ConflictSerializer extends BaseComponentSerializer<ConflictComponen
   }
 
   protected deserializeData(data: unknown): ConflictComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('ConflictComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.conflictType !== 'string') {
+      throw new Error('ConflictComponent.conflictType must be string');
+    }
+    if (typeof d.target !== 'string') {
+      throw new Error('ConflictComponent.target must be string');
+    }
+    if (typeof d.state !== 'string') {
+      throw new Error('ConflictComponent.state must be string');
+    }
+    if (typeof d.startTime !== 'number') {
+      throw new Error('ConflictComponent.startTime must be number');
+    }
+
     return createConflictComponent({
-      conflictType: d.conflictType,
+      conflictType: d.conflictType as ConflictComponent['conflictType'],
       target: d.target,
-      state: d.state,
+      state: d.state as ConflictComponent['state'],
       startTime: d.startTime,
-      huntingState: d.huntingState,
-      cause: d.cause,
-      surprise: d.surprise,
-      modifiers: d.modifiers,
-      attackerPower: d.attackerPower,
-      defenderPower: d.defenderPower,
-      outcome: d.outcome,
-      winner: d.winner,
-      combatants: d.combatants,
-      trigger: d.trigger,
-      metadata: d.metadata,
-      method: d.method,
-      targetFollower: d.targetFollower,
-      consequence: d.consequence,
-      lethal: d.lethal,
+      huntingState: typeof d.huntingState === 'string' ? d.huntingState as ConflictComponent['huntingState'] : undefined,
+      cause: typeof d.cause === 'string' ? d.cause : undefined,
+      surprise: typeof d.surprise === 'boolean' ? d.surprise : undefined,
+      modifiers: d.modifiers as Record<string, number> | undefined,
+      attackerPower: typeof d.attackerPower === 'number' ? d.attackerPower : undefined,
+      defenderPower: typeof d.defenderPower === 'number' ? d.defenderPower : undefined,
+      outcome: typeof d.outcome === 'string' ? d.outcome as ConflictComponent['outcome'] : undefined,
+      winner: typeof d.winner === 'string' ? d.winner : undefined,
+      combatants: Array.isArray(d.combatants) ? d.combatants as string[] : undefined,
+      trigger: typeof d.trigger === 'string' ? d.trigger : undefined,
+      metadata: d.metadata as Record<string, unknown> | undefined,
+      method: typeof d.method === 'string' ? d.method : undefined,
+      targetFollower: typeof d.targetFollower === 'string' ? d.targetFollower : undefined,
+      consequence: typeof d.consequence === 'string' ? d.consequence : undefined,
+      lethal: typeof d.lethal === 'boolean' ? d.lethal : undefined,
     });
   }
 
@@ -64,8 +82,9 @@ export class ConflictSerializer extends BaseComponentSerializer<ConflictComponen
     if (typeof data !== 'object' || data === null) {
       throw new Error('ConflictComponent data must be object');
     }
-    const d = data as any;
-    if (!d.conflictType || !d.target || d.state === undefined || d.startTime === undefined) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.conflictType !== 'string' || typeof d.target !== 'string' ||
+        typeof d.state !== 'string' || typeof d.startTime !== 'number') {
       throw new Error('ConflictComponent missing required fields');
     }
     return true;

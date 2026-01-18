@@ -14,6 +14,7 @@ import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * Pending myth to be created (before LLM request)
@@ -51,7 +52,7 @@ export class MythGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'myth_generation';
   public readonly priority: number = 118; // After prayer answering
   public readonly requiredComponents = [];
-  protected readonly throttleInterval = 50; // Every 2.5 seconds at 20 TPS (check for LLM responses)
+  protected readonly throttleInterval = THROTTLE.SLOW; // SLOW - 5 seconds (check for LLM responses)
 
   private mythIdCounter: number = 0;
   private pendingMyths: PendingMyth[] = [];

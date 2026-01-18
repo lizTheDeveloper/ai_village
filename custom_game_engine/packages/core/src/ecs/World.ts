@@ -278,6 +278,12 @@ export interface World {
   /** Simulation scheduler for performance optimization */
   readonly simulationScheduler: SimulationScheduler;
 
+  /**
+   * Check if any entity in the world has the given component type.
+   * O(1) lookup - used for system activation checks.
+   */
+  hasComponentType(componentType: ComponentType): boolean;
+
   /** Create entity from raw components (for testing) */
   createEntity(archetype?: string): Entity;
 
@@ -480,6 +486,9 @@ export class WorldImpl implements WorldMutator {
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
+  // Track count of entities with each component type (for O(1) hasComponentType checks)
+  private _componentTypeCounts = new Map<ComponentType, number>();
+
   // Door location cache for fast lookups (updated when doors are built/destroyed)
   private doorLocationsCache: Array<{ x: number; y: number }> | null = null;
 
@@ -580,6 +589,10 @@ export class WorldImpl implements WorldMutator {
     return entity?.components.has(componentType) ?? false;
   }
 
+  hasComponentType(componentType: ComponentType): boolean {
+    return (this._componentTypeCounts.get(componentType) ?? 0) > 0;
+  }
+
   getEntitiesInChunk(chunkX: number, chunkY: number): ReadonlyArray<EntityId> {
     const key = `${chunkX},${chunkY}`;
     return Array.from(this.chunkIndex.get(key) ?? []);
@@ -625,6 +638,14 @@ export class WorldImpl implements WorldMutator {
       this.chunkIndex.get(key)?.delete(id);
     }
 
+    // Decrement component type counts for all components this entity has
+    for (const componentType of entity.components.keys()) {
+      const currentCount = this._componentTypeCounts.get(componentType) ?? 0;
+      if (currentCount > 0) {
+        this._componentTypeCounts.set(componentType, currentCount - 1);
+      }
+    }
+
     this._entities.delete(id);
     this._archetypeVersion++; // Invalidate query cache
 
@@ -646,10 +667,19 @@ export class WorldImpl implements WorldMutator {
       throw new Error(`Entity ${entityId} does not exist`);
     }
 
+    // Check if entity already has this component type (for count tracking)
+    const hadComponent = entity.components.has(component.type);
+
     // Cast to internal implementation to mutate
     const entityImpl = entity as EntityImpl;
     entityImpl.addComponent(component);
     this._archetypeVersion++; // Invalidate query cache
+
+    // Update component type count (only if this is a new component type for this entity)
+    if (!hadComponent) {
+      const currentCount = this._componentTypeCounts.get(component.type) ?? 0;
+      this._componentTypeCounts.set(component.type, currentCount + 1);
+    }
 
     // Update spatial index if position component
     if (component.type === 'position') {
@@ -688,6 +718,9 @@ export class WorldImpl implements WorldMutator {
       throw new Error(`Entity ${entityId} does not exist`);
     }
 
+    // Check if entity actually has this component (for count tracking)
+    const hadComponent = entity.components.has(componentType);
+
     // Update spatial index if removing position
     if (componentType === 'position') {
       const pos = entity.components.get('position') as
@@ -702,6 +735,14 @@ export class WorldImpl implements WorldMutator {
     const entityImpl = entity as EntityImpl;
     entityImpl.removeComponent(componentType);
     this._archetypeVersion++; // Invalidate query cache
+
+    // Update component type count
+    if (hadComponent) {
+      const currentCount = this._componentTypeCounts.get(componentType) ?? 0;
+      if (currentCount > 0) {
+        this._componentTypeCounts.set(componentType, currentCount - 1);
+      }
+    }
 
     this._eventBus.emit({
       type: 'entity:component:removed',

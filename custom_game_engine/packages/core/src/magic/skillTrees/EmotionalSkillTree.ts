@@ -791,8 +791,8 @@ export function calculateEmotionPower(
  * Get emotion category.
  */
 export function getEmotionCategory(emotion: keyof typeof EMOTIONS): 'positive' | 'negative' | 'complex' {
-  if (EMOTION_CATEGORIES.positive.includes(emotion as any)) return 'positive';
-  if (EMOTION_CATEGORIES.negative.includes(emotion as any)) return 'negative';
+  if ((EMOTION_CATEGORIES.positive as readonly string[]).includes(emotion)) return 'positive';
+  if ((EMOTION_CATEGORIES.negative as readonly string[]).includes(emotion)) return 'negative';
   return 'complex';
 }
 

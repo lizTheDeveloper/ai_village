@@ -842,7 +842,7 @@ export class PackMindSystem extends BaseSystem {
   public readonly priority: number = 161;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  protected readonly throttleInterval = 10;
+  protected readonly throttleInterval = 20; // NORMAL - 1 second (pack coordination should be fairly responsive)
 
   // Active pack minds
   private packs: Map<string, PackMind> = new Map();

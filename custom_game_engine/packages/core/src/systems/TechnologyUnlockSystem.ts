@@ -25,6 +25,7 @@ import type { CityDirectorComponent } from '../components/CityDirectorComponent.
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { isAgentInCity } from '../components/CityDirectorComponent.js';
 import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * TechnologyUnlockSystem watches for new buildings and unlocks them globally.
@@ -33,7 +34,7 @@ export class TechnologyUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'technology_unlock';
   public readonly priority: number = 16; // Run after building system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds - tech unlocks are rare events
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds - tech unlocks are rare events
 
   private systemRegistry: ISystemRegistry;
   private checkedBuildings: Set<string> = new Set(); // Track which buildings we've already processed

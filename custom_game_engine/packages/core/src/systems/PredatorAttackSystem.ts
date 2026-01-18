@@ -9,6 +9,7 @@ import { createInjuryComponent } from '../components/InjuryComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 // Simplified animal component interface for predator attacks
 interface AnimalComponent extends Component {
@@ -62,7 +63,7 @@ export class PredatorAttackSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'] as const;
 
   /** Throttle to every 1 second (20 ticks at 20 TPS) */
-  protected readonly throttleInterval = 20;
+  protected readonly throttleInterval = THROTTLE.NORMAL;
 
   protected onUpdate(ctx: SystemContext): void {
     // ctx.activeEntities are already filtered to animals via scheduler

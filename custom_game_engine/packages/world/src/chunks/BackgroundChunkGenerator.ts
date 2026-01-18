@@ -1,4 +1,5 @@
 import type { World } from '@ai-village/core';
+import { THROTTLE } from '@ai-village/core';
 import type { ChunkManager } from './ChunkManager.js';
 import type { TerrainGenerator } from '../terrain/TerrainGenerator.js';
 import type { Chunk } from './Chunk.js';
@@ -107,7 +108,7 @@ export class BackgroundChunkGenerator {
    *
    * @param chunkManager - ChunkManager instance for chunk access
    * @param terrainGenerator - TerrainGenerator instance for chunk generation
-   * @param throttleInterval - Ticks between chunk generation (default: 2 = 100ms at 20 TPS)
+   * @param throttleInterval - Ticks between chunk generation (default: THROTTLE.FAST = 10 ticks)
    * @param minTPS - Pause generation if TPS drops below this (default: 18)
    * @param resumeTPS - Resume generation when TPS recovers to this (default: 19)
    * @param workerPool - Optional worker pool for background generation
@@ -115,7 +116,7 @@ export class BackgroundChunkGenerator {
   constructor(
     chunkManager: ChunkManager,
     terrainGenerator: TerrainGenerator,
-    throttleInterval: number = 2,
+    throttleInterval: number = THROTTLE.FAST,
     minTPS: number = 18,
     resumeTPS: number = 19,
     workerPool?: ChunkGenerationWorkerPool
@@ -460,7 +461,7 @@ export class BackgroundChunkGenerator {
  *
  * @param chunkManager - ChunkManager instance
  * @param terrainGenerator - TerrainGenerator instance
- * @param throttleInterval - Ticks between chunk generation (default: 2)
+ * @param throttleInterval - Ticks between chunk generation (default: THROTTLE.FAST = 10 ticks)
  * @param minTPS - Pause generation if TPS drops below this (default: 18)
  * @param resumeTPS - Resume generation when TPS recovers to this (default: 19)
  * @param workerPool - Optional worker pool for background generation
@@ -469,7 +470,7 @@ export class BackgroundChunkGenerator {
 export function createBackgroundChunkGenerator(
   chunkManager: ChunkManager,
   terrainGenerator: TerrainGenerator,
-  throttleInterval: number = 2,
+  throttleInterval: number = THROTTLE.FAST,
   minTPS: number = 18,
   resumeTPS: number = 19,
   workerPool?: ChunkGenerationWorkerPool

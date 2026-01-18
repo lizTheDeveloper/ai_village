@@ -3,6 +3,7 @@ import type { World, WorldMutator } from '../ecs/World.js';
 import type { PositionComponent } from '../components/index.js';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 import { CHUNK_SIZE } from '@ai-village/world';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * System that handles chunk loading and terrain generation.
@@ -19,7 +20,7 @@ export class ChunkLoadingSystem extends BaseSystem {
 
   // Throttle to every 10 ticks (500ms at 20 TPS) for visual mode
   // Camera scrolling doesn't need every-tick updates
-  protected readonly throttleInterval = 10;
+  protected readonly throttleInterval = THROTTLE.FAST;
 
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;

@@ -23,7 +23,7 @@ export class SocialGradientSystem extends BaseSystem {
   public readonly priority: number = 22; // After AISystem, before Exploration
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  protected readonly throttleInterval: number = 20; // Only run once per second (at 20 TPS)
+  protected readonly throttleInterval: number = 200; // VERY_SLOW - 10 seconds (social gradients change slowly)
 
   // Future: Add event bus support for gradient events
   private lastProcessedMessageCount: Map<string, number> = new Map();

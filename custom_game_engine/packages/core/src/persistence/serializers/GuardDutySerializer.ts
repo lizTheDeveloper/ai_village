@@ -25,18 +25,44 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
   }
 
   protected deserializeData(data: unknown): GuardDutyComponent {
-    const d = data as any;
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('GuardDutyComponent data must be object');
+    }
+
+    const d = data as Record<string, unknown>;
+
+    if (typeof d.assignmentType !== 'string') {
+      throw new Error('GuardDutyComponent.assignmentType must be string');
+    }
+    if (typeof d.alertness !== 'number') {
+      throw new Error('GuardDutyComponent.alertness must be number');
+    }
+    if (typeof d.responseRadius !== 'number') {
+      throw new Error('GuardDutyComponent.responseRadius must be number');
+    }
 
     // Defensive deserialization: ensure required fields exist for each assignment type
-    const componentData: any = {
+    interface Vec3 { x: number; y: number; z: number; }
+    type ComponentData = {
+      assignmentType: string;
+      targetLocation?: Vec3;
+      targetPerson?: string;
+      patrolRoute?: Vec3[];
+      patrolIndex?: number;
+      alertness: number;
+      responseRadius: number;
+      lastCheckTime?: number;
+    };
+
+    const componentData: ComponentData = {
       assignmentType: d.assignmentType,
-      targetLocation: d.targetLocation,
-      targetPerson: d.targetPerson,
-      patrolRoute: d.patrolRoute,
-      patrolIndex: d.patrolIndex,
+      targetLocation: d.targetLocation as Vec3 | undefined,
+      targetPerson: typeof d.targetPerson === 'string' ? d.targetPerson : undefined,
+      patrolRoute: Array.isArray(d.patrolRoute) ? d.patrolRoute as Vec3[] : undefined,
+      patrolIndex: typeof d.patrolIndex === 'number' ? d.patrolIndex : undefined,
       alertness: d.alertness,
       responseRadius: d.responseRadius,
-      lastCheckTime: d.lastCheckTime,
+      lastCheckTime: typeof d.lastCheckTime === 'number' ? d.lastCheckTime : undefined,
     };
 
     // Fix invalid state: if assignment type requires a field but it's missing, provide a default
@@ -51,7 +77,7 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
       componentData.targetLocation = { x: 0, y: 0, z: 0 };
     }
 
-    if (d.assignmentType === 'patrol' && (!d.patrolRoute || d.patrolRoute.length === 0)) {
+    if (d.assignmentType === 'patrol' && (!d.patrolRoute || (Array.isArray(d.patrolRoute) && d.patrolRoute.length === 0))) {
       // Default to a simple patrol route at origin if missing
       componentData.patrolRoute = [{ x: 0, y: 0, z: 0 }];
     }
@@ -63,8 +89,8 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
     if (typeof data !== 'object' || data === null) {
       throw new Error('GuardDutyComponent data must be object');
     }
-    const d = data as any;
-    if (!d.assignmentType || d.alertness === undefined || d.responseRadius === undefined) {
+    const d = data as Record<string, unknown>;
+    if (typeof d.assignmentType !== 'string' || typeof d.alertness !== 'number' || typeof d.responseRadius !== 'number') {
       throw new Error('GuardDutyComponent missing required fields');
     }
     return true;

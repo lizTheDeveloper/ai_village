@@ -27,11 +27,11 @@ export class SquadronSystem extends BaseSystem {
   public readonly priority: number = 85;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Squadron];
   public readonly metadata = {
-    category: 'navigation' as const,
+    category: 'infrastructure',
     description: 'Manages tactical ship squadrons and formations',
-    dependsOn: ['emotional_navigation'],
-    writesComponents: [CT.Squadron],
-  };
+    dependsOn: ['emotional_navigation' as SystemId],
+    writesComponents: [CT.Squadron] as const,
+  } as const;
 
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 

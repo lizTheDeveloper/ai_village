@@ -14,6 +14,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World, Entity } from '../ecs/index.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { UpliftCandidateComponent, type CognitiveMetrics } from '../components/UpliftCandidateComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
@@ -169,10 +170,10 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
       recommended: upliftPotential >= 50 && populationSize >= EVALUATION_THRESHOLDS.MIN_POPULATION,
     });
 
-    (animal as any).addComponent(candidate);
+    (animal as EntityImpl).addComponent(candidate);
 
     // Emit event
-    this.events.emit('uplift_candidate_detected' as any, {
+    this.events.emit('uplift_candidate_detected', {
       entityId: animal.id,
       speciesId: species.speciesId,
       upliftPotential,

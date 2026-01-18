@@ -11,6 +11,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World, Entity } from '../ecs/index.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { ProtoSapienceComponent } from '../components/ProtoSapienceComponent.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
@@ -87,7 +88,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
       leadScientistId: program.leadScientistId,
     });
 
-    (entity as any).addComponent(upliftedTrait);
+    (entity as EntityImpl).addComponent(upliftedTrait);
 
     // Transform Animal → Agent
     this.transformToAgent(ctx, entity, awakening, upliftedTrait);
@@ -99,7 +100,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
     );
 
     // Emit awakening event
-    this.events.emit('consciousness_awakened' as any, {
+    this.events.emit('consciousness_awakened', {
       entityId: entity.id,
       entityName: upliftedTrait.getDisplayName(),
       programId: program.programId,
@@ -266,13 +267,15 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
     awakening: AwakeningMoment,
     upliftedTrait: UpliftedTraitComponent
   ): void {
+    const entityImpl = entity as EntityImpl;
+
     // Add AgentComponent
     const agent = createAgentComponent();
-    (entity as any).addComponent(agent);
+    entityImpl.addComponent(agent);
 
     // Add IdentityComponent
     const identity = createIdentityComponent(upliftedTrait.getDisplayName());
-    (entity as any).addComponent(identity);
+    entityImpl.addComponent(identity);
 
     // Add EpisodicMemoryComponent with awakening as first memory
     const episodic = new EpisodicMemoryComponent();
@@ -291,7 +294,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
       markedForConsolidation: true,
       timesRecalled: 0,
     });
-    (entity as any).addComponent(episodic);
+    entityImpl.addComponent(episodic);
 
     // Add SemanticMemoryComponent with basic knowledge
     const semantic = new SemanticMemoryComponent();
@@ -301,7 +304,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
       confidence: 1.0,
       sourceMemories: [], // No prior memories at awakening
     });
-    (entity as any).addComponent(semantic);
+    entityImpl.addComponent(semantic);
 
     // Add BeliefComponent with initial belief evidence
     const belief = new BeliefComponent();
@@ -309,7 +312,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
     belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
     belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
     belief.recordEvidence('world', 'self_sapience', 'experience', ctx.tick);
-    (entity as any).addComponent(belief);
+    entityImpl.addComponent(belief);
 
     // Mark species as sapient
     if (entity.hasComponent(CT.Species)) {

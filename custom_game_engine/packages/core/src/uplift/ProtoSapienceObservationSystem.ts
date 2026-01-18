@@ -15,6 +15,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World, Entity } from '../ecs/index.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import {
   ProtoSapienceComponent,
@@ -94,7 +95,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
         generationBorn: program.currentGeneration,
         expectedGenerationToSapience: program.acceleratedGenerations,
       });
-      (animal as any).addComponent(proto);
+      (animal as EntityImpl).addComponent(proto);
     } else {
       proto = animal.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
       // Update intelligence from program
@@ -132,7 +133,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
       proto.usesTools = true;
       this.recordToolUse(ctx, animal, proto, 'stick', 'food_extraction');
 
-      this.events.emit('proto_sapience_milestone' as any, {
+      this.events.emit('proto_sapience_milestone', {
         entityId: animal.id,
         milestone: 'first_tool_use',
         generation: program.currentGeneration,
@@ -144,7 +145,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
     if (!proto.createsTools && proto.intelligence >= EMERGENCE_THRESHOLDS.TOOL_CREATION) {
       proto.createsTools = true;
 
-      this.events.emit('proto_sapience_milestone' as any, {
+      this.events.emit('proto_sapience_milestone', {
         entityId: animal.id,
         milestone: 'first_tool_creation',
         generation: program.currentGeneration,
@@ -157,7 +158,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
       proto.hasProtocolanguage = true;
       proto.vocabularySize = 5; // Start with 5 basic "words"
 
-      this.events.emit('proto_sapience_milestone' as any, {
+      this.events.emit('proto_sapience_milestone', {
         entityId: animal.id,
         milestone: 'proto_language_emergence',
         generation: program.currentGeneration,
@@ -169,7 +170,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
     if (!proto.abstractThinking && proto.intelligence >= EMERGENCE_THRESHOLDS.ABSTRACT_THINKING) {
       proto.abstractThinking = true;
 
-      this.events.emit('proto_sapience_milestone' as any, {
+      this.events.emit('proto_sapience_milestone', {
         entityId: animal.id,
         milestone: 'abstract_thinking',
         generation: program.currentGeneration,
@@ -189,7 +190,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
         proto.passedMirrorTest = true;
         proto.recognizesSelf = true;
 
-        this.events.emit('proto_sapience_milestone' as any, {
+        this.events.emit('proto_sapience_milestone', {
           entityId: animal.id,
           milestone: 'mirror_test_passed',
           intelligence: proto.intelligence,
@@ -360,7 +361,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
         proto.hasCulturalTraditions = true;
         proto.traditions.push(this.generateCulturalTradition());
 
-        this.events.emit('proto_sapience_milestone' as any, {
+        this.events.emit('proto_sapience_milestone', {
           entityId: animal.id,
           milestone: 'cultural_tradition_emerged',
           tradition: proto.traditions[0],

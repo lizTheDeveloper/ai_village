@@ -8,6 +8,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 // ============================================================================
 // Ritual Types
@@ -58,7 +59,7 @@ export class RitualSystem extends BaseSystem {
   public readonly id = 'RitualSystem';
   public readonly priority = 83;
   public readonly requiredComponents = [];
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private config: RitualConfig;
   private rituals: Map<string, RitualData> = new Map();

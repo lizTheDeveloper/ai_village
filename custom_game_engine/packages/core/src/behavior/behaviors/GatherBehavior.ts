@@ -52,9 +52,19 @@ import {
 } from '../../constants/index.js';
 
 // Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: any | null = null;
+interface ChunkSpatialQuery {
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: string[],
+    options?: { limit?: number }
+  ): Array<{ entity: Entity; distance: number }>;
+}
 
-export function injectChunkSpatialQueryToGather(spatialQuery: any): void {
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToGather(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
   console.log('[GatherBehavior] ChunkSpatialQuery injected for efficient resource/plant lookups');
 }
@@ -218,7 +228,7 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       if (target.type === 'resource') {
-        // Check if this is a voxel resource (trees, rocks with height-based harvesting)
+            // Check if this is a voxel resource (trees, rocks with height-based harvesting)
         const targetImpl = target.entity as EntityImpl;
         const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
         if (voxelComp) {
@@ -1367,7 +1377,10 @@ export class GatherBehavior extends BaseBehavior {
 
       // Update plant - reduce fruitCount
       // CRITICAL FIX: Reset stage if all fruit harvested to enable regrowth
-      const species = (world as any).plantSpeciesLookup?.(plantComp.speciesId);
+      interface WorldWithPlantSpecies {
+        plantSpeciesLookup?: (id: string) => { harvestResetStage?: string; harvestDestroysPlant?: boolean } | undefined;
+      }
+      const species = (world as unknown as WorldWithPlantSpecies).plantSpeciesLookup?.(plantComp.speciesId);
       const newFruitCount = Math.max(0, (plantComp.fruitCount ?? 0) - result.amountAdded);
 
       plantImpl.updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
@@ -1437,7 +1450,12 @@ export class GatherBehavior extends BaseBehavior {
     agent: AgentComponent
   ): void {
     const buildingType = agent.behaviorState.returnToBuild as BuildingType;
-    const blueprint = (world as any).buildingRegistry?.tryGet(buildingType);
+    interface WorldWithBuildingRegistry {
+      buildingRegistry?: {
+        tryGet(type: BuildingType): { resourceCost: ResourceCost[] } | undefined;
+      };
+    }
+    const blueprint = (world as unknown as WorldWithBuildingRegistry).buildingRegistry?.tryGet(buildingType);
 
     if (!blueprint) {
       return;
@@ -1488,8 +1506,8 @@ export class GatherBehavior extends BaseBehavior {
 
     for (const cost of costs) {
       const available = inventory.slots
-        .filter((s: any) => s.itemId === cost.resourceId)
-        .reduce((sum: number, s: any) => sum + s.quantity, 0);
+        .filter((s) => s.itemId === cost.resourceId)
+        .reduce((sum, s) => sum + s.quantity, 0);
 
       if (available < cost.amountRequired) {
         missing.push({
@@ -1629,15 +1647,25 @@ export function gatherBehaviorWithContext(ctx: import('../BehaviorContext.js').B
     if (target.type === 'resource') {
       const targetImpl = target.entity as EntityImpl;
       const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
+      interface MinimalWorld {
+        tick: number;
+        eventBus: {
+          emit: (event: unknown) => void;
+        };
+      }
+      const minimalWorld: MinimalWorld = {
+        tick: ctx.tick,
+        eventBus: { emit: (e: unknown) => ctx.emit(e) }
+      };
       if (voxelComp) {
-        behavior.handleVoxelResourceGathering(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+        behavior.handleVoxelResourceGathering(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, ctx.agent);
       } else {
-        behavior.handleResourceGathering(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, ctx.agent);
+        behavior.handleResourceGathering(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, ctx.agent);
       }
     } else if (target.subtype === 'fruit') {
-      behavior.gatherFruit(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, target.position, workSpeedMultiplier);
+      behavior.gatherFruit(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, target.position, workSpeedMultiplier);
     } else {
-      behavior.gatherSeeds(ctx.entity, target.entity, { tick: ctx.tick, eventBus: { emit: (e: any) => ctx.emit(e) } } as any, inventory, target.position, workSpeedMultiplier);
+      behavior.gatherSeeds(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, target.position, workSpeedMultiplier);
     }
   }
 }

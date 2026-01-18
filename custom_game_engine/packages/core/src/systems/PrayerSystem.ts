@@ -12,6 +12,7 @@ import type { SpiritComponent } from '../components/SpiritComponent.js';
 import { resolvePrayer } from '../divinity/CosmologyInteraction.js';
 import type { Spirit } from '../divinity/AnimistTypes.js';
 import type { Deity } from '../divinity/DeityTypes.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * PrayerSystem - Generates prayers from agents to deities
@@ -28,7 +29,7 @@ export class PrayerSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer';
   public readonly priority: number = 116; // After belief generation
   public readonly requiredComponents = [] as const;
-  protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private prayerIdCounter: number = 0;
 

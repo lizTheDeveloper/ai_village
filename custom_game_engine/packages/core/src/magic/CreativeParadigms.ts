@@ -37,6 +37,8 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'sympathy_source',
+      name: 'Sympathetic Will',
       type: 'internal',
       regeneration: 'rest',
       detectability: 'subtle',
@@ -44,7 +46,7 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
       transferable: false,
       stealable: false,
     },
-  ] as any[],
+  ],
 
   costs: [
     { type: 'stamina', baseAmount: 10, powerMultiplier: 2.0 },

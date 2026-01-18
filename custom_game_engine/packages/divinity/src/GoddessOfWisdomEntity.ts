@@ -8,15 +8,18 @@
  * it enters the world, ensuring it fits the setting and is balanced.
  */
 
-import type { World } from '@ai-village/core';
-import type { Entity } from '@ai-village/core';
-import { createIdentityComponent } from '@ai-village/core';
-import { createPositionComponent } from '@ai-village/core';
-import { createTagsComponent } from '@ai-village/core';
-import { createRelationshipComponent } from '@ai-village/core';
-import { createEpisodicMemoryComponent } from '@ai-village/core';
-import { createConversationComponent } from '@ai-village/core';
-import { createRenderableComponent } from '@ai-village/core';
+import type { World, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
+import {
+  EntityImpl,
+  ComponentType,
+  createIdentityComponent,
+  createPositionComponent,
+  createTagsComponent,
+  createRelationshipComponent,
+  createEpisodicMemoryComponent,
+  createConversationComponent,
+  createRenderableComponent,
+} from '@ai-village/core';
 import {
   getWisdomGoddessByIndex,
   getWisdomGoddessSpritePath,
@@ -54,11 +57,11 @@ export function createGoddessOfWisdom(
 
   // Identity - Goddess of Wisdom
   const identity = createIdentityComponent(config.name);
-  (entity as any).addComponent(identity);
+  (entity as EntityImpl).addComponent(identity);
 
   // Position - manifests at research/discovery location
   const position = createPositionComponent(location.x, location.y);
-  (entity as any).addComponent(position);
+  (entity as EntityImpl).addComponent(position);
 
   // Tags - mark as deity and wisdom goddess
   const tags = createTagsComponent(
@@ -71,24 +74,24 @@ export function createGoddessOfWisdom(
     `origin:${config.origin}`, // Track cultural origin
     `scrutiny_style:${config.scrutinyStyle}`
   );
-  (entity as any).addComponent(tags);
+  (entity as EntityImpl).addComponent(tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getWisdomGoddessSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as any).addComponent(renderable);
+  (entity as EntityImpl).addComponent(renderable);
 
   // Episodic Memory - remembers all discoveries and judgments
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as any).addComponent(memory);
+  (entity as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with researchers and inventors
   const relationships = createRelationshipComponent();
-  (entity as any).addComponent(relationships);
+  (entity as EntityImpl).addComponent(relationships);
 
   // Conversation - can engage in dialogue about discoveries
   const conversation = createConversationComponent(100);
-  (entity as any).addComponent(conversation);
+  (entity as EntityImpl).addComponent(conversation);
 
   return entity;
 }

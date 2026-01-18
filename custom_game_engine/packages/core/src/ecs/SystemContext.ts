@@ -522,6 +522,20 @@ export abstract class BaseSystem implements System {
   abstract readonly priority: number;
   abstract readonly requiredComponents: ReadonlyArray<ComponentType>;
 
+  /**
+   * Components that must exist in the world for this system to run.
+   * Override this in subclasses to enable lazy activation.
+   *
+   * If specified and none of these components exist anywhere in the world,
+   * the system is skipped entirely (O(1) check in GameLoop).
+   *
+   * Example:
+   * ```typescript
+   * readonly activationComponents = ['player_control'] as const;
+   * ```
+   */
+  readonly activationComponents?: ReadonlyArray<ComponentType>;
+
   readonly metadata?: SystemMetadata;
 
   protected events!: SystemEventManager;

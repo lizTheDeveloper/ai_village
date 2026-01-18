@@ -23,9 +23,19 @@ import { ComponentType } from '../../types/ComponentType.js';
  * Injection point for ChunkSpatialQuery (optional dependency)
  * Used for efficient plant lookups when available
  */
-let chunkSpatialQuery: any | null = null;
+interface ChunkSpatialQuery {
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: string[],
+    options?: { limit?: number }
+  ): Array<{ entity: import('../../ecs/Entity.js').Entity; distance: number }>;
+}
 
-export function injectChunkSpatialQueryToFarmBehaviors(spatialQuery: any): void {
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToFarmBehaviors(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
   console.log('[FarmBehaviors] ChunkSpatialQuery injected for efficient plant lookups');
 }
@@ -75,7 +85,7 @@ export class TillBehavior extends BaseBehavior {
     this.stopMovement(entity);
 
     // Check if agent has seeds (motivation to till)
-    const hasSeeds = inventory?.slots?.some((slot: any) =>
+    const hasSeeds = inventory?.slots?.some((slot) =>
       slot.itemId && (slot.itemId.includes('seed') || slot.itemId === 'wheat_seed' || slot.itemId === 'carrot_seed')
     );
 
