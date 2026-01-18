@@ -297,11 +297,9 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
           if (itemDef && itemDef.traits?.armor) {
             const armorTrait = itemDef.traits.armor as ArmorTrait;
             // Type guard for resistances - they may not exist on all armor
-            if (armorTrait.resistances) {
-              const resistanceValue = armorTrait.resistances[damageType];
-              if (resistanceValue !== undefined) {
-                totalResistance += resistanceValue;
-              }
+            if (armorTrait.resistances && damageType in armorTrait.resistances) {
+              const resistances = armorTrait.resistances as Record<DamageType, number>;
+              totalResistance += resistances[damageType] ?? 0;
             }
           }
         }

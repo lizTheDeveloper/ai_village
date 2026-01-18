@@ -95,7 +95,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
         // Architectural note: Entity interface doesn't expose addComponent for readonly access pattern
         // EntityImpl has the mutation methods - this cast is required for entity modification
-        (summonedEntity as { addComponent: (c: any) => void }).addComponent(positionComponent);
+        (summonedEntity as unknown as { addComponent: (c: any) => void }).addComponent(positionComponent);
 
         // Set owner if controllable
         if (effect.controllable) {

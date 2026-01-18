@@ -24,6 +24,7 @@ export class ResourceGatheringSystem extends BaseSystem {
   public readonly id: SystemId = 'resource-gathering';
   public readonly priority: number = 5; // Run early, before AI decisions
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Resource];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   public readonly dependsOn = ['state_mutator'] as const;
 

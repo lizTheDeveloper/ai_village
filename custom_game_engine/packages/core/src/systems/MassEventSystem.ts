@@ -144,6 +144,7 @@ export class MassEventSystem extends BaseSystem {
   public readonly id = 'MassEventSystem';
   public readonly priority = 73;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: MassEventConfig;
   private massEvents: Map<string, MassEvent> = new Map();

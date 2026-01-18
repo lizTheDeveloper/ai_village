@@ -824,6 +824,7 @@ export class CellPhoneSystem extends BaseSystem {
   readonly id = 'CellPhoneSystem';
   readonly priority = 67;
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager: CellPhoneManager = new CellPhoneManager();
   private lastCallTimeoutCheck = 0;

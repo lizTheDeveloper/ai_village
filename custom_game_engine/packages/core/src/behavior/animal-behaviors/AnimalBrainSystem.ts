@@ -41,7 +41,8 @@ export interface BehaviorRegistry {
 export class AnimalBrainSystem extends BaseSystem {
   public readonly id: SystemId = 'animal-brain';
   public readonly priority: number = 12;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal', 'position', 'movement'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal', 'position', 'movement', CT.Position];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   private readonly registry: BehaviorRegistry;
 

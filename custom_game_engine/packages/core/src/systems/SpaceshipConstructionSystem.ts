@@ -187,6 +187,7 @@ export class SpaceshipConstructionSystem extends BaseSystem {
   public readonly id: SystemId = 'spaceship_construction';
   public readonly priority: number = 156; // After SpaceshipManagementSystem (155)
   public readonly requiredComponents = [CT.Building] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /** Active construction projects indexed by project ID */
   private activeProjects = new Map<string, SpaceshipConstructionProject>();

@@ -72,6 +72,7 @@ export class TempleSystem extends BaseSystem {
   public readonly id = 'TempleSystem';
   public readonly priority = 85;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: TempleConfig;
   private temples: Map<string, TempleData> = new Map();

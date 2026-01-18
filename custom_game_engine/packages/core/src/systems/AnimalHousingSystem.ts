@@ -32,7 +32,8 @@ import {
 export class AnimalHousingSystem extends BaseSystem {
   public readonly id: SystemId = 'animal-housing';
   public readonly priority: number = 51; // Run after BuildingSystem (50)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   private lastCleanlinessUpdate = 0;
   private readonly CLEANLINESS_UPDATE_INTERVAL = CLEANLINESS_UPDATE_INTERVAL; // Daily in seconds

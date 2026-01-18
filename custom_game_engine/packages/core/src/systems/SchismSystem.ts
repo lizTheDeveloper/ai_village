@@ -86,6 +86,7 @@ export class SchismSystem extends BaseSystem {
   public readonly id = 'SchismSystem';
   public readonly priority = 76;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: SchismConfig;
   private schisms: Map<string, SchismData> = new Map();

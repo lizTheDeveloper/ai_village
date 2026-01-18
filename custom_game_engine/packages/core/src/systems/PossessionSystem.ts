@@ -29,6 +29,7 @@ export class PossessionSystem extends BaseSystem {
   public readonly id = 'possession' as const;
   public readonly priority = 5; // High priority - runs before AgentBrainSystem
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   private readonly maxPossessionTicks = 12000; // 10 minutes at 20 TPS
   private readonly baseCostPerTick = 0.1; // Base belief cost

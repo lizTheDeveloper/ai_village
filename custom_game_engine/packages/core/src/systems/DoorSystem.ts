@@ -31,6 +31,7 @@ export class DoorSystem extends BaseSystem {
   public readonly id: SystemId = 'door';
   public readonly priority: number = 19; // Run before MovementSystem (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Position, CT.Agent];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   /**
    * Track doors that have been opened (position key -> tick opened)

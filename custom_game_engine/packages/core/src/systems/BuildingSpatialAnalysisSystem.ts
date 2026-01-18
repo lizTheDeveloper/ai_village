@@ -57,6 +57,7 @@ export class BuildingSpatialAnalysisSystem extends BaseSystem {
   public readonly id: SystemId = 'building_spatial_analysis';
   public readonly priority: number = 17; // Run after BuildingSystem (16)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Cache of pending layout data for buildings being constructed */
   private pendingLayouts = new Map<string, BuildingLayout>();

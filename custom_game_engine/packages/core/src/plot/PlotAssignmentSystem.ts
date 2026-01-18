@@ -46,6 +46,7 @@ export class PlotAssignmentSystem extends BaseSystem {
   readonly id = 'plot_assignment' as const;
   readonly priority = 85;
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private tickCounter = 0;
   private readonly assignmentInterval = 100; // Check every 100 ticks

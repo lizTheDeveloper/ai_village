@@ -779,6 +779,7 @@ export class SoapOperaSystem extends BaseSystem {
   readonly id = 'SoapOperaSystem';
   readonly priority = 73;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager = new SoapOperaManager();
 

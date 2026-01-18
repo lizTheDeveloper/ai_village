@@ -20,6 +20,7 @@ export class ReflectionSystem extends BaseSystem {
   public readonly id = CT.Reflection;
   public readonly priority = 110;
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private reflectionTriggers: Map<
     string,

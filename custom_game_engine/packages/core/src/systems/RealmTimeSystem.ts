@@ -17,6 +17,7 @@ export class RealmTimeSystem extends BaseSystem {
   readonly id: SystemId = 'realm_time';
   readonly priority: number = 5;  // Run very early
   readonly requiredComponents = ['realm_location'] as const;
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   protected onUpdate(ctx: SystemContext): void {
     // Update time tracking for each entity based on their current realm

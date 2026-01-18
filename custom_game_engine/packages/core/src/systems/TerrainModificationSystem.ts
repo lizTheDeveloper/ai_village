@@ -111,6 +111,7 @@ export class TerrainModificationSystem extends BaseSystem {
   public readonly id = 'TerrainModificationSystem';
   public readonly priority = 70;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: TerrainPowerConfig;
   private modifications: Map<string, TerrainModification> = new Map();

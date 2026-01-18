@@ -41,6 +41,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
+    // Use numeric encoding for string values in appliedValues
     const appliedValues: Record<string, number> = {};
 
     // Store original form for restoration
@@ -65,8 +66,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
           (targetAppearance as { form: string }).form = effect.targetState;
         }
 
-        appliedValues.newForm = effect.targetState;
-        appliedValues.oldForm = this.originalForms.get(target.id)?.form || 'unknown';
+        appliedValues.formChanged = 1;
         break;
       }
 
@@ -91,22 +91,19 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
           (targetAppearance as { material: string }).material = effect.targetState;
         }
 
-        appliedValues.newMaterial = effect.targetState;
-        appliedValues.oldMaterial = this.originalForms.get(target.id)?.material || 'flesh';
+        appliedValues.materialChanged = 1;
         break;
       }
 
       case 'alignment': {
         // Alignment change
-        appliedValues.newAlignment = effect.targetState;
-        appliedValues.oldAlignment = this.originalForms.get(target.id)?.alignment || 'neutral';
+        appliedValues.alignmentChanged = 1;
         break;
       }
 
       case 'species': {
         // Species change (polymorph)
-        appliedValues.newSpecies = effect.targetState;
-        appliedValues.oldSpecies = this.originalForms.get(target.id)?.species || 'unknown';
+        appliedValues.speciesChanged = 1;
         break;
       }
 

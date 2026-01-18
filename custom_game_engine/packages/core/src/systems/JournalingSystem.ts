@@ -15,6 +15,7 @@ export class JournalingSystem extends BaseSystem {
   readonly id: SystemId = 'journaling';
   readonly priority: number = 115;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private idleAgents: Set<string> = new Set();
 

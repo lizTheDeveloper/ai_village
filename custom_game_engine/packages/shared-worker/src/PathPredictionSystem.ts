@@ -38,6 +38,7 @@ export class PathPredictionSystem extends BaseSystem {
   public readonly id = 'path_prediction' as const;
   public readonly priority = 50;
   public readonly requiredComponents = ['position'] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {

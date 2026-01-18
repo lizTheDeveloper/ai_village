@@ -43,6 +43,7 @@ export class AutoSaveSystem extends BaseSystem {
   public readonly id: SystemId = 'auto_save';
   public readonly priority: number = 999; // Run last
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private lastSaveDay: number = -1;
   private checkpoints: Checkpoint[] = [];

@@ -45,6 +45,7 @@ export class GuardDutySystem extends BaseSystem {
   public readonly id: SystemId = 'guard_duty';
   public readonly priority = 48;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['guard_duty'];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private readonly ALERTNESS_DECAY_RATE = 0.0001; // Per millisecond
   private readonly THREAT_CHECK_INTERVAL = 5000; // 5 seconds

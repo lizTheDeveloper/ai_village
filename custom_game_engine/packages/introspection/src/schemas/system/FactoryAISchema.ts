@@ -212,15 +212,86 @@ export const FactoryAISchema = autoRegister(
 
     validate: (data): data is FactoryAIComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const f = data as any;
+      const f = data as Record<string, unknown>;
 
-      return (
-        f.type === 'factory_ai' &&
-        typeof f.name === 'string' &&
-        Array.isArray(f.primaryOutputs) &&
-        typeof f.health === 'string' &&
-        typeof f.stats === 'object'
-      );
+      // Check required primitive fields
+      if (!('type' in f && f.type === 'factory_ai')) return false;
+      if (!('version' in f && typeof f.version === 'number')) return false;
+      if (!('name' in f && typeof f.name === 'string')) return false;
+      if (!('goal' in f && typeof f.goal === 'string')) return false;
+      if (!('targetProductionRate' in f && typeof f.targetProductionRate === 'number')) return false;
+      if (!('allowExpansion' in f && typeof f.allowExpansion === 'boolean')) return false;
+      if (!('allowLogisticsRequests' in f && typeof f.allowLogisticsRequests === 'boolean')) return false;
+      if (!('health' in f && typeof f.health === 'string')) return false;
+      if (!('lastDecisionTick' in f && typeof f.lastDecisionTick === 'number')) return false;
+      if (!('decisionInterval' in f && typeof f.decisionInterval === 'number')) return false;
+      if (!('minPowerEfficiency' in f && typeof f.minPowerEfficiency === 'number')) return false;
+      if (!('minStockpileDays' in f && typeof f.minStockpileDays === 'number')) return false;
+      if (!('maxOutputStorage' in f && typeof f.maxOutputStorage === 'number')) return false;
+      if (!('intelligenceLevel' in f && typeof f.intelligenceLevel === 'number')) return false;
+
+      // Check primaryOutputs array
+      if (!('primaryOutputs' in f && Array.isArray(f.primaryOutputs))) return false;
+      if (!f.primaryOutputs.every((item) => typeof item === 'string')) return false;
+
+      // Check stats object
+      if (!('stats' in f && typeof f.stats === 'object' && f.stats !== null)) return false;
+      const stats = f.stats as Record<string, unknown>;
+      if (!('totalMachines' in stats && typeof stats.totalMachines === 'number')) return false;
+      if (!('activeMachines' in stats && typeof stats.activeMachines === 'number')) return false;
+      if (!('idleMachines' in stats && typeof stats.idleMachines === 'number')) return false;
+      if (!('totalInputsPerMinute' in stats && typeof stats.totalInputsPerMinute === 'number')) return false;
+      if (!('totalOutputsPerMinute' in stats && typeof stats.totalOutputsPerMinute === 'number')) return false;
+      if (!('efficiency' in stats && typeof stats.efficiency === 'number')) return false;
+      if (!('powerGeneration' in stats && typeof stats.powerGeneration === 'number')) return false;
+      if (!('powerConsumption' in stats && typeof stats.powerConsumption === 'number')) return false;
+      if (!('powerEfficiency' in stats && typeof stats.powerEfficiency === 'number')) return false;
+      if (!('beltUtilization' in stats && typeof stats.beltUtilization === 'number')) return false;
+      if (!('logisticsBottlenecks' in stats && typeof stats.logisticsBottlenecks === 'number')) return false;
+      if (!('inputStockpileDays' in stats && typeof stats.inputStockpileDays === 'number')) return false;
+      if (!('outputStorageUtilization' in stats && typeof stats.outputStorageUtilization === 'number')) return false;
+
+      // Check bottlenecks array
+      if (!('bottlenecks' in f && Array.isArray(f.bottlenecks))) return false;
+      for (const bottleneck of f.bottlenecks) {
+        if (typeof bottleneck !== 'object' || bottleneck === null) return false;
+        const b = bottleneck as Record<string, unknown>;
+        if (!('type' in b && typeof b.type === 'string')) return false;
+        if (!('severity' in b && typeof b.severity === 'number')) return false;
+        if (!('location' in b && typeof b.location === 'string')) return false;
+        if (!('suggestion' in b && typeof b.suggestion === 'string')) return false;
+        if (!('detectedAt' in b && typeof b.detectedAt === 'number')) return false;
+        // Optional affectedItem
+        if ('affectedItem' in b && b.affectedItem !== undefined && typeof b.affectedItem !== 'string') return false;
+      }
+
+      // Check recentDecisions array
+      if (!('recentDecisions' in f && Array.isArray(f.recentDecisions))) return false;
+      for (const decision of f.recentDecisions) {
+        if (typeof decision !== 'object' || decision === null) return false;
+        const d = decision as Record<string, unknown>;
+        if (!('timestamp' in d && typeof d.timestamp === 'number')) return false;
+        if (!('action' in d && typeof d.action === 'string')) return false;
+        if (!('reasoning' in d && typeof d.reasoning === 'string')) return false;
+        if (!('parameters' in d && typeof d.parameters === 'object' && d.parameters !== null)) return false;
+        if (!('expectedOutcome' in d && typeof d.expectedOutcome === 'string')) return false;
+        if (!('priority' in d && typeof d.priority === 'number')) return false;
+      }
+
+      // Check resourceRequests array
+      if (!('resourceRequests' in f && Array.isArray(f.resourceRequests))) return false;
+      for (const request of f.resourceRequests) {
+        if (typeof request !== 'object' || request === null) return false;
+        const r = request as Record<string, unknown>;
+        if (!('itemId' in r && typeof r.itemId === 'string')) return false;
+        if (!('quantityNeeded' in r && typeof r.quantityNeeded === 'number')) return false;
+        if (!('urgency' in r && typeof r.urgency === 'string')) return false;
+        if (!('reason' in r && typeof r.reason === 'string')) return false;
+        if (!('requestedAt' in r && typeof r.requestedAt === 'number')) return false;
+        if (!('fulfilled' in r && typeof r.fulfilled === 'boolean')) return false;
+      }
+
+      return true;
     },
 
     createDefault: () => ({

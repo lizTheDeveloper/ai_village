@@ -21,6 +21,7 @@ export class ExplorationSystem extends BaseSystem {
   public readonly id: SystemId = 'exploration';
   public readonly priority: number = 25; // After AISystem, before Steering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.ExplorationState] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private lastCoverageMilestone: Map<string, number> = new Map();
 

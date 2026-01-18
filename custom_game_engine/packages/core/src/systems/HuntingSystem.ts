@@ -54,6 +54,7 @@ export class HuntingSystem extends BaseSystem {
   public readonly id: SystemId = 'hunting';
   public readonly priority = 45; // After movement, before memory
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Conflict];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   private llmProvider?: (prompt: any) => Promise<{ narrative: string }>;
 

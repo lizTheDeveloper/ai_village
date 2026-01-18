@@ -51,6 +51,7 @@ export class MovementSystem extends BaseSystem {
     CT.Movement,
     CT.Position,
   ];
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   /**
    * Systems that must run before this one.

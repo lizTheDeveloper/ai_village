@@ -11,6 +11,7 @@ export class MemorySystem extends BaseSystem {
   public readonly id: SystemId = 'memory';
   public readonly priority: number = 25; // Run after movement
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.SpatialMemory];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {

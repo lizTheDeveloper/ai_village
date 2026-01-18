@@ -37,6 +37,7 @@ export class IdleBehaviorSystem extends BaseSystem {
     CT.Personality,
     CT.ActionQueue
   ];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
   public readonly dependsOn = [] as const;
 
   protected onUpdate(ctx: SystemContext): void {

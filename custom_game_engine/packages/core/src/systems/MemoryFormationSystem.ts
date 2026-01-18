@@ -81,6 +81,7 @@ export class MemoryFormationSystem extends BaseSystem {
   public readonly id: SystemId = 'memory_formation';
   public readonly priority: number = 100;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   // Performance optimization: rate limit memory formation
   private static readonly MAX_MEMORIES_PER_AGENT_PER_GAME_HOUR = 20;

@@ -10,6 +10,7 @@ export class VillageDefenseSystem extends BaseSystem {
   public readonly id: SystemId = 'village_defense';
   public readonly priority = 50;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onUpdate(_ctx: SystemContext): void {
     // Stub implementation

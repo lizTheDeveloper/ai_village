@@ -53,6 +53,7 @@ export class DominanceChallengeSystem extends BaseSystem {
   public readonly id: SystemId = 'dominance_challenge';
   public readonly priority = 49;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private eventBus?: EventBus;
 

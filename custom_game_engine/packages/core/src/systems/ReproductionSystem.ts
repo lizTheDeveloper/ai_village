@@ -58,6 +58,7 @@ export class ReproductionSystem extends BaseSystem {
   public readonly name = 'ReproductionSystem';
   public readonly priority = 50;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: ReproductionConfig;
 

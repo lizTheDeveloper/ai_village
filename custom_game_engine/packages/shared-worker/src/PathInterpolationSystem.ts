@@ -26,6 +26,7 @@ export class PathInterpolationSystem extends BaseSystem {
   public readonly id = 'path_interpolation' as const;
   public readonly priority = 5;
   public readonly requiredComponents = ['path_interpolator', 'position'] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {

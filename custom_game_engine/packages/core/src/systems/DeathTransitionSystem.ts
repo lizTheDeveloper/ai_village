@@ -36,7 +36,8 @@ import type { DeathBargainSystem } from './DeathBargainSystem.js';
 export class DeathTransitionSystem extends BaseSystem {
   readonly id: SystemId = 'death_transition';
   readonly priority: number = 110;  // Run after needs/combat systems
-  readonly requiredComponents = ['needs'] as const;  // Only require needs - realm_location is optional
+  readonly requiredComponents = ['needs'] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds  // Only require needs - realm_location is optional
 
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;

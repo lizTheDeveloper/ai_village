@@ -26,6 +26,7 @@ export class RelationshipConversationSystem extends BaseSystem {
   public readonly id: SystemId = 'relationship_conversation';
   public readonly priority: number = 16; // After CommunicationSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Listen for conversation:ended events - properly typed via EventMap

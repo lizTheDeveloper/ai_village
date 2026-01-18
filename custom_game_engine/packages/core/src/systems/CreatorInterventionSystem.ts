@@ -206,6 +206,7 @@ export class CreatorInterventionSystem extends BaseSystem {
   public readonly id: SystemId = 'creator_intervention';
   public readonly priority = 17; // After surveillance (16)
   public readonly requiredComponents = [CT.SupremeCreator] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Banned spells (global) */
   private bannedSpells: Map<string, SpellBan> = new Map();

@@ -43,6 +43,7 @@ export class PlanetTravelSystem extends BaseSystem {
   public readonly id: SystemId = CT.PlanetTravel;
   public readonly priority: number = 350;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
   public readonly metadata = {
     category: 'infrastructure' as const,
     description: 'Manages entity travel between planets',

@@ -50,6 +50,7 @@ export class MagicSystem extends BaseSystem {
   public readonly id: SystemId = 'magic';
   public readonly priority = 15;
   public readonly requiredComponents = [CT.Magic] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private initialized = false;
 

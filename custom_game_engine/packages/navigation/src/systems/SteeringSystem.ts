@@ -51,6 +51,7 @@ export class SteeringSystem extends BaseSystem {
     CT.Position,
     CT.Velocity,
   ];
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();

@@ -113,6 +113,7 @@ export class SpeciesCreationSystem extends BaseSystem {
   public readonly name = 'SpeciesCreationSystem';
   public readonly priority = 71;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: SpeciesCreationConfig;
   private species: Map<string, CreatedSpecies> = new Map();

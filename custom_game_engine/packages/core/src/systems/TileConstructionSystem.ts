@@ -163,6 +163,7 @@ export class TileConstructionSystem extends BaseSystem {
   public readonly id: SystemId = 'tile_construction';
   public readonly priority: number = 18; // After movement, before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Active construction tasks */
   private tasks: Map<string, ConstructionTask> = new Map();

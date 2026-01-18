@@ -26,7 +26,8 @@ export type DeltaBroadcastCallback = (delta: DeltaUpdate) => void;
 export class DeltaSyncSystem extends BaseSystem {
   public readonly id = 'delta_sync' as const;
   public readonly priority = 1000;
-  public readonly requiredComponents = [] as const; // Processes all entities
+  public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Processes all entities
 
   private broadcastCallback: DeltaBroadcastCallback | null = null;
   private lastProcessedEntities = new Set<string>();

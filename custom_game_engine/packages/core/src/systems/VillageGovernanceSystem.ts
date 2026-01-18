@@ -34,6 +34,7 @@ export class VillageGovernanceSystem extends BaseSystem {
   public readonly id: SystemId = 'village_governance';
   public readonly priority: number = 52; // Run after GovernanceDataSystem (50)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VillageGovernance];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /**
    * Initialize event listeners

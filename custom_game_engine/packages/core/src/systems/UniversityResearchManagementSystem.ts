@@ -68,6 +68,7 @@ export class UniversityResearchManagementSystem extends BaseSystem {
   public readonly id: SystemId = 'university_research_management';
   public readonly priority = 47; // After UniversitySystem (46)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: UniversityResearchManagementConfig;
   private lastProposalCheck: Map<string, number> = new Map(); // universityId -> tick

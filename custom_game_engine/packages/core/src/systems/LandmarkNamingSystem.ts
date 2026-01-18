@@ -53,6 +53,7 @@ export class LandmarkNamingSystem extends BaseSystem {
   public readonly id = 'landmark-naming';
   public readonly priority = 45; // After exploration (40), before other social systems
   public readonly requiredComponents: ReadonlyArray<CT> = [];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /** LLM decision queue for naming prompts */
   private llmQueue: LLMDecisionQueue;

@@ -627,6 +627,7 @@ export class TalkShowSystem extends BaseSystem {
   readonly id = 'TalkShowSystem';
   readonly priority = 71;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager = new TalkShowManager();
 

@@ -111,6 +111,7 @@ export class DeathBargainSystem extends BaseSystem {
   readonly id: SystemId = 'death_bargain';
   readonly priority: number = 120; // After death transition
   readonly requiredComponents = [ComponentType.DeathBargain] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private llmProvider?: LLMProvider;
   private riddleGenerator?: RiddleGenerator;

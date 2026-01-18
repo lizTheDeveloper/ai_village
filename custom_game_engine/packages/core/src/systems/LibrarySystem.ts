@@ -39,6 +39,7 @@ export class LibrarySystem extends BaseSystem {
   public readonly id: SystemId = 'library';
   public readonly priority = 45;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Library];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   // Borrowed books tracking (bookId → BorrowedBook)
   private borrowedBooks: Map<string, BorrowedBook> = new Map();

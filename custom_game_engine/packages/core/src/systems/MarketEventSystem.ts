@@ -53,6 +53,7 @@ export class MarketEventSystem extends BaseSystem {
   readonly id: SystemId = 'market_events';
   readonly priority: number = 24; // Run before TradingSystem (25)
   readonly requiredComponents: ReadonlyArray<string> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private activeEvents: ActiveMarketEvent[] = [];
   private lastEventCheck = 0;

@@ -15,6 +15,7 @@ export class AnimationSystem extends BaseSystem {
   readonly id = 'animation' as const;
   readonly priority = 100;
   readonly requiredComponents = ['animation', 'renderable'] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onUpdate(ctx: SystemContext): void {
     // Query entities with animation and renderable components

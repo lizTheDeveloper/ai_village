@@ -46,7 +46,8 @@ export interface ChunkSpawnInfo {
 export class GodCraftedDiscoverySystem extends BaseSystem {
   readonly id = 'god_crafted_discovery';
   readonly priority = 100; // Run after most other systems
-  readonly requiredComponents = [] as const; // No per-tick entity processing
+  readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds // No per-tick entity processing
 
   /** Universe ID for this system instance */
   private universeId: string = 'universe:main';

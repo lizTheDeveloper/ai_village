@@ -59,6 +59,7 @@ export class SleepSystem extends BaseSystem {
   public readonly id = 'sleep' as const;
   public readonly priority = 12; // After Needs (priority 15), before Memory (100)
   public readonly requiredComponents = [CT.Circadian, CT.Needs] as const;
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**
    * Systems that must run before this one.

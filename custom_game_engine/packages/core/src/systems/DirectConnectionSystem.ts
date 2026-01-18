@@ -20,6 +20,7 @@ export class DirectConnectionSystem extends BaseSystem {
   public readonly id: SystemId = 'direct_connection';
   public readonly priority: number = 52; // Before BeltSystem
   public readonly requiredComponents = [CT.MachineConnection, CT.Position] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Position -> Entity map, rebuilt once per update for O(1) lookups */
   private positionIndex: Map<string, Entity> = new Map();

@@ -36,6 +36,7 @@ export class EquipmentSystem extends BaseSystem {
     ComponentType.Equipment,
     ComponentType.Body,
   ];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**
    * Performance: Equipment rarely changes, so only update every 10 ticks.

@@ -60,6 +60,7 @@ export class TemperatureSystem extends BaseSystem {
     CT.Temperature,
     CT.Position,
   ];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   /**
    * Systems that must run before this one.

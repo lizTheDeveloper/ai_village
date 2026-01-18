@@ -57,7 +57,8 @@ const DEFAULT_CONFIG: SystemConfig = {
 export class WisdomGoddessSystem extends BaseSystem {
   public readonly id = 'wisdom_goddess_system';
   public readonly priority = 900; // Low priority - runs after most systems
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = []; // Global system, no entity requirements
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds // Global system, no entity requirements
   public enabled = true;
 
   private config: SystemConfig;

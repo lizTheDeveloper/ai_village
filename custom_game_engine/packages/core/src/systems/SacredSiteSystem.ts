@@ -109,6 +109,7 @@ export class SacredSiteSystem extends BaseSystem {
   public readonly id: SystemId = 'sacred_site';
   public readonly priority: number = 118; // After PrayerAnsweringSystem (117)
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private sites: Map<string, SacredSite> = new Map();
   private siteIdCounter: number = 0;

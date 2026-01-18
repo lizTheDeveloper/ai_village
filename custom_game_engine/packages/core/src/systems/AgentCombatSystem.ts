@@ -91,6 +91,7 @@ export class AgentCombatSystem extends BaseSystem {
   public readonly id: SystemId = 'agent_combat';
   public readonly priority = 46; // After hunting, before injury
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['conflict'];
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   private llmProvider?: LLMProvider;
 

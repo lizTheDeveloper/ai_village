@@ -90,6 +90,7 @@ export class UniversitySystem extends BaseSystem {
   public readonly id: SystemId = 'university';
   public readonly priority = 46; // After library (45)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private eventBus: CoreEventBus;
   private readonly RESEARCH_PROGRESS_PER_TICK = 0.1; // Base research speed

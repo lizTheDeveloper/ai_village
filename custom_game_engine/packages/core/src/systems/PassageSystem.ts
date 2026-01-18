@@ -45,6 +45,7 @@ export class PassageSystem extends BaseSystem {
   public readonly id: SystemId = 'passage';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Passage];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   private traversalQueue: TraversalRequest[] = [];
 

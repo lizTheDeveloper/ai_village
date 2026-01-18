@@ -114,6 +114,7 @@ export class MidwiferySystem extends BaseSystem {
   public readonly id: SystemId = 'midwifery';
   public readonly priority = 45; // Run before general NeedsSystem
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private reproductionSystem: ReproductionSystem | null = null;
   private lastUpdateTick: Tick = 0;

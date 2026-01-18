@@ -43,6 +43,7 @@ export class SoilSystem extends BaseSystem {
   public readonly id: SystemId = 'soil';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**
    * Systems that must run before this one.

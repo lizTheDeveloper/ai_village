@@ -28,6 +28,7 @@ export class BeltSystem extends BaseSystem {
   public readonly id: SystemId = 'belt';
   public readonly priority: number = 53; // After PowerGridSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Belt, CT.Position];
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;

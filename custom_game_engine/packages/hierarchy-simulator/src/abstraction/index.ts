@@ -19,9 +19,5 @@ export { AbstractGalaxy } from './AbstractGalaxy.js';
 export { AbstractTierBase } from './AbstractTierBase.js';
 export type {
   UniversalAddress,
-  Population,
-  Technology,
-  Resources,
   TradeRoute,
-  Conflict,
 } from './types.js';

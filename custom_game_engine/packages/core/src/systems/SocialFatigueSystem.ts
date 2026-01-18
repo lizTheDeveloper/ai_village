@@ -35,6 +35,7 @@ export class SocialFatigueSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.Conversation,
   ];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   // Fatigue accumulation and recovery rates
   // At 20 TPS:

@@ -631,6 +631,7 @@ export class TVArchiveSystem extends BaseSystem {
   readonly id = 'TVArchiveSystem';
   readonly priority = 76;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager = getArchiveManager();
   private lastMaintenanceTick = 0;

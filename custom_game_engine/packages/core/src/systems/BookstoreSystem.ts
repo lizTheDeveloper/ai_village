@@ -37,6 +37,7 @@ export class BookstoreSystem extends BaseSystem {
   readonly id: SystemId = 'bookstore';
   readonly priority = 46;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Bookstore];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   // Bookstore data (bookstoreId → BookstoreData)
   private bookstores: Map<EntityId, BookstoreData> = new Map();

@@ -16,6 +16,7 @@ export class AnimalVisualsSystem extends BaseSystem {
   readonly id = 'animal_visuals' as const;
   readonly priority = 301;
   readonly requiredComponents = ['animal', 'renderable'] as const;
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**
    * Calculate size multiplier based on animal size and life stage

@@ -16,6 +16,7 @@ export class AgentVisualsSystem extends BaseSystem {
   readonly id = 'agent_visuals' as const;
   readonly priority = 300;
   readonly requiredComponents = ['agent', 'renderable'] as const;
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {

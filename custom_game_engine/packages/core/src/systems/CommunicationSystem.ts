@@ -25,6 +25,7 @@ export class CommunicationSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.Conversation,
   ];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   // Satisfaction amounts for quality-based social need updates
   private static readonly CONTACT_SATISFACTION = 0.3; // Any conversation satisfies contact need

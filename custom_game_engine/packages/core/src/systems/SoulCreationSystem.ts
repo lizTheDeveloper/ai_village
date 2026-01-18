@@ -75,7 +75,8 @@ interface ActiveCeremony {
 export class SoulCreationSystem extends BaseSystem {
   readonly id: SystemId = 'soul_creation';
   readonly priority: number = 5; // Run early
-  readonly requiredComponents = [] as const; // Event-driven
+  readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Event-driven
 
   private pendingRequests: SoulCreationRequest[] = [];
   private activeCeremony?: ActiveCeremony;

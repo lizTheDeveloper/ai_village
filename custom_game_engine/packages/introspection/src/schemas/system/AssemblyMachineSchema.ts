@@ -139,17 +139,51 @@ export const AssemblyMachineSchema = autoRegister(
 
     validate: (data): data is AssemblyMachineComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const m = data as any;
+      const m = data as Record<string, unknown>;
 
-      return (
-        m.type === 'assembly_machine' &&
-        typeof m.machineType === 'string' &&
-        typeof m.progress === 'number' &&
-        typeof m.speed === 'number' &&
-        typeof m.ingredientSlots === 'number' &&
-        typeof m.moduleSlots === 'number' &&
-        Array.isArray(m.modules)
-      );
+      // Required: type field
+      if (!('type' in m) || m.type !== 'assembly_machine') return false;
+
+      // Required: machineType (string)
+      if (!('machineType' in m) || typeof m.machineType !== 'string') return false;
+
+      // Required: progress (number)
+      if (!('progress' in m) || typeof m.progress !== 'number') return false;
+
+      // Required: speed (number)
+      if (!('speed' in m) || typeof m.speed !== 'number') return false;
+
+      // Required: ingredientSlots (number)
+      if (!('ingredientSlots' in m) || typeof m.ingredientSlots !== 'number') return false;
+
+      // Required: moduleSlots (number)
+      if (!('moduleSlots' in m) || typeof m.moduleSlots !== 'number') return false;
+
+      // Required: modules (array)
+      if (!('modules' in m) || !Array.isArray(m.modules)) return false;
+
+      // Optional: currentRecipe (string | undefined)
+      if ('currentRecipe' in m && m.currentRecipe !== undefined && typeof m.currentRecipe !== 'string') {
+        return false;
+      }
+
+      // Validate modules array elements
+      for (const module of m.modules) {
+        if (typeof module !== 'object' || module === null) return false;
+        const mod = module as Record<string, unknown>;
+
+        if (!('moduleType' in mod) || (mod.moduleType !== 'speed' && mod.moduleType !== 'efficiency' && mod.moduleType !== 'productivity')) {
+          return false;
+        }
+        if (!('level' in mod) || (mod.level !== 1 && mod.level !== 2 && mod.level !== 3)) {
+          return false;
+        }
+        if (!('bonus' in mod) || typeof mod.bonus !== 'number') {
+          return false;
+        }
+      }
+
+      return true;
     },
 
     createDefault: () => ({

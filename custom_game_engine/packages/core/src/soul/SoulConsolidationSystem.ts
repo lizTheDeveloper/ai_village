@@ -28,6 +28,7 @@ export class SoulConsolidationSystem extends BaseSystem {
   readonly id = 'soul_consolidation' as const;
   readonly priority = 106;
   readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(_ctx: SystemContext): void {
     // This system only processes during sleep events, not every tick

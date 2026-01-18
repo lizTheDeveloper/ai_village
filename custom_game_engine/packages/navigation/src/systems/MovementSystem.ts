@@ -39,6 +39,7 @@ export class MovementSystem extends BaseSystem {
     CT.Movement,
     CT.Position,
   ];
+  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   // Performance: Cache building positions to avoid querying every frame
   private buildingCollisionCache: BuildingCollisionData[] | null = null;

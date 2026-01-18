@@ -34,6 +34,7 @@ export class DeathJudgmentSystem extends BaseSystem {
   readonly id: SystemId = 'death_judgment';
   readonly priority: number = 109;
   readonly requiredComponents = ['needs', 'realm_location'] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private processedDeaths: Set<string> = new Set();
 

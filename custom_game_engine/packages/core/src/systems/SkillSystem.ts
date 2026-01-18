@@ -72,6 +72,7 @@ export class SkillSystem extends BaseSystem {
   public readonly id = 'skill' as const;
   public readonly priority = 200; // Run after most game systems
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**
    * Initialize and subscribe to XP-granting events.

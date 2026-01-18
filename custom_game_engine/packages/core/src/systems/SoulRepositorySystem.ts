@@ -86,7 +86,8 @@ interface SoulIndex {
 export class SoulRepositorySystem extends BaseSystem {
   readonly id: SystemId = 'soul_repository';
   readonly priority = 950; // Run very late, after sprite generation
-  readonly requiredComponents = [] as const; // Event-driven
+  readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Event-driven
 
   private repositoryPath: string;
   private indexPath: string;

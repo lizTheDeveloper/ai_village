@@ -33,6 +33,7 @@ export class AfterlifeNeedsSystem extends BaseSystem {
   public readonly id: SystemId = 'afterlife_needs';
   public readonly priority: number = 16;  // Right after NeedsSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
+  protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   public readonly dependsOn = ['state_mutator'] as const;
 

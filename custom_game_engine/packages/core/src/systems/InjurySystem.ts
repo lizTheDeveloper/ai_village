@@ -35,6 +35,7 @@ export class InjurySystem extends BaseSystem {
   public readonly id: SystemId = 'injury';
   public readonly priority = 25; // After combat, before movement
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['injury'];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {

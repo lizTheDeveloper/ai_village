@@ -83,6 +83,7 @@ export class PriesthoodSystem extends BaseSystem {
   public readonly id = 'PriesthoodSystem';
   public readonly priority = 84;
   public readonly requiredComponents = [];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: PriesthoodConfig;
   private priests: Map<string, PriestData> = new Map();

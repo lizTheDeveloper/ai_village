@@ -71,6 +71,7 @@ export class DivinePowerSystem extends BaseSystem {
   public readonly id = 'divine_power';
   public readonly priority: number = 120; // After belief generation
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private pendingPowers: DivinePowerRequest[] = [];
 

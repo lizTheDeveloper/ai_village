@@ -137,6 +137,7 @@ export class AgentBrainSystem extends BaseSystem {
     CT.Position,
     CT.Movement,
   ];
+  protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   private perception: PerceptionProcessor;
   private decision: DecisionProcessor | ScheduledDecisionProcessor;

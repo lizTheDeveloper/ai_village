@@ -33,6 +33,7 @@ export class BodySystem extends BaseSystem {
   public readonly id: SystemId = 'body';
   public readonly priority: number = 13; // After NeedsSystem (15), before AI
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Body];
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**
    * Systems that must run before this one.

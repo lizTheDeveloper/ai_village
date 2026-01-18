@@ -19,6 +19,7 @@ export class GoalGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'goal_generation';
   public readonly priority: number = 115; // After reflection system
   public readonly requiredComponents = [] as const;
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds
   public readonly dependsOn = [] as const;
 
   private nextGoalId = 0;

@@ -874,6 +874,7 @@ export class GameShowSystem extends BaseSystem {
   readonly id = 'GameShowSystem';
   readonly priority = 72;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager = new GameShowManager();
 
