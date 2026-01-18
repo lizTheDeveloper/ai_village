@@ -45,6 +45,9 @@ export class ParentingSystem extends BaseSystem {
   public readonly priority = 500; // Run after needs/mood systems
   public readonly requiredComponents = [CT.Parenting] as const;
 
+  // Lazy activation: Skip entire system when no parenting components exist in world
+  public readonly activationComponents = [CT.Parenting] as const;
+
   public readonly name = 'ParentingSystem';
   private config: ParentingSystemConfig;
   protected readonly throttleInterval: number;
@@ -56,10 +59,8 @@ export class ParentingSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
-    // Find all entities with parenting responsibilities
-    const parents = ctx.world.query().with(CT.Parenting).executeEntities();
-
-    for (const parent of parents) {
+    // ctx.activeEntities already contains only entities with CT.Parenting (from requiredComponents)
+    for (const parent of ctx.activeEntities) {
       const parentingComp = (parent as EntityImpl).getComponent<ParentingComponent>(CT.Parenting);
       if (!parentingComp || parentingComp.responsibilities.length === 0) {
         continue;

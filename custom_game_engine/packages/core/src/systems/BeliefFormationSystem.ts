@@ -13,20 +13,18 @@ import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../util
 export class BeliefFormationSystem extends BaseSystem {
   public readonly id: SystemId = 'belief_formation';
   public readonly priority: number = 110; // After memory systems
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Belief, CT.EpisodicMemory, CT.Agent];
   protected readonly throttleInterval: number = 100; // Only run every 5 seconds (at 20 TPS)
+
+  // Lazy activation: Skip entire system when no belief components exist in world
+  public readonly activationComponents = [CT.Belief] as const;
 
   private readonly patternThreshold: number = 3; // Require 3 observations to form belief
 
   protected onUpdate(ctx: SystemContext): void {
+    // ctx.activeEntities already filtered to entities with Belief, EpisodicMemory, Agent (from requiredComponents)
     // OPTIMIZATION: Belief formation only happens during sleep (memory consolidation)
-    const believers = ctx.activeEntities.filter(e =>
-      e.components.has(CT.Belief) &&
-      e.components.has(CT.EpisodicMemory) &&
-      e.components.has(CT.Agent)
-    );
-
-    for (const entity of believers) {
+    for (const entity of ctx.activeEntities) {
       try {
         const agent = getAgent(entity);
 

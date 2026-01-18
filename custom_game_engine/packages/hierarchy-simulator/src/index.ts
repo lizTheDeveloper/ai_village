@@ -70,6 +70,17 @@ export { TIME_SCALE, TIER_LEVEL_INDEX } from './renormalization/TierConstants.js
 export { SimulationController } from './simulation/SimulationController.js';
 
 // ============================================================================
+// Statistical Simulation (Differential Equations)
+// ============================================================================
+
+export {
+  simulatePlanetTier,
+  simulateSystemTier,
+  simulateSectorTier,
+  simulateGalaxyTier,
+} from './simulation/StatisticalSimulation.js';
+
+// ============================================================================
 // Renderers
 // ============================================================================
 

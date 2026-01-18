@@ -648,7 +648,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Find nodes that have current node as prerequisite
         const childNodes = tree.nodes.filter(n =>
           n.unlockConditions.some(c =>
-            c.type === 'node_unlocked' && (c as any).nodeId === currentNodeId
+            c.type === 'node_unlocked' && (c as { type: string; nodeId: string }).nodeId === currentNodeId
           )
         );
         if (childNodes.length > 0 && childNodes[0]) {
@@ -660,7 +660,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Find nodes that current node depends on
         const prereqCondition = currentNode.unlockConditions.find(c => c.type === 'node_unlocked');
         if (prereqCondition) {
-          nextNodeId = (prereqCondition as any).nodeId;
+          nextNodeId = (prereqCondition as { type: string; nodeId: string }).nodeId;
         }
         break;
 
@@ -720,7 +720,7 @@ export class SkillTreePanel implements IWindowPanel {
 
     for (const node of tree.nodes) {
       // Check if node is hidden
-      if ((node as any).hidden !== true) {
+      if (!(node as { hidden?: boolean }).hidden) {
         continue; // Not a hidden node
       }
 
@@ -735,8 +735,8 @@ export class SkillTreePanel implements IWindowPanel {
           this.recentlyDiscoveredNodes.add(node.id);
 
           // Emit notification event
-          const eventBus = world.getEventBus();
-          (eventBus as any).emit({
+          const eventBus = world.getEventBus() as EventBus;
+          eventBus.emit({
             type: 'ui:notification',
             message: 'New ability discovered',
             level: 'discovery'

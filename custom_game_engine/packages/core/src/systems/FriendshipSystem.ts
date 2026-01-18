@@ -29,6 +29,9 @@ export class FriendshipSystem extends BaseSystem {
     CT.Relationship,
   ] as const;
 
+  // Lazy activation: Skip entire system when no relationship components exist in world
+  public readonly activationComponents = [CT.Relationship] as const;
+
   // Throttle updates - friendships don't form instantly
   protected readonly throttleInterval = 500; // Check every ~25 seconds (20 tps)
 

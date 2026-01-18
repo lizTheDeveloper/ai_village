@@ -26,6 +26,9 @@ export class CourtshipSystem extends BaseSystem {
   public readonly priority = 18; // After AI (10), before Movement (20)
   public readonly requiredComponents = [CT.Courtship] as const;
 
+  // Lazy activation: Skip entire system when no courtship components exist in world
+  public readonly activationComponents = [CT.Courtship] as const;
+
   // Throttle: Run courtship checks every 5 ticks (reduces CPU load)
   protected readonly throttleInterval = 5;
 

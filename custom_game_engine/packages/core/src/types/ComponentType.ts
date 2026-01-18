@@ -104,6 +104,7 @@ export enum ComponentType {
   // Research & Technology
   ResearchState = 'research_state',
   TechnologyUnlock = 'technology_unlock',
+  TechnologyEra = 'technology_era',
 
   // Publishing & Knowledge Infrastructure
   Library = 'library',
@@ -140,6 +141,7 @@ export enum ComponentType {
 
   // World & Time
   Time = 'time',
+  TimeCompression = 'time_compression',  // Grand strategy time scaling
   Weather = 'weather',
   Vision = 'vision',
   Passage = 'passage',
@@ -213,6 +215,8 @@ export enum ComponentType {
   Spaceship = 'spaceship',
   Squadron = 'squadron',  // Ship-fleet hierarchy: 3-10 ships
   Fleet = 'fleet',        // Ship-fleet hierarchy: 3-10 squadrons
+  Armada = 'armada',      // Ship-fleet hierarchy: 3-10 fleets
+  Navy = 'navy',          // Ship-fleet hierarchy: all military forces
   RainbowPlanet = 'rainbow_planet',  // Quantum superposition of planetary histories (Rainbow Mars)
 
   // Planet Travel

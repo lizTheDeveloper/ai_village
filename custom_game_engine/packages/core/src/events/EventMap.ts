@@ -32,6 +32,32 @@ export interface GameEventMap {
   'world:time:season': { season: string; year: number };
   'world:time:year': { year: number };
 
+  // === Time Compression Events (Grand Strategy) ===
+  'time:scale_changed': {
+    oldScale: number;
+    newScale: number;
+    tier: string;
+  };
+  'time:jump_started': {
+    startTick: number;
+    targetTick: number;
+    years: number;
+  };
+  'time:jump_completed': {
+    startTick: number;
+    endTick: number;
+    years: number;
+  };
+  'time:era_changed': {
+    era: number;
+    previousEra: number;
+    tick: number;
+  };
+  'time:simulation_mode_changed': {
+    mode: 'ecs' | 'statistical';
+    timeScale: number;
+  };
+
   // === Chunk Events ===
   'chunk_background_generated': {
     chunkX: number;
@@ -1753,6 +1779,38 @@ export interface GameEventMap {
     squadronId: string;
     shipId: string;
     reason: 'combat' | 'accident' | 'decoherence' | 'unknown';
+  };
+
+  // === Fleet Events (Ship-Fleet Hierarchy) ===
+  /** Squadron joined a fleet */
+  'fleet:squadron_joined': {
+    fleetId: string;
+    squadronId: string;
+  };
+
+  /** Squadron left a fleet */
+  'fleet:squadron_left': {
+    fleetId: string;
+    squadronId: string;
+  };
+
+  /** Squadron missing from fleet */
+  'fleet:squadron_missing': {
+    fleetId: string;
+    missingSquadronId: string;
+  };
+
+  /** Fleet disbanding (too few squadrons) */
+  'fleet:disbanding': {
+    fleetId: string;
+    reason: string;
+    remainingSquadrons: number;
+  };
+
+  /** Fleet supply critically low */
+  'fleet:low_supply': {
+    fleetId: string;
+    supplyLevel: number;
   };
 
   // === Action Events (additional) ===

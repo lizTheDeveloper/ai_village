@@ -818,6 +818,9 @@ export class HiveMindSystem extends BaseSystem {
   public readonly priority: number = 160;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  // Lazy activation: Skip entire system when no hive_member components exist in world
+  public readonly activationComponents = ['hive_member'] as const;
+
   protected readonly throttleInterval = 20;
 
   // Active hive collectives

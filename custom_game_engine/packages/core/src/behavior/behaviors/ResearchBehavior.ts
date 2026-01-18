@@ -455,7 +455,7 @@ function handleConductResearch(ctx: BehaviorContext, state: Record<string, unkno
     }
 
     // Pick first available research (or use specified researchId)
-    const researchToStart = state.researchId ?? available[0]?.id;
+    const researchToStart = (state.researchId as string | undefined) ?? available[0]?.id;
     if (!researchToStart) {
       return ctx.complete('No research to start');
     }

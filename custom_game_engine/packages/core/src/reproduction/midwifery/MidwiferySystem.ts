@@ -116,6 +116,10 @@ export class MidwiferySystem extends BaseSystem {
   public readonly priority = 45; // Run before general NeedsSystem
   public readonly requiredComponents = [] as const;
 
+  // Lazy activation: Skip entire system when no reproductive components exist in world
+  // System handles pregnancy → labor → postpartum → infant → nursing lifecycle
+  public readonly activationComponents = ['pregnancy', 'labor', 'postpartum', 'infant', 'nursing'] as const;
+
   // Throttle to every 5 seconds (100 ticks at 20 TPS) - reproduction is slow-changing
   protected readonly throttleInterval = THROTTLE.SLOW;
 

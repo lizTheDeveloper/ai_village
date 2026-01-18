@@ -21,7 +21,10 @@ import {
 export class SocialGradientSystem extends BaseSystem {
   public readonly id: SystemId = CT.SocialGradient;
   public readonly priority: number = 22; // After AISystem, before Exploration
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.SocialGradient];
+
+  // Lazy activation: Skip entire system when no social_gradient components exist in world
+  public readonly activationComponents = [CT.SocialGradient] as const;
 
   protected readonly throttleInterval: number = 200; // VERY_SLOW - 10 seconds (social gradients change slowly)
 
@@ -37,10 +40,8 @@ export class SocialGradientSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const { activeEntities, tick } = ctx;
 
-    // Apply gradient decay to all entities
-    const gradientsEntities = activeEntities.filter(e => e.components.has(CT.SocialGradient));
-
-    for (const entity of gradientsEntities) {
+    // Apply gradient decay to all entities (already filtered by requiredComponents to have SocialGradient)
+    for (const entity of activeEntities) {
       try {
         const socialGradient = getSocialGradient(entity);
         if (socialGradient) {

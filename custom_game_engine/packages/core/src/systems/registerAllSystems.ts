@@ -28,6 +28,7 @@ interface SimplifiedEventBus {
 
 // Time & Environment
 import { TimeSystem } from './TimeSystem.js';
+import { TimeCompressionSystem } from './TimeCompressionSystem.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
 import { FireSpreadSystem } from './FireSpreadSystem.js';
@@ -98,6 +99,12 @@ import { LandmarkNamingSystem } from './LandmarkNamingSystem.js';
 import { EmotionalNavigationSystem } from '../navigation/EmotionalNavigationSystem.js';
 import { VRSystem } from '../vr/VRSystem.js';
 
+// Fleet & Squadron Management
+import { NavySystem } from './NavySystem.js';
+import { ArmadaSystem } from './ArmadaSystem.js';
+import { FleetSystem } from './FleetSystem.js';
+import { SquadronSystem } from './SquadronSystem.js';
+
 // Building & Construction
 import { BuildingSystem } from './BuildingSystem.js';
 import { BuildingMaintenanceSystem } from './BuildingMaintenanceSystem.js';
@@ -146,6 +153,7 @@ import { UniversityResearchManagementSystem } from './UniversityResearchManageme
 import { PublishingProductionSystem } from './PublishingProductionSystem.js';
 import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
 import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
+import { TechnologyEraSystem } from './TechnologyEraSystem.js';
 import { CityBuildingGenerationSystem } from './CityBuildingGenerationSystem.js';
 import { ProfessionWorkSimulationSystem } from './ProfessionWorkSimulationSystem.js';
 import { EventReportingSystem } from './EventReportingSystem.js';
@@ -443,6 +451,7 @@ export function registerAllSystems(
   // TIME & ENVIRONMENT
   // ============================================================================
   gameLoop.systemRegistry.register(new TimeSystem());
+  gameLoop.systemRegistry.register(new TimeCompressionSystem());
   gameLoop.systemRegistry.register(new WeatherSystem());
 
   const soilSystem = new SoilSystem();
@@ -629,6 +638,14 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
   }
   gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
+
+  // ============================================================================
+  // FLEET & SQUADRON MANAGEMENT
+  // ============================================================================
+  // Fleet management (priority 80): Strategic fleet groups (3-10 squadrons)
+  // Squadron management (priority 85): Tactical ship squadrons (3-10 ships)
+  gameLoop.systemRegistry.register(new FleetSystem());
+  gameLoop.systemRegistry.register(new SquadronSystem());
 
   // ============================================================================
   // VIRTUAL REALITY

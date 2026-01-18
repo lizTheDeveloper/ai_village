@@ -18,6 +18,7 @@ export * from './WeatherSystem.js';
 export * from './FireSpreadSystem.js';
 export * from './SoilSystem.js';
 export * from './TimeSystem.js';
+export * from './TimeCompressionSystem.js';
 export * from './StateMutatorSystem.js'; // Batched vector updates for performance
 export * from './SleepSystem.js';
 // Plant systems have been moved to @ai-village/botany package

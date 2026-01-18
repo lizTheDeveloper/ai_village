@@ -842,6 +842,9 @@ export class PackMindSystem extends BaseSystem {
   public readonly priority: number = 161;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  // Lazy activation: Skip entire system when no pack_member components exist in world
+  public readonly activationComponents = ['pack_member'] as const;
+
   protected readonly throttleInterval = 20; // NORMAL - 1 second (pack coordination should be fairly responsive)
 
   // Active pack minds

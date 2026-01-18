@@ -14,7 +14,7 @@ import type { Entity } from '@ai-village/core';
 import type { EventBus } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 import { ComponentType as CT } from '@ai-village/core';
-import type { DeityComponent } from '@ai-village/core';
+import type { DeityComponent, IdentityComponent } from '@ai-village/core';
 import type { SpiritualComponent, Prayer } from '@ai-village/core';
 import type { AgentComponent } from '@ai-village/core';
 
@@ -90,7 +90,7 @@ export class DivineCommunicationPanel implements IWindowPanel {
     // Find player deity
     const deities = world.query().with(CT.Deity).executeEntities();
     this.deity = deities.find(d => {
-      const deityComp = d.components.get(CT.Deity) as any;
+      const deityComp = d.components.get(CT.Deity) as DeityComponent | undefined;
       return deityComp && deityComp.controller === 'player';
     }) || null;
 
@@ -118,7 +118,7 @@ export class DivineCommunicationPanel implements IWindowPanel {
       const spiritual = believer.components.get(CT.Spiritual) as SpiritualComponent;
       if (spiritual.believedDeity !== deityId) continue;
 
-      const identity = believer.components.get(CT.Identity) as any;
+      const identity = believer.components.get(CT.Identity) as IdentityComponent | undefined;
 
       this.followers.push({
         id: believer.id,
