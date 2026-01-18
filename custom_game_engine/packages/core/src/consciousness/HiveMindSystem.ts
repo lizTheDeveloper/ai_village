@@ -813,26 +813,18 @@ export const SPECIES_QUEEN_THOUGHTS: Record<string, string[]> = {
  * - Telepathic range (communication limits)
  * - Control decay over distance (signal degradation)
  */
-export class HiveMindSystem implements System {
+export class HiveMindSystem extends BaseSystem {
   public readonly id: SystemId = 'hive_mind';
   public readonly priority: number = 160;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus | null = null;
+  protected readonly throttleInterval = 20;
 
   // Active hive collectives
   private hives: Map<string, HiveCollective> = new Map();
 
-  // Tick throttling
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 20;
-
   // Memory decay is universal
   private static readonly MEMORY_DECAY_RATE = 0.001;
-
-  public setEventBus(eventBus: EventBus): void {
-    this.eventBus = eventBus;
-  }
 
   /**
    * Create a new hive collective
@@ -872,22 +864,20 @@ export class HiveMindSystem implements System {
 
     this.hives.set(hive.id, hive);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'hive:created' as any,
-        source: 'hive-mind-system',
-        data: {
-          hiveId: hive.id,
-          hiveName: name,
-          speciesId,
-          speciesName: speciesConfig.speciesName,
-          queenId: queenEntity.id,
-          centerX,
-          centerY,
-          telepathyRange: speciesConfig.telepathyRange,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'hive:created' as any,
+      source: 'hive-mind-system',
+      data: {
+        hiveId: hive.id,
+        hiveName: name,
+        speciesId,
+        speciesName: speciesConfig.speciesName,
+        queenId: queenEntity.id,
+        centerX,
+        centerY,
+        telepathyRange: speciesConfig.telepathyRange,
+      },
+    });
 
     return hive;
   }
@@ -920,18 +910,16 @@ export class HiveMindSystem implements System {
     hive.workersByCerebrate.set(cerebrateEntity.id, []);
     hive.population++;
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'hive:cerebrate_added' as any,
-        source: 'hive-mind-system',
-        data: {
-          hiveId,
-          cerebrateId: cerebrateEntity.id,
-          totalCerebrates: hive.cerebrateIds.length,
-          maxCerebrates: maxCerebrates === 'unlimited' ? 'unlimited' : maxCerebrates,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'hive:cerebrate_added' as any,
+      source: 'hive-mind-system',
+      data: {
+        hiveId,
+        cerebrateId: cerebrateEntity.id,
+        totalCerebrates: hive.cerebrateIds.length,
+        maxCerebrates: maxCerebrates === 'unlimited' ? 'unlimited' : maxCerebrates,
+      },
+    });
 
     return true;
   }
@@ -1010,20 +998,18 @@ export class HiveMindSystem implements System {
       hive.workersByCerebrate.set(assignedCerebrateId, workers);
     }
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'hive:worker_added' as any,
-        source: 'hive-mind-system',
-        data: {
-          hiveId,
-          workerId: workerEntity.id,
-          role,
-          assignedCerebrate: assignedCerebrateId,
-          inRange,
-          totalWorkers: hive.workerIds.length,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'hive:worker_added' as any,
+      source: 'hive-mind-system',
+      data: {
+        hiveId,
+        workerId: workerEntity.id,
+        role,
+        assignedCerebrate: assignedCerebrateId,
+        inRange,
+        totalWorkers: hive.workerIds.length,
+      },
+    });
 
     return true;
   }

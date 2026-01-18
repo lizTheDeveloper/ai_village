@@ -282,9 +282,7 @@ export class ExplorationSystem extends BaseSystem {
   /**
    * Check and emit coverage milestone events
    */
-  private _checkCoverageMilestones(entity: Entity, _world: World): void {
-    if (!this.eventBus) return;
-
+  private _checkCoverageMilestones(entity: Entity, _world: SystemContext['world']): void {
     const coverage = this.calculateCoverage(entity);
     const lastMilestone = this.lastCoverageMilestone.get(entity.id) ?? 0;
 
@@ -297,7 +295,7 @@ export class ExplorationSystem extends BaseSystem {
         if (!agentComp || !posComp) {
           throw new Error(`ExplorationSystem: Entity ${entity.id} missing required components for milestone event`);
         }
-        this.eventBus.emitImmediate({
+        this.events.emitGeneric({
           type: 'exploration:milestone',
           source: 'exploration',
           data: {

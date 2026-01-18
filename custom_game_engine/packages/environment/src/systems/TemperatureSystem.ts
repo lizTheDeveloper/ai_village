@@ -53,7 +53,7 @@ export function injectChunkSpatialQueryToTemperature(spatialQuery: any): void {
  * @see TimeSystem (priority 3) - Provides time of day for daily temperature variation
  * @see WeatherSystem (priority 5) - Provides weather modifiers (rain, frost) affecting temperature
  */
-export class TemperatureSystem implements System {
+export class TemperatureSystem extends BaseSystem {
   public readonly id: SystemId = 'temperature';
   public readonly priority: number = 14; // Run after weather (5), before needs (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
@@ -87,27 +87,27 @@ export class TemperatureSystem implements System {
   private tileInsulationCacheLastUpdate: number = 0;
   private readonly TILE_CACHE_DURATION = 50; // Refresh every 50 ticks (walls don't change often)
 
-  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Calculate world ambient temperature (uses cached time entity)
-    this.currentWorldTemp = this.calculateWorldTemperature(world);
+    this.currentWorldTemp = this.calculateWorldTemperature(ctx.world);
 
     // Get weather modifier once (uses cached weather entity)
-    const weatherModifier = this.getWeatherModifier(world);
+    const weatherModifier = this.getWeatherModifier(ctx.world);
 
     // Update building cache if needed (only every N ticks, not every frame!)
-    if (world.tick - this.buildingCacheLastUpdate > this.BUILDING_CACHE_DURATION) {
-      this.refreshBuildingCache(world);
-      this.buildingCacheLastUpdate = world.tick;
+    if (ctx.tick - this.buildingCacheLastUpdate > this.BUILDING_CACHE_DURATION) {
+      this.refreshBuildingCache(ctx.world);
+      this.buildingCacheLastUpdate = ctx.tick;
     }
 
     // Clear tile insulation cache periodically (walls can be built/destroyed)
-    if (world.tick - this.tileInsulationCacheLastUpdate > this.TILE_CACHE_DURATION) {
+    if (ctx.tick - this.tileInsulationCacheLastUpdate > this.TILE_CACHE_DURATION) {
       this.tileInsulationCache.clear();
-      this.tileInsulationCacheLastUpdate = world.tick;
+      this.tileInsulationCacheLastUpdate = ctx.tick;
     }
 
     // Filter entities with required components
-    const temperatureEntities = entities.filter(e =>
+    const temperatureEntities = ctx.activeEntities.filter(e =>
       e.components.has(CT.Temperature) && e.components.has(CT.Position)
     );
 
@@ -121,7 +121,7 @@ export class TemperatureSystem implements System {
 
     // Fast path: Use chunk queries to find entities near agents (O(M × E_chunk))
     if (chunkSpatialQuery) {
-      const agents = world.query()
+      const agents = ctx.world.query()
         .with(CT.Agent)
         .with(CT.Position)
         .executeEntities();
@@ -149,7 +149,7 @@ export class TemperatureSystem implements System {
       }
     } else {
       // Fallback: Global query with distance checking (O(N × M))
-      const agentPositions = world.query()
+      const agentPositions = ctx.world.query()
         .with(CT.Agent)
         .with(CT.Position)
         .executeEntities()
@@ -199,7 +199,7 @@ export class TemperatureSystem implements System {
       effectiveTemp += weatherModifier;
 
       // Apply building effects (insulation + base temp) - uses cache
-      const buildingEffect = this.calculateBuildingEffect(world, posComp);
+      const buildingEffect = this.calculateBuildingEffect(ctx.world, posComp);
       if (buildingEffect !== null) {
         // Formula: effectiveTemp = ambientTemp * (1 - insulation) + baseTemp
         effectiveTemp = effectiveTemp * (1 - buildingEffect.insulation) + buildingEffect.baseTemp;
@@ -215,7 +215,7 @@ export class TemperatureSystem implements System {
       // Gradually adjust body temperature toward environmental temperature (thermal inertia)
       // Body temperature changes slowly, not instantly
       const tempDiff = effectiveTemp - currentTempComp.currentTemp;
-      const tempChange = tempDiff * this.THERMAL_RATE * deltaTime;
+      const tempChange = tempDiff * this.THERMAL_RATE * ctx.deltaTime;
       const newTemp = currentTempComp.currentTemp + tempChange;
 
       // Update agent temperature with gradual change
@@ -229,13 +229,13 @@ export class TemperatureSystem implements System {
       const updatedTemp = impl.getComponent<TemperatureComponent>(CT.Temperature)!;
 
       // Check for state transitions and emit events
-      this.checkTemperatureEvents(world, entity, updatedTemp);
+      this.checkTemperatureEvents(ctx, entity, updatedTemp);
 
       // Apply health damage if in dangerous temperature
       if (updatedTemp.state === 'dangerously_cold' || updatedTemp.state === 'dangerously_hot') {
         const needsComp = impl.getComponent<NeedsComponent>(CT.Needs);
         if (needsComp) {
-          const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
+          const healthLoss = this.HEALTH_DAMAGE_RATE * ctx.deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
           // Direct mutation for class-based components
@@ -243,13 +243,11 @@ export class TemperatureSystem implements System {
 
           // Emit critical health event if health drops below 20%
           if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
-            world.eventBus.emit({
-              type: 'agent:health_critical',
-              source: entity.id,
-              data: { agentId: entity.id,
-            entityId: entity.id,
-            health: newHealth },
-            });
+            ctx.emit('agent:health_critical', {
+              agentId: entity.id,
+              entityId: entity.id,
+              health: newHealth
+            }, entity.id);
           }
         }
       }
