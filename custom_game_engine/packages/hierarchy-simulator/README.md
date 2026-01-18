@@ -26,7 +26,11 @@ hierarchy-simulator/
 │   │   ├── types.ts           # Core types (TierLevel, AbstractTier, ResourceFlow)
 │   │   ├── AbstractTierBase.ts    # Base tier implementation (population, economy, events)
 │   │   ├── AbstractGigasegment.ts # Galactic-scale tier (cultural influence, diplomacy)
-│   │   └── AbstractMegasegment.ts # Solar-system-scale tier (cultures, phenomena)
+│   │   ├── AbstractMegasegment.ts # Solar-system-scale tier (cultures, phenomena)
+│   │   ├── AbstractPlanet.ts      # Planet-scale tier (civilizations, continents, megastructures)
+│   │   ├── AbstractSystem.ts      # Star system tier (planetary colonies, dyson swarms)
+│   │   ├── AbstractSector.ts      # Sector tier (interstellar trade routes, federations)
+│   │   └── AbstractGalaxy.ts      # Galactic tier (spiral arms, supermassive black holes)
 │   ├── renormalization/       # RG engine and time scaling
 │   │   ├── RenormalizationEngine.ts  # Summarization, instantiation, statistical simulation
 │   │   ├── TierConstants.ts          # Time scales, summarization rules
@@ -47,9 +51,11 @@ hierarchy-simulator/
 
 ## Core Concepts
 
-### 1. Scale Hierarchy (7 Tiers)
+### 1. Scale Hierarchy (7 Base Tiers + 4 Interstellar Tiers)
 
 The simulator models a nested hierarchy from individual physics to galactic civilizations:
+
+**Base Ringworld Tiers:**
 
 | Tier | Area | Population | Children | Time Scale | Simulation Mode |
 |------|------|------------|----------|------------|-----------------|
@@ -61,7 +67,16 @@ The simulator models a nested hierarchy from individual physics to galactic civi
 | **Megasegment** | 10^13 km² | 100M-1B | 100 subsections | 1 month/tick | Culture |
 | **Gigasegment** | 10^15 km² | 10B-100B | 100 megasegments | 1 year/tick | Civilization |
 
-**Key Insight**: At chunk tier, full ECS runs (position, behavior, skills). At gigasegment tier, only *aggregates* exist (birth rate, tech level, belief density). Individual agent lifetimes become statistical noise.
+**Interstellar Expansion Tiers (Phase 1 Extended):**
+
+| Tier | Scale | Population | Features | Time Scale | Simulation Mode |
+|------|-------|------------|----------|------------|-----------------|
+| **Planet** | Entire planet | 1B-10B | Continents, civilizations, megastructures | 10 years/tick | Planetary statistics |
+| **System** | Star system | 10B-100B | Planets, dyson swarms, asteroid mining | 100 years/tick | System-wide economy |
+| **Sector** | 50-100 ly | 100B-1T | Trade routes, federations, wormhole network | 1000 years/tick | Interstellar politics |
+| **Galaxy** | Spiral galaxy | 1T-100T | Spiral arms, core civilizations, black hole | 10000 years/tick | Galactic evolution |
+
+**Key Insight**: At chunk tier, full ECS runs (position, behavior, skills). At planetary tier, only civilizations and continents exist. At galactic tier, individual stars become statistical noise.
 
 ### 2. Renormalization (Zoom In/Out)
 

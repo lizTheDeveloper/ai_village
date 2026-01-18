@@ -191,7 +191,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     // Restore original body
     const originalBody = this.originalBodies.get(target.id);
     if (originalBody) {
-      const currentBody = target.components.get('body') as BodyComponent;
+      const currentBody = target.getComponent<BodyComponent>('body');
       if (currentBody) {
         // Restore all properties
         Object.assign(currentBody, originalBody);
@@ -337,7 +337,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     spec: BodyTransformEffect['modifyBodyParts'],
     tick: number,
     source: ModificationSource,
-    appliedValues: Record<string, any>
+    appliedValues: Record<string, number | string | string[]>
   ): void {
     if (!spec) return;
 

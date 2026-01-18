@@ -1291,40 +1291,28 @@ export class PackMindSystem extends BaseSystem {
       pack.hasExperiencedFragmentation = true;
       pack.sharedEmotion = 'anxious';
 
-      this.events.emitGeneric({
-        type: 'pack:fragmented' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          packName: pack.name,
-          bodiesOutOfRange: pack.bodiesOutOfRange.size,
-          coherence: pack.coherence,
-        },
+      this.events.emitGeneric('pack:fragmented', {
+        packId,
+        packName: pack.name,
+        bodiesOutOfRange: pack.bodiesOutOfRange.size,
+        coherence: pack.coherence,
       });
     } else if (!wasCoherent && pack.isCoherent) {
       pack.sharedEmotion = 'focused';
 
-      this.events.emitGeneric({
-        type: 'pack:reunited' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          packName: pack.name,
-          coherence: pack.coherence,
-        },
+      this.events.emitGeneric('pack:reunited', {
+        packId,
+        packName: pack.name,
+        coherence: pack.coherence,
       });
     } else if (Math.abs(oldCoherence - pack.coherence) > 0.1) {
       // Significant coherence change
-      this.events.emitGeneric({
-        type: 'pack:coherence_changed' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          oldCoherence,
-          newCoherence: pack.coherence,
-          bodiesInRange: pack.bodiesInRange.size,
-          bodiesOutOfRange: pack.bodiesOutOfRange.size,
-        },
+      this.events.emitGeneric('pack:coherence_changed', {
+        packId,
+        oldCoherence,
+        newCoherence: pack.coherence,
+        bodiesInRange: pack.bodiesInRange.size,
+        bodiesOutOfRange: pack.bodiesOutOfRange.size,
       });
     }
 

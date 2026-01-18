@@ -9,8 +9,8 @@
  * This system runs ONLY in the SharedWorker, not in windows.
  */
 
-import type { World, Entity, System } from '@ai-village/core';
-import { EntityImpl } from '@ai-village/core';
+import type { World, Entity } from '@ai-village/core';
+import { EntityImpl, BaseSystem, type SystemContext } from '@ai-village/core';
 import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**

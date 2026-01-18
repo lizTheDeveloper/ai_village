@@ -11,7 +11,7 @@
  * This is the creepy Body Snatchers stuff happening in the background.
  */
 
-import type { System } from '@ai-village/core';
+import { BaseSystem, type SystemContext } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityId, Tick, SystemId } from '@ai-village/core';
