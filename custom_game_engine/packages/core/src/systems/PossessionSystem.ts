@@ -134,16 +134,12 @@ export class PossessionSystem extends BaseSystem {
     playerControl.totalBeliefSpent += cost;
 
     // Emit tick event for UI updates
-    world.eventBus.emit({
-      type: 'possession:tick',
-      source: 'system',
-      data: {
-        agentId: playerControl.possessedAgentId!,
-        beliefSpent: cost,
-        beliefRemaining: deity.belief.currentBelief,
-        ticksRemaining: this.maxPossessionTicks - (currentTick - playerControl.possessionStartTick),
-      },
-    });
+    this.events.emit('possession:tick', {
+      agentId: playerControl.possessedAgentId!,
+      beliefSpent: cost,
+      beliefRemaining: deity.belief.currentBelief,
+      ticksRemaining: this.maxPossessionTicks - (currentTick - playerControl.possessionStartTick),
+    }, 'system');
   }
 
   /**
@@ -199,15 +195,11 @@ export class PossessionSystem extends BaseSystem {
     agent.behaviorState = { possessedBy: playerEntity.id };
 
     // Emit event
-    world.eventBus.emit({
-      type: 'possession:jack_in',
-      source: 'system',
-      data: {
-        agentId: agentEntity.id,
-        initialCost,
-        beliefRemaining: deity.belief.currentBelief - initialCost,
-      },
-    });
+    this.events.emit('possession:jack_in', {
+      agentId: agentEntity.id,
+      initialCost,
+      beliefRemaining: deity.belief.currentBelief - initialCost,
+    }, 'system');
 
     return { success: true };
   }

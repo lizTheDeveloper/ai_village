@@ -286,22 +286,22 @@ export class ExplorationSystem extends BaseSystem {
     const milestones = [0.25, 0.5, 0.75, 0.9];
     for (const milestone of milestones) {
       if (coverage >= milestone && lastMilestone < milestone) {
-        // Use emitImmediate for testing and immediate feedback
+        // Use emitGeneric for custom event type
         const agentComp = getAgent(entity);
         const posComp = getPosition(entity);
         if (!agentComp || !posComp) {
           throw new Error(`ExplorationSystem: Entity ${entity.id} missing required components for milestone event`);
         }
-        ctx.events.emitGeneric({
-          type: 'exploration:milestone',
-          source: 'exploration',
-          data: {
+        ctx.events.emitGeneric(
+          'exploration:milestone',
+          {
             agentId: entity.id, // Use entity id as agent id
             entityId: entity.id,
             milestoneType: `coverage_${milestone}`,
             location: { x: posComp.x, y: posComp.y },
           },
-        });
+          'exploration'
+        );
         this.lastCoverageMilestone.set(entity.id, milestone);
       }
     }

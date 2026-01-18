@@ -9,7 +9,6 @@ import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { getEfficiencyBonus } from '../components/SkillsComponent.js';
 import { calculateSeedYield } from '../genetics/PlantGenetics.js';
 import { calculateHarvestQuality } from '../items/ItemQuality.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
 import { ComponentType } from '../types/ComponentType.js';
@@ -290,6 +289,9 @@ export class HarvestActionHandler implements ActionHandler {
     let seedsAdded = 0;
 
     try {
+      // Use WorldMutator interface to update components
+      const worldMutator = world as WorldMutator;
+
       // Add fruit to inventory WITH QUALITY (if any)
       if (fruitYield > 0) {
         const { inventory: inventoryAfterFruit, amountAdded: fruitsAddedCount } = addToInventoryWithQuality(
@@ -299,8 +301,7 @@ export class HarvestActionHandler implements ActionHandler {
           harvestQuality
         );
         fruitsAdded = fruitsAddedCount;
-        // Cast required: Entity interface doesn't expose mutation methods
-        (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterFruit);
+        worldMutator.updateComponent<InventoryComponent>(action.actorId, ComponentType.Inventory, () => inventoryAfterFruit);
 
         // Add seeds to inventory (seeds don't have quality - use regular addToInventory)
         if (seedYield > 0) {
@@ -316,8 +317,7 @@ export class HarvestActionHandler implements ActionHandler {
             seedYield
           );
           seedsAdded = seedsAddedCount;
-          // Cast required: Entity interface doesn't expose mutation methods
-          (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
+          worldMutator.updateComponent<InventoryComponent>(action.actorId, ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       } else {
         // No fruit, just add seeds
@@ -328,8 +328,7 @@ export class HarvestActionHandler implements ActionHandler {
             seedYield
           );
           seedsAdded = seedsAddedCount;
-          // Cast required: Entity interface doesn't expose mutation methods
-          (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
+          worldMutator.updateComponent<InventoryComponent>(action.actorId, ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       }
 
@@ -375,12 +374,10 @@ export class HarvestActionHandler implements ActionHandler {
       // Check if harvest destroys the plant or allows regrowth
       if (plant.harvestDestroysPlant) {
         // Destructive harvest (carrots, wheat, etc.) - remove plant from world
-        // Cast required: World interface doesn't expose mutation methods
-        (world as WorldMutator).destroyEntity(action.targetId, 'harvested');
+        worldMutator.destroyEntity(action.targetId, 'harvested');
       } else {
         // Non-destructive harvest (berry bushes, fruit trees) - reset plant to regrow
-        // Cast required: Entity interface doesn't expose mutation methods
-        (plantEntity as EntityImpl).updateComponent<PlantComponent>(ComponentType.Plant, (p) => {
+        worldMutator.updateComponent<PlantComponent>(action.targetId, ComponentType.Plant, (p) => {
           p.stage = plant.harvestResetStage;
           p.stageProgress = 0;
           p.fruitCount = 0;  // Reset fruit count, will regrow

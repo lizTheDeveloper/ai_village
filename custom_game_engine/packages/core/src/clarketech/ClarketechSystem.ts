@@ -991,24 +991,24 @@ export class ClarketechSystem extends BaseSystem {
 
       if (result.completed) {
         const tech = this.manager.getTechnology(techId);
-        ctx.events.emitGeneric({
-          type: 'clarketech_discovered' as any,
-          source: this.id,
-          data: {
+        ctx.events.emitGeneric(
+          'clarketech_discovered',
+          {
             techId,
             techName: tech?.name,
             tier: tech?.tier,
             leadResearcher: research.leadResearcherId,
           },
-        });
+          this.id
+        );
       }
 
       if (result.breakthrough) {
-        ctx.events.emitGeneric({
-          type: 'clarketech_breakthrough' as any,
-          source: this.id,
-          data: { techId },
-        });
+        ctx.events.emitGeneric(
+          'clarketech_breakthrough',
+          { techId },
+          this.id
+        );
       }
     }
   }
@@ -1041,15 +1041,15 @@ export class ClarketechSystem extends BaseSystem {
 
     if (research) {
       const tech = this.manager.getTechnology(techId);
-      this.events.emitGeneric({
-        type: 'clarketech_research_started' as any,
-        source: this.id,
-        data: {
+      this.events.emitGeneric(
+        'clarketech_research_started',
+        {
           techId,
           techName: tech?.name,
           leadResearcher: leadResearcherId,
         },
-      });
+        this.id
+      );
     }
 
     return research;
@@ -1072,16 +1072,16 @@ export class ClarketechSystem extends BaseSystem {
     );
 
     const tech = this.manager.getTechnology(techId);
-    this.events.emitGeneric({
-      type: 'clarketech_artifact_found' as any,
-      source: this.id,
-      data: {
+    this.events.emitGeneric(
+      'clarketech_artifact_found',
+      {
         artifactId: artifact.id,
         origin,
         techHint: tech?.category,
         discoverer: discovererId,
       },
-    });
+      this.id
+    );
 
     return artifact;
   }

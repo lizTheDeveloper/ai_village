@@ -18,7 +18,12 @@ export type TierLevel =
   | 'region'
   | 'zone'
   | 'chunk'
-  | 'tile';
+  | 'tile'
+  // NEW: Interstellar tiers
+  | 'planet'
+  | 'system'
+  | 'sector'
+  | 'galaxy';
 
 export type SimulationMode =
   | 'abstract'      // Statistics only
@@ -194,6 +199,31 @@ export const TIER_SCALES: Record<TierLevel, {
     populationRange: [0, 10],  // 0-10
     childrenCount: 0,
     label: 'Tile'
+  },
+  // NEW: Interstellar tiers
+  planet: {
+    area: 5e8,  // ~510 million km² (Earth-like)
+    populationRange: [1_000_000, 500_000_000],  // 1M-500M
+    childrenCount: 100,  // 100 gigasegments
+    label: 'Planet'
+  },
+  system: {
+    area: 1e18,  // Star system volume (~1 AU³)
+    populationRange: [100_000_000, 10_000_000_000],  // 100M-10B
+    childrenCount: 10,  // 2-20 planets + moons + stations
+    label: 'Star System'
+  },
+  sector: {
+    area: 1e24,  // 10-100 star systems in ~10 ly³ cube
+    populationRange: [1_000_000_000, 100_000_000_000],  // 1B-100B
+    childrenCount: 50,  // 10-100 systems
+    label: 'Sector'
+  },
+  galaxy: {
+    area: 1e30,  // Milky Way = ~100,000 ly diameter
+    populationRange: [10_000_000_000, 1e15],  // 10B-1 quadrillion
+    childrenCount: 1000,  // 100-10,000 sectors (spiral arms)
+    label: 'Galaxy'
   }
 };
 
