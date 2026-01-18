@@ -138,7 +138,7 @@ export const FleetComponentSchema: ComponentSchema<FleetComponent> = {
   fields: [
     { name: 'fleetId', type: 'string', required: true },
     { name: 'name', type: 'string', required: true },
-    { name: 'squadronIds', type: 'array', required: true },
+    { name: 'squadronIds', type: 'stringArray', required: true },
     { name: 'flagshipSquadronId', type: 'string', required: true },
     { name: 'admiralAgentId', type: 'string', required: false },
     { name: 'totalShips', type: 'number', required: true },

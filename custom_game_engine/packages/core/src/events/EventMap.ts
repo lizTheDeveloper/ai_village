@@ -2722,6 +2722,51 @@ export interface GameEventMap {
     passageId: string;
   };
 
+  // === Shipping Lane Events (Trade & Logistics) ===
+  /** Caravan departed origin on shipping lane */
+  'lane:caravan_departed': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    originId: string;
+  };
+
+  /** Caravan arrived at destination */
+  'lane:caravan_arrived': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    destinationId: string;
+  };
+
+  /** Caravan encountered hazard (pirates, weather, etc) */
+  'lane:hazard_encountered': {
+    caravanId: string;
+    laneId: string;
+    hazardType: 'pirates' | 'weather' | 'monsters' | 'passage_instability';
+    outcome: 'survived' | 'damaged' | 'destroyed';
+  };
+
+  /** Shipping lane blocked (embargo, passage collapse, etc) */
+  'lane:blocked': {
+    laneId: string;
+    caravanId?: string;
+  };
+
+  /** Shipping lane abandoned due to lack of use */
+  'lane:abandoned': {
+    laneId: string;
+    ticksSinceLastUse: number;
+  };
+
+  /** Caravan lost (lane disappeared, etc) */
+  'lane:caravan_lost': {
+    caravanId: string;
+    reason: string;
+  };
+
   // === Checkpoint Events (Time Travel) ===
   /** Automatic checkpoint created at midnight */
   'checkpoint:created': {
