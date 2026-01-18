@@ -280,7 +280,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
         level: Math.floor(Math.log2(context.casterMagic.totalSpellsCast + 1)),
       });
       result.appliedValues['dotDamage'] = dotValue.value;
-      result.appliedValues['dotType'] = effect.dotType;
+      result.appliedValues[`dotType_${effect.dotType}`] = 1; // Store as numeric flag
     }
 
     return result;

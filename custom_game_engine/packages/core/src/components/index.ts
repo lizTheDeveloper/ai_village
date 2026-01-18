@@ -754,6 +754,15 @@ export * from './DivineChatComponent.js';
 export type { DivineChatComponent } from './DivineChatComponent.js';
 export { createDivineChatComponent } from './DivineChatComponent.js';
 
+// Ship-Fleet Hierarchy (Grand Strategy - Phase 2)
+export * from './SquadronComponent.js';
+export { createSquadronComponent, SquadronComponentSchema } from './SquadronComponent.js';
+export type { SquadronComponent, SquadronFormation, SquadronMissionType } from './SquadronComponent.js';
+
+export * from './FleetComponent.js';
+export { createFleetComponent, FleetComponentSchema } from './FleetComponent.js';
+export type { FleetComponent, FleetMissionType } from './FleetComponent.js';
+
 // Trade & Logistics (Grand Strategy Layer)
 export * from './ShippingLaneComponent.js';
 export type { ShippingLaneComponent, LaneHazard } from './ShippingLaneComponent.js';

@@ -3130,6 +3130,38 @@ export interface GameEventMap {
     attackersRepelled: number;
   };
 
+  /** Village election completed */
+  'village:election_completed': {
+    villageId: string;
+    villageName: string;
+    newElders: string[];
+    tick: number;
+  };
+
+  /** Village council meeting held */
+  'village:council_meeting': {
+    villageId: string;
+    villageName: string;
+    tick: number;
+  };
+
+  /** Village proposal passed */
+  'village:proposal_passed': {
+    villageId: string;
+    villageName: string;
+    proposal: string;
+    type: string;
+    tick: number;
+  };
+
+  /** Village proposal rejected */
+  'village:proposal_rejected': {
+    villageId: string;
+    villageName: string;
+    proposal: string;
+    tick: number;
+  };
+
   // === Guard Duty Events ===
   /** Guard alertness dropped below threshold */
   'guard:alertness_low': {

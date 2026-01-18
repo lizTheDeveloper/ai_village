@@ -442,6 +442,8 @@ export const extraArmsEffect: BodyTransformEffect = {
     health: 100,
   },
   transformType: 'form',
+  targetState: 'multi-armed',
+  reversible: true,
   tags: ['transform', 'arms', 'manipulation'],
   modificationSource: 'magic',
 };
@@ -466,6 +468,8 @@ export const enhanceArmsEffect: BodyTransformEffect = {
     addFunctions: ['attack'],
   },
   transformType: 'form',
+  targetState: 'enhanced',
+  reversible: true,
   tags: ['transform', 'enhance', 'arms', 'strength'],
   modificationSource: 'magic',
 };
@@ -485,7 +489,9 @@ export const enlargeEffect: BodyTransformEffect = {
   dispellable: true,
   stackable: false,
   transformType: 'size',
+  targetState: 'large',
   newSize: 'large',
+  reversible: true,
   tags: ['transform', 'size', 'enlarge'],
   modificationSource: 'magic',
 };
@@ -505,7 +511,9 @@ export const reduceEffect: BodyTransformEffect = {
   dispellable: true,
   stackable: false,
   transformType: 'size',
+  targetState: 'small',
   newSize: 'small',
+  reversible: true,
   tags: ['transform', 'size', 'reduce'],
   modificationSource: 'magic',
 };
@@ -525,7 +533,9 @@ export const polymorphEffect: BodyTransformEffect = {
   dispellable: true,
   stackable: false,
   transformType: 'form',
+  targetState: 'avian_winged',
   newBodyPlan: 'avian_winged',  // Default, can be specified per cast
+  reversible: true,
   tags: ['transform', 'polymorph', 'powerful'],
   modificationSource: 'magic',
 };

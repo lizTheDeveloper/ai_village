@@ -21,24 +21,25 @@ export {
 
 export type {
   UniversalAddress,
-  Population,
-  Technology,
-  Resources,
   TradeRoute,
-  Conflict,
   TierLevel,
   SimulationMode,
   PopulationStats,
   EconomicState,
   AbstractTier,
   TransportHub,
+  ProductionFacility,
+  CulturalIdentity,
   ResourceType,
+  ResourceFlow,
   StabilityMetrics,
   TechProgress,
   GameEvent,
   EventType,
   SimulationStats,
 } from './abstraction/types.js';
+
+export { TIER_SCALES, RESOURCE_TYPES } from './abstraction/types.js';
 
 // ============================================================================
 // Adapters (Phase 2)
