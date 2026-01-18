@@ -19,17 +19,17 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { ComponentType } from '../types.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
+import { ensureSocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 export class FriendshipSystem extends BaseSystem {
   public readonly id = 'friendship' as const;
   public readonly priority = 17; // After RelationshipConversationSystem (16)
-  public readonly requiredComponents = [
-    CT.Agent,
-    CT.Relationship,
-  ] as const;
+  // Only require Agent component - Relationship is lazy-initialized
+  public readonly requiredComponents = [CT.Agent] as const;
 
   // Lazy activation: Skip entire system when no relationship components exist in world
+  // This ensures the system only runs when at least one entity has formed relationships
   public readonly activationComponents = [CT.Relationship] as const;
 
   // Throttle updates - friendships don't form instantly
@@ -86,18 +86,19 @@ export class FriendshipSystem extends BaseSystem {
     socialMemory: SocialMemoryComponent | undefined,
     world: World
   ): void {
-    if (!socialMemory) return;
+    // Lazy-initialize SocialMemoryComponent on first friendship
+    const lazySocialMemory = ensureSocialMemoryComponent(entity);
 
     // Check if component has proper methods (can be lost during deserialization)
-    if (typeof socialMemory.recordInteraction !== 'function' ||
-        typeof socialMemory.updateRelationshipType !== 'function') {
+    if (typeof lazySocialMemory.recordInteraction !== 'function' ||
+        typeof lazySocialMemory.updateRelationshipType !== 'function') {
       return;
     }
 
-    const existingMemory = socialMemory.socialMemories.get(partnerId);
+    const existingMemory = lazySocialMemory.socialMemories.get(partnerId);
     if (!existingMemory) {
       // Record a first interaction to create the memory, then update relationship type
-      socialMemory.recordInteraction({
+      lazySocialMemory.recordInteraction({
         agentId: partnerId,
         interactionType: 'friendship_formed',
         sentiment: 0.5,
@@ -106,7 +107,7 @@ export class FriendshipSystem extends BaseSystem {
       });
     }
     // Update relationship type using the component's method
-    socialMemory.updateRelationshipType(partnerId, 'friend');
+    lazySocialMemory.updateRelationshipType(partnerId, 'friend');
   }
 
   private emitFriendshipEvent(

@@ -28,6 +28,8 @@ export class ArmadaSystem extends BaseSystem {
   public readonly id: SystemId = 'armada_management' as SystemId;
   public readonly priority: number = 75;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Armada];
+  // Only run when armada components exist (O(1) activation check)
+  public readonly activationComponents = ['armada'] as const;
   public readonly metadata = {
     category: 'infrastructure',
     description: 'Manages multi-fleet armadas and campaigns',

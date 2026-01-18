@@ -161,3 +161,25 @@ export function getConversationDuration(
   if (!component.isActive) return 0;
   return currentTick - component.startedAt;
 }
+
+/**
+ * Lazy initialization helper for ConversationComponent.
+ * Creates and adds the component if it doesn't exist.
+ * Returns the existing or newly created component.
+ *
+ * Use this when starting a conversation to ensure the component exists.
+ */
+export function ensureConversationComponent(
+  entity: Entity,
+  maxMessages: number = 10
+): ConversationComponent {
+  // Import EntityImpl inline to avoid circular dependency
+  const EntityImpl = (entity as any).constructor;
+
+  let comp = entity.getComponent<ConversationComponent>('conversation');
+  if (!comp) {
+    comp = createConversationComponent(maxMessages);
+    (entity as any).addComponent(comp);
+  }
+  return comp;
+}

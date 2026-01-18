@@ -745,7 +745,7 @@ export class DivineChatPanel implements IWindowPanel {
         senderId: this.playerDeityId,
         content: this.inputText.trim(),
       },
-    } as any);
+    });
 
     this.inputText = '';
   }

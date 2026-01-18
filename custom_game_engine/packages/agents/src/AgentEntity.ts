@@ -52,7 +52,7 @@ import {
 // Reproduction system components
 import {
   createSexualityComponent,
-  createCourtshipComponent,
+  ensureCourtshipComponent,
 } from '@ai-village/reproduction';
 
 /**
@@ -284,14 +284,20 @@ export function createWanderingAgent(
   // Realm location - agents start in the mortal world
   entity.addComponent(createRealmLocationComponent('mortal_world'));
 
-  // Reproduction - sexuality, courtship, and parenting components
+  // Reproduction - sexuality and parenting components
   // Default to human paradigm (can be customized per species later)
   const sexuality = createSexualityComponent({
     relationshipStyle: 'monogamous', // Default for humans
   });
-  sexuality.activelySeeking = Math.random() > 0.3; // 70% chance of being open to romance
+  const isActivelySeeking = Math.random() > 0.3; // 70% chance of being open to romance
+  sexuality.activelySeeking = isActivelySeeking;
   entity.addComponent(sexuality);
-  entity.addComponent(createCourtshipComponent('human'));
+
+  // Lazily add courtship component only if actively seeking
+  if (isActivelySeeking) {
+    ensureCourtshipComponent(entity, 'human');
+  }
+
   entity.addComponent(createParentingComponent('both_parents')); // Human parental care
 
   // Species - all agents default to human species
@@ -502,14 +508,20 @@ export function createLLMAgent(
   // Realm location - agents start in the mortal world
   entity.addComponent(createRealmLocationComponent('mortal_world'));
 
-  // Reproduction - sexuality, courtship, and parenting components
+  // Reproduction - sexuality and parenting components
   // Default to human paradigm (can be customized per species later)
   const sexuality2 = createSexualityComponent({
     relationshipStyle: 'monogamous', // Default for humans
   });
-  sexuality2.activelySeeking = Math.random() > 0.3; // 70% chance of being open to romance
+  const isActivelySeeking2 = Math.random() > 0.3; // 70% chance of being open to romance
+  sexuality2.activelySeeking = isActivelySeeking2;
   entity.addComponent(sexuality2);
-  entity.addComponent(createCourtshipComponent('human'));
+
+  // Lazily add courtship component only if actively seeking
+  if (isActivelySeeking2) {
+    ensureCourtshipComponent(entity, 'human');
+  }
+
   entity.addComponent(createParentingComponent('both_parents')); // Human parental care
 
   // Species - all agents default to human species

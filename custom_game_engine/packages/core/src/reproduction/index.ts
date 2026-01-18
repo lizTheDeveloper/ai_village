@@ -221,6 +221,7 @@ export {
   // Component
   CourtshipComponent,
   createCourtshipComponent,
+  ensureCourtshipComponent,
   // Tactics
   UNIVERSAL_TACTICS,
   DWARF_TACTICS,

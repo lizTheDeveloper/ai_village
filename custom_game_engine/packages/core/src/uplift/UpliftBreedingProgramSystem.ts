@@ -21,6 +21,8 @@ export class UpliftBreedingProgramSystem extends BaseSystem {
   readonly id = 'UpliftBreedingProgramSystem';
   readonly priority = 560;
   readonly requiredComponents = [CT.UpliftProgram] as const;
+  // Only run when uplift_program components exist (O(1) activation check)
+  readonly activationComponents = ['uplift_program'] as const;
 
   protected readonly throttleInterval = 20; // Every second
 

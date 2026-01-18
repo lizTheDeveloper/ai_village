@@ -30,6 +30,8 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
   readonly id = 'ConsciousnessEmergenceSystem';
   readonly priority = 565;
   readonly requiredComponents = [CT.ProtoSapience, CT.Animal] as const;
+  // Only run when proto_sapience components exist (O(1) activation check)
+  readonly activationComponents = ['proto_sapience'] as const;
 
   protected readonly throttleInterval = 100; // Every 5 seconds, check for readiness
 

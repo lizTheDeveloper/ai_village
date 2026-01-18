@@ -55,7 +55,7 @@ export class ParadigmTreeView {
       throw new Error('Tree is required');
     } else {
       // Stateless mode - tree will be passed to render()
-      this.tree = null as any;
+      this.tree = null!;
     }
 
     this.layoutEngine = new TreeLayoutEngine();
@@ -262,7 +262,7 @@ export class ParadigmTreeView {
       // Check if this is a soft/optional requirement
       const toNode = tree.nodes.find(n => n.id === connection.to);
       const isSoftRequirement = toNode?.unlockConditions?.some(c =>
-        c.type === 'node_unlocked' && (c as any).soft === true
+        c.type === 'node_unlocked' && (c as { type: string; soft?: boolean }).soft === true
       );
 
       // Set line style

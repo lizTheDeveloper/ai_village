@@ -202,6 +202,8 @@ export class TechnologyEraSystem extends BaseSystem {
       const randomIndex = Math.floor(Math.random() * unlockedTechs.length);
       const techId = unlockedTechs[randomIndex];
 
+      if (!techId) continue; // Safety check
+
       // Mark as lost (but don't delete - conservation of game matter)
       eraComponent.lostTechnologies.push(techId);
       eraComponent.unlockedTechIds.delete(techId);

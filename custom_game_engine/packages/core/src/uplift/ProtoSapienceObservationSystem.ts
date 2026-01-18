@@ -51,6 +51,8 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
   readonly id = 'ProtoSapienceObservationSystem';
   readonly priority = 562;
   readonly requiredComponents = [CT.Animal] as const;
+  // Only run when uplift_program components exist (O(1) activation check)
+  readonly activationComponents = ['uplift_program'] as const;
 
   protected readonly throttleInterval = 100; // Every 5 seconds
 

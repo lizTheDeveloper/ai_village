@@ -75,6 +75,25 @@ export function createRelationshipComponent(): RelationshipComponent {
   };
 }
 
+/**
+ * Ensure an entity has a RelationshipComponent, creating it if needed.
+ * Used for lazy initialization - components are only added when first relationship is formed.
+ *
+ * @param entity - The entity to ensure has a relationship component
+ * @returns The relationship component (existing or newly created)
+ */
+export function ensureRelationshipComponent(entity: { getComponent: (type: string) => any; addComponent?: (comp: any) => void; updateComponent?: (type: string, updater: (comp: any) => any) => void }): RelationshipComponent {
+  let comp = entity.getComponent('relationship') as RelationshipComponent | undefined;
+  if (!comp) {
+    comp = createRelationshipComponent();
+    // Support both addComponent (EntityImpl) and generic entities
+    if (entity.addComponent) {
+      entity.addComponent(comp);
+    }
+  }
+  return comp;
+}
+
 export function getRelationship(
   component: RelationshipComponent,
   targetId: EntityId

@@ -27,6 +27,8 @@ export class FleetSystem extends BaseSystem {
   public readonly id: SystemId = 'fleet_management' as SystemId;
   public readonly priority: number = 80;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Fleet];
+  // Only run when fleet components exist (O(1) activation check)
+  public readonly activationComponents = ['fleet'] as const;
   public readonly metadata = {
     category: 'infrastructure',
     description: 'Manages strategic fleet groups and supply',

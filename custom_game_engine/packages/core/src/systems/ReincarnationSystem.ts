@@ -41,7 +41,6 @@ import {
   createAgentComponent,
   createMovementComponent,
   createVisionForProfile,
-  createConversationComponent,
   createRelationshipComponent,
   createInventoryComponent,
   createTemperatureComponent,
@@ -505,15 +504,15 @@ export class ReincarnationSystem extends BaseSystem {
 
     // Other memory components
     newEntity.addComponent(new SemanticMemoryComponent());
-    newEntity.addComponent(new SocialMemoryComponent());
+    // SocialMemoryComponent is now lazy-initialized on first social interaction
     newEntity.addComponent(new ReflectionComponent());
     newEntity.addComponent(new JournalComponent());
 
     // Vision - tiered awareness based on skill profile
     const visionProfile = getVisionProfileFromSkills(skills);
     newEntity.addComponent(createVisionForProfile(visionProfile));
-    newEntity.addComponent(createConversationComponent(10));
-    newEntity.addComponent(createRelationshipComponent());
+    // ConversationComponent is lazy-initialized when conversations start
+    // RelationshipComponent is now lazy-initialized when first relationship is formed
 
     // Inventory - start empty
     newEntity.addComponent(createInventoryComponent(24, 100));

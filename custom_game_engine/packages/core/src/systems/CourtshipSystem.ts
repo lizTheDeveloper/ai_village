@@ -13,10 +13,13 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity';
 import type { CourtshipComponent } from '../reproduction/courtship/CourtshipComponent';
 import type { SexualityComponent } from '../reproduction/SexualityComponent';
-import { CourtshipStateMachine } from '../reproduction/courtship/CourtshipStateMachine';
-import { attemptConception } from '../reproduction/courtship/compatibility';
+import {
+  CourtshipStateMachine,
+  ensureCourtshipComponent,
+  attemptConception,
+  getTacticsForSpecies,
+} from '../reproduction/index.js';
 import type { CourtshipTactic } from '../reproduction/courtship/types';
-import { getTacticsForSpecies } from '../reproduction/courtship/tactics';
 import type { SpeciesComponent } from '../components/SpeciesComponent';
 import type { PositionComponent } from '../components/PositionComponent';
 import type { ActiveCourtship } from '../reproduction/courtship/types';

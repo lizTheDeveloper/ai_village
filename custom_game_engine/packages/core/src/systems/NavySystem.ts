@@ -29,6 +29,8 @@ export class NavySystem extends BaseSystem {
   public readonly id: SystemId = 'navy_management' as SystemId;
   public readonly priority: number = 70;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Navy];
+  // Only run when navy components exist (O(1) activation check)
+  public readonly activationComponents = ['navy'] as const;
   public readonly metadata = {
     category: 'infrastructure',
     description: 'Manages nation-scale naval forces and budgets',
@@ -50,7 +52,7 @@ export class NavySystem extends BaseSystem {
       this.updateNavyStats(ctx.world, navyEntity as EntityImpl, navy, tick);
 
       // Track budget and maintenance
-      this.updateEconomy(navyEntity as EntityImpl, navy, tick);
+      this.updateEconomy(ctx.world, navyEntity as EntityImpl, navy, tick);
     }
   }
 
@@ -129,6 +131,7 @@ export class NavySystem extends BaseSystem {
    * Update navy economy (budget, maintenance, personnel costs)
    */
   private updateEconomy(
+    world: World,
     navyEntity: EntityImpl,
     navy: NavyComponent,
     tick: number

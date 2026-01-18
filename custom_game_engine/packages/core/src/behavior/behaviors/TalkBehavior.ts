@@ -18,12 +18,13 @@ import { enableInteractionLLM } from '../../components/AgentComponent.js';
 import type { ConversationComponent } from '../../components/ConversationComponent.js';
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../../components/SocialMemoryComponent.js';
+import { ensureSocialMemoryComponent } from '../../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { SteeringComponent } from '../../components/SteeringComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
-import { isInConversation, addMessage, startConversation } from '../../components/ConversationComponent.js';
-import { updateRelationship, shareMemory } from '../../components/RelationshipComponent.js';
+import { isInConversation, addMessage, startConversation, ensureConversationComponent } from '../../components/ConversationComponent.js';
+import { updateRelationship, shareMemory, ensureRelationshipComponent } from '../../components/RelationshipComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory, getSpatialMemoriesByType } from '../../components/SpatialMemoryComponent.js';
 import type { MemoryComponent } from '../../components/MemoryComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
@@ -54,16 +55,19 @@ export class TalkBehavior extends BaseBehavior {
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     // NOTE: We do NOT disable steering - agents will stay near conversation center via "arrive" behavior
 
-    const conversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
     const relationship = entity.getComponent<RelationshipComponent>(ComponentType.Relationship);
     const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
-    const socialMemory = entity.getComponent<SocialMemoryComponent>(ComponentType.SocialMemory);
+    // SocialMemoryComponent is now lazy-initialized on first social interaction
     const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
 
     // Check if we need to start a new conversation
     // This happens when 'talk' behavior is selected via priority-based decision
     // with a partnerId in behaviorState, but conversation isn't active yet
-    if (conversation && !isInConversation(conversation) && agent?.behaviorState?.partnerId) {
+    if (agent?.behaviorState?.partnerId) {
+      // Ensure conversation component exists before trying to start conversation
+      const conversation = ensureConversationComponent(entity, 10);
+
+      if (!isInConversation(conversation)) {
       const partnerIdValue = agent.behaviorState.partnerId;
       if (typeof partnerIdValue !== 'string') {
         return { complete: true, reason: 'Invalid partnerId type' };
@@ -111,10 +115,11 @@ export class TalkBehavior extends BaseBehavior {
 
       if (partner) {
         const partnerImpl = partner as EntityImpl;
-        const partnerConversation = partnerImpl.getComponent<ConversationComponent>(ComponentType.Conversation);
+        // Ensure partner has conversation component before checking if they're in conversation
+        const partnerConversation = ensureConversationComponent(partnerImpl, 10);
 
         // Only start if partner is available (not already talking to someone else)
-        if (partnerConversation && !isInConversation(partnerConversation)) {
+        if (!isInConversation(partnerConversation)) {
           // Calculate conversation center (midpoint between the two agents) for spatial stickiness
           const myPos = entity.getComponent<PositionComponent>(ComponentType.Position);
           const partnerPos = partnerImpl.getComponent<PositionComponent>(ComponentType.Position);
@@ -185,6 +190,7 @@ export class TalkBehavior extends BaseBehavior {
         // Partner doesn't exist - stay in current behavior, don't fall back to wander
         return { complete: true, reason: 'Partner not found' };
       }
+      }
     }
 
     // Re-fetch conversation after potentially starting it
@@ -227,44 +233,41 @@ export class TalkBehavior extends BaseBehavior {
     }
 
     // Update relationship (get to know each other better)
-    if (relationship) {
-      entity.updateComponent<RelationshipComponent>(ComponentType.Relationship, (current) =>
-        updateRelationship(current, partnerId, world.tick, 2)
-      );
-    }
+    // Lazy initialization: create component if it doesn't exist
+    ensureRelationshipComponent(entity);
+    entity.updateComponent<RelationshipComponent>(ComponentType.Relationship, (current) =>
+      updateRelationship(current, partnerId, world.tick, 2)
+    );
 
     // Update social memory (record this interaction for both parties)
-    if (socialMemory) {
-      const activePartnerImpl = activePartner as EntityImpl;
-      const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(ComponentType.Identity);
-      const partnerName = partnerIdentity?.name || 'someone';
+    // Lazy-initialize SocialMemoryComponent on first social interaction
+    const activePartnerImpl = activePartner as EntityImpl;
+    const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(ComponentType.Identity);
+    const partnerName = partnerIdentity?.name || 'someone';
 
-      socialMemory.recordInteraction({
-        agentId: partnerId,
-        interactionType: 'conversation',
-        sentiment: 0.2, // Neutral-positive for casual conversation
-        timestamp: world.tick,
-        trustDelta: 0.02, // Small trust increase from conversation
-        impression: `Had a conversation with ${partnerName}`,
-      });
-    }
+    const lazySocialMemory = ensureSocialMemoryComponent(entity);
+    lazySocialMemory.recordInteraction({
+      agentId: partnerId,
+      interactionType: 'conversation',
+      sentiment: 0.2, // Neutral-positive for casual conversation
+      timestamp: world.tick,
+      trustDelta: 0.02, // Small trust increase from conversation
+      impression: `Had a conversation with ${partnerName}`,
+    });
 
     // Also record for partner
-    const activePartnerImpl = activePartner as EntityImpl;
-    const partnerSocialMemory = activePartnerImpl.getComponent<SocialMemoryComponent>(ComponentType.SocialMemory);
-    if (partnerSocialMemory) {
-      const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
-      const myName = myIdentity?.name || 'someone';
+    const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+    const myName = myIdentity?.name || 'someone';
 
-      partnerSocialMemory.recordInteraction({
-        agentId: entity.id,
-        interactionType: 'conversation',
-        sentiment: 0.2,
-        timestamp: world.tick,
-        trustDelta: 0.02,
-        impression: `Had a conversation with ${myName}`,
-      });
-    }
+    const partnerLazySocialMemory = ensureSocialMemoryComponent(activePartnerImpl);
+    partnerLazySocialMemory.recordInteraction({
+      agentId: entity.id,
+      interactionType: 'conversation',
+      sentiment: 0.2,
+      timestamp: world.tick,
+      trustDelta: 0.02,
+      impression: `Had a conversation with ${myName}`,
+    });
 
     // Chance to speak
     if (Math.random() < SPEAK_CHANCE) {
@@ -470,13 +473,16 @@ export function talkBehavior(entity: EntityImpl, world: World): void {
  * @example registerBehaviorWithContext('talk', talkBehaviorWithContext);
  */
 export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  const conversation = ctx.getComponent<ConversationComponent>(CT.Conversation);
   const relationship = ctx.getComponent<RelationshipComponent>(CT.Relationship);
   const spatialMemory = ctx.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
-  const socialMemory = ctx.getComponent<SocialMemoryComponent>(CT.SocialMemory);
+  // SocialMemoryComponent is now lazy-initialized on first social interaction
 
   // Check if we need to start a new conversation
-  if (conversation && !isInConversation(conversation) && ctx.agent.behaviorState?.partnerId) {
+  if (ctx.agent.behaviorState?.partnerId) {
+    // Ensure conversation component exists before trying to start conversation
+    const conversation = ensureConversationComponent(ctx.entity, 10);
+
+    if (!isInConversation(conversation)) {
     const partnerIdValue = ctx.agent.behaviorState.partnerId;
     if (typeof partnerIdValue !== 'string') {
       return ctx.complete('Invalid partnerId type');
@@ -506,10 +512,11 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     }
 
     const partnerImpl = partner as EntityImpl;
-    const partnerConversation = partnerImpl.getComponent<ConversationComponent>(CT.Conversation);
+    // Ensure partner has conversation component before checking if they're in conversation
+    const partnerConversation = ensureConversationComponent(partnerImpl, 10);
 
     // Only start if partner is available
-    if (partnerConversation && !isInConversation(partnerConversation)) {
+    if (!isInConversation(partnerConversation)) {
       // Calculate conversation center
       const partnerPos = partnerImpl.getComponent<PositionComponent>(CT.Position);
       let centerX: number | undefined;
@@ -561,6 +568,7 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     } else {
       return ctx.complete('Partner unavailable for conversation');
     }
+    }
   }
 
   // Re-fetch conversation after potentially starting it
@@ -608,38 +616,34 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
     );
   }
 
-  // Update social memory
-  if (socialMemory) {
-    const activePartnerImpl = activePartner as EntityImpl;
-    const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(CT.Identity);
-    const partnerName = partnerIdentity?.name || 'someone';
+  // Update social memory - lazy-initialize on first interaction
+  const activePartnerImpl = activePartner as EntityImpl;
+  const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(CT.Identity);
+  const partnerName = partnerIdentity?.name || 'someone';
 
-    socialMemory.recordInteraction({
-      agentId: partnerId,
-      interactionType: 'conversation',
-      sentiment: 0.2,
-      timestamp: ctx.tick,
-      trustDelta: 0.02,
-      impression: `Had a conversation with ${partnerName}`,
-    });
-  }
+  const lazySocialMemory = ensureSocialMemoryComponent(ctx.entity);
+  lazySocialMemory.recordInteraction({
+    agentId: partnerId,
+    interactionType: 'conversation',
+    sentiment: 0.2,
+    timestamp: ctx.tick,
+    trustDelta: 0.02,
+    impression: `Had a conversation with ${partnerName}`,
+  });
 
   // Also record for partner
-  const activePartnerImpl = activePartner as EntityImpl;
-  const partnerSocialMemory = activePartnerImpl.getComponent<SocialMemoryComponent>(CT.SocialMemory);
-  if (partnerSocialMemory) {
-    const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
-    const myName = myIdentity?.name || 'someone';
+  const myIdentity = ctx.getComponent<IdentityComponent>(CT.Identity);
+  const myName = myIdentity?.name || 'someone';
 
-    partnerSocialMemory.recordInteraction({
-      agentId: ctx.entity.id,
-      interactionType: 'conversation',
-      sentiment: 0.2,
-      timestamp: ctx.tick,
-      trustDelta: 0.02,
-      impression: `Had a conversation with ${myName}`,
-    });
-  }
+  const partnerLazySocialMemory = ensureSocialMemoryComponent(activePartnerImpl);
+  partnerLazySocialMemory.recordInteraction({
+    agentId: ctx.entity.id,
+    interactionType: 'conversation',
+    sentiment: 0.2,
+    timestamp: ctx.tick,
+    trustDelta: 0.02,
+    impression: `Had a conversation with ${myName}`,
+  });
 
   // Chance to speak
   if (Math.random() < SPEAK_CHANCE) {

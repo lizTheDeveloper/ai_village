@@ -48,6 +48,8 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
   readonly id = 'UpliftCandidateDetectionSystem';
   readonly priority = 555;
   readonly requiredComponents = [] as const; // Queries all animals
+  // Only run when animal components exist (O(1) activation check)
+  readonly activationComponents = ['animal'] as const;
 
   protected readonly throttleInterval = 1000; // Every 50 seconds
 

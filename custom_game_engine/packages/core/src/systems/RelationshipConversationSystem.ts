@@ -17,6 +17,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
 import type { GameEventMap } from '../events/EventMap.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import { ensureRelationshipComponent } from '../components/RelationshipComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
@@ -102,8 +103,10 @@ export class RelationshipConversationSystem extends BaseSystem {
     partner: EntityImpl,
     quality: ConversationQuality
   ): void {
+    // Lazy initialization: create component if it doesn't exist
+    ensureRelationshipComponent(self);
     const relationshipComp = self.getComponent<RelationshipComponent>(CT.Relationship);
-    if (!relationshipComp) return;
+    if (!relationshipComp) return; // Should never happen after ensureRelationshipComponent
 
     let relationship = relationshipComp.relationships.get(partner.id);
 

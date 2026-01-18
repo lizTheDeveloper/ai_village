@@ -10,7 +10,7 @@ import type { World } from '../../ecs/World';
 import type { CourtshipComponent } from './CourtshipComponent';
 import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '../../components/RelationshipComponent';
-import { updateRelationship } from '../../components/RelationshipComponent';
+import { updateRelationship, ensureRelationshipComponent } from '../../components/RelationshipComponent';
 import type { CourtshipTactic, CourtshipParadigm, ActiveCourtship } from './types';
 import { calculateCompatibility } from './compatibility';
 
@@ -138,7 +138,9 @@ export class CourtshipStateMachine {
       );
 
       // Update relationship affinity and familiarity
+      // Lazy initialization: create component if it doesn't exist
       const targetImpl = target as EntityImpl;
+      ensureRelationshipComponent(targetImpl);
       const relationship = targetImpl.getComponent<RelationshipComponent>('relationship');
       if (relationship) {
         const updatedRelationship = updateRelationship(

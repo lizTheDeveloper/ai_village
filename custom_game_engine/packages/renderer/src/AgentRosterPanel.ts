@@ -11,7 +11,7 @@
 import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
 import { lookupSprite } from './sprites/SpriteService.js';
-import type { World } from '@ai-village/core';
+import type { World, IdentityComponent, AppearanceComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface AgentInfo {
@@ -159,8 +159,8 @@ export class AgentRosterPanel implements IWindowPanel {
     const agentEntities = world.query().with('agent', 'identity', 'appearance').executeEntities();
 
     for (const entity of agentEntities) {
-      const identity = entity.components.get('identity') as any;
-      const appearance = entity.components.get('appearance') as any;
+      const identity = entity.components.get('identity') as IdentityComponent | undefined;
+      const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
 
       if (identity && appearance) {
         const name = identity.name || 'Unknown';

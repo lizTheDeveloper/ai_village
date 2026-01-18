@@ -246,3 +246,19 @@ export class SocialMemoryComponent extends ComponentBase {
     this._socialMemories.set(agentId, updated);
   }
 }
+
+/**
+ * Lazy initialization helper: Get or create SocialMemoryComponent on an entity.
+ * Creates the component on first social interaction if it doesn't exist.
+ *
+ * @param entity The entity to check/update
+ * @returns The existing or newly created SocialMemoryComponent
+ */
+export function ensureSocialMemoryComponent(entity: any): SocialMemoryComponent {
+  let comp = entity.getComponent<SocialMemoryComponent>('social_memory');
+  if (!comp) {
+    comp = new SocialMemoryComponent();
+    entity.addComponent(comp);
+  }
+  return comp;
+}

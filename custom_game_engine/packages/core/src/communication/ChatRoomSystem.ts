@@ -15,6 +15,7 @@
 
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
@@ -126,7 +127,9 @@ export class ChatRoomSystem extends BaseSystem {
     // Create new room
     const entity = world.createEntity();
     const room = createChatRoomComponent(config, world.tick);
-    entity.addComponent(room);
+    // Cast required: world.createEntity() returns Entity interface,
+    // but internally creates EntityImpl with addComponent method
+    (entity as EntityImpl).addComponent(room);
 
     this.roomEntities.set(config.id, entity.id);
     this.knownMembers.set(config.id, new Set());

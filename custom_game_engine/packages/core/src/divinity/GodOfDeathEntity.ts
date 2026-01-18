@@ -12,7 +12,6 @@ import { ComponentType } from '../types/ComponentType.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { createPositionComponent, type PositionComponent } from '../components/PositionComponent.js';
 import { createTagsComponent, type TagsComponent } from '../components/TagsComponent.js';
-import { createRelationshipComponent } from '../components/RelationshipComponent.js';
 import { createEpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createConversationComponent } from '../components/ConversationComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
@@ -80,8 +79,7 @@ export function createGodOfDeath(
   (entity as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with mortals and player
-  const relationships = createRelationshipComponent();
-  (entity as EntityImpl).addComponent(relationships);
+  // RelationshipComponent is now lazy-initialized when first relationship is formed
 
   // Conversation - can engage in dialogue
   const conversation = createConversationComponent(100); // Gods have long conversation histories
