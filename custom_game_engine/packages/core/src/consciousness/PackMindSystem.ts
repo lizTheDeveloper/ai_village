@@ -923,23 +923,21 @@ export class PackMindSystem extends BaseSystem {
 
     this.packs.set(pack.id, pack);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'pack:created' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId: pack.id,
-          packName: name,
-          speciesId,
-          speciesName: speciesConfig.speciesName,
-          bodyCount: pack.bodyCount,
-          maxBodies: speciesConfig.maxBodies,
-          coherenceRange: speciesConfig.coherenceRange,
-          centerX,
-          centerY,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'pack:created' as any,
+      source: 'pack-mind-system',
+      data: {
+        packId: pack.id,
+        packName: name,
+        speciesId,
+        speciesName: speciesConfig.speciesName,
+        bodyCount: pack.bodyCount,
+        maxBodies: speciesConfig.maxBodies,
+        coherenceRange: speciesConfig.coherenceRange,
+        centerX,
+        centerY,
+      },
+    });
 
     return pack;
   }
@@ -1022,18 +1020,16 @@ export class PackMindSystem extends BaseSystem {
     const announcements = FORMATION_ANNOUNCEMENTS[formation];
     const announcement = announcements[Math.floor(Math.random() * announcements.length)]!;
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'pack:formation_changed' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          oldFormation,
-          newFormation: formation,
-          announcement,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'pack:formation_changed' as any,
+      source: 'pack-mind-system',
+      data: {
+        packId,
+        oldFormation,
+        newFormation: formation,
+        announcement,
+      },
+    });
 
     return true;
   }
@@ -1082,20 +1078,18 @@ export class PackMindSystem extends BaseSystem {
     // Update formation
     this.updateFormation(pack);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'pack:body_lost' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          lostBodyId: bodyEntityId,
-          lostBodyName: lostBody.name,
-          remainingBodies: pack.bodyCount,
-          minBodies,
-          griefThought,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'pack:body_lost' as any,
+      source: 'pack-mind-system',
+      data: {
+        packId,
+        lostBodyId: bodyEntityId,
+        lostBodyName: lostBody.name,
+        remainingBodies: pack.bodyCount,
+        minBodies,
+        griefThought,
+      },
+    });
 
     // Check for pack dissolution based on species rules
     const belowMinimum = pack.bodyCount < minBodies;
@@ -1104,18 +1098,16 @@ export class PackMindSystem extends BaseSystem {
 
     if (noBodies || singleBodyDeath || belowMinimum) {
       this.packs.delete(packId);
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'pack:dissolved' as any,
-          source: 'pack-mind-system',
-          data: {
-            packId,
-            packName: pack.name,
-            totalBodiesLost: pack.bodiesLost,
-            reason: noBodies ? 'no_bodies' : singleBodyDeath ? 'cannot_survive_alone' : 'below_minimum',
-          },
-        });
-      }
+      this.events.emitGeneric({
+        type: 'pack:dissolved' as any,
+        source: 'pack-mind-system',
+        data: {
+          packId,
+          packName: pack.name,
+          totalBodiesLost: pack.bodiesLost,
+          reason: noBodies ? 'no_bodies' : singleBodyDeath ? 'cannot_survive_alone' : 'below_minimum',
+        },
+      });
     }
 
     return true;
@@ -1187,20 +1179,18 @@ export class PackMindSystem extends BaseSystem {
 
     this.updateFormation(pack);
 
-    if (this.eventBus) {
-      this.eventBus.emit({
-        type: 'pack:body_added' as any,
-        source: 'pack-mind-system',
-        data: {
-          packId,
-          bodyId: bodyEntity.id,
-          bodyName: newBody.name,
-          inRange,
-          totalBodies: pack.bodyCount,
-          maxBodies: maxBodies === 'unlimited' ? 'unlimited' : maxBodies,
-        },
-      });
-    }
+    this.events.emitGeneric({
+      type: 'pack:body_added' as any,
+      source: 'pack-mind-system',
+      data: {
+        packId,
+        bodyId: bodyEntity.id,
+        bodyName: newBody.name,
+        inRange,
+        totalBodies: pack.bodyCount,
+        maxBodies: maxBodies === 'unlimited' ? 'unlimited' : maxBodies,
+      },
+    });
 
     return true;
   }
@@ -1321,47 +1311,41 @@ export class PackMindSystem extends BaseSystem {
       pack.hasExperiencedFragmentation = true;
       pack.sharedEmotion = 'anxious';
 
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'pack:fragmented' as any,
-          source: 'pack-mind-system',
-          data: {
-            packId,
-            packName: pack.name,
-            bodiesOutOfRange: pack.bodiesOutOfRange.size,
-            coherence: pack.coherence,
-          },
-        });
-      }
+      this.events.emitGeneric({
+        type: 'pack:fragmented' as any,
+        source: 'pack-mind-system',
+        data: {
+          packId,
+          packName: pack.name,
+          bodiesOutOfRange: pack.bodiesOutOfRange.size,
+          coherence: pack.coherence,
+        },
+      });
     } else if (!wasCoherent && pack.isCoherent) {
       pack.sharedEmotion = 'focused';
 
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'pack:reunited' as any,
-          source: 'pack-mind-system',
-          data: {
-            packId,
-            packName: pack.name,
-            coherence: pack.coherence,
-          },
-        });
-      }
+      this.events.emitGeneric({
+        type: 'pack:reunited' as any,
+        source: 'pack-mind-system',
+        data: {
+          packId,
+          packName: pack.name,
+          coherence: pack.coherence,
+        },
+      });
     } else if (Math.abs(oldCoherence - pack.coherence) > 0.1) {
       // Significant coherence change
-      if (this.eventBus) {
-        this.eventBus.emit({
-          type: 'pack:coherence_changed' as any,
-          source: 'pack-mind-system',
-          data: {
-            packId,
-            oldCoherence,
-            newCoherence: pack.coherence,
-            bodiesInRange: pack.bodiesInRange.size,
-            bodiesOutOfRange: pack.bodiesOutOfRange.size,
-          },
-        });
-      }
+      this.events.emitGeneric({
+        type: 'pack:coherence_changed' as any,
+        source: 'pack-mind-system',
+        data: {
+          packId,
+          oldCoherence,
+          newCoherence: pack.coherence,
+          bodiesInRange: pack.bodiesInRange.size,
+          bodiesOutOfRange: pack.bodiesOutOfRange.size,
+        },
+      });
     }
 
     return pack.isCoherent;
@@ -1370,12 +1354,7 @@ export class PackMindSystem extends BaseSystem {
   /**
    * Main update loop
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    if (world.tick - this.lastUpdateTick < PackMindSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = world.tick;
-
+  protected onUpdate(ctx: SystemContext): void {
     for (const pack of Array.from(this.packs.values())) {
       // Update coherence
       this.updateCoherence(pack.id);
@@ -1396,22 +1375,20 @@ export class PackMindSystem extends BaseSystem {
       }
 
       // Periodic status emit
-      if (world.tick % 500 === 0) {
-        if (this.eventBus) {
-          this.eventBus.emit({
-            type: 'pack:status_update' as any,
-            source: 'pack-mind-system',
-            data: {
-              packId: pack.id,
-              packName: pack.name,
-              bodyCount: pack.bodyCount,
-              isCoherent: pack.isCoherent,
-              formation: pack.formation,
-              emotion: pack.sharedEmotion,
-              thought: this.getPackThought(),
-            },
-          });
-        }
+      if (ctx.tick % 500 === 0) {
+        this.events.emitGeneric({
+          type: 'pack:status_update' as any,
+          source: 'pack-mind-system',
+          data: {
+            packId: pack.id,
+            packName: pack.name,
+            bodyCount: pack.bodyCount,
+            isCoherent: pack.isCoherent,
+            formation: pack.formation,
+            emotion: pack.sharedEmotion,
+            thought: this.getPackThought(),
+          },
+        });
       }
     }
   }

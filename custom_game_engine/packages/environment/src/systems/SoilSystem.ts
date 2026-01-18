@@ -1,5 +1,5 @@
-import type { System, SystemId, World, Entity, BiomeType } from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+import type { SystemId, BiomeType } from '@ai-village/core';
+import { ComponentType as CT, BaseSystem, type SystemContext } from '@ai-village/core';
 
 export interface Tile {
   terrain: string;
@@ -35,7 +35,7 @@ export interface Tile {
  * @see TimeSystem (priority 3) - Provides time tracking for daily soil updates and fertilizer duration
  * @see WeatherSystem (priority 5) - Provides weather events (rain, snow) that affect soil moisture
  */
-export class SoilSystem implements System {
+export class SoilSystem extends BaseSystem {
   public readonly id: SystemId = 'soil';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<string> = [];
@@ -51,9 +51,9 @@ export class SoilSystem implements System {
   private accumulatedTime: number = 0; // Track elapsed time in seconds
   private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
 
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
+  protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration from TimeComponent if available
-    const timeEntities = world.query().with(CT.Time).executeEntities();
+    const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as any;
@@ -64,7 +64,7 @@ export class SoilSystem implements System {
     }
 
     // Accumulate real-time seconds (accounting for time acceleration)
-    this.accumulatedTime += deltaTime * timeSpeedMultiplier;
+    this.accumulatedTime += ctx.deltaTime * timeSpeedMultiplier;
 
     // Calculate current day based on accumulated time
     const currentDay = Math.floor(this.accumulatedTime / this.SECONDS_PER_DAY);
@@ -88,7 +88,7 @@ export class SoilSystem implements System {
    * Till a grass tile to make it plantable
    * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
    */
-  public tillTile(world: World, tile: Tile, x: number, y: number, _agentId?: string): void {
+  public tillTile(world: any, tile: Tile, x: number, y: number, _agentId?: string): void {
     // CLAUDE.md: Validate inputs, no silent fallbacks
     if (!tile) {
       const error = 'tillTile requires a valid tile object';
@@ -154,7 +154,7 @@ export class SoilSystem implements System {
   /**
    * Water a tile to increase moisture
    */
-  public waterTile(world: World, tile: Tile, x: number, y: number): void {
+  public waterTile(world: any, tile: Tile, x: number, y: number): void {
     if (!tile.nutrients) {
       throw new Error(`Tile at (${x},${y}) missing required nutrients data`);
     }
@@ -195,7 +195,7 @@ export class SoilSystem implements System {
    * Apply fertilizer to a tile
    */
   public fertilizeTile(
-    world: World,
+    world: any,
     tile: Tile,
     x: number,
     y: number,
@@ -243,7 +243,7 @@ export class SoilSystem implements System {
   /**
    * Deplete soil after a harvest
    */
-  public depleteSoil(world: World, tile: Tile, x: number, y: number): void {
+  public depleteSoil(world: any, tile: Tile, x: number, y: number): void {
     if (!tile.tilled) {
       throw new Error(`Cannot deplete untilled tile at (${x},${y})`);
     }

@@ -241,39 +241,42 @@ export class PlantKnowledgeComponent extends ComponentBase {
         break;
       }
       case 'medicinal': {
-        // Type guard: medicinal expects object with medicinal properties
+        // Type guard: validate medicinal properties structure
         if (typeof value !== 'object' || value === null) {
           throw new Error(`Expected KnownMedicinalProperties object for 'medicinal' property, got ${typeof value}`);
         }
+        const medicinalValue = value as Partial<KnownMedicinalProperties>;
         if (entry.medicinal === 'unknown') {
           entry.medicinal = {};
         }
-        // Safe: value is an object, entry.medicinal is now an object
-        Object.assign(entry.medicinal, value as Record<string, unknown>);
+        // Type-safe: both are KnownMedicinalProperties
+        Object.assign(entry.medicinal, medicinalValue);
         break;
       }
       case 'magical': {
-        // Type guard: magical expects object with magical properties
+        // Type guard: validate magical properties structure
         if (typeof value !== 'object' || value === null) {
           throw new Error(`Expected KnownMagicalProperties object for 'magical' property, got ${typeof value}`);
         }
+        const magicalValue = value as Partial<KnownMagicalProperties>;
         if (entry.magical === 'unknown') {
           entry.magical = {};
         }
-        // Safe: value is an object, entry.magical is now an object
-        Object.assign(entry.magical, value as Record<string, unknown>);
+        // Type-safe: both are KnownMagicalProperties
+        Object.assign(entry.magical, magicalValue);
         break;
       }
       case 'crafting': {
-        // Type guard: crafting expects object with crafting properties
+        // Type guard: validate crafting properties structure
         if (typeof value !== 'object' || value === null) {
           throw new Error(`Expected KnownCraftingProperties object for 'crafting' property, got ${typeof value}`);
         }
+        const craftingValue = value as Partial<KnownCraftingProperties>;
         if (entry.crafting === 'unknown') {
           entry.crafting = {};
         }
-        // Safe: value is an object, entry.crafting is now an object
-        Object.assign(entry.crafting, value as Record<string, unknown>);
+        // Type-safe: both are KnownCraftingProperties
+        Object.assign(entry.crafting, craftingValue);
         break;
       }
     }
