@@ -127,16 +127,9 @@ export class ButcherBehavior extends BaseBehavior {
     const meatQuantity = baseMeatQuantity + qualityBonus;
 
     // Add products to inventory
-    interface InventorySlot {
-      itemId: string;
-      quantity: number;
-    }
-    interface SimpleInventory {
-      slots: InventorySlot[];
-    }
-    const inventory = entity.getComponent(CT.Inventory) as SimpleInventory | undefined;
+    const inventory = entity.getComponent(CT.Inventory) as InventoryComponent | undefined;
     if (inventory) {
-      entity.updateComponent(CT.Inventory, (inv: SimpleInventory) => ({
+      entity.updateComponent(CT.Inventory, (inv) => ({
         ...inv,
         slots: [
           ...inv.slots,
@@ -344,14 +337,7 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
 
   // Add products to inventory
   if (ctx.inventory) {
-    interface InventorySlot {
-      itemId: string;
-      quantity: number;
-    }
-    interface SimpleInventory {
-      slots: InventorySlot[];
-    }
-    ctx.updateComponent(CT.Inventory, (inv: SimpleInventory) => ({
+    ctx.updateComponent(CT.Inventory, (inv) => ({
       ...inv,
       slots: [
         ...inv.slots,

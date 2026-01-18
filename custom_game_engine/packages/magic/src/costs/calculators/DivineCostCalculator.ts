@@ -306,13 +306,13 @@ export class DivineCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, caster);
+    return super.getTerminalEffect(costType as MagicCostType, trigger, caster);
   }
 
   /**
    * Override cumulative check - karma is cumulative.
    */
   protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'karma' || super.isCumulativeCost(costType as any);
+    return costType === 'karma' || super.isCumulativeCost(costType as MagicCostType);
   }
 }

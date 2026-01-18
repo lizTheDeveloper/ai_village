@@ -273,7 +273,7 @@ export class EffectValidationPipeline {
   private validateOperation(op: EffectOperation, index: number): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
-    // Check that operation has 'op' field
+    // Check that operation has 'op' field (should always be present given the type)
     if (!('op' in op)) {
       issues.push({
         severity: 'error',
@@ -284,7 +284,7 @@ export class EffectValidationPipeline {
       return issues;
     }
 
-    const opType = (op as any).op;
+    const opType = op.op;
 
     // Validate operation-specific fields
     switch (opType) {
@@ -354,16 +354,16 @@ export class EffectValidationPipeline {
           });
         }
         // Validate damage type enum
-        if ('damageType' in op) {
-          const validDamageTypes = [
+        if ('damageType' in op && op.op === 'deal_damage') {
+          const validDamageTypes: DamageType[] = [
             'physical', 'fire', 'ice', 'lightning', 'poison',
             'holy', 'unholy', 'void', 'psychic', 'force',
           ];
-          if (!validDamageTypes.includes((op as any).damageType)) {
+          if (!validDamageTypes.includes(op.damageType)) {
             issues.push({
               severity: 'error',
               stage: 'schema',
-              message: `Invalid damage type: "${(op as any).damageType}". Must be one of: ${validDamageTypes.join(', ')}`,
+              message: `Invalid damage type: "${op.damageType}". Must be one of: ${validDamageTypes.join(', ')}`,
               field: `operations[${index}].damageType`,
             });
           }
@@ -469,115 +469,139 @@ export class EffectValidationPipeline {
   private scanOperationSecurity(op: EffectOperation, index: number): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
+    // Helper to extract string from field
+    const extractString = (obj: Record<string, unknown>, key: string): string | null => {
+      const val = obj[key];
+      return typeof val === 'string' ? val : null;
+    };
+
+    // Helper to extract number from field
+    const extractNumber = (obj: Record<string, unknown>, key: string): number | null => {
+      const val = obj[key];
+      return typeof val === 'number' ? val : null;
+    };
+
+    const opRecord = op as Record<string, unknown>;
+
     // Check stat names for dangerous patterns
     if ('stat' in op) {
-      const stat = (op as any).stat;
-      if (!this.isValidIdentifier(stat)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Invalid stat name: "${stat}" must be a valid identifier`,
-          field: `operations[${index}].stat`,
-        });
-      }
-      if (this.hasDangerousPattern(stat)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Stat name "${stat}" contains dangerous pattern`,
-          field: `operations[${index}].stat`,
-        });
+      const stat = extractString(opRecord, 'stat');
+      if (stat !== null) {
+        if (!this.isValidIdentifier(stat)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Invalid stat name: "${stat}" must be a valid identifier`,
+            field: `operations[${index}].stat`,
+          });
+        }
+        if (this.hasDangerousPattern(stat)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Stat name "${stat}" contains dangerous pattern`,
+            field: `operations[${index}].stat`,
+          });
+        }
       }
     }
 
     // Check status names
     if ('status' in op) {
-      const status = (op as any).status;
-      if (!this.isValidIdentifier(status)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Invalid status name: "${status}" must be a valid identifier`,
-          field: `operations[${index}].status`,
-        });
-      }
-      if (this.hasDangerousPattern(status)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Status name "${status}" contains dangerous pattern`,
-          field: `operations[${index}].status`,
-        });
+      const status = extractString(opRecord, 'status');
+      if (status !== null) {
+        if (!this.isValidIdentifier(status)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Invalid status name: "${status}" must be a valid identifier`,
+            field: `operations[${index}].status`,
+          });
+        }
+        if (this.hasDangerousPattern(status)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Status name "${status}" contains dangerous pattern`,
+            field: `operations[${index}].status`,
+          });
+        }
       }
     }
 
     // Check damage amounts
-    if ('amount' in op && typeof (op as any).amount === 'number') {
-      const amount = (op as any).amount;
-      if (amount > 10000) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Damage amount too high: ${amount} (max 10000)`,
-          field: `operations[${index}].amount`,
-        });
-      }
-      if (amount < -10000) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Damage amount too low: ${amount} (min -10000)`,
-          field: `operations[${index}].amount`,
-        });
+    if ('amount' in op) {
+      const amount = extractNumber(opRecord, 'amount');
+      if (amount !== null) {
+        if (amount > 10000) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Damage amount too high: ${amount} (max 10000)`,
+            field: `operations[${index}].amount`,
+          });
+        }
+        if (amount < -10000) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Damage amount too low: ${amount} (min -10000)`,
+            field: `operations[${index}].amount`,
+          });
+        }
       }
     }
 
     // Check spawn counts
-    if ('count' in op && typeof (op as any).count === 'number') {
-      const count = (op as any).count;
-      if (count > 100) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Spawn count too high: ${count} (max 100)`,
-          field: `operations[${index}].count`,
-        });
-      }
-      if (count < 0) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Spawn count cannot be negative: ${count}`,
-          field: `operations[${index}].count`,
-        });
+    if ('count' in op) {
+      const count = extractNumber(opRecord, 'count');
+      if (count !== null) {
+        if (count > 100) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Spawn count too high: ${count} (max 100)`,
+            field: `operations[${index}].count`,
+          });
+        }
+        if (count < 0) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Spawn count cannot be negative: ${count}`,
+            field: `operations[${index}].count`,
+          });
+        }
       }
     }
 
     // Check entity types
     if ('entityType' in op) {
-      const entityType = (op as any).entityType;
-      if (!this.isValidIdentifier(entityType)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Invalid entity type: "${entityType}" must be a valid identifier`,
-          field: `operations[${index}].entityType`,
-        });
-      }
-      if (this.hasDangerousPattern(entityType)) {
-        issues.push({
-          severity: 'error',
-          stage: 'security',
-          message: `Entity type "${entityType}" contains dangerous pattern`,
-          field: `operations[${index}].entityType`,
-        });
+      const entityType = extractString(opRecord, 'entityType');
+      if (entityType !== null) {
+        if (!this.isValidIdentifier(entityType)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Invalid entity type: "${entityType}" must be a valid identifier`,
+            field: `operations[${index}].entityType`,
+          });
+        }
+        if (this.hasDangerousPattern(entityType)) {
+          issues.push({
+            severity: 'error',
+            stage: 'security',
+            message: `Entity type "${entityType}" contains dangerous pattern`,
+            field: `operations[${index}].entityType`,
+          });
+        }
       }
     }
 
     // Check area radius
-    if ('radius' in (op as any) && typeof (op as any).radius === 'number') {
-      const radius = (op as any).radius;
-      if (radius > 1000) {
+    if ('radius' in op) {
+      const radius = extractNumber(opRecord, 'radius');
+      if (radius !== null && radius > 1000) {
         issues.push({
           severity: 'error',
           stage: 'security',

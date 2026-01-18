@@ -4046,7 +4046,7 @@ export interface GameEventMap {
     agentId: string;
     showId: string;
     characterName: string;
-    role: 'lead' | 'supporting' | 'recurring' | 'guest';
+    role: 'lead' | 'supporting' | 'recurring' | 'guest' | 'extra';
     compensation: number;
   };
 

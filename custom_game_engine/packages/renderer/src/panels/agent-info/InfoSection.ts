@@ -14,7 +14,7 @@ import type {
   InventoryComponentData,
   GoalsComponent,
 } from './types.js';
-import type { PersonalGoal, SpiritualComponent } from '@ai-village/core';
+import type { PersonalGoal, SpiritualComponent, SoulIdentityComponent, DeityComponent, Component } from '@ai-village/core';
 import {
   wrapText,
   renderWrappedText,
@@ -230,7 +230,7 @@ export class InfoSection {
     }
 
     // Soul information (if available)
-    const soulIdentity = entity.components.get('soul_identity') as any;
+    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
     if (soulIdentity) {
       ctx.font = '12px monospace';
       ctx.fillStyle = '#AADDFF';
@@ -564,8 +564,8 @@ export class InfoSection {
     }
 
     // Action Queue section
-    const actionQueue = entity.components.get('action_queue') as any;
-    if (actionQueue && !actionQueue.isEmpty()) {
+    const actionQueue = entity.components.get('action_queue') as Component | undefined;
+    if (actionQueue && !(actionQueue as any).isEmpty()) {
       currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
     }
 
@@ -590,15 +590,15 @@ export class InfoSection {
     let playerDeityId: string | null = null;
     if (typeof world.entities?.values === 'function') {
       for (const ent of world.entities.values()) {
-        const deity = ent.components?.get('deity');
+        const deity = ent.components?.get('deity') as DeityComponent | undefined;
         if (deity) {
           // Primary check: controller === 'player' (matches DivinePowersPanel)
-          if ((deity as any).controller === 'player') {
+          if (deity.controller === 'player') {
             playerDeityId = ent.id;
             break;
           }
-          // Fallback: domain === 'player'
-          if ((deity as any).domain === 'player') {
+          // Fallback: check domain if available
+          if (deity.identity?.domain === 'player' as any) {
             playerDeityId = ent.id;
             break;
           }
@@ -896,9 +896,9 @@ export class InfoSection {
     ctx.fillText(`⚙️ Action Queue (${actionQueue.size()})`, panelX + padding, y);
     y += lineHeight + 5;
 
-    // Get all actions by accessing the private queue field
+    // Get all actions by accessing the internal queue field
     // Since this is a UI display, we'll peek at the internal state
-    const actions = (actionQueue as any).queue || [];
+    const actions = ((actionQueue as any).queue as unknown[]) || [];
     const maxItems = Math.min(5, actions.length);
 
     ctx.font = '11px monospace';
@@ -1087,21 +1087,21 @@ export class InfoSection {
     }
 
     // Check action queue for targetPos
-    const actionQueue = entity.components.get('action_queue');
+    const actionQueue = entity.components.get('action_queue') as Component | undefined;
     if (actionQueue) {
-      let actions: any[] = [];
+      let actions: unknown[] = [];
 
-      if (typeof actionQueue.peek === 'function') {
-        const current = actionQueue.peek();
+      if (typeof (actionQueue as any).peek === 'function') {
+        const current = (actionQueue as any).peek();
         if (current) actions = [current];
-      } else if (Array.isArray(actionQueue.queue)) {
-        actions = actionQueue.queue;
-      } else if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
+      } else if (Array.isArray((actionQueue as any).queue)) {
+        actions = (actionQueue as any).queue;
+      } else if (typeof (actionQueue as any).isEmpty === 'function' && !(actionQueue as any).isEmpty()) {
         actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
       }
 
       if (actions.length > 0) {
-        const currentAction = actions[0];
+        const currentAction = actions[0] as any;
         if (currentAction?.targetPos) {
           const targetInfo = this.findTargetEntityName(currentAction.targetPos, world);
           return {

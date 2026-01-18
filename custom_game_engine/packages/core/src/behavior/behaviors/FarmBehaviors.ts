@@ -893,10 +893,13 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   const plantEntity = ctx.getEntity(nearestDryPlant.plantId);
   if (plantEntity) {
     const plantImpl = plantEntity as EntityImpl;
-    plantImpl.updateComponent(ComponentType.Plant, (plant: Component) => ({
-      ...plant,
-      _hydration: Math.min(100, (plant._hydration ?? plant.hydration ?? 50) + 20),
-    }));
+    plantImpl.updateComponent(ComponentType.Plant, (plant) => {
+      const plantWithHydration = plant as unknown as { _hydration?: number; hydration?: number };
+      return {
+        ...plant,
+        _hydration: Math.min(100, (plantWithHydration._hydration ?? plantWithHydration.hydration ?? 50) + 20),
+      };
+    });
   }
 
   return ctx.switchTo('farm', { lastAction: 'water' });

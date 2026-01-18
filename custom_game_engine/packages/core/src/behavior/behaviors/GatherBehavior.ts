@@ -1644,19 +1644,19 @@ export function gatherBehaviorWithContext(ctx: import('../BehaviorContext.js').B
 
     // Delegate to class methods for actual gathering
     const behavior = new GatherBehavior();
+    interface MinimalWorld {
+      tick: number;
+      eventBus: {
+        emit: (event: unknown) => void;
+      };
+    }
+    const minimalWorld: MinimalWorld = {
+      tick: ctx.tick,
+      eventBus: { emit: (e: unknown) => ctx.emit(e) }
+    };
     if (target.type === 'resource') {
       const targetImpl = target.entity as EntityImpl;
       const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
-      interface MinimalWorld {
-        tick: number;
-        eventBus: {
-          emit: (event: unknown) => void;
-        };
-      }
-      const minimalWorld: MinimalWorld = {
-        tick: ctx.tick,
-        eventBus: { emit: (e: unknown) => ctx.emit(e) }
-      };
       if (voxelComp) {
         behavior.handleVoxelResourceGathering(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, ctx.agent);
       } else {
