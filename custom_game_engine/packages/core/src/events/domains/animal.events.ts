@@ -38,6 +38,42 @@ export interface AnimalEvents {
     isSleeping: boolean;
     inHousing: boolean;
   };
+  animal_spawned: {
+    animalId: EntityId;
+    speciesId: string;
+    position: { x: number; y: number };
+    chunkX: number;
+    chunkY: number;
+    biome: string;
+  };
+  animal_died: {
+    animalId: EntityId;
+    speciesId: string;
+    cause: string;
+  };
+  animal_tamed: {
+    animalId: EntityId;
+    tamerId: EntityId;
+    agentId: EntityId;
+    method: string;
+  };
+  life_stage_changed: {
+    animalId: EntityId;
+    from: string;
+    to: string;
+  };
+  animal_state_changed: {
+    animalId: EntityId;
+    from: string;
+    to: string;
+  };
+  product_ready: {
+    animalId: EntityId;
+    productType: string;
+    productId: string;
+    itemId: string;
+    amount: number;
+  };
 }
 export type AnimalEventType = keyof AnimalEvents;
 export type AnimalEventData = AnimalEvents[AnimalEventType];

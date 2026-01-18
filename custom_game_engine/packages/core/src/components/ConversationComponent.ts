@@ -1,4 +1,5 @@
 import type { Component } from '../ecs/Component.js';
+import type { Entity } from '../ecs/Entity.js';
 import type { EntityId, Tick } from '../types.js';
 
 export interface ConversationMessage {

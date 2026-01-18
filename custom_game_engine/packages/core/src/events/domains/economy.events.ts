@@ -259,6 +259,26 @@ export interface EconomyEvents {
       quality?: number;
     } | null;
   };
+
+  'tool_used': {
+    itemInstanceId: string;
+    durabilityLost: number;
+    remainingCondition: number;
+    usageType: string;
+  };
+
+  'tool_low_durability': {
+    itemInstanceId: string;
+    condition: number;
+    agentId?: EntityId;
+    toolType: string;
+  };
+
+  'tool_broken': {
+    itemInstanceId: string;
+    toolType: string;
+    agentId?: EntityId;
+  };
 }
 
 export type EconomyEventType = keyof EconomyEvents;

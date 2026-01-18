@@ -89,7 +89,7 @@ export class SideViewTerrainRenderer {
             if (screenX + tilePixelSize < 0 || screenX > this.camera.viewportWidth) continue;
 
             // Calculate horizon-aware fade based on tile elevation and distance
-            const tileElevation = (tile as any).elevation ?? 0;
+            const tileElevation = (tile as { elevation?: number }).elevation ?? 0;
             const distance = Math.abs(layerIdx); // Depth distance in tiles
             const horizonFade = globalHorizonCalculator.getFogFade(
               cameraElevation,
@@ -125,7 +125,7 @@ export class SideViewTerrainRenderer {
             if (screenX + tilePixelSize < 0 || screenX > this.camera.viewportWidth) continue;
 
             // Calculate horizon-aware fade based on tile elevation and distance
-            const tileElevation = (tile as any).elevation ?? 0;
+            const tileElevation = (tile as { elevation?: number }).elevation ?? 0;
             const distance = Math.abs(layerIdx); // Depth distance in tiles
             const horizonFade = globalHorizonCalculator.getFogFade(
               cameraElevation,
@@ -155,7 +155,7 @@ export class SideViewTerrainRenderer {
     depthFade: number,
     layerIdx: number
   ): void {
-    const elevation = (tile as any).elevation ?? 0;
+    const elevation = (tile as { elevation?: number }).elevation ?? 0;
     const elevationOffset = elevation * tilePixelSize;
     const tileScreenY = seaLevelScreenY - elevationOffset;
 
@@ -327,7 +327,7 @@ export class SideViewTerrainRenderer {
       return 0;
     }
 
-    return (tile as any).elevation ?? 0;
+    return (tile as { elevation?: number }).elevation ?? 0;
   }
 
   /**

@@ -168,6 +168,63 @@ export interface SocialEvents {
     triggeredBy: string;
     affectedAgents: string[];
   };
+
+  // === Communication Device Events ===
+
+  /** Chat message sent */
+  'chat:message_sent': {
+    roomId: string;
+    messageId?: string;
+    senderId: string;
+    senderName?: string;
+    message?: string;
+    content?: string;
+    timestamp?: number;
+  };
+
+  /** Walkie talkie device issued to agent */
+  'walkie_talkie_issued': {
+    deviceId: string;
+    agentId: string;
+    model: string;
+  };
+
+  /** Walkie talkie transmission sent */
+  'walkie_talkie_transmission': {
+    transmissionId: string;
+    senderId: string;
+    channel: number;
+    message: string;
+    receiverCount: number;
+  };
+
+  /** Cell phone issued to agent */
+  'cell_phone_issued': {
+    phoneId: string;
+    phoneNumber: string;
+    agentId: string;
+    generation: string;
+  };
+
+  /** Cell phone call started */
+  'cell_phone_call_started': {
+    callId: string;
+    caller: string;
+    receiver: string;
+  };
+
+  /** Cell phone text message sent */
+  'cell_phone_text_sent': {
+    messageId: string;
+    sender: string;
+    receiverNumber: string;
+    hasMedia: boolean;
+  };
+
+  /** Cell network technology upgraded */
+  'cell_network_upgraded': {
+    generation: string;
+  };
 }
 export type SocialEventType = keyof SocialEvents;
 export type SocialEventData = SocialEvents[SocialEventType];

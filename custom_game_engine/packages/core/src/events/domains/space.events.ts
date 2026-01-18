@@ -159,6 +159,41 @@ export interface SpaceEvents {
     supplyLevel: number;
   };
 
+  // === Armada Events ===
+
+  /** Fleet missing from armada */
+  'armada:fleet_missing': {
+    armadaId: string;
+    missingFleetId: string;
+  };
+
+  /** Fleet joined an armada */
+  'armada:fleet_joined': {
+    armadaId: string;
+    fleetId: string;
+  };
+
+  /** Armada disbanding (too few fleets) */
+  'armada:disbanding': {
+    armadaId: string;
+    reason: string;
+    remainingFleets: number;
+  };
+
+  /** Fleet left an armada */
+  'armada:fleet_left': {
+    armadaId: string;
+    fleetId: string;
+  };
+
+  // === Navy Events ===
+
+  /** Armada missing from navy */
+  'navy:armada_missing': {
+    navyId: string;
+    missingArmadaId: string;
+  };
+
   // === Shipping Lane Events ===
 
   /** Caravan departed on shipping lane */

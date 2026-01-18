@@ -18,6 +18,9 @@ export class ContextSection {
   private onOpenConfigCallback: ((agentEntity: any) => void) | null = null;
   private lastPromptContent: string = '';
   private selectedPromptType: PromptType = 'combined';
+  private tabButtonsBounds: Array<{ x: number; y: number; width: number; height: number; type: PromptType }> = [];
+  private copyButtonBounds: { x: number; y: number; width: number; height: number } | null = null;
+  private configButtonBounds: { x: number; y: number; width: number; height: number; agentEntity: any } | null = null;
 
   constructor() {
     this.contextText = new SelectableText('agent-context-textarea');
@@ -35,7 +38,7 @@ export class ContextSection {
    */
   handleClick(canvasX: number, canvasY: number): boolean {
     // Check prompt type tab buttons
-    const tabButtonsBounds = (this as any).tabButtonsBounds;
+    const tabButtonsBounds = this.tabButtonsBounds;
     if (tabButtonsBounds) {
       for (const tab of tabButtonsBounds) {
         if (
