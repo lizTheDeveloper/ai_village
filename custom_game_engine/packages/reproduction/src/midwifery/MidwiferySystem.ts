@@ -117,7 +117,7 @@ export class MidwiferySystem extends BaseSystem {
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private reproductionSystem: ReproductionSystem | null = null;
-  private lastUpdateTick: Tick = 0;
+  private lastMidwiferyUpdateTick: Tick = 0;
 
   protected onInitialize(world: World, eventBus: EventBus): void {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
@@ -136,8 +136,8 @@ export class MidwiferySystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-    const deltaTicks = currentTick - this.lastUpdateTick;
-    this.lastUpdateTick = currentTick;
+    const deltaTicks = currentTick - this.lastMidwiferyUpdateTick;
+    this.lastMidwiferyUpdateTick = currentTick;
 
     if (deltaTicks <= 0) return;
 

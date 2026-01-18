@@ -306,11 +306,14 @@ export class ShippingLaneSystem extends BaseSystem {
         });
 
         // Update lane's last used tick
-        (laneEntity as EntityImpl).updateComponent('shipping_lane', (oldLane) => ({
-          ...oldLane,
-          lastUsedTick: currentTick,
-          activeCaravans: oldLane.activeCaravans.filter((id) => id !== caravan.caravanId),
-        }));
+        (laneEntity as EntityImpl).updateComponent('shipping_lane', (oldLane) => {
+          const typedLane = oldLane as ShippingLaneComponent;
+          return {
+            ...typedLane,
+            lastUsedTick: currentTick,
+            activeCaravans: typedLane.activeCaravans.filter((id: string) => id !== caravan.caravanId),
+          };
+        });
       }
     }
 
@@ -418,6 +421,7 @@ export class ShippingLaneSystem extends BaseSystem {
 
     const caravan: TradeCaravanComponent = {
       type: 'trade_caravan',
+      version: 1,
       caravanId,
       laneId,
       agreementId,
@@ -436,11 +440,14 @@ export class ShippingLaneSystem extends BaseSystem {
     (caravanEntity as EntityImpl).addComponent(caravan);
 
     // Update lane to track this caravan
-    (lane as EntityImpl).updateComponent('shipping_lane', (oldLane) => ({
-      ...oldLane,
-      activeCaravans: [...oldLane.activeCaravans, caravanId],
-      lastUsedTick: world.tick,
-    }));
+    (lane as EntityImpl).updateComponent('shipping_lane', (oldLane) => {
+      const typedLane = oldLane as ShippingLaneComponent;
+      return {
+        ...typedLane,
+        activeCaravans: [...typedLane.activeCaravans, caravanId],
+        lastUsedTick: world.tick,
+      };
+    });
 
     // Emit departure event
     world.eventBus.emit({
@@ -471,10 +478,13 @@ export class ShippingLaneSystem extends BaseSystem {
       return { success: false, reason: `Lane ${laneId} not found` };
     }
 
-    (laneEntity as EntityImpl).updateComponent('shipping_lane', (lane) => ({
-      ...lane,
-      hazards: [...lane.hazards, hazard],
-    }));
+    (laneEntity as EntityImpl).updateComponent('shipping_lane', (lane) => {
+      const typedLane = lane as ShippingLaneComponent;
+      return {
+        ...typedLane,
+        hazards: [...typedLane.hazards, hazard],
+      };
+    });
 
     return { success: true };
   }
@@ -493,12 +503,13 @@ export class ShippingLaneSystem extends BaseSystem {
     }
 
     (laneEntity as EntityImpl).updateComponent('shipping_lane', (lane) => {
-      const newHazards = [...lane.hazards];
+      const typedLane = lane as ShippingLaneComponent;
+      const newHazards = [...typedLane.hazards];
       if (hazardIndex < 0 || hazardIndex >= newHazards.length) {
         throw new Error(`Invalid hazard index: ${hazardIndex}`);
       }
       newHazards.splice(hazardIndex, 1);
-      return { ...lane, hazards: newHazards };
+      return { ...typedLane, hazards: newHazards };
     });
 
     return { success: true };
