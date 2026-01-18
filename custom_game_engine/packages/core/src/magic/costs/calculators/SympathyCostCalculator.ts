@@ -163,7 +163,7 @@ export class SympathyCostCalculator extends BaseCostCalculator {
    * Override terminal effect for sympathy-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     _caster: MagicComponent
   ): TerminalEffect {
@@ -181,13 +181,13 @@ export class SympathyCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    return super.getTerminalEffect(costType, trigger, _caster);
   }
 
   /**
    * Slippage is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'slippage' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'slippage' || super.isCumulativeCost(costType);
   }
 }

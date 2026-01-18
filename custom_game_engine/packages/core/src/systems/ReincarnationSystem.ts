@@ -161,32 +161,21 @@ const SPECIES_CATEGORIES: Record<string, string[]> = {
 /**
  * ReincarnationSystem - Handles the rebirth of souls per deity policy
  */
-export class ReincarnationSystem implements System {
+export class ReincarnationSystem extends BaseSystem {
   readonly id: SystemId = 'reincarnation';
   readonly priority: number = 120; // Run after DeathTransitionSystem
   readonly requiredComponents = [] as const; // Event-driven, doesn't need entity iteration
 
   private queuedSouls: Map<string, QueuedSoul> = new Map();
-  private eventUnsubscribe?: () => void;
 
   /**
    * Initialize event listener
    */
-  init(world: World): void {
-    this.eventUnsubscribe = world.eventBus.subscribe(
+  protected onInitialize(world: World): void {
+    world.eventBus.subscribe(
       'soul:reincarnation_queued',
       (event) => this.handleReincarnationQueued(world, event)
     );
-  }
-
-  /**
-   * Clean up event listener
-   */
-  destroy(): void {
-    if (this.eventUnsubscribe) {
-      this.eventUnsubscribe();
-      this.eventUnsubscribe = undefined;
-    }
   }
 
   /**
@@ -344,8 +333,9 @@ export class ReincarnationSystem implements System {
   /**
    * Main update - check for souls ready to be reborn
    */
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentTick = world.tick;
+  protected onUpdate(ctx: SystemContext): void {
+    const currentTick = ctx.tick;
+    const world = ctx.world;
 
     for (const [entityId, soul] of this.queuedSouls) {
       if (currentTick >= soul.rebirthAt) {
@@ -597,23 +587,19 @@ export class ReincarnationSystem implements System {
     (world as unknown as WorldInternal)._addEntity(newEntity);
 
     // Emit reincarnation complete event
-    world.eventBus.emit({
-      type: 'soul:reincarnated',
-      source: soul.originalEntityId,
-      data: {
-        originalEntityId: soul.originalEntityId,
-        newEntityId: newEntity.id,
-        deityId: soul.deityId,
-        memoryRetention: soul.config.memoryRetention,
-        speciesConstraint: soul.config.speciesConstraint,
-        preservedMemoryCount: soul.preserved.memories?.length ?? 0,
-        previousName: soul.preserved.name,
-        newName: soulName,
-        soulName: soul.preserved.soulIdentity?.soulName,
-        soulOriginCulture: soul.preserved.soulIdentity?.soulOriginCulture,
-        incarnationCount: soul.preserved.soulIdentity?.incarnationHistory.length ?? 0,
-      },
-    });
+    this.events.emit('soul:reincarnated', {
+      originalEntityId: soul.originalEntityId,
+      newEntityId: newEntity.id,
+      deityId: soul.deityId,
+      memoryRetention: soul.config.memoryRetention,
+      speciesConstraint: soul.config.speciesConstraint,
+      preservedMemoryCount: soul.preserved.memories?.length ?? 0,
+      previousName: soul.preserved.name,
+      newName: soulName,
+      soulName: soul.preserved.soulIdentity?.soulName,
+      soulOriginCulture: soul.preserved.soulIdentity?.soulOriginCulture,
+      incarnationCount: soul.preserved.soulIdentity?.incarnationHistory.length ?? 0,
+    }, soul.originalEntityId);
 
     // ✅ CONSERVATION OF GAME MATTER:
     // TODO: Full soul/body separation refactor needed

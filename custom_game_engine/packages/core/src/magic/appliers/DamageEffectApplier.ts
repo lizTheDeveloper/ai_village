@@ -135,7 +135,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
 
       // Also ignite tiles around the target if this is Trogdor's breath or similar AoE fire
       if (effect.tags?.includes('burnination') || effect.targetType === 'cone') {
-        const position = target.components.get(CT.Position) as any;
+        const position = target.getComponent<PositionComponent>(CT.Position);
         if (position && world.getTileAt) {
           // Ignite tile at target position
           context.fireSpreadSystem.igniteTile(
@@ -287,7 +287,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalResistance = 0;
 
     // Check equipped armor for resistances
-    const equipment = target.components.get('equipment_slots') as EquipmentSlotsComponent | undefined;
+    const equipment = target.getComponent<EquipmentSlotsComponent>('equipment_slots');
     if (equipment) {
       // Check each equipped item for armor traits
       for (const [_slot, equippedItem] of Object.entries(equipment.slots)) {
@@ -295,7 +295,10 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
           const itemDef = itemRegistry.get(equippedItem.definitionId);
           if (itemDef && itemDef.traits?.armor) {
             const armorTrait = itemDef.traits.armor as ArmorTrait;
-            const resistance = (armorTrait.resistances as any)?.[damageType] ?? 0;
+            // Type guard for resistances - they may not exist on all armor
+            const resistance = armorTrait.resistances && damageType in armorTrait.resistances
+              ? armorTrait.resistances[damageType]
+              : 0;
             totalResistance += resistance;
           }
         }
@@ -321,7 +324,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalDefense = 0;
 
     // Check equipped armor for defense
-    const equipment = target.components.get('equipment_slots') as EquipmentSlotsComponent | undefined;
+    const equipment = target.getComponent<EquipmentSlotsComponent>('equipment_slots');
     if (equipment) {
       // Sum defense from all equipped armor
       for (const [_slot, equippedItem] of Object.entries(equipment.slots)) {

@@ -209,7 +209,7 @@ export class MidwiferySystem extends BaseSystem {
 
     impl.addComponent(pregnancy);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:pregnancy_started',
       source: data.pregnantAgentId,
       data: {
@@ -339,7 +339,7 @@ export class MidwiferySystem extends BaseSystem {
 
     mother.addComponent(labor);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:labor_started',
       source: mother.id,
       data: {
@@ -450,7 +450,7 @@ export class MidwiferySystem extends BaseSystem {
     const complication = labor.addComplication(selected);
     complication.onset = currentTick;
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:complication',
       source: mother.id,
       data: {
@@ -540,14 +540,14 @@ export class MidwiferySystem extends BaseSystem {
       gestationalAgeWeeks: labor.gestationalAgeWeeks,
     };
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:birth',
       source: mother.id,
       data: outcome,
     } as any);
 
     // Also emit the standard birth event for canon tracking
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'birth',
       source: mother.id,
       data: {
@@ -672,7 +672,7 @@ export class MidwiferySystem extends BaseSystem {
     labor: LaborComponent,
     cause: string
   ): void {
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:maternal_death',
       source: mother.id,
       data: {
@@ -683,7 +683,7 @@ export class MidwiferySystem extends BaseSystem {
     } as any);
 
     // Emit death event
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'death',
       source: mother.id,
       data: {
@@ -699,7 +699,7 @@ export class MidwiferySystem extends BaseSystem {
    * Handle infant death
    */
   private handleInfantDeath(child: Entity, cause: string): void {
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:infant_death',
       source: child.id,
       data: {
@@ -708,7 +708,7 @@ export class MidwiferySystem extends BaseSystem {
       },
     } as any);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'death',
       source: child.id,
       data: {
@@ -748,7 +748,7 @@ export class MidwiferySystem extends BaseSystem {
       if (updatedPostpartum.fullyRecovered) {
         impl.removeComponent('postpartum');
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'midwifery:recovery_complete',
           source: entity.id,
           data: { motherId: entity.id },
@@ -821,7 +821,7 @@ export class MidwiferySystem extends BaseSystem {
       if (updatedInfant.hasMaturated()) {
         impl.removeComponent('infant');
 
-        this.eventBus?.emit({
+        this.events.emitGeneric({
           type: 'midwifery:infant_matured',
           source: entity.id,
           data: { childId: entity.id, ageDays: infant.ageDays },
@@ -878,7 +878,7 @@ export class MidwiferySystem extends BaseSystem {
 
     labor.setAttendance(midwifeId, skillLevel);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:midwife_attending',
       source: midwifeId,
       data: {
@@ -967,7 +967,7 @@ export class MidwiferySystem extends BaseSystem {
       return updated;
     });
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:prenatal_checkup',
       source: midwifeId,
       data: {
@@ -1003,7 +1003,7 @@ export class MidwiferySystem extends BaseSystem {
 
     const success = labor.treatComplication(complicationType, midwifeId, skillLevel, hasSupplies);
 
-    this.eventBus?.emit({
+    this.events.emitGeneric({
       type: 'midwifery:complication_treated',
       source: midwifeId,
       data: {
