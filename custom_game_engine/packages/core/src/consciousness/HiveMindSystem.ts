@@ -1096,17 +1096,13 @@ export class HiveMindSystem extends BaseSystem {
 
     hive.directives.push(directive);
 
-    this.events.emitGeneric({
-      type: 'hive:directive_issued' as any,
-      source: 'hive-mind-system',
-      data: {
-        hiveId,
-        directiveId: directive.id,
-        task,
-        priority,
-        assignedCount: directive.assignedWorkers.length,
-        reasoning,
-      },
+    this.events.emitGeneric('hive:directive_issued', {
+      hiveId,
+      directiveId: directive.id,
+      task,
+      priority,
+      assignedCount: directive.assignedWorkers.length,
+      reasoning,
     });
 
     return directive;
