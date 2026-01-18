@@ -190,6 +190,18 @@ export class TradeAgreementSystem extends BaseSystem {
 
     const scope = determineTradeScope(proposerIdentity, targetIdentity);
 
+    // Validate passages for cross-realm trades
+    // For now, we assume passageIds will be provided in crossRealmMetadata when creating the agreement
+    // In practice, the caller would need to discover and provide passage IDs
+    const passageIds: string[] = [];
+    const passageValidation = this.validatePassageForTrade(world, scope, passageIds);
+    if (!passageValidation.valid) {
+      return {
+        success: false,
+        reason: passageValidation.reason ?? 'Passage validation failed',
+      };
+    }
+
     // Calculate facilitation cost
     const totalValue = this.calculateTermsValue(terms);
     const facilitationCost = calculateTradeFacilitationCost(scope, totalValue);
@@ -1080,6 +1092,134 @@ export class TradeAgreementSystem extends BaseSystem {
   // ===========================================================================
   // Helper Methods
   // ===========================================================================
+
+  /**
+   * Validate that passage exists and is active for cross-realm trade
+   */
+  private validatePassageForTrade(
+    world: World,
+    scope: TradeScope,
+    passageIds: string[]
+  ): { valid: boolean; reason?: string } {
+    // Local and inter-village trades don't require passages
+    if (scope === 'local' || scope === 'inter_village') {
+      return { valid: true };
+    }
+
+    // Cross-realm trades require at least one passage
+    if (passageIds.length === 0) {
+      return {
+        valid: false,
+        reason: `Trade scope '${scope}' requires passage but none provided`,
+      };
+    }
+
+    // Verify passage exists and is in valid state
+    const passages = world.query().with('passage').executeEntities();
+
+    for (const passageId of passageIds) {
+      const passageEntity = passages.find((e) => {
+        const comp = e.getComponent<PassageComponent>('passage');
+        return comp?.passageId === passageId;
+      });
+
+      if (!passageEntity) {
+        return {
+          valid: false,
+          reason: `Passage '${passageId}' not found`,
+        };
+      }
+
+      const passageComp = passageEntity.getComponent<PassageComponent>('passage');
+      if (!passageComp) {
+        return {
+          valid: false,
+          reason: `Passage '${passageId}' missing passage component`,
+        };
+      }
+
+      // Check passage state - must be active and not collapsing
+      if (passageComp.state === 'collapsing') {
+        return {
+          valid: false,
+          reason: `Passage '${passageId}' is collapsing and cannot be used for trade`,
+        };
+      }
+
+      if (!passageComp.active) {
+        return {
+          valid: false,
+          reason: `Passage '${passageId}' is not active`,
+        };
+      }
+
+      if (passageComp.cooldown > 0) {
+        return {
+          valid: false,
+          reason: `Passage '${passageId}' is on cooldown (${passageComp.cooldown} ticks remaining)`,
+        };
+      }
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Handle passage collapse - mark affected agreements as violated
+   */
+  private handlePassageCollapsed(world: World, passageId: string): void {
+    const civEntities = world.query().with('trade_agreement').executeEntities();
+
+    for (const entity of civEntities) {
+      const comp = entity.getComponent<TradeAgreementComponent>('trade_agreement');
+      if (!comp) continue;
+
+      let needsUpdate = false;
+      const updatedAgreements: TradeAgreement[] = [];
+
+      for (const agreement of comp.activeAgreements) {
+        // Check if this agreement uses the collapsed passage
+        const usesPassage = agreement.crossRealmMetadata?.passageIds.includes(passageId) ?? false;
+
+        if (usesPassage && agreement.status === 'active') {
+          // Mark agreement as violated
+          const updatedAgreement: TradeAgreement = {
+            ...agreement,
+            status: 'violated',
+            violations: [
+              ...agreement.violations,
+              {
+                type: 'passage_collapsed',
+                description: `Passage '${passageId}' collapsed, breaking trade route`,
+                reportedBy: comp.civilizationId,
+                tick: BigInt(world.tick),
+              },
+            ],
+          };
+          updatedAgreements.push(updatedAgreement);
+          needsUpdate = true;
+
+          // Emit violation event
+          this.emitTradeEvent(world, 'violated', agreement.id, BigInt(world.tick), {
+            reason: 'passage_collapsed',
+            passageId,
+            affectedCivilization: comp.civilizationId,
+          });
+        } else {
+          updatedAgreements.push(agreement);
+        }
+      }
+
+      if (needsUpdate) {
+        const updatedComp: TradeAgreementComponent = {
+          ...comp,
+          activeAgreements: updatedAgreements,
+        };
+        // Cast to EntityImpl required - Entity interface is readonly
+        (entity as EntityImpl).updateComponent('trade_agreement', () => updatedComp);
+      }
+    }
+  }
 
   /**
    * Advance the time coordinate for a civilization

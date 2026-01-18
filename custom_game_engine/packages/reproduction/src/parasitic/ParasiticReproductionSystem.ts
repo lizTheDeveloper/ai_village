@@ -12,7 +12,7 @@
  * - "Courtship" may be simulated for camouflage purposes only
  */
 
-import type { System } from '@ai-village/core';
+import { BaseSystem, type SystemContext } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityId, Tick, SystemId } from '@ai-village/core';
