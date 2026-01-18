@@ -104,6 +104,8 @@ export class ConversionWarfareSystem extends BaseSystem {
   public readonly id = 'ConversionWarfareSystem';
   public readonly priority = 79;
   public readonly requiredComponents = [] as const;
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 300; // ~15 seconds at 20 TPS
 
   private config: ConversionConfig;

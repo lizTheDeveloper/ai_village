@@ -29,6 +29,8 @@ export class PrayerAnsweringSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer_answering';
   public readonly priority: number = 117; // After prayer generation
   public readonly requiredComponents = [];
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
 
   protected readonly throttleInterval = 100; // SLOW - 5 seconds (prayers don't need instant answers)
 

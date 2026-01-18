@@ -5,15 +5,18 @@
  * The God of Death is a visible, conversational deity that offers death bargains.
  */
 
-import type { World } from '@ai-village/core';
-import type { Entity } from '@ai-village/core';
-import { createIdentityComponent } from '@ai-village/core';
-import { createPositionComponent } from '@ai-village/core';
-import { createTagsComponent } from '@ai-village/core';
-import { createRelationshipComponent } from '@ai-village/core';
-import { createEpisodicMemoryComponent } from '@ai-village/core';
-import { createConversationComponent } from '@ai-village/core';
-import { createRenderableComponent } from '@ai-village/core';
+import type { World, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
+import {
+  EntityImpl,
+  ComponentType,
+  createIdentityComponent,
+  createPositionComponent,
+  createTagsComponent,
+  createRelationshipComponent,
+  createEpisodicMemoryComponent,
+  createConversationComponent,
+  createRenderableComponent,
+} from '@ai-village/core';
 import {
   getDeathGodByIndex,
   getDeathGodSpritePath,
@@ -51,11 +54,11 @@ export function createGodOfDeath(
 
   // Identity - God of Death
   const identity = createIdentityComponent(config.name);
-  (entity as any).addComponent(identity);
+  (entity as EntityImpl).addComponent(identity);
 
   // Position - manifests at death location
   const position = createPositionComponent(location.x, location.y);
-  (entity as any).addComponent(position);
+  (entity as EntityImpl).addComponent(position);
 
   // Tags - mark as deity and death god
   const tags = createTagsComponent(
@@ -66,24 +69,24 @@ export function createGodOfDeath(
     'conversational', // Can be talked to
     `origin:${config.origin}` // Track cultural origin
   );
-  (entity as any).addComponent(tags);
+  (entity as EntityImpl).addComponent(tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getDeathGodSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as any).addComponent(renderable);
+  (entity as EntityImpl).addComponent(renderable);
 
   // Episodic Memory - remembers all death bargains and interactions
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as any).addComponent(memory);
+  (entity as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with mortals and player
   const relationships = createRelationshipComponent();
-  (entity as any).addComponent(relationships);
+  (entity as EntityImpl).addComponent(relationships);
 
   // Conversation - can engage in dialogue
   const conversation = createConversationComponent(100); // Gods have long conversation histories
-  (entity as any).addComponent(conversation);
+  (entity as EntityImpl).addComponent(conversation);
 
   return entity;
 }
@@ -92,16 +95,10 @@ export function createGodOfDeath(
  * Check if an entity is the God of Death
  */
 export function isGodOfDeath(entity: Entity): boolean {
-  const tags = entity.components.get('tags') as any;
+  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
   if (!tags || !tags.tags) return false;
-  // Handle both Set and Array
-  if (tags.tags instanceof Set) {
-    return tags.tags.has('death_god');
-  }
-  if (Array.isArray(tags.tags)) {
-    return tags.tags.includes('death_god');
-  }
-  return false;
+  // TagsComponent.tags is always an array (see TagsComponent definition)
+  return tags.tags.includes('death_god');
 }
 
 /**
@@ -109,7 +106,7 @@ export function isGodOfDeath(entity: Entity): boolean {
  */
 export function findGodOfDeath(world: World): Entity | null {
   const entities = world.query()
-    .with('tags' as any)
+    .with(ComponentType.Tags)
     .executeEntities();
 
   for (const entity of entities) {
@@ -125,7 +122,7 @@ export function findGodOfDeath(world: World): Entity | null {
  * Move God of Death to a new location
  */
 export function moveGodOfDeath(entity: Entity, location: { x: number; y: number }): void {
-  const position = entity.components.get('position') as any;
+  const position = entity.components.get(ComponentType.Position) as PositionComponent | undefined;
   if (position) {
     position.x = location.x;
     position.y = location.y;

@@ -372,8 +372,12 @@ export class SaveLoadService {
       }
 
       // Clear existing world
-      // Note: World interface doesn't have clear(), so we access internal API
-      const worldImpl = world as any;  // TODO: Add clear() to World interface
+      // Type assertion: WorldImpl has _entities as an internal property
+      interface WorldImplInternal {
+        _entities: Map<string, unknown>;
+      }
+
+      const worldImpl = world as unknown as WorldImplInternal;
       worldImpl._entities.clear();
 
       // Restore multiverse state
@@ -381,7 +385,8 @@ export class SaveLoadService {
 
       // Restore god-crafted queue
       if (saveFile.godCraftedQueue) {
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
+        // Type assertion: We trust the serialized queue data structure
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue);
       }
 
       // TODO: Restore passages (need to recreate passage connections)
@@ -520,13 +525,19 @@ export class SaveLoadService {
       }
 
       // Load the snapshot into the world
-      const worldImpl = world as any;
+      // Type assertion: WorldImpl has _entities as an internal property
+      interface WorldImplInternal {
+        _entities: Map<string, unknown>;
+      }
+
+      const worldImpl = world as unknown as WorldImplInternal;
       worldImpl._entities.clear();
 
       multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);
 
       if (saveFile.godCraftedQueue) {
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
+        // Type assertion: We trust the serialized queue data structure
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue);
       }
 
       for (const universeSnapshot of saveFile.universes) {

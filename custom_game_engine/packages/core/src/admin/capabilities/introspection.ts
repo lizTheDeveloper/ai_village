@@ -6,6 +6,37 @@
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
 
+// Type definitions for game client and world
+type GameClientWithWorld = {
+  world?: {
+    __introspectionAPI?: IntrospectionAPI;
+    snapshots?: unknown[];
+  };
+};
+
+type IntrospectionAPI = {
+  getEntity(entityId: unknown, options?: unknown): Promise<unknown>;
+  queryEntities(query: unknown): Promise<unknown[]>;
+  getComponentSchema(type: unknown): unknown;
+  listSchemas(options?: unknown): unknown[];
+  getSkills(entityId: unknown): Promise<unknown>;
+  listBuildings(options?: unknown): Promise<unknown[]>;
+  listBlueprints(options?: unknown): unknown[];
+  getMutationHistory(options?: unknown): Promise<unknown[]>;
+  getCacheStats(): unknown;
+  getEconomicMetrics(options?: unknown): Promise<unknown>;
+  getEnvironmentalState(bounds?: unknown): Promise<unknown>;
+  mutateField(mutation: unknown): Promise<unknown>;
+  mutateBatch(mutations: unknown[]): Promise<unknown>;
+  undo(count: number): Promise<unknown>;
+  redo(count: number): Promise<unknown>;
+  placeBuilding(config: unknown): Promise<unknown>;
+  grantSkillXP(entityId: string, skill: string, amount: number): Promise<unknown>;
+  triggerBehavior(config: unknown): Promise<unknown>;
+  createSnapshot(entityIds: string[], metadata?: unknown): Promise<string>;
+  restoreSnapshot(snapshotId: string): Promise<unknown>;
+};
+
 const introspectionCapability = defineCapability({
   id: 'introspection',
   name: 'Introspection',
@@ -32,7 +63,7 @@ const introspectionCapability = defineCapability({
         ], description: 'Schema visibility level' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -70,7 +101,7 @@ const introspectionCapability = defineCapability({
         { name: 'offset', type: 'number', required: false, default: 0, description: 'Results offset (pagination)' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -117,7 +148,7 @@ const introspectionCapability = defineCapability({
         { name: 'type', type: 'string', required: true, description: 'Component type (e.g., "agent", "needs", "position")' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -144,7 +175,7 @@ const introspectionCapability = defineCapability({
         { name: 'mutable', type: 'boolean', required: false, description: 'Filter by mutability (true = mutable only)' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -178,7 +209,7 @@ const introspectionCapability = defineCapability({
         { name: 'entityId', type: 'entity-id', required: true, entityType: 'agent', description: 'Entity ID' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -206,7 +237,7 @@ const introspectionCapability = defineCapability({
         { name: 'boundsJson', type: 'string', required: false, description: 'JSON bounds: {"x":0,"y":0,"width":100,"height":100}' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -247,7 +278,7 @@ const introspectionCapability = defineCapability({
         { name: 'category', type: 'string', required: false, description: 'Filter by category' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -280,7 +311,7 @@ const introspectionCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 100, description: 'Max results' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -315,7 +346,7 @@ const introspectionCapability = defineCapability({
       description: 'List all saved snapshots',
       params: [],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -340,7 +371,7 @@ const introspectionCapability = defineCapability({
       description: 'Get total number of snapshots',
       params: [],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -355,7 +386,7 @@ const introspectionCapability = defineCapability({
       description: 'Get introspection cache statistics',
       params: [],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -382,7 +413,7 @@ const introspectionCapability = defineCapability({
         { name: 'timeRangeJson', type: 'string', required: false, description: 'JSON time range: {"start":0,"end":1000}' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -420,7 +451,7 @@ const introspectionCapability = defineCapability({
         { name: 'boundsJson', type: 'string', required: false, description: 'JSON bounds for regional data: {"x":0,"y":0,"width":100,"height":100}' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { error: 'No active game world' };
         }
@@ -461,7 +492,7 @@ const introspectionCapability = defineCapability({
         { name: 'reason', type: 'string', required: false, description: 'Reason for mutation (for audit log)' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -501,7 +532,7 @@ const introspectionCapability = defineCapability({
         { name: 'mutationsJson', type: 'string', required: true, description: 'JSON array of mutations: [{"entityId":"...","componentType":"needs","field":"hunger","value":0.5}]' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -537,7 +568,7 @@ const introspectionCapability = defineCapability({
         { name: 'count', type: 'number', required: false, default: 1, description: 'Number of mutations to undo' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -563,7 +594,7 @@ const introspectionCapability = defineCapability({
         { name: 'count', type: 'number', required: false, default: 1, description: 'Number of mutations to redo' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -592,7 +623,7 @@ const introspectionCapability = defineCapability({
         { name: 'checkCollisions', type: 'boolean', required: false, default: true, description: 'Check for collisions' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -632,7 +663,7 @@ const introspectionCapability = defineCapability({
         { name: 'amount', type: 'number', required: true, description: 'XP amount (100 = 1 level)' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -665,7 +696,7 @@ const introspectionCapability = defineCapability({
         { name: 'validate', type: 'boolean', required: false, default: true, description: 'Validate behavior params' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -706,7 +737,7 @@ const introspectionCapability = defineCapability({
         { name: 'metadataJson', type: 'string', required: false, description: 'JSON metadata: {"reason":"Before experiment"}' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -751,7 +782,7 @@ const introspectionCapability = defineCapability({
         { name: 'snapshotId', type: 'string', required: true, description: 'Snapshot ID to restore' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -777,7 +808,7 @@ const introspectionCapability = defineCapability({
         { name: 'snapshotId', type: 'string', required: true, description: 'Snapshot ID to delete' },
       ],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
@@ -801,7 +832,7 @@ const introspectionCapability = defineCapability({
       requiresConfirmation: true,
       params: [],
       handler: async (params, gameClient, context) => {
-        const world = (gameClient as any)?.world;
+        const world = (gameClient as GameClientWithWorld)?.world;
         if (!world) {
           return { success: false, error: 'No active game world' };
         }

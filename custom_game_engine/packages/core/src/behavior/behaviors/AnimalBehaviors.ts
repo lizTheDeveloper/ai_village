@@ -134,7 +134,7 @@ export class TameAnimalBehavior extends BaseBehavior {
       }
       if (result.success) {
         // Emit success event (use any since this is a custom event not in GameEventMap)
-        (world.eventBus as any).emit({
+        (world.eventBus as unknown as { emit: (event: unknown) => void }).emit({
           type: 'agent:tamed_animal',
           source: entity.id,
           data: {
@@ -272,7 +272,7 @@ export class HouseAnimalBehavior extends BaseBehavior {
       const result = assignAnimalToHousing(world, targetAnimalId, housing.entity.id);
       if (result.success) {
         // Emit success event (use any since this is a custom event not in GameEventMap)
-        (world.eventBus as any).emit({
+        (world.eventBus as unknown as { emit: (event: unknown) => void }).emit({
           type: 'agent:housed_animal',
           source: entity.id,
           data: {

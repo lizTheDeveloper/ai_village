@@ -150,7 +150,10 @@ export class TillBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { x: number; y: number; distance: number } | null {
-    const worldWithTiles = world as any;
+    interface WorldWithTiles {
+      getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
+    }
+    const worldWithTiles = world as unknown as WorldWithTiles;
     if (typeof worldWithTiles.getTileAt !== 'function') {
       console.warn('[TillBehavior] World does not have getTileAt - cannot find tiles to till');
       return null;
@@ -277,7 +280,10 @@ export class PlantBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { x: number; y: number; distance: number } | null {
-    const worldWithTiles = world as any;
+    interface WorldWithTiles {
+      getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
+    }
+    const worldWithTiles = world as unknown as WorldWithTiles;
     if (typeof worldWithTiles.getTileAt !== 'function') {
       console.warn('[PlantBehavior] World does not have getTileAt - cannot find tiles to plant');
       return null;
@@ -769,7 +775,7 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
 
   ctx.stopMovement();
 
-  const hasSeeds = inventory?.slots?.some((slot: any) =>
+  const hasSeeds = inventory?.slots?.some((slot) =>
     slot.itemId && (slot.itemId.includes('seed') || slot.itemId === 'wheat_seed' || slot.itemId === 'carrot_seed')
   );
 
@@ -779,8 +785,19 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
 
   // Delegate to class for tile finding logic
   const behavior = new TillBehavior();
-  const world = { tick: ctx.tick, getTileAt: (ctx as any).world?.getTileAt, eventBus: { emit: (e: any) => ctx.emit(e) } } as any;
-  return behavior.execute(ctx.entity, world);
+  interface WorldWithTiles {
+    tick: number;
+    getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
+    eventBus: {
+      emit: (event: unknown) => void;
+    };
+  }
+  const world: WorldWithTiles = {
+    tick: ctx.tick,
+    getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
+    eventBus: { emit: (e: unknown) => ctx.emit(e) }
+  };
+  return behavior.execute(ctx.entity, world as unknown as World);
 }
 
 export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
@@ -790,14 +807,22 @@ export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   // Delegate to class implementation which uses spatial queries
   const behavior = new PlantBehavior();
-  const world = {
+  interface WorldWithTiles {
+    tick: number;
+    getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
+    getEntity: (id: string) => import('../../ecs/Entity.js').Entity | undefined;
+    eventBus: {
+      emit: (event: unknown) => void;
+    };
+  }
+  const world: WorldWithTiles = {
     tick: ctx.tick,
-    getTileAt: (ctx as any).world?.getTileAt,
+    getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: any) => ctx.emit(e) },
-  } as any;
+    eventBus: { emit: (e: unknown) => ctx.emit(e) },
+  };
 
-  return behavior.execute(ctx.entity, world);
+  return behavior.execute(ctx.entity, world as unknown as World);
 }
 
 export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
@@ -812,7 +837,12 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   for (const { entity: plantEntity, distance } of nearbyPlants) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    interface PlantWithHydration {
+      stage?: string;
+      _hydration?: number;
+      hydration?: number;
+    }
+    const plant = plantImpl.getComponent<PlantWithHydration>(ComponentType.Plant);
     const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
@@ -863,7 +893,11 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   const plantEntity = ctx.getEntity(nearestDryPlant.plantId);
   if (plantEntity) {
     const plantImpl = plantEntity as EntityImpl;
-    plantImpl.updateComponent<any>(ComponentType.Plant, (plant) => ({
+    interface PlantWithHydration {
+      _hydration?: number;
+      hydration?: number;
+    }
+    plantImpl.updateComponent<PlantWithHydration>(ComponentType.Plant, (plant) => ({
       ...plant,
       _hydration: Math.min(100, (plant._hydration ?? plant.hydration ?? 50) + 20),
     }));
@@ -893,12 +927,18 @@ export function harvestBehaviorWithContext(ctx: import('../BehaviorContext.js').
 
   for (const { entity: plantEntity, distance } of nearbyPlants) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    interface PlantWithHarvest {
+      stage?: string;
+      fruitCount?: number;
+      seedsProduced?: number;
+      speciesId: string;
+    }
+    const plant = plantImpl.getComponent<PlantWithHarvest>(ComponentType.Plant);
     const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
-    if (!HARVESTABLE_STAGES.includes(plant.stage)) continue;
-    if (plant.fruitCount <= 0 && plant.seedsProduced <= 0) continue;
+    if (!HARVESTABLE_STAGES.includes(plant.stage || '')) continue;
+    if ((plant.fruitCount ?? 0) <= 0 && (plant.seedsProduced ?? 0) <= 0) continue;
 
     if (!nearestHarvestable || distance < nearestHarvestable.distance) {
       nearestHarvestable = {

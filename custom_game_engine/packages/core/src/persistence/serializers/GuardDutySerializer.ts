@@ -44,7 +44,7 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
     // Defensive deserialization: ensure required fields exist for each assignment type
     interface Vec3 { x: number; y: number; z: number; }
     type ComponentData = {
-      assignmentType: string;
+      assignmentType: GuardDutyComponent['assignmentType'];
       targetLocation?: Vec3;
       targetPerson?: string;
       patrolRoute?: Vec3[];
@@ -55,7 +55,7 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
     };
 
     const componentData: ComponentData = {
-      assignmentType: d.assignmentType,
+      assignmentType: d.assignmentType as GuardDutyComponent['assignmentType'],
       targetLocation: d.targetLocation as Vec3 | undefined,
       targetPerson: typeof d.targetPerson === 'string' ? d.targetPerson : undefined,
       patrolRoute: Array.isArray(d.patrolRoute) ? d.patrolRoute as Vec3[] : undefined,
@@ -82,7 +82,12 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
       componentData.patrolRoute = [{ x: 0, y: 0, z: 0 }];
     }
 
-    return createGuardDutyComponent(componentData);
+    return createGuardDutyComponent(componentData as {
+      assignmentType: GuardDutyComponent['assignmentType'];
+      alertness: number;
+      responseRadius: number;
+      [key: string]: unknown;
+    });
   }
 
   validate(data: unknown): data is GuardDutyComponent {

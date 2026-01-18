@@ -469,10 +469,16 @@ export class MultiverseNetworkManager {
       .executeEntities();
 
     for (const deityEntity of playerControlEntities) {
-      const playerControl = deityEntity.components.get('player_control') as any;
-      const deity = deityEntity.components.get('deity') as any;
+      const playerControl = deityEntity.components.get('player_control');
+      const deity = deityEntity.components.get('deity');
 
-      if (playerControl?.isPossessed && playerControl.possessedAgentId === entityId) {
+      type PlayerControlComponent = { isPossessed?: boolean; possessedAgentId?: string | null };
+      type DeityComponent = { origin?: string; controller?: string };
+
+      const typedPlayerControl = playerControl as PlayerControlComponent | undefined;
+      const typedDeity = deity as DeityComponent | undefined;
+
+      if (typedPlayerControl?.isPossessed && typedPlayerControl.possessedAgentId === entityId) {
         // Check if entity is an avatar (deity's physical manifestation)
         const isAvatar = entity.components.has('avatar');
 
@@ -492,9 +498,16 @@ export class MultiverseNetworkManager {
             );
 
             // Update avatar component with multiverse origin
-            const avatarComp = entity.components.get('avatar') as any;
-            if (avatarComp) {
-              (entity as any).updateComponent('avatar', {
+            const avatarComp = entity.components.get('avatar');
+            if (avatarComp && typeof avatarComp === 'object') {
+              type AvatarComponent = {
+                originMultiverseId?: string;
+                currentMultiverseId?: string;
+                divinePowersSuppressed?: boolean;
+                suppressionReason?: string;
+              };
+              (entity as { updateComponent<T>(type: string, updater: (current: T) => T): void }).updateComponent<AvatarComponent & { type: string }>('avatar', (current) => ({
+                ...current,
                 ...avatarComp,
                 originMultiverseId: sourceMultiverseId,
                 currentMultiverseId: this.multiverseCoordinator.getMultiverseId(
@@ -502,13 +515,13 @@ export class MultiverseNetworkManager {
                 ),
                 divinePowersSuppressed: true,
                 suppressionReason: 'foreign_multiverse',
-              });
+              }));
             }
           } else {
           }
         } else {
           // Possessing a normal agent - check deity power scope
-          const isMultiverseDeity = deity?.origin === 'player' && deity?.controller === 'player';
+          const isMultiverseDeity = typedDeity?.origin === 'player' && typedDeity?.controller === 'player';
 
           // Check if target universe is in same multiverse or foreign
           const isSameMultiverse = this.multiverseCoordinator.areUniversesInSameMultiverse(
@@ -520,8 +533,9 @@ export class MultiverseNetworkManager {
             // Auto jack-out: weak deity OR crossing to foreign multiverse
 
             // Force jack-out
-            (deityEntity as any).updateComponent('player_control', {
-              ...playerControl,
+            type UpdateableEntity = { updateComponent<T>(type: string, component: T): void };
+            (deityEntity as UpdateableEntity).updateComponent('player_control', {
+              ...(typedPlayerControl || {}),
               isPossessed: false,
               possessedAgentId: null,
               possessionStartTick: null,
@@ -529,10 +543,15 @@ export class MultiverseNetworkManager {
 
             // Emit event for UI notification
             const events = this.getOrCreateEventManager(passage.from.universeId, sourceUniverse.world);
+            const agentComp = entity.components.get('agent');
+            const agentName = (agentComp && typeof agentComp === 'object' && 'name' in agentComp)
+              ? (agentComp as { name?: string }).name || 'Unknown'
+              : 'Unknown';
+
             events.emitGeneric('possession:cross_universe_jackout', {
               deityId: deityEntity.id,
               entityId,
-              entityName: (entity.components.get('agent') as any)?.name || 'Unknown',
+              entityName: agentName,
               targetUniverseId: passage.to.universeId,
             });
           } else {
@@ -546,8 +565,14 @@ export class MultiverseNetworkManager {
               passage.to.universeId
             );
 
-            (deityEntity as any).updateComponent('player_control', {
-              ...playerControl,
+            type CrossUniversePlayerControl = PlayerControlComponent & {
+              deityUniverseId?: string;
+              deityMultiverseId?: string;
+              possessedUniverseId?: string;
+              possessedMultiverseId?: string;
+            };
+            (deityEntity as UpdateableEntity).updateComponent<CrossUniversePlayerControl>('player_control', {
+              ...(typedPlayerControl || {}),
               deityUniverseId: passage.from.universeId,
               deityMultiverseId: sourceMultiverseId,
               possessedUniverseId: passage.to.universeId,
@@ -560,7 +585,8 @@ export class MultiverseNetworkManager {
 
     // Remove entity from source universe
     // Cast to WorldMutator to access destroyEntity method
-    const worldMutator = sourceUniverse.world as any;
+    type WorldMutator = { destroyEntity(entityId: string, reason: string): void };
+    const worldMutator = sourceUniverse.world as WorldMutator;
     worldMutator.destroyEntity(entityId, 'Transferred to remote universe');
 
 
@@ -802,19 +828,21 @@ export class MultiverseNetworkManager {
       }
 
       // Deserialize entity
-      const entity = await (worldSerializer as any).deserializeEntity(
+      const entity = await (worldSerializer as { deserializeEntity(data: unknown): Promise<{ id: string }> }).deserializeEntity(
         message.entity
       );
 
       // Add entity to target world
-      const worldImpl = targetUniverse.world as any;
+      type WorldImpl = { _entities: Map<string, unknown> };
+      const worldImpl = targetUniverse.world as WorldImpl;
       const oldEntityId = entity.id;
 
       // Generate new entity ID for this universe
       const newEntityId = `${message.targetUniverseId}-entity-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
       // Update entity ID
-      (entity as any).id = newEntityId;
+      type MutableEntity = { id: string };
+      (entity as MutableEntity).id = newEntityId;
 
       // Add to world
       worldImpl._entities.set(newEntityId, entity);
@@ -993,15 +1021,16 @@ export class MultiverseNetworkManager {
     );
 
     // Serialize entities
+    type EntityWithId = { id: string };
     const serializedEntities = await Promise.all(
       entities.map(async (entity) => {
-        const serialized = await (worldSerializer as any).serializeEntity(
+        const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
           entity
         );
         // Cache for delta compression
         const cache = this.entityCache.get(passageId);
-        if (cache) {
-          cache.set(entity.id, serialized);
+        if (cache && typeof entity === 'object' && entity !== null && 'id' in entity) {
+          cache.set((entity as EntityWithId).id, serialized);
         }
         return serialized;
       })
@@ -1057,30 +1086,31 @@ export class MultiverseNetworkManager {
     const entitiesUpdated: import('./NetworkProtocol.js').EntityUpdate[] = [];
     const entitiesRemoved: string[] = [];
 
-    const currentEntityIds = new Set(currentEntities.map((e) => e.id));
+    const currentEntityIds = new Set(currentEntities.map((e) => (e as EntityWithId).id));
     const cachedEntityIds = new Set(cache.keys());
 
     // Find added entities
     for (const entity of currentEntities) {
-      if (!cache.has(entity.id)) {
-        const serialized = await (worldSerializer as any).serializeEntity(
+      const entityWithId = entity as EntityWithId;
+      if (!cache.has(entityWithId.id)) {
+        const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
           entity
         );
         entitiesAdded.push(serialized);
-        cache.set(entity.id, serialized);
+        cache.set(entityWithId.id, serialized);
       } else if (subscription.config.deltaUpdatesOnly) {
         // Check for updates
-        const deltas = this.computeEntityDeltas(entity, cache.get(entity.id)!);
+        const deltas = this.computeEntityDeltas(entity, cache.get(entityWithId.id)!);
         if (deltas.length > 0) {
           entitiesUpdated.push({
-            entityId: entity.id,
+            entityId: entityWithId.id,
             deltas,
           });
           // Update cache
-          const serialized = await (worldSerializer as any).serializeEntity(
+          const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
             entity
           );
-          cache.set(entity.id, serialized);
+          cache.set(entityWithId.id, serialized);
         }
       }
     }
@@ -1120,18 +1150,24 @@ export class MultiverseNetworkManager {
    * Filter entities by viewport bounds
    */
   private filterEntitiesByViewport(
-    entities: readonly any[],
+    entities: readonly unknown[],
     viewport: import('./NetworkProtocol.js').Bounds
-  ): any[] {
-    return entities.filter((entity) => {
-      const pos = entity.getComponent('position') as any;
-      if (!pos) return false;
+  ): unknown[] {
+    type EntityWithComponents = { getComponent(type: string): unknown };
+    type PositionComponent = { x: number; y: number };
 
+    return entities.filter((entity) => {
+      if (typeof entity !== 'object' || entity === null || !('getComponent' in entity)) return false;
+
+      const pos = (entity as EntityWithComponents).getComponent('position');
+      if (!pos || typeof pos !== 'object' || !('x' in pos) || !('y' in pos)) return false;
+
+      const typedPos = pos as PositionComponent;
       return (
-        pos.x >= viewport.x &&
-        pos.x < viewport.x + viewport.width &&
-        pos.y >= viewport.y &&
-        pos.y < viewport.y + viewport.height
+        typedPos.x >= viewport.x &&
+        typedPos.x < viewport.x + viewport.width &&
+        typedPos.y >= viewport.y &&
+        typedPos.y < viewport.y + viewport.height
       );
     });
   }
@@ -1140,10 +1176,16 @@ export class MultiverseNetworkManager {
    * Apply entity filter from stream config
    */
   private applyEntityFilter(
-    entities: readonly any[],
+    entities: readonly unknown[],
     config: import('./NetworkProtocol.js').StreamConfiguration
-  ): any[] {
+  ): unknown[] {
     let filtered = [...entities];
+
+    type EntityWithComponents = {
+      hasComponent(type: string): boolean;
+      getComponent(type: string): unknown;
+    };
+    type TagsComponent = { tags?: string[] };
 
     if (config.entityFilter) {
       const filter = config.entityFilter;
@@ -1151,16 +1193,18 @@ export class MultiverseNetworkManager {
       // Filter by types
       if (filter.types && filter.types.length > 0) {
         filtered = filtered.filter((entity) => {
-          return filter.types!.some((type) => entity.hasComponent(type));
+          if (typeof entity !== 'object' || entity === null || !('hasComponent' in entity)) return false;
+          return filter.types!.some((type) => (entity as EntityWithComponents).hasComponent(type));
         });
       }
 
       // Filter by tags
       if (filter.tags && filter.tags.length > 0) {
         filtered = filtered.filter((entity) => {
-          const tags = entity.getComponent('tags') as any;
-          if (!tags) return false;
-          return filter.tags!.some((tag) => tags.tags?.includes(tag));
+          if (typeof entity !== 'object' || entity === null || !('getComponent' in entity)) return false;
+          const tags = (entity as EntityWithComponents).getComponent('tags');
+          if (!tags || typeof tags !== 'object' || !('tags' in tags)) return false;
+          return filter.tags!.some((tag) => (tags as TagsComponent).tags?.includes(tag));
         });
       }
     }

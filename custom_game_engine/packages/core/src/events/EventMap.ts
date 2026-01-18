@@ -1242,6 +1242,72 @@ export interface GameEventMap {
     itemId?: string;
   };
 
+  // === Uplift Events ===
+  'uplift_candidate_detected': {
+    entityId: EntityId;
+    speciesId: string;
+    upliftPotential: number;
+    preSapient: boolean;
+    estimatedGenerations: number;
+  };
+  'consciousness_awakened': {
+    entityId: EntityId;
+    entityName: string;
+    programId: string;
+    sourceSpecies: string;
+    generation: number;
+    awakening: {
+      tick: number;
+      generation: number;
+      firstThought: string;
+      firstQuestion: string;
+      firstEmotion: string;
+      firstWord: string;
+      witnessIds: string[];
+    };
+  };
+  'proto_sapience_milestone': {
+    entityId: EntityId;
+    milestone: string;
+    generation?: number;
+    intelligence: number;
+    tradition?: string;
+  };
+  'uplift_generation_advanced': {
+    programId: string;
+    generation: number;
+    intelligence: number;
+    result: {
+      generation: number;
+      birthCount: number;
+      survivalRate: number;
+      averageIntelligence: number;
+      neuralComplexity: number;
+      mutations: string[];
+      breakthroughs: string[];
+      setbacks: string[];
+      notableIndividuals: string[];
+    };
+  };
+  'uplift_stage_changed': {
+    programId: string;
+    previousStage: string;
+    newStage: string;
+    generation: number;
+    intelligence: number;
+  };
+  'uplift_population_extinct': {
+    programId: string;
+    generation: number;
+    reason: string;
+  };
+  'uplifted_species_registered': {
+    speciesId: string;
+    speciesName: string;
+    programId: string;
+    sourceSpeciesId: string;
+  };
+
   // === Housing Events ===
   'housing:dirty': {
     housingId: EntityId;

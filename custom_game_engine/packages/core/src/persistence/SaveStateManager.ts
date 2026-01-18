@@ -153,13 +153,19 @@ export class SaveStateManager {
     const snapshot = await worldSerializer.serializeWorld(world, universeId, universeName);
 
     // Get time info
-    const timeEntities = world.query().with('time' as any).executeEntities();
-    const timeComp = timeEntities[0]?.getComponent('time' as any) as any;
+    const timeEntities = world.query().with('time').executeEntities();
+
+    interface TimeComponentData {
+      currentDay?: number;
+      tickCount?: number;
+    }
+
+    const timeComp = timeEntities[0]?.getComponent('time') as TimeComponentData | undefined;
     const day = timeComp?.currentDay ?? 0;
     const tick = timeComp?.tickCount ?? 0;
 
     // Count agents
-    const agentCount = world.query().with('agent' as any).executeEntities().length;
+    const agentCount = world.query().with('agent').executeEntities().length;
 
     // Create metadata
     const metadata: SaveMetadata = {

@@ -104,7 +104,7 @@ export class PlantTargeting {
       if (options.speciesId && plant.speciesId !== options.speciesId) continue;
 
       // Check fully grown filter
-      if (options.fullyGrown && plant.growthStage < 1.0) continue;
+      if (options.fullyGrown && (plant.growthStage ?? 0) < 1.0) continue;
 
       // Check for food
       if (options.hasFood) {
@@ -182,7 +182,7 @@ export class PlantTargeting {
       if (!plant || !plantPos) continue;
 
       if (options.speciesId && plant.speciesId !== options.speciesId) continue;
-      if (options.fullyGrown && plant.growthStage < 1.0) continue;
+      if (options.fullyGrown && (plant.growthStage ?? 0) < 1.0) continue;
 
       if (options.hasFood) {
         const edible = isEdibleSpecies(plant.speciesId);

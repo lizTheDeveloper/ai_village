@@ -117,6 +117,8 @@ export class DivineWeatherControl extends BaseSystem {
   public readonly id = 'DivineWeatherControl';
   public readonly priority = 72;
   public readonly requiredComponents = [] as const;
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
 
   private config: WeatherControlConfig;
   private weatherEvents: Map<string, DivineWeatherEvent> = new Map();

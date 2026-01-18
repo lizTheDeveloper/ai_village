@@ -52,6 +52,8 @@ export class MythGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'myth_generation';
   public readonly priority: number = 118; // After prayer answering
   public readonly requiredComponents = [];
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // SLOW - 5 seconds (check for LLM responses)
 
   private mythIdCounter: number = 0;

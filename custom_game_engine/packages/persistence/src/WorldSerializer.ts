@@ -51,8 +51,15 @@ export class WorldSerializer {
     // Get time component if it exists
     const timeEntities = world.query().with('time').execute();
     const timeEntityId = timeEntities[0];
+
+    interface TimeComponentData {
+      day?: number;
+      timeOfDay?: number;
+      phase?: 'dawn' | 'day' | 'dusk' | 'night';
+    }
+
     const timeComponent = timeEntityId
-      ? world.getComponent(timeEntityId, 'time') as any
+      ? world.getComponent(timeEntityId, 'time') as TimeComponentData | undefined
       : undefined;
 
     const snapshot: UniverseSnapshot = {
@@ -119,19 +126,23 @@ export class WorldSerializer {
     const deserializedEntities = await this.deserializeEntities(snapshot.entities);
 
     // Add entities to world
-    // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
     // CRITICAL: Use _addEntity instead of _entities.set() to properly update the spatial chunk index
     // Without this, findNearestResources() returns empty arrays and NPCs can't find food/resources
+    // Type assertion: WorldImpl has _addEntity as an internal method
+    interface WorldImplInternal {
+      _addEntity(entity: Entity): void;
+    }
+
     for (const entity of deserializedEntities) {
-      (worldImpl as any)._addEntity(entity);
+      (worldImpl as unknown as WorldImplInternal)._addEntity(entity);
     }
 
     // Deserialize world state (terrain, weather, etc.)
     if (snapshot.worldState.terrain) {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
-        // Cast to any to avoid type conflicts between core's IChunkManager and world's ChunkManager
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
+        // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -248,7 +259,13 @@ export class WorldSerializer {
 
       try {
         const component = componentSerializerRegistry.deserialize(componentData) as Component;
-        (entity as any).addComponent(component);
+
+        // Type assertion: EntityImpl has addComponent as an internal method
+        interface EntityImplInternal {
+          addComponent(component: Component): void;
+        }
+
+        (entity as unknown as EntityImplInternal).addComponent(component);
       } catch (error) {
         console.error(
           `[WorldSerializer] Failed to deserialize component ${componentData.type} ` +
@@ -270,9 +287,8 @@ export class WorldSerializer {
     const worldImpl = world as WorldImpl;
     const chunkManager = worldImpl.getChunkManager();
 
-    // Cast to any to avoid type conflicts between core's IChunkManager and world's ChunkManager
     const terrain = chunkManager
-      ? chunkSerializer.serializeChunks(chunkManager as any)
+      ? chunkSerializer.serializeChunks(chunkManager)
       : null;
 
     // Serialize zones using ZoneManager

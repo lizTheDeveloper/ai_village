@@ -58,6 +58,8 @@ export class FaithMechanicsSystem extends BaseSystem {
   public readonly id = 'faith_mechanics';
   public readonly priority: number = 85; // After prayer system, before decision making
   public readonly requiredComponents = [] as const;
+  // Only run when spiritual components exist (O(1) activation check)
+  public readonly activationComponents = ['spiritual'] as const;
 
   private config: FaithConfig;
   protected readonly throttleInterval: number;

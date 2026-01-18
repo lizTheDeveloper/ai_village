@@ -18,6 +18,9 @@ import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { TagsComponent } from '../components/TagsComponent.js';
 import {
   type ChatRoomComponent,
   type ChatRoomConfig,

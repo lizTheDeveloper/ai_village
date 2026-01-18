@@ -92,6 +92,8 @@ export class SyncretismSystem extends BaseSystem {
   public readonly id = 'SyncretismSystem';
   public readonly priority = 77;
   public readonly requiredComponents = [];
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 200; // Every 10 seconds (VERY_SLOW)
 
   private config: SyncretismConfig;

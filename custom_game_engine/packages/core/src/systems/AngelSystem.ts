@@ -102,6 +102,8 @@ export class AngelSystem extends BaseSystem {
   public readonly name = 'AngelSystem';
   public readonly priority = 74;
   public readonly requiredComponents = [];
+  // Only run when angel components exist (O(1) activation check)
+  public readonly activationComponents = ['angel'] as const;
 
   protected readonly throttleInterval = 200; // ~10 seconds at 20 TPS
 

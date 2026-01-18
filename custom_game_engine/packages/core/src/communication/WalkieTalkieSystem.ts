@@ -18,6 +18,7 @@ import { World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 // =============================================================================
 // TYPES
@@ -568,7 +569,7 @@ export class WalkieTalkieSystem extends BaseSystem {
 
     for (const agent of agents) {
       const agentComp = agent.getComponent(CT.Agent);
-      const posComp = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      const posComp = agent.getComponent<PositionComponent>(CT.Position);
       if (!agentComp || !posComp) continue;
 
       const device = this.manager.getDeviceByOwner(agent.id);
@@ -607,11 +608,11 @@ export class WalkieTalkieSystem extends BaseSystem {
   ): WalkieTalkieDevice {
     const device = this.manager.createDevice(agentId, agentName, model, x, y);
 
-    this.events.emit('walkie_talkie_issued' as any, {
+    this.events.emit('walkie_talkie_issued', {
       deviceId: device.id,
       agentId,
       model,
-    } as any);
+    });
 
     return device;
   }
@@ -630,13 +631,13 @@ export class WalkieTalkieSystem extends BaseSystem {
     const transmission = this.manager.transmit(device.id, message, currentTick);
 
     if (transmission) {
-      this.events.emit('walkie_talkie_transmission' as any, {
+      this.events.emit('walkie_talkie_transmission', {
         transmissionId: transmission.id,
         senderId: agentId,
         channel: transmission.channel,
         message,
         receiverCount: transmission.receivedBy.length,
-      } as any);
+      });
     }
 
     return transmission;

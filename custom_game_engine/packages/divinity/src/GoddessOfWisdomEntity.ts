@@ -100,8 +100,8 @@ export function createGoddessOfWisdom(
  * Check if an entity is the Goddess of Wisdom
  */
 export function isGoddessOfWisdom(entity: Entity): boolean {
-  const tags = entity.components.get('tags') as any;
-  return tags?.tags?.has('wisdom_goddess') ?? false;
+  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
+  return tags?.tags?.includes('wisdom_goddess') ?? false;
 }
 
 /**
@@ -109,7 +109,7 @@ export function isGoddessOfWisdom(entity: Entity): boolean {
  */
 export function findGoddessOfWisdom(world: World): Entity | null {
   const entities = world.query()
-    .with('tags' as any)
+    .with(ComponentType.Tags)
     .executeEntities();
 
   for (const entity of entities) {
@@ -125,7 +125,7 @@ export function findGoddessOfWisdom(world: World): Entity | null {
  * Move Goddess of Wisdom to a new location
  */
 export function moveGoddessOfWisdom(entity: Entity, location: { x: number; y: number }): void {
-  const position = entity.components.get('position') as any;
+  const position = entity.components.get(ComponentType.Position) as PositionComponent | undefined;
   if (position) {
     position.x = location.x;
     position.y = location.y;
@@ -136,7 +136,7 @@ export function moveGoddessOfWisdom(entity: Entity, location: { x: number; y: nu
  * Get the scrutiny style of the wisdom goddess
  */
 export function getScrutinyStyle(entity: Entity): 'strict' | 'encouraging' | 'curious' | 'pragmatic' {
-  const tags = entity.components.get('tags') as any;
+  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
   if (!tags?.tags) return 'pragmatic';
 
   for (const tag of tags.tags) {

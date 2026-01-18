@@ -63,6 +63,8 @@ export class AvatarSystem extends BaseSystem {
   public readonly name = 'AvatarSystem';
   public readonly priority = 75;
   public readonly requiredComponents = [];
+  // Only run when avatar components exist (O(1) activation check)
+  public readonly activationComponents = ['avatar'] as const;
 
   private config: AvatarConfig;
   private avatars: Map<string, AvatarData> = new Map();

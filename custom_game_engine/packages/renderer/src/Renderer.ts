@@ -417,8 +417,8 @@ export class Renderer {
         if (Math.abs(depthDiff) > 0.5) return depthDiff;
 
         // Then by Z (height) - lower entities render first
-        const zA = (posA as any)?.z ?? 0;
-        const zB = (posB as any)?.z ?? 0;
+        const zA = posA.z;
+        const zB = posB.z;
         return zA - zB;
       });
     }
@@ -451,8 +451,8 @@ export class Renderer {
         }
 
         // Secondary sort by Z
-        const zA = (posA as any)?.z ?? 0;
-        const zB = (posB as any)?.z ?? 0;
+        const zA = posA.z;
+        const zB = posB.z;
         return zA - zB;
       });
     }
@@ -463,8 +463,8 @@ export class Renderer {
 
       if (!pos || !renderable || !renderable.visible) continue;
 
-      // Get entity z-coordinate (default to 0)
-      const entityZ = (pos as any).z ?? 0;
+      // Get entity z-coordinate
+      const entityZ = pos.z;
 
       const worldX = pos.x * this.tileSize;
       const worldY = pos.y * this.tileSize;

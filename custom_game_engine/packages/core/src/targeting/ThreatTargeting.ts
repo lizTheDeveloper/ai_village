@@ -358,7 +358,7 @@ export class ThreatTargeting {
         if (options.threatTypes && !options.threatTypes.includes('predator')) {
           return null;
         }
-        if (options.minThreatLevel !== undefined && (animalAny.threatLevel || 0) < options.minThreatLevel) {
+        if (options.minThreatLevel !== undefined && (animalWithThreat.threatLevel || 0) < options.minThreatLevel) {
           return null;
         }
 
@@ -367,7 +367,7 @@ export class ThreatTargeting {
 
         return {
           threatType: 'predator',
-          threatLevel: animalAny.threatLevel || 50,
+          threatLevel: animalWithThreat.threatLevel || 50,
           isMoving,
           velocity: movement ? { x: movement.velocityX, y: movement.velocityY } : undefined,
         };
@@ -376,8 +376,8 @@ export class ThreatTargeting {
 
     // Check for hostile agent
     const agent = getAgent(potentialThreat);
-    const agentAny = agent as AgentComponent & { isHostile?: boolean } | null;
-    if (agentAny && agentAny.isHostile) {
+    const agentWithHostility = agent as AgentComponentWithHostility | null;
+    if (agentWithHostility && agentWithHostility.isHostile) {
       if (options.threatTypes && !options.threatTypes.includes('hostile')) {
         return null;
       }
@@ -396,11 +396,7 @@ export class ThreatTargeting {
     // Check for fire/hazard
     const resource = getResource(potentialThreat);
     if (resource) {
-      // Cast to access potential future fire/hazard properties
-      const resourceWithHazard = resource as ResourceComponent & {
-        isHazard?: boolean;
-        dangerLevel?: number;
-      };
+      const resourceWithHazard = resource as ResourceComponentWithHazard;
       const resourceType = resource.resourceType as string;
 
       if (resourceType === 'fire' || resourceWithHazard.isHazard) {

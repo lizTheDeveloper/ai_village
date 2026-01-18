@@ -27,6 +27,7 @@ import { World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 // =============================================================================
 // TYPES
@@ -863,7 +864,7 @@ export class CellPhoneSystem extends BaseSystem {
     const agents = ctx.world.query().with(CT.Agent, CT.Position).executeEntities();
 
     for (const agent of agents) {
-      const posComp = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      const posComp = agent.getComponent<PositionComponent>(CT.Position);
       if (!posComp) continue;
 
       const phone = this.manager.getPhoneByOwner(agent.id);
@@ -903,12 +904,12 @@ export class CellPhoneSystem extends BaseSystem {
   ): CellPhone {
     const phone = this.manager.createPhone(agentId, agentName, generation);
 
-    this.events.emit('cell_phone_issued' as any, {
+    this.events.emit('cell_phone_issued', {
       phoneId: phone.id,
       phoneNumber: phone.phoneNumber,
       agentId,
       generation: phone.generation,
-    } as any);
+    });
 
     return phone;
   }
@@ -927,11 +928,11 @@ export class CellPhoneSystem extends BaseSystem {
     const call = this.manager.makeCall(phone.id, receiverNumber, currentTick);
 
     if (call) {
-      this.events.emit('cell_phone_call_started' as any, {
+      this.events.emit('cell_phone_call_started', {
         callId: call.id,
         caller: callerId,
         receiver: call.receiverId,
-      } as any);
+      });
     }
 
     return call;
@@ -957,12 +958,12 @@ export class CellPhoneSystem extends BaseSystem {
     );
 
     if (message) {
-      this.events.emit('cell_phone_text_sent' as any, {
+      this.events.emit('cell_phone_text_sent', {
         messageId: message.id,
         sender: senderId,
         receiverNumber,
         hasMedia: message.hasMedia,
-      } as any);
+      });
     }
 
     return message;
@@ -974,9 +975,9 @@ export class CellPhoneSystem extends BaseSystem {
   advanceTechnology(newGeneration: CellPhoneGeneration): void {
     this.manager.setCurrentGeneration(newGeneration);
 
-    this.events.emit('cell_network_upgraded' as any, {
+    this.events.emit('cell_network_upgraded', {
       generation: newGeneration,
-    } as any);
+    });
   }
 }
 

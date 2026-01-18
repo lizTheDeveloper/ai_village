@@ -86,6 +86,8 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   public readonly id = 'ReligiousCompetitionSystem';
   public readonly priority = 78;
   public readonly requiredComponents = [];
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private config: CompetitionConfig;

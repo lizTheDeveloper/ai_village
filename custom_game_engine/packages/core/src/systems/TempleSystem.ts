@@ -72,6 +72,8 @@ export class TempleSystem extends BaseSystem {
   public readonly id = 'TempleSystem';
   public readonly priority = 85;
   public readonly requiredComponents = [];
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: TempleConfig;
