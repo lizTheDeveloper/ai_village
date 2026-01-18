@@ -5,9 +5,8 @@
  * Provides curated emotional experiences through various VR types.
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
@@ -18,39 +17,27 @@ import type { EmotionalSignature } from '../navigation/SpaceshipComponent.js';
 // System Implementation
 // ============================================================================
 
-export class VRSystem implements System {
+export class VRSystem extends BaseSystem {
   public readonly id: SystemId = 'vr_system' as SystemId;
   public readonly priority: number = 160;
-  public readonly requiredComponents: ReadonlyArray<typeof CT[keyof typeof CT]> = [
+  public readonly requiredComponents = [
     CT.VRSystem,
-  ];
+  ] as const;
+
+  protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
   private eventBus: EventBus | null = null;
-  private lastUpdateTick = 0;
-  private static readonly UPDATE_INTERVAL = 20; // Every 1 second at 20 TPS
 
-  public initialize(_world: World, eventBus: EventBus): void {
+  protected onInitialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
 
-  public update(
-    world: World,
-    entities: ReadonlyArray<Entity>,
-    _deltaTime: number
-  ): void {
-    const currentTick = world.tick;
-    
-    // Throttle updates
-    if (currentTick - this.lastUpdateTick < VRSystem.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdateTick = currentTick;
-
-    for (const entity of entities) {
+  protected onUpdate(ctx: SystemContext): void {
+    for (const entity of ctx.activeEntities) {
       const vrSystem = entity.getComponent('vr_system') as VRSystemComponent;
       if (!vrSystem) continue;
 
-      this.processVRSystem(world, currentTick, vrSystem);
+      this.processVRSystem(ctx.world, ctx.tick, vrSystem);
     }
   }
 

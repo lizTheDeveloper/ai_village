@@ -11,12 +11,10 @@
  * - Creating seasonal changes
  */
 
-import type { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
-import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 // ============================================================================
 // Divine Weather Types
@@ -115,18 +113,20 @@ export const DEFAULT_WEATHER_CONTROL_CONFIG: WeatherControlConfig = {
 // DivineWeatherControl
 // ============================================================================
 
-export class DivineWeatherControl implements System {
+export class DivineWeatherControl extends BaseSystem {
   public readonly id = 'DivineWeatherControl';
-  public readonly name = 'DivineWeatherControl';
   public readonly priority = 72;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents = [] as const;
 
   private config: WeatherControlConfig;
   private weatherEvents: Map<string, DivineWeatherEvent> = new Map();
-  private lastUpdate: number = 0;
-  private events!: SystemEventManager;
+
+  protected get throttleInterval(): number {
+    return this.config.updateInterval;
+  }
 
   constructor(config: Partial<WeatherControlConfig> = {}) {
+    super();
     this.config = {
       ...DEFAULT_WEATHER_CONTROL_CONFIG,
       ...config,
@@ -134,25 +134,9 @@ export class DivineWeatherControl implements System {
     };
   }
 
-  initialize(_world: World, eventBus: EventBus): void {
-    this.events = new SystemEventManager(eventBus, this.id);
-  }
-
-  cleanup(): void {
-    this.events.cleanup();
-  }
-
-  update(world: World): void {
-    const currentTick = world.tick;
-
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
-      return;
-    }
-
-    this.lastUpdate = currentTick;
-
+  protected onUpdate(ctx: SystemContext): void {
     // Process active weather events
-    this.processWeatherEvents(world, currentTick);
+    this.processWeatherEvents(ctx.world, ctx.tick);
   }
 
   /**
@@ -204,16 +188,18 @@ export class DivineWeatherControl implements System {
     this.applyWeatherEffects(world, weatherEvent);
 
     // Emit divine weather summoned event
-    this.events.emitGeneric('divine_weather_summoned', {
-      weatherEventId: weatherEvent.id,
-      deityId,
-      weatherType: type,
-      location,
-      radius,
-      intensity,
-      duration,
-      purpose,
-    });
+    if (this.events) {
+      this.events.emitGeneric('divine_weather_summoned', {
+        weatherEventId: weatherEvent.id,
+        deityId,
+        weatherType: type,
+        location,
+        radius,
+        intensity,
+        duration,
+        purpose,
+      });
+    }
 
     return weatherEvent;
   }

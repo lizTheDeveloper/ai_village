@@ -244,6 +244,6 @@ export const SupremeCreatorSchema = autoRegister(
       heal: () => {},
       isDead: () => false,
       getHealthPercent: () => 1,
-    } as SupremeCreatorComponent),
+    } as unknown as SupremeCreatorComponent),
   })
 );

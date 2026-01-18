@@ -164,7 +164,8 @@ export function wrapWorld(world: World): World {
       // Wrap methods that return entities to auto-wrap them
       if (typeof value === 'function' && (prop === 'getEntity' || prop === 'addEntity')) {
         // Wrapper function preserves 'this' context from caller or uses target
-        return function(this: World, ...args: unknown[]): unknown {
+        // Note: 'this' type is intentionally unknown as we're wrapping arbitrary methods
+        return function(this: unknown, ...args: unknown[]): unknown {
           const result = value.apply(this || target, args);
           // Type guard: check if result looks like an Entity
           if (result && typeof result === 'object' && 'id' in result) {
