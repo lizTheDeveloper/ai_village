@@ -694,6 +694,43 @@ export interface MiscEvents {
     tradition?: string;
   };
 
+  // === Uplift Program Events ===
+  'uplift_candidate_detected': {
+    entityId: EntityId;
+    speciesId: string;
+    upliftPotential: number;
+    preSapient: boolean;
+    estimatedGenerations: number;
+  };
+
+  'uplift_generation_advanced': {
+    programId: string;
+    generation: number;
+    intelligence: number;
+    result: unknown;
+  };
+
+  'uplift_stage_changed': {
+    programId: string;
+    previousStage: string;
+    newStage: string;
+    generation: number;
+    intelligence: number;
+  };
+
+  'uplift_population_extinct': {
+    programId: string;
+    generation: number;
+    reason: string;
+  };
+
+  'uplifted_species_registered': {
+    speciesId: string;
+    speciesName: string;
+    programId: string;
+    sourceSpeciesId: string;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

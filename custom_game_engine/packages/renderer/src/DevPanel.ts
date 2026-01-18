@@ -19,6 +19,7 @@ import {
   type SkillsComponent,
   type IdentityComponent,
   type TagsComponent,
+  type NeedsComponent,
   CT,
   getTileBasedBlueprintRegistry,
   parseLayout,
