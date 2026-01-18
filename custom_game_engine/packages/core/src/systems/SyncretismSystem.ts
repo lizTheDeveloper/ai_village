@@ -119,6 +119,7 @@ export class SyncretismSystem extends BaseSystem {
    * Check for potential syncretism between deities
    */
   private checkForSyncretism(world: World, currentTick: number): void {
+    // Deities are ALWAYS simulated entities, so we iterate all
     const deities = Array.from(world.entities.values())
       .filter(e => e.components.has(CT.Deity));
 
@@ -218,6 +219,7 @@ export class SyncretismSystem extends BaseSystem {
   private findSharedBelievers(world: World, deity1Id: string, deity2Id: string): string[] {
     const shared: string[] = [];
 
+    // Believers are agents (ALWAYS simulated), so we iterate all
     for (const entity of world.entities.values()) {
       if (!entity.components.has(CT.Spiritual)) continue;
 

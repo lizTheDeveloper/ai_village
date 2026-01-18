@@ -71,6 +71,7 @@ export class HolyTextSystem extends BaseSystem {
    * Check if deities need holy texts
    */
   private checkForTextGeneration(world: World, currentTick: number): void {
+    // Deities are ALWAYS simulated entities, so we iterate all
     for (const entity of world.entities.values()) {
       if (!entity.components.has(CT.Deity)) continue;
 

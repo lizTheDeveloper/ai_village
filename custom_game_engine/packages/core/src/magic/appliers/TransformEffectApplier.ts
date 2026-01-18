@@ -16,6 +16,15 @@ import type {
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 
+// Interface for stored appearance data
+interface StoredAppearance {
+  form?: string;
+  size?: number;
+  material?: string;
+  alignment?: string;
+  species?: string;
+}
+
 /**
  * Transform applier implementation.
  */
@@ -23,7 +32,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
   readonly category = 'transform' as const;
 
   // Store original forms for restoration
-  private originalForms: Map<string, any> = new Map();
+  private originalForms: Map<string, StoredAppearance> = new Map();
 
   apply(
     effect: TransformEffect,

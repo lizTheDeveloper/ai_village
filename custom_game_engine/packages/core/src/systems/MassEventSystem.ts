@@ -274,6 +274,7 @@ export class MassEventSystem extends BaseSystem {
   ): Array<{ id: string }> {
     const affected: Array<{ id: string }> = [];
 
+    // Mass events target agents (ALWAYS simulated), so we iterate all
     for (const entity of world.entities.values()) {
       let shouldAffect = false;
 

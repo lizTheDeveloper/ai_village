@@ -17,6 +17,7 @@ export class RoofRepairSystem extends BaseSystem {
   readonly id = 'roof_repair' as const;
   readonly priority = 950;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval: number = 200; // Update every 200 ticks (10 seconds)
   private hasRun = false;
 
   /**

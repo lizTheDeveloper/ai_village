@@ -94,6 +94,7 @@ export class TempleSystem extends BaseSystem {
 
     // Find all temple buildings
     // Note: Temple building type may not exist yet - this is a placeholder
+    // Buildings are ALWAYS simulated entities, so we iterate all
     const templeBuildings = Array.from(ctx.world.entities.values())
       .filter(e => {
         const building = e.components.get(CT.Building) as BuildingComponent | undefined;
@@ -206,6 +207,7 @@ export class TempleSystem extends BaseSystem {
     const nearby: Array<{ id: string }> = [];
     const radiusSq = this.config.influenceRadius * this.config.influenceRadius;
 
+    // Believers are agents (ALWAYS simulated), so we iterate all
     for (const entity of world.entities.values()) {
       if (!entity.components.has(CT.Agent) || !entity.components.has(CT.Spiritual)) {
         continue;

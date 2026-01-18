@@ -113,6 +113,7 @@ export class ReligiousCompetitionSystem extends BaseSystem {
    * Check for new competition opportunities
    */
   private checkForNewCompetitions(world: World, currentTick: number): void {
+    // Deities are ALWAYS simulated entities, so we iterate all
     const deities = Array.from(world.entities.values())
       .filter(e => e.components.has(CT.Deity));
 

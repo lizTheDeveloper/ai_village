@@ -113,6 +113,7 @@ export class SchismSystem extends BaseSystem {
    * Check for potential schisms
    */
   private checkForSchisms(world: World, currentTick: number): void {
+    // Deities are ALWAYS simulated entities, so we iterate all
     for (const entity of world.entities.values()) {
       if (!entity.components.has(CT.Deity)) continue;
 
@@ -141,6 +142,7 @@ export class SchismSystem extends BaseSystem {
     deityId: string,
     _deity: DeityComponent
   ): { score: number; cause: SchismCause; faction1: string[]; faction2: string[] } {
+    // Believers are agents (ALWAYS simulated), so we iterate all
     const believers = Array.from(world.entities.values())
       .filter(e => {
         if (!e.components.has(CT.Spiritual)) return false;

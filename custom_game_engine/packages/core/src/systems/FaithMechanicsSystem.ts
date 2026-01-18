@@ -70,6 +70,7 @@ export class FaithMechanicsSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     // Process all agents with spiritual components
+    // Believers are agents (ALWAYS simulated), so we iterate all
     for (const entity of ctx.world.entities.values()) {
       if (!entity.components.has(CT.Spiritual)) continue;
 
@@ -236,6 +237,7 @@ export class FaithMechanicsSystem extends BaseSystem {
     let totalPrayers = 0;
     let totalUnanswered = 0;
 
+    // Believers are agents (ALWAYS simulated), so we iterate all
     for (const entity of this.world.entities.values()) {
       if (!entity.components.has(CT.Spiritual)) continue;
 

@@ -221,7 +221,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
       case 'target': {
         // Spawn at target position
-        const targetPos = target.components.get('position') as { x: number; y: number; z?: number } | undefined;
+        const targetPos = target.getComponent<PositionComponent>('position');
         if (targetPos) {
           x = targetPos.x + (summonIndex - totalSummons / 2) * 0.5;
           y = targetPos.y;

@@ -891,9 +891,14 @@ export class CreatorInterventionSystem extends BaseSystem {
   // Utilities
   // ============================================================================
 
+  /**
+   * Find the Supreme Creator entity
+   * Note: Supreme Creator is ALWAYS simulated, so using targeted query is fine
+   */
   private findSupremeCreator(): Entity | null {
     if (!this.world) return null;
 
+    // This is a targeted singleton query - Supreme Creator always exists
     for (const entity of this.world.entities.values()) {
       if (entity.components.has(CT.SupremeCreator)) {
         return entity;
