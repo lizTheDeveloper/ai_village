@@ -133,10 +133,21 @@ export class AgentBrainSystem extends BaseSystem {
   private behaviors: BehaviorRegistry;
   private useScheduler: boolean = false;
 
-  // Performance: Cache agents query to avoid O(N²) in shouldThink()
+  // ========== PERFORMANCE OPTIMIZATION: Entity Caching ==========
+  // Cache agents query to avoid O(N²) in shouldThink()
   private allAgentsCache: ReadonlyArray<Entity> = [];
   private allAgentsCacheTick: number = -1;
   private agentIndexMap: Map<string, number> = new Map();
+
+  // ========== PERFORMANCE OPTIMIZATION: Zero Allocations ==========
+  // Reusable working objects to avoid allocations in hot paths
+  private readonly workingNearbyAgents: Entity[] = [];
+
+  // ========== PERFORMANCE OPTIMIZATION: Precomputed Constants ==========
+  private readonly SOCIAL_BEHAVIOR_RANGE = 15;
+  private readonly SOCIAL_BEHAVIOR_RANGE_SQ = 15 * 15;
+  private readonly HEARING_RANGE = 20;
+  private readonly HEARING_RANGE_SQ = 20 * 20;
 
   constructor(
     llmQueue?: LLMDecisionQueue,
@@ -299,6 +310,11 @@ export class AgentBrainSystem extends BaseSystem {
 
   /**
    * Main update loop.
+   *
+   * PERFORMANCE OPTIMIZATIONS (2026-01-18):
+   * - Early exits for player-controlled/dead agents
+   * - Staggered think intervals to distribute load
+   * - Performance timing only on slow frames (>10ms)
    */
   protected onUpdate(ctx: SystemContext): void {
     const startTime = performance.now();
@@ -307,16 +323,22 @@ export class AgentBrainSystem extends BaseSystem {
     let executionTime = 0;
     let thinkingAgents = 0;
 
+    // ========== EARLY EXIT: No agents ==========
+    if (ctx.activeEntities.length === 0) {
+      return;
+    }
+
     for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
       let agent = impl.getComponent<AgentComponent>(CT.Agent);
 
+      // ========== EARLY EXIT: No agent component ==========
       if (!agent) continue;
 
-      // Skip AI processing when agent is player-controlled (Phase 16: Player Avatar System)
+      // ========== EARLY EXIT: Player-controlled (Phase 16: Player Avatar System) ==========
       if (agent.behavior === 'player_controlled') continue;
 
-      // Skip AI processing for dead agents (health <= 0) - unless in afterlife
+      // ========== EARLY EXIT: Dead agents (health <= 0) - unless in afterlife ==========
       const needs = impl.getComponent<NeedsComponent>(CT.Needs);
       if (needs && needs.health <= 0) {
         // Check if they're in the afterlife - souls can still think
@@ -327,7 +349,7 @@ export class AgentBrainSystem extends BaseSystem {
         // Otherwise, afterlife soul can think
       }
 
-      // Check think interval with dynamic staggering
+      // ========== EARLY EXIT: Not time to think (dynamic staggering) ==========
       const shouldThink = this.shouldThink(impl, agent, ctx.world);
       if (!shouldThink) continue;
 
@@ -357,6 +379,7 @@ export class AgentBrainSystem extends BaseSystem {
       }
     }
 
+    // Only log performance on slow frames (>10ms) to reduce console spam
     const totalTime = performance.now() - startTime;
     if (totalTime > 10 && thinkingAgents > 0) {
       console.log(`[AgentBrainSystem] ${totalTime.toFixed(1)}ms total | ${thinkingAgents} agents | perception:${perceptionTime.toFixed(1)}ms decision:${decisionTime.toFixed(1)}ms execution:${executionTime.toFixed(1)}ms`);

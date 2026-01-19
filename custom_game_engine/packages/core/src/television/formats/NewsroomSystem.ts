@@ -516,6 +516,8 @@ export class NewsroomSystem extends BaseSystem {
   readonly id = 'NewsroomSystem';
   readonly priority = 70;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   private deskManager = new NewsDeskManager();
 

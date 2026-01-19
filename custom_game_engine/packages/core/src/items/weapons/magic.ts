@@ -11,12 +11,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { MAGIC_WEAPONS as ALL_MAGIC, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getMagicWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All magic focus weapons combined
  */
-export const ALL_MAGIC_WEAPONS: ItemDefinition[] = ALL_MAGIC;
+export const ALL_MAGIC_WEAPONS: ItemDefinition[] = getMagicWeapons();
 
 /**
  * Sub-categories for backward compatibility

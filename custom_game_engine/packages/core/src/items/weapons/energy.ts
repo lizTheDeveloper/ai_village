@@ -12,12 +12,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { ENERGY_WEAPONS as ALL_ENERGY, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getEnergyWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All energy weapons combined
  */
-export const ALL_ENERGY_WEAPONS: ItemDefinition[] = ALL_ENERGY;
+export const ALL_ENERGY_WEAPONS: ItemDefinition[] = getEnergyWeapons();
 
 /**
  * Sub-categories for backward compatibility

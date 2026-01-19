@@ -884,6 +884,10 @@ export class AcademicPaperManager {
     return this.papers.get(paperId);
   }
 
+  hasPapers(): boolean {
+    return this.papers.size > 0;
+  }
+
   getAuthor(authorId: string): Author | undefined {
     return this.authors.get(authorId);
   }
@@ -1039,6 +1043,11 @@ export class AcademicPaperSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no papers published
+    if (!this.manager.hasPapers()) {
+      return;
+    }
+
     this.tickCounter++;
     // Periodic updates if needed
   }

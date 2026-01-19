@@ -8,12 +8,9 @@
  * - Affordances describe capabilities, not prescriptions
  * - LLM reasons about problem→solution, affordances provide ground truth
  * - Data-driven: add new items/buildings without changing reasoning code
+ *
+ * Uses lazy loading to defer JSON parsing and validation until first access.
  */
-
-// Load data from JSON files (outside src/ directory)
-import buildingsData from '../../data/affordances/buildings.json';
-import itemsData from '../../data/affordances/items.json';
-import recipesData from '../../data/affordances/recipes.json';
 
 // ============================================================================
 // Core Affordance Types
@@ -56,10 +53,18 @@ export interface BuildingAffordance {
   solves: string[];
 }
 
+// Lazy-loaded cache
+let cachedBuildingAffordances: Record<string, BuildingAffordance> | null = null;
+
 /**
- * Validate and load building affordances from JSON data.
+ * Validate and load building affordances from JSON data (lazy).
  */
 function loadBuildingAffordances(): Record<string, BuildingAffordance> {
+  if (cachedBuildingAffordances) {
+    return cachedBuildingAffordances;
+  }
+
+  const buildingsData = require('../../data/affordances/buildings.json');
   const data = buildingsData as Record<string, unknown>;
   const result: Record<string, BuildingAffordance> = {};
 
@@ -80,10 +85,19 @@ function loadBuildingAffordances(): Record<string, BuildingAffordance> {
     result[key] = building;
   }
 
+  cachedBuildingAffordances = result;
   return result;
 }
 
-export const BUILDING_AFFORDANCES: Record<string, BuildingAffordance> = loadBuildingAffordances();
+/**
+ * Get building affordances (lazy-loaded)
+ */
+export function getBuildingAffordances(): Record<string, BuildingAffordance> {
+  return loadBuildingAffordances();
+}
+
+// Deprecated: Use getBuildingAffordances() function instead
+Object.defineProperty(exports, 'BUILDING_AFFORDANCES', { get: getBuildingAffordances });
 
 // ============================================================================
 // Item Affordances
@@ -101,10 +115,18 @@ export interface ItemAffordance {
   solves: string[];
 }
 
+// Lazy-loaded cache
+let cachedItemAffordances: Record<string, ItemAffordance> | null = null;
+
 /**
- * Validate and load item affordances from JSON data.
+ * Validate and load item affordances from JSON data (lazy).
  */
 function loadItemAffordances(): Record<string, ItemAffordance> {
+  if (cachedItemAffordances) {
+    return cachedItemAffordances;
+  }
+
+  const itemsData = require('../../data/affordances/items.json');
   const data = itemsData as Record<string, unknown>;
   const result: Record<string, ItemAffordance> = {};
 
@@ -127,10 +149,19 @@ function loadItemAffordances(): Record<string, ItemAffordance> {
     result[key] = item;
   }
 
+  cachedItemAffordances = result;
   return result;
 }
 
-export const ITEM_AFFORDANCES: Record<string, ItemAffordance> = loadItemAffordances();
+/**
+ * Get item affordances (lazy-loaded)
+ */
+export function getItemAffordances(): Record<string, ItemAffordance> {
+  return loadItemAffordances();
+}
+
+// Deprecated: Use getItemAffordances() function instead
+Object.defineProperty(exports, 'ITEM_AFFORDANCES', { get: getItemAffordances });
 
 // ============================================================================
 // Recipe Affordances
@@ -147,10 +178,18 @@ export interface RecipeAffordance {
   provides: string; // What problem this recipe solves
 }
 
+// Lazy-loaded cache
+let cachedRecipeAffordances: Record<string, RecipeAffordance> | null = null;
+
 /**
- * Validate and load recipe affordances from JSON data.
+ * Validate and load recipe affordances from JSON data (lazy).
  */
 function loadRecipeAffordances(): Record<string, RecipeAffordance> {
+  if (cachedRecipeAffordances) {
+    return cachedRecipeAffordances;
+  }
+
+  const recipesData = require('../../data/affordances/recipes.json');
   const data = recipesData as Record<string, unknown>;
   const result: Record<string, RecipeAffordance> = {};
 
@@ -177,10 +216,19 @@ function loadRecipeAffordances(): Record<string, RecipeAffordance> {
     result[key] = recipe;
   }
 
+  cachedRecipeAffordances = result;
   return result;
 }
 
-export const RECIPE_AFFORDANCES: Record<string, RecipeAffordance> = loadRecipeAffordances();
+/**
+ * Get recipe affordances (lazy-loaded)
+ */
+export function getRecipeAffordances(): Record<string, RecipeAffordance> {
+  return loadRecipeAffordances();
+}
+
+// Deprecated: Use getRecipeAffordances() function instead
+Object.defineProperty(exports, 'RECIPE_AFFORDANCES', { get: getRecipeAffordances });
 
 // ============================================================================
 // LLM Context Formatting
@@ -190,7 +238,7 @@ export const RECIPE_AFFORDANCES: Record<string, RecipeAffordance> = loadRecipeAf
  * Format building affordances for LLM context.
  */
 export function formatBuildingsForLLM(filter?: { tier?: number; solves?: string }): string {
-  let buildings = Object.values(BUILDING_AFFORDANCES);
+  let buildings = Object.values(getBuildingAffordances());
 
   if (filter?.tier !== undefined) {
     const maxTier = filter.tier;
@@ -214,7 +262,7 @@ export function formatBuildingsForLLM(filter?: { tier?: number; solves?: string 
  * Format items for LLM context.
  */
 export function formatItemsForLLM(category?: ItemAffordance['category']): string {
-  let items = Object.values(ITEM_AFFORDANCES);
+  let items = Object.values(getItemAffordances());
 
   if (category) {
     items = items.filter(i => i.category === category);
@@ -232,7 +280,7 @@ export function formatItemsForLLM(category?: ItemAffordance['category']): string
  * Format recipes for LLM context.
  */
 export function formatRecipesForLLM(station?: string | null): string {
-  let recipes = Object.values(RECIPE_AFFORDANCES);
+  let recipes = Object.values(getRecipeAffordances());
 
   if (station !== undefined) {
     recipes = recipes.filter(r => r.station === station);
@@ -251,7 +299,7 @@ export function formatRecipesForLLM(station?: string | null): string {
  * Get buildings that solve a specific problem.
  */
 export function findBuildingsForProblem(problem: string): BuildingAffordance[] {
-  return Object.values(BUILDING_AFFORDANCES).filter(b =>
+  return Object.values(getBuildingAffordances()).filter(b =>
     b.solves.some(s => s.includes(problem) || problem.includes(s))
   );
 }
@@ -260,7 +308,7 @@ export function findBuildingsForProblem(problem: string): BuildingAffordance[] {
  * Get items that solve a specific problem.
  */
 export function findItemsForProblem(problem: string): ItemAffordance[] {
-  return Object.values(ITEM_AFFORDANCES).filter(i =>
+  return Object.values(getItemAffordances()).filter(i =>
     i.solves.some(s => s.includes(problem) || problem.includes(s))
   );
 }

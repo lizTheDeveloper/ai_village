@@ -56,6 +56,14 @@ interface TerritoryComponent extends Component {
  * - Applies injuries on failed defense
  * - Alerts nearby agents
  * - Creates trauma memories for near-death experiences
+ *
+ * PERFORMANCE OPTIMIZATIONS (2026-01-18):
+ * - Throttling: 50 ticks (2.5s) - attacks are rare events
+ * - Map-based caching: O(1) predator/agent lookups
+ * - Early exits: Skip when no predators or agents
+ * - Zero allocations: Reusable working objects
+ * - Spatial optimization: Squared distance, precomputed radii
+ * - Cooldown tracking: Map-based attack tracking
  */
 export class PredatorAttackSystem extends BaseSystem {
   public readonly id: SystemId = 'predator_attack';
@@ -64,38 +72,138 @@ export class PredatorAttackSystem extends BaseSystem {
   // Only run when animal components exist (O(1) activation check)
   public readonly activationComponents = ['animal'] as const;
 
-  /** Throttle to every 1 second (20 ticks at 20 TPS) */
-  protected readonly throttleInterval = THROTTLE.NORMAL;
+  /** Throttle to every 2.5 seconds (50 ticks at 20 TPS) - attacks are rare events */
+  protected readonly throttleInterval = 50;
+
+  // ===== PERFORMANCE: Precomputed constants =====
+  private readonly PREDATOR_DANGER_THRESHOLD = 5;
+  private readonly DETECTION_RADIUS = 10;
+  private readonly DETECTION_RADIUS_SQ = 10 * 10;
+  private readonly ALLY_RADIUS = 5;
+  private readonly ALLY_RADIUS_SQ = 5 * 5;
+  private readonly ALERT_RADIUS = 15;
+  private readonly ALERT_RADIUS_SQ = 15 * 15;
+  private readonly MIN_VELOCITY_THRESHOLD = 0.001;
+
+  // ===== PERFORMANCE: Entity caching (Map-based for O(1) lookups) =====
+  private predatorCache = new Map<string, AnimalComponent>();
+  private agentCache = new Map<string, PositionComponent>();
+  private attackCooldowns = new Map<string, number>(); // predatorId -> tick of last attack
+  private lastCacheRebuild = 0;
+  private readonly CACHE_REBUILD_INTERVAL = 200; // Rebuild every 10 seconds
+
+  // ===== PERFORMANCE: Reusable working objects (zero allocations) =====
+  private readonly workingDistance = { dx: 0, dy: 0, dz: 0, distanceSq: 0 };
+  private readonly workingNearbyAgents: string[] = [];
+  private readonly workingAllies: string[] = [];
 
   protected onUpdate(ctx: SystemContext): void {
-    // ctx.activeEntities are already filtered to animals via scheduler
-    // We need to further filter for predators (danger >= 5)
-    const predators: Entity[] = [];
+    // PERFORMANCE: Early exit - no active animals
+    if (ctx.activeEntities.length === 0) {
+      return;
+    }
 
-    for (const entity of ctx.activeEntities) {
-      const animal = ctx.world.getComponent<AnimalComponent>(entity.id, 'animal');
-      if (animal && animal.danger >= 5) {
-        predators.push(entity);
+    // PERFORMANCE: Periodic cache rebuild for correctness
+    const shouldRebuildCache = ctx.world.tick - this.lastCacheRebuild >= this.CACHE_REBUILD_INTERVAL;
+
+    if (shouldRebuildCache) {
+      this.rebuildCaches(ctx.world, ctx.activeEntities);
+      this.lastCacheRebuild = ctx.world.tick;
+    } else {
+      // Incremental cache updates
+      this.updateCachesIncremental(ctx.world, ctx.activeEntities);
+    }
+
+    // PERFORMANCE: Early exit - no predators
+    if (this.predatorCache.size === 0) {
+      return;
+    }
+
+    // PERFORMANCE: Early exit - no agents
+    if (this.agentCache.size === 0) {
+      return;
+    }
+
+    // PERFORMANCE: Clean up old cooldowns (attacks older than 5 minutes)
+    const cooldownExpiry = ctx.world.tick - 6000; // 5 minutes at 20 TPS
+    for (const [predatorId, lastAttackTick] of this.attackCooldowns.entries()) {
+      if (lastAttackTick < cooldownExpiry) {
+        this.attackCooldowns.delete(predatorId);
       }
     }
 
-    // Get all agents for target checking (separate query since we need all agents, not just visible)
-    const agents = ctx.world.query().with('agent').executeEntities();
+    // Process each predator (using cached data)
+    for (const [predatorId, animal] of this.predatorCache.entries()) {
+      // PERFORMANCE: Skip predators on cooldown (recently attacked)
+      const lastAttackTick = this.attackCooldowns.get(predatorId);
+      if (lastAttackTick !== undefined && ctx.world.tick - lastAttackTick < this.throttleInterval) {
+        continue;
+      }
 
-    // Process each predator
-    for (const predator of predators) {
-      this.processPredator(ctx.world, predator, agents);
+      const predator = ctx.world.getEntity(predatorId);
+      if (!predator) {
+        continue; // Entity was removed
+      }
+
+      this.processPredatorOptimized(ctx.world, predator, predatorId, animal, ctx.world.tick);
     }
   }
 
-  private processPredator(world: World, predator: Entity, agents: readonly Entity[]): void {
-    const animal = world.getComponent<AnimalComponent>(predator.id, 'animal');
-    const predatorPos = world.getComponent<PositionComponent>(predator.id, 'position');
+  /**
+   * PERFORMANCE: Full cache rebuild (every 10 seconds for correctness)
+   */
+  private rebuildCaches(world: World, activeEntities: ReadonlyArray<Entity>): void {
+    this.predatorCache.clear();
+    this.agentCache.clear();
+
+    // Rebuild predator cache
+    for (const entity of activeEntities) {
+      const animal = world.getComponent<AnimalComponent>(entity.id, 'animal');
+      if (animal && animal.danger >= this.PREDATOR_DANGER_THRESHOLD) {
+        this.predatorCache.set(entity.id, animal);
+      }
+    }
+
+    // Rebuild agent cache (all agents with position)
+    const agents = world.query().with('agent').with('position').executeEntities();
+    for (const agent of agents) {
+      const pos = world.getComponent<PositionComponent>(agent.id, 'position');
+      if (pos) {
+        this.agentCache.set(agent.id, pos);
+      }
+    }
+  }
+
+  /**
+   * PERFORMANCE: Incremental cache updates (between rebuilds)
+   */
+  private updateCachesIncremental(world: World, activeEntities: ReadonlyArray<Entity>): void {
+    // Update predator cache with any new/changed animals
+    for (const entity of activeEntities) {
+      const animal = world.getComponent<AnimalComponent>(entity.id, 'animal');
+      if (animal && animal.danger >= this.PREDATOR_DANGER_THRESHOLD) {
+        this.predatorCache.set(entity.id, animal);
+      } else {
+        this.predatorCache.delete(entity.id);
+      }
+    }
+
+    // Agent cache is rebuilt periodically (agents move, so position changes frequently)
+  }
+
+  /**
+   * PERFORMANCE: Optimized predator processing using cached data
+   */
+  private processPredatorOptimized(
+    world: World,
+    predator: Entity,
+    predatorId: string,
+    animal: AnimalComponent,
+    currentTick: number
+  ): void {
+    const predatorPos = world.getComponent<PositionComponent>(predatorId, 'position');
 
     // Validate predator has required components
-    if (!animal) {
-      throw new Error('Predator missing required component: animal');
-    }
     if (!predatorPos) {
       throw new Error('Predator missing required component: position');
     }
@@ -105,36 +213,46 @@ export class PredatorAttackSystem extends BaseSystem {
       throw new Error(`Invalid danger level: must be 0-10, got ${animal.danger}`);
     }
 
-    // Check if predator already has a conflict
-    if (world.hasComponent(predator.id, 'conflict')) {
-      const conflict = world.getComponent<ConflictComponent>(predator.id, 'conflict');
+    // PERFORMANCE: Early exit - predator already in combat
+    if (world.hasComponent(predatorId, 'conflict')) {
+      const conflict = world.getComponent<ConflictComponent>(predatorId, 'conflict');
       if (conflict && conflict.state !== 'resolved') {
         return; // Already in combat
       }
     }
 
-    // Find nearby agents
-    const detectionRadius = 10;
-    const nearbyAgents = agents.filter(agent => {
-      const agentPos = world.getComponent<PositionComponent>(agent.id, 'position');
-      if (!agentPos) {
-        return false;
-      }
-      const distance = this.calculateDistance(predatorPos, agentPos);
-      return distance <= detectionRadius;
-    });
+    // PERFORMANCE: Find nearby agents using cached positions (squared distance)
+    this.workingNearbyAgents.length = 0; // Clear working array (reuse)
+    let closestAgentId: string | null = null;
+    let closestDistanceSq = this.DETECTION_RADIUS_SQ;
 
-    if (nearbyAgents.length === 0) {
-      return; // No targets
+    for (const [agentId, agentPos] of this.agentCache.entries()) {
+      // PERFORMANCE: Squared distance (no sqrt)
+      this.calculateDistanceSquared(predatorPos, agentPos, this.workingDistance);
+      const distSq = this.workingDistance.distanceSq;
+
+      if (distSq <= this.DETECTION_RADIUS_SQ) {
+        this.workingNearbyAgents.push(agentId);
+
+        // Track closest agent
+        if (distSq < closestDistanceSq) {
+          closestDistanceSq = distSq;
+          closestAgentId = agentId;
+        }
+      }
     }
 
-    // Find closest agent
-    const target = this.findClosestAgent(predatorPos, nearbyAgents, world);
+    // PERFORMANCE: Early exit - no targets
+    if (closestAgentId === null) {
+      return;
+    }
+
+    const target = world.getEntity(closestAgentId);
     if (!target) {
       return;
     }
 
-    const targetPos = world.getComponent<PositionComponent>(target.id, 'position');
+    const targetPos = this.agentCache.get(closestAgentId);
     if (!targetPos) {
       throw new Error('Target missing required component: position');
     }
@@ -149,7 +267,7 @@ export class PredatorAttackSystem extends BaseSystem {
     const trigger = this.getAttackTrigger(world, predator, target, animal);
 
     // Perform detection check if agent has stealth
-    const combatStats = world.getComponent<CombatStatsComponent>(target.id, 'combat_stats');
+    const combatStats = world.getComponent<CombatStatsComponent>(closestAgentId, 'combat_stats');
     if (combatStats && combatStats.stealthSkill) {
       const detected = this.performDetectionCheck(animal, combatStats);
       if (!detected) {
@@ -157,11 +275,14 @@ export class PredatorAttackSystem extends BaseSystem {
       }
     }
 
+    // PERFORMANCE: Record attack cooldown
+    this.attackCooldowns.set(predatorId, currentTick);
+
     // Create conflict component on predator
     const predatorImpl = predator as EntityImpl;
     predatorImpl.addComponent(createConflictComponent({
       conflictType: 'predator_attack',
-      target: target.id,
+      target: closestAgentId,
       state: 'attacking',
       startTime: Date.now(),
       trigger,
@@ -170,19 +291,37 @@ export class PredatorAttackSystem extends BaseSystem {
 
     // Emit predator:attack event
     this.events.emit('predator:attack', {
-      predatorId: predator.id,
-      targetId: target.id,
+      predatorId: predatorId,
+      targetId: closestAgentId,
       predatorType: animal.species,
-    }, predator.id);
+    }, predatorId);
 
-    // Find allies within 5 units
-    const allies = this.findAllies(world, target, targetPos, agents as Entity[]);
+    // PERFORMANCE: Find allies using cached positions (squared distance)
+    this.workingAllies.length = 0; // Clear working array (reuse)
+    for (const agentId of this.workingNearbyAgents) {
+      if (agentId === closestAgentId) {
+        continue;
+      }
+      if (!world.hasComponent(agentId, 'combat_stats')) {
+        continue;
+      }
+
+      const agentPos = this.agentCache.get(agentId);
+      if (!agentPos) {
+        continue;
+      }
+
+      this.calculateDistanceSquared(targetPos, agentPos, this.workingDistance);
+      if (this.workingDistance.distanceSq <= this.ALLY_RADIUS_SQ) {
+        this.workingAllies.push(agentId);
+      }
+    }
 
     // Resolve combat
-    this.resolveCombat(world, predator, target, animal, combatStats ?? null, allies);
+    this.resolveCombatOptimized(world, predator, target, closestAgentId, animal, combatStats ?? null);
 
     // Alert nearby agents
-    this.alertNearbyAgents(world, predator, target, targetPos, agents as Entity[]);
+    this.alertNearbyAgentsOptimized(world, predatorId, closestAgentId, targetPos, animal);
   }
 
   private evaluateAttackTrigger(
@@ -206,8 +345,10 @@ export class PredatorAttackSystem extends BaseSystem {
       const territory = world.getComponent<TerritoryComponent>(predator.id, 'territory');
       const targetPos = world.getComponent<PositionComponent>(target.id, 'position');
       if (territory && targetPos) {
-        const distance = this.calculateDistance(territory.center, targetPos);
-        if (distance <= territory.radius) {
+        // PERFORMANCE: Squared distance comparison
+        this.calculateDistanceSquared(territory.center, targetPos, this.workingDistance);
+        const radiusSq = territory.radius * territory.radius;
+        if (this.workingDistance.distanceSq <= radiusSq) {
           return true; // Territory defense
         }
       }
@@ -244,8 +385,10 @@ export class PredatorAttackSystem extends BaseSystem {
       const territory = world.getComponent<TerritoryComponent>(predator.id, 'territory');
       const targetPos = world.getComponent<PositionComponent>(target.id, 'position');
       if (territory && targetPos) {
-        const distance = this.calculateDistance(territory.center, targetPos);
-        if (distance <= territory.radius) {
+        // PERFORMANCE: Squared distance comparison
+        this.calculateDistanceSquared(territory.center, targetPos, this.workingDistance);
+        const radiusSq = territory.radius * territory.radius;
+        if (this.workingDistance.distanceSq <= radiusSq) {
           return 'territory';
         }
       }
@@ -265,36 +408,16 @@ export class PredatorAttackSystem extends BaseSystem {
     return Math.random() < Math.max(0.1, Math.min(0.9, detectionChance));
   }
 
-  private findAllies(
-    world: World,
-    target: Entity,
-    targetPos: PositionComponent,
-    agents: Entity[]
-  ): Entity[] {
-    const allyRadius = 5;
-    return agents.filter(agent => {
-      if (agent.id === target.id) {
-        return false;
-      }
-      if (!world.hasComponent(agent.id, 'combat_stats')) {
-        return false;
-      }
-      const agentPos = world.getComponent<PositionComponent>(agent.id, 'position');
-      if (!agentPos) {
-        return false;
-      }
-      const distance = this.calculateDistance(targetPos, agentPos);
-      return distance <= allyRadius;
-    });
-  }
-
-  private resolveCombat(
+  /**
+   * PERFORMANCE: Optimized combat resolution using cached ally data
+   */
+  private resolveCombatOptimized(
     world: World,
     predator: Entity,
     target: Entity,
+    targetId: string,
     animal: AnimalComponent,
-    combatStats: CombatStatsComponent | null,
-    allies: Entity[]
+    combatStats: CombatStatsComponent | null
   ): void {
     // Calculate combat power
     const predatorPower = animal.danger;
@@ -316,14 +439,14 @@ export class PredatorAttackSystem extends BaseSystem {
       defenderPower += 2;
     }
 
-    // Ally bonuses
+    // PERFORMANCE: Ally bonuses using cached ally list (workingAllies)
     const predatorImpl = predator as EntityImpl;
-    const combatants = [target.id];
-    for (const ally of allies) {
-      const allyStats = world.getComponent<CombatStatsComponent>(ally.id, 'combat_stats');
+    const combatants = [targetId];
+    for (const allyId of this.workingAllies) {
+      const allyStats = world.getComponent<CombatStatsComponent>(allyId, 'combat_stats');
       if (allyStats) {
         defenderPower += allyStats.combatSkill * 0.5; // Allies contribute half their skill
-        combatants.push(ally.id);
+        combatants.push(allyId);
       }
     }
 
@@ -427,29 +550,30 @@ export class PredatorAttackSystem extends BaseSystem {
     }, target.id);
   }
 
-  private alertNearbyAgents(
+  /**
+   * PERFORMANCE: Optimized alert system using cached agent positions
+   */
+  private alertNearbyAgentsOptimized(
     world: World,
-    predator: Entity,
-    target: Entity,
+    predatorId: string,
+    targetId: string,
     targetPos: PositionComponent,
-    agents: Entity[]
+    animal: AnimalComponent
   ): void {
-    const predatorAnimal = world.getComponent<AnimalComponent>(predator.id, 'animal');
-    if (!predatorAnimal) {
-      throw new Error('Predator missing required component: animal');
-    }
+    // PERFORMANCE: Iterate cached agents instead of full query
+    for (const [agentId, agentPos] of this.agentCache.entries()) {
+      if (agentId === targetId) {
+        continue;
+      }
 
-    const alertRadius = 15;
-    for (const agent of agents) {
-      if (agent.id === target.id) {
-        continue;
-      }
-      const agentPos = world.getComponent<PositionComponent>(agent.id, 'position');
-      if (!agentPos) {
-        continue;
-      }
-      const distance = this.calculateDistance(targetPos, agentPos);
-      if (distance <= alertRadius) {
+      // PERFORMANCE: Squared distance (no sqrt)
+      this.calculateDistanceSquared(targetPos, agentPos, this.workingDistance);
+      if (this.workingDistance.distanceSq <= this.ALERT_RADIUS_SQ) {
+        const agent = world.getEntity(agentId);
+        if (!agent) {
+          continue;
+        }
+
         const agentImpl = agent as EntityImpl;
         agentImpl.addComponent({
           type: 'alert',
@@ -458,41 +582,39 @@ export class PredatorAttackSystem extends BaseSystem {
           location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
         } as AlertComponent);
 
+        // PERFORMANCE: Calculate actual distance only when needed (for event emission)
+        const distance = Math.sqrt(this.workingDistance.distanceSq);
+
         // Emit guard:threat_detected event
         this.events.emit('guard:threat_detected', {
-          guardId: agent.id,
-          threatId: predator.id,
-          threatLevel: predatorAnimal.danger,
+          guardId: agentId,
+          threatId: predatorId,
+          threatLevel: animal.danger,
           distance,
           location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
-        }, agent.id);
+        }, agentId);
       }
     }
   }
 
-  private findClosestAgent(
-    predatorPos: PositionComponent,
-    agents: Entity[],
-    world: World
-  ): Entity | null {
-    let closest: Entity | null = null;
-    let minDistance = Infinity;
-
-    for (const agent of agents) {
-      const agentPos = world.getComponent<PositionComponent>(agent.id, 'position');
-      if (!agentPos) {
-        continue;
-      }
-      const distance = this.calculateDistance(predatorPos, agentPos);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closest = agent;
-      }
-    }
-
-    return closest;
+  /**
+   * PERFORMANCE: Calculate squared distance (avoids expensive sqrt)
+   * Uses reusable working object to avoid allocations
+   */
+  private calculateDistanceSquared(
+    pos1: { x: number; y: number; z: number },
+    pos2: { x: number; y: number; z: number },
+    out: { dx: number; dy: number; dz: number; distanceSq: number }
+  ): void {
+    out.dx = pos1.x - pos2.x;
+    out.dy = pos1.y - pos2.y;
+    out.dz = pos1.z - pos2.z;
+    out.distanceSq = out.dx * out.dx + out.dy * out.dy + out.dz * out.dz;
   }
 
+  /**
+   * Calculate distance with sqrt (used in territory checks where exact distance needed)
+   */
   private calculateDistance(
     pos1: { x: number; y: number; z: number },
     pos2: { x: number; y: number; z: number }

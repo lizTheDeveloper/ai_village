@@ -59,10 +59,14 @@ export class WindowManager {
   /**
    * Register a window with the manager
    */
-  public registerWindow(id: string, panel: IWindowPanel, config: WindowConfig): void {
+  public registerWindow(id: string, panel: IWindowPanel | null, config: WindowConfig): void {
     // Validate inputs - NO SILENT FALLBACKS
-    if (!panel) {
-      throw new Error('Panel cannot be null or undefined');
+    if (!panel && !config.factory) {
+      throw new Error('Either panel or factory must be provided');
+    }
+
+    if (panel && config.factory) {
+      throw new Error('Cannot provide both panel and factory - choose one');
     }
 
     if (this.windows.has(id)) {
@@ -132,6 +136,18 @@ export class WindowManager {
       throw new Error(`Window with ID "${id}" not found`);
     }
 
+    // Create panel lazily if using factory
+    if (!window.panel && window.config.factory) {
+      window.panel = window.config.factory();
+      if (!window.panel) {
+        throw new Error(`Factory for window "${id}" returned null or undefined`);
+      }
+    }
+
+    // At this point panel must exist
+    if (!window.panel) {
+      throw new Error(`Window "${id}" has no panel and no factory`);
+    }
 
     // Track if this is the first time showing (openedTime will be 0)
     const wasNeverShown = window.openedTime === 0;
@@ -216,7 +232,10 @@ export class WindowManager {
     }
 
     window.visible = false;
-    window.panel.setVisible(false);
+    // Only update panel if it exists (may not exist if never shown with lazy factory)
+    if (window.panel) {
+      window.panel.setVisible(false);
+    }
     this.saveLayout();
   }
 
@@ -882,8 +901,10 @@ export class WindowManager {
         window.minimized = savedWindow.minimized ?? false;
         window.pinned = savedWindow.pinned ?? false;
 
-        // Sync panel visibility
-        window.panel.setVisible(window.visible);
+        // Sync panel visibility (only if panel exists - may be lazy)
+        if (window.panel) {
+          window.panel.setVisible(window.visible);
+        }
       }
     } catch (error) {
       console.error('Failed to load window layout, using defaults:', error);
@@ -968,6 +989,12 @@ export class WindowManager {
    * Render a single window
    */
   private renderWindow(ctx: CanvasRenderingContext2D, window: ManagedWindow, world?: unknown): void {
+    // Skip rendering if panel doesn't exist yet (shouldn't happen for visible windows)
+    if (!window.panel) {
+      console.warn(`[WindowManager] Cannot render window "${window.id}" - panel not created`);
+      return;
+    }
+
     // Draw window background (only title bar height when minimized)
     ctx.fillStyle = '#2a2a2a';
     ctx.fillRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
@@ -1140,5 +1167,16 @@ export class WindowManager {
     return () => {
       // Unsubscribe logic would go here
     };
+  }
+
+  /**
+   * Get the panel instance for a window (may be null if using lazy factory and not yet shown)
+   */
+  public getPanel(id: string): IWindowPanel | null {
+    const window = this.windows.get(id);
+    if (!window) {
+      throw new Error(`Window with ID "${id}" not found`);
+    }
+    return window.panel;
   }
 }

@@ -13,12 +13,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { EXOTIC_WEAPONS as ALL_EXOTIC, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getExoticWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All exotic weapons combined
  */
-export const ALL_EXOTIC_WEAPONS: ItemDefinition[] = ALL_EXOTIC;
+export const ALL_EXOTIC_WEAPONS: ItemDefinition[] = getExoticWeapons();
 
 /**
  * Sub-categories for backward compatibility

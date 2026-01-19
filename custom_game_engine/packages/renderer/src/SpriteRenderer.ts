@@ -120,6 +120,15 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
     const deprecatedSprites = ['tent', 'storage-chest', 'storage-box', 'workbench', 'agent'];
     if (!deprecatedSprites.includes(spriteId)) {
       console.error(`[SpriteRenderer] Failed to load map object sprite: ${spriteId} from ${spritePath}`);
+
+      // Auto-queue missing sprites for generation
+      if (typeof window !== 'undefined') {
+        import('./sprites/SpriteGenerationClient.js').then(({ requestMapObjectGeneration }) => {
+          requestMapObjectGeneration(spriteId).catch((error) => {
+            console.warn(`[SpriteRenderer] Failed to queue ${spriteId}:`, error);
+          });
+        });
+      }
     }
   };
   img.src = spritePath;

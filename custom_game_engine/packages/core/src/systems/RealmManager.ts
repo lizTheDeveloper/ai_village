@@ -21,11 +21,18 @@ export class RealmManager extends BaseSystem {
   readonly id: SystemId = 'realm_manager';
   readonly priority: number = 50;
   readonly requiredComponents = [] as const;
+  // Lazy activation: Skip entire system when no realms exist in world
+  public readonly activationComponents = ['realm'] as const;
 
   private realms: Map<string, string> = new Map();  // realmId -> entity ID
   private realmTicks: Map<string, number> = new Map();  // realmId -> tick count
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no realms registered
+    if (this.realms.size === 0) {
+      return;
+    }
+
     // Update each active realm independently
     for (const [realmId, entityId] of this.realms) {
       const entity = ctx.world.getEntity(entityId);

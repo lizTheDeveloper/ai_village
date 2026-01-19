@@ -12,12 +12,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { CREATIVE_WEAPONS, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getCreativeWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All creative weapons combined
  */
-export const ALL_CREATIVE_WEAPONS: ItemDefinition[] = CREATIVE_WEAPONS;
+export const ALL_CREATIVE_WEAPONS: ItemDefinition[] = getCreativeWeapons();
 
 /**
  * Sub-categories for backward compatibility

@@ -2,11 +2,10 @@
  * Spells JSON Loader
  *
  * Phase 3: Content Extraction
- * Provides type-safe access to spells.json
+ * Provides type-safe access to spells.json with lazy loading
  */
 
 import type { SpellDefinition } from '../magic/SpellRegistry.js';
-import spellsData from '../../../../data/spells.json';
 
 export interface SpellsData {
   version: string;
@@ -22,21 +21,34 @@ export interface SpellsData {
   };
 }
 
-// Cast JSON data to typed interface
-const typedSpellsData = spellsData as unknown as SpellsData;
+// Lazy-loaded data cache
+let typedSpellsData: SpellsData | null = null;
+
+/**
+ * Load spells data on first access
+ */
+function loadSpellsData(): SpellsData {
+  if (!typedSpellsData) {
+    const spellsData = require('../../../../data/spells.json');
+    typedSpellsData = spellsData as unknown as SpellsData;
+  }
+  return typedSpellsData;
+}
 
 /**
  * Get all spells for a specific paradigm
  */
 export function getSpellsByParadigm(paradigmId: keyof SpellsData['paradigms']): SpellDefinition[] {
-  return typedSpellsData.paradigms[paradigmId] || [];
+  const data = loadSpellsData();
+  return data.paradigms[paradigmId] || [];
 }
 
 /**
  * Get all spells across all paradigms
  */
 export function getAllSpells(): SpellDefinition[] {
-  return Object.values(typedSpellsData.paradigms).flat();
+  const data = loadSpellsData();
+  return Object.values(data.paradigms).flat();
 }
 
 /**
@@ -46,10 +58,36 @@ export function getSpellById(id: string): SpellDefinition | undefined {
   return getAllSpells().find(spell => spell.id === id);
 }
 
-// Export arrays for backward compatibility
-export const DIVINE_SPELLS = typedSpellsData.paradigms.divine;
-export const ACADEMIC_SPELLS = typedSpellsData.paradigms.academic;
-export const BLOOD_SPELLS = typedSpellsData.paradigms.blood;
-export const NAME_SPELLS = typedSpellsData.paradigms.names;
-export const BREATH_SPELLS = typedSpellsData.paradigms.breath;
-export const PACT_SPELLS = typedSpellsData.paradigms.pact;
+// Lazy getter functions for backward compatibility
+export function getDivineSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('divine');
+}
+
+export function getAcademicSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('academic');
+}
+
+export function getBloodSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('blood');
+}
+
+export function getNameSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('names');
+}
+
+export function getBreathSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('breath');
+}
+
+export function getPactSpells(): SpellDefinition[] {
+  return getSpellsByParadigm('pact');
+}
+
+// Deprecated: Use getter functions instead
+// These are kept for backward compatibility but trigger lazy loading
+Object.defineProperty(exports, 'DIVINE_SPELLS', { get: getDivineSpells });
+Object.defineProperty(exports, 'ACADEMIC_SPELLS', { get: getAcademicSpells });
+Object.defineProperty(exports, 'BLOOD_SPELLS', { get: getBloodSpells });
+Object.defineProperty(exports, 'NAME_SPELLS', { get: getNameSpells });
+Object.defineProperty(exports, 'BREATH_SPELLS', { get: getBreathSpells });
+Object.defineProperty(exports, 'PACT_SPELLS', { get: getPactSpells });

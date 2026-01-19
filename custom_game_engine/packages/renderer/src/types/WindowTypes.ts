@@ -154,6 +154,9 @@ export interface WindowConfig {
 
   /** Menu category for organizing windows (defaults to 'default') */
   menuCategory?: WindowMenuCategory;
+
+  /** Optional factory function to create panel lazily on first show */
+  factory?: () => IWindowPanel;
 }
 
 /**
@@ -163,8 +166,8 @@ export interface ManagedWindow {
   /** Unique identifier */
   id: string;
 
-  /** The panel instance */
-  panel: IWindowPanel;
+  /** The panel instance (may be null if using lazy factory) */
+  panel: IWindowPanel | null;
 
   /** Configuration */
   config: WindowConfig;

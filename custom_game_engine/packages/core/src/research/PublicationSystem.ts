@@ -521,6 +521,13 @@ export class PublicationManager {
   }
 
   /**
+   * Check if any publications exist
+   */
+  public hasPublications(): boolean {
+    return this.publications.size > 0;
+  }
+
+  /**
    * Get all publications by an author
    */
   public getPublicationsByAuthor(authorId: string): Publication[] {
@@ -739,6 +746,11 @@ export class PublicationSystem extends BaseSystem {
    * Main update loop
    */
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no publications exist
+    if (!this.manager.hasPublications()) {
+      return;
+    }
+
     // Could do periodic things here like:
     // - Spread influence of popular publications
     // - Age out old publications

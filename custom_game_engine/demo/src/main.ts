@@ -166,6 +166,31 @@ import {
   createTextAdventurePanel,
   // Dev Actions Service
   devActionsService,
+  // Panel factories for lazy loading
+  createMemoryPanelFactory,
+  createRelationshipsPanelFactory,
+  createAnimalInfoPanelFactory,
+  createAnimalRosterPanelFactory,
+  createPlantInfoPanelFactory,
+  createEconomyPanelFactory,
+  createShopPanelFactory,
+  createGovernanceDashboardPanelFactory,
+  createCityManagerPanelFactory,
+  createResourcesPanelFactory,
+  createNotificationsPanelFactory,
+  createTileInspectorPanelFactory,
+  createResearchLibraryPanelFactory,
+  createTechTreePanelFactory,
+  createTimeControlsPanelFactory,
+  createUniverseManagerPanelFactory,
+  createMagicSystemsPanelFactory,
+  createSpellbookPanelFactory,
+  createDivinePowersPanelFactory,
+  createVisionComposerPanelFactory,
+  createDivineAnalyticsPanelFactory,
+  createSacredGeographyPanelFactory,
+  createAngelManagementPanelFactory,
+  createPrayerPanelFactory,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -855,22 +880,11 @@ async function registerAllSystems(
 interface UIPanelsResult {
   agentInfoPanel: AgentInfoPanel;
   agentRosterPanel: AgentRosterPanel;
-  animalInfoPanel: AnimalInfoPanel;
-  animalRosterPanel: AnimalRosterPanel;
-  plantInfoPanel: PlantInfoPanel;
-  resourcesPanel: ResourcesPanel;
-  memoryPanel: MemoryPanel;
-  relationshipsPanel: RelationshipsPanel;
-  notificationsPanel: NotificationsPanel;
-  economyPanel: EconomyPanel;
-  shopPanel: ShopPanel;
-  governancePanel: GovernanceDashboardPanel;
-  cityManagerPanel: CityManagerPanel;
+  // Lazily created panels removed from interface
   cityStatsWidget: CityStatsWidget;
   inventoryUI: InventoryUI;
   craftingUI: CraftingPanelUI;
   settingsPanel: SettingsPanel;
-  tileInspectorPanel: TileInspectorPanel;
   controlsPanel: ControlsPanel;
   hoverInfoPanel: UnifiedHoverInfoPanel;
 }
@@ -926,17 +940,19 @@ function createUIPanels(
 
   const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
-  const animalInfoPanel = new AnimalInfoPanel();
-  const animalRosterPanel = new AnimalRosterPanel(renderer.pixelLabLoader);
-  const plantInfoPanel = new PlantInfoPanel();
-  const resourcesPanel = new ResourcesPanel();
-  const memoryPanel = new MemoryPanel();
-  const relationshipsPanel = new RelationshipsPanel();
-  const notificationsPanel = new NotificationsPanel();
-  const economyPanel = new EconomyPanel();
-  const shopPanel = new ShopPanel();
-  const governancePanel = new GovernanceDashboardPanel();
-  const cityManagerPanel = new CityManagerPanel();
+  // Panels below will be created lazily via factories - removed eager creation
+  // const animalInfoPanel = new AnimalInfoPanel();
+  // const animalRosterPanel = new AnimalRosterPanel(renderer.pixelLabLoader);
+  // const plantInfoPanel = new PlantInfoPanel();
+  // const resourcesPanel = new ResourcesPanel();
+  // const memoryPanel = new MemoryPanel();
+  // const relationshipsPanel = new RelationshipsPanel();
+  // const notificationsPanel = new NotificationsPanel();
+  // const economyPanel = new EconomyPanel();
+  // const shopPanel = new ShopPanel();
+  // const governancePanel = new GovernanceDashboardPanel();
+  // const cityManagerPanel = new CityManagerPanel();
+
   const cityStatsWidget = new CityStatsWidget('top-right');
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
   const hoverInfoPanel = new UnifiedHoverInfoPanel();
@@ -959,11 +975,12 @@ function createUIPanels(
     }
   });
 
-  const tileInspectorPanel = new TileInspectorPanel(
-    gameLoop.world.eventBus,
-    renderer.getCamera(),
-    chunkManager
-  );
+  // TileInspectorPanel will be created lazily
+  // const tileInspectorPanel = new TileInspectorPanel(
+  //   gameLoop.world.eventBus,
+  //   renderer.getCamera(),
+  //   chunkManager
+  // );
 
   // Create placeholder for controlsPanel - will be initialized after windowManager
   const controlsPanel = null as any;
@@ -971,22 +988,10 @@ function createUIPanels(
   return {
     agentInfoPanel,
     agentRosterPanel,
-    animalInfoPanel,
-    animalRosterPanel,
-    plantInfoPanel,
-    resourcesPanel,
-    memoryPanel,
-    relationshipsPanel,
-    notificationsPanel,
-    economyPanel,
-    shopPanel,
-    governancePanel,
-    cityManagerPanel,
     cityStatsWidget,
     inventoryUI,
     craftingUI,
     settingsPanel,
-    tileInspectorPanel,
     controlsPanel,
     hoverInfoPanel,
   };
@@ -1007,21 +1012,13 @@ function setupWindowManager(
   const menuBar = new MenuBar(windowManager, canvas);
   menuBar.setRenderer(renderer);
 
-  // Create adapters
+  // Create adapters for eager panels only
   const agentInfoAdapter = createAgentInfoPanelAdapter(panels.agentInfoPanel);
-  const animalInfoAdapter = createAnimalInfoPanelAdapter(panels.animalInfoPanel);
-  const plantInfoAdapter = createPlantInfoPanelAdapter(panels.plantInfoPanel);
-  const memoryAdapter = createMemoryPanelAdapter(panels.memoryPanel);
-  const relationshipsAdapter = createRelationshipsPanelAdapter(panels.relationshipsPanel);
-  const resourcesAdapter = createResourcesPanelAdapter(panels.resourcesPanel);
-  const notificationsAdapter = createNotificationsPanelAdapter(panels.notificationsPanel);
-  const economyAdapter = createEconomyPanelAdapter(panels.economyPanel);
-  const shopAdapter = createShopPanelAdapter(panels.shopPanel);
-  const governanceAdapter = createGovernanceDashboardPanelAdapter(panels.governancePanel);
   const settingsAdapter = createSettingsPanelAdapter(panels.settingsPanel);
-  const tileInspectorAdapter = createTileInspectorPanelAdapter(panels.tileInspectorPanel);
   const inventoryAdapter = createInventoryPanelAdapter(panels.inventoryUI);
   const craftingAdapter = createCraftingPanelAdapter(panels.craftingUI);
+
+  // Lazy panel adapters will be created by factories when first shown
 
   const canvasRect = canvas.getBoundingClientRect();
   const logicalWidth = canvasRect.width;
@@ -1064,7 +1061,8 @@ function setupWindowManager(
     menuCategory: 'info',
   });
 
-  windowManager.registerWindow('animal-info', animalInfoAdapter, {
+  // Animal Info Panel - LAZY
+  windowManager.registerWindow('animal-info', null, {
     defaultX: logicalWidth - 320,
     defaultY: 10,
     defaultWidth: 300,
@@ -1075,9 +1073,11 @@ function setupWindowManager(
     minHeight: 300,
     showInWindowList: true,
     menuCategory: 'animals',
+    factory: createAnimalInfoPanelFactory(),
   });
 
-  windowManager.registerWindow('plant-info', plantInfoAdapter, {
+  // Plant Info Panel - LAZY
+  windowManager.registerWindow('plant-info', null, {
     defaultX: logicalWidth - 340,
     defaultY: 50,
     defaultWidth: 320,
@@ -1088,9 +1088,11 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'farming',
+    factory: createPlantInfoPanelFactory(),
   });
 
-  windowManager.registerWindow('resources', resourcesAdapter, {
+  // Resources Panel - LAZY
+  windowManager.registerWindow('resources', null, {
     defaultX: logicalWidth - 260,
     defaultY: 10,
     defaultWidth: 250,
@@ -1102,9 +1104,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'R',
     menuCategory: 'economy',
+    factory: createResourcesPanelFactory(),
   });
 
-  windowManager.registerWindow('memory', memoryAdapter, {
+  // Memory Panel - LAZY
+  windowManager.registerWindow('memory', null, {
     defaultX: 10,
     defaultY: logicalHeight - 610,
     defaultWidth: 400,
@@ -1116,9 +1120,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'M',
     menuCategory: 'social',
+    factory: createMemoryPanelFactory(),
   });
 
-  windowManager.registerWindow('relationships', relationshipsAdapter, {
+  // Relationships Panel - LAZY
+  windowManager.registerWindow('relationships', null, {
     defaultX: 420,
     defaultY: logicalHeight - 510,
     defaultWidth: 380,
@@ -1130,9 +1136,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'L',
     menuCategory: 'social',
+    factory: createRelationshipsPanelFactory(),
   });
 
-  windowManager.registerWindow('tile-inspector', tileInspectorAdapter, {
+  // Tile Inspector Panel - LAZY (needs eventBus, camera, chunkManager)
+  windowManager.registerWindow('tile-inspector', null, {
     defaultX: logicalWidth - 320,
     defaultY: logicalHeight - 410,
     defaultWidth: 300,
@@ -1142,6 +1150,11 @@ function setupWindowManager(
     minWidth: 250,
     minHeight: 300,
     showInWindowList: true,
+    factory: createTileInspectorPanelFactory(
+      (gameLoop as any).world.eventBus,
+      renderer.getCamera(),
+      chunkManager
+    ),
     keyboardShortcut: 'T',
     menuCategory: 'farming',
   });
@@ -1191,7 +1204,8 @@ function setupWindowManager(
     menuCategory: 'economy',
   });
 
-  windowManager.registerWindow('notifications', notificationsAdapter, {
+  // Notifications Panel - LAZY
+  windowManager.registerWindow('notifications', null, {
     defaultX: logicalWidth - 420,
     defaultY: logicalHeight - 350,
     defaultWidth: 400,
@@ -1203,9 +1217,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'N',
     menuCategory: 'settings',
+    factory: createNotificationsPanelFactory(),
   });
 
-  windowManager.registerWindow('economy', economyAdapter, {
+  // Economy Panel - LAZY
+  windowManager.registerWindow('economy', null, {
     defaultX: logicalWidth - 420,
     defaultY: logicalHeight - 520,
     defaultWidth: 400,
@@ -1217,9 +1233,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'E',
     menuCategory: 'economy',
+    factory: createEconomyPanelFactory(),
   });
 
-  windowManager.registerWindow('shop', shopAdapter, {
+  // Shop Panel - LAZY
+  windowManager.registerWindow('shop', null, {
     defaultX: (logicalWidth - 500) / 2,
     defaultY: (logicalHeight - 600) / 2,
     defaultWidth: 500,
@@ -1228,9 +1246,11 @@ function setupWindowManager(
     isModal: true,
     showInWindowList: false,
     menuCategory: 'economy',
+    factory: createShopPanelFactory(),
   });
 
-  windowManager.registerWindow('governance', governanceAdapter, {
+  // Governance Panel - LAZY
+  windowManager.registerWindow('governance', null, {
     defaultX: logicalWidth - 420,
     defaultY: 10,
     defaultWidth: 400,
@@ -1242,6 +1262,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'G',
     menuCategory: 'social',
+    factory: createGovernanceDashboardPanelFactory(),
   });
 
   // Register governance keyboard shortcut
@@ -1255,8 +1276,8 @@ function setupWindowManager(
     },
   });
 
-  // City Manager Panel
-  windowManager.registerWindow('city-manager', panels.cityManagerPanel, {
+  // City Manager Panel - LAZY
+  windowManager.registerWindow('city-manager', null, {
     defaultX: logicalWidth - 420,
     defaultY: 120,
     defaultWidth: 360,
@@ -1266,6 +1287,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'C',
     menuCategory: 'social',
+    factory: createCityManagerPanelFactory(),
   });
 
   // Register city manager keyboard shortcut
@@ -1300,9 +1322,8 @@ function setupWindowManager(
     menuCategory: 'settings',
   });
 
-  // Time Controls Panel
-  const timeControlsPanel = new TimeControlsPanel();
-  windowManager.registerWindow('time-controls', timeControlsPanel, {
+  // Time Controls Panel - LAZY
+  windowManager.registerWindow('time-controls', null, {
     defaultX: 10,
     defaultY: 50,
     defaultWidth: 220,
@@ -1312,11 +1333,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'T',
     menuCategory: 'settings',
+    factory: createTimeControlsPanelFactory(),
   });
 
-  // Universe Manager Panel
-  const universeManagerPanel = new UniverseManagerPanel();
-  windowManager.registerWindow('universe-manager', universeManagerPanel, {
+  // Universe Manager Panel - LAZY
+  windowManager.registerWindow('universe-manager', null, {
     defaultX: 10,
     defaultY: 250,
     defaultWidth: 350,
@@ -1326,6 +1347,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'U',
     menuCategory: 'settings',
+    factory: createUniverseManagerPanelFactory(),
   });
 
   // Agent Roster Panel - use existing panel from panels object (has click callback wired)
@@ -1341,9 +1363,8 @@ function setupWindowManager(
     menuCategory: 'info',
   });
 
-  // Research Library Panel
-  const researchLibraryPanel = new ResearchLibraryPanel();
-  windowManager.registerWindow('research-library', researchLibraryPanel, {
+  // Research Library Panel - LAZY
+  windowManager.registerWindow('research-library', null, {
     defaultX: 400,
     defaultY: 100,
     defaultWidth: 380,
@@ -1353,11 +1374,11 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'Y',
     menuCategory: 'research',
+    factory: createResearchLibraryPanelFactory(),
   });
 
-  // Tech Tree Panel
-  const techTreePanel = new TechTreePanel();
-  windowManager.registerWindow('tech-tree', techTreePanel, {
+  // Tech Tree Panel - LAZY
+  windowManager.registerWindow('tech-tree', null, {
     defaultX: 100,
     defaultY: 50,
     defaultWidth: 1200,
@@ -1367,6 +1388,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'K',
     menuCategory: 'research',
+    factory: createTechTreePanelFactory(),
   });
 
   // Agent Selection Panel (Jack-In)
@@ -1387,10 +1409,8 @@ function setupWindowManager(
   // Magic & Divine Panels
   // ============================================================================
 
-  // Magic Systems Panel
-  const magicSystemsPanel = new MagicSystemsPanel();
-  const magicSystemsAdapter = createMagicSystemsPanelAdapter(magicSystemsPanel);
-  windowManager.registerWindow('magic-systems', magicSystemsAdapter, {
+  // Magic Systems Panel - LAZY
+  windowManager.registerWindow('magic-systems', null, {
     defaultX: 10,
     defaultY: 100,
     defaultWidth: 380,
@@ -1401,12 +1421,11 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'magic',
+    factory: createMagicSystemsPanelFactory(),
   });
 
-  // Spellbook Panel
-  const spellbookPanel = new SpellbookPanel();
-  const spellbookAdapter = createSpellbookPanelAdapter(spellbookPanel);
-  windowManager.registerWindow('spellbook', spellbookAdapter, {
+  // Spellbook Panel - LAZY
+  windowManager.registerWindow('spellbook', null, {
     defaultX: 50,
     defaultY: 120,
     defaultWidth: 420,
@@ -1415,6 +1434,7 @@ function setupWindowManager(
     isResizable: true,
     minWidth: 350,
     minHeight: 400,
+    factory: createSpellbookPanelFactory(),
     showInWindowList: true,
     menuCategory: 'magic',
   });

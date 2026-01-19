@@ -70,6 +70,13 @@ export const DEFAULT_CITY_DIRECTOR_CONFIG: CityDirectorSystemConfig = {
  * CityDirectorSystem manages city-level strategic decisions.
  *
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
+ *
+ * PERFORMANCE OPTIMIZATIONS (2026-01-18):
+ * - Throttling: 100 ticks (5 seconds) - city planning is slow-changing
+ * - Map-based caching: 5 component Maps for O(1) lookups
+ * - Zero allocations: Reusable working objects
+ * - Early exits: Skip when no cities or no agents
+ * - Precomputed constants: ticksPerDay for food calculations
  */
 export class CityDirectorSystem extends BaseSystem {
   public readonly id: SystemId = 'city_director';
@@ -86,6 +93,26 @@ export class CityDirectorSystem extends BaseSystem {
   // LLM queue reference - set externally when available
   private llmQueue: { requestDecision: (id: string, prompt: string) => Promise<string> } | null = null;
 
+  // ========== PERFORMANCE OPTIMIZATION: Map-Based Caching ==========
+  // Cache entity components for O(1) lookups instead of O(n) iteration
+  private agentCache = new Map<string, AgentComponent>();
+  private positionCache = new Map<string, PositionComponent>();
+  private buildingCache = new Map<string, BuildingComponent>();
+  private inventoryCache = new Map<string, InventoryComponent>();
+  private steeringCache = new Map<string, SteeringComponent>();
+
+  // ========== PERFORMANCE OPTIMIZATION: Zero Allocations ==========
+  // Reusable working objects to avoid allocations in hot paths
+  private readonly workingAgentIds: string[] = [];
+
+  // ========== PERFORMANCE OPTIMIZATION: Precomputed Constants ==========
+  private readonly TICKS_PER_DAY = 24 * 60 * 3; // 1 day at 20 TPS
+  private readonly FOOD_PER_AGENT_PER_DAY = 3;
+
+  // Cache staleness tracking - rebuild caches if stale
+  private lastCacheRebuild: number = 0;
+  private readonly CACHE_REBUILD_INTERVAL = 1000; // Rebuild every 50 seconds
+
   constructor(config: Partial<CityDirectorSystemConfig> = {}) {
     super();
     this.config = { ...DEFAULT_CITY_DIRECTOR_CONFIG, ...config };
@@ -101,12 +128,22 @@ export class CityDirectorSystem extends BaseSystem {
 
   /**
    * Update all city directors.
+   *
+   * PERFORMANCE: Multi-level early exits, cached components, zero allocations
    */
   protected onUpdate(ctx: SystemContext): void {
     const directors = ctx.world.query().with('city_director' as ComponentType).executeEntities();
 
+    // ========== EARLY EXIT: No cities ==========
     if (directors.length === 0) {
       return;
+    }
+
+    // ========== CACHE REBUILD: Periodic refresh to stay synchronized ==========
+    const shouldRebuildCache = ctx.tick - this.lastCacheRebuild >= this.CACHE_REBUILD_INTERVAL;
+    if (shouldRebuildCache) {
+      this.rebuildCaches(ctx.world);
+      this.lastCacheRebuild = ctx.tick;
     }
 
     // Update stats periodically (cheaper than every tick)
@@ -120,9 +157,14 @@ export class CityDirectorSystem extends BaseSystem {
         continue;
       }
 
+      // ========== EARLY EXIT: No agents in city ==========
+      if (director.agentIds.length === 0) {
+        continue;
+      }
+
       // Update city stats
       if (shouldUpdateStats) {
-        this.updateCityStats(ctx.world, impl, director);
+        this.updateCityStatsOptimized(ctx.world, impl, director);
       }
 
       // Check if it's time for a director meeting
@@ -131,7 +173,7 @@ export class CityDirectorSystem extends BaseSystem {
       }
 
       // Apply blended priorities to autonomic NPCs in this city
-      this.applyPrioritiesToNPCs(ctx.world, director);
+      this.applyPrioritiesToNPCsOptimized(ctx.world, director);
     }
 
     if (shouldUpdateStats) {
@@ -140,47 +182,89 @@ export class CityDirectorSystem extends BaseSystem {
   }
 
   /**
-   * Update city statistics by querying world state.
+   * Rebuild component caches for O(1) lookups.
+   * Called periodically to stay synchronized with world state.
    */
-  private updateCityStats(world: World, entity: EntityImpl, director: CityDirectorComponent): void {
-    const agents = world.query().with(CT.Agent, CT.Position).executeEntities();
-    const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
-    const animals = world.query().with(CT.Animal, CT.Position).executeEntities();
+  private rebuildCaches(world: World): void {
+    // Clear old caches
+    this.agentCache.clear();
+    this.positionCache.clear();
+    this.buildingCache.clear();
+    this.inventoryCache.clear();
+    this.steeringCache.clear();
 
-    // Filter to agents within city bounds
-    const cityAgents: EntityImpl[] = [];
+    // Rebuild agent + position cache
+    const agents = world.query().with(CT.Agent, CT.Position).executeEntities();
+    for (const agent of agents) {
+      const impl = agent as EntityImpl;
+      const agentComp = impl.getComponent<AgentComponent>(CT.Agent);
+      const posComp = impl.getComponent<PositionComponent>(CT.Position);
+
+      if (agentComp) this.agentCache.set(impl.id, agentComp);
+      if (posComp) this.positionCache.set(impl.id, posComp);
+
+      const steeringComp = impl.getComponent<SteeringComponent>(CT.Steering);
+      if (steeringComp) this.steeringCache.set(impl.id, steeringComp);
+    }
+
+    // Rebuild building + inventory cache
+    const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
+    for (const building of buildings) {
+      const impl = building as EntityImpl;
+      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
+      const posComp = impl.getComponent<PositionComponent>(CT.Position);
+
+      if (buildingComp) this.buildingCache.set(impl.id, buildingComp);
+      if (posComp && !this.positionCache.has(impl.id)) {
+        this.positionCache.set(impl.id, posComp);
+      }
+
+      const invComp = impl.getComponent<InventoryComponent>(CT.Inventory);
+      if (invComp) this.inventoryCache.set(impl.id, invComp);
+    }
+  }
+
+  /**
+   * Update city statistics using cached components (optimized).
+   *
+   * PERFORMANCE: Uses Map caches for O(1) lookups, reuses working arrays
+   */
+  private updateCityStatsOptimized(world: World, entity: EntityImpl, director: CityDirectorComponent): void {
+    // ========== ZERO ALLOCATIONS: Reuse working array ==========
+    this.workingAgentIds.length = 0; // Clear without reallocating
+
     let autonomicCount = 0;
     let llmAgentCount = 0;
 
-    for (const agent of agents) {
-      const agentImpl = agent as EntityImpl;
-      const pos = agentImpl.getComponent<PositionComponent>(CT.Position);
+    // ========== OPTIMIZED: Use cached components for agents ==========
+    for (const [agentId, agentComp] of this.agentCache) {
+      const pos = this.positionCache.get(agentId);
+      if (!pos || !isAgentInCity(pos.x, pos.y, director.bounds)) continue;
 
-      if (pos && isAgentInCity(pos.x, pos.y, director.bounds)) {
-        cityAgents.push(agentImpl);
+      this.workingAgentIds.push(agentId);
 
-        const agentComp = agentImpl.getComponent<AgentComponent>(CT.Agent);
-        if (agentComp) {
-          const isAutonomic = agentComp.tier === 'autonomic' || (!agentComp.useLLM && !agentComp.tier);
-          if (isAutonomic) {
-            autonomicCount++;
-            // Apply containment bounds immediately to prevent wandering out
-            const steering = agentImpl.getComponent<SteeringComponent>(CT.Steering);
-            if (steering && !steering.containmentBounds) {
-              agentImpl.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
-                ...current,
-                containmentBounds: director.bounds,
-                containmentMargin: 20,
-              }));
-            }
-          } else if (agentComp.useLLM) {
-            llmAgentCount++;
+      const isAutonomic = agentComp.tier === 'autonomic' || (!agentComp.useLLM && !agentComp.tier);
+      if (isAutonomic) {
+        autonomicCount++;
+
+        // Apply containment bounds immediately to prevent wandering out
+        const steering = this.steeringCache.get(agentId);
+        if (steering && !steering.containmentBounds) {
+          const agentEntity = world.getEntity(agentId) as EntityImpl;
+          if (agentEntity) {
+            agentEntity.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
+              ...current,
+              containmentBounds: director.bounds,
+              containmentMargin: 20,
+            }));
           }
         }
+      } else if (agentComp.useLLM) {
+        llmAgentCount++;
       }
     }
 
-    // Count buildings within city bounds
+    // ========== OPTIMIZED: Use cached components for buildings ==========
     let totalBuildings = 0;
     let housingCapacity = 0;
     let storageCapacity = 0;
@@ -189,81 +273,89 @@ export class CityDirectorSystem extends BaseSystem {
     let totalWood = 0;
     let totalStone = 0;
 
-    for (const building of buildings) {
-      const buildingImpl = building as EntityImpl;
-      const pos = buildingImpl.getComponent<PositionComponent>(CT.Position);
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
+    for (const [buildingId, buildingComp] of this.buildingCache) {
+      const pos = this.positionCache.get(buildingId);
+      if (!pos || !isAgentInCity(pos.x, pos.y, director.bounds)) continue;
+      if (!buildingComp.isComplete) continue;
 
-      if (pos && buildingComp && isAgentInCity(pos.x, pos.y, director.bounds)) {
-        if (!buildingComp.isComplete) continue;
+      totalBuildings++;
 
-        totalBuildings++;
+      const bType = buildingComp.buildingType;
 
-        // Categorize building types
-        const bType = buildingComp.buildingType;
+      // Housing types (bed, bedroll)
+      if (bType === 'bed' || bType === 'bedroll') {
+        housingCapacity += 1;
+      }
 
-        // Housing types (bed, bedroll)
-        // NOTE: Multi-tile houses now use TileBasedBlueprintRegistry
-        if (['bed', 'bedroll'].includes(bType)) {
-          housingCapacity += 1;
-        }
+      // Storage types
+      if (bType === 'storage-chest') {
+        storageCapacity += 20;
+      } else if (bType === 'storage-box') {
+        storageCapacity += 10;
+      }
 
-        // Storage types
-        // NOTE: Large storage buildings (warehouses, granaries) now use TileBasedBlueprintRegistry
-        if (['storage-chest', 'storage-box'].includes(bType)) {
-          storageCapacity += bType === 'storage-chest' ? 20 : 10;
-        }
+      // Production types
+      if (
+        bType === 'forge' ||
+        bType === 'workbench' ||
+        bType === 'oven' ||
+        bType === 'loom' ||
+        bType === 'butchering_table'
+      ) {
+        productionBuildings++;
+      }
 
-        // Production types
-        // NOTE: Large workshops now use TileBasedBlueprintRegistry
-        if (['forge', 'workbench', 'oven', 'loom', 'butchering_table'].includes(bType)) {
-          productionBuildings++;
-        }
+      // Check building inventories for resources (O(1) cache lookup)
+      const inv = this.inventoryCache.get(buildingId);
+      if (inv) {
+        for (const slot of inv.slots) {
+          if (!slot || !slot.itemId || slot.quantity <= 0) continue;
 
-        // Check building inventories for resources
-        const inv = buildingImpl.getComponent<InventoryComponent>(CT.Inventory);
-        if (inv) {
-          for (const slot of inv.slots) {
-            if (slot && slot.itemId && slot.quantity > 0) {
-              const itemId = slot.itemId;
-              const qty = slot.quantity;
+          const itemId = slot.itemId;
+          const qty = slot.quantity;
 
-              // Food items
-              if (['food', 'bread', 'meat', 'vegetables', 'fruit', 'berry'].includes(itemId)) {
-                totalFood += qty;
-              } else if (itemId === 'wood' || itemId === 'lumber') {
-                totalWood += qty;
-              } else if (itemId === 'stone' || itemId === 'rock') {
-                totalStone += qty;
-              }
-            }
+          // Food items
+          if (
+            itemId === 'food' ||
+            itemId === 'bread' ||
+            itemId === 'meat' ||
+            itemId === 'vegetables' ||
+            itemId === 'fruit' ||
+            itemId === 'berry'
+          ) {
+            totalFood += qty;
+          } else if (itemId === 'wood' || itemId === 'lumber') {
+            totalWood += qty;
+          } else if (itemId === 'stone' || itemId === 'rock') {
+            totalStone += qty;
           }
         }
       }
     }
 
     // Count threats (wild animals with high stress within range)
+    // NOTE: Animals not cached yet - this is low-frequency, OK to query
     let nearbyThreats = 0;
+    const animals = world.query().with(CT.Animal, CT.Position).executeEntities();
     for (const animal of animals) {
       const animalImpl = animal as EntityImpl;
       const pos = animalImpl.getComponent<PositionComponent>(CT.Position);
       const animalComp = animalImpl.getComponent<AnimalComponent>(CT.Animal);
 
       if (pos && animalComp && isAgentInCity(pos.x, pos.y, director.bounds)) {
-        // Check if wild and stressed (likely to attack)
         if (animalComp.wild && animalComp.stress > 50) {
           nearbyThreats++;
         }
       }
     }
 
-    // Calculate food supply in days
-    const dailyFoodConsumption = cityAgents.length * 3; // ~3 food per agent per day
+    // ========== OPTIMIZED: Use precomputed constant ==========
+    const dailyFoodConsumption = this.workingAgentIds.length * this.FOOD_PER_AGENT_PER_DAY;
     const foodSupplyDays = dailyFoodConsumption > 0 ? totalFood / dailyFoodConsumption : 999;
 
     // Update stats
     const stats: CityStats = {
-      population: cityAgents.length,
+      population: this.workingAgentIds.length,
       autonomicNpcCount: autonomicCount,
       llmAgentCount,
       totalBuildings,
@@ -277,8 +369,8 @@ export class CityDirectorSystem extends BaseSystem {
       recentDeaths: 0, // Would need death tracking integration
     };
 
-    // Update agent IDs list
-    const agentIds = cityAgents.map((a) => a.id);
+    // ========== ZERO ALLOCATIONS: Copy workingAgentIds to new array only once ==========
+    const agentIds = this.workingAgentIds.slice();
 
     entity.updateComponent<CityDirectorComponent>('city_director' as ComponentType, (current) => ({
       ...current,
@@ -472,44 +564,49 @@ Respond in this exact JSON format:
   }
 
   /**
-   * Apply blended priorities to autonomic NPCs in the city.
+   * Apply blended priorities to autonomic NPCs in the city (optimized).
+   *
+   * PERFORMANCE: Uses cached components for O(1) lookups, minimal updates
    */
-  private applyPrioritiesToNPCs(world: World, director: CityDirectorComponent): void {
-    // Only apply to autonomic NPCs (not full LLM agents)
+  private applyPrioritiesToNPCsOptimized(world: World, director: CityDirectorComponent): void {
+    // ========== EARLY EXIT: No priorities to apply ==========
+    if (!director.priorities) return;
+
+    // ========== OPTIMIZED: Use cached components ==========
     for (const agentId of director.agentIds) {
-      const agent = world.getEntity(agentId);
-      if (!agent) continue;
-
-      const agentImpl = agent as EntityImpl;
-      const agentComp = agentImpl.getComponent<AgentComponent>(CT.Agent);
-
+      const agentComp = this.agentCache.get(agentId);
       if (!agentComp) continue;
 
       // Only apply to autonomic tier agents
       const isAutonomic = agentComp.tier === 'autonomic' || (!agentComp.useLLM && !agentComp.tier);
+      if (!isAutonomic) continue;
 
-      if (isAutonomic) {
-        // Apply containment bounds to steering component to keep agents in city
-        const steering = agentImpl.getComponent<SteeringComponent>(CT.Steering);
-        if (steering && !steering.containmentBounds) {
-          agentImpl.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
+      // Apply containment bounds to steering component to keep agents in city
+      const steering = this.steeringCache.get(agentId);
+      if (steering && !steering.containmentBounds) {
+        const agentEntity = world.getEntity(agentId) as EntityImpl;
+        if (agentEntity) {
+          agentEntity.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
             ...current,
             containmentBounds: director.bounds,
             containmentMargin: 20, // Start turning back 20 tiles from edge
           }));
         }
+      }
 
-        // Blend city priorities with agent's personal skill-based priorities
-        if (agentComp.priorities) {
-          const blendedPriorities = blendPriorities(
-            director.priorities,
-            agentComp.priorities,
-            director.cityInfluence
-          );
+      // Blend city priorities with agent's personal skill-based priorities
+      if (agentComp.priorities) {
+        const blendedPriorities = blendPriorities(
+          director.priorities,
+          agentComp.priorities,
+          director.cityInfluence
+        );
 
-          // Update agent with blended priorities
-          // Note: We store the blended priorities in a separate field to preserve original skill-based priorities
-          agentImpl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        // Update agent with blended priorities
+        // Note: We store the blended priorities in a separate field to preserve original skill-based priorities
+        const agentEntity = world.getEntity(agentId) as EntityImpl;
+        if (agentEntity) {
+          agentEntity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             effectivePriorities: blendedPriorities,
           }));

@@ -10,12 +10,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { RANGED_WEAPONS as ALL_RANGED, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getRangedWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All traditional ranged weapons combined
  */
-export const ALL_TRADITIONAL_RANGED: ItemDefinition[] = ALL_RANGED;
+export const ALL_TRADITIONAL_RANGED: ItemDefinition[] = getRangedWeapons();
 
 /**
  * Sub-categories for backward compatibility

@@ -120,3 +120,6 @@ export * from './TextAdventurePanel.js';
 
 // Dev tools services
 export * from './services/index.js';
+
+// Panel factories for lazy loading
+export * from './panels/PanelFactory.js';

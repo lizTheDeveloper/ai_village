@@ -91,11 +91,11 @@ export {
 
 // Default items - Phase 3: Content Extraction (now loaded from JSON)
 export {
-  DEFAULT_ITEMS,
-  RESOURCE_ITEMS,
-  FOOD_ITEMS,
-  MATERIAL_ITEMS,
-  TOOL_ITEMS,
+  getAllItems as DEFAULT_ITEMS,
+  getResourceItems as RESOURCE_ITEMS,
+  getFoodItems as FOOD_ITEMS,
+  getMaterialItems as MATERIAL_ITEMS,
+  getToolItems as TOOL_ITEMS,
 } from '../data/ItemsLoader.js';
 
 // Registration function still from TypeScript
@@ -172,11 +172,11 @@ export {
 // Auto-initialize the global registry with default items
 // This must be done after all imports to avoid circular dependencies
 import { itemRegistry } from './ItemRegistry.js';
-import { DEFAULT_ITEMS } from '../data/ItemsLoader.js';  // Phase 3: From JSON
+import { getAllItems } from '../data/ItemsLoader.js';  // Phase 3: From JSON
 import { DEFAULT_SEEDS } from './SeedItemFactory.js';
 
 // Register all default items and seeds at module load time
 if (itemRegistry.size === 0) {
-  itemRegistry.registerAll(DEFAULT_ITEMS);
+  itemRegistry.registerAll(getAllItems());
   itemRegistry.registerAll(DEFAULT_SEEDS);
 }

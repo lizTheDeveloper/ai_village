@@ -10,12 +10,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { FIREARMS as ALL_FIREARMS_DATA, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getFirearms, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All firearms combined
  */
-export const ALL_FIREARMS: ItemDefinition[] = ALL_FIREARMS_DATA;
+export const ALL_FIREARMS: ItemDefinition[] = getFirearms();
 
 /**
  * Sub-categories for backward compatibility

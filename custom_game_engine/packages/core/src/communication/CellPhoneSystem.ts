@@ -302,6 +302,10 @@ export class CellPhoneManager {
     return this.phones.get(phoneId);
   }
 
+  getPhoneCount(): number {
+    return this.phones.size;
+  }
+
   getPhoneByNumber(phoneNumber: string): CellPhone | undefined {
     return this.phonesByNumber.get(phoneNumber);
   }
@@ -835,6 +839,11 @@ export class CellPhoneSystem extends BaseSystem {
   private readonly SIGNAL_UPDATE_INTERVAL = 100; // Every 5 seconds
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no cell phones exist
+    if (this.manager.getPhoneCount() === 0) {
+      return;
+    }
+
     // Process timeouts on active calls
     if (ctx.tick - this.lastCallTimeoutCheck >= this.UPDATE_INTERVAL) {
       this.processCallTimeouts(ctx);

@@ -627,6 +627,8 @@ export class TalkShowSystem extends BaseSystem {
   readonly id = 'TalkShowSystem';
   readonly priority = 71;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private manager = new TalkShowManager();

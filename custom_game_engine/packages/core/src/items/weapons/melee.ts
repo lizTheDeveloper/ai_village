@@ -10,12 +10,12 @@
  */
 
 import { type ItemDefinition } from '../ItemDefinition.js';
-import { MELEE_WEAPONS as ALL_MELEE, WeaponsLoader } from '../../data/WeaponsLoader.js';
+import { getMeleeWeapons, WeaponsLoader } from '../../data/WeaponsLoader.js';
 
 /**
  * All melee weapons combined
  */
-export const ALL_MELEE_WEAPONS: ItemDefinition[] = ALL_MELEE;
+export const ALL_MELEE_WEAPONS: ItemDefinition[] = getMeleeWeapons();
 
 /**
  * Sub-categories for backward compatibility

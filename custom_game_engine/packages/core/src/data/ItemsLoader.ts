@@ -2,11 +2,10 @@
  * Items JSON Loader
  *
  * Phase 3: Content Extraction
- * Provides type-safe access to items.json
+ * Provides type-safe access to items.json with lazy loading
  */
 
 import type { ItemDefinition } from '../items/ItemDefinition.js';
-import itemsData from '../../../../data/items.json';
 
 export interface ItemsData {
   version: string;
@@ -27,39 +26,96 @@ export interface ItemsData {
   allItems: ItemDefinition[];
 }
 
-// Cast JSON data to typed interface
-const typedItemsData = itemsData as unknown as ItemsData;
+// Lazy-loaded data cache
+let typedItemsData: ItemsData | null = null;
+
+/**
+ * Load items data on first access
+ */
+function loadItemsData(): ItemsData {
+  if (!typedItemsData) {
+    // Dynamic import to defer loading until needed
+    const itemsData = require('../../../../data/items.json');
+    typedItemsData = itemsData as unknown as ItemsData;
+  }
+  return typedItemsData;
+}
 
 /**
  * Get items by category
  */
 export function getItemsByCategory(category: keyof ItemsData['categories']): ItemDefinition[] {
-  return typedItemsData.categories[category] || [];
+  const data = loadItemsData();
+  return data.categories[category] || [];
 }
 
 /**
  * Get all items
  */
 export function getAllItems(): ItemDefinition[] {
-  return typedItemsData.allItems;
+  const data = loadItemsData();
+  return data.allItems;
 }
 
 /**
  * Get a specific item by ID
  */
 export function getItemById(id: string): ItemDefinition | undefined {
-  return typedItemsData.allItems.find(item => item.id === id);
+  const data = loadItemsData();
+  return data.allItems.find(item => item.id === id);
 }
 
-// Export arrays for backward compatibility
-export const RESOURCE_ITEMS = typedItemsData.categories.resources;
-export const FOOD_ITEMS = typedItemsData.categories.food;
-export const MATERIAL_ITEMS = typedItemsData.categories.materials;
-export const TOOL_ITEMS = typedItemsData.categories.tools;
-export const WEAPON_ITEMS = typedItemsData.categories.weapons;
-export const CONSUMABLE_ITEMS = typedItemsData.categories.consumables;
-export const CLOTHING_ITEMS = typedItemsData.categories.clothing;
-export const ADVANCED_MATERIAL_ITEMS = typedItemsData.categories.advancedMaterials;
-export const PRESERVED_FOOD_ITEMS = typedItemsData.categories.preservedFood;
-export const FARMING_TOOL_ITEMS = typedItemsData.categories.farmingTools;
-export const DEFAULT_ITEMS = typedItemsData.allItems;
+// Lazy getters for backward compatibility
+export function getResourceItems(): ItemDefinition[] {
+  return getItemsByCategory('resources');
+}
+
+export function getFoodItems(): ItemDefinition[] {
+  return getItemsByCategory('food');
+}
+
+export function getMaterialItems(): ItemDefinition[] {
+  return getItemsByCategory('materials');
+}
+
+export function getToolItems(): ItemDefinition[] {
+  return getItemsByCategory('tools');
+}
+
+export function getWeaponItems(): ItemDefinition[] {
+  return getItemsByCategory('weapons');
+}
+
+export function getConsumableItems(): ItemDefinition[] {
+  return getItemsByCategory('consumables');
+}
+
+export function getClothingItems(): ItemDefinition[] {
+  return getItemsByCategory('clothing');
+}
+
+export function getAdvancedMaterialItems(): ItemDefinition[] {
+  return getItemsByCategory('advancedMaterials');
+}
+
+export function getPreservedFoodItems(): ItemDefinition[] {
+  return getItemsByCategory('preservedFood');
+}
+
+export function getFarmingToolItems(): ItemDefinition[] {
+  return getItemsByCategory('farmingTools');
+}
+
+// Deprecated: Use getter functions instead
+// These are kept for backward compatibility but trigger lazy loading
+Object.defineProperty(exports, 'RESOURCE_ITEMS', { get: getResourceItems });
+Object.defineProperty(exports, 'FOOD_ITEMS', { get: getFoodItems });
+Object.defineProperty(exports, 'MATERIAL_ITEMS', { get: getMaterialItems });
+Object.defineProperty(exports, 'TOOL_ITEMS', { get: getToolItems });
+Object.defineProperty(exports, 'WEAPON_ITEMS', { get: getWeaponItems });
+Object.defineProperty(exports, 'CONSUMABLE_ITEMS', { get: getConsumableItems });
+Object.defineProperty(exports, 'CLOTHING_ITEMS', { get: getClothingItems });
+Object.defineProperty(exports, 'ADVANCED_MATERIAL_ITEMS', { get: getAdvancedMaterialItems });
+Object.defineProperty(exports, 'PRESERVED_FOOD_ITEMS', { get: getPreservedFoodItems });
+Object.defineProperty(exports, 'FARMING_TOOL_ITEMS', { get: getFarmingToolItems });
+Object.defineProperty(exports, 'DEFAULT_ITEMS', { get: getAllItems });
