@@ -94,7 +94,7 @@ const TECH_MULTIPLIERS = [1.0, 2.0, 3.0, 4.0]; // index = tech gap
  * PERF: O(1) lookup table instead of O(n) conditionals
  */
 export function getFleetTechLevel(fleet: FleetComponent): number {
-  const shipTypes = fleet.shipTypeBreakdown;
+  const shipTypes = fleet.squadrons.shipTypeBreakdown;
   let maxTechLevel = 0;
 
   // PERF: Single pass through ship types using lookup table
@@ -281,9 +281,9 @@ export function getDefenderForces(world: World): DefenseForces {
       if (!fleet) continue;
 
       // PERF: Single-pass accumulation
-      totalShips += fleet.totalShips;
-      totalCrew += fleet.totalCrew;
-      fleetStrength += fleet.fleetStrength;
+      totalShips += fleet.squadrons.totalShips;
+      totalCrew += fleet.squadrons.totalCrew;
+      fleetStrength += fleet.combat.offensiveRating;
       fleetIds[fleetIdx++] = fleet.fleetId;
     }
 
@@ -309,13 +309,13 @@ export function getDefenderForces(world: World): DefenseForces {
  */
 export function calculateFleetStrength(fleet: FleetComponent): number {
   // Base strength from ship count and crew
-  const baseStrength = fleet.totalShips * 10 + fleet.totalCrew;
+  const baseStrength = fleet.squadrons.totalShips * 10 + fleet.squadrons.totalCrew;
 
   // Coherence multiplier (0.5 at low coherence, 1.5 at high coherence)
-  const coherenceMultiplier = 0.5 + fleet.fleetCoherence;
+  const coherenceMultiplier = 0.5 + fleet.coherence.average;
 
   // Supply multiplier (0.5 at empty, 1.0 at full supply)
-  const supplyMultiplier = 0.5 + (fleet.supplyLevel * 0.5);
+  const supplyMultiplier = 0.5 + (fleet.logistics.fuelReserves / 200);
 
   return baseStrength * coherenceMultiplier * supplyMultiplier;
 }

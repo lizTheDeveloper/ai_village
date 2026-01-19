@@ -29,13 +29,10 @@ import {
   type WorldMutator,
   // Crafting systems (Phase 10)
   CraftingSystem,
-  initializeDefaultRecipes,
   globalRecipeRegistry,
   // Skill systems (Phase 4 unified)
   CookingSystem,
   ExperimentationSystem,
-  // Phase 13: Research & Discovery
-  registerDefaultResearch,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
   // Governance Data System (Phase 11)
@@ -646,11 +643,11 @@ async function registerAllSystems(
   chunkManager?: ChunkManager,
   terrainGenerator?: TerrainGenerator
 ): Promise<SystemRegistrationResult> {
-  // Register default materials and recipes before system registration
-  const { registerDefaultMaterials } = await import('@ai-village/core');
-  registerDefaultMaterials();
-  initializeDefaultRecipes(globalRecipeRegistry);
-  registerDefaultResearch();
+  // Lazy loading: Materials, recipes, and research are now loaded on-demand
+  // Materials: Loaded when first material is accessed
+  // Recipes: Loaded when crafting UI opens or first recipe query (via ensureRecipesLoaded)
+  // Research: Loaded when research panel opens or tech tree accessed (via ensureResearchLoaded)
+  // This reduces startup time by ~2-3MB and defers parsing until needed
 
   // Generate session ID for metrics
   const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -876,7 +873,11 @@ function createUIPanels(
   const hoverInfoPanel = new UnifiedHoverInfoPanel();
 
   const craftingUI = new CraftingPanelUI(gameLoop.world, canvas);
-  craftingUI.onCraftNow((recipeId: string, quantity: number) => {
+  craftingUI.onCraftNow(async (recipeId: string, quantity: number) => {
+    // Lazy-load recipes on first craft attempt
+    const { ensureRecipesLoaded } = await import('@ai-village/core');
+    await ensureRecipesLoaded();
+
     const agentId = craftingUI.activeAgentId;
     if (!agentId) {
       showNotification('No agent selected', '#FFA500');

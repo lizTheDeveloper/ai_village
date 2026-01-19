@@ -5,11 +5,7 @@ import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
 // Types
 // ============================================================================
 
-export type ArmadaDoctrine =
-  | 'aggressive'  // Focus on offensive operations
-  | 'defensive'   // Protect territory
-  | 'balanced'    // Mixed strategy
-  | 'raider';     // Fast strikes, avoid pitched battles
+// Note: Doctrine removed - was duplicate of campaign type
 
 export type ArmadaCampaignType =
   | 'conquest'    // Conquer territory
@@ -36,86 +32,70 @@ export interface ArmadaComponent extends Component {
   name: string;
 
   /**
-   * Armada composition (3-10 fleets)
+   * Armada composition
    */
-  fleetIds: string[];
-
-  /**
-   * Lead fleet
-   */
-  flagshipFleetId: string;
-
-  /**
-   * Soul agent grand admiral (commands entire armada)
-   */
-  grandAdmiralAgentId?: string;
-
-  /**
-   * Aggregate statistics from fleets
-   */
-  totalShips: number;
-  totalCrew: number;
-
-  /**
-   * Armada coherence (aggregated from fleets)
-   * Average fleet coherence across all fleets
-   */
-  armadaCoherence: number;
-
-  /**
-   * Armada strength (statistical combat power)
-   * Sum of all fleet strengths with doctrine modifiers
-   */
-  armadaStrength: number;
-
-  /**
-   * Supply level (0-1)
-   * Low supply degrades coherence and combat strength
-   */
-  supplyLevel: number;
-
-  /**
-   * Strategic doctrine (affects combat bonuses)
-   */
-  doctrine: ArmadaDoctrine;
-
-  /**
-   * Current campaign
-   */
-  currentCampaign?: {
-    name: string;
-    type: ArmadaCampaignType;
-    objective: string;
-    targetSystems: string[];  // System IDs being contested
-    progress: number;         // 0-1
-    startTick: number;
-    systemsConquered: number;
-    systemsLost: number;
+  fleets: {
+    fleetIds: string[];  // 2+ fleets
+    totalSquadrons: number;
+    totalShips: number;
+    totalCrew: number;
   };
 
   /**
-   * Morale (affects combat strength)
+   * Armada commander (soul agent, supreme naval authority)
+   */
+  commanderId: string; // Soul agent (Grand Admiral)
+  flagshipFleetId: string;
+
+  /**
+   * Campaign objective
+   */
+  campaign: {
+    type: ArmadaCampaignType;
+    targetSystems: string[];  // Systems to conquer/defend
+    duration: number;         // Expected campaign length (ticks)
+    progress: number;         // 0-1
+    systemsConquered: string[];
+    systemsLost: string[];
+  };
+
+  /**
+   * Strategic strength (abstracted)
+   */
+  strength: {
+    shipCount: number;        // Total ships across all fleets
+    effectiveCombatPower: number; // Adjusted for coherence, morale
+    territoryControlled: number;  // Systems under armada control
+    supplyLines: {
+      secure: string[];       // Systems with safe supply
+      contested: string[];    // Systems under threat
+      cut: string[];          // Systems isolated
+    };
+  };
+
+  /**
+   * Armada morale (aggregate of crew morale)
    */
   morale: {
     average: number;          // 0-1
     trend: 'rising' | 'stable' | 'falling';
-    recentVictories: number;
-    recentDefeats: number;
+    factors: {
+      recentVictories: number;  // +morale
+      recentDefeats: number;    // -morale
+      supplySituation: 'good' | 'adequate' | 'poor'; // affects morale
+      timeSinceLeave: number;   // Tick since last shore leave
+    };
   };
 
   /**
-   * Attrition tracking
+   * Losses and reinforcements
    */
   attrition: {
     shipsLostTotal: number;
     crewLostTotal: number;
     replacementRate: number;  // Ships/tick arriving as reinforcements
+    canSustainOperations: boolean; // Losses < replacements?
   };
-
-  /**
-   * Ship type breakdown across all fleets
-   */
-  shipTypeBreakdown: Record<SpaceshipType, number>;
 }
 
 // ============================================================================
@@ -124,13 +104,12 @@ export interface ArmadaComponent extends Component {
 
 export function createArmadaComponent(
   name: string,
-  fleetIds: string[],
+  commanderId: string,
   flagshipFleetId: string,
-  grandAdmiralAgentId?: string,
-  doctrine: ArmadaDoctrine = 'balanced'
+  fleetIds: string[]
 ): ArmadaComponent {
-  if (fleetIds.length < 3 || fleetIds.length > 10) {
-    throw new Error(`Armada must have 3-10 fleets, got ${fleetIds.length}`);
+  if (fleetIds.length < 2) {
+    throw new Error(`Armada must have at least 2 fleets, got ${fleetIds.length}`);
   }
 
   if (!fleetIds.includes(flagshipFleetId)) {
@@ -142,27 +121,48 @@ export function createArmadaComponent(
     version: 1,
     armadaId: `armada_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     name,
-    fleetIds,
+    fleets: {
+      fleetIds,
+      totalSquadrons: 0,
+      totalShips: 0,
+      totalCrew: 0,
+    },
+    commanderId,
     flagshipFleetId,
-    grandAdmiralAgentId,
-    totalShips: 0,
-    totalCrew: 0,
-    armadaCoherence: 0,
-    armadaStrength: 0,
-    supplyLevel: 1.0, // Fully supplied
-    doctrine,
+    campaign: {
+      type: 'defense',
+      targetSystems: [],
+      duration: 10000,
+      progress: 0,
+      systemsConquered: [],
+      systemsLost: [],
+    },
+    strength: {
+      shipCount: 0,
+      effectiveCombatPower: 0,
+      territoryControlled: 0,
+      supplyLines: {
+        secure: [],
+        contested: [],
+        cut: [],
+      },
+    },
     morale: {
-      average: 0.7, // Default morale
+      average: 0.7,
       trend: 'stable',
-      recentVictories: 0,
-      recentDefeats: 0,
+      factors: {
+        recentVictories: 0,
+        recentDefeats: 0,
+        supplySituation: 'adequate',
+        timeSinceLeave: 0,
+      },
     },
     attrition: {
       shipsLostTotal: 0,
       crewLostTotal: 0,
       replacementRate: 0,
+      canSustainOperations: true,
     },
-    shipTypeBreakdown: {} as Record<SpaceshipType, number>,
   };
 }
 
@@ -176,33 +176,24 @@ export const ArmadaComponentSchema: ComponentSchema<ArmadaComponent> = {
   fields: [
     { name: 'armadaId', type: 'string', required: true },
     { name: 'name', type: 'string', required: true },
-    { name: 'fleetIds', type: 'stringArray', required: true },
+    { name: 'fleets', type: 'object', required: true },
+    { name: 'commanderId', type: 'string', required: true },
     { name: 'flagshipFleetId', type: 'string', required: true },
-    { name: 'grandAdmiralAgentId', type: 'string', required: false },
-    { name: 'totalShips', type: 'number', required: true },
-    { name: 'totalCrew', type: 'number', required: true },
-    { name: 'armadaCoherence', type: 'number', required: true },
-    { name: 'armadaStrength', type: 'number', required: true },
-    { name: 'supplyLevel', type: 'number', required: true },
-    { name: 'doctrine', type: 'string', required: true },
-    { name: 'currentCampaign', type: 'object', required: false },
+    { name: 'campaign', type: 'object', required: true },
+    { name: 'strength', type: 'object', required: true },
     { name: 'morale', type: 'object', required: true },
     { name: 'attrition', type: 'object', required: true },
-    { name: 'shipTypeBreakdown', type: 'object', required: true },
   ],
   validate: (data: unknown): data is ArmadaComponent => {
     if (typeof data !== 'object' || data === null) return false;
     if (!('type' in data) || data.type !== 'armada') return false;
     if (!('armadaId' in data) || typeof data.armadaId !== 'string') return false;
     if (!('name' in data) || typeof data.name !== 'string') return false;
-    if (!('fleetIds' in data) || !Array.isArray(data.fleetIds)) return false;
+    if (!('fleets' in data) || typeof data.fleets !== 'object') return false;
+    if (!('commanderId' in data) || typeof data.commanderId !== 'string') return false;
     if (!('flagshipFleetId' in data) || typeof data.flagshipFleetId !== 'string') return false;
-    if (!('doctrine' in data) || typeof data.doctrine !== 'string') return false;
     return true;
   },
-  createDefault: () => createArmadaComponent(
-    'Default Armada',
-    ['fleet1', 'fleet2', 'fleet3'],
-    'fleet1'
-  ),
+  createDefault: () =>
+    createArmadaComponent('Default Armada', 'grandAdmiral1', 'fleet1', ['fleet1', 'fleet2']),
 };

@@ -36,6 +36,7 @@ import { SoilSystem } from './SoilSystem.js';
 
 // Infrastructure
 import { SpatialGridMaintenanceSystem } from './SpatialGridMaintenanceSystem.js';
+import { SoASyncSystem } from './SoASyncSystem.js';
 
 // Plants - Import from @ai-village/botany package and pass via config.plantSystems
 // Plant systems have been moved to @ai-village/botany
@@ -107,6 +108,9 @@ import { NavySystem } from './NavySystem.js';
 import { ArmadaSystem } from './ArmadaSystem.js';
 import { FleetSystem } from './FleetSystem.js';
 import { SquadronSystem } from './SquadronSystem.js';
+import { FleetCoherenceSystem } from './FleetCoherenceSystem.js';
+import { FleetCombatSystem } from './FleetCombatSystem.js';
+import { NavyBudgetSystem } from './NavyBudgetSystem.js';
 
 // Megastructures (Phase 5: Grand Strategy)
 import { MegastructureConstructionSystem } from './MegastructureConstructionSystem.js';
@@ -323,6 +327,9 @@ import { AutoSaveSystem } from './AutoSaveSystem.js';
 // Query Cache Monitoring
 import { QueryCacheMonitorSystem } from './QueryCacheMonitorSystem.js';
 
+// Event Coalescing Monitoring
+import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js';
+
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
 
@@ -476,8 +483,12 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(soilSystem);
 
   // ============================================================================
-  // INFRASTRUCTURE - SPATIAL INDEXING
+  // INFRASTRUCTURE - SPATIAL INDEXING & SOA SYNCHRONIZATION
   // ============================================================================
+  // SoASyncSystem (priority 10) - Keep SoA storage synchronized with components
+  // Runs early to ensure SoA data is up-to-date before systems use it
+  gameLoop.systemRegistry.register(new SoASyncSystem());
+
   // SpatialGridMaintenanceSystem (priority 15) - Keep spatial grid synchronized
   // Runs early to ensure spatial grid is up-to-date before systems query it
   gameLoop.systemRegistry.register(new SpatialGridMaintenanceSystem());
@@ -675,6 +686,12 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new ArmadaSystem());
   gameLoop.systemRegistry.register(new FleetSystem());
   gameLoop.systemRegistry.register(new SquadronSystem());
+  // Fleet coherence (priority 400): Squadron→Fleet→Armada coherence aggregation
+  gameLoop.systemRegistry.register(new FleetCoherenceSystem());
+  // Fleet combat (priority 600): Lanchester's Laws fleet battle resolution
+  gameLoop.systemRegistry.register(new FleetCombatSystem());
+  // Navy budget (priority 850): Annual budget cycle, shipyard production
+  gameLoop.systemRegistry.register(new NavyBudgetSystem());
 
   // ============================================================================
   // MEGASTRUCTURES (Phase 5: Grand Strategy)
@@ -1075,10 +1092,13 @@ export function registerAllSystems(
   }
 
   // ============================================================================
-  // QUERY CACHE MONITORING
+  // MONITORING
   // ============================================================================
   // QueryCacheMonitorSystem (priority 990) - Logs cache statistics every 5 minutes
   gameLoop.systemRegistry.register(new QueryCacheMonitorSystem());
+
+  // EventCoalescingMonitorSystem (priority 998) - Logs event coalescing statistics every 5 minutes
+  gameLoop.systemRegistry.register(new EventCoalescingMonitorSystem());
 
   // ============================================================================
   // AUTO-SAVE (Optional)

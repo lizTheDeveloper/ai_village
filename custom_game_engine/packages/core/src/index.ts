@@ -900,6 +900,22 @@ export * from './navigation/index.js';
 export * from './vr/index.js';
 
 // ============================================================================
+// Pathfinding (WebAssembly)
+// ============================================================================
+// High-performance A* pathfinding with WASM acceleration
+export {
+  PathfindingSystem,
+  pathfindingSystem,
+  initializePathfinding,
+  PathfindingWASM,
+  pathfindingWASM,
+  PathfindingJS,
+  pathfindingJS,
+  type PathPoint,
+  type PathfindingOptions,
+} from './pathfinding/index.js';
+
+// ============================================================================
 // Microgenerators & God-Crafted Content
 // ============================================================================
 // Microgenerators core infrastructure (god-crafted content queue & discovery)
@@ -933,3 +949,9 @@ export {
   type DistanceResult,
   type EntityList,
 } from './utils/CommonPools.js';
+
+// ============================================================================
+// Web Worker Infrastructure
+// ============================================================================
+export * from './workers/index.js';
+export { WorkerMonitorSystem } from './systems/WorkerMonitorSystem.js';

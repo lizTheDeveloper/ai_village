@@ -10,7 +10,11 @@ export type FleetMissionType =
   | 'invasion'        // Conquer system
   | 'patrol'          // Multi-system patrol
   | 'trade_escort'    // Protect trade route
-  | 'exploration';    // Map β-space
+  | 'pirate_hunt'     // Hunt raiders
+  | 'exploration'     // Map β-space
+  | 'show_of_force'   // Intimidation
+  | 'relief'          // Aid distressed system
+  | 'blockade';       // Starve system
 
 // ============================================================================
 // Interface
@@ -27,69 +31,81 @@ export interface FleetComponent extends Component {
   name: string;
 
   /**
-   * Fleet composition (3-10 squadrons)
+   * Fleet composition
    */
-  squadronIds: string[];
+  squadrons: {
+    squadronIds: string[];  // 3-10 squadrons
+    totalShips: number;     // Sum of all ships
+    totalCrew: number;      // Sum of all crew
+    shipTypeBreakdown: Record<SpaceshipType, number>;
+  };
 
   /**
-   * Lead squadron
+   * Fleet admiral (soul agent, commands from flagship)
    */
+  admiralId: string; // Soul agent
   flagshipSquadronId: string;
-
-  /**
-   * Soul agent admiral (commands entire fleet)
-   */
-  admiralAgentId?: string;
-
-  /**
-   * Aggregate statistics from squadrons
-   */
-  totalShips: number;
-  totalCrew: number;
+  flagshipShipId: string;
 
   /**
    * Fleet coherence (aggregated from squadrons)
-   * Weighted average of squadron coherences
    */
-  fleetCoherence: number;
+  coherence: {
+    average: number;      // Mean squadron coherence
+    distribution: {       // Histogram of squadron coherences
+      low: number;        // Squadrons < 0.5 coherence
+      medium: number;     // 0.5-0.7
+      high: number;       // > 0.7
+    };
+    fleetCoherenceRating: 'poor' | 'adequate' | 'excellent';
+  };
 
   /**
-   * Fleet strength (statistical combat power)
+   * Fleet operational status
    */
-  fleetStrength: number;
+  status: {
+    readiness: number;    // 0-1, can fleet deploy?
+    inCombat: boolean;
+    currentSystem: string; // Star system ID
+    destination?: string;  // System ID
+    eta?: number;          // Ticks to arrival
+  };
 
   /**
-   * Home port (station or planet)
+   * Fleet mission
    */
-  homePortId?: string;
-
-  /**
-   * Operational range from home port
-   */
-  operationalRange: number;
-
-  /**
-   * Supply level (0-1)
-   * Low supply degrades coherence and combat strength
-   */
-  supplyLevel: number;
-
-  /**
-   * Current fleet mission
-   */
-  currentMission?: {
+  mission: {
     type: FleetMissionType;
     objective: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     startTick: number;
-    expectedDuration: number;
-    progress: number; // 0-1
+    expectedDuration: number; // Ticks
+    progress: number;         // 0-1
   };
 
   /**
-   * Ship type breakdown across all squadrons
+   * Combat capability (statistical)
    */
-  shipTypeBreakdown: Record<SpaceshipType, number>;
+  combat: {
+    offensiveRating: number;  // 0-100
+    defensiveRating: number;
+    marineStrength: number;   // Total marines
+    combatHistory: {
+      battlesWon: number;
+      battlesLost: number;
+      shipsLost: number;
+    };
+  };
+
+  /**
+   * Supply and logistics
+   */
+  logistics: {
+    supplyDepotSystemId?: string; // Where fleet resupplies
+    fuelReserves: number;          // Days of β-navigation fuel
+    repairCapability: number;      // Can repair X% hull per day
+    rangeFromSupply: number;       // Max distance from depot
+  };
 }
 
 // ============================================================================
@@ -98,9 +114,10 @@ export interface FleetComponent extends Component {
 
 export function createFleetComponent(
   name: string,
-  squadronIds: string[],
+  admiralId: string,
   flagshipSquadronId: string,
-  admiralAgentId?: string
+  flagshipShipId: string,
+  squadronIds: string[]
 ): FleetComponent {
   if (squadronIds.length < 3 || squadronIds.length > 10) {
     throw new Error(`Fleet must have 3-10 squadrons, got ${squadronIds.length}`);
@@ -115,16 +132,88 @@ export function createFleetComponent(
     version: 1,
     fleetId: `fleet_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     name,
-    squadronIds,
+    squadrons: {
+      squadronIds,
+      totalShips: 0,
+      totalCrew: 0,
+      shipTypeBreakdown: {} as Record<SpaceshipType, number>,
+    },
+    admiralId,
     flagshipSquadronId,
-    admiralAgentId,
-    totalShips: 0,
-    totalCrew: 0,
-    fleetCoherence: 0,
-    fleetStrength: 0,
-    operationalRange: 100, // Default range
-    supplyLevel: 1.0, // Fully supplied
-    shipTypeBreakdown: {} as Record<SpaceshipType, number>,
+    flagshipShipId,
+    coherence: {
+      average: 0,
+      distribution: {
+        low: 0,
+        medium: 0,
+        high: 0,
+      },
+      fleetCoherenceRating: 'adequate',
+    },
+    status: {
+      readiness: 1.0,
+      inCombat: false,
+      currentSystem: 'unknown',
+    },
+    mission: {
+      type: 'patrol',
+      objective: 'Default patrol mission',
+      priority: 'low',
+      startTick: 0,
+      expectedDuration: 1000,
+      progress: 0,
+    },
+    combat: {
+      offensiveRating: 0,
+      defensiveRating: 0,
+      marineStrength: 0,
+      combatHistory: {
+        battlesWon: 0,
+        battlesLost: 0,
+        shipsLost: 0,
+      },
+    },
+    logistics: {
+      fuelReserves: 100,
+      repairCapability: 0.1,
+      rangeFromSupply: 1000,
+    },
+  };
+}
+
+/**
+ * Calculate fleet coherence from squadron coherences
+ */
+export function calculateFleetCoherence(squadronCoherences: number[]): {
+  average: number;
+  distribution: { low: number; medium: number; high: number };
+  fleetCoherenceRating: 'poor' | 'adequate' | 'excellent';
+} {
+  if (squadronCoherences.length === 0) {
+    throw new Error('Cannot calculate coherence for empty fleet');
+  }
+
+  const mean = squadronCoherences.reduce((sum, c) => sum + c, 0) / squadronCoherences.length;
+
+  // Categorize squadrons
+  const low = squadronCoherences.filter((c) => c < 0.5).length;
+  const medium = squadronCoherences.filter((c) => c >= 0.5 && c < 0.7).length;
+  const high = squadronCoherences.filter((c) => c >= 0.7).length;
+
+  // Fleet coherence rating
+  let rating: 'poor' | 'adequate' | 'excellent';
+  if (mean < 0.5 || low > squadronCoherences.length * 0.5) {
+    rating = 'poor'; // Too many low-coherence squadrons
+  } else if (mean >= 0.7 && high > squadronCoherences.length * 0.7) {
+    rating = 'excellent';
+  } else {
+    rating = 'adequate';
+  }
+
+  return {
+    average: mean,
+    distribution: { low, medium, high },
+    fleetCoherenceRating: rating,
   };
 }
 
@@ -138,31 +227,32 @@ export const FleetComponentSchema: ComponentSchema<FleetComponent> = {
   fields: [
     { name: 'fleetId', type: 'string', required: true },
     { name: 'name', type: 'string', required: true },
-    { name: 'squadronIds', type: 'stringArray', required: true },
+    { name: 'squadrons', type: 'object', required: true },
+    { name: 'admiralId', type: 'string', required: true },
     { name: 'flagshipSquadronId', type: 'string', required: true },
-    { name: 'admiralAgentId', type: 'string', required: false },
-    { name: 'totalShips', type: 'number', required: true },
-    { name: 'totalCrew', type: 'number', required: true },
-    { name: 'fleetCoherence', type: 'number', required: true },
-    { name: 'fleetStrength', type: 'number', required: true },
-    { name: 'homePortId', type: 'string', required: false },
-    { name: 'operationalRange', type: 'number', required: true },
-    { name: 'supplyLevel', type: 'number', required: true },
-    { name: 'currentMission', type: 'object', required: false },
-    { name: 'shipTypeBreakdown', type: 'object', required: true },
+    { name: 'flagshipShipId', type: 'string', required: true },
+    { name: 'coherence', type: 'object', required: true },
+    { name: 'status', type: 'object', required: true },
+    { name: 'mission', type: 'object', required: true },
+    { name: 'combat', type: 'object', required: true },
+    { name: 'logistics', type: 'object', required: true },
   ],
   validate: (data: unknown): data is FleetComponent => {
     if (typeof data !== 'object' || data === null) return false;
     if (!('type' in data) || data.type !== 'fleet') return false;
     if (!('fleetId' in data) || typeof data.fleetId !== 'string') return false;
     if (!('name' in data) || typeof data.name !== 'string') return false;
-    if (!('squadronIds' in data) || !Array.isArray(data.squadronIds)) return false;
-    if (!('flagshipSquadronId' in data) || typeof data.flagshipSquadronId !== 'string') return false;
+    if (!('squadrons' in data) || typeof data.squadrons !== 'object') return false;
+    if (!('admiralId' in data) || typeof data.admiralId !== 'string') return false;
+    if (!('flagshipSquadronId' in data) || typeof data.flagshipSquadronId !== 'string')
+      return false;
+    if (!('flagshipShipId' in data) || typeof data.flagshipShipId !== 'string') return false;
     return true;
   },
-  createDefault: () => createFleetComponent(
-    'Default Fleet',
-    ['squadron1', 'squadron2', 'squadron3'],
-    'squadron1'
-  ),
+  createDefault: () =>
+    createFleetComponent('Default Fleet', 'admiral1', 'squadron1', 'ship1', [
+      'squadron1',
+      'squadron2',
+      'squadron3',
+    ]),
 };

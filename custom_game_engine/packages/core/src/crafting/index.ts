@@ -13,3 +13,4 @@ export * from './VerifyItemSources.js';
 export * from './LLMRecipeGenerator.js';
 export * from './IngredientAwareness.js';
 export * from './PendingApprovalRegistry.js';
+export * from './LazyRecipeLoader.js';

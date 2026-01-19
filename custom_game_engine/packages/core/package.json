@@ -22,5 +22,9 @@
   },
   "devDependencies": {
     "@types/uuid": "^9.0.7"
-  }
+  },
+  "description": "> **For Language Models:** This README is optimized for LM understanding. Read this document completely before working with the core package to understand the ECS architecture, system patterns, and integration points.",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

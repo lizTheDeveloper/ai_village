@@ -158,16 +158,30 @@ export function createTileInspectorPanelFactory(
 
 /**
  * Factory for ResearchLibraryPanel
+ * Lazy-loads research data on first panel creation
  */
 export function createResearchLibraryPanelFactory(): () => IWindowPanel {
-  return () => new ResearchLibraryPanel();
+  return () => {
+    // Lazy-load research on first access
+    import('@ai-village/core').then(({ ensureResearchLoaded }) => {
+      ensureResearchLoaded();
+    });
+    return new ResearchLibraryPanel();
+  };
 }
 
 /**
  * Factory for TechTreePanel
+ * Lazy-loads research data on first panel creation
  */
 export function createTechTreePanelFactory(): () => IWindowPanel {
-  return () => new TechTreePanel();
+  return () => {
+    // Lazy-load research on first access
+    import('@ai-village/core').then(({ ensureResearchLoaded }) => {
+      ensureResearchLoaded();
+    });
+    return new TechTreePanel();
+  };
 }
 
 /**

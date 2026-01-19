@@ -6,16 +6,21 @@ import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
 // ============================================================================
 
 export type SquadronFormation =
-  | 'line'      // Ships in line (simple formation)
-  | 'wedge'     // V formation (focus fire)
-  | 'sphere'    // Defensive ball (protect flagship)
-  | 'scattered'; // No formation (independent)
+  | 'line_ahead'      // Ships in line (good for broadside)
+  | 'line_abreast'    // Ships side-by-side (wide front)
+  | 'wedge'           // V formation (focus fire)
+  | 'sphere'          // Defensive ball (protect flagship)
+  | 'echelon'         // Diagonal steps (flanking)
+  | 'scattered';      // No formation (independent)
 
 export type SquadronMissionType =
   | 'patrol'          // Monitor area
   | 'escort'          // Protect trade ship
+  | 'reconnaissance'  // Scout β-space branches
   | 'assault'         // Attack target
-  | 'exploration';    // Map β-space branches
+  | 'blockade'        // Prevent passage
+  | 'rescue'          // Extract stranded ship
+  | 'exploration';    // Map unknown regions
 
 // ============================================================================
 // Interface
@@ -32,54 +37,65 @@ export interface SquadronComponent extends Component {
   name: string;
 
   /**
-   * Squadron composition (3-10 ships)
+   * Squadron composition
    */
-  shipIds: string[];
+  ships: {
+    shipIds: string[];  // 3-10 ships
+    totalCrew: number;  // Sum of all crew
+    shipTypes: Record<SpaceshipType, number>; // e.g., {courier_ship: 2, threshold_ship: 1}
+  };
 
   /**
-   * Lead ship in formation
+   * Squadron commander (soul agent, captain of flagship)
    */
-  flagshipId: string;
+  commanderId: string; // Soul agent
+  flagshipId: string;  // Which ship is flagship
 
   /**
-   * Soul agent commander (captain of flagship)
+   * Squadron coherence (average of ship coherences)
    */
-  commanderAgentId?: string;
+  coherence: {
+    average: number;      // Mean coherence across all ships
+    min: number;          // Weakest ship
+    max: number;          // Strongest ship
+    variance: number;     // Coherence spread (high = formation unstable)
+  };
 
   /**
-   * Aggregate statistics from member ships
-   */
-  totalCrew: number;
-
-  /**
-   * Average coherence weighted by ship crew size
-   * Squadron can only β-jump if this exceeds threshold
-   */
-  averageCoherence: number;
-
-  /**
-   * Combined combat strength
-   */
-  combatStrength: number;
-
-  /**
-   * Formation type (affects combat and navigation)
+   * Formation type (affects combat, navigation)
    */
   formation: SquadronFormation;
 
   /**
-   * Current squadron mission
+   * Squadron mission
    */
-  currentMission?: {
+  mission: {
     type: SquadronMissionType;
-    targetId?: string;  // Target entity ID (for assault/escort)
-    startTick: number;
+    targetLocation?: { x: number; y: number; z: number };
+    targetEntityId?: string;
+    escortedTradeAgreementId?: string; // If escorting trade
+    status: 'planning' | 'en_route' | 'engaged' | 'completed';
   };
 
   /**
-   * Ship type breakdown
+   * Combat readiness
    */
-  shipTypeBreakdown: Record<SpaceshipType, number>;
+  combat: {
+    totalFirepower: number;    // Sum of ship weapons
+    totalMarines: number;      // Sum of marines across ships
+    avgHullIntegrity: number;  // Health of squadron
+    combatExperience: number;  // 0-1, improves coordination
+  };
+
+  /**
+   * Supply state
+   */
+  logistics: {
+    fuelReserves: number;      // β-navigation fuel (emotional energy)
+    repairParts: number;
+    foodSupply: number;        // Crew sustenance
+    estimatedRange: number;    // How far squadron can go
+  };
 }
 
 // ============================================================================
@@ -88,9 +104,9 @@ export interface SquadronComponent extends Component {
 
 export function createSquadronComponent(
   name: string,
-  shipIds: string[],
+  commanderId: string,
   flagshipId: string,
-  commanderAgentId?: string
+  shipIds: string[]
 ): SquadronComponent {
   if (shipIds.length < 3 || shipIds.length > 10) {
     throw new Error(`Squadron must have 3-10 ships, got ${shipIds.length}`);
@@ -105,14 +121,96 @@ export function createSquadronComponent(
     version: 1,
     squadronId: `squadron_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     name,
-    shipIds,
+    ships: {
+      shipIds,
+      totalCrew: 0,
+      shipTypes: {} as Record<SpaceshipType, number>,
+    },
+    commanderId,
     flagshipId,
-    commanderAgentId,
-    totalCrew: 0,
-    averageCoherence: 0,
-    combatStrength: 0,
-    formation: 'line',
-    shipTypeBreakdown: {} as Record<SpaceshipType, number>,
+    coherence: {
+      average: 0,
+      min: 0,
+      max: 0,
+      variance: 0,
+    },
+    formation: 'line_ahead',
+    mission: {
+      type: 'patrol',
+      status: 'planning',
+    },
+    combat: {
+      totalFirepower: 0,
+      totalMarines: 0,
+      avgHullIntegrity: 1.0,
+      combatExperience: 0,
+    },
+    logistics: {
+      fuelReserves: 100,
+      repairParts: 50,
+      foodSupply: 100,
+      estimatedRange: 1000,
+    },
+  };
+}
+
+/**
+ * Calculate squadron coherence from constituent ship coherences
+ */
+export function calculateSquadronCoherence(shipCoherences: number[]): {
+  average: number;
+  min: number;
+  max: number;
+  variance: number;
+} {
+  if (shipCoherences.length === 0) {
+    throw new Error('Cannot calculate coherence for empty squadron');
+  }
+
+  const average = shipCoherences.reduce((sum, c) => sum + c, 0) / shipCoherences.length;
+  const min = Math.min(...shipCoherences);
+  const max = Math.max(...shipCoherences);
+
+  // Calculate variance (standard deviation)
+  const variance =
+    Math.sqrt(
+      shipCoherences.reduce((sum, c) => sum + Math.pow(c - average, 2), 0) /
+        shipCoherences.length
+    ) || 0;
+
+  return {
+    average,
+    min,
+    max,
+    variance,
+  };
+}
+
+/**
+ * Add a ship to a squadron
+ * Returns updated squadron component
+ */
+export function addShipToSquadron(
+  squadron: SquadronComponent,
+  shipId: string,
+  shipType: SpaceshipType,
+  crewCount: number
+): SquadronComponent {
+  if (squadron.ships.shipIds.length >= 10) {
+    throw new Error('Squadron already has maximum 10 ships');
+  }
+
+  const newShipIds = [...squadron.ships.shipIds, shipId];
+  const newShipTypes = { ...squadron.ships.shipTypes };
+  newShipTypes[shipType] = (newShipTypes[shipType] || 0) + 1;
+
+  return {
+    ...squadron,
+    ships: {
+      shipIds: newShipIds,
+      totalCrew: squadron.ships.totalCrew + crewCount,
+      shipTypes: newShipTypes,
+    },
   };
 }
 
@@ -126,28 +224,29 @@ export const SquadronComponentSchema: ComponentSchema<SquadronComponent> = {
   fields: [
     { name: 'squadronId', type: 'string', required: true },
     { name: 'name', type: 'string', required: true },
-    { name: 'shipIds', type: 'stringArray', required: true },
+    { name: 'ships', type: 'object', required: true },
+    { name: 'commanderId', type: 'string', required: true },
     { name: 'flagshipId', type: 'string', required: true },
-    { name: 'commanderAgentId', type: 'string', required: false },
-    { name: 'totalCrew', type: 'number', required: true },
-    { name: 'averageCoherence', type: 'number', required: true },
-    { name: 'combatStrength', type: 'number', required: true },
+    { name: 'coherence', type: 'object', required: true },
     { name: 'formation', type: 'string', required: true },
-    { name: 'currentMission', type: 'object', required: false },
-    { name: 'shipTypeBreakdown', type: 'object', required: true },
+    { name: 'mission', type: 'object', required: true },
+    { name: 'combat', type: 'object', required: true },
+    { name: 'logistics', type: 'object', required: true },
   ],
   validate: (data: unknown): data is SquadronComponent => {
     if (typeof data !== 'object' || data === null) return false;
     if (!('type' in data) || data.type !== 'squadron') return false;
     if (!('squadronId' in data) || typeof data.squadronId !== 'string') return false;
     if (!('name' in data) || typeof data.name !== 'string') return false;
-    if (!('shipIds' in data) || !Array.isArray(data.shipIds)) return false;
+    if (!('ships' in data) || typeof data.ships !== 'object') return false;
+    if (!('commanderId' in data) || typeof data.commanderId !== 'string') return false;
     if (!('flagshipId' in data) || typeof data.flagshipId !== 'string') return false;
     return true;
   },
-  createDefault: () => createSquadronComponent(
-    'Default Squadron',
-    ['ship1', 'ship2', 'ship3'],
-    'ship1'
-  ),
+  createDefault: () =>
+    createSquadronComponent('Default Squadron', 'commander1', 'ship1', [
+      'ship1',
+      'ship2',
+      'ship3',
+    ]),
 };

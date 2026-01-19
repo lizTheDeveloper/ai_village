@@ -16,7 +16,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { ArmadaComponent, ArmadaDoctrine } from '../components/ArmadaComponent.js';
+import type { ArmadaComponent } from '../components/ArmadaComponent.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
 
@@ -65,7 +65,7 @@ export class ArmadaSystem extends BaseSystem {
       if (!armada) continue;
 
       // PERF: Early exit for empty armadas
-      if (armada.fleetIds.length === 0) continue;
+      if (armada.fleets.fleetIds.length === 0) continue;
 
       // Update armada aggregate stats
       this.updateArmadaStats(ctx.world, armadaEntity as EntityImpl, armada, tick);
@@ -111,7 +111,7 @@ export class ArmadaSystem extends BaseSystem {
     this.shipTypeMap.clear();
 
     // Gather stats from all fleets
-    for (const fleetId of armada.fleetIds) {
+    for (const fleetId of armada.fleets.fleetIds) {
       // PERF: Use cached fleet lookup
       const fleetEntity = this.fleetCache.get(fleetId);
       if (!fleetEntity) {
@@ -130,18 +130,18 @@ export class ArmadaSystem extends BaseSystem {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      stats.totalShips += fleet.totalShips;
-      stats.totalCrew += fleet.totalCrew;
+      stats.totalShips += fleet.squadrons.totalShips;
+      stats.totalCrew += fleet.squadrons.totalCrew;
 
       // Weight coherence by fleet size
-      stats.weightedCoherence += fleet.fleetCoherence * fleet.totalShips;
+      stats.weightedCoherence += fleet.coherence.average * fleet.squadrons.totalShips;
 
       // Sum combat strength
-      stats.totalStrength += fleet.fleetStrength;
+      stats.totalStrength += fleet.combat.offensiveRating;
 
       // PERF: Aggregate ship types using Map (faster than object literal)
-      for (const [shipType, count] of Object.entries(fleet.shipTypeBreakdown)) {
-        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
+      for (const [shipType, count] of Object.entries(fleet.squadrons.shipTypeBreakdown)) {
+        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + (count as number));
       }
     }
 
@@ -157,32 +157,40 @@ export class ArmadaSystem extends BaseSystem {
     // PERF: Batch all component updates in single call
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,
-      totalShips: stats.totalShips,
-      totalCrew: stats.totalCrew,
-      armadaCoherence,
-      armadaStrength: stats.totalStrength,
-      shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
+      fleets: {
+        ...a.fleets,
+        totalShips: stats.totalShips,
+        totalCrew: stats.totalCrew,
+      },
+      strength: {
+        ...a.strength,
+        shipCount: stats.totalShips,
+        effectiveCombatPower: stats.totalStrength,
+      },
     }));
   }
 
   /**
-   * Apply doctrine bonuses to armada strength
+   * Apply morale bonuses to armada strength
    * PERF: Uses bitwise logic for trend calculation
    */
   private applyDoctrineEffects(
     armadaEntity: EntityImpl,
     armada: ArmadaComponent
   ): void {
-    // Doctrine bonuses affect armada strength
-    const doctrineBonus = getDoctrineStrengthBonus(armada.doctrine);
+    // Morale bonuses affect armada strength
+    const moraleBonus = armada.morale.average - 0.5; // -0.5 to +0.5 bonus
 
     // PERF: Only update if there's a bonus to apply
-    if (doctrineBonus === 0) return;
+    if (moraleBonus === 0) return;
 
     // Apply bonus
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,
-      armadaStrength: a.armadaStrength * (1 + doctrineBonus),
+      strength: {
+        ...a.strength,
+        effectiveCombatPower: a.strength.effectiveCombatPower * (1 + moraleBonus),
+      },
     }));
   }
 
@@ -194,7 +202,7 @@ export class ArmadaSystem extends BaseSystem {
     armadaEntity: EntityImpl,
     armada: ArmadaComponent
   ): void {
-    const { recentVictories, recentDefeats } = armada.morale;
+    const { recentVictories, recentDefeats } = armada.morale.factors;
 
     // PERF: Early exit if no morale change needed
     if (recentVictories === recentDefeats) {
@@ -235,24 +243,6 @@ export class ArmadaSystem extends BaseSystem {
 // ============================================================================
 
 /**
- * Calculate doctrine bonus for armada strength
- */
-export function getDoctrineStrengthBonus(doctrine: ArmadaDoctrine): number {
-  switch (doctrine) {
-    case 'aggressive':
-      return 0.15; // +15% strength in offensive operations
-    case 'defensive':
-      return 0.10; // +10% strength in defensive operations
-    case 'balanced':
-      return 0.05; // +5% general strength
-    case 'raider':
-      return 0.08; // +8% strength, specializes in hit-and-run
-    default:
-      return 0;
-  }
-}
-
-/**
  * Add a fleet to an armada
  */
 export function addFleetToArmada(
@@ -277,11 +267,11 @@ export function addFleetToArmada(
     return { success: false, reason: 'Entity is not an armada' };
   }
 
-  if (armada.fleetIds.length >= 10) {
+  if (armada.fleets.fleetIds.length >= 10) {
     return { success: false, reason: 'Armada already has maximum 10 fleets' };
   }
 
-  if (armada.fleetIds.includes(fleetId)) {
+  if (armada.fleets.fleetIds.includes(fleetId)) {
     return { success: false, reason: 'Fleet already in armada' };
   }
 
@@ -289,7 +279,10 @@ export function addFleetToArmada(
   const impl = armadaEntity as EntityImpl;
   impl.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
     ...a,
-    fleetIds: [...a.fleetIds, fleetId],
+    fleets: {
+      ...a.fleets,
+      fleetIds: [...a.fleets.fleetIds, fleetId],
+    },
   }));
 
   // Emit event
@@ -330,7 +323,7 @@ export function removeFleetFromArmada(
     return { success: false, reason: 'Entity is not an armada' };
   }
 
-  if (!armada.fleetIds.includes(fleetId)) {
+  if (!armada.fleets.fleetIds.includes(fleetId)) {
     return { success: false, reason: 'Fleet not in armada' };
   }
 
@@ -343,18 +336,21 @@ export function removeFleetFromArmada(
   const impl = armadaEntity as EntityImpl;
   impl.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
     ...a,
-    fleetIds: a.fleetIds.filter(id => id !== fleetId),
+    fleets: {
+      ...a.fleets,
+      fleetIds: a.fleets.fleetIds.filter((id: string) => id !== fleetId),
+    },
   }));
 
   // If armada now has < 3 fleets, emit disbanding warning
-  if (armada.fleetIds.length < 3) {
+  if (armada.fleets.fleetIds.length < 3) {
     world.eventBus.emit({
       type: 'armada:disbanding',
       source: armadaEntity.id,
       data: {
         armadaId: armada.armadaId,
         reason: 'too_few_fleets',
-        remainingFleets: armada.fleetIds.length - 1,
+        remainingFleets: armada.fleets.fleetIds.length - 1,
       },
     });
   }

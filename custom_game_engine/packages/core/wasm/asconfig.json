@@ -1,0 +1,23 @@
+{
+  "targets": {
+    "release": {
+      "outFile": "build/pathfinding.wasm",
+      "textFile": "build/pathfinding.wat",
+      "optimize": true,
+      "runtime": "stub",
+      "exportRuntime": true,
+      "exportTable": true,
+      "memoryBase": 0
+    },
+    "debug": {
+      "outFile": "build/pathfinding.debug.wasm",
+      "textFile": "build/pathfinding.debug.wat",
+      "debug": true,
+      "runtime": "stub",
+      "exportRuntime": true,
+      "exportTable": true,
+      "memoryBase": 0
+    }
+  },
+  "options": {}
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@ai-village/language",
+  "version": "0.1.0",
+  "description": "Procedural language generation system with phoneme inventories, Tracery grammars, and LLM translation",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  }
+}

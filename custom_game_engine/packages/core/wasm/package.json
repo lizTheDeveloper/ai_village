@@ -1,0 +1,13 @@
+{
+  "name": "@ai-village/core-wasm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "asc assembly/pathfinding.ts --outFile build/pathfinding.wasm --optimize --runtime stub --exportRuntime --exportTable --memoryBase 0",
+    "build:debug": "asc assembly/pathfinding.ts --outFile build/pathfinding.debug.wasm --debug --runtime stub --exportRuntime --exportTable --memoryBase 0"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.27.0"
+  }
+}

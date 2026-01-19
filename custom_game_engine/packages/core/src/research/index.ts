@@ -72,6 +72,13 @@ export {
   TIER_5_RESEARCH,
 } from './defaultResearch.js';
 
+// === Lazy Research Loader ===
+export {
+  ensureResearchLoaded,
+  isResearchLoaded,
+  resetResearchLoader,
+} from './LazyResearchLoader.js';
+
 // === Clarketech Research (Tier 6-8) ===
 export {
   CLARKETECH_RESEARCH,

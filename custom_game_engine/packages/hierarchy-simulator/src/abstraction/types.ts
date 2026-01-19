@@ -157,6 +157,11 @@ export const TIER_SCALES: Record<TierLevel, {
   populationRange: [number, number];
   childrenCount: number;
   label: string;
+  physicalProperties?: {
+    typicalDiameter?: number;  // km
+    typicalMass?: number;      // kg
+    typicalDensity?: number;   // kg/m³
+  };
 }> = {
   gigasegment: {
     area: 1e15,
@@ -205,25 +210,42 @@ export const TIER_SCALES: Record<TierLevel, {
     area: 5e8,  // ~510 million km² (Earth-like)
     populationRange: [1_000_000, 500_000_000],  // 1M-500M
     childrenCount: 100,  // 100 gigasegments
-    label: 'Planet'
+    label: 'Planet',
+    physicalProperties: {
+      typicalDiameter: 12742,      // km (Earth-like)
+      typicalMass: 5.972e24,       // kg (Earth mass)
+      typicalDensity: 5514,        // kg/m³ (rocky world)
+    }
   },
   system: {
     area: 1e18,  // Star system volume (~1 AU³)
     populationRange: [100_000_000, 10_000_000_000],  // 100M-10B
     childrenCount: 10,  // 2-20 planets + moons + stations
-    label: 'Star System'
+    label: 'Star System',
+    physicalProperties: {
+      typicalDiameter: 2e9,        // km (~13 AU, Kuiper belt)
+      typicalMass: 2e30,           // kg (Sun-like star)
+      typicalDensity: 0,           // Mostly vacuum
+    }
   },
   sector: {
     area: 1e24,  // 10-100 star systems in ~10 ly³ cube
     populationRange: [1_000_000_000, 100_000_000_000],  // 1B-100B
     childrenCount: 50,  // 10-100 systems
-    label: 'Sector'
+    label: 'Sector',
+    physicalProperties: {
+      typicalDiameter: 10 * 9.461e12,  // km (10 light-years)
+    }
   },
   galaxy: {
     area: 1e30,  // Milky Way = ~100,000 ly diameter
     populationRange: [10_000_000_000, 1e15],  // 10B-1 quadrillion
     childrenCount: 1000,  // 100-10,000 sectors (spiral arms)
-    label: 'Galaxy'
+    label: 'Galaxy',
+    physicalProperties: {
+      typicalDiameter: 100000 * 9.461e12,  // km (100,000 light-years)
+      typicalMass: 1.5e42,                  // kg (Milky Way mass)
+    }
   }
 };
 

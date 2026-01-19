@@ -191,6 +191,342 @@ const UNIVERSAL_PHONEMES: PhonemeInventory = {
 };
 ```
 
+## 1.5 Body-Plan-Based Phonology
+
+**Alien species produce sounds based on their anatomy.** Different body plans have different sound production mechanisms, creating truly alien languages.
+
+### Sound Production Mechanisms
+
+```typescript
+interface BodyPlanPhonology {
+  bodyPlanType: string;  // 'insectoid', 'avian', 'aquatic', 'reptilian', 'humanoid', etc.
+
+  soundProduction: {
+    mechanism: string[];    // How sounds are made
+    canProduce: string[];   // Phoneme categories this body can make
+    cannotProduce: string[]; // Impossible phonemes for this anatomy
+    specialSounds: string[]; // Unique alien phonemes
+  };
+
+  // Bias weights for phoneme selection
+  phonemeBias: {
+    preferTextures: string[];   // Favored sound qualities
+    avoidTextures: string[];    // Difficult/impossible qualities
+    uniqueQualities: string[];  // Body-plan-specific descriptors
+  };
+}
+```
+
+### Body Plan Phonology Library
+
+```typescript
+const BODY_PLAN_PHONOLOGIES: Record<string, BodyPlanPhonology> = {
+  /**
+   * INSECTOID: Stridulation, spiracles, mandible clicks
+   * Examples: Crickets, cicadas, beetles
+   * Can produce: Rapid clicks, buzzes, chirps, percussive rhythms
+   * Cannot produce: Liquid consonants, rounded vowels (no lips)
+   */
+  insectoid: {
+    bodyPlanType: 'insectoid',
+    soundProduction: {
+      mechanism: ['stridulation', 'spiracles', 'mandible_clicks', 'tymbal_vibration'],
+      canProduce: ['clicks', 'buzzes', 'chirps', 'percussives', 'high_frequency'],
+      cannotProduce: ['liquids', 'rounded_vowels', 'bilabials'],
+      specialSounds: ['!', '|', '||', 'zz', 'tk', 'kk', 'tz'],
+    },
+    phonemeBias: {
+      preferTextures: ['percussive', 'clicking', 'buzzing'],
+      avoidTextures: ['liquid', 'nasal', 'rounded'],
+      uniqueQualities: ['stridulant', 'buzzing', 'rhythmic', 'chittering'],
+    },
+  },
+
+  /**
+   * AVIAN: Syrinx (dual voice box), harmonic production
+   * Examples: Songbirds, parrots
+   * Can produce: Two simultaneous tones, complex harmonics, whistles
+   * Cannot produce: Harsh gutturals (delicate vocal apparatus)
+   */
+  avian: {
+    bodyPlanType: 'avian',
+    soundProduction: {
+      mechanism: ['syrinx', 'dual_voice_box', 'harmonic_resonance'],
+      canProduce: ['whistles', 'trills', 'harmonics', 'dual_tones', 'glides'],
+      cannotProduce: ['harsh_gutturals', 'deep_rumbles'],
+      specialSounds: ['**', '~', '↑', '↓', 'wh', 'tl'],
+    },
+    phonemeBias: {
+      preferTextures: ['liquid', 'breathy', 'harmonic'],
+      avoidTextures: ['guttural', 'harsh'],
+      uniqueQualities: ['harmonic', 'dual-tone', 'trilling', 'melodic', 'whistling'],
+    },
+  },
+
+  /**
+   * AQUATIC: Echolocation, pressure pulses, bubble streams
+   * Examples: Dolphins, whales, deep-sea creatures
+   * Can produce: Rapid clicks, sustained tones, ultrasonic frequencies
+   * Cannot produce: Dry fricatives (sounds require air/water medium)
+   */
+  aquatic: {
+    bodyPlanType: 'aquatic',
+    soundProduction: {
+      mechanism: ['echolocation', 'pressure_pulses', 'bubble_streams', 'resonance_cavities'],
+      canProduce: ['clicks', 'pops', 'sustained_tones', 'ultrasonic', 'subsonic'],
+      cannotProduce: ['dry_fricatives', 'breathy'],
+      specialSounds: ['◊', '•', '○', 'uu', 'oo'],
+    },
+    phonemeBias: {
+      preferTextures: ['liquid', 'resonant', 'echoic'],
+      avoidTextures: ['dry', 'breathy', 'sibilant'],
+      uniqueQualities: ['echoic', 'subsonic', 'pressure-based', 'sonar'],
+    },
+  },
+
+  /**
+   * REPTILIAN: Large resonance chambers, infrasonic capability
+   * Examples: Crocodiles, theorized large dinosaurs
+   * Can produce: Deep rumbles, hisses, infrasonic booms
+   * Cannot produce: High-frequency sounds (large vocal apparatus)
+   */
+  reptilian: {
+    bodyPlanType: 'reptilian',
+    soundProduction: {
+      mechanism: ['resonance_chambers', 'heated_air_hissing', 'chest_vibration'],
+      canProduce: ['hisses', 'rumbles', 'infrasonic', 'sustained_drones'],
+      cannotProduce: ['high_frequency', 'rapid_trills'],
+      specialSounds: ['sss', 'RR', 'hhh', 'ggg'],
+    },
+    phonemeBias: {
+      preferTextures: ['sibilant', 'guttural', 'rumbling'],
+      avoidTextures: ['percussive', 'clicking'],
+      uniqueQualities: ['rumbling', 'sustained', 'infrasonic', 'hissing'],
+    },
+  },
+
+  /**
+   * MULTI_THROATED: Multiple vocal chambers (throat singing × 3)
+   * Examples: Theoretical multi-chambered beings
+   * Can produce: 3-4 simultaneous frequencies, complex chords
+   * Cannot produce: Single pure tones (all sounds are layered)
+   */
+  multi_throated: {
+    bodyPlanType: 'multi_throated',
+    soundProduction: {
+      mechanism: ['triple_voice_box', 'harmonic_chambers', 'resonance_stacking'],
+      canProduce: ['chords', 'harmonics', 'polyrhythms', 'layered_tones'],
+      cannotProduce: ['pure_single_tones'],
+      specialSounds: ['***', '⊕', '≈'],
+    },
+    phonemeBias: {
+      preferTextures: ['harmonic', 'layered', 'resonant'],
+      avoidTextures: ['sharp', 'clipped'],
+      uniqueQualities: ['polyphonic', 'chordal', 'harmonic-stacking'],
+    },
+  },
+
+  /**
+   * CRYSTALLINE: Vibrating mineral structures
+   * Examples: Silicon-based life, mineral beings
+   * Can produce: Resonant chimes, harmonic frequencies, sustained tones
+   * Cannot produce: Soft sounds (rigid structure)
+   */
+  crystalline: {
+    bodyPlanType: 'crystalline',
+    soundProduction: {
+      mechanism: ['crystal_resonance', 'harmonic_vibration', 'frequency_modulation'],
+      canProduce: ['chimes', 'sustained_harmonics', 'pure_tones'],
+      cannotProduce: ['soft_sounds', 'fricatives', 'stops'],
+      specialSounds: ['♪', '♫', '△'],
+    },
+    phonemeBias: {
+      preferTextures: ['resonant', 'harmonic', 'chiming'],
+      avoidTextures: ['percussive', 'liquid'],
+      uniqueQualities: ['crystalline', 'chiming', 'pure-tone', 'harmonic-resonance'],
+    },
+  },
+
+  /**
+   * HUMANOID: Standard mammalian vocal apparatus
+   * Examples: Humans, primates
+   * Can produce: Full range of human phonemes
+   * Baseline for comparison
+   */
+  humanoid: {
+    bodyPlanType: 'humanoid',
+    soundProduction: {
+      mechanism: ['vocal_cords', 'tongue', 'lips', 'nasal_cavity'],
+      canProduce: ['all_standard_phonemes'],
+      cannotProduce: [],
+      specialSounds: [],
+    },
+    phonemeBias: {
+      preferTextures: [],
+      avoidTextures: [],
+      uniqueQualities: [],
+    },
+  },
+};
+```
+
+### Alien-Specific Phonemes
+
+Extend the universal phoneme inventory with body-plan-restricted sounds:
+
+```typescript
+const ALIEN_PHONEMES: PhonemeInventory = {
+  consonants: [
+    // === INSECTOID PHONEMES ===
+
+    // Mandible click (front)
+    { sound: '!', category: 'consonant', type: 'click',
+      qualities: { texture: ['clicking', 'percussive'], hardness: ['sharp'], position: ['front'], manner: ['clipped'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['insectoid'] },
+
+    // Lateral click
+    { sound: '|', category: 'consonant', type: 'click',
+      qualities: { texture: ['clicking', 'percussive'], hardness: ['crisp'], position: ['central'], manner: ['clipped'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['insectoid', 'aquatic'] },
+
+    // Double lateral click
+    { sound: '||', category: 'consonant', type: 'click',
+      qualities: { texture: ['clicking', 'percussive'], hardness: ['harsh'], position: ['central'], manner: ['rapid'] },
+      typology: { frequency: 'rare', prerequisites: ['|'] },
+      bodyPlanRestriction: ['insectoid'] },
+
+    // Stridulation buzz
+    { sound: 'zz', category: 'consonant', type: 'buzz',
+      qualities: { texture: ['buzzing', 'vibrant'], hardness: ['harsh'], position: ['full'], manner: ['sustained'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['insectoid'] },
+
+    // Rapid tick
+    { sound: 'tk', category: 'consonant', type: 'rapid_stop',
+      qualities: { texture: ['percussive', 'chittering'], hardness: ['crisp'], position: ['front'], manner: ['rapid'] },
+      typology: { frequency: 'rare', prerequisites: ['t', 'k'] },
+      bodyPlanRestriction: ['insectoid'] },
+
+    // === AVIAN PHONEMES ===
+
+    // Dual harmonic (two simultaneous tones)
+    { sound: '**', category: 'consonant', type: 'harmonic',
+      qualities: { texture: ['harmonic', 'dual-tone'], hardness: ['smooth'], position: ['full'], manner: ['layered'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['avian', 'multi_throated'] },
+
+    // Trill marker
+    { sound: '~', category: 'consonant', type: 'trill',
+      qualities: { texture: ['trilling', 'liquid'], hardness: ['soft'], position: ['front'], manner: ['flowing'] },
+      typology: { frequency: 'uncommon', prerequisites: ['r'] },
+      bodyPlanRestriction: ['avian'] },
+
+    // Whistle glide up
+    { sound: '↑', category: 'consonant', type: 'whistle_rise',
+      qualities: { texture: ['whistling', 'breathy'], hardness: ['smooth'], position: ['high'], manner: ['rising'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['avian'] },
+
+    // Whistle glide down
+    { sound: '↓', category: 'consonant', type: 'whistle_fall',
+      qualities: { texture: ['whistling', 'breathy'], hardness: ['smooth'], position: ['low'], manner: ['falling'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['avian'] },
+
+    // === AQUATIC PHONEMES ===
+
+    // Echolocation click (sharp)
+    { sound: '◊', category: 'consonant', type: 'echo_click',
+      qualities: { texture: ['echoic', 'percussive'], hardness: ['sharp'], position: ['full'], manner: ['rapid'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['aquatic'] },
+
+    // Bubble pop
+    { sound: '•', category: 'consonant', type: 'pop',
+      qualities: { texture: ['liquid', 'percussive'], hardness: ['soft'], position: ['front'], manner: ['clipped'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['aquatic'] },
+
+    // Pressure pulse (sustained click series)
+    { sound: '○', category: 'consonant', type: 'pulse',
+      qualities: { texture: ['echoic', 'resonant'], hardness: ['soft'], position: ['full'], manner: ['pulsing'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['aquatic'] },
+
+    // === REPTILIAN PHONEMES ===
+
+    // Subsonic rumble (deep)
+    { sound: 'RR', category: 'consonant', type: 'subsonic',
+      qualities: { texture: ['rumbling', 'resonant'], hardness: ['deep'], position: ['back'], manner: ['sustained'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['reptilian'] },
+
+    // Extended hiss
+    { sound: 'sss', category: 'consonant', type: 'sustained_fricative',
+      qualities: { texture: ['sibilant', 'hissing'], hardness: ['harsh'], position: ['front'], manner: ['sustained'] },
+      typology: { frequency: 'uncommon', prerequisites: ['s'] },
+      bodyPlanRestriction: ['reptilian'] },
+
+    // === MULTI-THROATED PHONEMES ===
+
+    // Triple harmonic chord
+    { sound: '***', category: 'consonant', type: 'chord',
+      qualities: { texture: ['harmonic', 'polyphonic'], hardness: ['smooth'], position: ['full'], manner: ['layered'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['multi_throated'] },
+
+    // Harmonic stack
+    { sound: '⊕', category: 'consonant', type: 'harmonic_stack',
+      qualities: { texture: ['harmonic', 'layered'], hardness: ['resonant'], position: ['full'], manner: ['stacked'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['multi_throated'] },
+
+    // === CRYSTALLINE PHONEMES ===
+
+    // Crystal chime (high)
+    { sound: '♪', category: 'consonant', type: 'chime',
+      qualities: { texture: ['chiming', 'resonant'], hardness: ['crisp'], position: ['high'], manner: ['sustained'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['crystalline'] },
+
+    // Crystal chord (low)
+    { sound: '♫', category: 'consonant', type: 'chord_chime',
+      qualities: { texture: ['chiming', 'harmonic'], hardness: ['resonant'], position: ['low'], manner: ['sustained'] },
+      typology: { frequency: 'rare', prerequisites: [] },
+      bodyPlanRestriction: ['crystalline'] },
+  ],
+
+  vowels: [],  // Most alien vowels use standard inventory but with restrictions
+  clusters: [], // Generated from allowed consonants
+  tones: [],
+  syllablePatterns: [],
+};
+
+// Add bodyPlanRestriction to PhonemeMetadata interface
+interface PhonemeMetadata {
+  sound: string;
+  category: 'consonant' | 'vowel' | 'cluster' | 'tone';
+
+  qualities: {
+    texture: string[];
+    hardness: string[];
+    position: string[];
+    manner: string[];
+  };
+
+  typology: {
+    frequency: 'universal' | 'common' | 'uncommon' | 'rare';
+    prerequisites?: string[];
+    incompatibleWith?: string[];
+  };
+
+  type?: string;
+  bodyPlanRestriction?: string[];  // NEW: Only producible by these body plans
+}
+```
+
 ### Language Character Analysis
 
 After selecting phonemes for a language, analyze their qualities to generate a Tracery description:
@@ -313,44 +649,85 @@ class LanguageGenerator {
   private descriptionGrammar = new LanguageDescriptionGrammar();
 
   /**
-   * Generate a language from planet configuration
+   * Generate a language from planet configuration and species body plan
    */
-  generateLanguage(planetConfig: PlanetConfig, seed: string): LanguageConfig {
+  generateLanguage(
+    planetConfig: PlanetConfig,
+    speciesBodyPlan: BodyPlan,  // NEW: Body plan determines sound production
+    seed: string
+  ): LanguageConfig {
     const rng = seededRandom(seed);
 
-    // 1. Select phoneme objects (with metadata)
-    const selectedConsonants = this.selectPhonemesWithBias(
-      UNIVERSAL_PHONEMES.consonants,
+    // 1. Get body plan phonology configuration
+    const bodyPhonology = BODY_PLAN_PHONOLOGIES[speciesBodyPlan.type] || BODY_PLAN_PHONOLOGIES.humanoid;
+
+    // 2. Combine universal + alien phoneme inventories
+    const allConsonants = [...UNIVERSAL_PHONEMES.consonants, ...ALIEN_PHONEMES.consonants];
+    const allVowels = UNIVERSAL_PHONEMES.vowels;
+
+    // 3. Filter phonemes by body plan restrictions
+    const availableConsonants = allConsonants.filter(p =>
+      !p.bodyPlanRestriction || p.bodyPlanRestriction.includes(speciesBodyPlan.type)
+    );
+
+    const availableVowels = allVowels.filter(p =>
+      !p.bodyPlanRestriction || p.bodyPlanRestriction.includes(speciesBodyPlan.type)
+    );
+
+    // 4. Select phonemes with triple bias: planet + body + typology
+    const selectedConsonants = this.selectPhonemesWithTripleBias(
+      availableConsonants,
       planetConfig.type,
+      bodyPhonology,
       rng,
       8,
       15
     );
 
-    const selectedVowels = this.selectPhonemesWithBias(
-      UNIVERSAL_PHONEMES.vowels,
+    const selectedVowels = this.selectPhonemesWithTripleBias(
+      availableVowels,
       planetConfig.type,
+      bodyPhonology,
       rng,
       3,
       7
     );
 
+    // 5. Add special body-plan-specific sounds
+    if (bodyPhonology.soundProduction.specialSounds.length > 0) {
+      const specialPhonemes = ALIEN_PHONEMES.consonants.filter(p =>
+        bodyPhonology.soundProduction.specialSounds.includes(p.sound)
+      );
+      const specialCount = Math.min(rng.intBetween(2, 4), specialPhonemes.length);
+      selectedConsonants.push(...selectRandomSubset(specialPhonemes, specialCount, rng));
+    }
+
     const selectedClusters = rng.chance(0.5)
-      ? selectRandomSubset(UNIVERSAL_PHONEMES.clusters, 3)
+      ? selectRandomSubset(UNIVERSAL_PHONEMES.clusters, 3, rng)
       : [];
 
-    // Combine all selected phonemes
+    // 6. Combine all selected phonemes
     const allSelectedPhonemes = [
       ...selectedConsonants,
       ...selectedVowels,
       ...selectedClusters,
     ];
 
-    // 2. Analyze phoneme qualities to determine language character
+    // 7. Analyze phoneme qualities to determine language character
     const character = this.phonemeAnalyzer.analyzeLanguageCharacter(allSelectedPhonemes);
 
-    // 3. Generate Tracery description based on character
-    const description = this.descriptionGrammar.generateDescription(character, planetConfig.type);
+    // 8. Enhance character with body-plan-specific qualities
+    if (bodyPhonology.phonemeBias.uniqueQualities.length > 0) {
+      // Add body-plan unique qualities to character description
+      character.bodyPlanQualities = bodyPhonology.phonemeBias.uniqueQualities;
+    }
+
+    // 9. Generate Tracery description based on character
+    const description = this.descriptionGrammar.generateDescription(
+      character,
+      planetConfig.type,
+      bodyPhonology  // NEW: Pass body phonology for metaphors
+    );
 
     // 4. Define syllable patterns
     const patterns = selectRandomSubset(
@@ -403,21 +780,22 @@ class LanguageGenerator {
   }
 
   /**
-   * Select phonemes with planet-type biases
+   * Select phonemes with triple bias: planet type + body plan + typology
    */
-  private selectPhonemesWithBias(
+  private selectPhonemesWithTripleBias(
     phonemes: PhonemeMetadata[],
     planetType: string,
+    bodyPhonology: BodyPlanPhonology,
     rng: SeededRandom,
     min: number,
     max: number
   ): PhonemeMetadata[] {
     const count = rng.intBetween(min, max);
 
-    // Weight phonemes by planet type
+    // Weight phonemes by all three factors
     const weighted = phonemes.map(p => ({
       phoneme: p,
-      weight: this.getPhonemeWeight(p, planetType),
+      weight: this.getPhonemeWeight(p, planetType, bodyPhonology),
     }));
 
     // Weighted random selection
@@ -433,26 +811,68 @@ class LanguageGenerator {
   }
 
   /**
-   * Get weight for phoneme based on planet type
+   * Get weight for phoneme based on planet type, body plan, and typology
    */
-  private getPhonemeWeight(phoneme: PhonemeMetadata, planetType: string): number {
+  private getPhonemeWeight(
+    phoneme: PhonemeMetadata,
+    planetType: string,
+    bodyPhonology: BodyPlanPhonology
+  ): number {
     let weight = 1.0;
+
+    // === BODY PLAN BIAS (strongest - determines what's physically possible) ===
+
+    // Preferred textures get huge boost
+    for (const preferredTexture of bodyPhonology.phonemeBias.preferTextures) {
+      if (phoneme.qualities.texture.includes(preferredTexture)) {
+        weight += 3.0;
+      }
+    }
+
+    // Avoided textures heavily penalized (difficult/impossible for this body)
+    for (const avoidedTexture of bodyPhonology.phonemeBias.avoidTextures) {
+      if (phoneme.qualities.texture.includes(avoidedTexture)) {
+        weight *= 0.1;  // 90% reduction
+      }
+    }
+
+    // === PLANET TYPE BIAS (medium - environment shapes language) ===
 
     if (planetType === 'volcanic') {
       // Prefer guttural, harsh, sharp
-      if (phoneme.qualities.texture.includes('guttural')) weight += 2.0;
-      if (phoneme.qualities.hardness.includes('harsh')) weight += 1.5;
-      if (phoneme.qualities.manner.includes('sharp')) weight += 1.0;
+      if (phoneme.qualities.texture.includes('guttural')) weight += 1.5;
+      if (phoneme.qualities.hardness.includes('harsh')) weight += 1.0;
+      if (phoneme.qualities.manner.includes('sharp')) weight += 0.8;
     } else if (planetType === 'ocean') {
       // Prefer liquid, soft, flowing
-      if (phoneme.qualities.texture.includes('liquid')) weight += 2.0;
-      if (phoneme.qualities.hardness.includes('soft')) weight += 1.5;
-      if (phoneme.qualities.manner.includes('flowing')) weight += 1.0;
+      if (phoneme.qualities.texture.includes('liquid')) weight += 1.5;
+      if (phoneme.qualities.hardness.includes('soft')) weight += 1.0;
+      if (phoneme.qualities.manner.includes('flowing')) weight += 0.8;
     } else if (planetType === 'desert') {
       // Prefer sibilant, crisp, sharp
-      if (phoneme.qualities.texture.includes('sibilant')) weight += 2.0;
-      if (phoneme.qualities.hardness.includes('crisp')) weight += 1.5;
-      if (phoneme.qualities.manner.includes('sharp')) weight += 1.0;
+      if (phoneme.qualities.texture.includes('sibilant')) weight += 1.5;
+      if (phoneme.qualities.hardness.includes('crisp')) weight += 1.0;
+      if (phoneme.qualities.manner.includes('sharp')) weight += 0.8;
+    } else if (planetType === 'forest') {
+      // Prefer nasal, soft, resonant
+      if (phoneme.qualities.texture.includes('nasal')) weight += 1.2;
+      if (phoneme.qualities.hardness.includes('soft')) weight += 0.8;
+      if (phoneme.qualities.manner.includes('resonant')) weight += 1.0;
+    } else if (planetType === 'arctic') {
+      // Prefer crisp, sharp, clipped
+      if (phoneme.qualities.hardness.includes('crisp')) weight += 1.2;
+      if (phoneme.qualities.manner.includes('clipped')) weight += 1.0;
+      if (phoneme.qualities.manner.includes('sharp')) weight += 0.8;
+    }
+
+    // === TYPOLOGICAL BIAS (weak - linguistic universals) ===
+
+    if (phoneme.typology) {
+      if (phoneme.typology.frequency === 'universal') {
+        weight += 0.5;  // Slight boost for common sounds
+      } else if (phoneme.typology.frequency === 'rare') {
+        weight *= 0.8;  // Slight penalty for rare sounds
+      }
     }
 
     return weight;
@@ -1265,6 +1685,98 @@ dictionaryService.addEntry(volcanoLang.id, {
 // Future word: "Vikhar" → LLM sees "khar" (fire) + context → "Smoke-Fire" or "Dark Fire"
 ```
 
+### Body-Plan-Based Language Examples
+
+**Insectoid species on desert planet:**
+```typescript
+// Body plan: insectoid (stridulation, mandible clicks)
+// Planet: desert (sibilant preference)
+// Selected phonemes: !, |, tk, zz, s, t, k, i, a
+// Character: { texture: 'clicking', hardness: 'crisp', manner: 'rapid' }
+// Description: "Their speech is clicking and crisp, rapid like stones clicking together in the burning sands"
+
+generatePlaceName({type: 'oasis', description: 'Hidden water source'})
+→ "!xak|zi" (Water-Hidden)
+→ "tk'zzi|a" (Life-Source)
+
+Agent prompt: "You speak the Chittering Tongue. Their speech is clicking and crisp, rapid like stones clicking together in the burning sands."
+```
+
+**Avian species on forest planet:**
+```typescript
+// Body plan: avian (syrinx, dual harmonics)
+// Planet: forest (nasal, soft preference)
+// Selected phonemes: **, ~, ↑, l, w, m, n, e, o, a
+// Character: { texture: 'harmonic', hardness: 'soft', manner: 'flowing' }
+// Description: "A soft harmonic language with flowing sounds, like songs through ancient trees"
+
+generatePlaceName({type: 'grove', description: 'Sacred singing trees'})
+→ "me**lowi~" (Sky-Song)
+→ "↑no**~we" (Rising-Wind)
+
+Agent prompt: "You speak the Songwing Language. A soft harmonic language with flowing sounds, like songs through ancient trees."
+```
+
+**Aquatic species on ocean planet:**
+```typescript
+// Body plan: aquatic (echolocation, pressure pulses)
+// Planet: ocean (liquid preference)
+// Selected phonemes: ◊, •, ○, l, m, w, o, u, a
+// Character: { texture: 'echoic', hardness: 'soft', manner: 'resonant' }
+// Description: "Liquid and soft, resonant like waves on distant shores through the depths"
+
+generatePlaceName({type: 'trench', description: 'Deep underwater canyon'})
+→ "◊alu•wa" (Deep-Current)
+→ "○wom◊" (Echo-Depth)
+
+Agent prompt: "You speak the Deepsonar Tongue. Liquid and soft, resonant like waves on distant shores through the depths."
+```
+
+**Reptilian species on volcanic planet:**
+```typescript
+// Body plan: reptilian (resonance chambers, infrasonic)
+// Planet: volcanic (guttural preference)
+// Selected phonemes: RR, sss, kh, x, r, k, g, a, i
+// Character: { texture: 'guttural', hardness: 'harsh', manner: 'sustained' }
+// Description: "Guttural and harsh, sustained like thunder in deep valleys shaped by fire and stone"
+
+generatePlaceName({type: 'caldera', description: 'Volcanic crater lake'})
+→ "khRRaxsss" (Fire-Rumble-Lake)
+→ "grix'kha" (Stone-Flame)
+
+Agent prompt: "You speak the Rumblehiss Language. Guttural and harsh, sustained like thunder in deep valleys shaped by fire and stone."
+```
+
+**Multi-throated species on mountain planet:**
+```typescript
+// Body plan: multi_throated (triple voice box, harmonic chords)
+// Planet: mountain (resonant preference)
+// Selected phonemes: ***, ⊕, m, n, r, o, a, e
+// Character: { texture: 'harmonic', hardness: 'resonant', manner: 'layered' }
+// Description: "A resonant harmonic language with layered sounds, polyphonic like echoes through high peaks"
+
+generatePlaceName({type: 'peak', description: 'Highest mountain'})
+→ "***ore⊕na" (Three-Voice-Summit)
+→ "man⊕***" (Sky-Chord)
+
+Agent prompt: "You speak the Threefold Harmony. A resonant harmonic language with layered sounds, polyphonic like echoes through high peaks."
+```
+
+**Crystalline species (any planet):**
+```typescript
+// Body plan: crystalline (crystal resonance, pure tones)
+// Planet: arctic (crisp preference)
+// Selected phonemes: ♪, ♫, i, e, a
+// Character: { texture: 'chiming', hardness: 'crisp', manner: 'sustained' }
+// Description: "A crisp chiming language with sustained sounds, crystalline like resonant chimes through frozen wastes"
+
+generatePlaceName({type: 'glacier', description: 'Ancient ice formation'})
+→ "♪ie♫a" (High-Ice-Chord)
+→ "a♫♪e" (Ancient-Chime)
+
+Agent prompt: "You speak the Crystal Resonance. A crisp chiming language with sustained sounds, crystalline like resonant chimes through frozen wastes."
+```
+
 ## 10. Advanced Features
 
 ### Morpheme Recognition
@@ -1348,11 +1860,14 @@ interface NameDisplay {
 ## 12. Implementation Phases
 
 ### Phase 1: Core System (MVP)
-- [ ] Phoneme inventory
-- [ ] Language generator
-- [ ] Tracery integration
+- [ ] Phoneme inventory with metadata (texture, hardness, manner, position)
+- [ ] Body plan phonology library (insectoid, avian, aquatic, reptilian, humanoid)
+- [ ] Alien phoneme inventory (clicks, harmonics, echolocation, etc.)
+- [ ] Language generator with triple bias (planet + body + typology)
+- [ ] Phoneme analyzer (detect language character from selected phonemes)
+- [ ] Tracery description grammar (generate language descriptions)
+- [ ] Tracery word grammar (generate alien words)
 - [ ] Basic grammar generation
-- [ ] Simple word generation
 
 ### Phase 2: Translation
 - [ ] LLM translation service
@@ -1393,16 +1908,22 @@ interface NameDisplay {
 ```
 packages/language/
 ├── src/
-│   ├── PhonemeInventory.ts       // Universal phoneme sets
-│   ├── LanguageGenerator.ts      // Generate language configs
+│   ├── PhonemeInventory.ts       // Universal phoneme sets with metadata
+│   ├── AlienPhonemes.ts          // Body-plan-restricted alien phonemes
+│   ├── BodyPlanPhonology.ts      // Body plan sound production configs
+│   ├── PhonemeAnalyzer.ts        // Analyze language character from phonemes
+│   ├── LanguageGenerator.ts      // Generate language configs (with body plans)
 │   ├── TraceryGrammarBuilder.ts  // Build grammars from languages
+│   ├── LanguageDescriptionGrammar.ts  // Generate language descriptions
 │   ├── LanguageTranslationService.ts  // LLM translation
 │   ├── LanguageDictionaryService.ts   // Persistent dictionary
 │   ├── PlaceNameGenerator.ts     // Generate place names
 │   ├── PersonNameGenerator.ts    // Generate person names
 │   └── types.ts                  // TypeScript interfaces
 ├── data/
-│   └── phonemes.json             // Phoneme inventory data
+│   ├── phonemes.json             // Phoneme inventory with metadata
+│   ├── alien-phonemes.json       // Alien-specific phonemes
+│   └── body-plan-phonology.json  // Body plan configurations
 └── README.md
 ```
 

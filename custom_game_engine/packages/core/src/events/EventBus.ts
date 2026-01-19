@@ -6,6 +6,7 @@ import type {
 } from './GameEvent.js';
 import type { EventType } from './EventMap.js';
 import type { Tick } from '../types.js';
+import { EventCoalescer, type CoalescingStrategy } from './EventCoalescer.js';
 
 // Re-export GameEvent for external use
 export type { GameEvent } from './GameEvent.js';
@@ -86,6 +87,26 @@ export interface EventBus {
 
   /** Remove a subscription by handler - compatibility method */
   off(eventType: EventType | EventType[], handler: EventHandler): void;
+
+  /**
+   * Register coalescing strategy for an event type.
+   *
+   * @param eventType - Event type to configure
+   * @param strategy - Coalescing strategy
+   */
+  setCoalescingStrategy(eventType: EventType, strategy: CoalescingStrategy): void;
+
+  /**
+   * Get event coalescing statistics.
+   *
+   * @returns Statistics about event reduction
+   */
+  getCoalescingStats(): {
+    eventsIn: number;
+    eventsOut: number;
+    eventsSkipped: number;
+    reductionPercent: number;
+  };
 }
 
 interface Subscription {
@@ -123,6 +144,10 @@ export class EventBusImpl implements EventBus {
 
   // Map for tracking subscriptions by handler (for .off() method)
   private handlerToUnsubscribe = new Map<EventHandler, Unsubscribe>();
+
+  // Event coalescing
+  private coalescer = new EventCoalescer();
+  private coalescingStats = { eventsIn: 0, eventsOut: 0 };
 
   subscribe<T extends EventType = EventType>(
     eventType: T | EventType | EventType[],
@@ -214,11 +239,21 @@ export class EventBusImpl implements EventBus {
       (a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
     );
 
-    // Dispatch all queued events
+    // Extract events
     const events = this.eventQueue.map((q) => q.event);
     this.eventQueue = [];
 
-    for (const event of events) {
+    // OPTIMIZATION: Coalesce events before dispatch
+    const beforeCount = events.length;
+    const coalescedEvents = this.coalescer.coalesce(events);
+    const afterCount = coalescedEvents.length;
+
+    // Track stats
+    this.coalescingStats.eventsIn += beforeCount;
+    this.coalescingStats.eventsOut += afterCount;
+
+    // Dispatch coalesced events
+    for (const event of coalescedEvents) {
       this.dispatchEvent(event);
       this.eventHistory.push(event);
     }
@@ -241,6 +276,29 @@ export class EventBusImpl implements EventBus {
 
   setCurrentTick(tick: Tick): void {
     this.currentTick = tick;
+  }
+
+  setCoalescingStrategy(eventType: EventType, strategy: CoalescingStrategy): void {
+    this.coalescer.setStrategy(eventType, strategy);
+  }
+
+  getCoalescingStats(): {
+    eventsIn: number;
+    eventsOut: number;
+    eventsSkipped: number;
+    reductionPercent: number;
+  } {
+    return {
+      eventsIn: this.coalescingStats.eventsIn,
+      eventsOut: this.coalescingStats.eventsOut,
+      eventsSkipped: this.coalescingStats.eventsIn - this.coalescingStats.eventsOut,
+      reductionPercent:
+        this.coalescingStats.eventsIn > 0
+          ? ((this.coalescingStats.eventsIn - this.coalescingStats.eventsOut) /
+              this.coalescingStats.eventsIn) *
+            100
+          : 0,
+    };
   }
 
   private dispatchEvent(event: GameEvent): void {

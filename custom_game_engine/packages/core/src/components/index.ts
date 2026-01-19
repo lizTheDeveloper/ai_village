@@ -823,6 +823,20 @@ export type { DivineChatComponent } from './DivineChatComponent.js';
 export { createDivineChatComponent } from './DivineChatComponent.js';
 
 // Ship-Fleet Hierarchy (Grand Strategy - Phase 2)
+export * from './ShipCrewComponent.js';
+export {
+  createShipCrewComponent,
+  updateMorale,
+  accumulateStress,
+  reduceStress,
+  calculateCoherenceContribution,
+  calculateShipCoherence,
+  calculateEmotionalDiversity,
+  aggregateCrewEmotions,
+  ShipCrewComponentSchema,
+} from './ShipCrewComponent.js';
+export type { ShipCrewComponent, CrewRole } from './ShipCrewComponent.js';
+
 export * from './SquadronComponent.js';
 export { createSquadronComponent, SquadronComponentSchema } from './SquadronComponent.js';
 export type { SquadronComponent, SquadronFormation, SquadronMissionType } from './SquadronComponent.js';
@@ -833,7 +847,7 @@ export type { FleetComponent, FleetMissionType } from './FleetComponent.js';
 
 export * from './ArmadaComponent.js';
 export { createArmadaComponent, ArmadaComponentSchema } from './ArmadaComponent.js';
-export type { ArmadaComponent, ArmadaDoctrine, ArmadaCampaignType } from './ArmadaComponent.js';
+export type { ArmadaComponent, ArmadaCampaignType } from './ArmadaComponent.js';
 
 export * from './NavyComponent.js';
 export { createNavyComponent, NavyComponentSchema } from './NavyComponent.js';

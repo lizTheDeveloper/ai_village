@@ -70,9 +70,12 @@ export enum ComponentType {
   TownHall = 'town_hall',
   CensusBureau = 'census_bureau',
   VillageGovernance = 'village_governance',
-  ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance
-  NationGovernance = 'nation_governance',  // Political hierarchy: national governance
-  EmpireGovernance = 'empire_governance',  // Political hierarchy: imperial governance
+  ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance (legacy)
+  Province = 'province',  // Political hierarchy: province component (Tier 2)
+  NationGovernance = 'nation_governance',  // Political hierarchy: national governance (legacy)
+  Nation = 'nation',  // Political hierarchy: nation component (Tier 3)
+  EmpireGovernance = 'empire_governance',  // Political hierarchy: imperial governance (legacy)
+  Empire = 'empire',  // Political hierarchy: empire component (Tier 4)
   FederationGovernance = 'federation_governance',  // Political hierarchy: federal governance
   GalacticCouncil = 'galactic_council',  // Political hierarchy: galactic governance
   Governor = 'governor',  // Phase 6: AI Governance - LLM-powered political decision making
@@ -238,6 +241,7 @@ export enum ComponentType {
 
   // Navigation & β-space
   Spaceship = 'spaceship',
+  ShipCrew = 'ship_crew',  // Ship-fleet hierarchy: crew member aboard a ship
   Squadron = 'squadron',  // Ship-fleet hierarchy: 3-10 ships
   Fleet = 'fleet',        // Ship-fleet hierarchy: 3-10 squadrons
   Armada = 'armada',      // Ship-fleet hierarchy: 3-10 fleets

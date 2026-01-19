@@ -187,6 +187,47 @@ export interface SpaceEvents {
     supplyLevel: number;
   };
 
+  /** Fleet coherence updated */
+  'fleet:coherence_updated': {
+    fleetId: string;
+    coherence: number;
+    totalShips: number;
+    totalCrew: number;
+    distribution: {
+      low: number;
+      medium: number;
+      high: number;
+    };
+  };
+
+  /** Fleet straggler detected (high straggler risk) */
+  'fleet:straggler_detected': {
+    fleetId: string;
+    coherence: number;
+    stragglerRisk: number;
+    lowCoherenceSquadrons: number;
+  };
+
+  /** Fleet battle started */
+  'fleet:battle_started': {
+    fleetId1: string;
+    fleetId2: string;
+    initialShips1: number;
+    initialShips2: number;
+  };
+
+  /** Fleet battle resolved */
+  'fleet:battle_resolved': {
+    fleetId1: string;
+    fleetId2: string;
+    victor: string;
+    fleet1Remaining: number;
+    fleet2Remaining: number;
+    shipsLost1: number;
+    shipsLost2: number;
+    duration: number;
+  };
+
   // === Armada Events ===
 
   /** Fleet missing from armada */
@@ -246,6 +287,76 @@ export interface SpaceEvents {
   'navy:fleet_added_to_reserves': {
     navyId: string;
     fleetId: string;
+  };
+
+  /** Navy budget processed */
+  'navy:budget_processed': {
+    navyId: string;
+    budget: number;
+    spent: {
+      construction: number;
+      maintenance: number;
+      personnel: number;
+      R_D: number;
+    };
+    shipsBuilt: number;
+    shipsMaintained: number;
+    crewPaid: number;
+    warnings: string[];
+  };
+
+  /** Navy ship constructed */
+  'navy:ship_constructed': {
+    navyId: string;
+    shipsBuilt: number;
+    constructionBudget: number;
+  };
+
+  /** Navy maintenance crisis (under-funded) */
+  'navy:maintenance_crisis': {
+    navyId: string;
+    totalShips: number;
+    shipsCanMaintain: number;
+    degradedShips: number;
+  };
+
+  /** Navy personnel crisis (unpaid crew) */
+  'navy:personnel_crisis': {
+    navyId: string;
+    totalCrew: number;
+    crewCanPay: number;
+    unpaidCrew: number;
+  };
+
+  // === Squadron Events ===
+
+  /** Squadron battle started */
+  'squadron:battle_started': {
+    squadronId1: string;
+    squadronId2: string;
+    formation1: string;
+    formation2: string;
+  };
+
+  /** Squadron battle resolved */
+  'squadron:battle_resolved': {
+    squadronId1: string;
+    squadronId2: string;
+    victor: string;
+    squadron1Remaining: number;
+    squadron2Remaining: number;
+    shipsLost1: number;
+    shipsLost2: number;
+  };
+
+  /** Armada system battle resolved */
+  'armada:system_battle_resolved': {
+    armadaId1: string;
+    armadaId2: string;
+    systemId: string;
+    victor: string;
+    losses1: number;
+    losses2: number;
   };
 
   // === Shipping Lane Events ===

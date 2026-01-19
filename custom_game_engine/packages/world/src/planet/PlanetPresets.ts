@@ -30,7 +30,7 @@ interface PlanetPresetsData {
 }
 
 function loadPlanetPresets(): Record<PlanetType, PlanetPreset> {
-  const rawData = planetPresetsData as RawPlanetPresetsData;
+  const rawData = planetPresetsData as unknown as RawPlanetPresetsData;
   if (!rawData || !rawData.presets || !rawData.biome_sets) {
     throw new Error('Failed to load planet presets from JSON');
   }
@@ -42,8 +42,8 @@ function loadPlanetPresets(): Record<PlanetType, PlanetPreset> {
       ? rawData.biome_sets[preset.allowedBiomes]
       : preset.allowedBiomes;
 
-    if (!allowedBiomes) {
-      throw new Error(`Missing biome set for planet type ${planetType}: ${preset.allowedBiomes}`);
+    if (!allowedBiomes || !Array.isArray(allowedBiomes)) {
+      throw new Error(`Missing or invalid biome set for planet type ${planetType}: ${preset.allowedBiomes}`);
     }
 
     resolvedPresets[planetType] = {
@@ -105,7 +105,7 @@ export function createPlanetConfigFromPreset(
     elevationOffset: overrides?.elevationOffset ?? preset.elevationOffset ?? 0,
     elevationScale: overrides?.elevationScale ?? preset.elevationScale ?? 1.0,
     seaLevel: overrides?.seaLevel ?? preset.seaLevel ?? -0.3,
-    allowedBiomes: overrides?.allowedBiomes ?? preset.allowedBiomes,
+    allowedBiomes: (overrides?.allowedBiomes ?? preset.allowedBiomes) || [],
     // Physical properties
     ...(preset.gravity !== undefined && { gravity: overrides?.gravity ?? preset.gravity }),
     ...(preset.atmosphereDensity !== undefined && { atmosphereDensity: overrides?.atmosphereDensity ?? preset.atmosphereDensity }),

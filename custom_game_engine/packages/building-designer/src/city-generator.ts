@@ -22,6 +22,7 @@ import {
   RESEARCH_BUILDINGS as ALL_RESEARCH,
 } from './building-library-data';
 import { cityFengShuiAnalyzer, type CityHarmonyAnalysis } from './city-feng-shui';
+import cityConfig from '../data/city-config.json';
 
 // =============================================================================
 // TYPES
@@ -202,260 +203,136 @@ export interface GeneratedCity {
 
 /**
  * City sizes scaled for realistic 1 tile = 1 meter scale.
- * Humans are 2 tiles tall, so buildings/cities need appropriate scale.
- *
- * Real-world reference:
- * - Hamlet: 200-400m across
- * - Village: 400-800m across
- * - Town: 1-3 km across
- * - City: 5-15 km across
- * - Metropolis: 20-50 km across
+ * Loaded from city-config.json
  */
-const CITY_SIZES: Record<CitySize, { sectors: number; tiles: number }> = {
-  tiny:   { sectors: 5, tiles: 320 },     // 5x5 sectors = 320x320 tiles (320m hamlet)
-  small:  { sectors: 10, tiles: 640 },    // 10x10 sectors = 640x640 tiles (640m village)
-  medium: { sectors: 25, tiles: 1600 },   // 25x25 sectors = 1600x1600 tiles (1.6km town)
-  large:  { sectors: 80, tiles: 5120 },   // 80x80 sectors = 5120x5120 tiles (5km city)
-  huge:   { sectors: 200, tiles: 12800 }, // 200x200 sectors = 12800x12800 tiles (12.8km metropolis)
-};
+const CITY_SIZES: Record<CitySize, { sectors: number; tiles: number }> = cityConfig.citySizes as Record<CitySize, { sectors: number; tiles: number }>;
 
-const SECTOR_SIZE = 64;  // Tiles per sector (64m city blocks)
+const SECTOR_SIZE = cityConfig.sectorSize;
 
 /**
  * Street widths in tiles (1 tile = 1 meter).
- * Scaled for realistic medieval/fantasy city streets.
+ * Loaded from city-config.json
  */
-const STREET_WIDTHS = {
-  arterial: 12,   // Main roads, market streets (12m wide)
-  collector: 8,   // Secondary roads (8m wide)
-  local: 5,       // Residential streets (5m wide)
-  alley: 3,       // Narrow passages (3m wide)
-};
+const STREET_WIDTHS = cityConfig.streetWidths;
 
 /**
  * Minimum distance between settlements (in tiles/meters).
- * Ensures cities don't spawn too close together.
- *
- * Based on realistic medieval settlement spacing:
- * - Villages: ~5-10 km apart (walking distance for trade)
- * - Towns: ~20-40 km apart (market catchment areas)
- * - Cities: ~50-100 km apart (regional capitals)
- * - Metropolises: ~200-500 km apart (major population centers)
+ * Loaded from city-config.json
  */
-export const CITY_SPACING: Record<CitySize, number> = {
-  tiny:   5_000,    // 5 km minimum between hamlets
-  small:  15_000,   // 15 km minimum between villages
-  medium: 40_000,   // 40 km minimum between towns
-  large:  100_000,  // 100 km minimum between cities
-  huge:   300_000,  // 300 km minimum between metropolises
-};
+export const CITY_SPACING: Record<CitySize, number> = cityConfig.citySpacing as Record<CitySize, number>;
 
 /**
  * City generation density per biome (cities per 1,000,000 km²).
- * Earth's land area is ~150 million km², this would give:
- * - Plains: 150 * 8 = ~1200 settlements of various sizes
- * - Forest: 150 * 2 = ~300 settlements (sparse)
- * - Desert: 150 * 0.5 = ~75 settlements (very sparse)
- * - Mountains: 150 * 1 = ~150 settlements (rare)
+ * Loaded from city-config.json
  */
-export const CITY_DENSITY_PER_MILLION_KM2: Record<string, number> = {
-  plains: 8,      // Fertile land supports many settlements
-  forest: 2,      // Forests have scattered settlements
-  desert: 0.5,    // Deserts have oasis towns only
-  mountains: 1,   // Mountains have mining towns, dwarven holds
-  river: 10,      // Rivers attract dense settlement
-  ocean: 0,       // No settlements in ocean
-};
+export const CITY_DENSITY_PER_MILLION_KM2: Record<string, number> = Object.fromEntries(
+  Object.entries(cityConfig.cityDensityPerMillionKm2).filter(([key]) => !key.startsWith('_'))
+) as Record<string, number>;
 
 /**
  * Preferred city types by biome.
- * Each biome favors certain architectural styles.
+ * Loaded from city-config.json
  */
-export const BIOME_CITY_TYPES: Record<string, CityType[]> = {
-  plains: ['grid', 'organic'],
-  forest: ['organic'],
-  desert: ['organic'],  // Compact, walled cities
-  mountains: ['dwarven', 'organic'],
-  river: ['grid', 'organic'],
-};
+export const BIOME_CITY_TYPES: Record<string, CityType[]> = Object.fromEntries(
+  Object.entries(cityConfig.biomeCityTypes).filter(([key]) => !key.startsWith('_'))
+) as Record<string, CityType[]>;
 
 /**
  * Maximum city size allowed per biome.
- * Some biomes can't support large cities.
+ * Loaded from city-config.json
  */
-export const BIOME_MAX_CITY_SIZE: Record<string, CitySize> = {
-  plains: 'huge',     // Plains can support metropolises
-  forest: 'medium',   // Forests limit to towns
-  desert: 'small',    // Deserts limit to villages (oases)
-  mountains: 'large', // Mountains can have large dwarven cities
-  river: 'huge',      // Rivers support major cities
-};
+export const BIOME_MAX_CITY_SIZE: Record<string, CitySize> = cityConfig.biomeMaxCitySize as Record<string, CitySize>;
 
-// District preferences for building categories
-const DISTRICT_BUILDINGS: Record<DistrictType, VoxelBuildingDefinition[]> = {
-  civic: ALL_COMMUNITY,
-  market: ALL_COMMERCIAL,
-  residential: ALL_HOUSES,
-  industrial: ALL_PRODUCTION,
-  research: ALL_RESEARCH,
-  agricultural: ALL_FARMING,
-  storage: ALL_STORAGE,
-  military: ALL_MILITARY,
-  slums: ALL_HOUSES.filter(b => b.tier <= 1),
-  wealthy: ALL_HOUSES.filter(b => b.tier >= 3),
-  // Dwarven districts - use appropriate building types
-  mine: ALL_STORAGE,  // Mining = storage of ore
-  forge: ALL_PRODUCTION.filter(b => b.name?.toLowerCase().includes('forge') || b.tier >= 2),
-  greathall: ALL_COMMUNITY,  // Great halls = community gathering
-  crafthall: ALL_PRODUCTION,  // Workshops
-  mushroom_farm: ALL_FARMING,
-  // Literary districts - use research and community buildings
-  library: ALL_RESEARCH,
-  margins: ALL_RESEARCH.filter(b => b.tier <= 2),
-  footnotes: ALL_RESEARCH,
-  typo_void: ALL_HOUSES.filter(b => b.tier <= 1),  // Degraded structures
-  scriptorium: ALL_RESEARCH,
-  // Crystalline districts
-  resonance_chamber: ALL_COMMUNITY,
-  prism_core: ALL_RESEARCH,
-  facet_housing: ALL_HOUSES.filter(b => b.tier >= 2),
-  refraction_lab: ALL_RESEARCH,
-  // Hive districts
-  brood_chamber: ALL_FARMING,
-  royal_cell: ALL_COMMUNITY,
-  worker_warren: ALL_HOUSES.filter(b => b.tier <= 2),
-  nectar_store: ALL_STORAGE,
-  pheromone_hub: ALL_COMMERCIAL,
-  // Fungal districts
-  mycelium_network: ALL_STORAGE,
-  spore_tower: ALL_COMMUNITY,
-  decomposition_pit: ALL_PRODUCTION,
-  fruiting_body: ALL_FARMING,
-  // Aquatic districts
-  bubble_dome: ALL_HOUSES,
-  kelp_forest: ALL_FARMING,
-  pressure_lock: ALL_STORAGE,
-  current_channel: ALL_COMMERCIAL,
-  abyssal_shrine: ALL_COMMUNITY,
-  // Temporal districts
-  past_echo: ALL_HOUSES.filter(b => b.tier <= 1),
-  present_anchor: ALL_COMMUNITY,
-  future_shadow: ALL_RESEARCH,
-  chrono_nexus: ALL_RESEARCH,
-  paradox_zone: ALL_STORAGE,
-  // Dream districts
-  lucid_plaza: ALL_COMMUNITY,
-  nightmare_quarter: ALL_MILITARY,
-  memory_palace: ALL_RESEARCH,
-  impossible_stair: ALL_HOUSES,
-  waking_edge: ALL_COMMERCIAL,
-  // Void districts
-  gravity_anchor: ALL_COMMUNITY,
-  star_dock: ALL_COMMERCIAL,
-  void_garden: ALL_FARMING,
-  silence_temple: ALL_COMMUNITY,
-  tether_station: ALL_STORAGE,
-  // Symbiotic districts
-  heart_chamber: ALL_COMMUNITY,
-  neural_cluster: ALL_RESEARCH,
-  digestion_tract: ALL_PRODUCTION,
-  membrane_quarter: ALL_MILITARY,
-  growth_bud: ALL_FARMING,
-  // Fractal districts
-  seed_pattern: ALL_COMMUNITY,
-  iteration_ring: ALL_HOUSES,
-  scale_bridge: ALL_COMMERCIAL,
-  infinity_edge: ALL_RESEARCH,
-  // Musical districts
-  harmony_hall: ALL_COMMUNITY,
-  rhythm_quarter: ALL_PRODUCTION,
-  melody_spire: ALL_HOUSES.filter(b => b.tier >= 2),
-  bass_foundation: ALL_STORAGE,
-  dissonance_pit: ALL_RESEARCH,
-};
+/**
+ * Parse building specification string from JSON config.
+ * Format: "BUILDING_CATEGORY[filter]"
+ * Examples:
+ *   "RESIDENTIAL_BUILDINGS" -> ALL_HOUSES
+ *   "RESIDENTIAL_BUILDINGS[tier<=1]" -> ALL_HOUSES.filter(b => b.tier <= 1)
+ *   "PRODUCTION_BUILDINGS[name~=forge||tier>=2]" -> ALL_PRODUCTION.filter(b => name includes 'forge' OR tier >= 2)
+ */
+function parseBuildingSpec(spec: string): VoxelBuildingDefinition[] {
+  // Map category names to building arrays
+  const categoryMap: Record<string, VoxelBuildingDefinition[]> = {
+    RESIDENTIAL_BUILDINGS: ALL_HOUSES,
+    PRODUCTION_BUILDINGS: ALL_PRODUCTION,
+    COMMERCIAL_BUILDINGS: ALL_COMMERCIAL,
+    STORAGE_BUILDINGS: ALL_STORAGE,
+    COMMUNITY_BUILDINGS: ALL_COMMUNITY,
+    MILITARY_BUILDINGS: ALL_MILITARY,
+    FARMING_BUILDINGS: ALL_FARMING,
+    RESEARCH_BUILDINGS: ALL_RESEARCH,
+  };
 
-// District adjacency preferences (used in advanced placement algorithms)
-export const DISTRICT_AFFINITIES: Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }> = {
-  civic:        { prefer: ['market', 'wealthy'], avoid: ['industrial', 'slums'] },
-  market:       { prefer: ['civic', 'residential'], avoid: ['military'] },
-  residential:  { prefer: ['market', 'civic'], avoid: ['industrial'] },
-  industrial:   { prefer: ['storage', 'slums'], avoid: ['wealthy', 'civic', 'residential'] },
-  research:     { prefer: ['civic', 'wealthy'], avoid: ['slums', 'industrial'] },
-  agricultural: { prefer: ['storage'], avoid: ['civic', 'wealthy'] },
-  storage:      { prefer: ['industrial', 'agricultural', 'market'], avoid: [] },
-  military:     { prefer: [], avoid: ['slums'] },
-  slums:        { prefer: ['industrial'], avoid: ['wealthy', 'civic'] },
-  wealthy:      { prefer: ['civic', 'research'], avoid: ['industrial', 'slums'] },
-  // Dwarven districts
-  mine:          { prefer: ['forge', 'storage'], avoid: ['greathall', 'residential'] },
-  forge:         { prefer: ['mine', 'crafthall'], avoid: ['mushroom_farm', 'residential'] },
-  greathall:     { prefer: ['residential', 'crafthall'], avoid: ['mine', 'typo_void'] },
-  crafthall:     { prefer: ['forge', 'storage'], avoid: ['typo_void'] },
-  mushroom_farm: { prefer: ['storage', 'residential'], avoid: ['forge'] },
-  // Literary districts
-  library:       { prefer: ['scriptorium', 'research', 'footnotes'], avoid: ['typo_void'] },
-  margins:       { prefer: ['library', 'footnotes'], avoid: ['typo_void'] },
-  footnotes:     { prefer: ['library', 'margins', 'scriptorium'], avoid: ['typo_void'] },
-  typo_void:     { prefer: [], avoid: ['library', 'scriptorium', 'footnotes'] },
-  scriptorium:   { prefer: ['library', 'research'], avoid: ['typo_void', 'forge'] },
-  // Crystalline districts
-  resonance_chamber: { prefer: ['prism_core', 'facet_housing'], avoid: ['dissonance_pit'] },
-  prism_core:        { prefer: ['resonance_chamber', 'refraction_lab'], avoid: [] },
-  facet_housing:     { prefer: ['resonance_chamber'], avoid: ['decomposition_pit'] },
-  refraction_lab:    { prefer: ['prism_core', 'research'], avoid: [] },
-  // Hive districts
-  brood_chamber:     { prefer: ['royal_cell', 'nectar_store'], avoid: ['decomposition_pit'] },
-  royal_cell:        { prefer: ['brood_chamber', 'pheromone_hub'], avoid: ['worker_warren'] },
-  worker_warren:     { prefer: ['nectar_store', 'pheromone_hub'], avoid: ['royal_cell'] },
-  nectar_store:      { prefer: ['brood_chamber', 'worker_warren'], avoid: [] },
-  pheromone_hub:     { prefer: ['royal_cell', 'worker_warren'], avoid: [] },
-  // Fungal districts
-  mycelium_network:  { prefer: ['spore_tower', 'decomposition_pit'], avoid: ['prism_core'] },
-  spore_tower:       { prefer: ['mycelium_network', 'fruiting_body'], avoid: [] },
-  decomposition_pit: { prefer: ['mycelium_network'], avoid: ['facet_housing', 'brood_chamber'] },
-  fruiting_body:     { prefer: ['spore_tower', 'mycelium_network'], avoid: [] },
-  // Aquatic districts
-  bubble_dome:       { prefer: ['kelp_forest', 'current_channel'], avoid: ['decomposition_pit'] },
-  kelp_forest:       { prefer: ['bubble_dome', 'current_channel'], avoid: [] },
-  pressure_lock:     { prefer: ['current_channel'], avoid: [] },
-  current_channel:   { prefer: ['bubble_dome', 'kelp_forest', 'pressure_lock'], avoid: ['abyssal_shrine'] },
-  abyssal_shrine:    { prefer: ['silence_temple'], avoid: ['current_channel'] },
-  // Temporal districts
-  past_echo:         { prefer: ['present_anchor'], avoid: ['future_shadow', 'paradox_zone'] },
-  present_anchor:    { prefer: ['past_echo', 'future_shadow', 'chrono_nexus'], avoid: ['paradox_zone'] },
-  future_shadow:     { prefer: ['present_anchor', 'chrono_nexus'], avoid: ['past_echo', 'paradox_zone'] },
-  chrono_nexus:      { prefer: ['present_anchor'], avoid: ['paradox_zone'] },
-  paradox_zone:      { prefer: [], avoid: ['past_echo', 'present_anchor', 'future_shadow', 'chrono_nexus'] },
-  // Dream districts
-  lucid_plaza:       { prefer: ['memory_palace', 'waking_edge'], avoid: ['nightmare_quarter'] },
-  nightmare_quarter: { prefer: ['impossible_stair'], avoid: ['lucid_plaza', 'waking_edge'] },
-  memory_palace:     { prefer: ['lucid_plaza'], avoid: ['nightmare_quarter'] },
-  impossible_stair:  { prefer: ['nightmare_quarter', 'lucid_plaza'], avoid: [] },
-  waking_edge:       { prefer: ['lucid_plaza'], avoid: ['nightmare_quarter'] },
-  // Void districts
-  gravity_anchor:    { prefer: ['star_dock', 'tether_station'], avoid: [] },
-  star_dock:         { prefer: ['gravity_anchor', 'tether_station'], avoid: ['silence_temple'] },
-  void_garden:       { prefer: ['silence_temple', 'gravity_anchor'], avoid: [] },
-  silence_temple:    { prefer: ['void_garden', 'abyssal_shrine'], avoid: ['star_dock', 'dissonance_pit'] },
-  tether_station:    { prefer: ['gravity_anchor', 'star_dock'], avoid: [] },
-  // Symbiotic districts
-  heart_chamber:     { prefer: ['neural_cluster', 'digestion_tract'], avoid: [] },
-  neural_cluster:    { prefer: ['heart_chamber', 'membrane_quarter'], avoid: ['decomposition_pit'] },
-  digestion_tract:   { prefer: ['heart_chamber', 'growth_bud'], avoid: [] },
-  membrane_quarter:  { prefer: ['neural_cluster'], avoid: ['decomposition_pit'] },
-  growth_bud:        { prefer: ['digestion_tract', 'heart_chamber'], avoid: [] },
-  // Fractal districts
-  seed_pattern:      { prefer: ['iteration_ring'], avoid: [] },
-  iteration_ring:    { prefer: ['seed_pattern', 'scale_bridge'], avoid: [] },
-  scale_bridge:      { prefer: ['iteration_ring', 'infinity_edge'], avoid: [] },
-  infinity_edge:     { prefer: ['scale_bridge'], avoid: ['seed_pattern'] },
-  // Musical districts
-  harmony_hall:      { prefer: ['melody_spire', 'rhythm_quarter', 'bass_foundation'], avoid: ['dissonance_pit'] },
-  rhythm_quarter:    { prefer: ['harmony_hall', 'bass_foundation'], avoid: [] },
-  melody_spire:      { prefer: ['harmony_hall'], avoid: ['bass_foundation'] },
-  bass_foundation:   { prefer: ['rhythm_quarter', 'harmony_hall'], avoid: ['melody_spire'] },
-  dissonance_pit:    { prefer: [], avoid: ['harmony_hall', 'silence_temple', 'resonance_chamber'] },
-};
+  // Parse "CATEGORY[filter]" or just "CATEGORY"
+  const match = spec.match(/^([A-Z_]+)(?:\[(.+)\])?$/);
+  if (!match) {
+    throw new Error(`Invalid building spec: ${spec}`);
+  }
+
+  const [, category, filterExpr] = match;
+  const buildings = categoryMap[category];
+
+  if (!buildings) {
+    throw new Error(`Unknown building category: ${category}`);
+  }
+
+  // No filter - return all buildings
+  if (!filterExpr) {
+    return buildings;
+  }
+
+  // Parse filter expression
+  // Support: tier<=1, tier>=3, name~=forge, name~=forge||tier>=2
+  return buildings.filter(b => {
+    // Split on || for OR conditions
+    const conditions = filterExpr.split('||');
+
+    for (const cond of conditions) {
+      const trimmed = cond.trim();
+
+      // tier<=N
+      if (trimmed.match(/^tier<=(\d+)$/)) {
+        const value = parseInt(trimmed.match(/^tier<=(\d+)$/)![1]);
+        if (b.tier <= value) return true;
+      }
+      // tier>=N
+      else if (trimmed.match(/^tier>=(\d+)$/)) {
+        const value = parseInt(trimmed.match(/^tier>=(\d+)$/)![1]);
+        if (b.tier >= value) return true;
+      }
+      // name~=value (contains)
+      else if (trimmed.match(/^name~=(.+)$/)) {
+        const value = trimmed.match(/^name~=(.+)$/)![1];
+        if (b.name?.toLowerCase().includes(value.toLowerCase())) return true;
+      }
+    }
+
+    return false;
+  });
+}
+
+/**
+ * Build DISTRICT_BUILDINGS from JSON config.
+ * Parses building specifications and applies filters.
+ */
+function buildDistrictBuildings(): Record<DistrictType, VoxelBuildingDefinition[]> {
+  const result = {} as Record<DistrictType, VoxelBuildingDefinition[]>;
+
+  for (const [district, spec] of Object.entries(cityConfig.districtBuildings)) {
+    if (district.startsWith('_')) continue; // Skip comments
+    result[district as DistrictType] = parseBuildingSpec(spec as string);
+  }
+
+  return result;
+}
+
+// District preferences for building categories (loaded from city-config.json)
+const DISTRICT_BUILDINGS: Record<DistrictType, VoxelBuildingDefinition[]> = buildDistrictBuildings();
+
+// District adjacency preferences (loaded from city-config.json)
+export const DISTRICT_AFFINITIES: Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }> =
+  cityConfig.districtAffinities as Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }>;
 
 // =============================================================================
 // UTILITY FUNCTIONS
