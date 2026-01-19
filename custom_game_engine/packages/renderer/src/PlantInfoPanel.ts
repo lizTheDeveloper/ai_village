@@ -3,6 +3,7 @@ import type { IWindowPanel } from './types/WindowTypes.js';
 import { DevSection } from './panels/agent-info/DevSection.js';
 import type { SectionRenderContext } from './panels/agent-info/types.js';
 import { renderSprite } from './SpriteRenderer.js';
+import { getPlantSpecies } from '@ai-village/world';
 
 /**
  * UI Panel displaying information about a selected plant.
@@ -473,12 +474,16 @@ export class PlantInfoPanel implements IWindowPanel {
    * Get display name for species ID
    */
   private getSpeciesDisplayName(speciesId: string): string {
-    // TODO: Look up from PlantSpeciesRegistry once it exists
-    // For now, convert kebab-case to Title Case
-    return speciesId
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    try {
+      const species = getPlantSpecies(speciesId);
+      return species.displayName || species.name;
+    } catch (error) {
+      // Fallback: convert kebab-case to Title Case if species not found
+      return speciesId
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
   }
 
   /**

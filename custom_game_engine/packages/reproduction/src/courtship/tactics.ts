@@ -37,11 +37,11 @@ function loadTacticsFromJSON(): {
   }
 
   return {
-    universal: tacticsData.universal as CourtshipTactic[],
-    dwarf: tacticsData.dwarf as CourtshipTactic[],
-    bird_folk: tacticsData.bird_folk as CourtshipTactic[],
-    mystif: tacticsData.mystif as CourtshipTactic[],
-    negative: tacticsData.negative as CourtshipTactic[],
+    universal: tacticsData.universal as unknown as CourtshipTactic[],
+    dwarf: tacticsData.dwarf as unknown as CourtshipTactic[],
+    bird_folk: tacticsData.bird_folk as unknown as CourtshipTactic[],
+    mystif: tacticsData.mystif as unknown as CourtshipTactic[],
+    negative: tacticsData.negative as unknown as CourtshipTactic[],
   };
 }
 

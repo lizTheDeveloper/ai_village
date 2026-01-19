@@ -24,6 +24,76 @@ import type { CensusBureauComponent } from '../components/CensusBureauComponent.
 import type { NationGovernanceComponent } from '../components/NationGovernanceComponent.js';
 import type { EmpireGovernanceComponent } from '../components/EmpireGovernanceComponent.js';
 import type { GalacticCouncilComponent } from '../components/GalacticCouncilComponent.js';
+import { ObjectPool, CachedQuery } from '../utils/performance.js';
+
+// ============================================================================
+// PERFORMANCE OPTIMIZATION: Object Pools and Cached Queries
+// ============================================================================
+
+// Object pools for frequently allocated context objects (reduces GC pressure)
+const provinceRecordPool = new ObjectPool(
+  () => ({ name: '', population: 0, resources: {} as Record<string, number>, happiness: 0 }),
+  (obj) => {
+    obj.name = '';
+    obj.population = 0;
+    obj.resources = {};
+    obj.happiness = 0;
+  }
+);
+
+const nationRecordPool = new ObjectPool(
+  () => ({ name: '', population: 0, loyalty: 0, militaryStrength: 0, resources: {} as Record<string, number> }),
+  (obj) => {
+    obj.name = '';
+    obj.population = 0;
+    obj.loyalty = 0;
+    obj.militaryStrength = 0;
+    obj.resources = {};
+  }
+);
+
+const diplomacyRecordPool = new ObjectPool(
+  () => ({ targetEmpire: '', relation: 'neutral' as 'allied' | 'neutral' | 'rival' | 'war', trustLevel: 0 }),
+  (obj) => {
+    obj.targetEmpire = '';
+    obj.relation = 'neutral' as 'allied' | 'neutral' | 'rival' | 'war';
+    obj.trustLevel = 0;
+  }
+);
+
+const threatRecordPool = new ObjectPool(
+  () => ({ type: '', severity: 0, description: '' }),
+  (obj) => {
+    obj.type = '';
+    obj.severity = 0;
+    obj.description = '';
+  }
+);
+
+const speciesRecordPool = new ObjectPool(
+  () => ({ speciesName: '', homeworld: '', population: 0, temperament: '' }),
+  (obj) => {
+    obj.speciesName = '';
+    obj.homeworld = '';
+    obj.population = 0;
+    obj.temperament = '';
+  }
+);
+
+const crisisRecordPool = new ObjectPool(
+  () => ({ type: '', severity: 0, affectedSpecies: [] as string[] }),
+  (obj) => {
+    obj.type = '';
+    obj.severity = 0;
+    obj.affectedSpecies = [];
+  }
+);
+
+// Cached queries to avoid repeated world queries (auto-invalidate each tick)
+const provinceGovernanceQuery = new CachedQuery(CT.ProvinceGovernance);
+const nationGovernanceQuery = new CachedQuery(CT.NationGovernance);
+const empireGovernanceQuery = new CachedQuery(CT.EmpireGovernance);
+const galacticCouncilQuery = new CachedQuery(CT.GalacticCouncil);
 
 // ============================================================================
 // TIER 0: PROVINCE GOVERNOR CONTEXT (extends CivilizationContext)
@@ -334,13 +404,20 @@ export interface NationContext {
 /**
  * Build context for nation head of state
  *
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Uses cached query to avoid repeated world.query() calls
+ * - Pre-allocates arrays with known size
+ * - Uses object pools for province records to reduce GC pressure
+ * - Minimizes Map iterations (only once per Map)
+ * - Caches intermediate results
+ *
  * @param headOfState - Head of state entity (king, president, etc.)
  * @param world - World instance
  * @returns Nation context for LLM prompts
  */
 export function buildNationContext(headOfState: Entity, world: World): NationContext {
-  // Find nation governance component
-  const nations = world.query().with(CT.NationGovernance).executeEntities();
+  // Use cached query instead of world.query() - avoids repeated queries if called multiple times per tick
+  const nations = nationGovernanceQuery.get(world);
   const nationEntity = nations.find((n) => {
     const impl = n as EntityImpl;
     const ng = impl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
@@ -358,81 +435,116 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
     throw new Error('Nation entity missing NationGovernance component');
   }
 
-  // Build provinces array from provinceIds
-  const allProvinces = world.query().with(CT.ProvinceGovernance).executeEntities();
-  const provinces = nation.provinceIds.map((provinceId) => {
+  // Cache province count and use cached query for provinces
+  const provinceCount = nation.provinceIds.length;
+  const allProvinces = provinceGovernanceQuery.get(world);
+
+  // Pre-allocate provinces array with exact size (avoids array resizing)
+  const provinces = new Array(provinceCount);
+
+  // Build provinces array using object pool to reduce GC pressure
+  for (let i = 0; i < provinceCount; i++) {
+    const provinceId = nation.provinceIds[i]!;
     const provinceEntity = allProvinces.find((p) => p.id === provinceId);
+
     if (!provinceEntity) {
-      return {
-        name: 'Unknown Province',
-        population: 0,
-        resources: {},
-        happiness: 0,
-      };
+      // Use object pool for unknown province record
+      const record = provinceRecordPool.acquire();
+      record.name = 'Unknown Province';
+      record.population = 0;
+      record.resources = {};
+      record.happiness = 0;
+      provinces[i] = record;
+      continue;
     }
 
     const provinceImpl = provinceEntity as EntityImpl;
     const province = provinceImpl.getComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance);
 
     if (!province) {
-      return {
-        name: 'Unknown Province',
-        population: 0,
-        resources: {},
-        happiness: 0,
-      };
+      // Use object pool for unknown province record
+      const record = provinceRecordPool.acquire();
+      record.name = 'Unknown Province';
+      record.population = 0;
+      record.resources = {};
+      record.happiness = 0;
+      provinces[i] = record;
+      continue;
     }
 
-    // Convert major resources array to resource map
-    const resources: Record<string, number> = {};
-    for (const resource of province.economy.majorResources) {
-      resources[resource] = 1; // Placeholder - would need actual quantities from warehouse system
+    // Acquire pooled object and populate
+    const record = provinceRecordPool.acquire();
+    record.name = province.provinceName;
+    record.population = province.totalPopulation;
+    record.happiness = province.stability;
+
+    // Build resources map inline (avoid separate loop)
+    const resourceCount = province.economy.majorResources.length;
+    for (let j = 0; j < resourceCount; j++) {
+      const resource = province.economy.majorResources[j]!;
+      record.resources[resource] = 1; // Placeholder - would need actual quantities from warehouse system
     }
 
-    return {
-      name: province.provinceName,
-      population: province.totalPopulation,
-      resources,
-      happiness: province.stability, // Use province stability as happiness proxy
-    };
-  });
+    provinces[i] = record;
+  }
 
-  // Build economy object from nation.economy fields
+  // Build economy object - calculate tax rate efficiently
+  let totalTaxes = 0;
+  const provincialTaxesSize = nation.economy.provincialTaxes.size;
+  if (provincialTaxesSize > 0) {
+    // Single iteration over Map values (Array.from to avoid downlevelIteration requirement)
+    const taxesArray = Array.from(nation.economy.provincialTaxes.values());
+    for (let i = 0; i < taxesArray.length; i++) {
+      totalTaxes += taxesArray[i]!;
+    }
+  }
+
   const economy = {
     gdp: nation.economy.GDP,
-    taxRate: nation.economy.provincialTaxes.size > 0
-      ? Array.from(nation.economy.provincialTaxes.values()).reduce((sum, tax) => sum + tax, 0) /
-          nation.economy.provincialTaxes.size /
-          nation.economy.GDP
-      : 0.1, // Default 10% if no provinces
+    taxRate: provincialTaxesSize > 0 ? totalTaxes / provincialTaxesSize / nation.economy.GDP : 0.1,
     reserves: {
       gold: nation.economy.annualBudget - nation.economy.nationalDebt,
     },
   };
 
-  // Build military object from nation.military fields
-  const military = {
-    strength: nation.military.standingArmy + nation.military.reserves,
-    deployments: nation.foreignPolicy.activeWars.map((war) => ({
+  // Build military object - cache total strength
+  const totalMilitaryStrength = nation.military.standingArmy + nation.military.reserves;
+  const activeWarsCount = nation.foreignPolicy.activeWars.length;
+  const deployments = new Array(activeWarsCount);
+
+  for (let i = 0; i < activeWarsCount; i++) {
+    const war = nation.foreignPolicy.activeWars[i]!;
+    deployments[i] = {
       location: war.name,
       size: Math.floor(nation.military.standingArmy * 0.3), // Estimate 30% deployed per war
-    })),
+    };
+  }
+
+  const military = {
+    strength: totalMilitaryStrength,
+    deployments,
   };
 
-  // Build neighbors array from nation.foreignPolicy.diplomaticRelations Map
-  const neighbors: NationDiplomaticRelation[] = Array.from(
-    nation.foreignPolicy.diplomaticRelations.values()
-  ).map((relation) => ({
-    name: relation.nationName,
-    relation:
-      relation.relationship === 'allied'
-        ? 'allied'
-        : relation.relationship === 'hostile' || relation.relationship === 'at_war'
-          ? 'hostile'
-          : 'neutral',
-  }));
+  // Build neighbors array - single iteration over Map
+  const diplomaticRelationsArray = Array.from(nation.foreignPolicy.diplomaticRelations.values());
+  const neighborsCount = diplomaticRelationsArray.length;
+  const neighbors: NationDiplomaticRelation[] = new Array(neighborsCount);
 
-  // Build pending proposals from national laws/policies
+  for (let i = 0; i < neighborsCount; i++) {
+    const relation = diplomaticRelationsArray[i]!;
+    neighbors[i] = {
+      name: relation.nationName,
+      relation:
+        relation.relationship === 'allied'
+          ? 'allied'
+          : relation.relationship === 'hostile' || relation.relationship === 'at_war'
+            ? 'hostile'
+            : 'neutral',
+    };
+  }
+
+  // Build pending proposals - pre-allocate with estimated size
+  const activeResearchCount = nation.technology.activeResearchProjects.length;
   const pendingProposals: Array<{
     type: string;
     proposer: string;
@@ -440,7 +552,8 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
   }> = [];
 
   // Add active research projects as proposals
-  for (const project of nation.technology.activeResearchProjects) {
+  for (let i = 0; i < activeResearchCount; i++) {
+    const project = nation.technology.activeResearchProjects[i]!;
     if (project.progress < 1) {
       pendingProposals.push({
         type: 'research',
@@ -451,7 +564,8 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
   }
 
   // Add war goals as proposals
-  for (const war of nation.foreignPolicy.activeWars) {
+  for (let i = 0; i < activeWarsCount; i++) {
+    const war = nation.foreignPolicy.activeWars[i]!;
     if (war.status === 'active') {
       pendingProposals.push({
         type: 'military',
@@ -471,7 +585,7 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
             ? 'democracy'
             : 'oligarchy',
       population: nation.totalPopulation,
-      territory: nation.provinceIds.length,
+      territory: provinceCount,
     },
     provinces,
     economy,
@@ -562,13 +676,20 @@ export interface EmpireContext {
 /**
  * Build context for emperor
  *
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Uses cached query to avoid repeated world.query() calls
+ * - Pre-allocates arrays with known size
+ * - Uses object pools for nation/diplomacy/threat records to reduce GC pressure
+ * - Minimizes Map iterations
+ * - Caches intermediate results
+ *
  * @param emperor - Emperor entity (soul agent)
  * @param world - World instance
  * @returns Empire context for LLM prompts
  */
 export function buildEmpireContext(emperor: Entity, world: World): EmpireContext {
-  // Find empire governance component
-  const empires = world.query().with(CT.EmpireGovernance).executeEntities();
+  // Use cached query instead of world.query()
+  const empires = empireGovernanceQuery.get(world);
   const empireEntity = empires.find((e) => {
     const impl = e as EntityImpl;
     const eg = impl.getComponent<EmpireGovernanceComponent>(CT.EmpireGovernance);
@@ -586,97 +707,162 @@ export function buildEmpireContext(emperor: Entity, world: World): EmpireContext
     throw new Error('Empire entity missing EmpireGovernance component');
   }
 
-  // Build nations array from both coreNationIds and vassalNationIds
-  const allNations = world.query().with(CT.NationGovernance).executeEntities();
-  const allNationIds = [...empire.coreNationIds, ...empire.vassalNationIds];
+  // Use cached query and pre-allocate nations array
+  const allNations = nationGovernanceQuery.get(world);
+  const coreNationsCount = empire.coreNationIds.length;
+  const vassalNationsCount = empire.vassalNationIds.length;
+  const totalNationsCount = coreNationsCount + vassalNationsCount;
+  const nations = new Array(totalNationsCount);
 
-  const nations = allNationIds.map((nationId) => {
+  // Process core nations first
+  for (let i = 0; i < coreNationsCount; i++) {
+    const nationId = empire.coreNationIds[i]!;
     const nationEntity = allNations.find((n) => n.id === nationId);
+
     if (!nationEntity) {
-      return {
-        name: 'Unknown Nation',
-        population: 0,
-        loyalty: 0,
-        militaryStrength: 0,
-        resources: {},
-      };
+      const record = nationRecordPool.acquire();
+      record.name = 'Unknown Nation';
+      record.population = 0;
+      record.loyalty = 0;
+      record.militaryStrength = 0;
+      record.resources = {};
+      nations[i] = record;
+      continue;
     }
 
     const nationImpl = nationEntity as EntityImpl;
     const nation = nationImpl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
 
     if (!nation) {
-      return {
-        name: 'Unknown Nation',
-        population: 0,
-        loyalty: 0,
-        militaryStrength: 0,
-        resources: {},
-      };
+      const record = nationRecordPool.acquire();
+      record.name = 'Unknown Nation';
+      record.population = 0;
+      record.loyalty = 0;
+      record.militaryStrength = 0;
+      record.resources = {};
+      nations[i] = record;
+      continue;
     }
 
-    // Calculate loyalty from empire.stability.vassalLoyalty Map
-    const loyalty = empire.stability.vassalLoyalty.get(nationId) ?? 1.0; // Core nations default to 1.0
-
-    // Convert resources to record
-    const resources: Record<string, number> = {};
-    resources['GDP'] = nation.economy.GDP;
-    resources['military_forces'] = nation.military.standingArmy + nation.military.reserves;
-
-    return {
-      name: nation.name,
-      population: nation.totalPopulation,
-      loyalty,
-      militaryStrength: nation.military.standingArmy + nation.military.reserves,
-      resources,
+    // Acquire pooled object and populate
+    const record = nationRecordPool.acquire();
+    record.name = nation.name;
+    record.population = nation.totalPopulation;
+    record.loyalty = empire.stability.vassalLoyalty.get(nationId) ?? 1.0; // Core nations default to 1.0
+    record.militaryStrength = nation.military.standingArmy + nation.military.reserves;
+    record.resources = {
+      GDP: nation.economy.GDP,
+      military_forces: nation.military.standingArmy + nation.military.reserves,
     };
-  });
 
-  // Build diplomaticRelations array from empire.foreignPolicy.diplomaticRelations Map
-  const diplomaticRelations = Array.from(empire.foreignPolicy.diplomaticRelations.values()).map(
-    (relation) => {
-      const mappedRelation:  'allied' | 'neutral' | 'rival' | 'war' =
-        relation.relationship === 'allied'
-          ? 'allied'
-          : relation.relationship === 'at_war'
-            ? 'war'
-            : relation.relationship === 'rival' || relation.relationship === 'hostile'
-              ? 'rival'
-              : 'neutral';
-      return {
-        targetEmpire: relation.empireName,
-        relation: mappedRelation,
-        trustLevel: relation.respectLevel,
-      };
+    nations[i] = record;
+  }
+
+  // Process vassal nations
+  for (let i = 0; i < vassalNationsCount; i++) {
+    const nationId = empire.vassalNationIds[i]!;
+    const nationEntity = allNations.find((n) => n.id === nationId);
+    const arrayIndex = coreNationsCount + i;
+
+    if (!nationEntity) {
+      const record = nationRecordPool.acquire();
+      record.name = 'Unknown Nation';
+      record.population = 0;
+      record.loyalty = 0;
+      record.militaryStrength = 0;
+      record.resources = {};
+      nations[arrayIndex] = record;
+      continue;
     }
-  );
 
-  // Build threats array from empire.stability.separatistMovements
-  const threats = empire.stability.separatistMovements.map((movement) => ({
-    type: movement.goal === 'independence' ? 'separatist_movement' : 'rebellion',
-    severity:
+    const nationImpl = nationEntity as EntityImpl;
+    const nation = nationImpl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+
+    if (!nation) {
+      const record = nationRecordPool.acquire();
+      record.name = 'Unknown Nation';
+      record.population = 0;
+      record.loyalty = 0;
+      record.militaryStrength = 0;
+      record.resources = {};
+      nations[arrayIndex] = record;
+      continue;
+    }
+
+    // Acquire pooled object and populate
+    const record = nationRecordPool.acquire();
+    record.name = nation.name;
+    record.population = nation.totalPopulation;
+    record.loyalty = empire.stability.vassalLoyalty.get(nationId) ?? 1.0;
+    record.militaryStrength = nation.military.standingArmy + nation.military.reserves;
+    record.resources = {
+      GDP: nation.economy.GDP,
+      military_forces: nation.military.standingArmy + nation.military.reserves,
+    };
+
+    nations[arrayIndex] = record;
+  }
+
+  // Build diplomaticRelations - single iteration, use object pool
+  const diplomaticRelationsArray = Array.from(empire.foreignPolicy.diplomaticRelations.values());
+  const diplomaticRelationsCount = diplomaticRelationsArray.length;
+  const diplomaticRelations = new Array(diplomaticRelationsCount);
+
+  for (let i = 0; i < diplomaticRelationsCount; i++) {
+    const relation = diplomaticRelationsArray[i]!;
+    const record = diplomacyRecordPool.acquire();
+    record.targetEmpire = relation.empireName;
+    record.relation =
+      relation.relationship === 'allied'
+        ? 'allied'
+        : relation.relationship === 'at_war'
+          ? 'war'
+          : relation.relationship === 'rival' || relation.relationship === 'hostile'
+            ? 'rival'
+            : 'neutral';
+    record.trustLevel = relation.respectLevel;
+    diplomaticRelations[i] = record;
+  }
+
+  // Build threats array from separatist movements - use object pool
+  const separatistMovementsCount = empire.stability.separatistMovements.length;
+  const activeWarsCount = empire.foreignPolicy.activeWars.length;
+  const threats = new Array(separatistMovementsCount + activeWarsCount);
+  let threatIndex = 0;
+
+  // Add separatist movements as threats
+  for (let i = 0; i < separatistMovementsCount; i++) {
+    const movement = empire.stability.separatistMovements[i]!;
+    const record = threatRecordPool.acquire();
+    record.type = movement.goal === 'independence' ? 'separatist_movement' : 'rebellion';
+    record.severity =
       movement.threatLevel === 'existential'
         ? 3
         : movement.threatLevel === 'major'
           ? 2
           : movement.threatLevel === 'moderate'
             ? 1
-            : 0,
-    description: `${movement.name} in vassal nation (${Math.floor(movement.supportLevel * 100)}% support)`,
-  }));
+            : 0;
+    record.description = `${movement.name} in vassal nation (${Math.floor(movement.supportLevel * 100)}% support)`;
+    threats[threatIndex++] = record;
+  }
 
   // Add active wars as threats
-  for (const war of empire.foreignPolicy.activeWars) {
+  for (let i = 0; i < activeWarsCount; i++) {
+    const war = empire.foreignPolicy.activeWars[i]!;
     if (war.status === 'active') {
-      threats.push({
-        type: 'invasion',
-        severity: war.totalCasualties > 1000000 ? 3 : war.totalCasualties > 100000 ? 2 : 1,
-        description: `${war.name}: ${war.warGoals.join(', ')}`,
-      });
+      const record = threatRecordPool.acquire();
+      record.type = 'invasion';
+      record.severity = war.totalCasualties > 1000000 ? 3 : war.totalCasualties > 100000 ? 2 : 1;
+      record.description = `${war.name}: ${war.warGoals.join(', ')}`;
+      threats[threatIndex++] = record;
     }
   }
 
-  // Build advisorRecommendations as empty array (placeholder for future advisor system)
+  // Trim threats array to actual size (some wars may not be active)
+  threats.length = threatIndex;
+
+  // Build advisorRecommendations
   const advisorRecommendations: Array<{
     advisor: string;
     recommendation: string;
@@ -697,13 +883,19 @@ export function buildEmpireContext(emperor: Entity, world: World): EmpireContext
     });
   }
 
-  const lowLoyaltyVassals = Array.from(empire.stability.vassalLoyalty.entries()).filter(
-    ([_, loyalty]) => loyalty < 0.5
-  );
-  if (lowLoyaltyVassals.length > 0) {
+  // Count low loyalty vassals (single Map iteration, Array.from to avoid downlevelIteration requirement)
+  let lowLoyaltyCount = 0;
+  const loyaltyArray = Array.from(empire.stability.vassalLoyalty.values());
+  for (let i = 0; i < loyaltyArray.length; i++) {
+    if (loyaltyArray[i]! < 0.5) {
+      lowLoyaltyCount++;
+    }
+  }
+
+  if (lowLoyaltyCount > 0) {
     advisorRecommendations.push({
       advisor: 'military',
-      recommendation: `${lowLoyaltyVassals.length} vassal(s) have low loyalty. Prepare for potential rebellions.`,
+      recommendation: `${lowLoyaltyCount} vassal(s) have low loyalty. Prepare for potential rebellions.`,
     });
   }
 
@@ -787,6 +979,13 @@ export interface GalacticCouncilContext {
 /**
  * Build context for galactic council session
  *
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Uses cached query to avoid repeated world.query() calls
+ * - Pre-allocates arrays with known size
+ * - Uses object pools for species/crisis records to reduce GC pressure
+ * - Minimizes array iterations and allocations
+ * - Caches intermediate results
+ *
  * @param councilDelegate - Delegate entity (soul agent representing a species/federation)
  * @param world - World instance
  * @returns Galactic council context for LLM prompts
@@ -795,8 +994,8 @@ export function buildGalacticCouncilContext(
   councilDelegate: Entity,
   world: World
 ): GalacticCouncilContext {
-  // Find galactic council component where councilDelegate is in assemblyDelegates
-  const councils = world.query().with(CT.GalacticCouncil).executeEntities();
+  // Use cached query instead of world.query()
+  const councils = galacticCouncilQuery.get(world);
   const councilEntity = councils.find((c) => {
     const impl = c as EntityImpl;
     const gc = impl.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
@@ -816,76 +1015,118 @@ export function buildGalacticCouncilContext(
     throw new Error('Council entity missing GalacticCouncil component');
   }
 
-  // Build galaxyState object from membership totals
+  // Cache counts for efficiency
+  const totalSectors = council.totalSectors;
+  const speciesCount = council.memberSpecies.length;
+
+  // Build galaxyState object - cache calculations
   const galaxyState: GalaxyState = {
-    totalStars: council.totalSectors * 1000, // Estimate 1000 stars per sector
-    totalPlanets: council.totalSectors * 3000, // Estimate 3000 planets per sector
+    totalStars: totalSectors * 1000, // Estimate 1000 stars per sector
+    totalPlanets: totalSectors * 3000, // Estimate 3000 planets per sector
     totalPopulation: council.totalPopulation,
-    speciesCount: council.memberSpecies.length,
+    speciesCount,
   };
 
-  // Build speciesRepresented array from membership.memberSpecies
-  const speciesRepresented: SpeciesRepresentation[] = council.memberSpecies.map((species) => ({
-    speciesName: species.name,
-    homeworld: species.homeworld,
-    population: species.population,
-    temperament: species.techLevel > 8 ? 'advanced' : species.techLevel > 5 ? 'developed' : 'emerging',
-  }));
-
-  // Build currentCrises array from crisis management data
-  const currentCrises: GalacticCrisis[] = [];
-
-  // Add existential threats as crises
-  for (const threat of council.science.existentialThreats) {
-    currentCrises.push({
-      type:
-        threat.type === 'gamma_ray_burst' || threat.type === 'supernova'
-          ? 'cosmic_anomaly'
-          : 'cosmic_anomaly',
-      severity:
-        threat.severity === 'extinction_level'
-          ? 1.0
-          : threat.severity === 'major'
-            ? 0.7
-            : threat.severity === 'moderate'
-              ? 0.5
-              : 0.3,
-      affectedSpecies: speciesRepresented.map((s) => s.speciesName), // All species affected by existential threats
-    });
+  // Build speciesRepresented array using object pool - pre-allocate
+  const speciesRepresented = new Array(speciesCount);
+  for (let i = 0; i < speciesCount; i++) {
+    const species = council.memberSpecies[i]!;
+    const record = speciesRecordPool.acquire();
+    record.speciesName = species.name;
+    record.homeworld = species.homeworld;
+    record.population = species.population;
+    record.temperament = species.techLevel > 8 ? 'advanced' : species.techLevel > 5 ? 'developed' : 'emerging';
+    speciesRepresented[i] = record;
   }
 
-  // Add active disputes as crises
-  for (const dispute of council.disputes.activeDisputes) {
+  // Build species names array once (reused for affected species)
+  const speciesNames = new Array(speciesCount);
+  for (let i = 0; i < speciesCount; i++) {
+    speciesNames[i] = speciesRepresented[i].speciesName;
+  }
+
+  // Build currentCrises array - pre-allocate with max possible size
+  const existentialThreatsCount = council.science.existentialThreats.length;
+  const activeDisputesCount = council.disputes.activeDisputes.length;
+  const currentCrises = new Array(existentialThreatsCount + activeDisputesCount);
+  let crisisIndex = 0;
+
+  // Add existential threats as crises
+  for (let i = 0; i < existentialThreatsCount; i++) {
+    const threat = council.science.existentialThreats[i]!;
+    const record = crisisRecordPool.acquire();
+    record.type =
+      threat.type === 'gamma_ray_burst' || threat.type === 'supernova'
+        ? 'cosmic_anomaly'
+        : 'cosmic_anomaly';
+    record.severity =
+      threat.severity === 'extinction_level'
+        ? 1.0
+        : threat.severity === 'major'
+          ? 0.7
+          : threat.severity === 'moderate'
+            ? 0.5
+            : 0.3;
+    record.affectedSpecies = speciesNames; // Reuse pre-built array (all species affected)
+    currentCrises[crisisIndex++] = record;
+  }
+
+  // Add active disputes as crises (only if escalated to war)
+  for (let i = 0; i < activeDisputesCount; i++) {
+    const dispute = council.disputes.activeDisputes[i]!;
     if (dispute.status === 'escalated_to_war') {
-      currentCrises.push({
-        type: 'war',
-        severity: 0.8,
-        affectedSpecies: dispute.parties.map((partyId) => {
-          // Try to find species name from member IDs
-          const species = council.memberSpecies.find((s) => s.representativeAgentId === partyId);
-          return species?.name ?? 'Unknown Species';
-        }),
-      });
+      const record = crisisRecordPool.acquire();
+      record.type = 'war';
+      record.severity = 0.8;
+
+      // Build affected species array efficiently
+      const partiesCount = dispute.parties.length;
+      const affectedSpecies = new Array(partiesCount);
+      for (let j = 0; j < partiesCount; j++) {
+        const partyId = dispute.parties[j]!;
+        // Find species name from member IDs
+        let speciesName = 'Unknown Species';
+        for (let k = 0; k < speciesCount; k++) {
+          const species = council.memberSpecies[k]!;
+          if (species.representativeAgentId === partyId) {
+            speciesName = species.name;
+            break;
+          }
+        }
+        affectedSpecies[j] = speciesName;
+      }
+      record.affectedSpecies = affectedSpecies;
+      currentCrises[crisisIndex++] = record;
     }
   }
 
-  // Build proposals array from pending council actions
+  // Trim currentCrises to actual size (some disputes may not be escalated)
+  currentCrises.length = crisisIndex;
+
+  // Build proposals array - pre-allocate with estimated size
+  const researchProjectsCount = council.science.jointResearchProjects.length;
+  const activeMissionsCount = council.peacekeepingForces.activeMissions.length;
   const proposals: GalacticProposal[] = [];
 
+  // Cache total council members for opposition calculation
+  const totalCouncilMembers = council.memberFederationIds.length + council.memberEmpireIds.length;
+
   // Add research projects as proposals
-  for (const project of council.science.jointResearchProjects) {
+  for (let i = 0; i < researchProjectsCount; i++) {
+    const project = council.science.jointResearchProjects[i]!;
     if (project.progress < 1) {
       proposals.push({
         proposedBy: 'Scientific Committee',
         proposal: `Continue ${project.name} research (${Math.floor(project.progress * 100)}% complete)`,
         support: project.participatingStates.length,
-        opposition: council.memberFederationIds.length + council.memberEmpireIds.length - project.participatingStates.length,
+        opposition: totalCouncilMembers - project.participatingStates.length,
       });
     }
   }
 
   // Add peacekeeping missions as proposals
-  for (const mission of council.peacekeepingForces.activeMissions) {
+  for (let i = 0; i < activeMissionsCount; i++) {
+    const mission = council.peacekeepingForces.activeMissions[i]!;
     if (mission.status === 'active') {
       proposals.push({
         proposedBy: 'Security Council',
