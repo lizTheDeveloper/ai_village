@@ -11,7 +11,8 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type { World, EntityImpl, EventBus } from '../../ecs/index.js';
+import type { World, EntityImpl } from '../../ecs/index.js';
+import type { EventBus } from '../../events/EventBus.js';
 import type { SkillProgressComponent } from '../../components/SkillProgressComponent.js';
 import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
 import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';

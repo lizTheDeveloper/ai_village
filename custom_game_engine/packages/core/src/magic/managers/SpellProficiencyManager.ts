@@ -10,7 +10,8 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type { EntityImpl, EventBus } from '../../ecs/index.js';
+import type { EntityImpl } from '../../ecs/index.js';
+import type { EventBus } from '../../events/EventBus.js';
 import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
 import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';

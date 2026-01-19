@@ -12,14 +12,14 @@
  * This preserves all existing data while transitioning to the new architecture.
  */
 
-import type { EntityImpl } from '../../ecs/Entity.js';
-import { ComponentType as CT } from '../../types/ComponentType.js';
-import type { MagicComponent } from '../../components/MagicComponent.js';
-import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';
-import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
-import type { CastingStateComponent } from '../../components/CastingStateComponent.js';
-import type { SkillProgressComponent } from '../../components/SkillProgressComponent.js';
-import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
+import type { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import type { MagicComponent } from '../components/MagicComponent.js';
+import type { ManaPoolsComponent } from '../components/ManaPoolsComponent.js';
+import type { SpellKnowledgeComponent } from '../components/SpellKnowledgeComponent.js';
+import type { CastingStateComponent } from '../components/CastingStateComponent.js';
+import type { SkillProgressComponent } from '../components/SkillProgressComponent.js';
+import type { ParadigmStateComponent } from '../components/ParadigmStateComponent.js';
 
 /**
  * Migrate an entity from monolithic MagicComponent to split components.

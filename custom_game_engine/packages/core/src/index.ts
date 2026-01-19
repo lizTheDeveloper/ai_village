@@ -541,13 +541,27 @@ export {
 // Magic paradigm system - Moved to @ai-village/magic package
 // Import from: import { MagicParadigm, SpellDefinition, ... } from '@ai-village/magic';
 
-// Magic System Managers - UI integration support
+// Magic System Managers - UI integration support (Phase 3 refactored managers)
 export {
   SkillTreeManager,
+  SpellProficiencyManager,
+  ManaRegenerationManager,
+  DivineSpellManager,
+  SpellCastingManager,
+} from './magic/managers/index.js';
+
+// Magic Validation
+export {
+  SpellValidator,
+  type ValidationResult,
+  type AffordabilityResult,
+} from './magic/validation/index.js';
+
+// Legacy managers (kept for backward compatibility, deprecated)
+export {
   SpellLearningManager,
   ManaManager,
   CooldownManager,
-  DivineSpellManager,
   SpellCaster,
 } from './systems/magic/index.js';
 

@@ -9,6 +9,8 @@ import type { MachineConnectionComponent, MachineSlot } from '../components/Mach
 import type { PowerComponent } from '../components/PowerComponent.js';
 import { calculateEffectiveSpeed } from '../components/AssemblyMachineComponent.js';
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import type { FactoryAIComponent } from '../components/FactoryAIComponent.js';
+import { recordProduction, recordConsumption } from '../components/FactoryAIComponent.js';
 
 /**
  * AssemblyMachineSystem - Auto-crafts recipes using machine inputs
@@ -131,7 +133,7 @@ export class AssemblyMachineSystem extends BaseSystem {
 
         if (success) {
           // Output successful - consume ingredients and reset progress
-          this.consumeIngredients(recipe, connection.inputs);
+          this.consumeIngredients(recipe, connection.inputs, ctx.world, ctx.tick);
           machine.progress = 0;
         } else {
           // Output blocked - halt production at 100% without consuming ingredients
@@ -209,10 +211,11 @@ export class AssemblyMachineSystem extends BaseSystem {
   /**
    * Consume ingredients from input slots
    */
-  private consumeIngredients(recipe: any, inputs: MachineSlot[]): void {
+  private consumeIngredients(recipe: any, inputs: MachineSlot[], world?: World, currentTick?: number): void {
     // Recipe interface uses 'ingredients' not 'inputs'
     for (const ingredient of recipe.ingredients) {
       let remaining = ingredient.quantity; // Use 'quantity' not 'amount'
+      let consumed = 0;
 
       for (const slot of inputs) {
         while (remaining > 0 && slot.items.length > 0) {
@@ -221,6 +224,7 @@ export class AssemblyMachineSystem extends BaseSystem {
 
           slot.items = slot.items.filter(i => i.instanceId !== item.instanceId);
           remaining--;
+          consumed++;
         }
 
         if (remaining === 0) break;
@@ -228,6 +232,11 @@ export class AssemblyMachineSystem extends BaseSystem {
 
       if (remaining > 0) {
         throw new Error(`Failed to consume all ingredients for ${recipe.id}`);
+      }
+
+      // Track consumption in factory AI if available
+      if (world && currentTick !== undefined) {
+        this.trackFactoryConsumption(world, ingredient.itemId, consumed, currentTick);
       }
     }
   }
@@ -288,8 +297,39 @@ export class AssemblyMachineSystem extends BaseSystem {
 
         slot.items.push(item);
       }
+
+      // Track production in factory AI if available
+      this.trackFactoryProduction(world, output.itemId, amount, world.tick);
     }
 
     return true;
+  }
+
+  /**
+   * Track production in factory AI (if one exists)
+   */
+  private trackFactoryProduction(world: World, itemId: string, quantity: number, currentTick: number): void {
+    // Find factory AI entities and record production
+    const factoryAIs = world.query().with(CT.FactoryAI).executeEntities();
+    for (const factoryEntity of factoryAIs) {
+      const ai = factoryEntity.getComponent<FactoryAIComponent>(CT.FactoryAI);
+      if (ai) {
+        recordProduction(ai, itemId, quantity, currentTick);
+      }
+    }
+  }
+
+  /**
+   * Track consumption in factory AI (if one exists)
+   */
+  private trackFactoryConsumption(world: World, itemId: string, quantity: number, currentTick: number): void {
+    // Find factory AI entities and record consumption
+    const factoryAIs = world.query().with(CT.FactoryAI).executeEntities();
+    for (const factoryEntity of factoryAIs) {
+      const ai = factoryEntity.getComponent<FactoryAIComponent>(CT.FactoryAI);
+      if (ai) {
+        recordConsumption(ai, itemId, quantity, currentTick);
+      }
+    }
   }
 }

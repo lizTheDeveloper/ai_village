@@ -459,7 +459,8 @@ export class CanonEventSystem extends BaseSystem {
     // PERF: Manual loop to count altered events (faster than filter)
     let alteredCount = 0;
     for (let i = 0; i < canonEvents.length; i++) {
-      if (canonEvents[i].wasAltered) alteredCount++;
+      const event = canonEvents[i];
+      if (event && event.wasAltered) alteredCount++;
     }
 
     const canonAdherence = 1 - (alteredCount / canonEvents.length);

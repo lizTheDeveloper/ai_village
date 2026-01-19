@@ -1095,14 +1095,15 @@ export {
   EffectValidationPipeline,
 } from './validation/EffectValidationPipeline.js';
 
+// SpellValidator moved to @ai-village/core
 export type {
   ValidationResult as SpellValidationResult,
   AffordabilityResult as SpellAffordabilityResult,
-} from './validation/SpellValidator.js';
+} from '@ai-village/core';
 
 export {
   SpellValidator,
-} from './validation/SpellValidator.js';
+} from '@ai-village/core';
 
 export type {
   EvaluationScores,
@@ -1188,13 +1189,14 @@ export {
 // ============================================================================
 // Magic Managers (Phase 3: Extracted from MagicSystem)
 // ============================================================================
+// Managers moved to @ai-village/core
 export {
   SkillTreeManager,
   SpellProficiencyManager,
   ManaRegenerationManager,
   DivineSpellManager,
   SpellCastingManager,
-} from './managers/index.js';
+} from '@ai-village/core';
 
 // ============================================================================
 // Magic Cost System

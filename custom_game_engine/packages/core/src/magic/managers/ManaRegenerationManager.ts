@@ -10,11 +10,11 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type { EntityImpl, EventBus } from '../../ecs/index.js';
+import type { EntityImpl } from '../../ecs/index.js';
 import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';
 import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
 import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
-import type { MagicSourceId } from '../../types/index.js';
+import type { MagicSourceId } from '../../components/MagicComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import { costRecoveryManager } from '../costs/CostRecoveryManager.js';
 
