@@ -230,7 +230,7 @@ export class AutonomicSystem {
     // Note: Removed high sleepDrive trigger - sleep is purely energy-based now
 
     // Moderate hunger: seek food (but not urgent enough to interrupt sleep)
-    // TEMP: Lower threshold to 0.6 (60%) for testing berry gathering
+    // Threshold: 60% (0.6) matches documented priority scale in README.md
     if (needs.hunger < 0.6) {
       return {
         behavior: 'seek_food',

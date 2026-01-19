@@ -3,6 +3,7 @@ import { ComponentType as CT, BaseSystem, type SystemContext } from '@ai-village
 
 interface TimeComponent {
   type: 'time';
+  version: number;
   speedMultiplier?: number;
 }
 
@@ -92,7 +93,7 @@ export class SoilSystem extends BaseSystem {
 
   /**
    * Till a grass tile to make it plantable
-   * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
+   * @param _agentId Optional agent ID for future tool checking (currently unused)
    */
   public tillTile(world: World, tile: Tile, x: number, y: number, _agentId?: string): void {
     // CLAUDE.md: Validate inputs, no silent fallbacks
