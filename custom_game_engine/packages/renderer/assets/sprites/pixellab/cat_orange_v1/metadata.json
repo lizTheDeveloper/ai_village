@@ -1,0 +1,17 @@
+{
+  "id": "cat_orange_v1",
+  "base_species": "cat",
+  "description": "orange tabby cat",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "regenerated_at": "2026-01-19T02:21:14.180Z"
+}

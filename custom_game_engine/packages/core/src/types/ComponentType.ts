@@ -87,6 +87,7 @@ export enum ComponentType {
   LogisticsChest = 'logistics_chest',
   ChunkProductionState = 'chunk_production_state',
   FactoryAI = 'factory_ai',
+  ProductionCapability = 'production_capability',  // Grand strategy: civilization production scaling
 
   // City Management
   CityDirector = 'city_director',

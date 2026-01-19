@@ -213,13 +213,15 @@ describe('InjurySystem', () => {
         location: 'torso',
       });
 
+      const initialHungerRate = agent.getComponent('needs').hungerDecayRate;
+
       system.update(world, Array.from(world.entities.values()), 1);
 
       const needs = agent.getComponent('needs');
 
-      // Blood loss increases hunger decay rate (major = 1.5x)
-      expect(needs.hungerDecayRate).toBeGreaterThan(1);
-      expect(needs.hungerDecayRate).toBe(1.5);
+      // Blood loss increases hunger decay rate (major = 1.5x the initial rate)
+      expect(needs.hungerDecayRate).toBeGreaterThan(initialHungerRate);
+      expect(needs.hungerDecayRate).toBe(initialHungerRate * 1.5);
     });
 
     it('should increase energy decay rate for all injuries', () => {
@@ -229,13 +231,15 @@ describe('InjurySystem', () => {
         location: 'torso',
       });
 
+      const initialEnergyRate = agent.getComponent('needs').energyDecayRate;
+
       system.update(world, Array.from(world.entities.values()), 1);
 
       const needs = agent.getComponent('needs');
 
-      // All injuries increase energy decay rate (major = 1.3x)
-      expect(needs.energyDecayRate).toBeGreaterThan(1);
-      expect(needs.energyDecayRate).toBe(1.3);
+      // All injuries increase energy decay rate (major = 1.3x the initial rate)
+      expect(needs.energyDecayRate).toBeGreaterThan(initialEnergyRate);
+      expect(needs.energyDecayRate).toBe(initialEnergyRate * 1.3);
     });
 
     it('should calculate healing time based on severity', () => {

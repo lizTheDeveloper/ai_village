@@ -76,11 +76,11 @@ export class GuardDutySystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {
-      const duty = ctx.world.getComponent<GuardDutyComponent>(entity.id, 'guard_duty');
+      const duty = entity.getComponent('guard_duty') as GuardDutyComponent | undefined;
       if (!duty) continue;
 
-      // Validate assignment - skip if invalid
-      if (!this.validateAssignment(duty)) continue;
+      // Validate assignment - throws if invalid
+      this.validateAssignment(duty);
 
       // Decay alertness
       this.decayAlertness(entity, duty, ctx.deltaTime);
@@ -163,7 +163,7 @@ export class GuardDutySystem extends BaseSystem {
     }));
 
     // Get guard position
-    const guardPos = world.getComponent<PositionComponent>(guard.id, 'position');
+    const guardPos = guard.getComponent('position') as PositionComponent | undefined;
     if (!guardPos) {
       return;
     }
@@ -174,9 +174,12 @@ export class GuardDutySystem extends BaseSystem {
     if (duty.assignmentType === 'location' && duty.targetLocation) {
       watchLocation = duty.targetLocation;
     } else if (duty.assignmentType === 'person' && duty.targetPerson) {
-      const targetPos = world.getComponent<PositionComponent>(duty.targetPerson, 'position');
-      if (targetPos) {
-        watchLocation = targetPos;
+      const targetEntity = world.getEntity(duty.targetPerson);
+      if (targetEntity) {
+        const targetPos = targetEntity.getComponent('position') as PositionComponent | undefined;
+        if (targetPos) {
+          watchLocation = targetPos;
+        }
       }
     }
 
@@ -201,14 +204,14 @@ export class GuardDutySystem extends BaseSystem {
     for (const entity of entities) {
       if (entity.id === guardId) continue;
 
-      const pos = world.getComponent<PositionComponent>(entity.id, 'position');
+      const pos = entity.getComponent('position') as PositionComponent | undefined;
       if (!pos) continue;
 
       const distance = this.calculateDistance(location, pos);
       if (distance > radius) continue;
 
       // Check if entity is a threat
-      const threatLevel = this.assessThreatLevel(world, entity);
+      const threatLevel = this.assessThreatLevel(entity);
       if (threatLevel > 0) {
         threats.push({ entity, distance, threatLevel });
       }
@@ -225,12 +228,12 @@ export class GuardDutySystem extends BaseSystem {
     return threats;
   }
 
-  private assessThreatLevel(world: World, entity: Entity): number {
+  private assessThreatLevel(entity: Entity): number {
     let threatLevel = 0;
 
     // Check for explicit threat_level component
-    if (world.hasComponent(entity.id, 'threat_level')) {
-      const threat = world.getComponent<ThreatLevelComponent>(entity.id, 'threat_level');
+    if (entity.hasComponent('threat_level')) {
+      const threat = entity.getComponent('threat_level') as ThreatLevelComponent | undefined;
       if (threat) {
         switch (threat.level) {
           case 'low':
@@ -250,16 +253,16 @@ export class GuardDutySystem extends BaseSystem {
     }
 
     // Check for active conflicts
-    if (world.hasComponent(entity.id, 'conflict')) {
-      const conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict');
+    if (entity.hasComponent('conflict')) {
+      const conflict = entity.getComponent('conflict') as ConflictComponent | undefined;
       if (conflict && conflict.state !== 'resolved') {
         threatLevel += 5; // Active combatants are high priority
       }
     }
 
     // Check for dangerous animals
-    if (world.hasComponent(entity.id, 'animal')) {
-      const animal = world.getComponent<AnimalComponent>(entity.id, 'animal');
+    if (entity.hasComponent('animal')) {
+      const animal = entity.getComponent('animal') as AnimalComponent | undefined;
       if (animal && animal.danger >= 5) {
         threatLevel += animal.danger; // Predators are threats
       }
@@ -282,7 +285,7 @@ export class GuardDutySystem extends BaseSystem {
     let detectionChance = duty.alertness;
 
     // Factor in threat's stealth skill (reduces detection chance)
-    const threatCombatStats = world.getComponent<CombatStatsComponent>(threat.entity.id, 'combat_stats');
+    const threatCombatStats = threat.entity.getComponent('combat_stats') as CombatStatsComponent | undefined;
     if (threatCombatStats && threatCombatStats.stealthSkill !== undefined) {
       // Higher stealth reduces detection chance (max 10 skill = -0.5 detection)
       const stealthModifier = threatCombatStats.stealthSkill * 0.05;
@@ -332,11 +335,11 @@ export class GuardDutySystem extends BaseSystem {
     threat: { entity: Entity; distance: number; threatLevel: number }
   ): 'alert_others' | 'intercept' | 'observe' | 'flee' {
     // Get guard's combat skill
-    const guardCombatStats = world.getComponent<CombatStatsComponent>(guard.id, 'combat_stats');
+    const guardCombatStats = guard.getComponent('combat_stats') as CombatStatsComponent | undefined;
     const guardCombatSkill = guardCombatStats?.combatSkill || 5;
 
     // Check threat level from component
-    const threatLevelComp = world.getComponent<ThreatLevelComponent>(threat.entity.id, 'threat_level');
+    const threatLevelComp = threat.entity.getComponent('threat_level') as ThreatLevelComponent | undefined;
     const threatLevelName = threatLevelComp?.level;
 
     // Critical threat and low combat skill -> flee
@@ -400,10 +403,10 @@ export class GuardDutySystem extends BaseSystem {
   }
 
   private propagateAlert(world: World, alertingGuard: Entity, threat: Entity): void {
-    const alertingGuardPos = world.getComponent<PositionComponent>(alertingGuard.id, 'position');
+    const alertingGuardPos = alertingGuard.getComponent('position') as PositionComponent | undefined;
     if (!alertingGuardPos) return;
 
-    const alertingGuardDuty = world.getComponent<GuardDutyComponent>(alertingGuard.id, 'guard_duty');
+    const alertingGuardDuty = alertingGuard.getComponent('guard_duty') as GuardDutyComponent | undefined;
     if (!alertingGuardDuty) return;
 
     // Find other guards within response radius
@@ -412,9 +415,9 @@ export class GuardDutySystem extends BaseSystem {
       if (entity.id === alertingGuard.id) continue;
 
       // Check if entity is a guard
-      if (!world.hasComponent(entity.id, 'guard_duty')) continue;
+      if (!entity.hasComponent('guard_duty')) continue;
 
-      const guardPos = world.getComponent<PositionComponent>(entity.id, 'position');
+      const guardPos = entity.getComponent('position') as PositionComponent | undefined;
       if (!guardPos) continue;
 
       const distance = this.calculateDistance(alertingGuardPos, guardPos);
@@ -444,7 +447,7 @@ export class GuardDutySystem extends BaseSystem {
       return;
     }
 
-    const entityPos = world.getComponent<PositionComponent>(entity.id, 'position');
+    const entityPos = entity.getComponent('position') as PositionComponent | undefined;
     if (!entityPos) {
       return;
     }

@@ -114,7 +114,7 @@ export class InjurySystem extends BaseSystem {
   }
 
   private applySkillPenalties(world: World, entity: Entity, injury: InjuryComponent): void {
-    if (!world.hasComponent(entity.id, 'combat_stats')) return;
+    if (!entity.hasComponent('combat_stats')) return;
 
     const entityImpl = entity as EntityImpl;
     const severityPenalty = injury.severity === 'minor' ? -1 : injury.severity === 'major' ? -2 : -3;
@@ -158,7 +158,7 @@ export class InjurySystem extends BaseSystem {
   }
 
   private applyMovementPenalties(world: World, entity: Entity, injury: InjuryComponent): void {
-    if (!world.hasComponent(entity.id, 'movement')) return;
+    if (!entity.hasComponent('movement')) return;
     if (injury.location !== 'legs' && injury.location !== 'feet') return;
 
     const entityImpl = entity as EntityImpl;
@@ -176,10 +176,10 @@ export class InjurySystem extends BaseSystem {
   }
 
   private applyNeedsModifiers(world: World, entity: Entity, injury: InjuryComponent): void {
-    if (!world.hasComponent(entity.id, 'needs')) return;
+    if (!entity.hasComponent('needs')) return;
 
     const entityImpl = entity as EntityImpl;
-    const needs = world.getComponent<NeedsComponent>(entity.id, 'needs');
+    const needs = entity.getComponent<NeedsComponent>('needs');
     if (!needs) return;
 
     // Calculate rate multipliers based on injury
@@ -209,7 +209,7 @@ export class InjurySystem extends BaseSystem {
 
   private handleMemoryEffects(world: World, entity: Entity, injury: InjuryComponent): void {
     if (injury.location !== 'head') return;
-    if (!world.hasComponent(entity.id, 'episodic_memory')) return;
+    if (!entity.hasComponent('episodic_memory')) return;
 
     const entityImpl = entity as EntityImpl;
 

@@ -229,34 +229,241 @@ function findRealmEntity(world: World, realmId: string): any | undefined {
  * Check if entity meets realm access restrictions
  */
 function checkAccessRestrictions(
-  _entity: any,
+  entity: any,
   realm: RealmComponent,
-  _accessMethod: AccessMethod
+  accessMethod: AccessMethod
 ): { allowed: boolean; reason?: string } {
   for (const restriction of realm.properties.accessRestrictions) {
     switch (restriction.type) {
-      case 'state':
+      case 'state': {
         // Check entity state (e.g., dead_or_sponsored)
-        // For now, we'll allow all state-based access
-        // TODO: Implement proper state checking
-        break;
+        const requirement = restriction.requirement;
 
-      case 'permission':
+        if (requirement === 'dead_or_sponsored') {
+          const isDead = entity.components.has('afterlife');
+          const hasDeathBargain = entity.components.has('death_bargain');
+          const deathBargain = hasDeathBargain
+            ? entity.components.get('death_bargain')
+            : undefined;
+
+          // Allow if dead, or has divine sponsorship (successful death bargain)
+          const sponsored = deathBargain && deathBargain.succeeded === true;
+
+          if (!isDead && !sponsored) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Must be dead or divinely sponsored',
+            };
+          }
+        } else if (requirement === 'pure_of_heart') {
+          // Check moral alignment or spiritual purity
+          const spiritual = entity.components.get('spiritual');
+          if (spiritual && spiritual.sin > 0.5) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Only the virtuous may enter',
+            };
+          }
+        }
+        break;
+      }
+
+      case 'permission': {
         // Check if entity has permission (e.g., divine_invitation)
-        // TODO: Implement permission checking
-        break;
+        const requirement = restriction.requirement;
 
-      case 'identity':
-      case 'action':
-      case 'knowledge':
-      case 'time':
-        // Other restriction types - not yet implemented
-        // TODO: Implement these restriction types
+        if (requirement === 'divine_invitation') {
+          // Check for divine invitation via death_bargain or deity component
+          const hasDeathBargain = entity.components.has('death_bargain');
+          const deathBargain = hasDeathBargain
+            ? entity.components.get('death_bargain')
+            : undefined;
+
+          // Check for successful bargain or divine marking
+          const hasInvitation =
+            (deathBargain && deathBargain.succeeded === true) ||
+            entity.components.has('deity') ||
+            (entity.components.has('tags') &&
+              entity.components.get('tags').tags.includes('divinely_invited'));
+
+          if (!hasInvitation) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Requires divine invitation',
+            };
+          }
+        } else if (requirement.startsWith('realm_permission:')) {
+          // Check for specific realm permission token
+          const permissionType = requirement.substring('realm_permission:'.length);
+          const tags = entity.components.get('tags');
+
+          if (!tags || !tags.tags.includes(`realm_access:${permissionType}`)) {
+            return {
+              allowed: false,
+              reason: restriction.description || `Requires permission: ${permissionType}`,
+            };
+          }
+        }
         break;
+      }
+
+      case 'identity': {
+        // Check entity identity requirements (species, deity status, etc.)
+        const requirement = restriction.requirement;
+
+        if (requirement === 'deity_only') {
+          if (!entity.components.has('deity')) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Only divine beings may enter',
+            };
+          }
+        } else if (requirement === 'spirit_only') {
+          if (!entity.components.has('spirit')) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Only spirits may enter',
+            };
+          }
+        } else if (requirement.startsWith('species:')) {
+          const requiredSpecies = requirement.substring('species:'.length);
+          const species = entity.components.get('species');
+          if (!species || species.name !== requiredSpecies) {
+            return {
+              allowed: false,
+              reason: restriction.description || `Only ${requiredSpecies} may enter`,
+            };
+          }
+        }
+        break;
+      }
+
+      case 'action': {
+        // Check if entity performed required action
+        const requirement = restriction.requirement;
+
+        if (requirement.startsWith('completed_quest:')) {
+          const questId = requirement.substring('completed_quest:'.length);
+          const tags = entity.components.get('tags');
+
+          if (!tags || !tags.tags.includes(`quest_completed:${questId}`)) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Must complete required quest',
+            };
+          }
+        } else if (requirement === 'ritual_performed') {
+          // Check if entity has performed the entry ritual (tracked via tags or memory)
+          const memory = entity.components.get('semantic_memory');
+          if (!memory || !memory.memories.some((m: any) => m.includes('performed realm entry ritual'))) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Must perform entry ritual first',
+            };
+          }
+        }
+        break;
+      }
+
+      case 'knowledge': {
+        // Check if entity knows required information
+        const requirement = restriction.requirement;
+
+        if (requirement === 'knows_true_name') {
+          // Check if entity knows realm ruler's true name
+          const memory = entity.components.get('semantic_memory');
+          if (!memory || !memory.memories.some((m: any) => m.includes(`true name of ${realm.properties.name}`))) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Must know the true name to enter',
+            };
+          }
+        } else if (requirement.startsWith('knows_secret:')) {
+          const secretId = requirement.substring('knows_secret:'.length);
+          const tags = entity.components.get('tags');
+
+          if (!tags || !tags.tags.includes(`secret_known:${secretId}`)) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Must know the secret',
+            };
+          }
+        }
+        break;
+      }
+
+      case 'time': {
+        // Check time-based restrictions
+        const requirement = restriction.requirement;
+        const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
+
+        if (requirement === 'first_visit_only' && realmLocation) {
+          const tags = entity.components.get('tags');
+          if (tags && tags.tags.includes(`visited_realm:${realm.properties.id}`)) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Can only enter once',
+            };
+          }
+        } else if (requirement.startsWith('time_of_day:')) {
+          const timeOfDay = requirement.substring('time_of_day:'.length);
+          const timeEntity = findTimeEntity(entity.world);
+          if (timeEntity) {
+            const time = timeEntity.components.get('time');
+            const currentHour = time ? time.hour : 12;
+
+            // Simple day/night check
+            const isDay = currentHour >= 6 && currentHour < 18;
+            const isNight = !isDay;
+
+            if (timeOfDay === 'day' && !isDay) {
+              return {
+                allowed: false,
+                reason: restriction.description || 'Can only enter during daytime',
+              };
+            } else if (timeOfDay === 'night' && !isNight) {
+              return {
+                allowed: false,
+                reason: restriction.description || 'Can only enter at night',
+              };
+            }
+          }
+        } else if (requirement.startsWith('after_tick:')) {
+          const requiredTick = parseInt(requirement.substring('after_tick:'.length), 10);
+          if (realm.currentTick < requiredTick) {
+            return {
+              allowed: false,
+              reason: restriction.description || 'Not yet time to enter',
+            };
+          }
+        }
+        break;
+      }
+
+      default:
+        // Unknown restriction type - deny access by default (fail-safe)
+        console.error(`[RealmTransition] Unknown restriction type: ${restriction.type}`);
+        return {
+          allowed: false,
+          reason: `Unknown restriction type: ${restriction.type}`,
+        };
     }
   }
 
   return { allowed: true };
+}
+
+/**
+ * Helper to find time entity (singleton)
+ */
+function findTimeEntity(world: any): any | undefined {
+  const entities = world.query().executeEntities();
+  for (const entity of entities) {
+    if (entity.components.has('time')) {
+      return entity;
+    }
+  }
+  return undefined;
 }
 
 /**
