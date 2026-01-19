@@ -64,6 +64,9 @@ export class InventoryUI {
   // Hover state
   private hoveredSlot: SlotReference | null = null;
 
+  // Quick bar assignments (slot index 0-9 -> backpack slot index)
+  private quickBarAssignments: (number | null)[] = [null, null, null, null, null, null, null, null, null, null];
+
   constructor(_canvas: HTMLCanvasElement, world: World) {
     this.world = world;
 
@@ -744,8 +747,43 @@ export class InventoryUI {
         ctx.fillText(keyLabel, slotX + slotSize / 2, quickBarSlotY + slotSize - 4);
       }
 
-      // TODO: Draw quick bar item if assigned
-      // For now, just show empty slots
+      // Draw quick bar item if assigned
+      const assignedBackpackSlot = this.quickBarAssignments[i];
+      if (assignedBackpackSlot !== null && this.playerInventory && assignedBackpackSlot < this.playerInventory.slots.length) {
+        const slot = this.playerInventory.slots[assignedBackpackSlot];
+        if (slot && slot.itemId && slot.quantity > 0) {
+          // Draw item icon (simplified - just text for now)
+          ctx.fillStyle = '#FFD700';
+          ctx.font = 'bold 12px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(slot.itemId.substring(0, 4).toUpperCase(), slotX + slotSize / 2, quickBarSlotY + slotSize / 2 - 6);
+
+          // Draw quantity
+          ctx.fillStyle = '#FFF';
+          ctx.font = '10px monospace';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          ctx.fillText(slot.quantity.toString(), slotX + slotSize - 4, quickBarSlotY + 4);
+
+          // Draw quality badge if present
+          if (slot.quality !== undefined) {
+            const qualityTier = getQualityTier(slot.quality);
+            const qualityColor = getQualityColor(qualityTier);
+
+            // Draw quality indicator in top-left corner
+            ctx.fillStyle = qualityColor;
+            ctx.beginPath();
+            ctx.arc(slotX + 6, quickBarSlotY + 6, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Add border to quality dot
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
     }
 
     // Render tooltip if hovering over item
@@ -913,8 +951,70 @@ export class InventoryUI {
       }
     }
 
-    // TODO: Check equipment slots (not implemented yet)
-    // TODO: Check quick bar slots (not implemented yet)
+    // Check equipment slots
+    const equipmentX = panelX + 20;
+    const equipSlotY = sectionY + 30;
+    const equipSlotSize = 36;
+    const equipSlotSpacing = 4;
+    const previewWidth = 80;
+    const previewX = equipmentX + 70;
+
+    const leftSlots = ['head', 'chest', 'legs', 'feet', 'hands'];
+    const rightSlots = ['main_hand', 'off_hand', 'back', 'neck', 'ring_left', 'ring_right'];
+
+    // Check left column equipment slots
+    for (let i = 0; i < leftSlots.length; i++) {
+      const slotName = leftSlots[i];
+      if (!slotName) continue;
+
+      const slotX = equipmentX;
+      const slotY = equipSlotY + i * (equipSlotSize + equipSlotSpacing);
+
+      if (
+        x >= slotX &&
+        x <= slotX + equipSlotSize &&
+        y >= slotY &&
+        y <= slotY + equipSlotSize
+      ) {
+        return { type: 'equipment', slot: slotName };
+      }
+    }
+
+    // Check right column equipment slots
+    for (let i = 0; i < rightSlots.length; i++) {
+      const slotName = rightSlots[i];
+      if (!slotName) continue;
+
+      const slotX = previewX + previewWidth + 10;
+      const slotY = equipSlotY + i * (equipSlotSize + equipSlotSpacing);
+
+      if (
+        x >= slotX &&
+        x <= slotX + equipSlotSize &&
+        y >= slotY &&
+        y <= slotY + equipSlotSize
+      ) {
+        return { type: 'equipment', slot: slotName };
+      }
+    }
+
+    // Check quick bar slots
+    const quickBarY = panelY + panelHeight - 80;
+    const quickBarStartX = panelX + (panelWidth - (10 * (slotSize + spacing))) / 2;
+    const quickBarSlotY = quickBarY + 25;
+
+    for (let i = 0; i < 10; i++) {
+      const slotX = quickBarStartX + i * (slotSize + spacing);
+
+      if (
+        x >= slotX &&
+        x <= slotX + slotSize &&
+        y >= quickBarSlotY &&
+        y <= quickBarSlotY + slotSize
+      ) {
+        return { type: 'quickbar', index: i };
+      }
+    }
 
     return null;
   }
@@ -922,4 +1022,58 @@ export class InventoryUI {
   // Store last canvas dimensions for slot position calculations
   private lastCanvasWidth: number = 0;
   private lastCanvasHeight: number = 0;
+
+  /**
+   * Assign a backpack slot to a quick bar slot
+   * @param quickBarIndex Quick bar slot (0-9)
+   * @param backpackSlotIndex Backpack slot index to assign
+   */
+  public assignQuickBarSlot(quickBarIndex: number, backpackSlotIndex: number): void {
+    if (quickBarIndex < 0 || quickBarIndex >= 10) {
+      throw new Error(`InventoryUI.assignQuickBarSlot: quickBarIndex ${quickBarIndex} out of range (0-9)`);
+    }
+
+    if (!this.playerInventory) {
+      throw new Error('InventoryUI.assignQuickBarSlot: no inventory set');
+    }
+
+    if (backpackSlotIndex < 0 || backpackSlotIndex >= this.playerInventory.slots.length) {
+      throw new Error(`InventoryUI.assignQuickBarSlot: backpackSlotIndex ${backpackSlotIndex} out of range`);
+    }
+
+    this.quickBarAssignments[quickBarIndex] = backpackSlotIndex;
+  }
+
+  /**
+   * Unassign a quick bar slot
+   * @param quickBarIndex Quick bar slot (0-9)
+   */
+  public unassignQuickBarSlot(quickBarIndex: number): void {
+    if (quickBarIndex < 0 || quickBarIndex >= 10) {
+      throw new Error(`InventoryUI.unassignQuickBarSlot: quickBarIndex ${quickBarIndex} out of range (0-9)`);
+    }
+
+    this.quickBarAssignments[quickBarIndex] = null;
+  }
+
+  /**
+   * Get backpack slot assigned to a quick bar slot
+   * @param quickBarIndex Quick bar slot (0-9)
+   * @returns Backpack slot index or null if not assigned
+   */
+  public getQuickBarAssignment(quickBarIndex: number): number | null {
+    if (quickBarIndex < 0 || quickBarIndex >= 10) {
+      throw new Error(`InventoryUI.getQuickBarAssignment: quickBarIndex ${quickBarIndex} out of range (0-9)`);
+    }
+
+    return this.quickBarAssignments[quickBarIndex];
+  }
+
+  /**
+   * Get all quick bar assignments
+   * @returns Array of backpack slot indices (null = not assigned)
+   */
+  public getQuickBarAssignments(): (number | null)[] {
+    return [...this.quickBarAssignments];
+  }
 }

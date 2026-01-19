@@ -54,7 +54,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Simulate 20 ticks (1 second at 20 TPS)
     for (let i = 0; i < 20; i++) {
-      (world as any)._tick++;
+      world.advanceTick();
       realityAnchorSystem.update(world);
     }
 
@@ -99,7 +99,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Simulate 20 ticks
     for (let i = 0; i < 20; i++) {
-      (world as any)._tick++;
+      world.advanceTick();
       realityAnchorSystem.update(world);
     }
 
@@ -141,7 +141,7 @@ describe('RealityAnchorSystem Integration', () => {
     expect(anchorPower.isPowered).toBe(true);
 
     // Simulate 20 ticks
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify field remains active
@@ -170,7 +170,7 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     // Run system
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify field collapsed
@@ -200,7 +200,7 @@ describe('RealityAnchorSystem Integration', () => {
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
 
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
     eventBus.flush();
 
@@ -236,7 +236,7 @@ describe('RealityAnchorSystem Integration', () => {
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
 
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify field collapse event and gods released
@@ -291,7 +291,7 @@ describe('RealityAnchorSystem Integration', () => {
     powerGridSystem.update(world, powerEntities, 1);
 
     // Run Reality Anchor system
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify field collapsed, god restored
@@ -333,7 +333,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Verify separate networks, not powered
     expect(anchorPower.isPowered).toBe(false);
 
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Should not charge
@@ -357,7 +357,7 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     // Should not crash
-    (world as any)._tick = 20;
+    world.setTick(20);
     expect(() => realityAnchorSystem.update(world)).not.toThrow();
 
     // Should not charge
@@ -386,7 +386,7 @@ describe('RealityAnchorSystem Integration', () => {
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
 
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify event emitted
@@ -433,7 +433,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Should have partial power
     expect(anchorPower.efficiency).toBe(0.5);
 
-    (world as any)._tick = 20;
+    world.setTick(20);
     realityAnchorSystem.update(world);
 
     // Verify partial power warning emitted

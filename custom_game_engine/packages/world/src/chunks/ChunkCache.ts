@@ -248,9 +248,17 @@ export function clearChunkCache(cache: ChunkCache): void {
  * Call this after adding/removing entities or when dirty flag is set
  *
  * @param cache - Chunk cache
- * @param world - World instance (needed to query entity components for building types)
+ * @param world - World instance (needed to query entity components and simulation modes)
  */
-export function recalculateChunkStats(cache: ChunkCache, world?: { getEntity(id: string): { components: Map<string, unknown> } | undefined }): void {
+export function recalculateChunkStats(
+  cache: ChunkCache,
+  world?: {
+    getEntity(id: string): { id: string; components: Map<string, unknown> } | undefined;
+    simulationScheduler?: {
+      isAlwaysActive?(entity: { id: string; components: Map<string, unknown> }): boolean;
+    };
+  }
+): void {
   let totalEntities = 0;
   const entityTypes = {
     agents: 0,
@@ -262,6 +270,13 @@ export function recalculateChunkStats(cache: ChunkCache, world?: { getEntity(id:
   // Clear previous Maps
   const buildingTypes = new Map<string, number>();
   const pendingBuilds = new Map<string, number>();
+
+  // Track actual simulation modes by querying SimulationScheduler
+  const simulationModeCounts = {
+    always: 0,
+    proximity: 0,
+    passive: 0, // PASSIVE entities are not indexed, so this should always be 0
+  };
 
   for (const [componentType, entities] of cache.entityIndex) {
     totalEntities += entities.size;
@@ -306,15 +321,35 @@ export function recalculateChunkStats(cache: ChunkCache, world?: { getEntity(id:
     }
   }
 
+  // Query actual simulation modes from SimulationScheduler
+  // This provides accurate simulation mode counts instead of assumptions
+  if (world?.simulationScheduler?.isAlwaysActive) {
+    // Count entities by their actual simulation mode
+    for (const [_, entities] of cache.entityIndex) {
+      for (const entityId of entities) {
+        const entity = world.getEntity(entityId);
+        if (!entity) continue;
+
+        // Check if entity is ALWAYS mode using SimulationScheduler
+        const isAlways = world.simulationScheduler.isAlwaysActive(entity);
+        if (isAlways) {
+          simulationModeCounts.always++;
+        } else {
+          // Not ALWAYS means PROXIMITY (PASSIVE entities are not indexed)
+          simulationModeCounts.proximity++;
+        }
+      }
+    }
+  } else {
+    // Fallback: Use component-based heuristics if SimulationScheduler not available
+    // This ensures backward compatibility with tests or environments without scheduler
+    simulationModeCounts.always = entityTypes.agents + entityTypes.buildings;
+    simulationModeCounts.proximity = entityTypes.plants + entityTypes.animals;
+  }
+
   cache.stats = {
     totalEntities,
-    simulationModes: {
-      // TODO: Query actual simulation modes from SimulationScheduler
-      // For now, assume agents/buildings = ALWAYS, plants/animals = PROXIMITY
-      always: entityTypes.agents + entityTypes.buildings,
-      proximity: entityTypes.plants + entityTypes.animals,
-      passive: 0, // PASSIVE entities are not indexed
-    },
+    simulationModes: simulationModeCounts,
     entityTypes,
     buildingTypes,
     pendingBuilds,

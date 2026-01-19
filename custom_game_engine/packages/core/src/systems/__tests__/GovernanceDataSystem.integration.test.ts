@@ -27,7 +27,7 @@ describe('GovernanceDataSystem Integration', () => {
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
-    (world as any)._tick = TEST_TICK; // Set world tick to pass throttle
+    world.setTick(TEST_TICK); // Set world tick to pass throttle
     system = new GovernanceDataSystem();
     system.initialize(world, eventBus);
   });
@@ -98,7 +98,7 @@ describe('GovernanceDataSystem Integration', () => {
       // Create agent with identity FIRST (must exist before death event)
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createIdentityComponent('TestAgent', 5, 0));
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create TownHall
       const townHall = new EntityImpl(createEntityId(), 0);
@@ -234,7 +234,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-      (world as any)._addEntity(healthyAgent);
+      world.addEntity(healthyAgent);
 
       // Create sick agent (hunger=50, energy=50)
       const sickAgent = new EntityImpl(createEntityId(), 0);
@@ -246,7 +246,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-      (world as any)._addEntity(sickAgent);
+      world.addEntity(sickAgent);
 
       // Create critical agent (hunger=20, energy=20)
       const criticalAgent = new EntityImpl(createEntityId(), 0);
@@ -258,7 +258,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-      (world as any)._addEntity(criticalAgent);
+      world.addEntity(criticalAgent);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -301,7 +301,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-      (world as any)._addEntity(healthyAgent);
+      world.addEntity(healthyAgent);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -414,7 +414,7 @@ describe('GovernanceDataSystem Integration', () => {
       // Create agent with identity
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createIdentityComponent('TestAgent', 5, 0));
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Spy on console.error
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -440,7 +440,7 @@ describe('GovernanceDataSystem Integration', () => {
       // Create agent with identity
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createIdentityComponent('TestAgent', 5, 0));
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Spy on console.error
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -463,7 +463,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should log error when agent missing identity component for death recording', () => {
       // Create agent WITHOUT identity
       const agent = new EntityImpl(createEntityId(), 0);
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Spy on console.error
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -490,14 +490,14 @@ describe('GovernanceDataSystem Integration', () => {
       const townHall1 = new EntityImpl(createEntityId(), 0);
       townHall1.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall1.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall1);
+      world.addEntity(townHall1);
 
       const townHall2 = new EntityImpl(createEntityId(), 0);
       const building2 = createBuildingComponent(BuildingType.TownHall, 1, 100);
       building2.condition = 60; // Damaged
       townHall2.addComponent(building2);
       townHall2.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall2);
+      world.addEntity(townHall2);
 
       // Create agents
       for (let i = 0; i < 3; i++) {

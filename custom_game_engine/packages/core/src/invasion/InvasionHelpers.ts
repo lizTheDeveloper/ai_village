@@ -137,22 +137,106 @@ export function getDefenseTechLevel(world: World): number {
 // ============================================================================
 
 /**
- * Get all systems in universe (placeholder - actual implementation would query star systems)
+ * Get all planets in universe
+ * Planets are the strategic entities in the game (not star systems)
+ * PERF: Direct array conversion from Map.keys()
  */
-export function getAllSystems(_world: World): string[] {
-  // TODO: Query actual star system entities when implemented
-  // For now, return placeholder systems
-  return ['system_alpha', 'system_beta', 'system_gamma', 'system_delta', 'system_epsilon'];
+export function getAllSystems(world: World): string[] {
+  // Query all planets registered in the world
+  const planets = world.getAllPlanets();
+  return planets.map((planet) => planet.id);
+}
+
+/**
+ * Calculate strategic value of a planet
+ * Based on: population, resource stockpiles, production capacity
+ * Higher value = more attractive invasion target
+ *
+ * @param world - World to query
+ * @param planetId - Planet to evaluate
+ * @returns Strategic value score (0-1000+)
+ */
+function calculatePlanetStrategicValue(world: World, planetId: string): number {
+  let value = 0;
+
+  // Population value (0-500 points)
+  // Query town halls and census bureaus for population data
+  const townHalls = world.query().with(CT.TownHall).executeEntities();
+  for (const entity of townHalls) {
+    const townHall = entity.getComponent(CT.TownHall);
+    if (!townHall) continue;
+
+    // Check if this town hall is on the target planet
+    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    if (planetLoc && planetLoc.currentPlanetId === planetId) {
+      // Population score: log scale, max 500 points for 10,000+ population
+      const popScore = Math.min(500, Math.log10(townHall.populationCount + 1) * 125);
+      value += popScore;
+    }
+  }
+
+  // Resource value (0-300 points)
+  // Query warehouses for resource stockpiles
+  const warehouses = world.query().with(CT.Warehouse).executeEntities();
+  for (const entity of warehouses) {
+    const warehouse = entity.getComponent(CT.Warehouse);
+    if (!warehouse) continue;
+
+    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    if (planetLoc && planetLoc.currentPlanetId === planetId) {
+      // Calculate total resource value (sum of all stockpiles)
+      let totalResources = 0;
+      for (const resource in warehouse.stockpiles) {
+        totalResources += warehouse.stockpiles[resource] ?? 0;
+      }
+      // Resource score: capped at 300 points
+      const resourceScore = Math.min(300, totalResources / 10);
+      value += resourceScore;
+    }
+  }
+
+  // Production capability value (0-200 points)
+  // Query production capability components
+  const productionEntities = world.query().with(CT.ProductionCapability).executeEntities();
+  for (const entity of productionEntities) {
+    const production = entity.getComponent(CT.ProductionCapability);
+    if (!production) continue;
+
+    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    if (planetLoc && planetLoc.currentPlanetId === planetId) {
+      // Production score based on tier and multiplier
+      const tierValue = production.tier * 40; // 0-160 points
+      const multiplierValue = Math.min(40, Math.log10(production.totalMultiplier + 1) * 10);
+      value += tierValue + multiplierValue;
+    }
+  }
+
+  return value;
 }
 
 /**
  * Get strategic systems (high-value targets)
+ * Sorted by strategic value (population, resources, production)
+ * PERF: Single-pass evaluation with sort
  */
-export function getStrategicSystems(_world: World): string[] {
-  // TODO: Filter systems by strategic value (population, resources, etc.)
-  // For now, return first 3 systems
-  const allSystems = getAllSystems(_world);
-  return allSystems.slice(0, 3);
+export function getStrategicSystems(world: World): string[] {
+  const allPlanets = getAllSystems(world);
+
+  // Early exit if no planets
+  if (allPlanets.length === 0) return [];
+
+  // Calculate strategic value for each planet
+  const planetValues: Array<{ id: string; value: number }> = [];
+  for (const planetId of allPlanets) {
+    const value = calculatePlanetStrategicValue(world, planetId);
+    planetValues.push({ id: planetId, value });
+  }
+
+  // Sort by value descending
+  planetValues.sort((a, b) => b.value - a.value);
+
+  // Return top strategic targets (up to 5)
+  return planetValues.slice(0, 5).map((pv) => pv.id);
 }
 
 // ============================================================================
@@ -298,13 +382,64 @@ export function calculateDependency(techPackage: {
 
 /**
  * Calculate industrial collapse from trade dominance
- * PERF: Simplified calculation with early exit
+ * Based on ratio of import volume to local production capacity
+ * Higher ratio = more dependency = more industrial collapse
+ *
+ * Formula:
+ * - importDependency = totalImports / localProduction
+ * - collapse = min(0.95, importDependency * 0.7)
+ *
+ * PERF: Direct calculation, no allocations
+ *
+ * @param poorCivId - ID of the civilization being economically dominated
+ * @param tradeAgreement - Trade agreement data (TradeAgreement from TradeAgreementTypes)
+ * @returns Industrial collapse level (0-1, where 1 = total collapse)
  */
 export function calculateIndustrialCollapse(
-  _poorCivId: string,
-  _tradeAgreement: unknown
+  poorCivId: string,
+  tradeAgreement: any
 ): number {
-  // TODO: Implement based on trade volume vs local production capacity
-  // For now, return moderate collapse
-  return 0.6;
+  // Type guard for trade agreement structure
+  if (!tradeAgreement || typeof tradeAgreement !== 'object') {
+    return 0; // No valid agreement = no collapse
+  }
+
+  // Extract trade flows (from TradeAgreementTypes.ts structure)
+  const flows = tradeAgreement.tradeFlows;
+  if (!Array.isArray(flows) || flows.length === 0) {
+    return 0; // No trade flows = no collapse
+  }
+
+  // Calculate total imports for poor civilization
+  let totalImports = 0;
+  for (const flow of flows) {
+    if (!flow || typeof flow !== 'object') continue;
+
+    // Count imports (where poorCiv is the 'to' party)
+    if (flow.to === poorCivId) {
+      const quantity = flow.quantity ?? 0;
+      totalImports += quantity;
+    }
+  }
+
+  // Early exit if no imports
+  if (totalImports === 0) return 0;
+
+  // Estimate local production capacity
+  // Use trade agreement terms to infer local capacity
+  // If they're importing heavily, local production is likely low
+  const terms = tradeAgreement.terms;
+  const agreedVolume = terms?.totalVolume ?? totalImports;
+
+  // Calculate import dependency ratio
+  // We assume local production would normally cover agreedVolume
+  // Actual imports exceeding this indicate dependency
+  const importDependency = totalImports / Math.max(1, agreedVolume);
+
+  // Convert to collapse level
+  // 0.7 multiplier prevents unrealistic total collapse
+  // Cap at 0.95 (always leave some local industry)
+  const collapse = Math.min(0.95, importDependency * 0.7);
+
+  return collapse;
 }

@@ -513,11 +513,145 @@ export class PromptRenderer {
   }
 
   /**
-   * Get available actions from behavior schemas (future implementation)
-   * This will introspect behavior components to generate action lists
+   * Get available actions from behavior registry
+   *
+   * Introspects the behavior registry to generate a list of actions this agent can perform.
+   * Filters based on:
+   * - Skills component (if present) - uses getAvailableActions from SkillsComponent
+   * - Behavior registry metadata (descriptions)
+   *
+   * @param entity - Entity with components map
+   * @param behaviorRegistry - Optional behavior registry to introspect
+   * @returns Array of action strings with descriptions
    */
-  static renderAvailableActions(entity: { components: Map<string, any> }): string[] {
-    // TODO: Implement behavior introspection in Phase 5
-    return [];
+  static renderAvailableActions(
+    entity: { components: Map<string, any> },
+    behaviorRegistry?: any
+  ): string[] {
+    const actions: string[] = [];
+
+    // If no behavior registry provided, return empty array
+    if (!behaviorRegistry) {
+      return actions;
+    }
+
+    // Get skills component to filter skill-based actions
+    const skills = entity.components.get('skills');
+    const skillLevels = skills?.levels ?? {};
+
+    // Get all registered behaviors from the registry
+    const registeredBehaviors = behaviorRegistry.getRegisteredBehaviors?.() ?? [];
+
+    for (const behaviorName of registeredBehaviors) {
+      const meta = behaviorRegistry.get?.(behaviorName);
+
+      if (!meta) continue;
+
+      // Check if this behavior requires skills that the agent doesn't have
+      if (!this.canPerformBehavior(behaviorName, skillLevels)) {
+        continue;
+      }
+
+      // Format action with description if available
+      if (meta.description) {
+        actions.push(`${behaviorName}: ${meta.description}`);
+      } else {
+        actions.push(behaviorName);
+      }
+    }
+
+    return actions;
+  }
+
+  /**
+   * Check if agent has required skills for a behavior.
+   * Implements progressive skill reveal logic from SkillsComponent.
+   */
+  private static canPerformBehavior(behaviorName: string, skills: Record<string, number>): boolean {
+    // Universal actions - always available
+    const universalActions = new Set([
+      'wander', 'idle', 'rest', 'sleep', 'seek_sleep', 'forced_sleep',
+      'eat', 'drink', 'talk', 'follow', 'follow_agent', 'gather',
+      'pick', 'harvest', 'seek_food', 'deposit_items', 'flee_to_home',
+      'approach', 'observe', 'explore', 'flee_danger', 'seek_water',
+      'seek_shelter', 'seek_warmth', 'seek_cooling', 'navigate',
+      'call_meeting', 'attend_meeting', 'player_controlled'
+    ]);
+
+    if (universalActions.has(behaviorName)) {
+      return true;
+    }
+
+    // Skill-gated actions
+    const farmingLevel = skills.farming ?? 0;
+    const cookingLevel = skills.cooking ?? 0;
+    const craftingLevel = skills.crafting ?? 0;
+    const buildingLevel = skills.building ?? 0;
+    const animalHandlingLevel = skills.animal_handling ?? 0;
+    const medicineLevel = skills.medicine ?? 0;
+    const combatLevel = skills.combat ?? 0;
+    const magicLevel = skills.magic ?? 0;
+
+    // Farming actions (level 1+)
+    if (['plant', 'till', 'farm', 'water', 'fertilize'].includes(behaviorName)) {
+      return farmingLevel >= 1;
+    }
+
+    // Cooking actions (level 1+)
+    if (['cook'].includes(behaviorName)) {
+      return cookingLevel >= 1;
+    }
+
+    // Crafting actions (level 1+)
+    if (['craft'].includes(behaviorName)) {
+      return craftingLevel >= 1;
+    }
+
+    // Building actions (level 1+)
+    if (['build', 'plan_build', 'tile_build', 'material_transport', 'repair', 'upgrade'].includes(behaviorName)) {
+      return buildingLevel >= 1;
+    }
+
+    // Animal handling (level 2+)
+    if (['tame_animal', 'house_animal', 'butcher'].includes(behaviorName)) {
+      return animalHandlingLevel >= 2;
+    }
+
+    // Medicine (level 2+)
+    if (['heal'].includes(behaviorName)) {
+      return medicineLevel >= 2;
+    }
+
+    // Combat and hunting (level 1+)
+    if (['initiate_combat', 'hunt'].includes(behaviorName)) {
+      return combatLevel >= 1;
+    }
+
+    // Magic (level 1+)
+    if (['cast_spell', 'pray', 'meditate', 'group_pray'].includes(behaviorName)) {
+      return magicLevel >= 1;
+    }
+
+    // Research and specialized behaviors (level 2+)
+    if (['research'].includes(behaviorName)) {
+      return (skills.research ?? 0) >= 2;
+    }
+
+    // Trade (level 1+)
+    if (['trade'].includes(behaviorName)) {
+      return (skills.trade ?? 0) >= 1;
+    }
+
+    // Special behaviors - always allow (queue management, goals, etc.)
+    if ([
+      'set_priorities', 'set_personal_goal', 'set_medium_term_goal',
+      'set_group_goal', 'sleep_until_queue_complete', 'follow_reporting_target',
+      'explore_frontier', 'explore_spiral', 'follow_gradient', 'work', 'help'
+    ].includes(behaviorName)) {
+      return true;
+    }
+
+    // Default: allow if we don't recognize it (assume it's a custom behavior)
+    return true;
   }
 }

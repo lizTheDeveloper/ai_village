@@ -6,11 +6,11 @@
  */
 
 import type { IWindowPanel } from './IWindowPanel.js';
-import type { VersionedEntity } from '@ai-village/persistence';
 import type {
   UniverseSnapshotMessage,
   UniverseTickUpdate,
   Bounds,
+  VersionedEntity,
 } from '@ai-village/core';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { renderSprite } from './SpriteRenderer.js';
@@ -482,7 +482,7 @@ export class RemoteUniverseView implements IWindowPanel {
     // Final fallback: colored square based on entity type
     if (!rendered) {
       const hasComponent = (type: string): boolean =>
-        entity.components.some((c) => c.type === type);
+        entity.components.some((c: any) => c.type === type);
 
       let color = '#888';
       if (hasComponent('agent')) {

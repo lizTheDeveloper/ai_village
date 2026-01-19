@@ -149,7 +149,10 @@ export class WorldSerializer {
       zoneManager.deserializeZones(snapshot.worldState.zones);
     }
 
-    // TODO: Deserialize weather, buildings
+    // NOTE: Weather and buildings are already deserialized through entity system (lines 125-133)
+    // - Weather: Stored as 'weather' component on entities (registered in serializers/index.ts)
+    // - Buildings: Stored as 'building' component on entities + tile data in terrain chunks
+    // Both use generic serializers and are restored when entities are added to world
 
   }
 
