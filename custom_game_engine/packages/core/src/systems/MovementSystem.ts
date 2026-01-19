@@ -18,6 +18,7 @@ import { addSpatialMemory } from '../components/SpatialMemoryComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
 import { getPartsByFunction } from '../components/BodyComponent.js';
+import { vector2DPool } from '../utils/CommonPools.js';
 
 
 interface TimeComponent {
@@ -68,7 +69,6 @@ export class MovementSystem extends BaseSystem {
   private lastDiscoveryCheck: Map<string, number> = new Map();
 
   // Performance: Reusable objects for collision calculations (zero allocations in hot path)
-  private readonly workingPerpendicular = { x1: 0, y1: 0, x2: 0, y2: 0 };
   private readonly workingPosition = { x: 0, y: 0 };
 
   // Performance: Precomputed collision constants
@@ -264,16 +264,19 @@ export class MovementSystem extends BaseSystem {
       // Check for hard collisions (buildings) - these block completely
       if (this.hasHardCollision(ctx.world, entity.id, newX, newY)) {
         // Try perpendicular directions to slide along walls
-        // Performance: Use reusable working object to avoid allocations
-        this.workingPerpendicular.x1 = -deltaY;
-        this.workingPerpendicular.y1 = deltaX;
-        this.workingPerpendicular.x2 = deltaY;
-        this.workingPerpendicular.y2 = -deltaX;
+        // Performance: Use pooled vectors to avoid allocations
+        const perp1 = vector2DPool.acquire();
+        const perp2 = vector2DPool.acquire();
 
-        const alt1X = position.x + this.workingPerpendicular.x1;
-        const alt1Y = position.y + this.workingPerpendicular.y1;
-        const alt2X = position.x + this.workingPerpendicular.x2;
-        const alt2Y = position.y + this.workingPerpendicular.y2;
+        perp1.x = -deltaY;
+        perp1.y = deltaX;
+        perp2.x = deltaY;
+        perp2.y = -deltaX;
+
+        const alt1X = position.x + perp1.x;
+        const alt1Y = position.y + perp1.y;
+        const alt2X = position.x + perp2.x;
+        const alt2Y = position.y + perp2.y;
 
         if (!this.hasHardCollision(ctx.world, entity.id, alt1X, alt1Y)) {
           this.updatePosition(impl, alt1X, alt1Y, ctx.world);
@@ -283,6 +286,9 @@ export class MovementSystem extends BaseSystem {
           // Completely blocked by buildings - stop
           this.stopEntity(impl, velocity);
         }
+
+        vector2DPool.release(perp1);
+        vector2DPool.release(perp2);
       } else {
         // Check for soft collisions (other agents) - these slow but don't block
         const softCollisionPenalty = this.getSoftCollisionPenalty(ctx.world, entity.id, newX, newY);
