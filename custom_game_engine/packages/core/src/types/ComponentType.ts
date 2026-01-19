@@ -45,6 +45,7 @@ export enum ComponentType {
   Goals = 'goals',
   Reflection = 'reflection',
   Personality = 'personality',
+  KnowledgeLoss = 'knowledge_loss',  // Singleton: tracks lost knowledge from deaths
 
   // Skills & Actions
   Skills = 'skills',
@@ -145,10 +146,15 @@ export enum ComponentType {
   Weather = 'weather',
   Vision = 'vision',
   Passage = 'passage',
+  PassageExtended = 'passage_extended',  // Multiverse: extended passage metadata for inter-universe travel
 
   // Universe Metadata (Conservation of Game Matter)
   ProtoReality = 'proto_reality',
   CorruptedUniverse = 'corrupted_universe',
+  UniverseForkMetadata = 'universe_fork_metadata',  // Multiverse: timeline forking and divergence
+  DivergenceTracking = 'divergence_tracking',       // Multiverse: track timeline differences
+  CanonEvent = 'canon_event',                       // Multiverse: narrative anchors that resist change
+  MergeCompatibility = 'merge_compatibility',       // Multiverse: timeline merge compatibility tracking
 
   // World-level Registries
   NamedLandmarks = 'named_landmarks',
@@ -171,6 +177,8 @@ export enum ComponentType {
   RealityAnchor = 'reality_anchor',
   RebellionThreshold = 'rebellion_threshold',
   SupremeCreator = 'supreme_creator',
+  PowerVacuum = 'power_vacuum',     // Tracks vacant positions of authority
+  PositionHolder = 'position_holder', // Marks entities holding positions of power
 
   // Combat
   Conflict = 'conflict',
@@ -178,6 +186,11 @@ export enum ComponentType {
   ThreatDetection = 'threat_detection',
   Injury = 'injury',
   Burning = 'burning',
+  PackCombat = 'pack_combat',      // Pack mind collective combat component
+  HiveCombat = 'hive_combat',      // Hive mind collective combat component
+  PackMember = 'pack_member',      // Individual pack member marker
+  HiveQueen = 'hive_queen',        // Hive queen marker
+  HiveWorker = 'hive_worker',      // Hive worker marker
 
   // Reproduction & Life
   Sexuality = 'sexuality',
@@ -231,4 +244,11 @@ export enum ComponentType {
 
   // Virtual Reality
   VRSystem = 'vr_system',
+
+  // Invasion (Multiverse warfare)
+  Invasion = 'invasion',
+
+  // Megastructures (Grand Strategy Phase 5)
+  Megastructure = 'megastructure',           // Massive engineering projects (Dyson swarms, wormholes)
+  ConstructionProject = 'construction_project', // Active megastructure construction tracking
 }

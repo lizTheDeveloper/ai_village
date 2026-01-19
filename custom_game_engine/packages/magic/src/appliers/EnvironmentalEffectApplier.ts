@@ -18,6 +18,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EnvironmentComponent, EnvironmentalZoneComponent } from '../types/ComponentTypes.js';
 
 // ============================================================================
 // EnvironmentalEffectApplier
@@ -163,7 +164,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     if (isGlobal) {
       // Global weather change - create/update world environment component
       const envEntity = this.getOrCreateEnvironmentEntity(world);
-      const envComp = envEntity.getComponent('environment') as any;
+      const envComp = envEntity.getComponent('environment') as EnvironmentComponent | undefined;
       if (envComp) {
         envComp.weather = weatherType;
         envComp.weatherIntensity = 1.0;
@@ -228,7 +229,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
 
     if (isGlobal) {
       const envEntity = this.getOrCreateEnvironmentEntity(world);
-      const envComp = envEntity.getComponent('environment') as any;
+      const envComp = envEntity.getComponent('environment') as EnvironmentComponent | undefined;
       if (envComp) {
         envComp.globalLightLevel = lightLevel;
       }
@@ -263,7 +264,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
 
     if (isGlobal) {
       const envEntity = this.getOrCreateEnvironmentEntity(world);
-      const envComp = envEntity.getComponent('environment') as any;
+      const envComp = envEntity.getComponent('environment') as EnvironmentComponent | undefined;
       if (envComp) {
         envComp.temperatureModifier = (envComp.temperatureModifier ?? 0) + temperatureChange;
       }
@@ -296,7 +297,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     if (isGlobal) {
       // Global zone would affect entire world
       const envEntity = this.getOrCreateEnvironmentEntity(world);
-      const envComp = envEntity.getComponent('environment') as any;
+      const envComp = envEntity.getComponent('environment') as EnvironmentComponent | undefined;
       if (envComp) {
         if (!envComp.globalZones) {
           envComp.globalZones = [];
@@ -399,11 +400,12 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       .executeEntities();
 
     for (const zone of zones) {
-      const zoneComp = zone.getComponent('environmental_zone') as any;
-      const zonePos = zone.getComponent('position') as any;
+      const zoneComp = zone.getComponent('environmental_zone') as EnvironmentalZoneComponent | undefined;
+      const zonePos = zone.getComponent('position') as { x: number; y: number } | undefined;
 
       if (
         zoneComp?.effectId === effect.id &&
+        zonePos &&
         Math.abs(zonePos.x - center.x) < 0.1 &&
         Math.abs(zonePos.y - center.y) < 0.1 &&
         Math.abs(zoneComp.radius - radius) < 0.1

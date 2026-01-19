@@ -322,7 +322,7 @@ export const AerialHarmonySchema = autoRegister(
 
     validate: (data): data is AerialHarmonyComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const ah = data as any;
+      const ah = data as Record<string, unknown>;
 
       return (
         ah.type === 'aerial_harmony' &&

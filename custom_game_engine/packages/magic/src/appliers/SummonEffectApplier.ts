@@ -13,6 +13,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { PositionComponentData } from '../types/ComponentTypes.js';
 import { createPositionComponent } from '@ai-village/core';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
@@ -48,10 +49,11 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     }
 
     // Extract position values from component
+    const posData = casterPosComp as unknown as PositionComponentData;
     const casterPos = {
-      x: (casterPosComp as any).x ?? 0,
-      y: (casterPosComp as any).y ?? 0,
-      z: (casterPosComp as any).z ?? 0,
+      x: posData.x ?? 0,
+      y: posData.y ?? 0,
+      z: posData.z ?? 0,
     };
 
     // Calculate summon parameters
@@ -92,7 +94,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        (summonedEntity as any).addComponent(positionComponent);
+        summonedEntity.addComponent(positionComponent);
 
         // Set owner if controllable
         if (effect.controllable) {
@@ -184,7 +186,8 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         const entity = world.getEntity(summonId);
         if (entity) {
           // Use WorldImpl to destroy entity - World interface doesn't expose this
-          (world as any).destroyEntity(summonId, 'summon_expired');
+          // Type assertion needed because destroyEntity is not in the public World interface
+          (world as unknown as { destroyEntity: (entityId: string, reason: string) => void }).destroyEntity(summonId, 'summon_expired');
         }
       } catch (error) {
         // Entity might have already been destroyed - that's fine

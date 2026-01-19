@@ -17,7 +17,7 @@ import { ComponentRegistry } from '../registry/ComponentRegistry.js';
 interface FieldData {
   name: string;
   field: FieldSchema;
-  value: any;
+  value: unknown;
 }
 
 /**
@@ -98,10 +98,16 @@ export class AgentPromptRenderer {
       // Only include agent-visible fields
       if (fieldSchema.visibility.agent !== true) continue;
 
-      const value = (component as any)[fieldName];
+      const value = (component as Record<string, unknown>)[fieldName];
 
       // Get LLM config for this field
-      const llmConfig = (fieldSchema as any).llm;
+      const llmConfig = (fieldSchema as FieldSchema & { llm?: unknown }).llm as {
+        alwaysInclude?: boolean;
+        hideIf?: (value: unknown) => boolean;
+        promptSection?: string;
+        promptLabel?: string;
+        format?: (value: unknown) => string;
+      } | undefined;
 
       // Check hideIf condition
       if (llmConfig?.hideIf && llmConfig.hideIf(value)) {
@@ -143,7 +149,8 @@ export class AgentPromptRenderer {
       }
 
       for (const { name, field, value } of fields) {
-        const label = (field as any).llm?.promptLabel || field.displayName || name;
+        const llmConfig = (field as FieldSchema & { llm?: { promptLabel?: string } }).llm;
+        const label = llmConfig?.promptLabel || field.displayName || name;
         const formatted = this.formatValue(value, field);
 
         if (includeFieldNames) {
@@ -165,9 +172,9 @@ export class AgentPromptRenderer {
    * Format a field value for agent self-awareness
    * Uses same formatting as PromptRenderer for consistency
    */
-  private static formatValue(value: any, field: FieldSchema): string {
+  private static formatValue(value: unknown, field: FieldSchema): string {
     // Use custom formatter if provided
-    const llmConfig = (field as any).llm;
+    const llmConfig = (field as FieldSchema & { llm?: { format?: (value: unknown) => string } }).llm;
     if (llmConfig?.format) {
       return llmConfig.format(value);
     }
@@ -183,6 +190,8 @@ export class AgentPromptRenderer {
         return value ? 'yes' : 'no';
 
       case 'number':
+        if (typeof value !== 'number') return String(value);
+
         // Format with range context if available
         if (field.range) {
           const [min, max] = field.range;

@@ -199,7 +199,7 @@ export const VisionSchema = autoRegister(
         // Heard speech - format actual text without exposing UUIDs
         if (data.heardSpeech.length > 0) {
           const speechTexts = data.heardSpeech
-            .map(s => `"${s.text}"`)
+            .map((s: { text: string }) => `"${s.text}"`)
             .slice(0, 3)  // Limit to 3 most recent to avoid bloat
             .join(', ');
 
@@ -221,7 +221,7 @@ export const VisionSchema = autoRegister(
 
     validate: (data: unknown): data is VisionComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
+      const comp = data as Record<string, unknown>;
       return (
         comp.type === 'vision' &&
         typeof comp.range === 'number' &&

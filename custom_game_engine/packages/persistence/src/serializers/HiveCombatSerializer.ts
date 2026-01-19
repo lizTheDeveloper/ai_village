@@ -23,14 +23,14 @@ export class HiveCombatSerializer extends BaseComponentSerializer<HiveCombatComp
   }
 
   protected deserializeData(data: unknown): HiveCombatComponent {
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     return createHiveCombatComponent({
-      hiveId: d.hiveId,
-      queen: d.queen,
-      workers: d.workers,
-      objective: d.objective,
-      queenDead: d.queenDead,
-      collapseTriggered: d.collapseTriggered,
+      hiveId: d.hiveId as string,
+      queen: d.queen as string,
+      workers: d.workers as string[],
+      objective: d.objective as string | undefined,
+      queenDead: d.queenDead as boolean | undefined,
+      collapseTriggered: d.collapseTriggered as boolean | undefined,
     });
   }
 
@@ -38,7 +38,7 @@ export class HiveCombatSerializer extends BaseComponentSerializer<HiveCombatComp
     if (typeof data !== 'object' || data === null) {
       throw new Error('HiveCombatComponent data must be object');
     }
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     if (!d.hiveId || !d.queen || !d.workers) {
       throw new Error('HiveCombatComponent missing required fields');
     }

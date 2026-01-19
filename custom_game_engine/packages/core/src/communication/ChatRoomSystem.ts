@@ -38,6 +38,8 @@ export class ChatRoomSystem extends BaseSystem {
   readonly id = 'chat_room' as const;
   readonly priority: number = 50;
   readonly requiredComponents = [] as const;
+  // Only run when chat room components exist (O(1) activation check)
+  readonly activationComponents = [ComponentType.ChatRoom] as const;
 
   /** Room ID -> Entity ID mapping */
   private roomEntities: Map<string, string> = new Map();

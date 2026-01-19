@@ -17,6 +17,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { ParadigmState, ChannelData, RiskData } from '../types/ComponentTypes.js';
 
 // ============================================================================
 // Paradigm Effect Operations
@@ -146,10 +147,10 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
 
       // Remove suppression state
       if (targetMagic.paradigmState[paradigmId]) {
-        const state = targetMagic.paradigmState[paradigmId];
+        const state = targetMagic.paradigmState[paradigmId] as ParadigmState;
         if (state && 'suppressed' in state) {
-          delete (state as any).suppressed;
-          delete (state as any).suppressedUntil;
+          delete state.suppressed;
+          delete state.suppressedUntil;
         }
       }
     }
@@ -259,7 +260,7 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       targetMagic.paradigmState[paradigmId] = {};
     }
 
-    const state = targetMagic.paradigmState[paradigmId] as any;
+    const state = targetMagic.paradigmState[paradigmId] as ParadigmState;
     state.suppressed = true;
     state.suppressedUntil = effect.duration ? currentTick + effect.duration : undefined;
 
@@ -326,7 +327,7 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
     }
 
     // Check if adaptation already exists
-    const exists = targetMagic.adaptations.some(a => a.spellId === spellId);
+    const exists = targetMagic.adaptations.some((a) => a.spellId === spellId);
 
     if (exists) {
       result.appliedValues['alreadyAdapted'] = 1;
@@ -339,8 +340,8 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       adaptationType,
       modifications: {
         costModifier: effect.parameters.costModifier as number | undefined,
-        additionalChannels: effect.parameters.additionalChannels as any[] | undefined,
-        additionalRisks: effect.parameters.additionalRisks as any[] | undefined,
+        additionalChannels: effect.parameters.additionalChannels as ChannelData[] | undefined,
+        additionalRisks: effect.parameters.additionalRisks as RiskData[] | undefined,
       },
     });
 

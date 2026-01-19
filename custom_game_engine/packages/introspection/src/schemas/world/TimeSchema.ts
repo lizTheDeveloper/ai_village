@@ -190,9 +190,10 @@ export const TimeSchema = autoRegister(
     },
 
     validate: (data): data is TimeComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'time') return false;
+      if (d.type !== 'time') return false;
       if (typeof d.timeOfDay !== 'number' || d.timeOfDay < 0 || d.timeOfDay >= 24) {
         throw new RangeError(`Invalid timeOfDay: ${d.timeOfDay} (must be 0-24)`);
       }
@@ -202,7 +203,7 @@ export const TimeSchema = autoRegister(
       if (typeof d.speedMultiplier !== 'number' || d.speedMultiplier <= 0) {
         throw new RangeError(`Invalid speedMultiplier: ${d.speedMultiplier} (must be > 0)`);
       }
-      if (!['dawn', 'day', 'dusk', 'night'].includes(d.phase)) return false;
+      if (!['dawn', 'day', 'dusk', 'night'].includes(d.phase as string)) return false;
       if (typeof d.lightLevel !== 'number' || d.lightLevel < 0 || d.lightLevel > 1) {
         throw new RangeError(`Invalid lightLevel: ${d.lightLevel} (must be 0-1)`);
       }

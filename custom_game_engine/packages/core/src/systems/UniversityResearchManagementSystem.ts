@@ -68,6 +68,10 @@ export class UniversityResearchManagementSystem extends BaseSystem {
   public readonly id: SystemId = 'university_research_management';
   public readonly priority = 47; // After UniversitySystem (46)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
+
+  // Lazy activation: Skip entire system when no universities exist in world
+  public readonly activationComponents = ['university'] as const;
+
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: UniversityResearchManagementConfig;

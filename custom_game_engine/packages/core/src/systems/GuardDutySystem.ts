@@ -29,6 +29,27 @@ interface AlertComponent extends Component {
   alertType: string;
   location: { x: number; y: number; z: number };
   threatId?: string;
+  alertedBy?: string;
+}
+
+interface GuardResponseComponent extends Component {
+  readonly type: 'guard_response';
+  readonly version: number;
+  action: 'alert_others' | 'intercept' | 'observe' | 'flee';
+  threatId: string;
+}
+
+interface ThreatLevelComponent extends Component {
+  readonly type: 'threat_level';
+  readonly version: number;
+  level: 'low' | 'moderate' | 'high' | 'critical';
+}
+
+interface CombatStatsComponent extends Component {
+  readonly type: 'combat_stats';
+  readonly version: number;
+  combatSkill: number;
+  stealthSkill?: number;
 }
 
 /**
@@ -75,27 +96,27 @@ export class GuardDutySystem extends BaseSystem {
   }
 
   /**
-   * Validate guard assignment. Returns false if invalid (skip processing).
+   * Validate guard assignment. Throws errors on invalid assignments (strict mode).
    */
   private validateAssignment(duty: GuardDutyComponent): boolean {
     if (!duty.assignmentType) {
-      return false; // No assignment type - skip
+      throw new Error('Guard assignment type is required');
     }
 
     switch (duty.assignmentType) {
       case 'location':
         if (!duty.targetLocation) {
-          return false; // Invalid location guard - skip
+          throw new Error('Location guard assignment requires targetLocation');
         }
         break;
       case 'person':
         if (!duty.targetPerson) {
-          return false; // Invalid person guard - skip
+          throw new Error('Person guard assignment requires targetPerson');
         }
         break;
       case 'patrol':
         if (!duty.patrolRoute || duty.patrolRoute.length === 0) {
-          return false; // Invalid patrol - skip
+          throw new Error('Patrol assignment requires patrolRoute');
         }
         break;
     }
@@ -207,6 +228,27 @@ export class GuardDutySystem extends BaseSystem {
   private assessThreatLevel(world: World, entity: Entity): number {
     let threatLevel = 0;
 
+    // Check for explicit threat_level component
+    if (world.hasComponent(entity.id, 'threat_level')) {
+      const threat = world.getComponent<ThreatLevelComponent>(entity.id, 'threat_level');
+      if (threat) {
+        switch (threat.level) {
+          case 'low':
+            threatLevel += 2;
+            break;
+          case 'moderate':
+            threatLevel += 4;
+            break;
+          case 'high':
+            threatLevel += 7;
+            break;
+          case 'critical':
+            threatLevel += 10;
+            break;
+        }
+      }
+    }
+
     // Check for active conflicts
     if (world.hasComponent(entity.id, 'conflict')) {
       const conflict = world.getComponent<ConflictComponent>(entity.id, 'conflict');
@@ -236,8 +278,16 @@ export class GuardDutySystem extends BaseSystem {
     threat: { entity: Entity; distance: number; threatLevel: number },
     watchLocation: { x: number; y: number; z: number }
   ): void {
-    // Detection chance based on alertness
-    const detectionChance = duty.alertness;
+    // Detection chance based on alertness and threat's stealth
+    let detectionChance = duty.alertness;
+
+    // Factor in threat's stealth skill (reduces detection chance)
+    const threatCombatStats = world.getComponent<CombatStatsComponent>(threat.entity.id, 'combat_stats');
+    if (threatCombatStats && threatCombatStats.stealthSkill !== undefined) {
+      // Higher stealth reduces detection chance (max 10 skill = -0.5 detection)
+      const stealthModifier = threatCombatStats.stealthSkill * 0.05;
+      detectionChance = Math.max(0.1, detectionChance - stealthModifier);
+    }
 
     if (Math.random() > detectionChance) {
       return; // Failed to detect threat
@@ -269,28 +319,48 @@ export class GuardDutySystem extends BaseSystem {
     }));
 
     // Determine response
-    const response = this.selectResponse(duty, threat);
+    const response = this.selectResponse(world, guard, duty, threat);
 
     // Execute response
     this.executeResponse(world, guard, threat.entity, response);
   }
 
   private selectResponse(
+    world: World,
+    guard: Entity,
     duty: GuardDutyComponent,
     threat: { entity: Entity; distance: number; threatLevel: number }
   ): 'alert_others' | 'intercept' | 'observe' | 'flee' {
-    // High threat and close distance -> intercept
-    if (threat.threatLevel >= 7 && threat.distance <= duty.responseRadius * 0.5) {
+    // Get guard's combat skill
+    const guardCombatStats = world.getComponent<CombatStatsComponent>(guard.id, 'combat_stats');
+    const guardCombatSkill = guardCombatStats?.combatSkill || 5;
+
+    // Check threat level from component
+    const threatLevelComp = world.getComponent<ThreatLevelComponent>(threat.entity.id, 'threat_level');
+    const threatLevelName = threatLevelComp?.level;
+
+    // Critical threat and low combat skill -> flee
+    if (threatLevelName === 'critical' && guardCombatSkill <= 5) {
+      return 'flee';
+    }
+
+    // High threat and high combat skill -> intercept
+    if (threatLevelName === 'high' && guardCombatSkill >= 8) {
       return 'intercept';
     }
 
-    // Medium threat -> alert others
-    if (threat.threatLevel >= 4) {
+    // High threat without high skill -> alert others
+    if (threatLevelName === 'high') {
       return 'alert_others';
     }
 
-    // Low alertness -> observe
-    if (duty.alertness < 0.5) {
+    // Moderate threat -> alert others
+    if (threatLevelName === 'moderate' || threat.threatLevel >= 4) {
+      return 'alert_others';
+    }
+
+    // Low threat -> observe
+    if (threatLevelName === 'low' || threat.threatLevel <= 2) {
       return 'observe';
     }
 
@@ -299,19 +369,74 @@ export class GuardDutySystem extends BaseSystem {
   }
 
   private executeResponse(
-    _world: World,
+    world: World,
     guard: Entity,
     threat: Entity,
     response: 'alert_others' | 'intercept' | 'observe' | 'flee'
   ): void {
+    const guardImpl = guard as EntityImpl;
+
+    // Add guard_response component
+    guardImpl.addComponent({
+      type: 'guard_response',
+      version: 1,
+      action: response,
+      threatId: threat.id,
+    } as GuardResponseComponent);
+
     this.events.emit('guard:response', {
       guardId: guard.id,
       threatId: threat.id,
       response,
     }, guard.id);
 
+    // If response is to alert others, propagate to nearby guards
+    if (response === 'alert_others') {
+      this.propagateAlert(world, guard, threat);
+    }
+
     // Actual response implementation would depend on other systems
-    // For now, just emit the event
+    // For now, just emit the event and alert component
+  }
+
+  private propagateAlert(world: World, alertingGuard: Entity, threat: Entity): void {
+    const alertingGuardPos = world.getComponent<PositionComponent>(alertingGuard.id, 'position');
+    if (!alertingGuardPos) return;
+
+    const alertingGuardDuty = world.getComponent<GuardDutyComponent>(alertingGuard.id, 'guard_duty');
+    if (!alertingGuardDuty) return;
+
+    // Find other guards within response radius
+    const allEntities = Array.from(world.entities.values());
+    for (const entity of allEntities) {
+      if (entity.id === alertingGuard.id) continue;
+
+      // Check if entity is a guard
+      if (!world.hasComponent(entity.id, 'guard_duty')) continue;
+
+      const guardPos = world.getComponent<PositionComponent>(entity.id, 'position');
+      if (!guardPos) continue;
+
+      const distance = this.calculateDistance(alertingGuardPos, guardPos);
+      if (distance > alertingGuardDuty.responseRadius) continue;
+
+      // Alert this guard
+      const entityImpl = entity as EntityImpl;
+      entityImpl.addComponent({
+        type: 'alert',
+        version: 1,
+        alertType: 'threat_detected',
+        location: alertingGuardPos,
+        threatId: threat.id,
+        alertedBy: alertingGuard.id,
+      } as AlertComponent);
+
+      // Boost their alertness
+      entityImpl.updateComponent<GuardDutyComponent>('guard_duty', (d) => ({
+        ...d,
+        alertness: Math.min(1.0, d.alertness + 0.2),
+      }));
+    }
   }
 
   private updatePatrol(world: World, entity: Entity, duty: GuardDutyComponent): void {

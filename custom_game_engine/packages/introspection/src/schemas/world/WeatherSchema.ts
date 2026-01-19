@@ -145,7 +145,7 @@ export const WeatherSchema = autoRegister(
 
     validate: (data: unknown): data is WeatherComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const comp = data as any;
+      const comp = data as Record<string, unknown>;
       return typeof comp.weatherType === 'string'
         && typeof comp.intensity === 'number'
         && typeof comp.duration === 'number';

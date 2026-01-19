@@ -28,7 +28,7 @@ export class CombatLogPanel implements IWindowPanel {
   private element: HTMLElement | null = null;
 
   // Event handlers for cleanup
-  private eventHandlers: Map<string, (data: any) => void> = new Map();
+  private eventHandlers: Map<string, (data: Record<string, unknown>) => void> = new Map();
 
 
   getDefaultWidth(): number {
@@ -77,7 +77,7 @@ export class CombatLogPanel implements IWindowPanel {
     ] as const;
 
     for (const eventType of events) {
-      const handler = (data: any) => this.handleCombatEvent(eventType, data);
+      const handler = (data: Record<string, unknown>) => this.handleCombatEvent(eventType, data);
       this.eventHandlers.set(eventType, handler);
       this.eventBus.on(eventType, handler);
     }
@@ -86,7 +86,7 @@ export class CombatLogPanel implements IWindowPanel {
   /**
    * Handle combat event
    */
-  private handleCombatEvent(type: string, data: any): void {
+  private handleCombatEvent(type: string, data: Record<string, unknown>): void {
     const message = this.formatEventMessage(type, data);
     const participants = this.extractParticipants(data);
 
@@ -104,7 +104,7 @@ export class CombatLogPanel implements IWindowPanel {
   /**
    * Format event message
    */
-  private formatEventMessage(type: string, data: any): string {
+  private formatEventMessage(type: string, data: Record<string, unknown>): string {
     switch (type) {
       case 'conflict:started':
         return `Conflict started: ${data.type}`;
@@ -136,7 +136,7 @@ export class CombatLogPanel implements IWindowPanel {
   /**
    * Extract participants from event data
    */
-  private extractParticipants(data: any): string[] {
+  private extractParticipants(data: Record<string, unknown>): string[] {
     const participants: string[] = [];
 
     if (data.participants && Array.isArray(data.participants)) {
@@ -425,7 +425,7 @@ export class CombatLogPanel implements IWindowPanel {
    */
   public cleanup(): void {
     for (const [eventType, handler] of this.eventHandlers.entries()) {
-      this.eventBus.off(eventType as any, handler);
+      this.eventBus.off(eventType, handler);
     }
     this.eventHandlers.clear();
   }

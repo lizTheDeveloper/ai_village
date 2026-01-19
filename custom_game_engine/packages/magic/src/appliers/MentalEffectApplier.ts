@@ -21,6 +21,12 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type {
+  BehaviorComponent,
+  MentalEffectsComponent,
+  PerceptionEffectsComponent,
+  StatsComponent,
+} from '../types/ComponentTypes.js';
 
 // ============================================================================
 // MentalEffectApplier
@@ -60,7 +66,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     const mentalStrength = strengthValue?.value ?? effect.mentalStrength.base;
 
     // Perform willpower resistance check
-    const stats = target.components.get('stats') as any;
+    const stats = target.components.get('stats') as StatsComponent | undefined;
     const willpower = stats?.willpower ?? 10;
 
     // Resistance check: willpower must exceed 80% of mental strength to resist
@@ -171,9 +177,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     _context: EffectContext
   ): void {
-    let behavior = target.components.get('behavior') as any;
+    let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
-      behavior = {};
+      behavior = { type: 'behavior', currentBehavior: 'flee' };
       (target as any).components.set('behavior', behavior);
     }
     behavior.currentBehavior = 'flee';
@@ -189,9 +195,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     _context: EffectContext
   ): void {
-    let mentalEffects = target.components.get('mental_effects') as any;
+    let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = {};
+      mentalEffects = { type: 'mental_effects' };
       (target as any).components.set('mental_effects', mentalEffects);
     }
 
@@ -208,9 +214,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     context: EffectContext
   ): void {
-    let behavior = target.components.get('behavior') as any;
+    let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
-      behavior = {};
+      behavior = { type: 'behavior', currentBehavior: 'confused' };
       (target as any).components.set('behavior', behavior);
     }
     behavior.confused = true;
@@ -226,9 +232,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     context: EffectContext
   ): void {
-    let mentalEffects = target.components.get('mental_effects') as any;
+    let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = {};
+      mentalEffects = { type: 'mental_effects' };
       (target as any).components.set('mental_effects', mentalEffects);
     }
 
@@ -245,7 +251,13 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     _context: EffectContext
   ): void {
-    let memory = target.components.get('memory') as any;
+    interface MemoryComponent {
+      modified?: boolean;
+      modifiedBy?: string;
+      [key: string]: any;
+    }
+
+    let memory = target.components.get('memory') as MemoryComponent | undefined;
     if (!memory) {
       memory = {};
       (target as any).components.set('memory', memory);
@@ -264,9 +276,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     context: EffectContext
   ): void {
-    let perceptionEffects = target.components.get('perception_effects') as any;
+    let perceptionEffects = target.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
     if (!perceptionEffects) {
-      perceptionEffects = { illusions: [] };
+      perceptionEffects = { type: 'perception_effects', illusions: [] };
       (target as any).components.set('perception_effects', perceptionEffects);
     }
 
@@ -294,9 +306,9 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     _context: EffectContext
   ): void {
-    let mentalEffects = target.components.get('mental_effects') as any;
+    let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = {};
+      mentalEffects = { type: 'mental_effects' };
       (target as any).components.set('mental_effects', mentalEffects);
     }
 

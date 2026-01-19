@@ -86,6 +86,8 @@ export class AIGodBehaviorSystem extends BaseSystem {
   public readonly id = 'AIGodBehaviorSystem';
   public readonly priority = 90;
   public readonly requiredComponents = [CT.Deity]; // Let ECS filter deity entities
+  // Only run when deity components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Deity] as const;
 
   protected readonly throttleInterval = 2400; // ~2 minutes at 20 TPS
 

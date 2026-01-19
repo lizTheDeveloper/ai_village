@@ -10,6 +10,18 @@ import type { EventBus } from '@ai-village/core';
 import type { MenuContext } from './MenuContext.js';
 import type { ContextAction } from './types.js';
 
+// Component interfaces for type safety
+interface BuildingComponent {
+  canEnter?: boolean;
+  locked?: boolean;
+  health?: number;
+}
+
+interface HarvestableComponent {
+  amount?: number;
+  resourceType?: string;
+}
+
 /**
  * Registry for context menu actions.
  */
@@ -109,26 +121,24 @@ export class ContextActionRegistry {
 
       // Emit success event
       this.eventBus.emit({
-        type: 'ui:contextmenu:action_executed' as any,
+        type: 'ui:contextmenu:action_executed',
         source: 'world',
         data: {
           actionId,
-          success: true,
-          context
+          success: true
         }
-      } as any);
+      });
     } catch (error) {
       // Emit failure event
       this.eventBus.emit({
-        type: 'ui:contextmenu:action_executed' as any,
+        type: 'ui:contextmenu:action_executed',
         source: 'world',
         data: {
           actionId,
           success: false,
-          error: error instanceof Error ? error.message : String(error),
-          context
+          error: error instanceof Error ? error.message : String(error)
         }
-      } as any);
+      });
 
       // Re-throw error
       throw error;
@@ -159,26 +169,24 @@ export class ContextActionRegistry {
 
       // Emit success event
       this.eventBus.emit({
-        type: 'ui:contextmenu:action_executed' as any,
+        type: 'ui:contextmenu:action_executed',
         source: 'world',
         data: {
           actionId: action.id,
-          success: true,
-          context
+          success: true
         }
-      } as any);
+      });
     } catch (error) {
       // Emit failure event
       this.eventBus.emit({
-        type: 'ui:contextmenu:action_executed' as any,
+        type: 'ui:contextmenu:action_executed',
         source: 'world',
         data: {
           actionId: action.id,
           success: false,
-          error: error instanceof Error ? error.message : String(error),
-          context
+          error: error instanceof Error ? error.message : String(error)
         }
-      } as any);
+      });
 
       // Re-throw error
       throw error;
@@ -216,10 +224,10 @@ export class ContextActionRegistry {
       category: 'movement',
       isApplicable: (ctx) => ctx.hasSelection() && ctx.isWalkable,
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:move' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:move', source: 'world', data: {
           target: ctx.worldPosition,
           entities: ctx.selectedEntities
-        } } as any);
+        } });
       }
     });
 
@@ -235,10 +243,10 @@ export class ContextActionRegistry {
         const selected = ctx.getSelectedEntities(_world);
         const firstSelected = selected[0];
         if (firstSelected) {
-          eventBus.emit({ type: 'action:follow' as any, source: 'world', data: {
+          eventBus.emit({ type: 'action:follow', source: 'world', data: {
             followerId: firstSelected.id,
             targetId: ctx.targetEntity
-          } } as any);
+          } });
         }
       }
     });
@@ -252,9 +260,9 @@ export class ContextActionRegistry {
       category: 'social',
       isApplicable: (ctx) => ctx.targetType === 'agent',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'conversation:start' as any, source: 'world', data: {
+        eventBus.emit({ type: 'conversation:start', source: 'world', data: {
           targetId: ctx.targetEntity
-        } } as any);
+        } });
       }
     });
 
@@ -270,10 +278,10 @@ export class ContextActionRegistry {
         const panelType = ctx.targetType === 'agent' ? 'agent_info' :
                           ctx.targetType === 'building' ? 'building_info' : 'entity_info';
 
-        eventBus.emit({ type: 'ui:panel:open' as any, source: 'world', data: {
+        eventBus.emit({ type: 'ui:panel:open', source: 'world', data: {
           panelType,
           entityId: ctx.targetEntity
-        } } as any);
+        } });
       }
     });
   }
@@ -292,17 +300,17 @@ export class ContextActionRegistry {
         const building = ctx.getTargetEntity(this.world);
         if (!building) return false;
 
-        const buildingComp = (building as EntityImpl).getComponent('building') as any;
+        const buildingComp = (building as EntityImpl).getComponent('building') as BuildingComponent | undefined;
         return buildingComp && buildingComp.canEnter === true && buildingComp.locked !== true;
       },
       execute: (ctx, _world, eventBus) => {
         const selected = ctx.getSelectedEntities(_world);
         const firstSelected = selected[0];
         if (firstSelected) {
-          eventBus.emit({ type: 'action:enter_building' as any, source: 'world', data: {
+          eventBus.emit({ type: 'action:enter_building', source: 'world', data: {
             agentId: firstSelected.id,
             buildingId: ctx.targetEntity
-          } } as any);
+          } });
         }
       }
     });
@@ -320,13 +328,13 @@ export class ContextActionRegistry {
         const building = ctx.getTargetEntity(this.world);
         if (!building) return false;
 
-        const buildingComp = (building as EntityImpl).getComponent('building') as any;
-        return buildingComp && buildingComp.health < 1.0;
+        const buildingComp = (building as EntityImpl).getComponent('building') as BuildingComponent | undefined;
+        return buildingComp && buildingComp.health !== undefined && buildingComp.health < 1.0;
       },
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:repair' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:repair', source: 'world', data: {
           buildingId: ctx.targetEntity
-        } } as any);
+        } });
       }
     });
 
@@ -342,9 +350,9 @@ export class ContextActionRegistry {
       consequences: ['Building will be removed', 'Materials may be recovered'],
       isApplicable: (ctx) => ctx.targetType === 'building',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:demolish' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:demolish', source: 'world', data: {
           buildingId: ctx.targetEntity
-        } } as any);
+        } });
       }
     });
   }
@@ -363,17 +371,17 @@ export class ContextActionRegistry {
         const resource = ctx.getTargetEntity(this.world);
         if (!resource) return false;
 
-        const harvestable = (resource as EntityImpl).getComponent('harvestable') as any;
-        return harvestable && harvestable.amount > 0;
+        const harvestable = (resource as EntityImpl).getComponent('harvestable') as HarvestableComponent | undefined;
+        return harvestable && harvestable.amount !== undefined && harvestable.amount > 0;
       },
       execute: (ctx, _world, eventBus) => {
         const resource = ctx.getTargetEntity(_world);
-        const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as any : undefined;
+        const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as HarvestableComponent | undefined : undefined;
 
-        eventBus.emit({ type: 'action:harvest' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:harvest', source: 'world', data: {
           resourceId: ctx.targetEntity,
           resourceType: harvestable?.resourceType
-        } } as any);
+        } });
       }
     });
 
@@ -389,10 +397,10 @@ export class ContextActionRegistry {
         const selected = ctx.getSelectedEntities(_world);
         const firstSelected = selected[0];
         if (firstSelected) {
-          eventBus.emit({ type: 'action:assign_worker' as any, source: 'world', data: {
+          eventBus.emit({ type: 'action:assign_worker', source: 'world', data: {
             workerId: firstSelected.id,
             resourceId: ctx.targetEntity
-          } } as any);
+          } });
         }
       }
     });
@@ -412,10 +420,10 @@ export class ContextActionRegistry {
           icon: 'priority_high',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_priority' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_priority', source: 'world', data: {
               resourceId: ctx.targetEntity,
               priority: 'high'
-            } } as any);
+            } });
           }
         },
         {
@@ -424,10 +432,10 @@ export class ContextActionRegistry {
           icon: 'priority_normal',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_priority' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_priority', source: 'world', data: {
               resourceId: ctx.targetEntity,
               priority: 'normal'
-            } } as any);
+            } });
           }
         },
         {
@@ -436,10 +444,10 @@ export class ContextActionRegistry {
           icon: 'priority_low',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_priority' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_priority', source: 'world', data: {
               resourceId: ctx.targetEntity,
               priority: 'low'
-            } } as any);
+            } });
           }
         },
         {
@@ -448,10 +456,10 @@ export class ContextActionRegistry {
           icon: 'priority_forbid',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_priority' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_priority', source: 'world', data: {
               resourceId: ctx.targetEntity,
               priority: 'forbid'
-            } } as any);
+            } });
           }
         }
       ],
@@ -466,10 +474,10 @@ export class ContextActionRegistry {
       category: 'info',
       isApplicable: (ctx) => ctx.targetEntity !== null,
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'ui:panel:open' as any, source: 'world', data: {
+        eventBus.emit({ type: 'ui:panel:open', source: 'world', data: {
           panelType: 'resource_info',
           entityId: ctx.targetEntity
-        } } as any);
+        } });
       }
     });
   }
@@ -490,10 +498,10 @@ export class ContextActionRegistry {
           icon: 'house',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'ui:building_placement:open' as any, source: 'world', data: {
+            eventBus.emit({ type: 'ui:building_placement:open', source: 'world', data: {
               category: 'residential',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         },
         {
@@ -502,10 +510,10 @@ export class ContextActionRegistry {
           icon: 'factory',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'ui:building_placement:open' as any, source: 'world', data: {
+            eventBus.emit({ type: 'ui:building_placement:open', source: 'world', data: {
               category: 'production',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         }
       ],
@@ -521,10 +529,10 @@ export class ContextActionRegistry {
       category: 'navigation',
       isApplicable: (ctx) => ctx.targetType === 'empty_tile',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:place_waypoint' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:place_waypoint', source: 'world', data: {
           x: ctx.worldPosition.x,
           y: ctx.worldPosition.y
-        } } as any);
+        } });
       }
     });
 
@@ -537,10 +545,10 @@ export class ContextActionRegistry {
       category: 'camera',
       isApplicable: () => true,
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'camera:focus' as any, source: 'world', data: {
+        eventBus.emit({ type: 'camera:focus', source: 'world', data: {
           x: ctx.worldPosition.x,
           y: ctx.worldPosition.y
-        } } as any);
+        } });
       }
     });
 
@@ -552,10 +560,10 @@ export class ContextActionRegistry {
       category: 'info',
       isApplicable: () => true, // Always show - provides fallback for debugging
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'ui:panel:open' as any, source: 'world', data: {
+        eventBus.emit({ type: 'ui:panel:open', source: 'world', data: {
           panelType: 'tile_inspector',
           position: ctx.worldPosition
-        } } as any);
+        } });
       }
     });
   }
@@ -572,10 +580,10 @@ export class ContextActionRegistry {
         // Emit move action for each selected entity
         const selected = ctx.getSelectedEntities(_world);
         for (const entity of selected) {
-          eventBus.emit({ type: 'action:move' as any, source: 'world', data: {
+          eventBus.emit({ type: 'action:move', source: 'world', data: {
             entityId: entity.id,
             target: ctx.worldPosition
-          } } as any);
+          } });
         }
       }
     });
@@ -589,9 +597,9 @@ export class ContextActionRegistry {
       category: 'selection',
       isApplicable: (ctx) => ctx.getSelectedCount() > 1,
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:create_group' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:create_group', source: 'world', data: {
           agentIds: ctx.selectedEntities
-        } } as any);
+        } });
       }
     });
 
@@ -603,10 +611,10 @@ export class ContextActionRegistry {
       category: 'movement',
       isApplicable: (ctx) => ctx.hasSelection() && ctx.targetType === 'empty_tile',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:scatter' as any, source: 'world', data: {
+        eventBus.emit({ type: 'action:scatter', source: 'world', data: {
           agentIds: ctx.selectedEntities,
           center: ctx.worldPosition
-        } } as any);
+        } });
       }
     });
 
@@ -624,11 +632,11 @@ export class ContextActionRegistry {
           icon: 'formation_line',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_formation' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
               agentIds: ctx.selectedEntities,
               formationType: 'line',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         },
         {
@@ -637,11 +645,11 @@ export class ContextActionRegistry {
           icon: 'formation_column',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_formation' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
               agentIds: ctx.selectedEntities,
               formationType: 'column',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         },
         {
@@ -650,11 +658,11 @@ export class ContextActionRegistry {
           icon: 'formation_circle',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_formation' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
               agentIds: ctx.selectedEntities,
               formationType: 'circle',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         },
         {
@@ -663,11 +671,11 @@ export class ContextActionRegistry {
           icon: 'formation_spread',
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
-            eventBus.emit({ type: 'action:set_formation' as any, source: 'world', data: {
+            eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
               agentIds: ctx.selectedEntities,
               formationType: 'spread',
               position: ctx.worldPosition
-            } } as any);
+            } });
           }
         }
       ],

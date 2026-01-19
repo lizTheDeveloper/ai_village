@@ -2583,22 +2583,26 @@ export class DevPanel implements IWindowPanel {
         const testEntity = schema.createDefault();
 
         // Set some interesting test values for specific components
+        // Type assertion to Record for property access since we're dynamically setting test values
+        const entityRecord = testEntity as unknown as Record<string, unknown>;
+
         if (this.selectedIntrospectionComponent === 'identity' && 'name' in testEntity) {
-          (testEntity as any).name = 'Test Entity';
-          (testEntity as any).age = 1000;
-          (testEntity as any).species = 'elf';
+          entityRecord.name = 'Test Entity';
+          entityRecord.age = 1000;
+          entityRecord.species = 'elf';
         } else if (this.selectedIntrospectionComponent === 'personality' && 'openness' in testEntity) {
-          (testEntity as any).openness = 0.9;
-          (testEntity as any).agreeableness = 0.8;
-          (testEntity as any).spirituality = 0.7;
+          entityRecord.openness = 0.9;
+          entityRecord.agreeableness = 0.8;
+          entityRecord.spirituality = 0.7;
         } else if (this.selectedIntrospectionComponent === 'skills' && 'levels' in testEntity) {
-          (testEntity as any).levels.exploration = 5;
-          (testEntity as any).levels.crafting = 4;
-          (testEntity as any).levels.farming = 3;
+          const levels = entityRecord.levels as Record<string, number>;
+          levels.exploration = 5;
+          levels.crafting = 4;
+          levels.farming = 3;
         } else if (this.selectedIntrospectionComponent === 'needs' && 'hunger' in testEntity) {
-          (testEntity as any).hunger = 0.3;
-          (testEntity as any).energy = 0.4;
-          (testEntity as any).socialContact = 0.2;
+          entityRecord.hunger = 0.3;
+          entityRecord.energy = 0.4;
+          entityRecord.socialContact = 0.2;
         }
 
         this.introspectionTestEntities.set(this.selectedIntrospectionComponent, testEntity);
@@ -2611,7 +2615,8 @@ export class DevPanel implements IWindowPanel {
             // Update the test entity
             const entity = this.introspectionTestEntities.get(this.selectedIntrospectionComponent);
             if (entity) {
-              (entity as any)[fieldName] = newValue;
+              const entityRecord = entity as Record<string, unknown>;
+              entityRecord[fieldName] = newValue;
               this.log(`Updated ${this.selectedIntrospectionComponent}.${fieldName} to ${newValue}`);
             }
           }

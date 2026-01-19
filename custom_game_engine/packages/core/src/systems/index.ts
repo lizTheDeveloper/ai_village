@@ -143,6 +143,7 @@ export * from './DivineBodyModification.js';
 export * from './MassEventSystem.js';
 // Multiverse & Passages
 export * from './PassageSystem.js';
+export * from './TimelineMergerSystem.js';
 // Realm System - Mythological pocket dimensions
 export * from './RealmManager.js';
 export * from './PortalSystem.js';

@@ -179,7 +179,7 @@ export const MachinePlacementSchema = autoRegister(
 
     validate: (data): data is MachinePlacementComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const mp = data as any;
+      const mp = data as Record<string, unknown>;
 
       return (
         mp.type === 'machine_placement' &&

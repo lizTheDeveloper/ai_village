@@ -376,54 +376,67 @@ export class VisionProcessor {
         }
       }
     } else {
-      // Fallback: Global query (for backward compatibility during transition)
-      const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
+      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(position.x / CHUNK_SIZE);
+      const chunkY = Math.floor(position.y / CHUNK_SIZE);
+      const chunkRange = Math.ceil(areaRange / CHUNK_SIZE);
 
-      for (const plantEntity of plants) {
-        const plantImpl = plantEntity as EntityImpl;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-        const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+        for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+          const entityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-        if (!plantPos || !plant) continue;
+          for (const entityId of entityIds) {
+            const plantEntity = world.getEntity(entityId);
+            if (!plantEntity) continue;
 
-        const distance = this.distance(position, plantPos);
+            const plantImpl = plantEntity as EntityImpl;
+            const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+            const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
 
-        if (distance <= closeRange) {
-          nearbyPlants.push({ id: plantEntity.id, distance, tier: 'close' });
-          seenPlantIds.push(plantEntity.id);
+            if (!plantPos || !plant) continue;
 
-          addSpatialMemory(
-            spatialMemory,
-            {
-              type: 'plant_location',
-              x: plantPos.x,
-              y: plantPos.y,
-              entityId: plantEntity.id,
-              metadata: {
-                speciesId: plant.speciesId,
-                stage: plant.stage,
-                hasSeeds: plant.seedsProduced > 0,
-                hasFruit: (plant.fruitCount || 0) > 0,
-              },
-            },
-            world.tick,
-            100
-          );
-        } else if (distance <= areaRange) {
-          seenPlantIds.push(plantEntity.id);
+            const distance = this.distance(position, plantPos);
 
-          addSpatialMemory(
-            spatialMemory,
-            {
-              type: 'plant_location',
-              x: plantPos.x,
-              y: plantPos.y,
-              entityId: plantEntity.id,
-              metadata: { speciesId: plant.speciesId, stage: plant.stage },
-            },
-            world.tick,
-            60
-          );
+            if (distance <= closeRange) {
+              nearbyPlants.push({ id: plantEntity.id, distance, tier: 'close' });
+              seenPlantIds.push(plantEntity.id);
+
+              addSpatialMemory(
+                spatialMemory,
+                {
+                  type: 'plant_location',
+                  x: plantPos.x,
+                  y: plantPos.y,
+                  entityId: plantEntity.id,
+                  metadata: {
+                    speciesId: plant.speciesId,
+                    stage: plant.stage,
+                    hasSeeds: plant.seedsProduced > 0,
+                    hasFruit: (plant.fruitCount || 0) > 0,
+                  },
+                },
+                world.tick,
+                100
+              );
+            } else if (distance <= areaRange) {
+              seenPlantIds.push(plantEntity.id);
+
+              addSpatialMemory(
+                spatialMemory,
+                {
+                  type: 'plant_location',
+                  x: plantPos.x,
+                  y: plantPos.y,
+                  entityId: plantEntity.id,
+                  metadata: { speciesId: plant.speciesId, stage: plant.stage },
+                },
+                world.tick,
+                60
+              );
+            }
+          }
         }
       }
 
@@ -502,46 +515,62 @@ export class VisionProcessor {
         }
       }
     } else {
-      // Fallback: Global query (for backward compatibility during transition)
-      const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(position.x / CHUNK_SIZE);
+      const chunkY = Math.floor(position.y / CHUNK_SIZE);
+      const chunkRange = Math.ceil(areaRange / CHUNK_SIZE);
 
-      for (const otherAgent of agents) {
-        if (otherAgent.id === entity.id) continue;
+      for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+        for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+          const entityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-        const otherPos = (otherAgent as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
-        if (!otherPos) continue;
+          for (const entityId of entityIds) {
+            if (entityId === entity.id) continue;
 
-        const distance = this.distance(position, otherPos);
+            const otherAgent = world.getEntity(entityId);
+            if (!otherAgent) continue;
 
-        if (distance <= closeRange) {
-          nearbyAgents.push({ id: otherAgent.id, distance, tier: 'close' });
-          seenAgentIds.push(otherAgent.id);
+            const otherImpl = otherAgent as EntityImpl;
+            if (!otherImpl.hasComponent(ComponentType.Agent)) continue;
 
-          addSpatialMemory(
-            spatialMemory,
-            {
-              type: 'agent_seen',
-              x: otherPos.x,
-              y: otherPos.y,
-              entityId: otherAgent.id,
-            },
-            world.tick,
-            100
-          );
-        } else if (distance <= areaRange) {
-          seenAgentIds.push(otherAgent.id);
+            const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
+            if (!otherPos) continue;
 
-          addSpatialMemory(
-            spatialMemory,
-            {
-              type: 'agent_seen',
-              x: otherPos.x,
-              y: otherPos.y,
-              entityId: otherAgent.id,
-            },
-            world.tick,
-            40
-          );
+            const distance = this.distance(position, otherPos);
+
+            if (distance <= closeRange) {
+              nearbyAgents.push({ id: otherAgent.id, distance, tier: 'close' });
+              seenAgentIds.push(otherAgent.id);
+
+              addSpatialMemory(
+                spatialMemory,
+                {
+                  type: 'agent_seen',
+                  x: otherPos.x,
+                  y: otherPos.y,
+                  entityId: otherAgent.id,
+                },
+                world.tick,
+                100
+              );
+            } else if (distance <= areaRange) {
+              seenAgentIds.push(otherAgent.id);
+
+              addSpatialMemory(
+                spatialMemory,
+                {
+                  type: 'agent_seen',
+                  x: otherPos.x,
+                  y: otherPos.y,
+                  entityId: otherAgent.id,
+                },
+                world.tick,
+                40
+              );
+            }
+          }
         }
       }
 

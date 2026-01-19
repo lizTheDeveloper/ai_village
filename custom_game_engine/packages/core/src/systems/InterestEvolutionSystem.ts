@@ -146,6 +146,8 @@ export class InterestEvolutionSystem extends BaseSystem {
     CT.Agent,
     CT.Interests,
   ];
+  // Only run when interests components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Interests] as const;
 
   // Check for decay once per game month at 20 TPS
   protected readonly throttleInterval = 30 * 24 * 1200; // 1 month at 20 TPS
@@ -162,11 +164,11 @@ export class InterestEvolutionSystem extends BaseSystem {
     // Listen for experience triggers
     // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
     // Using onGeneric for forward compatibility with events not yet in EventMap
-    this.events.onGeneric('agent:death', (_data, event) => this.handleExperience(event, this.world));
-    this.events.onGeneric('deity:miracle', (_data, event) => this.handleExperience(event, this.world));
+    this.events.onGeneric('agent:death', (data) => this.handleExperience(data as GameEvent, this.world));
+    this.events.onGeneric('deity:miracle', (data) => this.handleExperience(data as GameEvent, this.world));
     this.events.on('building:completed', (_data, event) => this.handleExperience(event, this.world));
     this.events.on('agent:born', (_data, event) => this.handleExperience(event, this.world));
-    this.events.onGeneric('prayer:answered', (_data, event) => this.handleExperience(event, this.world));
+    this.events.onGeneric('prayer:answered', (data) => this.handleExperience(data as GameEvent, this.world));
 
     // Listen for skill increases
     this.events.on('skill:level_up', (_data, event) => this.handleSkillGrowth(event, this.world));

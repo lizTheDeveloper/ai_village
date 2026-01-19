@@ -671,9 +671,13 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     }
 
     // Always set behavior to flee - create component if missing
-    let behavior = target.components.get('behavior') as any;
+    let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
-      world.addComponent(target.id, { type: 'behavior', currentBehavior: 'flee' } as any);
+      const newBehavior: BehaviorComponent = {
+        type: 'behavior' as const,
+        currentBehavior: 'flee' as const
+      };
+      world.addComponent(target.id, newBehavior);
     } else {
       behavior.currentBehavior = 'flee';
     }

@@ -50,12 +50,13 @@ import type { RelationshipComponent } from '../components/RelationshipComponent.
  */
 function getTypedComponent<T extends Component>(entity: Entity | EntityImpl, type: string): T | null {
   // EntityImpl has getComponent, Entity interface doesn't expose it
-  const impl = entity as EntityImpl;
-  if (typeof impl.getComponent === 'function') {
-    return impl.getComponent<T>(type) ?? null;
+  // Type guard: check if entity has getComponent method
+  if ('getComponent' in entity && typeof entity.getComponent === 'function') {
+    return entity.getComponent<T>(type) ?? null;
   }
   // Fallback to components map for Entity interface
-  return (entity.components.get(type) as T) ?? null;
+  const component = entity.components.get(type);
+  return component ? (component as T) : null;
 }
 
 // ============================================================================
@@ -228,9 +229,9 @@ export function getResource(entity: Entity): ResourceComponent | null {
  * if (!hasComponents(entity, ['agent', 'position', 'needs'])) continue;
  */
 export function hasComponents(entity: Entity, types: string[]): boolean {
-  const impl = entity as EntityImpl;
-  if (typeof impl.hasComponent === 'function') {
-    return types.every(type => impl.hasComponent(type));
+  // Type guard: check if entity has hasComponent method
+  if ('hasComponent' in entity && typeof entity.hasComponent === 'function') {
+    return types.every(type => entity.hasComponent(type));
   }
   return types.every(type => entity.components.has(type));
 }

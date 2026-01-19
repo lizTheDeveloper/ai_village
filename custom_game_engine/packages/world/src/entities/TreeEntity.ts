@@ -107,7 +107,7 @@ export function createTree(
   }));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

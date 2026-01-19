@@ -54,9 +54,9 @@ export class DevRenderer {
   /**
    * Initialize widgets for a component
    */
-  initializeComponent(
+  initializeComponent<T extends Component>(
     componentType: string,
-    componentData: Component,
+    componentData: T,
     onFieldChange: (fieldName: string, newValue: unknown) => void
   ): void {
     const schema = ComponentRegistry.get(componentType);
@@ -74,7 +74,7 @@ export class DevRenderer {
       if (!isVisible) continue;
 
       // Get current value from component data
-      const currentValue = (componentData as any)[fieldName];
+      const currentValue = (componentData as Record<string, unknown>)[fieldName];
 
       // Create widget
       const widget = createWidget(
@@ -164,12 +164,12 @@ export class DevRenderer {
   /**
    * Update a component's data (refresh widget values)
    */
-  updateComponent(componentType: string, componentData: Component): void {
+  updateComponent<T extends Component>(componentType: string, componentData: T): void {
     const fieldWidgets = this.widgets.get(componentType);
     if (!fieldWidgets) return;
 
     for (const fieldWidget of fieldWidgets) {
-      const currentValue = (componentData as any)[fieldWidget.fieldName];
+      const currentValue = (componentData as Record<string, unknown>)[fieldWidget.fieldName];
       fieldWidget.widget.setValue(currentValue);
     }
   }

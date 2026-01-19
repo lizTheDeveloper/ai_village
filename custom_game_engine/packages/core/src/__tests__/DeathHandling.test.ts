@@ -18,8 +18,7 @@ import { EventBus } from '../events/EventBus';
  * - Pack mind coherence recalculated
  * - Hive collapse triggered if queen dies
  */
-// TODO: DeathHandling system is not fully implemented - tests skipped until complete
-describe.skip('DeathHandling', () => {
+describe('DeathHandling', () => {
   let world: World;
   let system: DeathTransitionSystem;
   let eventBus: EventBus;

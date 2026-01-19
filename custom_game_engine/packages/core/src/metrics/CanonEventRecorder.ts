@@ -16,6 +16,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { UniverseSnapshot } from '../persistence/types.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { MetricsCollector } from './MetricsCollector.js';
 
 /**
  * Types of canon events that trigger state snapshots
@@ -209,9 +210,18 @@ export class CanonEventRecorder {
   private events: CanonEvent[] = [];
   private eventIdCounter = 0;
   private milestoneDaysRecorded = new Set<number>();
+  private metricsCollector: MetricsCollector | null = null;
 
   constructor(config: Partial<CanonEventConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  /**
+   * Inject MetricsCollector for accessing historical metrics
+   * Called by MetricsCollectionSystem during initialization
+   */
+  setMetricsCollector(collector: MetricsCollector): void {
+    this.metricsCollector = collector;
   }
 
   /**
@@ -322,11 +332,19 @@ export class CanonEventRecorder {
       }
     }
 
+    // Get historical metrics from MetricsCollector if available
+    const sessionMetrics = this.metricsCollector?.getMetric('session_metrics');
+    const totalDeaths = sessionMetrics?.totalDeaths ?? 0;
+    const totalBirths = sessionMetrics?.totalBirths ?? 0;
+
+    // Total souls created = living + dead
+    const totalSoulsCreated = ensouledAgents.length + totalDeaths;
+
     return {
-      totalSoulsCreated: ensouledAgents.length,  // TODO: Track historical count
+      totalSoulsCreated,
       livingEnsouled: ensouledAgents.length,
-      totalDeaths: 0,  // TODO: Track from metrics
-      totalBirths: ensouledAgents.length,  // TODO: Track from metrics
+      totalDeaths,
+      totalBirths,
       totalUnions: unionCount,
       lineages: Array.from(lineages.values()),
       reincarnationChains,

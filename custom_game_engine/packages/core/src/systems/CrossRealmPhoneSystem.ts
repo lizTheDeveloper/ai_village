@@ -44,6 +44,8 @@ export class CrossRealmPhoneSystem extends BaseSystem {
   public readonly id = 'cross_realm_phone_system';
   public readonly priority = 800; // Late priority, after most game logic
   public readonly requiredComponents = ['cross_realm_phone'] as const;
+  // Only run when cross_realm_phone components exist (O(1) activation check)
+  public readonly activationComponents = ['cross_realm_phone'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /** Phone registry: address.deviceId -> entity */

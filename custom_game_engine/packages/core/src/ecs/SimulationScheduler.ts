@@ -187,9 +187,13 @@ export function isInSimulationRange(
   physicsConfig: UniversePhysicsConfig = STANDARD_3D_CONFIG
 ): boolean {
   // Get entity position
-  const position = entity.components.get('position') as
-    | { x: number; y: number; z?: number; w?: number; v?: number; u?: number }
-    | undefined;
+  const positionComponent = entity.components.get('position');
+  if (!positionComponent || typeof positionComponent !== 'object') return false;
+
+  // Type guard: check that position has required fields
+  if (!('x' in positionComponent) || !('y' in positionComponent)) return false;
+
+  const position = positionComponent as { x: number; y: number; z?: number; w?: number; v?: number; u?: number };
   if (!position) return false;
 
   const entityZ = position.z ?? 0;
@@ -264,12 +268,12 @@ export class SimulationScheduler {
 
     const agents = world.query().with('agent' as ComponentType).with('position' as ComponentType).executeEntities();
     for (const agent of agents) {
-      const position = agent.components.get('position') as
-        | { x: number; y: number; z?: number }
-        | undefined;
-      if (position) {
-        this.agentPositions.push({ x: position.x, y: position.y, z: position.z });
-      }
+      const positionComponent = agent.components.get('position');
+      if (!positionComponent || typeof positionComponent !== 'object') continue;
+      if (!('x' in positionComponent) || !('y' in positionComponent)) continue;
+
+      const position = positionComponent as { x: number; y: number; z?: number };
+      this.agentPositions.push({ x: position.x, y: position.y, z: position.z });
     }
 
     // Update spatial grid with current entity positions
@@ -278,13 +282,13 @@ export class SimulationScheduler {
 
       // Add all entities with positions to the spatial grid
       for (const entity of world.entities.values()) {
-        const position = entity.components.get('position') as
-          | { x: number; y: number; z?: number; w?: number; v?: number; u?: number }
-          | undefined;
-        if (position) {
-          const coords = getCoordinates(position, this.physicsConfig.spatialDimensions);
-          this.spatialGrid.add(entity.id, coords);
-        }
+        const positionComponent = entity.components.get('position');
+        if (!positionComponent || typeof positionComponent !== 'object') continue;
+        if (!('x' in positionComponent) || !('y' in positionComponent)) continue;
+
+        const position = positionComponent as { x: number; y: number; z?: number; w?: number; v?: number; u?: number };
+        const coords = getCoordinates(position, this.physicsConfig.spatialDimensions);
+        this.spatialGrid.add(entity.id, coords);
       }
     }
   }

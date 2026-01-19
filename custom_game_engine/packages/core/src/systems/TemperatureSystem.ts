@@ -48,6 +48,8 @@ export class TemperatureSystem extends BaseSystem {
     CT.Temperature,
     CT.Position,
   ];
+  // Only run when temperature components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Temperature] as const;
 
   /**
    * Systems that must run before this one.

@@ -22,13 +22,13 @@ export class PackCombatSerializer extends BaseComponentSerializer<PackCombatComp
   }
 
   protected deserializeData(data: unknown): PackCombatComponent {
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     return createPackCombatComponent({
-      packId: d.packId,
-      bodiesInPack: d.bodiesInPack,
-      coherence: d.coherence,
-      coordinationBonus: d.coordinationBonus,
-      dissolved: d.dissolved,
+      packId: d.packId as string,
+      bodiesInPack: d.bodiesInPack as string[],
+      coherence: d.coherence as number,
+      coordinationBonus: d.coordinationBonus as number | undefined,
+      dissolved: d.dissolved as boolean | undefined,
     });
   }
 
@@ -36,7 +36,7 @@ export class PackCombatSerializer extends BaseComponentSerializer<PackCombatComp
     if (typeof data !== 'object' || data === null) {
       throw new Error('PackCombatComponent data must be object');
     }
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     if (!d.packId || !d.bodiesInPack || d.coherence === undefined) {
       throw new Error('PackCombatComponent missing required fields');
     }

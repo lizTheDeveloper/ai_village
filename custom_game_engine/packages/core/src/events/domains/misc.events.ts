@@ -413,6 +413,11 @@ export interface MiscEvents {
     challengeType: string;
   };
 
+  'death:notification': {
+    deceasedId: string;
+    notifiedAgents: string[];
+  };
+
   // === Entity Events ===
   'entity:destroyed': {
     entityId: EntityId;

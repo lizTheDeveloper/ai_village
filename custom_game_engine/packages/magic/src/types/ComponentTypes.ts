@@ -149,6 +149,16 @@ export interface ParadigmState {
   [key: string]: any; // For extensibility
 }
 
+export interface ChannelData {
+  type: string;
+  [key: string]: any;
+}
+
+export interface RiskData {
+  type: string;
+  [key: string]: any;
+}
+
 // ============================================================================
 // Items & Creation
 // ============================================================================

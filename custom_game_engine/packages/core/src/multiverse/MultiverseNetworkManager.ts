@@ -29,8 +29,21 @@ import { worldSerializer } from '../persistence/WorldSerializer.js';
 import { computeChecksumSync } from '../persistence/utils.js';
 
 // WebSocket type (works in both browser and Node.js)
-type WebSocket = any;
-type WebSocketServer = any;
+// Using structural typing to avoid direct dependency on ws package
+interface WebSocketLike {
+  send(data: string): void;
+  close(): void;
+  on?(event: string, handler: (...args: unknown[]) => void): void;
+  onopen?: ((event: unknown) => void) | null;
+  onclose?: ((event: unknown) => void) | null;
+  onerror?: ((error: unknown) => void) | null;
+  onmessage?: ((event: { data: string }) => void) | null;
+}
+
+interface WebSocketServerLike {
+  close(): void;
+  on(event: string, handler: (...args: unknown[]) => void): void;
+}
 
 /**
  * Pending operations (for request/response pattern)
@@ -38,7 +51,7 @@ type WebSocketServer = any;
 interface PendingOperation<T> {
   resolve: (value: T) => void;
   reject: (error: Error) => void;
-  timeout: NodeJS.Timeout;
+  timeout: ReturnType<typeof setTimeout>;
 }
 
 /**
@@ -51,7 +64,7 @@ interface UniverseSubscription {
   config: import('./NetworkProtocol.js').StreamConfiguration;
   viewport?: import('./NetworkProtocol.js').Bounds;
   lastSentTick: bigint;
-  updateInterval: NodeJS.Timeout;
+  updateInterval: ReturnType<typeof setInterval>;
 }
 
 export class MultiverseNetworkManager {
@@ -61,20 +74,20 @@ export class MultiverseNetworkManager {
   private eventManagers: Map<string, SystemEventManager> = new Map();
 
   // WebSocket connections
-  private wsServer: WebSocketServer | null = null;
-  private wsConnections: Map<PeerId, WebSocket> = new Map();
+  private wsServer: WebSocketServerLike | null = null;
+  private wsConnections: Map<PeerId, WebSocketLike> = new Map();
 
   // Remote passages
   private remotePassages: Map<PassageId, RemotePassage> = new Map();
 
   // Pending operations
-  private pendingAcks: Map<string, PendingOperation<any>> = new Map();
+  private pendingAcks: Map<string, PendingOperation<unknown>> = new Map();
 
   // Active subscriptions (passageId -> subscription state)
   private activeSubscriptions: Map<PassageId, UniverseSubscription> = new Map();
 
   // Cached entity states for delta compression (passageId -> entityId -> last sent state)
-  private entityCache: Map<PassageId, Map<string, any>> = new Map();
+  private entityCache: Map<PassageId, Map<string, unknown>> = new Map();
 
   // My peer ID
   private myPeerId: PeerId;
@@ -103,10 +116,10 @@ export class MultiverseNetworkManager {
     try {
       const { WebSocketServer } = await import('ws');
 
-      this.wsServer = new WebSocketServer({ port });
+      this.wsServer = new WebSocketServer({ port }) as unknown as WebSocketServerLike;
 
-      this.wsServer.on('connection', (ws: WebSocket) => {
-        this.handleNewConnection(ws);
+      this.wsServer.on('connection', (ws: unknown) => {
+        this.handleNewConnection(ws as WebSocketLike);
       });
 
       this.wsServer.on('error', (error: Error) => {
@@ -135,30 +148,32 @@ export class MultiverseNetworkManager {
   /**
    * Handle new incoming connection
    */
-  private handleNewConnection(ws: WebSocket): void {
+  private handleNewConnection(ws: WebSocketLike): void {
     const peerId = this.generatePeerId();
     this.wsConnections.set(peerId, ws);
 
+    // Setup message handler (Node.js WebSocket style)
+    if (ws.on) {
+      ws.on('message', (data: unknown) => {
+        try {
+          const dataStr = typeof data === 'string' ? data : String(data);
+          const message = JSON.parse(dataStr) as NetworkMessage;
+          this.handleMessage(peerId, message);
+        } catch (error) {
+          console.error('[NetworkManager] Failed to parse message:', error);
+        }
+      });
 
-    // Setup message handler
-    ws.on('message', (data: string) => {
-      try {
-        const message = JSON.parse(data.toString()) as NetworkMessage;
-        this.handleMessage(peerId, message);
-      } catch (error) {
-        console.error('[NetworkManager] Failed to parse message:', error);
-      }
-    });
+      // Setup close handler
+      ws.on('close', () => {
+        this.handlePeerDisconnect(peerId);
+      });
 
-    // Setup close handler
-    ws.on('close', () => {
-      this.handlePeerDisconnect(peerId);
-    });
-
-    // Setup error handler
-    ws.on('error', (error: Error) => {
-      console.error(`[NetworkManager] WebSocket error for ${peerId}:`, error);
-    });
+      // Setup error handler
+      ws.on('error', (error: unknown) => {
+        console.error(`[NetworkManager] WebSocket error for ${peerId}:`, error);
+      });
+    }
   }
 
   // ============================================================================
@@ -170,16 +185,16 @@ export class MultiverseNetworkManager {
    */
   async connectToPeer(address: string): Promise<PeerId> {
     // Try browser WebSocket first
-    let WebSocketClass: any;
+    let WebSocketClass: new (address: string) => WebSocketLike;
 
     if (typeof WebSocket !== 'undefined') {
       // Browser environment
-      WebSocketClass = WebSocket;
+      WebSocketClass = WebSocket as unknown as new (address: string) => WebSocketLike;
     } else {
       // Node.js environment
       try {
         const ws = await import('ws');
-        WebSocketClass = ws.WebSocket || ws.default;
+        WebSocketClass = (ws.WebSocket || ws.default) as unknown as new (address: string) => WebSocketLike;
       } catch (error) {
         throw new Error(
           'WebSocket not available. ' +
@@ -193,7 +208,7 @@ export class MultiverseNetworkManager {
     // Wait for connection
     await new Promise<void>((resolve, reject) => {
       ws.onopen = () => resolve();
-      ws.onerror = (error: any) => reject(error);
+      ws.onerror = (error: unknown) => reject(error);
 
       // Timeout after 10 seconds
       setTimeout(() => reject(new Error('Connection timeout')), 10000);
@@ -202,8 +217,8 @@ export class MultiverseNetworkManager {
     const peerId = this.generatePeerId();
     this.wsConnections.set(peerId, ws);
 
-    // Setup handlers
-    ws.onmessage = (event: any) => {
+    // Setup handlers (browser style)
+    ws.onmessage = (event: { data: string }) => {
       try {
         const message = JSON.parse(event.data) as NetworkMessage;
         this.handleMessage(peerId, message);
@@ -216,10 +231,9 @@ export class MultiverseNetworkManager {
       this.handlePeerDisconnect(peerId);
     };
 
-    ws.onerror = (error: any) => {
+    ws.onerror = (error: unknown) => {
       console.error(`[NetworkManager] WebSocket error:`, error);
     };
-
 
     return peerId;
   }
@@ -431,9 +445,8 @@ export class MultiverseNetworkManager {
     }
 
     // Serialize entity
-    const serializedEntity = await (worldSerializer as { serializeEntity(entity: Entity): Promise<unknown> }).serializeEntity(
-      entity
-    );
+    type WorldSerializerWithEntity = { serializeEntity(entity: unknown): Promise<unknown> };
+    const serializedEntity = await (worldSerializer as WorldSerializerWithEntity).serializeEntity(entity);
 
     // Compute checksum
     const checksum = computeChecksumSync(serializedEntity);
@@ -640,7 +653,11 @@ export class MultiverseNetworkManager {
         break;
 
       default:
-        console.warn(`[NetworkManager] Unknown message type: ${(message as any).type}`);
+        // Type guard for unknown message
+        const unknownType = typeof message === 'object' && message !== null && 'type' in message
+          ? (message as { type: unknown }).type
+          : 'unknown';
+        console.warn(`[NetworkManager] Unknown message type: ${unknownType}`);
     }
   }
 
@@ -828,13 +845,12 @@ export class MultiverseNetworkManager {
       }
 
       // Deserialize entity
-      const entity = await (worldSerializer as { deserializeEntity(data: unknown): Promise<{ id: string }> }).deserializeEntity(
-        message.entity
-      );
+      type WorldSerializerWithDeserialize = { deserializeEntity(data: unknown): Promise<{ id: string }> };
+      const entity = await (worldSerializer as WorldSerializerWithDeserialize).deserializeEntity(message.entity);
 
       // Add entity to target world
-      type WorldImpl = { _entities: Map<string, unknown> };
-      const worldImpl = targetUniverse.world as WorldImpl;
+      type WorldWithEntities = { _entities: Map<string, unknown> };
+      const worldImpl = targetUniverse.world as WorldWithEntities;
       const oldEntityId = entity.id;
 
       // Generate new entity ID for this universe
@@ -965,7 +981,7 @@ export class MultiverseNetworkManager {
       lastSentTick: universe.universeTick,
       updateInterval: setInterval(() => {
         this.sendUniverseUpdate(message.passageId);
-      }, 1000 / message.config.syncFrequency) as any,
+      }, 1000 / message.config.syncFrequency),
     };
 
     this.activeSubscriptions.set(message.passageId, subscription);
@@ -1022,11 +1038,10 @@ export class MultiverseNetworkManager {
 
     // Serialize entities
     type EntityWithId = { id: string };
+    type WorldSerializerWithSerialize = { serializeEntity(entity: unknown): Promise<unknown> };
     const serializedEntities = await Promise.all(
       entities.map(async (entity) => {
-        const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
-          entity
-        );
+        const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
         // Cache for delta compression
         const cache = this.entityCache.get(passageId);
         if (cache && typeof entity === 'object' && entity !== null && 'id' in entity) {
@@ -1082,7 +1097,7 @@ export class MultiverseNetworkManager {
     if (!cache) return;
 
     // Compute deltas
-    const entitiesAdded: any[] = [];
+    const entitiesAdded: unknown[] = [];
     const entitiesUpdated: import('./NetworkProtocol.js').EntityUpdate[] = [];
     const entitiesRemoved: string[] = [];
 
@@ -1090,12 +1105,11 @@ export class MultiverseNetworkManager {
     const cachedEntityIds = new Set(cache.keys());
 
     // Find added entities
+    type WorldSerializerWithSerialize = { serializeEntity(entity: unknown): Promise<unknown> };
     for (const entity of currentEntities) {
       const entityWithId = entity as EntityWithId;
       if (!cache.has(entityWithId.id)) {
-        const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
-          entity
-        );
+        const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
         entitiesAdded.push(serialized);
         cache.set(entityWithId.id, serialized);
       } else if (subscription.config.deltaUpdatesOnly) {
@@ -1107,9 +1121,7 @@ export class MultiverseNetworkManager {
             deltas,
           });
           // Update cache
-          const serialized = await (worldSerializer as { serializeEntity(entity: unknown): Promise<unknown> }).serializeEntity(
-            entity
-          );
+          const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
           cache.set(entityWithId.id, serialized);
         }
       }
@@ -1221,24 +1233,34 @@ export class MultiverseNetworkManager {
    * Compute deltas between current and cached entity state
    */
   private computeEntityDeltas(
-    entity: any,
-    cachedState: any
+    entity: unknown,
+    cachedState: unknown
   ): import('./NetworkProtocol.js').ComponentDelta[] {
     const deltas: import('./NetworkProtocol.js').ComponentDelta[] = [];
 
+    // Type guards
+    if (typeof entity !== 'object' || entity === null || !('components' in entity)) return deltas;
+    if (typeof cachedState !== 'object' || cachedState === null || !('components' in cachedState)) return deltas;
+
+    type EntityWithComponents = { components: Map<string, unknown>; getComponent(type: string): unknown };
+    type CachedStateWithComponents = { components: Array<{ type: string; data: unknown }> };
+
+    const typedEntity = entity as EntityWithComponents;
+    const typedCached = cachedState as CachedStateWithComponents;
+
     const currentComponents = new Set<string>(
-      Array.from(entity.components.keys()) as string[]
+      Array.from(typedEntity.components.keys())
     );
     const cachedComponents = new Set<string>(
-      cachedState.components.map((c: any) => c.type as string)
+      typedCached.components.map((c) => c.type)
     );
 
     // Added components
     for (const type of currentComponents) {
       if (!cachedComponents.has(type)) {
-        const component = entity.getComponent(type);
+        const component = typedEntity.getComponent(type);
         deltas.push({
-          componentType: type as string,
+          componentType: type,
           operation: 'add',
           data: component,
         });
@@ -1249,7 +1271,7 @@ export class MultiverseNetworkManager {
     for (const type of cachedComponents) {
       if (!currentComponents.has(type)) {
         deltas.push({
-          componentType: type as string,
+          componentType: type,
           operation: 'remove',
         });
       }
@@ -1258,13 +1280,13 @@ export class MultiverseNetworkManager {
     // Updated components (simplified - check if serialized form differs)
     for (const type of currentComponents) {
       if (cachedComponents.has(type)) {
-        const current = entity.getComponent(type);
-        const cached = cachedState.components.find((c: any) => c.type === type);
+        const current = typedEntity.getComponent(type);
+        const cached = typedCached.components.find((c) => c.type === type);
 
         // Simple deep comparison via JSON
         if (JSON.stringify(current) !== JSON.stringify(cached?.data)) {
           deltas.push({
-            componentType: type as string,
+            componentType: type,
             operation: 'update',
             data: current,
           });
@@ -1282,10 +1304,15 @@ export class MultiverseNetworkManager {
   /**
    * Get or create event manager for a universe
    */
-  private getOrCreateEventManager(universeId: string, world: any): SystemEventManager {
+  private getOrCreateEventManager(universeId: string, world: unknown): SystemEventManager {
     let events = this.eventManagers.get(universeId);
     if (!events) {
-      events = new SystemEventManager(world.eventBus, `multiverse_network_${universeId}`);
+      // Type guard for world with eventBus
+      if (typeof world !== 'object' || world === null || !('eventBus' in world)) {
+        throw new Error('World does not have eventBus property');
+      }
+      type WorldWithEventBus = { eventBus: unknown };
+      events = new SystemEventManager((world as WorldWithEventBus).eventBus, `multiverse_network_${universeId}`);
       this.eventManagers.set(universeId, events);
     }
     return events;

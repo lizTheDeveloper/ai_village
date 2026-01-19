@@ -44,6 +44,8 @@ import {
   // Conflict system components
   createCombatStatsComponent,
   createDominanceRankComponent,
+  type InjuryComponent,
+  type GuardDutyComponent,
   // Realm system components
   createRealmLocationComponent,
   SpeciesComponent,
@@ -54,6 +56,14 @@ import {
   createSexualityComponent,
   ensureCourtshipComponent,
 } from '@ai-village/reproduction';
+
+/**
+ * Internal interface for accessing World's _addEntity method.
+ * This is used for proper spatial indexing when adding entities.
+ */
+interface WorldInternal extends WorldMutator {
+  _addEntity(entity: EntityImpl): void;
+}
 
 /**
  * Determine the best vision profile based on agent skills.
@@ -231,7 +241,7 @@ export function createWanderingAgent(
   entity.addComponent(createGatheringStatsComponent());
 
   // Spiritual component - faith and divine connection based on personality
-  const spiritualityTrait = (personality as any)?.spirituality ?? 0.5;
+  const spiritualityTrait = personality.spirituality;
   entity.addComponent(createSpiritualComponent(spiritualityTrait, options?.believedDeity));
 
   // Personal Goals - track agent's aspirations and progress
@@ -247,7 +257,7 @@ export function createWanderingAgent(
   }));
 
   // Injury tracking - starts with no injuries (using empty component object)
-  entity.addComponent({
+  const initialInjury: InjuryComponent = {
     type: 'injury',
     version: 1,
     injuryType: 'laceration', // Required by interface but unused when injuries array is empty
@@ -258,13 +268,14 @@ export function createWanderingAgent(
     elapsed: 0,
     treated: false,
     untreatedDuration: 0,
-  } as any); // Cast needed because interface requires fields even when using injuries array
+  };
+  entity.addComponent(initialInjury);
 
   // Guard duty - not assigned initially (using minimal object)
-  entity.addComponent({
+  const initialGuardDuty: GuardDutyComponent = {
     type: 'guard_duty',
     version: 1,
-    assignmentType: 'location' as const, // Required by interface but unused when no assignment
+    assignmentType: 'location', // Required by interface but unused when no assignment
     targetLocation: undefined,
     targetPerson: undefined,
     patrolRoute: undefined,
@@ -272,7 +283,8 @@ export function createWanderingAgent(
     alertness: 1.0,
     responseRadius: 10,
     lastCheckTime: 0,
-  } as any); // Cast needed for optional fields
+  };
+  entity.addComponent(initialGuardDuty);
 
   // Dominance rank - neutral rank for non-hierarchical species
   entity.addComponent(createDominanceRankComponent({
@@ -303,8 +315,8 @@ export function createWanderingAgent(
   // Species - all agents default to human species
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
-  // Add to world
-  (world as any)._addEntity(entity);
+  // Add to world - using internal _addEntity method for proper spatial indexing
+  (world as WorldInternal)._addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
   const identity = entity.getComponent('identity') as { name: string } | undefined;
@@ -455,7 +467,7 @@ export function createLLMAgent(
   entity.addComponent(createGatheringStatsComponent());
 
   // Spiritual component - faith and divine connection based on personality
-  const spiritualityTrait = (personalityLLM as any)?.spirituality ?? 0.5;
+  const spiritualityTrait = personalityLLM.spirituality;
   entity.addComponent(createSpiritualComponent(spiritualityTrait, options?.believedDeity));
 
   // Personal Goals - track agent's aspirations and progress
@@ -471,7 +483,7 @@ export function createLLMAgent(
   }));
 
   // Injury tracking - starts with no injuries (using empty component object)
-  entity.addComponent({
+  const initialInjuryLLM: InjuryComponent = {
     type: 'injury',
     version: 1,
     injuryType: 'laceration', // Required by interface but unused when injuries array is empty
@@ -482,13 +494,14 @@ export function createLLMAgent(
     elapsed: 0,
     treated: false,
     untreatedDuration: 0,
-  } as any); // Cast needed because interface requires fields even when using injuries array
+  };
+  entity.addComponent(initialInjuryLLM);
 
   // Guard duty - not assigned initially (using minimal object)
-  entity.addComponent({
+  const initialGuardDutyLLM: GuardDutyComponent = {
     type: 'guard_duty',
     version: 1,
-    assignmentType: 'location' as const, // Required by interface but unused when no assignment
+    assignmentType: 'location', // Required by interface but unused when no assignment
     targetLocation: undefined,
     targetPerson: undefined,
     patrolRoute: undefined,
@@ -496,7 +509,8 @@ export function createLLMAgent(
     alertness: 1.0,
     responseRadius: 10,
     lastCheckTime: 0,
-  } as any); // Cast needed for optional fields
+  };
+  entity.addComponent(initialGuardDutyLLM);
 
   // Dominance rank - neutral rank for non-hierarchical species
   entity.addComponent(createDominanceRankComponent({
@@ -547,8 +561,8 @@ export function createLLMAgent(
     });
   }
 
-  // Add to world
-  (world as any)._addEntity(entity);
+  // Add to world - using internal _addEntity method for proper spatial indexing
+  (world as WorldInternal)._addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
   const identity = entity.getComponent('identity') as { name: string } | undefined;

@@ -357,7 +357,8 @@ const introspectionCapability = defineCapability({
 
         try {
           // Access snapshots from persistence system
-          const snapshots = (world as any).snapshots || [];
+          type WorldWithSnapshots = { snapshots?: unknown[] };
+          const snapshots = (world as WorldWithSnapshots).snapshots || [];
           return { count: snapshots.length, snapshots };
         } catch (error) {
           return { error: error instanceof Error ? error.message : String(error) };
@@ -375,7 +376,8 @@ const introspectionCapability = defineCapability({
         if (!world) {
           return { error: 'No active game world' };
         }
-        const snapshots = (world as any).snapshots || [];
+        type WorldWithSnapshots = { snapshots?: unknown[] };
+        const snapshots = (world as WorldWithSnapshots).snapshots || [];
         return { count: snapshots.length };
       },
     }),
@@ -501,7 +503,7 @@ const introspectionCapability = defineCapability({
           return { success: false, error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        let value: any;
+        let value: unknown;
         try {
           value = JSON.parse(params.valueJson as string);
         } catch (err) {
@@ -632,7 +634,7 @@ const introspectionCapability = defineCapability({
           return { success: false, error: 'GameIntrospectionAPI not available on world instance' };
         }
 
-        let position: any;
+        let position: unknown;
         try {
           position = JSON.parse(params.positionJson as string);
         } catch (err) {
@@ -813,7 +815,8 @@ const introspectionCapability = defineCapability({
           return { success: false, error: 'No active game world' };
         }
         type Snapshot = { id: string };
-        const snapshots = world.snapshots || [];
+        type WorldWithSnapshots = { snapshots?: unknown[] };
+        const snapshots = (world as WorldWithSnapshots).snapshots || [];
         const index = snapshots.findIndex((s) => typeof s === 'object' && s !== null && 'id' in s && (s as Snapshot).id === params.snapshotId);
 
         if (index === -1) {
@@ -837,10 +840,10 @@ const introspectionCapability = defineCapability({
         if (!world) {
           return { success: false, error: 'No active game world' };
         }
-        type MutableWorld = { snapshots?: unknown[] };
-        const snapshots = world.snapshots || [];
+        type WorldWithSnapshots = { snapshots?: unknown[] };
+        const snapshots = (world as WorldWithSnapshots).snapshots || [];
         const count = snapshots.length;
-        (world as MutableWorld).snapshots = [];
+        (world as WorldWithSnapshots).snapshots = [];
 
         return { success: true, deletedCount: count };
       },

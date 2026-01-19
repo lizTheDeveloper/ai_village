@@ -37,53 +37,56 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
 
   sources: [
     {
+      id: 'sympathy_alar',
+      name: 'Alar',
       type: 'internal',
       regeneration: 'rest',
       detectability: 'subtle',
       storable: false,
       transferable: false,
       stealable: false,
+      description: 'Mental focus and willpower for maintaining sympathetic links',
     },
-  ] as any[],
+  ],
 
   costs: [
-    { type: 'stamina', baseAmount: 10, powerMultiplier: 2.0 },
-    { type: 'sanity', baseAmount: 5, powerMultiplier: 1.5 }, // Mental strain
-  ] as any[],
+    { type: 'stamina', canBeTerminal: false, cumulative: true, recoverable: true, recoveryMethod: 'rest', visibility: 'subtle' },
+    { type: 'sanity', canBeTerminal: false, cumulative: true, recoverable: true, recoveryMethod: 'rest', visibility: 'subtle' },
+  ],
 
   channels: [
-    { name: 'will', requirement: 'required' },
-    { name: 'focus', requirement: 'required' }, // Alar (mental discipline)
-    { name: 'material', requirement: 'required' }, // Need linked objects
-  ] as any[],
+    { type: 'will', requirement: 'required', canBeMastered: true, blockEffect: 'prevents_casting', description: 'Mental focus (Alar)' },
+    { type: 'focus', requirement: 'required', canBeMastered: true, blockEffect: 'prevents_casting', description: 'Concentration on the binding' },
+    { type: 'material', requirement: 'required', canBeMastered: false, blockEffect: 'prevents_casting', description: 'Link objects needed' },
+  ],
 
   laws: [
-    { type: 'similarity', strength: 'absolute', circumventable: false },
-    { type: 'conservation', strength: 'absolute', circumventable: false },
-    { type: 'contagion', strength: 'strong', circumventable: false },
-  ] as any[],
+    { id: 'similarity', name: 'Law of Similarity', type: 'similarity', strictness: 'absolute', canBeCircumvented: false, description: 'Link strength depends on similarity' },
+    { id: 'conservation', name: 'Conservation of Energy', type: 'conservation', strictness: 'absolute', canBeCircumvented: false, description: 'Energy cannot be created' },
+    { id: 'contagion', name: 'Law of Contagion', type: 'contagion', strictness: 'strong', canBeCircumvented: false, description: 'Things that touched remain connected' },
+  ],
 
   risks: [
-    { trigger: 'failure', consequence: 'backlash', severity: 'severe', probability: 0.3, mitigatable: true },
-    { trigger: 'overuse', consequence: 'burnout', severity: 'moderate', probability: 0.2, mitigatable: true },
-    { trigger: 'paradox', consequence: 'feedback_loop', severity: 'catastrophic', probability: 0.1, mitigatable: false },
-  ] as any[],
+    { trigger: 'overuse', consequence: 'backlash', severity: 'severe', probability: 0.3, mitigatable: true, mitigationSkill: 'alar_mastery', description: 'Binder\'s chills from overextension' },
+    { trigger: 'overuse', consequence: 'burnout', severity: 'moderate', probability: 0.2, mitigatable: true, description: 'Mental exhaustion from maintaining multiple bindings' },
+    { trigger: 'split_alar', consequence: 'feedback_loop', severity: 'catastrophic', probability: 0.1, mitigatable: false, description: 'Split focus causes catastrophic feedback' },
+  ],
 
   acquisitionMethods: [
-    { method: 'study', rarity: 'common' },
-    { method: 'apprenticeship', rarity: 'common' },
-  ] as any[],
+    { method: 'study', rarity: 'uncommon', voluntary: true, prerequisites: ['university_access'], grantsAccess: ['sympathy_alar'], startingProficiency: 15, description: 'University training in sympathy' },
+    { method: 'training', rarity: 'common', voluntary: true, prerequisites: ['strong_alar'], grantsAccess: ['sympathy_alar'], startingProficiency: 10, description: 'Apprenticeship with a sympathist' },
+  ],
 
   availableTechniques: ['create', 'destroy', 'transform', 'control'],
   availableForms: ['fire', 'water', 'earth', 'air', 'body', 'mind'],
 
   forbiddenCombinations: [
-    { technique: 'create', form: 'spirit', reason: 'Cannot create sympathy with souls' },
-  ] as any[],
+    { technique: 'create', form: 'spirit', reason: 'Cannot create sympathy with souls', consequence: 'Soul damage to both parties' },
+  ],
 
   resonantCombinations: [
     { technique: 'control', form: 'fire', bonusEffect: 'Heat transfer through links', powerMultiplier: 1.5 },
-  ] as any[],
+  ],
 
   powerScaling: 'logarithmic',
   powerCeiling: 100,
@@ -96,7 +99,6 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
   foreignMagicPolicy: 'neutral',
   compatibleParadigms: ['academic'],
   conflictingParadigms: ['pact', 'divine'],
-  foreignMagicEffect: 'weakened' as any,
 };
 
 /**

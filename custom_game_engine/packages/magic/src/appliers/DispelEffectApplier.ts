@@ -19,6 +19,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { ActiveEffectsComponent } from '../types/ComponentTypes.js';
 
 // ============================================================================
 // DispelEffectApplier
@@ -40,8 +41,8 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     // Check range (unless self-cast or counterspell)
     const dispelType = (effect as any).dispelType;
     if (dispelType !== 'counterspell' && effect.range && caster.id !== target.id) {
-      const casterPos = caster.components.get('position') as any;
-      const targetPos = target.components.get('position') as any;
+      const casterPos = caster.components.get('position') as { x?: number; y?: number } | undefined;
+      const targetPos = target.components.get('position') as { x?: number; y?: number } | undefined;
 
       // Default to origin if no position
       const casterX = casterPos?.x ?? 0;
@@ -115,7 +116,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const activeEffects = target.components.get('active_effects') as any;
+    const activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (!activeEffects || !activeEffects.effects || activeEffects.effects.length === 0) {
       return {
@@ -136,7 +137,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     const dispelPower = dispelPowerScaled ? dispelPowerScaled.value : ((effect as any).dispelPower ?? 50);
 
     // Filter to dispellable effects
-    const dispellableEffects = activeEffects.effects.filter((e: any) =>
+    const dispellableEffects = activeEffects.effects.filter((e) =>
       !e.permanent && this.canDispel(e, dispelPower)
     );
 
@@ -186,7 +187,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const activeEffects = target.components.get('active_effects') as any;
+    const activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (!activeEffects || !activeEffects.effects || activeEffects.effects.length === 0) {
       return {
@@ -208,7 +209,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
 
     // Separate dispellable from permanent/protected effects
     const initialCount = activeEffects.effects.length;
-    activeEffects.effects = activeEffects.effects.filter((e: any) =>
+    activeEffects.effects = activeEffects.effects.filter((e) =>
       e.permanent || !this.canDispel(e, dispelPower)
     );
     const finalCount = activeEffects.effects.length;
@@ -239,7 +240,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const activeEffects = target.components.get('active_effects') as any;
+    const activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (!activeEffects || !activeEffects.effects || activeEffects.effects.length === 0) {
       return {
@@ -277,7 +278,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
 
     // Remove effects matching category
     const initialCount = activeEffects.effects.length;
-    activeEffects.effects = activeEffects.effects.filter((e: any) =>
+    activeEffects.effects = activeEffects.effects.filter((e) =>
       e.category !== targetCategory || e.permanent || !this.canDispel(e, dispelPower)
     );
     const finalCount = activeEffects.effects.length;
@@ -309,11 +310,12 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    let activeEffects = target.components.get('active_effects') as any;
+    let activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (!activeEffects) {
       // Add active_effects component if missing
       activeEffects = {
+        type: 'active_effects',
         effects: [],
         suppressed: false,
       };
@@ -425,7 +427,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
    * Check if an effect can be dispelled based on power level.
    * Dispel succeeds if dispel power >= 80% of effect power.
    */
-  private canDispel(activeEffect: any, dispelPower: number): boolean {
+  private canDispel(activeEffect: ActiveEffect, dispelPower: number): boolean {
     const effectPower = activeEffect.power ?? 50;
     const requiredPower = effectPower * 0.8;
     return dispelPower >= requiredPower;
@@ -442,7 +444,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     context: EffectContext
   ): void {
     // Check if suppression has expired
-    const activeEffects = target.components.get('active_effects') as any;
+    const activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (activeEffects && activeEffects.suppressed) {
       if (activeEffects.suppressedUntil && context.tick >= activeEffects.suppressedUntil) {
@@ -463,7 +465,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _world: World
   ): void {
     // Clean up suppression if this was a suppression effect
-    const activeEffects = target.components.get('active_effects') as any;
+    const activeEffects = target.components.get('active_effects') as ActiveEffectsComponent | undefined;
 
     if (activeEffects && activeEffects.suppressed) {
       activeEffects.suppressed = false;

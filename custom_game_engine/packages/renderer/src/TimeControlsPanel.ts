@@ -1,5 +1,14 @@
 import type { IWindowPanel } from './types/WindowTypes.js';
-import type { World } from '@ai-village/core';
+import type { World, Entity } from '@ai-village/core';
+
+// Component interface for type safety
+interface TimeComponent {
+  timeOfDay: number;
+  day: number;
+  phase: string;
+  speedMultiplier: number;
+  _savedSpeed?: number;
+}
 
 /**
  * TimeControlsPanel - Visual controls for time speed and pause/play
@@ -65,7 +74,7 @@ export class TimeControlsPanel implements IWindowPanel {
     // Get time component
     const timeEntities = world.query().with('time').executeEntities();
     const timeEntity = timeEntities.length > 0 ? timeEntities[0] : null;
-    const timeComp = timeEntity?.components.get('time') as any;
+    const timeComp = timeEntity?.components.get('time') as TimeComponent | undefined;
 
     if (!timeComp) {
       ctx.fillStyle = '#999';
@@ -177,7 +186,7 @@ export class TimeControlsPanel implements IWindowPanel {
 
     const timeEntities = world.query().with('time').executeEntities();
     const timeEntity = timeEntities.length > 0 ? timeEntities[0] : null;
-    const timeComp = timeEntity?.components.get('time') as any;
+    const timeComp = timeEntity?.components.get('time') as TimeComponent | undefined;
 
     if (!timeComp || !timeEntity) {
       return false;
@@ -198,10 +207,12 @@ export class TimeControlsPanel implements IWindowPanel {
           if (!speedBtn || speedBtn.speed === undefined) continue;
 
           const speed = speedBtn.speed;
-          (timeEntity as any).updateComponent('time', (current: any) => ({
-            ...current,
-            speedMultiplier: speed,
-          }));
+          if ('updateComponent' in timeEntity && typeof timeEntity.updateComponent === 'function') {
+            timeEntity.updateComponent('time', (current: TimeComponent) => ({
+              ...current,
+              speedMultiplier: speed,
+            }));
+          }
 
           // Unpause if paused
           if (this.isPaused) {
@@ -222,17 +233,19 @@ export class TimeControlsPanel implements IWindowPanel {
         this.isPaused = !this.isPaused;
 
         // Store previous speed and set to 0, or restore previous speed
-        if (this.isPaused) {
-          (timeEntity as any).updateComponent('time', (current: any) => ({
-            ...current,
-            _savedSpeed: current.speedMultiplier,
-            speedMultiplier: 0,
-          }));
-        } else {
-          (timeEntity as any).updateComponent('time', (current: any) => ({
-            ...current,
-            speedMultiplier: current._savedSpeed || 1,
-          }));
+        if ('updateComponent' in timeEntity && typeof timeEntity.updateComponent === 'function') {
+          if (this.isPaused) {
+            timeEntity.updateComponent('time', (current: TimeComponent) => ({
+              ...current,
+              _savedSpeed: current.speedMultiplier,
+              speedMultiplier: 0,
+            }));
+          } else {
+            timeEntity.updateComponent('time', (current: TimeComponent) => ({
+              ...current,
+              speedMultiplier: current._savedSpeed || 1,
+            }));
+          }
         }
 
         return true;
@@ -260,17 +273,19 @@ export class TimeControlsPanel implements IWindowPanel {
 
       this.isPaused = !this.isPaused;
 
-      if (this.isPaused) {
-        (timeEntity as any).updateComponent('time', (current: any) => ({
-          ...current,
-          _savedSpeed: current.speedMultiplier,
-          speedMultiplier: 0,
-        }));
-      } else {
-        (timeEntity as any).updateComponent('time', (current: any) => ({
-          ...current,
-          speedMultiplier: current._savedSpeed || 1,
-        }));
+      if ('updateComponent' in timeEntity && typeof timeEntity.updateComponent === 'function') {
+        if (this.isPaused) {
+          timeEntity.updateComponent('time', (current: TimeComponent) => ({
+            ...current,
+            _savedSpeed: current.speedMultiplier,
+            speedMultiplier: 0,
+          }));
+        } else {
+          timeEntity.updateComponent('time', (current: TimeComponent) => ({
+            ...current,
+            speedMultiplier: current._savedSpeed || 1,
+          }));
+        }
       }
 
       return true;

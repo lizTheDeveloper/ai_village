@@ -490,11 +490,13 @@ export class WisdomGoddessSystem extends BaseSystem {
     }
 
     // Update the relationship using atomic component update
-    // EntityImpl cast needed: updateComponent is only available on EntityImpl, not Entity interface
-    const goddessImpl = goddess as EntityImpl;
-    goddessImpl.updateComponent<RelationshipComponent>('relationship', (current) =>
-      updateRelationship(current, targetId, currentTick, 3, affinityChange)
-    );
+    // Cast to EntityImpl to access updateComponent method
+    if ('updateComponent' in goddess) {
+      const goddessImpl = goddess as EntityImpl;
+      goddessImpl.updateComponent<RelationshipComponent>('relationship', (current) =>
+        updateRelationship(current, targetId, currentTick, 3, affinityChange)
+      );
+    }
   }
 
   /**

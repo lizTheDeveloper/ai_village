@@ -77,7 +77,7 @@ export class PlayerCanvasRenderer implements PlayerRenderer {
 
     // Render each field
     for (const [fieldName, field] of visibleFields) {
-      const value = (component as any)[fieldName];
+      const value = (component as Record<string, unknown>)[fieldName];
 
       // Render icon if present and enabled
       let offsetX = x;

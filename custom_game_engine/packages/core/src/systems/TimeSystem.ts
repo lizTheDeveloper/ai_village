@@ -93,6 +93,8 @@ export class TimeSystem extends BaseSystem {
   public readonly id: SystemId = 'time';
   public readonly priority: number = 3; // Run early, before Weather (priority 5)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
+  // Only run when time components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Time] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   /**

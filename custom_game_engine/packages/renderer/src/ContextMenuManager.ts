@@ -11,6 +11,17 @@ import type { Camera } from './Camera.js';
 import { MenuContext } from './context-menu/MenuContext.js';
 import { ContextActionRegistry } from './context-menu/ContextActionRegistry.js';
 import { ContextMenuRenderer } from './ContextMenuRenderer.js';
+
+// Component interfaces for type safety
+interface BuildingComponent {
+  canEnter?: boolean;
+  locked?: boolean;
+  health?: number;
+}
+
+interface HarvestableComponent {
+  amount?: number;
+}
 import type {
   RadialMenuItem,
   MenuState,
@@ -696,16 +707,16 @@ export class ContextMenuManager {
       // Additional context-specific checks
       if (action.id === 'enter') {
         const building = context.getTargetEntity(this.world);
-        const buildingComp = building ? (building as EntityImpl).getComponent('building') as any : undefined;
+        const buildingComp = building ? (building as EntityImpl).getComponent('building') as BuildingComponent | undefined : undefined;
         isEnabled = buildingComp?.canEnter === true && buildingComp?.locked !== true;
       } else if (action.id === 'repair') {
         const building = context.getTargetEntity(this.world);
-        const buildingComp = building ? (building as EntityImpl).getComponent('building') as any : undefined;
-        isEnabled = buildingComp && buildingComp.health < 1.0;
+        const buildingComp = building ? (building as EntityImpl).getComponent('building') as BuildingComponent | undefined : undefined;
+        isEnabled = buildingComp !== undefined && buildingComp.health !== undefined && buildingComp.health < 1.0;
       } else if (action.id === 'harvest') {
         const resource = context.getTargetEntity(this.world);
-        const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as any : undefined;
-        isEnabled = harvestable && harvestable.amount > 0;
+        const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as HarvestableComponent | undefined : undefined;
+        isEnabled = harvestable !== undefined && harvestable.amount !== undefined && harvestable.amount > 0;
       } else if (action.id === 'follow') {
         isEnabled = context.hasSelection();
       } else if (action.id === 'assign_worker') {
@@ -769,7 +780,7 @@ export class ContextMenuManager {
    */
   private cleanupEventListeners(): void {
     for (const { event, handler } of this.eventListeners) {
-      this.eventBus.off(event as any, handler);
+      this.eventBus.off(event, handler);
     }
     this.eventListeners = [];
   }

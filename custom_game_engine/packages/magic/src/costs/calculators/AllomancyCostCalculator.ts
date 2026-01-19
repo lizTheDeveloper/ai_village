@@ -17,6 +17,7 @@ import {
   type ResourceInitOptions,
   type TerminalEffect,
 } from '../CostCalculator.js';
+import type { MagicCostType } from '../MagicParadigm.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 
 /** Allomantic metals */
@@ -195,7 +196,7 @@ export class AllomancyCostCalculator extends BaseCostCalculator {
    * Override terminal effect for allomancy-specific consequences.
    */
   protected override getTerminalEffect(
-    costType: string,
+    costType: MagicCostType,
     trigger: 'zero' | 'max',
     _caster: MagicComponent
   ): TerminalEffect {
@@ -214,13 +215,13 @@ export class AllomancyCostCalculator extends BaseCostCalculator {
       };
     }
 
-    return super.getTerminalEffect(costType as any, trigger, _caster);
+    return super.getTerminalEffect(costType, trigger, _caster);
   }
 
   /**
    * Strain is cumulative.
    */
-  protected override isCumulativeCost(costType: string): boolean {
-    return costType === 'strain' || super.isCumulativeCost(costType as any);
+  protected override isCumulativeCost(costType: MagicCostType): boolean {
+    return costType === 'strain' || super.isCumulativeCost(costType);
   }
 }

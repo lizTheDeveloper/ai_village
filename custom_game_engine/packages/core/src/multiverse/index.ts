@@ -70,3 +70,15 @@ export type {
   SpatialAudioSettings,
   PlayerVoiceState,
 } from './ProximityVoiceChat.js';
+
+// Timeline merge helpers
+export {
+  findCommonAncestor,
+  compareAgentStates,
+  compareAgentSkills,
+  findEntity,
+  replaceEntity,
+  addEntity,
+  findComponent,
+  markBranchAsMerged,
+} from './MergeHelpers.js';

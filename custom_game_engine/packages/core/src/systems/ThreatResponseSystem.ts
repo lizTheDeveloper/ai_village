@@ -38,6 +38,8 @@ export class ThreatResponseSystem extends BaseSystem {
   public readonly id = 'threat-response';
   public readonly priority = 900; // Late priority, after most game logic
   public readonly requiredComponents = ['threat_detection', 'position', 'personality'] as const;
+  // Lazy activation: Skip entire system when no threat detection exists in world
+  public readonly activationComponents = ['threat_detection'] as const;
   public readonly name = 'ThreatResponseSystem';
 
   protected readonly throttleInterval = 5; // Every 5 ticks (~0.25 seconds)

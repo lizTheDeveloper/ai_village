@@ -11,6 +11,17 @@ import type { Entity } from '@ai-village/core';
 import type { Camera } from '../Camera.js';
 import type { ContextType } from './types.js';
 
+// Component interfaces for type safety
+interface PositionComponent {
+  x: number;
+  y: number;
+  z?: number;
+}
+
+interface SelectableComponent {
+  selected?: boolean;
+}
+
 /**
  * Context information for menu actions.
  */
@@ -274,7 +285,7 @@ export class MenuContext {
     // Query all entities with position components
     // NOTE: Entity positions are stored in TILE coordinates
     for (const entity of Array.from(world.entities.values())) {
-      const pos = (entity as EntityImpl).getComponent('position') as any;
+      const pos = (entity as EntityImpl).getComponent('position') as PositionComponent | undefined;
       if (!pos) continue;
 
       const dx = pos.x - x;
@@ -297,7 +308,7 @@ export class MenuContext {
 
     for (const entity of Array.from(world.entities.values())) {
       const entityImpl = entity as EntityImpl;
-      const selectable = entityImpl.getComponent('selectable') as any;
+      const selectable = entityImpl.getComponent('selectable') as SelectableComponent | undefined;
       if (selectable && selectable.selected === true) {
         selected.push(entityImpl.id);
       }

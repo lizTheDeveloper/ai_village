@@ -50,7 +50,7 @@ export function createLeafPile(world: WorldMutator, x: number, y: number): strin
   entity.addComponent(createResourceComponent('leaves', 30, 0.2)); // 30 leaves, regenerates 0.2/sec
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

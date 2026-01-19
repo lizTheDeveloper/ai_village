@@ -1,5 +1,35 @@
-import type { EventBus, World, Entity } from '@ai-village/core';
+import type { EventBus, World, Entity, NeedsComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
+
+// Component interfaces for type safety
+interface IdentityComponent {
+  name?: string;
+}
+
+interface CombatStatsComponent {
+  combatSkill?: number;
+  weapon?: string;
+  armor?: string;
+}
+
+interface InjuryData {
+  type: string;
+  severity?: string;
+  bodyPart?: string;
+}
+
+interface InjuryComponent {
+  injuries: InjuryData[];
+}
+
+interface ConflictComponent {
+  stance?: string;
+  currentAction?: string;
+}
+
+interface EntitySelectedData {
+  entityId?: string;
+}
 
 /**
  * CombatUnitPanel - Detailed view of selected combatant
@@ -18,7 +48,7 @@ export class CombatUnitPanel implements IWindowPanel {
   private element: HTMLElement | null = null;
 
   // Event handlers for cleanup
-  private entitySelectedHandler: ((data: any) => void) | null = null;
+  private entitySelectedHandler: ((data: EntitySelectedData) => void) | null = null;
 
 
   getDefaultWidth(): number {
@@ -78,7 +108,7 @@ export class CombatUnitPanel implements IWindowPanel {
   /**
    * Handle entity selected event
    */
-  private handleEntitySelected(data: any): void {
+  private handleEntitySelected(data: EntitySelectedData): void {
     if (data.entityId) {
       const entity = this.world.getEntity(data.entityId);
       this.setSelectedEntity(entity || null);
@@ -126,7 +156,7 @@ export class CombatUnitPanel implements IWindowPanel {
     container.appendChild(title);
 
     // Entity name
-    const identity = this.selectedEntity.components.get('identity') as any;
+    const identity = this.selectedEntity.components.get('identity') as IdentityComponent | undefined;
     if (identity) {
       const nameEl = document.createElement('div');
       nameEl.className = 'unit-name';
@@ -140,8 +170,8 @@ export class CombatUnitPanel implements IWindowPanel {
     }
 
     // Combat stats section
-    const combatStats = this.selectedEntity.components.get('combat_stats') as any;
-    const needs = this.selectedEntity.components.get('needs') as any;
+    const combatStats = this.selectedEntity.components.get('combat_stats') as CombatStatsComponent | undefined;
+    const needs = this.selectedEntity.components.get('needs') as NeedsComponent | undefined;
 
     if (combatStats || needs) {
       const statsSection = document.createElement('div');
@@ -246,7 +276,7 @@ export class CombatUnitPanel implements IWindowPanel {
     }
 
     // Injuries section
-    const injury = this.selectedEntity.components.get('injury') as any;
+    const injury = this.selectedEntity.components.get('injury') as InjuryComponent | undefined;
     if (injury && injury.injuries && injury.injuries.length > 0) {
       const injurySection = document.createElement('div');
       injurySection.style.cssText = `
@@ -280,7 +310,7 @@ export class CombatUnitPanel implements IWindowPanel {
     }
 
     // Current stance
-    const conflict = this.selectedEntity.components.get('conflict') as any;
+    const conflict = this.selectedEntity.components.get('conflict') as ConflictComponent | undefined;
     if (conflict) {
       const stanceSection = document.createElement('div');
       stanceSection.style.cssText = `

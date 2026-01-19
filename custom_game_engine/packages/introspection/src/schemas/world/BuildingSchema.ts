@@ -320,9 +320,10 @@ export const BuildingSchema = autoRegister(
     },
 
     validate: (data): data is BuildingComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'building') return false;
+      if (d.type !== 'building') return false;
       if (typeof d.buildingType !== 'string') return false;
       if (typeof d.tier !== 'number' || d.tier < 1 || d.tier > 3) {
         throw new RangeError(`Invalid tier: ${d.tier} (must be 1-3)`);
@@ -334,7 +335,7 @@ export const BuildingSchema = autoRegister(
       if (typeof d.blocksMovement !== 'boolean') return false;
       if (typeof d.storageCapacity !== 'number' || d.storageCapacity < 0) return false;
       if (!Array.isArray(d.currentOccupants)) return false;
-      if (!['communal', 'personal', 'shared'].includes(d.accessType)) return false;
+      if (!['communal', 'personal', 'shared'].includes(d.accessType as string)) return false;
 
       return true;
     },

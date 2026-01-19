@@ -106,6 +106,8 @@ export * from './ShopComponent.js';
 export type { ShopComponent } from './ShopComponent.js';
 export * from './MarketStateComponent.js';
 export type { MarketStateComponent, ItemMarketStats } from './MarketStateComponent.js';
+export * from './KnowledgeLossComponent.js';
+export type { KnowledgeLossComponent, LostMemory } from './KnowledgeLossComponent.js';
 // Publishing components
 export * from './LibraryComponent.js';
 export { createLibraryComponent, addItemToLibrary, recordRead, canAccessLibrary, addMember } from './LibraryComponent.js';
@@ -303,6 +305,20 @@ export type {
   MilitaryComponent,
 } from './MilitaryComponent.js';
 export * from './PassageComponent.js';
+// Invasion (Multiverse warfare)
+export * from './InvasionComponent.js';
+export { createInvasionComponent } from './InvasionComponent.js';
+export type {
+  InvasionComponent,
+  InvasionType,
+  InvasionOutcome,
+  DefenseStrategy,
+  InvasionResult,
+  UpliftResult,
+  EconomicInvasionResult,
+  InvasionDefense,
+  ActiveInvasion,
+} from './InvasionComponent.js';
 export {
   createPassageComponent,
   canTraverse,
@@ -780,3 +796,33 @@ export * from './ShippingLaneComponent.js';
 export type { ShippingLaneComponent, LaneHazard } from './ShippingLaneComponent.js';
 export * from './TradeCaravanComponent.js';
 export type { TradeCaravanComponent, CargoItem } from './TradeCaravanComponent.js';
+
+// Multiverse & Timeline Forking
+export * from './UniverseForkMetadataComponent.js';
+export * from './MergeCompatibilityComponent.js';
+export {
+  createUniverseForkMetadata,
+  recordDivergenceEvent,
+  DIVERGENCE_EVENT_IMPACTS,
+} from './UniverseForkMetadataComponent.js';
+export type {
+  UniverseForkMetadataComponent,
+  ForkTrigger,
+  CriticalEvent,
+  DivergenceEvent,
+  CanonEvent,
+  MergeConflict,
+} from './UniverseForkMetadataComponent.js';
+
+// Multiverse - Divergence Tracking
+export * from './DivergenceTrackingComponent.js';
+export type { DivergenceTrackingComponent } from './DivergenceTrackingComponent.js';
+export { DIVERGENCE_EVENT_IMPACTS as DIVERGENCE_IMPACTS } from './DivergenceTrackingComponent.js';
+
+// Multiverse - Canon Events
+export * from './CanonEventComponent.js';
+export type {
+  CanonEventComponent,
+  CanonEventAlteration,
+  CanonEventConvergence,
+} from './CanonEventComponent.js';

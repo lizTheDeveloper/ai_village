@@ -222,7 +222,7 @@ export const CrossRealmPhoneSchema = autoRegister(
 
     validate: (data): data is CrossRealmPhoneComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const c = data as any;
+      const c = data as Record<string, unknown>;
 
       return (
         c.type === 'cross_realm_phone' &&

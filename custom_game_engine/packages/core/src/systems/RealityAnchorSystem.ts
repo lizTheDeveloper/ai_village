@@ -27,6 +27,8 @@ export class RealityAnchorSystem extends BaseSystem {
   public readonly id: SystemId = 'reality_anchor';
   public readonly priority = 18; // After intervention system
   public readonly requiredComponents = [CT.RealityAnchor] as const;
+  // Only run when reality anchor components exist (O(1) activation check)
+  public readonly activationComponents = [CT.RealityAnchor] as const;
 
   /** Update interval (ticks) */
   protected readonly throttleInterval = 20; // Once per second at 20 TPS

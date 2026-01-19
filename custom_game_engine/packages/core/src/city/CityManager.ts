@@ -14,10 +14,17 @@ import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import { createBuildingComponent, type BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
+import type { EventBus } from '../events/EventBus.js';
 
 // =============================================================================
 // TYPES
 // =============================================================================
+
+export interface RecentDeath {
+  entityId: string;
+  tick: number;
+  causeOfDeath: string;
+}
 
 export type CityFocus =
   | 'survival'      // Food critically low
@@ -105,6 +112,12 @@ export class CityManager {
   private manualPriorities: StrategicPriorities | null = null;
   private priorityLocked: boolean = false;
 
+  // Death tracking
+  /** How long to keep death events for city stats (24 in-game hours = 1,728,000 ticks at 20 TPS) */
+  private static readonly DEATH_RETENTION_TICKS = 1_728_000;
+  /** Recent deaths tracked for city metrics */
+  private recentDeaths: RecentDeath[] = [];
+
   constructor(config: CityManagerConfig = {}) {
     this.decisionInterval = config.decisionInterval ?? 14400;  // 1 day
     this.statsUpdateInterval = config.statsUpdateInterval ?? 200;  // 10 seconds
@@ -120,6 +133,25 @@ export class CityManager {
       concerns: [],
     };
     this.decisions = [];
+  }
+
+  /**
+   * Initialize event subscriptions (must be called after EventBus is available)
+   */
+  initialize(eventBus: EventBus): void {
+    // Subscribe to death events for city metrics
+    eventBus.subscribe('agent:died', (event: { data: { entityId: string; causeOfDeath: string }; tick: number }) => {
+      if (!event.data || typeof event.data !== 'object') return;
+
+      const deathData = event.data;
+      if (!deathData.entityId) return;
+
+      this.recentDeaths.push({
+        entityId: deathData.entityId,
+        tick: event.tick ?? 0,
+        causeOfDeath: deathData.causeOfDeath ?? 'unknown',
+      });
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -356,6 +388,10 @@ export class CityManager {
     return this.priorityLocked;
   }
 
+  getRecentDeaths(): readonly RecentDeath[] {
+    return [...this.recentDeaths];
+  }
+
   // ---------------------------------------------------------------------------
   // DECISION LOGIC (Rule-Based)
   // ---------------------------------------------------------------------------
@@ -537,8 +573,14 @@ export class CityManager {
   }
 
   private countRecentDeaths(world: World): number {
-    // TODO: Track recent death events (last 24 hours)
-    return 0;
+    const currentTick = world.tick;
+
+    // Clean up old deaths (older than 24 in-game hours)
+    this.recentDeaths = this.recentDeaths.filter(
+      d => currentTick - d.tick < CityManager.DEATH_RETENTION_TICKS
+    );
+
+    return this.recentDeaths.length;
   }
 
   // ---------------------------------------------------------------------------

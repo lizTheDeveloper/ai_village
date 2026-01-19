@@ -558,7 +558,8 @@ export class InteractionAPI {
     }
 
     const itemImpl = itemEntity as EntityImpl;
-    const item = itemImpl.getComponent<{ itemId: string; quantity?: number }>(ComponentType.Item);
+    interface ItemData { itemId: string; quantity?: number }
+    const item = itemImpl.getComponent(ComponentType.Item) as ItemData | undefined;
     if (!item) {
       return { success: false, message: 'Target is not an item' };
     }

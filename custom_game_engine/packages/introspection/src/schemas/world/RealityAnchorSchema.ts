@@ -197,7 +197,7 @@ export const RealityAnchorSchema = autoRegister(
     },
 
     createDefault: (): RealityAnchorComponent => ({
-      type: 'reality_anchor' as any,
+      type: 'reality_anchor',
       version: 1,
       status: 'under_construction',
       fieldRadius: 100,

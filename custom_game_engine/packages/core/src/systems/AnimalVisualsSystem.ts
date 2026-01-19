@@ -16,6 +16,8 @@ export class AnimalVisualsSystem extends BaseSystem {
   readonly id = 'animal_visuals' as const;
   readonly priority = 301;
   readonly requiredComponents = ['animal', 'renderable'] as const;
+  // Only run when animal components exist (O(1) activation check)
+  readonly activationComponents = ['animal'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**

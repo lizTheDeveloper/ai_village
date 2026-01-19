@@ -272,15 +272,15 @@ export class LoreSpawnSystem extends BaseSystem {
       createRenderableComponent(glyphByCategory[fragment.category] || '📄')
     );
 
-    // Emit event
-    this.events.emit('lore:spawned' as any, {
+    // Emit event (generic since lore events not yet in EventMap)
+    this.events.emitGeneric('lore:spawned', {
       fragmentId: fragment.fragmentId,
       title: fragment.title,
       importance: fragment.importance,
       category: fragment.category,
       entityId: entity.id,
       position: { x, y },
-    } as any, entity.id);
+    });
   }
 
   // ============ Public API ============

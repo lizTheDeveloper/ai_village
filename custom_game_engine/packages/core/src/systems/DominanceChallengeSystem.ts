@@ -30,6 +30,27 @@ interface DeathComponent extends Component {
   time: number;
 }
 
+interface ExiledComponent extends Component {
+  readonly type: 'exiled';
+  readonly version: number;
+  exiledBy: string;
+  time: number;
+}
+
+interface FleeingComponent extends Component {
+  readonly type: 'fleeing';
+  readonly version: number;
+  from: string;
+  startTime: number;
+}
+
+interface SeekingAllianceComponent extends Component {
+  readonly type: 'seeking_alliance';
+  readonly version: number;
+  potential: string[];
+  reason: string;
+}
+
 type DominanceChallengeMethod =
   | 'combat'
   | 'display'
@@ -107,6 +128,24 @@ export class DominanceChallengeSystem extends BaseSystem {
       throw new Error('Challenger cannot challenge above rank');
     }
 
+    // Validate method is required
+    if (!conflict.method) {
+      throw new Error('Challenge method is required');
+    }
+
+    // Validate method is valid
+    const validMethods: DominanceChallengeMethod[] = [
+      'combat',
+      'display',
+      'resource_seizure',
+      'follower_theft',
+      'humiliation',
+      'assassination',
+    ];
+    if (!validMethods.includes(conflict.method as DominanceChallengeMethod)) {
+      throw new Error('Invalid challenge method');
+    }
+
     // Get incumbent
     if (!conflict.target) {
       throw new Error('Challenge missing target');
@@ -114,7 +153,7 @@ export class DominanceChallengeSystem extends BaseSystem {
 
     const incumbent = allEntities.find(e => e.id === conflict.target);
     if (!incumbent) {
-      throw new Error(`Target entity not found: ${conflict.target}`);
+      throw new Error('Challenge target entity not found');
     }
 
     const incumbentAgent = world.getComponent<AgentComponent>(incumbent.id, 'agent');
@@ -160,6 +199,7 @@ export class DominanceChallengeSystem extends BaseSystem {
       ...c,
       state: 'resolved',
       outcome: challengerWins ? 'attacker_victory' : 'defender_victory',
+      winner: challengerWins ? challenger.id : incumbent.id,
       endTime: Date.now(),
     }));
 
@@ -309,7 +349,7 @@ export class DominanceChallengeSystem extends BaseSystem {
   }
 
   private applyConsequences(
-    _world: World,
+    world: World,
     challenger: Entity,
     incumbent: Entity,
     challengerRank: DominanceRankComponent,
@@ -317,6 +357,10 @@ export class DominanceChallengeSystem extends BaseSystem {
     challengerWins: boolean,
     method: DominanceChallengeMethod
   ): void {
+    const conflict = world.getComponent<ConflictComponent>(challenger.id, 'conflict');
+    if (!conflict) {
+      throw new Error('Conflict component missing');
+    }
     const challengerImpl = challenger as EntityImpl;
     const incumbentImpl = incumbent as EntityImpl;
 
@@ -333,7 +377,7 @@ export class DominanceChallengeSystem extends BaseSystem {
       }));
 
       // Determine loser fate based on method
-      const loserFate = this.determineLoserFate(method, challengerWins);
+      const loserFate = this.determineLoserFate(conflict, method, challengerWins);
 
       if (loserFate === 'death' || loserFate === 'exile') {
         // Incumbent loses all subordinates
@@ -352,6 +396,13 @@ export class DominanceChallengeSystem extends BaseSystem {
             cause: method === 'assassination' ? 'assassination' : 'dominance_challenge',
             time: Date.now(),
           } as DeathComponent);
+        } else if (loserFate === 'exile') {
+          incumbentImpl.addComponent({
+            type: 'exiled',
+            version: 1,
+            exiledBy: challenger.id,
+            time: Date.now(),
+          } as ExiledComponent);
         }
       } else {
         // Incumbent is demoted
@@ -376,7 +427,7 @@ export class DominanceChallengeSystem extends BaseSystem {
       }
     } else {
       // Challenger failed
-      const challengerFate = this.determineLoserFate(method, challengerWins);
+      const challengerFate = this.determineLoserFate(conflict, method, challengerWins);
 
       if (challengerFate === 'death' || challengerFate === 'exile') {
         challengerImpl.updateComponent<DominanceRankComponent>('dominance_rank', (r) => ({
@@ -393,6 +444,13 @@ export class DominanceChallengeSystem extends BaseSystem {
             cause: 'failed_dominance_challenge',
             time: Date.now(),
           } as DeathComponent);
+        } else if (challengerFate === 'exile') {
+          challengerImpl.addComponent({
+            type: 'exiled',
+            version: 1,
+            exiledBy: incumbent.id,
+            time: Date.now(),
+          } as ExiledComponent);
         }
       } else if (challengerFate === 'subordinate') {
         // Challenger becomes subordinate of incumbent
@@ -422,7 +480,23 @@ export class DominanceChallengeSystem extends BaseSystem {
     }
   }
 
-  private determineLoserFate(method: DominanceChallengeMethod, challengerWon: boolean): DominanceOutcomeType {
+  private determineLoserFate(
+    conflict: ConflictComponent,
+    method: DominanceChallengeMethod,
+    challengerWon: boolean
+  ): DominanceOutcomeType {
+    // If consequence is explicitly set, use it
+    if (conflict.consequence) {
+      if (conflict.consequence === 'death') return 'death';
+      if (conflict.consequence === 'exile') return 'exile';
+      if (conflict.consequence === 'demotion') return 'demotion';
+    }
+
+    // If lethal flag is set, death is possible
+    if (conflict.lethal) {
+      return 'death';
+    }
+
     // Assassination attempts result in death
     if (method === 'assassination') {
       return 'death';
@@ -469,6 +543,7 @@ export class DominanceChallengeSystem extends BaseSystem {
     for (const entity of dominanceEntities) {
       const agent = world.getComponent<AgentComponent>(entity.id, 'agent');
       const rank = world.getComponent<DominanceRankComponent>(entity.id, 'dominance_rank');
+      const combatStats = world.getComponent<CombatStatsComponent>(entity.id, 'combat_stats');
 
       if (!agent || !rank) continue;
 
@@ -476,6 +551,49 @@ export class DominanceChallengeSystem extends BaseSystem {
       const opportunityChance = this.calculateCascadeChance(rank, challengerWon);
 
       if (Math.random() < opportunityChance) {
+        const entityImpl = entity as EntityImpl;
+
+        // Determine cascade type based on entity strength and rank
+        if (challengerWon && rank.canChallengeAbove && rank.rank < 5) {
+          // Strong entities may challenge new alpha
+          if (Math.random() < 0.4) {
+            entityImpl.addComponent({
+              type: 'conflict',
+              version: 1,
+              conflictType: 'dominance_challenge',
+              target: challenger.id,
+              state: 'active',
+              startTime: Date.now(),
+              method: 'combat',
+            } as ConflictComponent);
+          }
+        } else if (!challengerWon && combatStats && combatStats.combatSkill < 5) {
+          // Weak entities flee after witnessing defeat
+          if (Math.random() < 0.3) {
+            entityImpl.addComponent({
+              type: 'fleeing',
+              version: 1,
+              from: incumbent.id,
+              startTime: Date.now(),
+            } as FleeingComponent);
+          }
+        } else if (!challengerWon) {
+          // Mid-tier entities seek alliances
+          if (Math.random() < 0.2) {
+            // Find other potential allies
+            const potentialAllies = dominanceEntities
+              .filter(e => e.id !== entity.id)
+              .map(e => e.id);
+
+            entityImpl.addComponent({
+              type: 'seeking_alliance',
+              version: 1,
+              potential: potentialAllies,
+              reason: 'dominance_challenge_aftermath',
+            } as SeekingAllianceComponent);
+          }
+        }
+
         // Emit cascade effect event
         if (this.eventBus) {
           this.eventBus.emit({

@@ -133,7 +133,18 @@ export class MetricsStreamClient {
     }
     // Check for Vite's import.meta.env in browser
     if (typeof globalThis !== 'undefined') {
-      const meta = (globalThis as any).import?.meta?.env;
+      interface GlobalWithImport {
+        import?: {
+          meta?: {
+            env?: {
+              VITEST?: boolean;
+              MODE?: string;
+            };
+          };
+        };
+      }
+      const globalWithImport = globalThis as GlobalWithImport;
+      const meta = globalWithImport.import?.meta?.env;
       if (meta?.VITEST || meta?.MODE === 'test') {
         return true;
       }

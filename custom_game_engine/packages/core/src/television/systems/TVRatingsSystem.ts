@@ -41,6 +41,8 @@ export class TVRatingsSystem extends BaseSystem {
   readonly id = 'tv_ratings' as const;
   readonly priority = 66; // After broadcasting
   readonly requiredComponents = [ComponentType.TVShow] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   protected readonly throttleInterval = EVALUATION_INTERVAL;
 

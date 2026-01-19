@@ -49,7 +49,7 @@ export function createRock(world: WorldMutator, x: number, y: number): string {
   entity.addComponent(createResourceComponent('stone', 100, 0.1)); // 100 stone, regenerates 0.1/sec
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

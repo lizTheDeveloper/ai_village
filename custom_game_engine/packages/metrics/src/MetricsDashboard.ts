@@ -32,9 +32,12 @@ export interface ChartData {
     datasets?: Array<{
       label?: string;
       data: number[];
-      [key: string]: any;
+      [key: string]: unknown;
     }>;
-    [key: string]: any;
+    heatmap?: Record<number, Record<number, number>>;
+    nodes?: Array<{ id: string; label: string }>;
+    edges?: Array<{ from: string; to: string }>;
+    [key: string]: unknown;
   };
 }
 
@@ -47,7 +50,7 @@ export type AlertType = 'warning' | 'critical' | 'info';
  * Dashboard alert
  */
 export interface DashboardAlert {
-  id?: string;
+  id: string;
   type: AlertType;
   message: string;
   metric: string;
@@ -180,7 +183,7 @@ export class MetricsDashboard {
     // Update average hunger
     try {
       const avgHunger = this.collector.getAggregatedMetric('hunger', { aggregation: 'avg' });
-      if (!isNaN(avgHunger)) {
+      if (typeof avgHunger === 'number' && !isNaN(avgHunger)) {
         this.state.liveMetrics.avgHunger = avgHunger;
       }
     } catch (e) {
@@ -393,11 +396,12 @@ export class MetricsDashboard {
   /**
    * Add an alert
    */
-  addAlert(alert: DashboardAlert & { id?: string }): void {
-    if (!alert.id) {
-      alert.id = `alert-${this.alertIdCounter++}`;
-    }
-    this.state.alerts.push(alert as DashboardAlert);
+  addAlert(alert: Omit<DashboardAlert, 'id'> & { id?: string }): void {
+    const alertWithId: DashboardAlert = {
+      ...alert,
+      id: alert.id || `alert-${this.alertIdCounter++}`,
+    };
+    this.state.alerts.push(alertWithId);
   }
 
   /**
@@ -502,7 +506,7 @@ export class MetricsDashboard {
    * Dismiss an alert by ID
    */
   dismissAlert(alertId: string): void {
-    this.state.alerts = this.state.alerts.filter(a => (a as any).id !== alertId);
+    this.state.alerts = this.state.alerts.filter(a => a.id !== alertId);
   }
 
   /**

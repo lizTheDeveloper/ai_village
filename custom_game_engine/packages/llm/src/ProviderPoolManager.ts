@@ -34,6 +34,8 @@ export interface PoolStats {
     rateLimited: boolean;
     rateLimitWaitMs: number;
     semaphoreUtilization: number;
+    availableSlots: number;
+    maxConcurrent: number;
   };
 }
 
@@ -183,6 +185,8 @@ export class ProviderPoolManager {
         rateLimited: queueStats.rateLimited,
         rateLimitWaitMs: queueStats.rateLimitWaitMs,
         semaphoreUtilization: queueStats.semaphoreStats.utilization,
+        availableSlots: queueStats.semaphoreStats.available,
+        maxConcurrent: queueStats.semaphoreStats.capacity,
       };
     }
 

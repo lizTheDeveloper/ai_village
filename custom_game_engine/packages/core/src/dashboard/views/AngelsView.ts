@@ -11,6 +11,10 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import type { DeityComponent } from '../../components/DeityComponent.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
 
 /**
  * Angel information
@@ -43,7 +47,7 @@ export interface AngelsViewData extends ViewData {
   angelTypes: Array<{ id: string; name: string; cost: number; description: string }>;
 }
 
-const CT = { Deity: 'deity', Angel: 'angel', Agent: 'agent', Position: 'position' };
+const CT = { Deity: 'deity', Angel: 'angel', Agent: 'agent', Position: 'position', Identity: 'identity' } as const;
 
 /**
  * Angels View Definition
@@ -105,10 +109,10 @@ export const AngelsView: DashboardView<AngelsViewData> = {
 
     try {
       // Find player deity
-      let playerDeity: { id: string; component: any } | null = null;
+      let playerDeity: { id: string; component: DeityComponent } | null = null;
       for (const entity of world.entities.values()) {
         if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as any;
+          const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
           if (deityComp && deityComp.controller === 'player') {
             playerDeity = { id: entity.id, component: deityComp };
             break;
@@ -135,19 +139,28 @@ export const AngelsView: DashboardView<AngelsViewData> = {
         const angelComp = entity.components.get(CT.Angel);
         if (!angelComp) continue;
 
-        const agentComp = entity.components.get(CT.Agent);
-        const posComp = entity.components.get(CT.Position);
+        const identityComp = entity.components.get(CT.Identity) as IdentityComponent | undefined;
+        const posComp = entity.components.get(CT.Position) as PositionComponent | undefined;
+
+        // AngelComponent doesn't exist yet, so we access it as a generic component
+        // with expected fields (type, power, currentTask, loyalty)
+        const angelData = angelComp as unknown as {
+          type?: string;
+          power?: number;
+          currentTask?: string;
+          loyalty?: number;
+        };
 
         angels.push({
           id: entity.id,
-          name: (agentComp as any)?.name ?? (angelComp as any).name ?? 'Unnamed Angel',
-          type: (angelComp as any).type ?? 'messenger',
-          power: (angelComp as any).power ?? 100,
-          currentTask: (angelComp as any).currentTask ?? null,
+          name: identityComp?.name ?? 'Unnamed Angel',
+          type: angelData.type ?? 'messenger',
+          power: angelData.power ?? 100,
+          currentTask: angelData.currentTask ?? null,
           location: posComp
-            ? { x: (posComp as any).x, y: (posComp as any).y }
+            ? { x: posComp.x, y: posComp.y }
             : null,
-          loyaltystrength: (angelComp as any).loyalty ?? 1.0,
+          loyaltystrength: angelData.loyalty ?? 1.0,
         });
       }
 

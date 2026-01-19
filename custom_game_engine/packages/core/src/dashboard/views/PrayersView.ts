@@ -12,6 +12,9 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import type { DeityComponent } from '../../components/DeityComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import type { SpiritualComponent, Prayer } from '../../components/SpiritualComponent.js';
 
 /**
  * Prayer information
@@ -41,7 +44,7 @@ export interface PrayersViewData extends ViewData {
   totalAnswered: number;
 }
 
-const CT = { Deity: 'deity', Agent: 'agent', Spiritual: 'spiritual' };
+const CT = { Deity: 'deity', Identity: 'identity', Spiritual: 'spiritual' } as const;
 
 /**
  * Prayers View Definition
@@ -97,18 +100,18 @@ export const PrayersView: DashboardView<PrayersViewData> = {
         const agentEntity = world.getEntity(prayer.agentId);
         if (!agentEntity) continue;
 
-        const agentComp = agentEntity.components.get(CT.Agent);
-        const spiritualComp = agentEntity.components.get(CT.Spiritual);
+        const identityComp = agentEntity.components.get(CT.Identity) as IdentityComponent | undefined;
+        const spiritualComp = agentEntity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
 
-        if (!agentComp || !spiritualComp) continue;
+        if (!identityComp || !spiritualComp) continue;
 
-        const agentName = (agentComp as any).name ?? 'Unknown Believer';
-        const faith = (spiritualComp as any).faith ?? 0;
+        const agentName = identityComp.name ?? 'Unknown Believer';
+        const faith = spiritualComp.faith ?? 0;
 
         // Find the actual prayer content
-        const spiritualPrayers = (spiritualComp as any).prayers ?? [];
+        const spiritualPrayers = spiritualComp.prayers ?? [];
         const matchingPrayer = spiritualPrayers.find(
-          (p: any) => p.id === prayer.prayerId || p.timestamp === prayer.timestamp
+          (p: Prayer) => p.id === prayer.prayerId || p.timestamp === prayer.timestamp
         );
 
         const content = matchingPrayer?.content ?? 'Please hear my prayer...';
@@ -303,10 +306,10 @@ export const PrayersView: DashboardView<PrayersViewData> = {
 /**
  * Helper: Find player deity
  */
-function findPlayerDeity(world: any): { id: string; deityComponent: any } | null {
+function findPlayerDeity(world: any): { id: string; deityComponent: DeityComponent } | null {
   for (const entity of world.entities.values()) {
     if (entity.components.has(CT.Deity)) {
-      const deityComp = entity.components.get(CT.Deity);
+      const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         return {
           id: entity.id,

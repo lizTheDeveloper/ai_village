@@ -180,35 +180,48 @@ export class HearingProcessor {
         }
       }
     } else {
-      // Fallback to global query (slower, used in tests or when chunk query not available)
-      const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(position.x / CHUNK_SIZE);
+      const chunkY = Math.floor(position.y / CHUNK_SIZE);
+      const chunkRange = Math.ceil(this.hearingRange / CHUNK_SIZE);
 
-      for (const otherAgent of agents) {
-        if (otherAgent.id === entity.id) continue;
+      for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+        for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+          const entityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-        const otherImpl = otherAgent as EntityImpl;
-        const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
-        const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
+          for (const entityId of entityIds) {
+            if (entityId === entity.id) continue;
 
-        if (!otherPos || !otherAgentComp) continue;
+            const otherAgent = world.getEntity(entityId);
+            if (!otherAgent) continue;
 
-        // Skip sleeping agents - they shouldn't be speaking
-        const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
-        if (otherCircadian?.isSleeping) continue;
+            const otherImpl = otherAgent as EntityImpl;
+            const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
+            const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
 
-        const distance = this.distance(position, otherPos);
+            if (!otherPos || !otherAgentComp) continue;
 
-        // Within hearing range and has recent speech
-        if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
-          const identity = otherImpl.getComponent<IdentityComponent>(ComponentType.Identity);
-          const speakerName = identity?.name || 'Someone';
+            // Skip sleeping agents - they shouldn't be speaking
+            const otherCircadian = otherImpl.getComponent<CircadianComponent>(ComponentType.Circadian);
+            if (otherCircadian?.isSleeping) continue;
 
-          heardSpeech.push({
-            speaker: speakerName,
-            text: otherAgentComp.recentSpeech,
-            speakerId: otherAgent.id,
-            distance,
-          });
+            const distance = this.distance(position, otherPos);
+
+            // Within hearing range and has recent speech
+            if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
+              const identity = otherImpl.getComponent<IdentityComponent>(ComponentType.Identity);
+              const speakerName = identity?.name || 'Someone';
+
+              heardSpeech.push({
+                speaker: speakerName,
+                text: otherAgentComp.recentSpeech,
+                speakerId: otherAgent.id,
+                distance,
+              });
+            }
+          }
         }
       }
     }
@@ -250,18 +263,39 @@ export class HearingProcessor {
 
       return agentsInRadius.map((result: SpatialQueryResult) => result.entity);
     } else {
-      // Fallback to global query
-      const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      const CHUNK_SIZE = 32;
+      const chunkX = Math.floor(position.x / CHUNK_SIZE);
+      const chunkY = Math.floor(position.y / CHUNK_SIZE);
+      const chunkRange = Math.ceil(this.hearingRange / CHUNK_SIZE);
 
-      return agents.filter((other) => {
-        if (other.id === entity.id) return false;
+      const result: Entity[] = [];
 
-        const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
-        if (!otherPos) return false;
+      for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+        for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+          const entityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-        const distance = this.distance(position, otherPos);
-        return distance <= this.hearingRange;
-      });
+          for (const entityId of entityIds) {
+            if (entityId === entity.id) continue;
+
+            const other = world.getEntity(entityId);
+            if (!other) continue;
+
+            const otherImpl = other as EntityImpl;
+            if (!otherImpl.hasComponent(ComponentType.Agent)) continue;
+
+            const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
+            if (!otherPos) continue;
+
+            const distance = this.distance(position, otherPos);
+            if (distance <= this.hearingRange) {
+              result.push(other);
+            }
+          }
+        }
+      }
+
+      return result;
     }
   }
 

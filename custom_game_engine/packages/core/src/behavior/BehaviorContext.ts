@@ -29,7 +29,6 @@ import type { GameEvent } from '../events/GameEvent.js';
 import type { EventType } from '../events/EventMap.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { CHUNK_SIZE } from '../types.js';
-import { getSharedChunkSpatialQuery } from './behaviors/BaseBehavior.js';
 
 // ============================================================================
 // Types
@@ -348,13 +347,13 @@ export class BehaviorContextImpl implements BehaviorContext {
   readonly needs: Readonly<NeedsComponent> | null;
   readonly gameTime: { day: number; hour: number; season: string };
 
-  private readonly spatialQuery: ReturnType<typeof getSharedChunkSpatialQuery> | null;
+  private readonly spatialQuery: import('../services/SpatialQueryService.js').SpatialQueryService | null;
 
   constructor(entity: EntityImpl, world: World) {
     this.entity = entity;
     this.world = world;
     this.tick = world.tick;
-    this.spatialQuery = getSharedChunkSpatialQuery();
+    this.spatialQuery = world.spatialQuery; // Get from world, not injection
 
     // Pre-fetch commonly needed components
     const position = entity.getComponent<PositionComponent>(CT.Position);

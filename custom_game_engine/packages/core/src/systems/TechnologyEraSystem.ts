@@ -140,6 +140,8 @@ export class TechnologyEraSystem extends BaseSystem {
   public readonly id: SystemId = 'technology_era';
   public readonly priority: number = 200; // After most gameplay systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.TechnologyEra];
+  // Only run when technology era components exist (O(1) activation check)
+  public readonly activationComponents = [CT.TechnologyEra] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds (100 ticks)
 
   // ========== Cached State (Performance Optimization) ==========

@@ -587,6 +587,8 @@ export class TVAdvertisingSystem extends BaseSystem {
   readonly id = 'TVAdvertisingSystem';
   readonly priority = 68;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   protected readonly throttleInterval = 20 * 60; // Every minute
 

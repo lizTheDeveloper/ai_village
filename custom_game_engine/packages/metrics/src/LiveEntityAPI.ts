@@ -50,7 +50,52 @@ export interface EntityDetails {
  * Interface for the LLM scheduler (from @ai-village/llm)
  */
 export interface LLMScheduler {
-  getMetricsWithAverages(): any;
+  getMetricsWithAverages(): unknown;
+}
+
+/**
+ * Extended World interface with runtime properties
+ */
+interface WorldWithRuntimeProps extends World {
+  speedMultiplier?: number;
+  paused?: boolean;
+}
+
+/**
+ * Extended World interface with mutator methods
+ */
+interface WorldWithMutator extends World {
+  addComponent(entityId: string, component: unknown): void;
+}
+
+/**
+ * Common component interfaces for type safety
+ */
+interface IdentityComponent {
+  type: 'identity';
+  name?: string;
+}
+
+interface PositionComponent {
+  type: 'position';
+  x?: number;
+  y?: number;
+}
+
+interface AgentComponent {
+  type: 'agent';
+  currentBehavior?: string;
+  behavior?: string;
+  name?: string;
+  generation?: number;
+  birthTick?: number;
+}
+
+/**
+ * Extended Entity interface with mutable addComponent
+ */
+interface MutableEntity extends Entity {
+  addComponent(component: unknown): void;
 }
 
 export class LiveEntityAPI {
@@ -449,8 +494,8 @@ export class LiveEntityAPI {
 
     try {
       const agentId = shouldUseLLM
-        ? createLLMAgent(this.world as any, x, y, agentSpeed, undefined, options)
-        : createWanderingAgent(this.world as any, x, y, agentSpeed, options);
+        ? createLLMAgent(this.world, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world, x, y, agentSpeed, options);
 
       // Optionally set the agent's name if provided
       if (name && typeof name === 'string') {
@@ -567,7 +612,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const needs = entity.components.get('needs') as Record<string, any> | undefined;
+    const needs = entity.components.get('needs') as Record<string, unknown> | undefined;
     if (!needs) {
       return {
         requestId: action.requestId,
@@ -754,9 +799,9 @@ export class LiveEntityAPI {
     }
 
     // Access speed multiplier on world (if exists)
-    const worldAny = this.world as any;
-    if (worldAny.speedMultiplier !== undefined) {
-      worldAny.speedMultiplier = speed;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.speedMultiplier !== undefined) {
+      worldWithRuntime.speedMultiplier = speed;
     }
 
     return {
@@ -781,9 +826,9 @@ export class LiveEntityAPI {
     }
 
     // Access paused state on world (if exists)
-    const worldAny = this.world as any;
-    if (worldAny.paused !== undefined) {
-      worldAny.paused = paused;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.paused !== undefined) {
+      worldWithRuntime.paused = paused;
     }
 
     return {
@@ -945,15 +990,16 @@ export class LiveEntityAPI {
       const deityEntity = this.world.createEntity();
       const deityComponent = new DeityComponent(name, deityController);
       // Use WorldMutator's addComponent since Entity interface is read-only
-      (this.world as any).addComponent(deityEntity.id, deityComponent);
+      const worldMutator = this.world as WorldWithMutator;
+      worldMutator.addComponent(deityEntity.id, deityComponent);
 
       // Add identity component for chat system and UI display
       const identityComponent = createIdentityComponent(name, 'deity');
-      (this.world as any).addComponent(deityEntity.id, identityComponent);
+      worldMutator.addComponent(deityEntity.id, identityComponent);
 
       // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
       const tagsComponent = createTagsComponent('deity');
-      (this.world as any).addComponent(deityEntity.id, tagsComponent);
+      worldMutator.addComponent(deityEntity.id, tagsComponent);
 
       return {
         requestId: action.requestId,
@@ -2168,7 +2214,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const identity = entity.getComponent('identity') as any;
+    const identity = entity.getComponent<IdentityComponent>('identity');
     const agentName = identity?.name || 'Unknown';
 
     this.agentDebugManager.startLogging(agentId, agentName);
@@ -2234,7 +2280,7 @@ export class LiveEntityAPI {
     // Get agent names for each tracked ID
     const agentsWithNames = trackedAgents.map(agentId => {
       const entity = this.world.getEntity(agentId);
-      const identity = entity?.getComponent('identity') as any;
+      const identity = entity?.getComponent<IdentityComponent>('identity');
       return {
         id: agentId,
         name: identity?.name || 'Unknown',
@@ -2378,14 +2424,14 @@ export class LiveEntityAPI {
 
     const normalizedSearch = name.toLowerCase();
     const matches = agents.filter((entity) => {
-      const identity = entity.getComponent('identity') as any;
+      const identity = entity.getComponent<IdentityComponent>('identity');
       return identity?.name?.toLowerCase().includes(normalizedSearch);
     });
 
     const results = matches.map((entity) => {
-      const identity = entity.getComponent('identity') as any;
-      const position = entity.getComponent('position') as any;
-      const agent = entity.getComponent('agent') as any;
+      const identity = entity.getComponent<IdentityComponent>('identity');
+      const position = entity.getComponent<PositionComponent>('position');
+      const agent = entity.getComponent<AgentComponent>('agent');
 
       return {
         id: entity.id,
@@ -2494,7 +2540,7 @@ export class LiveEntityAPI {
       startTime: this.world.tick,
     };
 
-    (hunter as any).addComponent(conflict);
+    (hunter as MutableEntity).addComponent(conflict);
 
     return {
       requestId: action.requestId,
@@ -2607,7 +2653,7 @@ export class LiveEntityAPI {
       surprise: false,
     };
 
-    (attacker as any).addComponent(conflict);
+    (attacker as MutableEntity).addComponent(conflict);
 
     return {
       requestId: action.requestId,

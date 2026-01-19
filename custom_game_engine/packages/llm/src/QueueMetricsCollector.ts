@@ -9,6 +9,36 @@
  * - Provider utilization
  */
 
+/**
+ * Stats from a single provider queue (from ProviderQueue.getStats())
+ */
+export interface ProviderQueueStats {
+  queueLength: number;
+  rateLimited: boolean;
+  rateLimitWaitMs: number;
+  semaphoreStats: {
+    available: number;
+    queued: number;
+    capacity: number;
+    utilization: number;
+  };
+  providerId: string;
+}
+
+/**
+ * Pool stats from ProviderPoolManager.getQueueStats()
+ */
+export interface PoolStatsMap {
+  [providerName: string]: {
+    queueLength: number;
+    rateLimited: boolean;
+    rateLimitWaitMs: number;
+    semaphoreUtilization: number;
+    availableSlots: number;
+    maxConcurrent: number;
+  };
+}
+
 export interface QueueSnapshot {
   timestamp: number;
   provider: string;
@@ -74,7 +104,7 @@ export class QueueMetricsCollector {
   /**
    * Start automatic snapshot collection
    */
-  startAutoSnapshot(getQueueStats: () => any): void {
+  startAutoSnapshot(getQueueStats: () => PoolStatsMap): void {
     if (this.snapshotTimer) {
       clearInterval(this.snapshotTimer);
     }
@@ -87,12 +117,12 @@ export class QueueMetricsCollector {
         this.recordSnapshot({
           timestamp: Date.now(),
           provider,
-          queueLength: (stat as any).queueLength || 0,
-          rateLimited: (stat as any).rateLimited || false,
-          rateLimitWaitMs: (stat as any).rateLimitWaitMs || 0,
-          utilizationPercent: (stat as any).semaphoreStats?.utilization || 0,
-          availableSlots: (stat as any).semaphoreStats?.available || 0,
-          maxConcurrent: (stat as any).semaphoreStats?.capacity || 0,
+          queueLength: stat.queueLength,
+          rateLimited: stat.rateLimited,
+          rateLimitWaitMs: stat.rateLimitWaitMs,
+          utilizationPercent: stat.semaphoreUtilization,
+          availableSlots: stat.availableSlots,
+          maxConcurrent: stat.maxConcurrent,
         });
       }
     }, this.snapshotInterval);

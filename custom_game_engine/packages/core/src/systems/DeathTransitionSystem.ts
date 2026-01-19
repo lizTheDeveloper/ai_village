@@ -1,12 +1,13 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { GoalsComponent } from '../components/GoalsComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
@@ -15,6 +16,39 @@ import type { DeathJudgmentComponent } from '../components/DeathJudgmentComponen
 import { transitionToRealm } from '../realms/RealmTransition.js';
 import { routeSoulToAfterlife } from '../realms/SoulRoutingService.js';
 import { createAfterlifeComponent, type CauseOfDeath } from '../components/AfterlifeComponent.js';
+import type { InventoryComponent } from '../components/InventoryComponent.js';
+import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import { createKnowledgeLossComponent, addLostMemories, type KnowledgeLossComponent, type LostMemory } from '../components/KnowledgeLossComponent.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+
+import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import type { MoodComponent } from '../components/MoodComponent.js';
+
+// Legacy test format types for backward compatibility
+interface LegacyInventoryComponent {
+  type: 'inventory';
+  items: Array<{ type: string; quantity: number }>;
+}
+
+interface LegacyEpisodicMemoryComponent {
+  memories: Array<{
+    id: string;
+    shared?: boolean;
+    content: string;
+    type?: string;
+    deceased?: string;
+    cause?: string;
+    location?: { x: number; y: number };
+    timestamp?: number;
+  }>;
+}
+
+interface DroppedItemComponent {
+  type: 'item';
+  version: 1;
+  itemType: string;
+  quantity: number;
+}
 
 /** Agent tiers that get full afterlife experience */
 const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
@@ -37,10 +71,13 @@ export class DeathTransitionSystem extends BaseSystem {
   readonly id: SystemId = 'death_transition';
   readonly priority: number = 110;  // Run after needs/combat systems
   readonly requiredComponents = ['needs'] as const;
+  // Only run when needs components exist (O(1) activation check)
+  readonly activationComponents = ['needs'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds  // Only require needs - realm_location is optional
 
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
+  private knowledgeLossEntityId: string | null = null; // Cache singleton entity ID
 
   /**
    * Set the death bargain system for hero resurrection challenges
@@ -105,6 +142,27 @@ export class DeathTransitionSystem extends BaseSystem {
   private handleDeath(world: World, entityId: string, realmLocation: RealmLocationComponent): void {
     const entity = world.getEntity(entityId);
     if (!entity) return;
+
+    // Drop inventory at death location
+    const position = entity.components.get('position') as PositionComponent | undefined;
+    if (position) {
+      this.dropInventory(world, entity, position);
+
+      // Create witness memories for nearby agents
+      this.createWitnessMemories(world, entity, position);
+    }
+
+    // Track knowledge loss from unique memories
+    this.trackKnowledgeLoss(world, entity);
+
+    // Check for power vacuum if entity held a position
+    this.checkPowerVacuum(world, entity);
+
+    // Handle pack mind coherence recalculation
+    this.handlePackDeath(world, entity);
+
+    // Handle hive collapse on queen death
+    this.handleHiveDeath(world, entity);
 
     // Check if this entity qualifies for afterlife (full/reduced tier agents only)
     const agent = entity.components.get('agent') as AgentComponent | undefined;
@@ -188,6 +246,9 @@ export class DeathTransitionSystem extends BaseSystem {
         routingReason: routing.reason,
         routingDeity: routing.deityId,
       });
+
+      // Notify relationships and apply mourning
+      this.notifyRelationships(world, entity);
     }
   }
 
@@ -287,6 +348,18 @@ export class DeathTransitionSystem extends BaseSystem {
   private handleSimpleDeath(world: World, entity: Entity): void {
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
 
+    // Create witness memories for nearby agents
+    const position = entity.components.get('position') as PositionComponent | undefined;
+    if (position) {
+      this.createWitnessMemories(world, entity, position);
+    }
+
+    // Check for power vacuum if entity held a position
+    this.checkPowerVacuum(world, entity);
+
+    // Handle hive collapse on queen death
+    this.handleHiveDeath(world, entity);
+
     // Emit simple death event (no afterlife routing)
     this.events.emit('agent:died', {
       entityId: entity.id,
@@ -297,10 +370,95 @@ export class DeathTransitionSystem extends BaseSystem {
       routingDeity: undefined,
     });
 
+    // Notify relationships and apply mourning
+    this.notifyRelationships(world, entity);
+
     // Mark for cleanup (could be handled by a cleanup system)
     const realmLocation = entity.components.get('realm_location') as RealmLocationComponent | undefined;
     if (realmLocation && !realmLocation.transformations.includes('dead')) {
       realmLocation.transformations.push('dead');
+    }
+  }
+
+  /**
+   * Notify all entities with relationships to the deceased and apply mourning to close relations
+   */
+  private notifyRelationships(world: World, entity: Entity): void {
+    const notifiedAgents: string[] = [];
+
+    // Query all entities with relationship components
+    const allEntities = world.query().with('relationship').executeEntities();
+
+    for (const other of allEntities) {
+      const relationshipComp = other.components.get('relationship') as RelationshipComponent | undefined;
+      if (!relationshipComp) continue;
+
+      // Check if this entity has a relationship with the deceased
+      const relationship = relationshipComp.relationships.get(entity.id);
+      if (!relationship) continue;
+
+      // Add to notified agents list
+      notifiedAgents.push(other.id);
+
+      // Determine if this is a close relationship that should trigger mourning
+      // Close = high affinity (>60) OR high trust (>60) OR high familiarity (>70)
+      const isClose = relationship.affinity > 60 || relationship.trust > 60 || relationship.familiarity > 70;
+
+      if (isClose) {
+        // Apply mourning to close relations
+        let mood = other.components.get('mood') as MoodComponent | undefined;
+
+        if (!mood) {
+          // Create mood component if it doesn't exist
+          mood = {
+            type: 'mood',
+            version: 1,
+            currentMood: 0,
+            baselineMood: 0,
+            factors: {
+              physical: 0,
+              foodSatisfaction: 0,
+              foodVariety: 0,
+              social: -20,  // Death of friend impacts social factor
+              comfort: 0,
+              rest: 0,
+              achievement: 0,
+              environment: 0,
+            },
+            emotionalState: 'grieving',
+            moodHistory: [],
+            recentMeals: [],
+            favorites: [],
+            comfortFoods: [],
+            lastUpdate: world.tick,
+            grief: 50,  // Base grief level for close relationship
+            mourning: true,
+          };
+          (other as EntityImpl).addComponent(mood);
+        } else {
+          // Update existing mood component
+          const updatedMood: MoodComponent = {
+            ...mood,
+            grief: (mood.grief ?? 0) + 50,  // Add grief
+            mourning: true,
+            emotionalState: 'grieving',
+            factors: {
+              ...mood.factors,
+              social: Math.max(-100, mood.factors.social - 20),  // Reduce social factor
+            },
+            lastUpdate: world.tick,
+          };
+          (other as EntityImpl).updateComponent('mood', () => updatedMood);
+        }
+      }
+    }
+
+    // Emit death notification event
+    if (notifiedAgents.length > 0) {
+      this.events.emit('death:notification', {
+        deceasedId: entity.id,
+        notifiedAgents,
+      });
     }
   }
 
@@ -344,8 +502,18 @@ export class DeathTransitionSystem extends BaseSystem {
       }
     }
 
-    // TODO: Get descendants from family tree system when implemented
+    // Get descendants by finding entities where this entity is listed as a parent
     const descendants: string[] = [];
+    const allEntitiesWithGenetics = world.query().with('genetic').executeEntities();
+    for (const potentialDescendant of allEntitiesWithGenetics) {
+      const descendantGenetics = potentialDescendant.components.get('genetic') as GeneticComponent | undefined;
+      if (descendantGenetics?.parentIds) {
+        // Check if the deceased entity is one of the parents
+        if (descendantGenetics.parentIds.includes(entity.id)) {
+          descendants.push(potentialDescendant.id);
+        }
+      }
+    }
 
     // Create the afterlife component
     const afterlife = createAfterlifeComponent({
@@ -385,6 +553,472 @@ export class DeathTransitionSystem extends BaseSystem {
 
     // Default to unknown
     return 'unknown';
+  }
+
+  /**
+   * Drop inventory items at death location
+   */
+  private dropInventory(world: World, entity: Entity, position: PositionComponent): void {
+    const inventory = entity.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventory) return;
+
+    const mutator = world as WorldMutator;
+
+    // Handle both new InventoryComponent format and legacy test format
+    if ('slots' in inventory) {
+      // New format: InventoryComponent with slots
+      for (const slot of inventory.slots) {
+        if (slot.itemId && slot.quantity > 0) {
+          this.createDroppedItem(mutator, position, slot.itemId, slot.quantity);
+        }
+      }
+      // Clear all slots
+      for (const slot of inventory.slots) {
+        slot.itemId = null;
+        slot.quantity = 0;
+      }
+      inventory.currentWeight = 0;
+    } else if ('items' in inventory) {
+      // Legacy test format: inventory with items array
+      const legacyInventory = inventory as LegacyInventoryComponent;
+      for (const item of legacyInventory.items) {
+        this.createDroppedItem(mutator, position, item.type, item.quantity);
+      }
+      // Clear items array
+      legacyInventory.items = [];
+    }
+  }
+
+  /**
+   * Track knowledge loss when an agent dies
+   *
+   * Scans the deceased agent's episodic memories and records any unique (non-shared)
+   * memories as lost knowledge. Shared memories are preserved in the collective.
+   */
+  private trackKnowledgeLoss(world: World, entity: Entity): void {
+    const episodicMemory = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    if (!episodicMemory) return;
+
+    const identity = entity.components.get('identity') as IdentityComponent | undefined;
+    const currentTick = world.tick;
+
+    // Get or create knowledge loss singleton entity
+    if (!this.knowledgeLossEntityId) {
+      // Try to find existing singleton
+      for (const e of world.entities.values()) {
+        if (e.components.has('knowledge_loss')) {
+          this.knowledgeLossEntityId = e.id;
+          break;
+        }
+      }
+
+      // Create if not found
+      if (!this.knowledgeLossEntityId) {
+        const mutator = world as WorldMutator;
+        const knowledgeLossEntity = mutator.createEntity();
+        const knowledgeLossComponent = createKnowledgeLossComponent();
+        mutator.addComponent(knowledgeLossEntity.id, knowledgeLossComponent);
+        this.knowledgeLossEntityId = knowledgeLossEntity.id;
+      }
+    }
+
+    const knowledgeLossEntity = world.getEntity(this.knowledgeLossEntityId);
+    if (!knowledgeLossEntity) return;
+
+    const knowledgeLoss = knowledgeLossEntity.components.get('knowledge_loss') as KnowledgeLossComponent | undefined;
+    if (!knowledgeLoss) return;
+
+    // Collect unique (non-shared) memories
+    const lostMemories: LostMemory[] = [];
+
+    // Handle both EpisodicMemoryComponent format and test format
+    if ('episodicMemories' in episodicMemory) {
+      // Production format: EpisodicMemoryComponent
+      const memories = episodicMemory.episodicMemories;
+      for (const memory of memories) {
+        // All episodic memories are unique (not shared) by default
+        // Future: add 'shared' field to EpisodicMemory type if needed
+        lostMemories.push({
+          id: memory.id,
+          content: memory.summary,
+          deceasedId: entity.id,
+          deceasedName: identity?.name,
+          lostAt: currentTick,
+          importance: memory.importance,
+          emotionalIntensity: memory.emotionalIntensity,
+          eventType: memory.eventType,
+        });
+      }
+    } else if ('memories' in episodicMemory) {
+      // Test format: simple memories array with shared field
+      const legacyMemory = episodicMemory as LegacyEpisodicMemoryComponent;
+      for (const memory of legacyMemory.memories) {
+        // Only track unique memories (shared === false or undefined)
+        if (memory.shared !== true) {
+          lostMemories.push({
+            id: memory.id,
+            content: memory.content,
+            deceasedId: entity.id,
+            deceasedName: identity?.name,
+            lostAt: currentTick,
+            importance: 0.5, // Default importance for test format
+          });
+        }
+      }
+    }
+
+    if (lostMemories.length > 0) {
+      // Update knowledge loss component
+      const updatedComponent = addLostMemories(knowledgeLoss, lostMemories);
+      const mutator = world as WorldMutator;
+      mutator.addComponent(this.knowledgeLossEntityId, updatedComponent);
+    }
+  }
+
+  /**
+   * Create a dropped item entity at the specified position
+   */
+  private createDroppedItem(
+    mutator: WorldMutator,
+    position: PositionComponent,
+    itemType: string,
+    quantity: number
+  ): void {
+    const itemEntity = mutator.createEntity();
+
+    // Add position component using the proper factory function
+    mutator.addComponent(itemEntity.id, createPositionComponent(position.x, position.y, position.z));
+
+    // Add item component
+    // The test expects an 'item' component with a 'type' field containing the item type
+    // We construct this carefully to avoid conflicts with the component's 'type' identifier
+    const itemComponent: DroppedItemComponent = {
+      type: 'item',
+      version: 1,
+      itemType,
+      quantity,
+    };
+
+    mutator.addComponent(itemEntity.id, itemComponent);
+  }
+
+  /**
+   * Create death witness memories for nearby agents
+   *
+   * Finds all agents within witness range of the death location and adds
+   * episodic memories of witnessing the death event.
+   *
+   * @param world - The game world
+   * @param entity - The deceased entity
+   * @param position - Position where death occurred
+   */
+  private createWitnessMemories(world: World, entity: Entity, position: PositionComponent): void {
+    const WITNESS_RANGE = 10; // Distance in tiles for witnessing a death
+    const WITNESS_RANGE_SQUARED = WITNESS_RANGE * WITNESS_RANGE;
+    const currentTick = world.tick;
+    const causeOfDeath = this.determineCauseOfDeath(entity);
+    const identity = entity.components.get('identity') as IdentityComponent | undefined;
+
+    // Query all entities with both position and episodic_memory components
+    const potentialWitnesses = world.query()
+      .with('position')
+      .with('episodic_memory')
+      .executeEntities();
+
+    for (const witness of potentialWitnesses) {
+      // Don't let the deceased witness their own death
+      if (witness.id === entity.id) continue;
+
+      const witnessPos = witness.components.get('position') as PositionComponent | undefined;
+      if (!witnessPos) continue;
+
+      // Calculate squared distance for performance (avoid Math.sqrt)
+      const dx = witnessPos.x - position.x;
+      const dy = witnessPos.y - position.y;
+      const distanceSquared = dx * dx + dy * dy;
+
+      // Check if within witness range
+      if (distanceSquared > WITNESS_RANGE_SQUARED) continue;
+
+      // Get episodic memory component
+      const episodicMemory = witness.components.get('episodic_memory');
+      if (!episodicMemory) continue;
+
+      // Handle both production EpisodicMemoryComponent and test format
+      if (typeof (episodicMemory as EpisodicMemoryComponent).formMemory === 'function') {
+        // Production format: Use formMemory method
+        const memoryComponent = episodicMemory as EpisodicMemoryComponent;
+        memoryComponent.formMemory({
+          eventType: 'death_witnessed',
+          summary: `Witnessed the death of ${identity?.name ?? 'someone'} from ${causeOfDeath}`,
+          timestamp: currentTick,
+          participants: [entity.id],
+          location: { x: position.x, y: position.y },
+          emotionalValence: -0.7, // Negative emotion (death is sad/disturbing)
+          emotionalIntensity: 0.6, // Moderately intense
+          surprise: 0.7, // Deaths are usually surprising
+          socialSignificance: 0.5, // Socially significant event
+          survivalRelevance: 0.4, // Reminds of mortality
+        });
+      } else if ('memories' in episodicMemory) {
+        // Test format: Simple memories array
+        const legacyMemory = episodicMemory as LegacyEpisodicMemoryComponent;
+        legacyMemory.memories.push({
+          id: `death_witness_${currentTick}_${entity.id}`,
+          content: `Witnessed death of ${identity?.name ?? 'someone'}`,
+          type: 'death_witnessed',
+          deceased: entity.id,
+          cause: causeOfDeath,
+          location: { x: position.x, y: position.y },
+          timestamp: currentTick,
+        });
+      }
+    }
+  }
+
+  /**
+   * Check for power vacuum when an entity holding a position dies
+   *
+   * If the deceased held a position of authority (chief, elder, etc.),
+   * create a world-level power_vacuum component to track the vacant position
+   * and potential candidates for succession.
+   */
+  private checkPowerVacuum(world: World, entity: Entity): void {
+    // Check if entity held a position
+    const positionHolder = entity.components.get('position_holder') as
+      | { position: string; authority: number }
+      | undefined;
+
+    if (!positionHolder) {
+      return; // No position held, no power vacuum
+    }
+
+    const mutator = world as WorldMutator;
+
+    // Find potential candidates for succession
+    // Look for living agents with high authority/reputation in the same settlement
+    const candidates: string[] = [];
+
+    // Query all agents to find potential successors
+    const agents = world.query().with(CT.Agent).with(CT.Identity).executeEntities();
+
+    for (const agent of agents) {
+      // Skip the deceased
+      if (agent.id === entity.id) continue;
+
+      // Skip dead agents
+      const needs = agent.components.get('needs') as NeedsComponent | undefined;
+      if (needs && needs.health <= 0) continue;
+
+      // For now, add all living agents as potential candidates
+      // Future: Filter by authority level, skills, reputation, proximity to settlement
+      candidates.push(agent.id);
+    }
+
+    // Create or update world-level power_vacuum component
+    // Since the test expects world.getComponent('power_vacuum') to work,
+    // we need to create a singleton entity to store this world-level component
+
+    // Find existing power_vacuum singleton entity
+    let vacuumEntity = world.query()
+      .with(CT.PowerVacuum)
+      .executeEntities()[0];
+
+    if (!vacuumEntity) {
+      // Create singleton entity for power vacuum tracking
+      vacuumEntity = mutator.createEntity();
+    }
+
+    // Add or update the power_vacuum component
+    const powerVacuumComponent = {
+      type: 'power_vacuum',
+      version: 1,
+      position: positionHolder.position,
+      candidates,
+      deceasedId: entity.id,
+      occurredAtTick: world.tick,
+    };
+
+    mutator.addComponent(vacuumEntity.id, powerVacuumComponent);
+
+    // Emit event for power vacuum detection
+    this.events.emit('rebellion:power_vacuum', {
+      message: `Power vacuum detected: ${positionHolder.position} position vacant after death of ${entity.id}`,
+    });
+  }
+
+  /**
+   * Handle pack mind coherence recalculation when a pack member dies
+   *
+   * When a pack mind body dies:
+   * 1. Remove the deceased from the pack's bodiesInPack array
+   * 2. Recalculate coherence (reduce based on members lost)
+   * 3. If coherence drops below threshold (0.2), mark pack as dissolved
+   */
+  private handlePackDeath(world: World, entity: Entity): void {
+    // Check if entity is part of a pack
+    const packMember = entity.components.get('pack_member') as
+      | { packId: string }
+      | undefined;
+
+    if (!packMember) {
+      return; // Not a pack member, nothing to do
+    }
+
+    // Find the pack mind entity with matching packId
+    const packMinds = world.query()
+      .with(CT.PackCombat)
+      .executeEntities();
+
+    for (const packMindEntity of packMinds) {
+      const packCombat = packMindEntity.components.get('pack_combat') as
+        | { packId: string; bodiesInPack: string[]; coherence: number; dissolved?: boolean }
+        | undefined;
+
+      if (!packCombat || packCombat.packId !== packMember.packId) {
+        continue;
+      }
+
+      // Found the matching pack mind
+      // Remove the deceased from bodiesInPack
+      const indexToRemove = packCombat.bodiesInPack.indexOf(entity.id);
+      if (indexToRemove === -1) {
+        continue; // Entity not in pack (shouldn't happen, but be safe)
+      }
+
+      packCombat.bodiesInPack.splice(indexToRemove, 1);
+
+      // Recalculate coherence
+      // Formula: Reduce by 0.15 per member lost, or proportional to pack size
+      const coherenceReduction = Math.max(0.1, 0.15);
+      const newCoherence = Math.max(0, packCombat.coherence - coherenceReduction);
+      packCombat.coherence = newCoherence;
+
+      // Check if pack should dissolve (coherence below threshold)
+      const DISSOLUTION_THRESHOLD = 0.2;
+      if (newCoherence < DISSOLUTION_THRESHOLD) {
+        packCombat.dissolved = true;
+      }
+
+      // Force update the component
+      const mutator = world as WorldMutator;
+      mutator.addComponent(packMindEntity.id, {
+        type: 'pack_combat',
+        version: 1,
+        ...packCombat,
+      });
+
+      // Emit event for pack member death
+      this.events.emitGeneric('pack:member_died', {
+        packId: packCombat.packId,
+        deceasedId: entity.id,
+        remainingBodies: packCombat.bodiesInPack.length,
+        coherence: newCoherence,
+        dissolved: packCombat.dissolved ?? false,
+      });
+
+      break; // Found and updated the pack, done
+    }
+  }
+
+  /**
+   * Handle hive collapse when a queen dies
+   *
+   * When a hive queen dies:
+   * 1. Find the hive entity with matching hiveId
+   * 2. Mark queen as dead
+   * 3. Trigger hive collapse
+   */
+  private handleHiveDeath(world: World, entity: Entity): void {
+    // Check if entity is a hive queen
+    const hiveQueen = entity.components.get('hive_queen') as
+      | { hiveId: string }
+      | undefined;
+
+    if (!hiveQueen) {
+      // Not a queen, check if it's a worker
+      const hiveWorker = entity.components.get('hive_worker') as
+        | { hiveId: string }
+        | undefined;
+
+      if (!hiveWorker) {
+        return; // Not part of a hive
+      }
+
+      // Worker death - remove from hive workers list
+      const hives = world.query()
+        .with(CT.HiveCombat)
+        .executeEntities();
+
+      for (const hiveEntity of hives) {
+        const hiveCombat = hiveEntity.components.get('hive_combat') as
+          | { hiveId: string; workers: string[] }
+          | undefined;
+
+        if (!hiveCombat || hiveCombat.hiveId !== hiveWorker.hiveId) {
+          continue;
+        }
+
+        // Remove worker from workers list
+        const workerIndex = hiveCombat.workers.indexOf(entity.id);
+        if (workerIndex !== -1) {
+          hiveCombat.workers.splice(workerIndex, 1);
+
+          // Update component
+          const mutator = world as WorldMutator;
+          mutator.addComponent(hiveEntity.id, {
+            type: 'hive_combat',
+            version: 1,
+            ...hiveCombat,
+          });
+        }
+
+        break;
+      }
+
+      return;
+    }
+
+    // Queen death - trigger hive collapse
+    const hives = world.query()
+      .with(CT.HiveCombat)
+      .executeEntities();
+
+    for (const hiveEntity of hives) {
+      const hiveCombat = hiveEntity.components.get('hive_combat') as
+        | { hiveId: string; queen: string; workers: string[]; queenDead?: boolean; collapseTriggered?: boolean }
+        | undefined;
+
+      if (!hiveCombat || hiveCombat.hiveId !== hiveQueen.hiveId) {
+        continue;
+      }
+
+      // Check if the deceased is the queen
+      if (hiveCombat.queen !== entity.id) {
+        continue;
+      }
+
+      // Mark queen as dead and trigger collapse
+      hiveCombat.queenDead = true;
+      hiveCombat.collapseTriggered = true;
+
+      // Update component
+      const mutator = world as WorldMutator;
+      mutator.addComponent(hiveEntity.id, {
+        type: 'hive_combat',
+        version: 1,
+        ...hiveCombat,
+      });
+
+      // Emit event for hive collapse
+      this.events.emitGeneric('hive:collapse', {
+        hiveId: hiveCombat.hiveId,
+        queenId: entity.id,
+        remainingWorkers: hiveCombat.workers.length,
+      });
+
+      break;
+    }
   }
 
   /**

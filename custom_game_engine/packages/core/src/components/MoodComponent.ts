@@ -219,6 +219,16 @@ export interface MoodComponent extends Component {
   lastUpdate: number;
 
   // ============================================================================
+  // Mourning and Grief System
+  // ============================================================================
+
+  /** Grief intensity (0-100) from death of close relations */
+  grief?: number;
+
+  /** Whether this agent is currently mourning a death */
+  mourning?: boolean;
+
+  // ============================================================================
   // Forward-Compatibility: Stress System (optional)
   // ============================================================================
 

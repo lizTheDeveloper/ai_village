@@ -27,7 +27,7 @@
  * ```
  */
 
-import type { World } from '@ai-village/core';
+import type { World, SpatialQueryService } from '@ai-village/core';
 import type { Entity, EntityImpl } from '@ai-village/core';
 import type { EntityId, ComponentType } from '@ai-village/core';
 import type { PositionComponent } from '@ai-village/core';
@@ -57,8 +57,10 @@ export interface EntityWithDistance {
 
 /**
  * ChunkSpatialQuery - Spatial query API using chunk indexing
+ *
+ * Implements SpatialQueryService interface for unified spatial queries.
  */
-export class ChunkSpatialQuery {
+export class ChunkSpatialQuery implements SpatialQueryService {
   constructor(
     private world: World,
     private chunkManager: ChunkManager,

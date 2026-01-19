@@ -33,7 +33,7 @@ export function createIronDeposit(world: WorldMutator, x: number, y: number): st
   entity.addComponent(createResourceComponent('iron_ore', amount, 0));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }
@@ -62,7 +62,7 @@ export function createCoalDeposit(world: WorldMutator, x: number, y: number): st
   entity.addComponent(createResourceComponent('coal', amount, 0));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }
@@ -91,7 +91,7 @@ export function createCopperDeposit(world: WorldMutator, x: number, y: number): 
   entity.addComponent(createResourceComponent('copper_ore', amount, 0));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }
@@ -120,7 +120,7 @@ export function createGoldDeposit(world: WorldMutator, x: number, y: number): st
   entity.addComponent(createResourceComponent('gold_ore', amount, 0));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

@@ -90,6 +90,10 @@ export class UniversitySystem extends BaseSystem {
   public readonly id: SystemId = 'university';
   public readonly priority = 46; // After library (45)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.University];
+
+  // Lazy activation: Skip entire system when no universities exist in world
+  public readonly activationComponents = ['university'] as const;
+
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private eventBus: CoreEventBus;

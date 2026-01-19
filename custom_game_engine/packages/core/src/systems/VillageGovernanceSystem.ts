@@ -34,6 +34,8 @@ export class VillageGovernanceSystem extends BaseSystem {
   public readonly id: SystemId = 'village_governance';
   public readonly priority: number = 52; // Run after GovernanceDataSystem (50)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VillageGovernance];
+  // Lazy activation: Skip entire system when no village governance exists in world
+  public readonly activationComponents = [CT.VillageGovernance] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /**

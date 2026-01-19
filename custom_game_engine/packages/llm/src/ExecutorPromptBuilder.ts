@@ -35,6 +35,9 @@ import {
   type InventoryComponent,
   type InventorySlot,
   type AgentComponent,
+  type BuildingComponent,
+  type ResourceComponent,
+  type PlantComponent,
   formatGoalsForPrompt,
   formatGoalsSectionForPrompt,
   getAvailableBuildings,
@@ -64,10 +67,27 @@ export interface ExecutorPrompt {
   instruction: string;            // What to decide
 }
 
-// Chunk spatial query injection for O(1) building lookups
-let chunkSpatialQuery: any | null = null;
+/**
+ * Interface for chunk spatial query (injected at runtime)
+ */
+interface ChunkSpatialQuery {
+  hasBuildingNearPosition(x: number, y: number, buildingType: string): boolean;
+}
 
-export function injectChunkSpatialQueryToExecutorPromptBuilder(spatialQuery: any): void {
+/**
+ * Extended World interface with buildingRegistry
+ */
+interface WorldWithBuildingRegistry extends World {
+  buildingRegistry?: {
+    get(buildingType: string): any;
+    getUnlocked(): any[];
+  };
+}
+
+// Chunk spatial query injection for O(1) building lookups
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToExecutorPromptBuilder(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
 }
 
@@ -162,7 +182,7 @@ export class ExecutorPromptBuilder {
    * Auto-generates prompts for all schema'd components.
    */
   private buildSchemaPrompt(agent: Entity, world: World): string {
-    const schemaPrompt = PromptRenderer.renderEntity(agent as any, world);
+    const schemaPrompt = PromptRenderer.renderEntity(agent, world);
 
     if (!schemaPrompt) {
       return '';
@@ -211,13 +231,13 @@ export class ExecutorPromptBuilder {
       if (!entity) continue;
 
       // Check for completed campfire buildings
-      const building = entity.components.get('building') as any;
+      const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building?.buildingType === 'campfire') {
         return true;
       }
 
       // Check for agents currently building campfires (prevents duplicate simultaneous builds)
-      const agentComp = entity.components.get('agent') as any;
+      const agentComp = entity.components.get('agent') as AgentComponent | undefined;
       if (agentComp?.behavior === 'build' && agentComp.behaviorState?.buildingType === 'campfire') {
         return true;
       }
@@ -342,8 +362,8 @@ export class ExecutorPromptBuilder {
     // Query all buildings in the world
     const buildings = world.query().with('building').executeEntities();
     const buildingData = buildings.map(b => {
-      const buildingComp = b.components.get('building') as any;
-      const identity = b.components.get('identity') as any;
+      const buildingComp = b.components.get('building') as BuildingComponent | undefined;
+      const identity = b.components.get('identity') as IdentityComponent | undefined;
       return {
         id: b.id,
         name: buildingComp?.buildingType || 'Unknown Building',
@@ -423,7 +443,7 @@ export class ExecutorPromptBuilder {
           const resource = world.getEntity(resourceId);
           if (!resource) continue;
 
-          const resourceComp = resource.components.get('resource') as any;
+          const resourceComp = resource.components.get('resource') as ResourceComponent | undefined;
           if (resourceComp?.resourceType) {
             const currentCount = resourceCounts.get(resourceComp.resourceType) || 0;
             resourceCounts.set(resourceComp.resourceType, currentCount + 1);
@@ -437,9 +457,9 @@ export class ExecutorPromptBuilder {
           const plant = world.getEntity(plantId);
           if (!plant) continue;
 
-          const plantComp = plant.components.get('plant') as any;
-          if (plantComp?.species) {
-            const speciesName = plantComp.species.replace(/-/g, ' ');
+          const plantComp = plant.components.get('plant') as PlantComponent | undefined;
+          if (plantComp?.speciesId) {
+            const speciesName = plantComp.speciesId.replace(/-/g, ' ');
             const currentCount = plantCounts.get(speciesName) || 0;
             plantCounts.set(speciesName, currentCount + 1);
           }
@@ -483,13 +503,12 @@ export class ExecutorPromptBuilder {
     skills: SkillsComponent | undefined
   ): string {
     // Check for buildingRegistry (extended World interface)
-    // Use any cast to avoid intersection type issues with private properties
-    const worldAny = world as any;
-    if (!worldAny.buildingRegistry) {
+    const worldWithRegistry = world as WorldWithBuildingRegistry;
+    if (!worldWithRegistry.buildingRegistry) {
       return '';
     }
 
-    const registry = worldAny.buildingRegistry;
+    const registry = worldWithRegistry.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings: any[];

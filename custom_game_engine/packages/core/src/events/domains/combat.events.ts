@@ -194,6 +194,25 @@ export interface CombatEvents {
     targetLocation: { x: number; y: number };
     invaderType?: string;
   };
+
+  /** Hive collapse triggered (queen died) */
+  'hive:collapse': {
+    hiveId: string;
+    queenId: EntityId;
+  };
+
+  /** Hive worker died */
+  'hive:worker_died': {
+    hiveId: string;
+    workerId: EntityId;
+    remainingWorkers: number;
+  };
+
+  /** Pack dissolved (alpha died or too few members) */
+  'pack:dissolved': {
+    packId: string;
+    reason: 'alpha_died' | 'insufficient_members';
+  };
 }
 
 export type CombatEventType = keyof CombatEvents;

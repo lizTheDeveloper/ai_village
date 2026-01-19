@@ -17,6 +17,8 @@ export class RoofRepairSystem extends BaseSystem {
   readonly id = 'roof_repair' as const;
   readonly priority = 950;
   readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when building components exist (O(1) activation check)
+  readonly activationComponents = [CT.Building] as const;
   protected readonly throttleInterval: number = 200; // Update every 200 ticks (10 seconds)
   private hasRun = false;
 

@@ -149,7 +149,7 @@ export const ProtoRealitySchema = autoRegister(
 
     validate: (data): data is ProtoRealityComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const p = data as any;
+      const p = data as Record<string, unknown>;
 
       return (
         p.type === 'proto_reality' &&

@@ -11,7 +11,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
-import { spawnCity, getCityTemplates, type CitySpawnConfig } from '../city/CitySpawner.js';
+import { spawnCity, getCityTemplates, type CitySpawnConfig, type CityTemplate } from '../city/CitySpawner.js';
 // Note: @ai-village/world imports are done via dynamic import in handleSpawnAgent
 // to break circular dependency: core -> world -> reproduction -> core
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -43,6 +43,21 @@ export interface EntityDetails {
   id: string;
   name?: string;
   components: Record<string, unknown>;
+}
+
+/**
+ * Extended World interface with runtime properties
+ */
+interface WorldWithRuntimeProps extends World {
+  speedMultiplier?: number;
+  paused?: boolean;
+}
+
+/**
+ * Extended World interface with mutator methods
+ */
+interface WorldWithMutator extends World {
+  addComponent(entityId: string, component: unknown): void;
 }
 
 /**
@@ -350,7 +365,7 @@ export class LiveEntityAPI {
     }
 
     const config: CitySpawnConfig = {
-      template: template as any,
+      template: template as CityTemplate,
       x,
       y,
       name: typeof name === 'string' ? name : undefined,
@@ -410,8 +425,8 @@ export class LiveEntityAPI {
       // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
       const { createLLMAgent, createWanderingAgent } = await import('@ai-village/agents');
       const agentId = shouldUseLLM
-        ? createLLMAgent(this.world as any, x, y, agentSpeed, undefined, options)
-        : createWanderingAgent(this.world as any, x, y, agentSpeed, options);
+        ? createLLMAgent(this.world, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world, x, y, agentSpeed, options);
 
       // Optionally set the agent's name if provided
       if (name && typeof name === 'string') {
@@ -715,9 +730,9 @@ export class LiveEntityAPI {
     }
 
     // Access speed multiplier on world (if exists)
-    const worldAny = this.world as any;
-    if (worldAny.speedMultiplier !== undefined) {
-      worldAny.speedMultiplier = speed;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.speedMultiplier !== undefined) {
+      worldWithRuntime.speedMultiplier = speed;
     }
 
     return {
@@ -742,9 +757,9 @@ export class LiveEntityAPI {
     }
 
     // Access paused state on world (if exists)
-    const worldAny = this.world as any;
-    if (worldAny.paused !== undefined) {
-      worldAny.paused = paused;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.paused !== undefined) {
+      worldWithRuntime.paused = paused;
     }
 
     return {
@@ -906,15 +921,16 @@ export class LiveEntityAPI {
       const deityEntity = this.world.createEntity();
       const deityComponent = new DeityComponent(name, deityController);
       // Use WorldMutator's addComponent since Entity interface is read-only
-      (this.world as any).addComponent(deityEntity.id, deityComponent);
+      const worldMutator = this.world as WorldWithMutator;
+      worldMutator.addComponent(deityEntity.id, deityComponent);
 
       // Add identity component for chat system and UI display
       const identityComponent = createIdentityComponent(name, 'deity');
-      (this.world as any).addComponent(deityEntity.id, identityComponent);
+      worldMutator.addComponent(deityEntity.id, identityComponent);
 
       // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
       const tagsComponent = createTagsComponent('deity');
-      (this.world as any).addComponent(deityEntity.id, tagsComponent);
+      worldMutator.addComponent(deityEntity.id, tagsComponent);
 
       return {
         requestId: action.requestId,

@@ -1,5 +1,10 @@
-import type { SystemId, BiomeType } from '@ai-village/core';
+import type { SystemId, BiomeType, Entity, World } from '@ai-village/core';
 import { ComponentType as CT, BaseSystem, type SystemContext } from '@ai-village/core';
+
+interface TimeComponent {
+  type: 'time';
+  speedMultiplier?: number;
+}
 
 export interface Tile {
   terrain: string;
@@ -57,8 +62,8 @@ export class SoilSystem extends BaseSystem {
     const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as any;
-      const timeComp = timeEntity.getComponent(CT.Time) as any;
+      const timeEntity: Entity = timeEntities[0];
+      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
       if (timeComp && timeComp.speedMultiplier) {
         timeSpeedMultiplier = timeComp.speedMultiplier;
       }
@@ -89,7 +94,7 @@ export class SoilSystem extends BaseSystem {
    * Till a grass tile to make it plantable
    * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
    */
-  public tillTile(world: any, tile: Tile, x: number, y: number, _agentId?: string): void {
+  public tillTile(world: World, tile: Tile, x: number, y: number, _agentId?: string): void {
     // CLAUDE.md: Validate inputs, no silent fallbacks
     if (!tile) {
       const error = 'tillTile requires a valid tile object';
@@ -155,7 +160,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Water a tile to increase moisture
    */
-  public waterTile(world: any, tile: Tile, x: number, y: number): void {
+  public waterTile(world: World, tile: Tile, x: number, y: number): void {
     if (!tile.nutrients) {
       throw new Error(`Tile at (${x},${y}) missing required nutrients data`);
     }
@@ -196,7 +201,7 @@ export class SoilSystem extends BaseSystem {
    * Apply fertilizer to a tile
    */
   public fertilizeTile(
-    world: any,
+    world: World,
     tile: Tile,
     x: number,
     y: number,
@@ -244,7 +249,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Deplete soil after a harvest
    */
-  public depleteSoil(world: any, tile: Tile, x: number, y: number): void {
+  public depleteSoil(world: World, tile: Tile, x: number, y: number): void {
     if (!tile.tilled) {
       throw new Error(`Cannot deplete untilled tile at (${x},${y})`);
     }
@@ -274,7 +279,7 @@ export class SoilSystem extends BaseSystem {
    * Process moisture decay for a tile
    */
   public decayMoisture(
-    world: any,
+    world: World,
     tile: Tile,
     x: number,
     y: number,
@@ -318,7 +323,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Process rain moisture increase for outdoor tiles
    */
-  public applyRain(world: any, tile: Tile, x: number, y: number, intensity: number): void {
+  public applyRain(world: World, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
     // Rain adds 40 moisture * intensity
@@ -342,7 +347,7 @@ export class SoilSystem extends BaseSystem {
   /**
    * Process snow moisture increase for outdoor tiles
    */
-  public applySnow(world: any, tile: Tile, x: number, y: number, intensity: number): void {
+  public applySnow(world: World, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
     // Snow adds 20 moisture * intensity

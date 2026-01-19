@@ -14,6 +14,23 @@
 import type { World } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
+// Component interfaces for type safety
+interface DeityComponent {
+  controller?: string;
+  belief?: {
+    currentBelief?: number;
+  };
+  believers?: string[];
+}
+
+interface AgentComponent {
+  name?: string;
+}
+
+interface SpiritualComponent {
+  faith?: number;
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -199,7 +216,7 @@ export class VisionComposerPanel implements IWindowPanel {
 
     // Find player-controlled deity
     for (const entity of world.entities.values()) {
-      const deityComp = entity.components.get('deity') as any;
+      const deityComp = entity.components.get('deity') as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;
         this.belief = deityComp.belief?.currentBelief ?? 0;
@@ -210,8 +227,8 @@ export class VisionComposerPanel implements IWindowPanel {
         for (const believerId of believers) {
           const believerEntity = world.getEntity(believerId);
           if (believerEntity) {
-            const agentComp = believerEntity.components.get('agent') as any;
-            const spiritualComp = believerEntity.components.get('spiritual') as any;
+            const agentComp = believerEntity.components.get('agent') as AgentComponent | undefined;
+            const spiritualComp = believerEntity.components.get('spiritual') as SpiritualComponent | undefined;
             if (agentComp) {
               this.realTargets.push({
                 id: believerId,

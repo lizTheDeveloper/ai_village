@@ -13,6 +13,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { Component } from '../ecs/Component.js';
 import type {
   GodCraftedContent,
   DiscoveryCondition,
@@ -99,7 +100,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     try {
       candidates = godCraftedQueue.pullForUniverse(this.universeId, {
         validated: true,
-      });
+      } as unknown as Component);
     } catch (error) {
       console.error('[GodCraftedDiscovery] Error pulling from queue:', error);
       return;
@@ -135,7 +136,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const worldY = chunkInfo.y * chunkInfo.size + localY;
 
     // Spawn content at position
-    const result = this.spawnContent(content, world, { x: worldX, y: worldY });
+    const result = this.spawnContent(content, world, { x: worldX, y: worldY } as unknown as Component);
 
     if (result.success) {
       godCraftedQueue.markDiscovered(
@@ -250,6 +251,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     // Add riddle component
     entity.addComponent({
       type: 'generated_content',
+      version: 1,
       contentType: 'riddle',
       content: {
         question: riddleData.question,
@@ -262,32 +264,35 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as any);
+    } as unknown as Component);
 
     // Add god-crafted metadata
     entity.addComponent({
       type: 'god_crafted_artifact',
+      version: 1,
       contentId: content.id,
       creator: content.creator,
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as any);
+    } as unknown as Component);
 
     // Add identity for display
     entity.addComponent({
       type: 'identity',
+      version: 1,
       name: `Riddle of ${content.creator.name}`,
       description: content.lore,
-    } as any);
+    } as unknown as Component);
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
       entity.addComponent({
         type: 'position',
+        version: 1,
         x: position.x,
         y: position.y,
-      } as any);
+      } as unknown as Component);
     }
 
     // Silent spawn - no console spam
@@ -306,7 +311,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    });
+    } as unknown as Component);
 
     return {
       success: true,
@@ -346,32 +351,34 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as any);
+    } as unknown as Component);
 
     // Add god-crafted metadata
     entity.addComponent({
       type: 'god_crafted_artifact',
+      version: 1,
       contentId: content.id,
       creator: content.creator,
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as any);
+    } as unknown as Component);
 
     // Add identity for display
     entity.addComponent({
       type: 'identity',
       name: spellData.name,
       description: spellData.description,
-    } as any);
+    } as unknown as Component);
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
       entity.addComponent({
         type: 'position',
+        version: 1,
         x: position.x,
         y: position.y,
-      } as any);
+      } as unknown as Component);
     }
 
     // Silent spawn - no console spam
@@ -390,7 +397,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    });
+    } as unknown as Component);
 
     return {
       success: true,
@@ -430,32 +437,34 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as any);
+    } as unknown as Component);
 
     // Add god-crafted metadata
     entity.addComponent({
       type: 'god_crafted_artifact',
+      version: 1,
       contentId: content.id,
       creator: content.creator,
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as any);
+    } as unknown as Component);
 
     // Add identity for display
     entity.addComponent({
       type: 'identity',
       name: recipeData.name,
       description: `A ${recipeData.type} recipe crafted by ${content.creator.name}`,
-    } as any);
+    } as unknown as Component);
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
       entity.addComponent({
         type: 'position',
+        version: 1,
         x: position.x,
         y: position.y,
-      } as any);
+      } as unknown as Component);
     }
 
     // Silent spawn - no console spam
@@ -474,7 +483,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    });
+    } as unknown as Component);
 
     return {
       success: true,

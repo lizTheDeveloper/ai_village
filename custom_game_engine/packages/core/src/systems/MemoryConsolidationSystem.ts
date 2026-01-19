@@ -127,8 +127,9 @@ export class MemoryConsolidationSystem extends BaseSystem {
     // Reset the pending game days counter
     this.pendingGameDays = 0;
 
-    // Get all entities with episodic memory
-    const memoryEntities = world.query().executeEntities();
+    // Get only entities with episodic memory (not ALL entities)
+    // This is O(M) where M = agents with memory, instead of O(N) where N = all entities
+    const memoryEntities = world.query().with(CT.EpisodicMemory).executeEntities();
 
     // Check if any consolidation triggers are for entities without memory component
     for (const agentId of this.consolidationTriggers) {

@@ -236,7 +236,7 @@ class UI {
 
     // Render agents as dots
     agents.forEach((agent) => {
-      const pos = agent.getComponent('position') as any;
+      const pos = agent.getComponent('position') as { x: number; y: number } | undefined;
       if (!pos) return;
 
       const dot = document.createElement('div');
@@ -253,6 +253,8 @@ class UI {
 // =============================================================================
 
 (async () => {
+  console.log('🏙️ Initializing City Simulator...');
+
   // Get preset from URL query param (default: 'basic')
   const params = new URLSearchParams(window.location.search);
   const preset = (params.get('preset') as 'basic' | 'large-city' | 'population-growth') || 'basic';
@@ -268,6 +270,20 @@ class UI {
   const ui = new UI(simulator);
 
   // Expose for debugging
-  (window as any).simulator = simulator;
-  (window as any).ui = ui;
+  interface WindowWithDebug extends Window {
+    simulator: HeadlessCitySimulator;
+    ui: UI;
+  }
+  (window as WindowWithDebug).simulator = simulator;
+  (window as WindowWithDebug).ui = ui;
+
+  console.log('✅ City Simulator initialized!');
+  console.log(`- Preset: ${preset}`);
+  console.log('- Real ECS with game systems');
+  console.log('- Real agents, buildings, resources');
+  console.log('- CityManager making strategic decisions');
+  console.log('\nAvailable presets (add ?preset=NAME to URL):');
+  console.log('  - basic: 50 agents, farm + storage, minimal systems');
+  console.log('  - large-city: 200 agents, 9 storage buildings, full economy');
+  console.log('  - population-growth: 20 agents, reproduction systems enabled');
 })();

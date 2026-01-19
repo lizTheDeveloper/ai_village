@@ -36,27 +36,27 @@ export class ConflictSerializer extends BaseComponentSerializer<ConflictComponen
   }
 
   protected deserializeData(data: unknown): ConflictComponent {
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     return createConflictComponent({
-      conflictType: d.conflictType,
-      target: d.target,
-      state: d.state,
-      startTime: d.startTime,
-      huntingState: d.huntingState,
-      cause: d.cause,
-      surprise: d.surprise,
-      modifiers: d.modifiers,
-      attackerPower: d.attackerPower,
-      defenderPower: d.defenderPower,
-      outcome: d.outcome,
-      winner: d.winner,
-      combatants: d.combatants,
-      trigger: d.trigger,
-      metadata: d.metadata,
-      method: d.method,
-      targetFollower: d.targetFollower,
-      consequence: d.consequence,
-      lethal: d.lethal,
+      conflictType: d.conflictType as string,
+      target: d.target as string,
+      state: d.state as string,
+      startTime: d.startTime as number,
+      huntingState: d.huntingState as string | undefined,
+      cause: d.cause as string | undefined,
+      surprise: d.surprise as boolean | undefined,
+      modifiers: d.modifiers as Record<string, number> | undefined,
+      attackerPower: d.attackerPower as number | undefined,
+      defenderPower: d.defenderPower as number | undefined,
+      outcome: d.outcome as string | undefined,
+      winner: d.winner as string | undefined,
+      combatants: d.combatants as string[] | undefined,
+      trigger: d.trigger as string | undefined,
+      metadata: d.metadata as Record<string, unknown> | undefined,
+      method: d.method as string | undefined,
+      targetFollower: d.targetFollower as string | undefined,
+      consequence: d.consequence as string | undefined,
+      lethal: d.lethal as boolean | undefined,
     });
   }
 
@@ -64,7 +64,7 @@ export class ConflictSerializer extends BaseComponentSerializer<ConflictComponen
     if (typeof data !== 'object' || data === null) {
       throw new Error('ConflictComponent data must be object');
     }
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     if (!d.conflictType || !d.target || d.state === undefined || d.startTime === undefined) {
       throw new Error('ConflictComponent missing required fields');
     }

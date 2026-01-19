@@ -19,6 +19,7 @@ import {
   type BuildingComponent,
   type ResourceCost,
   type AgentComponent,
+  type AnimalComponent,
   type InterestsComponent,
   type RelationshipComponent,
   type Relationship,
@@ -64,10 +65,27 @@ export interface AgentPrompt {
   instruction: string;         // What to decide
 }
 
-// Chunk spatial query injection for O(1) building lookups
-let chunkSpatialQuery: any | null = null;
+/**
+ * Interface for chunk spatial query (injected at runtime)
+ */
+interface ChunkSpatialQuery {
+  hasBuildingNearPosition(x: number, y: number, buildingType: string): boolean;
+}
 
-export function injectChunkSpatialQueryToPromptBuilder(spatialQuery: any): void {
+/**
+ * Extended World interface with buildingRegistry
+ */
+interface WorldWithBuildingRegistry extends World {
+  buildingRegistry?: {
+    get(buildingType: string): any;
+    getUnlocked(): any[];
+  };
+}
+
+// Chunk spatial query injection for O(1) building lookups
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+
+export function injectChunkSpatialQueryToPromptBuilder(spatialQuery: ChunkSpatialQuery): void {
   chunkSpatialQuery = spatialQuery;
   console.log('[StructuredPromptBuilder] ChunkSpatialQuery injected for O(1) campfire detection');
 }
@@ -237,7 +255,7 @@ export class StructuredPromptBuilder {
     // Use PromptRenderer to generate prompts for all schema'd components
     // This will skip components that don't have schemas registered
     // Pass world for entity name resolution in relationships, etc.
-    const schemaPrompt = PromptRenderer.renderEntity(agent as any, world);
+    const schemaPrompt = PromptRenderer.renderEntity(agent, world);
 
     if (!schemaPrompt) {
       return '';
@@ -374,12 +392,12 @@ export class StructuredPromptBuilder {
       const entity = world.getEntity(entityId);
       if (!entity) continue;
 
-      const animal = entity.components.get('animal') as any;
+      const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
         // Calculate distance (simplified - assume we have position)
         visibleAnimals.push({
           id: entityId,
-          species: animal.species || 'animal',
+          species: animal.speciesId || 'animal',
           distance: 0, // TODO: calculate actual distance
         });
       }
@@ -467,13 +485,12 @@ export class StructuredPromptBuilder {
    */
   private buildBuildingsKnowledge(agent: Entity, world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
     // Check for buildingRegistry (extended World interface)
-    // Use any cast to avoid intersection type issues with private properties
-    const worldAny = world as any;
-    if (!world || !worldAny.buildingRegistry) {
+    const worldWithRegistry = world as WorldWithBuildingRegistry;
+    if (!world || !worldWithRegistry.buildingRegistry) {
       return '';
     }
 
-    const registry = worldAny.buildingRegistry;
+    const registry = worldWithRegistry.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings;
@@ -1331,7 +1348,9 @@ export class StructuredPromptBuilder {
 
       // Check for agents currently building campfires (prevents duplicate simultaneous builds)
       const agentComp = entity.components.get('agent') as AgentComponent | undefined;
-      if (agentComp?.behavior === 'build' && (agentComp.behaviorState as any)?.buildingType === 'campfire') {
+      if (agentComp?.behavior === 'build' &&
+          'buildingType' in agentComp.behaviorState &&
+          agentComp.behaviorState.buildingType === 'campfire') {
         return true;
       }
     }

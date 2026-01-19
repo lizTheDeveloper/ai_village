@@ -1,4 +1,33 @@
 import type { World, Entity } from '@ai-village/core';
+import type { NeedsComponent } from '@ai-village/core';
+
+// Component interfaces for type safety
+interface PositionComponent {
+  x: number;
+  y: number;
+  z?: number;
+}
+
+interface CombatStatsComponent {
+  combatSkill?: number;
+  weapon?: string;
+  armor?: string;
+}
+
+interface ConflictComponent {
+  stance?: string;
+  currentAction?: string;
+}
+
+interface InjuryData {
+  type: string;
+  severity?: string;
+  bodyPart?: string;
+}
+
+interface InjuryComponent {
+  injuries: InjuryData[];
+}
 
 /**
  * HealthBarRenderer - Renders health bars and injury indicators above entities
@@ -57,7 +86,7 @@ export class HealthBarRenderer {
       }
 
       // Get entity position
-      const position = entity.components.get('position') as any;
+      const position = entity.components.get('position') as PositionComponent | undefined;
       if (!position) {
         continue;
       }
@@ -85,9 +114,9 @@ export class HealthBarRenderer {
    * Determine if entity should display health bar
    */
   public shouldRenderHealthBar(entity: Entity): boolean {
-    const needs = entity.components.get('needs') as any;
-    const combatStats = entity.components.get('combat_stats') as any;
-    const conflict = entity.components.get('conflict') as any;
+    const needs = entity.components.get('needs') as NeedsComponent | undefined;
+    const combatStats = entity.components.get('combat_stats') as CombatStatsComponent | undefined;
+    const conflict = entity.components.get('conflict') as ConflictComponent | undefined;
 
     // Must have needs component for health tracking
     if (!needs || !combatStats) {
@@ -112,8 +141,8 @@ export class HealthBarRenderer {
    * Render health bar for a specific entity
    */
   public renderHealthBar(entity: Entity, screenX: number, screenY: number): void {
-    const needs = entity.components.get('needs') as any;
-    const position = entity.components.get('position') as any;
+    const needs = entity.components.get('needs') as NeedsComponent | undefined;
+    const position = entity.components.get('position') as PositionComponent | undefined;
 
     if (!needs) {
       throw new Error('Cannot render health bar: entity missing needs component');
@@ -159,7 +188,7 @@ export class HealthBarRenderer {
    * Render injury indicators above health bar
    */
   public renderInjuryIndicators(entity: Entity, screenX: number, screenY: number): void {
-    const injury = entity.components.get('injury') as any;
+    const injury = entity.components.get('injury') as InjuryComponent | undefined;
 
     if (!injury || !injury.injuries || injury.injuries.length === 0) {
       return;

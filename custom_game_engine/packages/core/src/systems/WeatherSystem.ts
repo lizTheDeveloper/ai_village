@@ -17,6 +17,8 @@ export class WeatherSystem extends BaseSystem {
   public readonly id: SystemId = CT.Weather;
   public readonly priority: number = 5; // Run early, before temperature system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Weather];
+  // Only run when weather components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Weather] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**

@@ -171,8 +171,8 @@ export function calculatePersonalityMesh(agent1: Entity, agent2: Entity): number
 // ============================================================================
 
 export function calculateSharedInterests(agent1: Entity, agent2: Entity): number {
-  const agent1Component = (agent1 as EntityImpl).getComponent('agent') as any;
-  const agent2Component = (agent2 as EntityImpl).getComponent('agent') as any;
+  const agent1Component = (agent1 as EntityImpl).getComponent('agent');
+  const agent2Component = (agent2 as EntityImpl).getComponent('agent');
 
   if (!agent1Component?.priorities || !agent2Component?.priorities) {
     return 0.5; // Neutral when no priority data

@@ -19,6 +19,8 @@ export class PlantVisualsSystem extends BaseSystem {
   readonly priority = 300;
   // Only require 'plant' - we'll add 'renderable' if missing
   readonly requiredComponents = ['plant', 'position'] as const;
+  // Only run when plant components exist (O(1) activation check)
+  readonly activationComponents = ['plant'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   /**

@@ -87,6 +87,8 @@ export class TVPostProductionSystem extends BaseSystem {
   readonly id = 'tv_post_production' as const;
   readonly priority = 63; // After production
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   /** Active post-production jobs */
   private activeJobs: Map<string, PostProductionJob> = new Map();

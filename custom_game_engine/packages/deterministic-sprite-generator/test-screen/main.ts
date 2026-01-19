@@ -2,7 +2,37 @@
  * Test screen for deterministic sprite generator
  */
 
-import { generateSprite, type Color, type GeneratedSprite } from '../src/index.js';
+import { generateSprite, type Color, type GeneratedSprite, type GenerationParams } from '../src/index.js';
+
+// Type definitions for game data structures
+interface EntityComponent {
+  [key: string]: unknown;
+}
+
+interface GameEntity {
+  id: string;
+  components?: {
+    agent?: EntityComponent;
+    identity?: {
+      name?: string;
+    };
+    genetic?: unknown;
+  };
+}
+
+interface GameData {
+  world?: {
+    entities?: GameEntity[];
+  };
+}
+
+// Extend Window interface for test screen globals
+declare global {
+  interface Window {
+    gameAgents?: GameEntity[];
+    generateFromAgent?: (agentId: string) => void;
+  }
+}
 
 // UI elements
 const seedInput = document.getElementById('seed') as HTMLInputElement;
@@ -88,7 +118,7 @@ function generate(): void {
   const seed = seedInput.value;
   const template = templateSelect.value;
   const scale = parseInt(scaleInput.value, 10);
-  const planetaryArtStyle = artStyleSelect.value as any;
+  const planetaryArtStyle = artStyleSelect.value as GenerationParams['planetaryArtStyle'];
 
   const colors: Record<string, Color> = {
     skin: hexToColor(skinColorInput.value),
@@ -160,16 +190,16 @@ function loadGameData(event: Event): void {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
-      const data = JSON.parse(e.target?.result as string);
+      const data = JSON.parse(e.target?.result as string) as GameData;
 
       // Extract agent/entity data
-      const agents = data.world?.entities?.filter((e: any) => e.components?.agent) || [];
+      const agents = data.world?.entities?.filter((e: GameEntity) => e.components?.agent) || [];
 
       gameDataPreview.innerHTML = `
         <h3>Loaded Game Data</h3>
         <p><strong>Agents found:</strong> ${agents.length}</p>
         <div style="margin-top: 15px;">
-          ${agents.slice(0, 5).map((agent: any, i: number) => {
+          ${agents.slice(0, 5).map((agent: GameEntity, i: number) => {
             const identity = agent.components?.identity;
             const agentId = agent.id || `agent_${i}`;
             return `
@@ -185,7 +215,7 @@ function loadGameData(event: Event): void {
       `;
 
       // Store agents for sprite generation
-      (window as any).gameAgents = agents;
+      window.gameAgents = agents;
     } catch (error) {
       console.error('Failed to load game data:', error);
       alert(`Failed to load game data: ${error}`);
@@ -195,9 +225,9 @@ function loadGameData(event: Event): void {
 }
 
 // Generate sprite from agent data
-(window as any).generateFromAgent = (agentId: string) => {
-  const agents = (window as any).gameAgents || [];
-  const agent = agents.find((a: any) => a.id === agentId);
+window.generateFromAgent = (agentId: string) => {
+  const agents = window.gameAgents || [];
+  const agent = agents.find((a: GameEntity) => a.id === agentId);
 
   if (!agent) {
     alert('Agent not found');

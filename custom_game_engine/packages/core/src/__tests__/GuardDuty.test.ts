@@ -15,8 +15,7 @@ import { EventBusImpl, type EventBus } from '../events/EventBus';
  * - Response selection (alert others, intercept, observe, flee)
  * - Alert propagation to other guards
  */
-// TODO: GuardDutySystem is not fully implemented - tests skipped until complete
-describe.skip('GuardDutySystem', () => {
+describe('GuardDutySystem', () => {
   let world: World;
   let system: GuardDutySystem;
   let eventBus: EventBus;

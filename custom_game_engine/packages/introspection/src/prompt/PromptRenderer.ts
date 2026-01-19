@@ -22,7 +22,7 @@ import { isVisibleToLLM, shouldSummarizeForLLM } from '../types/VisibilityTypes.
 interface FieldData {
   name: string;
   field: FieldSchema;
-  value: any;
+  value: unknown;
 }
 
 /**
@@ -151,7 +151,7 @@ export class PromptRenderer {
     for (const [fieldName, fieldSchema] of Object.entries(schema.fields)) {
       if (!isVisibleToLLM(fieldSchema.visibility)) continue;
 
-      const value = (component as any)[fieldName];
+      const value = (component as Record<string, unknown>)[fieldName];
       const formatted = this.formatValue(value, fieldSchema);
       output = output.replace(`{${fieldName}}`, formatted);
     }
@@ -173,10 +173,16 @@ export class PromptRenderer {
       // Only include LLM-visible fields
       if (!isVisibleToLLM(fieldSchema.visibility)) continue;
 
-      const value = (component as any)[fieldName];
+      const value = (component as Record<string, unknown>)[fieldName];
 
       // Skip null/undefined/empty values unless explicitly required
-      const llmConfig = (fieldSchema as any).llm;
+      const llmConfig = (fieldSchema as FieldSchema & { llm?: unknown }).llm as {
+        alwaysInclude?: boolean;
+        hideIf?: (value: unknown) => boolean;
+        promptSection?: string;
+        promptLabel?: string;
+        format?: (value: unknown) => string;
+      } | undefined;
       if ((value === null || value === undefined) && !llmConfig?.alwaysInclude) {
         continue;
       }
@@ -231,7 +237,8 @@ export class PromptRenderer {
       }
 
       for (const { name, field, value } of fields) {
-        const label = (field as any).llm?.promptLabel || field.displayName || name;
+        const llmConfig = (field as FieldSchema & { llm?: { promptLabel?: string } }).llm;
+        const label = llmConfig?.promptLabel || field.displayName || name;
         const formatted = this.formatValue(value, field);
 
         if (includeFieldNames) {
@@ -252,9 +259,9 @@ export class PromptRenderer {
   /**
    * Format a field value for LLM consumption
    */
-  private static formatValue(value: any, field: FieldSchema): string {
+  private static formatValue(value: unknown, field: FieldSchema): string {
     // Use custom formatter if provided
-    const llmConfig = (field as any).llm;
+    const llmConfig = (field as FieldSchema & { llm?: { format?: (value: unknown) => string } }).llm;
     if (llmConfig?.format) {
       return llmConfig.format(value);
     }
@@ -270,6 +277,8 @@ export class PromptRenderer {
         return value ? 'yes' : 'no';
 
       case 'number':
+        if (typeof value !== 'number') return String(value);
+
         // Round to 2 decimal places for cleaner output
         const rounded = Math.round(value * 100) / 100;
 
@@ -366,7 +375,7 @@ export class PromptRenderer {
   /**
    * Format an array of objects in an LLM-friendly way
    */
-  private static formatArrayOfObjects(arr: any[], field: FieldSchema): string {
+  private static formatArrayOfObjects(arr: unknown[], field: FieldSchema): string {
     // Limit to first 10 items to avoid token bloat
     const items = arr.slice(0, 10);
 
@@ -404,7 +413,7 @@ export class PromptRenderer {
   /**
    * Format a map of objects in an LLM-friendly way
    */
-  private static formatMapOfObjects(entries: Array<[string, any]>, field: FieldSchema): string {
+  private static formatMapOfObjects(entries: Array<[string, unknown]>, field: FieldSchema): string {
     // Limit to first 10 entries
     const limited = entries.slice(0, 10);
 
@@ -434,40 +443,50 @@ export class PromptRenderer {
    * Format a complex object in a compact, LLM-friendly way
    * Shows only the most relevant fields
    */
-  private static formatComplexValue(obj: any): string {
+  private static formatComplexValue(obj: unknown): string {
     if (typeof obj !== 'object' || obj === null) {
       return String(obj);
     }
 
+    // Type guard helper for checking property types
+    const hasStringProp = (o: object, key: string): boolean => key in o && typeof (o as Record<string, unknown>)[key] === 'string';
+    const hasNumberProp = (o: object, key: string): boolean => key in o && typeof (o as Record<string, unknown>)[key] === 'number';
+
     // Special handling for common patterns
     if ('itemId' in obj && 'quantity' in obj) {
       // InventorySlot
-      if (!obj.itemId) return 'empty';
-      const quality = obj.quality ? ` (Q${obj.quality})` : '';
-      return `${obj.itemId} ×${obj.quantity}${quality}`;
+      const objData = obj as Record<string, unknown>;
+      if (!objData.itemId) return 'empty';
+      const quality = hasNumberProp(obj, 'quality') ? ` (Q${objData.quality})` : '';
+      return `${objData.itemId} ×${objData.quantity}${quality}`;
     }
 
     if ('equipmentId' in obj && 'slot' in obj) {
       // EquipmentSlot
-      const quality = obj.quality ? ` (Q${obj.quality})` : '';
-      const durability = obj.durability !== undefined ? ` [${obj.durability}%]` : '';
-      return `${obj.equipmentId}${quality}${durability}`;
+      const objData = obj as Record<string, unknown>;
+      const quality = hasNumberProp(obj, 'quality') ? ` (Q${objData.quality})` : '';
+      const durability = objData.durability !== undefined ? ` [${objData.durability}%]` : '';
+      return `${objData.equipmentId}${quality}${durability}`;
     }
 
     if ('targetId' in obj && 'affinity' in obj) {
       // Relationship
-      const roundedAffinity = Math.round(obj.affinity * 100) / 100;
-      const affinity = obj.affinity > 0 ? `+${roundedAffinity}` : roundedAffinity;
-      const roundedTrust = obj.trust !== undefined ? Math.round(obj.trust * 100) / 100 : undefined;
+      const objData = obj as Record<string, unknown>;
+      if (typeof objData.affinity !== 'number') return String(obj);
+      const roundedAffinity = Math.round(objData.affinity * 100) / 100;
+      const affinity = objData.affinity > 0 ? `+${roundedAffinity}` : roundedAffinity;
+      const roundedTrust = hasNumberProp(obj, 'trust') && typeof objData.trust === 'number' ? Math.round(objData.trust * 100) / 100 : undefined;
       const trust = roundedTrust !== undefined ? `, trust ${roundedTrust}` : '';
-      return `${obj.targetId} (affinity ${affinity}${trust})`;
+      return `${objData.targetId} (affinity ${affinity}${trust})`;
     }
 
     if ('agentId' in obj && 'overallSentiment' in obj) {
       // SocialMemory
-      const sentiment = obj.overallSentiment > 0 ? 'positive' : obj.overallSentiment < 0 ? 'negative' : 'neutral';
-      const trust = obj.trust !== undefined ? `, trust ${Math.round(obj.trust * 100)}%` : '';
-      return `${obj.agentId} (${sentiment}${trust})`;
+      const objData = obj as Record<string, unknown>;
+      if (typeof objData.overallSentiment !== 'number') return String(obj);
+      const sentiment = objData.overallSentiment > 0 ? 'positive' : objData.overallSentiment < 0 ? 'negative' : 'neutral';
+      const trust = hasNumberProp(obj, 'trust') && typeof objData.trust === 'number' ? `, trust ${Math.round(objData.trust * 100)}%` : '';
+      return `${objData.agentId} (${sentiment}${trust})`;
     }
 
     // Generic object - show up to 3 key-value pairs

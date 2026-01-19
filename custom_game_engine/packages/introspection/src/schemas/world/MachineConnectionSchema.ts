@@ -101,7 +101,7 @@ export const MachineConnectionSchema = autoRegister(
 
     validate: (data): data is MachineConnectionComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const mc = data as any;
+      const mc = data as Record<string, unknown>;
 
       return (
         mc.type === 'machine_connection' &&

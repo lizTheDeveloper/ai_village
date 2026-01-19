@@ -133,7 +133,7 @@ export const TechnologyUnlockSchema = autoRegister(
 
     validate: (data): data is TechnologyUnlockComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const t = data as any;
+      const t = data as Record<string, unknown>;
 
       return (
         t.type === 'technology_unlock' &&

@@ -25,6 +25,8 @@ import type {
   EmergentPattern,
   Anomaly,
   Milestone,
+  AgentStats,
+  CauseOfDeath,
 } from './types.js';
 
 /**
@@ -391,7 +393,7 @@ export class MetricsCollector {
       birthTimestamp: event.timestamp as number,
       birthGeneration: event.generation as number,
       parents: event.parents as [string, string] | null,
-      initialStats: event.initialStats as any,
+      initialStats: event.initialStats as AgentStats,
       childrenCount: 0,
       descendantsCount: 0,
       skillsLearned: [],
@@ -474,9 +476,9 @@ export class MetricsCollector {
     }
 
     metrics.deathTimestamp = event.timestamp as number;
-    metrics.causeOfDeath = event.causeOfDeath as any;
+    metrics.causeOfDeath = event.causeOfDeath as CauseOfDeath;
     metrics.ageAtDeath = event.ageAtDeath as number;
-    metrics.finalStats = event.finalStats as any;
+    metrics.finalStats = event.finalStats as AgentStats;
     metrics.lifespan = metrics.deathTimestamp - metrics.birthTimestamp;
 
     this.sessionMetrics.totalDeaths++;
@@ -751,16 +753,18 @@ export class MetricsCollector {
 
     if (event.type === 'activity:started') {
       // Store start time for duration calculation
-      (metrics as any)[`_${activity}_start`] = timestamp;
+      const metricsWithStartTimes = metrics as BehavioralMetrics[string] & Record<string, number>;
+      metricsWithStartTimes[`_${activity}_start`] = timestamp;
     } else if (event.type === 'activity:ended') {
-      const startTime = (metrics as any)[`_${activity}_start`];
+      const metricsWithStartTimes = metrics as BehavioralMetrics[string] & Record<string, number>;
+      const startTime = metricsWithStartTimes[`_${activity}_start`];
       if (startTime !== undefined) {
         const duration = timestamp - startTime;
         if (!metrics.activityBreakdown[activity]) {
           metrics.activityBreakdown[activity] = 0;
         }
         metrics.activityBreakdown[activity] += duration;
-        delete (metrics as any)[`_${activity}_start`];
+        delete metricsWithStartTimes[`_${activity}_start`];
 
         // Update efficiency score
         const isProductive = activity !== 'idle';
@@ -881,7 +885,7 @@ export class MetricsCollector {
     } else if (event.type === 'session:ended') {
       this.sessionMetrics.endTime = event.timestamp as number;
       this.sessionMetrics.realTimeDuration = this.sessionMetrics.endTime - this.sessionMetrics.startTime;
-      this.sessionMetrics.gameEndReason = event.reason as any;
+      this.sessionMetrics.gameEndReason = event.reason as 'manual_quit' | 'extinction' | 'victory_condition' | 'crash';
     }
   }
 
@@ -1117,8 +1121,8 @@ export class MetricsCollector {
   /**
    * Get a specific metric by name
    */
-  getMetric(name: string, timeRange?: TimeRange): any {
-    let data: any;
+  getMetric(name: string, timeRange?: TimeRange): unknown {
+    let data: unknown;
 
     switch (name) {
       case 'agent_lifecycle':
@@ -1177,7 +1181,7 @@ export class MetricsCollector {
   /**
    * Get all metrics
    */
-  getAllMetrics(): Record<string, any> {
+  getAllMetrics(): Record<string, unknown> {
     // Check if we have any data at all
     const hasAnyData =
       this.agentLifecycle.size > 0 ||
@@ -1211,7 +1215,7 @@ export class MetricsCollector {
   /**
    * Get aggregated metric
    */
-  getAggregatedMetric(name: string, options: Partial<AggregationOptions>): any {
+  getAggregatedMetric(name: string, options: Partial<AggregationOptions>): number | { mostCommon: string; count: number } {
     if (!options.aggregation) {
       throw new Error('Aggregation type must be specified');
     }

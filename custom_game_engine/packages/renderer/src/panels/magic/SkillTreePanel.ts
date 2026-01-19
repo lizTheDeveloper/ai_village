@@ -22,7 +22,7 @@ export class SkillTreePanel implements IWindowPanel {
   private lastDiscoveryCheckTime: number = 0;
   private tabScrollOffset: number = 0;
 
-  constructor(_windowManager: any) {
+  constructor(_windowManager: unknown) {
     // WindowManager reference not currently needed
     this.treeView = new ParadigmTreeView();
     this.uiState = this.createInitialUIState();
@@ -521,7 +521,7 @@ export class SkillTreePanel implements IWindowPanel {
       return false;
     }
 
-    const node = tree.nodes.find((n: any) => n.id === nodeId);
+    const node = tree.nodes.find((n) => n.id === nodeId);
     if (!node) {
       return false;
     }
@@ -562,7 +562,13 @@ export class SkillTreePanel implements IWindowPanel {
         });
 
         // Apply effects via SkillTreeManager
-        const skillTreeManager = (world as any).getSkillTreeManager?.() as any;
+        const worldWithManager = world as unknown as {
+          getSkillTreeManager?: () => {
+            unlockSkillNode: (entity: Entity, paradigmId: string, nodeId: string, xpCost: number) => void;
+            applyNodeEffects: (entity: Entity, paradigmId: string, nodeId: string) => void;
+          };
+        };
+        const skillTreeManager = worldWithManager.getSkillTreeManager?.();
         if (skillTreeManager) {
           skillTreeManager.unlockSkillNode(this.selectedEntity, activeParadigmId, nodeId, evaluation.xpCost);
           skillTreeManager.applyNodeEffects(this.selectedEntity, activeParadigmId, nodeId);

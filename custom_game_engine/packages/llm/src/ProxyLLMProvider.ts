@@ -20,6 +20,14 @@
 
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
+/**
+ * Extended LLM request with metadata fields used by the proxy
+ */
+export interface ProxyLLMRequest extends LLMRequest {
+  agentId?: string;
+  model?: string;
+}
+
 export class ProxyLLMProvider implements LLMProvider {
   private readonly proxyUrl: string;
   private readonly timeout = 60000; // 60 second timeout (increased for queue wait)
@@ -86,7 +94,8 @@ export class ProxyLLMProvider implements LLMProvider {
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
-    const provider = this.detectProvider((request as any).model);
+    const proxyRequest = request as ProxyLLMRequest;
+    const provider = this.detectProvider(proxyRequest.model);
     const maxRetries = 3; // Retry up to 3 times if server-side rate limited
     let retryCount = 0;
 
@@ -111,9 +120,9 @@ export class ProxyLLMProvider implements LLMProvider {
           },
           body: JSON.stringify({
             sessionId: this.sessionId,
-            agentId: (request as any).agentId || 'unknown',
+            agentId: proxyRequest.agentId || 'unknown',
             prompt: request.prompt,
-            model: (request as any).model,
+            model: proxyRequest.model,
             maxTokens: request.maxTokens,
             temperature: request.temperature,
           }),

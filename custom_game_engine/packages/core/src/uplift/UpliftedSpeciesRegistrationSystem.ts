@@ -58,6 +58,8 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
   readonly id = 'UpliftedSpeciesRegistrationSystem';
   readonly priority = 570;
   readonly requiredComponents = [] as const;
+  // Only run when uplift program components exist (O(1) activation check)
+  readonly activationComponents = [CT.UpliftProgram] as const;
 
   protected readonly throttleInterval = 200; // Every 10 seconds
 

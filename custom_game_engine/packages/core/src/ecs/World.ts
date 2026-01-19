@@ -255,6 +255,9 @@ export interface World {
     componentType: ComponentType
   ): T | undefined;
 
+  /** Get singleton component (searches all entities for first match) */
+  getComponent<T extends Component>(componentType: ComponentType): T | undefined;
+
   /** Check if entity has component */
   hasComponent(entityId: EntityId, componentType: ComponentType): boolean;
 
@@ -277,6 +280,15 @@ export interface World {
 
   /** Simulation scheduler for performance optimization */
   readonly simulationScheduler: SimulationScheduler;
+
+  /**
+   * Spatial query service for finding nearby entities.
+   * Uses chunk-based indexing for O(nearby) instead of O(all entities).
+   *
+   * Prefer using BehaviorContext.getEntitiesInRadius() or
+   * SystemContext.getNearbyEntities() which wrap this service.
+   */
+  readonly spatialQuery: import('../services/SpatialQueryService.js').SpatialQueryService | null;
 
   /**
    * Check if any entity in the world has the given component type.
@@ -489,6 +501,9 @@ export class WorldImpl implements WorldMutator {
   // Track count of entities with each component type (for O(1) hasComponentType checks)
   private _componentTypeCounts = new Map<ComponentType, number>();
 
+  // Spatial query service for chunk-based spatial queries
+  private _spatialQuery: import('../services/SpatialQueryService.js').SpatialQueryService | null = null;
+
   // Door location cache for fast lookups (updated when doors are built/destroyed)
   private doorLocationsCache: Array<{ x: number; y: number }> | null = null;
 
@@ -540,6 +555,14 @@ export class WorldImpl implements WorldMutator {
     return this._simulationScheduler;
   }
 
+  get spatialQuery(): import('../services/SpatialQueryService.js').SpatialQueryService | null {
+    return this._spatialQuery;
+  }
+
+  setSpatialQuery(service: import('../services/SpatialQueryService.js').SpatialQueryService): void {
+    this._spatialQuery = service;
+  }
+
   get craftingSystem(): import('../crafting/CraftingSystem.js').CraftingSystem | undefined {
     return this._craftingSystem;
   }
@@ -576,10 +599,23 @@ export class WorldImpl implements WorldMutator {
   }
 
   getComponent<T extends Component>(
-    entityId: EntityId,
-    componentType: ComponentType
+    entityTypeOrEntityId: EntityId | ComponentType,
+    componentType?: ComponentType
   ): T | undefined {
-    const entity = this._entities.get(entityId);
+    // Overload: getComponent(componentType) - singleton lookup
+    if (componentType === undefined) {
+      const singletonComponentType = componentTypeOrEntityId as ComponentType;
+      for (const entity of this._entities.values()) {
+        const component = entity.components.get(singletonComponentType);
+        if (component) {
+          return component as T;
+        }
+      }
+      return undefined;
+    }
+
+    // Original: getComponent(entityId, componentType)
+    const entity = this._entities.get(componentTypeOrEntityId as EntityId);
     if (!entity) return undefined;
     return entity.components.get(componentType) as T | undefined;
   }

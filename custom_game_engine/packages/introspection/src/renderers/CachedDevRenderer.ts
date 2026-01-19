@@ -120,7 +120,7 @@ export class CachedDevRenderer {
             continue; // Skip dev-only fields
           }
 
-          const fieldEl = this.renderField(fieldName, (component as any)[fieldName], fieldDef);
+          const fieldEl = this.renderField(fieldName, (component as Record<string, unknown>)[fieldName], fieldDef);
           fieldsContainer.appendChild(fieldEl);
         }
       }
@@ -132,7 +132,7 @@ export class CachedDevRenderer {
             continue;
           }
 
-          const fieldEl = this.renderField(fieldName, (component as any)[fieldName], fieldDef);
+          const fieldEl = this.renderField(fieldName, (component as Record<string, unknown>)[fieldName], fieldDef);
           fieldsContainer.appendChild(fieldEl);
         }
       }

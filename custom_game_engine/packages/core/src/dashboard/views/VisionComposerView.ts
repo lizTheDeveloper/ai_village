@@ -13,6 +13,9 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import type { DeityComponent } from '../../components/DeityComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
 
 /**
  * Vision type info
@@ -125,13 +128,13 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
     }
 
     try {
-      const CT = { Deity: 'deity', Agent: 'agent', Spiritual: 'spiritual' };
+      const CT = { Deity: 'deity', Identity: 'identity', Spiritual: 'spiritual' } as const;
 
       // Find player deity
-      let playerDeity: { id: string; component: any } | null = null;
+      let playerDeity: { id: string; component: DeityComponent } | null = null;
       for (const entity of world.entities.values()) {
         if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as any;
+          const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
           if (deityComp && deityComp.controller === 'player') {
             playerDeity = { id: entity.id, component: deityComp };
             break;
@@ -195,20 +198,20 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
       const targets: VisionTarget[] = [];
 
       for (const entity of world.entities.values()) {
-        if (!entity.components.has(CT.Agent)) continue;
+        if (!entity.components.has(CT.Identity)) continue;
 
-        const agentComp = entity.components.get(CT.Agent);
-        const spiritualComp = entity.components.get(CT.Spiritual);
+        const identityComp = entity.components.get(CT.Identity) as IdentityComponent | undefined;
+        const spiritualComp = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
 
-        if (!agentComp || !spiritualComp) continue;
+        if (!identityComp || !spiritualComp) continue;
 
-        const agentName = (agentComp as any).name ?? 'Unknown';
-        const faith = (spiritualComp as any).faith ?? 0;
-        const believedDeity = (spiritualComp as any).believedDeity;
+        const agentName = identityComp.name ?? 'Unknown';
+        const faith = spiritualComp.faith ?? 0;
+        const believedDeity = spiritualComp.believedDeity;
 
         // Believers are most receptive
         if (believedDeity === playerDeity.id) {
-          const isPriest = false; // TODO: Check if agent has priest role
+          const isPriest = spiritualComp.religiousLeader ?? false;
           targets.push({
             id: entity.id,
             name: agentName,
@@ -252,7 +255,7 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
       }
 
       // Get recent visions from deity component
-      const recentVisions: SentVision[] = deityComp.sentVisions?.map((sv: any) => ({
+      const recentVisions: SentVision[] = deityComp.sentVisions?.map((sv) => ({
         targetName: sv.targetName,
         type: sv.powerType,
         symbols: [], // TODO: Track symbols used

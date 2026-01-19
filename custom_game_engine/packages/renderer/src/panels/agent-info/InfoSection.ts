@@ -565,7 +565,8 @@ export class InfoSection {
 
     // Action Queue section
     const actionQueue = entity.components.get('action_queue') as Component | undefined;
-    if (actionQueue && !(actionQueue as any).isEmpty()) {
+    const queueWithMethods = actionQueue as unknown as { isEmpty?: () => boolean };
+    if (actionQueue && queueWithMethods.isEmpty && !queueWithMethods.isEmpty()) {
       currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
     }
 
@@ -597,8 +598,9 @@ export class InfoSection {
             playerDeityId = ent.id;
             break;
           }
-          // Fallback: check domain if available
-          if (deity.identity?.domain === 'player' as any) {
+          // Fallback: check domain if available (domain is typed as DeityDomain, but 'player' may not be in the enum)
+          const identity = deity.identity as { domain?: string } | undefined;
+          if (identity?.domain === 'player') {
             playerDeityId = ent.id;
             break;
           }
@@ -884,7 +886,7 @@ export class InfoSection {
     ctx: CanvasRenderingContext2D,
     panelX: number,
     y: number,
-    actionQueue: any,
+    actionQueue: Component,
     padding: number,
     lineHeight: number
   ): number {
@@ -893,17 +895,24 @@ export class InfoSection {
 
     ctx.font = 'bold 12px monospace';
     ctx.fillStyle = '#FFAA00';
-    ctx.fillText(`⚙️ Action Queue (${actionQueue.size()})`, panelX + padding, y);
+
+    const queueWithMethods = actionQueue as unknown as {
+      size?: () => number;
+      queue?: unknown[];
+    };
+
+    const queueSize = queueWithMethods.size?.() ?? 0;
+    ctx.fillText(`⚙️ Action Queue (${queueSize})`, panelX + padding, y);
     y += lineHeight + 5;
 
     // Get all actions by accessing the internal queue field
     // Since this is a UI display, we'll peek at the internal state
-    const actions = ((actionQueue as any).queue as unknown[]) || [];
+    const actions = (queueWithMethods.queue as unknown[]) || [];
     const maxItems = Math.min(5, actions.length);
 
     ctx.font = '11px monospace';
     for (let i = 0; i < maxItems; i++) {
-      const action = actions[i];
+      const action = actions[i] as Record<string, unknown>;
       if (!action) continue;
 
       const isCurrent = i === 0;
@@ -915,7 +924,8 @@ export class InfoSection {
 
       ctx.fillStyle = isCurrent ? '#00FF00' : '#FFFFFF';
 
-      const actionName = action.type.replace('_', ' ');
+      const actionType = (action.type as string) || 'unknown';
+      const actionName = actionType.replace('_', ' ');
       const priorityText = action.priority ? ` [P${action.priority}]` : '';
       const statusIcon = isCurrent ? '▶' : '·';
       const displayText = `${statusIcon} ${actionName}${priorityText}`;
@@ -926,9 +936,11 @@ export class InfoSection {
       // Show target if available
       if (action.targetId || action.targetPos) {
         ctx.fillStyle = '#888888';
-        const target = action.targetId
-          ? `ID: ${action.targetId.substring(0, 8)}`
-          : `Pos: (${action.targetPos?.x?.toFixed(0)}, ${action.targetPos?.y?.toFixed(0)})`;
+        const targetId = action.targetId as string | undefined;
+        const targetPos = action.targetPos as { x: number; y: number } | undefined;
+        const target = targetId
+          ? `ID: ${targetId.substring(0, 8)}`
+          : `Pos: (${targetPos?.x?.toFixed(0)}, ${targetPos?.y?.toFixed(0)})`;
         ctx.fillText(`  ${target}`, panelX + padding + 5, y);
         y += 12;
       }
@@ -1091,24 +1103,34 @@ export class InfoSection {
     if (actionQueue) {
       let actions: unknown[] = [];
 
-      if (typeof (actionQueue as any).peek === 'function') {
-        const current = (actionQueue as any).peek();
+      const queueWithMethods = actionQueue as unknown as {
+        peek?: () => unknown;
+        isEmpty?: () => boolean;
+        queue?: unknown[];
+        _queue?: unknown[];
+        actions?: unknown[];
+      };
+
+      if (typeof queueWithMethods.peek === 'function') {
+        const current = queueWithMethods.peek();
         if (current) actions = [current];
-      } else if (Array.isArray((actionQueue as any).queue)) {
-        actions = (actionQueue as any).queue;
-      } else if (typeof (actionQueue as any).isEmpty === 'function' && !(actionQueue as any).isEmpty()) {
-        actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
+      } else if (Array.isArray(queueWithMethods.queue)) {
+        actions = queueWithMethods.queue;
+      } else if (typeof queueWithMethods.isEmpty === 'function' && !queueWithMethods.isEmpty()) {
+        actions = queueWithMethods._queue || queueWithMethods.actions || [];
       }
 
       if (actions.length > 0) {
-        const currentAction = actions[0] as any;
-        if (currentAction?.targetPos) {
-          const targetInfo = this.findTargetEntityName(currentAction.targetPos, world);
+        const currentAction = actions[0] as Record<string, unknown>;
+        const targetPos = currentAction?.targetPos as { x: number; y: number } | undefined;
+        if (targetPos) {
+          const targetInfo = this.findTargetEntityName(targetPos, world);
+          const actionType = (currentAction.type as string) || targetInfo.type;
           return {
-            x: currentAction.targetPos.x,
-            y: currentAction.targetPos.y,
+            x: targetPos.x,
+            y: targetPos.y,
             name: targetInfo.name,
-            type: currentAction.type || targetInfo.type,
+            type: actionType,
           };
         }
       }

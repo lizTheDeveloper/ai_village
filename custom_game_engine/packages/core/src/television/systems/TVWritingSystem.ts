@@ -68,6 +68,8 @@ export class TVWritingSystem extends BaseSystem {
   readonly id = 'tv_writing' as const;
   readonly priority = 63; // After development
   readonly requiredComponents = [ComponentType.TVShow] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   protected readonly throttleInterval = WRITING_INTERVAL;
 

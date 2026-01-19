@@ -197,7 +197,7 @@ export class MetricsAPI {
   async getNetworkMetrics(params: NetworkQueryParams): Promise<APIResponse<NetworkMetricsResult>> {
     try {
       const allMetrics = this.collector.getAllMetrics();
-      const socialMetrics = allMetrics.social;
+      const socialMetrics = (allMetrics.social_metrics || {}) as { socialNetworkDensity?: number; relationshipsFormed?: number };
 
       // Get interactions within time range
       const interactions = this.getInteractionsInRange(params.startTime, params.endTime);
@@ -480,16 +480,16 @@ export class MetricsAPI {
   async getSummary(): Promise<APIResponse<SimulationSummary>> {
     try {
       const allMetrics = this.collector.getAllMetrics();
-      const session = allMetrics.session;
-      const lifecycle = allMetrics.lifecycle as Map<string, any>;
+      const session = allMetrics.session as { sessionId?: string; startTime?: number; realTimeDuration?: number; peakPopulation?: number } | undefined;
+      const lifecycle = allMetrics.lifecycle as Map<string, { deathTimestamp?: number }> | undefined;
 
       // Count behaviors
       const behaviorCounts = new Map<string, number>();
-      const behavioralMetrics = allMetrics.behavioral as Record<string, any>;
+      const behavioralMetrics = allMetrics.behavioral as Record<string, { activityBreakdown?: Record<string, number> }> | undefined;
 
       if (behavioralMetrics) {
         for (const [, agentData] of Object.entries(behavioralMetrics)) {
-          const breakdown = (agentData as any).activityBreakdown as Record<string, number> | undefined;
+          const breakdown = agentData.activityBreakdown;
           if (breakdown) {
             for (const [behavior, time] of Object.entries(breakdown)) {
               behaviorCounts.set(behavior, (behaviorCounts.get(behavior) || 0) + time);
@@ -529,8 +529,8 @@ export class MetricsAPI {
           currentPopulation: lifecycle?.size ?? 0,
           totalBirths,
           totalDeaths,
-          totalInteractions: allMetrics.social?.relationshipsFormed ?? 0,
-          avgNetworkDensity: allMetrics.social?.socialNetworkDensity ?? 0,
+          totalInteractions: (allMetrics.social_metrics as { relationshipsFormed?: number })?.relationshipsFormed ?? 0,
+          avgNetworkDensity: (allMetrics.social_metrics as { socialNetworkDensity?: number })?.socialNetworkDensity ?? 0,
           dominantBehaviors,
         },
         timestamp: Date.now(),

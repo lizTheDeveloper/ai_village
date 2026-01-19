@@ -19,6 +19,14 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type {
+  StatusEffectsComponent,
+  TemporalEffectData,
+  AgeComponent,
+  NeedsComponentWithHealth,
+  TemporalStateComponent,
+  RewindRequest,
+} from '../types/ComponentTypes.js';
 
 // ============================================================================
 // TemporalEffectApplier
@@ -127,7 +135,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     }
 
     // Get or create status_effects component
-    let statusEffects = target.components.get('status_effects') as any;
+    let statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
     if (!statusEffects) {
       statusEffects = { type: 'status_effects', timeScale: 1.0 };
     }
@@ -141,7 +149,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       statusEffects.temporalEffects = [];
     }
 
-    const temporalData = {
+    const temporalData: TemporalEffectData = {
       id: `${effect.id}_${context.tick}`,
       effectId: effect.id,
       spellId: context.spell.id,
@@ -201,7 +209,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     const ageChange = context.scaledValues.get('ageChange')?.value ?? effect.ageChange ?? 0;
 
     // Get or create age component
-    let age = target.components.get('age') as any;
+    let age = target.components.get('age') as AgeComponent | undefined;
     if (!age) {
       age = { type: 'age', years: 0 };
     }
@@ -218,7 +226,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     // Extreme aging (1000+ years) causes death
     let causedDeath = false;
     if (age.years >= 1000) {
-      const needs = target.components.get('needs') as any;
+      const needs = target.components.get('needs') as NeedsComponentWithHealth | undefined;
       if (needs) {
         needs.health = 0;
         causedDeath = true;
@@ -257,7 +265,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     // Note: Actual state restoration would require persistence system integration
     // For now, we just record the intent
-    let temporal = target.components.get('temporal_state') as any;
+    let temporal = target.components.get('temporal_state') as TemporalStateComponent | undefined;
     if (!temporal) {
       temporal = { type: 'temporal_state', rewindRequests: [] };
     }
@@ -266,13 +274,15 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       temporal.rewindRequests = [];
     }
 
-    temporal.rewindRequests.push({
+    const rewindRequest: RewindRequest = {
       effectId: effect.id,
       spellId: context.spell.id,
       casterId: caster.id,
       rewindTicks,
       requestedAt: context.tick,
-    });
+    };
+
+    temporal.rewindRequests.push(rewindRequest);
     (target as EntityImpl).addComponent(temporal);
 
     return {
@@ -313,13 +323,13 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     target: Entity,
     world: World
   ): void {
-    const statusEffects = target.components.get('status_effects') as any;
+    const statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
     if (!statusEffects) return;
 
     // Remove temporal effect data
     if (statusEffects.temporalEffects) {
       const index = statusEffects.temporalEffects.findIndex(
-        (te: any) =>
+        (te) =>
           te.effectId === activeEffect.effectId &&
           te.appliedAt === activeEffect.appliedAt
       );
@@ -335,7 +345,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
         // Calculate combined time scale from remaining effects
         // Use the most recent effect's time factor
         const lastEffect = statusEffects.temporalEffects[statusEffects.temporalEffects.length - 1];
-        statusEffects.timeScale = lastEffect.timeFactor ?? 1.0;
+        statusEffects.timeScale = lastEffect?.timeFactor ?? 1.0;
       }
     }
   }

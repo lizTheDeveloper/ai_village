@@ -29,6 +29,8 @@ export class FactoryAISystem extends BaseSystem {
   public readonly id = 'factory_ai';
   public readonly priority = 48; // Before off-screen optimization
   public readonly requiredComponents = [CT.FactoryAI] as const;
+  // Lazy activation: Skip entire system when no factory AI exists in world
+  public readonly activationComponents = [CT.FactoryAI] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   /**

@@ -104,6 +104,23 @@ interface EpisodicMemoryComponent {
   [key: string]: unknown;
 }
 
+// Window.game API type
+interface GameAPI {
+  agentInfoPanel?: {
+    getSelectedEntityId?(): string | undefined;
+  };
+  animalInfoPanel?: {
+    getSelectedEntityId?(): string | undefined;
+  };
+  devPanel?: {
+    getSelectedAgentId?(): string | undefined;
+  };
+}
+
+interface WindowWithGame extends Window {
+  game?: GameAPI;
+}
+
 /**
  * DeathBargainSystem - Offers dying heroes a chance to return
  */
@@ -111,6 +128,8 @@ export class DeathBargainSystem extends BaseSystem {
   readonly id: SystemId = 'death_bargain';
   readonly priority: number = 120; // After death transition
   readonly requiredComponents = [ComponentType.DeathBargain] as const;
+  // Only run when death bargain components exist (O(1) activation check)
+  readonly activationComponents = [ComponentType.DeathBargain] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private llmProvider?: LLMProvider;
@@ -1040,11 +1059,38 @@ Answer ONLY with "YES" or "NO".`;
 
   /**
    * Check if player is watching this entity
-   * TODO: Implement player focus/camera system
+   *
+   * Checks if the entity is currently selected in any UI panel:
+   * - AgentInfoPanel (for agents)
+   * - AnimalInfoPanel (for animals)
+   * - DevPanel (for agents)
    */
-  private isPlayerWatching(_world: World, _entity: Entity): boolean {
-    // Placeholder: In future, check if player camera is focused on this entity
-    // or if entity is selected, or if player has this entity favorited
+  private isPlayerWatching(_world: World, entity: Entity): boolean {
+    // Check if window.game API is available (browser context only)
+    if (typeof window === 'undefined' || !('game' in window)) {
+      return false;
+    }
+
+    const game = (window as WindowWithGame).game;
+    if (!game) return false;
+
+    const entityId = entity.id;
+
+    // Check AgentInfoPanel (primary selection for agents)
+    if (game.agentInfoPanel?.getSelectedEntityId?.() === entityId) {
+      return true;
+    }
+
+    // Check AnimalInfoPanel (selection for animals)
+    if (game.animalInfoPanel?.getSelectedEntityId?.() === entityId) {
+      return true;
+    }
+
+    // Check DevPanel (also tracks selected agents)
+    if (game.devPanel?.getSelectedAgentId?.() === entityId) {
+      return true;
+    }
+
     return false;
   }
 

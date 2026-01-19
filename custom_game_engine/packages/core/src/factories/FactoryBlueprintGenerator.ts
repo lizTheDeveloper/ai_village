@@ -225,9 +225,10 @@ export class FactoryBlueprintGenerator {
     powerType: 'mechanical' | 'electrical' | 'arcane',
     generation: number
   ): Entity {
-    const entity = world.createEntity() as EntityImpl;
-    (entity as any).addComponent(createPositionComponent(x, y));
-    (entity as any).addComponent(createPowerProducer(powerType, generation));
+    const entity = world.createEntity();
+    const entityWithAddComponent = entity as unknown as { addComponent: (comp: unknown) => void };
+    entityWithAddComponent.addComponent(createPositionComponent(x, y));
+    entityWithAddComponent.addComponent(createPowerProducer(powerType, generation));
     return entity;
   }
 
@@ -237,8 +238,9 @@ export class FactoryBlueprintGenerator {
     y: number,
     placement: MachinePlacement
   ): Entity {
-    const entity = world.createEntity() as EntityImpl;
-    (entity as any).addComponent(createPositionComponent(x, y));
+    const entity = world.createEntity();
+    const entityWithAddComponent = entity as unknown as { addComponent: (comp: unknown) => void };
+    entityWithAddComponent.addComponent(createPositionComponent(x, y));
 
     // Create assembly machine component
     const assembly = createAssemblyMachineComponent(placement.machineItemId, { speed: 1 });
@@ -246,7 +248,7 @@ export class FactoryBlueprintGenerator {
       assembly.currentRecipe = placement.recipe;
     }
     assembly.speed = this.getMachineSpeed(placement.machineItemId);
-    (entity as any).addComponent(assembly);
+    entityWithAddComponent.addComponent(assembly);
 
     // Create machine connections
     const connection = createMachineConnectionComponent();
@@ -256,12 +258,12 @@ export class FactoryBlueprintGenerator {
     if (placement.outputDirection) {
       connection.outputs[0]!.offset = placement.outputDirection;
     }
-    (entity as any).addComponent(connection);
+    entityWithAddComponent.addComponent(connection);
 
     // Create power component
     const powerConsumption = this.estimateMachinePower(placement.machineItemId);
     const power = createPowerConsumer('electrical', powerConsumption);
-    (entity as any).addComponent(power);
+    entityWithAddComponent.addComponent(power);
 
     return entity;
   }
@@ -272,8 +274,9 @@ export class FactoryBlueprintGenerator {
     y: number,
     placement: BeltPlacement
   ): Entity {
-    const entity = world.createEntity() as EntityImpl;
-    (entity as any).addComponent(createPositionComponent(x, y));
+    const entity = world.createEntity();
+    const entityWithAddComponent = entity as unknown as { addComponent: (comp: unknown) => void };
+    entityWithAddComponent.addComponent(createPositionComponent(x, y));
 
     const belt = createBeltComponent(placement.direction, placement.tier);
 
@@ -282,7 +285,7 @@ export class FactoryBlueprintGenerator {
       addItemsToBelt(belt, placement.preloadItemId, placement.preloadCount);
     }
 
-    (entity as any).addComponent(belt);
+    entityWithAddComponent.addComponent(belt);
     return entity;
   }
 

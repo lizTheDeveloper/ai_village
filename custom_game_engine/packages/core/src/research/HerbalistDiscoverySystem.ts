@@ -15,6 +15,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import {
   getAcademicPaperSystem,
   type AcademicPaperSystem,
@@ -259,8 +260,8 @@ export class HerbalistDiscoverySystem extends BaseSystem {
       this.discoveredSpecies.add(speciesId);
     }
 
-    const agentComp = agentEntity.getComponent<AgentComponent>(ComponentType.Agent);
-    if (!agentComp) return null;
+    const identity = agentEntity.getComponent<IdentityComponent>(ComponentType.Identity);
+    if (!identity?.name) return null;
 
     const discovery: PlantDiscovery = {
       id: `discovery_${speciesId}_${Date.now()}`,
@@ -272,7 +273,7 @@ export class HerbalistDiscoverySystem extends BaseSystem {
       medicinalProperties,
       discoveredAt: world.tick,
       discovererId: agentEntity.id,
-      discovererName: agentComp.name ?? 'Unknown Herbalist',
+      discovererName: identity.name,
       paperPublished: false,
     };
 
@@ -313,10 +314,10 @@ export class HerbalistDiscoverySystem extends BaseSystem {
     const coAuthorIds: string[] = [];
     const coAuthorNames: string[] = [];
     for (const e of coDiscoverers) {
-      const agent = e.getComponent<AgentComponent>(ComponentType.Agent);
-      if (agent) {
+      const identity = e.getComponent<IdentityComponent>(ComponentType.Identity);
+      if (identity?.name) {
         coAuthorIds.push(e.id);
-        coAuthorNames.push(agent.name ?? 'Unknown');
+        coAuthorNames.push(identity.name);
       }
     }
 

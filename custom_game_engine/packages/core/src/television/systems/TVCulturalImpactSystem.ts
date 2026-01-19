@@ -790,6 +790,8 @@ export class TVCulturalImpactSystem extends BaseSystem {
   readonly id = 'TVCulturalImpactSystem';
   readonly priority = 75;
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Lazy activation: Skip entire system when no TV stations exist in world
+  public readonly activationComponents = ['tv_station'] as const;
 
   private manager = new CulturalImpactManager();
 

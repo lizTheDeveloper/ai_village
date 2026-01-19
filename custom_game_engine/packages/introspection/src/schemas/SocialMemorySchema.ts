@@ -159,7 +159,7 @@ export const SocialMemorySchema = autoRegister(
     // Mutators for safe memory updates
     mutators: {
       recordInteraction: (
-        entity: any,
+        entity: { getComponent: (type: string) => { recordInteraction: (params: Record<string, unknown>) => void } },
         agentId: string,
         sentiment: number,
         timestamp: number,
@@ -183,7 +183,7 @@ export const SocialMemorySchema = autoRegister(
       },
 
       learnFact: (
-        entity: any,
+        entity: { getComponent: (type: string) => { learnAboutAgent: (params: Record<string, unknown>) => void } },
         agentId: string,
         fact: string,
         confidence: number,
@@ -212,10 +212,12 @@ export const SocialMemorySchema = autoRegister(
 
     validate: (data): data is SocialMemoryData => {
       if (typeof data !== 'object' || data === null) return false;
-      if ((data as any).type !== 'social_memory') return false;
-      if ((data as any).version !== 1) return false;
 
-      const memories = (data as any).socialMemories;
+      const candidate = data as Record<string, unknown>;
+      if (candidate.type !== 'social_memory') return false;
+      if (candidate.version !== 1) return false;
+
+      const memories = candidate.socialMemories;
       if (!(memories instanceof Map)) return false;
 
       // Validate at least one memory entry if map is not empty
@@ -223,7 +225,7 @@ export const SocialMemorySchema = autoRegister(
         if (typeof key !== 'string') return false;
         if (typeof value !== 'object' || value === null) return false;
 
-        const mem = value as any;
+        const mem = value as Record<string, unknown>;
         if (typeof mem.agentId !== 'string') return false;
         if (typeof mem.overallSentiment !== 'number') return false;
         if (typeof mem.trust !== 'number') return false;

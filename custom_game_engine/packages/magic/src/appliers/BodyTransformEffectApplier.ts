@@ -411,9 +411,11 @@ export const growWingsEffect: BodyTransformEffect = {
     health: 120,
   },
   transformType: 'form',
+  targetState: 'winged',
+  reversible: true,
   tags: ['transform', 'wings', 'flight'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Extra Arms - adds 2 extra arms
@@ -432,9 +434,11 @@ export const extraArmsEffect: BodyTransformEffect = {
     health: 100,
   },
   transformType: 'form',
+  targetState: 'multi_armed',
+  reversible: true,
   tags: ['transform', 'arms', 'manipulation'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Enhance Arms - makes arms stronger and more durable
@@ -452,9 +456,11 @@ export const enhanceArmsEffect: BodyTransformEffect = {
     addFunctions: ['attack'],
   },
   transformType: 'form',
+  targetState: 'enhanced',
+  reversible: true,
   tags: ['transform', 'enhance', 'arms', 'strength'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Enlarge - increases body size
@@ -468,9 +474,11 @@ export const enlargeEffect: BodyTransformEffect = {
   duration: 600,
   transformType: 'size',
   newSize: 'large',
+  targetState: 'large',
+  reversible: true,
   tags: ['transform', 'size', 'enlarge'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Reduce - decreases body size
@@ -484,9 +492,11 @@ export const reduceEffect: BodyTransformEffect = {
   duration: 600,
   transformType: 'size',
   newSize: 'small',
+  targetState: 'small',
+  reversible: true,
   tags: ['transform', 'size', 'reduce'],
   modificationSource: 'magic',
-} as any;
+};
 
 /**
  * Polymorph - full body transformation
@@ -500,9 +510,11 @@ export const polymorphEffect: BodyTransformEffect = {
   duration: 1800,
   transformType: 'form',
   newBodyPlan: 'avian_winged',  // Default, can be specified per cast
+  targetState: 'avian_winged',
+  reversible: true,
   tags: ['transform', 'polymorph', 'powerful'],
   modificationSource: 'magic',
-} as any;
+};
 
 // ============================================================================
 // Registration

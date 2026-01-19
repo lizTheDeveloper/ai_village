@@ -4,7 +4,7 @@
 
 import type { Chunk } from './Chunk.js';
 import type { ChunkManager } from './ChunkManager.js';
-import type { Tile } from './Tile.js';
+import type { Tile, TerrainType, BiomeType } from './Tile.js';
 import { createEmptyNeighbors } from './TileNeighbors.js';
 import type {
   TerrainSnapshot,
@@ -333,7 +333,7 @@ export class ChunkSerializer {
 
         // Add to chunk manager (access internal Map directly)
         // ChunkManager.chunks is private Map<string, Chunk>
-        (chunkManager as { chunks: Map<string, Chunk> }).chunks.set(key, chunk);
+        (chunkManager as unknown as { chunks: Map<string, Chunk> }).chunks.set(key, chunk);
 
       } catch (error) {
         console.error(
@@ -349,7 +349,7 @@ export class ChunkSerializer {
           error as Error
         );
 
-        (chunkManager as { chunks: Map<string, Chunk> }).chunks.set(key, corruptedChunk);
+        (chunkManager as unknown as { chunks: Map<string, Chunk> }).chunks.set(key, corruptedChunk);
       }
     }
   }
@@ -449,12 +449,12 @@ export class ChunkSerializer {
    */
   private deserializeTile(data: SerializedTile): Tile {
     return {
-      terrain: data.terrain,
+      terrain: data.terrain as TerrainType,
       floor: data.floor,
       elevation: data.elevation ?? 0,
       moisture: data.moisture ?? 50,
       fertility: data.fertility ?? 50,
-      biome: data.biome,
+      biome: data.biome as BiomeType | undefined,
       wall: data.wall,
       door: data.door,
       window: data.window,

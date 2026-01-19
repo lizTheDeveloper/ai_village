@@ -83,7 +83,7 @@ export const NamedLandmarksSchema = autoRegister(
 
     validate: (data): data is NamedLandmarksComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const nl = data as any;
+      const nl = data as Record<string, unknown>;
 
       return (
         nl.type === 'named_landmarks' &&

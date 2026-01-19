@@ -1,7 +1,8 @@
 {
   "id": "sheep_black",
-  "name": "black sheep",
-  "size": 64,
+  "base_species": "sheep",
+  "description": "black sheep with wool",
+  "size": 48,
   "directions": [
     "south",
     "southwest",
@@ -12,9 +13,5 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-05T10:32:26.898Z",
-  "generation_method": "reference_workflow",
-  "notes": "South first, east with south ref, west flipped from east, others with south ref",
-  "description": "black sheep",
-  "category": "animal"
+  "regenerated_at": "2026-01-19T02:09:35.759Z"
 }

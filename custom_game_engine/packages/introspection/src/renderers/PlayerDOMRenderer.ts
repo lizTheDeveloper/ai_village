@@ -98,7 +98,7 @@ export class PlayerDOMRenderer implements PlayerRenderer {
 
       // Render each field in group
       for (const [fieldName, field] of fields) {
-        const value = (component as any)[fieldName];
+        const value = (component as Record<string, unknown>)[fieldName];
         const fieldElement = this.createFieldElement(fieldName, field, value, {
           showLabels,
           showIcons,

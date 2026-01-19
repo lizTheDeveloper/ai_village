@@ -28,19 +28,19 @@ export class InjurySerializer extends BaseComponentSerializer<InjuryComponent> {
   }
 
   protected deserializeData(data: unknown): InjuryComponent {
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     return createInjuryComponent({
-      injuryType: d.injuryType,
-      severity: d.severity,
-      location: d.location,
-      skillPenalties: d.skillPenalties,
-      movementPenalty: d.movementPenalty,
-      healingTime: d.healingTime,
-      elapsed: d.elapsed,
-      requiresTreatment: d.requiresTreatment,
-      treated: d.treated,
-      untreatedDuration: d.untreatedDuration,
-      injuries: d.injuries,
+      injuryType: d.injuryType as string,
+      severity: d.severity as number,
+      location: d.location as string,
+      skillPenalties: d.skillPenalties as Record<string, number> | undefined,
+      movementPenalty: d.movementPenalty as number | undefined,
+      healingTime: d.healingTime as number | undefined,
+      elapsed: d.elapsed as number | undefined,
+      requiresTreatment: d.requiresTreatment as boolean | undefined,
+      treated: d.treated as boolean | undefined,
+      untreatedDuration: d.untreatedDuration as number | undefined,
+      injuries: d.injuries as Array<{ type: string; severity: number; location: string }> | undefined,
     });
   }
 
@@ -48,7 +48,7 @@ export class InjurySerializer extends BaseComponentSerializer<InjuryComponent> {
     if (typeof data !== 'object' || data === null) {
       throw new Error('InjuryComponent data must be object');
     }
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     if (!d.injuryType || !d.severity || !d.location) {
       throw new Error('InjuryComponent missing required fields');
     }

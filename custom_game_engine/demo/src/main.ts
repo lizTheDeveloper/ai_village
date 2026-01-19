@@ -3841,49 +3841,26 @@ async function main() {
     chunkManager.getChunkCaches()
   );
 
-  // Inject into VisionProcessor (for plant and agent detection)
+  // Create ChunkSpatialQuery and attach to world (unified approach)
+  (world as any).setSpatialQuery(chunkSpatialQuery);
+  console.log('[Main] SpatialQueryService attached to world');
+
+  // Legacy injection for gradual migration (can be removed once all files migrated)
   injectChunkSpatialQuery(chunkSpatialQuery);
-
-  // Inject into HearingProcessor (for nearby speech detection)
   injectChunkSpatialQueryForHearing(chunkSpatialQuery);
-
-  // Inject into AgentBrainSystem (for nearby agent lookups in decision making)
   injectChunkSpatialQueryForBrain(chunkSpatialQuery);
-
-  // Inject into MovementSystem (for passive resource discovery)
   injectChunkSpatialQueryToMovement(chunkSpatialQuery);
-
-  // Inject into FarmBehaviors (for plant lookups)
   injectChunkSpatialQueryToFarmBehaviors(chunkSpatialQuery);
-
-  // Inject into SeekFoodBehavior (for food source lookups)
   injectChunkSpatialQueryToSeekFood(chunkSpatialQuery);
-
-  // Inject into SeekCoolingBehavior (for cooling source lookups)
   injectChunkSpatialQueryToSeekCooling(chunkSpatialQuery);
-
-  // Inject into SleepBehavior (for bed lookups)
   injectChunkSpatialQueryToSleep(chunkSpatialQuery);
-
-  // Inject into GatherBehavior (for resource and plant lookups)
   injectChunkSpatialQueryToGather(chunkSpatialQuery);
-
-  // Inject into BuildBehavior (for building proximity checks)
   injectChunkSpatialQueryToBuild(chunkSpatialQuery);
-
-  // Inject into DepositItemsBehavior (for storage building lookups)
   injectChunkSpatialQueryToDepositItems(chunkSpatialQuery);
-
-  // Inject into RepairBehavior (for damaged building lookups)
   injectChunkSpatialQueryToRepair(chunkSpatialQuery);
-
-  // Inject centralized spatial query for all behaviors (via BaseBehavior)
   injectChunkSpatialQueryToBehaviors(chunkSpatialQuery);
-
-  // Inject into TemperatureSystem (for agent proximity checks)
   injectChunkSpatialQueryToTemperature(chunkSpatialQuery);
-
-  console.log('[Main] ChunkSpatialQuery injected into all systems and behaviors');
+  console.log('[Main] Legacy ChunkSpatialQuery injections complete (migration in progress)');
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);

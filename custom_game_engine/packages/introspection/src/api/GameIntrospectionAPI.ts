@@ -456,11 +456,10 @@ export class GameIntrospectionAPI {
 
     // Apply bounds filtering if specified
     if (query.bounds) {
-      entities = entities.filter((entity) => {
-        const position = entity.components.get('position') as
-          | { x: number; y: number }
-          | undefined;
-        if (!position) return false;
+      entities = entities.filter((entity): boolean => {
+        const posComp = entity.components.get('position');
+        if (!posComp || !this.isPositionComponent(posComp)) return false;
+        const position = posComp;
 
         return (
           position.x >= query.bounds!.minX &&
@@ -488,7 +487,7 @@ export class GameIntrospectionAPI {
 
     // Enrich entities
     const enrichedEntities: EnrichedEntity[] = paginatedEntities
-      .map((entity) => this.getEntity(entity.id, {}))
+      .map((entity): EnrichedEntity | null => this.getEntity(entity.id, {}))
       .filter((e): e is EnrichedEntity => e !== null);
 
     const result: QueryResult = {
@@ -681,9 +680,10 @@ export class GameIntrospectionAPI {
 
     // Access the private instance to get undo/redo stacks
     // We need to access the internal state, which requires reflection
-    const mutationServiceInstance = (this.mutationService as typeof MutationService & {
+    const mutationServiceWithGetter = this.mutationService as unknown as {
       getInstance?: () => MutationServiceInstanceLike;
-    }).getInstance?.();
+    };
+    const mutationServiceInstance = mutationServiceWithGetter.getInstance?.();
     if (!mutationServiceInstance) {
       // If we can't access the instance, return empty history
       return history;
@@ -2037,17 +2037,17 @@ export class GameIntrospectionAPI {
         // Remove all current components
         const currentComponentTypes = Array.from(entity.components.keys());
         for (const componentType of currentComponentTypes) {
-          entityImpl.removeComponent(componentType);
+          entityImpl.removeComponent(componentType as string);
         }
 
         // Restore components from snapshot
         for (const [componentType, componentData] of Object.entries(entityState.components)) {
           // Deserialize component data
           // Note: We use simple JSON cloning since we serialized with serializeComponent
-          const clonedData = JSON.parse(JSON.stringify(componentData));
+          const clonedData = JSON.parse(JSON.stringify(componentData)) as Record<string, unknown>;
 
           // Restore Maps and Sets if needed
-          const restoredData = this.deserializeComponent(clonedData, componentType);
+          const restoredData = this.deserializeComponent(clonedData, componentType as string);
 
           entityImpl.addComponent(restoredData);
         }
@@ -2186,9 +2186,9 @@ export class GameIntrospectionAPI {
         },
       };
     }
-    const marketState = marketEntity.components.get('market_state') as any;
+    const marketStateComp = marketEntity.components.get('market_state');
 
-    if (!marketState || !marketState.itemStats) {
+    if (!marketStateComp || !this.isMarketStateComponent(marketStateComp) || !marketStateComp.itemStats) {
       return {
         prices: {},
         tradeVolume: {},
@@ -2205,7 +2205,7 @@ export class GameIntrospectionAPI {
     const tradersSet = new Set<string>();
 
     // Process each item in market stats
-    for (const [itemId, stats] of marketState.itemStats.entries()) {
+    for (const [itemId, stats] of marketStateComp.itemStats.entries()) {
       // Filter by resources if specified
       if (options?.resources && !options.resources.includes(itemId)) {
         continue;
@@ -2237,7 +2237,9 @@ export class GameIntrospectionAPI {
         const recentPrices = priceHistory.slice(-10);
         const firstPrice = recentPrices[0];
         const lastPrice = recentPrices[recentPrices.length - 1];
-        trend = lastPrice - firstPrice;
+        if (firstPrice !== undefined && lastPrice !== undefined) {
+          trend = lastPrice - firstPrice;
+        }
       }
 
       prices[itemId] = {
@@ -2263,10 +2265,10 @@ export class GameIntrospectionAPI {
     let sellers = 0;
 
     for (const entity of currencyEntities) {
-      const currency = entity.components.get('currency') as any;
-      if (!currency?.transactions) continue;
+      const currencyComp = entity.components.get('currency');
+      if (!currencyComp || !this.isCurrencyComponent(currencyComp) || !currencyComp.transactions) continue;
 
-      const recentTransactions = currency.transactions.slice(-10);
+      const recentTransactions = currencyComp.transactions.slice(-10);
       let hasBuy = false;
       let hasSell = false;
 
@@ -2490,21 +2492,15 @@ export class GameIntrospectionAPI {
   private getEntitySimulationMode(entity: Entity): string | undefined {
     // Check if entity has simulation mode metadata
     // This would come from SimulationScheduler
-    const scheduler = (this.world as any).simulationScheduler as
-      | SimulationScheduler
-      | undefined;
+    const scheduler = this.world.simulationScheduler;
     if (!scheduler) {
       return undefined;
     }
 
     // Determine mode based on components
-    for (const [componentType] of entity.components.entries()) {
-      const config = (SimulationScheduler as any).getSimulationConfig?.(componentType);
-      if (config) {
-        return config.mode;
-      }
-    }
-
+    // Note: SimulationScheduler.getSimulationConfig is a static method
+    // We would need to examine the scheduler's internal config map, but that's not exposed
+    // For now, return undefined as we can't safely access this without proper API
     return undefined;
   }
 
@@ -2637,5 +2633,135 @@ export class GameIntrospectionAPI {
 
     // Use ValidationService for full validation (type, range, mutability, etc.)
     return ValidationService.validate(schema, field, value, false);
+  }
+
+  // ============================================================================
+  // Type Guard Methods
+  // ============================================================================
+
+  /**
+   * Type guard for SkillsComponent
+   */
+  private isSkillsComponent(component: unknown): component is SkillsComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'skills' &&
+      'levels' in component &&
+      typeof component.levels === 'object'
+    );
+  }
+
+  /**
+   * Type guard for AgentComponent
+   */
+  private isAgentComponent(component: unknown): component is AgentComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'agent'
+    );
+  }
+
+  /**
+   * Type guard for BuildingComponent
+   */
+  private isBuildingComponent(component: unknown): component is BuildingComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'building'
+    );
+  }
+
+  /**
+   * Type guard for PositionComponent
+   */
+  private isPositionComponent(component: unknown): component is PositionComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'position' &&
+      'x' in component &&
+      'y' in component &&
+      typeof component.x === 'number' &&
+      typeof component.y === 'number'
+    );
+  }
+
+  /**
+   * Type guard for WeatherComponent
+   */
+  private isWeatherComponent(component: unknown): component is WeatherComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'weather'
+    );
+  }
+
+  /**
+   * Type guard for TemperatureComponent
+   */
+  private isTemperatureComponent(component: unknown): component is TemperatureComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'temperature'
+    );
+  }
+
+  /**
+   * Type guard for TimeComponent
+   */
+  private isTimeComponent(component: unknown): component is TimeComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'time'
+    );
+  }
+
+  /**
+   * Type guard for MarketStateComponent
+   */
+  private isMarketStateComponent(component: unknown): component is MarketStateComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'market_state'
+    );
+  }
+
+  /**
+   * Type guard for CurrencyComponent
+   */
+  private isCurrencyComponent(component: unknown): component is CurrencyComponentLike {
+    return (
+      typeof component === 'object' &&
+      component !== null &&
+      'type' in component &&
+      component.type === 'currency'
+    );
+  }
+
+  /**
+   * Type guard for ChunkSystem
+   */
+  private isChunkSystem(system: unknown): system is ChunkSystemLike {
+    return (
+      typeof system === 'object' &&
+      system !== null &&
+      'getTile' in system &&
+      typeof system.getTile === 'function'
+    );
   }
 }

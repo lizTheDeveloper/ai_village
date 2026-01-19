@@ -85,3 +85,10 @@ export {
 // Feng Shui Analyzers - Spatial harmony analysis
 export { fengShuiAnalyzer, FengShuiAnalyzer } from './FengShuiAnalyzer.js';
 export { aerialFengShuiAnalyzer, AerialFengShuiAnalyzer } from './AerialFengShuiAnalyzer.js';
+
+// Spatial Query Service - Unified API for spatial entity queries
+export {
+  type SpatialQueryService,
+  type EntityWithDistance,
+  type SpatialQueryOptions,
+} from './SpatialQueryService.js';

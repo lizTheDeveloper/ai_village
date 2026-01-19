@@ -131,14 +131,14 @@ export class SocialFatigueSystem extends BaseSystem {
       socialFatigue: newFatigue,
     }));
 
-    // Emit warning event when fatigue exceeds threshold
+    // Emit warning event when fatigue exceeds threshold (generic since not in EventMap)
     if (newFatigue >= conversation.fatigueThreshold && conversation.socialFatigue < conversation.fatigueThreshold) {
-      this.events.emit('conversation:fatigue_threshold_exceeded' as any, {
+      this.events.emitGeneric('conversation:fatigue_threshold_exceeded', {
         agentId: entity.id,
         fatigue: newFatigue,
         threshold: conversation.fatigueThreshold,
         extraversion,
-      } as any, entity.id);
+      });
     }
   }
 

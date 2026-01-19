@@ -255,7 +255,7 @@ export const UpliftProgramSchema = autoRegister(
 
     validate: (data): data is UpliftProgramComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const u = data as any;
+      const u = data as Record<string, unknown>;
 
       return (
         u.type === 'uplift_program' &&

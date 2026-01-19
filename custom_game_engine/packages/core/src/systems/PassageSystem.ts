@@ -45,6 +45,8 @@ export class PassageSystem extends BaseSystem {
   public readonly id: SystemId = 'passage';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Passage];
+  // Only run when passage components exist (O(1) activation check)
+  public readonly activationComponents = [CT.Passage] as const;
   protected readonly throttleInterval = 10; // FAST - 0.5 seconds
 
   private traversalQueue: TraversalRequest[] = [];

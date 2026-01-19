@@ -31,6 +31,8 @@ export class RebellionEventSystem extends BaseSystem {
   public readonly id: SystemId = 'rebellion_event';
   public readonly priority = 19; // After reality anchor system
   public readonly requiredComponents = [CT.RebellionThreshold] as const;
+  // Lazy activation: Skip entire system when no rebellion threshold exists in world
+  public readonly activationComponents = [CT.RebellionThreshold] as const;
 
   /** Update interval (ticks) */
   protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS

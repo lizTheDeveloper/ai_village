@@ -38,6 +38,10 @@ export class SpaceshipManagementSystem extends BaseSystem {
   public readonly id: SystemId = 'spaceship_management' as SystemId;
   public readonly priority: number = 155;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Spaceship];
+
+  // Lazy activation: Skip entire system when no spaceships exist in world
+  public readonly activationComponents = ['spaceship'] as const;
+
   public readonly metadata = {
     category: 'infrastructure' as const,
     description: 'Manages spaceship internal components and β-space jumps',

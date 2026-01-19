@@ -207,10 +207,11 @@ export const RelationshipSchema = autoRegister(
 
     validate: (data): data is RelationshipComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      if ((data as any).type !== 'relationship') return false;
-      if ((data as any).version !== 1) return false;
+      if (!('type' in data) || data.type !== 'relationship') return false;
+      if (!('version' in data) || data.version !== 1) return false;
 
-      const relationships = (data as any).relationships;
+      if (!('relationships' in data)) return false;
+      const relationships = data.relationships;
       if (!(relationships instanceof Map)) return false;
 
       // Validate at least one relationship entry if map is not empty
@@ -218,12 +219,12 @@ export const RelationshipSchema = autoRegister(
         if (typeof key !== 'string') return false;
         if (typeof value !== 'object' || value === null) return false;
 
-        const rel = value as any;
-        if (typeof rel.targetId !== 'string') return false;
-        if (typeof rel.familiarity !== 'number') return false;
-        if (typeof rel.affinity !== 'number') return false;
-        if (typeof rel.trust !== 'number') return false;
-        if (!Array.isArray(rel.perceivedSkills)) return false;
+        // Type guard for relationship value
+        if (!('targetId' in value) || typeof value.targetId !== 'string') return false;
+        if (!('familiarity' in value) || typeof value.familiarity !== 'number') return false;
+        if (!('affinity' in value) || typeof value.affinity !== 'number') return false;
+        if (!('trust' in value) || typeof value.trust !== 'number') return false;
+        if (!('perceivedSkills' in value) || !Array.isArray(value.perceivedSkills)) return false;
 
         // Only check first entry to avoid performance issues
         break;

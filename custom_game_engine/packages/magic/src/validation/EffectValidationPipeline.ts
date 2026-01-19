@@ -619,16 +619,16 @@ export class EffectValidationPipeline {
 
     // Scan operations for expressions
     effect.operations.forEach((op, index) => {
-      if ('amount' in op) {
-        const exprIssues = this.scanExpression((op as any).amount, `operations[${index}].amount`);
+      if ('amount' in op && op.amount !== undefined) {
+        const exprIssues = this.scanExpression(op.amount, `operations[${index}].amount`);
         issues.push(...exprIssues);
       }
-      if ('value' in op) {
-        const exprIssues = this.scanExpression((op as any).value, `operations[${index}].value`);
+      if ('value' in op && op.value !== undefined) {
+        const exprIssues = this.scanExpression(op.value, `operations[${index}].value`);
         issues.push(...exprIssues);
       }
-      if ('count' in op) {
-        const exprIssues = this.scanExpression((op as any).count, `operations[${index}].count`);
+      if ('count' in op && op.count !== undefined) {
+        const exprIssues = this.scanExpression(op.count, `operations[${index}].count`);
         issues.push(...exprIssues);
       }
     });
@@ -664,24 +664,23 @@ export class EffectValidationPipeline {
     }
 
     // Binary expressions
-    if (typeof expr === 'object' && 'op' in expr && 'left' in expr && 'right' in expr) {
-      const leftIssues = this.scanExpression((expr as any).left, `${path}.left`, depth + 1);
-      const rightIssues = this.scanExpression((expr as any).right, `${path}.right`, depth + 1);
+    if (typeof expr === 'object' && expr !== null && 'op' in expr && 'left' in expr && 'right' in expr) {
+      const leftIssues = this.scanExpression(expr.left, `${path}.left`, depth + 1);
+      const rightIssues = this.scanExpression(expr.right, `${path}.right`, depth + 1);
       issues.push(...leftIssues, ...rightIssues);
     }
 
     // Function expressions
-    if (typeof expr === 'object' && 'fn' in expr && 'args' in expr) {
-      const fnExpr = expr as any;
-      fnExpr.args.forEach((arg: Expression, index: number) => {
+    if (typeof expr === 'object' && expr !== null && 'fn' in expr && 'args' in expr && Array.isArray(expr.args)) {
+      expr.args.forEach((arg, index: number) => {
         const argIssues = this.scanExpression(arg, `${path}.args[${index}]`, depth + 1);
         issues.push(...argIssues);
       });
     }
 
     // Unary expressions
-    if (typeof expr === 'object' && 'op' in expr && 'operand' in expr) {
-      const operandIssues = this.scanExpression((expr as any).operand, `${path}.operand`, depth + 1);
+    if (typeof expr === 'object' && expr !== null && 'op' in expr && 'operand' in expr && !('left' in expr) && !('right' in expr)) {
+      const operandIssues = this.scanExpression(expr.operand, `${path}.operand`, depth + 1);
       issues.push(...operandIssues);
     }
 

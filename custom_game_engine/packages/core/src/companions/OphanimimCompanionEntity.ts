@@ -24,7 +24,7 @@ export function createOphanimimCompanion(world: World, currentTick: number): Ent
   const entity = world.createEntity();
 
   // Identity - Ophanim companion (name TBD)
-  const identityComp = entity.components.get(CT.Identity) as any;
+  const identityComp = entity.components.get(CT.Identity) as { name: string } | undefined;
   if (identityComp) {
     identityComp.name = 'Ophanim'; // TODO: Generate unique name
   }
@@ -33,7 +33,7 @@ export function createOphanimimCompanion(world: World, currentTick: number): Ent
   // (Will be rendered in chat panel, not in world)
 
   // Tags - mark as companion, divine, immortal
-  const tagsComp = entity.components.get(CT.Tags) as any;
+  const tagsComp = entity.components.get(CT.Tags) as { tags: string[] } | undefined;
   if (tagsComp) {
     tagsComp.tags.push(
       'companion',
@@ -53,17 +53,19 @@ export function createOphanimimCompanion(world: World, currentTick: number): Ent
     sessionCount: 0,
     createdAtTick: currentTick,
   });
-  (entity as any).addComponent(companion);
+  if ('addComponent' in entity && typeof entity.addComponent === 'function') {
+    (entity as { addComponent: (comp: CompanionComponent) => void }).addComponent(companion);
+  }
 
   // Episodic Memory - remembers events and player interactions
-  const memoryComp = entity.components.get(CT.EpisodicMemory) as any;
+  const memoryComp = entity.components.get(CT.EpisodicMemory) as { _maxMemories: number } | undefined;
   if (memoryComp) {
     // Companion has large memory capacity
     memoryComp._maxMemories = 5000;
   }
 
   // Conversation - can engage in dialogue
-  const conversationComp = entity.components.get(CT.Conversation) as any;
+  const conversationComp = entity.components.get(CT.Conversation) as { maxMessages: number } | undefined;
   if (conversationComp) {
     // High conversation capacity
     conversationComp.maxMessages = 200;
@@ -71,7 +73,7 @@ export function createOphanimimCompanion(world: World, currentTick: number): Ent
 
   // Renderable - will be rendered in UI panel
   // (Sprite path determined by evolution tier and emotion)
-  const renderableComp = entity.components.get(CT.Renderable) as any;
+  const renderableComp = entity.components.get(CT.Renderable) as { spritePath: string; layer: string } | undefined;
   if (renderableComp) {
     renderableComp.spritePath = getCompanionSpritePath(0, 'alert');
     renderableComp.layer = 'ui'; // UI layer, not world

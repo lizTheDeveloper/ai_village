@@ -291,7 +291,7 @@ export const BuildingHarmonySchema = autoRegister(
 
     validate: (data): data is BuildingHarmonyComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const bh = data as any;
+      const bh = data as Record<string, unknown>;
 
       return (
         bh.type === 'building_harmony' &&

@@ -181,7 +181,7 @@ export function registerAllSerializers(): void {
     toVersion: 2,
     description: 'Add sizeMultiplier and alpha fields to renderable component',
     migrate: (data: unknown) => {
-      const old = data as any;
+      const old = data as Record<string, unknown>;
       return {
         ...old,
         sizeMultiplier: old.sizeMultiplier ?? 1.0,

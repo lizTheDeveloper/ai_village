@@ -48,7 +48,7 @@ export function createMountain(world: WorldMutator, x: number, y: number, z: num
   entity.addComponent(createTagsComponent('mountain', 'obstacle', 'terrain', 'landmark'));
 
   // Add to world (WorldMutator._addEntity is internal)
-  (world as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
 
   return entity.id;
 }

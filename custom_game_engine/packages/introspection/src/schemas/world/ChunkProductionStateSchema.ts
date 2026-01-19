@@ -133,7 +133,7 @@ export const ChunkProductionStateSchema = autoRegister(
 
     validate: (data): data is ChunkProductionStateComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const c = data as any;
+      const c = data as Record<string, unknown>;
 
       return (
         c.type === 'chunk_production_state' &&

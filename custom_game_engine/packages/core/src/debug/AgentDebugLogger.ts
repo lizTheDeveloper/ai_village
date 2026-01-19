@@ -129,7 +129,8 @@ export class AgentDebugLogger {
     const tick = this.getCurrentTick(world);
 
     // Position (required field)
-    const position = entity.getComponent<{ x: number; y: number }>('position');
+    interface PositionData { x: number; y: number }
+    const position = entity.getComponent('position') as PositionData | undefined;
     const entry: AgentDebugEntry = {
       timestamp: Date.now(),
       tick,
@@ -138,7 +139,8 @@ export class AgentDebugLogger {
     };
 
     // Identity
-    const identity = entity.getComponent<{ name?: string }>('identity');
+    interface IdentityData { name?: string }
+    const identity = entity.getComponent('identity') as IdentityData | undefined;
     if (identity) {
       entry.agentName = identity.name;
     }
@@ -154,7 +156,8 @@ export class AgentDebugLogger {
     }
 
     // Target (check multiple sources)
-    const steering = entity.getComponent<{ target?: { x: number; y: number } }>('steering');
+    interface SteeringData { target?: { x: number; y: number } }
+    const steering = entity.getComponent('steering') as SteeringData | undefined;
     if (steering?.target) {
       entry.target = {
         x: steering.target.x,
@@ -177,7 +180,8 @@ export class AgentDebugLogger {
     }
 
     // Movement
-    const movement = entity.getComponent<{ velocityX: number; velocityY: number; speed: number }>('movement');
+    interface MovementData { velocityX: number; velocityY: number; speed: number }
+    const movement = entity.getComponent('movement') as MovementData | undefined;
     if (movement) {
       entry.velocity = { x: movement.velocityX, y: movement.velocityY };
       entry.speed = movement.speed;
@@ -193,7 +197,7 @@ export class AgentDebugLogger {
       lastThought?: string;
       assignedBed?: string;
     }
-    const agent = entity.getComponent<AgentDebugData>('agent');
+    const agent = entity.getComponent('agent') as AgentDebugData | undefined;
     if (agent) {
       entry.behavior = agent.behavior;
 
@@ -230,7 +234,7 @@ export class AgentDebugLogger {
       if (agent.assignedBed && position) {
         const bedEntity = world.getEntity(agent.assignedBed);
         if (bedEntity) {
-          const bedPos = bedEntity.getComponent<{ x: number; y: number }>('position');
+          const bedPos = bedEntity.getComponent('position') as PositionData | undefined;
           if (bedPos) {
             entry.home = { x: bedPos.x, y: bedPos.y };
             const dx = position.x - bedPos.x;
@@ -256,7 +260,8 @@ export class AgentDebugLogger {
     }
 
     // Needs
-    const needs = entity.getComponent<{ hunger: number; energy: number; health: number }>('needs');
+    interface NeedsData { hunger: number; energy: number; health: number }
+    const needs = entity.getComponent('needs') as NeedsData | undefined;
     if (needs) {
       entry.needs = {
         hunger: needs.hunger,
@@ -281,7 +286,7 @@ export class AgentDebugLogger {
         error?: string;
       } | null;
     }
-    const llmHistory = entity.getComponent<LLMHistoryDebugData>('llm_history');
+    const llmHistory = entity.getComponent('llm_history') as LLMHistoryDebugData | undefined;
     if (llmHistory) {
       const lastInteraction = llmHistory.getLastAnyInteraction?.();
       if (lastInteraction) {
@@ -358,7 +363,8 @@ export class AgentDebugLogger {
     const timeEntities = world.query().with('time').executeEntities();
     const firstTimeEntity = timeEntities[0];
     if (firstTimeEntity) {
-      const time = firstTimeEntity.getComponent<{ tick?: number }>('time');
+      interface TimeData { tick?: number }
+      const time = firstTimeEntity.getComponent('time') as TimeData | undefined;
       return time?.tick || 0;
     }
     return 0;

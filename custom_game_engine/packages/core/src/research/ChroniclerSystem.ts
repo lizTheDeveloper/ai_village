@@ -16,6 +16,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import {
   getPublicationSystem,
   type PublicationSystem,
@@ -473,11 +474,11 @@ export class ChroniclerSystem extends BaseSystem {
       if (notableEvents.length >= 3) {
         const chronicler = this.findChronicler(ctx.world);
         if (chronicler) {
-          const agentComp = chronicler.getComponent<AgentComponent>(ComponentType.Agent);
+          const identity = chronicler.getComponent<IdentityComponent>(ComponentType.Identity);
           this.publishChronicle(
             {
               id: chronicler.id,
-              name: agentComp?.name ?? 'Village Chronicler',
+              name: identity?.name ?? 'Village Chronicler',
             },
             this.pendingEvents,
             { from: this.currentChronicleStart, to: ctx.tick }

@@ -133,8 +133,11 @@ export class TameAnimalBehavior extends BaseBehavior {
         }
       }
       if (result.success) {
-        // Emit success event (use any since this is a custom event not in GameEventMap)
-        (world.eventBus as unknown as { emit: (event: unknown) => void }).emit({
+        // Emit success event (custom event not in GameEventMap)
+        interface EventBusLike {
+          emit(event: { type: string; source: string; data: unknown }): void;
+        }
+        (world.eventBus as EventBusLike).emit({
           type: 'agent:tamed_animal',
           source: entity.id,
           data: {
@@ -271,8 +274,11 @@ export class HouseAnimalBehavior extends BaseBehavior {
       // Assign animal to housing
       const result = assignAnimalToHousing(world, targetAnimalId, housing.entity.id);
       if (result.success) {
-        // Emit success event (use any since this is a custom event not in GameEventMap)
-        (world.eventBus as unknown as { emit: (event: unknown) => void }).emit({
+        // Emit success event (custom event not in GameEventMap)
+        interface EventBusLike {
+          emit(event: { type: string; source: string; data: unknown }): void;
+        }
+        (world.eventBus as EventBusLike).emit({
           type: 'agent:housed_animal',
           source: entity.id,
           data: {
@@ -464,8 +470,11 @@ export function tameAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeha
 
     // Create taming system instance for this attempt
     const tamingSystem = new TamingSystem();
-    // Use private world access through entity
-    const world = (ctx as any).world;
+    // Access world from BehaviorContext
+    interface ContextWithWorld {
+      world: World;
+    }
+    const world = (ctx as unknown as ContextWithWorld).world;
     tamingSystem.setWorld(world);
 
     // Attempt taming
@@ -627,7 +636,10 @@ export function houseAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeh
     ctx.stopMovement();
 
     // Assign animal to housing
-    const world = (ctx as any).world;
+    interface ContextWithWorld {
+      world: World;
+    }
+    const world = (ctx as unknown as ContextWithWorld).world;
     const result = assignAnimalToHousing(world, targetAnimalId, housing.entity.id);
 
     if (result.success) {

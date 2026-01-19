@@ -157,7 +157,7 @@ export const BeltSchema = autoRegister(
 
     validate: (data): data is BeltComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const b = data as any;
+      const b = data as Record<string, unknown>;
 
       return (
         b.type === 'belt' &&

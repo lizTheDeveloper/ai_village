@@ -238,7 +238,7 @@ export class PlantDiscoverySystem extends BaseSystem {
       // Discover 1-2 ailments it treats
       const unknownAilments = knownMedicinal === 'unknown'
         ? medicinal.treats
-        : medicinal.treats.filter(a =>
+        : medicinal.treats.filter((a: string) =>
             !knownMedicinal.knownTreats?.includes(a)
           );
 
@@ -263,7 +263,7 @@ export class PlantDiscoverySystem extends BaseSystem {
       const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
         ? knownMedicinal.knownPreparations
         : [];
-      const unknownPrep = preparation.filter(p => !currentPrep.includes(p));
+      const unknownPrep = preparation.filter((p: string) => !currentPrep.includes(p));
 
       if (unknownPrep.length > 0) {
         const toDiscover = unknownPrep[0];

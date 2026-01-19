@@ -81,6 +81,8 @@ export class TVDevelopmentSystem extends BaseSystem {
   readonly id = 'tv_development' as const;
   readonly priority = 62; // Before production systems
   readonly requiredComponents = [ComponentType.TVStation] as const;
+  // Only run when TV station components exist (O(1) activation check)
+  readonly activationComponents = [ComponentType.TVStation] as const;
 
   protected readonly throttleInterval = PITCH_PROCESSING_INTERVAL;
 

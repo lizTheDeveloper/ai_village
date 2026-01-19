@@ -187,9 +187,10 @@ export const ResourceSchema = autoRegister(
     },
 
     validate: (data): data is ResourceComponent => {
-      const d = data as any;
+      if (typeof data !== 'object' || data === null) return false;
+      const d = data as Record<string, unknown>;
 
-      if (!d || d.type !== 'resource') return false;
+      if (d.type !== 'resource') return false;
       if (typeof d.resourceType !== 'string') return false;
       if (typeof d.amount !== 'number' || d.amount < 0) {
         throw new RangeError(`Invalid amount: ${d.amount} (must be >= 0)`);

@@ -4,6 +4,20 @@ import { EventBusImpl } from '../events/EventBus';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem';
 import { Entity } from '../ecs/Entity';
 
+// Custom matcher for toBeOneOf
+expect.extend({
+  toBeOneOf(received: any, array: any[]) {
+    const pass = array.includes(received);
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `expected ${received} not to be one of ${array.join(', ')}`
+          : `expected ${received} to be one of ${array.join(', ')}`,
+    };
+  },
+});
+
 /**
  * Tests for DominanceChallengeSystem - Acceptance Criterion 4
  *
@@ -13,8 +27,7 @@ import { Entity } from '../ecs/Entity';
  * - Immediate hierarchy updates after resolution
  * - Cascade effects (others challenging, fleeing, seeking alliances)
  */
-// TODO: DominanceChallengeSystem is not fully implemented - tests skipped until complete
-describe.skip('DominanceChallengeSystem', () => {
+describe('DominanceChallengeSystem', () => {
   let world: World;
   let system: DominanceChallengeSystem;
   let alpha: Entity;

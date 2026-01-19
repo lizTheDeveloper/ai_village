@@ -71,6 +71,9 @@ export class MetricsCollectionSystem extends BaseSystem {
   protected onInitialize(world: World, eventBus: EventBus): void {
     this.collector = new MetricsCollector(world);
 
+    // Inject metrics collector into canon recorder for historical data access
+    this.canonRecorder.setMetricsCollector(this.collector);
+
     // Initialize streaming if enabled
     if (this.config.streaming) {
       this.streamClient = new MetricsStreamClient(this.config.streamConfig);

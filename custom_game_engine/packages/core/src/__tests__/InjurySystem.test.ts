@@ -115,8 +115,7 @@ describe('InjurySystem', () => {
       expect(stats.craftingSkill).toBeLessThan(6);
     });
 
-    // TODO: Test logic needs review - the comparison stats.combatSkill - 7 gives negative number
-    it.skip('should apply skill penalties for hand injuries', () => {
+    it('should apply skill penalties for hand injuries', () => {
       agent.addComponent('injury', {
         injuryType: 'burn',
         severity: 'major',
@@ -127,9 +126,11 @@ describe('InjurySystem', () => {
 
       const stats = agent.getComponent('combat_stats');
 
-      // Hand injury should severely reduce crafting skill
-      expect(stats.craftingSkill).toBeLessThan(6);
-      expect(stats.craftingSkill).toBeLessThan(stats.combatSkill - 7); // More severe than arms
+      // Hand injury should severely reduce crafting skill (2x penalty vs arms)
+      // Major injury: -2 combat, -4 crafting (2x penalty for hands)
+      expect(stats.craftingSkill).toBeLessThan(6); // 6 - 4 = 2
+      expect(stats.combatSkill).toBeLessThan(7); // 7 - 2 = 5
+      expect(stats.craftingSkill).toBeLessThan(stats.combatSkill); // Crafting more affected
     });
 
     it('should apply movement penalty for leg injuries', () => {
@@ -161,8 +162,22 @@ describe('InjurySystem', () => {
       expect(movement.currentSpeed).toBeLessThan(agent.getComponent('movement').baseSpeed / 2);
     });
 
-    // TODO: System only disables memory for critical head injuries, not major
-    it.skip('should prevent memory formation for head injuries', () => {
+    it('should prevent memory formation for critical head injuries', () => {
+      agent.addComponent('injury', {
+        injuryType: 'blunt',
+        severity: 'critical',
+        location: 'head',
+      });
+      agent.addComponent('episodic_memory', { canFormMemories: true });
+
+      system.update(world, Array.from(world.entities.values()), 1);
+
+      const memory = agent.getComponent('episodic_memory');
+
+      expect(memory.canFormMemories).toBe(false);
+    });
+
+    it('should allow memory formation for major head injuries', () => {
       agent.addComponent('injury', {
         injuryType: 'blunt',
         severity: 'major',
@@ -174,7 +189,7 @@ describe('InjurySystem', () => {
 
       const memory = agent.getComponent('episodic_memory');
 
-      expect(memory.canFormMemories).toBe(false);
+      expect(memory.canFormMemories).toBe(true);
     });
 
     it('should reduce socializing for psychological injuries', () => {
@@ -191,26 +206,23 @@ describe('InjurySystem', () => {
       expect(stats.socialSkill).toBeLessThan(5);
     });
 
-    // TODO: System modifies hungerDecayRate, not hungerRate
-    it.skip('should increase hunger for blood loss injuries', () => {
+    it('should increase hunger decay rate for blood loss injuries', () => {
       agent.addComponent('injury', {
         injuryType: 'laceration',
         severity: 'major',
         location: 'torso',
       });
 
-      const initialHunger = agent.getComponent('needs').hunger;
-
       system.update(world, Array.from(world.entities.values()), 1);
 
       const needs = agent.getComponent('needs');
 
-      // Blood loss increases hunger rate
-      expect(needs.hungerRate).toBeGreaterThan(1);
+      // Blood loss increases hunger decay rate (major = 1.5x)
+      expect(needs.hungerDecayRate).toBeGreaterThan(1);
+      expect(needs.hungerDecayRate).toBe(1.5);
     });
 
-    // TODO: System modifies energyDecayRate, not energyRate
-    it.skip('should decrease energy for all injuries', () => {
+    it('should increase energy decay rate for all injuries', () => {
       agent.addComponent('injury', {
         injuryType: 'blunt',
         severity: 'major',
@@ -221,11 +233,12 @@ describe('InjurySystem', () => {
 
       const needs = agent.getComponent('needs');
 
-      expect(needs.energyRate).toBeGreaterThan(1);
+      // All injuries increase energy decay rate (major = 1.3x)
+      expect(needs.energyDecayRate).toBeGreaterThan(1);
+      expect(needs.energyDecayRate).toBe(1.3);
     });
 
-    // TODO: Healing time is only set during handleHealing, not on first update
-    it.skip('should calculate healing time based on severity', () => {
+    it('should calculate healing time based on severity', () => {
       const minorInjury = world.createEntity();
       minorInjury.addComponent('injury', {
         injuryType: 'laceration',
@@ -272,8 +285,7 @@ describe('InjurySystem', () => {
       expect(injury.treated).toBe(false);
     });
 
-    // TODO: untreatedDuration gets incremented during update even on first pass
-    it.skip('should require treatment for critical injuries', () => {
+    it('should require treatment for critical injuries', () => {
       agent.addComponent('injury', {
         injuryType: 'burn',
         severity: 'critical',
@@ -302,8 +314,7 @@ describe('InjurySystem', () => {
       expect(injury.requiresTreatment).toBe(false);
     });
 
-    // TODO: Healing requires requiresTreatment: false for minor injuries
-    it.skip('should heal minor injuries over time', () => {
+    it('should heal minor injuries over time', () => {
       agent.addComponent('injury', {
         injuryType: 'laceration',
         severity: 'minor',
@@ -320,8 +331,7 @@ describe('InjurySystem', () => {
       expect(agent.hasComponent('injury')).toBe(false);
     });
 
-    // TODO: elapsed counter behavior differs from test expectation
-    it.skip('should not heal major injuries without treatment', () => {
+    it('should not heal major injuries without treatment', () => {
       agent.addComponent('injury', {
         injuryType: 'laceration',
         severity: 'major',
@@ -337,13 +347,12 @@ describe('InjurySystem', () => {
         system.update(world, Array.from(world.entities.values()), 1);
       }
 
-      // Should still have injury
+      // Should still have injury - elapsed increments but healing doesn't progress
       expect(agent.hasComponent('injury')).toBe(true);
-      expect(agent.getComponent('injury').elapsed).toBeLessThan(100);
+      expect(agent.getComponent('injury').elapsed).toBe(100);
     });
 
-    // TODO: Healing behavior needs review
-    it.skip('should heal major injuries after treatment', () => {
+    it('should heal major injuries after treatment', () => {
       agent.addComponent('injury', {
         injuryType: 'laceration',
         severity: 'major',

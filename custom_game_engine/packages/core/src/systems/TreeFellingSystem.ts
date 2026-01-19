@@ -68,6 +68,8 @@ export class TreeFellingSystem extends BaseSystem {
   readonly id: SystemId = 'tree_felling';
   readonly priority: number = 45; // After gathering, before cleanup
   readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.VoxelResource, CT.Position];
+  // Only run when voxel_resource components exist (O(1) activation check)
+  readonly activationComponents = [CT.VoxelResource] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onUpdate(ctx: SystemContext): void {

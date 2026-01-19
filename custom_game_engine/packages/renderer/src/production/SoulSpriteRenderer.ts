@@ -395,7 +395,7 @@ export class SoulSpriteRenderer {
       // Handle both string and object formats
       const base64Data = typeof imageData === 'string'
         ? imageData
-        : (imageData as any).base64 || (imageData as any).image;
+        : (imageData as Record<string, unknown>).base64 as string || (imageData as Record<string, unknown>).image as string;
 
       if (!base64Data) {
         console.error(`[SoulSpriteRenderer] Invalid image data format for ${direction}:`, imageData);
@@ -425,7 +425,7 @@ export class SoulSpriteRenderer {
             // Handle both string and object formats
             const base64Data = typeof frame === 'string'
               ? frame
-              : (frame as any).base64 || (frame as any).image;
+              : (frame as Record<string, unknown>).base64 as string || (frame as Record<string, unknown>).image as string;
 
             if (!base64Data) {
               console.error(`[SoulSpriteRenderer] Invalid frame data format for ${animName}/${direction}/frame_${i}:`, frame);

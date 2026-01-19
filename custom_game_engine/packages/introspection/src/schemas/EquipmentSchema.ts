@@ -254,7 +254,7 @@ export const EquipmentSchema = autoRegister(
 
     validate: (data): data is EquipmentComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const d = data as any;
+      const d = data as Record<string, unknown>;
 
       if (d.type !== 'equipment') return false;
 
@@ -263,7 +263,7 @@ export const EquipmentSchema = autoRegister(
       for (const [key, slot] of Object.entries(d.equipped)) {
         if (typeof key !== 'string') return false;
         if (typeof slot !== 'object' || slot === null) return false;
-        const s = slot as any;
+        const s = slot as Record<string, unknown>;
         if (typeof s.itemId !== 'string') return false;
         if (s.instanceId !== undefined && typeof s.instanceId !== 'string')
           return false;
@@ -271,25 +271,28 @@ export const EquipmentSchema = autoRegister(
 
       // Validate weapons
       if (typeof d.weapons !== 'object' || d.weapons === null) return false;
-      if (d.weapons.mainHand !== undefined) {
-        const mh = d.weapons.mainHand;
+      const weapons = d.weapons as Record<string, unknown>;
+      if (weapons.mainHand !== undefined) {
+        const mh = weapons.mainHand as Record<string, unknown>;
         if (typeof mh !== 'object' || typeof mh.itemId !== 'string') return false;
       }
-      if (d.weapons.offHand !== undefined) {
-        const oh = d.weapons.offHand;
+      if (weapons.offHand !== undefined) {
+        const oh = weapons.offHand as Record<string, unknown>;
         if (typeof oh !== 'object' || typeof oh.itemId !== 'string') return false;
       }
 
       // Validate accessories
       if (typeof d.accessories !== 'object' || d.accessories === null) return false;
-      if (!Array.isArray(d.accessories.rings)) return false;
-      if (!Array.isArray(d.accessories.trinkets)) return false;
+      const accessories = d.accessories as Record<string, unknown>;
+      if (!Array.isArray(accessories.rings)) return false;
+      if (!Array.isArray(accessories.trinkets)) return false;
 
       // Validate autoEquip
       if (typeof d.autoEquip !== 'object' || d.autoEquip === null) return false;
-      if (typeof d.autoEquip.weapons !== 'boolean') return false;
-      if (typeof d.autoEquip.armor !== 'boolean') return false;
-      if (typeof d.autoEquip.clothing !== 'boolean') return false;
+      const autoEquip = d.autoEquip as Record<string, unknown>;
+      if (typeof autoEquip.weapons !== 'boolean') return false;
+      if (typeof autoEquip.armor !== 'boolean') return false;
+      if (typeof autoEquip.clothing !== 'boolean') return false;
 
       // Validate stats
       if (typeof d.totalWeight !== 'number' || d.totalWeight < 0) return false;

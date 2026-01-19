@@ -232,14 +232,17 @@ export class InteractionOverlay {
     // 5. Check pending_action for navigation targets
     if (targetX === undefined || targetY === undefined) {
       const pendingAction = entity.getComponent('pending_action') as Component | undefined;
-      const targetPos = (pendingAction as any)?.targetPos as { x: number; y: number } | undefined;
-      const target = (pendingAction as any)?.target as { x: number; y: number } | undefined;
-      if (targetPos) {
-        targetX = targetPos.x;
-        targetY = targetPos.y;
-      } else if (target) {
-        targetX = target.x;
-        targetY = target.y;
+      if (pendingAction) {
+        const actionData = pendingAction as unknown as Record<string, unknown>;
+        const targetPos = actionData.targetPos as { x: number; y: number } | undefined;
+        const target = actionData.target as { x: number; y: number } | undefined;
+        if (targetPos) {
+          targetX = targetPos.x;
+          targetY = targetPos.y;
+        } else if (target) {
+          targetX = target.x;
+          targetY = target.y;
+        }
       }
     }
 
@@ -251,18 +254,26 @@ export class InteractionOverlay {
         // Try to access queue data - the structure might vary
         let actions: unknown[] = [];
 
-        if (typeof (actionQueue as any).peek === 'function') {
-          const current = (actionQueue as any).peek();
+        const queueWithMethods = actionQueue as unknown as {
+          peek?: () => unknown;
+          isEmpty?: () => boolean;
+          queue?: unknown[];
+          _queue?: unknown[];
+          actions?: unknown[];
+        };
+
+        if (typeof queueWithMethods.peek === 'function') {
+          const current = queueWithMethods.peek();
           if (current) actions = [current];
-        } else if (Array.isArray((actionQueue as any).queue)) {
-          actions = (actionQueue as any).queue;
-        } else if (typeof (actionQueue as any).isEmpty === 'function' && !(actionQueue as any).isEmpty()) {
+        } else if (Array.isArray(queueWithMethods.queue)) {
+          actions = queueWithMethods.queue;
+        } else if (typeof queueWithMethods.isEmpty === 'function' && !queueWithMethods.isEmpty()) {
           // Last resort: try internal queue property
-          actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
+          actions = queueWithMethods._queue || queueWithMethods.actions || [];
         }
 
         if (actions.length > 0) {
-          const currentAction = actions[0] as any;
+          const currentAction = actions[0] as Record<string, unknown>;
           const targetPos = currentAction?.targetPos as { x: number; y: number } | undefined;
           if (targetPos) {
             targetX = targetPos.x;

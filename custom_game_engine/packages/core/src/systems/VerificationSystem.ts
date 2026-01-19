@@ -19,6 +19,8 @@ export class VerificationSystem extends BaseSystem {
   public readonly id: SystemId = 'verification';
   public readonly priority: number = 35; // After exploration/steering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when social gradient components exist (O(1) activation check)
+  public readonly activationComponents = [CT.SocialGradient] as const;
 
   protected readonly throttleInterval: number = 40; // Only run every 2 seconds (at 20 TPS)
 

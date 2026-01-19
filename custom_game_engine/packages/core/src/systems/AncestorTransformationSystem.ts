@@ -79,6 +79,8 @@ export class AncestorTransformationSystem extends BaseSystem {
   readonly id: SystemId = 'ancestor_transformation';
   readonly priority: number = 115;  // After AfterlifeNeedsSystem
   readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
+  // Only run when afterlife components exist (O(1) activation check)
+  readonly activationComponents = ['afterlife'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onUpdate(ctx: SystemContext): void {

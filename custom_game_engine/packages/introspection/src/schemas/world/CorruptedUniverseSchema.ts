@@ -150,7 +150,7 @@ export const CorruptedUniverseSchema = autoRegister(
 
     validate: (data): data is CorruptedUniverseComponent => {
       if (typeof data !== 'object' || data === null) return false;
-      const c = data as any;
+      const c = data as Record<string, unknown>;
 
       return (
         c.type === 'corrupted_universe' &&

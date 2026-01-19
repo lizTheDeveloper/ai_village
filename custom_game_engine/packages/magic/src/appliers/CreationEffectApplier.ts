@@ -14,6 +14,12 @@ import type {
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 import { createPositionComponent } from '@ai-village/core';
+import type {
+  PositionComponentData,
+  ItemComponent,
+  IdentityComponent,
+  ExpirationComponent,
+} from '../types/ComponentTypes.js';
 
 /**
  * List of items that cannot be created through magic.
@@ -75,10 +81,11 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     }
 
     // Extract position values from component
+    const casterPosData = casterPosComp as PositionComponentData;
     const casterPos = {
-      x: (casterPosComp as any).x ?? 0,
-      y: (casterPosComp as any).y ?? 0,
-      z: (casterPosComp as any).z ?? 0,
+      x: casterPosData.x ?? 0,
+      y: casterPosData.y ?? 0,
+      z: casterPosData.z ?? 0,
     };
 
     // Calculate creation parameters from scaled values or effect properties
@@ -132,11 +139,11 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
 
         // Set position
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z);
-        (itemEntity as any).addComponent(positionComponent);
+        itemEntity.addComponent('position', positionComponent);
 
         // Add item component with quality metadata
-        const itemComponent = {
-          type: 'item' as const,
+        const itemComponent: ItemComponent = {
+          type: 'item',
           itemType: effect.createdItem,
           quality: quality,
           createdBy: caster.id,
@@ -144,26 +151,26 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
           spellId: context.spell.id,
           permanent: effect.permanent,
         };
-        (itemEntity as any).addComponent(itemComponent);
+        itemEntity.addComponent('item', itemComponent);
 
         // Add identity component for the item
-        const identityComponent = {
-          type: 'identity' as const,
+        const identityComponent: IdentityComponent = {
+          type: 'identity',
           name: effect.createdItem,
           description: `A ${effect.createdItem} created by magic`,
         };
-        (itemEntity as any).addComponent(identityComponent);
+        itemEntity.addComponent('identity', identityComponent);
 
         // If temporary, add expiration data
         if (!effect.permanent && (effect.duration || context.spell.duration)) {
           const duration = effect.duration ?? context.spell.duration ?? 0;
-          const expirationComponent = {
-            type: 'expiration' as const,
+          const expirationComponent: ExpirationComponent = {
+            type: 'expiration',
             expiresAt: context.tick + duration,
             creatorId: caster.id,
             reason: 'temporary_creation',
           };
-          (itemEntity as any).addComponent(expirationComponent);
+          itemEntity.addComponent('expiration', expirationComponent);
         }
 
         createdEntityIds.push(itemEntity.id);
@@ -218,11 +225,11 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
 
         // Check if item should expire
         if (!effect.permanent) {
-          const expiration = entity.components.get('expiration') as any;
+          const expiration = entity.components.get('expiration') as ExpirationComponent | undefined;
           if (expiration && context.tick >= expiration.expiresAt) {
             // Item has expired - mark for destruction
             try {
-              (world as any).destroyEntity(itemId, 'creation_expired');
+              world.destroyEntity(itemId, 'creation_expired');
             } catch (error) {
               // Entity might have already been destroyed
             }
@@ -251,7 +258,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
         try {
           const entity = world.getEntity(itemId);
           if (entity) {
-            (world as any).destroyEntity(itemId, 'creation_effect_expired');
+            world.destroyEntity(itemId, 'creation_effect_expired');
           }
         } catch (error) {
           // Entity might have already been destroyed - that's fine

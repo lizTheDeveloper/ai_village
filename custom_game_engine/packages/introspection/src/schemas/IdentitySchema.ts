@@ -85,9 +85,12 @@ export const IdentitySchema = autoRegister(
       return (
         typeof data === 'object' &&
         data !== null &&
-        (data as any).type === 'identity' &&
-        typeof (data as any).name === 'string' &&
-        typeof (data as any).age === 'number'
+        'type' in data &&
+        data.type === 'identity' &&
+        'name' in data &&
+        typeof data.name === 'string' &&
+        'age' in data &&
+        typeof data.age === 'number'
       );
     },
 

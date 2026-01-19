@@ -24,6 +24,8 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
   readonly id: SystemId = 'afterlife_memory_fading';
   readonly priority: number = 17;
   readonly requiredComponents = ['afterlife_memory', 'episodic_memory'] as const;
+  // Only run when afterlife_memory components exist (O(1) activation check)
+  readonly activationComponents = ['afterlife_memory'] as const;
 
   protected readonly throttleInterval = 1000; // Update every 1000 ticks (~game day)
 

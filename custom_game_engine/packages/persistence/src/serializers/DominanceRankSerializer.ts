@@ -20,11 +20,11 @@ export class DominanceRankSerializer extends BaseComponentSerializer<DominanceRa
   }
 
   protected deserializeData(data: unknown): DominanceRankComponent {
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     return createDominanceRankComponent({
-      rank: d.rank,
-      subordinates: d.subordinates,
-      canChallengeAbove: d.canChallengeAbove,
+      rank: d.rank as number,
+      subordinates: d.subordinates as string[] | undefined,
+      canChallengeAbove: d.canChallengeAbove as boolean | undefined,
     });
   }
 
@@ -32,7 +32,7 @@ export class DominanceRankSerializer extends BaseComponentSerializer<DominanceRa
     if (typeof data !== 'object' || data === null) {
       throw new Error('DominanceRankComponent data must be object');
     }
-    const d = data as any;
+    const d = data as Record<string, unknown>;
     if (d.rank === undefined) {
       throw new Error('DominanceRankComponent missing required rank');
     }

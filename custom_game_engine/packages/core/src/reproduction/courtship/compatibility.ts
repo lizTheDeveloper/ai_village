@@ -162,15 +162,25 @@ export function calculatePersonalityMesh(agent1: Entity, agent2: Entity): number
 // ============================================================================
 
 export function calculateSharedInterests(agent1: Entity, agent2: Entity): number {
-  const agent1Component = (agent1 as EntityImpl).getComponent('agent') as any;
-  const agent2Component = (agent2 as EntityImpl).getComponent('agent') as any;
-
-  if (!agent1Component?.priorities || !agent2Component?.priorities) {
-    return 0.5; // Neutral when no priority data
+  // Type guard: check if entities have getComponent method
+  if (!('getComponent' in agent1) || !('getComponent' in agent2)) {
+    return 0.5;
   }
 
-  const priorities1 = agent1Component.priorities;
-  const priorities2 = agent2Component.priorities;
+  const agent1Component = (agent1 as EntityImpl).getComponent('agent');
+  const agent2Component = (agent2 as EntityImpl).getComponent('agent');
+
+  // Type guard: check if agent components have priorities
+  if (!agent1Component || typeof agent1Component !== 'object' || !('priorities' in agent1Component)) {
+    return 0.5;
+  }
+  if (!agent2Component || typeof agent2Component !== 'object' || !('priorities' in agent2Component)) {
+    return 0.5;
+  }
+
+  type AgentWithPriorities = { priorities: StrategicPriorities };
+  const priorities1 = (agent1Component as AgentWithPriorities).priorities;
+  const priorities2 = (agent2Component as AgentWithPriorities).priorities;
 
   let sharedCount = 0;
   const priorityKeys: Array<keyof StrategicPriorities> = [

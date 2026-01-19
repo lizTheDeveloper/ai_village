@@ -88,6 +88,8 @@ export class CreatorSurveillanceSystem extends BaseSystem {
   public readonly id: SystemId = 'creator_surveillance';
   public readonly priority = 16; // Right after MagicSystem (15)
   public readonly requiredComponents = [CT.SupremeCreator] as const;
+  // Only run when supreme_creator components exist (O(1) activation check)
+  public readonly activationComponents = [CT.SupremeCreator] as const;
 
   /** Surveillance statistics */
   private stats: SurveillanceStats = {

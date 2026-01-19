@@ -34,6 +34,7 @@ import {
   type RelationshipComponent,
   type Relationship,
   type ResourceComponent,
+  type PlantComponent,
   type SpatialMemoryComponent,
   type PositionComponent,
   formatGoalsForPrompt,
@@ -212,7 +213,7 @@ export class TalkerPromptBuilder {
       components: filteredComponents
     };
 
-    const schemaPrompt = PromptRenderer.renderEntity(filteredEntity as any, world);
+    const schemaPrompt = PromptRenderer.renderEntity(filteredEntity, world);
 
     if (!schemaPrompt) {
       return '';
@@ -476,7 +477,7 @@ export class TalkerPromptBuilder {
         if (vision.seenPlants) {
           vision.seenPlants.forEach(entityId => {
             const plant = world.getEntity(entityId);
-            const plantComp = plant?.components.get('plant') as any;
+            const plantComp = plant?.components.get('plant') as PlantComponent | undefined;
             if (plantComp?.speciesId) {
               resourceTypes.add(plantComp.speciesId);
             }

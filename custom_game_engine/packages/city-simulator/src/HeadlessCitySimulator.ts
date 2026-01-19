@@ -251,13 +251,17 @@ export class HeadlessCitySimulator {
     // Create world entities
     const world = this.gameLoop.world;
 
+    // Initialize city manager event subscriptions
+    this.cityManager.initialize(world.eventBus);
+
     // Create world entity with time, weather, and landmarks (following test pattern)
     const worldEntity = new EntityImpl(createEntityId(), world.tick);
     worldEntity.addComponent(createTimeComponent());
     worldEntity.addComponent(createWeatherComponent('clear', 0.5, 14400)); // Clear weather, 50% intensity, 1 day duration
     worldEntity.addComponent(createNamedLandmarksComponent());
-    (world as any)._addEntity(worldEntity);
-    (world as any)._worldEntityId = worldEntity.id; // Critical for systems to find world entity
+    const worldInternal = world as WorldInternal;
+    worldInternal._addEntity(worldEntity);
+    worldInternal._worldEntityId = worldEntity.id; // Critical for systems to find world entity
 
     // Create city center
     const cityCenter = {
@@ -274,10 +278,10 @@ export class HeadlessCitySimulator {
     } : undefined;
 
     // Create initial buildings based on preset
-    this.createInitialBuildings(world as any, cityCenter);
+    this.createInitialBuildings(worldInternal, cityCenter);
 
     // Create resources
-    this.createResources(world as any, {
+    this.createResources(worldInternal, {
       minX: 0,
       maxX: worldSize!.width,
       minY: 0,
@@ -291,7 +295,7 @@ export class HeadlessCitySimulator {
       const x = cityCenter.x + (Math.random() - 0.5) * spawnRadius;
       const y = cityCenter.y + (Math.random() - 0.5) * spawnRadius;
 
-      const agentId = createWanderingAgent(world as any, x, y); // Use default speed (2.0)
+      const agentId = createWanderingAgent(world, x, y); // Use default speed (2.0)
 
       // Apply containment bounds if economy enabled
       if (cityBounds) {
@@ -306,7 +310,7 @@ export class HeadlessCitySimulator {
 
     // Run initial stabilization (following test pattern)
     for (let i = 0; i < 1000; i++) {
-      (this.gameLoop as any).tick(0.05);
+      const gameLoopWithTick = this.gameLoop as GameLoopWithTick; gameLoopWithTick.tick(0.05);
     }
 
     // Force initial stats update so UI shows correct values immediately
@@ -385,7 +389,8 @@ export class HeadlessCitySimulator {
 
   private tick(): void {
     // Run game systems
-    (this.gameLoop as any).tick(0.05);
+    const gameLoopWithTick = this.gameLoop as GameLoopWithTick;
+    gameLoopWithTick.tick(0.05);
 
     // Run city manager
     this.cityManager.tick(this.gameLoop.world);
@@ -413,8 +418,8 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   setPriorities(priorities: StrategicPriorities): void {
-    this.cityManager.setPriorities(priorities as any);
-    this.cityManager.broadcastPriorities(this.gameLoop.world as any, priorities as any);
+    this.cityManager.setPriorities(priorities);
+    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
     this.emit('priorities-changed', priorities);
   }
 
@@ -424,7 +429,7 @@ export class HeadlessCitySimulator {
   }
 
   forceDecision(): void {
-    this.cityManager.forceDecision(this.gameLoop.world as any);
+    this.cityManager.forceDecision(this.gameLoop.world);
     this.emit('decision', this.cityManager.getReasoning());
   }
 
@@ -433,7 +438,7 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   getWorld(): World {
-    return this.gameLoop.world as any;
+    return this.gameLoop.world;
   }
 
   getCityManager(): CityManager {
@@ -497,7 +502,7 @@ export class HeadlessCitySimulator {
   // WORLD SETUP
   // ---------------------------------------------------------------------------
 
-  private createInitialBuildings(world: World, cityCenter: { x: number; y: number }): void {
+  private createInitialBuildings(world: WorldInternal, cityCenter: { x: number; y: number }): void {
     const { storageBuildings, foodPerStorage } = this.presetConfig;
 
     // Campfire at center
@@ -505,7 +510,7 @@ export class HeadlessCitySimulator {
     campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100));
     campfire.addComponent(createPositionComponent(cityCenter.x, cityCenter.y));
     campfire.addComponent(createRenderableComponent('campfire', 'object'));
-    (world as any)._addEntity(campfire);
+    world._addEntity(campfire);
 
     // Storage buildings based on preset
     if (this.preset === 'large-city') {
@@ -531,7 +536,7 @@ export class HeadlessCitySimulator {
         inventory.slots[1] = { itemId: 'wood', quantity: 50 };
         inventory.slots[2] = { itemId: 'stone', quantity: 30 };
         storage.addComponent(inventory);
-        (world as any)._addEntity(storage);
+        world._addEntity(storage);
       }
     } else {
       // Basic/population-growth: Single storage near center
@@ -544,7 +549,7 @@ export class HeadlessCitySimulator {
       inventory.slots[1] = { itemId: 'wood', quantity: 30 };
       inventory.slots[2] = { itemId: 'stone', quantity: 20 };
       storage.addComponent(inventory);
-      (world as any)._addEntity(storage);
+      world._addEntity(storage);
     }
 
     // Farm (basic preset gets farm to prevent starvation)
@@ -554,7 +559,7 @@ export class HeadlessCitySimulator {
       shelter.addComponent(createBuildingComponent(BuildingType.Bedroll, 1, 100));
       shelter.addComponent(createPositionComponent(cityCenter.x + 5, cityCenter.y + 5));
       shelter.addComponent(createRenderableComponent('bedroll', 'object'));
-      (world as any)._addEntity(shelter);
+      world._addEntity(shelter);
     }
 
     // Initial shelter
@@ -562,10 +567,10 @@ export class HeadlessCitySimulator {
     shelter.addComponent(createBuildingComponent(BuildingType.Bedroll, 1, 100));
     shelter.addComponent(createPositionComponent(cityCenter.x - 3, cityCenter.y));
     shelter.addComponent(createRenderableComponent('bedroll', 'object'));
-    (world as any)._addEntity(shelter);
+    world._addEntity(shelter);
   }
 
-  private createResources(world: World, bounds: { minX: number; maxX: number; minY: number; maxY: number }): void {
+  private createResources(world: WorldInternal, bounds: { minX: number; maxX: number; minY: number; maxY: number }): void {
     const width = bounds.maxX - bounds.minX;
     const height = bounds.maxY - bounds.minY;
 
@@ -585,9 +590,9 @@ export class HeadlessCitySimulator {
         harvestable: true,
         harvestRate: 1,
         regenerationRate: 0.001,
-      } as any);
+      });
       tree.addComponent(createRenderableComponent('tree', 'object'));
-      (world as any)._addEntity(tree);
+      world._addEntity(tree);
     }
 
     // Create stone deposits
@@ -606,9 +611,9 @@ export class HeadlessCitySimulator {
         harvestable: true,
         harvestRate: 0.8,
         regenerationRate: 0,
-      } as any);
+      });
       stone.addComponent(createRenderableComponent('rock', 'object'));
-      (world as any)._addEntity(stone);
+      world._addEntity(stone);
     }
 
     // Create food nodes (berry bushes)
@@ -627,9 +632,9 @@ export class HeadlessCitySimulator {
         harvestable: true,
         harvestRate: 1.5,
         regenerationRate: 0.01,
-      } as any);
+      });
       food.addComponent(createRenderableComponent('blueberry-bush', 'object'));
-      (world as any)._addEntity(food);
+      world._addEntity(food);
     }
   }
 }

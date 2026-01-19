@@ -124,10 +124,15 @@ export class ResearchBehavior extends BaseBehavior {
       if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
       // Check if this is a research building (has research functionality)
-      const blueprint = (world as any).buildingRegistry?.tryGet(buildingComp.buildingType);
+      interface WorldWithRegistry {
+        buildingRegistry?: {
+          tryGet(type: string): { functionality: Array<{ type: string }> } | undefined;
+        };
+      }
+      const blueprint = (world as WorldWithRegistry).buildingRegistry?.tryGet(buildingComp.buildingType);
       if (!blueprint) continue;
 
-      const hasResearch = blueprint.functionality.some((f: any) => f.type === 'research');
+      const hasResearch = blueprint.functionality.some((f: { type: string }) => f.type === 'research');
       if (!hasResearch) continue;
 
       // Calculate distance

@@ -85,9 +85,8 @@ export class GovernanceDataSystem extends BaseSystem {
    * Record a death in the death log.
    */
   private recordDeath(world: World, agentId: string, cause: string, timestamp: number): void {
-    // Find agent name from identity component
-    const entities = world.query().with(CT.Identity).executeEntities();
-    const agent = entities.find(e => e.id === agentId);
+    // Find agent name from identity component using direct lookup O(1) instead of query + find O(N)
+    const agent = world.getEntity(agentId);
     const agentImpl = agent as EntityImpl | undefined;
     const identityComp = agentImpl ? agentImpl.getComponent<IdentityComponent>(CT.Identity) : null;
 

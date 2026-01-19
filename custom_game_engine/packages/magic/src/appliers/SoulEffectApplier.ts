@@ -21,6 +21,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { PerceptionEffectsComponent, NeedsComponentWithHealth, StatusEffectsComponent } from '../types/ComponentTypes.js';
 
 // ============================================================================
 // Soul Component Interface
@@ -412,9 +413,9 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Add or enhance perception_effects component on caster
-    let perceptionEffects = caster.components.get('perception_effects') as any;
+    let perceptionEffects = caster.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
     if (!perceptionEffects) {
-      perceptionEffects = {};
+      perceptionEffects = { type: 'perception_effects' };
       (caster as any).components.set('perception_effects', perceptionEffects);
     }
 
@@ -473,7 +474,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     soul.departed = false;
 
     // Restore health
-    const needs = target.components.get('needs') as any;
+    const needs = target.components.get('needs') as NeedsComponentWithHealth | undefined;
     if (needs) {
       const restoredHealth = needs.maxHealth ? needs.maxHealth * 0.25 : 25;
       needs.health = restoredHealth;
@@ -481,7 +482,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     }
 
     // Remove death status
-    const statusEffects = target.components.get('status_effects') as any;
+    const statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
     if (statusEffects) {
       statusEffects.isDead = false;
     }

@@ -22,6 +22,13 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type {
+  PositionComponentData,
+  OrientationComponent,
+  TeleportAnchorsComponent,
+  StatsComponent,
+  ResistanceComponent,
+} from '../types/ComponentTypes.js';
 
 // ============================================================================
 // TeleportEffectApplier
@@ -83,8 +90,8 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Validate range based on teleport type
-    const pos = targetPos as any;
-    const casterPos = caster.getComponent('position') as any;
+    const pos = targetPos as PositionComponentData;
+    const casterPos = caster.getComponent('position') as PositionComponentData | undefined;
 
     // For self/directional/random teleports, measure from current position to destination
     // For target teleports, measure from caster to target (range limits targeting, not destination)
@@ -278,8 +285,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!casterPos) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        const cPos = casterPos as any;
-        return { success: true, x: cPos.x, y: cPos.y };
+        return { success: true, x: casterPos.x, y: casterPos.y };
       }
 
       case 'swap': {
@@ -288,8 +294,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!casterPos) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        const cPos = casterPos as any;
-        return { success: true, x: cPos.x, y: cPos.y };
+        return { success: true, x: casterPos.x, y: casterPos.y };
       }
 
       case 'directional': {
@@ -297,7 +302,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as any;
+        const tPos = targetPos as PositionComponentData;
         const direction = (context as any).direction || (effect as any).direction;
         const distance = (effect as any).distance || 10;
 
@@ -314,8 +319,8 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as any;
-        const orientation = target.getComponent('orientation') as any;
+        const tPos = targetPos as PositionComponentData;
+        const orientation = target.getComponent('orientation') as OrientationComponent | undefined;
         if (!orientation) {
           return { success: false, error: 'Target lacks orientation component' };
         }
@@ -335,7 +340,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as any;
+        const tPos = targetPos as PositionComponentData;
         const maxRange = (context as any).range || (effect as any).range || effect.maxDistance || 15;
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * maxRange;
@@ -351,11 +356,11 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
       case 'anchor': {
         // Teleport to marked anchor location
         const anchorName = (context as any).anchorName || (effect as any).anchorName;
-        const anchors = caster.getComponent('teleport_anchors') as any;
+        const anchors = caster.getComponent('teleport_anchors') as TeleportAnchorsComponent | undefined;
         if (!anchors) {
           return { success: false, error: 'No teleport anchors found' };
         }
-        const anchor = anchors.anchors.find((a: any) => a.name === anchorName);
+        const anchor = anchors.anchors.find((a) => a.name === anchorName);
         if (!anchor) {
           return { success: false, error: `Anchor '${anchorName}' not found` };
         }
@@ -420,14 +425,14 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     context: EffectContext,
     teleportType: string
   ): { success: true; targetsTeleported?: number } | { success: false; error: string } {
-    const targetPos = target.getComponent('position') as any;
+    const targetPos = target.getComponent('position') as PositionComponentData | undefined;
     if (!targetPos) {
       return { success: false, error: 'Target lacks position component' };
     }
 
     // Handle swap teleport (exchange positions)
     if (teleportType === 'swap') {
-      const casterPos = caster.getComponent('position') as any;
+      const casterPos = caster.getComponent('position') as PositionComponentData | undefined;
       if (!casterPos) {
         return { success: false, error: 'Caster lacks position component' };
       }
@@ -456,7 +461,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
 
       // Teleport additional targets
       for (const entity of additionalTargets) {
-        const pos = entity.getComponent('position') as any;
+        const pos = entity.getComponent('position') as PositionComponentData | undefined;
         if (pos) {
           pos.x = destination.x;
           pos.y = destination.y;
@@ -485,11 +490,11 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
    */
   private checkResistance(target: Entity, context: EffectContext): boolean {
     // Check willpower resistance
-    const stats = target.getComponent('stats') as any;
+    const stats = target.getComponent('stats') as StatsComponent | undefined;
     const willpower = stats?.willpower ?? 10;
 
     // Check teleport resistance trait
-    const resistance = target.getComponent('resistance') as any;
+    const resistance = target.getComponent('resistance') as ResistanceComponent | undefined;
     const teleportResistance = resistance?.teleport ?? 0;
 
     // High willpower or resistance can resist

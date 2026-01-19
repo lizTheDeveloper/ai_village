@@ -55,6 +55,8 @@ export class TimeCompressionSystem extends BaseSystem {
   public readonly id: SystemId = 'time_compression';
   public readonly priority: number = 5; // Very early, before most systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.TimeCompression];
+  // Only run when time compression components exist (O(1) activation check)
+  public readonly activationComponents = [CT.TimeCompression] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical for time control
 
   /**

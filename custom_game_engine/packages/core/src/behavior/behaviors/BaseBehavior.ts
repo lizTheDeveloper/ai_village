@@ -132,7 +132,12 @@ export abstract class BaseBehavior implements IBehavior {
       filter?: (entity: Entity) => boolean;
     }
   ): Array<{ entity: Entity; distance: number; distanceSquared: number; position: { x: number; y: number } }> {
-    // Use ChunkSpatialQuery if available (fast, chunk-based)
+    // Prefer world.spatialQuery (new unified approach)
+    if (world.spatialQuery) {
+      return world.spatialQuery.getEntitiesInRadius(x, y, radius, componentTypes, options);
+    }
+
+    // Legacy: Try shared injection (for transition period)
     if (sharedChunkSpatialQuery) {
       return sharedChunkSpatialQuery.getEntitiesInRadius(x, y, radius, componentTypes, options);
     }
@@ -156,6 +161,12 @@ export abstract class BaseBehavior implements IBehavior {
       filter?: (entity: Entity) => boolean;
     }
   ): { entity: Entity; distance: number; distanceSquared: number; position: { x: number; y: number } } | null {
+    // Prefer world.spatialQuery (new unified approach)
+    if (world.spatialQuery) {
+      return world.spatialQuery.getNearestEntity(x, y, componentTypes, options);
+    }
+
+    // Legacy: Try shared injection (for transition period)
     if (sharedChunkSpatialQuery) {
       return sharedChunkSpatialQuery.getNearestEntity(x, y, componentTypes, options);
     }
@@ -180,6 +191,12 @@ export abstract class BaseBehavior implements IBehavior {
     radius: number,
     componentTypes: string[]
   ): boolean {
+    // Prefer world.spatialQuery (new unified approach)
+    if (world.spatialQuery) {
+      return world.spatialQuery.hasEntityInRadius(x, y, radius, componentTypes);
+    }
+
+    // Legacy: Try shared injection (for transition period)
     if (sharedChunkSpatialQuery) {
       return sharedChunkSpatialQuery.hasEntityInRadius(x, y, radius, componentTypes);
     }

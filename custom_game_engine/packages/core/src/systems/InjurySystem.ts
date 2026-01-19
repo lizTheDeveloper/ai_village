@@ -43,19 +43,23 @@ export class InjurySystem extends BaseSystem {
     for (const entity of ctx.activeEntities) {
       const world = ctx.world;
       const deltaTime = ctx.deltaTime;
-      const injury = world.getComponent<InjuryComponent>(entity.id, 'injury');
+      const comps = ctx.components(entity);
+      const injury = comps.optional<InjuryComponent>('injury');
       if (!injury) continue;
 
       // Validate injury
       this.validateInjury(injury);
 
-      // Set requiresTreatment if not set
-      if (injury.requiresTreatment === undefined) {
+      // Initialize injury fields if not set
+      if (injury.requiresTreatment === undefined || injury.healingTime === undefined) {
         const entityImpl = entity as EntityImpl;
         entityImpl.updateComponent<InjuryComponent>('injury', (inj) => ({
           ...inj,
-          requiresTreatment: inj.severity === 'major' || inj.severity === 'critical',
+          requiresTreatment: inj.requiresTreatment !== undefined ? inj.requiresTreatment : (inj.severity === 'major' || inj.severity === 'critical'),
           treated: inj.treated || false,
+          healingTime: inj.healingTime !== undefined ? inj.healingTime : this.calculateHealingTime(inj),
+          elapsed: inj.elapsed || 0,
+          untreatedDuration: inj.untreatedDuration || 0,
         }));
       }
 
@@ -220,15 +224,17 @@ export class InjurySystem extends BaseSystem {
 
     // Update elapsed time
     entityImpl.updateComponent<InjuryComponent>('injury', (inj) => {
-      const newElapsed = (inj.elapsed || 0) + deltaTime;
+      const currentElapsed = inj.elapsed || 0;
+      const newElapsed = currentElapsed + deltaTime;
 
       // Check if injury requires treatment
       if (inj.requiresTreatment && !inj.treated) {
-        // Don't heal without treatment
+        // Don't heal without treatment, but only increment untreatedDuration after first update
+        const currentUntreated = inj.untreatedDuration || 0;
         return {
           ...inj,
           elapsed: newElapsed,
-          untreatedDuration: (inj.untreatedDuration || 0) + deltaTime,
+          untreatedDuration: currentElapsed > 0 ? currentUntreated + deltaTime : 0,
         };
       }
 

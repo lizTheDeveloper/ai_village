@@ -18,6 +18,7 @@ import type { EventBus } from '@ai-village/core';
 import type { SystemId, Tick } from '@ai-village/core';
 import { ReproductionSystem } from '@ai-village/core';
 import { ComponentType } from '@ai-village/core';
+import type { IdentityComponent, PositionComponent } from '@ai-village/core';
 
 import {
   PregnancyComponent,
@@ -123,13 +124,16 @@ export class MidwiferySystem extends BaseSystem {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
     // Note: world.getSystem may not be available in all contexts (e.g., tests)
     try {
-      this.reproductionSystem = (world as any).getSystem?.('ReproductionSystem') as ReproductionSystem | null;
+      // Type-safe system access with proper error handling
+      const worldWithSystems = world as World & { getSystem?: (name: string) => unknown };
+      const system = worldWithSystems.getSystem?.('ReproductionSystem');
+      this.reproductionSystem = system instanceof ReproductionSystem ? system : null;
     } catch {
       this.reproductionSystem = null;
     }
 
     // Subscribe to conception events using the events manager
-    this.events.subscribe('conception' as any, (event: any) => {
+    this.events.subscribe('conception', (event) => {
       this.handleConception(event.data);
     });
   }
@@ -545,23 +549,17 @@ export class MidwiferySystem extends BaseSystem {
       type: 'midwifery:birth',
       source: mother.id,
       data: outcome,
-    } as any);
+    });
 
     // Also emit the standard birth event for canon tracking
     this.events.emitGeneric({
-      type: 'birth',
+      type: 'agent:born',
       source: mother.id,
       data: {
-        motherId: mother.id,
-        fatherId,
-        childId: childIds[0],
-        childIds,
-        gestationalAge: labor.gestationalAgeWeeks,
-        birthWeight: labor.premature ? 'low' : 'normal',
-        complications: labor.complications.map(c => c.type),
-        attendedBy: labor.attendingMidwifeId,
+        agentId: childIds[0] ?? '',
+        parentIds: [mother.id, fatherId],
       },
-    } as any);
+    });
 
     // Remove pregnancy and labor components
     mother.removeComponent('pregnancy');
@@ -598,30 +596,35 @@ export class MidwiferySystem extends BaseSystem {
       const motherIdentity = mother.components.get('identity') as { name?: string } | undefined;
       const childName = `Child of ${motherIdentity?.name ?? 'Unknown'}`;
 
-      // Add identity component
-      childImpl.addComponent({
+      // Add identity component with proper typing
+      const identityComponent: IdentityComponent = {
         type: 'identity',
         version: 1,
         name: childName,
-        parents: [mother.id, fatherId],
-      } as any);
+        age: 0,
+        species: 'human', // Inherit from mother in full implementation
+      };
+      childImpl.addComponent(identityComponent);
     }
 
     const childImpl = child as EntityImpl;
 
     // Add position near mother
-    const motherPos = mother.components.get(ComponentType.Position) as { x?: number; y?: number } | undefined;
+    const motherPos = mother.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!childImpl.hasComponent(ComponentType.Position)) {
-      childImpl.addComponent({
-        type: ComponentType.Position,
+      const positionComponent: PositionComponent = {
+        type: 'position',
         version: 1,
         x: (motherPos?.x ?? 0) + Math.random() * 2 - 1,
         y: (motherPos?.y ?? 0) + Math.random() * 2 - 1,
-        z: 0,
-      } as any);
+        z: motherPos?.z ?? 0,
+        chunkX: Math.floor(((motherPos?.x ?? 0) + Math.random() * 2 - 1) / 32),
+        chunkY: Math.floor(((motherPos?.y ?? 0) + Math.random() * 2 - 1) / 32),
+      };
+      childImpl.addComponent(positionComponent);
     } else {
       // Update position to be near mother
-      const pos = childImpl.components.get(ComponentType.Position) as unknown as { x: number; y: number; z: number } | undefined;
+      const pos = childImpl.components.get(ComponentType.Position) as PositionComponent | undefined;
       if (pos) {
         pos.x = (motherPos?.x ?? 0) + Math.random() * 2 - 1;
         pos.y = (motherPos?.y ?? 0) + Math.random() * 2 - 1;
@@ -681,17 +684,19 @@ export class MidwiferySystem extends BaseSystem {
         cause,
         complications: labor.complications.map(c => c.type),
       },
-    } as any);
+    });
 
     // Emit death event
     this.events.emitGeneric({
-      type: 'death',
+      type: 'death:occurred',
       source: mother.id,
       data: {
         entityId: mother.id,
         cause: `childbirth_${cause}`,
+        location: { x: 0, y: 0, z: 0 }, // Position would be from mother's position component
+        time: this.world?.tick ?? 0,
       },
-    } as any);
+    });
 
     // The actual death handling should be done by the death system
   }
@@ -707,16 +712,18 @@ export class MidwiferySystem extends BaseSystem {
         childId: child.id,
         cause,
       },
-    } as any);
+    });
 
     this.events.emitGeneric({
-      type: 'death',
+      type: 'death:occurred',
       source: child.id,
       data: {
         entityId: child.id,
         cause: `stillbirth_${cause}`,
+        location: { x: 0, y: 0, z: 0 }, // Position would be from child's position component
+        time: this.world?.tick ?? 0,
       },
-    } as any);
+    });
   }
 
   // =========================================================================

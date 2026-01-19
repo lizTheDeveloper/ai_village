@@ -269,8 +269,14 @@ import { ThreatResponseSystem } from './ThreatResponseSystem.js';
 
 // Realms & Portals
 import { PassageSystem } from './PassageSystem.js';
+import { PassageTraversalSystem } from './PassageTraversalSystem.js';
+import { TimelineMergerSystem } from './TimelineMergerSystem.js';
+import { InvasionSystem } from './InvasionSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
+import { UniverseForkingSystem } from './UniverseForkingSystem.js';
+import { DivergenceTrackingSystem } from './DivergenceTrackingSystem.js';
+import { CanonEventSystem } from './CanonEventSystem.js';
 import { DeathJudgmentSystem } from './DeathJudgmentSystem.js';
 import { DeathBargainSystem } from './DeathBargainSystem.js';
 import { DeathTransitionSystem } from './DeathTransitionSystem.js';
@@ -890,7 +896,13 @@ export function registerAllSystems(
   // ============================================================================
   // REALMS & PORTALS
   // ============================================================================
+  gameLoop.systemRegistry.register(new UniverseForkingSystem());  // Multiverse forking mechanics (priority 10)
+  gameLoop.systemRegistry.register(new DivergenceTrackingSystem());  // Multiverse: track timeline differences (priority 250)
+  gameLoop.systemRegistry.register(new CanonEventSystem());  // Multiverse: canon events and convergence (priority 260)
   gameLoop.systemRegistry.register(new PassageSystem());
+  gameLoop.systemRegistry.register(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
+  gameLoop.systemRegistry.register(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
+  gameLoop.systemRegistry.register(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
   gameLoop.systemRegistry.register(new PortalSystem());
   gameLoop.systemRegistry.register(new RealmTimeSystem());
   // RealmManager registered below with variable (line 666)

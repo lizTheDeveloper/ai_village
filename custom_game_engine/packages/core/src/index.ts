@@ -311,6 +311,13 @@ export {
   aerialFengShuiAnalyzer,
 } from './services/AerialFengShuiAnalyzer.js';
 
+// Spatial Query Service - Unified API for spatial entity queries
+export type {
+  SpatialQueryService,
+  EntityWithDistance,
+  SpatialQueryOptions,
+} from './services/SpatialQueryService.js';
+
 // Note: MovementAPI, TargetingAPI, InteractionAPI are re-exported
 // with conflicts from components. Import from @ai-village/core/services
 // if you need those specific APIs.

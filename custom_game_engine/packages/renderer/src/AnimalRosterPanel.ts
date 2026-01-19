@@ -12,6 +12,12 @@ import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
 import type { World } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
+// Component interface for type safety
+interface AppearanceComponent {
+  spriteFolder?: string;
+  spriteFolderId?: string;
+}
+
 interface AnimalInfo {
   id: string;
   species: string;
@@ -153,7 +159,7 @@ export class AnimalRosterPanel implements IWindowPanel {
     const animalEntities = world.query().with('animal', 'appearance').executeEntities();
 
     for (const entity of animalEntities) {
-      const appearance = entity.components.get('appearance') as any;
+      const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
 
       if (appearance) {
         let spriteFolder = appearance.spriteFolder || appearance.spriteFolderId || 'chicken';

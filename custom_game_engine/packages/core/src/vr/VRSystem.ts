@@ -24,6 +24,8 @@ export class VRSystem extends BaseSystem {
   public readonly requiredComponents = [
     CT.VRSystem,
   ] as const;
+  // Only run when VR system components exist (O(1) activation check)
+  public readonly activationComponents = [CT.VRSystem] as const;
 
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
