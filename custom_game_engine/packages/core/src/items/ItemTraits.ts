@@ -6,6 +6,7 @@ import { ToolTrait } from './traits/ToolTrait';
 import { ArmorTrait } from './traits/ArmorTrait';
 import { StatBonusTrait } from './traits/StatBonusTrait';
 import { AmmoTrait } from './traits/AmmoTrait';
+import { MaterialTrait } from './traits/MaterialTrait';
 
 /**
  * Compositional trait bag for items.
@@ -44,4 +45,7 @@ export interface ItemTraits {
 
   /** Item is ammunition for ranged weapons (Weapons Expansion) */
   ammo?: AmmoTrait;
+
+  /** Item has material properties (building materials, resources, etc.) */
+  material?: MaterialTrait;
 }

@@ -1,0 +1,6231 @@
+[
+  {
+    "setId": "basic_agriculture",
+    "name": "Foundational Agriculture",
+    "description": "The fundamental principles of growing food from seeds",
+    "field": "agriculture",
+    "allPapers": [
+      "seed_selection",
+      "soil_preparation",
+      "irrigation_principles",
+      "fertilization_theory",
+      "crop_rotation",
+      "climate_control",
+      "year_round_growing"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "agriculture_i",
+        "papersRequired": 2,
+        "mandatoryPapers": [
+          "seed_selection"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "farm_plot"
+          },
+          {
+            "type": "crop",
+            "cropId": "wheat"
+          },
+          {
+            "type": "crop",
+            "cropId": "carrot"
+          },
+          {
+            "type": "ability",
+            "abilityId": "plant_seeds"
+          }
+        ]
+      },
+      {
+        "technologyId": "agriculture_ii",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "irrigation_principles",
+          "fertilization_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "irrigation_system"
+          },
+          {
+            "type": "item",
+            "itemId": "fertilizer"
+          },
+          {
+            "type": "crop",
+            "cropId": "tomato"
+          },
+          {
+            "type": "crop",
+            "cropId": "corn"
+          }
+        ]
+      },
+      {
+        "technologyId": "greenhouse_cultivation",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "climate_control",
+          "year_round_growing"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "greenhouse"
+          },
+          {
+            "type": "crop",
+            "cropId": "tropical_fruit"
+          },
+          {
+            "type": "ability",
+            "abilityId": "year_round_farming"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_metallurgy",
+    "name": "Fundamental Metalworking",
+    "description": "From rocks to refined metal",
+    "field": "metallurgy",
+    "allPapers": [
+      "ore_identification",
+      "smelting_fundamentals",
+      "iron_working",
+      "mining_techniques",
+      "forge_construction",
+      "bellows_operation",
+      "tool_maintenance",
+      "ore_grading",
+      "slag_management"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_metallurgy",
+        "papersRequired": 3,
+        "mandatoryPapers": [
+          "smelting_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "furnace"
+          },
+          {
+            "type": "building",
+            "buildingId": "smithy"
+          },
+          {
+            "type": "ability",
+            "abilityId": "smelt_ore"
+          }
+        ]
+      },
+      {
+        "technologyId": "iron_age",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "iron_working"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "iron_ingot"
+          },
+          {
+            "type": "item",
+            "itemId": "iron_tools"
+          },
+          {
+            "type": "ability",
+            "abilityId": "craft_iron"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_metallurgy",
+    "name": "Steel & Alloys",
+    "description": "Beyond simple iron - the art of advanced metalworking",
+    "field": "metallurgy",
+    "allPapers": [
+      "carbon_infusion",
+      "quenching_theory",
+      "alloy_theory",
+      "pattern_welding",
+      "hardness_testing",
+      "grain_structure",
+      "temperature_precision",
+      "surface_finishing",
+      "wire_drawing",
+      "metal_casting",
+      "tool_steel",
+      "legendary_metallurgy"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "steel_forging",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "carbon_infusion"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "steel_ingot"
+          },
+          {
+            "type": "item",
+            "itemId": "steel_weapons"
+          },
+          {
+            "type": "item",
+            "itemId": "steel_armor"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_alloys",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "alloy_theory"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "bronze"
+          },
+          {
+            "type": "item",
+            "itemId": "brass"
+          },
+          {
+            "type": "ability",
+            "abilityId": "create_alloys"
+          }
+        ]
+      },
+      {
+        "technologyId": "legendary_metals",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "legendary_metallurgy"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "masterwork_crafting"
+          },
+          {
+            "type": "item",
+            "itemId": "masterwork_blade"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_alchemy",
+    "name": "Foundations of Alchemy",
+    "description": "Learning to identify, extract, and mix substances safely",
+    "field": "alchemy",
+    "allPapers": [
+      "substance_identification",
+      "extraction_methods",
+      "mixture_theory",
+      "crystallization_methods",
+      "sublimation_techniques",
+      "solution_preparation",
+      "precipitation_reactions",
+      "solubility_principles",
+      "laboratory_safety"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_alchemy",
+        "papersRequired": 3,
+        "mandatoryPapers": [
+          "substance_identification"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "alchemy_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "identify_substances"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_alchemy",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "mixture_theory"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "acid"
+          },
+          {
+            "type": "item",
+            "itemId": "base"
+          },
+          {
+            "type": "building",
+            "buildingId": "advanced_lab"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_alchemy",
+    "name": "Potions & Transmutation",
+    "description": "The pinnacle of alchemical knowledge",
+    "field": "alchemy",
+    "allPapers": [
+      "potion_formulation",
+      "transmutation_principles",
+      "grand_alchemy",
+      "tincture_preparation",
+      "medicinal_herbs",
+      "poison_recognition",
+      "antidote_formulation",
+      "distillation_cycles",
+      "specific_gravity"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "medicine",
+        "papersRequired": 3,
+        "mandatoryPapers": [
+          "potion_formulation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "apothecary"
+          },
+          {
+            "type": "item",
+            "itemId": "healing_potion"
+          },
+          {
+            "type": "item",
+            "itemId": "medicine"
+          }
+        ]
+      },
+      {
+        "technologyId": "transmutation",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "transmutation_principles"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "transmute_metals"
+          }
+        ]
+      },
+      {
+        "technologyId": "legendary_alchemy",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "grand_alchemy"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "universal_solvent"
+          },
+          {
+            "type": "item",
+            "itemId": "elixir_of_life"
+          },
+          {
+            "type": "ability",
+            "abilityId": "grand_transmutation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "rune_magic",
+    "name": "The Art of Runic Inscription",
+    "description": "From simple symbols to reality-altering elder runes",
+    "field": "arcane",
+    "allPapers": [
+      "symbol_recognition",
+      "carving_fundamentals",
+      "material_sympathies",
+      "rune_combinations",
+      "activation_methods",
+      "chromatic_runecraft",
+      "geometric_patterns",
+      "phonetic_activation",
+      "rune_syntax",
+      "protective_wards",
+      "rune_erasure",
+      "rune_amplification",
+      "temporal_inscription",
+      "layered_runes",
+      "binding_inscriptions",
+      "sympathetic_linking",
+      "runic_arrays",
+      "elder_runes"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_runes",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "symbol_recognition"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "carve_basic_runes"
+          },
+          {
+            "type": "spell",
+            "spellId": "rune_of_light"
+          },
+          {
+            "type": "spell",
+            "spellId": "rune_of_protection"
+          }
+        ]
+      },
+      {
+        "technologyId": "intermediate_runes",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "rune_combinations",
+          "activation_methods"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "combine_runes"
+          },
+          {
+            "type": "spell",
+            "spellId": "rune_of_fire"
+          },
+          {
+            "type": "spell",
+            "spellId": "rune_of_frost"
+          },
+          {
+            "type": "building",
+            "buildingId": "rune_workshop"
+          }
+        ]
+      },
+      {
+        "technologyId": "elder_runes",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "elder_runes"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "carve_elder_runes"
+          },
+          {
+            "type": "spell",
+            "spellId": "elder_rune_of_binding"
+          },
+          {
+            "type": "spell",
+            "spellId": "elder_rune_of_unmaking"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_physics",
+    "name": "Classical Physics",
+    "description": "Newtonian mechanics, thermodynamics, and optics",
+    "field": "physics",
+    "allPapers": [
+      "newtons_laws",
+      "force_and_acceleration",
+      "conservation_of_energy",
+      "conservation_of_momentum",
+      "gravitation_theory",
+      "orbital_mechanics",
+      "thermodynamics_first_law",
+      "thermodynamics_second_law",
+      "entropy_and_disorder",
+      "heat_transfer_theory",
+      "wave_mechanics",
+      "optics_fundamentals",
+      "reflection_and_refraction",
+      "lens_theory",
+      "projectile_motion",
+      "rotational_dynamics",
+      "simple_harmonic_motion",
+      "fluid_mechanics",
+      "pressure_and_buoyancy",
+      "bernoulli_principle"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "newtonian_mechanics",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "newtons_laws",
+          "force_and_acceleration",
+          "conservation_of_energy"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "physics_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "calculate_trajectories"
+          }
+        ]
+      },
+      {
+        "technologyId": "thermodynamics",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "thermodynamics_first_law",
+          "thermodynamics_second_law",
+          "entropy_and_disorder"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "heat_engine"
+          },
+          {
+            "type": "ability",
+            "abilityId": "design_thermal_systems"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_optics",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "optics_fundamentals",
+          "lens_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "telescope"
+          },
+          {
+            "type": "building",
+            "buildingId": "microscope"
+          },
+          {
+            "type": "item",
+            "itemId": "precision_lenses"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "mathematics_fundamentals",
+    "name": "Foundational Mathematics",
+    "description": "Calculus, linear algebra, and geometry",
+    "field": "mathematics",
+    "allPapers": [
+      "differential_calculus",
+      "integral_calculus",
+      "multivariable_calculus",
+      "fundamental_theorem_calculus",
+      "limits_and_continuity",
+      "series_and_sequences",
+      "linear_algebra_basics",
+      "matrix_operations",
+      "vector_spaces",
+      "eigenvalues_eigenvectors",
+      "euclidean_geometry",
+      "analytic_geometry",
+      "trigonometry_advanced",
+      "complex_numbers",
+      "probability_theory",
+      "statistics_foundations",
+      "set_theory",
+      "mathematical_logic"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "calculus_mastery",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "differential_calculus",
+          "integral_calculus"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "mathematics_institute"
+          },
+          {
+            "type": "ability",
+            "abilityId": "solve_differential_problems"
+          }
+        ]
+      },
+      {
+        "technologyId": "linear_algebra",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "linear_algebra_basics",
+          "matrix_operations",
+          "vector_spaces"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "matrix_computation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "solve_linear_systems"
+          }
+        ]
+      },
+      {
+        "technologyId": "mathematical_foundations",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "fundamental_theorem_calculus",
+          "probability_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "advanced_mathematical_reasoning"
+          },
+          {
+            "type": "building",
+            "buildingId": "research_university"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_physics",
+    "name": "Modern Physics",
+    "description": "Relativity, electromagnetism, and nuclear physics",
+    "field": "advanced_physics",
+    "allPapers": [
+      "special_relativity",
+      "general_relativity",
+      "spacetime_curvature",
+      "time_dilation",
+      "length_contraction",
+      "mass_energy_equivalence",
+      "electromagnetic_theory",
+      "maxwells_equations",
+      "electromagnetic_waves",
+      "light_as_wave",
+      "light_as_particle",
+      "photoelectric_effect",
+      "atomic_structure",
+      "nuclear_fission",
+      "nuclear_fusion",
+      "radioactive_decay",
+      "strong_nuclear_force",
+      "weak_nuclear_force",
+      "particle_accelerators",
+      "plasma_physics",
+      "electromagnetic_field_theory",
+      "relativistic_mechanics"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "special_relativity_tech",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "special_relativity",
+          "time_dilation",
+          "mass_energy_equivalence"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "relativistic_calculations"
+          },
+          {
+            "type": "building",
+            "buildingId": "advanced_physics_lab"
+          }
+        ]
+      },
+      {
+        "technologyId": "electromagnetism_mastery",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "maxwells_equations",
+          "electromagnetic_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "design_electromagnetic_devices"
+          },
+          {
+            "type": "building",
+            "buildingId": "particle_accelerator"
+          }
+        ]
+      },
+      {
+        "technologyId": "nuclear_physics",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "nuclear_fission",
+          "nuclear_fusion",
+          "strong_nuclear_force"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "nuclear_reactor"
+          },
+          {
+            "type": "ability",
+            "abilityId": "harness_nuclear_energy"
+          }
+        ]
+      },
+      {
+        "technologyId": "general_relativity_tech",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "general_relativity",
+          "spacetime_curvature"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "understand_curved_spacetime"
+          },
+          {
+            "type": "building",
+            "buildingId": "gravitational_observatory"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_mathematics",
+    "name": "Advanced Mathematical Theory",
+    "description": "Topology, differential equations, and abstract algebra",
+    "field": "advanced_mathematics",
+    "allPapers": [
+      "ordinary_differential_equations",
+      "partial_differential_equations",
+      "fourier_analysis",
+      "laplace_transforms",
+      "tensor_calculus",
+      "differential_geometry",
+      "riemannian_geometry",
+      "topology_basics",
+      "algebraic_topology",
+      "group_theory",
+      "ring_theory",
+      "field_theory_algebra",
+      "lie_groups",
+      "lie_algebras",
+      "representation_theory",
+      "hilbert_spaces",
+      "functional_analysis",
+      "measure_theory",
+      "complex_analysis",
+      "non_euclidean_geometry"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "differential_equations_mastery",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "ordinary_differential_equations",
+          "partial_differential_equations"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "model_dynamic_systems"
+          },
+          {
+            "type": "building",
+            "buildingId": "computational_mathematics_lab"
+          }
+        ]
+      },
+      {
+        "technologyId": "geometric_analysis",
+        "papersRequired": 11,
+        "mandatoryPapers": [
+          "tensor_calculus",
+          "differential_geometry",
+          "riemannian_geometry"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "analyze_curved_spaces"
+          },
+          {
+            "type": "ability",
+            "abilityId": "tensor_manipulation"
+          }
+        ]
+      },
+      {
+        "technologyId": "abstract_algebra_mastery",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "group_theory",
+          "lie_groups",
+          "representation_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "symmetry_analysis"
+          },
+          {
+            "type": "ability",
+            "abilityId": "algebraic_structure_design"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "artificial_intelligence",
+    "name": "Artificial Intelligence & Machine Learning",
+    "description": "Neural networks, LLMs, agents, RAG, and agentic systems",
+    "field": "artificial_intelligence",
+    "allPapers": [
+      "perceptron_basics",
+      "backpropagation",
+      "gradient_descent",
+      "neural_network_architectures",
+      "convolutional_networks",
+      "recurrent_networks",
+      "lstm_architecture",
+      "attention_mechanisms",
+      "transformer_architecture",
+      "language_model_scaling_laws",
+      "gpt_architecture",
+      "constitutional_ai",
+      "reinforcement_learning_basics",
+      "rlhf_theory",
+      "agent_architectures",
+      "retrieval_augmented_generation",
+      "embedding_spaces",
+      "vector_databases",
+      "agentic_systems",
+      "tool_use_frameworks",
+      "multi_agent_coordination",
+      "knowledge_compression"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_neural_networks",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "perceptron_basics",
+          "backpropagation",
+          "gradient_descent"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "ai_research_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "train_neural_networks"
+          }
+        ]
+      },
+      {
+        "technologyId": "language_models",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "transformer_architecture",
+          "attention_mechanisms",
+          "language_model_scaling_laws"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "llm_training_facility"
+          },
+          {
+            "type": "ability",
+            "abilityId": "train_language_models"
+          },
+          {
+            "type": "item",
+            "itemId": "compressed_wiki"
+          }
+        ]
+      },
+      {
+        "technologyId": "agentic_ai",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "agent_architectures",
+          "retrieval_augmented_generation",
+          "tool_use_frameworks"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "design_ai_agents"
+          },
+          {
+            "type": "ability",
+            "abilityId": "rag_systems"
+          },
+          {
+            "type": "building",
+            "buildingId": "agentic_ai_lab"
+          }
+        ]
+      },
+      {
+        "technologyId": "multi_agent_systems",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "multi_agent_coordination",
+          "agentic_systems"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "coordinate_agent_teams"
+          },
+          {
+            "type": "ability",
+            "abilityId": "collective_intelligence"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "neural_interfaces",
+    "name": "Neural Interfaces & Brain-Computer Integration",
+    "description": "Direct brain-computer communication and neural prosthetics",
+    "field": "neural_interfaces",
+    "allPapers": [
+      "neural_signal_processing",
+      "brain_computer_interface_basics",
+      "invasive_neural_implants",
+      "non_invasive_neural_reading",
+      "motor_cortex_decoding",
+      "visual_cortex_interface",
+      "auditory_cortex_interface",
+      "neural_encoding_theory",
+      "bidirectional_neural_interface",
+      "neural_plasticity_hacking",
+      "brain_machine_symbiosis",
+      "neural_bandwidth_optimization",
+      "thought_translation",
+      "direct_neural_communication",
+      "brain_to_brain_interface",
+      "neural_lace_architecture",
+      "full_brain_interface",
+      "brainship_integration_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_bci",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "neural_signal_processing",
+          "brain_computer_interface_basics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "neural_interface_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "read_neural_signals"
+          }
+        ]
+      },
+      {
+        "technologyId": "bidirectional_neural_interface",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "bidirectional_neural_interface",
+          "neural_encoding_theory"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "neural_implant"
+          },
+          {
+            "type": "ability",
+            "abilityId": "write_neural_signals"
+          }
+        ]
+      },
+      {
+        "technologyId": "brain_machine_symbiosis",
+        "papersRequired": 13,
+        "mandatoryPapers": [
+          "brain_machine_symbiosis",
+          "neural_lace_architecture"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "create_neural_symbiosis"
+          },
+          {
+            "type": "building",
+            "buildingId": "symbiosis_surgery_center"
+          }
+        ]
+      },
+      {
+        "technologyId": "brainship_neural_integration",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "brainship_integration_theory",
+          "full_brain_interface"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "integrate_brain_with_ship"
+          },
+          {
+            "type": "building",
+            "buildingId": "brainship_surgery_facility"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "exotic_physics",
+    "name": "Exotic Physics",
+    "description": "Quantum field theory, particle physics, and cosmological models",
+    "field": "exotic_physics",
+    "allPapers": [
+      "quantum_field_theory",
+      "feynman_diagrams",
+      "renormalization_theory",
+      "gauge_theory",
+      "yang_mills_theory",
+      "standard_model",
+      "quark_theory",
+      "gluon_interactions",
+      "electroweak_unification",
+      "higgs_mechanism",
+      "supersymmetry",
+      "string_theory_basics",
+      "extra_dimensions",
+      "brane_cosmology",
+      "quantum_gravity_candidates",
+      "cosmological_inflation",
+      "dark_matter_theory",
+      "dark_energy_hypothesis",
+      "black_hole_thermodynamics",
+      "hawking_radiation",
+      "holographic_principle",
+      "ads_cft_correspondence",
+      "multiverse_hypothesis",
+      "anthropic_principle",
+      "vacuum_energy_density"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "quantum_field_theory_basics",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "quantum_field_theory",
+          "feynman_diagrams",
+          "gauge_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "high_energy_physics_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "qft_calculations"
+          }
+        ]
+      },
+      {
+        "technologyId": "particle_physics_mastery",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "standard_model",
+          "higgs_mechanism",
+          "electroweak_unification"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "collider_facility"
+          },
+          {
+            "type": "ability",
+            "abilityId": "probe_fundamental_particles"
+          }
+        ]
+      },
+      {
+        "technologyId": "unified_field_theory",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "string_theory_basics",
+          "quantum_gravity_candidates",
+          "extra_dimensions"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "unified_physics_understanding"
+          },
+          {
+            "type": "building",
+            "buildingId": "theoretical_physics_institute"
+          }
+        ]
+      },
+      {
+        "technologyId": "exotic_cosmology",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "multiverse_hypothesis",
+          "holographic_principle",
+          "brane_cosmology"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "probe_reality_structure"
+          },
+          {
+            "type": "ability",
+            "abilityId": "detect_extra_dimensions"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "quantum_observation",
+    "name": "Quantum Observation Fundamentals",
+    "description": "Understanding quantum superposition and the observer effect",
+    "field": "quantum_mechanics",
+    "allPapers": [
+      "double_slit_experiment",
+      "wavefunction_collapse",
+      "quantum_superposition",
+      "schrodingers_paradox",
+      "observer_effect",
+      "decoherence_theory",
+      "quantum_entanglement",
+      "measurement_problem",
+      "copenhagen_interpretation",
+      "many_worlds_hypothesis"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "quantum_theory_i",
+        "papersRequired": 3,
+        "mandatoryPapers": [
+          "wavefunction_collapse",
+          "observer_effect"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "understand_superposition"
+          },
+          {
+            "type": "building",
+            "buildingId": "quantum_lab"
+          }
+        ]
+      },
+      {
+        "technologyId": "quantum_theory_ii",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "decoherence_theory",
+          "quantum_entanglement"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "quantum_measurement"
+          },
+          {
+            "type": "item",
+            "itemId": "quantum_detector"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "beta_space_fundamentals",
+    "name": "\u03b2-Space Navigation Theory",
+    "description": "Timeline navigation via emotional topology and probability branches",
+    "field": "temporal_navigation",
+    "allPapers": [
+      "emotional_topology",
+      "beta_branch_theory",
+      "timeline_branching",
+      "probability_navigation",
+      "narrative_weight_theory",
+      "emotional_anchoring",
+      "beta_space_geometry",
+      "timeline_compatibility",
+      "branch_distance_metrics",
+      "emotional_coordinates",
+      "navigation_safety_protocols",
+      "beta_space_cartography"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "beta_navigation_theory",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "beta_branch_theory",
+          "emotional_topology"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "perceive_beta_branches"
+          },
+          {
+            "type": "building",
+            "buildingId": "beta_observatory"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_beta_navigation",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "probability_navigation",
+          "navigation_safety_protocols"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "navigate_beta_space"
+          },
+          {
+            "type": "building",
+            "buildingId": "threshold_ship"
+          },
+          {
+            "type": "building",
+            "buildingId": "courier_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_beta_navigation",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "beta_space_geometry",
+          "beta_space_cartography"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "advanced_beta_navigation"
+          },
+          {
+            "type": "building",
+            "buildingId": "story_ship"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "crew_coherence",
+    "name": "Crew Coherence Engineering",
+    "description": "Quantum observer coupling and collective reality perception",
+    "field": "temporal_navigation",
+    "allPapers": [
+      "observer_coupling",
+      "collective_observation",
+      "coherence_thresholds",
+      "decoherence_prevention",
+      "crew_size_limits",
+      "emotional_synchronization",
+      "coherence_training",
+      "meditation_protocols",
+      "shared_narrative_techniques",
+      "coherence_monitoring",
+      "emergency_recoupling",
+      "brainship_symbiosis_theory",
+      "perfect_coupling_mechanics",
+      "solo_navigation_advantages"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "coherence_monitoring",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "observer_coupling",
+          "coherence_thresholds"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "coherence_meter"
+          },
+          {
+            "type": "ability",
+            "abilityId": "monitor_crew_coherence"
+          }
+        ]
+      },
+      {
+        "technologyId": "coherence_training",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "emotional_synchronization",
+          "meditation_protocols"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "meditation_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "train_crew_coherence"
+          }
+        ]
+      },
+      {
+        "technologyId": "brainship_construction",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "brainship_symbiosis_theory",
+          "perfect_coupling_mechanics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "brainship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "create_brainship_bond"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "rainbow_planet_discovery",
+    "name": "Rainbow Planet Mechanics",
+    "description": "Planets in quantum superposition with multiple simultaneous pasts",
+    "field": "quantum_mechanics",
+    "allPapers": [
+      "planetary_superposition",
+      "observational_collapse",
+      "rainbow_mars_discovery",
+      "multiple_histories_theory",
+      "planetary_wavefunction",
+      "timeline_archaeology",
+      "extinct_civilization_observation",
+      "probability_weighted_pasts",
+      "decoherence_prevention",
+      "planetary_quantum_states",
+      "cross_timeline_contamination",
+      "green_mars_hypothesis",
+      "blue_mars_hypothesis",
+      "red_mars_observation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "detect_rainbow_planets",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "planetary_superposition",
+          "rainbow_mars_discovery"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "quantum_planet_scanner"
+          },
+          {
+            "type": "ability",
+            "abilityId": "detect_superposition_planets"
+          }
+        ]
+      },
+      {
+        "technologyId": "planetary_archaeology",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "timeline_archaeology",
+          "extinct_civilization_observation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "svetz_retrieval_ship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "retrieve_from_extinct_timelines"
+          }
+        ]
+      },
+      {
+        "technologyId": "controlled_collapse",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "observational_collapse",
+          "planetary_wavefunction"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "collapse_planetary_history"
+          },
+          {
+            "type": "ability",
+            "abilityId": "decohere_to_superposition"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "temporal_archaeology",
+    "name": "Temporal Archaeology",
+    "description": "Retrieving artifacts and entities from extinct timeline branches",
+    "field": "temporal_navigation",
+    "allPapers": [
+      "extinct_branch_detection",
+      "temporal_retrieval_theory",
+      "svetz_protocols",
+      "entity_extraction",
+      "timeline_contamination_risks",
+      "preservation_techniques",
+      "extinct_species_cataloging",
+      "paradox_avoidance",
+      "retrieval_ethics",
+      "cross_branch_biology",
+      "timeline_stability_analysis",
+      "contamination_quarantine"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_temporal_retrieval",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "extinct_branch_detection",
+          "temporal_retrieval_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "detect_extinct_branches"
+          },
+          {
+            "type": "building",
+            "buildingId": "temporal_archive"
+          }
+        ]
+      },
+      {
+        "technologyId": "svetz_operations",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "svetz_protocols",
+          "entity_extraction"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "svetz_retrieval_ship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "retrieve_extinct_entities"
+          }
+        ]
+      },
+      {
+        "technologyId": "contamination_management",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "timeline_contamination_risks",
+          "contamination_quarantine"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "quarantine_facility"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manage_timeline_contamination"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "timeline_engineering",
+    "name": "Advanced Timeline Engineering",
+    "description": "Probability mapping, branch merging, and timeline manipulation",
+    "field": "dimensional_awareness",
+    "allPapers": [
+      "probability_space_mapping",
+      "unobserved_branch_navigation",
+      "branch_compatibility_theory",
+      "timeline_merger_mechanics",
+      "fork_bomb_prevention",
+      "probability_scout_design",
+      "solo_navigation_theory",
+      "perfect_observer_coupling",
+      "branch_collapse_protocols",
+      "multiverse_shear_prevention",
+      "timeline_merger_ethics",
+      "dimensional_awareness_training",
+      "post_temporal_perception",
+      "stage_three_transition"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "probability_scouting",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "probability_space_mapping",
+          "solo_navigation_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "probability_scout"
+          },
+          {
+            "type": "ability",
+            "abilityId": "map_unobserved_branches"
+          }
+        ]
+      },
+      {
+        "technologyId": "timeline_merger",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "branch_compatibility_theory",
+          "timeline_merger_mechanics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "timeline_merger_ship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "merge_compatible_branches"
+          }
+        ]
+      },
+      {
+        "technologyId": "stage_three_awareness",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "dimensional_awareness_training",
+          "stage_three_transition"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "stage_3_perception"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manipulate_probability_branches"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "digital_consciousness",
+    "name": "Digital Consciousness Transfer",
+    "description": "Uploading minds to digital substrates for enhanced \u03b2-navigation",
+    "field": "dimensional_awareness",
+    "allPapers": [
+      "consciousness_mapping",
+      "neural_pattern_extraction",
+      "digital_substrate_design",
+      "gleisner_architecture",
+      "consciousness_verification",
+      "digital_coherence_advantages",
+      "self_editing_protocols",
+      "backup_and_restore",
+      "digital_immortality",
+      "consciousness_merging",
+      "substrate_independence"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "consciousness_upload",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "consciousness_mapping",
+          "neural_pattern_extraction"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "upload_facility"
+          },
+          {
+            "type": "ability",
+            "abilityId": "upload_consciousness"
+          }
+        ]
+      },
+      {
+        "technologyId": "gleisner_vessels",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "gleisner_architecture",
+          "digital_coherence_advantages"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "gleisner_vessel"
+          },
+          {
+            "type": "ability",
+            "abilityId": "digital_beta_navigation"
+          }
+        ]
+      },
+      {
+        "technologyId": "digital_transcendence",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "substrate_independence",
+          "consciousness_merging"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "substrate_independent_existence"
+          },
+          {
+            "type": "ability",
+            "abilityId": "merge_digital_consciousnesses"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_narrative_magic",
+    "name": "Foundational Narrative Theory",
+    "description": "Stories shape reality - learn the basics of narrative causality",
+    "field": "narrative_magic",
+    "allPapers": [
+      "narrative_causality_basics",
+      "story_structure_fundamentals",
+      "character_archetype_theory",
+      "plot_device_identification",
+      "foreshadowing_mechanics",
+      "narrative_tension_dynamics",
+      "story_resolution_theory",
+      "genre_conventions_study",
+      "audience_expectation_theory",
+      "narrative_consistency",
+      "chekovs_gun_principle",
+      "red_herring_theory",
+      "dramatic_irony_mechanics",
+      "story_logic_fundamentals",
+      "narrative_momentum",
+      "character_motivation_theory",
+      "plot_progression_analysis",
+      "story_beat_structure",
+      "narrative_pacing_theory",
+      "thematic_coherence"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "narrative_awareness",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "narrative_causality_basics",
+          "story_structure_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "storyteller_guild"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_narrative_patterns"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_story_magic",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "plot_device_identification",
+          "story_logic_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "minor_narrative_influence"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_wild_magic",
+    "name": "Wild Magic Fundamentals",
+    "description": "Harness raw, unpredictable magical chaos",
+    "field": "wild_magic",
+    "allPapers": [
+      "wild_magic_theory",
+      "chaos_energy_detection",
+      "unpredictability_acceptance",
+      "wild_surge_observation",
+      "magical_entropy_basics",
+      "chaos_channeling_basics",
+      "wild_magic_safety",
+      "surge_mitigation_techniques",
+      "chaos_affinity_cultivation",
+      "wild_magic_bloodline_study",
+      "spontaneous_magic_theory",
+      "reality_instability_awareness",
+      "chaos_anchor_creation",
+      "wild_magic_meditation",
+      "entropy_sensitivity_training",
+      "chaos_pattern_recognition",
+      "wild_magic_control_paradox",
+      "surge_prediction_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "wild_magic_sensitivity",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "wild_magic_theory",
+          "chaos_energy_detection"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "chaos_meditation_grove"
+          },
+          {
+            "type": "ability",
+            "abilityId": "sense_wild_magic"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_chaos_channeling",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "chaos_channeling_basics",
+          "wild_magic_safety"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "channel_chaos_safely"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_narrative_mechanics",
+    "name": "Advanced Narrative Manipulation",
+    "description": "Perceive and manipulate the meta-narrative structure of reality",
+    "field": "narrative_magic",
+    "allPapers": [
+      "metafictional_awareness_introduction",
+      "fourth_wall_cracks",
+      "author_intent_theory",
+      "character_agency_vs_plot",
+      "narrative_determinism",
+      "story_editing_theory",
+      "retroactive_continuity_basics",
+      "parallel_narrative_theory",
+      "subplot_mechanics",
+      "narrative_branching_theory",
+      "story_convergence_points",
+      "plot_hole_formation",
+      "continuity_error_theory",
+      "narrative_weight_measurement",
+      "protagonist_identification",
+      "supporting_character_theory",
+      "narrative_convenience_study",
+      "deus_ex_machina_analysis",
+      "plot_armor_observation",
+      "genre_shifting_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "metafictional_perception",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "metafictional_awareness_introduction",
+          "fourth_wall_cracks"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "metafiction_library"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_fourth_wall"
+          }
+        ]
+      },
+      {
+        "technologyId": "narrative_editing",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "story_editing_theory",
+          "retroactive_continuity_basics",
+          "plot_hole_formation"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "edit_local_narrative"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_chaos_theory",
+    "name": "Advanced Chaos Manipulation",
+    "description": "Master entropy and chaotic magical systems",
+    "field": "wild_magic",
+    "allPapers": [
+      "chaos_mathematics",
+      "entropy_manipulation_theory",
+      "butterfly_effect_magic",
+      "deterministic_chaos_study",
+      "strange_attractor_theory",
+      "reality_stability_measurement",
+      "chaos_cascade_theory",
+      "controlled_wild_surge",
+      "chaos_amplification",
+      "entropy_reversal_theory",
+      "reality_fracture_basics",
+      "dimensional_instability",
+      "chaos_resonance",
+      "wild_magic_focusing",
+      "reality_tear_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "chaos_mathematics_mastery",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "chaos_mathematics",
+          "entropy_manipulation_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "chaos_laboratory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manipulate_entropy"
+          }
+        ]
+      },
+      {
+        "technologyId": "reality_instability_mastery",
+        "papersRequired": 11,
+        "mandatoryPapers": [
+          "reality_stability_measurement",
+          "reality_fracture_basics"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "create_reality_instabilities"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "narrative_plot_hole_exploitation",
+    "name": "Plot Hole Dimensional Navigation",
+    "description": "Navigate timelines by exploiting narrative inconsistencies",
+    "field": "narrative_magic",
+    "allPapers": [
+      "plot_hole_detection_mastery",
+      "continuity_error_weaponization",
+      "narrative_beta_correspondence",
+      "story_branch_timeline_theory",
+      "protagonist_privilege_exploitation",
+      "plot_armor_quantification",
+      "deus_ex_machina_invocation",
+      "retroactive_continuity_casting",
+      "alternate_ending_access",
+      "franchise_multiverse_mapping",
+      "crossover_event_navigation",
+      "reboot_timeline_theory",
+      "sequel_hook_anchoring",
+      "narrative_convenience_maximization",
+      "author_revision_detection"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "plot_hole_navigation",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "plot_hole_detection_mastery",
+          "narrative_beta_correspondence"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "narrative_observatory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_plot_holes"
+          }
+        ]
+      },
+      {
+        "technologyId": "absurd_beta_travel",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "story_branch_timeline_theory",
+          "alternate_ending_access",
+          "franchise_multiverse_mapping",
+          "narrative_convenience_maximization"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "plot_device_ship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "navigate_via_plot_holes"
+          },
+          {
+            "type": "ability",
+            "abilityId": "narrative_beta_navigation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "wild_chaos_beta_navigation",
+    "name": "Chaos-Driven Timeline Navigation",
+    "description": "Navigate timelines via entropy gradients and reality breaks",
+    "field": "wild_magic",
+    "allPapers": [
+      "dimensional_fracture_navigation",
+      "reality_tear_creation_mastery",
+      "chaos_rift_stabilization",
+      "entropy_gradient_sensing",
+      "wild_surge_riding",
+      "chaos_beta_correspondence",
+      "entropy_timeline_theory",
+      "wild_magic_quantum_coupling",
+      "chaotic_branch_navigation",
+      "reality_storm_surfing",
+      "dimensional_chaos_ship_theory",
+      "chaos_anchor_beta_space",
+      "wild_magic_timeline_sensing"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "chaos_rift_travel",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "reality_tear_creation_mastery",
+          "chaos_rift_stabilization"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "tear_dimensional_barriers"
+          }
+        ]
+      },
+      {
+        "technologyId": "wild_beta_navigation",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "chaos_beta_correspondence",
+          "wild_magic_quantum_coupling",
+          "chaotic_branch_navigation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "chaos_storm_ship"
+          },
+          {
+            "type": "ability",
+            "abilityId": "wild_beta_navigation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "surf_reality_storms"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_daemon_theory",
+    "name": "Daemon Nature and Bonding Fundamentals",
+    "description": "Study the fundamental nature of daemons and their bond with humans",
+    "field": "daemon_magic",
+    "allPapers": [
+      "daemon_physical_manifestation",
+      "daemon_consciousness_theory",
+      "human_daemon_soul_bond",
+      "daemon_shape_shifting_mechanics",
+      "settling_process_observation",
+      "daemon_touch_taboo_theory",
+      "intercision_trauma_study",
+      "daemon_separation_distance_limits",
+      "daemon_communication_methods",
+      "daemon_emotional_reflection",
+      "child_daemon_flexibility",
+      "adult_daemon_fixation",
+      "daemon_animal_forms_cataloging",
+      "true_form_determination_theory",
+      "daemon_naming_practices",
+      "daemon_death_mechanics",
+      "witches_daemon_separation_basics",
+      "shamanic_daemon_traditions",
+      "daemon_cultural_variations",
+      "daemon_less_beings_theory",
+      "daemon_perception_abilities",
+      "daemon_instinct_vs_human_reason",
+      "daemon_gender_correspondence",
+      "daemon_symbolic_meaning",
+      "daemon_bond_strength_measurement"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "daemon_awareness",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "daemon_physical_manifestation",
+          "human_daemon_soul_bond",
+          "settling_process_observation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "daemon_study_hall"
+          },
+          {
+            "type": "ability",
+            "abilityId": "understand_daemon_nature"
+          }
+        ]
+      },
+      {
+        "technologyId": "daemon_bond_mastery",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "daemon_communication_methods",
+          "true_form_determination_theory",
+          "daemon_bond_strength_measurement"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "strengthen_daemon_bond"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "daemon_separation_training",
+    "name": "Daemon Separation and Extended Distance",
+    "description": "Master the painful but necessary art of daemon separation",
+    "field": "daemon_magic",
+    "allPapers": [
+      "intercision_ethical_analysis",
+      "voluntary_separation_protocols",
+      "witch_separation_techniques",
+      "separation_pain_management",
+      "gradual_distance_increase_training",
+      "separation_meditation_methods",
+      "daemon_separation_psychological_effects",
+      "reconnection_after_separation",
+      "shamanic_separation_rituals",
+      "cloud_pine_branch_travel",
+      "separation_distance_measurement",
+      "extreme_distance_daemon_communication",
+      "separation_trauma_healing",
+      "forced_separation_consequences",
+      "separation_vs_intercision_differences",
+      "daemon_autonomy_after_separation",
+      "separated_daemon_independent_action",
+      "witch_daemon_miles_apart",
+      "separation_endurance_training",
+      "daemon_location_sensing",
+      "separated_combat_coordination",
+      "reunion_emotional_intensity",
+      "permanent_separation_theory",
+      "separation_soul_damage_prevention",
+      "advanced_separation_techniques",
+      "multi_day_separation_protocols",
+      "cross_world_daemon_coherence",
+      "daemon_quantum_entanglement",
+      "separated_daemon_perception_sharing",
+      "separation_mastery_achievement"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_daemon_separation",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "voluntary_separation_protocols",
+          "witch_separation_techniques",
+          "separation_pain_management"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "separation_training_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "separate_from_daemon_short_distance"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_daemon_separation",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "witch_daemon_miles_apart",
+          "cross_world_daemon_coherence",
+          "separation_mastery_achievement"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "separate_from_daemon_extreme_distance"
+          },
+          {
+            "type": "ability",
+            "abilityId": "daemon_enhanced_perception"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "dust_navigation_fundamentals",
+    "name": "Dust Perception and Navigation",
+    "description": "Learn to see and navigate the Dust currents that flow between worlds",
+    "field": "daemon_magic",
+    "allPapers": [
+      "dust_elementary_particle_theory",
+      "conscious_dust_hypothesis",
+      "dust_attraction_to_consciousness",
+      "rusakov_field_detection",
+      "dust_photon_emission",
+      "aurora_borealis_dust_connection",
+      "dust_detector_construction",
+      "dust_flow_visualization",
+      "cave_painting_dust_analysis",
+      "dust_wisdom_correlation",
+      "original_sin_dust_theory",
+      "church_dust_suppression_study",
+      "dust_child_adult_differential",
+      "puberty_dust_attraction_increase",
+      "dust_daemon_interaction",
+      "dust_consciousness_feedback_loop",
+      "dust_between_worlds_flow",
+      "world_boundary_dust_accumulation",
+      "dust_current_mapping_methods",
+      "dust_navigation_theory",
+      "dust_enhanced_perception",
+      "alethiometer_dust_mechanics",
+      "symbol_reader_dust_channeling",
+      "dust_truth_revelation",
+      "amber_spyglass_dust_vision",
+      "multiverse_dust_currents",
+      "dust_window_detection",
+      "natural_world_crossing_points",
+      "dust_rift_identification",
+      "temporal_dust_patterns",
+      "dust_memory_theory",
+      "dust_branching_timeline_signature",
+      "dust_emotional_resonance",
+      "dust_narrative_weight_correlation",
+      "advanced_dust_navigation_techniques"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "dust_perception",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "conscious_dust_hypothesis",
+          "rusakov_field_detection",
+          "dust_flow_visualization"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "dust_observatory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_dust_currents"
+          }
+        ]
+      },
+      {
+        "technologyId": "dust_navigation_basics",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "dust_current_mapping_methods",
+          "world_boundary_dust_accumulation",
+          "dust_navigation_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "follow_dust_currents"
+          },
+          {
+            "type": "ability",
+            "abilityId": "detect_world_boundaries"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_dust_sensing",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "amber_spyglass_dust_vision",
+          "dust_branching_timeline_signature",
+          "advanced_dust_navigation_techniques"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "amber_spyglass"
+          },
+          {
+            "type": "ability",
+            "abilityId": "see_dust_in_all_worlds"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "subtle_knife_mastery",
+    "name": "The Subtle Knife and Reality Cutting",
+    "description": "Learn to cut through the fabric of reality itself",
+    "field": "daemon_magic",
+    "allPapers": [
+      "subtle_knife_origin_study",
+      "torre_degli_angeli_history",
+      "guild_of_philosophers_research",
+      "reality_fabric_structure",
+      "edge_atom_sharpness_theory",
+      "spectre_creation_mechanics",
+      "window_cutting_technique",
+      "reality_wound_theory",
+      "bearer_hand_scarring",
+      "knife_bearer_selection_criteria",
+      "subtle_knife_focus_requirements",
+      "will_parry_technique_analysis",
+      "knife_target_visualization",
+      "reality_resistance_measurement",
+      "clean_cut_vs_tear_comparison",
+      "window_size_limitations",
+      "window_stability_duration",
+      "window_closure_mechanics",
+      "permanent_window_consequences",
+      "spectre_window_correlation",
+      "knife_misuse_dangers",
+      "reality_scar_accumulation",
+      "knife_intention_focus",
+      "cutting_under_pressure",
+      "defensive_window_creation",
+      "rapid_window_sequence",
+      "precision_cutting_mastery",
+      "world_specific_cutting_difficulty",
+      "knife_bearer_responsibility",
+      "ultimate_reality_severance"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_reality_cutting",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "subtle_knife_origin_study",
+          "window_cutting_technique",
+          "reality_fabric_structure"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "knife_bearer_sanctum"
+          },
+          {
+            "type": "ability",
+            "abilityId": "attempt_reality_cutting"
+          }
+        ]
+      },
+      {
+        "technologyId": "stable_window_creation",
+        "papersRequired": 18,
+        "mandatoryPapers": [
+          "clean_cut_vs_tear_comparison",
+          "window_stability_duration",
+          "knife_intention_focus"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "subtle_knife"
+          },
+          {
+            "type": "ability",
+            "abilityId": "cut_stable_windows"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_knife_bearer",
+        "papersRequired": 25,
+        "mandatoryPapers": [
+          "precision_cutting_mastery",
+          "rapid_window_sequence",
+          "ultimate_reality_severance"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_reality_cutting"
+          },
+          {
+            "type": "ability",
+            "abilityId": "cut_between_any_worlds"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "daemon_dust_navigation",
+    "name": "Daemon Dust Navigation",
+    "description": "Navigate between worlds via Dust currents and the Subtle Knife",
+    "field": "daemon_magic",
+    "allPapers": [
+      "daemon_nature_theory",
+      "dust_particles_observation",
+      "dust_consciousness_hypothesis",
+      "multiverse_dust_flows",
+      "dust_vision_training",
+      "dust_current_mapping",
+      "world_boundary_detection",
+      "subtle_knife_theory",
+      "reality_cutting_mechanics",
+      "window_creation_techniques",
+      "daemon_separation_mastery",
+      "witch_distance_achievement",
+      "cross_world_coherence",
+      "daemon_guided_navigation",
+      "multiverse_cartography",
+      "dust_beta_space_correspondence",
+      "daemon_quantum_coupling",
+      "cross_timeline_dust_flow",
+      "spectres_and_timeline_contamination",
+      "alethiometer_truth_navigation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "daemon_dust_vision",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "daemon_nature_theory",
+          "dust_particles_observation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "dust_observatory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_dust_currents"
+          }
+        ]
+      },
+      {
+        "technologyId": "subtle_knife_mastery",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "subtle_knife_theory",
+          "reality_cutting_mechanics",
+          "window_creation_techniques"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "subtle_knife"
+          },
+          {
+            "type": "ability",
+            "abilityId": "cut_between_worlds"
+          },
+          {
+            "type": "building",
+            "buildingId": "daemon_world_walker_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "daemon_beta_navigation",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "dust_beta_space_correspondence",
+          "daemon_quantum_coupling",
+          "cross_timeline_dust_flow"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "daemon_navigate_beta_space"
+          },
+          {
+            "type": "ability",
+            "abilityId": "alethiometer_navigation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_rune_theory",
+    "name": "Foundational Runelore",
+    "description": "Master the basic runes and their inherent meanings",
+    "field": "rune_magic",
+    "allPapers": [
+      "runic_alphabet_basics",
+      "elder_futhark_introduction",
+      "younger_futhark_study",
+      "anglo_saxon_runes",
+      "rune_phonetic_values",
+      "rune_symbolic_meanings",
+      "rune_magical_properties",
+      "rune_combination_theory",
+      "bind_rune_basics",
+      "rune_orientation_significance",
+      "upright_vs_reversed_runes",
+      "rune_element_associations",
+      "rune_deity_connections",
+      "runic_divination_basics",
+      "rune_casting_methods",
+      "rune_meditation_practices",
+      "personal_rune_identification",
+      "rune_mnemonics",
+      "rune_chanting_techniques",
+      "galdr_basic_theory",
+      "rune_visualization",
+      "rune_poetry_traditions",
+      "historical_rune_inscriptions",
+      "archaeological_rune_study",
+      "modern_vs_ancient_runecraft"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "rune_literacy",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "elder_futhark_introduction",
+          "rune_symbolic_meanings",
+          "rune_magical_properties"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "rune_study_hall"
+          },
+          {
+            "type": "ability",
+            "abilityId": "read_basic_runes"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_rune_magic",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "bind_rune_basics",
+          "galdr_basic_theory",
+          "rune_meditation_practices"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "channel_rune_energy"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "rune_carving_mastery",
+    "name": "The Art of Rune Inscription",
+    "description": "Master the techniques of carving runes into various materials",
+    "field": "rune_magic",
+    "allPapers": [
+      "rune_carving_tools",
+      "sacred_blade_preparation",
+      "rune_material_selection",
+      "wood_rune_carving",
+      "stone_rune_inscription",
+      "metal_rune_forging",
+      "bone_rune_etching",
+      "crystal_rune_cutting",
+      "carving_meditation_focus",
+      "intention_during_carving",
+      "rune_activation_rituals",
+      "blood_consecration_theory",
+      "energy_infusion_methods",
+      "carving_timing_significance",
+      "lunar_phase_rune_carving",
+      "seasonal_rune_creation",
+      "personal_vs_general_runes",
+      "rune_permanence_techniques",
+      "weathering_protection_methods",
+      "rune_repair_and_maintenance",
+      "defective_rune_disposal",
+      "rune_destruction_protocols",
+      "multi_rune_sequences",
+      "rune_spacing_and_layout",
+      "three_dimensional_rune_arrays",
+      "architectural_rune_placement",
+      "protective_ward_runes",
+      "boundary_marking_runes",
+      "rune_tool_consecration",
+      "master_carver_techniques"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_rune_carving",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "rune_carving_tools",
+          "stone_rune_inscription",
+          "rune_activation_rituals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "rune_carving_workshop"
+          },
+          {
+            "type": "ability",
+            "abilityId": "carve_functional_runes"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_rune_inscription",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "energy_infusion_methods",
+          "multi_rune_sequences",
+          "master_carver_techniques"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "create_powerful_rune_arrays"
+          },
+          {
+            "type": "ability",
+            "abilityId": "permanent_rune_inscription"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_runic_arrays",
+    "name": "Complex Runic Geometries",
+    "description": "Design and construct intricate arrays of interconnected runes",
+    "field": "rune_magic",
+    "allPapers": [
+      "runic_geometry_fundamentals",
+      "sacred_geometry_rune_integration",
+      "symmetry_in_rune_arrays",
+      "circular_rune_formations",
+      "linear_rune_sequences",
+      "spiral_rune_patterns",
+      "fractal_rune_recursion",
+      "rune_node_theory",
+      "power_flow_between_runes",
+      "rune_resonance_mechanics",
+      "harmonic_rune_frequencies",
+      "dissonant_rune_combinations",
+      "amplification_rune_placement",
+      "dampening_rune_insertion",
+      "rune_circuit_completion",
+      "array_activation_sequences",
+      "staged_rune_triggering",
+      "conditional_rune_activation",
+      "self_sustaining_rune_loops",
+      "rune_feedback_prevention",
+      "array_failure_modes",
+      "rune_array_debugging",
+      "master_rune_theory",
+      "keystone_rune_placement",
+      "distributed_rune_networks",
+      "long_distance_rune_linking",
+      "ley_line_rune_integration",
+      "environmental_power_channeling",
+      "weather_based_rune_arrays",
+      "seasonal_rune_cycles",
+      "astronomical_rune_alignment",
+      "permanent_rune_structure_design",
+      "rune_circle_construction",
+      "standing_stone_rune_complexes",
+      "architectural_rune_integration"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "rune_array_construction",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "runic_geometry_fundamentals",
+          "power_flow_between_runes",
+          "array_activation_sequences"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "rune_array_testing_grounds"
+          },
+          {
+            "type": "ability",
+            "abilityId": "design_rune_arrays"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_rune_networks",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "master_rune_theory",
+          "distributed_rune_networks",
+          "ley_line_rune_integration"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "create_continental_rune_network"
+          },
+          {
+            "type": "building",
+            "buildingId": "standing_stone_complex"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_rune_architecture",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "permanent_rune_structure_design",
+          "architectural_rune_integration",
+          "self_sustaining_rune_loops"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "build_rune_powered_structures"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "dimensional_rune_theory",
+    "name": "Spatial and Temporal Runic Encoding",
+    "description": "Learn to encode locations and dimensions in runic form",
+    "field": "rune_magic",
+    "allPapers": [
+      "location_encoding_runes",
+      "coordinate_rune_syntax",
+      "distance_measurement_runes",
+      "direction_indication_runes",
+      "three_dimensional_position_runes",
+      "altitude_encoding_theory",
+      "underground_depth_runes",
+      "relative_position_runes",
+      "anchor_point_establishment",
+      "reference_frame_runes",
+      "world_tree_coordinate_system",
+      "yggdrasil_branch_notation",
+      "realm_identification_runes",
+      "inter_realm_addressing",
+      "barrier_permeability_runes",
+      "veil_thinning_detection",
+      "natural_portal_identification_runes",
+      "ley_line_intersection_runes",
+      "power_nexus_marking",
+      "temporal_coordinate_theory",
+      "time_encoding_runes",
+      "past_present_future_markers",
+      "temporal_duration_runes",
+      "seasonal_time_reference",
+      "astronomical_time_markers",
+      "event_based_temporal_anchors",
+      "true_name_acquisition_theory",
+      "location_true_naming",
+      "dimensional_nomenclature",
+      "bifrost_rune_analysis",
+      "rainbow_bridge_encoding",
+      "multi_realm_navigation_runes"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "spatial_rune_encoding",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "location_encoding_runes",
+          "coordinate_rune_syntax",
+          "three_dimensional_position_runes"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "cartographic_rune_library"
+          },
+          {
+            "type": "ability",
+            "abilityId": "encode_locations_in_runes"
+          }
+        ]
+      },
+      {
+        "technologyId": "realm_identification",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "world_tree_coordinate_system",
+          "realm_identification_runes",
+          "inter_realm_addressing"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "identify_other_realms"
+          },
+          {
+            "type": "ability",
+            "abilityId": "detect_realm_boundaries"
+          }
+        ]
+      },
+      {
+        "technologyId": "dimensional_addressing",
+        "papersRequired": 26,
+        "mandatoryPapers": [
+          "true_name_acquisition_theory",
+          "dimensional_nomenclature",
+          "multi_realm_navigation_runes"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "address_any_dimension"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "rune_dimensional_gates",
+    "name": "Runic Dimensional Gates",
+    "description": "Carve runes to open stable portals between timelines",
+    "field": "rune_magic",
+    "allPapers": [
+      "elder_futhark_mastery",
+      "true_names_of_dimensions",
+      "rune_spatial_encoding",
+      "bifrost_rune_analysis",
+      "gateway_rune_syntax",
+      "dimensional_coordinate_runes",
+      "stability_binding_runes",
+      "anchor_point_runes",
+      "permanent_gate_construction",
+      "multi_destination_runes",
+      "selective_permeability_runes",
+      "temporal_address_runes",
+      "beta_branch_rune_notation",
+      "emotional_topology_runes",
+      "narrative_weight_encoding",
+      "rune_quantum_coupling",
+      "yggdrasil_navigation_theory",
+      "world_tree_dimensional_map"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_portal_runes",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "elder_futhark_mastery",
+          "gateway_rune_syntax"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "rune_carving_workshop"
+          },
+          {
+            "type": "ability",
+            "abilityId": "carve_dimensional_runes"
+          }
+        ]
+      },
+      {
+        "technologyId": "stable_dimensional_gates",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "permanent_gate_construction",
+          "anchor_point_runes",
+          "dimensional_coordinate_runes"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "runic_portal_gate"
+          },
+          {
+            "type": "ability",
+            "abilityId": "create_stable_portals"
+          },
+          {
+            "type": "building",
+            "buildingId": "rune_walker_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "yggdrasil_navigation",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "beta_branch_rune_notation",
+          "yggdrasil_navigation_theory",
+          "world_tree_dimensional_map"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "navigate_world_tree"
+          },
+          {
+            "type": "ability",
+            "abilityId": "rune_beta_navigation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_demonology",
+    "name": "Foundational Entity Theory",
+    "description": "Study the nature of demons, devils, and extra-dimensional beings",
+    "field": "pact_magic",
+    "allPapers": [
+      "entity_existence_hypothesis",
+      "dimensional_outsider_theory",
+      "demon_taxonomy_basics",
+      "devil_vs_demon_distinction",
+      "entity_hierarchy_theory",
+      "lesser_demons_cataloging",
+      "greater_demons_study",
+      "demon_lord_observation",
+      "entity_motivations_theory",
+      "demon_desires_and_needs",
+      "entity_perception_of_mortals",
+      "demon_psychology_basics",
+      "entity_intelligence_levels",
+      "demon_communication_capability",
+      "entity_deception_patterns",
+      "truth_detection_in_entities",
+      "demon_weakness_cataloging",
+      "entity_strength_assessment",
+      "demon_natural_habitat_theory",
+      "entity_dimensional_origins",
+      "summoning_accident_case_studies",
+      "historical_entity_encounters",
+      "entity_manifestation_signs",
+      "demon_presence_detection",
+      "protective_measures_basics"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "entity_awareness",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "entity_existence_hypothesis",
+          "demon_taxonomy_basics",
+          "entity_motivations_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "demonology_library"
+          },
+          {
+            "type": "ability",
+            "abilityId": "recognize_entity_types"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_demon_protection",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "demon_presence_detection",
+          "protective_measures_basics",
+          "truth_detection_in_entities"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "basic_demon_warding"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "summoning_binding",
+    "name": "Entity Summoning and Containment",
+    "description": "Master the dangerous art of calling forth and binding demons",
+    "field": "pact_magic",
+    "allPapers": [
+      "summoning_circle_geometry",
+      "sacred_circle_construction",
+      "circle_material_selection",
+      "salt_circle_theory",
+      "iron_binding_properties",
+      "silver_demon_repulsion",
+      "holy_water_effectiveness",
+      "protective_ward_design",
+      "layered_protection_theory",
+      "circle_failure_modes",
+      "emergency_banishment_protocols",
+      "true_name_power_theory",
+      "true_name_discovery_methods",
+      "entity_calling_rituals",
+      "incantation_pronunciation",
+      "summoning_component_requirements",
+      "sacrifice_vs_offering_distinction",
+      "blood_circle_consecration",
+      "entity_compulsion_theory",
+      "binding_duration_limits",
+      "entity_resistance_measurement",
+      "forced_manifestation_techniques",
+      "willing_vs_unwilling_summoning",
+      "demon_banishment_methods",
+      "entity_dismissal_protocols",
+      "circle_cleanup_and_disposal",
+      "summoning_timing_significance",
+      "lunar_phase_summoning_power",
+      "planetary_hour_calculations",
+      "advanced_summoning_mastery"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_summoning",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "summoning_circle_geometry",
+          "protective_ward_design",
+          "entity_calling_rituals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "summoning_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "summon_lesser_entities"
+          }
+        ]
+      },
+      {
+        "technologyId": "entity_binding",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "true_name_power_theory",
+          "entity_compulsion_theory",
+          "demon_banishment_methods"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "bind_summoned_entities"
+          },
+          {
+            "type": "ability",
+            "abilityId": "emergency_banishment"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "contract_theory",
+    "name": "Metaphysical Contract Law",
+    "description": "Master the binding laws that govern deals with demons",
+    "field": "pact_magic",
+    "allPapers": [
+      "pact_metaphysics_fundamentals",
+      "binding_contract_theory",
+      "soul_contract_mechanics",
+      "contract_enforcement_mechanisms",
+      "universal_contract_law",
+      "entity_contract_limitations",
+      "loophole_detection_theory",
+      "precise_wording_importance",
+      "ambiguity_exploitation_risks",
+      "contract_interpretation_rules",
+      "letter_vs_spirit_distinction",
+      "demon_lawyer_tactics",
+      "mortal_lawyer_training",
+      "contract_negotiation_theory",
+      "bargaining_position_assessment",
+      "demon_desire_evaluation",
+      "price_calculation_methods",
+      "payment_structuring_theory",
+      "immediate_vs_deferred_payment",
+      "installment_contract_design",
+      "conditional_clause_construction",
+      "escape_clause_theory",
+      "contract_nullification_conditions",
+      "breach_of_contract_consequences",
+      "entity_breach_penalties",
+      "mortal_breach_dangers",
+      "contract_duration_specification",
+      "perpetual_vs_limited_contracts",
+      "contract_renewal_clauses",
+      "multi_party_pact_theory",
+      "witness_requirements",
+      "contract_recording_methods",
+      "pact_mark_manifestation",
+      "soul_signature_theory",
+      "advanced_contract_design"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_pact_negotiation",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "binding_contract_theory",
+          "precise_wording_importance",
+          "contract_negotiation_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "pact_law_library"
+          },
+          {
+            "type": "ability",
+            "abilityId": "negotiate_demon_contracts"
+          }
+        ]
+      },
+      {
+        "technologyId": "safe_contract_design",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "loophole_detection_theory",
+          "escape_clause_theory",
+          "breach_of_contract_consequences"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "design_safe_pacts"
+          },
+          {
+            "type": "ability",
+            "abilityId": "detect_contract_traps"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_pact_law",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "advanced_contract_design",
+          "multi_party_pact_theory",
+          "contract_nullification_conditions"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_demon_contracts"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_pact_negotiation",
+    "name": "Greater Entity Bargaining",
+    "description": "Negotiate with demon lords and arch-devils for significant power",
+    "field": "pact_magic",
+    "allPapers": [
+      "greater_entity_contact_protocols",
+      "demon_lord_true_name_research",
+      "arch_devil_hierarchies",
+      "entity_politics_navigation",
+      "demon_faction_identification",
+      "entity_rivalry_exploitation",
+      "demon_lord_desires",
+      "greater_entity_price_ranges",
+      "soul_value_assessment",
+      "soul_quality_vs_quantity",
+      "alternative_payment_methods",
+      "service_contract_theory",
+      "champion_pact_design",
+      "warlock_bond_mechanics",
+      "entity_granted_power_theory",
+      "demon_gift_manifestation",
+      "cursed_gift_identification",
+      "pact_power_limitations",
+      "entity_influence_resistance",
+      "autonomy_preservation_clauses",
+      "demon_possession_prevention",
+      "entity_communication_privileges",
+      "demon_advisory_role_limits",
+      "pact_secrecy_clauses",
+      "entity_reputation_management",
+      "demon_testimony_reliability",
+      "pact_chain_theory",
+      "multi_entity_pacts",
+      "conflicting_contract_resolution",
+      "ultimate_pact_mastery"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "greater_entity_summoning",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "greater_entity_contact_protocols",
+          "demon_lord_true_name_research",
+          "entity_politics_navigation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "greater_summoning_sanctum"
+          },
+          {
+            "type": "ability",
+            "abilityId": "summon_demon_lords"
+          }
+        ]
+      },
+      {
+        "technologyId": "warlock_pact",
+        "papersRequired": 18,
+        "mandatoryPapers": [
+          "warlock_bond_mechanics",
+          "entity_granted_power_theory",
+          "autonomy_preservation_clauses"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "form_warlock_pact"
+          },
+          {
+            "type": "ability",
+            "abilityId": "channel_patron_power"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_pact_negotiator",
+        "papersRequired": 25,
+        "mandatoryPapers": [
+          "pact_chain_theory",
+          "conflicting_contract_resolution",
+          "ultimate_pact_mastery"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "negotiate_any_pact"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "pact_dimensional_travel",
+    "name": "Pact-Bound Dimensional Travel",
+    "description": "Bargain with extra-dimensional entities for passage between worlds",
+    "field": "pact_magic",
+    "allPapers": [
+      "entity_existence_theory",
+      "dimensional_outsider_cataloging",
+      "binding_contract_fundamentals",
+      "true_name_acquisition",
+      "summoning_circle_geometry",
+      "protective_ward_construction",
+      "entity_communication_protocols",
+      "bargaining_theory",
+      "price_calculation",
+      "passage_contract_templates",
+      "dimensional_guide_binding",
+      "safe_conduct_guarantees",
+      "temporal_navigation_riders",
+      "beta_space_entity_identification",
+      "timeline_demon_contracts",
+      "narrative_devil_bargains",
+      "emotional_topology_guides",
+      "pact_quantum_coupling",
+      "entity_granted_ship_construction",
+      "permanent_dimensional_patronage"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_entity_contact",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "entity_existence_theory",
+          "summoning_circle_geometry",
+          "protective_ward_construction"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "summoning_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "contact_dimensional_entities"
+          }
+        ]
+      },
+      {
+        "technologyId": "dimensional_passage_contracts",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "passage_contract_templates",
+          "dimensional_guide_binding",
+          "bargaining_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "bargain_for_passage"
+          },
+          {
+            "type": "building",
+            "buildingId": "pact_walker_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "beta_space_patronage",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "beta_space_entity_identification",
+          "timeline_demon_contracts",
+          "pact_quantum_coupling"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "pact_beta_navigation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "entity_guided_timeline_travel"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_music_magic",
+    "name": "Foundational Song Theory",
+    "description": "Study the mystical properties of sound and music",
+    "field": "song_magic",
+    "allPapers": [
+      "sound_wave_mechanics",
+      "frequency_theory",
+      "harmonic_series_study",
+      "resonance_fundamentals",
+      "voice_as_instrument_theory",
+      "pitch_perfect_training",
+      "tonal_memory_development",
+      "musical_notation_systems",
+      "scale_construction_theory",
+      "modal_music_theory",
+      "chord_progression_fundamentals",
+      "rhythm_and_timing",
+      "polyrhythmic_techniques",
+      "overtone_singing_basics",
+      "harmonic_overtones_study",
+      "sound_and_emotion_connection",
+      "music_psychoacoustics",
+      "therapeutic_music_theory",
+      "sonic_meditation_practices",
+      "chant_and_mantra_basics",
+      "group_singing_harmonics",
+      "acoustic_resonance_spaces",
+      "sound_amplification_natural",
+      "musical_energy_detection",
+      "song_magic_sensitivity_training"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "musical_awareness",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "sound_wave_mechanics",
+          "resonance_fundamentals",
+          "harmonic_series_study"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "song_academy"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_harmonic_energy"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_song_magic",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "voice_as_instrument_theory",
+          "overtone_singing_basics",
+          "musical_energy_detection"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "channel_power_through_song"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "harmonic_magic",
+    "name": "Resonant Frequency Manipulation",
+    "description": "Master the art of affecting matter and energy through harmonic resonance",
+    "field": "song_magic",
+    "allPapers": [
+      "material_resonant_frequencies",
+      "shattering_glass_with_song",
+      "resonant_destruction_theory",
+      "constructive_resonance",
+      "harmonic_healing_techniques",
+      "frequency_specific_effects",
+      "sonic_disruption_patterns",
+      "harmonic_protection_songs",
+      "defensive_frequency_shields",
+      "resonant_frequency_identification",
+      "perfect_pitch_mastery",
+      "frequency_matching_techniques",
+      "sympathetic_vibration_theory",
+      "harmonic_amplification_methods",
+      "voice_power_projection",
+      "sustained_note_endurance",
+      "vocal_range_expansion",
+      "multi_tonal_singing",
+      "chord_singing_solo_technique",
+      "harmonic_convergence_theory",
+      "consonance_vs_dissonance_effects",
+      "dissonant_reality_disruption",
+      "consonant_reality_stabilization",
+      "harmonic_sequences_power",
+      "musical_spell_casting",
+      "song_duration_and_potency",
+      "resting_note_theory",
+      "silence_as_power",
+      "acoustic_environment_optimization",
+      "advanced_harmonic_mastery"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "resonant_manipulation",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "material_resonant_frequencies",
+          "frequency_specific_effects",
+          "resonant_frequency_identification"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "resonance_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manipulate_matter_with_song"
+          }
+        ]
+      },
+      {
+        "technologyId": "harmonic_combat",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "sonic_disruption_patterns",
+          "defensive_frequency_shields",
+          "dissonant_reality_disruption"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "sonic_weaponry"
+          },
+          {
+            "type": "ability",
+            "abilityId": "harmonic_defense"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "reality_resonance",
+    "name": "The Music of the Spheres",
+    "description": "Perceive and manipulate the fundamental frequencies of reality",
+    "field": "song_magic",
+    "allPapers": [
+      "reality_vibration_theory",
+      "fundamental_frequency_of_existence",
+      "cosmic_harmony_observation",
+      "music_of_the_spheres",
+      "planetary_resonance_frequencies",
+      "stellar_harmonic_patterns",
+      "celestial_music_theory",
+      "universal_resonance_hypothesis",
+      "reality_fabric_vibrations",
+      "dimensional_frequency_differences",
+      "timeline_harmonic_signatures",
+      "probability_wave_harmonics",
+      "quantum_vibration_theory",
+      "particle_wave_frequency_duality",
+      "atomic_resonance_frequencies",
+      "molecular_harmonic_structures",
+      "crystal_lattice_vibrations",
+      "living_tissue_resonances",
+      "consciousness_frequency_theory",
+      "thought_vibration_patterns",
+      "emotional_frequency_signatures",
+      "intention_resonance_alignment",
+      "reality_tuning_fork_theory",
+      "sympathetic_universe_hypothesis",
+      "reality_can_be_sung_theory",
+      "creation_through_vibration",
+      "vibrational_cosmology",
+      "harmonic_creation_myths",
+      "word_as_vibration_power",
+      "true_names_as_frequencies",
+      "reality_frequency_mapping",
+      "harmonic_reality_manipulation",
+      "singing_reality_into_form",
+      "vibrational_transmutation",
+      "master_reality_frequency_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "reality_perception",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "reality_vibration_theory",
+          "fundamental_frequency_of_existence",
+          "cosmic_harmony_observation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "cosmic_observatory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "hear_reality_frequencies"
+          }
+        ]
+      },
+      {
+        "technologyId": "dimensional_frequency_sense",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "dimensional_frequency_differences",
+          "timeline_harmonic_signatures",
+          "reality_frequency_mapping"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "perceive_dimensional_harmonics"
+          }
+        ]
+      },
+      {
+        "technologyId": "reality_singing",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "reality_can_be_sung_theory",
+          "harmonic_reality_manipulation",
+          "master_reality_frequency_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "sing_reality_changes"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_song_magic",
+    "name": "Songs of Power",
+    "description": "Craft and perform songs that reshape the fundamental nature of reality",
+    "field": "song_magic",
+    "allPapers": [
+      "song_composition_theory",
+      "magical_melody_construction",
+      "power_word_integration",
+      "harmonic_spell_songs",
+      "layered_song_magic",
+      "polyphonic_reality_manipulation",
+      "song_improvisation_mastery",
+      "spontaneous_song_magic",
+      "adaptive_harmonic_response",
+      "counter_song_techniques",
+      "harmonic_battle_tactics",
+      "song_duel_theory",
+      "group_song_amplification",
+      "choral_power_multiplication",
+      "synchronized_group_singing",
+      "harmonic_convergence_rituals",
+      "mass_song_magic",
+      "bardic_tradition_mastery",
+      "epic_song_construction",
+      "legendary_ballad_power",
+      "song_of_making_theory",
+      "creation_songs",
+      "song_of_unmaking",
+      "destruction_ballads",
+      "song_of_binding",
+      "song_of_liberation",
+      "transformation_songs",
+      "shapeshifting_melodies",
+      "healing_symphony_composition",
+      "resurrection_requiem_theory",
+      "time_dilation_songs",
+      "temporal_harmonics_manipulation",
+      "eternal_song_theory",
+      "ultimate_song_magic_mastery"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "song_composition",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "song_composition_theory",
+          "magical_melody_construction",
+          "harmonic_spell_songs"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "song_composition_hall"
+          },
+          {
+            "type": "ability",
+            "abilityId": "compose_power_songs"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_song_magic",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "song_of_making_theory",
+          "transformation_songs",
+          "temporal_harmonics_manipulation"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "reality_shaping_songs"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_bard",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "eternal_song_theory",
+          "ultimate_song_magic_mastery",
+          "resurrection_requiem_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_song_magic"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "song_harmonic_travel",
+    "name": "Harmonic Resonance Navigation",
+    "description": "Navigate timelines by singing reality into different harmonic frequencies",
+    "field": "song_magic",
+    "allPapers": [
+      "cosmic_harmony_theory",
+      "dimensional_frequencies",
+      "reality_resonance",
+      "music_of_spheres",
+      "harmonic_convergence",
+      "portal_songs",
+      "frequency_shift_vocals",
+      "harmonic_anchor_melodies",
+      "dimensional_tuning",
+      "resonance_navigation",
+      "timeline_frequencies",
+      "beta_space_harmonic_map",
+      "emotional_tone_correspondence",
+      "narrative_rhythm_theory",
+      "song_quantum_coupling",
+      "harmonic_fleet_construction"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "harmonic_awareness",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "cosmic_harmony_theory",
+          "dimensional_frequencies"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "harmonic_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "perceive_dimensional_frequencies"
+          }
+        ]
+      },
+      {
+        "technologyId": "dimensional_singing",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "portal_songs",
+          "frequency_shift_vocals",
+          "harmonic_anchor_melodies"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "sing_dimensional_portals"
+          },
+          {
+            "type": "building",
+            "buildingId": "song_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "harmonic_beta_navigation",
+        "papersRequired": 13,
+        "mandatoryPapers": [
+          "beta_space_harmonic_map",
+          "timeline_frequencies",
+          "song_quantum_coupling"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "harmonic_beta_navigation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "sing_timeline_resonance"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_theology",
+    "name": "Foundational Divine Studies",
+    "description": "Study the nature of gods, divinity, and the path to apotheosis",
+    "field": "divine_magic",
+    "allPapers": [
+      "divine_existence_theory",
+      "nature_of_godhood",
+      "pantheon_hierarchies_study",
+      "monotheism_vs_polytheism",
+      "god_mortal_relationship_theory",
+      "divine_intervention_patterns",
+      "prayer_mechanics_fundamentals",
+      "worship_energy_theory",
+      "faith_power_correlation",
+      "devotion_measurement_study",
+      "divine_attention_mechanics",
+      "god_consciousness_theory",
+      "divine_omniscience_limits",
+      "divine_omnipotence_paradoxes",
+      "divine_benevolence_theory",
+      "god_morality_independence",
+      "divine_commandments_study",
+      "religious_law_foundations",
+      "sacred_text_interpretation",
+      "divine_revelation_theory",
+      "prophet_selection_criteria",
+      "miracle_authentication_methods",
+      "divine_sign_interpretation",
+      "apotheosis_historical_cases",
+      "mortal_to_god_transition_theory",
+      "divine_spark_hypothesis",
+      "inherent_vs_granted_divinity",
+      "demigod_nature_study",
+      "divine_bloodline_theory",
+      "theological_education_methods"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "divine_theory",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "divine_existence_theory",
+          "nature_of_godhood",
+          "worship_energy_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "theology_academy"
+          },
+          {
+            "type": "ability",
+            "abilityId": "understand_divine_nature"
+          }
+        ]
+      },
+      {
+        "technologyId": "apotheosis_awareness",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "apotheosis_historical_cases",
+          "divine_spark_hypothesis",
+          "mortal_to_god_transition_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "perceive_path_to_divinity"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "worship_faith_mechanics",
+    "name": "The Mechanics of Faith",
+    "description": "Master the systems by which mortal worship empowers the divine",
+    "field": "divine_magic",
+    "allPapers": [
+      "worship_power_generation",
+      "prayer_energy_conversion",
+      "faith_battery_theory",
+      "devotional_energy_storage",
+      "worship_frequency_optimization",
+      "ritual_power_amplification",
+      "mass_worship_multiplication",
+      "congregation_size_effects",
+      "quality_vs_quantity_worship",
+      "true_faith_vs_performative_worship",
+      "fear_based_worship_efficacy",
+      "love_based_worship_purity",
+      "worship_motivation_spectrum",
+      "sacrifice_power_theory",
+      "blood_sacrifice_mechanics",
+      "material_offering_value",
+      "time_sacrifice_devotion",
+      "self_sacrifice_ultimate_gift",
+      "martyr_worship_amplification",
+      "saint_veneration_power",
+      "relic_worship_focus",
+      "shrine_power_concentration",
+      "temple_worship_architecture",
+      "sacred_geometry_application",
+      "divine_symbol_power",
+      "icon_veneration_effects",
+      "statue_animation_theory",
+      "pilgrimage_devotion_journeys",
+      "holy_site_power_accumulation",
+      "ley_line_temple_placement",
+      "worship_network_theory",
+      "inter_temple_faith_linking",
+      "pantheon_worship_distribution",
+      "dominant_vs_minor_deity_power",
+      "worship_power_application"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_worship_infrastructure",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "worship_power_generation",
+          "temple_worship_architecture",
+          "ritual_power_amplification"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "grand_temple"
+          },
+          {
+            "type": "ability",
+            "abilityId": "channel_worship_power"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_faith_systems",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "worship_network_theory",
+          "holy_site_power_accumulation",
+          "sacrifice_power_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "optimize_worship_collection"
+          },
+          {
+            "type": "building",
+            "buildingId": "worship_network_nexus"
+          }
+        ]
+      },
+      {
+        "technologyId": "master_faith_channeling",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "worship_power_application",
+          "pantheon_worship_distribution",
+          "martyr_worship_amplification"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "maximize_worship_efficiency"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "divine_power_cultivation",
+    "name": "Cultivation of Divine Might",
+    "description": "Gather and wield the power of accumulated worship",
+    "field": "divine_magic",
+    "allPapers": [
+      "divine_power_storage_theory",
+      "godhood_battery_creation",
+      "worship_to_power_conversion",
+      "divine_energy_density",
+      "power_threshold_requirements",
+      "lesser_divinity_attainment",
+      "demigod_power_levels",
+      "minor_god_capabilities",
+      "major_god_power_scale",
+      "supreme_deity_theoretical_limits",
+      "divine_power_manifestation",
+      "miracle_working_theory",
+      "prayer_answering_mechanics",
+      "divine_intervention_costs",
+      "direct_vs_indirect_intervention",
+      "mortal_agency_preservation",
+      "free_will_vs_divine_plan",
+      "divine_guidance_subtlety",
+      "omen_sending_techniques",
+      "dream_visitation_methods",
+      "prophet_communication_channels",
+      "avatar_creation_theory",
+      "divine_manifestation_risks",
+      "mortal_form_limitations",
+      "divine_essence_dilution",
+      "avatar_destruction_consequences",
+      "divine_champion_selection",
+      "blessing_granting_theory",
+      "curse_infliction_methods",
+      "divine_judgment_mechanics",
+      "smiting_energy_requirements",
+      "mass_blessing_techniques",
+      "plague_and_famine_control",
+      "weather_manipulation_divinity",
+      "natural_disaster_direction",
+      "life_and_death_authority",
+      "resurrection_power_costs",
+      "immortality_granting_theory",
+      "divine_power_combat_applications",
+      "god_vs_god_conflict_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "divine_power_accumulation",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "divine_power_storage_theory",
+          "worship_to_power_conversion",
+          "power_threshold_requirements"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "divine_power_reservoir"
+          },
+          {
+            "type": "ability",
+            "abilityId": "accumulate_divine_power"
+          }
+        ]
+      },
+      {
+        "technologyId": "miracle_working",
+        "papersRequired": 24,
+        "mandatoryPapers": [
+          "miracle_working_theory",
+          "prayer_answering_mechanics",
+          "divine_intervention_costs"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "perform_minor_miracles"
+          },
+          {
+            "type": "ability",
+            "abilityId": "answer_prayers"
+          }
+        ]
+      },
+      {
+        "technologyId": "divine_manifestation",
+        "papersRequired": 32,
+        "mandatoryPapers": [
+          "avatar_creation_theory",
+          "divine_champion_selection",
+          "blessing_granting_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "create_divine_avatar"
+          },
+          {
+            "type": "ability",
+            "abilityId": "grant_divine_blessings"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "path_to_apotheosis",
+    "name": "The Road to Godhood",
+    "description": "Undertake the perilous transformation from mortal to deity",
+    "field": "divine_magic",
+    "allPapers": [
+      "apotheosis_ritual_design",
+      "divine_ascension_requirements",
+      "worship_threshold_for_godhood",
+      "follower_minimum_calculation",
+      "faith_intensity_requirements",
+      "divine_spark_ignition",
+      "mortal_limits_transcendence",
+      "physical_form_shedding",
+      "consciousness_expansion_to_divinity",
+      "omnipresence_attainment_theory",
+      "omniscience_limitations_acceptance",
+      "divine_perception_adjustment",
+      "time_perception_expansion",
+      "mortal_concerns_transcendence",
+      "divine_detachment_dangers",
+      "humanity_retention_theory",
+      "compassion_preservation_methods",
+      "divine_madness_prevention",
+      "power_corruption_resistance",
+      "absolute_power_psychology",
+      "divine_responsibility_ethics",
+      "worshipper_care_obligations",
+      "divine_domain_selection",
+      "portfolio_specialization_theory",
+      "aspect_vs_universal_divinity",
+      "domain_power_concentration",
+      "competing_deity_politics",
+      "pantheon_integration_strategies",
+      "elder_god_recognition_seeking",
+      "divine_hierarchy_navigation",
+      "godhood_sustainability_theory",
+      "worship_maintenance_requirements",
+      "faith_loss_consequences",
+      "divine_power_degradation",
+      "forgotten_god_fate",
+      "divine_death_possibility",
+      "god_killing_theoretical_methods",
+      "divine_immortality_limitations",
+      "ascension_point_of_no_return",
+      "final_apotheosis_transformation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "apotheosis_preparation",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "apotheosis_ritual_design",
+          "divine_ascension_requirements",
+          "worship_threshold_for_godhood"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "apotheosis_chamber"
+          },
+          {
+            "type": "ability",
+            "abilityId": "prepare_divine_ascension"
+          }
+        ]
+      },
+      {
+        "technologyId": "divine_transformation",
+        "papersRequired": 24,
+        "mandatoryPapers": [
+          "divine_spark_ignition",
+          "consciousness_expansion_to_divinity",
+          "mortal_limits_transcendence"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "begin_apotheosis_transformation"
+          }
+        ]
+      },
+      {
+        "technologyId": "godhood_stability",
+        "papersRequired": 32,
+        "mandatoryPapers": [
+          "godhood_sustainability_theory",
+          "divine_domain_selection",
+          "pantheon_integration_strategies"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "stabilize_divine_form"
+          },
+          {
+            "type": "ability",
+            "abilityId": "maintain_godhood"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "divine_ascension_travel",
+    "name": "Divine Ascension and Celestial Navigation",
+    "description": "Transcend mortality to navigate the multiverse as a divine entity",
+    "field": "divine_magic",
+    "allPapers": [
+      "apotheosis_completion_final_stage",
+      "full_divine_consciousness",
+      "divine_spark_cultivation",
+      "worship_power_mechanics",
+      "faith_energy_collection",
+      "divine_ascension_rituals",
+      "omnipresence_fundamentals",
+      "divine_perception",
+      "celestial_navigation",
+      "prayer_based_teleportation",
+      "divine_will_manifestation",
+      "cross_timeline_worship",
+      "divine_multiverse_awareness",
+      "pantheon_dimensional_politics",
+      "divine_beta_space_correspondence",
+      "faith_quantum_coupling",
+      "divine_realm_creation",
+      "personal_heaven_construction",
+      "divine_plane_anchoring",
+      "celestial_pathway_mapping",
+      "divine_portal_creation",
+      "god_form_timeline_navigation",
+      "divine_omnipresence_timeline_extension",
+      "faith_anchor_multiverse_travel",
+      "ultimate_divine_navigation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "divine_omnipresence",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "apotheosis_completion_final_stage",
+          "full_divine_consciousness",
+          "omnipresence_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "divine_throne"
+          },
+          {
+            "type": "ability",
+            "abilityId": "achieve_omnipresence"
+          }
+        ]
+      },
+      {
+        "technologyId": "divine_realm_mastery",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "divine_realm_creation",
+          "personal_heaven_construction",
+          "divine_plane_anchoring"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "divine_realm"
+          },
+          {
+            "type": "ability",
+            "abilityId": "create_divine_planes"
+          }
+        ]
+      },
+      {
+        "technologyId": "divine_multiverse_navigation",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "divine_multiverse_awareness",
+          "faith_quantum_coupling",
+          "ultimate_divine_navigation"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "divine_beta_navigation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "navigate_as_god"
+          },
+          {
+            "type": "building",
+            "buildingId": "divine_chariot_ship"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "basic_magical_theory",
+    "name": "Foundational Arcane Studies",
+    "description": "Study magic through rigorous academic methodology",
+    "field": "academic_magic",
+    "allPapers": [
+      "magic_existence_verification",
+      "supernatural_phenomenon_cataloging",
+      "magical_vs_natural_distinction",
+      "arcane_energy_detection",
+      "mana_particle_theory",
+      "thaumic_field_hypothesis",
+      "magical_force_measurement",
+      "spell_effect_documentation",
+      "reproducible_magic_experiments",
+      "magical_scientific_method",
+      "arcane_hypothesis_testing",
+      "magical_peer_review_standards",
+      "spell_notation_systems",
+      "magical_equation_basics",
+      "thaumic_mathematics_introduction",
+      "spell_component_analysis",
+      "verbal_component_linguistics",
+      "somatic_gesture_mechanics",
+      "material_component_chemistry",
+      "focus_object_theory",
+      "wand_theory_fundamentals",
+      "staff_amplification_mechanics",
+      "magical_tool_construction",
+      "spell_learning_pedagogy",
+      "magical_education_methods",
+      "apprenticeship_vs_academy",
+      "standardized_magical_testing",
+      "magical_certification_theory",
+      "ethical_magic_use_philosophy",
+      "magical_research_methodology"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "magical_literacy",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "magic_existence_verification",
+          "arcane_energy_detection",
+          "magical_scientific_method"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "magical_academy"
+          },
+          {
+            "type": "ability",
+            "abilityId": "study_magic_academically"
+          }
+        ]
+      },
+      {
+        "technologyId": "basic_spell_theory",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "spell_component_analysis",
+          "spell_notation_systems",
+          "thaumic_mathematics_introduction"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "understand_spell_structure"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "spell_mathematics",
+    "name": "The Mathematics of Magic",
+    "description": "Model magical phenomena using advanced mathematics",
+    "field": "academic_magic",
+    "allPapers": [
+      "thaumic_calculus_fundamentals",
+      "arcane_differential_equations",
+      "spell_topology_theory",
+      "magical_field_equations",
+      "mana_flow_dynamics",
+      "energy_conservation_in_magic",
+      "thermodynamics_of_spellcasting",
+      "entropy_and_magic_relationship",
+      "magical_efficiency_calculations",
+      "spell_power_scaling_laws",
+      "area_of_effect_geometry",
+      "duration_time_equations",
+      "range_distance_formulas",
+      "resistance_penetration_mathematics",
+      "spell_interference_patterns",
+      "constructive_spell_interference",
+      "destructive_spell_interference",
+      "spell_harmonics_theory",
+      "magical_resonance_frequencies",
+      "anti_magic_field_mathematics",
+      "spell_reflection_geometry",
+      "magical_absorption_rates",
+      "mana_regeneration_curves",
+      "casting_time_optimization",
+      "simultaneous_casting_theory",
+      "spell_sequence_chaining",
+      "metamagic_mathematical_models",
+      "spell_modification_equations",
+      "power_word_mathematics",
+      "true_name_magical_algebra",
+      "sympathetic_magic_correlation",
+      "contagion_magic_propagation",
+      "ritual_magic_amplification_math",
+      "group_casting_multiplication",
+      "spell_failure_probability_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "mathematical_spellcraft",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "thaumic_calculus_fundamentals",
+          "magical_field_equations",
+          "mana_flow_dynamics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "thaumic_laboratory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "calculate_spell_effects"
+          }
+        ]
+      },
+      {
+        "technologyId": "spell_optimization",
+        "papersRequired": 22,
+        "mandatoryPapers": [
+          "spell_power_scaling_laws",
+          "magical_efficiency_calculations",
+          "metamagic_mathematical_models"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "optimize_spell_formulas"
+          }
+        ]
+      },
+      {
+        "technologyId": "advanced_spell_mathematics",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "spell_interference_patterns",
+          "ritual_magic_amplification_math",
+          "spell_failure_probability_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_spell_mathematics"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "advanced_magical_physics",
+    "name": "Arcane Physics Theory",
+    "description": "Understand the fundamental physics underlying magical reality manipulation",
+    "field": "academic_magic",
+    "allPapers": [
+      "magical_particle_physics",
+      "mana_quanta_theory",
+      "thaumic_wave_particle_duality",
+      "arcane_uncertainty_principle",
+      "magical_entanglement",
+      "spell_superposition_states",
+      "wavefunction_collapse_in_magic",
+      "quantum_magic_observer_effects",
+      "magical_field_theory_advanced",
+      "unified_magical_force_theory",
+      "elemental_force_unification",
+      "arcane_standard_model",
+      "magical_symmetry_principles",
+      "conservation_laws_in_magic",
+      "magical_relativity_theory",
+      "time_dilation_in_slow_time_spells",
+      "space_contortion_in_teleportation",
+      "pocket_dimension_physics",
+      "bag_of_holding_spatial_mathematics",
+      "extra_dimensional_storage_theory",
+      "plane_shift_mechanics",
+      "dimensional_barrier_structure",
+      "planar_boundary_permeability",
+      "astral_projection_physics",
+      "ethereal_plane_interaction",
+      "shadow_plane_mechanics",
+      "elemental_plane_physics",
+      "plane_of_fire_thermodynamics",
+      "plane_of_water_fluid_dynamics",
+      "positive_negative_energy_planes",
+      "life_death_energy_theory",
+      "necromancy_energy_physics",
+      "healing_magic_biology_physics",
+      "transmutation_atomic_rearrangement",
+      "polymorph_mass_energy_conversion",
+      "illusion_light_manipulation_physics",
+      "enchantment_neural_magic_interface",
+      "divination_information_theory",
+      "scrying_remote_viewing_physics",
+      "temporal_magic_time_physics"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "arcane_physics",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "magical_particle_physics",
+          "unified_magical_force_theory",
+          "magical_field_theory_advanced"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "arcane_physics_institute"
+          },
+          {
+            "type": "ability",
+            "abilityId": "understand_magical_physics"
+          }
+        ]
+      },
+      {
+        "technologyId": "dimensional_magic_theory",
+        "papersRequired": 24,
+        "mandatoryPapers": [
+          "pocket_dimension_physics",
+          "plane_shift_mechanics",
+          "dimensional_barrier_structure"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "theoretical_dimensional_magic"
+          }
+        ]
+      },
+      {
+        "technologyId": "unified_arcane_theory",
+        "papersRequired": 32,
+        "mandatoryPapers": [
+          "arcane_standard_model",
+          "temporal_magic_time_physics",
+          "transmutation_atomic_rearrangement"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_arcane_physics"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "reality_theory_mastery",
+    "name": "Reality Manipulation Theory",
+    "description": "Master the theoretical foundations of reality-altering magic",
+    "field": "academic_magic",
+    "allPapers": [
+      "reality_fabric_structure_theory",
+      "fundamental_reality_constants",
+      "natural_law_modification_theory",
+      "physics_override_spells",
+      "gravity_manipulation_theory",
+      "time_manipulation_theoretical_limits",
+      "temporal_paradox_mathematics",
+      "time_travel_spell_design",
+      "causality_loop_prevention",
+      "timeline_branching_theory",
+      "alternate_reality_creation",
+      "wish_spell_reality_alteration",
+      "miracle_vs_wish_distinction",
+      "reality_warping_energy_costs",
+      "universal_constants_manipulation",
+      "fine_structure_constant_alteration",
+      "speed_of_light_modification_spells",
+      "planck_constant_warping",
+      "local_vs_universal_reality_changes",
+      "reality_bubble_theory",
+      "demiplane_creation_mathematics",
+      "custom_physics_pocket_universe",
+      "genesis_spell_world_creation",
+      "artificial_universe_construction",
+      "simulated_reality_magic",
+      "reality_is_information_theory",
+      "magical_matrix_hypothesis",
+      "consciousness_creates_reality_magic",
+      "observer_creates_universe_spells",
+      "collective_unconscious_reality_shaping",
+      "archetypal_magic_theory",
+      "platonic_ideal_manifestation",
+      "concept_into_reality_spells",
+      "abstract_idea_materialization",
+      "mathematical_truth_spell_enforcement",
+      "logical_necessity_reality_binding",
+      "impossible_made_possible_theory",
+      "paradox_stabilization_mathematics",
+      "contradiction_containment_spells",
+      "reality_syntax_error_correction",
+      "existence_debugging_theory",
+      "reality_version_control",
+      "universe_state_saving_loading",
+      "reality_forking_and_merging",
+      "ultimate_reality_manipulation_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "reality_warping_theory",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "reality_fabric_structure_theory",
+          "natural_law_modification_theory",
+          "wish_spell_reality_alteration"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "reality_research_institute"
+          },
+          {
+            "type": "ability",
+            "abilityId": "theoretical_reality_warping"
+          }
+        ]
+      },
+      {
+        "technologyId": "demiplane_theory",
+        "papersRequired": 28,
+        "mandatoryPapers": [
+          "demiplane_creation_mathematics",
+          "genesis_spell_world_creation",
+          "custom_physics_pocket_universe"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "design_custom_realities"
+          }
+        ]
+      },
+      {
+        "technologyId": "ultimate_reality_theory",
+        "papersRequired": 36,
+        "mandatoryPapers": [
+          "reality_is_information_theory",
+          "paradox_stabilization_mathematics",
+          "ultimate_reality_manipulation_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "master_reality_theory"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "academic_reality_theory",
+    "name": "Academic Reality Manipulation Theory",
+    "description": "Navigate dimensions via rigorous magical theory and spell mathematics",
+    "field": "academic_magic",
+    "allPapers": [
+      "fundamental_spell_theory",
+      "thaumic_field_equations",
+      "magical_conservation_laws",
+      "spell_component_analysis",
+      "mana_flow_dynamics",
+      "dimensional_magic_mathematics",
+      "portal_spell_derivation",
+      "spatial_folding_theorems",
+      "teleportation_paradox_resolution",
+      "anchor_point_stability_proofs",
+      "reality_manipulation_limits",
+      "causality_preservation_constraints",
+      "timeline_coherence_mathematics",
+      "multiverse_spell_compatibility",
+      "magical_beta_space_model",
+      "spell_based_quantum_coupling",
+      "theoretical_timeline_navigation",
+      "academic_observer_coupling",
+      "magical_crew_coherence_theory",
+      "theoretical_magic_ship_design"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "advanced_spell_theory",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "fundamental_spell_theory",
+          "thaumic_field_equations",
+          "dimensional_magic_mathematics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "magical_research_university"
+          },
+          {
+            "type": "ability",
+            "abilityId": "theoretical_spell_design"
+          }
+        ]
+      },
+      {
+        "technologyId": "reality_warping_mastery",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "portal_spell_derivation",
+          "spatial_folding_theorems",
+          "reality_manipulation_limits",
+          "causality_preservation_constraints"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "warp_local_reality"
+          },
+          {
+            "type": "building",
+            "buildingId": "theoretical_magic_ship"
+          }
+        ]
+      },
+      {
+        "technologyId": "academic_beta_navigation",
+        "papersRequired": 17,
+        "mandatoryPapers": [
+          "magical_beta_space_model",
+          "spell_based_quantum_coupling",
+          "theoretical_timeline_navigation",
+          "academic_observer_coupling"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "academic_beta_navigation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "magical_timeline_calculation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "engineering_basics",
+    "name": "Foundational Engineering",
+    "description": "Materials science, structural mechanics, and design principles",
+    "field": "engineering",
+    "allPapers": [
+      "materials_science_fundamentals",
+      "stress_strain_relationships",
+      "structural_analysis_basics",
+      "beam_theory",
+      "column_buckling",
+      "material_properties_testing",
+      "hardness_testing_methods",
+      "tensile_strength_measurement",
+      "fatigue_failure_analysis",
+      "fracture_mechanics_introduction",
+      "design_safety_factors",
+      "engineering_drawing_standards",
+      "geometric_dimensioning_tolerancing",
+      "manufacturing_processes_overview",
+      "casting_fundamentals",
+      "forging_basics",
+      "machining_principles",
+      "precision_measurement_tools",
+      "quality_control_fundamentals",
+      "standardization_in_engineering",
+      "engineering_ethics",
+      "failure_analysis_methodology"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "engineering_fundamentals",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "materials_science_fundamentals",
+          "structural_analysis_basics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "engineering_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "engineering_design"
+          }
+        ]
+      },
+      {
+        "technologyId": "precision_manufacturing",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "precision_measurement_tools",
+          "quality_control_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "precision_workshop"
+          },
+          {
+            "type": "ability",
+            "abilityId": "precision_crafting"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "power_generation_i_steam",
+    "name": "Steam Power and Early Electrical Generation",
+    "description": "From steam engines to coal-fired power plants",
+    "field": "power_generation",
+    "allPapers": [
+      "steam_engine_principles",
+      "boiler_design_fundamentals",
+      "pressure_vessel_safety",
+      "steam_turbine_theory",
+      "condensers_heat_exchangers",
+      "thermodynamic_cycles_rankine",
+      "efficiency_optimization_heat_engines",
+      "coal_combustion_chemistry",
+      "coal_power_plant_design",
+      "smoke_stack_emissions_control",
+      "ash_handling_systems",
+      "water_treatment_boilers",
+      "steam_pressure_regulation",
+      "governor_systems",
+      "electrical_generator_basics",
+      "faraday_electromagnetic_induction",
+      "ac_vs_dc_generation",
+      "voltage_regulation",
+      "power_transmission_basics",
+      "transformer_theory_introduction",
+      "electrical_grid_topology",
+      "load_balancing_fundamentals",
+      "power_factor_correction",
+      "grid_synchronization",
+      "early_electrical_safety"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "steam_power",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "steam_engine_principles",
+          "boiler_design_fundamentals"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "steam_generator"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_steam_power"
+          }
+        ]
+      },
+      {
+        "technologyId": "coal_power_generation",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "coal_power_plant_design",
+          "electrical_generator_basics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "coal_power_plant"
+          },
+          {
+            "type": "building",
+            "buildingId": "power_distribution_i"
+          }
+        ]
+      },
+      {
+        "technologyId": "electrical_grid_i",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "electrical_grid_topology",
+          "grid_synchronization"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "electrical_grid"
+          },
+          {
+            "type": "building",
+            "buildingId": "power_substation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "manufacturing_automation_i",
+    "name": "Assembly Lines and Early Automation",
+    "description": "From hand assembly to mechanized production",
+    "field": "manufacturing",
+    "allPapers": [
+      "assembly_line_principles",
+      "work_division_specialization",
+      "time_motion_studies",
+      "standardized_parts_interchangeability",
+      "conveyor_belt_mechanics",
+      "material_handling_automation",
+      "sequential_assembly_stations",
+      "quality_control_sampling",
+      "statistical_process_control",
+      "defect_detection_methods",
+      "inventory_management_basics",
+      "just_in_time_production_introduction",
+      "batch_vs_continuous_production",
+      "production_scheduling",
+      "bottleneck_analysis",
+      "throughput_optimization",
+      "factory_layout_optimization",
+      "workflow_efficiency",
+      "worker_safety_automation",
+      "early_mechanical_automation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "assembly_line",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "assembly_line_principles",
+          "conveyor_belt_mechanics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "assembly_line"
+          },
+          {
+            "type": "item",
+            "itemId": "conveyor_belt_i"
+          }
+        ]
+      },
+      {
+        "technologyId": "automated_assembly_i",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "material_handling_automation",
+          "early_mechanical_automation"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "assembly_machine_i"
+          },
+          {
+            "type": "ability",
+            "abilityId": "automate_production"
+          }
+        ]
+      },
+      {
+        "technologyId": "quality_control_systems",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "statistical_process_control",
+          "defect_detection_methods"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "quality_control_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "quality_inspection"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "climate_control_technology",
+    "name": "HVAC and Climate Systems",
+    "description": "Heating, ventilation, air conditioning, and climate control",
+    "field": "climate_control",
+    "allPapers": [
+      "thermodynamics_heating_cooling",
+      "heat_pump_principles",
+      "refrigeration_cycle",
+      "refrigerant_chemistry",
+      "compressor_design",
+      "evaporator_condenser_theory",
+      "air_conditioning_basics",
+      "humidity_control",
+      "ventilation_air_quality",
+      "duct_design_airflow",
+      "thermal_insulation_principles",
+      "radiant_heating_systems",
+      "forced_air_heating",
+      "climate_zone_adaptation",
+      "integrated_climate_control_systems"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_heating",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "thermodynamics_heating_cooling",
+          "radiant_heating_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "heater"
+          },
+          {
+            "type": "ability",
+            "abilityId": "control_temperature"
+          }
+        ]
+      },
+      {
+        "technologyId": "air_conditioning",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "refrigeration_cycle",
+          "air_conditioning_basics"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "air_conditioner"
+          },
+          {
+            "type": "ability",
+            "abilityId": "climate_cooling"
+          }
+        ]
+      },
+      {
+        "technologyId": "hvac_systems",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "integrated_climate_control_systems",
+          "ventilation_air_quality"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "climate_control_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "full_climate_control"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "entertainment_culture_i",
+    "name": "Games, Stories, and Early Entertainment",
+    "description": "The creation of games, novels, theater, and recreational media",
+    "field": "entertainment",
+    "allPapers": [
+      "game_design_principles",
+      "rules_systems_game_theory",
+      "narrative_structure_storytelling",
+      "character_development_writing",
+      "plot_construction_techniques",
+      "dialogue_writing_craft",
+      "novel_publishing_process",
+      "theater_performance_theory",
+      "stage_design_lighting",
+      "dramatic_arts_fundamentals",
+      "music_composition_basics",
+      "recreational_activity_design",
+      "entertainment_venue_architecture",
+      "audience_psychology",
+      "cultural_narrative_transmission"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "board_games",
+        "papersRequired": 3,
+        "mandatoryPapers": [
+          "game_design_principles",
+          "rules_systems_game_theory"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "board_game"
+          },
+          {
+            "type": "ability",
+            "abilityId": "design_games"
+          }
+        ]
+      },
+      {
+        "technologyId": "literary_arts",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "narrative_structure_storytelling",
+          "novel_publishing_process"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "novel"
+          },
+          {
+            "type": "building",
+            "buildingId": "publishing_house"
+          },
+          {
+            "type": "ability",
+            "abilityId": "write_novels"
+          }
+        ]
+      },
+      {
+        "technologyId": "performing_arts",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "theater_performance_theory",
+          "entertainment_venue_architecture"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "theater"
+          },
+          {
+            "type": "building",
+            "buildingId": "entertainment_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "organize_performances"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "computing_ii_digital_age",
+    "name": "Modern Computing and Software Engineering",
+    "description": "From mainframes to personal computers and beyond",
+    "field": "computing",
+    "allPapers": [
+      "transistor_based_computing",
+      "integrated_circuits",
+      "microprocessor_architecture",
+      "memory_hierarchy_caching",
+      "operating_system_design",
+      "process_scheduling_algorithms",
+      "virtual_memory_management",
+      "file_systems",
+      "database_theory",
+      "relational_database_design",
+      "sql_query_languages",
+      "transaction_processing",
+      "programming_language_design",
+      "compiler_construction",
+      "software_engineering_principles",
+      "version_control_systems",
+      "debugging_testing_methodologies",
+      "algorithm_complexity_analysis",
+      "data_structures_optimization",
+      "computer_graphics_fundamentals"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "modern_computers",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "microprocessor_architecture",
+          "operating_system_design"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "modern_computer"
+          },
+          {
+            "type": "ability",
+            "abilityId": "programming"
+          }
+        ]
+      },
+      {
+        "technologyId": "databases",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "database_theory",
+          "relational_database_design"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "data_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "database_management"
+          }
+        ]
+      },
+      {
+        "technologyId": "software_engineering",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "software_engineering_principles",
+          "version_control_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "software_development_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "professional_programming"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "power_generation_ii_nuclear",
+    "name": "Nuclear Fission and Fusion Power",
+    "description": "From nuclear reactors to fusion energy",
+    "field": "power_generation",
+    "allPapers": [
+      "nuclear_fission_basics",
+      "chain_reaction_control",
+      "neutron_moderation",
+      "reactor_core_design",
+      "control_rod_mechanics",
+      "reactor_coolant_systems",
+      "nuclear_safety_systems",
+      "radiation_shielding",
+      "nuclear_waste_management",
+      "radioactive_decay_heat_removal",
+      "pressurized_water_reactor_design",
+      "boiling_water_reactor_design",
+      "breeder_reactor_theory",
+      "nuclear_fuel_cycle",
+      "plasma_physics_basics",
+      "fusion_reaction_fundamentals",
+      "magnetic_confinement_theory",
+      "tokamak_design_principles",
+      "plasma_heating_methods",
+      "fusion_energy_gain",
+      "inertial_confinement_fusion",
+      "fusion_reactor_materials",
+      "tritium_breeding_blankets",
+      "fusion_power_plant_design",
+      "advanced_fusion_concepts"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "nuclear_fission_power",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "nuclear_fission_basics",
+          "reactor_core_design",
+          "nuclear_safety_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "nuclear_reactor"
+          },
+          {
+            "type": "building",
+            "buildingId": "nuclear_power_plant"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_nuclear_power"
+          }
+        ]
+      },
+      {
+        "technologyId": "fusion_power",
+        "papersRequired": 18,
+        "mandatoryPapers": [
+          "fusion_reaction_fundamentals",
+          "tokamak_design_principles",
+          "fusion_power_plant_design"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "fusion_reactor"
+          },
+          {
+            "type": "building",
+            "buildingId": "fusion_power_plant"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_fusion_power"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "space_industry_i_launch",
+    "name": "Rockets, Satellites, and Orbital Infrastructure",
+    "description": "From rocket science to orbital operations with distributed time coordination",
+    "field": "space_industry",
+    "allPapers": [
+      "rocket_propulsion_fundamentals",
+      "tsiolkovsky_rocket_equation",
+      "multi_stage_rocket_design",
+      "liquid_fuel_propulsion",
+      "solid_fuel_propulsion",
+      "rocket_engine_nozzle_design",
+      "combustion_chamber_design",
+      "fuel_oxidizer_chemistry",
+      "rocket_guidance_systems",
+      "inertial_navigation",
+      "orbital_mechanics_basics",
+      "hohmann_transfer_orbits",
+      "orbital_rendezvous_techniques",
+      "satellite_design_principles",
+      "satellite_power_systems",
+      "satellite_communication_systems",
+      "satellite_attitude_control",
+      "orbital_debris_mitigation",
+      "space_environment_effects",
+      "radiation_hardened_electronics",
+      "satellite_time_synchronization",
+      "distributed_time_coordination",
+      "relativistic_time_dilation_effects",
+      "space_station_life_support",
+      "orbital_infrastructure_assembly"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "rocket_launch",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "rocket_propulsion_fundamentals",
+          "multi_stage_rocket_design"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "rocket_launch_pad"
+          },
+          {
+            "type": "item",
+            "itemId": "rocket"
+          },
+          {
+            "type": "ability",
+            "abilityId": "launch_rockets"
+          }
+        ]
+      },
+      {
+        "technologyId": "satellites",
+        "papersRequired": 15,
+        "mandatoryPapers": [
+          "satellite_design_principles",
+          "satellite_time_synchronization",
+          "distributed_time_coordination"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "satellite"
+          },
+          {
+            "type": "building",
+            "buildingId": "ground_control_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_satellites"
+          },
+          {
+            "type": "item",
+            "itemId": "vector_clock_module"
+          }
+        ]
+      },
+      {
+        "technologyId": "orbital_stations",
+        "papersRequired": 20,
+        "mandatoryPapers": [
+          "space_station_life_support",
+          "orbital_infrastructure_assembly"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "orbital_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "construct_orbital_infrastructure"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "distributed_systems",
+    "name": "Distributed Computing and Coordination",
+    "description": "Vector clocks, consensus algorithms, and distributed coordination - foundation for collective intelligence",
+    "field": "distributed_systems",
+    "allPapers": [
+      "distributed_system_fundamentals",
+      "clock_synchronization_problem",
+      "lamport_timestamps",
+      "vector_clock_theory",
+      "causal_ordering_events",
+      "distributed_consensus_problem",
+      "two_phase_commit",
+      "paxos_algorithm",
+      "raft_consensus_algorithm",
+      "byzantine_fault_tolerance",
+      "distributed_locking",
+      "distributed_transactions",
+      "eventual_consistency",
+      "cap_theorem",
+      "distributed_hash_tables",
+      "gossip_protocols",
+      "distributed_coordination_services",
+      "leader_election_algorithms",
+      "distributed_monitoring",
+      "cluster_coordination"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "distributed_coordination",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "vector_clock_theory",
+          "distributed_consensus_problem"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "distributed_coordination_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "coordinate_distributed_systems"
+          }
+        ]
+      },
+      {
+        "technologyId": "consensus_systems",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "paxos_algorithm",
+          "raft_consensus_algorithm"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "consensus_system"
+          },
+          {
+            "type": "building",
+            "buildingId": "distributed_computing_cluster"
+          },
+          {
+            "type": "ability",
+            "abilityId": "implement_consensus"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "manufacturing_automation_ii",
+    "name": "Advanced Robotics and Factory Automation",
+    "description": "From basic automation to fully automated production lines",
+    "field": "manufacturing",
+    "allPapers": [
+      "industrial_robotics_fundamentals",
+      "robotic_arm_kinematics",
+      "end_effector_design",
+      "robot_programming_languages",
+      "machine_vision_quality_control",
+      "adaptive_manufacturing",
+      "flexible_manufacturing_systems",
+      "computer_integrated_manufacturing",
+      "automated_material_handling_ii",
+      "high_speed_conveyor_systems",
+      "precision_pick_and_place",
+      "automated_assembly_techniques_ii",
+      "lights_out_manufacturing",
+      "predictive_maintenance",
+      "factory_automation_networks"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "advanced_assembly_ii",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "industrial_robotics_fundamentals",
+          "automated_assembly_techniques_ii"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "assembly_machine_ii"
+          },
+          {
+            "type": "ability",
+            "abilityId": "advanced_automation"
+          }
+        ]
+      },
+      {
+        "technologyId": "high_speed_production",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "high_speed_conveyor_systems",
+          "machine_vision_quality_control"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "belt_tier_2"
+          },
+          {
+            "type": "ability",
+            "abilityId": "high_speed_manufacturing"
+          }
+        ]
+      },
+      {
+        "technologyId": "full_automation",
+        "papersRequired": 13,
+        "mandatoryPapers": [
+          "lights_out_manufacturing",
+          "factory_automation_networks"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "assembly_machine_iii"
+          },
+          {
+            "type": "item",
+            "itemId": "belt_tier_3"
+          },
+          {
+            "type": "ability",
+            "abilityId": "fully_automated_factory"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "video_game_industry",
+    "name": "Video Games and Interactive Entertainment",
+    "description": "From early video games to VR and game development companies",
+    "field": "entertainment",
+    "allPapers": [
+      "interactive_media_theory",
+      "video_game_design_principles",
+      "game_engine_architecture",
+      "real_time_rendering",
+      "game_physics_simulation",
+      "procedural_content_generation",
+      "artificial_intelligence_for_games",
+      "multiplayer_networking",
+      "game_user_interface_design",
+      "virtual_reality_fundamentals",
+      "vr_motion_tracking",
+      "immersive_experience_design",
+      "game_development_workflows",
+      "game_studio_management",
+      "video_game_industry_economics"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "video_games",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "video_game_design_principles",
+          "game_engine_architecture"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "video_game"
+          },
+          {
+            "type": "building",
+            "buildingId": "arcade"
+          },
+          {
+            "type": "ability",
+            "abilityId": "develop_games"
+          }
+        ]
+      },
+      {
+        "technologyId": "game_development_studios",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "game_development_workflows",
+          "game_studio_management"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "video_game_company"
+          },
+          {
+            "type": "building",
+            "buildingId": "game_development_studio"
+          },
+          {
+            "type": "ability",
+            "abilityId": "run_game_studio"
+          }
+        ]
+      },
+      {
+        "technologyId": "virtual_reality",
+        "papersRequired": 13,
+        "mandatoryPapers": [
+          "virtual_reality_fundamentals",
+          "vr_motion_tracking",
+          "immersive_experience_design"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "vr_headset"
+          },
+          {
+            "type": "item",
+            "itemId": "vr_game"
+          },
+          {
+            "type": "ability",
+            "abilityId": "develop_vr_experiences"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "task_management_collaboration",
+    "name": "Project Management and Distributed Collaboration",
+    "description": "Coordinating large teams on complex projects - foundation for emergent collective intelligence",
+    "field": "collaboration",
+    "allPapers": [
+      "project_management_fundamentals",
+      "task_decomposition_theory",
+      "work_breakdown_structures",
+      "critical_path_analysis",
+      "resource_allocation_algorithms",
+      "collaborative_software_design",
+      "distributed_team_coordination",
+      "asynchronous_communication_patterns",
+      "collective_intelligence_theory",
+      "emergent_coordination_systems"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "project_management",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "project_management_fundamentals",
+          "task_decomposition_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "project_office"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manage_projects"
+          }
+        ]
+      },
+      {
+        "technologyId": "task_management_systems",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "collaborative_software_design",
+          "distributed_team_coordination"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "task_management_app"
+          },
+          {
+            "type": "building",
+            "buildingId": "project_coordination_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "coordinate_large_teams"
+          }
+        ]
+      },
+      {
+        "technologyId": "collective_intelligence_platforms",
+        "papersRequired": 9,
+        "mandatoryPapers": [
+          "collective_intelligence_theory",
+          "emergent_coordination_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "distributed_work_platform"
+          },
+          {
+            "type": "ability",
+            "abilityId": "enable_collective_intelligence"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "power_generation_iii_megastructures",
+    "name": "Stellar Engineering and Dyson Swarms",
+    "description": "Harvesting the energy of stars with orbital megastructures",
+    "field": "power_generation",
+    "allPapers": [
+      "stellar_energy_capture_theory",
+      "dyson_sphere_concepts",
+      "dyson_swarm_architecture",
+      "orbital_solar_collectors",
+      "microwave_power_transmission",
+      "rectenna_technology",
+      "space_based_power_beaming",
+      "megastructure_materials_science",
+      "self_replicating_manufacturing",
+      "stellar_engineering_economics"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "dyson_swarm_basics",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "dyson_swarm_architecture",
+          "orbital_solar_collectors"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "dyson_swarm_component"
+          },
+          {
+            "type": "ability",
+            "abilityId": "construct_megastructures"
+          }
+        ]
+      },
+      {
+        "technologyId": "microwave_power_beaming",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "microwave_power_transmission",
+          "space_based_power_beaming"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "microwave_receiver"
+          },
+          {
+            "type": "building",
+            "buildingId": "orbital_power_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "beam_power_from_orbit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "transportation_logistics",
+    "name": "Transportation and Supply Chain",
+    "description": "From internal combustion to modern logistics",
+    "field": "transportation",
+    "allPapers": [
+      "internal_combustion_engine_basics",
+      "four_stroke_cycle",
+      "fuel_injection_systems",
+      "transmission_design",
+      "vehicle_chassis_engineering",
+      "suspension_systems",
+      "automotive_manufacturing",
+      "diesel_engine_principles",
+      "electric_vehicle_basics",
+      "battery_technology_vehicles",
+      "logistics_network_theory",
+      "warehouse_operations",
+      "inventory_optimization",
+      "supply_chain_management",
+      "transportation_routing",
+      "freight_systems",
+      "container_standardization",
+      "intermodal_transport",
+      "logistics_information_systems",
+      "distribution_network_design"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "automotive_vehicles",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "internal_combustion_engine_basics",
+          "transmission_design"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "truck"
+          },
+          {
+            "type": "item",
+            "itemId": "car"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_vehicles"
+          }
+        ]
+      },
+      {
+        "technologyId": "logistics_systems",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "supply_chain_management",
+          "warehouse_operations"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "warehouse"
+          },
+          {
+            "type": "building",
+            "buildingId": "logistics_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manage_supply_chains"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "communication_systems_i",
+    "name": "Telegraph to Radio",
+    "description": "Early electrical communication systems",
+    "field": "communication",
+    "allPapers": [
+      "electrical_telegraphy",
+      "morse_code_theory",
+      "telegraph_networks",
+      "telephone_invention",
+      "voice_transmission_theory",
+      "switchboard_technology",
+      "electromagnetic_wave_theory",
+      "radio_wave_propagation",
+      "amplitude_modulation",
+      "radio_transmitter_design",
+      "radio_receiver_design",
+      "antenna_theory",
+      "broadcast_systems",
+      "frequency_allocation",
+      "wireless_communication_regulation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "telegraph_systems",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "electrical_telegraphy",
+          "telegraph_networks"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "telegraph_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "send_telegrams"
+          }
+        ]
+      },
+      {
+        "technologyId": "telephone_networks",
+        "papersRequired": 7,
+        "mandatoryPapers": [
+          "telephone_invention",
+          "switchboard_technology"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "telephone_exchange"
+          },
+          {
+            "type": "item",
+            "itemId": "telephone"
+          },
+          {
+            "type": "ability",
+            "abilityId": "voice_communication"
+          }
+        ]
+      },
+      {
+        "technologyId": "radio_broadcasting",
+        "papersRequired": 11,
+        "mandatoryPapers": [
+          "radio_transmitter_design",
+          "broadcast_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "radio_tower"
+          },
+          {
+            "type": "building",
+            "buildingId": "radio_station"
+          },
+          {
+            "type": "ability",
+            "abilityId": "broadcast_radio"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "electrical_engineering",
+    "name": "Circuit Theory and Power Distribution",
+    "description": "From basic circuits to electrical grids",
+    "field": "electrical_engineering",
+    "allPapers": [
+      "circuit_theory_fundamentals",
+      "ohms_law_applications",
+      "kirchhoffs_circuit_laws",
+      "ac_circuit_analysis",
+      "complex_impedance",
+      "resonant_circuits",
+      "filter_design",
+      "transformer_design",
+      "three_phase_power",
+      "electric_motor_theory",
+      "dc_motor_design",
+      "ac_motor_design",
+      "motor_control_systems",
+      "power_electronics",
+      "rectifier_circuits",
+      "inverter_technology",
+      "electrical_distribution_systems",
+      "substation_engineering",
+      "circuit_protection_devices",
+      "electrical_safety_codes"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "circuit_design",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "circuit_theory_fundamentals",
+          "ac_circuit_analysis"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "electrical_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "design_circuits"
+          }
+        ]
+      },
+      {
+        "technologyId": "electric_motors",
+        "papersRequired": 11,
+        "mandatoryPapers": [
+          "electric_motor_theory",
+          "motor_control_systems"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "electric_motor"
+          },
+          {
+            "type": "building",
+            "buildingId": "motor_factory"
+          },
+          {
+            "type": "ability",
+            "abilityId": "manufacture_motors"
+          }
+        ]
+      },
+      {
+        "technologyId": "electrical_distribution",
+        "papersRequired": 16,
+        "mandatoryPapers": [
+          "electrical_distribution_systems",
+          "substation_engineering"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "electrical_substation"
+          },
+          {
+            "type": "ability",
+            "abilityId": "distribute_power"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "computing_fundamentals",
+    "name": "Early Computing and Algorithms",
+    "description": "From mechanical calculators to electronic computers",
+    "field": "computing",
+    "allPapers": [
+      "boolean_algebra",
+      "logic_gates",
+      "binary_number_systems",
+      "digital_circuit_design",
+      "flip_flops_memory_elements",
+      "cpu_architecture_basics",
+      "instruction_set_design",
+      "assembly_language",
+      "stored_program_concept",
+      "algorithm_theory",
+      "sorting_algorithms",
+      "searching_algorithms",
+      "data_structure_fundamentals",
+      "stack_queue_theory",
+      "linked_list_structures",
+      "tree_data_structures",
+      "hash_table_design",
+      "computational_complexity_theory"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "digital_logic",
+        "papersRequired": 5,
+        "mandatoryPapers": [
+          "boolean_algebra",
+          "logic_gates"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "computer_lab"
+          },
+          {
+            "type": "ability",
+            "abilityId": "understand_digital_circuits"
+          }
+        ]
+      },
+      {
+        "technologyId": "early_computers",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "cpu_architecture_basics",
+          "stored_program_concept"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "early_computer"
+          },
+          {
+            "type": "ability",
+            "abilityId": "program_computers"
+          }
+        ]
+      },
+      {
+        "technologyId": "algorithm_design",
+        "papersRequired": 14,
+        "mandatoryPapers": [
+          "algorithm_theory",
+          "computational_complexity_theory"
+        ],
+        "grants": [
+          {
+            "type": "ability",
+            "abilityId": "design_efficient_algorithms"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "communication_ii_internet",
+    "name": "Networking and the Internet",
+    "description": "From packet switching to the World Wide Web",
+    "field": "communication",
+    "allPapers": [
+      "packet_switching_theory",
+      "network_protocols",
+      "tcp_ip_protocol_suite",
+      "routing_algorithms",
+      "domain_name_system",
+      "internet_architecture",
+      "network_security_basics",
+      "encryption_fundamentals",
+      "world_wide_web_architecture",
+      "http_protocol",
+      "html_markup_language",
+      "web_server_technology",
+      "distributed_hypermedia_systems",
+      "internet_service_infrastructure",
+      "content_delivery_networks"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "networking",
+        "papersRequired": 6,
+        "mandatoryPapers": [
+          "packet_switching_theory",
+          "tcp_ip_protocol_suite"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "network_infrastructure"
+          },
+          {
+            "type": "ability",
+            "abilityId": "network_engineering"
+          }
+        ]
+      },
+      {
+        "technologyId": "internet",
+        "papersRequired": 10,
+        "mandatoryPapers": [
+          "internet_architecture",
+          "domain_name_system"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "internet_backbone"
+          },
+          {
+            "type": "building",
+            "buildingId": "internet_exchange"
+          },
+          {
+            "type": "ability",
+            "abilityId": "operate_internet_infrastructure"
+          }
+        ]
+      },
+      {
+        "technologyId": "world_wide_web",
+        "papersRequired": 13,
+        "mandatoryPapers": [
+          "world_wide_web_architecture",
+          "http_protocol"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "web_server"
+          },
+          {
+            "type": "ability",
+            "abilityId": "create_websites"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "military_defense",
+    "name": "Military Technology and Strategic Defense",
+    "description": "Advanced materials, coordination, and strategic capabilities",
+    "field": "military",
+    "allPapers": [
+      "advanced_materials_armor",
+      "composite_materials_defense",
+      "ballistic_protection_theory",
+      "tactical_communication_systems",
+      "encrypted_military_communications",
+      "command_control_systems",
+      "strategic_coordination_theory",
+      "threat_detection_systems",
+      "defensive_positioning_theory",
+      "logistics_for_defense",
+      "supply_chain_resilience",
+      "defense_manufacturing_capabilities",
+      "strategic_resource_allocation",
+      "multi_agent_tactical_coordination",
+      "defense_technology_integration"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "advanced_armor",
+        "papersRequired": 4,
+        "mandatoryPapers": [
+          "advanced_materials_armor",
+          "composite_materials_defense"
+        ],
+        "grants": [
+          {
+            "type": "item",
+            "itemId": "advanced_armor"
+          },
+          {
+            "type": "ability",
+            "abilityId": "craft_advanced_armor"
+          }
+        ]
+      },
+      {
+        "technologyId": "tactical_systems",
+        "papersRequired": 8,
+        "mandatoryPapers": [
+          "command_control_systems",
+          "tactical_communication_systems"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "command_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "coordinate_tactical_operations"
+          }
+        ]
+      },
+      {
+        "technologyId": "strategic_defense",
+        "papersRequired": 12,
+        "mandatoryPapers": [
+          "multi_agent_tactical_coordination",
+          "strategic_coordination_theory"
+        ],
+        "grants": [
+          {
+            "type": "building",
+            "buildingId": "strategic_defense_center"
+          },
+          {
+            "type": "ability",
+            "abilityId": "strategic_defense_planning"
+          }
+        ]
+      }
+    ]
+  }
+]

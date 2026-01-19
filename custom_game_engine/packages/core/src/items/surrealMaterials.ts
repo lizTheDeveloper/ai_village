@@ -8,7 +8,7 @@
  * This module loads material definitions from JSON and converts them to ItemDefinition objects.
  */
 
-import { defineItem, type ItemDefinition } from './ItemDefinition.js';
+import { defineItem, type ItemDefinition, type ItemCategory, type ItemRarity } from './ItemDefinition.js';
 import surrealMaterialsData from '../../data/surreal-materials.json';
 
 /**
@@ -38,8 +38,11 @@ interface MaterialData {
  * Converts JSON material data to ItemDefinition using defineItem
  */
 function loadMaterialFromJSON(data: MaterialData): ItemDefinition {
-  const { id, name, category, ...properties } = data;
-  return defineItem(id, name, category, properties);
+  const { id, name, category, rarity, ...properties } = data;
+  return defineItem(id, name, category as ItemCategory, {
+    ...properties,
+    ...(rarity ? { rarity: rarity as ItemRarity } : {})
+  } as any);
 }
 
 /**
