@@ -66,6 +66,8 @@ export class ResearchSystem extends BaseSystem {
   public readonly id: SystemId = 'research';
   public readonly priority: number = 55; // After BuildingSystem (16), before most others
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position];
+  // Lazy activation: Skip entire system when no research is active
+  public readonly activationComponents = ['research_state'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private isInitialized = false;

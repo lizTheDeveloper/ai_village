@@ -58,6 +58,8 @@ export class ReproductionSystem extends BaseSystem {
   public readonly name = 'ReproductionSystem';
   public readonly priority = 50;
   public readonly requiredComponents = [];
+  // Lazy activation: Skip entire system when no genetic exists
+  public readonly activationComponents = ['genetic'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: ReproductionConfig;

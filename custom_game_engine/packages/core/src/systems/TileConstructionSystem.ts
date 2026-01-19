@@ -163,6 +163,8 @@ export class TileConstructionSystem extends BaseSystem {
   public readonly id: SystemId = 'tile_construction';
   public readonly priority: number = 18; // After movement, before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no construction exists
+  public readonly activationComponents = ['construction'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Active construction tasks */

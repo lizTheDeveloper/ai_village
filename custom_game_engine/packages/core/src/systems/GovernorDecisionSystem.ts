@@ -53,6 +53,20 @@ import {
   buildProvinceGovernorContext,
   buildVillageContext,
 } from '../governance/GovernorContextBuilders.js';
+import {
+  buildGalacticCouncilPrompt,
+  buildEmperorPrompt,
+  buildParliamentPrompt,
+  buildMayorPrompt,
+  buildGovernorPersonalityContext,
+  buildCrisisPrompt,
+} from '../governance/GovernorPromptTemplates.js';
+import type {
+  GalacticCouncilContext,
+  EmpireContext,
+  NationContext,
+  ProvinceGovernorContext,
+} from '../governance/GovernorContextBuilders.js';
 
 // ============================================================================
 // Types
@@ -487,107 +501,31 @@ export class GovernorDecisionSystem extends BaseSystem {
    * Build personality context from governor's history and ideology
    */
   private buildPersonalityContext(governor: EntityImpl, govComp: GovernorComponent): string {
-    if (govComp.decisions.length === 0) {
-      return ''; // No personality context for new governors
-    }
-
-    // Extract ideology description
-    const ideology = govComp.ideology;
-    const ideologyDesc =
-      `Economic: ${ideology.economic > 0 ? 'free market' : 'centrally planned'}, ` +
-      `Social: ${ideology.social > 0 ? 'libertarian' : 'authoritarian'}, ` +
-      `Foreign: ${ideology.foreign > 0 ? 'interventionist' : 'isolationist'}`;
-
-    // Top 5 most impactful decisions
-    const topDecisions = [...govComp.decisions]
-      .filter((d) => d.outcome !== 'pending')
-      .sort((a, b) => Math.abs(b.popularityImpact) - Math.abs(a.popularityImpact))
-      .slice(0, 5);
-
-    let context = `YOUR POLITICAL IDENTITY:
-Political Ideology: ${ideologyDesc}
-Approval Rating: ${Math.round(govComp.approvalRating * 100)}%
-
-`;
-
-    if (topDecisions.length > 0) {
-      context += `YOUR PAST MAJOR DECISIONS:
-${topDecisions
-  .map(
-    (d) =>
-      `- ${d.decisionType}: ${d.context} → ${d.outcome} (popularity ${d.popularityImpact > 0 ? '+' : ''}${Math.round(d.popularityImpact * 100)}%)`
-  )
-  .join('\n')}
-
-`;
-    }
-
-    // Constituency approval
-    const constituencies = Object.entries(govComp.constituencyApproval)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    if (constituencies.length > 0) {
-      context += `CONSTITUENCY APPROVAL:
-${constituencies.map(([name, approval]) => `- ${name}: ${Math.round(approval * 100)}%`).join('\n')}
-
-`;
-    }
-
-    context += `Your decisions should reflect your established ideology and past precedents, unless circumstances demand adaptation.\n`;
-
-    return context;
+    // Use the prompt template function
+    return buildGovernorPersonalityContext(governor);
   }
 
   /**
    * Build tier-specific prompt template
    */
   private buildTierPromptTemplate(tier: PoliticalTier, context: Record<string, unknown>): string {
-    // Basic prompt template - will be expanded in Phase 2
-    const crises = (context.crises as unknown[]) ?? [];
-    const directives = (context.directives as unknown[]) ?? [];
-
-    let prompt = `You are a governor at the ${tier.toUpperCase().replace('_', ' ')} tier.
-
-JURISDICTION: ${context.jurisdiction}
-POPULATION: ${context.population?.toLocaleString() ?? 'Unknown'}
-
-`;
-
-    if (crises.length > 0) {
-      prompt += `PENDING CRISES: ${crises.length}\n`;
+    // Map each tier to its prompt template
+    switch (tier) {
+      case 'galactic_council':
+        return buildGalacticCouncilPrompt(context as unknown as GalacticCouncilContext);
+      case 'empire':
+        return buildEmperorPrompt(context as unknown as EmpireContext);
+      case 'nation':
+        // Parliament member role - default to 'member'
+        return buildParliamentPrompt(context as unknown as NationContext, 'member');
+      case 'province':
+        return buildMayorPrompt(context as unknown as ProvinceGovernorContext);
+      case 'village':
+        // No LLM for village tier
+        return '';
+      default:
+        throw new Error(`Unknown tier: ${tier}`);
     }
-
-    if (directives.length > 0) {
-      prompt += `PENDING DIRECTIVES: ${directives.length}\n`;
-    }
-
-    prompt += `
-YOUR ROLE:
-- Make strategic decisions for your jurisdiction
-- Respond to crises and directives
-- Balance constituent interests with broader goals
-
-AVAILABLE ACTIONS:
-- set_policy: Establish new policy
-- allocate_resources: Distribute resources
-- respond_to_crisis: Address pending crisis
-- complete_directive: Execute higher-tier directive
-
-What is your decision?
-
-Respond with JSON:
-{
-  "reasoning": "Your analysis of the situation",
-  "action": {
-    "type": "set_policy" | "allocate_resources" | "respond_to_crisis" | "complete_directive",
-    "target": "target_id",
-    "parameters": { /* action-specific params */ }
-  },
-  "speech": "Your public statement (optional)"
-}`;
-
-    return prompt;
   }
 
   /**
@@ -630,11 +568,8 @@ Respond with JSON:
       return;
     }
 
-    // TODO: Implement action execution based on decision.action.type
-    // For now, just log and emit event
-    console.warn(
-      `[GovernorDecisionSystem] Execute decision: ${decision.action.type} for ${governor.id}`
-    );
+    // Route action to appropriate handler
+    this.executeActionByType(governor, govComp, decision, world);
 
     // Emit decision executed event
     world.eventBus.emit({
@@ -648,6 +583,120 @@ Respond with JSON:
         tick: world.tick,
       },
     });
+  }
+
+  /**
+   * Route action to appropriate handler and emit typed events
+   */
+  private executeActionByType(
+    governor: EntityImpl,
+    govComp: GovernorComponent,
+    decision: ParsedGovernorDecision,
+    world: World
+  ): void {
+    const action = decision.action;
+
+    // All actions emit governor:action_executed event
+    // Future: Additional systems can listen to these events and implement actual logic
+    switch (action.type) {
+      case 'set_policy':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'set_policy',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'allocate_resources':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'allocate_resources',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'declare_war':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'declare_war',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'propose_alliance':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'propose_alliance',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'respond_to_crisis':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'respond_to_crisis',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'complete_directive':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'complete_directive',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'vote_on_proposal':
+        world.eventBus.emit({
+          type: 'governor:action_executed',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            tier: govComp.tier,
+            actionType: 'vote_on_proposal',
+            tick: world.tick,
+          },
+        });
+        break;
+
+      default:
+        // Unknown action type - log warning
+        console.warn(
+          `[GovernorDecisionSystem] Unknown action type: ${action.type} for governor ${governor.id}`
+        );
+        break;
+    }
   }
 
   /**

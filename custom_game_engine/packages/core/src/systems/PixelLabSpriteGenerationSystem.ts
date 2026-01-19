@@ -36,6 +36,8 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   readonly id: SystemId = 'pixellab_sprite_generation';
   readonly priority = 900; // Run late, after other systems
   readonly requiredComponents = [] as const; // Event-driven
+  // Lazy activation: Skip entire system when no pixellab_request exists
+  public readonly activationComponents = ['pixellab_request'] as const;
 
   protected readonly throttleInterval = 60; // Check job status every 60 ticks (3 seconds at 20 TPS)
 

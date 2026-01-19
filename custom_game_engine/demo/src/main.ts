@@ -880,11 +880,22 @@ async function registerAllSystems(
 interface UIPanelsResult {
   agentInfoPanel: AgentInfoPanel;
   agentRosterPanel: AgentRosterPanel;
-  // Lazily created panels removed from interface
+  animalInfoPanel: AnimalInfoPanel;
+  animalRosterPanel: AnimalRosterPanel;
+  plantInfoPanel: PlantInfoPanel;
+  resourcesPanel: ResourcesPanel;
+  memoryPanel: MemoryPanel;
+  relationshipsPanel: RelationshipsPanel;
+  notificationsPanel: NotificationsPanel;
+  economyPanel: EconomyPanel;
+  shopPanel: ShopPanel;
+  governancePanel: GovernanceDashboardPanel;
+  cityManagerPanel: CityManagerPanel;
   cityStatsWidget: CityStatsWidget;
   inventoryUI: InventoryUI;
   craftingUI: CraftingPanelUI;
   settingsPanel: SettingsPanel;
+  tileInspectorPanel: TileInspectorPanel;
   controlsPanel: ControlsPanel;
   hoverInfoPanel: UnifiedHoverInfoPanel;
 }
@@ -940,19 +951,17 @@ function createUIPanels(
 
   const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
-  // Panels below will be created lazily via factories - removed eager creation
-  // const animalInfoPanel = new AnimalInfoPanel();
-  // const animalRosterPanel = new AnimalRosterPanel(renderer.pixelLabLoader);
-  // const plantInfoPanel = new PlantInfoPanel();
-  // const resourcesPanel = new ResourcesPanel();
-  // const memoryPanel = new MemoryPanel();
-  // const relationshipsPanel = new RelationshipsPanel();
-  // const notificationsPanel = new NotificationsPanel();
-  // const economyPanel = new EconomyPanel();
-  // const shopPanel = new ShopPanel();
-  // const governancePanel = new GovernanceDashboardPanel();
-  // const cityManagerPanel = new CityManagerPanel();
-
+  const animalInfoPanel = new AnimalInfoPanel();
+  const animalRosterPanel = new AnimalRosterPanel(renderer.pixelLabLoader);
+  const plantInfoPanel = new PlantInfoPanel();
+  const resourcesPanel = new ResourcesPanel();
+  const memoryPanel = new MemoryPanel();
+  const relationshipsPanel = new RelationshipsPanel();
+  const notificationsPanel = new NotificationsPanel();
+  const economyPanel = new EconomyPanel();
+  const shopPanel = new ShopPanel();
+  const governancePanel = new GovernanceDashboardPanel();
+  const cityManagerPanel = new CityManagerPanel();
   const cityStatsWidget = new CityStatsWidget('top-right');
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
   const hoverInfoPanel = new UnifiedHoverInfoPanel();
@@ -975,12 +984,11 @@ function createUIPanels(
     }
   });
 
-  // TileInspectorPanel will be created lazily
-  // const tileInspectorPanel = new TileInspectorPanel(
-  //   gameLoop.world.eventBus,
-  //   renderer.getCamera(),
-  //   chunkManager
-  // );
+  const tileInspectorPanel = new TileInspectorPanel(
+    gameLoop.world.eventBus,
+    renderer.getCamera(),
+    chunkManager
+  );
 
   // Create placeholder for controlsPanel - will be initialized after windowManager
   const controlsPanel = null as any;
@@ -988,10 +996,22 @@ function createUIPanels(
   return {
     agentInfoPanel,
     agentRosterPanel,
+    animalInfoPanel,
+    animalRosterPanel,
+    plantInfoPanel,
+    resourcesPanel,
+    memoryPanel,
+    relationshipsPanel,
+    notificationsPanel,
+    economyPanel,
+    shopPanel,
+    governancePanel,
+    cityManagerPanel,
     cityStatsWidget,
     inventoryUI,
     craftingUI,
     settingsPanel,
+    tileInspectorPanel,
     controlsPanel,
     hoverInfoPanel,
   };
@@ -1012,13 +1032,21 @@ function setupWindowManager(
   const menuBar = new MenuBar(windowManager, canvas);
   menuBar.setRenderer(renderer);
 
-  // Create adapters for eager panels only
+  // Create adapters
   const agentInfoAdapter = createAgentInfoPanelAdapter(panels.agentInfoPanel);
+  const animalInfoAdapter = createAnimalInfoPanelAdapter(panels.animalInfoPanel);
+  const plantInfoAdapter = createPlantInfoPanelAdapter(panels.plantInfoPanel);
+  const memoryAdapter = createMemoryPanelAdapter(panels.memoryPanel);
+  const relationshipsAdapter = createRelationshipsPanelAdapter(panels.relationshipsPanel);
+  const resourcesAdapter = createResourcesPanelAdapter(panels.resourcesPanel);
+  const notificationsAdapter = createNotificationsPanelAdapter(panels.notificationsPanel);
+  const economyAdapter = createEconomyPanelAdapter(panels.economyPanel);
+  const shopAdapter = createShopPanelAdapter(panels.shopPanel);
+  const governanceAdapter = createGovernanceDashboardPanelAdapter(panels.governancePanel);
   const settingsAdapter = createSettingsPanelAdapter(panels.settingsPanel);
+  const tileInspectorAdapter = createTileInspectorPanelAdapter(panels.tileInspectorPanel);
   const inventoryAdapter = createInventoryPanelAdapter(panels.inventoryUI);
   const craftingAdapter = createCraftingPanelAdapter(panels.craftingUI);
-
-  // Lazy panel adapters will be created by factories when first shown
 
   const canvasRect = canvas.getBoundingClientRect();
   const logicalWidth = canvasRect.width;
@@ -1061,8 +1089,7 @@ function setupWindowManager(
     menuCategory: 'info',
   });
 
-  // Animal Info Panel - LAZY
-  windowManager.registerWindow('animal-info', null, {
+  windowManager.registerWindow('animal-info', animalInfoAdapter, {
     defaultX: logicalWidth - 320,
     defaultY: 10,
     defaultWidth: 300,
@@ -1073,11 +1100,9 @@ function setupWindowManager(
     minHeight: 300,
     showInWindowList: true,
     menuCategory: 'animals',
-    factory: createAnimalInfoPanelFactory(),
   });
 
-  // Plant Info Panel - LAZY
-  windowManager.registerWindow('plant-info', null, {
+  windowManager.registerWindow('plant-info', plantInfoAdapter, {
     defaultX: logicalWidth - 340,
     defaultY: 50,
     defaultWidth: 320,
@@ -1088,11 +1113,9 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'farming',
-    factory: createPlantInfoPanelFactory(),
   });
 
-  // Resources Panel - LAZY
-  windowManager.registerWindow('resources', null, {
+  windowManager.registerWindow('resources', resourcesAdapter, {
     defaultX: logicalWidth - 260,
     defaultY: 10,
     defaultWidth: 250,
@@ -1104,11 +1127,9 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'R',
     menuCategory: 'economy',
-    factory: createResourcesPanelFactory(),
   });
 
-  // Memory Panel - LAZY
-  windowManager.registerWindow('memory', null, {
+  windowManager.registerWindow('memory', memoryAdapter, {
     defaultX: 10,
     defaultY: logicalHeight - 610,
     defaultWidth: 400,
@@ -1120,11 +1141,9 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'M',
     menuCategory: 'social',
-    factory: createMemoryPanelFactory(),
   });
 
-  // Relationships Panel - LAZY
-  windowManager.registerWindow('relationships', null, {
+  windowManager.registerWindow('relationships', relationshipsAdapter, {
     defaultX: 420,
     defaultY: logicalHeight - 510,
     defaultWidth: 380,
@@ -1136,11 +1155,9 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'L',
     menuCategory: 'social',
-    factory: createRelationshipsPanelFactory(),
   });
 
-  // Tile Inspector Panel - LAZY (needs eventBus, camera, chunkManager)
-  windowManager.registerWindow('tile-inspector', null, {
+  windowManager.registerWindow('tile-inspector', tileInspectorAdapter, {
     defaultX: logicalWidth - 320,
     defaultY: logicalHeight - 410,
     defaultWidth: 300,
@@ -1150,11 +1167,6 @@ function setupWindowManager(
     minWidth: 250,
     minHeight: 300,
     showInWindowList: true,
-    factory: createTileInspectorPanelFactory(
-      (gameLoop as any).world.eventBus,
-      renderer.getCamera(),
-      chunkManager
-    ),
     keyboardShortcut: 'T',
     menuCategory: 'farming',
   });
@@ -1204,8 +1216,7 @@ function setupWindowManager(
     menuCategory: 'economy',
   });
 
-  // Notifications Panel - LAZY
-  windowManager.registerWindow('notifications', null, {
+  windowManager.registerWindow('notifications', notificationsAdapter, {
     defaultX: logicalWidth - 420,
     defaultY: logicalHeight - 350,
     defaultWidth: 400,
@@ -1217,11 +1228,9 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'N',
     menuCategory: 'settings',
-    factory: createNotificationsPanelFactory(),
   });
 
-  // Economy Panel - LAZY
-  windowManager.registerWindow('economy', null, {
+  windowManager.registerWindow('economy', economyAdapter, {
     defaultX: logicalWidth - 420,
     defaultY: logicalHeight - 520,
     defaultWidth: 400,
@@ -1233,11 +1242,9 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'E',
     menuCategory: 'economy',
-    factory: createEconomyPanelFactory(),
   });
 
-  // Shop Panel - LAZY
-  windowManager.registerWindow('shop', null, {
+  windowManager.registerWindow('shop', shopAdapter, {
     defaultX: (logicalWidth - 500) / 2,
     defaultY: (logicalHeight - 600) / 2,
     defaultWidth: 500,
@@ -1246,11 +1253,9 @@ function setupWindowManager(
     isModal: true,
     showInWindowList: false,
     menuCategory: 'economy',
-    factory: createShopPanelFactory(),
   });
 
-  // Governance Panel - LAZY
-  windowManager.registerWindow('governance', null, {
+  windowManager.registerWindow('governance', governanceAdapter, {
     defaultX: logicalWidth - 420,
     defaultY: 10,
     defaultWidth: 400,
@@ -1262,7 +1267,6 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'G',
     menuCategory: 'social',
-    factory: createGovernanceDashboardPanelFactory(),
   });
 
   // Register governance keyboard shortcut
@@ -1276,8 +1280,8 @@ function setupWindowManager(
     },
   });
 
-  // City Manager Panel - LAZY
-  windowManager.registerWindow('city-manager', null, {
+  // City Manager Panel
+  windowManager.registerWindow('city-manager', panels.cityManagerPanel, {
     defaultX: logicalWidth - 420,
     defaultY: 120,
     defaultWidth: 360,
@@ -1287,7 +1291,6 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'C',
     menuCategory: 'social',
-    factory: createCityManagerPanelFactory(),
   });
 
   // Register city manager keyboard shortcut
@@ -1456,10 +1459,8 @@ function setupWindowManager(
     keyboardShortcut: 'P', // P for Paradigm skill tree
   });
 
-  // Divine Powers Panel
-  const divinePowersPanel = new DivinePowersPanel();
-  const divinePowersAdapter = createDivinePowersPanelAdapter(divinePowersPanel);
-  windowManager.registerWindow('divine-powers', divinePowersAdapter, {
+  // Divine Powers Panel - LAZY
+  windowManager.registerWindow('divine-powers', null, {
     defaultX: 100,
     defaultY: 80,
     defaultWidth: 400,
@@ -1470,6 +1471,7 @@ function setupWindowManager(
     minHeight: 400,
     showInWindowList: true,
     menuCategory: 'divinity',
+    factory: createDivinePowersPanelFactory(),
   });
 
   // Divine Chat Panel
@@ -1488,10 +1490,8 @@ function setupWindowManager(
     menuCategory: 'divinity',
   });
 
-  // Vision Composer Panel
-  const visionComposerPanel = new VisionComposerPanel();
-  const visionComposerAdapter = createVisionComposerPanelAdapter(visionComposerPanel);
-  windowManager.registerWindow('vision-composer', visionComposerAdapter, {
+  // Vision Composer Panel - LAZY
+  windowManager.registerWindow('vision-composer', null, {
     defaultX: 150,
     defaultY: 100,
     defaultWidth: 500,
@@ -1502,6 +1502,7 @@ function setupWindowManager(
     minHeight: 450,
     showInWindowList: true,
     menuCategory: 'divinity',
+    factory: createVisionComposerPanelFactory(),
   });
 
   // Dev Panel
@@ -1535,29 +1536,8 @@ function setupWindowManager(
     },
   });
 
-  // Divine Analytics Panel
-  const divineAnalyticsPanel = new DivineAnalyticsPanel(
-    {
-      analytics: {
-        faithTrend: [],
-        prayersByDomain: {},
-        prophecyAccuracy: 0,
-        believerGrowth: 0,
-        miracleEffectiveness: 0,
-      },
-      energy: { current: 100, max: 1000, regenRate: 1 },
-      selectedTimeRange: '7_days',
-      selectedProphecyId: null,
-      scrollOffset: 0,
-    },
-    {
-      onSelectProphecy: () => {},
-      onExportData: () => {},
-      onTimeRangeChange: () => {},
-    }
-  );
-  const divineAnalyticsAdapter = createDivineAnalyticsPanelAdapter(divineAnalyticsPanel);
-  windowManager.registerWindow('divine-analytics', divineAnalyticsAdapter, {
+  // Divine Analytics Panel - LAZY
+  windowManager.registerWindow('divine-analytics', null, {
     defaultX: 250,
     defaultY: 120,
     defaultWidth: 700,
@@ -1568,35 +1548,16 @@ function setupWindowManager(
     minHeight: 400,
     showInWindowList: true,
     menuCategory: 'divinity',
+    factory: createDivineAnalyticsPanelFactory(),
   });
 
-  // Sacred Geography Panel
-  const sacredGeographyPanel = new SacredGeographyPanel(
-    {
-      sites: [],
-      selectedSiteId: null,
-      enabledLayers: new Set(['sacred_sites']),
-      faithDensity: [],
-      currentEnergy: 100,
-      mapBounds: { minX: 0, minY: 0, maxX: 100, maxY: 100 },
-      cameraOffset: { x: 0, y: 0 },
-      zoom: 1,
-    },
-    {
-      onSelectSite: () => {},
-      onBlessSite: () => {},
-      onSendMiracle: () => {},
-      onViewHistory: () => {},
-      onToggleLayer: () => {},
-      onCenterOnSite: () => {},
-    }
-  );
-  const sacredGeographyAdapter = createSacredGeographyPanelAdapter(sacredGeographyPanel);
-  windowManager.registerWindow('sacred-geography', sacredGeographyAdapter, {
+  // Sacred Geography Panel - LAZY
+  windowManager.registerWindow('sacred-geography', null, {
     defaultX: 300,
     defaultY: 140,
     defaultWidth: 600,
     defaultHeight: 500,
+    factory: createSacredGeographyPanelFactory(),
     isDraggable: true,
     isResizable: true,
     minWidth: 450,
@@ -1605,31 +1566,8 @@ function setupWindowManager(
     menuCategory: 'divinity',
   });
 
-  // Angel Management Panel
-  const angelManagementPanel = new AngelManagementPanel(
-    {
-      angels: [],
-      selectedAngelId: null,
-      energy: { current: 100, max: 1000, regenRate: 1 },
-      wizardOpen: false,
-      wizardStep: 0,
-      wizardDraft: null,
-      availableAgentsToAssign: [],
-    },
-    {
-      onSelectAngel: () => {},
-      onCreateAngel: () => {},
-      onToggleAngelRest: () => {},
-      onSetAngelAutonomy: () => {},
-      onToggleAbility: () => {},
-      onAssignAgent: () => {},
-      onUnassignAgent: () => {},
-      onOpenCreationWizard: () => {},
-      onCloseCreationWizard: () => {},
-    }
-  );
-  const angelManagementAdapter = createAngelManagementPanelAdapter(angelManagementPanel);
-  windowManager.registerWindow('angel-management', angelManagementAdapter, {
+  // Angel Management Panel - LAZY
+  windowManager.registerWindow('angel-management', null, {
     defaultX: 350,
     defaultY: 160,
     defaultWidth: 550,
@@ -1640,29 +1578,11 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'divinity',
+    factory: createAngelManagementPanelFactory(),
   });
 
-  // Prayer Panel
-  const prayerPanel = new PrayerPanel(
-    {
-      prayers: [],
-      selectedPrayerId: null,
-      selectedPrayerContext: null,
-      availableAngels: [],
-      currentEnergy: 100,
-      filterDomain: 'all',
-      filterUrgency: 'all',
-    },
-    {
-      onSendVision: () => {},
-      onPerformMiracle: () => {},
-      onAssignAngel: () => {},
-      onIgnorePrayer: () => {},
-      onSelectPrayer: () => {},
-    }
-  );
-  const prayerAdapter = createPrayerPanelAdapter(prayerPanel);
-  windowManager.registerWindow('prayers', prayerAdapter, {
+  // Prayer Panel - LAZY
+  windowManager.registerWindow('prayers', null, {
     defaultX: 400,
     defaultY: 180,
     defaultWidth: 550,
@@ -1673,6 +1593,7 @@ function setupWindowManager(
     minHeight: 300,
     showInWindowList: true,
     menuCategory: 'divinity',
+    factory: createPrayerPanelFactory(),
   });
 
   // Text Adventure Panel (1D Renderer - accessibility/narrative output)
@@ -2073,10 +1994,12 @@ function setupEventHandlers(
       soilSystem.waterTile(gameLoop.world, tile, x, y);
       showNotification(`Watered tile at (${x}, ${y})`, '#1E90FF');
 
-      const refreshedTile = chunk.tiles[tileIndex];
-      if (refreshedTile) {
-        tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
-      }
+      // TileInspector update removed - panel is now lazy
+      // If needed in future, emit event that TileInspector can listen to
+      // const refreshedTile = chunk.tiles[tileIndex];
+      // if (refreshedTile) {
+      //   tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
+      // }
     } catch (err: any) {
       console.error(`[Main] Failed to water tile: ${err.message}`);
       showNotification(`Failed to water: ${err.message}`, '#FF0000');

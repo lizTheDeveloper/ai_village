@@ -48,6 +48,8 @@ export class SoilSystem extends BaseSystem {
   public readonly id: SystemId = 'soil';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<string> = [];
+  // Lazy activation: Skip entire system when no soil exists
+  public readonly activationComponents = ['soil'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**

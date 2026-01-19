@@ -373,6 +373,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   public readonly id: SystemId = 'megastructure_maintenance';
   public readonly priority: number = 310;
   public readonly requiredComponents: ReadonlyArray<CT_Type> = [CT.Position]; // Placeholder - actual 'megastructure' component
+  // Lazy activation: Skip entire system when no megastructure exists
+  public readonly activationComponents = ['megastructure'] as const;
   protected readonly throttleInterval = 500; // 25 seconds
 
   // Performance: Map-based entity cache for O(1) lookups

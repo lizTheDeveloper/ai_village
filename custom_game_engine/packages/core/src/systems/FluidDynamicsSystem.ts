@@ -40,6 +40,8 @@ export class FluidDynamicsSystem extends BaseSystem {
   public readonly id: SystemId = 'fluid_dynamics';
   public readonly priority: number = 16; // After terrain mod (15), before swimming (18)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no fluid tiles exist
+  public readonly activationComponents = ['fluid'] as const;
 
   // Dwarf Fortress-style slow updates (once per game minute)
   protected readonly throttleInterval = 1200; // 1 minute = 60 seconds × 20 TPS
@@ -73,6 +75,11 @@ export class FluidDynamicsSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no dirty tiles to process
+    if (this.dirtyTiles.size === 0) {
+      return;
+    }
+
     // Performance tracking
     const startTime = performance.now();
     let tilesProcessed = 0;

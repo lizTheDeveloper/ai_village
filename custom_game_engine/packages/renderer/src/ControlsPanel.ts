@@ -131,7 +131,7 @@ export class ControlsPanel implements IWindowPanel {
     if (this.windowManager) {
       const windows = this.windowManager.getAllWindows();
       for (const window of windows) {
-        if (window.config.keyboardShortcut && window.config.showInWindowList !== false) {
+        if (window.config.keyboardShortcut && window.config.showInWindowList !== false && window.panel) {
           const shortcut = window.config.keyboardShortcut;
           const displayKey = shortcut === 'Escape' ? 'Esc' : shortcut.toUpperCase();
           drawControl(displayKey, window.panel.getTitle());
