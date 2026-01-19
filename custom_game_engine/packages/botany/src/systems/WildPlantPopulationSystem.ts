@@ -2,6 +2,7 @@ import type {
   SystemId,
   ComponentType,
   World,
+  WorldMutator,
   Entity,
   PlantComponent,
   PlantSpecies,
@@ -237,7 +238,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
   /**
    * Update plant counts per chunk (only for visible chunks near agents)
    */
-  private updateChunkCounts(world: World): void {
+  private updateChunkCounts(world: WorldMutator): void {
     this.chunkPlantCounts.clear();
 
     const plants = world.query().with(CT.Plant).executeEntities();
@@ -296,7 +297,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
   /**
    * Try to germinate seeds from the seed bank
    */
-  private germinateSeedBank(world: World): void {
+  private germinateSeedBank(world: WorldMutator): void {
     for (const [chunkKey, bank] of this.seedBanks) {
       const currentCount = this.chunkPlantCounts.get(chunkKey) || 0;
 
@@ -359,7 +360,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
   /**
    * Check for natural spawning in low-density areas
    */
-  private checkNaturalSpawning(world: World): void {
+  private checkNaturalSpawning(world: WorldMutator): void {
     // Natural spawning happens in chunks with low density
     // This simulates wind-blown or animal-carried seeds
 

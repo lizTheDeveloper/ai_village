@@ -1,6 +1,7 @@
 import { defineComponent } from '../../types/ComponentSchema.js';
 import { autoRegister } from '../../registry/autoRegister.js';
 import type { RealityAnchorComponent } from '@ai-village/core';
+import { ComponentType } from '@ai-village/core';
 
 /**
  * RealityAnchorSchema - Introspection schema for RealityAnchorComponent
@@ -197,7 +198,7 @@ export const RealityAnchorSchema = autoRegister(
     },
 
     createDefault: (): RealityAnchorComponent => ({
-      type: 'reality_anchor',
+      type: ComponentType.RealityAnchor,
       version: 1,
       status: 'under_construction',
       fieldRadius: 100,

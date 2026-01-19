@@ -173,7 +173,7 @@ export class SpaceshipManagementSystem extends BaseSystem {
         scenarioId: scenario.id,
         scenarioName: scenario.name,
         participantIds,
-        targetEmotion: scenario.targetEmotion,
+        targetEmotion: JSON.stringify(scenario.targetEmotion),
       },
     });
   }
@@ -418,7 +418,7 @@ export function startEmotionTheaterSession(
       scenarioId,
       scenarioName: scenario.name,
       participantIds,
-      targetEmotion: scenario.targetEmotion,
+      targetEmotion: JSON.stringify(scenario.targetEmotion),
     },
   });
 

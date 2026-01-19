@@ -13,6 +13,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId } from '../types.js';
 import type { VRSystemComponent, VRSession } from './VRSystemComponent.js';
 import type { EmotionalSignature } from '../navigation/SpaceshipComponent.js';
+import type { MoodComponent } from '../components/MoodComponent.js';
 
 // ============================================================================
 // System Implementation
@@ -205,10 +206,6 @@ export class VRSystem extends BaseSystem {
     fidelity: number
   ): void {
     // Get mood component
-    interface MoodComponent {
-      currentMood: number;
-      emotionalState: string;
-    }
     const mood = entity.getComponent<MoodComponent>('mood');
     if (!mood) return;
 

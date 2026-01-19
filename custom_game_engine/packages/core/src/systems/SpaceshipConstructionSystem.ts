@@ -345,6 +345,8 @@ export class SpaceshipConstructionSystem extends BaseSystem {
       progress: 0,
       startedAt: world.tick,
       totalTicks: config.constructionTime,
+      ticksElapsed: 0,
+      ticksRemaining: config.constructionTime,
     };
 
     // Create spaceship entity (initially in construction state)

@@ -12,7 +12,7 @@
  */
 
 import { BaseSystem, type SystemContext } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityId, Tick, SystemId } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
@@ -153,7 +153,7 @@ export class ColonizationSystem extends BaseSystem {
   // ==========================================================================
 
   private processColonizedHost(
-    world: World,
+    world: WorldMutator,
     entity: Entity,
     colonization: ParasiticColonizationComponent,
     currentTick: Tick,

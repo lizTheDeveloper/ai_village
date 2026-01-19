@@ -2,6 +2,7 @@ import type {
   SystemId,
   ComponentType,
   World,
+  WorldMutator,
   Entity,
   PlantComponent,
   SeedComponent,
@@ -627,7 +628,7 @@ export class PlantSystem extends BaseSystem {
     plant: PlantComponent,
     species: PlantSpecies,
     environment: Environment,
-    world: World,
+    world: WorldMutator,
     entityId: string,
     hoursElapsed: number
   ): void {
@@ -772,7 +773,7 @@ export class PlantSystem extends BaseSystem {
     plant: PlantComponent,
     species: PlantSpecies,
     environment: Environment,
-    world: World,
+    world: WorldMutator,
     entityId: string
   ): void {
     if (!species.stageTransitions) {
@@ -1301,7 +1302,7 @@ export class PlantSystem extends BaseSystem {
    * - Plant health (higher health = more fruit)
    * - Genetic yield modifier
    */
-  private regenerateFruitAtMidnight(entities: ReadonlyArray<Entity>, _world: World): void {
+  private regenerateFruitAtMidnight(entities: ReadonlyArray<Entity>, _world: WorldMutator): void {
     let plantsRegenerated = 0;
 
     for (const entity of entities) {

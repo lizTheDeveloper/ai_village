@@ -148,9 +148,9 @@ export const RealmSchema = autoRegister(
       properties: {
         id: 'default-realm',
         name: 'Mortal World',
-        category: 'terrestrial',
+        category: 'wild',
         parentUniverseId: 'default-universe',
-        size: 'medium',
+        size: 'territory',
         topology: 'standard',
         timeFlow: 'normal',
         timeRatio: 1.0,

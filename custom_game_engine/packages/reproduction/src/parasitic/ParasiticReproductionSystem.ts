@@ -13,7 +13,7 @@
  */
 
 import { BaseSystem, type SystemContext } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityId, Tick, SystemId } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
@@ -122,7 +122,7 @@ export class ParasiticReproductionSystem extends BaseSystem {
   }
 
   private processCollective(
-    world: World,
+    world: WorldMutator,
     _collectiveEntityId: EntityId,
     collective: CollectiveMindComponent,
     currentTick: Tick,
@@ -165,7 +165,7 @@ export class ParasiticReproductionSystem extends BaseSystem {
     }
   }
 
-  private processScheduledColonizations(world: World, currentTick: Tick): void {
+  private processScheduledColonizations(world: WorldMutator, currentTick: Tick): void {
     const toProcess: Array<{ targetId: EntityId; collectiveId: string }> = [];
 
     for (const [targetId, schedule] of this.scheduledColonizations) {
@@ -237,7 +237,7 @@ export class ParasiticReproductionSystem extends BaseSystem {
     lineage.hostHistory.push(targetId);
   }
 
-  private findCollective(world: World, collectiveId: string): Entity | null {
+  private findCollective(world: WorldMutator, collectiveId: string): Entity | null {
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');

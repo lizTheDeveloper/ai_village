@@ -2,6 +2,7 @@ import type {
   SystemId,
   ComponentType,
   World,
+  WorldMutator,
   Entity,
   PlantComponent,
   EventBus,
@@ -225,7 +226,7 @@ export class PlantDiseaseSystem extends BaseSystem {
   /**
    * Get current game day (simplified)
    */
-  private getCurrentGameDay(_world: World): number {
+  private getCurrentGameDay(_world: WorldMutator): number {
     // In a real implementation, this would query the time system
     return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   }
@@ -453,7 +454,7 @@ export class PlantDiseaseSystem extends BaseSystem {
     entityId: string,
     category: string,
     gameDay: number,
-    world: World
+    world: WorldMutator
   ): void {
     // Don't stack too many pests
     if (plant.pests.length >= 3) return;
@@ -565,7 +566,7 @@ export class PlantDiseaseSystem extends BaseSystem {
   private spreadDiseases(
     plant: PlantComponent,
     entityId: string,
-    _world: World,
+    _world: WorldMutator,
     gameDay: number,
     activeEntities: ReadonlyArray<Entity>
   ): void {
@@ -639,7 +640,7 @@ export class PlantDiseaseSystem extends BaseSystem {
   private migratePests(
     plant: PlantComponent,
     entityId: string,
-    world: World,
+    world: WorldMutator,
     gameDay: number,
     activeEntities: ReadonlyArray<Entity>
   ): void {
