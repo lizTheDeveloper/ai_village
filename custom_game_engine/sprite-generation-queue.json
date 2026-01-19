@@ -12,134 +12,15 @@
       "error": "API 503: Service Unavailable"
     },
     {
-      "folderId": "moss-mature",
-      "description": "Mature lush moss patch, deep green fuzzy carpet covering ground, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "moss-withered",
-      "description": "Dried dead moss, brown and crispy texture, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-seed",
-      "description": "Wild garlic bulb seed on forest floor, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
       "folderId": "wild-garlic-sprout",
       "description": "Young wild garlic with first broad green leaves emerging, pixel art, top-down view, transparent background",
-      "status": "queued",
+      "status": "failed",
       "queuedAt": 1737256800000,
       "options": {
         "type": "plant",
         "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-vegetative",
-      "description": "Growing wild garlic with multiple broad lance-shaped green leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-flowering",
-      "description": "Wild garlic with cluster of small white star-shaped flowers on tall stem, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-fruiting",
-      "description": "Wild garlic after flowering with seed pods developing, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-mature",
-      "description": "Mature wild garlic with full healthy broad leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-seeding",
-      "description": "Wild garlic dispersing seeds from dried flower head, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "wild-garlic-withered",
-      "description": "Withered wild garlic with yellowed dried leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "oak-tree-seed",
-      "description": "Acorn on forest floor with cap attached, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 24
-      }
-    },
-    {
-      "folderId": "oak-tree-sprout",
-      "description": "Young oak sapling with first lobed leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "oak-tree-vegetative",
-      "description": "Growing young oak tree with developing trunk and branches with lobed leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 64
-      }
+      },
+      "error": "API 503: Service Unavailable"
     },
     {
       "folderId": "oak-tree-flowering",
