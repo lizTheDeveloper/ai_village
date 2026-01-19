@@ -363,7 +363,7 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
       if (!pool) {
         // Create pool if it doesn't exist (for cumulative costs)
         if (this.isCumulativeCost(cost.type)) {
-          pool = this.createDefaultPool(cost.type);
+          pool = this.createDefaultPool(cost.type) as any;
           caster.resourcePools[cost.type] = pool as any;
         } else {
           // Can't deduct from non-existent pool

@@ -114,6 +114,28 @@ export interface UIEvents {
     entityIds: EntityId[];
     stance: string;
   };
+
+  /** UI action triggered */
+  'ui_action': {
+    action: string;
+    entityId?: EntityId;
+    data?: unknown;
+  };
+
+  /** UI notification */
+  'ui:notification': {
+    message: string;
+    type?: 'info' | 'success' | 'warning' | 'error';
+    duration?: number;
+  };
+
+  /** Chat send message */
+  'chat:send_message': {
+    roomId?: string;
+    message: string;
+    senderId?: EntityId;
+    data?: unknown;
+  };
 }
 
 export type UIEventType = keyof UIEvents;

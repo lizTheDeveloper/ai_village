@@ -231,6 +231,10 @@ export class WalkieTalkieManager {
     return this.devices.get(deviceId);
   }
 
+  getDeviceCount(): number {
+    return this.devices.size;
+  }
+
   getDeviceByOwner(ownerId: string): WalkieTalkieDevice | undefined {
     for (const device of this.devices.values()) {
       if (device.ownerId === ownerId) {
@@ -564,6 +568,11 @@ export class WalkieTalkieSystem extends BaseSystem {
   private manager: WalkieTalkieManager = new WalkieTalkieManager();
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no walkie talkies exist
+    if (this.manager.getDeviceCount() === 0) {
+      return;
+    }
+
     // Update device positions from agent positions
     const agents = ctx.world.query().with(CT.Agent, CT.Position).executeEntities();
 

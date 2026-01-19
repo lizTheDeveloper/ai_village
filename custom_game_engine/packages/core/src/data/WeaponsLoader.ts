@@ -1,21 +1,12 @@
 /**
  * Weapons Data Loader
  *
- * Loads weapon definitions from JSON data files.
+ * Loads weapon definitions from JSON data files with lazy loading.
  * Provides type-safe access to weapon definitions.
  */
 
 import type { ItemDefinition } from '../items/ItemDefinition.js';
 import { defineItem } from '../items/ItemDefinition.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-
-// Load JSON data
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const weaponsDataPath = path.join(__dirname, 'weapons.json');
-const weaponsData = JSON.parse(fs.readFileSync(weaponsDataPath, 'utf8'));
 
 /**
  * Convert JSON weapon data to ItemDefinition

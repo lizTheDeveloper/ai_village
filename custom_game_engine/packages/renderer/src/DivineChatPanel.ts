@@ -743,7 +743,7 @@ export class DivineChatPanel implements IWindowPanel {
       data: {
         roomId: 'divine_chat',
         senderId: this.playerDeityId,
-        content: this.inputText.trim(),
+        message: this.inputText.trim(),
       },
     });
 

@@ -468,6 +468,11 @@ export class EventReportingSystem extends BaseSystem {
     // TODO: Add public method to DeskManager to get all desks
     const desks = Array.from((deskManager as unknown as { desks: Map<string, NewsDesk> }).desks.values());
 
+    // Lazy loading: Skip if no news desks exist
+    if (desks.length === 0) {
+      return;
+    }
+
     for (const desk of desks) {
       for (const reporter of desk.fieldReporters) {
         if (reporter.status !== 'en_route' && reporter.status !== 'on_scene') {

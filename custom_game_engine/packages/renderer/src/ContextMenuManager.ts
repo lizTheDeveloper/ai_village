@@ -780,7 +780,7 @@ export class ContextMenuManager {
    */
   private cleanupEventListeners(): void {
     for (const { event, handler } of this.eventListeners) {
-      this.eventBus.off(event, handler);
+      this.eventBus.off(event as any, handler);
     }
     this.eventListeners = [];
   }

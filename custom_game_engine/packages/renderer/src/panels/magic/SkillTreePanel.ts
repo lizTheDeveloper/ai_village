@@ -593,8 +593,11 @@ export class SkillTreePanel implements IWindowPanel {
         const eventBus = world.getEventBus() as EventBus;
         eventBus.emit({
           type: 'ui:notification',
-          message: `Failed to unlock node: ${error.message}`,
-          level: 'error'
+          source: 'skill_tree',
+          data: {
+            message: `Failed to unlock node: ${error.message}`,
+            type: 'error' as const
+          }
         });
 
         return false;
@@ -613,8 +616,11 @@ export class SkillTreePanel implements IWindowPanel {
       const eventBus = world.getEventBus() as EventBus;
       eventBus.emit({
         type: 'ui:notification',
-        message,
-        level: 'error'
+        source: 'skill_tree',
+        data: {
+          message,
+          type: 'error' as const
+        }
       });
 
       return false;
@@ -746,8 +752,11 @@ export class SkillTreePanel implements IWindowPanel {
           const eventBus = world.getEventBus() as EventBus;
           eventBus.emit({
             type: 'ui:notification',
-            message: 'New ability discovered',
-            level: 'discovery'
+            source: 'skill_tree',
+            data: {
+              message: 'New ability discovered',
+              type: 'info' as const
+            }
           });
         }
       }

@@ -79,7 +79,7 @@ export class CombatLogPanel implements IWindowPanel {
     for (const eventType of events) {
       const handler = (data: Record<string, unknown>) => this.handleCombatEvent(eventType, data);
       this.eventHandlers.set(eventType, handler);
-      this.eventBus.on(eventType, handler);
+      this.eventBus.on(eventType, handler as any);
     }
   }
 
@@ -95,7 +95,7 @@ export class CombatLogPanel implements IWindowPanel {
       type,
       message,
       participants,
-      narrative: data.narrative,
+      narrative: data.narrative as string | undefined,
     });
 
     this.updateUI();
@@ -142,11 +142,11 @@ export class CombatLogPanel implements IWindowPanel {
     if (data.participants && Array.isArray(data.participants)) {
       participants.push(...data.participants);
     }
-    if (data.attackerId) participants.push(data.attackerId);
-    if (data.defenderId) participants.push(data.defenderId);
-    if (data.hunterId) participants.push(data.hunterId);
-    if (data.targetId) participants.push(data.targetId);
-    if (data.entityId) participants.push(data.entityId);
+    if (data.attackerId) participants.push(data.attackerId as string);
+    if (data.defenderId) participants.push(data.defenderId as string);
+    if (data.hunterId) participants.push(data.hunterId as string);
+    if (data.targetId) participants.push(data.targetId as string);
+    if (data.entityId) participants.push(data.entityId as string);
 
     // Remove duplicates
     return Array.from(new Set(participants));
@@ -425,7 +425,7 @@ export class CombatLogPanel implements IWindowPanel {
    */
   public cleanup(): void {
     for (const [eventType, handler] of this.eventHandlers.entries()) {
-      this.eventBus.off(eventType, handler);
+      this.eventBus.off(eventType as any, handler as any);
     }
     this.eventHandlers.clear();
   }

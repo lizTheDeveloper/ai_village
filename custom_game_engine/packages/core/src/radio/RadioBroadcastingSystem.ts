@@ -49,8 +49,14 @@ export class RadioBroadcastingSystem extends BaseSystem {
   private listeners: Map<string, RadioListenerState> = new Map();
 
   protected onUpdate(ctx: SystemContext): void {
+    // Lazy loading: Skip if no radio stations exist
+    const stations = this.manager.getAllStations();
+    if (stations.length === 0) {
+      return;
+    }
+
     // Update each broadcasting station
-    for (const station of this.manager.getAllStations()) {
+    for (const station of stations) {
       if (station.status !== 'broadcasting') continue;
 
       // Check if current show has ended

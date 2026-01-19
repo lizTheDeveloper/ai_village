@@ -2043,7 +2043,7 @@ export class DevPanel implements IWindowPanel {
 
         // Grant XP to a random skill
         const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-        const currentLevel = skills.levels[randomSkill] || 0;
+        const currentLevel = (skills.levels as any)[randomSkill] || 0;
         const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
         // Update the skill component
@@ -2505,7 +2505,7 @@ export class DevPanel implements IWindowPanel {
       }
 
       const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-      const currentLevel = skills.levels[randomSkill] || 0;
+      const currentLevel = (skills.levels as any)[randomSkill] || 0;
       const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
       // Update the skill component
