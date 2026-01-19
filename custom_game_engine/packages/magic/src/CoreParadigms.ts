@@ -15,13 +15,13 @@ import { loadCoreParadigms } from './data-loader.js';
 const LOADED_PARADIGMS = loadCoreParadigms();
 
 // Export individual paradigms for backward compatibility
-export const ACADEMIC_PARADIGM: MagicParadigm = LOADED_PARADIGMS.academic;
-export const PACT_PARADIGM: MagicParadigm = LOADED_PARADIGMS.pact;
-export const NAME_PARADIGM: MagicParadigm = LOADED_PARADIGMS.names;
-export const BREATH_PARADIGM: MagicParadigm = LOADED_PARADIGMS.breath;
-export const DIVINE_PARADIGM: MagicParadigm = LOADED_PARADIGMS.divine;
-export const BLOOD_PARADIGM: MagicParadigm = LOADED_PARADIGMS.blood;
-export const EMOTIONAL_PARADIGM: MagicParadigm = LOADED_PARADIGMS.emotional;
+export const ACADEMIC_PARADIGM: MagicParadigm = LOADED_PARADIGMS.academic!;
+export const PACT_PARADIGM: MagicParadigm = LOADED_PARADIGMS.pact!;
+export const NAME_PARADIGM: MagicParadigm = LOADED_PARADIGMS.names!;
+export const BREATH_PARADIGM: MagicParadigm = LOADED_PARADIGMS.breath!;
+export const DIVINE_PARADIGM: MagicParadigm = LOADED_PARADIGMS.divine!;
+export const BLOOD_PARADIGM: MagicParadigm = LOADED_PARADIGMS.blood!;
+export const EMOTIONAL_PARADIGM: MagicParadigm = LOADED_PARADIGMS.emotional!;
 
 // ============================================================================
 // Core Paradigm Registry

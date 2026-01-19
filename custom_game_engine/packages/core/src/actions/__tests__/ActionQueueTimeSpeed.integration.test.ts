@@ -39,12 +39,7 @@ describe('ActionQueue Time Speed Integration', () => {
     timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1)); // dawn, 48s day, 1x speed
 
-    // Add entity directly to world using internal method
-    // This is necessary for test setup because we're creating a fully-formed entity
-    // with components rather than using the standard createEntity flow
-    interface WorldInternal {
-      _addEntity(entity: Entity): void;
-    }
+    // Add entity directly to world
     world.addEntity(timeEntity);
 
     // Create action registry and queue

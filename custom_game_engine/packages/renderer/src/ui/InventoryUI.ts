@@ -749,7 +749,7 @@ export class InventoryUI {
 
       // Draw quick bar item if assigned
       const assignedBackpackSlot = this.quickBarAssignments[i];
-      if (assignedBackpackSlot !== null && this.playerInventory && assignedBackpackSlot < this.playerInventory.slots.length) {
+      if (assignedBackpackSlot !== null && assignedBackpackSlot !== undefined && this.playerInventory && assignedBackpackSlot < this.playerInventory.slots.length) {
         const slot = this.playerInventory.slots[assignedBackpackSlot];
         if (slot && slot.itemId && slot.quantity > 0) {
           // Draw item icon (simplified - just text for now)
@@ -1066,7 +1066,8 @@ export class InventoryUI {
       throw new Error(`InventoryUI.getQuickBarAssignment: quickBarIndex ${quickBarIndex} out of range (0-9)`);
     }
 
-    return this.quickBarAssignments[quickBarIndex];
+    const assignment = this.quickBarAssignments[quickBarIndex];
+    return assignment ?? null;
   }
 
   /**

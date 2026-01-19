@@ -148,7 +148,8 @@ export function getDefenseTechLevel(world: World): number {
 export function getAllSystems(world: World): string[] {
   // Query all planets registered in the world
   const planets = world.getPlanets();
-  return planets.map((planet: { id: string }) => planet.id);
+  // Convert Map keys to array
+  return Array.from(planets.keys());
 }
 
 /**

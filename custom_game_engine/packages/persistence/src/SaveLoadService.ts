@@ -375,6 +375,14 @@ export class SaveLoadService {
       // Restore multiverse state
       multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);
 
+      // Clear existing passages before restoring
+      // Access private passages map via type assertion to clear it
+      interface MultiverseCoordinatorInternal {
+        passages: Map<string, unknown>;
+      }
+      const coordinatorInternal = multiverseCoordinator as unknown as MultiverseCoordinatorInternal;
+      coordinatorInternal.passages.clear();
+
       // Restore god-crafted queue
       if (saveFile.godCraftedQueue) {
         // Type assertion: We trust the serialized queue data structure
@@ -556,6 +564,14 @@ export class SaveLoadService {
       worldImpl._entities.clear();
 
       multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);
+
+      // Clear existing passages before restoring
+      // Access private passages map via type assertion to clear it
+      interface MultiverseCoordinatorInternal {
+        passages: Map<string, unknown>;
+      }
+      const coordinatorInternal = multiverseCoordinator as unknown as MultiverseCoordinatorInternal;
+      coordinatorInternal.passages.clear();
 
       if (saveFile.godCraftedQueue) {
         // Type assertion: We trust the serialized queue data structure

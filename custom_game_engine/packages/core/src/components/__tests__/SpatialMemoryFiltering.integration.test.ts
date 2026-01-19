@@ -312,7 +312,7 @@ describe('SpatialMemory Filtering Integration Tests', () => {
       const agent2 = new EntityImpl(createEntityId(), 0);
       const memory2 = new SpatialMemoryComponent();
       agent2.addComponent(memory2);
-      (world as any)._addEntity(agent2);
+      world.addEntity(agent2);
 
       // Agent 1 explores north
       addSpatialMemory(

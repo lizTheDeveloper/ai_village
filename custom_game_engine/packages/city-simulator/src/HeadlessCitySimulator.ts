@@ -60,9 +60,8 @@ import type { Entity } from '@ai-village/core';
 // INTERNAL TYPE EXTENSIONS
 // =============================================================================
 
-// Internal World API type for _addEntity and _worldEntityId
+// Internal World API type for _worldEntityId (addEntity is now public)
 interface WorldInternal extends World {
-  _addEntity(entity: Entity): void;
   _worldEntityId: string;
 }
 

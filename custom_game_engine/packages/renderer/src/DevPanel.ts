@@ -2176,14 +2176,112 @@ export class DevPanel implements IWindowPanel {
         }
         break;
       case 'spawn_angel':
-        // TODO: Implement actual angel spawning when divine entities are implemented
-        const angels = (this.divineResources.get('angels') ?? 0) + 1;
-        this.divineResources.set('angels', angels);
-        this.log('Spawned new angel (not yet implemented)');
+        if (this.world) {
+          try {
+            // Find first deity to spawn angel for
+            const deities = this.world.query().with(CT.Deity).executeEntities();
+            if (deities.length === 0) {
+              this.log('ERROR: No deities found to spawn angel for');
+              break;
+            }
+
+            const deity = deities[0];
+            const deityComp = deity!.getComponent<DeityComponent>(CT.Deity);
+            if (!deityComp) {
+              this.log('ERROR: Deity missing DeityComponent');
+              break;
+            }
+
+            // Try to get AngelSystem from gameLoop
+            const angelSystem = this.world.gameLoop?.systemRegistry.getSystem('AngelSystem');
+            if (!angelSystem || !('createAngel' in angelSystem)) {
+              this.log('ERROR: AngelSystem not found or missing createAngel method');
+              this.log('Angel spawning requires AngelSystem to be registered');
+              break;
+            }
+
+            // Create angel (messenger rank, autonomous AI)
+            const angel = (angelSystem as any).createAngel(
+              deity.id,
+              this.world,
+              'messenger',
+              'deliver_messages',
+              true
+            );
+
+            if (angel) {
+              const angels = (this.divineResources.get('angels') ?? 0) + 1;
+              this.divineResources.set('angels', angels);
+              this.log(`Spawned messenger angel for deity ${deityComp.identity.primaryName} (ID: ${angel.id})`);
+            } else {
+              this.log('ERROR: Angel creation failed (insufficient belief or angels disabled in universe)');
+            }
+          } catch (error) {
+            this.log(`ERROR spawning angel: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        } else {
+          this.log('ERROR: No world available');
+        }
         break;
       case 'answer_prayers':
-        // TODO: Implement prayer answering when prayer system is available
-        this.log('Answered all pending prayers (not yet implemented)');
+        if (this.world) {
+          try {
+            // Find all deities with pending prayers
+            const deities = this.world.query().with(CT.Deity).executeEntities();
+            if (deities.length === 0) {
+              this.log('No deities found');
+              break;
+            }
+
+            let totalAnswered = 0;
+            let totalCost = 0;
+
+            for (const deity of deities) {
+              const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
+              if (!deityComp) continue;
+
+              // Answer all prayers in queue
+              const prayersToAnswer = [...deityComp.prayerQueue];
+              for (const prayer of prayersToAnswer) {
+                const cost = 75; // Default prayer answering cost
+                if (deityComp.answerPrayer(prayer.prayerId, cost)) {
+                  totalAnswered++;
+                  totalCost += cost;
+
+                  // Update believer's spiritual component
+                  const believerEntity = this.world.getEntity(prayer.agentId);
+                  if (believerEntity) {
+                    const spiritual = believerEntity.getComponent<SpiritualComponent>(CT.Spiritual);
+                    if (spiritual) {
+                      // Mark prayer as answered in believer's component
+                      const updatedPrayers = spiritual.prayers.map(p =>
+                        p.id === prayer.prayerId
+                          ? { ...p, answered: true, responseType: 'vision' as const, responseTime: this.world!.tick }
+                          : p
+                      );
+                      spiritual.prayers = updatedPrayers;
+                      spiritual.answeredPrayers++;
+                      spiritual.faith = Math.min(1, spiritual.faith + 0.1); // Boost faith
+                      this.world.updateComponent(believerEntity.id, CT.Spiritual, () => spiritual);
+                    }
+                  }
+                }
+              }
+
+              this.world.updateComponent(deity.id, CT.Deity, () => deityComp);
+            }
+
+            if (totalAnswered > 0) {
+              this.log(`Answered ${totalAnswered} prayers (cost: ${totalCost} belief total)`);
+            } else {
+              this.log('No pending prayers to answer');
+            }
+          } catch (error) {
+            this.log(`ERROR answering prayers: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        } else {
+          this.log('ERROR: No world available');
+        }
         break;
       case 'grant_xp_all':
         this.grantXPToAllAgents(500);

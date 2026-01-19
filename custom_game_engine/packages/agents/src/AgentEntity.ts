@@ -307,7 +307,7 @@ export function createWanderingAgent(
   // Species - all agents default to human species
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
-  // Add to world - using internal _addEntity method for proper spatial indexing
+  // Add to world with proper spatial indexing
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
@@ -553,7 +553,7 @@ export function createLLMAgent(
     });
   }
 
-  // Add to world - using internal _addEntity method for proper spatial indexing
+  // Add to world with proper spatial indexing
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking

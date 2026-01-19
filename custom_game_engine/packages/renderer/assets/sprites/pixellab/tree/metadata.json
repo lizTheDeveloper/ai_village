@@ -1,17 +1,9 @@
 {
   "id": "tree",
-  "category": "regeneration",
+  "category": "objects",
   "size": 48,
-  "description": "Tree plant, pixel art, top-down view",
-  "generated_at": "2026-01-05T01:42:33.336Z",
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ]
+  "description": "Mature deciduous tree with full green canopy, thick trunk, pixel art, top-down view, transparent background",
+  "original_description": "Mature deciduous tree with full green canopy, thick trunk, pixel art, top-down view, transparent background",
+  "generated_at": "2026-01-19T03:51:03.911Z",
+  "type": "static"
 }

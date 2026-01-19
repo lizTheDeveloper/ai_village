@@ -82,6 +82,11 @@ export class Renderer {
   public showAgentTasks = true;
   public showCityBounds = true; // Show city director boundary boxes
 
+  // Reusable arrays to avoid per-frame allocations (massive GC savings)
+  private _visibleEntities: Entity[] = [];
+  private _agentPositions: Array<{ x: number; y: number }> = [];
+  private _sortedEntities: Entity[] = [];
+
   // Bound handlers for cleanup
   private boundResizeHandler: (() => void) | null = null;
 
@@ -325,53 +330,73 @@ export class Renderer {
     }
 
     // Draw entities (if any have position component)
-    let entities = world.query().with('position', 'renderable').executeEntities();
+    const allEntities = world.query().with('position', 'renderable').executeEntities();
 
-    // Get agent positions for proximity culling
-    const agentPositions: Array<{ x: number; y: number }> = [];
+    // Get agent positions for proximity culling - reuse array
+    this._agentPositions.length = 0;
     const agentEntities = world.query().with('agent', 'position').executeEntities();
     for (const agentEntity of agentEntities) {
       const pos = agentEntity.components.get('position') as PositionComponent | undefined;
       if (pos) {
-        agentPositions.push({ x: pos.x, y: pos.y });
+        this._agentPositions.push({ x: pos.x, y: pos.y });
       }
     }
 
     // Vision range for culling (from GameBalance.VISION_RANGE_TILES)
-    const VISION_RANGE = 15; // tiles
+    const VISION_RANGE_SQUARED = 15 * 15; // Use squared distance to avoid Math.sqrt
     const VIEWPORT_MARGIN = 2; // tiles - small margin for smooth scrolling
 
-    // Filter entities based on smart culling:
+    // Pre-calculate viewport bounds in tile coordinates
+    const viewMinX = bounds.left / this.tileSize - VIEWPORT_MARGIN;
+    const viewMaxX = bounds.right / this.tileSize + VIEWPORT_MARGIN;
+    const viewMinY = bounds.top / this.tileSize - VIEWPORT_MARGIN;
+    const viewMaxY = bounds.bottom / this.tileSize + VIEWPORT_MARGIN;
+
+    // Filter entities into reusable array (no allocation)
     // Keep if: building, planted crop, near any agent, or in viewport
-    entities = [...entities].filter((entity) => {
+    this._visibleEntities.length = 0;
+    for (const entity of allEntities) {
       const pos = entity.components.get('position') as PositionComponent | undefined;
-      if (!pos) return false;
+      if (!pos) continue;
 
       // Always keep buildings (agent-created)
-      if (entity.components.has('building')) return true;
+      if (entity.components.has('building')) {
+        this._visibleEntities.push(entity);
+        continue;
+      }
 
       // Always keep planted crops (agent-created)
       const plant = entity.components.get('plant') as PlantComponent | undefined;
-      if (plant?.planted) return true;
-
-      // Keep if within vision range of any agent
-      for (const agentPos of agentPositions) {
-        const dx = pos.x - agentPos.x;
-        const dy = pos.y - agentPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance <= VISION_RANGE) return true;
+      if (plant?.planted) {
+        this._visibleEntities.push(entity);
+        continue;
       }
 
-      // Keep if within viewport bounds (for player visibility)
-      const inViewportX = pos.x >= bounds.left / this.tileSize - VIEWPORT_MARGIN &&
-                         pos.x <= bounds.right / this.tileSize + VIEWPORT_MARGIN;
-      const inViewportY = pos.y >= bounds.top / this.tileSize - VIEWPORT_MARGIN &&
-                         pos.y <= bounds.bottom / this.tileSize + VIEWPORT_MARGIN;
-      if (inViewportX && inViewportY) return true;
+      // Keep if within viewport bounds (for player visibility) - check first as it's fastest
+      if (pos.x >= viewMinX && pos.x <= viewMaxX && pos.y >= viewMinY && pos.y <= viewMaxY) {
+        this._visibleEntities.push(entity);
+        continue;
+      }
 
-      // Cull everything else
-      return false;
-    });
+      // Keep if within vision range of any agent (squared distance - no sqrt!)
+      let nearAgent = false;
+      for (const agentPos of this._agentPositions) {
+        const dx = pos.x - agentPos.x;
+        const dy = pos.y - agentPos.y;
+        const distSquared = dx * dx + dy * dy;
+        if (distSquared <= VISION_RANGE_SQUARED) {
+          nearAgent = true;
+          break;
+        }
+      }
+      if (nearAgent) {
+        this._visibleEntities.push(entity);
+      }
+      // Otherwise cull
+    }
+
+    // Use filtered entities for the rest of rendering
+    let entities: Entity[] = this._visibleEntities;
 
     // In side-view mode, filter to only show entities "in front" of the camera
     // based on facing direction, within a few depth layers
@@ -383,29 +408,30 @@ export class Renderer {
       // Camera position in world tiles
       const cameraWorldX = this.camera.x / this.tileSize;
       const cameraWorldY = this.camera.y / this.tileSize;
+      const cameraDepth = depthAxis === 'x' ? cameraWorldX : cameraWorldY;
 
-      // Filter to only entities in front of the camera within depth range
-      entities = [...entities].filter((entity) => {
+      // Filter in-place into _sortedEntities to avoid allocation
+      this._sortedEntities.length = 0;
+      for (const entity of entities) {
         const pos = entity.components.get('position') as PositionComponent | undefined;
-        if (!pos) return false;
+        if (!pos) continue;
 
         // Get entity position on depth axis
         const entityDepth = depthAxis === 'x' ? pos.x : pos.y;
-        const cameraDepth = depthAxis === 'x' ? cameraWorldX : cameraWorldY;
 
         // Calculate signed distance in front of camera
-        // depthDirection tells us which way is "forward"
         const signedDistance = (entityDepth - cameraDepth) * depthDirection;
 
         // Only show entities that are in front (signedDistance >= 0) and within max depth
         // Also allow entities slightly behind (within 1 tile) for the current row
-        if (signedDistance < -1 || signedDistance > maxDepthLayers) return false;
+        if (signedDistance >= -1 && signedDistance <= maxDepthLayers) {
+          this._sortedEntities.push(entity);
+        }
+      }
+      entities = this._sortedEntities;
 
-        return true;
-      });
-
-      // Sort by depth (furthest first) then by Z (height)
-      entities = [...entities].sort((a, b) => {
+      // Sort in-place by depth (furthest first) then by Z (height)
+      entities.sort((a, b) => {
         const posA = a.components.get('position') as PositionComponent | undefined;
         const posB = b.components.get('position') as PositionComponent | undefined;
         if (!posA || !posB) return 0;
@@ -417,30 +443,20 @@ export class Renderer {
         if (Math.abs(depthDiff) > 0.5) return depthDiff;
 
         // Then by Z (height) - lower entities render first
-        const zA = posA.z;
-        const zB = posB.z;
-        return zA - zB;
+        return posA.z - posB.z;
       });
-    }
-
-    // Debug: count buildings
-    // const buildingEntities = entities.filter(e => e.components.has('building'));
-    // if (buildingEntities.length > 0) {
-    //   console.log(`[Renderer] Found ${buildingEntities.length} buildings to render:`,
-    //     buildingEntities.map(e => ({
-    //       id: e.id,
-    //       building: e.components.get('building'),
-    //       renderable: e.components.get('renderable'),
-    //       position: e.components.get('position')
-    //     }))
-    //   );
-    // }
-
-    // Sort entities for proper rendering order (both modes)
-    if (!this.camera.isSideView()) {
+    } else {
       // Top-down mode: sort by Y (lower Y = further from camera = render first)
       // Then by Z (lower Z = underground = render first)
-      entities = [...entities].sort((a, b) => {
+      // Copy to _sortedEntities for sorting (don't modify _visibleEntities)
+      this._sortedEntities.length = 0;
+      for (const entity of entities) {
+        this._sortedEntities.push(entity);
+      }
+      entities = this._sortedEntities;
+
+      // Sort in-place (no spread allocation!)
+      entities.sort((a, b) => {
         const posA = a.components.get('position') as PositionComponent | undefined;
         const posB = b.components.get('position') as PositionComponent | undefined;
         if (!posA || !posB) return 0;
@@ -451,9 +467,7 @@ export class Renderer {
         }
 
         // Secondary sort by Z
-        const zA = posA.z;
-        const zB = posB.z;
-        return zA - zB;
+        return posA.z - posB.z;
       });
     }
 
@@ -615,7 +629,7 @@ export class Renderer {
         this.canvas.width,
         this.canvas.height,
         this.camera.zoom,
-        [...entities] // Pass pre-filtered entities for performance (convert readonly to mutable)
+        entities // Already mutable from _sortedEntities - no spread needed
       );
     }
 

@@ -93,19 +93,23 @@ export interface MegastructureBlueprint {
 // DATA LOADING
 // ============================================================================
 
-import blueprintsData from '../../data/megastructures.json';
+import blueprintsData from '../../data/megastructures.json' assert { type: 'json' };
 
 // Load and validate blueprints from JSON
 function loadMegastructureBlueprints(): Record<string, MegastructureBlueprint> {
   const blueprints: Record<string, MegastructureBlueprint> = {};
 
-  for (const [key, data] of Object.entries(blueprintsData)) {
+  // Cast blueprintsData to the correct type
+  const data = blueprintsData as Record<string, Record<string, unknown>>;
+
+  for (const [key, blueprint] of Object.entries(data)) {
     // Validate required fields
-    if (!data.id || !data.name || !data.category || !data.tier) {
+    const bp = blueprint as any;
+    if (!bp.id || !bp.name || !bp.category || !bp.tier) {
       throw new Error(`Invalid megastructure blueprint: ${key} - missing required fields`);
     }
 
-    blueprints[key] = data as MegastructureBlueprint;
+    blueprints[key] = bp as MegastructureBlueprint;
   }
 
   return blueprints;
