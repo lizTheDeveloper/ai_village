@@ -379,8 +379,8 @@ export class ContextActionRegistry {
         const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as HarvestableComponent | undefined : undefined;
 
         eventBus.emit({ type: 'action:harvest', source: 'world', data: {
-          resourceId: ctx.targetEntity,
-          resourceType: harvestable?.resourceType
+          plantId: ctx.targetEntity,
+          speciesId: harvestable?.resourceType
         } });
       }
     });

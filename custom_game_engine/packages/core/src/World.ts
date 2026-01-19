@@ -1,6 +1,9 @@
 /**
  * Test helper World that provides convenience methods for component creation.
  * This is used in tests to simplify entity/component creation.
+ *
+ * NOTE: This is NOT the main World class - see ./ecs/World.ts for that.
+ * This is a test-only helper that extends WorldImpl.
  */
 
 import { WorldImpl } from './ecs/World.js';

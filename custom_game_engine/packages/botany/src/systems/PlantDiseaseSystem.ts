@@ -211,15 +211,15 @@ export class PlantDiseaseSystem extends BaseSystem {
       this.checkDiseaseOutbreak(plant, entityId, category, gameDay);
 
       // Check for new pest infestations
-      this.checkPestInfestation(plant, entityId, category, gameDay, world);
+      this.checkPestInfestation(plant, entityId, category, gameDay, world as any);
 
       // Disease spread
       if (this.config.enableSpread) {
-        this.spreadDiseases(plant, entityId, world, gameDay, activeEntities);
+        this.spreadDiseases(plant, entityId, world as any, gameDay, activeEntities);
       }
 
       // Pest migration
-      this.migratePests(plant, entityId, world, gameDay, activeEntities);
+      this.migratePests(plant, entityId, world as any, gameDay, activeEntities);
     }
   }
 
