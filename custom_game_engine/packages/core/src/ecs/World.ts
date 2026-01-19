@@ -22,6 +22,7 @@ import { resetUsedNames } from '../components/IdentityComponent.js';
 import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
 import { SimulationScheduler } from './SimulationScheduler.js';
 import { diagnosticsHarness } from '../diagnostics/DiagnosticsHarness.js';
+import { SpatialGrid } from './SpatialGrid.js';
 // ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
 // Re-export for backwards compatibility
@@ -282,6 +283,13 @@ export interface World {
   readonly simulationScheduler: SimulationScheduler;
 
   /**
+   * Spatial grid for high-performance proximity queries.
+   * Grid-based spatial hashing for O(1) lookups instead of O(n) entity iteration.
+   * Maintained by SpatialGridMaintenanceSystem.
+   */
+  readonly spatialGrid: SpatialGrid;
+
+  /**
    * Spatial query service for finding nearby entities.
    * Uses chunk-based indexing for O(nearby) instead of O(all entities).
    *
@@ -289,6 +297,16 @@ export interface World {
    * SystemContext.getNearbyEntities() which wrap this service.
    */
   readonly spatialQuery: import('../services/SpatialQueryService.js').SpatialQueryService | null;
+
+  /**
+   * Query entities near a point using the spatial grid.
+   * Convenience method that returns full Entity objects.
+   *
+   * Performance: O(cells_in_radius × entities_per_cell) instead of O(all_entities)
+   *
+   * Note: Caller should still check exact distance with squared distance comparison.
+   */
+  queryEntitiesNear(x: number, y: number, radius: number): Entity[];
 
   /**
    * Check if any entity in the world has the given component type.
@@ -509,6 +527,9 @@ export class WorldImpl implements WorldMutator {
   // Simulation scheduling for performance optimization
   private _simulationScheduler = new SimulationScheduler();
 
+  // Spatial grid for high-performance proximity queries
+  private _spatialGrid = new SpatialGrid(10);
+
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
@@ -567,6 +588,10 @@ export class WorldImpl implements WorldMutator {
 
   get simulationScheduler(): SimulationScheduler {
     return this._simulationScheduler;
+  }
+
+  get spatialGrid(): SpatialGrid {
+    return this._spatialGrid;
   }
 
   get spatialQuery(): import('../services/SpatialQueryService.js').SpatialQueryService | null {
@@ -679,11 +704,14 @@ export class WorldImpl implements WorldMutator {
       throw new Error(`Entity ${id} does not exist`);
     }
 
-    // Remove from spatial index
+    // Remove from spatial grid
     const pos = entity.components.get('position') as
-      | { chunkX: number; chunkY: number }
+      | { x: number; y: number; chunkX: number; chunkY: number }
       | undefined;
     if (pos) {
+      this._spatialGrid.remove(id);
+
+      // Also remove from chunk index
       const key = `${pos.chunkX},${pos.chunkY}`;
       this.chunkIndex.get(key)?.delete(id);
     }
@@ -1254,6 +1282,28 @@ export class WorldImpl implements WorldMutator {
   }
 
   /**
+   * Query entities near a point using the spatial grid.
+   * Convenience method that returns full Entity objects.
+   *
+   * Performance: O(cells_in_radius × entities_per_cell) instead of O(all_entities)
+   *
+   * Note: Caller should still check exact distance with squared distance comparison.
+   */
+  queryEntitiesNear(x: number, y: number, radius: number): Entity[] {
+    const entityIds = this._spatialGrid.getEntitiesNear(x, y, radius);
+    const entities: Entity[] = [];
+
+    for (const entityId of entityIds) {
+      const entity = this._entities.get(entityId);
+      if (entity) {
+        entities.push(entity);
+      }
+    }
+
+    return entities;
+  }
+
+  /**
    * Clear all entities from the world.
    * Used by save/load system to reset world state before deserialization.
    * WARNING: This is a destructive operation - use only during load operations.
@@ -1261,6 +1311,7 @@ export class WorldImpl implements WorldMutator {
   clear(): void {
     this._entities.clear();
     this.chunkIndex.clear();
+    this._spatialGrid.clear();
     this.doorLocationsCache = null;
     this._archetypeVersion++; // Invalidate query cache
   }

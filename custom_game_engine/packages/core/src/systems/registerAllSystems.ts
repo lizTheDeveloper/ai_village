@@ -34,6 +34,9 @@ import { TemperatureSystem } from './TemperatureSystem.js';
 import { FireSpreadSystem } from './FireSpreadSystem.js';
 import { SoilSystem } from './SoilSystem.js';
 
+// Infrastructure
+import { SpatialGridMaintenanceSystem } from './SpatialGridMaintenanceSystem.js';
+
 // Plants - Import from @ai-village/botany package and pass via config.plantSystems
 // Plant systems have been moved to @ai-village/botany
 import { PlantVisualsSystem } from './PlantVisualsSystem.js';
@@ -468,6 +471,13 @@ export function registerAllSystems(
 
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
+
+  // ============================================================================
+  // INFRASTRUCTURE - SPATIAL INDEXING
+  // ============================================================================
+  // SpatialGridMaintenanceSystem (priority 15) - Keep spatial grid synchronized
+  // Runs early to ensure spatial grid is up-to-date before systems query it
+  gameLoop.systemRegistry.register(new SpatialGridMaintenanceSystem());
 
   // ============================================================================
   // CHUNK LOADING (Terrain Generation)
