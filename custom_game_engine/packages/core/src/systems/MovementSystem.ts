@@ -16,6 +16,8 @@ import type { Tile } from '@ai-village/world';
 import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js';
 import { addSpatialMemory } from '../components/SpatialMemoryComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
+import type { BodyComponent } from '../components/BodyComponent.js';
+import { getPartsByFunction } from '../components/BodyComponent.js';
 
 
 interface TimeComponent {
@@ -357,10 +359,21 @@ export class MovementSystem extends BaseSystem {
         }
 
         // Medium-deep water (depth 3-4): Swimmable for aquatic species
-        // For now, block all movement (AgentSwimmingSystem will handle swimming later)
         if (depth <= 4) {
-          // TODO: Check if agent has 'swimming' locomotion
-          // For now: block movement
+          // Check if entity has swimming locomotion capability
+          const entity = world.entities.get(entityId);
+          if (entity) {
+            const impl = entity as EntityImpl;
+            const body = impl.getComponent<BodyComponent>(CT.Body);
+            if (body) {
+              const swimmingParts = getPartsByFunction(body, 'swimming');
+              // Allow movement if entity has functional swimming parts
+              if (swimmingParts.length > 0) {
+                return false; // Allow swimming
+              }
+            }
+          }
+          // Block movement if no swimming capability
           return true;
         }
 

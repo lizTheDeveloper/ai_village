@@ -170,10 +170,32 @@ export class AIGodBehaviorSystem extends BaseSystem {
     }
 
     // Priority 3: Protect faithful (bless them during hardship)
-    // TODO: Detect when believers are in danger
+    const endangeredBelievers = this.findEndangeredBelievers(world, deity);
+    if (endangeredBelievers.length > 0 && deity.belief.currentBelief >= 150) {
+      const mostEndangered = endangeredBelievers[0];
+      if (mostEndangered) {
+        // Bless the most endangered believer to protect them
+        deity.spendBelief(150);
+        // Minor miracle to protect believer (healing, food, warmth, etc.)
+        // Event emission for future integration with effect systems
+        world.eventBus.emit({
+          type: 'divinity:miracle',
+          source: deity.identity.primaryName,
+          data: {
+            deityId: _deityId,
+            targetId: mostEndangered.id,
+            powerType: 'bless_individual',
+            effect: 'divine_protection',
+            danger: mostEndangered.danger,
+          },
+        });
+      }
+    }
 
     // Priority 4: Domain expression (act according to domain)
-    // TODO: Weather gods cause weather, harvest gods bless crops, etc.
+    if (deity.belief.currentBelief >= 200 && deity.identity.domain) {
+      this.performDomainAction(world, _deityId, deity, _currentTick);
+    }
   }
 
   /**

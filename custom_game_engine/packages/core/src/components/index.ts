@@ -207,7 +207,6 @@ export { createGoalsComponent, formatGoalsForPrompt, formatGoalsSectionForPrompt
 export * from './MagicComponent.js';
 
 // Magic component splits (Phase 2 refactor)
-export * from './ManaPoolsComponent.js';
 export {
   createManaPoolsComponent,
   createManaPoolsComponentWithSource,
@@ -218,7 +217,6 @@ export {
   type ResourcePool,
 } from './ManaPoolsComponent.js';
 
-export * from './SpellKnowledgeComponent.js';
 export {
   createSpellKnowledgeComponent,
   createSpellKnowledgeComponentWithParadigm,
@@ -228,7 +226,6 @@ export {
   type KnownSpell,
 } from './SpellKnowledgeComponent.js';
 
-export * from './CastingStateComponent.js';
 export {
   createCastingStateComponent,
   isCasting,
@@ -236,7 +233,6 @@ export {
   type CastingStateComponent,
 } from './CastingStateComponent.js';
 
-export * from './SkillProgressComponent.js';
 export {
   createSkillProgressComponent,
   createSkillProgressComponentWithParadigm,
@@ -247,11 +243,10 @@ export {
   type SkillTreeParadigmState,
 } from './SkillProgressComponent.js';
 
-export * from './ParadigmStateComponent.js';
 export {
   createParadigmStateComponent,
   createParadigmStateComponentWithParadigm,
-  getParadigmState,
+  getComponentParadigmState,
   hasParadigm,
   type ParadigmStateComponent,
   type ParadigmSpecificState,
@@ -314,13 +309,12 @@ export type {
   NeedsBodyPart,
 } from './NeedsComponent.js';
 // Magic system types (forward-compatibility - Phase 30)
+// Note: ManaPool and KnownSpell are exported from split components above
 export type {
   MagicSourceId,
   MagicTechnique,
   MagicForm,
   ComposedSpell,
-  KnownSpell,
-  ManaPool,
   MagicComponent,
 } from './MagicComponent.js';
 // Spiritual system types (forward-compatibility - Phase 27)

@@ -35,6 +35,9 @@ import { DivineSpellManager } from '@ai-village/magic/managers/DivineSpellManage
 import { SpellCastingManager } from '@ai-village/magic/managers/SpellCastingManager.js';
 import { SpellValidator } from '@ai-village/magic/validation/SpellValidator.js';
 
+// Import migration utility
+import { migrateAllMagicComponents } from '@ai-village/magic/MagicComponentMigration.js';
+
 /**
  * MagicSystem - Process magic casting and effects
  *
@@ -67,12 +70,10 @@ export class MagicSystem extends BaseSystem {
     if (!this.initialized) {
       // Auto-migrate all entities from monolithic MagicComponent to split components
       // This ensures backward compatibility with old saves
-      import('@ai-village/magic/MagicComponentMigration.js').then(({ migrateAllMagicComponents }) => {
-        const migratedCount = migrateAllMagicComponents(world, false); // Keep old component for now
-        if (migratedCount > 0) {
-          console.warn(`[MagicSystem] Auto-migrated ${migratedCount} entities to split magic components`);
-        }
-      });
+      const migratedCount = migrateAllMagicComponents(world, false); // Keep old component for now
+      if (migratedCount > 0) {
+        console.warn(`[MagicSystem] Auto-migrated ${migratedCount} entities to split magic components`);
+      }
 
       initMagicInfrastructure(world);
       this.effectExecutor = SpellEffectExecutor.getInstance();

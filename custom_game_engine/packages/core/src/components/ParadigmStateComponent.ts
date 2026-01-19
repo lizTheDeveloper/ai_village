@@ -228,9 +228,9 @@ export function createParadigmStateComponentWithParadigm(
 }
 
 /**
- * Get paradigm-specific state for a paradigm.
+ * Get paradigm-specific state for a paradigm from a component.
  */
-export function getParadigmState(
+export function getComponentParadigmState(
   component: ParadigmStateComponent,
   paradigmId: string
 ): ParadigmSpecificState | undefined {
