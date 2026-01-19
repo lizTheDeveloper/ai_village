@@ -309,71 +309,153 @@ interface LanguageConfig {
 
 ```typescript
 class LanguageGenerator {
+  private phonemeAnalyzer = new PhonemeAnalyzer();
+  private descriptionGrammar = new LanguageDescriptionGrammar();
+
   /**
    * Generate a language from planet configuration
    */
   generateLanguage(planetConfig: PlanetConfig, seed: string): LanguageConfig {
     const rng = seededRandom(seed);
 
-    // 1. Select phoneme subset (30-60% of universal set)
-    const consonants = selectRandomSubset(
-      UNIVERSAL_PHONEMES.stops.concat(
-        UNIVERSAL_PHONEMES.fricatives,
-        UNIVERSAL_PHONEMES.nasals,
-        UNIVERSAL_PHONEMES.liquids
-      ),
-      rng.intBetween(8, 15)
+    // 1. Select phoneme objects (with metadata)
+    const selectedConsonants = this.selectPhonemesWithBias(
+      UNIVERSAL_PHONEMES.consonants,
+      planetConfig.type,
+      rng,
+      8,
+      15
     );
 
-    const vowels = selectRandomSubset(
-      UNIVERSAL_PHONEMES.closeVowels.concat(
-        UNIVERSAL_PHONEMES.midVowels,
-        UNIVERSAL_PHONEMES.openVowels
-      ),
-      rng.intBetween(3, 7)
+    const selectedVowels = this.selectPhonemesWithBias(
+      UNIVERSAL_PHONEMES.vowels,
+      planetConfig.type,
+      rng,
+      3,
+      7
     );
 
-    // 2. Planet-specific phoneme biases
-    if (planetConfig.type === 'volcanic') {
-      // Add harsh sounds
-      consonants.push(...['kh', 'x', 'q']);
-      vowels = vowels.filter(v => v !== 'u'); // Prefer open vowels
-    } else if (planetConfig.type === 'ocean') {
-      // Add liquid sounds
-      consonants.push(...['l', 'r', 'w']);
-      vowels.push('u', 'o'); // Prefer rounded vowels
-    }
+    const selectedClusters = rng.chance(0.5)
+      ? selectRandomSubset(UNIVERSAL_PHONEMES.clusters, 3)
+      : [];
 
-    // 3. Define syllable patterns
+    // Combine all selected phonemes
+    const allSelectedPhonemes = [
+      ...selectedConsonants,
+      ...selectedVowels,
+      ...selectedClusters,
+    ];
+
+    // 2. Analyze phoneme qualities to determine language character
+    const character = this.phonemeAnalyzer.analyzeLanguageCharacter(allSelectedPhonemes);
+
+    // 3. Generate Tracery description based on character
+    const description = this.descriptionGrammar.generateDescription(character, planetConfig.type);
+
+    // 4. Define syllable patterns
     const patterns = selectRandomSubset(
       UNIVERSAL_PHONEMES.syllablePatterns,
       rng.intBetween(3, 6)
     );
 
-    // 4. Generate morphology rules
+    // 5. Generate morphology rules
     const config: LanguageConfig = {
       id: `${planetConfig.type}_lang_${seed}`,
       name: '', // Generated later through translation
       planetType: planetConfig.type,
       seed,
-      selectedConsonants: consonants,
-      selectedVowels: vowels,
-      selectedClusters: rng.chance(0.5) ? selectRandomSubset(UNIVERSAL_PHONEMES.clusters, 3) : [],
+
+      // Store both full phoneme objects and flat arrays
+      selectedPhonemes: allSelectedPhonemes,
+      selectedConsonants: selectedConsonants.map(p => p.sound),
+      selectedVowels: selectedVowels.map(p => p.sound),
+      selectedClusters: selectedClusters.map(p => p.sound),
       allowedClusters: rng.chance(0.5),
       allowedTones: rng.chance(0.3),
+
+      // Language character from analysis
+      character,
+      description,
+
       syllablePatterns: patterns,
       maxSyllablesPerWord: rng.intBetween(2, 4),
       vowelHarmony: rng.chance(0.4),
       consonantHarmony: rng.chance(0.3),
       wordOrder: rng.choice(['SVO', 'SOV', 'VSO']),
       usesAffixes: rng.chance(0.7),
-      prefixes: generateAffixes(consonants, vowels, 'prefix', 3),
-      suffixes: generateAffixes(consonants, vowels, 'suffix', 5),
+      prefixes: generateAffixes(
+        selectedConsonants.map(p => p.sound),
+        selectedVowels.map(p => p.sound),
+        'prefix',
+        3
+      ),
+      suffixes: generateAffixes(
+        selectedConsonants.map(p => p.sound),
+        selectedVowels.map(p => p.sound),
+        'suffix',
+        5
+      ),
       nameStructure: rng.choice(['given', 'given-family', 'single']),
       placeNamePattern: '', // Generated below
     };
 
     return config;
+  }
+
+  /**
+   * Select phonemes with planet-type biases
+   */
+  private selectPhonemesWithBias(
+    phonemes: PhonemeMetadata[],
+    planetType: string,
+    rng: SeededRandom,
+    min: number,
+    max: number
+  ): PhonemeMetadata[] {
+    const count = rng.intBetween(min, max);
+
+    // Weight phonemes by planet type
+    const weighted = phonemes.map(p => ({
+      phoneme: p,
+      weight: this.getPhonemeWeight(p, planetType),
+    }));
+
+    // Weighted random selection
+    const selected: PhonemeMetadata[] = [];
+    for (let i = 0; i < count; i++) {
+      const phoneme = weightedChoice(weighted, rng);
+      if (phoneme && !selected.includes(phoneme)) {
+        selected.push(phoneme);
+      }
+    }
+
+    return selected;
+  }
+
+  /**
+   * Get weight for phoneme based on planet type
+   */
+  private getPhonemeWeight(phoneme: PhonemeMetadata, planetType: string): number {
+    let weight = 1.0;
+
+    if (planetType === 'volcanic') {
+      // Prefer guttural, harsh, sharp
+      if (phoneme.qualities.texture.includes('guttural')) weight += 2.0;
+      if (phoneme.qualities.hardness.includes('harsh')) weight += 1.5;
+      if (phoneme.qualities.manner.includes('sharp')) weight += 1.0;
+    } else if (planetType === 'ocean') {
+      // Prefer liquid, soft, flowing
+      if (phoneme.qualities.texture.includes('liquid')) weight += 2.0;
+      if (phoneme.qualities.hardness.includes('soft')) weight += 1.5;
+      if (phoneme.qualities.manner.includes('flowing')) weight += 1.0;
+    } else if (planetType === 'desert') {
+      // Prefer sibilant, crisp, sharp
+      if (phoneme.qualities.texture.includes('sibilant')) weight += 2.0;
+      if (phoneme.qualities.hardness.includes('crisp')) weight += 1.5;
+      if (phoneme.qualities.manner.includes('sharp')) weight += 1.0;
+    }
+
+    return weight;
   }
 }
 ```

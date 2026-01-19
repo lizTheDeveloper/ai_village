@@ -19,17 +19,40 @@ import planetPresetsData from '../../data/planet-presets.json';
 // Load Planet Presets from JSON
 // ============================================================================
 
+interface RawPlanetPresetsData {
+  biome_sets: Record<string, BiomeType[]>;
+  presets: Record<PlanetType, Omit<PlanetPreset, 'allowedBiomes'> & { allowedBiomes: string | BiomeType[] }>;
+}
+
 interface PlanetPresetsData {
   biome_sets: Record<string, BiomeType[]>;
   presets: Record<PlanetType, PlanetPreset>;
 }
 
 function loadPlanetPresets(): Record<PlanetType, PlanetPreset> {
-  const data = planetPresetsData as PlanetPresetsData;
-  if (!data || !data.presets) {
+  const rawData = planetPresetsData as RawPlanetPresetsData;
+  if (!rawData || !rawData.presets || !rawData.biome_sets) {
     throw new Error('Failed to load planet presets from JSON');
   }
-  return data.presets;
+
+  // Resolve biome set references
+  const resolvedPresets: Record<string, PlanetPreset> = {};
+  for (const [planetType, preset] of Object.entries(rawData.presets)) {
+    const allowedBiomes = typeof preset.allowedBiomes === 'string'
+      ? rawData.biome_sets[preset.allowedBiomes]
+      : preset.allowedBiomes;
+
+    if (!allowedBiomes) {
+      throw new Error(`Missing biome set for planet type ${planetType}: ${preset.allowedBiomes}`);
+    }
+
+    resolvedPresets[planetType] = {
+      ...preset,
+      allowedBiomes,
+    };
+  }
+
+  return resolvedPresets as Record<PlanetType, PlanetPreset>;
 }
 
 /**
@@ -82,7 +105,7 @@ export function createPlanetConfigFromPreset(
     elevationOffset: overrides?.elevationOffset ?? preset.elevationOffset ?? 0,
     elevationScale: overrides?.elevationScale ?? preset.elevationScale ?? 1.0,
     seaLevel: overrides?.seaLevel ?? preset.seaLevel ?? -0.3,
-    allowedBiomes: overrides?.allowedBiomes ?? preset.allowedBiomes ?? STANDARD_BIOMES,
+    allowedBiomes: overrides?.allowedBiomes ?? preset.allowedBiomes,
     // Physical properties
     ...(preset.gravity !== undefined && { gravity: overrides?.gravity ?? preset.gravity }),
     ...(preset.atmosphereDensity !== undefined && { atmosphereDensity: overrides?.atmosphereDensity ?? preset.atmosphereDensity }),
