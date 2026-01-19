@@ -176,13 +176,13 @@ export class PredatorAttackSystem extends BaseSystem {
     }, predator.id);
 
     // Find allies within 5 units
-    const allies = this.findAllies(world, target, targetPos, agents);
+    const allies = this.findAllies(world, target, targetPos, agents as Entity[]);
 
     // Resolve combat
     this.resolveCombat(world, predator, target, animal, combatStats ?? null, allies);
 
     // Alert nearby agents
-    this.alertNearbyAgents(world, predator, target, targetPos, agents);
+    this.alertNearbyAgents(world, predator, target, targetPos, agents as Entity[]);
   }
 
   private evaluateAttackTrigger(

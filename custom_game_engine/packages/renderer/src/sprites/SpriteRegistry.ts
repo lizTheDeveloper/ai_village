@@ -8,7 +8,7 @@
  * match while flagging that a better sprite should be generated.
  */
 
-import spriteRegistryData from '../../data/sprite-registry.json' assert { type: 'json' };
+import spriteRegistryData from '../../data/sprite-registry.json';
 
 export type BodyType = 'humanoid' | 'quadruped' | 'avian' | 'serpentine' | 'insectoid';
 export type ClothingType = 'peasant' | 'common' | 'merchant' | 'noble' | 'royal';

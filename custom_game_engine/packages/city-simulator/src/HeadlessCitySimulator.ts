@@ -68,10 +68,10 @@ interface WorldInternal extends World {
 }
 
 // GameLoop with public tick method
-interface GameLoopWithTick extends GameLoop {
+type GameLoopWithTick = GameLoop & {
   tick(deltaTime: number): void;
   world: World;
-}
+};
 
 // =============================================================================
 // TYPES

@@ -10,6 +10,8 @@
 
 import type { MultiverseCoordinator } from './MultiverseCoordinator.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
+import type { EventBus } from '../events/EventBus.js';
+import type { VersionedEntity } from '../persistence/types.js';
 import type {
   NetworkMessage,
   RemotePassage,
@@ -1160,7 +1162,7 @@ export class MultiverseNetworkManager {
         type: 'universe_tick',
         universeId: subscription.universeId,
         tick: universe.universeTick.toString(),
-        entitiesAdded,
+        entitiesAdded: entitiesAdded as VersionedEntity[],
         entitiesUpdated,
         entitiesRemoved,
         events: [], // TODO: Add event streaming
@@ -1277,7 +1279,7 @@ export class MultiverseNetworkManager {
         deltas.push({
           componentType: type,
           operation: 'add',
-          data: component,
+          data: component as Partial<any> | undefined,
         });
       }
     }
@@ -1303,7 +1305,7 @@ export class MultiverseNetworkManager {
           deltas.push({
             componentType: type,
             operation: 'update',
-            data: current,
+            data: current as Partial<any> | undefined,
           });
         }
       }
@@ -1326,7 +1328,7 @@ export class MultiverseNetworkManager {
       if (typeof world !== 'object' || world === null || !('eventBus' in world)) {
         throw new Error('World does not have eventBus property');
       }
-      type WorldWithEventBus = { eventBus: unknown };
+      type WorldWithEventBus = { eventBus: EventBus };
       events = new SystemEventManager((world as WorldWithEventBus).eventBus, `multiverse_network_${universeId}`);
       this.eventManagers.set(universeId, events);
     }
@@ -1355,7 +1357,7 @@ export class MultiverseNetworkManager {
         reject(new Error('Acknowledgment timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, { resolve, reject, timeout });
+      this.pendingAcks.set(key, { resolve: resolve as any, reject: reject as any, timeout });
     });
   }
 
@@ -1374,7 +1376,7 @@ export class MultiverseNetworkManager {
         reject(new Error('Response timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, { resolve, reject, timeout });
+      this.pendingAcks.set(key, { resolve: resolve as any, reject: reject as any, timeout });
     });
   }
 

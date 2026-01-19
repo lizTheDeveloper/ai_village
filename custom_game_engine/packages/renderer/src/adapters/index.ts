@@ -7,7 +7,7 @@
  */
 
 import { PanelAdapter, type PanelConfig } from './PanelAdapter.js';
-import panelConfigsDataRaw from '../../data/panel-configs.json' assert { type: 'json' };
+import panelConfigsDataRaw from '../../data/panel-configs.json';
 
 // ============================================================================
 // JSON Data Loading

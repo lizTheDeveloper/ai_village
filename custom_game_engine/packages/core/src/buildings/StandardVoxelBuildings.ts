@@ -11,7 +11,7 @@
  */
 
 import type { BuildingBlueprint } from './BuildingBlueprintRegistry.js';
-import buildingsDataRaw from '../../data/buildings.json' assert { type: 'json' };
+import buildingsDataRaw from '../../data/buildings.json';
 
 const buildingsData = buildingsDataRaw as { buildings: BuildingBlueprint[] };
 

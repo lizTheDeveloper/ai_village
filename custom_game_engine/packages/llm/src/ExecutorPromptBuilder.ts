@@ -68,14 +68,14 @@ export interface ExecutorPrompt {
 }
 
 /**
- * Extended World interface with buildingRegistry
+ * Extended World type with buildingRegistry
  */
-interface WorldWithBuildingRegistry extends World {
+type WorldWithBuildingRegistry = World & {
   buildingRegistry?: {
     get(buildingType: string): any;
     getUnlocked(): any[];
   };
-}
+};
 
 /**
  * ExecutorPromptBuilder - Builds prompts for strategic decision-making

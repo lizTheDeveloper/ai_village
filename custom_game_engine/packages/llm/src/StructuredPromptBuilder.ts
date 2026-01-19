@@ -66,14 +66,14 @@ export interface AgentPrompt {
 }
 
 /**
- * Extended World interface with buildingRegistry
+ * Extended World type with buildingRegistry
  */
-interface WorldWithBuildingRegistry extends World {
+type WorldWithBuildingRegistry = World & {
   buildingRegistry?: {
     get(buildingType: string): any;
     getUnlocked(): any[];
   };
-}
+};
 
 /**
  * Builds structured prompts for LLM decision making.
