@@ -358,15 +358,15 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string):
 /**
  * Create souls for initial agents (adults spawned at game start)
  * These are not newborns, but mature individuals who need souls appropriate for their age
- * Shows ceremonies one at a time in a modal before the game starts
+ * Shows progress messages during creation - no modal dialogs
  */
 async function createSoulsForInitialAgents(
   gameLoop: GameLoop,
   agentIds: string[],
   llmProvider: LLMProvider,
-  renderer: any,
   universeConfig: UniverseConfig | null,
-  isLLMAvailable: boolean
+  isLLMAvailable: boolean,
+  onProgress?: (message: string) => void
 ): Promise<void> {
   const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
@@ -384,66 +384,45 @@ async function createSoulsForInitialAgents(
   // Set the LLM provider for the Fates to use
   soulSystem.setLLMProvider(llmProvider);
 
+  // Report start of soul weaving
+  if (onProgress) {
+    onProgress('✨ The Three Fates begin weaving souls...');
+  }
 
-  // Create modal to display ceremonies
-  const ceremonyModal = new SoulCeremonyModal();
-
-  // Create agent cards to show each created agent
-  const { AgentCreationCards } = await import('@ai-village/renderer');
-  const agentCards = new AgentCreationCards(renderer.pixelLabLoader);
-  agentCards.show();
-
-  // Create souls ONE AT A TIME (sequentially) so we can display each ceremony
-  // No timeout - wait indefinitely for ceremony completion (loading animation will be added later)
-
-  for (let index = 0; index < agentIds.length; index++) {
-    const agentId = agentIds[index]!;
+  // Create souls in parallel - let them all start at once
+  const soulPromises = agentIds.map(async (agentId, index) => {
     const agent = gameLoop.world.getEntity(agentId);
-    if (!agent) continue;
+    if (!agent) return;
 
     const identity = agent.components.get('identity') as any;
     const name = identity?.name ?? 'Unknown';
 
+    // Report this soul's creation
+    if (onProgress) {
+      onProgress(`🧵 Weaving soul for ${name}...`);
+    }
 
-    // Wait for this soul to be created before starting the next
-    // Add 30-second timeout to prevent hanging
-    const ceremonyPromise = new Promise<void>((resolve, reject) => {
-      let resolved = false;
-      let currentCeremonyData: any = null;
-
+    // Wait for this soul to be created
+    const ceremonyPromise = new Promise<void>((resolve) => {
       // Subscribe to ceremony events for this soul
-      const startSub = gameLoop.world.eventBus.subscribe('soul:ceremony_started', (event: any) => {
-        currentCeremonyData = event.data;
-        ceremonyModal.startCeremony({
-          culture: event.data.context.culture,
-          cosmicAlignment: event.data.context.cosmicAlignment,
-          isReforging: event.data.context.isReforging,
-          previousWisdom: event.data.context.previousWisdom,
-          previousLives: event.data.context.previousLives,
-        });
-      });
-
-      const thinkingSub = gameLoop.world.eventBus.subscribe('soul:fate_thinking', (event: any) => {
-        ceremonyModal.setThinking(event.data.speaker);
-      });
-
-      const speakSub = gameLoop.world.eventBus.subscribe('soul:fate_speaks', (event: any) => {
-        ceremonyModal.addSpeech(event.data.speaker, event.data.text, event.data.topic);
-      });
-
       const completeSub = gameLoop.world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
+        // Check if this event is for our agent
+        if (event.data.agentId !== agentId && event.data.soulId) {
+          // Check if soul is linked to this agent
+          const soulEntity = gameLoop.world.getEntity(event.data.soulId);
+          const incarnation = soulEntity?.components.get('incarnation') as any;
+          if (!incarnation || incarnation.primaryBindingId !== agentId) {
+            return; // Not our soul, skip
+          }
+        }
 
-        // Add agent card immediately when ceremony completes
-        const appearance = agent.components.get('appearance') as any;
-        const spriteFolder = appearance?.spriteFolder || 'villager';
-        agentCards.addAgentCard({
-          agentId,
-          name,
-          purpose: event.data.purpose,
-          archetype: event.data.archetype,
-          interests: event.data.interests,
-          spriteFolder,
-        });
+        // This is our soul - process it
+        completeSub(); // Unsubscribe
+
+        // Report completion
+        if (onProgress) {
+          onProgress(`💫 ${name}'s soul woven (${event.data.archetype})`);
+        }
 
         // Send soul to server repository for persistence
         fetch('http://localhost:3001/api/save-soul', {
@@ -451,7 +430,7 @@ async function createSoulsForInitialAgents(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             soulId: event.data.soulId,
-            agentId: event.data.agentId || event.data.soulId,
+            agentId: event.data.agentId || agentId,
             name: event.data.name,
             species: event.data.species,
             archetype: event.data.archetype,
@@ -465,101 +444,40 @@ async function createSoulsForInitialAgents(
           console.warn('[Soul Repository] Failed to save soul to server:', err);
         });
 
-        // Get first memory from universe scenario (not from ceremony transcript!)
-        let firstMemory: string | undefined;
-        if (universeConfig) {
-          const scenario = SCENARIO_PRESETS.find(s => s.id === universeConfig.scenarioPresetId);
-          firstMemory = scenario?.description || universeConfig.customScenarioText;
+        // Link soul to agent
+        const soulLink = createSoulLinkComponent(event.data.soulId, gameLoop.world.tick, true);
+        (agent as any).addComponent(soulLink);
+
+        // Update agent's spirituality based on the Fates' decision (archetype/interests)
+        const isMystic = event.data.archetype === 'mystic';
+        const hasSpiritualInterests = (event.data.interests as string[])?.some(
+          (i: string) => ['spirituality', 'divinity', 'faith', 'religion', 'prayer'].includes(i.toLowerCase())
+        );
+        if (isMystic || hasSpiritualInterests) {
+          const spiritual = agent.components.get('spiritual') as any;
+          if (spiritual) {
+            spiritual.spirituality = isMystic ? 0.95 : 0.8;
+          }
         }
 
-        // Get soul sprite folder and reincarnation count
-        const spriteFolderId = appearance?.spriteFolderId || appearance?.spriteFolder;
+        // Update soul's incarnation status
         const soulEntity = gameLoop.world.getEntity(event.data.soulId);
-        const soulIdentity = soulEntity?.components.get('soul_identity') as any;
-        const reincarnationCount = soulIdentity?.incarnationHistory?.length || 1;
-
-        ceremonyModal.completeCeremony(
-          event.data.purpose,
-          event.data.interests,
-          event.data.destiny,
-          event.data.archetype,
-          name,  // Pass the agent's name for personalized title
-          firstMemory,  // First memory from the Fates
-          () => {
-            // User accepted this soul - clean up and continue
-            if (!resolved) {
-              resolved = true;
-              startSub();  // Unsubscribe is the function itself
-              thinkingSub();
-              speakSub();
-              completeSub();
-              ceremonyModal.hide();
-
-              // Link soul to agent
-              const soulLink = createSoulLinkComponent(event.data.soulId, gameLoop.world.tick, true);
-              (agent as any).addComponent(soulLink);
-
-              // Update agent's spirituality based on the Fates' decision (archetype/interests)
-              // Mystic archetype or spiritual interests = high spirituality
-              const isMystic = event.data.archetype === 'mystic';
-              const hasSpiritualInterests = (event.data.interests as string[])?.some(
-                (i: string) => ['spirituality', 'divinity', 'faith', 'religion', 'prayer'].includes(i.toLowerCase())
-              );
-              if (isMystic || hasSpiritualInterests) {
-                const spiritual = agent.components.get('spiritual') as any;
-                if (spiritual) {
-                  spiritual.spirituality = isMystic ? 0.95 : 0.8;
-                }
-              }
-
-              // Update soul's incarnation status
-              const soulEntity = gameLoop.world.getEntity(event.data.soulId);
-              if (soulEntity) {
-                const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
-                if (incarnation) {
-                  incarnation.currentBindings.push({
-                    targetId: agentId,
-                    bindingType: 'incarnated',
-                    bindingStrength: 1.0,
-                    createdTick: gameLoop.world.tick,
-                    isPrimary: true,
-                  });
-                  incarnation.state = 'incarnated';
-                  incarnation.primaryBindingId = agentId;
-                }
-              }
-
-              resolve();
-            }
-          },
-          () => {
-            // User rejected this soul - regenerate a new one
-
-            // Hide modal and reset state
-            ceremonyModal.hide();
-            startSub();
-            thinkingSub();
-            speakSub();
-            completeSub();
-
-            // Trigger a new soul creation ceremony
-            // This will loop back and create a new ceremony for the same agent
-            const context: SoulCreationContext = {
-              culture: 'The First Village',
-              cosmicAlignment: 0.5 + (Math.random() - 0.5) * 0.3,
-              isReforging: false,
-              ceremonyRealm: 'tapestry_of_fate',
-              worldEvents: ['The first village is being founded'],
-            };
-
-            // Re-request soul creation with same agent
-            soulSystem.requestSoulCreation(context, (newSoulId: string) => {
-              // New ceremony will fire events and re-trigger this handler
+        if (soulEntity) {
+          const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
+          if (incarnation) {
+            incarnation.currentBindings.push({
+              targetId: agentId,
+              bindingType: 'incarnated',
+              bindingStrength: 1.0,
+              createdTick: gameLoop.world.tick,
+              isPrimary: true,
             });
-          },
-          spriteFolderId,
-          reincarnationCount
-        );
+            incarnation.state = 'incarnated';
+            incarnation.primaryBindingId = agentId;
+          }
+        }
+
+        resolve();
       });
 
       // Context for adult soul creation (not a newborn)
@@ -577,24 +495,15 @@ async function createSoulsForInitialAgents(
       });
     });
 
-    // Add timeout to ceremony
-    const timeoutPromise = new Promise<void>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`Soul ceremony for ${name} timed out after 30 seconds`));
-      }, 30000);
-    });
+    return ceremonyPromise;
+  });
 
-    try {
-      await Promise.race([ceremonyPromise, timeoutPromise]);
-    } catch (error) {
-      console.error(`[Demo] Soul ceremony failed for ${name}:`, error);
-      console.warn(`[Demo] Skipping soul for ${name} and continuing...`);
-      // Continue to next agent even if this one fails
-    }
+  // Wait for all souls to be created
+  await Promise.all(soulPromises);
+
+  if (onProgress) {
+    onProgress('✅ All souls woven by the Fates!');
   }
-
-
-  // Cards stay visible - no auto-hide
 }
 
 async function createPlayerDeity(world: WorldMutator): Promise<string> {
@@ -4310,17 +4219,23 @@ async function main() {
       console.log('[Main] SharedWorker already running simulation');
     }
 
-    // Create souls for the initial agents (displays modal before map loads)
-    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
+    // Start creating souls for the initial agents (non-blocking - runs in parallel)
+    const soulCreationPromise = createSoulsForInitialAgents(
+      gameLoop,
+      agentIds,
+      llmProvider,
+      universeConfig,
+      isLLMAvailable,
+      (message: string) => {
+        if (universeConfigScreen) {
+          universeConfigScreen.updateProgress(message);
+        }
+      }
+    );
 
     // Populate the roster panels with initial agents
     panels.agentRosterPanel.updateFromWorld(gameLoop.world);
     panels.animalRosterPanel.updateFromWorld(gameLoop.world);
-
-    // Hide the universe config screen now that all souls are created
-    if (universeConfigScreen) {
-      universeConfigScreen.hide();
-    }
 
     const playerDeityId = await createPlayerDeity(gameLoop.world);
 
@@ -4566,6 +4481,16 @@ async function main() {
   );
 
   // Game loop already started before soul creation
+
+  // Wait for soul creation to complete before hiding loading screen and taking snapshot
+  if (!loadedCheckpoint && soulCreationPromise) {
+    await soulCreationPromise;
+
+    // Hide the universe config screen now that all souls are created
+    if (universeConfigScreen) {
+      universeConfigScreen.hide();
+    }
+  }
 
   // Take initial snapshot for new universes so reloading returns to the same universe
   if (!loadedCheckpoint) {

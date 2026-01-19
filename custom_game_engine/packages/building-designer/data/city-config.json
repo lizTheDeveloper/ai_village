@@ -1,0 +1,326 @@
+{
+  "$schema": "./city-config.schema.json",
+  "version": "1.0.0",
+  "description": "City generation configuration for building-designer package",
+
+  "citySizes": {
+    "tiny": {
+      "sectors": 5,
+      "tiles": 320,
+      "description": "5x5 sectors = 320x320 tiles (320m hamlet)"
+    },
+    "small": {
+      "sectors": 10,
+      "tiles": 640,
+      "description": "10x10 sectors = 640x640 tiles (640m village)"
+    },
+    "medium": {
+      "sectors": 25,
+      "tiles": 1600,
+      "description": "25x25 sectors = 1600x1600 tiles (1.6km town)"
+    },
+    "large": {
+      "sectors": 80,
+      "tiles": 5120,
+      "description": "80x80 sectors = 5120x5120 tiles (5km city)"
+    },
+    "huge": {
+      "sectors": 200,
+      "tiles": 12800,
+      "description": "200x200 sectors = 12800x12800 tiles (12.8km metropolis)"
+    }
+  },
+
+  "sectorSize": 64,
+
+  "streetWidths": {
+    "arterial": 12,
+    "collector": 8,
+    "local": 5,
+    "alley": 3,
+    "_comment": "Street widths in tiles (1 tile = 1 meter). Scaled for realistic medieval/fantasy city streets."
+  },
+
+  "citySpacing": {
+    "tiny": 5000,
+    "small": 15000,
+    "medium": 40000,
+    "large": 100000,
+    "huge": 300000,
+    "_comment": "Minimum distance between settlements (in tiles/meters). Based on realistic medieval settlement spacing."
+  },
+
+  "cityDensityPerMillionKm2": {
+    "plains": 8,
+    "forest": 2,
+    "desert": 0.5,
+    "mountains": 1,
+    "river": 10,
+    "ocean": 0,
+    "_comment": "City generation density per biome (cities per 1,000,000 km²). Earth's land area is ~150 million km²."
+  },
+
+  "biomeCityTypes": {
+    "plains": ["grid", "organic"],
+    "forest": ["organic"],
+    "desert": ["organic"],
+    "mountains": ["dwarven", "organic"],
+    "river": ["grid", "organic"],
+    "_comment": "Preferred city types by biome. Each biome favors certain architectural styles."
+  },
+
+  "biomeMaxCitySize": {
+    "plains": "huge",
+    "forest": "medium",
+    "desert": "small",
+    "mountains": "large",
+    "river": "huge",
+    "_comment": "Maximum city size allowed per biome. Some biomes can't support large cities."
+  },
+
+  "districtBuildings": {
+    "civic": "COMMUNITY_BUILDINGS",
+    "market": "COMMERCIAL_BUILDINGS",
+    "residential": "RESIDENTIAL_BUILDINGS",
+    "industrial": "PRODUCTION_BUILDINGS",
+    "research": "RESEARCH_BUILDINGS",
+    "agricultural": "FARMING_BUILDINGS",
+    "storage": "STORAGE_BUILDINGS",
+    "military": "MILITARY_BUILDINGS",
+    "slums": "RESIDENTIAL_BUILDINGS[tier<=1]",
+    "wealthy": "RESIDENTIAL_BUILDINGS[tier>=3]",
+    "mine": "STORAGE_BUILDINGS",
+    "forge": "PRODUCTION_BUILDINGS[name~=forge||tier>=2]",
+    "greathall": "COMMUNITY_BUILDINGS",
+    "crafthall": "PRODUCTION_BUILDINGS",
+    "mushroom_farm": "FARMING_BUILDINGS",
+    "library": "RESEARCH_BUILDINGS",
+    "margins": "RESEARCH_BUILDINGS[tier<=2]",
+    "footnotes": "RESEARCH_BUILDINGS",
+    "typo_void": "RESIDENTIAL_BUILDINGS[tier<=1]",
+    "scriptorium": "RESEARCH_BUILDINGS",
+    "resonance_chamber": "COMMUNITY_BUILDINGS",
+    "prism_core": "RESEARCH_BUILDINGS",
+    "facet_housing": "RESIDENTIAL_BUILDINGS[tier>=2]",
+    "refraction_lab": "RESEARCH_BUILDINGS",
+    "brood_chamber": "FARMING_BUILDINGS",
+    "royal_cell": "COMMUNITY_BUILDINGS",
+    "worker_warren": "RESIDENTIAL_BUILDINGS[tier<=2]",
+    "nectar_store": "STORAGE_BUILDINGS",
+    "pheromone_hub": "COMMERCIAL_BUILDINGS",
+    "mycelium_network": "STORAGE_BUILDINGS",
+    "spore_tower": "COMMUNITY_BUILDINGS",
+    "decomposition_pit": "PRODUCTION_BUILDINGS",
+    "fruiting_body": "FARMING_BUILDINGS",
+    "bubble_dome": "RESIDENTIAL_BUILDINGS",
+    "kelp_forest": "FARMING_BUILDINGS",
+    "pressure_lock": "STORAGE_BUILDINGS",
+    "current_channel": "COMMERCIAL_BUILDINGS",
+    "abyssal_shrine": "COMMUNITY_BUILDINGS",
+    "past_echo": "RESIDENTIAL_BUILDINGS[tier<=1]",
+    "present_anchor": "COMMUNITY_BUILDINGS",
+    "future_shadow": "RESEARCH_BUILDINGS",
+    "chrono_nexus": "RESEARCH_BUILDINGS",
+    "paradox_zone": "STORAGE_BUILDINGS",
+    "lucid_plaza": "COMMUNITY_BUILDINGS",
+    "nightmare_quarter": "MILITARY_BUILDINGS",
+    "memory_palace": "RESEARCH_BUILDINGS",
+    "impossible_stair": "RESIDENTIAL_BUILDINGS",
+    "waking_edge": "COMMERCIAL_BUILDINGS",
+    "gravity_anchor": "COMMUNITY_BUILDINGS",
+    "star_dock": "COMMERCIAL_BUILDINGS",
+    "void_garden": "FARMING_BUILDINGS",
+    "silence_temple": "COMMUNITY_BUILDINGS",
+    "tether_station": "STORAGE_BUILDINGS",
+    "heart_chamber": "COMMUNITY_BUILDINGS",
+    "neural_cluster": "RESEARCH_BUILDINGS",
+    "digestion_tract": "PRODUCTION_BUILDINGS",
+    "membrane_quarter": "MILITARY_BUILDINGS",
+    "growth_bud": "FARMING_BUILDINGS",
+    "seed_pattern": "COMMUNITY_BUILDINGS",
+    "iteration_ring": "RESIDENTIAL_BUILDINGS",
+    "scale_bridge": "COMMERCIAL_BUILDINGS",
+    "infinity_edge": "RESEARCH_BUILDINGS",
+    "harmony_hall": "COMMUNITY_BUILDINGS",
+    "rhythm_quarter": "PRODUCTION_BUILDINGS",
+    "melody_spire": "RESIDENTIAL_BUILDINGS[tier>=2]",
+    "bass_foundation": "STORAGE_BUILDINGS",
+    "dissonance_pit": "RESEARCH_BUILDINGS",
+    "_comment": "District preferences for building categories. References building arrays from buildings.ts. Filters use notation: [tier<=1] means tier is 1 or less."
+  },
+
+  "districtAffinities": {
+    "civic": {
+      "prefer": ["market", "wealthy"],
+      "avoid": ["industrial", "slums"]
+    },
+    "market": {
+      "prefer": ["civic", "residential"],
+      "avoid": ["military"]
+    },
+    "residential": {
+      "prefer": ["market", "civic"],
+      "avoid": ["industrial"]
+    },
+    "industrial": {
+      "prefer": ["storage", "slums"],
+      "avoid": ["wealthy", "civic", "residential"]
+    },
+    "research": {
+      "prefer": ["civic", "wealthy"],
+      "avoid": ["slums", "industrial"]
+    },
+    "agricultural": {
+      "prefer": ["storage"],
+      "avoid": ["civic", "wealthy"]
+    },
+    "storage": {
+      "prefer": ["industrial", "agricultural", "market"],
+      "avoid": []
+    },
+    "military": {
+      "prefer": [],
+      "avoid": ["slums"]
+    },
+    "slums": {
+      "prefer": ["industrial"],
+      "avoid": ["wealthy", "civic"]
+    },
+    "wealthy": {
+      "prefer": ["civic", "research"],
+      "avoid": ["industrial", "slums"]
+    },
+    "mine": {
+      "prefer": ["forge", "storage"],
+      "avoid": ["greathall", "residential"]
+    },
+    "forge": {
+      "prefer": ["mine", "crafthall"],
+      "avoid": ["mushroom_farm", "residential"]
+    },
+    "greathall": {
+      "prefer": ["residential", "crafthall"],
+      "avoid": ["mine", "typo_void"]
+    },
+    "crafthall": {
+      "prefer": ["forge", "storage"],
+      "avoid": ["typo_void"]
+    },
+    "mushroom_farm": {
+      "prefer": ["storage", "residential"],
+      "avoid": ["forge"]
+    },
+    "library": {
+      "prefer": ["scriptorium", "research", "footnotes"],
+      "avoid": ["typo_void"]
+    },
+    "margins": {
+      "prefer": ["library", "footnotes"],
+      "avoid": ["typo_void"]
+    },
+    "footnotes": {
+      "prefer": ["library", "margins", "scriptorium"],
+      "avoid": ["typo_void"]
+    },
+    "typo_void": {
+      "prefer": [],
+      "avoid": ["library", "scriptorium", "footnotes"]
+    },
+    "scriptorium": {
+      "prefer": ["library", "research"],
+      "avoid": ["typo_void", "forge"]
+    },
+    "resonance_chamber": {
+      "prefer": ["prism_core", "facet_housing"],
+      "avoid": ["dissonance_pit"]
+    },
+    "prism_core": {
+      "prefer": ["resonance_chamber", "refraction_lab"],
+      "avoid": []
+    },
+    "facet_housing": {
+      "prefer": ["resonance_chamber"],
+      "avoid": ["decomposition_pit"]
+    },
+    "refraction_lab": {
+      "prefer": ["prism_core", "research"],
+      "avoid": []
+    },
+    "brood_chamber": {
+      "prefer": ["royal_cell", "nectar_store"],
+      "avoid": ["decomposition_pit"]
+    },
+    "royal_cell": {
+      "prefer": ["brood_chamber", "pheromone_hub"],
+      "avoid": ["worker_warren"]
+    },
+    "worker_warren": {
+      "prefer": ["nectar_store", "pheromone_hub"],
+      "avoid": ["royal_cell"]
+    },
+    "nectar_store": {
+      "prefer": ["brood_chamber", "worker_warren"],
+      "avoid": []
+    },
+    "pheromone_hub": {
+      "prefer": ["royal_cell", "worker_warren"],
+      "avoid": []
+    },
+    "mycelium_network": {
+      "prefer": ["spore_tower", "decomposition_pit"],
+      "avoid": ["prism_core"]
+    },
+    "spore_tower": {
+      "prefer": ["mycelium_network", "fruiting_body"],
+      "avoid": []
+    },
+    "decomposition_pit": {
+      "prefer": ["mycelium_network"],
+      "avoid": ["facet_housing", "brood_chamber"]
+    },
+    "fruiting_body": {
+      "prefer": ["spore_tower", "mycelium_network"],
+      "avoid": []
+    },
+    "bubble_dome": {
+      "prefer": ["kelp_forest", "current_channel"],
+      "avoid": ["decomposition_pit"]
+    },
+    "kelp_forest": {
+      "prefer": ["bubble_dome", "current_channel"],
+      "avoid": []
+    },
+    "pressure_lock": {
+      "prefer": ["current_channel"],
+      "avoid": []
+    },
+    "current_channel": {
+      "prefer": ["bubble_dome", "kelp_forest", "pressure_lock"],
+      "avoid": ["abyssal_shrine"]
+    },
+    "abyssal_shrine": {
+      "prefer": ["silence_temple"],
+      "avoid": ["current_channel"]
+    },
+    "past_echo": {
+      "prefer": ["present_anchor"],
+      "avoid": ["future_shadow", "paradox_zone"]
+    },
+    "present_anchor": {
+      "prefer": ["past_echo", "future_shadow", "chrono_nexus"],
+      "avoid": ["paradox_zone"]
+    },
+    "future_shadow": {
+      "prefer": ["present_anchor", "chrono_nexus"],
+      "avoid": ["past_echo", "paradox_zone"]
+    },
+    "chrono_nexus": {
+      "prefer": ["present_anchor"],
+      "avoid": ["paradox_zone"]
+    },
+    "paradox_zone": {
+      "prefer": [],
+      "avoid": ["past_echo", "present_anchor", "future_shadow", "chrono_nexus"]
+    }
+  }
+}

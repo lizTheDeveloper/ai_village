@@ -1,0 +1,2239 @@
+{
+  "categories": {
+    "spaceflight_production": {
+      "name": "Spaceflight Production",
+      "description": "Buildings for spaceship component manufacturing and magical material processing",
+      "tier_range": [2, 5]
+    },
+    "shipyard": {
+      "name": "Shipyard & Research",
+      "description": "Ship construction facilities and β-space research infrastructure",
+      "tier_range": [3, 5]
+    },
+    "automation": {
+      "name": "Factory Automation",
+      "description": "Industrial automation and Dyson Swarm construction",
+      "tier_range": [1, 5]
+    },
+    "governance": {
+      "name": "Governance & Information",
+      "description": "Administrative buildings providing population and resource tracking",
+      "tier_range": [1, 3]
+    },
+    "religious": {
+      "name": "Religious Infrastructure",
+      "description": "Sacred sites for worship, prayer, and belief generation",
+      "tier_range": [1, 3]
+    },
+    "commercial": {
+      "name": "Commerce & Trade",
+      "description": "Shops and trading establishments",
+      "tier_range": [2, 2]
+    },
+    "maternal_care": {
+      "name": "Maternal Health",
+      "description": "Pregnancy, labor, and infant care facilities",
+      "tier_range": [1, 3]
+    }
+  },
+  "buildings": [
+    {
+      "id": "arcane_forge",
+      "name": "Arcane Forge",
+      "description": "A forge infused with magical energies for processing mana crystals, stellarite, and other magical materials. Essential for spaceflight component production.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 200 },
+        { "resourceId": "iron_ingot", "amountRequired": 100 },
+        { "resourceId": "mana_shard", "amountRequired": 50 },
+        { "resourceId": "coal", "amountRequired": 100 }
+      ],
+      "techRequired": ["basic_propulsion"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 600,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "refined_mana",
+            "crystal_lens",
+            "stellarite_ingot",
+            "emotional_essence",
+            "mana_crystal",
+            "resonance_coil",
+            "emotional_amplifier",
+            "stellarite_plate",
+            "resonance_core",
+            "emotional_matrix",
+            "coherence_crystal"
+          ],
+          "speed": 1.0
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["mana_shard", "raw_crystal", "stellarite_ore", "mana_crystal"],
+          "capacity": 200
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "ley_line_extractor",
+      "name": "Ley Line Extractor",
+      "description": "A specialized facility that taps into ley lines to extract and process void essence and concentrated mana. Must be built near a ley line node for maximum efficiency.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "mana_crystal", "amountRequired": 30 },
+        { "resourceId": "copper_ingot", "amountRequired": 80 },
+        { "resourceId": "stone", "amountRequired": 150 },
+        { "resourceId": "raw_crystal", "amountRequired": 20 }
+      ],
+      "techRequired": ["emotional_topology"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 900,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["condensed_void", "void_capacitor"],
+          "speed": 0.8
+        },
+        {
+          "type": "resource_generation",
+          "resourceType": "mana_shard",
+          "rate": 2
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["void_essence", "condensed_void", "mana_shard"],
+          "capacity": 100
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "electronics_lab",
+      "name": "Electronics Laboratory",
+      "description": "A high-tech facility for fabricating circuits, processors, and neural interfaces. Clean room conditions maintained by magical air filtration.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 180 },
+        { "resourceId": "glass", "amountRequired": 80 },
+        { "resourceId": "copper_ingot", "amountRequired": 60 },
+        { "resourceId": "iron_ingot", "amountRequired": 50 }
+      ],
+      "techRequired": ["basic_propulsion"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 720,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "basic_circuit",
+            "advanced_circuit",
+            "processing_unit",
+            "quantum_processor",
+            "neural_interface"
+          ],
+          "speed": 1.0
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["silicon_wafer", "basic_circuit", "advanced_circuit", "rare_earth_compound"],
+          "capacity": 150
+        },
+        {
+          "type": "research",
+          "fields": ["engineering"],
+          "bonus": 1.2
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "shipyard",
+      "name": "Spaceship Shipyard",
+      "description": "A standard shipyard for assembling ship components. Can produce hull plating, propulsion systems, and basic ship modules.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 8,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "steel_ingot", "amountRequired": 300 },
+        { "resourceId": "stone", "amountRequired": 400 },
+        { "resourceId": "iron_ingot", "amountRequired": 200 },
+        { "resourceId": "wood", "amountRequired": 150 }
+      ],
+      "techRequired": ["shipyard_construction"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1200,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "focusing_array",
+            "hull_plating",
+            "communication_relay",
+            "life_support_module",
+            "void_engine_component",
+            "meditation_chamber_unit",
+            "courier_hull_kit"
+          ],
+          "speed": 1.0
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["hull_plating", "stellarite_plate", "spacecraft_parts"],
+          "capacity": 500
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "advanced_shipyard",
+      "name": "Advanced Spaceship Shipyard",
+      "description": "A state-of-the-art shipyard capable of assembling complex β-space capable vessels. Integrates arcane components for emotional navigation systems.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 10,
+      "height": 8,
+      "resourceCost": [
+        { "resourceId": "stellarite_ingot", "amountRequired": 100 },
+        { "resourceId": "mana_crystal", "amountRequired": 80 },
+        { "resourceId": "steel_ingot", "amountRequired": 400 },
+        { "resourceId": "resonance_core", "amountRequired": 10 }
+      ],
+      "techRequired": ["advanced_shipyard"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1800,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "reinforced_hull",
+            "propulsion_unit",
+            "navigation_array",
+            "power_core",
+            "shield_generator",
+            "heart_chamber_core",
+            "emotion_theater_system",
+            "memory_hall_archive",
+            "vr_immersion_pod",
+            "gleisner_body_frame",
+            "worldship_hull_kit",
+            "threshold_hull_kit",
+            "brainship_hull_kit",
+            "storyship_hull_kit",
+            "gleisner_hull_kit"
+          ],
+          "speed": 1.2
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["reinforced_hull", "ship_module", "hull_kit"],
+          "capacity": 300
+        },
+        {
+          "type": "research",
+          "fields": ["spaceflight"],
+          "bonus": 1.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "temporal_lab",
+      "name": "Temporal Research Laboratory",
+      "description": "A heavily shielded facility for manipulating temporal mechanics. Required for processing temporal crystals and building time-manipulation devices.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 7,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "temporal_crystal", "amountRequired": 5 },
+        { "resourceId": "void_capacitor", "amountRequired": 10 },
+        { "resourceId": "quantum_processor", "amountRequired": 5 },
+        { "resourceId": "stellarite_plate", "amountRequired": 20 }
+      ],
+      "techRequired": ["svetz_retrieval"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1500,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "temporal_crystal",
+            "temporal_regulator",
+            "timeline_anchor",
+            "observation_nullifier",
+            "svetz_retrieval_engine"
+          ],
+          "speed": 0.6
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["temporal_dust", "temporal_crystal", "timeline_anchor"],
+          "capacity": 50
+        },
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane"],
+          "bonus": 2.0
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "reality_forge",
+      "name": "Reality Forge",
+      "description": "The pinnacle of combined magical and technological achievement. A facility capable of manipulating the fundamental fabric of reality itself.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 10,
+      "height": 10,
+      "resourceCost": [
+        { "resourceId": "neutronium_shard", "amountRequired": 3 },
+        { "resourceId": "soul_anchor", "amountRequired": 2 },
+        { "resourceId": "timeline_anchor", "amountRequired": 3 },
+        { "resourceId": "quantum_processor", "amountRequired": 20 },
+        { "resourceId": "stellarite_plate", "amountRequired": 50 },
+        { "resourceId": "mana_crystal", "amountRequired": 200 }
+      ],
+      "techRequired": ["probability_scout"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 3600,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [
+            "soul_anchor",
+            "probability_lens",
+            "reality_thread",
+            "neutronium_core",
+            "probability_drive",
+            "timeline_merger_core",
+            "svetz_hull_kit",
+            "probability_scout_hull_kit",
+            "timeline_merger_hull_kit"
+          ],
+          "speed": 0.3
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["reality_thread", "probability_lens", "neutronium_core"],
+          "capacity": 20
+        },
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane", "experimental"],
+          "bonus": 3.0
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "mana_condenser",
+      "name": "Mana Condenser",
+      "description": "A tower that draws ambient mana from the atmosphere. Passively generates mana shards over time. More effective when placed on ley line nodes.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 100 },
+        { "resourceId": "raw_crystal", "amountRequired": 20 },
+        { "resourceId": "copper_ingot", "amountRequired": 30 }
+      ],
+      "techRequired": ["basic_propulsion"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": false,
+      "buildTime": 300,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "resource_generation",
+          "resourceType": "mana_shard",
+          "rate": 1
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "void_well",
+      "name": "Void Well",
+      "description": "A dangerous extraction facility that opens tiny rifts to the void. Produces void essence but requires careful management to prevent catastrophic breaches.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "condensed_void", "amountRequired": 5 },
+        { "resourceId": "stellarite_plate", "amountRequired": 10 },
+        { "resourceId": "resonance_core", "amountRequired": 3 }
+      ],
+      "techRequired": ["emotional_topology"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 800,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "resource_generation",
+          "resourceType": "void_essence",
+          "rate": 0.5
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["void_essence"],
+          "capacity": 30
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "emotional_resonance_chamber",
+      "name": "Emotional Resonance Chamber",
+      "description": "A chamber where agents can contribute their emotional experiences to be crystallized into emotional resonance. A key ingredient for β-space navigation technology.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "mana_crystal", "amountRequired": 20 },
+        { "resourceId": "copper_ingot", "amountRequired": 40 },
+        { "resourceId": "wood", "amountRequired": 60 },
+        { "resourceId": "cloth", "amountRequired": 40 }
+      ],
+      "techRequired": ["emotional_topology"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 480,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "resource_generation",
+          "resourceType": "emotional_resonance",
+          "rate": 3
+        },
+        {
+          "type": "mood_aura",
+          "moodBonus": 10,
+          "radius": 6
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "soul_collection_shrine",
+      "name": "Soul Collection Shrine",
+      "description": "A sacred shrine where soul fragments naturally accumulate from the departed. Requires proper funerary rites to function and is the only ethical source of soul fragments.",
+      "category": "community",
+      "subcategory": "spaceflight_production",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 80 },
+        { "resourceId": "gold_ingot", "amountRequired": 10 },
+        { "resourceId": "mana_crystal", "amountRequired": 15 }
+      ],
+      "techRequired": ["brainship_symbiosis"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 600,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "resource_generation",
+          "resourceType": "soul_fragment",
+          "rate": 0.1
+        },
+        {
+          "type": "mood_aura",
+          "moodBonus": 5,
+          "radius": 10
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "stellarite_smelter",
+      "name": "Stellarite Smelter",
+      "description": "A specialized high-temperature smelter for processing stellarite ore. Uses magical containment fields to handle the extreme temperatures required.",
+      "category": "production",
+      "subcategory": "spaceflight_production",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 150 },
+        { "resourceId": "iron_ingot", "amountRequired": 100 },
+        { "resourceId": "mana_crystal", "amountRequired": 25 },
+        { "resourceId": "coal", "amountRequired": 100 }
+      ],
+      "techRequired": ["worldship_design"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 540,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["stellarite_ingot", "stellarite_plate"],
+          "speed": 1.5
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["stellarite_ore", "stellarite_ingot", "stellarite_plate"],
+          "capacity": 100
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "shipyard_basic",
+      "name": "Basic Shipyard",
+      "description": "A basic shipyard for constructing physical propulsion spacecraft. Enables worldship and basic vessel construction.",
+      "category": "production",
+      "subcategory": "shipyard",
+      "width": 8,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "iron_ingot", "amountRequired": 200 },
+        { "resourceId": "stone_block", "amountRequired": 500 },
+        { "resourceId": "wood", "amountRequired": 300 }
+      ],
+      "techRequired": ["spaceflight_shipyard"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1200,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["worldship_hull", "propulsion_system", "life_support_module"],
+          "speed": 1.0
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["steel_plate", "glass_panel", "spacecraft_parts"],
+          "capacity": 500
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "worldship_drydock",
+      "name": "Worldship Drydock",
+      "description": "A massive drydock facility for constructing generation ships capable of sustaining communities across interstellar distances.",
+      "category": "production",
+      "subcategory": "shipyard",
+      "width": 12,
+      "height": 10,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 500 },
+        { "resourceId": "glass_panel", "amountRequired": 200 },
+        { "resourceId": "stone_block", "amountRequired": 1000 },
+        { "resourceId": "iron_ingot", "amountRequired": 300 }
+      ],
+      "techRequired": ["spaceflight_worldship"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 2400,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["worldship_core", "habitat_module", "generation_ship_hull"],
+          "speed": 0.5
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["spacecraft_parts", "habitat_modules", "life_support"],
+          "capacity": 1000
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "shipyard_advanced",
+      "name": "Advanced Shipyard",
+      "description": "An upgraded shipyard capable of constructing β-space capable vessels. Integrates mana-infused materials for emotional navigation systems.",
+      "category": "production",
+      "subcategory": "shipyard",
+      "width": 10,
+      "height": 8,
+      "resourceCost": [
+        { "resourceId": "mana_crystal", "amountRequired": 100 },
+        { "resourceId": "resonance_core", "amountRequired": 10 },
+        { "resourceId": "steel_plate", "amountRequired": 300 },
+        { "resourceId": "glass_panel", "amountRequired": 150 }
+      ],
+      "techRequired": ["spaceflight_advanced_shipyard"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1800,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["threshold_ship_hull", "courier_ship_hull", "emotion_theater_module", "heart_chamber"],
+          "speed": 1.2
+        },
+        {
+          "type": "storage",
+          "itemTypes": ["mana_crystal", "resonance_core", "spacecraft_parts", "emotional_components"],
+          "capacity": 400
+        },
+        {
+          "type": "research",
+          "fields": ["spaceflight"],
+          "bonus": 1.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "vr_chamber",
+      "name": "VR Training Chamber",
+      "description": "A curated emotional experience space for training crews in β-space navigation. Uses advanced illusion magic for full sensory immersion.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "mana_crystal", "amountRequired": 50 },
+        { "resourceId": "glass_panel", "amountRequired": 100 },
+        { "resourceId": "wood", "amountRequired": 80 }
+      ],
+      "techRequired": ["spaceflight_vr_systems"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": false,
+      "buildTime": 600,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "mood_aura",
+          "moodBonus": 20,
+          "radius": 5
+        },
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane"],
+          "bonus": 1.3
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "meditation_training_hall",
+      "name": "Meditation Training Hall",
+      "description": "A serene space for emotional regulation training. Crews must master emotional control before β-space navigation.",
+      "category": "community",
+      "subcategory": "shipyard",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 150 },
+        { "resourceId": "cloth", "amountRequired": 100 },
+        { "resourceId": "stone", "amountRequired": 80 }
+      ],
+      "techRequired": ["spaceflight_meditation_chambers"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": false,
+      "buildTime": 480,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "mood_aura",
+          "moodBonus": 25,
+          "radius": 8
+        },
+        {
+          "type": "meditation_site",
+          "visionClarityBonus": 1.5,
+          "meditationSpeedBonus": 1.3
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "medical_research_lab",
+      "name": "Medical Research Lab",
+      "description": "A laboratory for neural interface research and brainship symbiosis development. Required for integrating consciousness with ship systems.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 150 },
+        { "resourceId": "glass", "amountRequired": 100 },
+        { "resourceId": "iron", "amountRequired": 80 },
+        { "resourceId": "mana_crystal", "amountRequired": 20 }
+      ],
+      "techRequired": ["genetics_neural_interface"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 900,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["genetics", "spaceflight"],
+          "bonus": 2.0
+        },
+        {
+          "type": "healing",
+          "healingRate": 15
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "vr_research_lab",
+      "name": "VR Research Laboratory",
+      "description": "An advanced laboratory for developing emotion theater systems and immersive emotional induction technology.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "mana_crystal", "amountRequired": 80 },
+        { "resourceId": "glass_panel", "amountRequired": 150 },
+        { "resourceId": "resonance_core", "amountRequired": 5 },
+        { "resourceId": "stone", "amountRequired": 200 }
+      ],
+      "techRequired": ["spaceflight_the_heart"],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1080,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane"],
+          "bonus": 2.0
+        },
+        {
+          "type": "crafting",
+          "recipes": ["emotion_theater", "vr_headset", "immersion_pod"],
+          "speed": 1.0
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "digital_fabrication_lab",
+      "name": "Digital Fabrication Lab",
+      "description": "A high-tech facility for constructing Gleisner vessels where consciousness and hull are unified.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "quantum_processor", "amountRequired": 10 },
+        { "resourceId": "mana_crystal", "amountRequired": 100 },
+        { "resourceId": "steel_plate", "amountRequired": 200 },
+        { "resourceId": "glass_panel", "amountRequired": 150 }
+      ],
+      "techRequired": ["arcane_digital_consciousness"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1440,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane", "experimental"],
+          "bonus": 2.5
+        },
+        {
+          "type": "crafting",
+          "recipes": ["gleisner_hull", "consciousness_matrix", "soul_anchor_mount"],
+          "speed": 0.8
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "temporal_research_lab",
+      "name": "Temporal Research Laboratory",
+      "description": "A facility for studying temporal mechanics and developing Svetz retrieval technology for temporal archaeology.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 7,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "timeline_anchor", "amountRequired": 3 },
+        { "resourceId": "mana_crystal", "amountRequired": 200 },
+        { "resourceId": "resonance_core", "amountRequired": 20 },
+        { "resourceId": "stone", "amountRequired": 300 }
+      ],
+      "techRequired": ["arcane_temporal_mechanics"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1800,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane", "experimental"],
+          "bonus": 3.0
+        },
+        {
+          "type": "crafting",
+          "recipes": ["svetz_drive", "temporal_stabilizer", "extinction_sampler"],
+          "speed": 0.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "quantum_research_lab",
+      "name": "Quantum Research Laboratory",
+      "description": "A facility for quantum mechanics research and probability scout development. Enables mapping unobserved probability branches.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "observation_nullifier", "amountRequired": 2 },
+        { "resourceId": "quantum_processor", "amountRequired": 15 },
+        { "resourceId": "mana_crystal", "amountRequired": 150 },
+        { "resourceId": "glass_panel", "amountRequired": 200 }
+      ],
+      "techRequired": ["spaceflight_gleisner_vessel"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 1620,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["spaceflight", "experimental"],
+          "bonus": 2.5
+        },
+        {
+          "type": "crafting",
+          "recipes": ["probability_drive", "branch_mapper", "quantum_stabilizer"],
+          "speed": 0.6
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "reality_engineering_lab",
+      "name": "Reality Engineering Laboratory",
+      "description": "The ultimate research facility for developing timeline merger technology. Capable of collapsing compatible probability branches.",
+      "category": "research",
+      "subcategory": "shipyard",
+      "width": 8,
+      "height": 8,
+      "resourceCost": [
+        { "resourceId": "probability_catalyst", "amountRequired": 5 },
+        { "resourceId": "branch_resonator", "amountRequired": 3 },
+        { "resourceId": "coherence_amplifier", "amountRequired": 2 },
+        { "resourceId": "quantum_processor", "amountRequired": 30 },
+        { "resourceId": "mana_crystal", "amountRequired": 500 }
+      ],
+      "techRequired": ["arcane_reality_manipulation"],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": false,
+      "buildTime": 3600,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["spaceflight", "arcane", "experimental"],
+          "bonus": 4.0
+        },
+        {
+          "type": "crafting",
+          "recipes": ["timeline_merger_core", "branch_collapse_device", "fork_bomb_cleanup_tool"],
+          "speed": 0.3
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "solar_panel",
+      "name": "Solar Panel",
+      "description": "Converts sunlight into electrical power. Foundation of factory energy.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 2,
+      "height": 2,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 10 },
+        { "resourceId": "copper_plate", "amountRequired": 5 },
+        { "resourceId": "circuit_basic", "amountRequired": 2 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 1 },
+      "unlocked": true,
+      "buildTime": 60,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "power_generation",
+          "power": 60
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "solar_array",
+      "name": "Solar Array",
+      "description": "Large array of solar panels for higher energy output.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 50 },
+        { "resourceId": "copper_plate", "amountRequired": 30 },
+        { "resourceId": "circuit_advanced", "amountRequired": 10 },
+        { "resourceId": "steel_plate", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 180,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "power_generation",
+          "power": 400
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "battery_bank",
+      "name": "Battery Bank",
+      "description": "Stores excess power for use during low generation periods.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 30 },
+        { "resourceId": "battery", "amountRequired": 50 },
+        { "resourceId": "circuit_advanced", "amountRequired": 15 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 120,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "power_storage",
+          "capacity": 5000
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "fusion_reactor",
+      "name": "Fusion Reactor",
+      "description": "High-capacity power generation for massive factory cities.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 200 },
+        { "resourceId": "processing_unit", "amountRequired": 50 },
+        { "resourceId": "quantum_processor", "amountRequired": 10 },
+        { "resourceId": "battery", "amountRequired": 100 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 600,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "power_generation",
+          "power": 5000
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "conveyor_belt",
+      "name": "Conveyor Belt",
+      "description": "Moves items between machines automatically.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 1,
+      "height": 1,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 1 },
+        { "resourceId": "iron_gear", "amountRequired": 1 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 1 },
+      "unlocked": true,
+      "buildTime": 5,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "transport",
+          "speed": 15
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "fast_belt",
+      "name": "Fast Belt",
+      "description": "Higher throughput conveyor belt.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 1,
+      "height": 1,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 2 },
+        { "resourceId": "iron_gear", "amountRequired": 2 },
+        { "resourceId": "circuit_basic", "amountRequired": 1 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 8,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "transport",
+          "speed": 30
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "express_belt",
+      "name": "Express Belt",
+      "description": "Maximum speed belt for high-throughput factories.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 1,
+      "height": 1,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 2 },
+        { "resourceId": "iron_gear", "amountRequired": 4 },
+        { "resourceId": "circuit_advanced", "amountRequired": 1 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 12,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "transport",
+          "speed": 45
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "inserter",
+      "name": "Inserter",
+      "description": "Transfers items between belts and machines.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 1,
+      "height": 1,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 2 },
+        { "resourceId": "iron_gear", "amountRequired": 1 },
+        { "resourceId": "circuit_basic", "amountRequired": 1 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 1 },
+      "unlocked": true,
+      "buildTime": 10,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "item_transfer",
+          "speed": 1
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "fast_inserter",
+      "name": "Fast Inserter",
+      "description": "Higher speed item transfer.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 1,
+      "height": 1,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 4 },
+        { "resourceId": "iron_gear", "amountRequired": 2 },
+        { "resourceId": "circuit_basic", "amountRequired": 2 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 15,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "item_transfer",
+          "speed": 2
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "assembly_machine_i",
+      "name": "Assembly Machine I",
+      "description": "Basic automated crafting machine.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "iron_plate", "amountRequired": 20 },
+        { "resourceId": "iron_gear", "amountRequired": 10 },
+        { "resourceId": "circuit_basic", "amountRequired": 5 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 60,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [],
+          "speed": 0.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "assembly_machine_ii",
+      "name": "Assembly Machine II",
+      "description": "Improved assembly machine with faster crafting.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 20 },
+        { "resourceId": "iron_gear", "amountRequired": 15 },
+        { "resourceId": "circuit_advanced", "amountRequired": 5 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 90,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [],
+          "speed": 0.75
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "assembly_machine_iii",
+      "name": "Assembly Machine III",
+      "description": "Advanced assembly machine for high-tier production.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 30 },
+        { "resourceId": "iron_gear", "amountRequired": 20 },
+        { "resourceId": "circuit_advanced", "amountRequired": 10 },
+        { "resourceId": "processing_unit", "amountRequired": 5 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 120,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [],
+          "speed": 1.25
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "chemical_plant",
+      "name": "Chemical Plant",
+      "description": "Processes chemicals and fluids.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 25 },
+        { "resourceId": "iron_gear", "amountRequired": 10 },
+        { "resourceId": "circuit_advanced", "amountRequired": 8 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 100,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": [],
+          "speed": 1.0
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "factory_ai_core",
+      "name": "Factory AI Core",
+      "description": "Autonomous AI that manages factory production, detects bottlenecks, and optimizes efficiency.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 200 },
+        { "resourceId": "processing_unit", "amountRequired": 50 },
+        { "resourceId": "quantum_processor", "amountRequired": 5 },
+        { "resourceId": "circuit_advanced", "amountRequired": 100 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 300,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "automation",
+          "radius": 100,
+          "intelligence": 1
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "roboport",
+      "name": "Roboport",
+      "description": "Command center for construction and logistics robots.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 50 },
+        { "resourceId": "iron_gear", "amountRequired": 30 },
+        { "resourceId": "circuit_advanced", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 180,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "robot_station",
+          "range": 50,
+          "chargingStations": 4
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "solar_sail_assembler",
+      "name": "Solar Sail Assembler",
+      "description": "Specialized factory for constructing solar sails for Dyson Swarm.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 300 },
+        { "resourceId": "processing_unit", "amountRequired": 100 },
+        { "resourceId": "quantum_processor", "amountRequired": 20 },
+        { "resourceId": "battery", "amountRequired": 50 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 600,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "crafting",
+          "recipes": ["solar_sail"],
+          "speed": 0.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "dyson_receiver",
+      "name": "Dyson Receiver Station",
+      "description": "Receives power transmitted from Dyson Swarm.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 10,
+      "height": 10,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 500 },
+        { "resourceId": "quantum_processor", "amountRequired": 50 },
+        { "resourceId": "circuit_advanced", "amountRequired": 200 },
+        { "resourceId": "battery", "amountRequired": 100 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 1200,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "power_generation",
+          "power": 10000
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "dyson_control_station",
+      "name": "Dyson Control Station",
+      "description": "Controls and coordinates Dyson Swarm operations.",
+      "category": "production",
+      "subcategory": "automation",
+      "width": 8,
+      "height": 8,
+      "resourceCost": [
+        { "resourceId": "steel_plate", "amountRequired": 400 },
+        { "resourceId": "quantum_processor", "amountRequired": 100 },
+        { "resourceId": "processing_unit", "amountRequired": 200 },
+        { "resourceId": "circuit_advanced", "amountRequired": 300 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt", "stone"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 900,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "dyson_control",
+          "maxSails": 10000
+        }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": true
+    },
+    {
+      "id": "town-hall",
+      "name": "Town Hall",
+      "description": "Basic governance building. Tracks population count, agent roster, births, and deaths",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 50 },
+        { "resourceId": "stone", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 240,
+      "tier": 1,
+      "functionality": [
+        { "type": "governance", "governanceType": "administration" },
+        { "type": "social_hub", "radius": 15 }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "census-bureau",
+      "name": "Census Bureau",
+      "description": "Demographics and analytics. Tracks age distribution, birth/death rates, and population projections. Requires Town Hall. Must be staffed",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 100 },
+        { "resourceId": "stone", "amountRequired": 50 },
+        { "resourceId": "cloth", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 480,
+      "tier": 2,
+      "functionality": [
+        { "type": "governance", "governanceType": "demographics" },
+        { "type": "knowledge_repository" }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "warehouse",
+      "name": "Granary / Resource Warehouse",
+      "description": "Resource tracking. Shows stockpiles, production/consumption rates, and days until depletion",
+      "category": "storage",
+      "subcategory": "governance",
+      "width": 4,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 80 },
+        { "resourceId": "stone", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 360,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "storage",
+          "itemTypes": ["food", "wood", "stone", "iron", "cloth"],
+          "capacity": 1000
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "weather-station",
+      "name": "Weather Station",
+      "description": "Environmental monitoring. Provides temperature forecasts and extreme weather warnings. Must be placed in open area",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 2,
+      "height": 2,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 60 },
+        { "resourceId": "stone", "amountRequired": 40 },
+        { "resourceId": "iron", "amountRequired": 10 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 300,
+      "tier": 1,
+      "functionality": [
+        { "type": "vision_extension", "radiusBonus": 20 }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "health-clinic",
+      "name": "Health Clinic",
+      "description": "Medical tracking. Monitors population health, diseases, malnutrition, and causes of death. Must be staffed by healers",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 100 },
+        { "resourceId": "stone", "amountRequired": 50 },
+        { "resourceId": "cloth", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 600,
+      "tier": 2,
+      "functionality": [
+        { "type": "healing", "healingRate": 5 },
+        { "type": "knowledge_repository" }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "meeting-hall",
+      "name": "Meeting Hall",
+      "description": "Social cohesion tracking. Maps social networks, tracks relationships, detects conflicts, and monitors morale",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 120 },
+        { "resourceId": "stone", "amountRequired": 60 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 480,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "mood_aura",
+          "moodBonus": 10,
+          "radius": 10
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "watchtower",
+      "name": "Watchtower",
+      "description": "Threat detection. Provides early warning of environmental threats and resource crises. Must be staffed by watchman",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 2,
+      "height": 2,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 80 },
+        { "resourceId": "stone", "amountRequired": 60 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 360,
+      "tier": 1,
+      "functionality": [
+        { "type": "vision_extension", "radiusBonus": 30 }
+      ],
+      "canRotate": false,
+      "rotationAngles": [0],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "labor-guild",
+      "name": "Labor Guild",
+      "description": "Workforce management. Tracks labor allocation, skill inventory, and identifies bottlenecks. Requires Town Hall",
+      "category": "community",
+      "subcategory": "governance",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 90 },
+        { "resourceId": "stone", "amountRequired": 40 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 420,
+      "tier": 2,
+      "functionality": [
+        { "type": "job_board" },
+        { "type": "governance", "governanceType": "workforce" }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "archive",
+      "name": "Archive / Library",
+      "description": "Historical data and analysis. Provides long-term trend analysis, generational comparisons, and predictive modeling. Requires Census Bureau and Town Hall. Must be staffed by scholar",
+      "category": "research",
+      "subcategory": "governance",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 150 },
+        { "resourceId": "stone", "amountRequired": 80 },
+        { "resourceId": "cloth", "amountRequired": 50 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 720,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "research",
+          "fields": ["demographics", "history", "social_science"],
+          "bonus": 1.5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "shrine",
+      "name": "Shrine",
+      "description": "Small sacred site. Believers can pray here. Generates modest belief for deities. Marks the start of organized faith",
+      "category": "religious",
+      "subcategory": "religious",
+      "width": 2,
+      "height": 2,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 20 },
+        { "resourceId": "stone", "amountRequired": 10 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 1 },
+      "unlocked": true,
+      "buildTime": 120,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "prayer_site",
+          "beliefMultiplier": 1.2,
+          "prayerCapacity": 3
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "temple",
+      "name": "Temple",
+      "description": "Formal place of worship. Significantly boosts belief generation. Can host rituals and ceremonies. Allows priest designation",
+      "category": "religious",
+      "subcategory": "religious",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 100 },
+        { "resourceId": "stone", "amountRequired": 80 },
+        { "resourceId": "cloth", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 600,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "prayer_site",
+          "beliefMultiplier": 2.0,
+          "prayerCapacity": 10
+        },
+        {
+          "type": "ritual_site",
+          "ritualTypes": ["blessing", "ceremony", "sermon"]
+        },
+        {
+          "type": "priest_quarters",
+          "priestCapacity": 2
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "grand-temple",
+      "name": "Grand Temple",
+      "description": "Magnificent house of worship. Massive belief generation. Center of religious life. Allows multiple priests and grand ceremonies. Becomes a pilgrimage destination",
+      "category": "religious",
+      "subcategory": "religious",
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 200 },
+        { "resourceId": "stone", "amountRequired": 300 },
+        { "resourceId": "cloth", "amountRequired": 100 },
+        { "resourceId": "iron", "amountRequired": 50 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 5 },
+      "unlocked": true,
+      "buildTime": 1200,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "prayer_site",
+          "beliefMultiplier": 3.0,
+          "prayerCapacity": 30
+        },
+        {
+          "type": "ritual_site",
+          "ritualTypes": ["blessing", "ceremony", "sermon", "mass", "festival"]
+        },
+        {
+          "type": "priest_quarters",
+          "priestCapacity": 5
+        },
+        {
+          "type": "pilgrimage_site",
+          "attractionRadius": 100
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "meditation-garden",
+      "name": "Meditation Garden",
+      "description": "Peaceful outdoor sanctuary. Increases vision clarity and meditation effectiveness. Believers find peace and clarity here",
+      "category": "religious",
+      "subcategory": "religious",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 40 },
+        { "resourceId": "stone", "amountRequired": 60 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass"],
+      "terrainForbidden": ["water", "deep_water", "dirt"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 240,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "meditation_site",
+          "visionClarityBonus": 0.3,
+          "meditationSpeedBonus": 1.5
+        },
+        {
+          "type": "prayer_site",
+          "beliefMultiplier": 1.1,
+          "prayerCapacity": 5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "sacred-grove",
+      "name": "Sacred Grove",
+      "description": "Ancient trees dedicated to nature deities. Natural sacred site. Especially powerful for nature, harvest, and earth deities",
+      "category": "religious",
+      "subcategory": "religious",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 10 },
+        { "resourceId": "stone", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "forest"],
+      "terrainForbidden": ["water", "deep_water", "dirt", "stone"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 180,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "prayer_site",
+          "beliefMultiplier": 2.5,
+          "prayerCapacity": 8,
+          "domainBonus": ["nature", "harvest", "earth"]
+        },
+        {
+          "type": "ritual_site",
+          "ritualTypes": ["harvest_festival", "nature_blessing"]
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": false,
+      "requiresFoundation": false
+    },
+    {
+      "id": "general_store",
+      "name": "General Store",
+      "description": "A general store that buys and sells common goods and supplies",
+      "category": "commercial",
+      "subcategory": "commercial",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 30 },
+        { "resourceId": "stone", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 150,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "shop",
+          "shopType": "general"
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "blacksmith",
+      "name": "Blacksmith Shop",
+      "description": "A blacksmith shop specializing in metal tools, weapons, and armor",
+      "category": "commercial",
+      "subcategory": "commercial",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 25 },
+        { "resourceId": "stone", "amountRequired": 35 },
+        { "resourceId": "iron", "amountRequired": 15 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 180,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "shop",
+          "shopType": "blacksmith"
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "farm_supply_shop",
+      "name": "Farm Supply Shop",
+      "description": "A shop specializing in seeds, farming tools, and agricultural supplies",
+      "category": "commercial",
+      "subcategory": "commercial",
+      "width": 2,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 35 },
+        { "resourceId": "stone", "amountRequired": 15 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 120,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "shop",
+          "shopType": "farm_supply"
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "tavern",
+      "name": "Tavern",
+      "description": "A cozy tavern selling food, drinks, and providing a place for social gatherings",
+      "category": "commercial",
+      "subcategory": "commercial",
+      "width": 4,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 40 },
+        { "resourceId": "stone", "amountRequired": 25 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 200,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "shop",
+          "shopType": "tavern"
+        },
+        {
+          "type": "mood_aura",
+          "moodBonus": 10,
+          "radius": 5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "birthing-hut",
+      "name": "Birthing Hut",
+      "description": "A dedicated space for labor and delivery. Provides safety bonuses during birth, reduces complication severity, and offers privacy for mothers. Must be staffed by a midwife for full benefits.",
+      "category": "community",
+      "subcategory": "maternal_care",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 40 },
+        { "resourceId": "cloth", "amountRequired": 20 },
+        { "resourceId": "straw", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 2 },
+      "unlocked": true,
+      "buildTime": 180,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "healing",
+          "healingRate": 0.05,
+          "conditions": ["postpartum"]
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "nursery",
+      "name": "Nursery",
+      "description": "A warm, safe space for infants and nursing mothers. Improves infant health, supports wet nursing, and provides a gathering place for new mothers. Requires Birthing Hut.",
+      "category": "community",
+      "subcategory": "maternal_care",
+      "width": 4,
+      "height": 3,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 60 },
+        { "resourceId": "cloth", "amountRequired": 40 },
+        { "resourceId": "straw", "amountRequired": 20 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 3 },
+      "unlocked": true,
+      "buildTime": 240,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "mood_aura",
+          "moodBonus": 5,
+          "radius": 5
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    },
+    {
+      "id": "maternity-clinic",
+      "name": "Maternity Clinic",
+      "description": "Advanced maternal care facility with prenatal checkup capabilities. Provides early detection of pregnancy complications and improves birth outcomes. Requires Health Clinic and Birthing Hut. Must be staffed by skilled midwife.",
+      "category": "community",
+      "subcategory": "maternal_care",
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 100 },
+        { "resourceId": "stone", "amountRequired": 50 },
+        { "resourceId": "cloth", "amountRequired": 60 },
+        { "resourceId": "iron", "amountRequired": 10 }
+      ],
+      "techRequired": [],
+      "terrainRequired": ["grass", "dirt"],
+      "terrainForbidden": ["water", "deep_water"],
+      "skillRequired": { "skill": "building", "level": 4 },
+      "unlocked": true,
+      "buildTime": 480,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "healing",
+          "healingRate": 0.1,
+          "conditions": ["pregnancy", "postpartum", "infant"]
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false
+    }
+  ]
+}

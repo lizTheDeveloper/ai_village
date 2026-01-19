@@ -915,3 +915,21 @@ export { GodCraftedDiscoverySystem, type ChunkSpawnInfo } from './microgenerator
 // Botany module dependencies - Plant system constants and utilities
 export { PLANT_CONSTANTS } from './systems/constants/PlantConstants.js';
 export { BugReporter, type BugReport } from './utils/BugReporter.js';
+
+// ============================================================================
+// Object Pooling System
+// ============================================================================
+export { ObjectPool, type PoolStats } from './utils/ObjectPool.js';
+export {
+  vector2DPool,
+  boundingBoxPool,
+  distanceResultPool,
+  entityListPool,
+  calculateDistance,
+  createVector,
+  createBoundingBox,
+  type Vector2D,
+  type BoundingBox,
+  type DistanceResult,
+  type EntityList,
+} from './utils/CommonPools.js';

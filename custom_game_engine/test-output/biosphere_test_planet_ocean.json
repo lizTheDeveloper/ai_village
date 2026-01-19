@@ -1,0 +1,2808 @@
+{
+  "$schema": "https://aivillage.dev/schemas/biosphere/v1",
+  "planet": {
+    "id": "test_planet_ocean",
+    "name": "Aquarius Prime",
+    "type": "hycean",
+    "seed": "test_seed_aqua_001",
+    "temperatureOffset": 0.2,
+    "temperatureScale": 0.8,
+    "moistureOffset": 1,
+    "moistureScale": 0.5,
+    "elevationOffset": -0.5,
+    "elevationScale": 0.5,
+    "seaLevel": 0.5,
+    "allowedBiomes": [
+      "ocean",
+      "wetland"
+    ],
+    "gravity": 1.2,
+    "atmosphereDensity": 2.5,
+    "atmosphereType": "hydrogen"
+  },
+  "niches": [
+    {
+      "id": "producer_photosynthetic_land",
+      "name": "Land Photosynthesizers",
+      "category": "producer",
+      "energySource": "photosynthesis",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "diurnal"
+      },
+      "sizeClass": "small",
+      "constraints": {
+        "requiredGravityRange": [
+          0.1,
+          3
+        ],
+        "requiredAtmosphere": [
+          "hydrogen"
+        ],
+        "requiredTemperatureRange": [
+          -20,
+          50
+        ]
+      },
+      "expectedSpeciesCount": 2,
+      "sapientPossible": false
+    },
+    {
+      "id": "producer_photosynthetic_aquatic",
+      "name": "Aquatic Photosynthesizers",
+      "category": "producer",
+      "energySource": "photosynthesis",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "river",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_surface",
+        "activityPattern": "diurnal"
+      },
+      "sizeClass": "microscopic",
+      "constraints": {
+        "requiredTemperatureRange": [
+          -2,
+          40
+        ]
+      },
+      "expectedSpeciesCount": 8,
+      "sapientPossible": false
+    },
+    {
+      "id": "herbivore_grazer_surface",
+      "name": "surface Grazers",
+      "category": "herbivore",
+      "energySource": "herbivory",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "large",
+      "constraints": {
+        "requiredGravityRange": [
+          0.1,
+          3
+        ]
+      },
+      "expectedSpeciesCount": 3,
+      "sapientPossible": true
+    },
+    {
+      "id": "herbivore_grazer_aerial",
+      "name": "aerial Grazers",
+      "category": "herbivore",
+      "energySource": "herbivory",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "aerial",
+        "activityPattern": "diurnal"
+      },
+      "sizeClass": "large",
+      "constraints": {
+        "requiredGravityRange": [
+          0.1,
+          3
+        ]
+      },
+      "expectedSpeciesCount": 3,
+      "sapientPossible": false
+    },
+    {
+      "id": "herbivore_grazer_aquatic_surface",
+      "name": "aquatic surface Grazers",
+      "category": "herbivore",
+      "energySource": "herbivory",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "large",
+      "constraints": {
+        "requiredGravityRange": [
+          0.1,
+          3
+        ]
+      },
+      "expectedSpeciesCount": 4,
+      "sapientPossible": false
+    },
+    {
+      "id": "herbivore_grazer_aquatic_mid",
+      "name": "aquatic mid Grazers",
+      "category": "herbivore",
+      "energySource": "herbivory",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_mid",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "large",
+      "constraints": {
+        "requiredGravityRange": [
+          0.1,
+          3
+        ]
+      },
+      "expectedSpeciesCount": 4,
+      "sapientPossible": false
+    },
+    {
+      "id": "carnivore_small_surface",
+      "name": "surface Small Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "small",
+      "constraints": {},
+      "expectedSpeciesCount": 1,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_apex_surface",
+      "name": "surface Apex Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "crepuscular"
+      },
+      "sizeClass": "large",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_small_aerial",
+      "name": "aerial Small Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "aerial",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "small",
+      "constraints": {},
+      "expectedSpeciesCount": 1,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_apex_aerial",
+      "name": "aerial Apex Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "wetland"
+        ],
+        "verticalZone": "aerial",
+        "activityPattern": "crepuscular"
+      },
+      "sizeClass": "large",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_small_aquatic_mid",
+      "name": "aquatic mid Small Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_mid",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "small",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_apex_aquatic_mid",
+      "name": "aquatic mid Apex Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_mid",
+        "activityPattern": "crepuscular"
+      },
+      "sizeClass": "large",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_small_aquatic_deep",
+      "name": "aquatic deep Small Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_deep",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "small",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "carnivore_apex_aquatic_deep",
+      "name": "aquatic deep Apex Predators",
+      "category": "carnivore",
+      "energySource": "predation",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "aquatic_deep",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "large",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "decomposer_general",
+      "name": "Decomposers",
+      "category": "decomposer",
+      "energySource": "scavenging",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "tiny",
+      "constraints": {},
+      "expectedSpeciesCount": 3,
+      "sapientPossible": false
+    },
+    {
+      "id": "scavenger_opportunist",
+      "name": "Opportunistic Scavengers",
+      "category": "omnivore",
+      "energySource": "scavenging",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "medium",
+      "constraints": {},
+      "expectedSpeciesCount": 2,
+      "sapientPossible": true
+    },
+    {
+      "id": "parasite_host_dependent",
+      "name": "Parasitic Organisms",
+      "category": "parasite",
+      "energySource": "parasitism",
+      "habitat": {
+        "biomes": [
+          "ocean",
+          "wetland"
+        ],
+        "verticalZone": "surface",
+        "activityPattern": "continuous"
+      },
+      "sizeClass": "tiny",
+      "constraints": {},
+      "expectedSpeciesCount": 3,
+      "sapientPossible": false
+    }
+  ],
+  "species": [
+    {
+      "id": "alien_xenoform_vfdqa_1768798384517",
+      "name": "Test Creature 837",
+      "scientificName": "Xenoform vfdqa",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "crystalline_lattice",
+      "locomotion": "inching",
+      "sensorySystem": "gravitational_sense",
+      "diet": "piscivore",
+      "socialStructure": "void_communion",
+      "defense": "void_absorption",
+      "reproduction": "fission",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: crystalline geometric body structure, geometric crystal appendages. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fission.",
+      "behaviorNotes": "Social Behavior: void communion. Feeding Strategy: piscivore. Defense Mechanism: void absorption.",
+      "nicheId": "producer_photosynthetic_land",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_rc83gc_1768798384517",
+      "name": "Test Creature 804",
+      "scientificName": "Xenoform rc83gc",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "quad_core",
+      "locomotion": "phase_shifting",
+      "sensorySystem": "chemical_analysis",
+      "diet": "granivore",
+      "socialStructure": "swarm_cooperation",
+      "defense": "dimension_hop",
+      "reproduction": "emotional_conception",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: four-way radial symmetry, X-shaped body, four of everything, chemical-sensing tendrils. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: emotional conception.",
+      "behaviorNotes": "Social Behavior: swarm cooperation. Feeding Strategy: granivore. Defense Mechanism: dimension hop.",
+      "nicheId": "producer_photosynthetic_land",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_hxosf_1768798384517",
+      "name": "Test Creature 265",
+      "scientificName": "Xenoform hxosf",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "colonial_swarm",
+      "locomotion": "teleportation",
+      "sensorySystem": "gravitational_sense",
+      "diet": "photosynthesis",
+      "socialStructure": "void_communion",
+      "defense": "teleportation_escape",
+      "reproduction": "live_birth",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, swarm of tiny units. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: live birth.",
+      "behaviorNotes": "Social Behavior: void communion. Feeding Strategy: photosynthesis. Defense Mechanism: teleportation escape.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_pwx10a_1768798384517",
+      "name": "Test Creature 173",
+      "scientificName": "Xenoform pwx10a",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "flat_plane",
+      "locomotion": "slithering",
+      "sensorySystem": "psychic_reception",
+      "diet": "insectivore",
+      "socialStructure": "anarchist_collective",
+      "defense": "gravity_well",
+      "reproduction": "conjugation",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: fringe of cilia around edge, serpentine undulating body. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: conjugation.",
+      "behaviorNotes": "Social Behavior: anarchist collective. Feeding Strategy: insectivore. Defense Mechanism: gravity well.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_uw57sb_1768798384517",
+      "name": "Test Creature 246",
+      "scientificName": "Xenoform uw57sb",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "tentacle_walking",
+      "sensorySystem": "future_echoes",
+      "diet": "nectarivore",
+      "socialStructure": "seasonal_fission",
+      "defense": "quantum_uncertainty",
+      "reproduction": "dimensional_seeding",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, tentacles for movement. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dimensional seeding.",
+      "behaviorNotes": "Social Behavior: seasonal fission. Feeding Strategy: nectarivore. Defense Mechanism: quantum uncertainty.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_3rfpq8_1768798384517",
+      "name": "Test Creature 421",
+      "scientificName": "Xenoform 3rfpq8",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "spherical_core",
+      "locomotion": "rolling",
+      "sensorySystem": "electrical_discharge",
+      "diet": "piscivore",
+      "socialStructure": "temporal_council",
+      "defense": "regeneration",
+      "reproduction": "dimensional_seeding",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: spherical core body, limbs optional, usually retractable. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dimensional seeding.",
+      "behaviorNotes": "Social Behavior: temporal council. Feeding Strategy: piscivore. Defense Mechanism: regeneration.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_aegv86r_1768798384517",
+      "name": "Test Creature 120",
+      "scientificName": "Xenoform aegv86r",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "gas_bag",
+      "locomotion": "rolling",
+      "sensorySystem": "time_vision",
+      "diet": "frugivore",
+      "socialStructure": "memory_collective",
+      "defense": "swarm_dispersal",
+      "reproduction": "hive_spawning",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: dangling tendrils below. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: hive spawning.",
+      "behaviorNotes": "Social Behavior: memory collective. Feeding Strategy: frugivore. Defense Mechanism: swarm dispersal.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_loq2yf_1768798384517",
+      "name": "Test Creature 294",
+      "scientificName": "Xenoform loq2yf",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "radial_symmetry",
+      "locomotion": "flight_wings",
+      "sensorySystem": "dimensional_awareness",
+      "diet": "scavenger",
+      "socialStructure": "parasitic_dominance",
+      "defense": "camouflage",
+      "reproduction": "metamorphosis",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, 5-12 radiating appendages, wings for flight, color-shifting skin patterns. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: metamorphosis.",
+      "behaviorNotes": "Social Behavior: parasitic dominance. Feeding Strategy: scavenger. Defense Mechanism: camouflage.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_6ttug2_1768798384517",
+      "name": "Test Creature 81",
+      "scientificName": "Xenoform 6ttug2",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "inverse_skeleton",
+      "locomotion": "bouncing",
+      "sensorySystem": "radiation_detection",
+      "diet": "folivore",
+      "socialStructure": "matriarchy",
+      "defense": "molecular_restructure",
+      "reproduction": "dream_manifestation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, variable. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dream manifestation.",
+      "behaviorNotes": "Social Behavior: matriarchy. Feeding Strategy: folivore. Defense Mechanism: molecular restructure.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_qehyb_1768798384517",
+      "name": "Test Creature 146",
+      "scientificName": "Xenoform qehyb",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "wheel_form",
+      "locomotion": "wind_surfing",
+      "sensorySystem": "pressure_waves",
+      "diet": "fungivore",
+      "socialStructure": "crystalline_resonance",
+      "defense": "mimicry",
+      "reproduction": "fission",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: spokes radiating from hub. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fission.",
+      "behaviorNotes": "Social Behavior: crystalline resonance. Feeding Strategy: fungivore. Defense Mechanism: mimicry.",
+      "nicheId": "producer_photosynthetic_aquatic",
+      "sizeClass": "microscopic"
+    },
+    {
+      "id": "alien_xenoform_ckyih_1768798384517",
+      "name": "Test Creature 362",
+      "scientificName": "Xenoform ckyih",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "colonial_swarm",
+      "locomotion": "jet_propulsion",
+      "sensorySystem": "collective_mind",
+      "diet": "granivore",
+      "socialStructure": "dream_assembly",
+      "defense": "armored_shell",
+      "reproduction": "time_loop_birth",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, swarm of tiny units, jet propulsion vents, heavy armored plating. Environmental context: earthy natural colors, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: time loop birth.",
+      "behaviorNotes": "Social Behavior: dream assembly. Feeding Strategy: granivore. Defense Mechanism: armored shell.",
+      "nicheId": "herbivore_grazer_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_38sdlvv_1768798384517",
+      "name": "Test Creature 426",
+      "scientificName": "Xenoform 38sdlvv",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "serpentine_elongated",
+      "locomotion": "rocket_boost",
+      "sensorySystem": "crystalline_resonance",
+      "diet": "parasitic",
+      "socialStructure": "anarchist_collective",
+      "defense": "armored_shell",
+      "reproduction": "telepathic_breeding",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, no visible limbs, heavy armored plating. Environmental context: earthy natural colors, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: telepathic breeding.",
+      "behaviorNotes": "Social Behavior: anarchist collective. Feeding Strategy: parasitic. Defense Mechanism: armored shell.",
+      "nicheId": "herbivore_grazer_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_5vlkhr_1768798384517",
+      "name": "Test Creature 176",
+      "scientificName": "Xenoform 5vlkhr",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "blob_form",
+      "locomotion": "gravity_manipulation",
+      "sensorySystem": "pressure_waves",
+      "diet": "folivore",
+      "socialStructure": "seasonal_fission",
+      "defense": "swarm_dispersal",
+      "reproduction": "fission",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: amorphous blob-like form, shapeshifting pseudopods. Environmental context: earthy natural colors, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fission.",
+      "behaviorNotes": "Social Behavior: seasonal fission. Feeding Strategy: folivore. Defense Mechanism: swarm dispersal.",
+      "nicheId": "herbivore_grazer_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_qrd26d_1768798384517",
+      "name": "Test Creature 809",
+      "scientificName": "Xenoform qrd26d",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "crystalline_lattice",
+      "locomotion": "osmotic_flow",
+      "sensorySystem": "magnetic_navigation",
+      "diet": "hematophage",
+      "socialStructure": "hive_mind",
+      "defense": "emotional_manipulation",
+      "reproduction": "symbiotic_merger",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: crystalline geometric body structure, geometric crystal appendages. Environmental context: lightweight appearance, aerial adaptations, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: symbiotic merger.",
+      "behaviorNotes": "Social Behavior: hive mind. Feeding Strategy: hematophage. Defense Mechanism: emotional manipulation.",
+      "nicheId": "herbivore_grazer_aerial",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_05bxbb_1768798384517",
+      "name": "Test Creature 369",
+      "scientificName": "Xenoform 05bxbb",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "colonial_swarm",
+      "locomotion": "slithering",
+      "sensorySystem": "radiation_detection",
+      "diet": "nectarivore",
+      "socialStructure": "nomadic_bands",
+      "defense": "reflective_surface",
+      "reproduction": "time_loop_birth",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, swarm of tiny units, serpentine undulating body. Environmental context: lightweight appearance, aerial adaptations, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: time loop birth.",
+      "behaviorNotes": "Social Behavior: nomadic bands. Feeding Strategy: nectarivore. Defense Mechanism: reflective surface.",
+      "nicheId": "herbivore_grazer_aerial",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_m78h3p_1768798384517",
+      "name": "Test Creature 485",
+      "scientificName": "Xenoform m78h3p",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "modular_segments",
+      "locomotion": "dimensional_stepping",
+      "sensorySystem": "gravitational_sense",
+      "diet": "fungivore",
+      "socialStructure": "solitary",
+      "defense": "sonic_scream",
+      "reproduction": "telepathic_breeding",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, modular segmented body with variable limbs. Environmental context: lightweight appearance, aerial adaptations, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: telepathic breeding.",
+      "behaviorNotes": "Social Behavior: solitary. Feeding Strategy: fungivore. Defense Mechanism: sonic scream.",
+      "nicheId": "herbivore_grazer_aerial",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_i6n3m_1768798384517",
+      "name": "Test Creature 351",
+      "scientificName": "Xenoform i6n3m",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "tentacle_mass",
+      "locomotion": "slithering",
+      "sensorySystem": "future_echoes",
+      "diet": "piscivore",
+      "socialStructure": "caste_system",
+      "defense": "void_absorption",
+      "reproduction": "time_loop_birth",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, numerous tentacles, serpentine undulating body. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: time loop birth.",
+      "behaviorNotes": "Social Behavior: caste system. Feeding Strategy: piscivore. Defense Mechanism: void absorption.",
+      "nicheId": "herbivore_grazer_aquatic_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_j6dmd8_1768798384517",
+      "name": "Test Creature 405",
+      "scientificName": "Xenoform j6dmd8",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "time_dilation",
+      "sensorySystem": "crystalline_resonance",
+      "diet": "herbivore_standard",
+      "socialStructure": "generational_relay",
+      "defense": "dimension_hop",
+      "reproduction": "fragmentation",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, grinding mouthparts. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fragmentation.",
+      "behaviorNotes": "Social Behavior: generational relay. Feeding Strategy: herbivore standard. Defense Mechanism: dimension hop.",
+      "nicheId": "herbivore_grazer_aquatic_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_3dyob_1768798384517",
+      "name": "Test Creature 709",
+      "scientificName": "Xenoform 3dyob",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "serpentine_elongated",
+      "locomotion": "teleportation",
+      "sensorySystem": "sound_texture",
+      "diet": "fungivore",
+      "socialStructure": "competitive_arena",
+      "defense": "quantum_uncertainty",
+      "reproduction": "memory_transfer",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, no visible limbs. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: memory transfer.",
+      "behaviorNotes": "Social Behavior: competitive arena. Feeding Strategy: fungivore. Defense Mechanism: quantum uncertainty.",
+      "nicheId": "herbivore_grazer_aquatic_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_7a9pz_1768798384517",
+      "name": "Test Creature 345",
+      "scientificName": "Xenoform 7a9pz",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "quad_core",
+      "locomotion": "slithering",
+      "sensorySystem": "time_vision",
+      "diet": "hematophage",
+      "socialStructure": "digital_network",
+      "defense": "crystal_armor",
+      "reproduction": "parthenogenesis",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: four-way radial symmetry, X-shaped body, four of everything, serpentine undulating body, heavy armored plating. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: parthenogenesis.",
+      "behaviorNotes": "Social Behavior: digital network. Feeding Strategy: hematophage. Defense Mechanism: crystal armor.",
+      "nicheId": "herbivore_grazer_aquatic_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_nhg4ru_1768798384517",
+      "name": "Test Creature 217",
+      "scientificName": "Xenoform nhg4ru",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "gas_bag",
+      "locomotion": "rolling",
+      "sensorySystem": "time_vision",
+      "diet": "parasitic",
+      "socialStructure": "memory_collective",
+      "defense": "void_absorption",
+      "reproduction": "death_spawning",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: dangling tendrils below. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: death spawning.",
+      "behaviorNotes": "Social Behavior: memory collective. Feeding Strategy: parasitic. Defense Mechanism: void absorption.",
+      "nicheId": "herbivore_grazer_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_sh1i4d_1768798384517",
+      "name": "Test Creature 48",
+      "scientificName": "Xenoform sh1i4d",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "radial_symmetry",
+      "locomotion": "swimming",
+      "sensorySystem": "electrical_discharge",
+      "diet": "fungivore",
+      "socialStructure": "competitive_arena",
+      "defense": "molecular_restructure",
+      "reproduction": "dream_manifestation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, 5-12 radiating appendages, fins or tail for aquatic movement. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dream manifestation.",
+      "behaviorNotes": "Social Behavior: competitive arena. Feeding Strategy: fungivore. Defense Mechanism: molecular restructure.",
+      "nicheId": "herbivore_grazer_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_hrnnp9_1768798384517",
+      "name": "Test Creature 709",
+      "scientificName": "Xenoform hrnnp9",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "quad_core",
+      "locomotion": "swimming",
+      "sensorySystem": "cosmic_ray",
+      "diet": "herbivore_standard",
+      "socialStructure": "nomadic_bands",
+      "defense": "molecular_restructure",
+      "reproduction": "crystalline_growth",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: four-way radial symmetry, X-shaped body, four of everything, fins or tail for aquatic movement, grinding mouthparts. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: crystalline growth.",
+      "behaviorNotes": "Social Behavior: nomadic bands. Feeding Strategy: herbivore standard. Defense Mechanism: molecular restructure.",
+      "nicheId": "herbivore_grazer_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_g87d7_1768798384517",
+      "name": "Test Creature 546",
+      "scientificName": "Xenoform g87d7",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "wheel_form",
+      "locomotion": "climbing",
+      "sensorySystem": "chemical_trail",
+      "diet": "piscivore",
+      "socialStructure": "nomadic_bands",
+      "defense": "mimicry",
+      "reproduction": "sexual_standard",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "good",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: spokes radiating from hub, gripping appendages for climbing, chemical-sensing tendrils. Environmental context: aquatic coloring (blues/greens), streamlined for water, non-threatening appearance, gentle features, approachable, less threatening features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: sexual standard.",
+      "behaviorNotes": "Social Behavior: nomadic bands. Feeding Strategy: piscivore. Defense Mechanism: mimicry.",
+      "nicheId": "herbivore_grazer_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_gdh0ba_1768798384517",
+      "name": "Test Creature 640",
+      "scientificName": "Xenoform gdh0ba",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "tentacle_mass",
+      "locomotion": "phase_shifting",
+      "sensorySystem": "crystalline_resonance",
+      "diet": "hematophage",
+      "socialStructure": "matriarchy",
+      "defense": "armored_shell",
+      "reproduction": "sexual_standard",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, numerous tentacles, heavy armored plating. Environmental context: earthy natural colors, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: sexual standard.",
+      "behaviorNotes": "Social Behavior: matriarchy. Feeding Strategy: hematophage. Defense Mechanism: armored shell.",
+      "nicheId": "carnivore_small_surface",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_qk6m3g_1768798384517",
+      "name": "Test Creature 859",
+      "scientificName": "Xenoform qk6m3g",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "nested_spheres",
+      "locomotion": "bouncing",
+      "sensorySystem": "chemical_trail",
+      "diet": "carnivore_predator",
+      "socialStructure": "pair_bonding",
+      "defense": "camouflage",
+      "reproduction": "telepathic_breeding",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "severe",
+      "spritePrompt": "Pixel art alien creature: each layer has appendages, chemical-sensing tendrils, color-shifting skin patterns, sharp fangs and claws. Environmental context: earthy natural colors, intimidating and powerful appearance, prominent predatory features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: telepathic breeding.",
+      "behaviorNotes": "Social Behavior: pair bonding. Feeding Strategy: carnivore predator. Defense Mechanism: camouflage.",
+      "nicheId": "carnivore_apex_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_i9rwnn_1768798384517",
+      "name": "Test Creature 237",
+      "scientificName": "Xenoform i9rwnn",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "spherical_core",
+      "locomotion": "swimming",
+      "sensorySystem": "emotional_detection",
+      "diet": "filter_feeder",
+      "socialStructure": "tribal_council",
+      "defense": "phase_shifting",
+      "reproduction": "crystalline_growth",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: spherical core body, limbs optional, usually retractable, fins or tail for aquatic movement, semi-transparent phasing form, filter-feeding apparatus. Environmental context: earthy natural colors, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: crystalline growth.",
+      "behaviorNotes": "Social Behavior: tribal council. Feeding Strategy: filter feeder. Defense Mechanism: phase shifting.",
+      "nicheId": "carnivore_apex_surface",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_ujddu_1768798384517",
+      "name": "Test Creature 147",
+      "scientificName": "Xenoform ujddu",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "crystalline_lattice",
+      "locomotion": "gravity_manipulation",
+      "sensorySystem": "future_echoes",
+      "diet": "nectarivore",
+      "socialStructure": "void_communion",
+      "defense": "toxic_secretion",
+      "reproduction": "radiation_mutation",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.517Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: crystalline geometric body structure, geometric crystal appendages, visible poison glands. Environmental context: lightweight appearance, aerial adaptations, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: radiation mutation.",
+      "behaviorNotes": "Social Behavior: void communion. Feeding Strategy: nectarivore. Defense Mechanism: toxic secretion.",
+      "nicheId": "carnivore_small_aerial",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_a0145d_1768798384518",
+      "name": "Test Creature 525",
+      "scientificName": "Xenoform a0145d",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "serpentine_elongated",
+      "locomotion": "time_dilation",
+      "sensorySystem": "chemical_analysis",
+      "diet": "parasitic",
+      "socialStructure": "swarm_cooperation",
+      "defense": "probability_alteration",
+      "reproduction": "death_spawning",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, no visible limbs, chemical-sensing tendrils. Environmental context: lightweight appearance, aerial adaptations, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: death spawning.",
+      "behaviorNotes": "Social Behavior: swarm cooperation. Feeding Strategy: parasitic. Defense Mechanism: probability alteration.",
+      "nicheId": "carnivore_apex_aerial",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_hgol7q_1768798384518",
+      "name": "Test Creature 85",
+      "scientificName": "Xenoform hgol7q",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "quadrupedal_running",
+      "sensorySystem": "pressure_waves",
+      "diet": "insectivore",
+      "socialStructure": "hive_mind",
+      "defense": "phase_shifting",
+      "reproduction": "memory_transfer",
+      "intelligence": "hive_intelligence",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "severe",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, semi-transparent phasing form. Environmental context: lightweight appearance, aerial adaptations, intimidating and powerful appearance, prominent predatory features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: memory transfer.",
+      "behaviorNotes": "Social Behavior: hive mind. Feeding Strategy: insectivore. Defense Mechanism: phase shifting.",
+      "culturalNotes": "Intelligence Level: hive intelligence. Likely to form hive mind based societies. Communication methods and cultural practices require further study.",
+      "nicheId": "carnivore_apex_aerial",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_0m42xn_1768798384518",
+      "name": "Test Creature 906",
+      "scientificName": "Xenoform 0m42xn",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "blob_form",
+      "locomotion": "burrowing",
+      "sensorySystem": "spatial_distortion",
+      "diet": "omnivore",
+      "socialStructure": "pair_bonding",
+      "defense": "swarm_dispersal",
+      "reproduction": "fission",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: amorphous blob-like form, shapeshifting pseudopods, wings for flight. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fission.",
+      "behaviorNotes": "Social Behavior: pair bonding. Feeding Strategy: omnivore. Defense Mechanism: swarm dispersal.",
+      "nicheId": "carnivore_small_aquatic_mid",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_o8swf_1768798384518",
+      "name": "Test Creature 788",
+      "scientificName": "Xenoform o8swf",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "nested_spheres",
+      "locomotion": "climbing",
+      "sensorySystem": "quantum_probability",
+      "diet": "filter_feeder",
+      "socialStructure": "tribal_council",
+      "defense": "quantum_uncertainty",
+      "reproduction": "spore_dispersal",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: each layer has appendages, gripping appendages for climbing, filter-feeding apparatus. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: spore dispersal.",
+      "behaviorNotes": "Social Behavior: tribal council. Feeding Strategy: filter feeder. Defense Mechanism: quantum uncertainty.",
+      "nicheId": "carnivore_small_aquatic_mid",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_iepf2j_1768798384518",
+      "name": "Test Creature 750",
+      "scientificName": "Xenoform iepf2j",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "swimming",
+      "sensorySystem": "sound_texture",
+      "diet": "herbivore_standard",
+      "socialStructure": "telepathic_network",
+      "defense": "camouflage",
+      "reproduction": "crystalline_growth",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, fins or tail for aquatic movement, color-shifting skin patterns, grinding mouthparts. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: crystalline growth.",
+      "behaviorNotes": "Social Behavior: telepathic network. Feeding Strategy: herbivore standard. Defense Mechanism: camouflage.",
+      "nicheId": "carnivore_apex_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_e8gtt_1768798384518",
+      "name": "Test Creature 6",
+      "scientificName": "Xenoform e8gtt",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "hollow_shell",
+      "locomotion": "teleportation",
+      "sensorySystem": "dimensional_awareness",
+      "diet": "nectarivore",
+      "socialStructure": "pack_hierarchy",
+      "defense": "swarm_dispersal",
+      "reproduction": "radiation_mutation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "severe",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, soft body inside, few appendages outside. Environmental context: aquatic coloring (blues/greens), streamlined for water, intimidating and powerful appearance, prominent predatory features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: radiation mutation.",
+      "behaviorNotes": "Social Behavior: pack hierarchy. Feeding Strategy: nectarivore. Defense Mechanism: swarm dispersal.",
+      "nicheId": "carnivore_apex_aquatic_mid",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_1bjhcl_1768798384518",
+      "name": "Test Creature 442",
+      "scientificName": "Xenoform 1bjhcl",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "vertical_tower",
+      "locomotion": "gravity_manipulation",
+      "sensorySystem": "crystalline_resonance",
+      "diet": "scavenger",
+      "socialStructure": "solitary",
+      "defense": "energy_shield",
+      "reproduction": "energy_condensation",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: rings of limbs at different heights. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: energy condensation.",
+      "behaviorNotes": "Social Behavior: solitary. Feeding Strategy: scavenger. Defense Mechanism: energy shield.",
+      "nicheId": "carnivore_small_aquatic_deep",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_sqtiv8_1768798384518",
+      "name": "Test Creature 503",
+      "scientificName": "Xenoform sqtiv8",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "vertical_tower",
+      "locomotion": "electromagnetic_rail",
+      "sensorySystem": "collective_mind",
+      "diet": "nectarivore",
+      "socialStructure": "tribal_council",
+      "defense": "energy_shield",
+      "reproduction": "dream_manifestation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: rings of limbs at different heights, magnetic field generators. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dream manifestation.",
+      "behaviorNotes": "Social Behavior: tribal council. Feeding Strategy: nectarivore. Defense Mechanism: energy shield.",
+      "nicheId": "carnivore_small_aquatic_deep",
+      "sizeClass": "small"
+    },
+    {
+      "id": "alien_xenoform_z0ki36_1768798384518",
+      "name": "Test Creature 582",
+      "scientificName": "Xenoform z0ki36",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "inverse_skeleton",
+      "locomotion": "slithering",
+      "sensorySystem": "chemical_trail",
+      "diet": "frugivore",
+      "socialStructure": "hive_mind",
+      "defense": "hardlight_clone",
+      "reproduction": "asexual_budding",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, variable, serpentine undulating body, chemical-sensing tendrils. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: asexual budding.",
+      "behaviorNotes": "Social Behavior: hive mind. Feeding Strategy: frugivore. Defense Mechanism: hardlight clone.",
+      "nicheId": "carnivore_apex_aquatic_deep",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_oemtaa_1768798384518",
+      "name": "Test Creature 3",
+      "scientificName": "Xenoform oemtaa",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "flat_plane",
+      "locomotion": "bipedal_walking",
+      "sensorySystem": "electromagnetic_sense",
+      "diet": "hematophage",
+      "socialStructure": "territorial_city",
+      "defense": "toxic_secretion",
+      "reproduction": "radiation_mutation",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "moderate",
+      "spritePrompt": "Pixel art alien creature: fringe of cilia around edge, electromagnetic sensing organs, visible poison glands. Environmental context: aquatic coloring (blues/greens), streamlined for water, visibly dangerous features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: radiation mutation.",
+      "behaviorNotes": "Social Behavior: territorial city. Feeding Strategy: hematophage. Defense Mechanism: toxic secretion.",
+      "nicheId": "carnivore_apex_aquatic_deep",
+      "sizeClass": "large"
+    },
+    {
+      "id": "alien_xenoform_wz2b_1768798384518",
+      "name": "Test Creature 35",
+      "scientificName": "Xenoform wz2b",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "quad_core",
+      "locomotion": "slithering",
+      "sensorySystem": "quantum_probability",
+      "diet": "decomposer",
+      "socialStructure": "nuclear_family",
+      "defense": "probability_alteration",
+      "reproduction": "fragmentation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: four-way radial symmetry, X-shaped body, four of everything, serpentine undulating body. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fragmentation.",
+      "behaviorNotes": "Social Behavior: nuclear family. Feeding Strategy: decomposer. Defense Mechanism: probability alteration.",
+      "nicheId": "decomposer_general",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_ofh69c_1768798384518",
+      "name": "Test Creature 673",
+      "scientificName": "Xenoform ofh69c",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "modular_segments",
+      "locomotion": "wind_surfing",
+      "sensorySystem": "cosmic_ray",
+      "diet": "frugivore",
+      "socialStructure": "seasonal_fission",
+      "defense": "molecular_restructure",
+      "reproduction": "viral_replication",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, modular segmented body with variable limbs. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: viral replication.",
+      "behaviorNotes": "Social Behavior: seasonal fission. Feeding Strategy: frugivore. Defense Mechanism: molecular restructure.",
+      "nicheId": "decomposer_general",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_muxn9_1768798384518",
+      "name": "Test Creature 974",
+      "scientificName": "Xenoform muxn9",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "magnetic_levitation",
+      "sensorySystem": "visual_standard",
+      "diet": "herbivore_standard",
+      "socialStructure": "memory_collective",
+      "defense": "regeneration",
+      "reproduction": "spore_dispersal",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, magnetic field generators, prominent eyes, grinding mouthparts. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: spore dispersal.",
+      "behaviorNotes": "Social Behavior: memory collective. Feeding Strategy: herbivore standard. Defense Mechanism: regeneration.",
+      "nicheId": "decomposer_general",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_yle2wq_1768798384518",
+      "name": "Test Creature 209",
+      "scientificName": "Xenoform yle2wq",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "colonial_swarm",
+      "locomotion": "swimming",
+      "sensorySystem": "pressure_waves",
+      "diet": "decomposer",
+      "socialStructure": "digital_network",
+      "defense": "hardlight_clone",
+      "reproduction": "dream_manifestation",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, swarm of tiny units, fins or tail for aquatic movement. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: dream manifestation.",
+      "behaviorNotes": "Social Behavior: digital network. Feeding Strategy: decomposer. Defense Mechanism: hardlight clone.",
+      "nicheId": "scavenger_opportunist",
+      "sizeClass": "medium"
+    },
+    {
+      "id": "alien_xenoform_dsjdyr_1768798384518",
+      "name": "Test Creature 190",
+      "scientificName": "Xenoform dsjdyr",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "radial_symmetry",
+      "locomotion": "bouncing",
+      "sensorySystem": "phase_detection",
+      "diet": "hematophage",
+      "socialStructure": "caste_system",
+      "defense": "regeneration",
+      "reproduction": "symbiotic_merger",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, 5-12 radiating appendages. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: symbiotic merger.",
+      "behaviorNotes": "Social Behavior: caste system. Feeding Strategy: hematophage. Defense Mechanism: regeneration.",
+      "nicheId": "scavenger_opportunist",
+      "sizeClass": "medium"
+    },
+    {
+      "id": "alien_xenoform_asi42_1768798384518",
+      "name": "Test Creature 533",
+      "scientificName": "Xenoform asi42",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "blob_form",
+      "locomotion": "flight_wings",
+      "sensorySystem": "visual_standard",
+      "diet": "carnivore_predator",
+      "socialStructure": "telepathic_network",
+      "defense": "molecular_restructure",
+      "reproduction": "telepathic_breeding",
+      "intelligence": "problem_solver",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "minor",
+      "spritePrompt": "Pixel art alien creature: amorphous blob-like form, shapeshifting pseudopods, wings for flight, prominent eyes, sharp fangs and claws. Environmental context: earthy natural colors, slightly dangerous looking. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: telepathic breeding.",
+      "behaviorNotes": "Social Behavior: telepathic network. Feeding Strategy: carnivore predator. Defense Mechanism: molecular restructure.",
+      "nicheId": "parasite_host_dependent",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_g59r7i_1768798384518",
+      "name": "Test Creature 393",
+      "scientificName": "Xenoform g59r7i",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "blob_form",
+      "locomotion": "burrowing",
+      "sensorySystem": "quantum_probability",
+      "diet": "piscivore",
+      "socialStructure": "parasitic_dominance",
+      "defense": "dimension_hop",
+      "reproduction": "fragmentation",
+      "intelligence": "basic_learning",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "minor",
+      "spritePrompt": "Pixel art alien creature: amorphous blob-like form, shapeshifting pseudopods, wings for flight. Environmental context: earthy natural colors, slightly dangerous looking. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fragmentation.",
+      "behaviorNotes": "Social Behavior: parasitic dominance. Feeding Strategy: piscivore. Defense Mechanism: dimension hop.",
+      "nicheId": "parasite_host_dependent",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_xw10hx_1768798384518",
+      "name": "Test Creature 824",
+      "scientificName": "Xenoform xw10hx",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "vertical_tower",
+      "locomotion": "climbing",
+      "sensorySystem": "dimensional_awareness",
+      "diet": "filter_feeder",
+      "socialStructure": "territorial_city",
+      "defense": "emotional_manipulation",
+      "reproduction": "fragmentation",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "minor",
+      "spritePrompt": "Pixel art alien creature: rings of limbs at different heights, gripping appendages for climbing, filter-feeding apparatus. Environmental context: earthy natural colors, slightly dangerous looking. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: fragmentation.",
+      "behaviorNotes": "Social Behavior: territorial city. Feeding Strategy: filter feeder. Defense Mechanism: emotional manipulation.",
+      "nicheId": "parasite_host_dependent",
+      "sizeClass": "tiny"
+    }
+  ],
+  "foodWeb": {
+    "alien_xenoform_vfdqa_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_rc83gc_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_rc83gc_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_vfdqa_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_hxosf_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_pwx10a_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_uw57sb_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_3rfpq8_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_aegv86r_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_loq2yf_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_6ttug2_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_qehyb_1768798384517": {
+      "preys": [],
+      "predators": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "competitors": [
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_ckyih_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_38sdlvv_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_5vlkhr_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_qrd26d_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_05bxbb_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_m78h3p_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_i6n3m_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_j6dmd8_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_3dyob_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_7a9pz_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_nhg4ru_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_sh1i4d_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_hrnnp9_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_g87d7_1768798384517": {
+      "preys": [
+        "alien_xenoform_vfdqa_1768798384517",
+        "alien_xenoform_rc83gc_1768798384517",
+        "alien_xenoform_hxosf_1768798384517",
+        "alien_xenoform_pwx10a_1768798384517",
+        "alien_xenoform_uw57sb_1768798384517",
+        "alien_xenoform_3rfpq8_1768798384517",
+        "alien_xenoform_aegv86r_1768798384517",
+        "alien_xenoform_loq2yf_1768798384517",
+        "alien_xenoform_6ttug2_1768798384517",
+        "alien_xenoform_qehyb_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_gdh0ba_1768798384517": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [],
+      "mutualists": []
+    },
+    "alien_xenoform_qk6m3g_1768798384517": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_i9rwnn_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_i9rwnn_1768798384517": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_qk6m3g_1768798384517"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_ujddu_1768798384517": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [],
+      "mutualists": []
+    },
+    "alien_xenoform_a0145d_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_hgol7q_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_hgol7q_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_a0145d_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_0m42xn_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_o8swf_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_o8swf_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_0m42xn_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_iepf2j_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_e8gtt_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_e8gtt_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_iepf2j_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_1bjhcl_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_sqtiv8_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517"
+      ],
+      "predators": [
+        "alien_xenoform_qk6m3g_1768798384517",
+        "alien_xenoform_i9rwnn_1768798384517",
+        "alien_xenoform_a0145d_1768798384518",
+        "alien_xenoform_hgol7q_1768798384518",
+        "alien_xenoform_iepf2j_1768798384518",
+        "alien_xenoform_e8gtt_1768798384518",
+        "alien_xenoform_z0ki36_1768798384518",
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "competitors": [
+        "alien_xenoform_1bjhcl_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_z0ki36_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_oemtaa_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_oemtaa_1768798384518": {
+      "preys": [
+        "alien_xenoform_ckyih_1768798384517",
+        "alien_xenoform_38sdlvv_1768798384517",
+        "alien_xenoform_5vlkhr_1768798384517",
+        "alien_xenoform_qrd26d_1768798384517",
+        "alien_xenoform_05bxbb_1768798384517",
+        "alien_xenoform_m78h3p_1768798384517",
+        "alien_xenoform_i6n3m_1768798384517",
+        "alien_xenoform_j6dmd8_1768798384517",
+        "alien_xenoform_3dyob_1768798384517",
+        "alien_xenoform_7a9pz_1768798384517",
+        "alien_xenoform_nhg4ru_1768798384517",
+        "alien_xenoform_sh1i4d_1768798384517",
+        "alien_xenoform_hrnnp9_1768798384517",
+        "alien_xenoform_g87d7_1768798384517",
+        "alien_xenoform_gdh0ba_1768798384517",
+        "alien_xenoform_ujddu_1768798384517",
+        "alien_xenoform_0m42xn_1768798384518",
+        "alien_xenoform_o8swf_1768798384518",
+        "alien_xenoform_1bjhcl_1768798384518",
+        "alien_xenoform_sqtiv8_1768798384518"
+      ],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_z0ki36_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_wz2b_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_ofh69c_1768798384518",
+        "alien_xenoform_muxn9_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_ofh69c_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_wz2b_1768798384518",
+        "alien_xenoform_muxn9_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_muxn9_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_wz2b_1768798384518",
+        "alien_xenoform_ofh69c_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_yle2wq_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_dsjdyr_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_dsjdyr_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_yle2wq_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_asi42_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_g59r7i_1768798384518",
+        "alien_xenoform_xw10hx_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_g59r7i_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_asi42_1768798384518",
+        "alien_xenoform_xw10hx_1768798384518"
+      ],
+      "mutualists": []
+    },
+    "alien_xenoform_xw10hx_1768798384518": {
+      "preys": [],
+      "predators": [],
+      "competitors": [
+        "alien_xenoform_asi42_1768798384518",
+        "alien_xenoform_g59r7i_1768798384518"
+      ],
+      "mutualists": []
+    }
+  },
+  "nicheFilling": {
+    "producer_photosynthetic_land": [
+      "alien_xenoform_vfdqa_1768798384517",
+      "alien_xenoform_rc83gc_1768798384517"
+    ],
+    "producer_photosynthetic_aquatic": [
+      "alien_xenoform_hxosf_1768798384517",
+      "alien_xenoform_pwx10a_1768798384517",
+      "alien_xenoform_uw57sb_1768798384517",
+      "alien_xenoform_3rfpq8_1768798384517",
+      "alien_xenoform_aegv86r_1768798384517",
+      "alien_xenoform_loq2yf_1768798384517",
+      "alien_xenoform_6ttug2_1768798384517",
+      "alien_xenoform_qehyb_1768798384517"
+    ],
+    "herbivore_grazer_surface": [
+      "alien_xenoform_ckyih_1768798384517",
+      "alien_xenoform_38sdlvv_1768798384517",
+      "alien_xenoform_5vlkhr_1768798384517"
+    ],
+    "herbivore_grazer_aerial": [
+      "alien_xenoform_qrd26d_1768798384517",
+      "alien_xenoform_05bxbb_1768798384517",
+      "alien_xenoform_m78h3p_1768798384517"
+    ],
+    "herbivore_grazer_aquatic_surface": [
+      "alien_xenoform_i6n3m_1768798384517",
+      "alien_xenoform_j6dmd8_1768798384517",
+      "alien_xenoform_3dyob_1768798384517",
+      "alien_xenoform_7a9pz_1768798384517"
+    ],
+    "herbivore_grazer_aquatic_mid": [
+      "alien_xenoform_nhg4ru_1768798384517",
+      "alien_xenoform_sh1i4d_1768798384517",
+      "alien_xenoform_hrnnp9_1768798384517",
+      "alien_xenoform_g87d7_1768798384517"
+    ],
+    "carnivore_small_surface": [
+      "alien_xenoform_gdh0ba_1768798384517"
+    ],
+    "carnivore_apex_surface": [
+      "alien_xenoform_qk6m3g_1768798384517",
+      "alien_xenoform_i9rwnn_1768798384517"
+    ],
+    "carnivore_small_aerial": [
+      "alien_xenoform_ujddu_1768798384517"
+    ],
+    "carnivore_apex_aerial": [
+      "alien_xenoform_a0145d_1768798384518",
+      "alien_xenoform_hgol7q_1768798384518"
+    ],
+    "carnivore_small_aquatic_mid": [
+      "alien_xenoform_0m42xn_1768798384518",
+      "alien_xenoform_o8swf_1768798384518"
+    ],
+    "carnivore_apex_aquatic_mid": [
+      "alien_xenoform_iepf2j_1768798384518",
+      "alien_xenoform_e8gtt_1768798384518"
+    ],
+    "carnivore_small_aquatic_deep": [
+      "alien_xenoform_1bjhcl_1768798384518",
+      "alien_xenoform_sqtiv8_1768798384518"
+    ],
+    "carnivore_apex_aquatic_deep": [
+      "alien_xenoform_z0ki36_1768798384518",
+      "alien_xenoform_oemtaa_1768798384518"
+    ],
+    "decomposer_general": [
+      "alien_xenoform_wz2b_1768798384518",
+      "alien_xenoform_ofh69c_1768798384518",
+      "alien_xenoform_muxn9_1768798384518"
+    ],
+    "scavenger_opportunist": [
+      "alien_xenoform_yle2wq_1768798384518",
+      "alien_xenoform_dsjdyr_1768798384518"
+    ],
+    "parasite_host_dependent": [
+      "alien_xenoform_asi42_1768798384518",
+      "alien_xenoform_g59r7i_1768798384518",
+      "alien_xenoform_xw10hx_1768798384518"
+    ]
+  },
+  "sapientSpecies": [
+    {
+      "id": "alien_xenoform_hgol7q_1768798384518",
+      "name": "Test Creature 85",
+      "scientificName": "Xenoform hgol7q",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "bilateral_standard",
+      "locomotion": "quadrupedal_running",
+      "sensorySystem": "pressure_waves",
+      "diet": "insectivore",
+      "socialStructure": "hive_mind",
+      "defense": "phase_shifting",
+      "reproduction": "memory_transfer",
+      "intelligence": "hive_intelligence",
+      "discovered": "2026-01-19T04:53:04.518Z",
+      "nativeWorld": "Aquarius Prime",
+      "domesticationPotential": "poor",
+      "dangerLevel": "severe",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, 4-6 limbs, semi-transparent phasing form. Environmental context: lightweight appearance, aerial adaptations, intimidating and powerful appearance, prominent predatory features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: memory transfer.",
+      "behaviorNotes": "Social Behavior: hive mind. Feeding Strategy: insectivore. Defense Mechanism: phase shifting.",
+      "culturalNotes": "Intelligence Level: hive intelligence. Likely to form hive mind based societies. Communication methods and cultural practices require further study.",
+      "nicheId": "carnivore_apex_aerial",
+      "sizeClass": "large"
+    }
+  ],
+  "artStyle": "snes",
+  "metadata": {
+    "generatedAt": 1768798384519,
+    "generationTimeMs": 2,
+    "totalSpecies": 46,
+    "sapientCount": 1,
+    "trophicLevels": 4,
+    "averageSpeciesPerNiche": 2.7058823529411766
+  }
+}

@@ -1,0 +1,282 @@
+[
+  {
+    "id": "refined_mana",
+    "name": "Refined Mana",
+    "category": "Materials"
+  },
+  {
+    "id": "rare_earth_compound",
+    "name": "Rare Earth Compound",
+    "category": "Materials"
+  },
+  {
+    "id": "silicon_wafer",
+    "name": "Silicon Wafer",
+    "category": "Materials"
+  },
+  {
+    "id": "crystal_lens",
+    "name": "Crystal Lens",
+    "category": "Materials"
+  },
+  {
+    "id": "stellarite_ingot",
+    "name": "Stellarite Ingot",
+    "category": "Materials"
+  },
+  {
+    "id": "condensed_void",
+    "name": "Condensed Void",
+    "category": "Materials"
+  },
+  {
+    "id": "temporal_crystal",
+    "name": "Temporal Crystal",
+    "category": "Materials"
+  },
+  {
+    "id": "emotional_essence",
+    "name": "Emotional Essence",
+    "category": "Materials"
+  },
+  {
+    "id": "mana_crystal",
+    "name": "Mana Crystal",
+    "category": "Materials"
+  },
+  {
+    "id": "basic_circuit",
+    "name": "Basic Circuit",
+    "category": "Materials"
+  },
+  {
+    "id": "advanced_circuit",
+    "name": "Advanced Circuit",
+    "category": "Materials"
+  },
+  {
+    "id": "resonance_coil",
+    "name": "Resonance Coil",
+    "category": "Materials"
+  },
+  {
+    "id": "focusing_array",
+    "name": "Focusing Array",
+    "category": "Materials"
+  },
+  {
+    "id": "void_capacitor",
+    "name": "Void Capacitor",
+    "category": "Materials"
+  },
+  {
+    "id": "temporal_regulator",
+    "name": "Temporal Regulator",
+    "category": "Materials"
+  },
+  {
+    "id": "emotional_amplifier",
+    "name": "Emotional Amplifier",
+    "category": "Materials"
+  },
+  {
+    "id": "stellarite_plate",
+    "name": "Stellarite Plate",
+    "category": "Materials"
+  },
+  {
+    "id": "processing_unit",
+    "name": "Processing Unit",
+    "category": "Materials"
+  },
+  {
+    "id": "quantum_processor",
+    "name": "Quantum Processor",
+    "category": "Materials"
+  },
+  {
+    "id": "resonance_core",
+    "name": "Resonance Core",
+    "category": "Materials"
+  },
+  {
+    "id": "emotional_matrix",
+    "name": "Emotional Matrix",
+    "category": "Materials"
+  },
+  {
+    "id": "void_engine_component",
+    "name": "Void Engine Component",
+    "category": "Materials"
+  },
+  {
+    "id": "life_support_module",
+    "name": "Life Support Module",
+    "category": "Materials"
+  },
+  {
+    "id": "neural_interface",
+    "name": "Neural Interface",
+    "category": "Materials"
+  },
+  {
+    "id": "soul_anchor",
+    "name": "Soul Anchor",
+    "category": "Materials"
+  },
+  {
+    "id": "timeline_anchor",
+    "name": "Timeline Anchor",
+    "category": "Materials"
+  },
+  {
+    "id": "observation_nullifier",
+    "name": "Observation Nullifier",
+    "category": "Materials"
+  },
+  {
+    "id": "probability_lens",
+    "name": "Probability Lens",
+    "category": "Materials"
+  },
+  {
+    "id": "reality_thread",
+    "name": "Reality Thread",
+    "category": "Materials"
+  },
+  {
+    "id": "coherence_crystal",
+    "name": "Coherence Crystal",
+    "category": "Materials"
+  },
+  {
+    "id": "neutronium_core",
+    "name": "Neutronium Core",
+    "category": "Materials"
+  },
+  {
+    "id": "hull_plating",
+    "name": "Hull Plating",
+    "category": "Building"
+  },
+  {
+    "id": "reinforced_hull",
+    "name": "Reinforced Hull Section",
+    "category": "Building"
+  },
+  {
+    "id": "propulsion_unit",
+    "name": "Propulsion Unit",
+    "category": "Building"
+  },
+  {
+    "id": "navigation_array",
+    "name": "Navigation Array",
+    "category": "Building"
+  },
+  {
+    "id": "communication_relay",
+    "name": "Communication Relay",
+    "category": "Building"
+  },
+  {
+    "id": "power_core",
+    "name": "Power Core",
+    "category": "Building"
+  },
+  {
+    "id": "shield_generator",
+    "name": "Shield Generator",
+    "category": "Building"
+  },
+  {
+    "id": "heart_chamber_core",
+    "name": "Heart Chamber Core",
+    "category": "Building"
+  },
+  {
+    "id": "emotion_theater_system",
+    "name": "Emotion Theater System",
+    "category": "Building"
+  },
+  {
+    "id": "memory_hall_archive",
+    "name": "Memory Hall Archive",
+    "category": "Building"
+  },
+  {
+    "id": "meditation_chamber_unit",
+    "name": "Meditation Chamber Unit",
+    "category": "Building"
+  },
+  {
+    "id": "vr_immersion_pod",
+    "name": "VR Immersion Pod",
+    "category": "Building"
+  },
+  {
+    "id": "gleisner_body_frame",
+    "name": "Gleisner Body Frame",
+    "category": "Building"
+  },
+  {
+    "id": "svetz_retrieval_engine",
+    "name": "Svetz Retrieval Engine",
+    "category": "Building"
+  },
+  {
+    "id": "probability_drive",
+    "name": "Probability Drive",
+    "category": "Building"
+  },
+  {
+    "id": "timeline_merger_core",
+    "name": "Timeline Merger Core",
+    "category": "Building"
+  },
+  {
+    "id": "worldship_hull_kit",
+    "name": "Worldship Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "threshold_hull_kit",
+    "name": "Threshold Ship Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "courier_hull_kit",
+    "name": "Courier Ship Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "brainship_hull_kit",
+    "name": "Brainship Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "storyship_hull_kit",
+    "name": "Storyship Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "gleisner_hull_kit",
+    "name": "Gleisner Vessel Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "svetz_hull_kit",
+    "name": "Svetz Retrieval Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "probability_scout_hull_kit",
+    "name": "Probability Scout Hull Kit",
+    "category": "Building"
+  },
+  {
+    "id": "timeline_merger_hull_kit",
+    "name": "Timeline Merger Hull Kit",
+    "category": "Building"
+  }
+]

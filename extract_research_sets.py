@@ -125,11 +125,35 @@ def parse_research_set(obj_text: str) -> Dict[str, Any]:
         papers = re.findall(r"['\"]([^'\"]+)['\"]", papers_text)
         result['allPapers'] = papers
 
-    # Extract unlocks array
-    unlocks_match = re.search(r"unlocks:\s*\[(.*)\](?:\s*\};\s*$)", obj_text, re.DOTALL)
+    # Extract unlocks array - find the last occurrence of "unlocks:" before the closing brace
+    unlocks_match = re.search(r"unlocks:\s*\[", obj_text)
     if unlocks_match:
-        unlocks_text = unlocks_match.group(1)
-        result['unlocks'] = parse_unlocks(unlocks_text)
+        # Find the matching closing bracket
+        start = unlocks_match.end() - 1
+        bracket_count = 0
+        in_string = False
+        string_char = None
+
+        for i in range(start, len(obj_text)):
+            char = obj_text[i]
+
+            if char in ['"', "'", '`'] and (i == 0 or obj_text[i-1] != '\\'):
+                if not in_string:
+                    in_string = True
+                    string_char = char
+                elif char == string_char:
+                    in_string = False
+                    string_char = None
+
+            if not in_string:
+                if char == '[':
+                    bracket_count += 1
+                elif char == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0:
+                        unlocks_text = obj_text[start+1:i]
+                        result['unlocks'] = parse_unlocks(unlocks_text)
+                        break
 
     return result
 
@@ -220,19 +244,33 @@ def parse_grants(grants_text: str) -> List[Dict[str, str]]:
     return grants
 
 def main():
-    # Read the TypeScript file
-    ts_file = '/Users/annhoward/src/ai_village/custom_game_engine/packages/world/src/research-papers/research-sets.ts'
+    # Read both TypeScript files
+    base_dir = '/Users/annhoward/src/ai_village/custom_game_engine/packages/world/src/research-papers'
 
+    # Extract from research-sets.ts (main file)
+    ts_file = f'{base_dir}/research-sets.ts'
     with open(ts_file, 'r') as f:
         content = f.read()
+    main_sets = extract_research_sets(content)
+    print(f"Extracted {len(main_sets)} research sets from research-sets.ts")
 
-    # Extract research sets
-    research_sets = extract_research_sets(content)
+    # Extract from tech-expansion-sets.ts
+    tech_file = f'{base_dir}/tech-expansion-sets.ts'
+    with open(tech_file, 'r') as f:
+        tech_content = f.read()
+    tech_sets = extract_research_sets(tech_content)
+    print(f"Extracted {len(tech_sets)} research sets from tech-expansion-sets.ts")
 
-    print(f"Extracted {len(research_sets)} research sets")
+    # Combine all sets
+    research_sets = main_sets + tech_sets
+    print(f"Total: {len(research_sets)} research sets")
 
-    # Write to JSON
-    output_file = '/Users/annhoward/src/ai_village/custom_game_engine/packages/world/data/research-sets.json'
+    # Write to JSON (in data directory alongside specs)
+    output_file = '/Users/annhoward/src/ai_village/custom_game_engine/packages/world/src/research-papers/data/research-sets.json'
+
+    # Create directory if it doesn't exist
+    import os
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     with open(output_file, 'w') as f:
         json.dump(research_sets, f, indent=2)

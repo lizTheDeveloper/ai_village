@@ -1,0 +1,114 @@
+
+> @ai-village/game-engine@0.1.0 build
+> tsc --build
+
+packages/llm/src/ExecutorPromptBuilder.ts(171,54): error TS2352: Conversion of type 'Entity' to type '{ id: string; components: Map<string, any>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'components' are incompatible.
+    Type 'ReadonlyMap<string, Component>' is missing the following properties from type 'Map<string, any>': clear, delete, set, [Symbol.toStringTag]
+packages/llm/src/ExecutorPromptBuilder.ts(493,28): error TS2339: Property 'buildingRegistry' does not exist on type 'never'.
+  The intersection 'WorldWithBuildingRegistry' was reduced to 'never' because property 'buildingRegistry' exists in multiple constituents and is private in some.
+packages/llm/src/ExecutorPromptBuilder.ts(497,40): error TS2339: Property 'buildingRegistry' does not exist on type 'never'.
+  The intersection 'WorldWithBuildingRegistry' was reduced to 'never' because property 'buildingRegistry' exists in multiple constituents and is private in some.
+packages/llm/src/StructuredPromptBuilder.ts(251,54): error TS2352: Conversion of type 'Entity' to type '{ id: string; components: Map<string, any>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'components' are incompatible.
+    Type 'ReadonlyMap<string, Component>' is missing the following properties from type 'Map<string, any>': clear, delete, set, [Symbol.toStringTag]
+packages/llm/src/StructuredPromptBuilder.ts(491,38): error TS2339: Property 'buildingRegistry' does not exist on type 'never'.
+  The intersection 'WorldWithBuildingRegistry' was reduced to 'never' because property 'buildingRegistry' exists in multiple constituents and is private in some.
+packages/llm/src/StructuredPromptBuilder.ts(495,40): error TS2339: Property 'buildingRegistry' does not exist on type 'never'.
+  The intersection 'WorldWithBuildingRegistry' was reduced to 'never' because property 'buildingRegistry' exists in multiple constituents and is private in some.
+packages/magic/src/AnimistParadigms.ts(230,14): error TS2322: Type 'MagicParadigm | undefined' is not assignable to type 'MagicParadigm'.
+  Type 'undefined' is not assignable to type 'MagicParadigm'.
+packages/magic/src/appliers/ControlEffectApplier.ts(288,7): error TS2322: Type 'string' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+packages/magic/src/appliers/ParadigmEffectApplier.ts(343,9): error TS2322: Type 'ChannelData[] | undefined' is not assignable to type 'MagicChannelType[] | undefined'.
+  Type 'ChannelData[]' is not assignable to type 'MagicChannelType[]'.
+    Type 'ChannelData' is not assignable to type 'MagicChannelType'.
+packages/magic/src/appliers/ParadigmEffectApplier.ts(344,9): error TS2322: Type 'RiskData[] | undefined' is not assignable to type 'MagicRisk[] | undefined'.
+  Type 'RiskData[]' is not assignable to type 'MagicRisk[]'.
+    Type 'RiskData' is missing the following properties from type 'MagicRisk': trigger, consequence, severity, probability, mitigatable
+packages/magic/src/appliers/SummonEffectApplier.ts(97,37): error TS2345: Argument of type 'Component' is not assignable to parameter of type 'ComponentClassOrString'.
+packages/magic/src/costs/CostCalculator.ts(366,11): error TS2322: Type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/components/ManaPoolsComponent").ResourcePool' is not assignable to type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/components/MagicComponent").ResourcePool'.
+  Types of property 'type' are incompatible.
+    Type 'string' is not assignable to type 'MagicCostType'.
+packages/magic/src/CreativeParadigms.ts(72,30): error TS2322: Type '"feedback_loop"' is not assignable to type 'MagicRiskConsequence'.
+packages/magic/src/validate-spells.ts(76,20): error TS2532: Object is possibly 'undefined'.
+packages/magic/src/validate-spells.ts(76,46): error TS2532: Object is possibly 'undefined'.
+packages/magic/src/validate-spells.ts(77,22): error TS2532: Object is possibly 'undefined'.
+packages/magic/src/validate-spells.ts(78,20): error TS2532: Object is possibly 'undefined'.
+packages/magic/src/validate-spells.ts(78,48): error TS2532: Object is possibly 'undefined'.
+packages/magic/src/validate-spells.ts(79,22): error TS2532: Object is possibly 'undefined'.
+packages/persistence/src/SaveLoadService.ts(389,37): error TS2345: Argument of type '{ version: number; entries: unknown[]; }' is not assignable to parameter of type '{ version: number; entries: QueueEntry[]; }'.
+  Types of property 'entries' are incompatible.
+    Type 'unknown[]' is not assignable to type 'QueueEntry[]'.
+      Type 'unknown' is not assignable to type 'QueueEntry'.
+packages/persistence/src/SaveLoadService.ts(578,37): error TS2345: Argument of type '{ version: number; entries: unknown[]; }' is not assignable to parameter of type '{ version: number; entries: QueueEntry[]; }'.
+  Types of property 'entries' are incompatible.
+    Type 'unknown[]' is not assignable to type 'QueueEntry[]'.
+      Type 'unknown' is not assignable to type 'QueueEntry'.
+packages/persistence/src/serializers/ConflictSerializer.ts(41,7): error TS2322: Type 'string' is not assignable to type '"hunting" | "predator_attack" | "agent_combat" | "dominance_challenge"'.
+packages/persistence/src/serializers/ConflictSerializer.ts(45,7): error TS2322: Type 'string | undefined' is not assignable to type '"tracking" | "stalking" | "kill_success" | "failed" | "lost" | "escape" | undefined'.
+  Type 'string' is not assignable to type '"tracking" | "stalking" | "kill_success" | "failed" | "lost" | "escape" | undefined'.
+packages/persistence/src/serializers/ConflictSerializer.ts(48,7): error TS2322: Type 'Record<string, number> | undefined' is not assignable to type '{ type: string; value: number; }[] | undefined'.
+  Type 'Record<string, number>' is missing the following properties from type '{ type: string; value: number; }[]': length, pop, push, concat, and 29 more.
+packages/persistence/src/serializers/ConflictSerializer.ts(51,7): error TS2322: Type 'string | undefined' is not assignable to type '"death" | "attacker_victory" | "defender_victory" | "mutual_injury" | "stalemate" | undefined'.
+  Type 'string' is not assignable to type '"death" | "attacker_victory" | "defender_victory" | "mutual_injury" | "stalemate" | undefined'.
+packages/persistence/src/serializers/ConflictSerializer.ts(54,7): error TS2322: Type 'string | undefined' is not assignable to type '"hunger" | "territory" | "provocation" | undefined'.
+  Type 'string' is not assignable to type '"hunger" | "territory" | "provocation" | undefined'.
+packages/persistence/src/serializers/ConflictSerializer.ts(56,7): error TS2322: Type 'string | undefined' is not assignable to type '"combat" | "display" | "resource_seizure" | "follower_theft" | undefined'.
+  Type 'string' is not assignable to type '"combat" | "display" | "resource_seizure" | "follower_theft" | undefined'.
+packages/persistence/src/serializers/ConflictSerializer.ts(58,7): error TS2322: Type 'string | undefined' is not assignable to type '"death" | "rank_swap" | "demotion" | "exile" | undefined'.
+  Type 'string' is not assignable to type '"death" | "rank_swap" | "demotion" | "exile" | undefined'.
+packages/persistence/src/serializers/InjurySerializer.ts(33,7): error TS2322: Type 'string' is not assignable to type '"laceration" | "puncture" | "blunt" | "burn" | "bite" | "exhaustion" | "psychological"'.
+packages/persistence/src/serializers/InjurySerializer.ts(34,7): error TS2322: Type 'number' is not assignable to type '"minor" | "major" | "critical"'.
+packages/persistence/src/serializers/InjurySerializer.ts(35,7): error TS2322: Type 'string' is not assignable to type '"head" | "torso" | "arms" | "legs" | "hands" | "feet"'.
+packages/persistence/src/serializers/InjurySerializer.ts(43,7): error TS2322: Type '{ type: string; severity: number; location: string; }[] | undefined' is not assignable to type '{ injuryType: "laceration" | "puncture" | "blunt" | "burn" | "bite" | "exhaustion" | "psychological"; severity: "minor" | "major" | "critical"; location: "head" | "torso" | "arms" | "legs" | "hands" | "feet"; }[] | undefined'.
+  Type '{ type: string; severity: number; location: string; }[]' is not assignable to type '{ injuryType: "laceration" | "puncture" | "blunt" | "burn" | "bite" | "exhaustion" | "psychological"; severity: "minor" | "major" | "critical"; location: "head" | "torso" | "arms" | "legs" | "hands" | "feet"; }[]'.
+    Property 'injuryType' is missing in type '{ type: string; severity: number; location: string; }' but required in type '{ injuryType: "laceration" | "puncture" | "blunt" | "burn" | "bite" | "exhaustion" | "psychological"; severity: "minor" | "major" | "critical"; location: "head" | "torso" | "arms" | "legs" | "hands" | "feet"; }'.
+packages/persistence/src/serializers/ManaPoolsSerializer.ts(27,5): error TS2322: Type 'string | undefined' is not assignable to type 'MagicSourceId | undefined'.
+  Type 'string' is not assignable to type 'MagicSourceId | undefined'.
+packages/persistence/src/types.ts(6,43): error TS2307: Cannot find module '@ai-village/divinity' or its corresponding type declarations.
+packages/persistence/src/WorldSerializer.ts(8,43): error TS2307: Cannot find module '@ai-village/divinity' or its corresponding type declarations.
+packages/metrics/src/LiveEntityAPI.ts(17,15): error TS2440: Import declaration conflicts with local declaration of 'IdentityComponent'.
+packages/metrics/src/LiveEntityAPI.ts(17,34): error TS2440: Import declaration conflicts with local declaration of 'PositionComponent'.
+packages/metrics/src/LiveEntityAPI.ts(17,53): error TS2440: Import declaration conflicts with local declaration of 'AgentComponent'.
+packages/city-simulator/src/HeadlessCitySimulator.ts(422,36): error TS2345: Argument of type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/components/AgentComponent").StrategicPriorities' is not assignable to parameter of type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/city/CityManager").StrategicPriorities'.
+  Types of property 'gathering' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+packages/city-simulator/src/HeadlessCitySimulator.ts(423,63): error TS2345: Argument of type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/components/AgentComponent").StrategicPriorities' is not assignable to parameter of type 'import("/Users/annhoward/src/ai_village/custom_game_engine/packages/core/dist/src/city/CityManager").StrategicPriorities'.
+  Types of property 'gathering' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+packages/city-simulator/src/HeadlessCitySimulator.ts(442,5): error TS2740: Type 'World' is missing the following properties from type 'World': getAllEntities, _tick, _gameTime, _entities, and 33 more.
+packages/renderer/src/AnimalInfoPanel.ts(763,11): error TS2322: Type '"ui_action"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/AnimalInfoPanel.ts(784,11): error TS2322: Type '"ui_action"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/AnimalInfoPanel.ts(803,11): error TS2322: Type '"ui_action"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/CombatLogPanel.ts(82,35): error TS2345: Argument of type '(data: Record<string, unknown>) => void' is not assignable to parameter of type 'EventHandler<"combat:attack" | "combat:ended" | "combat:dodge" | "conflict:started" | "conflict:resolved" | "hunt:started" | "hunt:success" | "hunt:failed" | "predator:attack" | "injury:inflicted" | "death:occurred">'.
+  Types of parameters 'data' and 'event' are incompatible.
+    Type 'GameEvent<"combat:attack" | "combat:ended" | "combat:dodge" | "conflict:started" | "conflict:resolved" | "hunt:started" | "hunt:success" | "hunt:failed" | "predator:attack" | "injury:inflicted" | "death:occurred">' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'GameEvent<"combat:attack" | "combat:ended" | "combat:dodge" | "conflict:started" | "conflict:resolved" | "hunt:started" | "hunt:success" | "hunt:failed" | "predator:attack" | "injury:inflicted" | "death:occurred">'.
+packages/renderer/src/CombatLogPanel.ts(98,7): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+packages/renderer/src/CombatLogPanel.ts(145,44): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+packages/renderer/src/CombatLogPanel.ts(146,44): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+packages/renderer/src/CombatLogPanel.ts(147,42): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+packages/renderer/src/CombatLogPanel.ts(148,42): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+packages/renderer/src/CombatLogPanel.ts(149,42): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+packages/renderer/src/CombatLogPanel.ts(428,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'keyof GameEventMap | (keyof GameEventMap)[]'.
+packages/renderer/src/CombatUnitPanel.ts(83,44): error TS2345: Argument of type '(data: EntitySelectedData) => void' is not assignable to parameter of type 'EventHandler<"ui:entity:selected">'.
+  Types of parameters 'data' and 'event' are incompatible.
+    Type 'GameEvent<"ui:entity:selected">' has no properties in common with type 'EntitySelectedData'.
+packages/renderer/src/CombatUnitPanel.ts(414,47): error TS2345: Argument of type '(data: EntitySelectedData) => void' is not assignable to parameter of type 'EventHandler'.
+  Types of parameters 'data' and 'event' are incompatible.
+    Type 'GameEvent<keyof GameEventMap>' has no properties in common with type 'EntitySelectedData'.
+packages/renderer/src/context-menu/ContextActionRegistry.ts(383,11): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+packages/renderer/src/ContextMenuManager.ts(783,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'keyof GameEventMap | (keyof GameEventMap)[]'.
+packages/renderer/src/DevPanel.ts(46,8): error TS2307: Cannot find module '@ai-village/divinity' or its corresponding type declarations.
+packages/renderer/src/DevPanel.ts(2046,30): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<SkillId, SkillLevel>'.
+  No index signature with a parameter of type 'string' was found on type 'Record<SkillId, SkillLevel>'.
+packages/renderer/src/DevPanel.ts(2508,28): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<SkillId, SkillLevel>'.
+  No index signature with a parameter of type 'string' was found on type 'Record<SkillId, SkillLevel>'.
+packages/renderer/src/DivineChatPanel.ts(741,7): error TS2322: Type '"chat:send_message"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/panels/magic/SkillTreePanel.ts(595,11): error TS2322: Type '"ui:notification"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/panels/magic/SkillTreePanel.ts(615,9): error TS2322: Type '"ui:notification"' is not assignable to type 'keyof GameEventMap'.
+packages/renderer/src/panels/magic/SkillTreePanel.ts(748,13): error TS2322: Type '"ui:notification"' is not assignable to type 'keyof GameEventMap'.

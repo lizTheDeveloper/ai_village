@@ -320,6 +320,9 @@ import { CityDirectorSystem } from './CityDirectorSystem.js';
 // Auto-save
 import { AutoSaveSystem } from './AutoSaveSystem.js';
 
+// Query Cache Monitoring
+import { QueryCacheMonitorSystem } from './QueryCacheMonitorSystem.js';
+
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
 
@@ -1070,6 +1073,12 @@ export function registerAllSystems(
     });
     gameLoop.systemRegistry.register(metricsSystem);
   }
+
+  // ============================================================================
+  // QUERY CACHE MONITORING
+  // ============================================================================
+  // QueryCacheMonitorSystem (priority 990) - Logs cache statistics every 5 minutes
+  gameLoop.systemRegistry.register(new QueryCacheMonitorSystem());
 
   // ============================================================================
   // AUTO-SAVE (Optional)

@@ -10,10 +10,14 @@
  * - Realm dependencies
  *
  * See: specs/realm-species-creation.md
+ *
+ * Race templates are now loaded from JSON data files to separate
+ * narrative content from code structure.
  */
 
 import type { SkillId } from '../components/SkillsComponent.js';
 import type { RealmPreset } from './MythologicalRealms.js';
+import raceTemplatesData from '../../data/race-templates.json';
 
 // ============================================================================
 // Racial Trait System

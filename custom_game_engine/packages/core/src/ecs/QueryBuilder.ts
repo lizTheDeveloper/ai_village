@@ -1,6 +1,7 @@
 import type { EntityId, ComponentType } from '../types.js';
 import type { Entity } from './Entity.js';
 import type { World } from './World.js';
+import { generateQuerySignature } from './QuerySignature.js';
 
 /**
  * Query builder for finding entities.
@@ -98,6 +99,33 @@ export class QueryBuilder implements IQueryBuilder {
   }
 
   executeEntities(): ReadonlyArray<Entity> {
+    // Try cache for component-only queries (no spatial filters)
+    // Spatial filters are not cacheable because they depend on runtime parameters
+    if (this.isCacheable()) {
+      const signature = this.generateSignature();
+      const currentVersion = this.world.archetypeVersion;
+      const cached = this.world.queryCache.get(signature, currentVersion);
+
+      if (cached !== null) {
+        // Cache hit - return cached results
+        return cached;
+      }
+
+      // Cache miss - execute query and cache results
+      const results = this.executeEntitiesUncached();
+      this.world.queryCache.set(signature, results, currentVersion, this.world.tick);
+      return results;
+    }
+
+    // Non-cacheable query (has spatial filters) - execute directly
+    return this.executeEntitiesUncached();
+  }
+
+  /**
+   * Execute query without cache (original implementation).
+   * Used for cache misses and non-cacheable queries.
+   */
+  private executeEntitiesUncached(): ReadonlyArray<Entity> {
     // Reuse entity array - WARNING: Result array is reused on next query
     this.resultEntities.length = 0;
 
@@ -108,6 +136,44 @@ export class QueryBuilder implements IQueryBuilder {
     }
 
     return this.resultEntities;
+  }
+
+  /**
+   * Check if this query can be cached.
+   * Only queries with component filters (with/without) are cacheable.
+   * Spatial filters (rect, chunk, near) are not cacheable.
+   */
+  private isCacheable(): boolean {
+    for (const filter of this.filters) {
+      if (
+        filter.type === 'rect' ||
+        filter.type === 'chunk' ||
+        filter.type === 'near' ||
+        filter.type === 'tags'
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Generate cache signature for this query.
+   * Only called for cacheable queries.
+   */
+  private generateSignature(): string {
+    const withComponents: ComponentType[] = [];
+    const withoutComponents: ComponentType[] = [];
+
+    for (const filter of this.filters) {
+      if (filter.type === 'components') {
+        withComponents.push(...(filter.data as ComponentType[]));
+      } else if (filter.type === 'without_components') {
+        withoutComponents.push(...(filter.data as ComponentType[]));
+      }
+    }
+
+    return generateQuerySignature(withComponents, withoutComponents);
   }
 
   private matchesAllFilters(entity: Entity): boolean {

@@ -23,6 +23,7 @@ import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
 import { SimulationScheduler } from './SimulationScheduler.js';
 import { diagnosticsHarness } from '../diagnostics/DiagnosticsHarness.js';
 import { SpatialGrid } from './SpatialGrid.js';
+import { QueryCache } from './QueryCache.js';
 // ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
 // Re-export for backwards compatibility
@@ -290,6 +291,18 @@ export interface World {
   readonly spatialGrid: SpatialGrid;
 
   /**
+   * Query result cache for high-performance repeated queries.
+   * Automatically invalidates when world structure changes.
+   *
+   * Performance:
+   * - Cache hit: ~0.1ms (Map lookup)
+   * - Cache miss: ~1-5ms (full query execution)
+   * - Expected hit rate: 85-90%
+   * - Memory overhead: ~10-50 KB (100 entries)
+   */
+  readonly queryCache: QueryCache;
+
+  /**
    * Spatial query service for finding nearby entities.
    * Uses chunk-based indexing for O(nearby) instead of O(all entities).
    *
@@ -530,6 +543,9 @@ export class WorldImpl implements WorldMutator {
   // Spatial grid for high-performance proximity queries
   private _spatialGrid = new SpatialGrid(10);
 
+  // Query cache for high-performance repeated queries
+  private _queryCache = new QueryCache(100);
+
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
@@ -592,6 +608,10 @@ export class WorldImpl implements WorldMutator {
 
   get spatialGrid(): SpatialGrid {
     return this._spatialGrid;
+  }
+
+  get queryCache(): QueryCache {
+    return this._queryCache;
   }
 
   get spatialQuery(): import('../services/SpatialQueryService.js').SpatialQueryService | null {
@@ -1312,6 +1332,7 @@ export class WorldImpl implements WorldMutator {
     this._entities.clear();
     this.chunkIndex.clear();
     this._spatialGrid.clear();
+    this._queryCache.clear();
     this.doorLocationsCache = null;
     this._archetypeVersion++; // Invalidate query cache
   }

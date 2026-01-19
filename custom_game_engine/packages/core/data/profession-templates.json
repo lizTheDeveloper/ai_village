@@ -1,0 +1,165 @@
+{
+  "$schema": "https://aivillage.dev/schemas/profession-templates/v1",
+  "version": "1.0.0",
+  "description": "Content templates for profession output generation - organized by role, output type, and quality tier",
+  "template_categories": {
+    "newspaper_article": [
+      {
+        "template": "{{cityName}} Population Reaches {{population}} - Mayor Celebrates Growth",
+        "requiredContext": ["cityName", "population"],
+        "qualityRange": { "min": 0.6, "max": 1.0 }
+      },
+      {
+        "template": "Local Weather Forecast: {{weather}} Expected Through Week",
+        "requiredContext": ["weather"],
+        "qualityRange": { "min": 0.4, "max": 0.8 }
+      },
+      {
+        "template": "Breaking: New Construction Project Announced in Downtown {{cityName}}",
+        "requiredContext": ["cityName"],
+        "qualityRange": { "min": 0.7, "max": 1.0 }
+      },
+      {
+        "template": "City Council Debates Infrastructure Improvements",
+        "requiredContext": [],
+        "qualityRange": { "min": 0.5, "max": 0.9 }
+      },
+      {
+        "template": "Local Business {{randomPlace}} Celebrates Grand Opening",
+        "requiredContext": ["randomPlace"],
+        "qualityRange": { "min": 0.4, "max": 0.7 }
+      },
+      {
+        "template": "Opinion: Why {{cityName}} Needs Better Public Transit",
+        "requiredContext": ["cityName"],
+        "qualityRange": { "min": 0.6, "max": 0.9 }
+      },
+      {
+        "template": "Community Spotlight: Meet {{randomName}}, Local Artisan",
+        "requiredContext": ["randomName"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      },
+      {
+        "template": "Market Report: Prices {{randomNumber}}% This Quarter",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.4, "max": 0.7 }
+      }
+    ],
+    "tv_episode": [
+      {
+        "template": "Episode: \"The Mystery of {{randomPlace}}\" - Drama unfolds in {{cityName}}",
+        "requiredContext": ["randomPlace", "cityName"],
+        "qualityRange": { "min": 0.7, "max": 1.0 }
+      },
+      {
+        "template": "Sitcom Special: \"{{randomName}}'s Big Day\"",
+        "requiredContext": ["randomName"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      },
+      {
+        "template": "News Magazine: Investigating {{cityName}}'s Growth",
+        "requiredContext": ["cityName"],
+        "qualityRange": { "min": 0.6, "max": 0.9 }
+      },
+      {
+        "template": "Talk Show: Interview with {{randomName}}",
+        "requiredContext": ["randomName"],
+        "qualityRange": { "min": 0.4, "max": 0.7 }
+      },
+      {
+        "template": "Documentary: Life in {{cityName}} - Population {{population}}",
+        "requiredContext": ["cityName", "population"],
+        "qualityRange": { "min": 0.7, "max": 1.0 }
+      }
+    ],
+    "radio_broadcast": [
+      {
+        "template": "Morning Show: {{agentName}} Plays Top Hits and Local News",
+        "requiredContext": ["agentName"],
+        "qualityRange": { "min": 0.6, "max": 0.9 }
+      },
+      {
+        "template": "Drive Time: Traffic Report for {{cityName}} - {{weather}}",
+        "requiredContext": ["cityName", "weather"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      },
+      {
+        "template": "Talk Radio: Callers Discuss {{cityName}}'s Future",
+        "requiredContext": ["cityName"],
+        "qualityRange": { "min": 0.4, "max": 0.7 }
+      },
+      {
+        "template": "Music Hour: {{agentName}} Spins Classic Tracks",
+        "requiredContext": ["agentName"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      },
+      {
+        "template": "News Update: {{population}} Residents Now Call {{cityName}} Home",
+        "requiredContext": ["population", "cityName"],
+        "qualityRange": { "min": 0.6, "max": 0.9 }
+      }
+    ],
+    "service_output": [
+      {
+        "template": "Treated {{randomNumber}} patients with excellent care",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.7, "max": 1.0 }
+      },
+      {
+        "template": "Taught {{randomNumber}} students valuable lessons",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.6, "max": 0.9 }
+      },
+      {
+        "template": "Processed {{randomNumber}} administrative forms",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.4, "max": 0.7 }
+      },
+      {
+        "template": "Assisted {{randomNumber}} library patrons with research",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      },
+      {
+        "template": "Completed {{randomNumber}} shop transactions",
+        "requiredContext": ["randomNumber"],
+        "qualityRange": { "min": 0.5, "max": 0.8 }
+      }
+    ]
+  },
+  "role_mappings": {
+    "newspaper_reporter": "newspaper_article",
+    "newspaper_editor": "newspaper_article",
+    "tv_actor": "tv_episode",
+    "tv_director": "tv_episode",
+    "tv_producer": "tv_episode",
+    "tv_writer": "tv_episode",
+    "radio_dj": "radio_broadcast",
+    "radio_producer": "radio_broadcast",
+    "office_worker": "service_output",
+    "shopkeeper": "service_output",
+    "teacher": "service_output",
+    "librarian": "service_output",
+    "doctor": "service_output",
+    "nurse": "service_output",
+    "bureaucrat": "service_output",
+    "city_planner": "service_output",
+    "accountant": "service_output",
+    "generic_worker": "service_output"
+  },
+  "random_context_pools": {
+    "randomNames": [
+      "Alice", "Bob", "Carol", "David", "Emma", "Frank", "Grace", "Henry",
+      "Iris", "Jack", "Kate", "Leo", "Maya", "Noah", "Olivia", "Peter"
+    ],
+    "randomPlaces": [
+      "Market Square", "Town Hall", "Central Park", "Main Street",
+      "Riverside", "Hilltop Plaza", "Old Quarter", "North District",
+      "East End", "Harbor Front", "University Campus", "Industrial Zone"
+    ],
+    "weatherOptions": [
+      "Sunny", "Partly Cloudy", "Overcast", "Light Rain", "Heavy Rain",
+      "Clear Skies", "Fog", "Windy", "Snow", "Mild"
+    ]
+  }
+}
