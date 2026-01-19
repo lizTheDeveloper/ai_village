@@ -1,0 +1,867 @@
+{
+  "id": "feng_shui_skill_tree",
+  "name": "Way of Spatial Harmony",
+  "paradigmId": "feng_shui_magic",
+  "description": "The art of reading and shaping the flow of chi through spaces.\nPractitioners learn to perceive the invisible energies that permeate buildings,\nunderstand the five-element balance, and create environments that nurture\nthose who dwell within.",
+  "nodes": [
+    {
+      "id": "chi-sensitivity",
+      "name": "Chi Sensitivity",
+      "description": "Begin to feel the subtle energy that flows through spaces.",
+      "paradigmId": "feng_shui_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Can sense general chi quality in buildings"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "chi_perception"
+          },
+          "description": "Sense chi flow in spaces"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The first step in Feng Shui mastery is awareness.\nYou learn to sense chi - the life energy that permeates all spaces.\nAt first, only strong flows or severe stagnation are perceptible.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🌬️"
+    },
+    {
+      "id": "element-awareness",
+      "name": "Element Awareness",
+      "description": "Learn to perceive the five elements in materials and objects.",
+      "paradigmId": "feng_shui_magic",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 5,
+          "description": "Identify element composition of objects"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_elements"
+          },
+          "description": "Perceive five elements in materials"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wood, Fire, Earth, Metal, Water - these five forces compose all things.\nYou develop the ability to see which elements dominate a space.\nMaterial composition becomes visible to your trained senses.",
+      "prerequisites": [
+        "chi-sensitivity"
+      ],
+      "icon": "🔥"
+    },
+    {
+      "id": "flow-reading",
+      "name": "Flow Reading",
+      "description": "Trace the paths chi takes through a space.",
+      "paradigmId": "feng_shui_magic",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 5,
+          "description": "Visualize chi movement patterns"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "trace_chi_flow"
+          },
+          "description": "Trace chi paths through buildings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Chi enters through openings and flows like water through rooms.\nYou learn to follow these invisible currents.\nEntrances, doorways, windows - all affect the flow patterns.",
+      "prerequisites": [
+        "chi-sensitivity"
+      ],
+      "icon": "💨"
+    },
+    {
+      "id": "stagnation-sense",
+      "name": "Stagnation Sense",
+      "description": "Detect areas where chi pools and becomes stale.",
+      "paradigmId": "feng_shui_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 40,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Locate stagnant chi areas"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "detect_stagnation"
+          },
+          "description": "Detect areas with <30% flow strength"
+        },
+        {
+          "type": "defense",
+          "baseValue": 5,
+          "description": "Instinctively avoid lingering in stagnant areas"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Where energy cannot flow, it stagnates like still water.\nThese dead zones drain vitality from those who linger.\nYou learn to feel the heavy, oppressive quality of stagnant chi.",
+      "prerequisites": [
+        "flow-reading"
+      ],
+      "icon": "🌫️"
+    },
+    {
+      "id": "sha-qi-detection",
+      "name": "Sha Qi Detection",
+      "description": "Sense the \"killing breath\" of harmful energy lines.",
+      "paradigmId": "feng_shui_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 45,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 15,
+          "description": "Sense killing breath energy lines"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "detect_sha_qi"
+          },
+          "description": "Detect Sha Qi lines of 4+ tiles"
+        },
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Reduced harm from standing in Sha Qi paths"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When chi flows in an unbroken straight line, it becomes a blade.\nFrom door to opposite opening, the killing breath strikes all in its path.\nYou develop sensitivity to these dangerous energy corridors.",
+      "prerequisites": [
+        "flow-reading"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "element-balance-reading",
+      "name": "Element Balance Reading",
+      "description": "Perceive the proportional balance of all five elements.",
+      "paradigmId": "feng_shui_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 40,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense element proportions in spaces"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "read_element_balance"
+          },
+          "description": "Detect deficient and excessive elements"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "True harmony requires all elements in proper proportion.\nYou learn to sense when one element overwhelms or another is deficient.\nThe ideal ratio becomes an intuition you carry within.",
+      "prerequisites": [
+        "element-awareness"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "id": "golden-ratio-sense",
+      "name": "Golden Ratio Sense",
+      "description": "Feel whether room proportions resonate with natural order.",
+      "paradigmId": "feng_shui_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 35,
+      "maxLevel": 2,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 5,
+          "description": "Intuit room proportion quality"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_proportions"
+          },
+          "description": "Feel whether proportions approach 1.618"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The golden ratio of 1.618 underlies all beautiful forms.\nRooms that approach this proportion feel instinctively right.\nYou develop sensitivity to spatial proportions and their harmony.",
+      "prerequisites": [
+        "chi-sensitivity"
+      ],
+      "icon": "📐"
+    },
+    {
+      "id": "commanding-position-finding",
+      "name": "Commanding Position",
+      "description": "Locate the power spots in any room.",
+      "paradigmId": "feng_shui_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "find_commanding_position"
+          },
+          "description": "Identify optimal furniture placement"
+        },
+        {
+          "type": "resource_regen",
+          "baseValue": 5,
+          "description": "Better rest in commanding position"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "In every room, there are positions of power - where one can see all\nwhile being protected. The commanding position for a bed differs from\nthat of a desk or throne, but all share the principle of visibility\nwith security.",
+      "prerequisites": [
+        "flow-reading",
+        "stagnation-sense"
+      ],
+      "icon": "👁️"
+    },
+    {
+      "id": "chi-redirection",
+      "name": "Chi Redirection",
+      "description": "Learn to redirect chi flow using objects and placement.",
+      "paradigmId": "feng_shui_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "redirect_chi"
+          },
+          "description": "Suggest furniture placements to improve flow"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "break_sha_qi"
+          },
+          "description": "Place objects to break killing breath lines"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A well-placed screen can deflect Sha Qi. A plant can enliven stagnation.\nYou learn the art of subtle manipulation - adjusting energy through\ncareful placement of furniture, decorations, and materials.",
+      "prerequisites": [
+        "sha-qi-detection",
+        "stagnation-sense"
+      ],
+      "icon": "🔄"
+    },
+    {
+      "id": "element-balancing",
+      "name": "Element Balancing",
+      "description": "Add or adjust elements to create balance.",
+      "paradigmId": "feng_shui_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "balance_elements"
+          },
+          "description": "Recommend element additions for balance"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When fire overwhelms, introduce water. When metal is deficient, add it.\nYou learn which materials, colors, and objects carry elemental energy.\nThrough careful addition, you can restore balance to any space.",
+      "prerequisites": [
+        "element-balance-reading"
+      ],
+      "icon": "🎯"
+    },
+    {
+      "id": "cycle-mastery",
+      "name": "Cycle Mastery",
+      "description": "Understand both generating and controlling element cycles.",
+      "paradigmId": "feng_shui_magic",
+      "category": "specialization",
+      "tier": 4,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "use_generating_cycle"
+          },
+          "description": "Strengthen elements via generating predecessor"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "use_controlling_cycle"
+          },
+          "description": "Weaken elements via controlling element"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wood feeds Fire feeds Earth feeds Metal feeds Water feeds Wood.\nThis is the generating cycle - creation flowing endlessly.\nWood controls Earth, Earth controls Water, Water controls Fire,\nFire controls Metal, Metal controls Wood - the restraining cycle.\nYou master both, knowing when to generate and when to control.",
+      "prerequisites": [
+        "element-balancing"
+      ],
+      "icon": "☯️"
+    },
+    {
+      "id": "space-harmonization",
+      "name": "Space Harmonization",
+      "description": "Optimize an entire space for maximum harmony.",
+      "paradigmId": "feng_shui_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 75,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "full_feng_shui_analysis"
+          },
+          "description": "Perform complete harmony analysis"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "suggest_improvements"
+          },
+          "description": "Provide prioritized improvement suggestions"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Drawing on all your skills, you can analyze a space completely\nand guide its transformation to sublime harmony. Flow, elements,\nproportions, positions - all factors come together in your vision.",
+      "prerequisites": [
+        "commanding-position-finding",
+        "chi-redirection",
+        "element-balancing"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "personal-chi-cultivation",
+      "name": "Personal Chi Cultivation",
+      "description": "Maintain internal balance regardless of external space.",
+      "paradigmId": "feng_shui_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 65,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 20,
+          "description": "Reduced negative effects from poor Feng Shui"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "internal_balance"
+          },
+          "description": "Maintain personal harmony in any space"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The master carries harmony within. Though you remain sensitive to\nspatial energy, you can maintain your own element balance and chi flow\neven in discordant environments.",
+      "prerequisites": [
+        "element-balancing",
+        "chi-redirection"
+      ],
+      "icon": "🧘"
+    },
+    {
+      "id": "auspicious-timing",
+      "name": "Auspicious Timing",
+      "description": "Know when chi flows favor different activities.",
+      "paradigmId": "feng_shui_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense when timing enhances activities"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_auspicious_time"
+          },
+          "description": "Feel temporal chi flow patterns"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Chi is not static - it shifts with seasons, moon phases, and hours.\nYou learn to sense these temporal flows, knowing when spaces\nare most conducive to rest, work, creativity, or social gathering.",
+      "prerequisites": [
+        "flow-reading",
+        "element-balance-reading"
+      ],
+      "icon": "🌙"
+    },
+    {
+      "id": "living-space-bond",
+      "name": "Living Space Bond",
+      "description": "Form deep connection with a harmonized space.",
+      "paradigmId": "feng_shui_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 80,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "bond_with_space"
+          },
+          "description": "Form lasting connection with harmonized building"
+        },
+        {
+          "type": "resource_regen",
+          "baseValue": 15,
+          "description": "Faster recovery in bonded space"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_intrusion"
+          },
+          "description": "Know when bonded space is disturbed"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A space you have perfected becomes an extension of yourself.\nYou sense disturbances instantly, draw strength from its harmony,\nand can adjust its energy from anywhere within.",
+      "prerequisites": [
+        "space-harmonization",
+        "personal-chi-cultivation"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "id": "architectural-vision",
+      "name": "Architectural Vision",
+      "description": "Envision perfect spaces before they are built.",
+      "paradigmId": "feng_shui_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 85,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_harmonious_building"
+          },
+          "description": "Create building plans with inherent high harmony"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 30,
+          "description": "Buildings designed start with +30 harmony score"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The greatest masters need not adjust existing spaces - they conceive\nperfection from the start. You can design buildings that will have\nsublime harmony from their first moment of existence.",
+      "prerequisites": [
+        "space-harmonization",
+        "golden-ratio-sense",
+        "cycle-mastery"
+      ],
+      "icon": "📜"
+    },
+    {
+      "id": "quick-read",
+      "name": "Quick Read",
+      "description": "Assess a space's harmony at a glance.",
+      "paradigmId": "feng_shui_magic",
+      "category": "efficiency",
+      "tier": 3,
+      "xpCost": 45,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "resource_efficiency",
+          "baseValue": 50,
+          "description": "Harmony assessment takes half the time"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "With practice, full analysis becomes unnecessary for basic assessment.\nA moment's observation reveals the essential harmony level.",
+      "prerequisites": [
+        "chi-sensitivity",
+        "element-awareness"
+      ],
+      "icon": "👀"
+    },
+    {
+      "id": "material-intuition",
+      "name": "Material Intuition",
+      "description": "Instantly know which materials would improve a space.",
+      "paradigmId": "feng_shui_magic",
+      "category": "efficiency",
+      "tier": 3,
+      "xpCost": 40,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "instant_material_suggestion"
+          },
+          "description": "Immediately knows best material to add"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Rather than calculating element balance, you simply know\nwhat material would help. The right suggestion arises unbidden.",
+      "prerequisites": [
+        "element-balance-reading"
+      ],
+      "icon": "🪨"
+    },
+    {
+      "id": "subtle-adjustment",
+      "name": "Subtle Adjustment",
+      "description": "Make small changes that yield large harmony improvements.",
+      "paradigmId": "feng_shui_magic",
+      "category": "efficiency",
+      "tier": 4,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 40,
+          "description": "Each adjustment provides 40% more harmony improvement"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The master moves one chair and transforms the room.\nYou learn which small adjustments have outsized effects on chi flow.",
+      "prerequisites": [
+        "chi-redirection"
+      ],
+      "icon": "🪑"
+    },
+    {
+      "id": "space-consultation",
+      "name": "Space Consultation",
+      "description": "Advise others on improving their living spaces.",
+      "paradigmId": "feng_shui_magic",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 45,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "consult_feng_shui"
+          },
+          "description": "Advise NPCs on space improvements"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 10,
+          "description": "Reputation boost from helpful consultations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your perception of harmony becomes valuable to others.\nYou can explain Feng Shui principles in ways they understand\nand guide them to better arrangements.",
+      "prerequisites": [
+        "commanding-position-finding",
+        "element-balancing"
+      ],
+      "icon": "🗣️"
+    },
+    {
+      "id": "harmony-gifting",
+      "name": "Harmony Gifting",
+      "description": "Create small objects imbued with elemental balance.",
+      "paradigmId": "feng_shui_magic",
+      "category": "relationship",
+      "tier": 4,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "craft_harmony_token"
+          },
+          "description": "Create items that add +5-10 harmony to rooms"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "You learn to craft tokens that carry harmonic energy.\nA small statue, a woven charm, a painted tile - these gifts\nbring a touch of balance to any space they enter.",
+      "prerequisites": [
+        "element-balancing",
+        "cycle-mastery"
+      ],
+      "icon": "🎁"
+    }
+  ],
+  "entryNodes": [
+    "chi-sensitivity"
+  ],
+  "connections": [
+    {
+      "from": "chi-sensitivity",
+      "to": "element-awareness"
+    },
+    {
+      "from": "chi-sensitivity",
+      "to": "flow-reading"
+    },
+    {
+      "from": "flow-reading",
+      "to": "stagnation-sense"
+    },
+    {
+      "from": "flow-reading",
+      "to": "sha-qi-detection"
+    },
+    {
+      "from": "element-awareness",
+      "to": "element-balance-reading"
+    },
+    {
+      "from": "chi-sensitivity",
+      "to": "golden-ratio-sense"
+    },
+    {
+      "from": "flow-reading",
+      "to": "commanding-position-finding"
+    },
+    {
+      "from": "stagnation-sense",
+      "to": "commanding-position-finding"
+    },
+    {
+      "from": "sha-qi-detection",
+      "to": "chi-redirection"
+    },
+    {
+      "from": "stagnation-sense",
+      "to": "chi-redirection"
+    },
+    {
+      "from": "element-balance-reading",
+      "to": "element-balancing"
+    },
+    {
+      "from": "element-balancing",
+      "to": "cycle-mastery"
+    },
+    {
+      "from": "commanding-position-finding",
+      "to": "space-harmonization"
+    },
+    {
+      "from": "chi-redirection",
+      "to": "space-harmonization"
+    },
+    {
+      "from": "element-balancing",
+      "to": "space-harmonization"
+    },
+    {
+      "from": "element-balancing",
+      "to": "personal-chi-cultivation"
+    },
+    {
+      "from": "chi-redirection",
+      "to": "personal-chi-cultivation"
+    },
+    {
+      "from": "flow-reading",
+      "to": "auspicious-timing"
+    },
+    {
+      "from": "element-balance-reading",
+      "to": "auspicious-timing"
+    },
+    {
+      "from": "space-harmonization",
+      "to": "living-space-bond"
+    },
+    {
+      "from": "personal-chi-cultivation",
+      "to": "living-space-bond"
+    },
+    {
+      "from": "space-harmonization",
+      "to": "architectural-vision"
+    },
+    {
+      "from": "golden-ratio-sense",
+      "to": "architectural-vision"
+    },
+    {
+      "from": "cycle-mastery",
+      "to": "architectural-vision"
+    },
+    {
+      "from": "chi-sensitivity",
+      "to": "quick-read"
+    },
+    {
+      "from": "element-awareness",
+      "to": "quick-read"
+    },
+    {
+      "from": "element-balance-reading",
+      "to": "material-intuition"
+    },
+    {
+      "from": "chi-redirection",
+      "to": "subtle-adjustment"
+    },
+    {
+      "from": "commanding-position-finding",
+      "to": "space-consultation"
+    },
+    {
+      "from": "element-balancing",
+      "to": "space-consultation"
+    },
+    {
+      "from": "element-balancing",
+      "to": "harmony-gifting"
+    },
+    {
+      "from": "cycle-mastery",
+      "to": "harmony-gifting"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "analyze_space",
+      "xpAmount": 15,
+      "description": "Perform Feng Shui analysis on a building"
+    },
+    {
+      "eventType": "improve_harmony",
+      "xpAmount": 25,
+      "description": "Successfully increase a space's harmony score"
+    },
+    {
+      "eventType": "fix_sha_qi",
+      "xpAmount": 20,
+      "description": "Redirect or block a killing breath line"
+    },
+    {
+      "eventType": "balance_elements",
+      "xpAmount": 20,
+      "description": "Correct an element imbalance in a space"
+    },
+    {
+      "eventType": "find_commanding",
+      "xpAmount": 10,
+      "description": "Correctly identify a commanding position"
+    },
+    {
+      "eventType": "consult_success",
+      "xpAmount": 30,
+      "description": "Give advice that improves someone's living space"
+    },
+    {
+      "eventType": "design_building",
+      "xpAmount": 50,
+      "description": "Create a building plan with 80+ harmony"
+    },
+    {
+      "eventType": "sublime_space",
+      "xpAmount": 75,
+      "description": "Bring a space to 90+ harmony score"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

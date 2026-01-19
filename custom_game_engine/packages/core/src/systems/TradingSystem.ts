@@ -50,6 +50,7 @@ export class TradingSystem extends BaseSystem {
   public readonly id: SystemId = 'trading';
   public readonly priority: number = 25; // Run after most other systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Inventory];
+  public readonly activationComponents = ['shop'] as const; // Lazy activation: Skip entire system when no shops exist
   protected readonly throttleInterval: number = 20; // Update every 20 ticks (1 second)
 
   private isInitialized = false;

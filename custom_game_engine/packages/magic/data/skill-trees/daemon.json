@@ -1,0 +1,943 @@
+{
+  "id": "daemon-tree",
+  "paradigmId": "daemon",
+  "name": "The Daemon Bond",
+  "description": "Master the connection with your external soul, perceive Dust, and perhaps learn the witch's secret of separation.",
+  "lore": "Your daemon is your soul made visible - an animal companion that is truly\na part of you. In childhood, your daemon shifts form constantly; in adulthood,\nthey settle into one form that reflects your true nature. The bond between\nhuman and daemon is unbreakable... or so most believe.\n\nDust - the golden particles of consciousness - settles on those with settled\ndaemons. Learn to perceive it, and you may glimpse truths hidden from others.\n\nAnd for those with witch blood, there is another path: the terrible ordeal\nof separation, which allows you to travel apart from your daemon. But the\nprice is paid in pain.",
+  "nodes": [
+    {
+      "id": "daemon-bond",
+      "name": "Daemon Bond",
+      "description": "The fundamental connection between you and your daemon",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Connected to your external soul",
+          "target": {
+            "abilityId": "daemon_sense"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your daemon is your soul made visible - an animal companion that is\ntruly a part of you. The bond between human and daemon is sacred and unbreakable.\nTo be separated from your daemon causes physical pain; to have it touched by\nanother is the deepest violation.",
+      "hidden": false,
+      "icon": "🦊"
+    },
+    {
+      "id": "emotional-sync",
+      "name": "Emotional Synchronization",
+      "description": "Deepen the emotional connection with your daemon",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 25,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "bond_strength",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "+X% emotional attunement with daemon"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When you feel, your daemon feels. Learning to synchronize your emotions allows for clearer communication and mutual support.",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "levelCostMultiplier": 1.3
+    },
+    {
+      "id": "silent-speech",
+      "name": "Silent Speech",
+      "description": "Learn to communicate with your daemon through thought alone",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Communicate with daemon without speaking",
+          "target": {
+            "abilityId": "daemon_telepathy"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "touch-taboo",
+      "name": "Sacred Boundary",
+      "description": "Your awareness of the sacred boundary around your daemon",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Sense when someone intends to touch your daemon"
+        },
+        {
+          "type": "intimidation",
+          "baseValue": 5,
+          "description": "Others sense the taboo instinctively"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The touch of another human on your daemon is the deepest violation possible. Even enemies hesitate at this taboo.",
+      "prerequisites": [
+        "daemon-bond"
+      ]
+    },
+    {
+      "id": "form-awareness",
+      "name": "Form Awareness",
+      "description": "Learn to read the meaning in daemon forms",
+      "paradigmId": "daemon",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Understand what daemon forms mean about personality",
+          "target": {
+            "abilityId": "form_reading"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A person's daemon reveals their true nature. A servant with a dog daemon\nhas a loyal soul. A person with a snake daemon... well, you know to be wary.",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "form-shifting",
+      "name": "Form Flexibility",
+      "description": "In childhood, daemons can take any form",
+      "paradigmId": "daemon",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Daemon can change forms freely (pre-settling only)",
+          "target": {
+            "abilityId": "form_shift"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "age_range",
+          "params": {
+            "maxAge": 14
+          },
+          "description": "Only available before settling"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Children's daemons shift constantly - now a moth, now a wildcat, now a bird. This flexibility is the mark of an unsettled soul, full of possibility.",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "settling",
+      "name": "The Settling",
+      "description": "Your daemon has settled into its final form",
+      "paradigmId": "daemon",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Daemon has taken its permanent form",
+          "target": {
+            "abilityId": "settled_form"
+          }
+        },
+        {
+          "type": "dust_affinity",
+          "baseValue": 10,
+          "description": "Dust is now attracted to you and your daemon"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "daemon_settled",
+          "params": {},
+          "description": "Daemon must have naturally settled",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The settling comes to all who grow up. One day your daemon shifts for\nthe last time, and you know - this is who you are. This is who you've always been.\nSome welcome it with joy; others mourn the loss of possibility.",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "hidden": true,
+      "icon": "🔒"
+    },
+    {
+      "id": "form-affinity",
+      "name": "Form Affinity",
+      "description": "Embrace the strengths of your daemon's form",
+      "paradigmId": "daemon",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "form_bonus",
+          "baseValue": 1,
+          "description": "Gain abilities based on daemon's settled form"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A person with a hawk daemon sees further. A person with a wolf daemon has keener instincts for danger. Your form is your destiny.",
+      "prerequisites": [
+        "settling"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "form-mastery",
+      "name": "Form Mastery",
+      "description": "Master the unique abilities of your daemon's form",
+      "paradigmId": "daemon",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "form_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% effectiveness of form abilities"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "form-affinity"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dust-sense",
+      "name": "Dust Sense",
+      "description": "Learn to perceive the conscious particles called Dust",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 2,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can perceive Dust particles",
+          "target": {
+            "abilityId": "dust_perception"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Dust is consciousness made manifest - golden particles that settle on\nthose who think and feel. Children cannot see it, for Dust is drawn only\nto settled daemons and mature minds.",
+      "prerequisites": [
+        "settling"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "dust-vision",
+      "name": "Dust Vision",
+      "description": "See the golden streams of Dust flowing through the world",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "See Dust currents and concentrations",
+          "target": {
+            "abilityId": "dust_vision"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dust-attraction",
+      "name": "Dust Attraction",
+      "description": "Learn to draw Dust toward you through focused consciousness",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "dust_affinity",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "description": "Attract more Dust to yourself"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Those who think deeply, who question, who love and hate with passion - they draw Dust like lodestone draws iron.",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "alethiometer-training",
+      "name": "Alethiometer Reading",
+      "description": "Learn to read the alethiometer - the golden compass of truth",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 10,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can read the golden compass",
+          "target": {
+            "abilityId": "alethiometer_read"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "alethiometrist"
+          },
+          "description": "Must find a teacher of alethiometer reading"
+        },
+        {
+          "type": "artifact_bonded",
+          "params": {
+            "artifactType": "alethiometer"
+          },
+          "description": "Must have access to an alethiometer"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The alethiometer speaks through Dust. Thirty-six symbols, infinite\nmeanings, and truth for those patient enough to learn. Most scholars take\ndecades to master even a portion of its language.",
+      "prerequisites": [
+        "dust-vision"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "intuitive-reading",
+      "name": "Intuitive Reading",
+      "description": "Read the alethiometer through pure instinct",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Read the alethiometer by instinct",
+          "target": {
+            "abilityId": "intuitive_alethiometer"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "gift_innate",
+          "params": {
+            "giftId": "intuitive_reading"
+          },
+          "description": "Must possess the rare gift of intuitive reading",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Some rare individuals - almost always children - can read the alethiometer\nwithout training. They slip into a trance-like state and the answers come.\nBut this gift fades with settling, with knowledge, with growing up.",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "hidden": true,
+      "icon": "🔮"
+    },
+    {
+      "id": "dust-navigation",
+      "name": "Dust Navigation",
+      "description": "Learn to sense the currents of Dust that flow between worlds",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense and navigate Dust currents between worlds",
+          "target": {
+            "abilityId": "world_sense"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "alethiometer-training",
+            "level": 5
+          },
+          "description": "Must have significant alethiometer training"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Dust flows between worlds through windows and cracks in reality. Those sensitive enough can feel these currents and follow them.",
+      "prerequisites": [
+        "dust-vision",
+        "alethiometer-training"
+      ]
+    },
+    {
+      "id": "dust-communion",
+      "name": "Dust Communion",
+      "description": "Achieve direct communion with Dust consciousness",
+      "paradigmId": "daemon",
+      "category": "dust",
+      "tier": 5,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Enter deep communion with Dust",
+          "target": {
+            "abilityId": "dust_communion"
+          }
+        },
+        {
+          "type": "wisdom",
+          "baseValue": 20,
+          "description": "Wisdom gained from Dust consciousness"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "dust-attraction",
+            "level": 5
+          },
+          "description": "Must have strong Dust affinity"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Dust is not merely particles - it is consciousness itself, the accumulated wisdom of countless beings. To commune with Dust is to touch something vast and ancient.",
+      "prerequisites": [
+        "dust-attraction",
+        "deep-bond"
+      ]
+    },
+    {
+      "id": "witch-blood",
+      "name": "Witch Blood",
+      "description": "The blood of witches runs in your veins",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Potential for daemon separation",
+          "target": {
+            "abilityId": "separation_potential"
+          }
+        },
+        {
+          "type": "lifespan",
+          "baseValue": 100,
+          "description": "Extended lifespan potential"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineId": "witch"
+          },
+          "description": "Must have witch bloodline",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Witches are not human - not quite. They live for centuries, fly through\nthe northern skies, and bear a terrible secret: they can separate from\ntheir daemons. This power comes at a price paid in pain.",
+      "prerequisites": [
+        "daemon-bond"
+      ],
+      "hidden": true,
+      "icon": "🌙"
+    },
+    {
+      "id": "separation-ordeal",
+      "name": "The Ordeal",
+      "description": "Undergo the terrible ordeal of separation",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 3,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can begin separation from daemon",
+          "target": {
+            "abilityId": "separation_start"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "separation_ordeal"
+          },
+          "description": "Must undergo the separation ordeal",
+          "hidden": true
+        },
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "separation_pain"
+          },
+          "description": "Must endure the pain of stretching the bond"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Every witch must face the ordeal - walking away from their daemon until\nthe bond stretches to the breaking point. The pain is indescribable. Many\ndo not survive. Those who do are forever changed.",
+      "prerequisites": [
+        "witch-blood",
+        "settling"
+      ],
+      "hidden": true,
+      "icon": "💔"
+    },
+    {
+      "id": "basic-separation",
+      "name": "Initial Separation",
+      "description": "Maintain separation at short distances",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": 50,
+          "description": "Can separate up to 50 meters from daemon"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "separation-ordeal"
+      ]
+    },
+    {
+      "id": "extended-separation",
+      "name": "Extended Separation",
+      "description": "Extend the distance you can travel from your daemon",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": 100,
+          "perLevelValue": 100,
+          "description": "+X meters separation distance"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "basic-separation"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "unlimited-separation",
+      "name": "Unlimited Separation",
+      "description": "Travel any distance from your daemon",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": -1,
+          "description": "Can separate any distance from daemon"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "extended-separation",
+            "level": 5
+          },
+          "description": "Must master extended separation"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The greatest witches can send their daemons to the far side of the world while they remain at home. The bond stretches but never breaks.",
+      "prerequisites": [
+        "extended-separation"
+      ]
+    },
+    {
+      "id": "witch-flight",
+      "name": "Cloud-Pine Flight",
+      "description": "Master the art of flying on cloud-pine",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can fly on cloud-pine branch",
+          "target": {
+            "abilityId": "witch_flight"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "artifact_bonded",
+          "params": {
+            "artifactType": "cloud_pine"
+          },
+          "description": "Must bond with a cloud-pine branch"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Witches fly on branches of cloud-pine, racing through the northern skies faster than any bird. This is their birthright.",
+      "prerequisites": [
+        "separation-ordeal"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "daemon-scout",
+      "name": "Daemon Scout",
+      "description": "Send your daemon ahead to scout while you remain behind",
+      "paradigmId": "daemon",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 175,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Send daemon ahead as a scout",
+          "target": {
+            "abilityId": "daemon_scouting"
+          }
+        },
+        {
+          "type": "perception",
+          "baseValue": 20,
+          "description": "See through daemon's eyes while separated"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "silent-speech",
+            "level": 3
+          },
+          "description": "Must have perfected silent communication"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "extended-separation",
+        "silent-speech"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "intercision-awareness",
+      "name": "Intercision Awareness",
+      "description": "Recognize the horror of intercision",
+      "paradigmId": "daemon",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Recognize severed individuals",
+          "target": {
+            "abilityId": "severed_sense"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Intercision - the cutting of the bond between human and daemon.\nThose who have been severed are empty, dead-eyed, barely human.\nThe Magisterium calls it \"making the cut.\" We call it murder of the soul.",
+      "prerequisites": [
+        "touch-taboo"
+      ],
+      "icon": "⚠️"
+    },
+    {
+      "id": "bond-fortification",
+      "name": "Bond Fortification",
+      "description": "Strengthen your bond against those who would sever it",
+      "paradigmId": "daemon",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 25,
+          "perLevelValue": 10,
+          "description": "Resistance to forced separation attempts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "emotional-sync",
+            "level": 3
+          },
+          "description": "Must have strong emotional bond"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "intercision-awareness",
+        "emotional-sync"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "deep-bond",
+      "name": "Deep Bond",
+      "description": "Achieve a profound unity with your daemon",
+      "paradigmId": "daemon",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "bond_strength",
+          "baseValue": 25,
+          "description": "Daemon is a true extension of yourself"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Share sensory input with daemon",
+          "target": {
+            "abilityId": "sensory_sharing"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "emotional-sync",
+            "level": 5
+          },
+          "description": "Must have perfected emotional synchronization"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "form-mastery",
+        "emotional-sync"
+      ]
+    },
+    {
+      "id": "daemon-combat",
+      "name": "Daemon Combat",
+      "description": "Learn to fight in perfect coordination with your daemon",
+      "paradigmId": "daemon",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Fight in coordination with daemon",
+          "target": {
+            "abilityId": "daemon_assist"
+          }
+        },
+        {
+          "type": "combat",
+          "baseValue": 15,
+          "description": "Bonus when daemon assists in combat"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "form_category",
+          "params": {
+            "category": "predator"
+          },
+          "description": "Daemon must have a combat-capable form"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your daemon can bite, claw, distract - but more importantly, they can warn you of danger and watch your back. Fighting as one is fighting as two.",
+      "prerequisites": [
+        "form-affinity"
+      ],
+      "levelCostMultiplier": 1.4
+    }
+  ],
+  "entryNodes": [
+    "daemon-bond"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "daemon_interaction",
+      "xpAmount": 5,
+      "description": "Meaningful interaction with your daemon"
+    },
+    {
+      "eventType": "form_used",
+      "xpAmount": 10,
+      "description": "Use your daemon's form abilities"
+    },
+    {
+      "eventType": "dust_perceived",
+      "xpAmount": 15,
+      "description": "Successfully perceive Dust"
+    },
+    {
+      "eventType": "alethiometer_reading",
+      "xpAmount": 50,
+      "description": "Successfully read the alethiometer"
+    },
+    {
+      "eventType": "separation_extended",
+      "xpAmount": 25,
+      "description": "Successfully separate from daemon"
+    },
+    {
+      "eventType": "daemon_scouting_success",
+      "xpAmount": 30,
+      "description": "Daemon successfully scouts ahead"
+    },
+    {
+      "eventType": "bond_threatened",
+      "xpAmount": 20,
+      "description": "Resist a threat to your daemon bond"
+    },
+    {
+      "eventType": "form_revelation",
+      "xpAmount": 100,
+      "description": "Your daemon settles or reveals a truth about form"
+    },
+    {
+      "eventType": "world_window_found",
+      "xpAmount": 75,
+      "description": "Discover a window between worlds"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "intercision",
+        "params": {},
+        "description": "Intercision permanently destroys all daemon abilities"
+      }
+    ]
+  },
+  "version": 1
+}

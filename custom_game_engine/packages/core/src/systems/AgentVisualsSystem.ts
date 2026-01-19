@@ -16,6 +16,8 @@ export class AgentVisualsSystem extends BaseSystem {
   readonly id = 'agent_visuals' as const;
   readonly priority = 300;
   readonly requiredComponents = ['agent', 'renderable'] as const;
+  // Lazy activation: Skip entire system when no agent exists
+  public readonly activationComponents = ['agent'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   protected onUpdate(ctx: SystemContext): void {

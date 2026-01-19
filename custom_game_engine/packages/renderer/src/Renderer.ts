@@ -52,14 +52,17 @@ export class Renderer {
   private camera: Camera;
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
-  private floatingTextRenderer!: FloatingTextRenderer;
-  private speechBubbleRenderer!: SpeechBubbleRenderer;
-  private particleRenderer!: ParticleRenderer;
-  private bedOwnershipRenderer!: BedOwnershipRenderer;
+  // Lazy-initialized renderers (created on first use)
+  private floatingTextRenderer: FloatingTextRenderer | null = null;
+  private speechBubbleRenderer: SpeechBubbleRenderer | null = null;
+  private particleRenderer: ParticleRenderer | null = null;
+  private bedOwnershipRenderer: BedOwnershipRenderer | null = null;
+  private animalRenderer: AnimalRenderer | null = null;
+
+  // Core renderers (always needed)
   private terrainRenderer!: TerrainRenderer;
   private sideViewTerrainRenderer!: SideViewTerrainRenderer;
   private agentRenderer!: AgentRenderer;
-  private animalRenderer!: AnimalRenderer;
   private buildingRenderer!: BuildingRenderer;
   private debugOverlay!: DebugOverlay;
   private interactionOverlay!: InteractionOverlay;
@@ -114,19 +117,19 @@ export class Renderer {
     // This ensures chunks loaded from saves are visible to the Renderer
     this.chunkManager = chunkManager;
     this.terrainGenerator = terrainGenerator;
-    this.floatingTextRenderer = new FloatingTextRenderer();
-    this.speechBubbleRenderer = new SpeechBubbleRenderer();
-    this.particleRenderer = new ParticleRenderer();
-    this.bedOwnershipRenderer = new BedOwnershipRenderer();
+
+    // Initialize core renderers (always needed)
     this.terrainRenderer = new TerrainRenderer(this.ctx, this.tileSize);
     this.sideViewTerrainRenderer = new SideViewTerrainRenderer(this.ctx, this.tileSize, this.chunkManager, this.camera);
     this.agentRenderer = new AgentRenderer(this.ctx, this.tileSize, this.camera);
-    this.animalRenderer = new AnimalRenderer(this.ctx);
     this.buildingRenderer = new BuildingRenderer(this.ctx);
     this.debugOverlay = new DebugOverlay(this.ctx, this.chunkManager, this.terrainGenerator);
     this.interactionOverlay = new InteractionOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx, '/assets/sprites/pixellab');
+
+    // Lazy renderers: floatingTextRenderer, speechBubbleRenderer, particleRenderer,
+    // bedOwnershipRenderer, animalRenderer initialized on first use via getters
 
     // Handle resize - store bound handler for cleanup
     this.resize();
@@ -196,24 +199,53 @@ export class Renderer {
   }
 
   /**
-   * Get the floating text renderer for adding feedback messages.
+   * Get the floating text renderer for adding feedback messages (lazy-initialized).
    */
   getFloatingTextRenderer(): FloatingTextRenderer {
+    if (!this.floatingTextRenderer) {
+      this.floatingTextRenderer = new FloatingTextRenderer();
+    }
     return this.floatingTextRenderer;
   }
 
   /**
-   * Get the speech bubble renderer for agent dialogue.
+   * Get the speech bubble renderer for agent dialogue (lazy-initialized).
    */
   getSpeechBubbleRenderer(): SpeechBubbleRenderer {
+    if (!this.speechBubbleRenderer) {
+      this.speechBubbleRenderer = new SpeechBubbleRenderer();
+    }
     return this.speechBubbleRenderer;
   }
 
   /**
-   * Get the particle renderer for visual effects.
+   * Get the particle renderer for visual effects (lazy-initialized).
    */
   getParticleRenderer(): ParticleRenderer {
+    if (!this.particleRenderer) {
+      this.particleRenderer = new ParticleRenderer();
+    }
     return this.particleRenderer;
+  }
+
+  /**
+   * Get the bed ownership renderer (lazy-initialized).
+   */
+  private getBedOwnershipRenderer(): BedOwnershipRenderer {
+    if (!this.bedOwnershipRenderer) {
+      this.bedOwnershipRenderer = new BedOwnershipRenderer();
+    }
+    return this.bedOwnershipRenderer;
+  }
+
+  /**
+   * Get the animal renderer (lazy-initialized).
+   */
+  private getAnimalRenderer(): AnimalRenderer {
+    if (!this.animalRenderer) {
+      this.animalRenderer = new AnimalRenderer(this.ctx);
+    }
+    return this.animalRenderer;
   }
 
   /**
@@ -564,7 +596,7 @@ export class Renderer {
 
       // Register agent speech for speech bubble rendering
       if (agent?.recentSpeech) {
-        this.speechBubbleRenderer.registerSpeech(entity.id, agent.recentSpeech);
+        this.getSpeechBubbleRenderer().registerSpeech(entity.id, agent.recentSpeech);
       }
 
       // Draw Z's above sleeping agents
@@ -581,7 +613,7 @@ export class Renderer {
       // Draw animal state label
       const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
-        this.animalRenderer.drawAnimalState(screen.x, screen.y, animal.state, animal.wild, this.tileSize, this.camera.zoom);
+        this.getAnimalRenderer().drawAnimalState(screen.x, screen.y, animal.state, animal.wild, this.tileSize, this.camera.zoom);
       }
 
       // Highlight selected entity
@@ -609,16 +641,16 @@ export class Renderer {
     this.debugOverlay.drawCityBoundaries(world, this.camera, this.tileSize);
 
     // Draw floating text (resource gathering feedback, etc.)
-    this.floatingTextRenderer.render(this.ctx, this.camera, Date.now());
+    this.getFloatingTextRenderer().render(this.ctx, this.camera, Date.now());
 
     // Draw particles (dust, sparks, etc.)
-    this.particleRenderer.render(this.ctx, this.camera, Date.now());
+    this.getParticleRenderer().render(this.ctx, this.camera, Date.now());
 
     // Draw bed ownership markers
-    this.bedOwnershipRenderer.render(this.ctx, this.camera, world);
+    this.getBedOwnershipRenderer().render(this.ctx, this.camera, world);
 
     // Update and render speech bubbles
-    this.speechBubbleRenderer.update();
+    this.getSpeechBubbleRenderer().update();
     this.renderSpeechBubbles(world);
 
     // Render combat UI elements (after speech bubbles, before debug)
@@ -678,7 +710,7 @@ export class Renderer {
       });
     }
 
-    this.speechBubbleRenderer.render(this.ctx, agentData);
+    this.getSpeechBubbleRenderer().render(this.ctx, agentData);
   }
 
 

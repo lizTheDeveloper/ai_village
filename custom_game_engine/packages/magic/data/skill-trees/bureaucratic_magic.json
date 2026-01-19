@@ -1,0 +1,809 @@
+{
+  "id": "bureaucratic_skill_tree",
+  "paradigmId": "bureaucratic_magic",
+  "name": "Bureaucratic Magic Skill Tree",
+  "description": "Master the art of magical paperwork, stamps, and procedural power",
+  "lore": "The Department of Reality Alteration maintains order through proper channels.\nAll magical effects require appropriate documentation. Processing times apply.\nForms available at your local magical registrar. No exceptions without Form E-1.",
+  "nodes": [
+    {
+      "id": "basic-filing",
+      "name": "Basic Filing",
+      "description": "Learn to create properly formatted magical forms",
+      "paradigmId": "bureaucratic_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can create and file simple forms",
+          "target": {
+            "abilityId": "form_creation"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Form 1-A: Application for Magical Effect. Fill out in triplicate.\nUse black ink only. Sign and date. Submit to appropriate department.\nProcessing time: 3-5 business days. Magic begins upon approval.",
+      "levelCostMultiplier": 1.3,
+      "icon": "📋"
+    },
+    {
+      "id": "rubber-stamp",
+      "name": "Rubber Stamp",
+      "description": "Learn to use official stamps to activate forms",
+      "paradigmId": "bureaucratic_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can stamp forms with basic approval",
+          "target": {
+            "abilityId": "stamp_basic"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The stamp is mightier than the sword. APPROVED. DENIED. PENDING.\nEach impression carries the weight of the institution behind it.\nHandle with care; stamps cannot be unstamped.",
+      "icon": "🔴"
+    },
+    {
+      "id": "ink-and-paper",
+      "name": "Ink and Paper Attunement",
+      "description": "Develop an affinity for office supplies",
+      "paradigmId": "bureaucratic_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 20,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to all bureaucratic magic"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The paper knows its purpose. The ink remembers what it writes.\nTrue bureaucrats can feel when a form is improperly filled,\nwhen a stamp is missing, when a signature is forged.",
+      "levelCostMultiplier": 1.4,
+      "icon": "🖋️"
+    },
+    {
+      "id": "requisition-forms",
+      "name": "Requisition Forms",
+      "description": "Learn to requisition resources through paperwork",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "requisition"
+          },
+          "description": "Request resources through proper channels"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Need supplies? File Form R-7. Need equipment? Form R-12.\nNeed a small miracle? Form R-99 with supervisor signature.\nProper requisition is proper magic.",
+      "prerequisites": [
+        "basic-filing"
+      ],
+      "icon": "📦"
+    },
+    {
+      "id": "petition-forms",
+      "name": "Petition Forms",
+      "description": "Learn to petition for rule exceptions",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "petition"
+          },
+          "description": "Petition for exceptions to rules"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The rules say no. But Form P-1 says \"unless.\"\nA well-crafted petition can bend any regulation,\nfind loopholes in any law, exceptions to any policy.",
+      "prerequisites": [
+        "basic-filing"
+      ],
+      "icon": "📜"
+    },
+    {
+      "id": "declaration-forms",
+      "name": "Declaration Forms",
+      "description": "Learn to declare things into truth",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "declaration"
+          },
+          "description": "Declare something to be officially true"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "bureaucracy",
+            "skillLevel": 3
+          },
+          "description": "Requires Bureaucracy skill level 3"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Form D-1: Declaration of Fact. When properly filed and approved,\nthe declaration becomes true. \"I hereby declare this object to be invisible.\"\nReality updates its records accordingly.",
+      "prerequisites": [
+        "petition-forms"
+      ],
+      "icon": "📢"
+    },
+    {
+      "id": "registration-forms",
+      "name": "Registration Forms",
+      "description": "Learn to register and deregister official existence",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "registration"
+          },
+          "description": "Register entities into official existence"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "deregistration"
+          },
+          "description": "Remove entities from official records"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "If it's not in the records, it doesn't exist. Form REG-1 creates\nofficial existence. Form DEREG-1 removes it. Deregistered entities\nbecome invisible to bureaucratic systems. They might still exist, but\nas far as paperwork is concerned, they never did.",
+      "prerequisites": [
+        "requisition-forms"
+      ],
+      "icon": "📝"
+    },
+    {
+      "id": "stamp-authority",
+      "name": "Stamp Authority",
+      "description": "Learn to use stamps with binding authority",
+      "paradigmId": "bureaucratic_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stamp_approved"
+          },
+          "description": "APPROVED stamp activates forms"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stamp_denied"
+          },
+          "description": "DENIED stamp nullifies forms"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your stamps now carry weight. APPROVED makes things happen.\nDENIED makes them unhappen. The institution recognizes your authority.",
+      "prerequisites": [
+        "rubber-stamp"
+      ],
+      "icon": "✅"
+    },
+    {
+      "id": "pending-stamp",
+      "name": "Pending Stamp",
+      "description": "Learn to freeze effects in pending status",
+      "paradigmId": "bureaucratic_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 70,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stamp_pending"
+          },
+          "description": "PENDING stamp suspends effects in time"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "PENDING: the most powerful stamp. Effects freeze mid-execution.\nTime stops for the stamped form. Spells wait eternally for approval\nthat may never come. Some say the pending pile is a dimension unto itself.",
+      "prerequisites": [
+        "stamp-authority"
+      ],
+      "icon": "⏳"
+    },
+    {
+      "id": "urgent-stamp",
+      "name": "Urgent Stamp",
+      "description": "Learn to mark forms for urgent processing",
+      "paradigmId": "bureaucratic_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 70,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stamp_urgent"
+          },
+          "description": "URGENT stamp speeds processing dramatically"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "URGENT bypasses the queue. URGENT demands immediate attention.\nURGENT makes bureaucracy move at the speed of panic.\nUse sparingly - if everything is urgent, nothing is.",
+      "prerequisites": [
+        "stamp-authority"
+      ],
+      "icon": "🚨"
+    },
+    {
+      "id": "notarized-stamp",
+      "name": "Notarized Stamp",
+      "description": "Learn to notarize for permanent, binding effects",
+      "paradigmId": "bureaucratic_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stamp_notarized"
+          },
+          "description": "NOTARIZED stamp makes effects permanent and binding"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 6
+          },
+          "description": "Requires 6 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The notarized stamp is sacred. What is notarized cannot be un-notarized.\nIt becomes part of the permanent record, woven into the fabric of bureaucracy.\nEven gods must file appeals to change a notarized document.",
+      "prerequisites": [
+        "pending-stamp",
+        "urgent-stamp"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "id": "red-tape-defense",
+      "name": "Red Tape Defense",
+      "description": "Use bureaucratic procedures as magical defense",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Procedural barriers block attacks"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "red_tape_barrier"
+          },
+          "description": "Create barriers of procedural requirements"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"Before you can harm me, please fill out Form A-1, Attack Declaration.\nThen submit Form V-3, Victim Notification, in triplicate. Don't forget\nForm I-7, Intent to Cause Harm. Processing time: 4-6 weeks.\"",
+      "prerequisites": [
+        "basic-filing",
+        "rubber-stamp"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "🚧"
+    },
+    {
+      "id": "appeal-process",
+      "name": "Appeal Process",
+      "description": "Learn to file appeals against magical effects",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "file_appeal"
+          },
+          "description": "Challenge any magical decision"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Any decision can be appealed. Form AP-1 challenges the ruling.\nForm AP-2 escalates to higher authority. Form AP-FINAL goes to\nthe Supreme Bureaucratic Court, where reality itself is on trial.",
+      "prerequisites": [
+        "declaration-forms"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "audit-powers",
+      "name": "Audit Powers",
+      "description": "Gain the power to audit magical operations",
+      "paradigmId": "bureaucratic_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "magical_audit"
+          },
+          "description": "Audit magical effects and expose irregularities"
+        },
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Can detect forged forms and improper stamps"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "bureaucracy",
+            "skillLevel": 5
+          },
+          "description": "Requires Bureaucracy skill level 5"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The Audit reveals all. Every spell must be accounted for.\nEvery magical effect traced to its source form. The auditor sees\ndiscrepancies, catches fraudulent filings, exposes magical malfeasance.",
+      "prerequisites": [
+        "registration-forms"
+      ],
+      "icon": "🔍"
+    },
+    {
+      "id": "clerk-rank",
+      "name": "Clerk Certification",
+      "description": "Achieve official clerk status",
+      "paradigmId": "bureaucratic_magic",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 10,
+          "description": "Recognized clerk status"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "filing_cabinet_access"
+          },
+          "description": "Access to standard filing cabinets"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Welcome to the department. Here is your desk, your stamps, your forms.\nFiling hours are 9 to 5. Lunch is 30 minutes. Don't make waves.",
+      "prerequisites": [
+        "basic-filing"
+      ],
+      "icon": "👔"
+    },
+    {
+      "id": "administrator-rank",
+      "name": "Administrator Certification",
+      "description": "Achieve administrator status",
+      "paradigmId": "bureaucratic_magic",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 15,
+          "description": "Administrator privileges"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "approve_minor_forms"
+          },
+          "description": "Can approve forms without supervisor"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 300
+          },
+          "description": "Requires 300 total XP in Bureaucratic magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You have proven your dedication to proper procedure. You may now\napprove minor forms without supervisor signature. Your stamp carries\ninstitutional weight. Use it responsibly.",
+      "prerequisites": [
+        "clerk-rank",
+        "stamp-authority"
+      ],
+      "icon": "💼"
+    },
+    {
+      "id": "director-rank",
+      "name": "Director Certification",
+      "description": "Achieve director status",
+      "paradigmId": "bureaucratic_magic",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 25,
+          "description": "Director privileges"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_form_types"
+          },
+          "description": "Can create new form types"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "department_access"
+          },
+          "description": "Full department access"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 600
+          },
+          "description": "Requires 600 total XP in Bureaucratic magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You now direct the flow of paperwork. You create forms, not just fill them.\nYour department bends to your will. Other bureaucrats defer to your authority.\nThe power of middle management is yours.",
+      "prerequisites": [
+        "administrator-rank",
+        "notarized-stamp"
+      ],
+      "icon": "🏢"
+    },
+    {
+      "id": "bureaucratic-paradox",
+      "name": "Bureaucratic Paradox",
+      "description": "Master the art of bureaucratic paradox",
+      "paradigmId": "bureaucratic_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "paradox_form"
+          },
+          "description": "Create self-referential paradoxical forms"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 10
+          },
+          "description": "Requires 10 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "\"This form is only valid if it has not been filed. Filing this form\ninvalidates it.\" The paradox crashes reality's bureaucratic system.\nIn the confusion, anything becomes possible.",
+      "prerequisites": [
+        "director-rank"
+      ],
+      "icon": "🔄"
+    },
+    {
+      "id": "eternal-pending",
+      "name": "Eternal Pending",
+      "description": "Master the eternal pending state",
+      "paradigmId": "bureaucratic_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "eternal_pending"
+          },
+          "description": "Trap effects in permanent pending status"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The pending pile grows. Items enter but never leave.\nSome forms have been pending since the beginning of time.\nMaster this, and you can trap anything in eternal bureaucratic limbo.",
+      "prerequisites": [
+        "pending-stamp",
+        "director-rank"
+      ],
+      "icon": "♾️"
+    },
+    {
+      "id": "supreme-chancellor",
+      "name": "Supreme Chancellor",
+      "description": "Achieve supreme bureaucratic power",
+      "paradigmId": "bureaucratic_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme bureaucratic authority"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "reality_memo"
+          },
+          "description": "Issue memos that reshape reality"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1000
+          },
+          "description": "Requires 1000 total XP in Bureaucratic magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At the height of bureaucratic power, your memos reshape reality.\n\"Per policy update 2024-001, gravity shall be reduced by 50%.\"\nWhen you speak through proper channels, the universe complies.",
+      "prerequisites": [
+        "bureaucratic-paradox",
+        "eternal-pending"
+      ],
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "basic-filing",
+    "rubber-stamp",
+    "ink-and-paper"
+  ],
+  "connections": [
+    {
+      "from": "basic-filing",
+      "to": "requisition-forms"
+    },
+    {
+      "from": "basic-filing",
+      "to": "petition-forms"
+    },
+    {
+      "from": "petition-forms",
+      "to": "declaration-forms"
+    },
+    {
+      "from": "requisition-forms",
+      "to": "registration-forms"
+    },
+    {
+      "from": "rubber-stamp",
+      "to": "stamp-authority"
+    },
+    {
+      "from": "stamp-authority",
+      "to": "pending-stamp"
+    },
+    {
+      "from": "stamp-authority",
+      "to": "urgent-stamp"
+    },
+    {
+      "from": "pending-stamp",
+      "to": "notarized-stamp"
+    },
+    {
+      "from": "urgent-stamp",
+      "to": "notarized-stamp"
+    },
+    {
+      "from": "basic-filing",
+      "to": "red-tape-defense"
+    },
+    {
+      "from": "rubber-stamp",
+      "to": "red-tape-defense"
+    },
+    {
+      "from": "declaration-forms",
+      "to": "appeal-process"
+    },
+    {
+      "from": "registration-forms",
+      "to": "audit-powers"
+    },
+    {
+      "from": "basic-filing",
+      "to": "clerk-rank"
+    },
+    {
+      "from": "clerk-rank",
+      "to": "administrator-rank"
+    },
+    {
+      "from": "stamp-authority",
+      "to": "administrator-rank"
+    },
+    {
+      "from": "administrator-rank",
+      "to": "director-rank"
+    },
+    {
+      "from": "notarized-stamp",
+      "to": "director-rank"
+    },
+    {
+      "from": "director-rank",
+      "to": "bureaucratic-paradox"
+    },
+    {
+      "from": "pending-stamp",
+      "to": "eternal-pending"
+    },
+    {
+      "from": "director-rank",
+      "to": "eternal-pending"
+    },
+    {
+      "from": "bureaucratic-paradox",
+      "to": "supreme-chancellor"
+    },
+    {
+      "from": "eternal-pending",
+      "to": "supreme-chancellor"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "form_filed",
+      "xpAmount": 5,
+      "description": "File a magical form correctly",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "form_approved",
+      "xpAmount": 10,
+      "description": "Have a form approved"
+    },
+    {
+      "eventType": "stamp_used",
+      "xpAmount": 3,
+      "description": "Use an official stamp"
+    },
+    {
+      "eventType": "audit_conducted",
+      "xpAmount": 20,
+      "description": "Conduct a magical audit"
+    },
+    {
+      "eventType": "appeal_won",
+      "xpAmount": 25,
+      "description": "Win a bureaucratic appeal"
+    },
+    {
+      "eventType": "red_tape_defense",
+      "xpAmount": 8,
+      "description": "Block an attack with red tape"
+    },
+    {
+      "eventType": "rank_promotion",
+      "xpAmount": 50,
+      "description": "Receive a rank promotion"
+    },
+    {
+      "eventType": "business_hours_casting",
+      "xpAmount": 2,
+      "description": "Cast during business hours (9-5)"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": true,
+    "requiresInnateAbility": false,
+    "respecPenalty": 0.1
+  },
+  "version": 1
+}

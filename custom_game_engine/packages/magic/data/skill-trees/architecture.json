@@ -1,0 +1,1128 @@
+{
+  "id": "architecture_skill_tree",
+  "name": "Art of Building",
+  "paradigmId": "architecture",
+  "description": "The knowledge of designing and constructing buildings.\nFrom simple shelters to grand monuments, architects shape the\nphysical environment where communities live, work, and gather.\nProgression unlocks more complex building types and techniques.",
+  "nodes": [
+    {
+      "id": "shelter-basics",
+      "name": "Shelter Basics",
+      "description": "Learn to construct basic shelters from simple materials.",
+      "paradigmId": "architecture",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 20,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "build_tier1"
+          },
+          "description": "Can build basic shelters and structures"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "description": "Faster construction of basic buildings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every builder starts here - with the fundamentals.\nA lean-to against the rain, a fire pit for warmth, a box for storage.\nThese simple structures are the foundation of all architecture.",
+      "levelCostMultiplier": 1.2,
+      "icon": "🏕️"
+    },
+    {
+      "id": "material-knowledge",
+      "name": "Material Knowledge",
+      "description": "Understand the properties of different building materials.",
+      "paradigmId": "architecture",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 5,
+          "description": "Assess material quality before use"
+        },
+        {
+          "type": "resource_efficiency",
+          "baseValue": 10,
+          "description": "Less waste when cutting and shaping materials"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wood, stone, mud, thatch - each has its nature.\nWood is warm but burns. Stone endures but chills.\nLearn what each material offers and demands.",
+      "prerequisites": [
+        "shelter-basics"
+      ],
+      "icon": "🪵"
+    },
+    {
+      "id": "structural-understanding",
+      "name": "Structural Understanding",
+      "description": "Grasp how weight and forces flow through structures.",
+      "paradigmId": "architecture",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "assess_stability"
+          },
+          "description": "Evaluate structural integrity"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "description": "Buildings are more stable"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A roof pushes outward as well as down.\nWalls must brace against wind and their own load.\nUnderstanding these forces prevents collapse.",
+      "prerequisites": [
+        "shelter-basics"
+      ],
+      "icon": "🏗️"
+    },
+    {
+      "id": "workspace-design",
+      "name": "Workspace Design",
+      "description": "Design workspaces that enhance productivity.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_workshop"
+          },
+          "description": "Design efficient crafting spaces"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "description": "Workshops provide crafting speed bonus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A craftsman's space should serve their craft.\nTools within reach, materials flowing in, products flowing out.\nGood workshop design can double a worker's output.",
+      "prerequisites": [
+        "material-knowledge",
+        "structural-understanding"
+      ],
+      "icon": "🔨"
+    },
+    {
+      "id": "thermal-design",
+      "name": "Thermal Design",
+      "description": "Control heat flow through building design.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_insulation"
+          },
+          "description": "Design for temperature control"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "description": "Buildings maintain comfortable temperature"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Thick walls hold warmth in winter, coolness in summer.\nHearth placement, window size, ceiling height - all affect comfort.\nMaster these and your buildings will be havens in any season.",
+      "prerequisites": [
+        "material-knowledge"
+      ],
+      "icon": "🌡️"
+    },
+    {
+      "id": "storage-architecture",
+      "name": "Storage Architecture",
+      "description": "Maximize storage capacity through clever design.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_storage"
+          },
+          "description": "Design efficient storage buildings"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 15,
+          "description": "Storage buildings have increased capacity"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A good granary keeps grain dry and accessible.\nA proper barn shelters animals and their feed.\nSpace is precious - learn to use every corner.",
+      "prerequisites": [
+        "structural-understanding"
+      ],
+      "icon": "📦"
+    },
+    {
+      "id": "animal-housing",
+      "name": "Animal Housing",
+      "description": "Design housing that keeps animals healthy and productive.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_animal_housing"
+          },
+          "description": "Design healthy animal shelters"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "build_tier2_animal"
+          },
+          "description": "Build chicken coops, stables, kennels"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Each creature has its needs. Chickens want roosts.\nHorses need space to move. Bees require ventilation.\nDesign for the animal, and they will thrive.",
+      "prerequisites": [
+        "shelter-basics",
+        "structural-understanding"
+      ],
+      "icon": "🐔"
+    },
+    {
+      "id": "room-composition",
+      "name": "Room Composition",
+      "description": "Compose multiple rooms into functional buildings.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "compose_rooms"
+          },
+          "description": "Combine room types into coherent buildings"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "use_building_designer"
+          },
+          "description": "Access the LLM building designer tool"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A house is more than rooms - it is how they connect.\nKitchen near dining, bedroom away from noise, storage accessible.\nLearn to compose rooms into harmonious wholes.",
+      "prerequisites": [
+        "workspace-design",
+        "thermal-design"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "id": "multi-floor-design",
+      "name": "Multi-Floor Design",
+      "description": "Design buildings that rise multiple stories.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_stairs"
+          },
+          "description": "Add stairs and upper floors"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "build_tier3"
+          },
+          "description": "Build advanced multi-story structures"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Height brings advantages - views, status, safety from floods.\nBut stairs must be safe, floors must bear weight, and\nupper rooms need their own considerations.",
+      "prerequisites": [
+        "structural-understanding",
+        "room-composition"
+      ],
+      "icon": "🏢"
+    },
+    {
+      "id": "blueprint-creation",
+      "name": "Blueprint Creation",
+      "description": "Create detailed plans that others can follow.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_blueprint"
+          },
+          "description": "Draw plans others can follow"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "share_designs"
+          },
+          "description": "Teach building designs to others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A blueprint captures your vision in lines and symbols.\nWith it, any skilled builder can recreate your design.\nYour best ideas can spread throughout the village.",
+      "prerequisites": [
+        "room-composition"
+      ],
+      "icon": "📐"
+    },
+    {
+      "id": "specialized-production",
+      "name": "Specialized Production",
+      "description": "Design buildings for specialized production.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_forge"
+          },
+          "description": "Design forges, kilns, and furnaces"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_laboratory"
+          },
+          "description": "Design research laboratories"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A forge needs ventilation for smoke, space for bellows,\nand walls that won't catch fire. Each specialized building\nhas requirements that must be understood and respected.",
+      "prerequisites": [
+        "workspace-design",
+        "thermal-design"
+      ],
+      "icon": "⚒️"
+    },
+    {
+      "id": "community-buildings",
+      "name": "Community Buildings",
+      "description": "Design buildings that serve the entire community.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 70,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_meeting_hall"
+          },
+          "description": "Design spaces for community gathering"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "build_tier4"
+          },
+          "description": "Build governance and community structures"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A meeting hall must hold many, let all see the speaker,\nand feel welcoming to all. Town halls need record storage,\nprivate offices, and public spaces. Think of the community.",
+      "prerequisites": [
+        "room-composition",
+        "multi-floor-design"
+      ],
+      "icon": "🏛️"
+    },
+    {
+      "id": "aesthetic-mastery",
+      "name": "Aesthetic Mastery",
+      "description": "Create buildings that are beautiful as well as functional.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 20,
+          "description": "Buildings provide mood bonus to occupants"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "decorative_elements"
+          },
+          "description": "Add carved details, painted surfaces"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Function is the foundation, but beauty elevates.\nCarved eaves, painted trim, pleasing proportions -\nthese transform shelter into home, workspace into sanctuary.",
+      "prerequisites": [
+        "room-composition",
+        "blueprint-creation"
+      ],
+      "icon": "🎨"
+    },
+    {
+      "id": "sacred-architecture",
+      "name": "Sacred Architecture",
+      "description": "Design spaces that inspire spiritual connection.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 65,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_temple"
+          },
+          "description": "Design temples and sacred spaces"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_shrine"
+          },
+          "description": "Create shrines and meditation spaces"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Sacred spaces follow different rules.\nLight falls just so, sound reverberates or hushes,\nand something ineffable makes the spirit stir.",
+      "prerequisites": [
+        "aesthetic-mastery",
+        "community-buildings"
+      ],
+      "icon": "⛪"
+    },
+    {
+      "id": "infrastructure-design",
+      "name": "Infrastructure Design",
+      "description": "Design the systems that connect buildings.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 65,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_irrigation"
+          },
+          "description": "Plan water channels and wells"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_roads"
+          },
+          "description": "Plan roads and pathways"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Buildings alone do not make a village.\nWater must flow, roads must connect, waste must be managed.\nThe infrastructure between buildings is architecture too.",
+      "prerequisites": [
+        "community-buildings",
+        "specialized-production"
+      ],
+      "icon": "🌊"
+    },
+    {
+      "id": "monumental-architecture",
+      "name": "Monumental Architecture",
+      "description": "Create structures that will stand for generations.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 90,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "design_monument"
+          },
+          "description": "Design grand monuments and towers"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "build_tier5"
+          },
+          "description": "Build legendary structures"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some buildings transcend their builders.\nThe great tower, the grand temple, the inventors' hall -\nthese become landmarks that define a civilization.",
+      "prerequisites": [
+        "sacred-architecture",
+        "infrastructure-design"
+      ],
+      "icon": "🗼"
+    },
+    {
+      "id": "master-architect",
+      "name": "Master Architect",
+      "description": "Achieve mastery recognized throughout the land.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 30,
+          "description": "All buildings gain quality bonus"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "architect_consultation"
+          },
+          "description": "Other builders seek your guidance"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "legacy_designs"
+          },
+          "description": "Create designs that persist after death"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The master architect sees the whole - how buildings\nserve people, how villages grow, how form serves function.\nYour designs become the standard others aspire to.",
+      "prerequisites": [
+        "monumental-architecture",
+        "aesthetic-mastery"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "urban-planning",
+      "name": "Urban Planning",
+      "description": "Plan the layout of entire settlements.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 85,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "plan_district"
+          },
+          "description": "Plan entire districts and neighborhoods"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "zone_planning"
+          },
+          "description": "Designate zones for different uses"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Beyond individual buildings lies the village itself.\nWhere should homes cluster? Where should industry go?\nThe urban planner shapes how a community grows.",
+      "prerequisites": [
+        "infrastructure-design",
+        "community-buildings"
+      ],
+      "icon": "🗺️"
+    },
+    {
+      "id": "flow-awareness",
+      "name": "Flow Awareness",
+      "description": "Understand how energy flows through buildings.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense how energy moves through spaces"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "analyze_chi_flow"
+          },
+          "description": "Identify stagnant areas and Sha Qi lines"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Good architects know that spaces breathe.\nAir, light, and movement follow invisible paths.\nLearn to see these flows and design around them.",
+      "prerequisites": [
+        "room-composition"
+      ],
+      "icon": "🌬️"
+    },
+    {
+      "id": "proportional-harmony",
+      "name": "Proportional Harmony",
+      "description": "Design rooms with naturally pleasing proportions.",
+      "paradigmId": "architecture",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 5,
+          "description": "Intuit pleasing room proportions"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "golden_ratio_design"
+          },
+          "description": "Design rooms with golden ratio proportions"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The ratio of 1.618 appears throughout nature.\nRooms that approach this proportion feel right.\nNeither too long, nor too square - balanced.",
+      "prerequisites": [
+        "room-composition"
+      ],
+      "icon": "📐"
+    },
+    {
+      "id": "commanding-positions",
+      "name": "Commanding Positions",
+      "description": "Place key furniture in positions of power.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 45,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "place_commanding"
+          },
+          "description": "Position beds, desks, and thrones optimally"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "description": "Occupants feel more secure and productive"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A bed should see the door but not face it directly.\nA desk should have a wall behind and view of entry.\nThese commanding positions grant security and awareness.",
+      "prerequisites": [
+        "flow-awareness"
+      ],
+      "icon": "👁️"
+    },
+    {
+      "id": "element-balance",
+      "name": "Element Balance",
+      "description": "Balance the five elements in building design.",
+      "paradigmId": "architecture",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense element imbalances in spaces"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "balance_elements"
+          },
+          "description": "Add materials to balance wood, fire, earth, metal, water"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wood, fire, earth, metal, water - all must be present.\nStone walls need wooden furniture. Metal tools need plants.\nBalance creates spaces where people thrive.",
+      "prerequisites": [
+        "flow-awareness",
+        "material-knowledge"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "id": "spatial-harmony-mastery",
+      "name": "Spatial Harmony Mastery",
+      "description": "Master the art of spatially harmonious design.",
+      "paradigmId": "architecture",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 65,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "full_harmony_analysis"
+          },
+          "description": "Perform complete Feng Shui analysis on buildings"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "harmony_optimization"
+          },
+          "description": "Evolve designs for maximum harmony score"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 20,
+          "description": "Designed buildings start with +20 harmony"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The master architect considers all factors together:\nflow, proportion, position, element balance.\nTheir buildings feel right the moment you enter.",
+      "prerequisites": [
+        "commanding-positions",
+        "element-balance",
+        "proportional-harmony"
+      ],
+      "icon": "☯️"
+    },
+    {
+      "id": "quick-construction",
+      "name": "Quick Construction",
+      "description": "Build faster through efficient techniques.",
+      "paradigmId": "architecture",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "resource_efficiency",
+          "baseValue": 20,
+          "description": "Construction completes 20% faster"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Experience teaches shortcuts that don't sacrifice quality.\nPrepare materials in advance, work in logical sequence,\nand a building rises in half the time.",
+      "prerequisites": [
+        "shelter-basics"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "material-efficiency",
+      "name": "Material Efficiency",
+      "description": "Use materials more efficiently with less waste.",
+      "paradigmId": "architecture",
+      "category": "efficiency",
+      "tier": 3,
+      "xpCost": 40,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "cost_reduction",
+          "baseValue": 15,
+          "description": "Buildings require 15% fewer resources"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every scrap has a use. Offcuts become pegs.\nStone chips fill gaps. Sawdust becomes insulation.\nThe efficient builder wastes nothing.",
+      "prerequisites": [
+        "material-knowledge"
+      ],
+      "icon": "♻️"
+    },
+    {
+      "id": "construction-leadership",
+      "name": "Construction Leadership",
+      "description": "Lead teams of builders to complete large projects.",
+      "paradigmId": "architecture",
+      "category": "efficiency",
+      "tier": 4,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "lead_construction"
+          },
+          "description": "Coordinate multiple builders"
+        },
+        {
+          "type": "technique_proficiency",
+          "baseValue": 15,
+          "description": "Team construction bonus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Great buildings require many hands.\nThe construction leader assigns tasks, coordinates timing,\nand ensures all parts come together correctly.",
+      "prerequisites": [
+        "blueprint-creation",
+        "quick-construction"
+      ],
+      "icon": "👷"
+    }
+  ],
+  "entryNodes": [
+    "shelter-basics"
+  ],
+  "connections": [
+    {
+      "from": "shelter-basics",
+      "to": "material-knowledge"
+    },
+    {
+      "from": "shelter-basics",
+      "to": "structural-understanding"
+    },
+    {
+      "from": "material-knowledge",
+      "to": "workspace-design"
+    },
+    {
+      "from": "structural-understanding",
+      "to": "workspace-design"
+    },
+    {
+      "from": "material-knowledge",
+      "to": "thermal-design"
+    },
+    {
+      "from": "structural-understanding",
+      "to": "storage-architecture"
+    },
+    {
+      "from": "shelter-basics",
+      "to": "animal-housing"
+    },
+    {
+      "from": "structural-understanding",
+      "to": "animal-housing"
+    },
+    {
+      "from": "workspace-design",
+      "to": "room-composition"
+    },
+    {
+      "from": "thermal-design",
+      "to": "room-composition"
+    },
+    {
+      "from": "structural-understanding",
+      "to": "multi-floor-design"
+    },
+    {
+      "from": "room-composition",
+      "to": "multi-floor-design"
+    },
+    {
+      "from": "room-composition",
+      "to": "blueprint-creation"
+    },
+    {
+      "from": "workspace-design",
+      "to": "specialized-production"
+    },
+    {
+      "from": "thermal-design",
+      "to": "specialized-production"
+    },
+    {
+      "from": "room-composition",
+      "to": "community-buildings"
+    },
+    {
+      "from": "multi-floor-design",
+      "to": "community-buildings"
+    },
+    {
+      "from": "room-composition",
+      "to": "aesthetic-mastery"
+    },
+    {
+      "from": "blueprint-creation",
+      "to": "aesthetic-mastery"
+    },
+    {
+      "from": "aesthetic-mastery",
+      "to": "sacred-architecture"
+    },
+    {
+      "from": "community-buildings",
+      "to": "sacred-architecture"
+    },
+    {
+      "from": "community-buildings",
+      "to": "infrastructure-design"
+    },
+    {
+      "from": "specialized-production",
+      "to": "infrastructure-design"
+    },
+    {
+      "from": "sacred-architecture",
+      "to": "monumental-architecture"
+    },
+    {
+      "from": "infrastructure-design",
+      "to": "monumental-architecture"
+    },
+    {
+      "from": "monumental-architecture",
+      "to": "master-architect"
+    },
+    {
+      "from": "aesthetic-mastery",
+      "to": "master-architect"
+    },
+    {
+      "from": "infrastructure-design",
+      "to": "urban-planning"
+    },
+    {
+      "from": "community-buildings",
+      "to": "urban-planning"
+    },
+    {
+      "from": "room-composition",
+      "to": "flow-awareness"
+    },
+    {
+      "from": "room-composition",
+      "to": "proportional-harmony"
+    },
+    {
+      "from": "flow-awareness",
+      "to": "commanding-positions"
+    },
+    {
+      "from": "flow-awareness",
+      "to": "element-balance"
+    },
+    {
+      "from": "material-knowledge",
+      "to": "element-balance"
+    },
+    {
+      "from": "commanding-positions",
+      "to": "spatial-harmony-mastery"
+    },
+    {
+      "from": "element-balance",
+      "to": "spatial-harmony-mastery"
+    },
+    {
+      "from": "proportional-harmony",
+      "to": "spatial-harmony-mastery"
+    },
+    {
+      "from": "shelter-basics",
+      "to": "quick-construction"
+    },
+    {
+      "from": "material-knowledge",
+      "to": "material-efficiency"
+    },
+    {
+      "from": "blueprint-creation",
+      "to": "construction-leadership"
+    },
+    {
+      "from": "quick-construction",
+      "to": "construction-leadership"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "complete_building",
+      "xpAmount": 20,
+      "description": "Complete construction of any building"
+    },
+    {
+      "eventType": "complete_tier2_building",
+      "xpAmount": 35,
+      "description": "Complete a Tier 2 building"
+    },
+    {
+      "eventType": "complete_tier3_building",
+      "xpAmount": 50,
+      "description": "Complete a Tier 3 building"
+    },
+    {
+      "eventType": "complete_tier4_building",
+      "xpAmount": 75,
+      "description": "Complete a Tier 4 building"
+    },
+    {
+      "eventType": "complete_tier5_building",
+      "xpAmount": 100,
+      "description": "Complete a Tier 5 building"
+    },
+    {
+      "eventType": "create_blueprint",
+      "xpAmount": 40,
+      "description": "Create a new building blueprint"
+    },
+    {
+      "eventType": "teach_design",
+      "xpAmount": 25,
+      "description": "Teach a building design to another agent"
+    },
+    {
+      "eventType": "optimize_layout",
+      "xpAmount": 30,
+      "description": "Improve an existing building layout"
+    },
+    {
+      "eventType": "repair_building",
+      "xpAmount": 10,
+      "description": "Repair a damaged building"
+    },
+    {
+      "eventType": "lead_construction",
+      "xpAmount": 45,
+      "description": "Lead a team to complete a building"
+    },
+    {
+      "eventType": "analyze_building_harmony",
+      "xpAmount": 15,
+      "description": "Analyze the Feng Shui of an existing building"
+    },
+    {
+      "eventType": "improve_building_harmony",
+      "xpAmount": 30,
+      "description": "Improve a building's harmony score"
+    },
+    {
+      "eventType": "design_harmonious_building",
+      "xpAmount": 50,
+      "description": "Design a building with 70+ harmony score"
+    },
+    {
+      "eventType": "achieve_sublime_harmony",
+      "xpAmount": 75,
+      "description": "Create a building with 90+ harmony score"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

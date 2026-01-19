@@ -1,0 +1,838 @@
+{
+  "id": "dream-tree",
+  "paradigmId": "dream",
+  "name": "The Art of Dreaming",
+  "description": "Master lucid dreaming, walk through others' dreams, and glimpse the future.",
+  "lore": "Dreams are not mere phantasms of a sleeping mind - they are a realm unto\nthemselves, as real in their way as the waking world. The dreamer who learns\nto walk with awareness through this realm gains powers beyond the waking:\nmastery of time, glimpses of the future, communion with the dead, and the\nability to share dreams with others.\n\nBut the dream realm has its dangers. Nightmares are not mere fears - they\nare predators that stalk the unwary. And those who spend too long in dreams\nmay find waking reality growing thin and unreal.",
+  "nodes": [
+    {
+      "id": "dream-recall",
+      "name": "Dream Recall",
+      "description": "Learn to remember your dreams",
+      "paradigmId": "dream",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Remember dreams upon waking",
+          "target": {
+            "abilityId": "dream_memory"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Most people forget their dreams within minutes of waking. The first step\nto dream magic is learning to carry those memories across the threshold.\nKeep a dream journal. Write immediately upon waking. In time, the veil thins.",
+      "levelCostMultiplier": 1.3,
+      "icon": "📔"
+    },
+    {
+      "id": "basic-lucidity",
+      "name": "Basic Lucidity",
+      "description": "Learn to recognize when you are dreaming",
+      "paradigmId": "dream",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "lucidity",
+          "baseValue": 1,
+          "perLevelValue": 1,
+          "description": "Awareness level within dreams"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The moment of recognition: \"This is a dream.\" For most, this triggers\nimmediate waking. But with practice, you can hold that awareness gently,\nlike a soap bubble, and remain within the dream while knowing its nature.",
+      "prerequisites": [
+        "dream-recall"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "💭"
+    },
+    {
+      "id": "reality-testing",
+      "name": "Reality Testing",
+      "description": "Learn techniques to recognize dreams",
+      "paradigmId": "dream",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "lucidity",
+          "baseValue": 1,
+          "description": "Techniques to trigger lucidity"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "reality_check"
+          },
+          "description": "Perform reality checks to detect dreams"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Look at your hands. Read text, look away, read again. Try to breathe with your nose pinched. In dreams, these simple tests reveal the truth.",
+      "prerequisites": [
+        "dream-recall"
+      ]
+    },
+    {
+      "id": "dream-stability",
+      "name": "Dream Stability",
+      "description": "Learn to stabilize dreams and prevent waking",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "dream_stability",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% resistance to dream collapse"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When lucidity comes, the dream often wavers - colors fade, details blur,\nthe ground becomes uncertain. Spin in place. Touch surfaces. Focus on\nsensory details. These anchors hold the dream together.",
+      "prerequisites": [
+        "basic-lucidity"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "dream-control",
+      "name": "Dream Control",
+      "description": "Learn to change the dream environment",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dream_manipulation"
+          },
+          "description": "Can alter dream environment"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "basic-lucidity",
+            "level": 2
+          },
+          "description": "Must have moderate lucidity control"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "In a lucid dream, expectation shapes reality. Believe a door leads\nsomewhere, and it will. Expect to fly, and you shall. The trick is not\nforcing change but allowing it - the dream responds to belief, not effort.",
+      "prerequisites": [
+        "dream-stability"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dream-flight",
+      "name": "Dream Flight",
+      "description": "Learn to fly within dreams",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dream_flight"
+          },
+          "description": "Can fly within dreams"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The most common lucid dream ability - and the most joyful. At first you may only hover or glide. With practice, you will soar.",
+      "prerequisites": [
+        "dream-control"
+      ]
+    },
+    {
+      "id": "time-perception",
+      "name": "Time Perception",
+      "description": "Learn to perceive and work with dream time",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dream_time_sense"
+          },
+          "description": "Perceive time dilation in dreams"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "In dreams, time is elastic. A night's sleep can contain weeks of\nsubjective experience - or a blink. Learning to perceive this elasticity\nis the first step to controlling it.",
+      "prerequisites": [
+        "dream-stability"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "time-dilation",
+      "name": "Time Dilation",
+      "description": "Extend your subjective time within dreams",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "time_dilation"
+          },
+          "description": "Extend subjective time in dreams"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "time-perception",
+            "level": 3
+          },
+          "description": "Must have mastered time perception"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "With mastery, you can stretch a single night's sleep into days of\ndream-time. Practice skills, study, explore - all while your body rests.\nBut be warned: spend too long, and waking reality begins to feel unreal.",
+      "prerequisites": [
+        "time-perception"
+      ]
+    },
+    {
+      "id": "dream-architecture",
+      "name": "Dream Architecture",
+      "description": "Build persistent locations in your dreamscape",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dream_construction"
+          },
+          "description": "Build persistent dream locations"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "dream-control",
+            "level": 3
+          },
+          "description": "Must have significant dream control"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Most dream environments are ephemeral, shifting with each visit. But\na skilled dreamer can construct places that persist - a workshop, a library,\na sanctuary. These become anchors, always accessible from within sleep.",
+      "prerequisites": [
+        "dream-control"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "nightmare-resistance",
+      "name": "Nightmare Resistance",
+      "description": "Build resistance to nightmare intrusion",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "nightmare_resistance",
+          "baseValue": 15,
+          "perLevelValue": 10,
+          "description": "+X% resistance to nightmare effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Nightmares are not merely bad dreams - they are patterns of fear that\ncan trap even a lucid dreamer. Resistance comes from recognizing them\nfor what they are: stories told by your own mind.",
+      "prerequisites": [
+        "basic-lucidity"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "nightmare-confrontation",
+      "name": "Nightmare Confrontation",
+      "description": "Learn to confront and transform nightmares",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "face_nightmare"
+          },
+          "description": "Confront nightmare entities directly"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "nightmare-resistance",
+            "level": 2
+          },
+          "description": "Must have baseline nightmare resistance"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The monster chasing you is your own creation. Turn and face it. Ask it\nwhat it wants. In dreams, what you run from grows stronger; what you face\nwith courage transforms.",
+      "prerequisites": [
+        "nightmare-resistance"
+      ]
+    },
+    {
+      "id": "nightmare-walking",
+      "name": "Nightmare Walking",
+      "description": "Enter the nightmare realm deliberately",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_dream_realm",
+          "baseValue": 1,
+          "description": "Can enter the nightmare realm"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "dream_visited",
+          "params": {
+            "dreamLocationId": "personal_nightmare"
+          },
+          "description": "Must have conquered a personal nightmare"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Beyond personal nightmares lies a deeper darkness - the collective realm\nof fear itself. To walk there willingly is to face horrors beyond imagination.\nBut also to find power, for nightmares fear nothing more than a fearless dreamer.",
+      "prerequisites": [
+        "nightmare-confrontation"
+      ]
+    },
+    {
+      "id": "dream-sense",
+      "name": "Dream Sense",
+      "description": "Sense the dreams of those sleeping nearby",
+      "paradigmId": "dream",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_dreamers"
+          },
+          "description": "Sense nearby sleeping minds"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "time_of_day",
+          "params": {
+            "timeRange": {
+              "start": 22,
+              "end": 6
+            }
+          },
+          "description": "Only available at night (10pm - 6am)"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "In sleep, minds radiate like fireflies in darkness. With practice, you\ncan sense these glowing presences - and eventually, reach toward them.",
+      "prerequisites": [
+        "dream-stability"
+      ]
+    },
+    {
+      "id": "dream-linking",
+      "name": "Dream Linking",
+      "description": "Learn to link your dream to another's",
+      "paradigmId": "dream",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "shared_dreaming",
+          "baseValue": 1,
+          "description": "Can connect to one other dreamer"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "dream_mentor"
+          },
+          "description": "Must learn from an experienced dream mage"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Two dreamers, sleeping in proximity, can learn to merge their dreams.\nAt first the connection is tenuous - you may only glimpse each other.\nWith practice, you can meet as clearly as in waking life.",
+      "prerequisites": [
+        "dream-sense"
+      ]
+    },
+    {
+      "id": "dream-invasion",
+      "name": "Dream Walking",
+      "description": "Enter the dreams of others without their consent",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dream_invasion"
+          },
+          "description": "Enter dreams without consent"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "dream-linking",
+            "level": 1
+          },
+          "description": "Must have mastered consensual dream sharing"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "dream-control",
+            "level": 4
+          },
+          "description": "Must have strong dream control"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "A dark art - to walk uninvited through another's sleeping mind. Their\ndefenses may be weak, but the moral weight is heavy. And dreamers often\nknow, on some level, when they have been violated.",
+      "prerequisites": [
+        "dream-linking"
+      ],
+      "icon": "👁️"
+    },
+    {
+      "id": "collective-dreaming",
+      "name": "Collective Dreaming",
+      "description": "Bring multiple dreamers into a shared space",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 275,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "shared_dreaming",
+          "baseValue": 4,
+          "perLevelValue": 2,
+          "description": "Can include X additional dreamers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When many dreamers meet in a single space, the dream grows in power\nand stability. Group rituals performed in shared dreams can affect\nwaking reality in ways impossible for a lone dreamer.",
+      "prerequisites": [
+        "dream-linking",
+        "dream-architecture"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "prophetic-sensitivity",
+      "name": "Prophetic Sensitivity",
+      "description": "Learn to recognize prophetic dreams",
+      "paradigmId": "dream",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "prophetic_sense"
+          },
+          "description": "Recognize when a dream is prophetic"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "vision_received",
+          "params": {
+            "visionType": "prophetic_dream"
+          },
+          "description": "Must have had a prophetic dream"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Not all dreams are mere fancy - some carry the weight of truth. A\nprophetic dream has a particular feeling: vivid, inevitable, heavy with\nmeaning. Learning to recognize this feeling is the key to oneiromancy.",
+      "prerequisites": [
+        "dream-recall"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "dream-interpretation",
+      "name": "Dream Interpretation",
+      "description": "Learn to interpret dream symbolism",
+      "paradigmId": "dream",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "interpret_dream"
+          },
+          "description": "Decode symbolic dream messages"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Dreams speak in symbols, not words. Water means emotion. Teeth mean anxiety. Learn the language, and dreams become messages.",
+      "prerequisites": [
+        "dream-recall",
+        "prophetic-sensitivity"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "induced-prophecy",
+      "name": "Induced Prophecy",
+      "description": "Learn to deliberately seek prophetic visions",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "induce_prophecy"
+          },
+          "description": "Deliberately seek prophetic dreams"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "moon_phase",
+          "params": {
+            "moonPhases": [
+              "full",
+              "new"
+            ]
+          },
+          "description": "Only achievable during full or new moon"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "With preparation and intention, you can enter sleep seeking answers.\nThe vision may not be clear - prophecy speaks in riddles. But the\ndreaming mind can see what the waking mind cannot.",
+      "prerequisites": [
+        "dream-interpretation",
+        "dream-control"
+      ]
+    },
+    {
+      "id": "memory-diving",
+      "name": "Memory Diving",
+      "description": "Explore memories through dreams",
+      "paradigmId": "dream",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_dream_realm",
+          "baseValue": 1,
+          "description": "Can enter memory-dreams"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "In dreams, you can revisit your memories - not as faded recollections,\nbut as living experiences. Walk through your childhood home. See faces\nlong forgotten. But beware: memories in dreams are not always accurate.",
+      "prerequisites": [
+        "dream-control"
+      ]
+    },
+    {
+      "id": "ancestral-dreaming",
+      "name": "Ancestral Dreaming",
+      "description": "Contact the dead through dreams",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_dream_realm",
+          "baseValue": 1,
+          "description": "Can contact ancestors in dreams"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "ancestral_preparation"
+          },
+          "description": "Must perform the ancestral preparation ritual"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The boundary between dreams and death is thin. Those who have passed\nsometimes linger in the ancestral dream-realm. Whether you contact true\nspirits or merely memories is a question even masters cannot answer.",
+      "prerequisites": [
+        "memory-diving"
+      ]
+    },
+    {
+      "id": "hypnagogia",
+      "name": "Hypnagogic Mastery",
+      "description": "Master the hypnagogic state between waking and sleeping",
+      "paradigmId": "dream",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "hypnagogic_control"
+          },
+          "description": "Control the edge-of-sleep state"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The moment of falling asleep is a liminal space where reality is\nmalleable. In this state, you can enter dreams consciously - and\nsometimes, perceive things invisible to both waking and sleeping minds.",
+      "prerequisites": [
+        "basic-lucidity",
+        "reality-testing"
+      ]
+    },
+    {
+      "id": "wild",
+      "name": "Wake-Initiated Lucid Dream",
+      "description": "Enter lucid dreams directly from waking consciousness",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "wild_technique"
+          },
+          "description": "Enter dreams directly from waking"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "hypnagogia",
+            "level": 1
+          },
+          "description": "Must have hypnagogic control"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "basic-lucidity",
+            "level": 4
+          },
+          "description": "Must have strong lucidity"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate technique: maintaining consciousness as you fall asleep,\nslipping from waking into dreaming without a break in awareness. It\nrequires perfect stillness and perfect alertness simultaneously.",
+      "prerequisites": [
+        "hypnagogia"
+      ]
+    },
+    {
+      "id": "nested-dreaming",
+      "name": "Nested Dreaming",
+      "description": "Create and navigate nested layers of dreams",
+      "paradigmId": "dream",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "nested_dreams"
+          },
+          "description": "Create dreams within dreams"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2000
+          },
+          "description": "Must have extensive dream experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Dreams within dreams - each layer deeper, time slower, reality more\nmalleable. The deepest dreamers can descend through multiple layers,\nthough each makes the return to waking more difficult.",
+      "prerequisites": [
+        "wild",
+        "time-dilation",
+        "dream-architecture"
+      ],
+      "icon": "🌀"
+    }
+  ],
+  "entryNodes": [
+    "dream-recall"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "dream_recalled",
+      "xpAmount": 5,
+      "description": "Remember a dream upon waking"
+    },
+    {
+      "eventType": "lucidity_achieved",
+      "xpAmount": 25,
+      "description": "Become lucid in a dream"
+    },
+    {
+      "eventType": "dream_stabilized",
+      "xpAmount": 15,
+      "description": "Stabilize a wavering dream"
+    },
+    {
+      "eventType": "dream_controlled",
+      "xpAmount": 20,
+      "description": "Successfully manipulate dream environment"
+    },
+    {
+      "eventType": "nightmare_faced",
+      "xpAmount": 50,
+      "description": "Confront and transform a nightmare"
+    },
+    {
+      "eventType": "dream_shared",
+      "xpAmount": 75,
+      "description": "Successfully share a dream with another"
+    },
+    {
+      "eventType": "prophecy_received",
+      "xpAmount": 100,
+      "description": "Receive a prophetic dream"
+    },
+    {
+      "eventType": "ancestor_contacted",
+      "xpAmount": 100,
+      "description": "Contact an ancestor in dreams"
+    },
+    {
+      "eventType": "realm_explored",
+      "xpAmount": 60,
+      "description": "Explore a new dream realm"
+    },
+    {
+      "eventType": "wild_success",
+      "xpAmount": 40,
+      "description": "Successfully perform WILD technique"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": true,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "trauma_experienced",
+        "params": {
+          "traumaType": "dream_death"
+        },
+        "description": "Dying in a dream causes temporary progress loss"
+      }
+    ]
+  },
+  "version": 1
+}

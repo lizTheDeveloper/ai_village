@@ -1,0 +1,753 @@
+{
+  "id": "pact-tree",
+  "paradigmId": "pact",
+  "name": "The Art of Pacts",
+  "description": "Make binding contracts with supernatural entities to gain power in exchange for service.",
+  "lore": "Power comes at a price. Always. The art of pacts is about negotiating that\nprice - finding entities willing to bargain, crafting contracts that bind both\nparties, managing obligations without being destroyed by them.\n\nThe entities you can pact with are many and varied:\n- Demons (angels serving dark gods) offer great power for terrible prices\n- Angels (servants of good gods) offer protection for righteous service\n- Fae delight in clever wordplay and exploit ambiguity\n- Spirits want simple things: respect, offerings, help\n- Elder Things offer forbidden knowledge at incomprehensible cost\n\nEvery pact is a binding magical contract enforced by reality itself. Break your\nword and face immediate consequences - loss of power, curses, hunts, even\nunmaking. But fulfill your obligations and the power is yours.\n\nThe greatest pact-makers don't just serve entities - they bind the entities\nthemselves. Through perfect contract wording, overwhelming magical power, or\ntrue name knowledge, you can reverse the relationship entirely. The demon serves\nYOU. The angel obeys YOUR commands.\n\nBut this is dangerous ground. Cosmic forces notice when mortals bind their\nservants. And entities don't forgive such presumption easily.",
+  "nodes": [
+    {
+      "id": "entity-sense",
+      "name": "Entity Awareness",
+      "description": "Learn to feel when supernatural entities are near",
+      "paradigmId": "pact",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 40,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense the presence of supernatural entities",
+          "target": {
+            "abilityId": "sense_entity"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The air changes when they're present. A chill for demons, warmth for angels,\na strange scent for fae. You learn to recognize these signs, to know when\nyou're in the presence of something Other.",
+      "levelCostMultiplier": 1.3,
+      "icon": "👁️"
+    },
+    {
+      "id": "contract-basics",
+      "name": "Contract Law",
+      "description": "Learn the basics of magical contract law",
+      "paradigmId": "pact",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Understand magical contract structure",
+          "target": {
+            "abilityId": "read_contract"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A pact is a binding magical contract. Every word matters. Every clause is\nenforced by reality itself. You must learn to read the terms, understand\nthe implications, see the hidden costs. A poorly written contract can\ndestroy you.",
+      "prerequisites": [
+        "entity-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "summoning-basics",
+      "name": "Basic Summoning",
+      "description": "Learn to summon entities to negotiate with",
+      "paradigmId": "pact",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Summon minor entities for negotiation",
+          "target": {
+            "abilityId": "summon_entity"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "pact_maker"
+          },
+          "description": "Must be taught by an experienced pact-maker"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Before you can make a pact, you must call the entity. Circle of salt,\ncandles, words of power. The basics are simple, but you must get them\nexactly right or you'll summon nothing - or worse, something you can't\ncontrol.",
+      "prerequisites": [
+        "entity-sense"
+      ]
+    },
+    {
+      "id": "protection-circle",
+      "name": "Protective Circles",
+      "description": "Learn to create protective circles",
+      "paradigmId": "pact",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 90,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create circles that entities cannot cross",
+          "target": {
+            "abilityId": "protection_circle"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Never summon without protection. A circle properly drawn keeps the entity\ncontained. Salt, silver, holy water, cold iron - different entities fear\ndifferent things. Get it wrong and they'll be free to do as they please.",
+      "prerequisites": [
+        "summoning-basics"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "demon-pacts",
+      "name": "Demonic Contracts",
+      "description": "Learn to negotiate with demons",
+      "paradigmId": "pact",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Make pacts with demons",
+          "target": {
+            "abilityId": "demon_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Demons are angels serving dark gods - they offer great power but demand\nterrible prices. Soul contracts are their favorite, but they'll bargain\nfor anything of value. They're cunning negotiators and love finding\nloopholes that benefit them. Never trust a demon's word - only the\ncontract itself.",
+      "prerequisites": [
+        "contract-basics",
+        "summoning-basics"
+      ],
+      "icon": "👹"
+    },
+    {
+      "id": "angel-pacts",
+      "name": "Angelic Covenants",
+      "description": "Learn to make covenants with angels",
+      "paradigmId": "pact",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Make covenants with angels",
+          "target": {
+            "abilityId": "angel_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Angels serve good gods and offer protection, healing, and righteous power.\nBut they demand moral behavior, holy quests, and absolute honesty. Break\nyour covenant and you'll face divine wrath. Angels don't forgive easily.",
+      "prerequisites": [
+        "contract-basics",
+        "summoning-basics"
+      ],
+      "icon": "👼"
+    },
+    {
+      "id": "fae-pacts",
+      "name": "Fae Bargains",
+      "description": "Learn the art of fae bargaining",
+      "paradigmId": "pact",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Make bargains with the fae",
+          "target": {
+            "abilityId": "fae_pact"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "contract-basics",
+            "level": 3
+          },
+          "description": "Fae bargaining requires advanced contract skill"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The fae love wordplay, riddles, and clever contracts. They cannot lie but\ndelight in misleading truth. Every word in a fae bargain must be precise -\nthey'll exploit any ambiguity. But if you can match their cleverness,\nfae pacts offer unique rewards.",
+      "prerequisites": [
+        "contract-basics",
+        "summoning-basics"
+      ],
+      "icon": "🧚"
+    },
+    {
+      "id": "spirit-pacts",
+      "name": "Spirit Agreements",
+      "description": "Learn to bargain with local spirits",
+      "paradigmId": "pact",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Make agreements with local spirits",
+          "target": {
+            "abilityId": "spirit_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Spirits are simpler than angels or demons - they want respect, offerings,\nand help maintaining their domain. In return they offer modest but reliable\npower. A spirit of a river might grant water magic for keeping the river\nclean. Simple, direct, honest.",
+      "prerequisites": [
+        "contract-basics"
+      ]
+    },
+    {
+      "id": "elder-pacts",
+      "name": "Elder Contracts",
+      "description": "Learn to contract with cosmic entities",
+      "paradigmId": "pact",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Make contracts with Elder Things",
+          "target": {
+            "abilityId": "elder_pact"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "elder_summons"
+          },
+          "description": "Must learn the forbidden summoning rites"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Elder Things exist beyond morality, beyond comprehension. They offer\nforbidden knowledge and reality-warping power. But their costs are\nequally incomprehensible - fragments of your sanity, pieces of your\nhumanity, changes to your very existence. Proceed with extreme caution.",
+      "prerequisites": [
+        "demon-pacts",
+        "angel-pacts"
+      ],
+      "icon": "🌌"
+    },
+    {
+      "id": "negotiation",
+      "name": "Contract Negotiation",
+      "description": "Master the art of negotiating better contract terms",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "target": {
+            "techniqueId": "control"
+          },
+          "description": "+X% to negotiation success"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Everything is negotiable. The entity wants something from you, or they\nwouldn't be bargaining. Learn to identify what they truly want, what\nthey're willing to concede, where you can push for better terms. Never\naccept the first offer.",
+      "prerequisites": [
+        "contract-basics"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "loopholes",
+      "name": "Loophole Detection",
+      "description": "Learn to find loopholes in contracts",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Find and exploit contract loopholes",
+          "target": {
+            "abilityId": "find_loophole"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "contract-basics",
+            "level": 5
+          },
+          "description": "Requires mastery of contract law"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Every contract has weaknesses - ambiguous wording, undefined terms,\nconflicting clauses. A skilled pact-maker can find these loopholes and\nexploit them. This works both ways: you can find loopholes in your own\ncontracts (to escape obligations) or in others' contracts (to help or\nharm them).",
+      "prerequisites": [
+        "contract-basics",
+        "negotiation"
+      ]
+    },
+    {
+      "id": "multiple-pacts",
+      "name": "Multiple Pacts",
+      "description": "Learn to manage multiple pacts without conflicts",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Maintain multiple pacts simultaneously",
+          "target": {
+            "abilityId": "multi_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "One pact is simple. Two pacts are manageable. Three or more and you're\njuggling obligations that may conflict. A demon wants you to kill. An\nangel forbids killing. How do you satisfy both? Careful contract writing\nand meticulous obligation tracking.",
+      "prerequisites": [
+        "negotiation",
+        "demon-pacts"
+      ]
+    },
+    {
+      "id": "pact-transfer",
+      "name": "Pact Transference",
+      "description": "Learn to transfer pact obligations to others",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transfer pact obligations to others",
+          "target": {
+            "abilityId": "transfer_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Sometimes you need to escape a pact without breaching it. If the contract\nallows, you can transfer your obligations to another person - making them\nthe new pact-holder. They get your benefits but also your costs. This\nrequires their consent (or clever deception) and the patron's agreement.",
+      "prerequisites": [
+        "loopholes",
+        "multiple-pacts"
+      ],
+      "icon": "🔄"
+    },
+    {
+      "id": "invocation",
+      "name": "Patron Invocation",
+      "description": "Learn to invoke your patron for immediate help",
+      "paradigmId": "pact",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Invoke patron for direct intervention",
+          "target": {
+            "abilityId": "invoke_patron"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "In times of need, call on your patron directly. Speak the invocation,\nand they will act - healing you, smiting your enemies, revealing secrets.\nBut this uses up goodwill. Invoke too often and they'll demand greater\ncompensation.",
+      "prerequisites": [
+        "demon-pacts"
+      ]
+    },
+    {
+      "id": "granted-spells",
+      "name": "Granted Abilities",
+      "description": "Receive permanent magical abilities from patron",
+      "paradigmId": "pact",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Gain permanent spells from patron",
+          "target": {
+            "abilityId": "granted_spell"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Most pacts grant specific spells or abilities - fire magic from a demon,\nhealing from an angel, illusions from a fae. These are permanent as long\nas the pact holds. Breach the contract and lose everything instantly.",
+      "prerequisites": [
+        "demon-pacts"
+      ]
+    },
+    {
+      "id": "familiar",
+      "name": "Pact Familiar",
+      "description": "Gain a familiar as part of your pact",
+      "paradigmId": "pact",
+      "category": "channeling",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Summon a familiar bound by pact",
+          "target": {
+            "abilityId": "summon_familiar"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some patrons grant a familiar - a minor entity bound to serve you. It acts\nas scout, advisor, spy, and sometimes weapon. But beware: the familiar\nalso reports back to the patron. It watches everything you do.",
+      "prerequisites": [
+        "granted-spells"
+      ],
+      "icon": "🐈‍⬛"
+    },
+    {
+      "id": "transformation",
+      "name": "Pact Transformation",
+      "description": "Accept physical/spiritual transformation from patron",
+      "paradigmId": "pact",
+      "category": "channeling",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Undergo transformation granted by pact",
+          "target": {
+            "abilityId": "pact_form"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some pacts offer transformation - wings from an angel, horns from a demon,\nfae-touched beauty, elemental infusion. These changes are permanent and\nvisible. You become something more (or less) than human. Choose carefully.",
+      "prerequisites": [
+        "familiar",
+        "elder-pacts"
+      ]
+    },
+    {
+      "id": "breach-detection",
+      "name": "Breach Detection",
+      "description": "Learn to detect impending contract breaches",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense when pacts are about to break",
+          "target": {
+            "abilityId": "detect_breach"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A pact about to break gives warning - a tightness in your chest, a ringing\nin your ears, a sense of doom. You learn to recognize these signs, giving\nyou precious time to rectify the situation before consequences strike.",
+      "prerequisites": [
+        "contract-basics",
+        "demon-pacts"
+      ]
+    },
+    {
+      "id": "consequence-mitigation",
+      "name": "Consequence Mitigation",
+      "description": "Learn to mitigate breach consequences",
+      "paradigmId": "pact",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Reduce breach consequences through fast action",
+          "target": {
+            "abilityId": "mitigate_breach"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "If you breach a pact, all is not lost. Immediate confession, compensation,\nor corrective action can reduce the penalty. A demon might accept extra\nservice instead of claiming your soul. Maybe. If you're very lucky and\nvery convincing.",
+      "prerequisites": [
+        "breach-detection",
+        "negotiation"
+      ]
+    },
+    {
+      "id": "pact-breaking",
+      "name": "Controlled Breach",
+      "description": "Master the dangerous art of breaking pacts",
+      "paradigmId": "pact",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Break pacts while minimizing consequences",
+          "target": {
+            "abilityId": "break_pact"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Sometimes you must break a pact, consequences be damned. With skill, you\ncan minimize the damage - fulfill just enough obligations to avoid the\nworst penalties, exploit loopholes to escape clauses, prepare defenses\nagainst retaliation. Still incredibly dangerous.",
+      "prerequisites": [
+        "mitigation-node",
+        "loopholes"
+      ],
+      "icon": "💔"
+    },
+    {
+      "id": "pact-binding",
+      "name": "Forced Binding",
+      "description": "Learn to force pacts on unwilling participants",
+      "paradigmId": "pact",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Bind others into pacts against their will",
+          "target": {
+            "abilityId": "force_pact"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "forced_binding"
+          },
+          "description": "Must learn the forbidden binding ritual"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The darkest art of pact-making: forcing someone into a contract without\ntheir true consent. Through trickery, magical compulsion, or exploiting\nmoments of weakness, you can bind them. But this attracts attention from\ncosmic forces that don't approve of such violations.",
+      "prerequisites": [
+        "pact-transfer",
+        "elder-pacts"
+      ],
+      "icon": "⛓️"
+    },
+    {
+      "id": "entity-binding",
+      "name": "Entity Binding",
+      "description": "Learn to bind entities into service",
+      "paradigmId": "pact",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Bind entities to serve YOU",
+          "target": {
+            "abilityId": "bind_entity"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 3000
+          },
+          "description": "Requires vast pact-making experience"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "contract-basics",
+            "level": 5
+          },
+          "description": "Requires perfect contract mastery"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate reversal: instead of serving an entity, make the entity serve\nyou. Through perfect contract wording, overwhelming power, or true name\nknowledge, you can bind demons, spirits, even lesser angels to your will.\nThis makes you something between mortal and god.",
+      "prerequisites": [
+        "pact-binding",
+        "elder-pacts"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    },
+    {
+      "id": "pact-weaving",
+      "name": "Pact Weaving",
+      "description": "Learn to weave multiple pacts into greater power",
+      "paradigmId": "pact",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 450,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Weave multiple pacts into synergistic whole",
+          "target": {
+            "abilityId": "weave_pacts"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "multiple-pacts",
+            "level": 3
+          },
+          "description": "Must have mastered multiple pact maintenance"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Most see multiple pacts as dangerous juggling. You see them as threads to\nbe woven. Combine an angel's protection with a demon's power. Balance a\nfae's cunning with an elemental's strength. When pacts are woven properly,\ntheir benefits multiply while their costs are distributed. This is mastery.",
+      "prerequisites": [
+        "multiple-pacts",
+        "entity-binding"
+      ]
+    }
+  ],
+  "entryNodes": [
+    "entity-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "entity_summoned",
+      "xpAmount": 30,
+      "description": "Successfully summon an entity"
+    },
+    {
+      "eventType": "pact_negotiated",
+      "xpAmount": 100,
+      "description": "Negotiate a new pact"
+    },
+    {
+      "eventType": "pact_fulfilled",
+      "xpAmount": 75,
+      "description": "Fulfill a pact obligation"
+    },
+    {
+      "eventType": "loophole_found",
+      "xpAmount": 125,
+      "description": "Find and exploit a contract loophole"
+    },
+    {
+      "eventType": "patron_invoked",
+      "xpAmount": 50,
+      "description": "Successfully invoke patron for aid"
+    },
+    {
+      "eventType": "pact_transferred",
+      "xpAmount": 150,
+      "description": "Transfer a pact to another person"
+    },
+    {
+      "eventType": "breach_mitigated",
+      "xpAmount": 200,
+      "description": "Successfully mitigate breach consequences"
+    },
+    {
+      "eventType": "entity_bound",
+      "xpAmount": 300,
+      "description": "Bind an entity to your service"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

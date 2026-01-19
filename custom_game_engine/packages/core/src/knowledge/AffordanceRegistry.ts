@@ -97,7 +97,6 @@ export function getBuildingAffordances(): Record<string, BuildingAffordance> {
 }
 
 // Deprecated: Use getBuildingAffordances() function instead
-Object.defineProperty(exports, 'BUILDING_AFFORDANCES', { get: getBuildingAffordances });
 
 // ============================================================================
 // Item Affordances
@@ -161,7 +160,6 @@ export function getItemAffordances(): Record<string, ItemAffordance> {
 }
 
 // Deprecated: Use getItemAffordances() function instead
-Object.defineProperty(exports, 'ITEM_AFFORDANCES', { get: getItemAffordances });
 
 // ============================================================================
 // Recipe Affordances
@@ -228,7 +226,6 @@ export function getRecipeAffordances(): Record<string, RecipeAffordance> {
 }
 
 // Deprecated: Use getRecipeAffordances() function instead
-Object.defineProperty(exports, 'RECIPE_AFFORDANCES', { get: getRecipeAffordances });
 
 // ============================================================================
 // LLM Context Formatting

@@ -104,6 +104,7 @@ export class LoreSpawnSystem extends BaseSystem {
   public readonly id: SystemId = 'lore_spawn';
   public readonly priority = 50; // Run late, after magic/intervention systems
   public readonly requiredComponents = [] as const;
+  public readonly activationComponents = ['lore_spawn_request'] as const; // Lazy activation: Skip entire system when no lore spawns requested
 
   protected readonly throttleInterval = 600; // 30 seconds at 20 TPS
 

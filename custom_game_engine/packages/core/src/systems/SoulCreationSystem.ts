@@ -76,6 +76,7 @@ export class SoulCreationSystem extends BaseSystem {
   readonly id: SystemId = 'soul_creation';
   readonly priority: number = 5; // Run early
   readonly requiredComponents = [] as const;
+  public readonly activationComponents = ['soul'] as const; // Lazy activation: Skip entire system when no souls being created
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Event-driven
 
   private pendingRequests: SoulCreationRequest[] = [];

@@ -1,0 +1,624 @@
+{
+  "id": "divine-tree",
+  "paradigmId": "divine",
+  "name": "The Divine Path",
+  "description": "Worship deities to gain their favor and channel divine power through prayer and devotion.",
+  "lore": "Divine magic is not learned but granted. It flows from the gods to their\nfaithful followers. You cannot steal it, study it, or master it through will\nalone. You can only worship, pray, and hope your deity deems you worthy.\n\nThe path begins simply: choose a deity and begin to worship. Pray regularly.\nFollow their commandments. Demonstrate devotion through action, not just words.\nOver time, if you prove faithful, you'll gain favor. And with favor comes power.\n\nDifferent deities grant different powers based on their domains. A god of life\ngrants healing and protection. A god of war grants strength and battle prowess.\nA god of knowledge grants wisdom and prophecy. Choose your deity carefully -\nyou'll be bound to their domain.\n\nAs you advance, you may be ordained as clergy - an official representative of\nyour faith. This brings formal powers: the ability to consecrate places, perform\nsacred rites, and channel divinity directly. The most devoted can achieve\ncommunion - direct conversation with their deity.\n\nThe miracles you perform aren't your power - they're your deity's power flowing\nthrough you. You're a conduit, a channel, a vessel. This means your power is\nlimited by your deity's favor. Displease them and you lose everything. Remain\nfaithful and you gain access to truly miraculous abilities.\n\nThe greatest clerics can create relics - permanent vessels of divine power. They\ncan call for divine intervention in moments of need. The most favored can even\nserve as avatars - allowing their deity to manifest directly through their body.\n\nThis is not a path of personal power but of service and devotion. You grow\nstrong not through mastery but through faith.",
+  "nodes": [
+    {
+      "id": "basic-prayer",
+      "name": "Basic Prayer",
+      "description": "Learn to pray and commune with deity",
+      "paradigmId": "divine",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Pray to your chosen deity",
+          "target": {
+            "abilityId": "pray"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Prayer is the foundation of divine magic. Kneel, bow your head, and speak\nto your god. They hear you - perhaps not always, perhaps not immediately,\nbut they hear. And sometimes, they answer.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🙏"
+    },
+    {
+      "id": "divine-sense",
+      "name": "Divine Awareness",
+      "description": "Sense divine presence and favor",
+      "paradigmId": "divine",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense divine presence and favor",
+          "target": {
+            "abilityId": "sense_divine"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "You learn to feel when the divine is near - a warmth, a presence, a sense\nof being watched. You can also sense your standing with your deity: are\nthey pleased? Angry? Indifferent? This awareness guides your worship.",
+      "prerequisites": [
+        "basic-prayer"
+      ]
+    },
+    {
+      "id": "devotion",
+      "name": "True Devotion",
+      "description": "Develop true devotion to your deity",
+      "paradigmId": "divine",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Demonstrate true devotion to deity",
+          "target": {
+            "abilityId": "devotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Faith without devotion is hollow. You must commit - not just words but\nactions, lifestyle, sacrifice. Follow your deity's commandments. Live by\ntheir principles. This devotion is what earns divine favor.",
+      "prerequisites": [
+        "basic-prayer"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "ritual-knowledge",
+      "name": "Ritual Knowledge",
+      "description": "Learn proper religious rituals",
+      "paradigmId": "divine",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Perform proper religious rituals",
+          "target": {
+            "abilityId": "ritual"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Each deity has their own rites and rituals - specific prayers, offerings,\nceremonies. Learn these properly and your worship is magnified. Perform\nthem wrong and you might offend rather than please.",
+      "prerequisites": [
+        "basic-prayer",
+        "devotion"
+      ]
+    },
+    {
+      "id": "life-domain",
+      "name": "Life Domain",
+      "description": "Specialize in the Life domain",
+      "paradigmId": "divine",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel divine life energy for healing",
+          "target": {
+            "abilityId": "divine_healing"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "deityDomain": "life"
+          },
+          "description": "Deity must have Life domain"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your deity grants power over life - healing wounds, curing disease,\nprotecting the living. This is the domain of mercy and compassion.",
+      "prerequisites": [
+        "ritual-knowledge"
+      ],
+      "icon": "💚"
+    },
+    {
+      "id": "war-domain",
+      "name": "War Domain",
+      "description": "Specialize in the War domain",
+      "paradigmId": "divine",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel divine power in battle",
+          "target": {
+            "abilityId": "divine_might"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "deityDomain": "war"
+          },
+          "description": "Deity must have War domain"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your deity grants power in battle - strength, endurance, tactical insight.\nThis is the domain of holy warriors and crusaders.",
+      "prerequisites": [
+        "ritual-knowledge"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "knowledge-domain",
+      "name": "Knowledge Domain",
+      "description": "Specialize in the Knowledge domain",
+      "paradigmId": "divine",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel divine wisdom and prophecy",
+          "target": {
+            "abilityId": "divine_wisdom"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "deityDomain": "knowledge"
+          },
+          "description": "Deity must have Knowledge domain"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your deity grants wisdom - insights, prophecies, understanding. This is\nthe domain of scholars and oracles.",
+      "prerequisites": [
+        "ritual-knowledge"
+      ],
+      "icon": "📜"
+    },
+    {
+      "id": "ordination",
+      "name": "Ordination",
+      "description": "Undergo ordination as clergy",
+      "paradigmId": "divine",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Become ordained clergy",
+          "target": {
+            "abilityId": "ordained"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "minimumFavor": 100
+          },
+          "description": "Must have significant divine favor"
+        },
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "high_priest"
+          },
+          "description": "Must be ordained by senior clergy"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Ordination is formal recognition by your faith. You become an official\nrepresentative of your deity - a priest, capable of performing sacred\nrites that laypeople cannot. This brings power but also responsibility.",
+      "prerequisites": [
+        "ritual-knowledge",
+        "devotion"
+      ],
+      "icon": "⛪"
+    },
+    {
+      "id": "channel-divinity",
+      "name": "Channel Divinity",
+      "description": "Learn to channel divine power directly",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel raw divine power",
+          "target": {
+            "abilityId": "channel_divine"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Become a conduit for divine power. Your deity's energy flows through you,\nmanifesting as miracles. This is exhausting and dangerous - too much divine\npower can burn out a mortal vessel - but incredibly effective.",
+      "prerequisites": [
+        "ordination",
+        "life-domain"
+      ]
+    },
+    {
+      "id": "divine-communion",
+      "name": "Divine Communion",
+      "description": "Achieve direct communion with deity",
+      "paradigmId": "divine",
+      "category": "ritual",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Commune directly with your deity",
+          "target": {
+            "abilityId": "commune"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "minimumFavor": 500
+          },
+          "description": "Must have exceptional divine favor"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Most prayers are one-way. But with true devotion and proper ritual, you\ncan achieve communion - two-way conversation with your deity. Ask questions,\nreceive guidance, understand divine will. This is the privilege of the\nmost faithful.",
+      "prerequisites": [
+        "channel-divinity",
+        "divine-sense"
+      ]
+    },
+    {
+      "id": "healing-miracles",
+      "name": "Healing Miracles",
+      "description": "Perform miracles of healing",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Perform healing miracles",
+          "target": {
+            "abilityId": "heal"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Call upon divine power to heal wounds, cure disease, restore life. The\npower isn't yours - it flows from your deity. You're just the channel.",
+      "prerequisites": [
+        "channel-divinity",
+        "life-domain"
+      ]
+    },
+    {
+      "id": "blessing-miracles",
+      "name": "Blessing Miracles",
+      "description": "Grant blessings in deity's name",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Grant divine blessings",
+          "target": {
+            "abilityId": "bless"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Bless others with divine favor - luck, strength, protection, courage.\nThese blessings are temporary but powerful, carrying a touch of the divine.",
+      "prerequisites": [
+        "channel-divinity"
+      ]
+    },
+    {
+      "id": "smiting-miracles",
+      "name": "Smiting Miracles",
+      "description": "Invoke divine wrath against enemies",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Call down divine wrath",
+          "target": {
+            "abilityId": "smite"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your deity's enemies are your enemies. Call down their wrath - smiting\nfoes with holy (or unholy) fire, striking them down with divine judgment.\nThis is righteous fury made manifest.",
+      "prerequisites": [
+        "channel-divinity",
+        "war-domain"
+      ]
+    },
+    {
+      "id": "protection-miracles",
+      "name": "Protection Miracles",
+      "description": "Create divine protections",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create divine protections",
+          "target": {
+            "abilityId": "divine_shield"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Call upon divine protection - shields of faith that deflect harm, wards\nthat repel evil, sanctuaries where the faithful are safe. Your deity\nguards those under their protection.",
+      "prerequisites": [
+        "channel-divinity"
+      ]
+    },
+    {
+      "id": "consecration",
+      "name": "Consecration",
+      "description": "Learn to consecrate places and objects",
+      "paradigmId": "divine",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Consecrate places and objects",
+          "target": {
+            "abilityId": "consecrate"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Make places and objects holy. A consecrated temple radiates divine power.\nA consecrated weapon smites evil. A consecrated shield protects the\nrighteous. This ritual binds divine energy to physical form.",
+      "prerequisites": [
+        "ordination",
+        "ritual-knowledge"
+      ]
+    },
+    {
+      "id": "relic-creation",
+      "name": "Relic Creation",
+      "description": "Learn to create divine relics",
+      "paradigmId": "divine",
+      "category": "ritual",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create holy relics",
+          "target": {
+            "abilityId": "create_relic"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "minimumFavor": 1000
+          },
+          "description": "Must have immense divine favor"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "A relic is more than just a consecrated object - it's a permanent vessel\nof divine power. Creating one requires exceptional favor, proper materials,\nand intensive ritual. But once made, a relic becomes an eternal symbol of\nyour deity's power.",
+      "prerequisites": [
+        "consecration",
+        "divine-communion"
+      ]
+    },
+    {
+      "id": "divine-intervention",
+      "name": "Divine Intervention",
+      "description": "Call upon deity for direct intervention",
+      "paradigmId": "divine",
+      "category": "channeling",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Call for direct divine intervention",
+          "target": {
+            "abilityId": "intervention"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "devotion",
+            "level": 5
+          },
+          "description": "Requires absolute devotion"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "In moments of desperate need, call directly upon your deity to intervene.\nThey may appear, send an avatar, or simply bend reality to your aid. This\nuses massive favor and cannot be done often - but when it works, it's\nmiraculous.",
+      "prerequisites": [
+        "divine-communion",
+        "channel-divinity"
+      ]
+    },
+    {
+      "id": "avatar-manifestation",
+      "name": "Avatar Manifestation",
+      "description": "Become avatar for deity manifestation",
+      "paradigmId": "divine",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Serve as avatar for deity's manifestation",
+          "target": {
+            "abilityId": "avatar"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "attention_given",
+          "params": {
+            "minimumFavor": 2000
+          },
+          "description": "Must be chosen by deity"
+        },
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2500
+          },
+          "description": "Requires vast divine experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate expression of devotion: allow your deity to manifest directly\nthrough you. Your body becomes their vessel, your voice their voice. While\nmanifested, you wield a fraction of true divine power. But this is dangerous -\nnot all mortals survive being an avatar.",
+      "prerequisites": [
+        "divine-intervention",
+        "channel-divinity"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "basic-prayer"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "prayer_offered",
+      "xpAmount": 10,
+      "description": "Offer sincere prayer"
+    },
+    {
+      "eventType": "ritual_performed",
+      "xpAmount": 30,
+      "description": "Perform proper religious ritual"
+    },
+    {
+      "eventType": "miracle_performed",
+      "xpAmount": 50,
+      "description": "Successfully perform a miracle"
+    },
+    {
+      "eventType": "devotion_demonstrated",
+      "xpAmount": 40,
+      "description": "Demonstrate true devotion"
+    },
+    {
+      "eventType": "convert_gained",
+      "xpAmount": 100,
+      "description": "Convert someone to your faith"
+    },
+    {
+      "eventType": "temple_consecrated",
+      "xpAmount": 200,
+      "description": "Consecrate a temple or shrine"
+    },
+    {
+      "eventType": "relic_created",
+      "xpAmount": 300,
+      "description": "Create a divine relic"
+    },
+    {
+      "eventType": "divine_communion_achieved",
+      "xpAmount": 150,
+      "description": "Achieve direct communion with deity"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

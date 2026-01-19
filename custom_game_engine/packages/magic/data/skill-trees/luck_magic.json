@@ -1,0 +1,729 @@
+{
+  "id": "luck_skill_tree",
+  "paradigmId": "luck_magic",
+  "name": "Luck Magic Skill Tree",
+  "description": "Master the art of probability manipulation and temporal luck borrowing",
+  "lore": "Luck is not chance - it is a resource. Your timeline holds a finite amount.\nMost spread it evenly across their days. You can concentrate it.\nBorrow from tomorrow, steal from others, or gamble with fate itself.\nBut remember: every lucky break creates an unlucky debt.",
+  "nodes": [
+    {
+      "id": "luck-sense",
+      "name": "Luck Sense",
+      "description": "Learn to sense the currents of luck",
+      "paradigmId": "luck_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense the flow of luck around you"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "luck_perception"
+          },
+          "description": "Perceive probability currents"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Luck isn't random - it flows. Like a river, with currents and eddies.\nThe lucky learn to feel these flows, to sense when fortune gathers\nand when it drains away. This sense is the first gift.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🍀"
+    },
+    {
+      "id": "small-favor",
+      "name": "Small Favors",
+      "description": "Learn to nudge luck in small ways",
+      "paradigmId": "luck_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 20,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "minor_luck"
+          },
+          "description": "Small luck boosts for minor situations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Start small. Find the lost key. Avoid the puddle. Catch the bus.\nThese tiny manipulations teach the feel of luck without the danger.\nEveryone starts with small favors.",
+      "levelCostMultiplier": 1.2,
+      "icon": "✨"
+    },
+    {
+      "id": "karma-awareness",
+      "name": "Karma Awareness",
+      "description": "Learn to perceive your karmic debt",
+      "paradigmId": "luck_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "karma_sense"
+          },
+          "description": "Sense your karmic debt level"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "For every lucky break, misfortune waits. The universe keeps accounts.\nLearning to sense your debt is crucial - too deep in the red\nand fate itself hunts you down.",
+      "icon": "⚖️"
+    },
+    {
+      "id": "borrow-luck",
+      "name": "Borrow Luck",
+      "description": "Learn to borrow luck from your future self",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "luck_borrow"
+          },
+          "description": "Borrow luck from your future"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your timeline contains a finite amount of luck. Most is spread evenly.\nBut you can concentrate it - pull luck from tomorrow to use today.\nTomorrow will be... unluckier. That's the price.",
+      "prerequisites": [
+        "small-favor"
+      ],
+      "icon": "⏳"
+    },
+    {
+      "id": "deep-borrowing",
+      "name": "Deep Borrowing",
+      "description": "Learn to borrow from further in the future",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "deep_borrow"
+          },
+          "description": "Borrow luck from distant future"
+        },
+        {
+          "type": "resource_max",
+          "baseValue": 20,
+          "description": "Increased borrowing capacity"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Why stop at tomorrow? Borrow from next week. Next month. Next year.\nThe further you reach, the more you can take. But debts compound.\nA decade of luck spent today means a decade of misery later.",
+      "prerequisites": [
+        "borrow-luck"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "📅"
+    },
+    {
+      "id": "interest-reduction",
+      "name": "Interest Reduction",
+      "description": "Learn to reduce the karmic cost of borrowing",
+      "paradigmId": "luck_magic",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "cost_reduction",
+          "baseValue": 20,
+          "perLevelValue": 10,
+          "description": "Reduced karma debt from borrowing",
+          "target": {
+            "resourceType": "luck"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The universe charges interest on borrowed luck. But there are tricks.\nSpread the debt. Delay the payment. Find loopholes in fate's accounting.\nMasters of luck borrow more while paying less.",
+      "prerequisites": [
+        "karma-awareness",
+        "borrow-luck"
+      ],
+      "levelCostMultiplier": 1.4,
+      "icon": "📉"
+    },
+    {
+      "id": "probability-nudge",
+      "name": "Probability Nudge",
+      "description": "Learn to nudge probability in your favor",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "nudge_probability"
+          },
+          "description": "Slightly adjust probability in your favor"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A coin flip becomes 55/45. A die roll favors you slightly.\nSmall nudges, barely noticeable, but they add up.\nThis is the subtle art of luck manipulation.",
+      "prerequisites": [
+        "luck-sense"
+      ],
+      "levelCostMultiplier": 1.4,
+      "icon": "🎲"
+    },
+    {
+      "id": "improbable-success",
+      "name": "Improbable Success",
+      "description": "Learn to make unlikely outcomes occur",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "improbable_success"
+          },
+          "description": "Make unlikely outcomes happen"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The arrow that shouldn't have hit. The trap that shouldn't have missed.\nAt this level, you can reach into probability and pull out miracles.\nBut miracles have costs.",
+      "prerequisites": [
+        "probability-nudge",
+        "borrow-luck"
+      ],
+      "icon": "🎯"
+    },
+    {
+      "id": "miracle-worker",
+      "name": "Miracle Worker",
+      "description": "Learn to achieve the statistically impossible",
+      "paradigmId": "luck_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "work_miracle"
+          },
+          "description": "Make the impossible possible"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 700
+          },
+          "description": "Requires 700 total XP in Luck magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "One in a million? Done. One in a billion? Difficult but doable.\nAt this level, probability is merely a suggestion.\nBut impossible luck creates impossible debt.",
+      "prerequisites": [
+        "improbable-success",
+        "deep-borrowing"
+      ],
+      "icon": "🌟"
+    },
+    {
+      "id": "luck-siphon",
+      "name": "Luck Siphon",
+      "description": "Learn to siphon luck from others",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "siphon_luck"
+          },
+          "description": "Drain luck from others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Why borrow from yourself when others have luck to spare?\nThe unlucky don't notice a little less. The lucky barely feel the drain.\nBut steal too much and they'll feel the curse.",
+      "prerequisites": [
+        "borrow-luck",
+        "luck-sense"
+      ],
+      "icon": "🧲"
+    },
+    {
+      "id": "luck-transfer",
+      "name": "Luck Transfer",
+      "description": "Learn to transfer luck between beings",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "transfer_luck"
+          },
+          "description": "Transfer luck between entities"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Take from the rich, give to the poor. Or the reverse.\nLuck can flow between people like water between vessels.\nControl the flow and you control fortune itself.",
+      "prerequisites": [
+        "luck-siphon"
+      ],
+      "icon": "↔️"
+    },
+    {
+      "id": "jinx",
+      "name": "Jinx",
+      "description": "Learn to curse others with misfortune",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 70,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "jinx_target"
+          },
+          "description": "Curse others with bad luck"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The evil eye. The hex. The jinx. Many names for the same thing:\ndeliberately pushing bad luck onto others. Their stumbles become yours\nto harvest. Their misfortune feeds your fortune.",
+      "prerequisites": [
+        "luck-siphon"
+      ],
+      "icon": "🧿"
+    },
+    {
+      "id": "lucky-charm",
+      "name": "Lucky Charm",
+      "description": "Learn to create lucky charms",
+      "paradigmId": "luck_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_charm"
+          },
+          "description": "Create objects that store luck"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Luck can be stored. A rabbit's foot. A four-leaf clover. A penny.\nThese talismans hold luck until needed, a reserve for emergencies.\nEvery luck mage carries several, just in case.",
+      "prerequisites": [
+        "small-favor"
+      ],
+      "icon": "🔮"
+    },
+    {
+      "id": "charm-mastery",
+      "name": "Charm Mastery",
+      "description": "Master the creation of lucky artifacts",
+      "paradigmId": "luck_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "master_charm"
+          },
+          "description": "Create powerful lucky artifacts"
+        },
+        {
+          "type": "resource_max",
+          "baseValue": 30,
+          "description": "Charms hold more luck"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A master charm-maker creates legendary talismans.\nObjects that change history. Heirlooms passed down generations.\nEach contains enough luck to change a life.",
+      "prerequisites": [
+        "lucky-charm",
+        "borrow-luck"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "💎"
+    },
+    {
+      "id": "karma-payment",
+      "name": "Karma Payment",
+      "description": "Learn to pay down karmic debt on your terms",
+      "paradigmId": "luck_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "pay_karma"
+          },
+          "description": "Deliberately experience bad luck to reduce debt"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Better to choose your misfortune than have fate choose for you.\nStub your toe on purpose. Miss the bus deliberately. Small payments\nprevent catastrophic collections.",
+      "prerequisites": [
+        "karma-awareness"
+      ],
+      "icon": "💰"
+    },
+    {
+      "id": "karma-shield",
+      "name": "Karma Shield",
+      "description": "Learn to shield yourself from karmic collection",
+      "paradigmId": "luck_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 20,
+          "description": "Protection from karmic backlash"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "karma_shield"
+          },
+          "description": "Temporarily shield from karma collection"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Delay the inevitable. When fate comes calling, you can hide.\nThe shield buys time - time to prepare, time to find solutions.\nBut the debt grows behind it, and shields don't last forever.",
+      "prerequisites": [
+        "karma-payment",
+        "interest-reduction"
+      ],
+      "icon": "🔰"
+    },
+    {
+      "id": "fate-gambler",
+      "name": "Fate Gambler",
+      "description": "Learn to gamble directly with fate",
+      "paradigmId": "luck_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "fate_gamble"
+          },
+          "description": "Gamble with fate itself"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 25,
+          "description": "Bonus to luck magic"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Double or nothing. All or nothing. The ultimate gamble.\nStake everything on a coin flip with the universe itself.\nWin and gain impossible power. Lose and lose everything.",
+      "prerequisites": [
+        "miracle-worker",
+        "karma-shield"
+      ],
+      "icon": "🎰"
+    },
+    {
+      "id": "luck-thief",
+      "name": "Master Luck Thief",
+      "description": "Become a master thief of fortune",
+      "paradigmId": "luck_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 160,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "mass_luck_theft"
+          },
+          "description": "Steal luck from entire groups"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Why steal from one when you can steal from many?\nA little luck from everyone in a crowd adds up to a fortune.\nCities grow unlucky when you pass through.",
+      "prerequisites": [
+        "luck-transfer",
+        "jinx"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "probability-zero",
+      "name": "Probability Zero",
+      "description": "Master absolute probability manipulation",
+      "paradigmId": "luck_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "probability_zero"
+          },
+          "description": "Make events have zero probability"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "probability_one"
+          },
+          "description": "Make events have 100% probability"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Luck magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "This cannot happen. This WILL happen. At the pinnacle of luck magic,\nprobability becomes determinism. Certainty is yours to command.\nBut absolute luck requires absolute payment.",
+      "prerequisites": [
+        "fate-gambler",
+        "luck-thief"
+      ],
+      "icon": "∞"
+    }
+  ],
+  "entryNodes": [
+    "luck-sense",
+    "small-favor",
+    "karma-awareness"
+  ],
+  "connections": [
+    {
+      "from": "small-favor",
+      "to": "borrow-luck"
+    },
+    {
+      "from": "borrow-luck",
+      "to": "deep-borrowing"
+    },
+    {
+      "from": "karma-awareness",
+      "to": "interest-reduction"
+    },
+    {
+      "from": "borrow-luck",
+      "to": "interest-reduction"
+    },
+    {
+      "from": "luck-sense",
+      "to": "probability-nudge"
+    },
+    {
+      "from": "probability-nudge",
+      "to": "improbable-success"
+    },
+    {
+      "from": "borrow-luck",
+      "to": "improbable-success"
+    },
+    {
+      "from": "improbable-success",
+      "to": "miracle-worker"
+    },
+    {
+      "from": "deep-borrowing",
+      "to": "miracle-worker"
+    },
+    {
+      "from": "borrow-luck",
+      "to": "luck-siphon"
+    },
+    {
+      "from": "luck-sense",
+      "to": "luck-siphon"
+    },
+    {
+      "from": "luck-siphon",
+      "to": "luck-transfer"
+    },
+    {
+      "from": "luck-siphon",
+      "to": "jinx"
+    },
+    {
+      "from": "small-favor",
+      "to": "lucky-charm"
+    },
+    {
+      "from": "lucky-charm",
+      "to": "charm-mastery"
+    },
+    {
+      "from": "borrow-luck",
+      "to": "charm-mastery"
+    },
+    {
+      "from": "karma-awareness",
+      "to": "karma-payment"
+    },
+    {
+      "from": "karma-payment",
+      "to": "karma-shield"
+    },
+    {
+      "from": "interest-reduction",
+      "to": "karma-shield"
+    },
+    {
+      "from": "miracle-worker",
+      "to": "fate-gambler"
+    },
+    {
+      "from": "karma-shield",
+      "to": "fate-gambler"
+    },
+    {
+      "from": "luck-transfer",
+      "to": "luck-thief"
+    },
+    {
+      "from": "jinx",
+      "to": "luck-thief"
+    },
+    {
+      "from": "fate-gambler",
+      "to": "probability-zero"
+    },
+    {
+      "from": "luck-thief",
+      "to": "probability-zero"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "luck_borrowed",
+      "xpAmount": 8,
+      "description": "Borrow luck from your future"
+    },
+    {
+      "eventType": "probability_changed",
+      "xpAmount": 10,
+      "description": "Successfully manipulate probability",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "luck_stolen",
+      "xpAmount": 12,
+      "description": "Steal luck from another"
+    },
+    {
+      "eventType": "charm_created",
+      "xpAmount": 15,
+      "description": "Create a lucky charm"
+    },
+    {
+      "eventType": "karma_paid",
+      "xpAmount": 5,
+      "description": "Pay down karmic debt"
+    },
+    {
+      "eventType": "improbable_success",
+      "xpAmount": 20,
+      "description": "Achieve an improbable outcome"
+    },
+    {
+      "eventType": "survived_backlash",
+      "xpAmount": 25,
+      "description": "Survive a karmic backlash"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

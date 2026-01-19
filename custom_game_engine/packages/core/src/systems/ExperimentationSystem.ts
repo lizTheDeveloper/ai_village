@@ -71,6 +71,7 @@ export class ExperimentationSystem extends BaseSystem {
   public readonly id: SystemId = 'experimentation';
   public readonly priority: number = 70; // After crafting systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position, CT.Inventory];
+  public readonly activationComponents = ['experiment'] as const; // Lazy activation: Skip entire system when no experiments running
 
   protected readonly throttleInterval = 60; // Every second at 60 tps
 

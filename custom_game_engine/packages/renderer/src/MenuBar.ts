@@ -325,7 +325,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const settingsWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'settings'
+      w.config.menuCategory === 'settings' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -334,7 +335,7 @@ export class MenuBar {
     for (const window of settingsWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -359,7 +360,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const agentWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      (w.config.menuCategory === 'info' || w.config.menuCategory === 'social')
+      (w.config.menuCategory === 'info' || w.config.menuCategory === 'social') &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -398,7 +400,7 @@ export class MenuBar {
       for (const window of categoryWindows) {
         items.push({
           type: 'window',
-          label: window.panel.getTitle(),
+          label: window.panel?.getTitle() || window.id,
           windowId: window.id,
           shortcut: window.config.keyboardShortcut,
         });
@@ -425,7 +427,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const economyWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'economy'
+      w.config.menuCategory === 'economy' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -433,7 +436,7 @@ export class MenuBar {
     for (const window of economyWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -461,7 +464,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const farmingWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'farming'
+      w.config.menuCategory === 'farming' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -469,7 +473,7 @@ export class MenuBar {
     for (const window of farmingWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -497,7 +501,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const animalWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'animals'
+      w.config.menuCategory === 'animals' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -505,7 +510,7 @@ export class MenuBar {
     for (const window of animalWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -533,7 +538,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const researchWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'research'
+      w.config.menuCategory === 'research' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -541,7 +547,7 @@ export class MenuBar {
     for (const window of researchWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -569,7 +575,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const magicWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'magic'
+      w.config.menuCategory === 'magic' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -577,7 +584,7 @@ export class MenuBar {
     for (const window of magicWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -605,7 +612,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const divinityWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'divinity'
+      w.config.menuCategory === 'divinity' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -614,7 +622,7 @@ export class MenuBar {
     for (const window of divinityWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -643,7 +651,8 @@ export class MenuBar {
     const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
     const devWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
-      w.config.menuCategory === 'dev'
+      w.config.menuCategory === 'dev' &&
+      w.panel !== null
     );
 
     const items: MenuItem[] = [];
@@ -652,7 +661,7 @@ export class MenuBar {
     for (const window of devWindows) {
       items.push({
         type: 'window',
-        label: window.panel.getTitle(),
+        label: window.panel?.getTitle() || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });

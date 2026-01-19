@@ -79,8 +79,12 @@ export class GuardDutySystem extends BaseSystem {
       const duty = entity.getComponent('guard_duty') as GuardDutyComponent | undefined;
       if (!duty) continue;
 
-      // Validate assignment - throws if invalid
-      this.validateAssignment(duty);
+      // Validate assignment - remove component if invalid
+      if (!this.validateAssignment(duty)) {
+        console.warn('[GuardDutySystem] Removing invalid guard_duty component from entity', entity.id);
+        (entity as any).removeComponent('guard_duty');
+        continue;
+      }
 
       // Decay alertness
       this.decayAlertness(entity, duty, ctx.deltaTime);
@@ -96,27 +100,31 @@ export class GuardDutySystem extends BaseSystem {
   }
 
   /**
-   * Validate guard assignment. Throws errors on invalid assignments (strict mode).
+   * Validate guard assignment. Returns false if invalid (component should be removed).
    */
   private validateAssignment(duty: GuardDutyComponent): boolean {
     if (!duty.assignmentType) {
-      throw new Error('Guard assignment type is required');
+      console.warn('[GuardDutySystem] Invalid guard duty: missing assignmentType');
+      return false;
     }
 
     switch (duty.assignmentType) {
       case 'location':
         if (!duty.targetLocation) {
-          throw new Error('Location guard assignment requires targetLocation');
+          console.warn('[GuardDutySystem] Invalid location guard: missing targetLocation');
+          return false;
         }
         break;
       case 'person':
         if (!duty.targetPerson) {
-          throw new Error('Person guard assignment requires targetPerson');
+          console.warn('[GuardDutySystem] Invalid person guard: missing targetPerson');
+          return false;
         }
         break;
       case 'patrol':
         if (!duty.patrolRoute || duty.patrolRoute.length === 0) {
-          throw new Error('Patrol assignment requires patrolRoute');
+          console.warn('[GuardDutySystem] Invalid patrol guard: missing or empty patrolRoute');
+          return false;
         }
         break;
     }

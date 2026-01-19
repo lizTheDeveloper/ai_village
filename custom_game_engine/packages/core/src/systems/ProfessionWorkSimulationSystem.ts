@@ -77,6 +77,8 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
   public readonly id: SystemId = 'profession_work_simulation';
   public readonly priority: number = 151;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no profession exists
+  public readonly activationComponents = ['profession'] as const;
 
   private config: ProfessionWorkConfig;
   private eventBus: EventBus | null = null;

@@ -1,0 +1,664 @@
+{
+  "id": "echo_skill_tree",
+  "paradigmId": "echo_magic",
+  "name": "Echo Magic Skill Tree",
+  "description": "Master the art of reading, manipulating, and becoming echoes of the past",
+  "lore": "Every action leaves an echo. Every word spoken still vibrates somewhere.\nEcho mages hear the past and can replay it, reshape it, even step into it.\nBut the past pulls at you. Spend too long in echoes and you become one.",
+  "nodes": [
+    {
+      "id": "echo-sense",
+      "name": "Echo Sense",
+      "description": "Learn to sense echoes of the past",
+      "paradigmId": "echo_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense residual echoes of past events"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "echo_detection"
+          },
+          "description": "Detect the presence of echoes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The past doesn't simply vanish. It echoes. Strong emotions,\nsignificant events, powerful words - they leave traces.\nLearn to hear these whispers of what was.",
+      "levelCostMultiplier": 1.3,
+      "icon": "👂"
+    },
+    {
+      "id": "memory-anchor",
+      "name": "Memory Anchor",
+      "description": "Learn to protect your own memories",
+      "paradigmId": "echo_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Resistance to memory loss"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "anchor_memory"
+          },
+          "description": "Anchor important memories against loss"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Echo magic costs memories. Your own past pays for accessing others'.\nLearn to anchor your essential memories - who you are, what you love.\nWithout anchors, echo mages eventually forget themselves.",
+      "levelCostMultiplier": 1.4,
+      "icon": "⚓"
+    },
+    {
+      "id": "resonance",
+      "name": "Resonance",
+      "description": "Learn to resonate with echoes",
+      "paradigmId": "echo_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to echo magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "resonate"
+          },
+          "description": "Resonate with nearby echoes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Echoes respond to resonance. Match their frequency and they open.\nYour emotional state, your focus, your intent - tune these\nto the echo you seek.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🔊"
+    },
+    {
+      "id": "read-recent",
+      "name": "Read Recent Echoes",
+      "description": "Learn to read recent echoes",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "read_recent_echo"
+          },
+          "description": "Read echoes from hours to days ago"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Fresh echoes are easiest. The argument that just happened.\nThe violence from yesterday. The love declared this morning.\nThese echoes practically shout their presence.",
+      "prerequisites": [
+        "echo-sense"
+      ],
+      "icon": "📖"
+    },
+    {
+      "id": "read-deep",
+      "name": "Read Deep Echoes",
+      "description": "Learn to read older echoes",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "read_deep_echo"
+          },
+          "description": "Read echoes from months to years ago"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Deeper echoes require more effort. They've faded, blurred,\nbeen overwritten by newer events. But the strongest persist -\nmurders, births, declarations of war, vows of love.",
+      "prerequisites": [
+        "read-recent"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "📚"
+    },
+    {
+      "id": "read-ancient",
+      "name": "Read Ancient Echoes",
+      "description": "Learn to read ancient echoes",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "read_ancient_echo"
+          },
+          "description": "Read echoes from decades to centuries ago"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 400
+          },
+          "description": "Requires 400 total XP in Echo magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The oldest echoes are the hardest to reach but often the most powerful.\nHistoric events. Legendary figures. The founding of empires.\nThese echoes have weight that modern moments lack.",
+      "prerequisites": [
+        "read-deep"
+      ],
+      "icon": "📜"
+    },
+    {
+      "id": "echo-replay",
+      "name": "Echo Replay",
+      "description": "Learn to replay echoes for others to witness",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "replay_echo"
+          },
+          "description": "Replay echoes as visible/audible phantasms"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Make the past visible again. The ghostly images of what was,\nplaying out for all to see. Courts use this to show crimes.\nHistorians use it to verify accounts. Lovers use it to relive joy.",
+      "prerequisites": [
+        "read-recent",
+        "resonance"
+      ],
+      "icon": "▶️"
+    },
+    {
+      "id": "echo-imprint",
+      "name": "Echo Imprint",
+      "description": "Learn to leave intentional echoes",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "imprint_echo"
+          },
+          "description": "Leave intentional echoes for future discovery"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Most echoes are accidental. But you can create them deliberately.\nLeave a message for the future. Mark a location. Store a memory\noutside your head where it will persist.",
+      "prerequisites": [
+        "resonance"
+      ],
+      "icon": "💾"
+    },
+    {
+      "id": "echo-absorption",
+      "name": "Echo Absorption",
+      "description": "Learn to absorb echoes for power",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "absorb_echo"
+          },
+          "description": "Absorb echoes for power"
+        },
+        {
+          "type": "resource_regen",
+          "baseValue": 10,
+          "description": "Regenerate power from absorbed echoes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Echoes contain energy. Consume them and that energy becomes yours.\nBut consumed echoes are gone forever - erased from history's record.\nSome things should be remembered. Choose carefully.",
+      "prerequisites": [
+        "echo-replay"
+      ],
+      "icon": "🌀"
+    },
+    {
+      "id": "echo-ghost",
+      "name": "Echo Ghost",
+      "description": "Learn to create echo ghosts",
+      "paradigmId": "echo_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_ghost"
+          },
+          "description": "Create semi-permanent echoes of people"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Strong enough echoes of a person can take on a life of their own.\nNot the person - never that - but a shadow, a reflection.\nThey remember, they speak, but they are not alive.",
+      "prerequisites": [
+        "echo-replay",
+        "read-deep"
+      ],
+      "icon": "👻"
+    },
+    {
+      "id": "ghost-binding",
+      "name": "Ghost Binding",
+      "description": "Learn to bind echo ghosts",
+      "paradigmId": "echo_magic",
+      "category": "specialization",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "bind_ghost"
+          },
+          "description": "Bind echo ghosts to your service"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 8
+          },
+          "description": "Requires 8 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "An echo ghost can be bound - made to serve, to guard, to inform.\nThey retain the skills and knowledge of their originals.\nBind a dead scholar and gain access to their expertise.",
+      "prerequisites": [
+        "echo-ghost"
+      ],
+      "icon": "⛓️"
+    },
+    {
+      "id": "history-glimpse",
+      "name": "History Glimpse",
+      "description": "Learn to glimpse historical moments",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "glimpse_history"
+          },
+          "description": "See brief flashes of historical events"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "More than reading echoes - actually seeing. Brief flashes,\nlike photographs from the past. Stand where battles were fought\nand see the moment a king fell.",
+      "prerequisites": [
+        "echo-replay",
+        "read-deep"
+      ],
+      "icon": "👁️"
+    },
+    {
+      "id": "history-walk",
+      "name": "History Walk",
+      "description": "Learn to walk through history",
+      "paradigmId": "echo_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "walk_history"
+          },
+          "description": "Enter the past as an invisible observer"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Enter the echo itself. Walk through the past, invisible and intangible.\nWatch history unfold around you. You cannot change anything -\nyou are a ghost to ghosts. But you can witness everything.",
+      "prerequisites": [
+        "history-glimpse",
+        "read-ancient"
+      ],
+      "icon": "🚶"
+    },
+    {
+      "id": "echo-loop",
+      "name": "Echo Loop",
+      "description": "Learn to create echo loops",
+      "paradigmId": "echo_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 110,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_loop"
+          },
+          "description": "Create repeating echo loops"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "An echo that repeats forever. Trap someone in reliving a moment,\nor create a guardian that resets and repeats its patrol eternally.\nLoops are stable but can be broken.",
+      "prerequisites": [
+        "echo-replay",
+        "echo-imprint"
+      ],
+      "icon": "🔁"
+    },
+    {
+      "id": "loop-trap",
+      "name": "Loop Trap",
+      "description": "Learn to trap others in echo loops",
+      "paradigmId": "echo_magic",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 160,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "trap_in_loop"
+          },
+          "description": "Trap targets in echo loops"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The cruelest prison: reliving the same moment forever.\nTime passes outside while the trapped live the same heartbeat\nover and over. Some call it merciful. Others, torture.",
+      "prerequisites": [
+        "echo-loop"
+      ],
+      "icon": "🔒"
+    },
+    {
+      "id": "echo-master",
+      "name": "Echo Master",
+      "description": "Achieve mastery over echo magic",
+      "paradigmId": "echo_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 30,
+          "description": "Master of echo magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "echo_mastery"
+          },
+          "description": "Full control over echoes"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Echo magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You have walked so long in the past that you belong to both times.\nEchoes speak to you freely. The past is your library,\nevery moment accessible, every memory available.",
+      "prerequisites": [
+        "history-walk",
+        "ghost-binding"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "living-echo",
+      "name": "Living Echo",
+      "description": "Become a living echo",
+      "paradigmId": "echo_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "become_echo"
+          },
+          "description": "Transform into an echo yourself"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme echo mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Echo magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate echo magic: transform yourself into an echo.\nYou exist outside time, impossible to truly kill (you've already happened),\nable to manifest in any moment where you left a trace.",
+      "prerequisites": [
+        "echo-master",
+        "loop-trap"
+      ],
+      "icon": "🌟"
+    }
+  ],
+  "entryNodes": [
+    "echo-sense",
+    "memory-anchor",
+    "resonance"
+  ],
+  "connections": [
+    {
+      "from": "echo-sense",
+      "to": "read-recent"
+    },
+    {
+      "from": "read-recent",
+      "to": "read-deep"
+    },
+    {
+      "from": "read-deep",
+      "to": "read-ancient"
+    },
+    {
+      "from": "read-recent",
+      "to": "echo-replay"
+    },
+    {
+      "from": "resonance",
+      "to": "echo-replay"
+    },
+    {
+      "from": "resonance",
+      "to": "echo-imprint"
+    },
+    {
+      "from": "echo-replay",
+      "to": "echo-absorption"
+    },
+    {
+      "from": "echo-replay",
+      "to": "echo-ghost"
+    },
+    {
+      "from": "read-deep",
+      "to": "echo-ghost"
+    },
+    {
+      "from": "echo-ghost",
+      "to": "ghost-binding"
+    },
+    {
+      "from": "echo-replay",
+      "to": "history-glimpse"
+    },
+    {
+      "from": "read-deep",
+      "to": "history-glimpse"
+    },
+    {
+      "from": "history-glimpse",
+      "to": "history-walk"
+    },
+    {
+      "from": "read-ancient",
+      "to": "history-walk"
+    },
+    {
+      "from": "echo-replay",
+      "to": "echo-loop"
+    },
+    {
+      "from": "echo-imprint",
+      "to": "echo-loop"
+    },
+    {
+      "from": "echo-loop",
+      "to": "loop-trap"
+    },
+    {
+      "from": "history-walk",
+      "to": "echo-master"
+    },
+    {
+      "from": "ghost-binding",
+      "to": "echo-master"
+    },
+    {
+      "from": "echo-master",
+      "to": "living-echo"
+    },
+    {
+      "from": "loop-trap",
+      "to": "living-echo"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "echo_read",
+      "xpAmount": 10,
+      "description": "Read an echo of the past",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "echo_replayed",
+      "xpAmount": 12,
+      "description": "Replay an echo for others"
+    },
+    {
+      "eventType": "echo_imprinted",
+      "xpAmount": 15,
+      "description": "Leave an intentional echo"
+    },
+    {
+      "eventType": "ghost_created",
+      "xpAmount": 25,
+      "description": "Create an echo ghost"
+    },
+    {
+      "eventType": "history_glimpsed",
+      "xpAmount": 20,
+      "description": "Glimpse a historical moment"
+    },
+    {
+      "eventType": "memory_protected",
+      "xpAmount": 5,
+      "description": "Successfully anchor a memory"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

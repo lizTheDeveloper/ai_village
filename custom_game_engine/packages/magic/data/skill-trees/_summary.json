@@ -1,0 +1,106 @@
+{
+  "totalTrees": 25,
+  "totalNodes": 532,
+  "trees": {
+    "daemon": {
+      "nodeCount": 27,
+      "file": "daemon.json"
+    },
+    "architecture": {
+      "nodeCount": 26,
+      "file": "architecture.json"
+    },
+    "dream": {
+      "nodeCount": 24,
+      "file": "dream.json"
+    },
+    "song": {
+      "nodeCount": 23,
+      "file": "song.json"
+    },
+    "name": {
+      "nodeCount": 23,
+      "file": "name.json"
+    },
+    "pact": {
+      "nodeCount": 23,
+      "file": "pact.json"
+    },
+    "allomancy": {
+      "nodeCount": 32,
+      "file": "allomancy.json"
+    },
+    "sympathy": {
+      "nodeCount": 24,
+      "file": "sympathy.json"
+    },
+    "rune": {
+      "nodeCount": 19,
+      "file": "rune.json"
+    },
+    "shinto": {
+      "nodeCount": 26,
+      "file": "shinto.json"
+    },
+    "breath": {
+      "nodeCount": 22,
+      "file": "breath.json"
+    },
+    "blood": {
+      "nodeCount": 21,
+      "file": "blood.json"
+    },
+    "belief_magic": {
+      "nodeCount": 18,
+      "file": "belief_magic.json"
+    },
+    "divine": {
+      "nodeCount": 18,
+      "file": "divine.json"
+    },
+    "academic": {
+      "nodeCount": 18,
+      "file": "academic.json"
+    },
+    "commerce_magic": {
+      "nodeCount": 19,
+      "file": "commerce_magic.json"
+    },
+    "debt_magic": {
+      "nodeCount": 19,
+      "file": "debt_magic.json"
+    },
+    "bureaucratic_magic": {
+      "nodeCount": 20,
+      "file": "bureaucratic_magic.json"
+    },
+    "game_magic": {
+      "nodeCount": 18,
+      "file": "game_magic.json"
+    },
+    "luck_magic": {
+      "nodeCount": 19,
+      "file": "luck_magic.json"
+    },
+    "emotional": {
+      "nodeCount": 20,
+      "file": "emotional.json"
+    },
+    "echo_magic": {
+      "nodeCount": 17,
+      "file": "echo_magic.json"
+    },
+    "paradox_magic": {
+      "nodeCount": 17,
+      "file": "paradox_magic.json"
+    },
+    "feng_shui_magic": {
+      "nodeCount": 21,
+      "file": "feng_shui_magic.json"
+    },
+    "threshold_magic": {
+      "nodeCount": 18,
+      "file": "threshold_magic.json"
+    }
+  }
+}

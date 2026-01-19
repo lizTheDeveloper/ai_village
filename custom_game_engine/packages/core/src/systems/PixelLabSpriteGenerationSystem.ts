@@ -44,6 +44,12 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   private pendingJobs: Map<string, PendingSpriteJob> = new Map();
 
   protected onInitialize(world: World): void {
+    // Skip in browser mode - sprite generation is handled by the daemon
+    if (typeof window !== 'undefined') {
+      console.log('[PixelLabSprite] System disabled in browser mode - daemon handles sprite generation');
+      return;
+    }
+
     // Subscribe to agent birth events
     world.eventBus.subscribe<'agent:birth'>('agent:birth', (event: GameEvent<'agent:birth'>) => {
       this.enqueueSpriteGeneration(world, event.data);
@@ -237,6 +243,11 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   }
 
   private async callPixelLabAPI(params: any): Promise<any> {
+    // Browser compatibility: Don't call API directly from browser
+    if (typeof window !== 'undefined') {
+      throw new Error('PixelLab API calls must go through server proxy in browser mode');
+    }
+
     const apiKey = process.env.PIXELLAB_API_KEY;
 
     if (!apiKey) {
@@ -261,6 +272,11 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   }
 
   private async callPixelLabAPIWithReference(params: any & { reference_image_path: string }): Promise<any> {
+    // Browser compatibility: Don't call API directly from browser
+    if (typeof window !== 'undefined') {
+      throw new Error('PixelLab API calls must go through server proxy in browser mode');
+    }
+
     const apiKey = process.env.PIXELLAB_API_KEY;
 
     if (!apiKey) {
@@ -356,6 +372,11 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Browser compatibility: Skip all updates in browser mode
+    if (typeof window !== 'undefined') {
+      return;
+    }
+
     if (this.pendingJobs.size === 0) {
       return;
     }
@@ -499,6 +520,11 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   }
 
   private async getJobStatus(jobId: string): Promise<any> {
+    // Browser compatibility: Don't call API directly from browser
+    if (typeof window !== 'undefined') {
+      throw new Error('PixelLab API calls must go through server proxy in browser mode');
+    }
+
     const apiKey = process.env.PIXELLAB_API_KEY;
 
     if (!apiKey) {

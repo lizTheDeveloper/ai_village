@@ -58,6 +58,8 @@ export class WisdomGoddessSystem extends BaseSystem {
   public readonly id = 'wisdom_goddess_system';
   public readonly priority = 900; // Low priority - runs after most systems
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no divinity exists
+  public readonly activationComponents = ['divinity'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds // Global system, no entity requirements
   public enabled = true;
 

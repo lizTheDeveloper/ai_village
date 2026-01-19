@@ -1,0 +1,794 @@
+{
+  "id": "sympathy-tree",
+  "paradigmId": "sympathy",
+  "name": "The Art of Sympathy",
+  "description": "Create links between objects based on similarity and shared history, allowing energy to flow between them.",
+  "lore": "Sympathy is based on two principles: Like affects like, and once together, always together.\nMaster your alar - your deep belief - and you can create links between objects that share\nproperties or history. Through these links, energy flows: heat, motion, force. But beware\nslippage - energy is always lost in the transfer, and working too hard can burn you out.",
+  "nodes": [
+    {
+      "id": "basic-alar",
+      "name": "Basic Alar",
+      "description": "Develop the basic mental focus needed for sympathy",
+      "paradigmId": "sympathy",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "alar_strength",
+          "baseValue": 1,
+          "perLevelValue": 1,
+          "description": "Mental focus strength for holding bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Alar is the cornerstone of sympathy. It is the deep, true belief that something\nIS something else. Not that it might be, or could be, but that it IS. This belief\nmust be held so firmly that reality itself bends to accommodate it.",
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "heart-of-stone",
+      "name": "Heart of Stone",
+      "description": "Learn to separate emotions from your alar",
+      "paradigmId": "sympathy",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "alar_strength",
+          "baseValue": 2,
+          "description": "Alar unaffected by emotional state"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "emotional_suppression"
+          },
+          "description": "Can suppress emotions to maintain focus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A sympathist with a heart of stone can maintain bindings even under extreme duress.",
+      "prerequisites": [
+        "basic-alar"
+      ]
+    },
+    {
+      "id": "first-binding",
+      "name": "First Binding",
+      "description": "Learn to create your first sympathetic binding",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_binding"
+          },
+          "description": "Can create a sympathetic link between objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "basic-alar"
+      ]
+    },
+    {
+      "id": "link-identical",
+      "name": "Identical Link",
+      "description": "Same material - the strongest possible link",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_identical"
+          },
+          "description": "Can create identical links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 10,
+          "target": {
+            "abilityId": "identical"
+          },
+          "description": "Link efficiency for identical bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "first-binding"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "link-similar",
+      "name": "Similar Link",
+      "description": "Similar materials (iron to steel, oak to ash)",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_similar"
+          },
+          "description": "Can create similar links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 5,
+          "target": {
+            "abilityId": "similar"
+          },
+          "description": "Link efficiency for similar bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-identical"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "link-congruent",
+      "name": "Congruent Link",
+      "description": "Objects of the same shape",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_congruent"
+          },
+          "description": "Can create congruent links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 5,
+          "target": {
+            "abilityId": "congruent"
+          },
+          "description": "Link efficiency for congruent bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-identical"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "link-once_together",
+      "name": "Once Together Link",
+      "description": "Objects that were once part of the same whole",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_once_together"
+          },
+          "description": "Can create once_together links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 5,
+          "target": {
+            "abilityId": "once_together"
+          },
+          "description": "Link efficiency for once_together bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-similar"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "link-sympathetic",
+      "name": "Sympathetic Link",
+      "description": "Symbolically related objects (blood to body)",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_sympathetic"
+          },
+          "description": "Can create sympathetic links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 5,
+          "target": {
+            "abilityId": "sympathetic"
+          },
+          "description": "Link efficiency for sympathetic bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-similar",
+        "link-congruent"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "link-antipathic",
+      "name": "Antipathic Link",
+      "description": "Opposite relationships - dangerous and powerful",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "link_antipathic"
+          },
+          "description": "Can create antipathic links"
+        },
+        {
+          "type": "link_strength",
+          "baseValue": 5,
+          "target": {
+            "abilityId": "antipathic"
+          },
+          "description": "Link efficiency for antipathic bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-sympathetic"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "binding-heat_transfer",
+      "name": "Heat Transfer",
+      "description": "Move heat between linked objects",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "heat_transfer"
+          },
+          "description": "Move heat between linked objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Risk: Binder fatigue from processing heat",
+      "prerequisites": [
+        "first-binding"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "binding-motion_transfer",
+      "name": "Motion Transfer",
+      "description": "Transfer kinetic energy between linked objects",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "motion_transfer"
+          },
+          "description": "Transfer kinetic energy between linked objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Risk: Physical feedback from sudden motion",
+      "prerequisites": [
+        "binding-heat_transfer"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "binding-light_transfer",
+      "name": "Light Transfer",
+      "description": "Channel light between linked objects",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "light_transfer"
+          },
+          "description": "Channel light between linked objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Risk: Visual disorientation",
+      "prerequisites": [
+        "binding-heat_transfer"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "binding-force_transfer",
+      "name": "Force Transfer",
+      "description": "Transfer physical force through links",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "force_transfer"
+          },
+          "description": "Transfer physical force through links"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Risk: Physical strain proportional to force",
+      "prerequisites": [
+        "binding-motion_transfer"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "binding-entropy_transfer",
+      "name": "Entropy Transfer",
+      "description": "Move decay and disorder between objects - extremely dangerous",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 5,
+      "xpCost": 325,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "entropy_transfer"
+          },
+          "description": "Move decay and disorder between objects - extremely dangerous"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Risk: Accelerated aging, potential death",
+      "prerequisites": [
+        "binding-force_transfer"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dual-binding",
+      "name": "Split Mind",
+      "description": "Learn to split your mind and hold two bindings at once",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "alar_split",
+          "baseValue": 1,
+          "description": "Can hold 2 bindings simultaneously"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "magic_proficiency",
+          "params": {
+            "techniqueId": "control",
+            "proficiencyLevel": 3
+          },
+          "description": "Must have significant binding experience"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "heart-of-stone"
+      ]
+    },
+    {
+      "id": "triple-binding",
+      "name": "Tripartite Mind",
+      "description": "Split your focus three ways",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "alar_split",
+          "baseValue": 1,
+          "description": "Can hold 3 bindings simultaneously"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1000
+          },
+          "description": "Requires extensive practice"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "dual-binding"
+      ]
+    },
+    {
+      "id": "quad-binding",
+      "name": "Quaternary Mind",
+      "description": "The rare talent of quadruple focus",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "alar_split",
+          "baseValue": 1,
+          "description": "Can hold 4 bindings simultaneously"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "sympathy",
+            "skillLevel": 4
+          },
+          "description": "Requires near-mastery of sympathy"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "triple-binding"
+      ]
+    },
+    {
+      "id": "slippage-control",
+      "name": "Slippage Control",
+      "description": "Reduce energy lost during sympathetic transfers",
+      "paradigmId": "sympathy",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "slippage_reduction",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Reduce energy lost in transfers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Slippage is the bane of all sympathists - energy bleeds off during transfer, limiting what can be accomplished.",
+      "prerequisites": [
+        "first-binding"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "perfect-link",
+      "name": "Perfect Link",
+      "description": "Create nearly perfect sympathetic links with minimal slippage",
+      "paradigmId": "sympathy",
+      "category": "efficiency",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "slippage_reduction",
+          "baseValue": 20,
+          "description": "Near-zero slippage on identical links"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "magic_proficiency",
+          "params": {
+            "techniqueId": "control",
+            "proficiencyLevel": 5
+          },
+          "description": "Must be an expert binder"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "slippage-control",
+        "link-identical"
+      ]
+    },
+    {
+      "id": "link-breaking",
+      "name": "Breaking Links",
+      "description": "Learn to sense and break hostile sympathetic links",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "break_link"
+          },
+          "description": "Can break sympathetic links targeting you"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "first-binding"
+      ]
+    },
+    {
+      "id": "alar-defense",
+      "name": "Iron Will",
+      "description": "Use your alar to defend against sympathetic attacks",
+      "paradigmId": "sympathy",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "alar_shield"
+          },
+          "description": "Can resist hostile bindings with pure will"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "link-breaking",
+        "heart-of-stone"
+      ]
+    },
+    {
+      "id": "body-binding",
+      "name": "Body as Link",
+      "description": "Learn to use your own body as a sympathetic link",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "body_link"
+          },
+          "description": "Can use your own body as part of a binding"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "sympathetic_accident"
+          },
+          "description": "Must have experienced sympathetic feedback firsthand",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Dangerous but powerful - using blood, hair, or flesh as links creates extremely strong connections.",
+      "prerequisites": [
+        "link-sympathetic"
+      ]
+    },
+    {
+      "id": "mommet",
+      "name": "Mommet Binding",
+      "description": "Learn to create mommets - sympathetic dolls for remote binding",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 450,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_mommet"
+          },
+          "description": "Can create mommets for remote sympathetic work"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "crafting",
+            "skillLevel": 2
+          },
+          "description": "Must have crafting skill to create mommets"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "A mommet is a doll linked to a person through their blood, hair, or saliva. What is done to the mommet affects the person.",
+      "prerequisites": [
+        "body-binding",
+        "link-once_together"
+      ]
+    },
+    {
+      "id": "bloodless-binding",
+      "name": "Bloodless Sympathy",
+      "description": "The legendary skill of creating bindings through alar alone",
+      "paradigmId": "sympathy",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 600,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "bloodless_link"
+          },
+          "description": "Can create bindings through pure alar without physical links"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 3000
+          },
+          "description": "Requires years of dedicated practice"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Only the greatest sympathists can create bindings without any physical connection - through sheer force of will.",
+      "prerequisites": [
+        "perfect-link",
+        "quad-binding"
+      ]
+    }
+  ],
+  "entryNodes": [
+    "basic-alar"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "binding_created",
+      "xpAmount": 10,
+      "description": "Create a sympathetic binding"
+    },
+    {
+      "eventType": "binding_maintained",
+      "xpAmount": 5,
+      "description": "Maintain a binding under stress"
+    },
+    {
+      "eventType": "heat_transferred",
+      "xpAmount": 8,
+      "description": "Transfer heat through binding"
+    },
+    {
+      "eventType": "motion_transferred",
+      "xpAmount": 12,
+      "description": "Transfer motion through binding"
+    },
+    {
+      "eventType": "split_focus_success",
+      "xpAmount": 20,
+      "description": "Successfully maintain multiple bindings"
+    },
+    {
+      "eventType": "hostile_link_broken",
+      "xpAmount": 25,
+      "description": "Break a hostile sympathetic link"
+    },
+    {
+      "eventType": "slippage_minimized",
+      "xpAmount": 15,
+      "description": "Complete a transfer with minimal slippage"
+    },
+    {
+      "eventType": "sympathy_study",
+      "xpAmount": 5,
+      "description": "Study sympathetic principles",
+      "conditions": [
+        {
+          "type": "location_visited",
+          "params": {
+            "locationId": "university"
+          },
+          "description": "Must be at a place of learning"
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

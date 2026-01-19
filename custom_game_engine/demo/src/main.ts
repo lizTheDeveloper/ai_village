@@ -4279,6 +4279,11 @@ async function main() {
         godCraftedSpawner: godCraftedDiscoverySystem,
         generateBiosphere: true,
         queueSprites: true,
+        onProgress: (message: string) => {
+          if (universeConfigScreen) {
+            universeConfigScreen.updateProgress(message);
+          }
+        },
       });
 
       // Store homeworld reference on world for future access

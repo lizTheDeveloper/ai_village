@@ -86,9 +86,9 @@ export class ChatRoomSystem extends BaseSystem {
       room.isActive = room.config.membership.members.length >= threshold;
 
       if (room.isActive && !wasActive) {
-        console.error(`[ChatRoomSystem] ${room.config.name} activated with ${room.config.membership.members.length} members`);
+        console.log(`[ChatRoomSystem] ${room.config.name} activated with ${room.config.membership.members.length} members`);
       } else if (!room.isActive && wasActive) {
-        console.error(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
+        console.log(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
       }
 
       room.lastActivityTick = ctx.tick;
@@ -136,7 +136,7 @@ export class ChatRoomSystem extends BaseSystem {
     this.roomEntities.set(config.id, entity.id);
     this.knownMembers.set(config.id, new Set());
 
-    console.error(`[ChatRoomSystem] Created room: ${config.name}`);
+    console.log(`[ChatRoomSystem] Created room: ${config.name}`);
 
     return room;
   }
@@ -264,7 +264,7 @@ export class ChatRoomSystem extends BaseSystem {
     const notification = createJoinNotification(room.config.id, entity.id, name);
     room.pendingNotifications.push(notification);
 
-    console.error(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
+    console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
   }
 
   /**
@@ -284,7 +284,7 @@ export class ChatRoomSystem extends BaseSystem {
       const notification = createLeaveNotification(room.config.id, entityId, name);
       room.pendingNotifications.push(notification);
 
-      console.error(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
+      console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
     }
   }
 
@@ -388,7 +388,7 @@ export class ChatRoomSystem extends BaseSystem {
     room.lastMessageTick = world.tick;
     room.lastActivityTick = world.tick;
 
-    console.error(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
+    console.log(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
 
     // Emit event for UI
     this.events.emit('chat:message_sent', {

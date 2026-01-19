@@ -141,9 +141,11 @@ export class HolyTextSystem extends BaseSystem {
   ): void {
     // Get first believer (zero allocation approach)
     let firstBeliever = 'unknown';
-    for (const believerId of deity.believers) {
-      firstBeliever = believerId;
-      break;
+    if (deity.believers && typeof deity.believers[Symbol.iterator] === 'function') {
+      for (const believerId of deity.believers) {
+        firstBeliever = believerId;
+        break;
+      }
     }
 
     // Generate teachings inline (reuse working array)

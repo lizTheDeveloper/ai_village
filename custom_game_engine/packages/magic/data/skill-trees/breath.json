@@ -1,0 +1,741 @@
+{
+  "id": "breath-tree",
+  "paradigmId": "breath",
+  "name": "The Art of Awakening",
+  "description": "Collect Breath, Awaken objects with Commands, and ascend through the Heightenings.",
+  "lore": "Everyone is born with one Breath - the divine spark that animates life. Most\npeople live their entire lives with just that single Breath, never knowing its\npotential. But Breath can be given, taken, and used.\n\nAn Awakener learns to collect Breath from others and use it to Awaken inanimate\nobjects - giving them motion, purpose, even sentience. The process is simple in\nconcept: touch the object, visualize what you want it to do, drain color from\nnearby objects to fuel the Command, and speak the Command phrase.\n\nBut mastery takes lifetimes. Different Awakening types have different costs and\ncomplexities. Type I (simple motion) is easy. Type IV (creating Lifeless) requires\nhundreds of Breaths and perfect technique.\n\nAs you accumulate Breath, you pass through Heightenings - thresholds that grant\npassive abilities. The First Heightening (50 Breaths) gives perfect pitch. The\nFifth Heightening (2000 Breaths) grants agelessness. The Tenth Heightening\n(50,000 Breaths) allows your Awakenings to spontaneously gain sentience.\n\nThe God King himself is said to hold over 50,000 Breaths. The Returned are born\nwith thousands. Common Awakeners might have 50-500. And most people? Just the\none they were born with, given away for a handful of coins to those who would\nuse it.",
+  "nodes": [
+    {
+      "id": "breath-sense",
+      "name": "Breath Awareness",
+      "description": "Learn to feel and recognize Breath",
+      "paradigmId": "breath",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense Breath in yourself and others",
+          "target": {
+            "abilityId": "sense_breath"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Everyone is born with one Breath - the spark of life given at birth.\nYou've always had it, but now you learn to feel it, to recognize its presence\nin yourself and others. It feels warm, vibrant, alive.",
+      "levelCostMultiplier": 1.2,
+      "icon": "🌬️"
+    },
+    {
+      "id": "color-sense",
+      "name": "Color Awareness",
+      "description": "Learn to see color as life-force",
+      "paradigmId": "breath",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% color perception"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Breath is tied to color. The more Breath something has, the more vibrant\nits colors. The less Breath, the more drab and gray. You learn to see this\nconnection - to read vitality through color itself.",
+      "prerequisites": [
+        "breath-sense"
+      ],
+      "levelCostMultiplier": 1.3
+    },
+    {
+      "id": "breath-transfer",
+      "name": "Breath Transfer",
+      "description": "Learn to give and receive Breath",
+      "paradigmId": "breath",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transfer Breath between people",
+          "target": {
+            "abilityId": "transfer_breath"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Breath can be transferred from one person to another. The giver must be\nwilling - or at least, not actively resisting. You learn the technique: the\ntouch, the intention, the moment of release. It takes only seconds, but feels\nlike a lifetime.",
+      "prerequisites": [
+        "breath-sense"
+      ]
+    },
+    {
+      "id": "first-heightening",
+      "name": "First Heightening",
+      "description": "Reach the First Heightening - perfect pitch",
+      "paradigmId": "breath",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Gain perfect pitch",
+          "target": {
+            "abilityId": "perfect_pitch"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "At 50 Breaths, you reach the First Heightening. Sounds become crystal clear.\nYou can identify any note, any voice, any rhythm with perfect accuracy. This\nis the first sign that you are no longer quite baseline.",
+      "prerequisites": [
+        "breath-sense"
+      ],
+      "icon": "🎵"
+    },
+    {
+      "id": "second-heightening",
+      "name": "Second Heightening",
+      "description": "Reach the Second Heightening - perfect color",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Gain perfect color recognition",
+          "target": {
+            "abilityId": "perfect_color"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 200
+          },
+          "description": "Must possess at least 200 Breaths"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At 200 Breaths, colors explode in clarity. You can identify the exact hue\nof any color instantly, distinguish between shades that others cannot perceive.\nThis is useful for Awakening - color is power.",
+      "prerequisites": [
+        "first-heightening"
+      ],
+      "icon": "🌈"
+    },
+    {
+      "id": "third-heightening",
+      "name": "Third Heightening",
+      "description": "Reach the Third Heightening - life sense",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense living auras",
+          "target": {
+            "abilityId": "life_sense"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 600
+          },
+          "description": "Must possess at least 600 Breaths"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At 600 Breaths, you gain perfect life sense. You can feel the auras of\nliving things nearby - their vitality, their health, their Breath. People\nglow with inner light that only you can see.",
+      "prerequisites": [
+        "second-heightening"
+      ]
+    },
+    {
+      "id": "fourth-heightening",
+      "name": "Fourth Heightening",
+      "description": "Reach the Fourth Heightening - perfect instinct",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense danger and hostile intent",
+          "target": {
+            "abilityId": "danger_sense"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 1000
+          },
+          "description": "Must possess at least 1000 Breaths"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At 1000 Breaths, your instincts become supernatural. You sense danger before\nit strikes, feel hostile intent like a physical force. Ambushes are nearly\nimpossible - your body knows to move before your mind understands why.",
+      "prerequisites": [
+        "third-heightening"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "fifth-heightening",
+      "name": "Fifth Heightening",
+      "description": "Reach the Fifth Heightening - agelessness",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "lifespan",
+          "baseValue": 1000,
+          "description": "Stop aging, immune to disease"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 2000
+          },
+          "description": "Must possess at least 2000 Breaths"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At 2000 Breaths, you stop aging. Disease cannot touch you. You become\nfunctionally immortal, as long as you maintain your Breath. This is why\nthe God King and Returned are what they are - Breath sustains life itself.",
+      "prerequisites": [
+        "fourth-heightening"
+      ],
+      "icon": "♾️"
+    },
+    {
+      "id": "basic-awakening",
+      "name": "Basic Awakening",
+      "description": "Learn the basic technique of Awakening",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken objects with simple Commands",
+          "target": {
+            "abilityId": "awaken"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "awakener"
+          },
+          "description": "Must be taught by an Awakener"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "To Awaken an object: touch it, visualize what you want it to do, drain\ncolor from nearby objects to fuel the Command, and speak the Command phrase.\nThe object will then follow your instructions. Simple Commands cost little\nBreath. Complex ones can cost hundreds.",
+      "prerequisites": [
+        "breath-transfer",
+        "color-sense"
+      ]
+    },
+    {
+      "id": "command-crafting",
+      "name": "Command Crafting",
+      "description": "Learn to craft effective Command phrases",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create custom Commands",
+          "target": {
+            "abilityId": "craft_command"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The Command phrase matters. \"Hold things\" works. \"Hold this\" works better.\n\"Protect my back\" is more effective than \"Fight for me.\" The more specific,\nthe better - but also the more limiting. You learn the art of Command phrasing.",
+      "prerequisites": [
+        "basic-awakening"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "visualization",
+      "name": "Clear Visualization",
+      "description": "Master the visualization required for Awakening",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "target": {
+            "techniqueId": "create"
+          },
+          "description": "+X% Awakening success rate"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "You must hold the image perfectly in your mind: what you want the object\nto do, how it should move, its purpose. Distraction breaks the Awakening.\nFear shatters it. Perfect focus is essential.",
+      "prerequisites": [
+        "basic-awakening"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "color-draining",
+      "name": "Efficient Draining",
+      "description": "Learn to drain color efficiently from surroundings",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "resource_efficiency",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "description": "Reduce color cost by X%"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Awakening requires color as fuel - drained from nearby objects. The more\nvibrant the colors, the better. You learn to pull color efficiently, to\nsense which objects have the most to give.",
+      "prerequisites": [
+        "basic-awakening",
+        "second-heightening"
+      ]
+    },
+    {
+      "id": "type-i-awakening",
+      "name": "Type I Awakening",
+      "description": "Master Type I Awakening - simple motion",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken objects for simple motion",
+          "target": {
+            "abilityId": "type_i_awaken"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Type I: Make a rope grab things. Make a stick fight. Simple motion for a\nsingle object. This is the bread and butter of Awakening - cheap, reliable,\neffective.",
+      "prerequisites": [
+        "basic-awakening"
+      ]
+    },
+    {
+      "id": "type-ii-awakening",
+      "name": "Type II Awakening",
+      "description": "Master Type II Awakening - complex motion",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken objects for complex motion",
+          "target": {
+            "abilityId": "type_ii_awaken"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Type II: Make cloth move like a tentacle. Make a cloak defend you actively.\nComplex, fluid motion for a single object. Costs more Breath but far more\nversatile.",
+      "prerequisites": [
+        "type-i-awakening",
+        "command-crafting"
+      ]
+    },
+    {
+      "id": "type-iii-awakening",
+      "name": "Type III Awakening",
+      "description": "Master Type III Awakening - multiple objects",
+      "paradigmId": "breath",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken multiple objects simultaneously",
+          "target": {
+            "abilityId": "type_iii_awaken"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "visualization",
+            "level": 3
+          },
+          "description": "Requires advanced visualization skill"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Type III: Command an army of sticks, a swarm of ropes. Awaken many objects\nat once with a single Command. Expensive but devastating in combat.",
+      "prerequisites": [
+        "type-ii-awakening",
+        "visualization"
+      ]
+    },
+    {
+      "id": "type-iv-awakening",
+      "name": "Type IV Awakening",
+      "description": "Master Type IV Awakening - create Lifeless",
+      "paradigmId": "breath",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create Lifeless - animated corpses with Commands",
+          "target": {
+            "abilityId": "type_iv_awaken"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 1000
+          },
+          "description": "Must have significant Breath to attempt"
+        },
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "lifeless_master"
+          },
+          "description": "Must learn from a Lifeless master"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Type IV: Awaken a corpse. Give a dead body new life, purpose, obedience.\nThis is the darkest use of Breath - creating Lifeless. They follow Commands\nperfectly, never tire, never question. They are not alive, but they move\nand fight as if they were. Costs hundreds of Breaths per corpse.",
+      "prerequisites": [
+        "type-iii-awakening"
+      ],
+      "icon": "💀"
+    },
+    {
+      "id": "willing-transfer",
+      "name": "Willing Transfer",
+      "description": "Learn to receive Breath from willing givers",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Receive Breath from willing donors",
+          "target": {
+            "abilityId": "receive_breath"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The proper way: someone gives their Breath willingly. Perhaps for money,\nperhaps for favor, perhaps out of love or duty. The transfer is clean,\ncomplete, without corruption. This is how most Awakeners gain Breath.",
+      "prerequisites": [
+        "breath-transfer"
+      ]
+    },
+    {
+      "id": "coercive-transfer",
+      "name": "Coercive Transfer",
+      "description": "Learn to take Breath from the reluctant or coerced",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Take Breath from the unwilling (risky)",
+          "target": {
+            "abilityId": "coerce_breath"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "If someone is forced to give Breath - through threat, blackmail, or fear -\nthe transfer becomes difficult. They resist, consciously or not. The Breath\nfights you. But it can be done, if you're strong enough.",
+      "prerequisites": [
+        "willing-transfer"
+      ],
+      "icon": "⚠️"
+    },
+    {
+      "id": "breath-return",
+      "name": "Return Breath",
+      "description": "Learn the difficult art of returning Breath",
+      "paradigmId": "breath",
+      "category": "resource",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Return Breath to its original owner",
+          "target": {
+            "abilityId": "return_breath"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Giving away Breath is harder than receiving it. Your body fights the loss.\nReturning Breath to its original owner is even harder - it must recognize\nthem, flow back willingly. Few Awakeners ever manage it.",
+      "prerequisites": [
+        "willing-transfer",
+        "fifth-heightening"
+      ],
+      "icon": "↩️"
+    },
+    {
+      "id": "command-breaking",
+      "name": "Command Breaking",
+      "description": "Learn to destroy others' Commands",
+      "paradigmId": "breath",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Break and destroy Commands",
+          "target": {
+            "abilityId": "break_command"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 10000
+          },
+          "description": "Requires Eighth Heightening (10,000 Breaths)"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At the Eighth Heightening, you can break Commands - unraveling the Breath\nthat animates an Awakened object, returning it to stillness. This is both\ndefensive (stopping enemy Awakenings) and offensive (wasting their Breath).",
+      "prerequisites": [
+        "type-iii-awakening"
+      ]
+    },
+    {
+      "id": "perfect-awakening",
+      "name": "Perfect Awakening",
+      "description": "Achieve Perfect Awakening - bypass color requirements",
+      "paradigmId": "breath",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken without color requirements",
+          "target": {
+            "abilityId": "perfect_awaken"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 20000
+          },
+          "description": "Requires Ninth Heightening (20,000 Breaths)"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At the Ninth Heightening, you can Awaken anything regardless of color. No\nneed to drain colors from the environment. Your Breath is so vast it provides\nits own fuel. This is mastery of the art.",
+      "prerequisites": [
+        "command-breaking",
+        "type-iv-awakening"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "spontaneous-sentience",
+      "name": "Spontaneous Sentience",
+      "description": "Achieve the Tenth Heightening - spontaneous sentience",
+      "paradigmId": "breath",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 750,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awakenings can spontaneously gain sentience",
+          "target": {
+            "abilityId": "grant_sentience"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "resource_accumulated",
+          "params": {
+            "resourceType": "breath",
+            "resourceAmountRequired": 50000
+          },
+          "description": "Requires Tenth Heightening (50,000 Breaths)"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At the Tenth Heightening, your Awakenings can spontaneously become sentient.\nNot just following Commands, but thinking, choosing, becoming. You create\nlife itself from lifeless matter. This is the power of gods.",
+      "prerequisites": [
+        "perfect-awakening"
+      ],
+      "hidden": true,
+      "icon": "👁️"
+    }
+  ],
+  "entryNodes": [
+    "breath-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "breath_received",
+      "xpAmount": 10,
+      "description": "Receive Breath from another person"
+    },
+    {
+      "eventType": "breath_given",
+      "xpAmount": 25,
+      "description": "Successfully give away Breath"
+    },
+    {
+      "eventType": "breath_returned",
+      "xpAmount": 100,
+      "description": "Return Breath to its original owner"
+    },
+    {
+      "eventType": "object_awakened",
+      "xpAmount": 30,
+      "description": "Successfully Awaken an object"
+    },
+    {
+      "eventType": "command_created",
+      "xpAmount": 50,
+      "description": "Create a new effective Command phrase"
+    },
+    {
+      "eventType": "lifeless_created",
+      "xpAmount": 200,
+      "description": "Successfully create a Lifeless"
+    },
+    {
+      "eventType": "command_broken",
+      "xpAmount": 75,
+      "description": "Break another Awakener's Command"
+    },
+    {
+      "eventType": "heightening_reached",
+      "xpAmount": 150,
+      "description": "Reach a new Heightening level"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

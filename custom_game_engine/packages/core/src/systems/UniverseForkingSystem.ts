@@ -63,6 +63,8 @@ export class UniverseForkingSystem extends BaseSystem {
   public readonly id: SystemId = 'universe_forking';
   public readonly priority: number = 10;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no universe_fork exists
+  public readonly activationComponents = ['universe_fork'] as const;
   protected readonly throttleInterval = 200;  // Every 10 seconds (20 TPS * 10s)
 
   private eventBus: SystemEventManager | null = null;

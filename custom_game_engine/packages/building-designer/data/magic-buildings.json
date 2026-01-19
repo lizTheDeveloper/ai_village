@@ -1,0 +1,2149 @@
+[
+  {
+    "id": "mana_well",
+    "name": "Mana Well",
+    "description": "A crystalline fountain that gathers and radiates magical energy, enhancing mana regeneration for nearby mages.",
+    "category": "research",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      "  ###  ",
+      " #~~~# ",
+      "#~~~~~#",
+      "#~~◊~~#",
+      "#~~~~~#",
+      " #~~~# ",
+      "  #D#  "
+    ],
+    "// Crystal walls = +2.0 mana regen, +15 spell power, academic affinity\n  // Marble floor = divine affinity, +15 mood, calming\n  materials": {
+      "wall": "crystal",
+      "floor": "marble",
+      "door": "silver"
+    },
+    "functionality": [
+      {
+        "type": "mana_well",
+        "params": {
+          "regenBonus": 2,
+          "radius": 15
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "academic"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 0,
+    "style": "arcane",
+    "lore": "The well draws upon leyline energy, concentrating it into a form mages can absorb. The crystal walls amplify and purify the raw magical essence."
+  },
+  {
+    "id": "leyline_nexus",
+    "name": "Leyline Nexus",
+    "description": "A powerful structure built at the intersection of magical leylines, dramatically amplifying all magic in the area.",
+    "category": "research",
+    "tier": 4,
+    "species": "tall",
+    "layout": [
+      "    #####    ",
+      "  ##.....##  ",
+      " #.........# ",
+      "#....~~~....#",
+      "#...~~~~~...#",
+      "#..~~~◊~~~..#",
+      "#...~~~~~...#",
+      "#....~~~....#",
+      " #.........# ",
+      "  ##.....##  ",
+      "    ##D##    "
+    ],
+    "floors": [
+      {
+        "level": 1,
+        "name": "Observation Platform",
+        "ceilingHeight": 6,
+        "layout": [
+          "    #####    ",
+          "  ##WWWWW##  ",
+          " #W.......W# ",
+          "#W.........W#",
+          "#W....^....W#",
+          "#W.........W#",
+          "#W.........W#",
+          " #W.......W# ",
+          "  ##WWWWW##  ",
+          "    #####    "
+        ]
+      }
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "leyline_tap",
+        "params": {
+          "powerMultiplier": 3,
+          "radius": 30
+        }
+      },
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "academic",
+          "bonus": 50
+        }
+      },
+      {
+        "type": "research",
+        "params": {
+          "bonus": 2,
+          "fields": [
+            "arcane",
+            "leyline_theory"
+          ]
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "mana_regen",
+        "magnitude": 5,
+        "radius": 30
+      },
+      {
+        "type": "spell_power",
+        "magnitude": 25,
+        "radius": 25
+      },
+      {
+        "type": "cost_reduction",
+        "magnitude": 15,
+        "radius": 20
+      },
+      {
+        "type": "range_extension",
+        "magnitude": 20,
+        "radius": 20
+      }
+    ],
+    "paradigmAffinity": [
+      "academic",
+      "dimensional"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 5,
+    "style": "arcane",
+    "lore": "Where leylines cross, reality grows thin. The Nexus harnesses this confluence, creating a beacon of magical power visible to those with the sight."
+  },
+  {
+    "id": "spell_focus_tower",
+    "name": "Spell Focus Tower",
+    "description": "A tall tower designed to focus and amplify spellcasting, with enchanted crystals that reduce casting costs.",
+    "category": "research",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      " ##### ",
+      "#.....#",
+      "#..K..#",
+      "#.....#",
+      "#..^..#",
+      "###D###"
+    ],
+    "floors": [
+      {
+        "level": 1,
+        "name": "Focus Chamber",
+        "ceilingHeight": 5,
+        "layout": [
+          " ##### ",
+          "#WWWWW#",
+          "#W.v.W#",
+          "#W...W#",
+          "###^###"
+        ]
+      },
+      {
+        "level": 2,
+        "name": "Crystal Apex",
+        "ceilingHeight": 8,
+        "layout": [
+          "  ###  ",
+          " #...# ",
+          "#..◊..#",
+          " #...# ",
+          "  #v#  "
+        ]
+      }
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "spell_focus",
+        "params": {
+          "costReduction": 20,
+          "rangeBonus": 30
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "cost_reduction",
+        "magnitude": 20,
+        "radius": 0
+      },
+      {
+        "type": "range_extension",
+        "magnitude": 30,
+        "radius": 0
+      },
+      {
+        "type": "cast_speed",
+        "magnitude": 10,
+        "radius": 10
+      }
+    ],
+    "paradigmAffinity": [
+      "academic"
+    ],
+    "capacity": 3,
+    "style": "arcane",
+    "lore": "The crystalline apex catches and focuses ambient magic, allowing spellcasters within to achieve feats normally beyond their reach."
+  },
+  {
+    "id": "sacred_shrine",
+    "name": "Sacred Shrine",
+    "description": "A small shrine dedicated to divine powers, granting favor to the faithful and providing minor healing.",
+    "category": "community",
+    "tier": 1,
+    "species": "medium",
+    "layout": [
+      " ### ",
+      "#...#",
+      "#.T.#",
+      "#...#",
+      "##D##"
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "spirit_anchor",
+        "params": {
+          "spiritType": "divine",
+          "capacity": 1
+        }
+      },
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 10,
+          "radius": 8
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 10,
+        "radius": 10,
+        "paradigm": "divine"
+      },
+      {
+        "type": "protection",
+        "magnitude": 5,
+        "radius": 8
+      }
+    ],
+    "paradigmAffinity": [
+      "divine"
+    ],
+    "elementalAttunement": "fire",
+    "capacity": 5,
+    "style": "divine",
+    "lore": "Even the smallest shrine can serve as a conduit for divine grace. The faithful who pray here find their spirits lifted."
+  },
+  {
+    "id": "temple_of_miracles",
+    "name": "Temple of Miracles",
+    "description": "A grand temple where divine magic flows freely, enabling miracles and granting powerful blessings.",
+    "category": "community",
+    "tier": 4,
+    "species": "tall",
+    "layout": [
+      "  #########  ",
+      " ##.......## ",
+      "##...SSS...##",
+      "#....SSS....#",
+      "#.S.......S.#",
+      "#.S...T...S.#",
+      "#.S.......S.#",
+      "#....SSS....#",
+      "##...SSS...##",
+      " ##.......## ",
+      "  ####D####  "
+    ],
+    "floors": [
+      {
+        "level": 1,
+        "name": "Bell Tower",
+        "ceilingHeight": 10,
+        "layout": [
+          "  #####  ",
+          " #WWWWW# ",
+          "#W.....W#",
+          "#W..v..W#",
+          "#W.....W#",
+          " #WWWWW# ",
+          "  #####  "
+        ]
+      }
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "spirit_anchor",
+        "params": {
+          "spiritType": "divine",
+          "capacity": 5
+        }
+      },
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "divine",
+          "bonus": 40
+        }
+      },
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 25,
+          "radius": 25
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 40,
+        "radius": 30,
+        "paradigm": "divine"
+      },
+      {
+        "type": "protection",
+        "magnitude": 20,
+        "radius": 25
+      },
+      {
+        "type": "mana_regen",
+        "magnitude": 2,
+        "radius": 20
+      },
+      "// Divine favor regen"
+    ],
+    "paradigmAffinity": [
+      "divine",
+      "belief"
+    ],
+    "elementalAttunement": "fire",
+    "capacity": 30,
+    "style": "divine",
+    "lore": "The Temple stands as a beacon of faith. Within these walls, prayers are answered and miracles manifest for the truly devoted."
+  },
+  {
+    "id": "kami_shrine",
+    "name": "Kami Shrine",
+    "description": "A traditional shrine that attracts and houses kami spirits, who bless the surrounding area.",
+    "category": "community",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      "   ###   ",
+      "  #...#  ",
+      " #.....# ",
+      "#...T...#",
+      "#.......#",
+      " #.....# ",
+      "  ##D##  "
+    ],
+    "// Bamboo = shinto +15, spirit_attraction, calming\n  // Living wood = shinto +25, alive, comforting\n  materials": {
+      "wall": "bamboo",
+      "floor": "living_wood",
+      "door": "bamboo"
+    },
+    "functionality": [
+      {
+        "type": "spirit_anchor",
+        "params": {
+          "spiritType": "kami",
+          "capacity": 3,
+          "kamiTypes": [
+            "nature",
+            "place",
+            "ancestor"
+          ]
+        }
+      },
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 15,
+          "radius": 15
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "shinto"
+    ],
+    "elementalAttunement": "wood",
+    "capacity": 10,
+    "style": "rustic",
+    "lore": "The kami are everywhere, but they prefer places of beauty and respect. The living bamboo and wood invite them to dwell and share their blessings."
+  },
+  {
+    "id": "torii_gate",
+    "name": "Torii Gate",
+    "description": "A sacred gate marking the boundary between mundane and sacred space, purifying all who pass through.",
+    "category": "decoration",
+    "tier": 1,
+    "species": "tall",
+    "layout": [
+      "#.....#",
+      "#######",
+      "#.....#",
+      "..D.D.."
+    ],
+    "materials": {
+      "wall": "wood",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "ward",
+        "params": {
+          "type": "purification",
+          "strength": 20
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 10,
+        "radius": 5,
+        "paradigm": "shinto"
+      },
+      {
+        "type": "corruption_resist",
+        "magnitude": 30,
+        "radius": 10
+      }
+    ],
+    "paradigmAffinity": [
+      "shinto",
+      "threshold"
+    ],
+    "elementalAttunement": "wood",
+    "capacity": 0,
+    "style": "rustic",
+    "lore": "The torii marks the transition from the profane to the sacred. Evil spirits cannot pass, and the pure find their burdens lightened."
+  },
+  {
+    "id": "dream_sanctuary",
+    "name": "Dream Sanctuary",
+    "description": "A quiet sanctuary designed for dream magic, with beds arranged for lucid dreaming and shared visions.",
+    "category": "research",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "#########",
+      "#B.....B#",
+      "#.......#",
+      "#...T...#",
+      "#.......#",
+      "#B.....B#",
+      "####D####"
+    ],
+    "// Dreams = dream +50, dream_induction, illusion_enhancement, dreamy atmosphere\n  // Moonlight = dream +30, spirit_attraction, lunar dreams\n  // Mist = threshold +25, dream +20, blurs boundaries\n  materials": {
+      "wall": "dreams",
+      "floor": "moonlight",
+      "door": "mist"
+    },
+    "functionality": [
+      {
+        "type": "dream_anchor",
+        "params": {
+          "stability": 80,
+          "sharedDreaming": true
+        }
+      },
+      {
+        "type": "sleeping",
+        "params": {
+          "beds": 4,
+          "restQuality": 1.5
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "dream"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 4,
+    "style": "ethereal",
+    "lore": "Within these walls of crystallized thought, the boundary between waking and dreaming dissolves. Sleepers here may walk the realms of dream with purpose."
+  },
+  {
+    "id": "nightmare_ward",
+    "name": "Nightmare Ward",
+    "description": "A protective structure that shields the area from nightmare incursions and dark dream entities.",
+    "category": "military",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      " ##### ",
+      "#.....#",
+      "#..K..#",
+      "#.....#",
+      "###D###"
+    ],
+    "// Silver = spirit_repulsion +20, corruption_resistance +25, divine +15\n  // Sunlight = spirit_repulsion +30, healing_aura, corruption_resistance +40\n  // Iron = spirit_repulsion +30 (cold iron repels fae)\n  materials": {
+      "wall": "silver",
+      "floor": "sunlight",
+      "door": "iron"
+    },
+    "functionality": [
+      {
+        "type": "ward",
+        "params": {
+          "type": "nightmare",
+          "strength": 50,
+          "radius": 25
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "dream"
+    ],
+    "capacity": 2,
+    "style": "arcane",
+    "lore": "The ward burns with cold silver light during the night, its sunlit floor and iron threshold a beacon that repels the creatures that hunt through dreams."
+  },
+  {
+    "id": "harmony_hall",
+    "name": "Harmony Hall",
+    "description": "A performance hall with perfect acoustics, where bardic magic resonates with supernatural power.",
+    "category": "community",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      "###########",
+      "#.........#",
+      "#...CCC...#",
+      "#.........#",
+      "#T.......T#",
+      "#.........#",
+      "#.........#",
+      "#.........#",
+      "####DDD####"
+    ],
+    "// Music = song +60, sound_amplification, emotion_amplification, euphoric\n  // Carpet = sound_dampening (controls echoes), comforting, +10 mood\n  // Bronze = allomancy (Seeker detects magic), metal element\n  materials": {
+      "wall": "music",
+      "floor": "carpet",
+      "door": "bronze"
+    },
+    "functionality": [
+      {
+        "type": "song_amplifier",
+        "params": {
+          "powerBonus": 40,
+          "harmonyBonus": 25
+        }
+      },
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 20,
+          "radius": 30
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "song"
+    ],
+    "elementalAttunement": "metal",
+    "capacity": 50,
+    "style": "rustic",
+    "lore": "The Hall was designed by a legendary bard-architect who understood that space itself can be an instrument. Its walls hum with frozen music."
+  },
+  {
+    "id": "echo_chamber",
+    "name": "Echo Chamber",
+    "description": "A domed chamber where sounds persist and echo with magical properties, perfect for voice-based magic.",
+    "category": "research",
+    "tier": 2,
+    "species": "tall",
+    "layout": [
+      "  #####  ",
+      " #.....# ",
+      "#.......#",
+      "#...T...#",
+      "#.......#",
+      " #.....# ",
+      "  ##D##  "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "song_amplifier",
+        "params": {
+          "echoStrength": 3,
+          "duration": 60
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 20,
+        "radius": 0,
+        "paradigm": "song"
+      },
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 15,
+        "radius": 0,
+        "paradigm": "name"
+      },
+      {
+        "type": "duration_extension",
+        "magnitude": 50,
+        "radius": 0
+      }
+    ],
+    "paradigmAffinity": [
+      "song",
+      "name",
+      "echo"
+    ],
+    "elementalAttunement": "metal",
+    "capacity": 5,
+    "style": "ancient",
+    "lore": "Words spoken here do not die. They linger, repeating in harmonics that can last for days—or forever, if spoken with power."
+  },
+  {
+    "id": "standing_stones",
+    "name": "Standing Stones",
+    "description": "A circle of carved standing stones that radiate permanent runic protection and power.",
+    "category": "decoration",
+    "tier": 4,
+    "species": "large",
+    "layout": [
+      "   T...T   ",
+      "  .......  ",
+      " T.......T ",
+      "...........  ",
+      "...........  ",
+      "...........  ",
+      " T.......T ",
+      "  .......  ",
+      "   T...T   "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "stone"
+    },
+    "functionality": [
+      {
+        "type": "ward",
+        "params": {
+          "type": "runic",
+          "strength": 40,
+          "radius": 35
+        }
+      },
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "rune",
+          "bonus": 30
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 30,
+        "radius": 35,
+        "paradigm": "rune"
+      },
+      {
+        "type": "protection",
+        "magnitude": 25,
+        "radius": 35
+      },
+      {
+        "type": "duration_extension",
+        "magnitude": 100,
+        "radius": 30
+      },
+      "// Runes last twice as long"
+    ],
+    "paradigmAffinity": [
+      "rune"
+    ],
+    "elementalAttunement": "earth",
+    "capacity": 0,
+    "style": "ancient",
+    "lore": "The stones have stood for millennia, their runes worn but still potent. Those who understand the old ways find their own runework amplified here."
+  },
+  {
+    "id": "vitality_font",
+    "name": "Vitality Font",
+    "description": "A sacred pool where blood magic is channeled for healing and restoration, never for harm.",
+    "category": "community",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "  #####  ",
+      " #~~~~~# ",
+      "#~~~~~~~#",
+      "#~~~T~~~#",
+      "#~~~~~~~#",
+      " #~~~~~# ",
+      "  ##D##  "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "blood_font",
+        "params": {
+          "purpose": "healing",
+          "efficiency": 2
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 25,
+        "radius": 0,
+        "paradigm": "blood"
+      },
+      {
+        "type": "blood_efficiency",
+        "magnitude": 50,
+        "radius": 10
+      },
+      {
+        "type": "mana_regen",
+        "magnitude": 1,
+        "radius": 10
+      },
+      "// Life force regen"
+    ],
+    "paradigmAffinity": [
+      "blood"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 6,
+    "style": "ancient",
+    "lore": "Blood carries life, and this font redirects that vital force toward healing. Those who donate here find their sacrifice magnified in the good it does."
+  },
+  {
+    "id": "pact_circle",
+    "name": "Pact Circle",
+    "description": "A warded ritual space for negotiating contracts with supernatural entities.",
+    "category": "research",
+    "tier": 4,
+    "species": "tall",
+    "layout": [
+      "  #######  ",
+      " #.......# ",
+      "#.........#",
+      "#....T....#",
+      "#.........#",
+      "#.........#",
+      " #.......# ",
+      "  ###D###  "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "pact_altar",
+        "params": {
+          "leverage": 20,
+          "safety": 80
+        }
+      },
+      {
+        "type": "ward",
+        "params": {
+          "type": "containment",
+          "strength": 60
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 35,
+        "radius": 0,
+        "paradigm": "pact"
+      },
+      {
+        "type": "pact_leverage",
+        "magnitude": 20,
+        "radius": 0
+      },
+      {
+        "type": "protection",
+        "magnitude": 40,
+        "radius": 5
+      },
+      "// Protection during negotiation"
+    ],
+    "paradigmAffinity": [
+      "pact"
+    ],
+    "capacity": 3,
+    "style": "arcane",
+    "lore": "The circle binds both parties to fair negotiation. Entities cannot breach the wards, and practitioners are protected from unfavorable terms."
+  },
+  {
+    "id": "true_name_vault",
+    "name": "True Name Vault",
+    "description": "A heavily warded vault where true names are stored and protected from those who would misuse them.",
+    "category": "storage",
+    "tier": 4,
+    "species": "short",
+    "layout": [
+      "#########",
+      "#SSSSSSS#",
+      "#S.....S#",
+      "#S..K..S#",
+      "#S.....S#",
+      "#SSSSSSS#",
+      "####D####"
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "true_name_vault",
+        "params": {
+          "capacity": 100,
+          "protection": 90
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "slots": 100,
+          "type": "names"
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "name_protection",
+        "magnitude": 90,
+        "radius": 0
+      },
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 20,
+        "radius": 0,
+        "paradigm": "name"
+      }
+    ],
+    "paradigmAffinity": [
+      "name"
+    ],
+    "capacity": 2,
+    "style": "ancient",
+    "lore": "Names are power. This vault keeps the most dangerous names locked away, their power dormant until legitimately needed."
+  },
+  {
+    "id": "metal_reserve",
+    "name": "Metal Reserve",
+    "description": "A secure facility storing pure allomantic metals for Mistings and Mistborn.",
+    "category": "storage",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "###########",
+      "#SSSSSSSSS#",
+      "#S.......S#",
+      "#S.......S#",
+      "#S...K...S#",
+      "#S.......S#",
+      "#SSSSSSSSS#",
+      "####DDD####"
+    ],
+    "materials": {
+      "wall": "metal",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "metal_reserve",
+        "params": {
+          "metals": [
+            "iron",
+            "steel",
+            "tin",
+            "pewter",
+            "copper",
+            "bronze",
+            "zinc",
+            "brass"
+          ]
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "slots": 200,
+          "type": "allomantic_metals"
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 15,
+        "radius": 5,
+        "paradigm": "allomancy"
+      }
+    ],
+    "paradigmAffinity": [
+      "allomancy"
+    ],
+    "elementalAttunement": "metal",
+    "capacity": 4,
+    "style": "modern",
+    "lore": "Pure metals, properly stored and catalogued. Allomancers know that impure metals can kill—this reserve ensures that never happens."
+  },
+  {
+    "id": "harmony_garden",
+    "name": "Harmony Garden",
+    "description": "A carefully designed garden that balances the five elements, optimizing chi flow for the entire area.",
+    "category": "decoration",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      ".............",
+      ".~~~.T.T.~~~.",
+      ".~~~.....~~~.",
+      ".....T.T.....",
+      ".T.........T.",
+      ".....T.T.....",
+      ".~~~.....~~~.",
+      ".~~~.T.T.~~~.",
+      "............."
+    ],
+    "materials": {
+      "wall": "wood",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "harmony_resonator",
+        "params": {
+          "elements": [
+            "wood",
+            "fire",
+            "earth",
+            "metal",
+            "water"
+          ],
+          "balance": 0.9
+        }
+      },
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 15,
+          "radius": 20
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "elemental_attune",
+        "magnitude": 15,
+        "radius": 25,
+        "element": "wood"
+      },
+      {
+        "type": "elemental_attune",
+        "magnitude": 15,
+        "radius": 25,
+        "element": "water"
+      },
+      {
+        "type": "mana_regen",
+        "magnitude": 1,
+        "radius": 20
+      }
+    ],
+    "paradigmAffinity": [
+      "shinto"
+    ],
+    "capacity": 0,
+    "style": "rustic",
+    "lore": "In perfect balance, all elements support each other. This garden embodies that principle, creating a space where magic flows naturally."
+  },
+  {
+    "id": "fire_fount",
+    "name": "Fire Fount",
+    "description": "A blazing brazier that amplifies fire-element magic and provides warmth and inspiration.",
+    "category": "decoration",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      "  ###  ",
+      " #~~~# ",
+      "#~~~~~#",
+      "#~~F~~#",
+      "#~~~~~#",
+      " #~~~# ",
+      "  ###  "
+    ],
+    "// Magma = fire +90, light_emission, extreme heat, alive\n  // Obsidian = dimensional_stability, scrying bonus\n  // Bronze = allomancy, conducts magic\n  materials": {
+      "wall": "magma",
+      "floor": "obsidian",
+      "door": "bronze"
+    },
+    "functionality": [
+      {
+        "type": "harmony_resonator",
+        "params": {
+          "elements": [
+            "fire"
+          ],
+          "strength": 50
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "academic"
+    ],
+    "elementalAttunement": "fire",
+    "capacity": 0,
+    "style": "ancient",
+    "lore": "The eternal flame burns without fuel, its magma walls a pure expression of the fire element. Pyromancers find their power magnified in its presence."
+  },
+  {
+    "id": "water_fount",
+    "name": "Water Fount",
+    "description": "A perpetual fountain that amplifies water-element magic and promotes healing and clarity.",
+    "category": "decoration",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      "  ###  ",
+      " #~~~# ",
+      "#~~~~~#",
+      "#~~◊~~#",
+      "#~~~~~#",
+      " #~~~# ",
+      "  ###  "
+    ],
+    "// Crystal = +2.0 mana regen, conducts magic, academic affinity\n  // Coral = water element +80, shinto +20, living, spirit_attraction\n  // Pearl = divine +15, dream +10, calming, lustrous\n  materials": {
+      "wall": "crystal",
+      "floor": "coral",
+      "door": "pearl"
+    },
+    "functionality": [
+      {
+        "type": "harmony_resonator",
+        "params": {
+          "elements": [
+            "water"
+          ],
+          "strength": 50
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "academic"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 0,
+    "style": "ancient",
+    "lore": "The waters flow in an endless cycle through crystal and coral, purifying and renewing. Hydromancers and healers alike draw strength from its eternal flow."
+  },
+  {
+    "id": "dimensional_anchor",
+    "name": "Dimensional Anchor",
+    "description": "A massive crystalline structure that stabilizes the local dimensional fabric, preventing rifts and corruption.",
+    "category": "military",
+    "tier": 5,
+    "species": "large",
+    "layout": [
+      "   #####   ",
+      "  #.....#  ",
+      " #.......# ",
+      "#....K....#",
+      "#.........#",
+      "#....◊....#",
+      "#.........#",
+      " #.......# ",
+      "  #.....#  ",
+      "   ##D##   "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "metal"
+    },
+    "functionality": [
+      {
+        "type": "dimensional_fold",
+        "params": {
+          "stabilization": 90,
+          "radius": 50
+        }
+      },
+      {
+        "type": "ward",
+        "params": {
+          "type": "dimensional",
+          "strength": 80
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "corruption_resist",
+        "magnitude": 80,
+        "radius": 50
+      },
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 25,
+        "radius": 30,
+        "paradigm": "dimensional"
+      },
+      {
+        "type": "protection",
+        "magnitude": 30,
+        "radius": 40
+      }
+    ],
+    "paradigmAffinity": [
+      "dimensional"
+    ],
+    "capacity": 3,
+    "style": "arcane",
+    "lore": "Where reality grows thin, the Anchor holds it firm. Without it, this region would long ago have been swallowed by the spaces between."
+  },
+  {
+    "id": "chaos_nexus",
+    "name": "Chaos Nexus",
+    "description": "A dangerously unstable structure where wild magic runs rampant. Powerful but unpredictable.",
+    "category": "research",
+    "tier": 5,
+    "species": "tall",
+    "layout": [
+      "  ?????  ",
+      " ?.....? ",
+      "?.......?",
+      "?...◊...?",
+      "?.......?",
+      " ?.....? ",
+      "  ??D??  "
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "stone",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "wild",
+          "bonus": 100,
+          "instability": 50
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 100,
+        "radius": 15,
+        "paradigm": "wild"
+      },
+      {
+        "type": "spell_power",
+        "magnitude": 50,
+        "radius": 10
+      },
+      {
+        "type": "luck_modifier",
+        "magnitude": -20,
+        "radius": 20
+      },
+      "// Unpredictable!"
+    ],
+    "paradigmAffinity": [
+      "wild"
+    ],
+    "capacity": 1,
+    "style": "whimsical",
+    "lore": "WARNING: The Nexus is not for the faint of heart. Magic here is amplified beyond reason, but control is nearly impossible. Proceed at your own risk."
+  },
+  {
+    "id": "passion_chamber",
+    "name": "Passion Chamber",
+    "description": "A space designed to amplify and channel emotional energy into magical power.",
+    "category": "research",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      " ##### ",
+      "#.....#",
+      "#..K..#",
+      "#.....#",
+      "###D###"
+    ],
+    "// Emotion = emotional +60, emotion_amplification, euphoric/terrifying\n  materials": {
+      "wall": "emotion",
+      "floor": "carpet",
+      "door": "living_wood"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "emotional",
+          "bonus": 40
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "emotional"
+    ],
+    "capacity": 4,
+    "style": "ethereal",
+    "lore": "Here, feelings become fuel. Rage multiplies fire, love enhances healing, grief creates wards. The chamber responds to what you feel."
+  },
+  {
+    "id": "catharsis_pool",
+    "name": "Catharsis Pool",
+    "description": "A tranquil pool where emotions can be released and transformed into pure magical energy.",
+    "category": "community",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "  #####  ",
+      " #~~~~~# ",
+      "#~~~~~~~#",
+      "#~~~◊~~~#",
+      "#~~~~~~~#",
+      " #~~~~~# ",
+      "  ##D##  "
+    ],
+    "// Tears = emotional +60, sympathy +30, purifying\n  materials": {
+      "wall": "tears",
+      "floor": "water",
+      "door": "mist"
+    },
+    "functionality": [
+      {
+        "type": "mood_aura",
+        "params": {
+          "bonus": 30,
+          "radius": 20
+        }
+      },
+      {
+        "type": "healing",
+        "params": {
+          "type": "emotional",
+          "strength": 50
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "emotional",
+      "sympathy"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 8,
+    "style": "ethereal",
+    "lore": "The pool accepts all feelings - joy and sorrow, rage and peace. What you release returns as power, cleansed of its burden."
+  },
+  {
+    "id": "sympathy_link_chamber",
+    "name": "Sympathy Link Chamber",
+    "description": "A workshop for creating and maintaining sympathetic connections between objects.",
+    "category": "research",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "#######",
+      "#.....#",
+      "#..K..#",
+      "#.....#",
+      "#..T..#",
+      "###D###"
+    ],
+    "// Amber = echo +30, memory enhancement, time preservation\n  // Copper = allomancy +30 (but conducts sympathy too)\n  materials": {
+      "wall": "amber",
+      "floor": "copper",
+      "door": "bronze"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "sympathy",
+          "bonus": 35
+        }
+      },
+      {
+        "type": "research",
+        "params": {
+          "bonus": 1.5,
+          "fields": [
+            "sympathy",
+            "connections"
+          ]
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "sympathy"
+    ],
+    "elementalAttunement": "fire",
+    "capacity": 3,
+    "style": "academic",
+    "lore": "What touches here remains connected. Hair, blood, and belonging create links that distance cannot sever. Handle with care."
+  },
+  {
+    "id": "debt_ledger_hall",
+    "name": "Debt Ledger Hall",
+    "description": "A hall where magical debts are recorded, tracked, and can be traded or called in.",
+    "category": "commercial",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "###########",
+      "#SSSSSSSSS#",
+      "#S.......S#",
+      "#S...K...S#",
+      "#S.......S#",
+      "#SSSSSSSSS#",
+      "####DDD####"
+    ],
+    "// Pages = literary +40, name +20, memory enhancement\n  // Ink = literary +35, name +30, pact_binding, truth_compulsion\n  materials": {
+      "wall": "pages",
+      "floor": "marble",
+      "door": "ink"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "debt",
+          "bonus": 45
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "slots": 100,
+          "type": "contracts"
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "debt"
+    ],
+    "capacity": 6,
+    "style": "modern",
+    "lore": "Every favor owed is written here. The ledger never forgets, and debts must always be paid. The magic ensures it."
+  },
+  {
+    "id": "bureau_of_forms",
+    "name": "Bureau of Forms",
+    "description": "A temple to bureaucracy where properly filed paperwork has magical power.",
+    "category": "community",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      "###########",
+      "#SSSSSSSSS#",
+      "#S.......S#",
+      "#S.......S#",
+      "#S...K...S#",
+      "#S.......S#",
+      "#SSSSSSSSS#",
+      "####DDD####"
+    ],
+    "// Pages = literary +40, memory enhancement\n  materials": {
+      "wall": "pages",
+      "floor": "stone",
+      "door": "iron"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "bureaucratic",
+          "bonus": 50
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "slots": 1000,
+          "type": "forms"
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "bureaucratic"
+    ],
+    "capacity": 10,
+    "style": "modern",
+    "lore": "Form 27-B/6 is not merely a request - it is a binding magical contract. File incorrectly and face the consequences."
+  },
+  {
+    "id": "fortunes_wheel",
+    "name": "Fortune's Wheel",
+    "description": "A gambling hall where luck itself can be bent, borrowed, and invested.",
+    "category": "commercial",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "  #####  ",
+      " #.....# ",
+      "#...◊...#",
+      "#.......#",
+      "#...T...#",
+      " #.....# ",
+      "  ##D##  "
+    ],
+    "// Gold = luck +10, commerce +30, spirit_attraction\n  // Jade = luck affinity (implicit), earth element, calming\n  materials": {
+      "wall": "gold",
+      "floor": "jade",
+      "door": "silver"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "luck",
+          "bonus": 40
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "luck_modifier",
+        "magnitude": 25,
+        "radius": 15
+      }
+    ],
+    "paradigmAffinity": [
+      "luck"
+    ],
+    "capacity": 12,
+    "style": "whimsical",
+    "lore": "Fortune favors the bold - but fortune can also be convinced. Spend luck here, and the universe will balance it later."
+  },
+  {
+    "id": "void_chapel",
+    "name": "Void Chapel",
+    "description": "A chapel of absolute silence where negation magic is practiced.",
+    "category": "research",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      " ####### ",
+      "#.......#",
+      "#.......#",
+      "#...K...#",
+      "#.......#",
+      "#.......#",
+      "###DDD###"
+    ],
+    "// Silence = name +30, threshold +25, sound_dampening 100\n  // Void = dimensional +40, dimensional_flux, terrifying\n  materials": {
+      "wall": "silence",
+      "floor": "void",
+      "door": "shadow"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "silence",
+          "bonus": 60
+        }
+      },
+      {
+        "type": "ward",
+        "params": {
+          "type": "sound",
+          "strength": 100
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "silence"
+    ],
+    "capacity": 4,
+    "style": "ethereal",
+    "lore": "In silence, all magic ends. Here, spells are unmade and voices fail. Enter only if you are prepared to hear nothing."
+  },
+  {
+    "id": "escher_observatory",
+    "name": "Escher Observatory",
+    "description": "A building of impossible geometry where paradoxes are studied and weaponized.",
+    "category": "research",
+    "tier": 5,
+    "species": "tall",
+    "layout": [
+      "  #####  ",
+      " #.....# ",
+      "#..^^^..#",
+      "#.......#",
+      "#...K...#",
+      "#.......#",
+      " #.....# ",
+      "  ##D##  "
+    ],
+    "// Time = dimensional +40, echo +35, time_dilation\n  // Crystal = academic +25, conducts_magic\n  materials": {
+      "wall": "time",
+      "floor": "crystal",
+      "door": "void"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "paradox",
+          "bonus": 70
+        }
+      },
+      {
+        "type": "research",
+        "params": {
+          "bonus": 2,
+          "fields": [
+            "paradox",
+            "logic",
+            "impossibility"
+          ]
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "paradox",
+      "dimensional"
+    ],
+    "capacity": 3,
+    "style": "impossible",
+    "lore": "The stairs go up and down simultaneously. The inside is larger than the outside. Those who study here learn to hold contradictions."
+  },
+  {
+    "id": "memory_archive",
+    "name": "Memory Archive",
+    "description": "A library where magical echoes are stored and can be replayed.",
+    "category": "research",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      "###########",
+      "#SSSSSSSSS#",
+      "#S.......S#",
+      "#S.......S#",
+      "#S...K...S#",
+      "#S.......S#",
+      "#SSSSSSSSS#",
+      "####DDD####"
+    ],
+    "// Memory = echo +50, name +25, memory_enhancement +60\n  materials": {
+      "wall": "memory",
+      "floor": "amber",
+      "door": "crystal"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "echo",
+          "bonus": 50
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "slots": 500,
+          "type": "echoes"
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "echo"
+    ],
+    "capacity": 8,
+    "style": "ancient",
+    "lore": "Every spell cast leaves an echo. Here, those echoes are preserved, catalogued, and can be awakened again."
+  },
+  {
+    "id": "arcade_sanctum",
+    "name": "Arcade Sanctum",
+    "description": "A mystical arcade where reality follows game rules that can be exploited.",
+    "category": "research",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      "#########",
+      "#.......#",
+      "#.CCCCC.#",
+      "#.......#",
+      "#...K...#",
+      "#.......#",
+      "####D####"
+    ],
+    "// Crystal = academic +25, conducts_magic\n  materials": {
+      "wall": "crystal",
+      "floor": "light",
+      "door": "bronze"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "game",
+          "bonus": 45
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 45,
+        "radius": 10,
+        "paradigm": "game"
+      }
+    ],
+    "paradigmAffinity": [
+      "game"
+    ],
+    "capacity": 6,
+    "style": "modern",
+    "lore": "In this sanctum, everything has stats. Find the exploits, level up, and remember: there is always a win condition."
+  },
+  {
+    "id": "makers_sanctum",
+    "name": "Maker's Sanctum",
+    "description": "A sacred workshop where the act of creation itself becomes magical.",
+    "category": "production",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "#########",
+      "#...K...#",
+      "#.......#",
+      "#..CCC..#",
+      "#.......#",
+      "#...T...#",
+      "####D####"
+    ],
+    "// Living wood = shinto +25, alive, breath +15\n  materials": {
+      "wall": "living_wood",
+      "floor": "stone",
+      "door": "iron"
+    },
+    "functionality": [
+      {
+        "type": "crafting",
+        "params": {
+          "station": "sanctum",
+          "speed": 1.5,
+          "quality": 1.5
+        }
+      },
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "craft",
+          "bonus": 40
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "craft"
+    ],
+    "elementalAttunement": "earth",
+    "capacity": 4,
+    "style": "rustic",
+    "lore": "Here, every hammer strike is a prayer. The better you craft, the more power you channel. Quality is magic."
+  },
+  {
+    "id": "merchants_exchange",
+    "name": "Merchant's Exchange",
+    "description": "A marketplace where the act of fair trade generates magical power.",
+    "category": "commercial",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      "#############",
+      "#...........#",
+      "#.C.......C.#",
+      "#...........#",
+      "#.....K.....#",
+      "#...........#",
+      "#.C.......C.#",
+      "####DDDDD####"
+    ],
+    "// Gold = commerce +30, luck +10, divine +20\n  materials": {
+      "wall": "gold",
+      "floor": "marble",
+      "door": "bronze"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "commerce",
+          "bonus": 45
+        }
+      },
+      {
+        "type": "shop",
+        "params": {
+          "type": "exchange",
+          "range": 30
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "commerce"
+    ],
+    "capacity": 20,
+    "style": "modern",
+    "lore": "Every fair exchange creates power. The more value flows through these walls, the stronger the magic grows."
+  },
+  {
+    "id": "moon_temple",
+    "name": "Moon Temple",
+    "description": "A temple aligned with lunar phases, its power waxing and waning with the moon.",
+    "category": "community",
+    "tier": 3,
+    "species": "tall",
+    "layout": [
+      "   #####   ",
+      "  #.....#  ",
+      " #.......# ",
+      "#....◊....#",
+      "#.........#",
+      " #.......# ",
+      "  #.....#  ",
+      "   ##D##   "
+    ],
+    "// Moonlight = dream +30, spirit_attraction, lunar dreams\n  // Silver = dream +15, spirit_repulsion (protection), divine +15\n  materials": {
+      "wall": "moonlight",
+      "floor": "silver",
+      "door": "pearl"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "lunar",
+          "bonus": 50,
+          "lunar_phase_dependent": true
+        }
+      }
+    ],
+    "magicalEffects": [
+      {
+        "type": "paradigm_bonus",
+        "magnitude": 50,
+        "radius": 25,
+        "conditions": {
+          "timeOfDay": "night"
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "lunar",
+      "dream"
+    ],
+    "elementalAttunement": "water",
+    "capacity": 15,
+    "style": "divine",
+    "lore": "As the moon waxes, so does this temple\\'s power. At the full moon, miracles are possible. At the new moon, only shadows remain."
+  },
+  {
+    "id": "solstice_circle",
+    "name": "Solstice Circle",
+    "description": "A stone circle aligned with the seasons, drawing power from the turning of the year.",
+    "category": "community",
+    "tier": 3,
+    "species": "medium",
+    "layout": [
+      "  .###.  ",
+      " #.....# ",
+      "#.......#",
+      "#...◊...#",
+      "#.......#",
+      " #.....# ",
+      "  .###.  "
+    ],
+    "// Stone = rune +15, dimensional_stability\n  // Living wood = alive, shinto +25\n  materials": {
+      "wall": "stone",
+      "floor": "living_wood",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "seasonal",
+          "bonus": 45,
+          "season_dependent": true
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "seasonal",
+      "shinto"
+    ],
+    "elementalAttunement": "wood",
+    "capacity": 20,
+    "style": "ancient",
+    "lore": "Spring brings growth, summer brings fire, autumn brings wisdom, winter brings rest. The circle turns, and so does power."
+  },
+  {
+    "id": "daemon_sanctum",
+    "name": "Daemon Sanctum",
+    "description": "A sacred space where humans commune with their daemons and Dust flows freely.",
+    "category": "research",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      " ####### ",
+      "#.......#",
+      "#...T...#",
+      "#.......#",
+      "#...K...#",
+      "#.......#",
+      "###DDD###"
+    ],
+    "// Soul stuff = breath +50, emotional +40, spirit_attraction\n  materials": {
+      "wall": "soul_stuff",
+      "floor": "starlight",
+      "door": "silver"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "daemon",
+          "bonus": 55
+        }
+      },
+      {
+        "type": "research",
+        "params": {
+          "bonus": 1.5,
+          "fields": [
+            "dust",
+            "daemon_bonds",
+            "multiverse"
+          ]
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "daemon"
+    ],
+    "capacity": 6,
+    "style": "ethereal",
+    "lore": "Here, the bond between human and daemon is strengthened. Dust swirls visibly, and the truth can be read in the Alethiometer."
+  },
+  {
+    "id": "absorption_chamber",
+    "name": "Absorption Chamber",
+    "description": "A dangerous facility where practitioners consume materials, creatures, or concepts to gain their properties.",
+    "category": "research",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      "#######",
+      "#.....#",
+      "#..◊..#",
+      "#.....#",
+      "#..K..#",
+      "###D###"
+    ],
+    "// Void = dimensional +40, absorbs things\n  materials": {
+      "wall": "void",
+      "floor": "obsidian",
+      "door": "iron"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "consumption",
+          "bonus": 50
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "consumption"
+    ],
+    "capacity": 2,
+    "style": "unsettling",
+    "lore": "What you eat becomes part of you. But consume too much, and you may forget who you were. The void always hungers."
+  },
+  {
+    "id": "talent_registry",
+    "name": "Talent Registry",
+    "description": "An office where unique magical talents are identified, recorded, and occasionally enhanced.",
+    "category": "community",
+    "tier": 2,
+    "species": "medium",
+    "layout": [
+      "#########",
+      "#SSSSSSS#",
+      "#S.....S#",
+      "#S..K..S#",
+      "#S.....S#",
+      "####D####"
+    ],
+    "materials": {
+      "wall": "pages",
+      "floor": "wood",
+      "door": "wood"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "talent",
+          "bonus": 30
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "talent"
+    ],
+    "capacity": 8,
+    "style": "rustic",
+    "lore": "Everyone has exactly one magical talent. Some change fingernail colors. Others transform reality. Come discover yours."
+  },
+  {
+    "id": "story_circle",
+    "name": "Story Circle",
+    "description": "A theater where stories have real power and narrative conventions become binding laws.",
+    "category": "community",
+    "tier": 4,
+    "species": "tall",
+    "layout": [
+      "  #######  ",
+      " #.......# ",
+      "#.........#",
+      "#....C....#",
+      "#.........#",
+      "#.........#",
+      " #.......# ",
+      "  ###D###  "
+    ],
+    "// Pages = literary +40\n  // Ink = truth_compulsion, pact_binding\n  materials": {
+      "wall": "pages",
+      "floor": "ink",
+      "door": "living_wood"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "narrative",
+          "bonus": 55
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "narrative",
+      "literary"
+    ],
+    "capacity": 30,
+    "style": "theatrical",
+    "lore": "Here, the million-to-one chance succeeds every time. Heroes triumph, villains monologue, and stories write themselves into reality."
+  },
+  {
+    "id": "library_of_babel",
+    "name": "Library of Babel",
+    "description": "A hexagonal library containing every possible book, where words have physical weight.",
+    "category": "research",
+    "tier": 5,
+    "species": "tall",
+    "layout": [
+      "  #####  ",
+      " #SSSSS# ",
+      "#SSSSSSS#",
+      "#SS.K.SS#",
+      "#SSSSSSS#",
+      " #SSSSS# ",
+      "  ##D##  "
+    ],
+    "// Pages = literary +40, memory_enhancement\n  // Thought = academic +30, memory_enhancement +30\n  materials": {
+      "wall": "pages",
+      "floor": "thought",
+      "door": "ink"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "literary",
+          "bonus": 70
+        }
+      },
+      {
+        "type": "research",
+        "params": {
+          "bonus": 3,
+          "fields": [
+            "everything",
+            "nothing",
+            "nonsense"
+          ]
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "literary",
+      "narrative"
+    ],
+    "capacity": 6,
+    "style": "impossible",
+    "lore": "Every book that could exist is here. Finding the one you need is the challenge. Beware: some books read you back."
+  },
+  {
+    "id": "awakening_workshop",
+    "name": "Awakening Workshop",
+    "description": "A colorful workshop where BioChromatic Breath is invested into objects, bringing them to life.",
+    "category": "production",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      "#########",
+      "#.......#",
+      "#..CCC..#",
+      "#.......#",
+      "#...K...#",
+      "#.......#",
+      "####D####"
+    ],
+    "// Breath = breath +100, name +30, breath_holding +50\n  materials": {
+      "wall": "breath",
+      "floor": "carpet",
+      "door": "cloth"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "breath",
+          "bonus": 60
+        }
+      },
+      {
+        "type": "crafting",
+        "params": {
+          "station": "awakening",
+          "speed": 1,
+          "quality": 2
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "breath"
+    ],
+    "capacity": 4,
+    "style": "colorful",
+    "lore": "Color drains from the world when Breath is given. But the Awakened objects live, think, and serve. Each Breath is precious."
+  },
+  {
+    "id": "crimson_altar",
+    "name": "Crimson Altar",
+    "description": "A dark altar where blood magic is practiced, trading life force for power.",
+    "category": "research",
+    "tier": 4,
+    "species": "medium",
+    "layout": [
+      " ##### ",
+      "#.....#",
+      "#..◊..#",
+      "#.....#",
+      "###D###"
+    ],
+    "// Blood = blood +100, pact +30, blood_potency +100\n  materials": {
+      "wall": "blood",
+      "floor": "obsidian",
+      "door": "iron"
+    },
+    "functionality": [
+      {
+        "type": "paradigm_amplifier",
+        "params": {
+          "paradigm": "blood",
+          "bonus": 70
+        }
+      }
+    ],
+    "paradigmAffinity": [
+      "blood"
+    ],
+    "capacity": 2,
+    "style": "dark",
+    "lore": "Blood is life, and life is power. What you sacrifice here returns tenfold - but the cost is never truly gone."
+  }
+]

@@ -1,0 +1,774 @@
+{
+  "id": "song-tree",
+  "paradigmId": "song",
+  "name": "The Art of Song",
+  "description": "Channel magic through music - healing, protection, destruction, and the fundamental harmonies of creation.",
+  "lore": "Before there were words, there was music. The universe was sung into being -\na grand harmony of creation that still echoes in all things. Those who learn\nto hear this music can add their voices to it, shaping reality through\nresonance and melody.\n\nSong magic requires no arcane words or complex gestures - only voice, breath,\nand the will to harmonize. It is perhaps the most natural of all magics,\naccessible to anyone who can carry a tune. But mastery requires more than\ntalent: it requires understanding harmony and discord, learning the ancient\nsongs, and sometimes, singing together with others.\n\nThe greatest song mages can hear the World Song itself - the fundamental music\nof creation. To sing along with that song is to touch the divine.",
+  "nodes": [
+    {
+      "id": "music-sense",
+      "name": "Music of the World",
+      "description": "Learn to hear the music that underlies all things",
+      "paradigmId": "song",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense the ambient music of places and things",
+          "target": {
+            "abilityId": "world_music_sense"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Everything has a song - a tree, a river, a mountain. Most cannot hear it.\nBut for those with the gift, the world is alive with music: the deep bass\nof stone, the high shimmer of sunlight, the complex harmonies of a forest.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🎵"
+    },
+    {
+      "id": "voice-awakening",
+      "name": "Voice Awakening",
+      "description": "Awaken the magical potential of your voice",
+      "paradigmId": "song",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "voice_range",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Magical range of voice"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "magical_voice"
+          },
+          "description": "Voice can carry magical effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your voice is your first and most powerful instrument. Properly trained,\nit can carry not just sound but intent, not just melody but magic.",
+      "prerequisites": [
+        "music-sense"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "pitch-control",
+      "name": "Perfect Pitch",
+      "description": "Develop precise control over pitch and tone",
+      "paradigmId": "song",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "harmony_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% harmony accuracy"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Magic is particular about pitch. A song sung off-key may fail or worse - create unexpected discord. Perfect pitch ensures clean magic.",
+      "prerequisites": [
+        "voice-awakening"
+      ],
+      "levelCostMultiplier": 1.3
+    },
+    {
+      "id": "breath-control",
+      "name": "Breath of Power",
+      "description": "Master breath control for sustained magical singing",
+      "paradigmId": "song",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sustained_singing"
+          },
+          "description": "Sustain notes for extended magical effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The breath is life force made sound. Control the breath, and you control the flow of power through your songs.",
+      "prerequisites": [
+        "voice-awakening"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "basic-harmony",
+      "name": "Harmonic Resonance",
+      "description": "Learn to sing in harmony with the world's music",
+      "paradigmId": "song",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "harmony_bonus",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "description": "+X% constructive spell power"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When your song aligns with the existing harmonies of the world,\neffects are amplified. This is the foundation of all constructive song magic.",
+      "prerequisites": [
+        "pitch-control"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "healing-songs",
+      "name": "Songs of Mending",
+      "description": "Learn the songs that mend body and spirit",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn and sing healing songs"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "song_learned",
+          "params": {
+            "songId": "first_healing_melody"
+          },
+          "description": "Must learn your first healing melody"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The oldest songs are healing songs - mother's lullabies, chants over\nthe sick, hymns for the wounded. Learn these melodies and your voice\nbecomes medicine.",
+      "prerequisites": [
+        "basic-harmony"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "warding-songs",
+      "name": "Songs of Protection",
+      "description": "Learn songs that create barriers and wards",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn and sing protective songs"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A mother's lullaby wards off nightmares. A marching song strengthens resolve. These are the warding songs - protection through harmony.",
+      "prerequisites": [
+        "basic-harmony"
+      ]
+    },
+    {
+      "id": "growing-songs",
+      "name": "Songs of Growth",
+      "description": "Learn songs that encourage life and growth",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn and sing songs of growth"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "farming",
+            "skillLevel": 2
+          },
+          "description": "Must have farming experience"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Farmers have always sung to their crops. There is truth in it - plants\nrespond to certain frequencies. Master these songs and you can coax\ngrowth from barren soil.",
+      "prerequisites": [
+        "healing-songs"
+      ]
+    },
+    {
+      "id": "basic-discord",
+      "name": "Dissonance",
+      "description": "Learn to create controlled discord",
+      "paradigmId": "song",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "discord_resistance",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% resistance to discord effects on self"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_dissonance"
+          },
+          "description": "Create disruptive dissonance"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Discord is not evil - it is change, disruption, the breaking of stasis.\nSometimes harmony must be broken before a new harmony can emerge. But\ndiscord is dangerous; it can consume the singer.",
+      "prerequisites": [
+        "pitch-control"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "breaking-songs",
+      "name": "Songs of Shattering",
+      "description": "Learn the songs that break and shatter",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn songs that shatter and destroy"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "witnessed_destruction"
+          },
+          "description": "Must have witnessed significant destruction"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "The right pitch can shatter glass. The right song can shatter stone,\nchains, even magical bonds. These are the songs of breaking - crude but\npowerful.",
+      "prerequisites": [
+        "basic-discord"
+      ]
+    },
+    {
+      "id": "silencing-songs",
+      "name": "Songs of Silence",
+      "description": "Learn to sing silence itself",
+      "paradigmId": "song",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "magical_silence"
+          },
+          "description": "Create zones of magical silence"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "breath-control",
+            "level": 3
+          },
+          "description": "Must have mastered breath control"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Paradoxical: a song of silence. But silence is not the absence of sound -\nit is the presence of perfect stillness. Master singers can impose this\nstillness on an area, negating all sound-based magic within.",
+      "prerequisites": [
+        "breaking-songs",
+        "breath-control"
+      ]
+    },
+    {
+      "id": "instrument-attunement",
+      "name": "Instrument Attunement",
+      "description": "Learn to channel magic through instruments",
+      "paradigmId": "song",
+      "category": "channeling",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "instrument_mastery",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% magical effectiveness with instruments"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "While the voice is the purest instrument, constructed instruments\noffer capabilities beyond the human body - greater range, sustained notes,\nmultiple simultaneous tones.",
+      "prerequisites": [
+        "music-sense"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "string-mastery",
+      "name": "String Mastery",
+      "description": "Master string instruments for emotional magic",
+      "paradigmId": "song",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "instrument_mastery",
+          "baseValue": 15,
+          "description": "Bonus with string instruments"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "heartstring_resonance"
+          },
+          "description": "String music affects emotions directly"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "string_instruments",
+            "skillLevel": 2
+          },
+          "description": "Must have string instrument skill"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Strings vibrate in sympathy with the human heart. A skilled player can\npluck emotions as easily as strings - drawing out sorrow, inspiring joy,\nkindling love or rage.",
+      "prerequisites": [
+        "instrument-attunement"
+      ]
+    },
+    {
+      "id": "wind-mastery",
+      "name": "Wind Mastery",
+      "description": "Master wind instruments for breath-spirit magic",
+      "paradigmId": "song",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "instrument_mastery",
+          "baseValue": 15,
+          "description": "Bonus with wind instruments"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "breath_projection"
+          },
+          "description": "Project breath/spirit through music"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wind instruments carry the breath - and breath is spirit. Play a flute\nand you breathe your life force into the music. This makes wind magic\npersonal and powerful, but also draining.",
+      "prerequisites": [
+        "instrument-attunement",
+        "breath-control"
+      ]
+    },
+    {
+      "id": "percussion-mastery",
+      "name": "Percussion Mastery",
+      "description": "Master percussion for rhythm-based magic",
+      "paradigmId": "song",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "instrument_mastery",
+          "baseValue": 15,
+          "description": "Bonus with percussion instruments"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "rhythm_control"
+          },
+          "description": "Control tempo and timing precisely"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The drum is the heartbeat of magic. Rhythm entrains the mind, synchronizes\ngroups, and creates patterns that magic flows along. A master drummer\ncontrols the very tempo of reality.",
+      "prerequisites": [
+        "instrument-attunement"
+      ]
+    },
+    {
+      "id": "duet-singing",
+      "name": "Duet Harmony",
+      "description": "Learn to harmonize magically with one other singer",
+      "paradigmId": "song",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "choir_coordination",
+          "baseValue": 1,
+          "description": "Can harmonize effectively with one other"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "duet_partner"
+          },
+          "description": "Must practice with a harmonizing partner"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "When two voices join in harmony, the magic is more than doubled. But\nharmonizing requires trust and practice - your magic must blend with\nanother's without conflict.",
+      "prerequisites": [
+        "basic-harmony",
+        "voice-awakening"
+      ]
+    },
+    {
+      "id": "choir-magic",
+      "name": "Choir Power",
+      "description": "Lead a choir in magical song",
+      "paradigmId": "song",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "choir_coordination",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Can coordinate X additional singers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A single voice is a stream; a choir is an ocean. When many voices unite\nin harmony, they can achieve effects impossible for any individual - moving\nmountains, calming storms, healing plagues.",
+      "prerequisites": [
+        "duet-singing"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "conductor",
+      "name": "Master Conductor",
+      "description": "Lead magical ensembles without singing yourself",
+      "paradigmId": "song",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "magical_conducting"
+          },
+          "description": "Direct magical ensembles without singing"
+        },
+        {
+          "type": "choir_coordination",
+          "baseValue": 10,
+          "description": "Major bonus to choir coordination"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "choir-magic",
+            "level": 3
+          },
+          "description": "Must have significant choir experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The conductor does not sing - they shape the singing of others. Through\ngesture, intent, and will, they weave individual voices into a single\nmagical instrument of immense power.",
+      "prerequisites": [
+        "choir-magic"
+      ]
+    },
+    {
+      "id": "calling-songs",
+      "name": "Songs of Calling",
+      "description": "Learn songs that call beings or things to you",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn songs that call and summon"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Everything has a name-song - the melody that is its essence. Sing it,\nand you call to that thing. Animals respond readily; spirits sometimes;\npeople only if they wish to come.",
+      "prerequisites": [
+        "basic-harmony"
+      ]
+    },
+    {
+      "id": "lament-songs",
+      "name": "Songs of Lament",
+      "description": "Learn the songs of mourning that move hearts",
+      "paradigmId": "song",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn songs of mourning and loss"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "significant_loss"
+          },
+          "description": "Must have experienced significant loss"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Laments are songs of loss - but also songs of power. A true lament can\nmake the hardest heart weep, can honor the dead so deeply that their\nspirits stir, can channel grief into purpose.",
+      "prerequisites": [
+        "basic-harmony"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "death-songs",
+      "name": "Songs of Passage",
+      "description": "Learn the songs that ease death and honor the dead",
+      "paradigmId": "song",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_song",
+          "baseValue": 1,
+          "description": "Can learn songs for death and the dead"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "death_vigil"
+          },
+          "description": "Must have sung at a death vigil"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The greatest singers know the songs of passage - melodies that ease\nthe dying, hymns that honor the dead, chants that ensure spirits find\ntheir way. These songs walk the border between life and death.",
+      "prerequisites": [
+        "lament-songs"
+      ]
+    },
+    {
+      "id": "power-words",
+      "name": "Words of Power",
+      "description": "Concentrate an entire song into a single word of power",
+      "paradigmId": "song",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 275,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "power_word"
+          },
+          "description": "Concentrate a song into a single word"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1500
+          },
+          "description": "Must have extensive singing experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Masters learn to compress - to take an entire song and fold it into a\nsingle syllable of absolute power. These words can stop hearts, shatter\nwalls, or heal mortal wounds - but each use drains the singer utterly.",
+      "prerequisites": [
+        "healing-songs",
+        "breaking-songs",
+        "breath-control"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "world-song",
+      "name": "The World Song",
+      "description": "Hear the fundamental song of creation itself",
+      "paradigmId": "song",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "hear_world_song"
+          },
+          "description": "Hear the fundamental music of creation"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "vision_received",
+          "params": {
+            "visionType": "musical_revelation"
+          },
+          "description": "Must receive a musical revelation"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Beyond all individual songs lies the World Song - the harmony of creation\nitself, the music that was sung before time began. To hear even a fragment\nis to understand the universe in a way no other magic allows.",
+      "prerequisites": [
+        "music-sense",
+        "death-songs",
+        "power-words"
+      ],
+      "hidden": true,
+      "icon": "🌌"
+    }
+  ],
+  "entryNodes": [
+    "music-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "song_performed",
+      "xpAmount": 10,
+      "description": "Perform a magical song"
+    },
+    {
+      "eventType": "song_learned",
+      "xpAmount": 50,
+      "description": "Learn a new magical song"
+    },
+    {
+      "eventType": "harmony_achieved",
+      "xpAmount": 20,
+      "description": "Achieve perfect harmony with another singer"
+    },
+    {
+      "eventType": "discord_controlled",
+      "xpAmount": 25,
+      "description": "Create controlled discord"
+    },
+    {
+      "eventType": "healing_sung",
+      "xpAmount": 30,
+      "description": "Heal someone through song"
+    },
+    {
+      "eventType": "choir_led",
+      "xpAmount": 50,
+      "description": "Lead a magical choir"
+    },
+    {
+      "eventType": "instrument_mastered",
+      "xpAmount": 75,
+      "description": "Master a new instrument type"
+    },
+    {
+      "eventType": "world_music_heard",
+      "xpAmount": 100,
+      "description": "Hear a fragment of the world song"
+    },
+    {
+      "eventType": "death_song_performed",
+      "xpAmount": 100,
+      "description": "Perform a song of passage"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

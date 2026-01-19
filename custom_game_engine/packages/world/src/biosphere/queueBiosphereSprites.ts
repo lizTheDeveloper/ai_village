@@ -6,8 +6,6 @@
  */
 
 import type { BiosphereData, SizeClass } from './BiosphereTypes.js';
-import fs from 'fs';
-import path from 'path';
 
 interface SpriteQueueEntry {
   folderId: string;
@@ -37,14 +35,27 @@ interface SpriteQueue {
  */
 export async function queueBiosphereSprites(
   biosphere: BiosphereData,
-  queuePath: string = path.join(process.cwd(), 'sprite-generation-queue.json')
+  queuePath?: string
 ): Promise<void> {
+  // Browser compatibility: Skip file system operations in browser
+  if (typeof window !== 'undefined') {
+    console.log('[queueBiosphereSprites] Skipping in browser mode - daemon handles sprite generation');
+    return;
+  }
+
+  // Dynamic imports for Node.js modules (only in server environment)
+  const fs = await import('fs');
+  const path = await import('path');
+
+  // Use default path in Node.js environment
+  const finalPath = queuePath || path.join(process.cwd(), 'sprite-generation-queue.json');
+
   console.log(`[queueBiosphereSprites] Queuing ${biosphere.species.length} species sprites...`);
 
   // Load existing queue
   let queue: SpriteQueue;
   try {
-    const queueData = fs.readFileSync(queuePath, 'utf8');
+    const queueData = fs.readFileSync(finalPath, 'utf8');
     queue = JSON.parse(queueData);
   } catch (error) {
     // Create new queue if doesn't exist
@@ -90,7 +101,7 @@ export async function queueBiosphereSprites(
   }
 
   // Save updated queue
-  fs.writeFileSync(queuePath, JSON.stringify(queue, null, 2));
+  fs.writeFileSync(finalPath, JSON.stringify(queue, null, 2));
 
   console.log(`[queueBiosphereSprites] Added ${addedCount} new species to sprite queue`);
   console.log(`[queueBiosphereSprites] Total queue size: ${queue.sprites.length}`);
@@ -116,7 +127,7 @@ function getSpriteSize(sizeClass: SizeClass): number {
  * Get queue statistics
  */
 export function getQueueStats(
-  queuePath: string = path.join(process.cwd(), 'sprite-generation-queue.json')
+  queuePath?: string
 ): {
   total: number;
   queued: number;
@@ -125,8 +136,29 @@ export function getQueueStats(
   failed: number;
   byPlanet: Record<string, number>;
 } {
+  // Browser compatibility: Return empty stats in browser
+  if (typeof window !== 'undefined') {
+    return {
+      total: 0,
+      queued: 0,
+      processing: 0,
+      complete: 0,
+      failed: 0,
+      byPlanet: {},
+    };
+  }
+
+  // Dynamic imports for Node.js modules (only in server environment)
+  // Note: This is a sync function, so we can't use await here
+  // We'll use require instead for synchronous loading
+  const fs = require('fs');
+  const path = require('path');
+
+  // Use default path in Node.js environment
+  const finalPath = queuePath || path.join(process.cwd(), 'sprite-generation-queue.json');
+
   try {
-    const queueData = fs.readFileSync(queuePath, 'utf8');
+    const queueData = fs.readFileSync(finalPath, 'utf8');
     const queue: SpriteQueue = JSON.parse(queueData);
 
     const stats = {

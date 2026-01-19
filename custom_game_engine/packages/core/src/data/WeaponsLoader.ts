@@ -1,12 +1,13 @@
 /**
  * Weapons Data Loader
  *
- * Loads weapon definitions from JSON data files with lazy loading.
+ * Loads weapon definitions from JSON data files.
  * Provides type-safe access to weapon definitions.
  */
 
 import type { ItemDefinition } from '../items/ItemDefinition.js';
 import { defineItem } from '../items/ItemDefinition.js';
+import weaponsData from './weapons.json';
 
 /**
  * Convert JSON weapon data to ItemDefinition
@@ -84,22 +85,11 @@ function loadWeaponCategory(categoryData: any): ItemDefinition[] {
 }
 
 /**
- * Weapons organized by category with lazy loading
+ * Weapons organized by category
  */
 export class WeaponsLoader {
   private static _allWeapons: ItemDefinition[] | null = null;
   private static _byCategory: Map<string, ItemDefinition[]> = new Map();
-  private static _weaponsData: any = null;
-
-  /**
-   * Lazy-load weapons data
-   */
-  private static loadWeaponsData(): any {
-    if (!this._weaponsData) {
-      this._weaponsData = require('./weapons.json');
-    }
-    return this._weaponsData;
-  }
 
   /**
    * Get all weapons
@@ -107,10 +97,9 @@ export class WeaponsLoader {
   static getAllWeapons(): ItemDefinition[] {
     if (!this._allWeapons) {
       this._allWeapons = [];
-      const weaponsData = this.loadWeaponsData();
 
       for (const categoryKey of Object.keys(weaponsData)) {
-        const categoryWeapons = loadWeaponCategory(weaponsData[categoryKey]);
+        const categoryWeapons = loadWeaponCategory((weaponsData as any)[categoryKey]);
         this._allWeapons.push(...categoryWeapons);
         this._byCategory.set(categoryKey, categoryWeapons);
       }
@@ -196,13 +185,5 @@ export function getAllWeaponsArray(): ItemDefinition[] {
   return WeaponsLoader.getAllWeapons();
 }
 
-// Deprecated: Use getter functions instead
-// These are kept for backward compatibility but trigger lazy loading
-Object.defineProperty(exports, 'CREATIVE_WEAPONS', { get: getCreativeWeapons });
-Object.defineProperty(exports, 'MELEE_WEAPONS', { get: getMeleeWeapons });
-Object.defineProperty(exports, 'FIREARMS', { get: getFirearms });
-Object.defineProperty(exports, 'MAGIC_WEAPONS', { get: getMagicWeapons });
-Object.defineProperty(exports, 'EXOTIC_WEAPONS', { get: getExoticWeapons });
-Object.defineProperty(exports, 'RANGED_WEAPONS', { get: getRangedWeapons });
-Object.defineProperty(exports, 'ENERGY_WEAPONS', { get: getEnergyWeapons });
-Object.defineProperty(exports, 'ALL_WEAPONS', { get: getAllWeaponsArray });
+// Deprecated backward compatibility exports removed
+// Use getter functions instead: getCreativeWeapons(), getMeleeWeapons(), etc.

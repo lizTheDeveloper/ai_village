@@ -145,29 +145,37 @@ export class PlantDiseaseSystem extends BaseSystem {
   private setupEventListeners(): void {
     // Listen for weather updates
     this.events.subscribe('weather:changed', (event: unknown) => {
-      const e = event as { data: { weatherType: string } };
-      const { weatherType } = e.data;
-      this.currentEnvironment.isRaining = weatherType === 'rain' || weatherType === 'storm';
+      const e = event as { data?: { weatherType?: string } };
+      if (e.data && e.data.weatherType) {
+        const { weatherType } = e.data;
+        this.currentEnvironment.isRaining = weatherType === 'rain' || weatherType === 'storm';
+      }
     });
 
     // Listen for time updates
     this.events.subscribe('world:time:hour', (event: unknown) => {
-      const e = event as { data: { hour: number } };
-      const { hour } = e.data;
-      this.currentEnvironment.isNight = hour < 6 || hour > 20;
+      const e = event as { data?: { hour?: number } };
+      if (e.data && typeof e.data.hour === 'number') {
+        const { hour } = e.data;
+        this.currentEnvironment.isNight = hour < 6 || hour > 20;
+      }
     });
 
     // Listen for season changes
     this.events.subscribe('world:time:season', (event: unknown) => {
-      const e = event as { data: { season: string } };
-      this.currentEnvironment.season = e.data.season;
+      const e = event as { data?: { season?: string } };
+      if (e.data && e.data.season) {
+        this.currentEnvironment.season = e.data.season;
+      }
     });
 
     // Listen for treatment applications
     this.events.subscribe('plant:treated', (event: unknown) => {
-      const e = event as { data: { entityId: string; treatmentId: string; treatmentType: string } };
-      const { entityId, treatmentId, treatmentType } = e.data;
-      this.applyTreatmentFromEvent(entityId, treatmentId, treatmentType);
+      const e = event as { data?: { entityId?: string; treatmentId?: string; treatmentType?: string } };
+      if (e.data && e.data.entityId && e.data.treatmentId && e.data.treatmentType) {
+        const { entityId, treatmentId, treatmentType } = e.data;
+        this.applyTreatmentFromEvent(entityId, treatmentId, treatmentType);
+      }
     });
   }
 

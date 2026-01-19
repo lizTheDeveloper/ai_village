@@ -2,10 +2,11 @@
  * Items JSON Loader
  *
  * Phase 3: Content Extraction
- * Provides type-safe access to items.json with lazy loading
+ * Provides type-safe access to items.json
  */
 
 import type { ItemDefinition } from '../items/ItemDefinition.js';
+import itemsDataRaw from '../../../../data/items.json';
 
 export interface ItemsData {
   version: string;
@@ -26,18 +27,13 @@ export interface ItemsData {
   allItems: ItemDefinition[];
 }
 
-// Lazy-loaded data cache
-let typedItemsData: ItemsData | null = null;
+// Cast imported data to typed interface
+const typedItemsData = itemsDataRaw as unknown as ItemsData;
 
 /**
- * Load items data on first access
+ * Get items data
  */
 function loadItemsData(): ItemsData {
-  if (!typedItemsData) {
-    // Dynamic import to defer loading until needed
-    const itemsData = require('../../../../data/items.json');
-    typedItemsData = itemsData as unknown as ItemsData;
-  }
   return typedItemsData;
 }
 
@@ -106,16 +102,5 @@ export function getFarmingToolItems(): ItemDefinition[] {
   return getItemsByCategory('farmingTools');
 }
 
-// Deprecated: Use getter functions instead
-// These are kept for backward compatibility but trigger lazy loading
-Object.defineProperty(exports, 'RESOURCE_ITEMS', { get: getResourceItems });
-Object.defineProperty(exports, 'FOOD_ITEMS', { get: getFoodItems });
-Object.defineProperty(exports, 'MATERIAL_ITEMS', { get: getMaterialItems });
-Object.defineProperty(exports, 'TOOL_ITEMS', { get: getToolItems });
-Object.defineProperty(exports, 'WEAPON_ITEMS', { get: getWeaponItems });
-Object.defineProperty(exports, 'CONSUMABLE_ITEMS', { get: getConsumableItems });
-Object.defineProperty(exports, 'CLOTHING_ITEMS', { get: getClothingItems });
-Object.defineProperty(exports, 'ADVANCED_MATERIAL_ITEMS', { get: getAdvancedMaterialItems });
-Object.defineProperty(exports, 'PRESERVED_FOOD_ITEMS', { get: getPreservedFoodItems });
-Object.defineProperty(exports, 'FARMING_TOOL_ITEMS', { get: getFarmingToolItems });
-Object.defineProperty(exports, 'DEFAULT_ITEMS', { get: getAllItems });
+// Deprecated backward compatibility exports removed
+// Use getter functions instead: getResourceItems(), getFoodItems(), etc.

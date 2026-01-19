@@ -1,0 +1,715 @@
+{
+  "id": "name-tree",
+  "paradigmId": "name",
+  "name": "The Art of Naming",
+  "description": "Master true names to command, bind, and reshape reality through the power of words.",
+  "lore": "In the beginning was the Word, and the Word was Power. To know a thing's\ntrue name is to know it completely - its nature, its history, its essence.\nAnd to speak that name is to have power over it.\n\nThe art of naming is ancient and perilous. Names are not invented but discovered,\nthrough meditation, observation, and understanding. A master namer may know\nthousands of names - of stones and trees, of beasts and people, of fire and\nwind and star. Each name is a tool, a key, a weapon.\n\nBut the power of names cuts both ways. Your own true name is your deepest\nvulnerability. Guard it jealously, for anyone who knows and speaks your name\nholds power over you. Many namers go by use-names, keeping their true names\nsecret even from themselves.\n\nThe greatest namers can change names - and thereby change reality itself.\nBut this is dangerous magic. Change a name wrongly and you may unmake the\nthing entirely, reducing it to formless void.",
+  "nodes": [
+    {
+      "id": "name-sense",
+      "name": "Name Sense",
+      "description": "Learn to recognize true names when you hear them",
+      "paradigmId": "name",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense when you hear a true name",
+          "target": {
+            "abilityId": "name_recognition"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A true name has a particular quality - a resonance, a rightness. When\nyou hear it, something in you recognizes it as truth. This is the first\nstep: learning to hear that resonance.",
+      "levelCostMultiplier": 1.3,
+      "icon": "👂"
+    },
+    {
+      "id": "true-speech",
+      "name": "True Speech",
+      "description": "Learn the true speech - the language of names",
+      "paradigmId": "name",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can speak in the true tongue",
+          "target": {
+            "abilityId": "true_speech"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "In the true speech, you cannot lie. Every word is what it says and says\nwhat it is. To speak a stone in true speech IS to speak to stone itself.\nThis is why the language is powerful - and dangerous.",
+      "prerequisites": [
+        "name-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "name-meditation",
+      "name": "Name Meditation",
+      "description": "Learn to discover names through deep meditation",
+      "paradigmId": "name",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Meditate to discover names",
+          "target": {
+            "abilityId": "name_meditation"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "To know a thing's name, you must know the thing itself - completely.\nThis requires observation, contemplation, and meditation. Sit with a stone\nfor days. Study its grain, its weight, its history. Then, perhaps, you\nwill hear its name.",
+      "prerequisites": [
+        "name-sense"
+      ]
+    },
+    {
+      "id": "name-memory",
+      "name": "Perfect Recall",
+      "description": "Develop perfect memory for true names",
+      "paradigmId": "name",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Never forget a true name once learned",
+          "target": {
+            "abilityId": "name_recall"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A name once truly learned cannot be forgotten - it becomes part of you.\nBut learning to hold many names requires discipline. Each name is a weight,\na responsibility. Master namers carry thousands.",
+      "prerequisites": [
+        "true-speech"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "simple-names",
+      "name": "Names of Simple Things",
+      "description": "Learn to name simple inanimate objects",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of simple objects"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "name_learned",
+          "params": {
+            "nameId": "first_simple_name"
+          },
+          "description": "Must learn your first simple name through meditation"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Stone. Water. Metal. Fire. These are the simple names - the foundation. Learn them first.",
+      "prerequisites": [
+        "true-speech"
+      ]
+    },
+    {
+      "id": "plant-names",
+      "name": "Names of Growing Things",
+      "description": "Learn to name plants and trees",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of plants"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Plants have slower, deeper names than stone. To know a tree's name\nrequires understanding its growth, its seasons, its relationship with\nsoil and sun. These are the first living names.",
+      "prerequisites": [
+        "simple-names"
+      ]
+    },
+    {
+      "id": "animal-names",
+      "name": "Names of Beasts",
+      "description": "Learn to name animals and beasts",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of animals"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Animals have quick, fierce names - harder to grasp than stone or plant.\nEach species has its own name, and sometimes individuals have names beyond\ntheir kind. A wolf is different than Wolf.",
+      "prerequisites": [
+        "plant-names"
+      ]
+    },
+    {
+      "id": "complex-names",
+      "name": "Names of Crafted Things",
+      "description": "Learn to name complex crafted objects",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 110,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of complex creations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A sword has a name beyond 'metal' and 'edge' - it is a thing of purpose\nand crafting. Named swords are famous for a reason. They are known,\nand therefore powerful.",
+      "prerequisites": [
+        "simple-names"
+      ]
+    },
+    {
+      "id": "people-names",
+      "name": "Names of People",
+      "description": "Learn to discover the true names of people",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn true names of people"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "master_namer"
+          },
+          "description": "Must be taught by a master namer"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "A person's true name is their deepest secret. It is who they are when\nall masks are stripped away. To know someone's true name is to hold\npower over them - and responsibility for them. Use this knowledge wisely.",
+      "prerequisites": [
+        "animal-names"
+      ],
+      "icon": "👤"
+    },
+    {
+      "id": "elemental-names",
+      "name": "Names of Forces",
+      "description": "Learn the names of wind, fire, and storm",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of fundamental forces"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "elemental_encounter"
+          },
+          "description": "Must have faced an elemental force"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Fire. Wind. Lightning. Ocean. These are not objects but forces - wild,\ndangerous, powerful. Their names are hard to grasp and harder to hold.\nBut once known, they grant mastery over the elements themselves.",
+      "prerequisites": [
+        "simple-names",
+        "animal-names"
+      ]
+    },
+    {
+      "id": "concept-names",
+      "name": "Names of Ideas",
+      "description": "Learn the names of concepts and ideas",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of abstract concepts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1000
+          },
+          "description": "Must have extensive naming experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "What is the name of Courage? Of Fear? Of Love? These are the deepest\nnames - abstractions made concrete through naming. They exist only in\nthe true speech, where concepts become as real as stone.",
+      "prerequisites": [
+        "people-names"
+      ]
+    },
+    {
+      "id": "spirit-names",
+      "name": "Names of Spirits",
+      "description": "Learn to name spirits, ghosts, and ethereal beings",
+      "paradigmId": "name",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_name_category",
+          "baseValue": 1,
+          "description": "Can learn names of spirits and immaterial beings"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "nature"
+          },
+          "description": "Must have encountered a spirit"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Spirits are less substantial than flesh but more real than ideas. Their\nnames are whispered, elusive, easily lost. But once bound in true speech,\na spirit must answer to its name.",
+      "prerequisites": [
+        "elemental-names"
+      ]
+    },
+    {
+      "id": "speaking-power",
+      "name": "Power of Speech",
+      "description": "Learn to speak names with power and intent",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Use names to command things",
+          "target": {
+            "abilityId": "name_command"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "To speak a name is one thing. To speak it with power is another. The\nname must be perfectly pronounced, at the right time, with the right intent.\nThen the named thing must obey - it has no choice.",
+      "prerequisites": [
+        "true-speech",
+        "simple-names"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "compelling-speech",
+      "name": "Compelling Speech",
+      "description": "Use names to force truth and revelation",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Compel truth through names",
+          "target": {
+            "abilityId": "compel_truth"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Speak a person's true name and they cannot lie to you. Speak a spirit's\nname and it must reveal itself. This is the power of names: they strip\naway all deception.",
+      "prerequisites": [
+        "speaking-power",
+        "people-names"
+      ]
+    },
+    {
+      "id": "binding-names",
+      "name": "Name Binding",
+      "description": "Learn to bind things through their names",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Use names to bind and restrict",
+          "target": {
+            "abilityId": "name_binding"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A name can be a chain. Speak it properly and the named thing is frozen,\nbound, unable to act against you. This is the basis of all name-wards\nand protective circles.",
+      "prerequisites": [
+        "speaking-power"
+      ]
+    },
+    {
+      "id": "summoning-names",
+      "name": "Name Summoning",
+      "description": "Learn to summon things through their names",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Summon things by speaking their names",
+          "target": {
+            "abilityId": "name_summoning"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Speak a name with sufficient power, and the named thing will come to you.\nDistance is no barrier - a true name bridges all space. But beware:\nsome things should not be summoned.",
+      "prerequisites": [
+        "speaking-power",
+        "spirit-names"
+      ]
+    },
+    {
+      "id": "name-hiding",
+      "name": "Name Hiding",
+      "description": "Learn to hide your true name from discovery",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 20,
+          "perLevelValue": 10,
+          "description": "+X% resistance to name-discovery"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A wise namer guards their own true name jealously. Never speak it aloud.\nNever write it down. Some go so far as to forget it themselves, though\nthis is dangerous - a name forgotten can be lost forever.",
+      "prerequisites": [
+        "people-names"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "false-names",
+      "name": "False Names",
+      "description": "Learn to create false names to protect your true one",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create and use false names as decoys",
+          "target": {
+            "abilityId": "false_name"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When asked for your name, give a false one - a use-name, a shadow-name.\nLet enemies waste their power on empty words while your true name remains\nhidden and safe.",
+      "prerequisites": [
+        "name-hiding"
+      ]
+    },
+    {
+      "id": "name-wards",
+      "name": "Name Wards",
+      "description": "Create protective wards against name magic",
+      "paradigmId": "name",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create wards against name magic",
+          "target": {
+            "abilityId": "name_ward"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A circle inscribed with the right words can ward against specific names -\npreventing their power within its bounds. This is how wise folk protect\nthemselves against naming.",
+      "prerequisites": [
+        "binding-names",
+        "name-hiding"
+      ]
+    },
+    {
+      "id": "changing-names",
+      "name": "Name Changing",
+      "description": "Learn to change names, thereby changing nature",
+      "paradigmId": "name",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Change the names of things, altering their nature",
+          "target": {
+            "abilityId": "name_change"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "speaking-power",
+            "level": 5
+          },
+          "description": "Must have mastered speaking power"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The deepest magic: to change a thing's name is to change what it is.\nSpeak the name of Lead and then Gold, and lead becomes gold. But this is\nperilous - change a name wrongly and you may unmake the thing entirely.",
+      "prerequisites": [
+        "speaking-power",
+        "concept-names"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "unmaking-names",
+      "name": "Unmaking",
+      "description": "Learn to unmake things by speaking their names backward",
+      "paradigmId": "name",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 275,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Unmake things by unweaving their names",
+          "target": {
+            "abilityId": "unmake"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "To speak a name backward is to call non-being. The thing named ceases\nto exist - not destroyed, but unmade, as if it had never been. This is\nthe darkest of name magic. Use it sparingly, if ever.",
+      "prerequisites": [
+        "changing-names"
+      ],
+      "icon": "💀"
+    },
+    {
+      "id": "nameless-state",
+      "name": "The Nameless State",
+      "description": "Learn to become nameless, beyond all power",
+      "paradigmId": "name",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Enter a state beyond naming",
+          "target": {
+            "abilityId": "nameless"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2000
+          },
+          "description": "Must have mastered naming itself"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate protection: to have no name at all. In this state, you are\nimmune to all name magic - but you also cannot use it. You become a void,\na cipher, something that cannot be grasped or held or known.",
+      "prerequisites": [
+        "name-wards",
+        "false-names"
+      ]
+    },
+    {
+      "id": "name-of-names",
+      "name": "The Name of Names",
+      "description": "Discover the Name of Names - the word that rules all words",
+      "paradigmId": "name",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Learn the Name that binds all other names",
+          "target": {
+            "abilityId": "master_name"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "master_name"
+          },
+          "description": "Must discover the ultimate secret"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "In the true speech, there is one Name that encompasses all others - the\nName of Names, the Word of Power. To know it is to hold sovereignty over\nall named things. But only one living person may know it at a time.",
+      "prerequisites": [
+        "changing-names",
+        "concept-names",
+        "spirit-names"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "name-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "name_learned",
+      "xpAmount": 50,
+      "description": "Learn a new true name"
+    },
+    {
+      "eventType": "name_spoken_power",
+      "xpAmount": 15,
+      "description": "Successfully speak a name with power"
+    },
+    {
+      "eventType": "thing_commanded",
+      "xpAmount": 25,
+      "description": "Command something through its name"
+    },
+    {
+      "eventType": "spirit_summoned",
+      "xpAmount": 75,
+      "description": "Summon a spirit through its name"
+    },
+    {
+      "eventType": "truth_compelled",
+      "xpAmount": 40,
+      "description": "Force truth through naming"
+    },
+    {
+      "eventType": "name_changed",
+      "xpAmount": 100,
+      "description": "Change a name, altering nature"
+    },
+    {
+      "eventType": "name_protected",
+      "xpAmount": 30,
+      "description": "Successfully protect your true name"
+    },
+    {
+      "eventType": "deep_name_discovered",
+      "xpAmount": 150,
+      "description": "Discover a deep or true name through meditation"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

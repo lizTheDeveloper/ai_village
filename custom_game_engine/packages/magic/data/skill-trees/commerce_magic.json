@@ -1,0 +1,747 @@
+{
+  "id": "commerce_skill_tree",
+  "paradigmId": "commerce_magic",
+  "name": "Commerce Magic Skill Tree",
+  "description": "Master the art of magical trade, contracts, and market manipulation",
+  "lore": "A deal is a deal. Shake hands and reality enforces the contract.\nThe invisible hand of the market is actually invisible hands enforcing trades.\nSupply and demand shape the world.",
+  "nodes": [
+    {
+      "id": "value-sense",
+      "name": "Value Sense",
+      "description": "Learn to sense the true value of things",
+      "paradigmId": "commerce_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense the true value of things"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "appraise"
+          },
+          "description": "Accurately appraise any item"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Value is more than price. A sword has value as metal, as weapon,\nas heirloom, as symbol. Learn to see all values at once.\nTrue value is the sum of all meanings.",
+      "levelCostMultiplier": 1.3,
+      "icon": "💰"
+    },
+    {
+      "id": "merchant-intuition",
+      "name": "Merchant Intuition",
+      "description": "Develop merchant intuition",
+      "paradigmId": "commerce_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to commerce magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "market_sense"
+          },
+          "description": "Sense market conditions and opportunities"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The born merchant knows when to buy and when to sell.\nThey feel market shifts before they happen. Supply and demand\nspeak to them in whispers. Trust your intuition.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🧠"
+    },
+    {
+      "id": "fair-dealing",
+      "name": "Fair Dealing",
+      "description": "Learn the principles of fair dealing",
+      "paradigmId": "commerce_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Protection from unfair trade consequences"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "fair_trade_aura"
+          },
+          "description": "Radiate fairness in deals"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Commerce magic punishes unfair trades. The cheat loses more than\nthey gain. Learn to deal fairly and the magic flows smoothly.\nFairness is not weakness - it's efficiency.",
+      "icon": "⚖️"
+    },
+    {
+      "id": "trade-blessing",
+      "name": "Trade Blessing",
+      "description": "Learn to bless trades for magical enhancement",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "bless_trade"
+          },
+          "description": "Bless trades for enhanced effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A blessed trade benefits both parties beyond the exchange itself.\nGoods improve, services excel, relationships strengthen.\nThe universe rewards fair exchange.",
+      "prerequisites": [
+        "fair-dealing"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "trade-power",
+      "name": "Trade Power",
+      "description": "Learn to draw power from trading",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 55,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "draw_trade_power"
+          },
+          "description": "Draw magical power from fair trades"
+        },
+        {
+          "type": "resource_regen",
+          "baseValue": 10,
+          "description": "Regenerate power through trading"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every fair trade releases energy. The satisfaction of both parties,\nthe completion of exchange, the flow of value - all generate power.\nTrade often, trade fairly, and never run dry.",
+      "prerequisites": [
+        "value-sense"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "arbitrage",
+      "name": "Magical Arbitrage",
+      "description": "Learn to profit from magical value differentials",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "magical_arbitrage"
+          },
+          "description": "Profit from value differentials"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Value isn't constant - it varies by place, by time, by buyer.\nArbitrage exploits these differences. Buy low here, sell high there.\nThe profit is pure magical energy.",
+      "prerequisites": [
+        "trade-power",
+        "merchant-intuition"
+      ],
+      "icon": "📊"
+    },
+    {
+      "id": "currency-attunement",
+      "name": "Currency Attunement",
+      "description": "Learn to use currency as magical focus",
+      "paradigmId": "commerce_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "attune_currency"
+          },
+          "description": "Attune to currency as magical focus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Money changes hands constantly, collecting belief and intent.\nA coin that has paid for joy carries joy. A coin that has paid for death\ncarries death. Learn to read and use this stored power.",
+      "prerequisites": [
+        "value-sense"
+      ],
+      "icon": "🪙"
+    },
+    {
+      "id": "currency-conversion",
+      "name": "Currency Conversion",
+      "description": "Learn to convert between currency types",
+      "paradigmId": "commerce_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "convert_currency"
+          },
+          "description": "Convert between currency types"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Gold to gems. Gems to favors. Favors to time. Time to memories.\nThe exchange rate is complex but knowable. Master conversion\nand no currency is beyond your reach.",
+      "prerequisites": [
+        "currency-attunement"
+      ],
+      "icon": "🔄"
+    },
+    {
+      "id": "mint-power",
+      "name": "Mint Power",
+      "description": "Learn to mint magical currency",
+      "paradigmId": "commerce_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "mint_currency"
+          },
+          "description": "Create magical currency"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 700
+          },
+          "description": "Requires 700 total XP in Commerce magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Not counterfeiting - creating. True magical currency, backed by\nyour power, your word, your reputation. Spend it and others gain\nyour power. Dangerous but useful.",
+      "prerequisites": [
+        "currency-conversion",
+        "contract-master"
+      ],
+      "icon": "🏛️"
+    },
+    {
+      "id": "binding-contract",
+      "name": "Binding Contract",
+      "description": "Learn to create magically binding contracts",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_contract"
+          },
+          "description": "Create magically binding contracts"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Put it in writing and the magic enforces it. A contract is more than\npaper - it's a spell. Terms become reality. Penalties become automatic.\nWrite carefully.",
+      "prerequisites": [
+        "fair-dealing"
+      ],
+      "icon": "📜"
+    },
+    {
+      "id": "contract-enforcement",
+      "name": "Contract Enforcement",
+      "description": "Learn to enforce contracts magically",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "enforce_contract"
+          },
+          "description": "Magically enforce contract terms"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When terms are violated, you can force compliance. The magic compels.\nPayments extracted, services rendered, penalties enacted -\nall without physical action.",
+      "prerequisites": [
+        "binding-contract"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "contract-master",
+      "name": "Contract Master",
+      "description": "Become a master of contract magic",
+      "paradigmId": "commerce_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "master_contract"
+          },
+          "description": "Create unbreakable master contracts"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 20,
+          "description": "Mastery of contract magic"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 8
+          },
+          "description": "Requires 8 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your contracts are legendary. Ironclad. Unbreakable. Every word\ncarefully chosen, every clause a trap for the unwary.\nNo one escapes a contract you've written.",
+      "prerequisites": [
+        "contract-enforcement"
+      ],
+      "icon": "📋"
+    },
+    {
+      "id": "supply-control",
+      "name": "Supply Control",
+      "description": "Learn to control supply",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "control_supply"
+          },
+          "description": "Magically influence supply of goods"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Create scarcity or abundance. Hide goods from the market or reveal them.\nWhen you control supply, you control price. When you control price,\nyou control power.",
+      "prerequisites": [
+        "arbitrage"
+      ],
+      "icon": "📦"
+    },
+    {
+      "id": "demand-shaping",
+      "name": "Demand Shaping",
+      "description": "Learn to shape demand",
+      "paradigmId": "commerce_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "shape_demand"
+          },
+          "description": "Magically influence demand for goods"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Make people want what you're selling. Create need where none existed.\nSatisfy desires before they're felt. Demand is just belief applied\nto commerce.",
+      "prerequisites": [
+        "merchant-intuition",
+        "trade-power"
+      ],
+      "icon": "📈"
+    },
+    {
+      "id": "market-crash",
+      "name": "Market Crash",
+      "description": "Learn to manipulate entire markets",
+      "paradigmId": "commerce_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "crash_market"
+          },
+          "description": "Cause or prevent market crashes"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Commerce magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The invisible hand becomes your hand. Crash economies. Create bubbles.\nBuild fortunes. Destroy empires. At this level, you don't trade in markets -\nyou ARE the market.",
+      "prerequisites": [
+        "supply-control",
+        "demand-shaping"
+      ],
+      "icon": "💥"
+    },
+    {
+      "id": "guild-member",
+      "name": "Guild Member",
+      "description": "Join a merchant guild",
+      "paradigmId": "commerce_magic",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 45,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "guild_access"
+          },
+          "description": "Access guild resources and knowledge"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 10,
+          "description": "Guild training bonus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Guilds are more than trade associations. They're magical lodges,\npooling the commerce power of all members. Join and gain their strength.\nBut guild rules bind.",
+      "prerequisites": [
+        "fair-dealing"
+      ],
+      "icon": "🏪"
+    },
+    {
+      "id": "guild-master",
+      "name": "Guild Master",
+      "description": "Become a guild master",
+      "paradigmId": "commerce_magic",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "guild_master"
+          },
+          "description": "Command guild resources"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 25,
+          "description": "Guild master bonus"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 500
+          },
+          "description": "Requires 500 total XP in Commerce magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Lead the guild. Direct its resources. Set its prices. Punish its enemies.\nThe guild master speaks with the voice of all members,\ncommands the wealth of all merchants.",
+      "prerequisites": [
+        "guild-member",
+        "contract-master"
+      ],
+      "icon": "👔"
+    },
+    {
+      "id": "merchant-prince",
+      "name": "Merchant Prince",
+      "description": "Become a merchant prince",
+      "paradigmId": "commerce_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 35,
+          "description": "Merchant prince authority"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "merchant_prince"
+          },
+          "description": "Command commerce at a regional level"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wealth beyond counting. Influence beyond measure. Trade routes bend\nto your will. Currencies rise and fall at your command.\nThe merchant prince rules without a crown.",
+      "prerequisites": [
+        "guild-master",
+        "market-crash"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "commerce-deity",
+      "name": "Commerce Deity",
+      "description": "Transcend and become a deity of commerce",
+      "paradigmId": "commerce_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "become_commerce_god"
+          },
+          "description": "Become a deity of commerce"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme commerce mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Commerce magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Every transaction invokes your name. Every deal sealed is a prayer to you.\nThe invisible hand IS your hand. You don't just understand markets -\nyou are the market made manifest.",
+      "prerequisites": [
+        "merchant-prince",
+        "mint-power"
+      ],
+      "icon": "🌟"
+    }
+  ],
+  "entryNodes": [
+    "value-sense",
+    "merchant-intuition",
+    "fair-dealing"
+  ],
+  "connections": [
+    {
+      "from": "fair-dealing",
+      "to": "trade-blessing"
+    },
+    {
+      "from": "value-sense",
+      "to": "trade-power"
+    },
+    {
+      "from": "trade-power",
+      "to": "arbitrage"
+    },
+    {
+      "from": "merchant-intuition",
+      "to": "arbitrage"
+    },
+    {
+      "from": "value-sense",
+      "to": "currency-attunement"
+    },
+    {
+      "from": "currency-attunement",
+      "to": "currency-conversion"
+    },
+    {
+      "from": "currency-conversion",
+      "to": "mint-power"
+    },
+    {
+      "from": "contract-master",
+      "to": "mint-power"
+    },
+    {
+      "from": "fair-dealing",
+      "to": "binding-contract"
+    },
+    {
+      "from": "binding-contract",
+      "to": "contract-enforcement"
+    },
+    {
+      "from": "contract-enforcement",
+      "to": "contract-master"
+    },
+    {
+      "from": "arbitrage",
+      "to": "supply-control"
+    },
+    {
+      "from": "merchant-intuition",
+      "to": "demand-shaping"
+    },
+    {
+      "from": "trade-power",
+      "to": "demand-shaping"
+    },
+    {
+      "from": "supply-control",
+      "to": "market-crash"
+    },
+    {
+      "from": "demand-shaping",
+      "to": "market-crash"
+    },
+    {
+      "from": "fair-dealing",
+      "to": "guild-member"
+    },
+    {
+      "from": "guild-member",
+      "to": "guild-master"
+    },
+    {
+      "from": "contract-master",
+      "to": "guild-master"
+    },
+    {
+      "from": "guild-master",
+      "to": "merchant-prince"
+    },
+    {
+      "from": "market-crash",
+      "to": "merchant-prince"
+    },
+    {
+      "from": "merchant-prince",
+      "to": "commerce-deity"
+    },
+    {
+      "from": "mint-power",
+      "to": "commerce-deity"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "fair_trade",
+      "xpAmount": 10,
+      "description": "Complete a fair trade",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "contract_created",
+      "xpAmount": 15,
+      "description": "Create a binding contract"
+    },
+    {
+      "eventType": "contract_enforced",
+      "xpAmount": 20,
+      "description": "Enforce a contract magically"
+    },
+    {
+      "eventType": "arbitrage_profit",
+      "xpAmount": 12,
+      "description": "Profit through magical arbitrage"
+    },
+    {
+      "eventType": "market_influence",
+      "xpAmount": 25,
+      "description": "Significantly influence a market"
+    },
+    {
+      "eventType": "guild_service",
+      "xpAmount": 8,
+      "description": "Perform service for guild"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": true,
+    "requiresInnateAbility": false,
+    "respecPenalty": 0.2
+  },
+  "version": 1
+}

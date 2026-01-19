@@ -53,6 +53,8 @@ export class MarketEventSystem extends BaseSystem {
   readonly id: SystemId = 'market_events';
   readonly priority: number = 24; // Run before TradingSystem (25)
   readonly requiredComponents: ReadonlyArray<string> = [];
+  // Lazy activation: Skip entire system when no market_state exists
+  public readonly activationComponents = ['market_state'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private activeEvents: ActiveMarketEvent[] = [];

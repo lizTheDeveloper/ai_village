@@ -65,6 +65,8 @@ export class TradeAgreementSystem extends BaseSystem {
   public readonly id: SystemId = 'trade_agreement';
   public readonly priority: number = 26; // Run after TradingSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no trade_route exists
+  public readonly activationComponents = ['trade_route'] as const;
 
   protected readonly throttleInterval = UPDATE_INTERVAL;
 

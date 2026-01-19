@@ -12,15 +12,15 @@
 import { VoxelBuildingDefinition, BuilderSpecies } from './types';
 import {
   ALL_BUILDINGS,
-  ALL_HOUSES,
-  ALL_PRODUCTION,
-  ALL_COMMERCIAL,
-  ALL_STORAGE,
-  ALL_COMMUNITY,
-  ALL_MILITARY,
-  ALL_FARMING,
-  ALL_RESEARCH,
-} from './building-library';
+  RESIDENTIAL_BUILDINGS as ALL_HOUSES,
+  PRODUCTION_BUILDINGS as ALL_PRODUCTION,
+  COMMERCIAL_BUILDINGS as ALL_COMMERCIAL,
+  STORAGE_BUILDINGS as ALL_STORAGE,
+  COMMUNITY_BUILDINGS as ALL_COMMUNITY,
+  MILITARY_BUILDINGS as ALL_MILITARY,
+  FARMING_BUILDINGS as ALL_FARMING,
+  RESEARCH_BUILDINGS as ALL_RESEARCH,
+} from './building-library-data';
 import { cityFengShuiAnalyzer, type CityHarmonyAnalysis } from './city-feng-shui';
 
 // =============================================================================

@@ -85,9 +85,3 @@ export function getPactSpells(): SpellDefinition[] {
 
 // Deprecated: Use getter functions instead
 // These are kept for backward compatibility but trigger lazy loading
-Object.defineProperty(exports, 'DIVINE_SPELLS', { get: getDivineSpells });
-Object.defineProperty(exports, 'ACADEMIC_SPELLS', { get: getAcademicSpells });
-Object.defineProperty(exports, 'BLOOD_SPELLS', { get: getBloodSpells });
-Object.defineProperty(exports, 'NAME_SPELLS', { get: getNameSpells });
-Object.defineProperty(exports, 'BREATH_SPELLS', { get: getBreathSpells });
-Object.defineProperty(exports, 'PACT_SPELLS', { get: getPactSpells });

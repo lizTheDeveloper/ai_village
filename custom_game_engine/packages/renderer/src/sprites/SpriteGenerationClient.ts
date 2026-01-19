@@ -186,11 +186,11 @@ export async function requestMapObjectGeneration(spriteId: string): Promise<void
       body: JSON.stringify({
         folderId: spriteId,
         description,
-        // Use map_object API parameters, not character API
-        spriteType: options.type, // 'plant', 'animal', or 'map_object'
-        options: {
+        // Server expects traits field for metadata
+        traits: {
+          spriteType: options.type, // 'plant', 'animal', or 'map_object'
           size: options.size,
-          view: 'high top-down', // For top-down sprites
+          view: 'high top-down',
         },
       }),
     });

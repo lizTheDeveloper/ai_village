@@ -254,20 +254,27 @@ export {
   OBSERVATORY,
 
   // Collections
-  ALL_HOUSES,
-  ALL_PRODUCTION,
-  ALL_COMMERCIAL,
-  ALL_STORAGE,
-  ALL_COMMUNITY,
-  ALL_MILITARY,
-  ALL_FARMING,
-  ALL_RESEARCH,
   ALL_BUILDINGS,
 
-  // Utility functions
-  getBuildingsForSpecies,
-  getHousesForSpecies,
-} from './building-library.js';
+  // By species
+  TINY_SPECIES_BUILDINGS,
+  SMALL_SPECIES_BUILDINGS,
+  SHORT_SPECIES_BUILDINGS,
+  MEDIUM_SPECIES_BUILDINGS,
+  TALL_SPECIES_BUILDINGS,
+  LARGE_SPECIES_BUILDINGS,
+  HUGE_SPECIES_BUILDINGS,
+
+  // By category
+  RESIDENTIAL_BUILDINGS,
+  PRODUCTION_BUILDINGS,
+  STORAGE_BUILDINGS,
+  COMMERCIAL_BUILDINGS,
+  COMMUNITY_BUILDINGS,
+  FARMING_BUILDINGS,
+  RESEARCH_BUILDINGS,
+  MILITARY_BUILDINGS,
+} from './building-library-data.js';
 
 // Exotic Buildings (non-standard, higher-dimensional)
 export {
@@ -355,7 +362,7 @@ export {
 
   // Research tree mapping
   RESEARCH_BUILDING_REQUIREMENTS,
-} from './crafting-buildings.js';
+} from './crafting-buildings-data.js';
 
 // City Generation
 export {
@@ -525,11 +532,7 @@ export {
   // Utility functions
   getBuildingsForParadigm,
   getBuildingsWithEffect,
-
-  // Material-based building creation
-  createMagicBuilding,
-  describeMaterialEffects,
-} from './magic-buildings.js';
+} from './magic-buildings-data.js';
 
 // Material Effects System
 export {

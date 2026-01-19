@@ -1,0 +1,708 @@
+{
+  "id": "game_skill_tree",
+  "paradigmId": "game_magic",
+  "name": "Game Magic Skill Tree",
+  "description": "Master the art of magical wagers, challenges, and binding games",
+  "lore": "Agree to the rules and reality enforces them. Bet your soul in a card game\nand you will lose it if you lose. Cheat and the game itself punishes you.\nBut win fairly and claim your prize. Every game is an opportunity.",
+  "nodes": [
+    {
+      "id": "game-sense",
+      "name": "Game Sense",
+      "description": "Learn to sense magical potential in games",
+      "paradigmId": "game_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense when games carry magical weight"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "detect_wager"
+          },
+          "description": "Detect magical wagers and bindings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every game has stakes. Most are mundane. But some games shimmer\nwith potential - where the universe itself is paying attention.\nLearn to spot these moments.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🎮"
+    },
+    {
+      "id": "fair-play",
+      "name": "Fair Play",
+      "description": "Learn the sacred art of fair play",
+      "paradigmId": "game_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 15,
+          "description": "Protected from cheating accusations"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "fair_play_aura"
+          },
+          "description": "Radiate fairness - opponents trust your honesty"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Game magic punishes cheaters harshly. The first lesson is simple:\nplay fair. Those who cheat at magical games lose more than the game.\nFair play isn't weakness - it's survival.",
+      "icon": "⚖️"
+    },
+    {
+      "id": "rule-understanding",
+      "name": "Rule Understanding",
+      "description": "Learn to instantly comprehend game rules",
+      "paradigmId": "game_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to game magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "rule_mastery"
+          },
+          "description": "Instantly understand any game's rules"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Rules are the skeleton of game magic. Know them perfectly.\nEvery loophole, every edge case, every technical interpretation.\nMaster the rules and you master the game.",
+      "levelCostMultiplier": 1.3,
+      "icon": "📜"
+    },
+    {
+      "id": "minor-wager",
+      "name": "Minor Wager",
+      "description": "Learn to create small magical wagers",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "minor_wager"
+          },
+          "description": "Create small magical wagers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"I bet you a drink I can make that shot.\" Simple words, but with\ngame magic, they bind. The loser MUST pay. Start small.\nLearn the weight of wagered words.",
+      "prerequisites": [
+        "game-sense"
+      ],
+      "icon": "🎲"
+    },
+    {
+      "id": "major-wager",
+      "name": "Major Wager",
+      "description": "Learn to create major magical wagers",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "major_wager"
+          },
+          "description": "Create significant magical wagers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Bet your house. Bet your horse. Bet years of service.\nMajor wagers carry major power - victory grants proportional reward.\nBut losing means losing everything wagered.",
+      "prerequisites": [
+        "minor-wager"
+      ],
+      "icon": "💎"
+    },
+    {
+      "id": "ultimate-stakes",
+      "name": "Ultimate Stakes",
+      "description": "Learn to wager the ultimate stakes",
+      "paradigmId": "game_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "ultimate_wager"
+          },
+          "description": "Wager souls, names, and existence itself"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 700
+          },
+          "description": "Requires 700 total XP in Game magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "\"I bet my soul.\" Three words that shake reality. Stakes this high\nattract attention from things that collect souls. The power offered\nis immense. The risk is everything.",
+      "prerequisites": [
+        "major-wager"
+      ],
+      "icon": "👻"
+    },
+    {
+      "id": "issue-challenge",
+      "name": "Issue Challenge",
+      "description": "Learn to issue binding challenges",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "challenge"
+          },
+          "description": "Issue binding magical challenges"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"I challenge you.\" When spoken with power, this cannot be ignored.\nThe challenged must respond - accept, decline, or propose counter-terms.\nDeclining carries its own costs.",
+      "prerequisites": [
+        "fair-play"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "compulsory-challenge",
+      "name": "Compulsory Challenge",
+      "description": "Learn to issue undeniable challenges",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "compulsory_challenge"
+          },
+          "description": "Issue challenges that cannot be declined"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 5
+          },
+          "description": "Requires 5 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Some challenges cannot be refused. The magic binds before consent.\nThe challenged must play - flight is not an option.\nUse this power sparingly; it makes enemies.",
+      "prerequisites": [
+        "issue-challenge"
+      ],
+      "icon": "🔒"
+    },
+    {
+      "id": "champion",
+      "name": "Champion",
+      "description": "Learn to use and be a champion",
+      "paradigmId": "game_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "designate_champion"
+          },
+          "description": "Choose a champion to play for you"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "be_champion"
+          },
+          "description": "Be a champion for others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Not all challenges must be faced personally. Designate a champion\nto play in your stead. Their victory is yours. Their loss... also yours.\nChampions carry heavy burdens.",
+      "prerequisites": [
+        "issue-challenge"
+      ],
+      "icon": "🏆"
+    },
+    {
+      "id": "rule-creation",
+      "name": "Rule Creation",
+      "description": "Learn to create binding game rules",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_rules"
+          },
+          "description": "Create new game rules that bind"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"Within this circle, no lies may be spoken.\" A new rule, magically\nenforced. Create the game, create the rules, control the outcome.\nBut rules bind the maker too.",
+      "prerequisites": [
+        "rule-understanding"
+      ],
+      "icon": "📝"
+    },
+    {
+      "id": "loophole-finder",
+      "name": "Loophole Finder",
+      "description": "Learn to find loopholes in rules",
+      "paradigmId": "game_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "find_loophole"
+          },
+          "description": "Find exploitable gaps in game rules"
+        },
+        {
+          "type": "perception",
+          "baseValue": 15,
+          "description": "Detect rule ambiguities"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every rule has exceptions. Every system has gaps. The loophole finder\nsees them all. Not cheating - creative interpretation.\nThe rules as written, not as intended.",
+      "prerequisites": [
+        "rule-understanding"
+      ],
+      "icon": "🔍"
+    },
+    {
+      "id": "rule-bending",
+      "name": "Rule Bending",
+      "description": "Learn to bend rules without breaking them",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "bend_rules"
+          },
+          "description": "Stretch rules to their breaking point"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Rules can flex. Push them to their limits without snapping them.\nWalk the line between fair and foul. The letter of the law,\nnot the spirit. But bend too far and they break - taking you with them.",
+      "prerequisites": [
+        "rule-creation",
+        "loophole-finder"
+      ],
+      "icon": "〰️"
+    },
+    {
+      "id": "victory-surge",
+      "name": "Victory Surge",
+      "description": "Learn to draw power from victories",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 55,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "victory_surge"
+          },
+          "description": "Gain temporary power from victories"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Victory energizes. The moment of triumph floods you with power.\nLearn to channel this surge, to store it, to use it.\nWinners keep winning for a reason.",
+      "prerequisites": [
+        "game-sense"
+      ],
+      "levelCostMultiplier": 1.4,
+      "icon": "⚡"
+    },
+    {
+      "id": "winning-streak",
+      "name": "Winning Streak",
+      "description": "Learn to amplify power through winning streaks",
+      "paradigmId": "game_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "winning_streak"
+          },
+          "description": "Consecutive wins amplify power"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Bonus from maintained streaks"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "One win is power. Two wins is more. Three, four, five - the power\ncompounds. A winning streak becomes unstoppable momentum.\nBut one loss ends it all.",
+      "prerequisites": [
+        "victory-surge"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "🔥"
+    },
+    {
+      "id": "claim-prize",
+      "name": "Claim Prize",
+      "description": "Learn to magically collect winnings",
+      "paradigmId": "game_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "claim_prize"
+          },
+          "description": "Magically enforce collection of winnings"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A bet won is a bet owed. If the loser won't pay, take it.\nThe magic enforces. Wagered objects appear in your hands.\nWagered services compel the debtor.",
+      "prerequisites": [
+        "minor-wager",
+        "victory-surge"
+      ],
+      "icon": "🎁"
+    },
+    {
+      "id": "eternal-game",
+      "name": "Eternal Game",
+      "description": "Learn to create eternal games",
+      "paradigmId": "game_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "eternal_game"
+          },
+          "description": "Create games that never end"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some games have no end. Chess matches that span centuries.\nCard games played across generations. Trap an enemy in an eternal game\nand they're trapped forever. But someone must play opposite them...",
+      "prerequisites": [
+        "compulsory-challenge",
+        "rule-creation"
+      ],
+      "icon": "♾️"
+    },
+    {
+      "id": "game-master",
+      "name": "Game Master",
+      "description": "Achieve mastery over all games",
+      "paradigmId": "game_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 30,
+          "description": "Supreme game magic mastery"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "game_master"
+          },
+          "description": "Become the master of all games"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Game magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You have played and won more games than can be counted.\nEvery type, every form, every variant. You are the Game Master now.\nYou set the rules. You design the challenges. Reality plays by your game.",
+      "prerequisites": [
+        "rule-bending",
+        "winning-streak"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "reality-game",
+      "name": "Reality Game",
+      "description": "Transform reality into a game",
+      "paradigmId": "game_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "reality_game"
+          },
+          "description": "Make reality itself the game board"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Ultimate game mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Game magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "What if life itself were a game? What if the universe followed\ngame rules? At the pinnacle of game magic, you can make it so.\nDeclare the rules. Set the stakes. Play for everything.",
+      "prerequisites": [
+        "game-master",
+        "eternal-game",
+        "ultimate-stakes"
+      ],
+      "icon": "🌍"
+    }
+  ],
+  "entryNodes": [
+    "game-sense",
+    "fair-play",
+    "rule-understanding"
+  ],
+  "connections": [
+    {
+      "from": "game-sense",
+      "to": "minor-wager"
+    },
+    {
+      "from": "minor-wager",
+      "to": "major-wager"
+    },
+    {
+      "from": "major-wager",
+      "to": "ultimate-stakes"
+    },
+    {
+      "from": "fair-play",
+      "to": "issue-challenge"
+    },
+    {
+      "from": "issue-challenge",
+      "to": "compulsory-challenge"
+    },
+    {
+      "from": "issue-challenge",
+      "to": "champion"
+    },
+    {
+      "from": "rule-understanding",
+      "to": "rule-creation"
+    },
+    {
+      "from": "rule-understanding",
+      "to": "loophole-finder"
+    },
+    {
+      "from": "rule-creation",
+      "to": "rule-bending"
+    },
+    {
+      "from": "loophole-finder",
+      "to": "rule-bending"
+    },
+    {
+      "from": "game-sense",
+      "to": "victory-surge"
+    },
+    {
+      "from": "victory-surge",
+      "to": "winning-streak"
+    },
+    {
+      "from": "minor-wager",
+      "to": "claim-prize"
+    },
+    {
+      "from": "victory-surge",
+      "to": "claim-prize"
+    },
+    {
+      "from": "compulsory-challenge",
+      "to": "eternal-game"
+    },
+    {
+      "from": "rule-creation",
+      "to": "eternal-game"
+    },
+    {
+      "from": "rule-bending",
+      "to": "game-master"
+    },
+    {
+      "from": "winning-streak",
+      "to": "game-master"
+    },
+    {
+      "from": "game-master",
+      "to": "reality-game"
+    },
+    {
+      "from": "eternal-game",
+      "to": "reality-game"
+    },
+    {
+      "from": "ultimate-stakes",
+      "to": "reality-game"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "game_won",
+      "xpAmount": 15,
+      "description": "Win a magical game",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "wager_created",
+      "xpAmount": 8,
+      "description": "Create a magical wager"
+    },
+    {
+      "eventType": "challenge_issued",
+      "xpAmount": 10,
+      "description": "Issue a binding challenge"
+    },
+    {
+      "eventType": "prize_claimed",
+      "xpAmount": 12,
+      "description": "Claim winnings from a game"
+    },
+    {
+      "eventType": "streak_maintained",
+      "xpAmount": 5,
+      "description": "Maintain a winning streak"
+    },
+    {
+      "eventType": "rule_created",
+      "xpAmount": 15,
+      "description": "Create a new binding rule"
+    },
+    {
+      "eventType": "fair_play_rewarded",
+      "xpAmount": 10,
+      "description": "Rewarded for playing fairly"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

@@ -1,0 +1,648 @@
+{
+  "id": "paradox_skill_tree",
+  "paradigmId": "paradox_magic",
+  "name": "Paradox Magic Skill Tree",
+  "description": "Master the art of logical contradiction and reality manipulation",
+  "lore": "This statement is false. A barber shaves all who don't shave themselves.\nThese words hurt to read. They hurt more to use. Reality wasn't built\nto handle contradictions. Force them upon it and it breaks.\nIn the breaking, power. In the power, madness.",
+  "nodes": [
+    {
+      "id": "contradiction-sense",
+      "name": "Contradiction Sense",
+      "description": "Learn to sense contradictions in reality",
+      "paradigmId": "paradox_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense logical contradictions in reality"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "paradox_detection"
+          },
+          "description": "Detect paradoxes and logical inconsistencies"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Reality has cracks. Places where logic frays, where the rules\ndon't quite add up. Most minds slide past them, unaware.\nYour mind learns to snag on these imperfections, to feel them.",
+      "levelCostMultiplier": 1.3,
+      "icon": "❓"
+    },
+    {
+      "id": "logic-flexibility",
+      "name": "Logic Flexibility",
+      "description": "Learn to think in contradictions without breaking",
+      "paradigmId": "paradox_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Resistance to paradox backlash"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The human mind wasn't built for paradox. It recoils from contradiction.\nBut with practice, you can hold two opposing truths simultaneously.\nThis flexibility protects you from the madness that breaks others.",
+      "levelCostMultiplier": 1.4,
+      "icon": "🧠"
+    },
+    {
+      "id": "impossible-thought",
+      "name": "Impossible Thought",
+      "description": "Learn to think impossible thoughts",
+      "paradigmId": "paradox_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 35,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to paradox magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "think_impossible"
+          },
+          "description": "Think thoughts that should be impossible"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Imagine a color you've never seen. Picture a square circle.\nMost can't. You must. The impossible thought is the seed\nfrom which paradox magic grows.",
+      "levelCostMultiplier": 1.3,
+      "icon": "💭"
+    },
+    {
+      "id": "liar-paradox",
+      "name": "The Liar Paradox",
+      "description": "Learn to invoke \"This statement is false\"",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "invoke_liar"
+          },
+          "description": "Invoke the liar paradox"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"This statement is false.\" If true, it's false. If false, it's true.\nSpeak it with conviction and reality stutters, caught in the loop.\nThe simplest paradox, but potent.",
+      "prerequisites": [
+        "contradiction-sense"
+      ],
+      "icon": "🗣️"
+    },
+    {
+      "id": "bootstrap-paradox",
+      "name": "The Bootstrap Paradox",
+      "description": "Learn to create self-causing loops",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "invoke_bootstrap"
+          },
+          "description": "Create effects that cause themselves"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The chicken and the egg, but as a weapon. Create an effect\nthat retroactively creates its own cause. Information from nowhere.\nPower from nothing. Time doesn't like this.",
+      "prerequisites": [
+        "liar-paradox"
+      ],
+      "icon": "🔄"
+    },
+    {
+      "id": "omnipotence-paradox",
+      "name": "The Omnipotence Paradox",
+      "description": "Invoke unstoppable force vs immovable object",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "invoke_omnipotence"
+          },
+          "description": "Create unstoppable vs immovable scenarios"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "What happens when the unstoppable meets the immovable?\nReality doesn't know. Reality can't know. Force the question\nand reality breaks trying to answer.",
+      "prerequisites": [
+        "contradiction-sense",
+        "impossible-thought"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "reality-stress",
+      "name": "Reality Stress",
+      "description": "Learn to stress reality with contradictions",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "stress_reality"
+          },
+          "description": "Apply logical pressure to reality"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Reality is strong but not infinitely so. Apply pressure\nat the logical seams and it begins to crack. Small glitches.\nMinor impossibilities. The first step to greater tears.",
+      "prerequisites": [
+        "contradiction-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "⚠️"
+    },
+    {
+      "id": "reality-tear",
+      "name": "Reality Tear",
+      "description": "Learn to tear holes in the fabric of reality",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "tear_reality"
+          },
+          "description": "Create temporary tears in reality"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "corruption_level",
+          "params": {
+            "corruptionMin": 10
+          },
+          "description": "Requires minimum 10 corruption"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Enough pressure and reality rips. Through the tear, glimpse\nwhat should not be. Sometimes useful things fall out.\nSometimes things fall in. Close it quickly.",
+      "prerequisites": [
+        "reality-stress",
+        "omnipotence-paradox"
+      ],
+      "icon": "🕳️"
+    },
+    {
+      "id": "reality-crash",
+      "name": "Reality Crash",
+      "description": "Learn to crash reality like a faulty program",
+      "paradigmId": "paradox_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "crash_reality"
+          },
+          "description": "Cause temporary physics failure"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Paradox magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Reality is code. Paradox is a bug. Force enough bugs simultaneously\nand the system crashes. For a beautiful, terrible moment,\nnothing works. Anything is possible. Nothing is real.",
+      "prerequisites": [
+        "reality-tear"
+      ],
+      "icon": "💥"
+    },
+    {
+      "id": "recursive-spell",
+      "name": "Recursive Spell",
+      "description": "Learn to cast self-referential spells",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "recursive_casting"
+          },
+          "description": "Cast spells that reference themselves"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A spell that casts itself casting itself casting itself...\nThe recursion amplifies power but risks infinite loops.\nKnow when to break the chain.",
+      "prerequisites": [
+        "bootstrap-paradox"
+      ],
+      "icon": "🔁"
+    },
+    {
+      "id": "strange-loop",
+      "name": "Strange Loop",
+      "description": "Learn to create strange loops in reality",
+      "paradigmId": "paradox_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_strange_loop"
+          },
+          "description": "Create Escher-like impossible structures"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Stairs that go up forever by going down. Water that flows uphill\nto feed itself. Hands drawing themselves into existence.\nStrange loops bend space and time into impossible shapes.",
+      "prerequisites": [
+        "recursive-spell"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "paradox-spirit",
+      "name": "Paradox Spirit",
+      "description": "Learn to summon spirits born from paradox",
+      "paradigmId": "paradox_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "summon_paradox_spirit"
+          },
+          "description": "Summon beings born from contradiction"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Where reality breaks, something fills the gap. Paradox spirits -\nbeings made of contradiction itself. They exist by not existing.\nThey help by harming. They are difficult to control.",
+      "prerequisites": [
+        "reality-tear"
+      ],
+      "icon": "👻"
+    },
+    {
+      "id": "impossible-being",
+      "name": "Impossible Being",
+      "description": "Learn to become an impossibility yourself",
+      "paradigmId": "paradox_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "become_impossible"
+          },
+          "description": "Temporarily become a logical impossibility"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 10
+          },
+          "description": "Requires 10 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate paradox: exist as something that cannot exist.\nFor a moment, you are your own contradiction. Reality cannot\nharm what reality cannot process. You slip between the rules.",
+      "prerequisites": [
+        "paradox-spirit",
+        "strange-loop"
+      ],
+      "icon": "🌀"
+    },
+    {
+      "id": "madness-resistance",
+      "name": "Madness Resistance",
+      "description": "Build resistance to paradox-induced madness",
+      "paradigmId": "paradox_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 15,
+          "perLevelValue": 10,
+          "description": "Resistance to sanity loss"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The mind breaks when forced to hold contradictions. But yours can bend.\nEach paradox weathered builds tolerance. You learn to let the\nimpossible slide through without catching.",
+      "prerequisites": [
+        "logic-flexibility"
+      ],
+      "levelCostMultiplier": 1.3,
+      "icon": "🛡️"
+    },
+    {
+      "id": "compartmentalization",
+      "name": "Compartmentalization",
+      "description": "Learn to isolate paradox damage mentally",
+      "paradigmId": "paradox_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "compartmentalize"
+          },
+          "description": "Isolate paradox damage to parts of your mind"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Wall off sections of your mind. Let the paradox break that part\nwhile the rest remains whole. Sacrifice memories, skills, even\npersonality fragments to preserve core sanity.",
+      "prerequisites": [
+        "madness-resistance"
+      ],
+      "icon": "🧩"
+    },
+    {
+      "id": "paradox-immunity",
+      "name": "Paradox Immunity",
+      "description": "Achieve near-immunity to paradox effects",
+      "paradigmId": "paradox_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 50,
+          "description": "Near-immunity to paradox backlash"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "paradox_immunity"
+          },
+          "description": "Become immune to most paradox effects"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 900
+          },
+          "description": "Requires 900 total XP in Paradox magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You have held so many contradictions that you have become one.\nNeither true nor false, neither real nor unreal. Paradox flows\nthrough you like water through a net.",
+      "prerequisites": [
+        "compartmentalization",
+        "impossible-being"
+      ],
+      "icon": "⭐"
+    },
+    {
+      "id": "existence-paradox",
+      "name": "Existence Paradox",
+      "description": "Master the paradox of your own existence",
+      "paradigmId": "paradox_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "existence_paradox"
+          },
+          "description": "Manipulate your own existence status"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme paradox mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1500
+          },
+          "description": "Requires 1500 total XP in Paradox magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Do you exist? A simple question with a simple answer, normally.\nBut you can make it complicated. Exist and not-exist simultaneously.\nThe grandfather paradox applied to yourself. The ultimate power.",
+      "prerequisites": [
+        "paradox-immunity",
+        "reality-crash"
+      ],
+      "icon": "🔮"
+    }
+  ],
+  "entryNodes": [
+    "contradiction-sense",
+    "logic-flexibility",
+    "impossible-thought"
+  ],
+  "connections": [
+    {
+      "from": "contradiction-sense",
+      "to": "liar-paradox"
+    },
+    {
+      "from": "liar-paradox",
+      "to": "bootstrap-paradox"
+    },
+    {
+      "from": "contradiction-sense",
+      "to": "omnipotence-paradox"
+    },
+    {
+      "from": "impossible-thought",
+      "to": "omnipotence-paradox"
+    },
+    {
+      "from": "contradiction-sense",
+      "to": "reality-stress"
+    },
+    {
+      "from": "reality-stress",
+      "to": "reality-tear"
+    },
+    {
+      "from": "omnipotence-paradox",
+      "to": "reality-tear"
+    },
+    {
+      "from": "reality-tear",
+      "to": "reality-crash"
+    },
+    {
+      "from": "bootstrap-paradox",
+      "to": "recursive-spell"
+    },
+    {
+      "from": "recursive-spell",
+      "to": "strange-loop"
+    },
+    {
+      "from": "reality-tear",
+      "to": "paradox-spirit"
+    },
+    {
+      "from": "paradox-spirit",
+      "to": "impossible-being"
+    },
+    {
+      "from": "strange-loop",
+      "to": "impossible-being"
+    },
+    {
+      "from": "logic-flexibility",
+      "to": "madness-resistance"
+    },
+    {
+      "from": "madness-resistance",
+      "to": "compartmentalization"
+    },
+    {
+      "from": "compartmentalization",
+      "to": "paradox-immunity"
+    },
+    {
+      "from": "impossible-being",
+      "to": "paradox-immunity"
+    },
+    {
+      "from": "paradox-immunity",
+      "to": "existence-paradox"
+    },
+    {
+      "from": "reality-crash",
+      "to": "existence-paradox"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "paradox_invoked",
+      "xpAmount": 15,
+      "description": "Successfully invoke a paradox",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "reality_stressed",
+      "xpAmount": 10,
+      "description": "Stress reality with contradictions"
+    },
+    {
+      "eventType": "reality_torn",
+      "xpAmount": 30,
+      "description": "Create a reality tear"
+    },
+    {
+      "eventType": "sanity_survived",
+      "xpAmount": 20,
+      "description": "Survive sanity damage from paradox"
+    },
+    {
+      "eventType": "paradox_spirit_controlled",
+      "xpAmount": 25,
+      "description": "Successfully control a paradox spirit"
+    },
+    {
+      "eventType": "impossible_thought",
+      "xpAmount": 5,
+      "description": "Think an impossible thought"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

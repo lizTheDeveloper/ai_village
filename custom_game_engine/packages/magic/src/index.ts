@@ -365,23 +365,62 @@ export {
 // Paradigm-Specific Skill Trees
 // ============================================================================
 
+// ============================================================================
+// Skill Tree Data (Loaded from JSON)
+// ============================================================================
+
+export {
+  // Tree loader functions
+  loadSkillTree,
+  getAllParadigmIds,
+  getAllSkillTrees,
+
+  // Tree exports for backward compatibility
+  ALLOMANCY_SKILL_TREE,
+  SHINTO_SKILL_TREE,
+  SYMPATHY_SKILL_TREE,
+  DAEMON_SKILL_TREE,
+  DREAM_SKILL_TREE,
+  SONG_SKILL_TREE,
+  NAME_SKILL_TREE,
+  BREATH_SKILL_TREE,
+  PACT_SKILL_TREE,
+  BLOOD_SKILL_TREE,
+  EMOTIONAL_SKILL_TREE,
+  RUNE_SKILL_TREE,
+  DIVINE_SKILL_TREE,
+  ACADEMIC_SKILL_TREE,
+  BUREAUCRATIC_SKILL_TREE,
+  DEBT_SKILL_TREE,
+  LUCK_SKILL_TREE,
+  PARADOX_SKILL_TREE,
+  GAME_SKILL_TREE,
+  ECHO_SKILL_TREE,
+  THRESHOLD_SKILL_TREE,
+  BELIEF_SKILL_TREE,
+  COMMERCE_SKILL_TREE,
+  FENG_SHUI_SKILL_TREE,
+  ARCHITECTURE_SKILL_TREE,
+} from './skillTrees/loadSkillTrees.js';
+
+// ============================================================================
+// Paradigm-Specific Helpers (still from original files)
+// ============================================================================
+
 // Allomancy (Mistborn-inspired)
 export {
-  ALLOMANCY_SKILL_TREE,
   getMistingMetals,
   isMetalAvailable,
 } from './skillTrees/AllomancySkillTree.js';
 
 // Shinto (Kami relationships)
 export {
-  SHINTO_SKILL_TREE,
   getAvailableKamiTypes,
   isPuritySufficient,
 } from './skillTrees/ShintoSkillTree.js';
 
 // Sympathy (Name of the Wind inspired)
 export {
-  SYMPATHY_SKILL_TREE,
   LINK_TYPES,
   BINDING_PRINCIPLES,
   calculateLinkEfficiency,
@@ -391,7 +430,6 @@ export {
 
 // Daemon (His Dark Materials inspired)
 export {
-  DAEMON_SKILL_TREE,
   DAEMON_FORM_CATEGORIES,
   DUST_INTERACTIONS,
   getFormBonuses,
@@ -404,7 +442,6 @@ export {
 
 // Dream (Lucid dreaming, oneiromancy)
 export {
-  DREAM_SKILL_TREE,
   DREAM_REALMS,
   SLEEP_STAGES,
   NIGHTMARE_TYPES,
@@ -417,7 +454,6 @@ export {
 
 // Song (Musical magic, bardic traditions)
 export {
-  SONG_SKILL_TREE,
   SONG_TYPES,
   MUSICAL_ELEMENTS,
   INSTRUMENT_TYPES,
@@ -430,7 +466,6 @@ export {
 
 // Name (Earthsea-inspired true names)
 export {
-  NAME_SKILL_TREE,
   NAME_CATEGORIES,
   NAME_MASTERY_LEVELS,
   NAME_EFFECTS,
@@ -443,7 +478,6 @@ export {
 
 // Breath (Warbreaker-inspired Awakening)
 export {
-  BREATH_SKILL_TREE,
   HEIGHTENINGS,
   AWAKENING_TYPES,
   COMMAND_CATEGORIES,
@@ -458,7 +492,6 @@ export {
 
 // Pact (Contract magic with entities)
 export {
-  PACT_SKILL_TREE,
   PATRON_TYPES,
   PACT_COSTS,
   PACT_BENEFITS,
@@ -473,7 +506,6 @@ export {
 
 // Blood (Hemomancy and vitality magic)
 export {
-  BLOOD_SKILL_TREE,
   BLOOD_SOURCES,
   BLOODLINES,
   BLOOD_TECHNIQUES,
@@ -489,7 +521,6 @@ export {
 
 // Emotional (Emotion-based magic)
 export {
-  EMOTIONAL_SKILL_TREE,
   EMOTIONS,
   EMOTION_CATEGORIES,
   EMOTIONAL_TECHNIQUES,
@@ -505,7 +536,6 @@ export {
 
 // Rune (Runecarving and inscription)
 export {
-  RUNE_SKILL_TREE,
   RUNE_CATEGORIES,
   CARVING_MATERIALS,
   RUNE_TIERS,
@@ -520,7 +550,6 @@ export {
 
 // Divine (Worship and miracles)
 export {
-  DIVINE_SKILL_TREE,
   DIVINE_DOMAINS,
   CLERICAL_RANKS,
   MIRACLE_TYPES,
@@ -538,7 +567,6 @@ export {
 
 // Academic (Formal magical education)
 export {
-  ACADEMIC_SKILL_TREE,
   MAGIC_SCHOOLS,
   ACADEMIC_RANKS,
   METAMAGIC,
@@ -554,7 +582,6 @@ export {
 
 // Bureaucratic (Paperwork and stamps)
 export {
-  BUREAUCRATIC_SKILL_TREE,
   FORM_TYPES,
   STAMP_TYPES,
   BUREAUCRATIC_RANKS,
@@ -567,7 +594,6 @@ export {
 
 // Debt (Fae-style favors and obligations)
 export {
-  DEBT_SKILL_TREE,
   DEBT_TYPES,
   DEBT_CREATION,
   INTEREST_RATES,
@@ -579,7 +605,6 @@ export {
 
 // Luck (Probability manipulation)
 export {
-  LUCK_SKILL_TREE,
   LUCK_TYPES,
   PROBABILITY_TIERS,
   KARMA_LEVELS,
@@ -592,7 +617,6 @@ export {
 
 // Paradox (Logical contradictions)
 export {
-  PARADOX_SKILL_TREE,
   PARADOX_TYPES,
   REALITY_STABILITY,
   SANITY_COSTS,
@@ -604,7 +628,6 @@ export {
 
 // Game (Wagers and challenges)
 export {
-  GAME_SKILL_TREE,
   GAME_TYPES,
   STAKE_TYPES,
   VICTORY_MULTIPLIERS,
@@ -617,7 +640,6 @@ export {
 
 // Echo (Memories and past events)
 export {
-  ECHO_SKILL_TREE,
   ECHO_TYPES,
   TIME_DEPTHS,
   ECHO_CLARITY,
@@ -629,7 +651,6 @@ export {
 
 // Threshold (Boundaries and liminal spaces)
 export {
-  THRESHOLD_SKILL_TREE,
   THRESHOLD_TYPES,
   LIMINAL_STATES,
   INVITATION_LEVELS,
@@ -641,7 +662,6 @@ export {
 
 // Belief (Faith and reality consensus)
 export {
-  BELIEF_SKILL_TREE,
   BELIEF_TYPES,
   BELIEF_INTENSITY,
   BELIEF_ENTITIES,
@@ -653,7 +673,6 @@ export {
 
 // Commerce (Trade and contracts)
 export {
-  COMMERCE_SKILL_TREE,
   TRADE_TYPES,
   CURRENCY_TYPES,
   CONTRACT_LEVELS,
@@ -665,7 +684,6 @@ export {
 
 // Feng Shui (Spatial harmony magic)
 export {
-  FENG_SHUI_SKILL_TREE,
   FENG_SHUI_ELEMENTS,
   CHI_FLOW_STATES,
   HARMONY_LEVELS,
@@ -682,7 +700,6 @@ export {
 
 // Architecture (Building design and construction)
 export {
-  ARCHITECTURE_SKILL_TREE,
   BUILDING_TIERS,
   BUILDING_CATEGORIES,
   DESIGN_PRINCIPLES,

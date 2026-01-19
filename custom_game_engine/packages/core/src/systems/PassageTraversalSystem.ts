@@ -54,6 +54,8 @@ export class PassageTraversalSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
     CT.PassageExtended,
   ];
+  // Lazy activation: Skip entire system when no passage exists
+  public readonly activationComponents = ['passage'] as const;
   protected readonly throttleInterval = 20; // Every 1 second (20 ticks)
 
   // Zero-allocation working objects - reused across update cycles

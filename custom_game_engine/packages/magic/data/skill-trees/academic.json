@@ -1,0 +1,594 @@
+{
+  "id": "academic-tree",
+  "paradigmId": "academic",
+  "name": "The Arcane Academy",
+  "description": "Master formal magic through study, research, and systematic spell construction.",
+  "lore": "Magic is a science. It has rules, formulas, principles that can be studied\nand mastered. The academic tradition treats magic as any other field of study -\nthrough education, practice, and research.\n\nYou begin with theory: understanding how magic flows, how it can be shaped, what\nfundamental principles govern its behavior. This isn't innate talent or divine\ngift - it's learned knowledge, accessible to anyone willing to study.\n\nNext comes practical application: your first cantrip, a simple spell that proves\nyou understand the basics. From there, you expand: learning more spells, building\na spellbook, mastering different schools of magic.\n\nMana is your fuel - internal magical energy that every living thing possesses.\nYou learn to sense it, conserve it, regenerate it faster. Better mana management\nmeans more spells cast before exhaustion.\n\nThe schools of magic represent different approaches and effects:\n- Evocation creates energy (fireballs, lightning)\n- Illusion deceives perception (invisibility, disguises)\n- Transmutation changes matter (polymorph, enhancement)\n- Abjuration protects and wards (shields, counterspells)\n- And more...\n\nAdvanced techniques involve spell preparation (doing the complex work in advance)\nand metamagic (modifying spells to be faster, stronger, subtler). The greatest\nwizards can research entirely new spells, inventing original magic.\n\nThe path culminates in Archmage status - recognition as one of the greatest\nmagical scholars of your age. This isn't about raw power but deep understanding\nand contribution to magical knowledge.\n\nThe academic path is methodical, intellectual, and systematic. Power comes not\nfrom faith, bloodline, or sacrifice - but from study, practice, and mastery of\nfundamental principles.",
+  "nodes": [
+    {
+      "id": "arcane-theory",
+      "name": "Arcane Theory",
+      "description": "Learn basic arcane theory",
+      "paradigmId": "academic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 40,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Understand basic magical theory",
+          "target": {
+            "abilityId": "arcane_literacy"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Magic is a science. It has rules, principles, formulas. You begin by\nlearning the theory - how magic flows, how it can be shaped, what makes a\nspell work. This foundation is essential for everything that follows.",
+      "levelCostMultiplier": 1.4,
+      "icon": "📚"
+    },
+    {
+      "id": "mana-sense",
+      "name": "Mana Awareness",
+      "description": "Learn to sense your mana pool",
+      "paradigmId": "academic",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense your personal mana reserves",
+          "target": {
+            "abilityId": "sense_mana"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every mage has a personal mana pool - internal magical energy. You learn\nto feel it, to know how much you have, how much spells cost. This awareness\nprevents burnout and helps manage your power.",
+      "prerequisites": [
+        "arcane-theory"
+      ]
+    },
+    {
+      "id": "basic-spellcasting",
+      "name": "Basic Spellcasting",
+      "description": "Learn to cast basic cantrips",
+      "paradigmId": "academic",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast basic cantrips",
+          "target": {
+            "abilityId": "cast_cantrip"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "wizard"
+          },
+          "description": "Must be taught by a trained mage"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your first real spell. Cantrips are simple, low-power effects - create\nlight, move small objects, clean things. They cost almost no mana but\nteach the fundamentals: focus, words, gestures, and will combined into\nmagical effect.",
+      "prerequisites": [
+        "arcane-theory",
+        "mana-sense"
+      ]
+    },
+    {
+      "id": "mana-regeneration",
+      "name": "Mana Regeneration",
+      "description": "Improve mana regeneration rate",
+      "paradigmId": "academic",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "resource_efficiency",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Increase mana regeneration by X%"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Mana regenerates naturally over time, faster with rest and meditation.\nYou learn techniques to accelerate this - breathing exercises, mental\ndisciplines, energy channeling. The better your regeneration, the more\nspells you can cast.",
+      "prerequisites": [
+        "mana-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "evocation",
+      "name": "Evocation Mastery",
+      "description": "Specialize in evocation magic",
+      "paradigmId": "academic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast evocation spells (fire, lightning, force)",
+          "target": {
+            "abilityId": "evocation"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Evocation is the art of creating and projecting energy. Fireballs,\nlightning bolts, force missiles. Raw destructive power. This is the most\nstraightforward school - point, cast, destroy.",
+      "prerequisites": [
+        "basic-spellcasting",
+        "arcane-theory"
+      ],
+      "icon": "🔥"
+    },
+    {
+      "id": "illusion",
+      "name": "Illusion Mastery",
+      "description": "Specialize in illusion magic",
+      "paradigmId": "academic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast illusion spells (disguise, invisibility, phantasms)",
+          "target": {
+            "abilityId": "illusion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Illusion is about perception - making people see, hear, or feel what\nisn't there. Disguises, invisibility, phantom armies. Subtle, clever,\nand incredibly effective when used right.",
+      "prerequisites": [
+        "basic-spellcasting",
+        "arcane-theory"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "transmutation",
+      "name": "Transmutation Mastery",
+      "description": "Specialize in transmutation magic",
+      "paradigmId": "academic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast transmutation spells (polymorph, enhancement, alchemy)",
+          "target": {
+            "abilityId": "transmutation"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Transmutation changes the nature of things. Turn lead to gold. Transform\ninto animals. Enhance physical abilities. Shrink or grow. This school\ntouches on alchemy and fundamental alteration.",
+      "prerequisites": [
+        "basic-spellcasting",
+        "arcane-theory"
+      ],
+      "icon": "🔬"
+    },
+    {
+      "id": "abjuration",
+      "name": "Abjuration Mastery",
+      "description": "Specialize in abjuration magic",
+      "paradigmId": "academic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast abjuration spells (shields, wards, dispelling)",
+          "target": {
+            "abilityId": "abjuration"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Abjuration is defensive magic - shields, wards, counterspells, dispelling.\nNot flashy, but incredibly valuable. A good abjurer is nearly unkillable\nand can shut down enemy casters.",
+      "prerequisites": [
+        "basic-spellcasting"
+      ],
+      "icon": "🛡️"
+    },
+    {
+      "id": "spellbook",
+      "name": "Spellbook Mastery",
+      "description": "Learn to create and use spellbooks",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create and maintain a spellbook",
+          "target": {
+            "abilityId": "spellbook"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A spellbook is a mage's most valuable possession. It contains spell\nformulas, notes, research. You learn to properly record spells, organize\nyour knowledge, and protect your book from theft or damage.",
+      "prerequisites": [
+        "basic-spellcasting",
+        "arcane-theory"
+      ]
+    },
+    {
+      "id": "spell-preparation",
+      "name": "Spell Preparation",
+      "description": "Learn to prepare spells in advance",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Prepare spells for quick casting",
+          "target": {
+            "abilityId": "prepare_spell"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Complex spells take too long to cast from scratch. You learn to prepare\nthem in advance - doing most of the work beforehand so the final casting\nis quick. This is Vancian magic: preparation and execution separated.",
+      "prerequisites": [
+        "spellbook"
+      ]
+    },
+    {
+      "id": "spell-research",
+      "name": "Spell Research",
+      "description": "Learn to research and invent spells",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Research and invent new spells",
+          "target": {
+            "abilityId": "research_spell"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "arcane-theory",
+            "level": 3
+          },
+          "description": "Requires deep theoretical knowledge"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Most mages just use existing spells. But true scholars can research new\nones - combining effects, tweaking formulas, inventing entirely original\nmagic. This is how magical knowledge advances.",
+      "prerequisites": [
+        "spellbook",
+        "arcane-theory"
+      ]
+    },
+    {
+      "id": "quicken-spell",
+      "name": "Quicken Spell",
+      "description": "Learn to quicken spell casting",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast spells faster",
+          "target": {
+            "abilityId": "quicken"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Normally spells take time to cast. But you can learn to compress the\ncasting - skipping steps, streamlining gestures, making the process\nfaster. Costs more mana but much quicker.",
+      "prerequisites": [
+        "spell-preparation",
+        "evocation"
+      ]
+    },
+    {
+      "id": "empower-spell",
+      "name": "Empower Spell",
+      "description": "Learn to empower spells",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Increase spell power",
+          "target": {
+            "abilityId": "empower"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Channel extra mana into a spell to increase its power. Fireballs burn\nhotter. Healing spells restore more. Every effect magnified. Expensive\nbut devastating.",
+      "prerequisites": [
+        "spell-preparation"
+      ]
+    },
+    {
+      "id": "subtle-spell",
+      "name": "Subtle Spell",
+      "description": "Learn to cast spells subtly",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Cast spells without obvious signs",
+          "target": {
+            "abilityId": "subtle"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Normally spells are obvious - glowing, loud, visible. But you can learn\nto cast subtly - no gestures, no words, no visible effect until the spell\nstrikes. Perfect for deception and stealth.",
+      "prerequisites": [
+        "illusion",
+        "spell-preparation"
+      ]
+    },
+    {
+      "id": "twin-spell",
+      "name": "Twin Spell",
+      "description": "Learn to twin spells",
+      "paradigmId": "academic",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Target two creatures with one spell",
+          "target": {
+            "abilityId": "twin"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Split a spell to affect two targets instead of one. One fireball becomes\ntwo. One healing spell saves two lives. Double the effect for less than\ndouble the cost.",
+      "prerequisites": [
+        "empower-spell",
+        "spell-research"
+      ]
+    },
+    {
+      "id": "arcane-mastery",
+      "name": "Arcane Mastery",
+      "description": "Achieve general arcane mastery",
+      "paradigmId": "academic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 20,
+          "perLevelValue": 5,
+          "description": "+X% to all spellcasting"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2000
+          },
+          "description": "Requires extensive magical practice"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "True mastery of the arcane arts. Your spells are more powerful, more\nefficient, more reliable. You understand magic at a fundamental level\nthat most mages never reach.",
+      "prerequisites": [
+        "evocation",
+        "illusion",
+        "transmutation"
+      ]
+    },
+    {
+      "id": "spell-innovation",
+      "name": "Spell Innovation",
+      "description": "Innovate new magical paradigms",
+      "paradigmId": "academic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create entirely new schools of magic",
+          "target": {
+            "abilityId": "innovate"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "arcane-theory",
+            "level": 5
+          },
+          "description": "Requires perfect theoretical understanding"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "spell-research",
+            "level": 1
+          },
+          "description": "Must have research experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The greatest mages don't just master existing magic - they create new\nforms entirely. Invent new schools. Discover new principles. Reshape the\nvery nature of magic itself. This is legendary-tier wizardry.",
+      "prerequisites": [
+        "spell-research",
+        "arcane-mastery"
+      ]
+    },
+    {
+      "id": "archmage",
+      "name": "Archmage Ascension",
+      "description": "Ascend to Archmage status",
+      "paradigmId": "academic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Achieve the rank of Archmage",
+          "target": {
+            "abilityId": "archmage"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 5000
+          },
+          "description": "Requires legendary magical expertise"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Archmage - a title reserved for the greatest wizards of an age. You've\nmastered multiple schools. You've contributed original research. You've\npushed the boundaries of magical knowledge. This is as high as mortals\ncan climb.",
+      "prerequisites": [
+        "arcane-mastery",
+        "spell-innovation"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "arcane-theory"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "spell_cast",
+      "xpAmount": 15,
+      "description": "Successfully cast a spell"
+    },
+    {
+      "eventType": "spell_learned",
+      "xpAmount": 50,
+      "description": "Learn a new spell"
+    },
+    {
+      "eventType": "research_completed",
+      "xpAmount": 150,
+      "description": "Complete spell research"
+    },
+    {
+      "eventType": "spell_invented",
+      "xpAmount": 300,
+      "description": "Invent an entirely new spell"
+    },
+    {
+      "eventType": "metamagic_applied",
+      "xpAmount": 40,
+      "description": "Successfully apply metamagic"
+    },
+    {
+      "eventType": "spellbook_completed",
+      "xpAmount": 100,
+      "description": "Complete a full spellbook"
+    },
+    {
+      "eventType": "student_taught",
+      "xpAmount": 75,
+      "description": "Teach magic to a student"
+    },
+    {
+      "eventType": "theory_published",
+      "xpAmount": 200,
+      "description": "Publish original magical theory"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": false,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

@@ -1,0 +1,594 @@
+{
+  "id": "rune-tree",
+  "paradigmId": "rune",
+  "name": "The Runic Art",
+  "description": "Master the ancient art of rune carving - inscribing magical symbols that reshape reality.",
+  "lore": "Runes are the written language of magic itself. Each symbol is a word of\npower, a command to reality. Carved correctly, runes can protect, strengthen,\nbind, destroy, or reshape the world.\n\nThe tradition is ancient - older than most civilizations. The first runes were\ncarved by gods or titans (depending on which stories you believe), symbols of\nprimal forces etched into the bones of the world. Later, mortals learned to\ncopy these symbols, to carve them into wood and stone and metal.\n\nLearning runecraft begins with reading - understanding what each symbol means,\nwhat it does, how it functions. Then comes carving: the meticulous, precise work\nof inscribing runes into various materials. Every line must be perfect. Every\nangle exact. A wrongly carved rune is worse than useless - it can explode,\nbackfire, or summon things best left alone.\n\nDifferent materials have different properties. Wood is easy but temporary. Stone\nis permanent but hard. Metal conducts power well. Crystal amplifies effects but\nshatters easily. Even living flesh can bear runes - tattoos of power that bond\nwith the bearer.\n\nMaster carvers learn to combine runes into sequences - each feeding into the\nnext, creating cascading effects impossible with single runes. They discover the\nElder Runes - ancient symbols of reality-bending power. The greatest even learn\nto draw living runes in air and light, inscriptions that exist for mere moments\nbut activate instantly.\n\nThe path of runecraft is one of patience, precision, and scholarship. It's less\nabout raw power and more about careful, methodical application of ancient\nknowledge.",
+  "nodes": [
+    {
+      "id": "rune-reading",
+      "name": "Rune Reading",
+      "description": "Learn to read and understand runes",
+      "paradigmId": "rune",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 40,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Read and understand carved runes",
+          "target": {
+            "abilityId": "read_runes"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Runes are an ancient language - each symbol carries meaning and power.\nYou learn to recognize them, to read their shapes, to understand what they\ndo. This is the first step: seeing runes not as mere markings but as\nliving magic.",
+      "levelCostMultiplier": 1.3,
+      "icon": "ᚱ"
+    },
+    {
+      "id": "basic-carving",
+      "name": "Basic Runecarving",
+      "description": "Learn to carve runes into wood",
+      "paradigmId": "rune",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Carve basic runes into wood",
+          "target": {
+            "abilityId": "carve_rune"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "rune_carver"
+          },
+          "description": "Must be taught by a rune carver"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "To use runes, you must inscribe them. Start with wood - softest material,\nmost forgiving. Each line must be perfect. Each angle precise. A wrongly\ncarved rune is worse than useless - it can backfire catastrophically.",
+      "prerequisites": [
+        "rune-reading"
+      ]
+    },
+    {
+      "id": "rune-sense",
+      "name": "Rune Sense",
+      "description": "Sense the presence of carved runes",
+      "paradigmId": "rune",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense active runes nearby",
+          "target": {
+            "abilityId": "sense_runes"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Active runes emanate power. You learn to feel this - a tingling, a\nresonance, a sense of potential. This lets you detect warded doors,\ncursed objects, hidden protections.",
+      "prerequisites": [
+        "rune-reading"
+      ]
+    },
+    {
+      "id": "precision-carving",
+      "name": "Precision Carving",
+      "description": "Master precise, powerful rune carving",
+      "paradigmId": "rune",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "target": {
+            "techniqueId": "create"
+          },
+          "description": "+X% rune power from quality"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The quality of the carving affects the rune's power. Perfect lines,\nexact angles, flawless execution - these amplify the effect. You learn\nto carve with jeweler's precision, each stroke perfection.",
+      "prerequisites": [
+        "basic-carving"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "stone-carving",
+      "name": "Stone Runecarving",
+      "description": "Learn to carve runes into stone",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Carve runes into stone",
+          "target": {
+            "abilityId": "carve_stone"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Stone is harder than wood but permanent. A rune carved in stone lasts\ncenturies, millennia. This is how the ancients preserved their magic -\nrunes carved into standing stones, monuments, mountain faces.",
+      "prerequisites": [
+        "basic-carving",
+        "precision-carving"
+      ]
+    },
+    {
+      "id": "metal-carving",
+      "name": "Metal Runecarving",
+      "description": "Learn to carve runes into metal",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Carve runes into metal",
+          "target": {
+            "abilityId": "carve_metal"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "crafting",
+            "level": 3
+          },
+          "description": "Requires crafting skill"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Metal conducts magical power better than wood or stone. Runes carved in\nmetal are stronger, sharper, more responsive. This is how you make runic\nweapons and armor - each piece inscribed with power.",
+      "prerequisites": [
+        "stone-carving"
+      ]
+    },
+    {
+      "id": "crystal-carving",
+      "name": "Crystal Runecarving",
+      "description": "Learn to carve runes into crystal",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Carve runes into crystal",
+          "target": {
+            "abilityId": "carve_crystal"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Crystal is fragile but incredibly powerful. Runes carved in crystal\namplify their effects massively - but shatter the crystal and the rune\nexplodes with stored energy. Dangerous but devastating.",
+      "prerequisites": [
+        "metal-carving"
+      ]
+    },
+    {
+      "id": "flesh-carving",
+      "name": "Flesh Runecarving",
+      "description": "Learn to carve runes into living flesh",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Carve runes into living flesh (tattoos)",
+          "target": {
+            "abilityId": "carve_flesh"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Runes can be tattooed or scarred into skin. These living runes bond with\nthe bearer, drawing power from their life force. Painful to create but\nintimately powerful. The rune becomes part of you.",
+      "prerequisites": [
+        "metal-carving"
+      ],
+      "icon": "🖋️"
+    },
+    {
+      "id": "common-runes",
+      "name": "Common Runes",
+      "description": "Learn the common runes",
+      "paradigmId": "rune",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_rune",
+          "baseValue": 1,
+          "description": "Learn common protective and power runes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The basic runes are widely known: protection, strength, light, warmth.\nSimple effects but reliable. Every rune carver learns these first.",
+      "prerequisites": [
+        "basic-carving"
+      ]
+    },
+    {
+      "id": "protection-runes",
+      "name": "Runes of Protection",
+      "description": "Learn runes of protection and warding",
+      "paradigmId": "rune",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_rune",
+          "baseValue": 1,
+          "description": "Learn protection and warding runes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Runes can ward against harm - evil spirits, hostile magic, physical\ndanger. Carve them on doorways, weapons, armor. Each rune is a shield.",
+      "prerequisites": [
+        "common-runes"
+      ]
+    },
+    {
+      "id": "element-runes",
+      "name": "Elemental Runes",
+      "description": "Learn runes of the elements",
+      "paradigmId": "rune",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_rune",
+          "baseValue": 1,
+          "description": "Learn elemental runes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Each element has its runes. Fire for warmth and destruction. Water for\nflowing and healing. Earth for stability and growth. Air for freedom and\nspeed. Master these and you command the elements through inscription.",
+      "prerequisites": [
+        "common-runes"
+      ]
+    },
+    {
+      "id": "binding-runes",
+      "name": "Runes of Binding",
+      "description": "Learn runes of binding and control",
+      "paradigmId": "rune",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_rune",
+          "baseValue": 1,
+          "description": "Learn binding and control runes"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some runes constrain - they bind spirits, lock doors, prevent movement.\nCarve them correctly and you create prisons of magic. These runes are\ndangerous knowledge.",
+      "prerequisites": [
+        "protection-runes"
+      ]
+    },
+    {
+      "id": "elder-runes",
+      "name": "Elder Runes",
+      "description": "Learn the Elder Runes of power",
+      "paradigmId": "rune",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_rune",
+          "baseValue": 1,
+          "description": "Learn the ancient Elder Runes"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "elder_rune_knowledge"
+          },
+          "description": "Must discover the Elder Rune lore"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The Elder Runes are ancient beyond memory - symbols of primal power\ncarved by gods or titans. Each can reshape reality. But they're also\nincredibly dangerous to use. One wrong line and the rune explodes.",
+      "prerequisites": [
+        "binding-runes",
+        "element-runes"
+      ],
+      "icon": "ᛟ"
+    },
+    {
+      "id": "rune-combinations",
+      "name": "Rune Sequences",
+      "description": "Learn to combine runes into powerful sequences",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Combine multiple runes into sequences",
+          "target": {
+            "abilityId": "rune_sequence"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A single rune is powerful. Multiple runes together are exponentially more\nso. Learn to carve them in sequence, each feeding into the next, creating\neffects impossible with single runes. This is runecraft mastery.",
+      "prerequisites": [
+        "protection-runes",
+        "element-runes"
+      ]
+    },
+    {
+      "id": "rune-activation",
+      "name": "Rune Activation",
+      "description": "Master different rune activation methods",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Activate runes with various triggers",
+          "target": {
+            "abilityId": "activate_rune"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some runes are always active. Others need activation - a touch, a word,\na drop of blood. You learn to carve conditional runes that trigger only\nwhen needed, preserving their power for the right moment.",
+      "prerequisites": [
+        "common-runes"
+      ]
+    },
+    {
+      "id": "rune-crafting",
+      "name": "Runic Crafting",
+      "description": "Craft items optimized for rune inscription",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create items specifically for rune carving",
+          "target": {
+            "abilityId": "runic_craft"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "You can carve runes on any surface, but items made specifically to hold\nrunes are far more powerful. Learn to craft runestones, runic weapons,\nrunic armor - each designed to amplify inscribed magic.",
+      "prerequisites": [
+        "metal-carving",
+        "precision-carving"
+      ]
+    },
+    {
+      "id": "rune-erasing",
+      "name": "Rune Erasure",
+      "description": "Learn to safely erase runes",
+      "paradigmId": "rune",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Safely erase carved runes",
+          "target": {
+            "abilityId": "erase_rune"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Erasing a rune isn't as simple as scratching it out. Do it wrong and\nthe stored power explodes. You learn the proper rituals to discharge a\nrune safely before removing it.",
+      "prerequisites": [
+        "rune-activation",
+        "rune-sense"
+      ]
+    },
+    {
+      "id": "living-runes",
+      "name": "Living Runes",
+      "description": "Learn to draw runes in air and light",
+      "paradigmId": "rune",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Draw runes in air and light",
+          "target": {
+            "abilityId": "living_rune"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "precision-carving",
+            "level": 5
+          },
+          "description": "Requires perfect carving precision"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The greatest rune carvers can inscribe runes on nothing - drawing them\nin air with gesture, in light with will. These living runes last only\nmoments but activate instantly. This is combat runecrafting.",
+      "prerequisites": [
+        "rune-combinations",
+        "elder-runes"
+      ]
+    },
+    {
+      "id": "rune-mastery",
+      "name": "Master Runecraft",
+      "description": "Achieve true mastery of runecraft",
+      "paradigmId": "rune",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Achieve mastery of all runecraft",
+          "target": {
+            "abilityId": "rune_master"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2500
+          },
+          "description": "Requires vast runecrafting experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "A master runecraftsman can carve any rune on any surface with any tool.\nEvery stroke is perfect. Every angle exact. Their runes are works of art\nand engines of power. Reality itself bends to inscribed will.",
+      "prerequisites": [
+        "living-runes",
+        "rune-crafting"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "rune-reading"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "rune_read",
+      "xpAmount": 10,
+      "description": "Successfully read and understand a rune"
+    },
+    {
+      "eventType": "rune_carved",
+      "xpAmount": 25,
+      "description": "Successfully carve a rune"
+    },
+    {
+      "eventType": "rune_activated",
+      "xpAmount": 30,
+      "description": "Successfully activate a carved rune"
+    },
+    {
+      "eventType": "new_rune_learned",
+      "xpAmount": 100,
+      "description": "Learn a new rune"
+    },
+    {
+      "eventType": "rune_sequence_created",
+      "xpAmount": 150,
+      "description": "Create a successful rune sequence"
+    },
+    {
+      "eventType": "elder_rune_carved",
+      "xpAmount": 300,
+      "description": "Successfully carve an Elder Rune"
+    },
+    {
+      "eventType": "perfect_carving",
+      "xpAmount": 75,
+      "description": "Achieve perfect precision on a rune"
+    },
+    {
+      "eventType": "rune_item_crafted",
+      "xpAmount": 125,
+      "description": "Craft an item specifically for rune inscription"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

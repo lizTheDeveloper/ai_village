@@ -1,0 +1,720 @@
+{
+  "id": "belief_skill_tree",
+  "paradigmId": "belief_magic",
+  "name": "Belief Magic Skill Tree",
+  "description": "Master the art of faith, myth, and reality-altering belief",
+  "lore": "Reality is consensus. Gods exist because people believe in them.\nMyths become real when enough people tell the story.\nLose your believers and you fade from existence.",
+  "nodes": [
+    {
+      "id": "belief-sense",
+      "name": "Belief Sense",
+      "description": "Learn to sense the beliefs of others",
+      "paradigmId": "belief_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense the beliefs of others"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "detect_belief"
+          },
+          "description": "Detect what others believe"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every mind holds beliefs. Some weak, some strong. Some true, some false.\nLearn to feel these beliefs, to taste their flavor, to measure their power.\nThis sense is the foundation of belief magic.",
+      "levelCostMultiplier": 1.3,
+      "icon": "👁️"
+    },
+    {
+      "id": "faith-attunement",
+      "name": "Faith Attunement",
+      "description": "Learn to attune to sources of faith",
+      "paradigmId": "belief_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to belief magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "faith_attunement"
+          },
+          "description": "Attune to sources of faith"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Faith radiates. Churches, shrines, stadiums, concert halls -\nanywhere people gather in shared belief. Learn to feel these\nconcentrations, to tap into their power.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🙏"
+    },
+    {
+      "id": "reality-flexibility",
+      "name": "Reality Flexibility",
+      "description": "Learn that reality is more flexible than it seems",
+      "paradigmId": "belief_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Resistance to belief attacks"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "flexible_reality"
+          },
+          "description": "Accept multiple truths simultaneously"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "What is true? Whatever enough people believe. Reality is not solid -\nit's consensus. Learn to loosen your grip on \"truth\" and gain the\npower to reshape what everyone believes.",
+      "icon": "🌊"
+    },
+    {
+      "id": "inspire-belief",
+      "name": "Inspire Belief",
+      "description": "Learn to inspire belief in others",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "inspire_belief"
+          },
+          "description": "Inspire belief in others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Speak with conviction. Act with purpose. Be what you claim to be.\nPeople want to believe. Give them something worth believing in\nand they will follow.",
+      "prerequisites": [
+        "belief-sense"
+      ],
+      "levelCostMultiplier": 1.4,
+      "icon": "✨"
+    },
+    {
+      "id": "gather-followers",
+      "name": "Gather Followers",
+      "description": "Learn to actively gather believers",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 55,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "gather_followers"
+          },
+          "description": "Actively gather believers"
+        },
+        {
+          "type": "resource_max",
+          "baseValue": 20,
+          "description": "Increased faith capacity"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "One believer is a spark. Ten is a flame. A hundred is a fire.\nA thousand is a conflagration. Gather your flock. The more believe,\nthe more power flows to you.",
+      "prerequisites": [
+        "faith-attunement"
+      ],
+      "icon": "👥"
+    },
+    {
+      "id": "mass-conversion",
+      "name": "Mass Conversion",
+      "description": "Learn to convert masses to your belief",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "mass_conversion"
+          },
+          "description": "Convert many at once to your belief"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 400
+          },
+          "description": "Requires 400 total XP in Belief magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The preacher who can move crowds. The speaker who can shift nations.\nWhen you speak to thousands and thousands believe, reality itself\nbends to accommodate.",
+      "prerequisites": [
+        "inspire-belief",
+        "gather-followers"
+      ],
+      "icon": "📣"
+    },
+    {
+      "id": "minor-manifestation",
+      "name": "Minor Manifestation",
+      "description": "Learn to manifest minor beliefs into reality",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "manifest_minor"
+          },
+          "description": "Make small beliefs real"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"I believe I can make this shot.\" And you do. \"I believe I'll be safe.\"\nAnd you are. Small beliefs, small manifestations. But real.\nThe first step to reshaping reality.",
+      "prerequisites": [
+        "inspire-belief"
+      ],
+      "icon": "🌟"
+    },
+    {
+      "id": "major-manifestation",
+      "name": "Major Manifestation",
+      "description": "Learn to manifest major beliefs into reality",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "manifest_major"
+          },
+          "description": "Make significant beliefs real"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"We believe this leader will save us.\" And they gain the power to do so.\n\"We believe this mountain is sacred.\" And it becomes so.\nCollective belief reshapes the world.",
+      "prerequisites": [
+        "minor-manifestation",
+        "gather-followers"
+      ],
+      "icon": "⭐"
+    },
+    {
+      "id": "reality-rewrite",
+      "name": "Reality Rewrite",
+      "description": "Learn to completely rewrite reality",
+      "paradigmId": "belief_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "rewrite_reality"
+          },
+          "description": "Completely rewrite aspects of reality through belief"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Belief magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "With enough believers, you can change what was always true.\n\"The sun has always risen in the west.\" If everyone believes it,\nhistory rewrites. Reality complies. The ultimate power.",
+      "prerequisites": [
+        "major-manifestation",
+        "mass-conversion"
+      ],
+      "icon": "🌌"
+    },
+    {
+      "id": "create-spirit",
+      "name": "Create Belief Spirit",
+      "description": "Learn to create spirits from belief",
+      "paradigmId": "belief_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_minor_spirit"
+          },
+          "description": "Create minor spirits from focused belief"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Believe hard enough in a guardian angel and one appears.\nFear a monster under the bed and it becomes real.\nSpirits are belief given form.",
+      "prerequisites": [
+        "minor-manifestation"
+      ],
+      "icon": "👻"
+    },
+    {
+      "id": "create-tulpa",
+      "name": "Create Tulpa",
+      "description": "Learn to create tulpas",
+      "paradigmId": "belief_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_tulpa"
+          },
+          "description": "Create independent thought-forms"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A tulpa is more than a spirit - it's an independent mind born from belief.\nIt thinks, it acts, it grows. Created by you but not controlled by you.\nA child of pure thought.",
+      "prerequisites": [
+        "create-spirit"
+      ],
+      "icon": "🧠"
+    },
+    {
+      "id": "create-god",
+      "name": "Create Godling",
+      "description": "Learn to create godlings",
+      "paradigmId": "belief_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_godling"
+          },
+          "description": "Create minor divine entities"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 10
+          },
+          "description": "Requires 10 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "With enough worship, a god is born. Not an ancient power awakened -\na new divine entity, created from pure collective faith.\nYou can create gods. Think about that.",
+      "prerequisites": [
+        "create-tulpa",
+        "mass-conversion"
+      ],
+      "icon": "👼"
+    },
+    {
+      "id": "story-power",
+      "name": "Story Power",
+      "description": "Learn to draw power from stories told about you",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "power_from_story"
+          },
+          "description": "Draw power from being part of stories"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When people tell stories about you, you grow stronger.\nThe hero of legend. The monster of nightmares. The trickster of tales.\nBecome a story and become powerful.",
+      "prerequisites": [
+        "faith-attunement"
+      ],
+      "icon": "📖"
+    },
+    {
+      "id": "myth-weaving",
+      "name": "Myth Weaving",
+      "description": "Learn to weave myths into reality",
+      "paradigmId": "belief_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "weave_myth"
+          },
+          "description": "Create myths that become true"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Tell a story. Tell it again. Tell it until everyone knows it.\nWhen the myth is universal, it becomes true. Was it ever false?\nDoes that distinction even matter?",
+      "prerequisites": [
+        "story-power",
+        "inspire-belief"
+      ],
+      "icon": "🕸️"
+    },
+    {
+      "id": "faith-shield",
+      "name": "Faith Shield",
+      "description": "Learn to use faith as protection",
+      "paradigmId": "belief_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 20,
+          "perLevelValue": 10,
+          "description": "Belief of followers protects you"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "faith_shield"
+          },
+          "description": "Your believers' faith shields you"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When your followers believe you are invincible, you become harder to kill.\nTheir faith wraps around you like armor. Doubt is your only weakness.",
+      "prerequisites": [
+        "gather-followers"
+      ],
+      "levelCostMultiplier": 1.4,
+      "icon": "🛡️"
+    },
+    {
+      "id": "dogma",
+      "name": "Establish Dogma",
+      "description": "Learn to establish unchangeable dogma",
+      "paradigmId": "belief_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_dogma"
+          },
+          "description": "Create unchangeable belief structures"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Certain beliefs must never change. Enshrine them as dogma\nand they become resistant to erosion, doubt, and competing beliefs.\nThe core faith protected forever.",
+      "prerequisites": [
+        "faith-shield",
+        "myth-weaving"
+      ],
+      "icon": "⚓"
+    },
+    {
+      "id": "prophet",
+      "name": "Prophet",
+      "description": "Become a prophet",
+      "paradigmId": "belief_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 30,
+          "description": "Prophetic authority"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "prophecy"
+          },
+          "description": "Make prophecies that believers make true"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your words become prophecy. When you speak of the future, your believers\nmake it happen. Self-fulfilling predictions backed by the power of faith.",
+      "prerequisites": [
+        "dogma",
+        "major-manifestation"
+      ],
+      "icon": "🔮"
+    },
+    {
+      "id": "living-myth",
+      "name": "Living Myth",
+      "description": "Transcend mortality and become a living myth",
+      "paradigmId": "belief_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "become_myth"
+          },
+          "description": "Become a living myth"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme belief mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Belief magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You are no longer a person who is believed in. You ARE belief.\nA living myth, sustained by the faith of your followers.\nAs long as they believe, you cannot truly die.",
+      "prerequisites": [
+        "prophet",
+        "reality-rewrite",
+        "create-god"
+      ],
+      "icon": "🌟"
+    }
+  ],
+  "entryNodes": [
+    "belief-sense",
+    "faith-attunement",
+    "reality-flexibility"
+  ],
+  "connections": [
+    {
+      "from": "belief-sense",
+      "to": "inspire-belief"
+    },
+    {
+      "from": "faith-attunement",
+      "to": "gather-followers"
+    },
+    {
+      "from": "inspire-belief",
+      "to": "mass-conversion"
+    },
+    {
+      "from": "gather-followers",
+      "to": "mass-conversion"
+    },
+    {
+      "from": "inspire-belief",
+      "to": "minor-manifestation"
+    },
+    {
+      "from": "minor-manifestation",
+      "to": "major-manifestation"
+    },
+    {
+      "from": "gather-followers",
+      "to": "major-manifestation"
+    },
+    {
+      "from": "major-manifestation",
+      "to": "reality-rewrite"
+    },
+    {
+      "from": "mass-conversion",
+      "to": "reality-rewrite"
+    },
+    {
+      "from": "minor-manifestation",
+      "to": "create-spirit"
+    },
+    {
+      "from": "create-spirit",
+      "to": "create-tulpa"
+    },
+    {
+      "from": "create-tulpa",
+      "to": "create-god"
+    },
+    {
+      "from": "mass-conversion",
+      "to": "create-god"
+    },
+    {
+      "from": "faith-attunement",
+      "to": "story-power"
+    },
+    {
+      "from": "story-power",
+      "to": "myth-weaving"
+    },
+    {
+      "from": "inspire-belief",
+      "to": "myth-weaving"
+    },
+    {
+      "from": "gather-followers",
+      "to": "faith-shield"
+    },
+    {
+      "from": "faith-shield",
+      "to": "dogma"
+    },
+    {
+      "from": "myth-weaving",
+      "to": "dogma"
+    },
+    {
+      "from": "dogma",
+      "to": "prophet"
+    },
+    {
+      "from": "major-manifestation",
+      "to": "prophet"
+    },
+    {
+      "from": "prophet",
+      "to": "living-myth"
+    },
+    {
+      "from": "reality-rewrite",
+      "to": "living-myth"
+    },
+    {
+      "from": "create-god",
+      "to": "living-myth"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "believer_gained",
+      "xpAmount": 5,
+      "description": "Gain a new believer"
+    },
+    {
+      "eventType": "belief_manifested",
+      "xpAmount": 15,
+      "description": "Manifest a belief into reality",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "story_spread",
+      "xpAmount": 8,
+      "description": "A story about you spreads"
+    },
+    {
+      "eventType": "entity_created",
+      "xpAmount": 25,
+      "description": "Create a belief entity"
+    },
+    {
+      "eventType": "faith_defended",
+      "xpAmount": 12,
+      "description": "Defend against attacks on your belief"
+    },
+    {
+      "eventType": "prophecy_fulfilled",
+      "xpAmount": 30,
+      "description": "Fulfill a prophecy"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": false,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "resource_level",
+        "params": {
+          "resourceType": "belief",
+          "resourceMax": 0
+        },
+        "description": "Losing all believers causes fade"
+      }
+    ]
+  },
+  "version": 1
+}

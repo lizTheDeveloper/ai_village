@@ -28,35 +28,36 @@ import { MagicSystemsPanel } from '../MagicSystemsPanel';
 import { SpellbookPanel } from '../SpellbookPanel';
 import { DivinePowersPanel } from '../DivinePowersPanel';
 import { VisionComposerPanel } from '../VisionComposerPanel';
-import { DivineAnalyticsPanel } from '../DivineAnalyticsPanel';
-import { SacredGeographyPanel } from '../SacredGeographyPanel';
-import { AngelManagementPanel } from '../AngelManagementPanel';
-import { PrayerPanel } from '../PrayerPanel';
+import { DivineAnalyticsPanel } from '../divine/DivineAnalyticsPanel';
+import { SacredGeographyPanel } from '../divine/SacredGeographyPanel';
+import { AngelManagementPanel } from '../divine/AngelManagementPanel';
+import { PrayerPanel } from '../divine/PrayerPanel';
 
-// Import adapter factory functions
-import { createMemoryPanelAdapter } from '../adapters/MemoryPanelAdapter';
-import { createRelationshipsPanelAdapter } from '../adapters/RelationshipsPanelAdapter';
-import { createAnimalInfoPanelAdapter } from '../adapters/AnimalInfoPanelAdapter';
-import { createPlantInfoPanelAdapter } from '../adapters/PlantInfoPanelAdapter';
-import { createEconomyPanelAdapter } from '../adapters/EconomyPanelAdapter';
-import { createShopPanelAdapter } from '../adapters/ShopPanelAdapter';
-import { createGovernanceDashboardPanelAdapter } from '../adapters/GovernanceDashboardPanelAdapter';
-import { createResourcesPanelAdapter } from '../adapters/ResourcesPanelAdapter';
-import { createNotificationsPanelAdapter } from '../adapters/NotificationsPanelAdapter';
-import { createTileInspectorPanelAdapter } from '../adapters/TileInspectorPanelAdapter';
-import { createMagicSystemsPanelAdapter } from '../adapters/MagicSystemsPanelAdapter';
-import { createSpellbookPanelAdapter } from '../adapters/SpellbookPanelAdapter';
-import { createDivinePowersPanelAdapter } from '../adapters/DivinePowersPanelAdapter';
-import { createVisionComposerPanelAdapter } from '../adapters/VisionComposerPanelAdapter';
-import { createDivineAnalyticsPanelAdapter } from '../adapters/DivineAnalyticsPanelAdapter';
-import { createSacredGeographyPanelAdapter } from '../adapters/SacredGeographyPanelAdapter';
-import { createAngelManagementPanelAdapter } from '../adapters/AngelManagementPanelAdapter';
-import { createPrayerPanelAdapter } from '../adapters/PrayerPanelAdapter';
+// Import adapter factory functions from index
+import {
+  createMemoryPanelAdapter,
+  createRelationshipsPanelAdapter,
+  createAnimalInfoPanelAdapter,
+  createPlantInfoPanelAdapter,
+  createEconomyPanelAdapter,
+  createShopPanelAdapter,
+  createGovernanceDashboardPanelAdapter,
+  createResourcesPanelAdapter,
+  createNotificationsPanelAdapter,
+  createTileInspectorPanelAdapter,
+  createMagicSystemsPanelAdapter,
+  createSpellbookPanelAdapter,
+  createDivinePowersPanelAdapter,
+  createVisionComposerPanelAdapter,
+  createDivineAnalyticsPanelAdapter,
+  createSacredGeographyPanelAdapter,
+  createAngelManagementPanelAdapter,
+  createPrayerPanelAdapter,
+} from '../adapters/index';
 
 import type { EventBus } from '@ai-village/core';
 import type { Camera } from '../Camera';
 import type { ChunkManager } from '@ai-village/world';
-import type { PixelLabLoader } from '../PixelLabLoader';
 
 /**
  * Panel factory context - dependencies needed by some panel factories
@@ -65,7 +66,6 @@ export interface PanelFactoryContext {
   eventBus?: EventBus;
   camera?: Camera;
   chunkManager?: ChunkManager;
-  pixelLabLoader?: PixelLabLoader;
 }
 
 /**
@@ -92,8 +92,8 @@ export function createAnimalInfoPanelFactory(): () => IWindowPanel {
 /**
  * Factory for AnimalRosterPanel
  */
-export function createAnimalRosterPanelFactory(pixelLabLoader: PixelLabLoader): () => IWindowPanel {
-  return () => new AnimalRosterPanel(pixelLabLoader);
+export function createAnimalRosterPanelFactory(spriteLoader: any): () => IWindowPanel {
+  return () => new AnimalRosterPanel(spriteLoader);
 }
 
 /**
@@ -220,13 +220,33 @@ export function createDivineAnalyticsPanelFactory(): () => IWindowPanel {
     const panel = new DivineAnalyticsPanel(
       {
         analytics: {
-          faithTrend: [],
-          prayersByDomain: {},
-          prophecyAccuracy: 0,
-          believerGrowth: 0,
-          miracleEffectiveness: 0,
+          faithTrends: [],
+          prayerStats: {
+            total: 0,
+            answered: 0,
+            unanswered: 0,
+            byDomain: {
+              survival: 0,
+              health: 0,
+              social: 0,
+              guidance: 0,
+              environment: 0,
+              gratitude: 0,
+              other: 0,
+            },
+            averageResponseTime: 0,
+          },
+          faithDistribution: {
+            skeptics: 0,
+            curious: 0,
+            believers: 0,
+            devout: 0,
+            average: 0,
+          },
+          prophecies: [],
+          energyEconomy: { income: 0, consumption: 0, net: 0 },
         },
-        energy: { current: 100, max: 1000, regenRate: 1 },
+        energy: { current: 100, max: 1000, regenRate: 1, consumption: 0 },
         selectedTimeRange: '7_days',
         selectedProphecyId: null,
         scrollOffset: 0,
@@ -279,7 +299,7 @@ export function createAngelManagementPanelFactory(): () => IWindowPanel {
       {
         angels: [],
         selectedAngelId: null,
-        energy: { current: 100, max: 1000, regenRate: 1 },
+        energy: { current: 100, max: 1000, regenRate: 1, consumption: 0 },
         wizardOpen: false,
         wizardStep: 0,
         wizardDraft: null,

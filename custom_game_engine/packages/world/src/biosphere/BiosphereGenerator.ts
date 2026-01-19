@@ -23,15 +23,26 @@ type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo' |
   'atari2600' | 'atari7800' | 'wonderswan' | 'ngpc' | 'virtualboy' | '3do' |
   'celeste' | 'undertale' | 'stardew' | 'terraria';
 
+export type ProgressCallback = (message: string) => void;
+
 export class BiosphereGenerator {
   private nicheIdentifier: EcologicalNicheIdentifier;
   private alienGenerator: AlienSpeciesGenerator;
   private planet: PlanetConfig;
+  private progressCallback?: ProgressCallback;
 
-  constructor(llmProvider: LLMProvider, planet: PlanetConfig) {
+  constructor(llmProvider: LLMProvider, planet: PlanetConfig, progressCallback?: ProgressCallback) {
     this.nicheIdentifier = new EcologicalNicheIdentifier();
     this.alienGenerator = new AlienSpeciesGenerator(llmProvider);
     this.planet = planet;
+    this.progressCallback = progressCallback;
+  }
+
+  private reportProgress(message: string): void {
+    console.log(`[BiosphereGenerator] ${message}`);
+    if (this.progressCallback) {
+      this.progressCallback(message);
+    }
   }
 
   /**
@@ -40,15 +51,15 @@ export class BiosphereGenerator {
   async generateBiosphere(): Promise<BiosphereData> {
     const startTime = Date.now();
 
-    console.log(`[BiosphereGenerator] Generating biosphere for ${this.planet.name}...`);
+    this.reportProgress(`🌍 Creating world of ${this.planet.name}...`);
 
     // Phase 1: Identify ecological niches
-    console.log('[BiosphereGenerator] Phase 1: Identifying niches...');
+    this.reportProgress('🌱 Ecological niches emerging...');
     const niches = this.nicheIdentifier.identifyNiches(this.planet);
-    console.log(`[BiosphereGenerator] Identified ${niches.length} ecological niches`);
+    this.reportProgress(`✨ ${niches.length} unique habitats discovered`);
 
     // Phase 2: Generate species for each niche
-    console.log('[BiosphereGenerator] Phase 2: Generating species...');
+    this.reportProgress('🧬 Evolving creatures...');
     const species: GeneratedAlienSpecies[] = [];
 
     for (const niche of niches) {
@@ -56,10 +67,10 @@ export class BiosphereGenerator {
       species.push(...nicheSpecies);
     }
 
-    console.log(`[BiosphereGenerator] Generated ${species.length} species`);
+    this.reportProgress(`🦋 ${species.length} species evolved`);
 
     // Phase 3: Build food web
-    console.log('[BiosphereGenerator] Phase 3: Building food web...');
+    this.reportProgress('🍽️ Establishing food chains...');
     const foodWeb = this.buildFoodWeb(species, niches);
 
     // Phase 4: Map niches to species
@@ -72,11 +83,11 @@ export class BiosphereGenerator {
       s.intelligence === 'hive_intelligence'
     );
 
-    console.log(`[BiosphereGenerator] Found ${sapientSpecies.length} sapient species`);
+    this.reportProgress(`🧠 Discovered ${sapientSpecies.length} intelligent species`);
 
     // Phase 6: Choose art style deterministically
     const artStyle = this.selectArtStyle(this.planet.seed);
-    console.log(`[BiosphereGenerator] Selected art style: ${artStyle}`);
+    this.reportProgress(`🎨 Choosing artistic style: ${artStyle}`);
 
     const endTime = Date.now();
     const generationTimeMs = endTime - startTime;
@@ -100,8 +111,8 @@ export class BiosphereGenerator {
       },
     };
 
-    console.log(`[BiosphereGenerator] Biosphere generation complete in ${generationTimeMs}ms`);
-    console.log(`[BiosphereGenerator] ${biosphere.metadata.totalSpecies} species across ${biosphere.metadata.trophicLevels} trophic levels`);
+    this.reportProgress(`✅ Biosphere complete! ${biosphere.metadata.totalSpecies} species thriving`);
+    console.log(`[BiosphereGenerator] Generation time: ${generationTimeMs}ms | ${biosphere.metadata.trophicLevels} trophic levels`);
 
     return biosphere;
   }

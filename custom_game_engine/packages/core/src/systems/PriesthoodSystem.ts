@@ -83,6 +83,8 @@ export class PriesthoodSystem extends BaseSystem {
   public readonly id = 'PriesthoodSystem';
   public readonly priority = 84;
   public readonly requiredComponents = [];
+  // Lazy activation: Skip entire system when no priesthood exists
+  public readonly activationComponents = ['priesthood'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: PriesthoodConfig;

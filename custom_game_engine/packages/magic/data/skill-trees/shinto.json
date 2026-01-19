@@ -1,0 +1,1005 @@
+{
+  "id": "shinto-tree",
+  "paradigmId": "shinto",
+  "name": "The Way of the Kami",
+  "description": "Learn to interact with the spirits that inhabit all things through offerings, purity, and respect.",
+  "lore": "The Way is not learned from books, but from the land itself. Every rock, every tree,\nevery crossroads has a spirit. To walk the Way is to acknowledge them, to show respect,\nto maintain the purity that allows communion. The kami do not demand worship - they\ndemand recognition. Give it, and they may bless you. Ignore them or show disrespect,\nand they will turn their faces from you.",
+  "nodes": [
+    {
+      "id": "spirit-sense",
+      "name": "Spirit Sense",
+      "description": "Learn to feel the presence of spirits in the world",
+      "paradigmId": "shinto",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "spirit_sight",
+          "baseValue": 1,
+          "description": "Can sense nearby kami presence"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The first step is simply awareness - learning to feel when you are not alone.",
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "basic-purity",
+      "name": "Ritual Cleanliness",
+      "description": "Learn the basics of maintaining ritual purity",
+      "paradigmId": "shinto",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 50,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "purity_maintenance",
+          "baseValue": 5,
+          "perLevelValue": 5,
+          "description": "Slower purity decay"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Purity is not about morality - it is about spiritual cleanliness. The pure can approach the kami; the polluted cannot.",
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "purification",
+      "name": "Purification Rites",
+      "description": "Learn rituals to cleanse pollution",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 1,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "harae"
+          },
+          "description": "Can perform basic purification rituals"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "basic-purity"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "great-purification",
+      "name": "Great Purification",
+      "description": "Master the Great Purification, cleansing even severe pollution",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "oharae"
+          },
+          "description": "Can perform the Great Purification ceremony"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "purity_level",
+          "params": {
+            "purityMin": 80
+          },
+          "description": "Must maintain high purity to learn this rite"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "purification"
+      ]
+    },
+    {
+      "id": "offering-basics",
+      "name": "Art of Offering",
+      "description": "Learn what offerings please the kami",
+      "paradigmId": "shinto",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "offering_effectiveness",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Offerings grant more favor"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "kami-reading",
+      "name": "Reading the Spirits",
+      "description": "Learn to read what each kami desires",
+      "paradigmId": "shinto",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_preferences"
+          },
+          "description": "Can sense what offerings a kami prefers"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "offering-basics",
+        "spirit-sense"
+      ]
+    },
+    {
+      "id": "taboo-sense",
+      "name": "Taboo Awareness",
+      "description": "Learn to sense the taboos of each kami",
+      "paradigmId": "shinto",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sense_taboos"
+          },
+          "description": "Can sense what offends a kami"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "kami-reading"
+      ]
+    },
+    {
+      "id": "kami-nature",
+      "name": "Nature Kami",
+      "description": "Learn to interact with nature spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "nature"
+          },
+          "description": "Can interact with nature kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "nature"
+          },
+          "description": "+X% favor gain with nature kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "nature"
+          },
+          "description": "Must have encountered a nature kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-place",
+      "name": "Place Kami",
+      "description": "Learn to interact with place spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "place"
+          },
+          "description": "Can interact with place kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "place"
+          },
+          "description": "+X% favor gain with place kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "place"
+          },
+          "description": "Must have encountered a place kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-ancestor",
+      "name": "Ancestor Kami",
+      "description": "Learn to interact with ancestor spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "ancestor"
+          },
+          "description": "Can interact with ancestor kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "ancestor"
+          },
+          "description": "+X% favor gain with ancestor kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "ancestor"
+          },
+          "description": "Must have encountered a ancestor kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense",
+        "purification"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-household",
+      "name": "Household Kami",
+      "description": "Learn to interact with household spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "household"
+          },
+          "description": "Can interact with household kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "household"
+          },
+          "description": "+X% favor gain with household kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "household"
+          },
+          "description": "Must have encountered a household kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-craft",
+      "name": "Craft Kami",
+      "description": "Learn to interact with craft spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "craft"
+          },
+          "description": "Can interact with craft kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "craft"
+          },
+          "description": "+X% favor gain with craft kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "craft"
+          },
+          "description": "Must have encountered a craft kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-elemental",
+      "name": "Elemental Kami",
+      "description": "Learn to interact with elemental spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "elemental"
+          },
+          "description": "Can interact with elemental kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "elemental"
+          },
+          "description": "+X% favor gain with elemental kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "elemental"
+          },
+          "description": "Must have encountered a elemental kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-animal",
+      "name": "Animal Kami",
+      "description": "Learn to interact with animal spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "animal"
+          },
+          "description": "Can interact with animal kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "animal"
+          },
+          "description": "+X% favor gain with animal kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "animal"
+          },
+          "description": "Must have encountered a animal kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "kami-food",
+      "name": "Food Kami",
+      "description": "Learn to interact with food spirits",
+      "paradigmId": "shinto",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_kami_type",
+          "baseValue": 1,
+          "target": {
+            "kamiType": "food"
+          },
+          "description": "Can interact with food kami"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "target": {
+            "kamiType": "food"
+          },
+          "description": "+X% favor gain with food kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_met",
+          "params": {
+            "kamiType": "food"
+          },
+          "description": "Must have encountered a food kami",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "spirit-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "hidden": true
+    },
+    {
+      "id": "blessing-request",
+      "name": "Requesting Blessings",
+      "description": "Learn the proper way to request blessings from kami",
+      "paradigmId": "shinto",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "request_blessing"
+          },
+          "description": "Can formally request blessings from kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_favor",
+          "params": {
+            "favorLevel": 50
+          },
+          "description": "Must have earned significant favor with at least one kami"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "offering-basics"
+      ]
+    },
+    {
+      "id": "sustained-blessing",
+      "name": "Maintaining Blessings",
+      "description": "Learn to maintain kami blessings over time",
+      "paradigmId": "shinto",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sustained_blessing"
+          },
+          "description": "Blessings last longer"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "blessing-request"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "sacred-space",
+      "name": "Sacred Boundaries",
+      "description": "Learn to create and maintain sacred spaces",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 2,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "shimenawa"
+          },
+          "description": "Can create sacred boundaries with shimenawa"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "purification"
+      ]
+    },
+    {
+      "id": "shrine-craft",
+      "name": "Shrine Crafting",
+      "description": "Learn to build shrines that kami can inhabit",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "shrine_consecration"
+          },
+          "description": "Can build and consecrate shrines"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "skill_level",
+          "params": {
+            "skillId": "building",
+            "skillLevel": 2
+          },
+          "description": "Must have basic building skill"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "sacred-space"
+      ]
+    },
+    {
+      "id": "kami-invitation",
+      "name": "Inviting the Kami",
+      "description": "Learn the ritual to invite a kami to make a shrine their home",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "kanjou"
+          },
+          "description": "Can invite a kami to inhabit a shrine"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_favor",
+          "params": {
+            "favorLevel": 80
+          },
+          "description": "Must have very high favor with a kami"
+        },
+        {
+          "type": "purity_level",
+          "params": {
+            "purityMin": 90
+          },
+          "description": "Must be in state of high purity"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "shrine-craft"
+      ]
+    },
+    {
+      "id": "ceremony-basics",
+      "name": "Ceremonial Arts",
+      "description": "Learn the basics of conducting ceremonies",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "basic_ceremony"
+          },
+          "description": "Can perform basic ceremonies"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "purification",
+        "offering-basics"
+      ]
+    },
+    {
+      "id": "festival-arts",
+      "name": "Festival Arts",
+      "description": "Learn to organize festivals that honor the kami",
+      "paradigmId": "shinto",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "matsuri"
+          },
+          "description": "Can organize and lead festivals"
+        },
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 20,
+          "description": "Massive favor boost during festivals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 3
+          },
+          "description": "Must have relationships with at least 3 kami types"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "ceremony-basics",
+        "sacred-space"
+      ]
+    },
+    {
+      "id": "pollution-resistance",
+      "name": "Spiritual Fortitude",
+      "description": "Build resistance to spiritual pollution",
+      "paradigmId": "shinto",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "pollution_resistance",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "Resist pollution accumulation"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "basic-purity"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "death-handling",
+      "name": "Death Rites",
+      "description": "Learn to handle death without severe pollution",
+      "paradigmId": "shinto",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "pollution_resistance",
+          "baseValue": 20,
+          "target": {
+            "kamiType": "death"
+          },
+          "description": "Reduced pollution from death contact"
+        },
+        {
+          "type": "unlock_ritual",
+          "baseValue": 1,
+          "target": {
+            "ritualId": "funeral_rites"
+          },
+          "description": "Can perform proper funeral rites"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "oharae"
+          },
+          "description": "Must have performed the Great Purification"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "pollution-resistance",
+        "kami-ancestor"
+      ]
+    },
+    {
+      "id": "kannushi",
+      "name": "Kannushi (Shrine Keeper)",
+      "description": "Become a recognized keeper of the way",
+      "paradigmId": "shinto",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "kami_favor_bonus",
+          "baseValue": 25,
+          "description": "Major favor bonus with all kami"
+        },
+        {
+          "type": "purity_maintenance",
+          "baseValue": 25,
+          "description": "Greatly reduced purity decay"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "kami_communion"
+          },
+          "description": "Can commune directly with kami"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "purity_level",
+          "params": {
+            "purityMin": 95
+          },
+          "description": "Must maintain near-perfect purity"
+        },
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2000
+          },
+          "description": "Must have dedicated significant time to practice"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "kami-invitation",
+        "festival-arts"
+      ]
+    },
+    {
+      "id": "miko",
+      "name": "Miko (Shrine Attendant)",
+      "description": "Become a shrine attendant with oracular gifts",
+      "paradigmId": "shinto",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "kagura_dance"
+          },
+          "description": "Can perform sacred kagura dance"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "oracle_trance"
+          },
+          "description": "Can enter oracle trance to receive messages"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "kami_favor",
+          "params": {
+            "favorLevel": 90
+          },
+          "description": "Must have devoted favor from a patron kami"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "ceremony-basics",
+        "sustained-blessing"
+      ]
+    }
+  ],
+  "entryNodes": [
+    "spirit-sense",
+    "basic-purity"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "offering_given",
+      "xpAmount": 10,
+      "description": "Make an offering to a kami"
+    },
+    {
+      "eventType": "kami_encountered",
+      "xpAmount": 50,
+      "description": "Encounter a new type of kami"
+    },
+    {
+      "eventType": "purification_performed",
+      "xpAmount": 15,
+      "description": "Perform a purification ritual"
+    },
+    {
+      "eventType": "blessing_received",
+      "xpAmount": 30,
+      "description": "Receive a blessing from a kami"
+    },
+    {
+      "eventType": "ceremony_conducted",
+      "xpAmount": 40,
+      "description": "Conduct a ceremony"
+    },
+    {
+      "eventType": "shrine_tended",
+      "xpAmount": 5,
+      "description": "Tend to a shrine"
+    },
+    {
+      "eventType": "festival_participated",
+      "xpAmount": 75,
+      "description": "Participate in or lead a festival"
+    },
+    {
+      "eventType": "taboo_avoided",
+      "xpAmount": 10,
+      "description": "Recognize and avoid a taboo"
+    },
+    {
+      "eventType": "purity_maintained",
+      "xpAmount": 5,
+      "description": "Maintain high purity for a day",
+      "conditions": [
+        {
+          "type": "purity_level",
+          "params": {
+            "purityMin": 80
+          },
+          "description": "Must have high purity"
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": false,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "purity_level",
+        "params": {
+          "purityMax": 20
+        },
+        "description": "Severe pollution causes progress loss"
+      }
+    ]
+  },
+  "version": 1
+}

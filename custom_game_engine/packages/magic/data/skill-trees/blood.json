@@ -1,0 +1,678 @@
+{
+  "id": "blood-tree",
+  "paradigmId": "blood",
+  "name": "The Sanguine Art",
+  "description": "Master blood magic through sacrifice, vitality manipulation, and bloodline awakening.",
+  "lore": "Blood is life. This simple truth underlies all blood magic. Every drop\ncontains vitality, power, essence - the fundamental force that separates the\nliving from the dead. And what contains power can be used for power.\n\nThe path begins with self-sacrifice. Your own blood is the safest source -\nhonest magic, where your pain fuels your power. Cut your palm, speak the words,\nand reality bends to your will. It hurts, yes. It weakens you, yes. But there's\nno corruption in using what's yours.\n\nBut blood magic doesn't stop at self-sacrifice. You can use others' blood -\ngiven willingly or taken by force. You can awaken dormant bloodline powers\nsleeping in your ancestry. You can manipulate blood physically, boiling it in\nenemies' veins or shaping it into weapons. You can create blood bonds, magical\nconnections that let you share life force or even die for another.\n\nThe darkest techniques involve stealing life itself - draining vitality from\nothers to fuel your own existence, controlling people through their blood like\npuppets, or even achieving immortality through blood phylacteries.\n\nThe greatest blood mages achieve apotheosis - transforming into living blood\nitself. No fixed form, no mortal weakness, existing as pure animated life force.\nNeither alive nor dead, but eternal.\n\nBut remember: every use of blood magic leaves a mark. The more you sacrifice,\nthe more you change. And some sacrifices can never be undone.",
+  "nodes": [
+    {
+      "id": "blood-sense",
+      "name": "Blood Awareness",
+      "description": "Learn to sense the life force in blood",
+      "paradigmId": "blood",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense blood and vitality in living things",
+          "target": {
+            "abilityId": "sense_blood"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Blood is life. Every drop contains vitality, power, essence. You learn\nto feel it - the pulse of life in yourself and others. The stronger the\nlife force, the brighter it shines to your senses.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🩸"
+    },
+    {
+      "id": "basic-sacrifice",
+      "name": "Self-Sacrifice",
+      "description": "Learn to use your own blood as magical fuel",
+      "paradigmId": "blood",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Use your own blood to fuel magic",
+          "target": {
+            "abilityId": "blood_fuel"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "blood_mage"
+          },
+          "description": "Must be taught by a blood mage"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The first lesson: your own blood is the safest source. Cut your palm,\nspeak the words, and your blood becomes power. It hurts, yes. It weakens\nyou, yes. But it's honest magic - no debt to others, no corruption of\ninnocents. Just your pain for your power.",
+      "prerequisites": [
+        "blood-sense"
+      ]
+    },
+    {
+      "id": "pain-tolerance",
+      "name": "Pain Mastery",
+      "description": "Learn to tolerate the pain of sacrifice",
+      "paradigmId": "blood",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "resource_efficiency",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "description": "Reduce health cost of blood magic by X%"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Blood magic hurts. Every time. But pain is just sensation - you can learn\nto endure it, to function through it, even to use it. Master pain and you\nmaster blood magic.",
+      "prerequisites": [
+        "basic-sacrifice"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "wound-sealing",
+      "name": "Wound Sealing",
+      "description": "Learn to seal wounds instantly with blood magic",
+      "paradigmId": "blood",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Seal wounds with blood magic",
+          "target": {
+            "abilityId": "seal_wound"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "After sacrifice comes sealing. Speak the word and your blood crystallizes,\nsealing the wound, stopping the bleeding. You'll still need time to heal,\nbut at least you won't bleed out in the middle of a ritual.",
+      "prerequisites": [
+        "basic-sacrifice"
+      ]
+    },
+    {
+      "id": "bloodline-awakening",
+      "name": "Bloodline Awakening",
+      "description": "Awaken the powers sleeping in your blood",
+      "paradigmId": "blood",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Awaken dormant bloodline powers",
+          "target": {
+            "abilityId": "awaken_bloodline"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "minimumStrength": 0.3
+          },
+          "description": "Must have significant bloodline heritage"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your ancestors' power flows in your veins - dormant, waiting. Through\nritual and sacrifice, you can awaken it. Dragon blood grants scales and\nfire. Fae blood grants beauty and illusion. What does yours hold?",
+      "prerequisites": [
+        "blood-sense",
+        "basic-sacrifice"
+      ]
+    },
+    {
+      "id": "bloodline-strengthen",
+      "name": "Bloodline Refinement",
+      "description": "Strengthen your bloodline beyond natural limits",
+      "paradigmId": "blood",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Strengthen your bloodline through ritual",
+          "target": {
+            "abilityId": "strengthen_bloodline"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your blood can be refined, concentrated, purified. Through careful ritual\nand the blood of those who share your heritage, you can strengthen the\nbloodline beyond what inheritance gave you. Become more than your ancestors.",
+      "prerequisites": [
+        "bloodline-awakening"
+      ]
+    },
+    {
+      "id": "bloodline-theft",
+      "name": "Bloodline Theft",
+      "description": "Learn to steal others' bloodline powers",
+      "paradigmId": "blood",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Steal bloodline powers from others",
+          "target": {
+            "abilityId": "steal_bloodline"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "bloodline_theft_ritual"
+          },
+          "description": "Must learn the forbidden ritual"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The darkest use of bloodline magic: taking the heritage of another. Drink\ntheir blood in ritual, and their powers become yours. Dragon fire, fae\ncharm, demonic strength - all can be stolen. But this is corruption of\nthe deepest kind.",
+      "prerequisites": [
+        "bloodline-strengthen"
+      ],
+      "icon": "💀"
+    },
+    {
+      "id": "hemomancy",
+      "name": "Blood Shaping",
+      "description": "Learn to control and shape blood",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Manipulate blood physically",
+          "target": {
+            "abilityId": "shape_blood"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Blood obeys you. Make it flow uphill. Freeze it into weapons. Boil enemies'\nblood in their veins. This is hemomancy - direct control over blood itself.\nTerrifying and effective.",
+      "prerequisites": [
+        "basic-sacrifice",
+        "blood-sense"
+      ]
+    },
+    {
+      "id": "blood-scrying",
+      "name": "Blood Scrying",
+      "description": "Use blood to scry and see distant places",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Scry using blood as a focus",
+          "target": {
+            "abilityId": "blood_scry"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A drop of someone's blood is a connection to them. Use it as a focus and\nyou can see through their eyes, feel what they feel, know where they are.\nThe more blood, the clearer the connection.",
+      "prerequisites": [
+        "blood-sense"
+      ]
+    },
+    {
+      "id": "blood-tracking",
+      "name": "Blood Tracking",
+      "description": "Track prey through blood traces",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Track creatures through blood traces",
+          "target": {
+            "abilityId": "track_blood"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every wound leaves blood. Every blood drop is a beacon. You can follow\nthese traces across vast distances, sensing the life force that shed them.\nHunters find this invaluable.",
+      "prerequisites": [
+        "blood-sense"
+      ]
+    },
+    {
+      "id": "blood-cursing",
+      "name": "Blood Curses",
+      "description": "Learn to curse others through blood connection",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Curse others through their blood",
+          "target": {
+            "abilityId": "blood_curse"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "With their blood, you can afflict them. Sickness, weakness, pain, misfortune.\nThe curse flows through the blood connection, inevitable and inescapable.\nThis is why blood mages are feared.",
+      "prerequisites": [
+        "hemomancy",
+        "blood-scrying"
+      ],
+      "icon": "💀"
+    },
+    {
+      "id": "blood-bonding",
+      "name": "Blood Bonds",
+      "description": "Create bonds by mixing blood",
+      "paradigmId": "blood",
+      "category": "ritual",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create magical bonds through shared blood",
+          "target": {
+            "abilityId": "blood_bond"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Mix your blood with another's in ritual, and you become bonded. You feel\nwhat they feel. You know when they're in danger. You can lend them strength\nor share their pain. This is how blood pacts are sealed.",
+      "prerequisites": [
+        "basic-sacrifice"
+      ]
+    },
+    {
+      "id": "life-sharing",
+      "name": "Life Sharing",
+      "description": "Share vitality through blood bonds",
+      "paradigmId": "blood",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Share life force through blood bonds",
+          "target": {
+            "abilityId": "share_life"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Through a blood bond, you can transfer life force. Heal them by giving\nyour vitality. Take their injuries upon yourself. Die for them, if necessary,\nyour life flowing into theirs. This is the deepest sacrifice.",
+      "prerequisites": [
+        "blood-bonding",
+        "wound-sealing"
+      ]
+    },
+    {
+      "id": "bond-breaking",
+      "name": "Bond Severing",
+      "description": "Learn to sever blood bonds",
+      "paradigmId": "blood",
+      "category": "ritual",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sever blood bonds",
+          "target": {
+            "abilityId": "break_bond"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Blood bonds are permanent - unless you know how to break them. Ritual,\nsacrifice, and willpower can sever even the strongest bond. This frees\nyou but leaves a scar on the soul.",
+      "prerequisites": [
+        "blood-bonding"
+      ]
+    },
+    {
+      "id": "regeneration",
+      "name": "Blood Regeneration",
+      "description": "Regenerate wounds using blood magic",
+      "paradigmId": "blood",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Regenerate health using blood magic",
+          "target": {
+            "abilityId": "regenerate"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your blood can heal you faster than natural. Accelerate healing, close\nwounds, regrow tissue. Costs blood to fuel blood, but in emergencies this\ncan save your life.",
+      "prerequisites": [
+        "wound-sealing",
+        "pain-tolerance"
+      ]
+    },
+    {
+      "id": "life-extension",
+      "name": "Life Extension",
+      "description": "Extend your lifespan through blood magic",
+      "paradigmId": "blood",
+      "category": "channeling",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "lifespan",
+          "baseValue": 100,
+          "perLevelValue": 50,
+          "description": "Extend lifespan by X years"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Blood is life, and with enough blood, life can be extended. Age slower.\nResist disease. Recover from what should be mortal wounds. This doesn't\ngrant true immortality - but centuries instead of decades.",
+      "prerequisites": [
+        "regeneration"
+      ]
+    },
+    {
+      "id": "vitality-drain",
+      "name": "Life Drain",
+      "description": "Drain life force from living creatures",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Drain life force from others",
+          "target": {
+            "abilityId": "drain_life"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Touch them and pull their vitality into yourself. Their wounds become your\nhealing. Their strength becomes your strength. This is vampiric magic -\nsustaining yourself by draining others.",
+      "prerequisites": [
+        "hemomancy",
+        "regeneration"
+      ],
+      "icon": "🧛"
+    },
+    {
+      "id": "vitality-transfer",
+      "name": "Life Transfusion",
+      "description": "Transfer your vitality to heal others",
+      "paradigmId": "blood",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transfer your vitality to others",
+          "target": {
+            "abilityId": "transfer_life"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The opposite of draining: give your life force to another. Heal their\nwounds with your blood. Restore their strength with your vitality. Die\nso they might live. This is the healer's sacrifice.",
+      "prerequisites": [
+        "regeneration",
+        "life-sharing"
+      ]
+    },
+    {
+      "id": "blood-puppetry",
+      "name": "Blood Puppetry",
+      "description": "Control others' bodies through their blood",
+      "paradigmId": "blood",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Control others through their blood",
+          "target": {
+            "abilityId": "blood_puppet"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "secret_revealed",
+          "params": {
+            "secretId": "blood_puppetry_technique"
+          },
+          "description": "Must learn the forbidden technique"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "With enough of their blood, you can control them - force them to move,\nspeak, act against their will. Their blood becomes puppet strings. This\nis abomination - violating free will through blood magic.",
+      "prerequisites": [
+        "hemomancy",
+        "blood-cursing"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "blood-resurrection",
+      "name": "Blood Resurrection",
+      "description": "Resurrect through prepared blood phylacteries",
+      "paradigmId": "blood",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Return from death through blood",
+          "target": {
+            "abilityId": "blood_resurrect"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 3000
+          },
+          "description": "Requires vast blood magic experience"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate blood magic: defeat death itself. Store your life essence in\nblood phylacteries - vials of your blood preserved through ritual. When\nyou die, your soul flows into the nearest phylactery and regenerates a\nnew body. True immortality - at a terrible price.",
+      "prerequisites": [
+        "life-extension",
+        "vitality-transfer"
+      ],
+      "hidden": true,
+      "icon": "♾️"
+    },
+    {
+      "id": "sanguine-apotheosis",
+      "name": "Sanguine Apotheosis",
+      "description": "Achieve apotheosis - become living blood",
+      "paradigmId": "blood",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 600,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transform into living blood",
+          "target": {
+            "abilityId": "blood_form"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "hemomancy",
+            "level": 5
+          },
+          "description": "Requires perfect blood control"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "life-extension",
+            "level": 5
+          },
+          "description": "Requires mastery of life extension"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The pinnacle of blood magic: transform your entire being into animated\nblood. No fixed form, no mortal weakness. Flow through cracks, reform from\ndrops, exist as pure life force. You become blood incarnate - neither fully\nalive nor dead, but eternal.",
+      "prerequisites": [
+        "blood-resurrection",
+        "hemomancy"
+      ],
+      "hidden": true,
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "blood-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "blood_sacrificed",
+      "xpAmount": 15,
+      "description": "Sacrifice blood to fuel magic"
+    },
+    {
+      "eventType": "wound_healed_blood",
+      "xpAmount": 25,
+      "description": "Heal a wound with blood magic"
+    },
+    {
+      "eventType": "blood_bond_created",
+      "xpAmount": 100,
+      "description": "Create a blood bond"
+    },
+    {
+      "eventType": "bloodline_awakened",
+      "xpAmount": 150,
+      "description": "Awaken your bloodline powers"
+    },
+    {
+      "eventType": "life_force_drained",
+      "xpAmount": 50,
+      "description": "Drain life force from another"
+    },
+    {
+      "eventType": "blood_curse_cast",
+      "xpAmount": 75,
+      "description": "Successfully curse someone through blood"
+    },
+    {
+      "eventType": "vitality_transferred",
+      "xpAmount": 60,
+      "description": "Transfer vitality to another"
+    },
+    {
+      "eventType": "death_survived_resurrection",
+      "xpAmount": 300,
+      "description": "Return from death via blood resurrection"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

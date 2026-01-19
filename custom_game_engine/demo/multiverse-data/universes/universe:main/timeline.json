@@ -621,7 +621,20 @@
       "fileSize": 1729314,
       "checksum": "-653e3b10",
       "filename": "1361.json.gz"
+    },
+    {
+      "tick": 2923,
+      "timestamp": 1768812130203,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1471606,
+      "checksum": "-2f23641c",
+      "filename": "2923.json.gz",
+      "decayPolicy": {
+        "neverDecay": true,
+        "preservationReason": "canonical event"
+      }
     }
   ],
-  "lastUpdated": 1768273834730
+  "lastUpdated": 1768812130204
 }

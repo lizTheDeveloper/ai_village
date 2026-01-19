@@ -57,6 +57,7 @@ export class BuildingSpatialAnalysisSystem extends BaseSystem {
   public readonly id: SystemId = 'building_spatial_analysis';
   public readonly priority: number = 17; // Run after BuildingSystem (16)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
+  public readonly activationComponents = ['building_harmony'] as const; // Lazy activation: Skip entire system when no Feng Shui analysis active
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /** Cache of pending layout data for buildings being constructed */

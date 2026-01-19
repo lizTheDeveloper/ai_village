@@ -196,7 +196,7 @@ export class WindowManager {
         // Emit notification
         this.emit('window:auto-closed', {
           windowId: lruWindowId,
-          windowTitle: lruWindow.panel.getTitle(),
+          windowTitle: lruWindow.panel?.getTitle() || lruWindowId,
           reason: 'out-of-space',
         } as WindowAutoCloseEvent);
 
@@ -480,7 +480,7 @@ export class WindowManager {
       const contentY = window.y + TITLE_BAR_HEIGHT;
       const contentHeight = window.height - TITLE_BAR_HEIGHT;
 
-      if (window.panel.handleContentClick) {
+      if (window.panel?.handleContentClick) {
         const relativeX = x - window.x;
         const relativeY = y - contentY;
         window.panel.handleContentClick(relativeX, relativeY, window.width, contentHeight);
@@ -572,7 +572,7 @@ export class WindowManager {
     }
 
     // Forward to panel's handleScroll if implemented
-    if (window.panel.handleScroll) {
+    if (window.panel?.handleScroll) {
       const contentHeight = window.height - TITLE_BAR_HEIGHT;
       return window.panel.handleScroll(deltaY, contentHeight);
     }

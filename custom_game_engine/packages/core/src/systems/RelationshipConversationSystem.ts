@@ -27,6 +27,8 @@ export class RelationshipConversationSystem extends BaseSystem {
   public readonly id: SystemId = 'relationship_conversation';
   public readonly priority: number = 16; // After CommunicationSystem (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no relationship exists
+  public readonly activationComponents = ['relationship'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   protected onInitialize(_world: World, _eventBus: EventBus): void {

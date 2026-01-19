@@ -21,6 +21,8 @@ export class PublishingUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_unlock';
   public readonly priority = 15; // Early, to detect unlocks quickly
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Lazy activation: Skip entire system when no publishing_company exists
+  public readonly activationComponents = ['publishing_company'] as const;
   protected readonly throttleInterval = 50; // Check every 50 ticks (2.5 seconds at 20 TPS)
 
   // Track published papers (paper ID → publication tick)

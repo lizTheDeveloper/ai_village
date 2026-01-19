@@ -1,0 +1,712 @@
+{
+  "id": "threshold_skill_tree",
+  "paradigmId": "threshold_magic",
+  "name": "Threshold Magic Skill Tree",
+  "description": "Master the art of boundaries, doorways, and liminal spaces",
+  "lore": "Between day and night, between worlds, between life and death -\nthe in-between places hold power. Stand at a threshold and you stand\neverywhere. Cross it wrong and you may never cross back.",
+  "nodes": [
+    {
+      "id": "threshold-sense",
+      "name": "Threshold Sense",
+      "description": "Learn to sense thresholds and boundaries",
+      "paradigmId": "threshold_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense thresholds and boundaries"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "threshold_detection"
+          },
+          "description": "Detect all nearby thresholds"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The world is full of edges. Most pass through doorways without thought,\ncross borders without feeling. You learn to feel them all -\nthe tingle of transition, the weight of boundaries.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🚪"
+    },
+    {
+      "id": "liminal-awareness",
+      "name": "Liminal Awareness",
+      "description": "Learn to recognize liminal states",
+      "paradigmId": "threshold_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "liminal_sense"
+          },
+          "description": "Sense liminal times and places"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus at liminal times/places"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Dawn is not day or night but both. The shore is not land or sea but both.\nThese in-between states hold power that solid states lack.\nLearn to recognize them, seek them out.",
+      "levelCostMultiplier": 1.3,
+      "icon": "🌅"
+    },
+    {
+      "id": "boundary-respect",
+      "name": "Boundary Respect",
+      "description": "Learn to properly respect boundaries",
+      "paradigmId": "threshold_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Protection at thresholds"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "honor_threshold"
+          },
+          "description": "Properly honor thresholds for safe passage"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Thresholds have guardians - seen and unseen. Those who cross without\nproper respect invite their wrath. Learn the rituals of passage,\nthe acknowledgments required. Respect the boundary and it respects you.",
+      "icon": "🙏"
+    },
+    {
+      "id": "doorway-power",
+      "name": "Doorway Power",
+      "description": "Learn to draw power from doorways",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "draw_doorway_power"
+          },
+          "description": "Draw power from doorways"
+        },
+        {
+          "type": "resource_regen",
+          "baseValue": 10,
+          "description": "Regenerate power near doorways"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every doorway is a potential source. Enter and exit deliberately.\nFeel the power in the crossing. Some doorways are stronger than others -\nancient gates, sacred arches, prison doors.",
+      "prerequisites": [
+        "threshold-sense"
+      ],
+      "icon": "⚡"
+    },
+    {
+      "id": "seal-threshold",
+      "name": "Seal Threshold",
+      "description": "Learn to seal thresholds against passage",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 55,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "seal_threshold"
+          },
+          "description": "Seal doorways against passage"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A sealed threshold cannot be crossed. Not by force, not by magic,\nnot by pleading. The seal recognizes no authority but its maker's.\nThis is the first defensive threshold magic.",
+      "prerequisites": [
+        "boundary-respect"
+      ],
+      "icon": "🔐"
+    },
+    {
+      "id": "keyed-threshold",
+      "name": "Keyed Threshold",
+      "description": "Learn to create conditional thresholds",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "key_threshold"
+          },
+          "description": "Create keyed thresholds with conditions"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Not just sealed or open - keyed. \"Only those who speak the password.\"\n\"Only those of the blood.\" \"Only those who bring tribute.\"\nComplex conditions, complex magic.",
+      "prerequisites": [
+        "seal-threshold"
+      ],
+      "icon": "🔑"
+    },
+    {
+      "id": "minor-gateway",
+      "name": "Minor Gateway",
+      "description": "Learn to create short-range gateways",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_minor_gateway"
+          },
+          "description": "Create short-range gateways"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Connect two doorways. Walk through one, emerge from the other.\nLimited range at first - across a room, across a building.\nBut the principle scales.",
+      "prerequisites": [
+        "doorway-power"
+      ],
+      "icon": "🌀"
+    },
+    {
+      "id": "major-gateway",
+      "name": "Major Gateway",
+      "description": "Learn to create long-range gateways",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_major_gateway"
+          },
+          "description": "Create long-range gateways"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 400
+          },
+          "description": "Requires 400 total XP in Threshold magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Across cities. Across countries. Across oceans. The greater the distance,\nthe greater the cost. But no distance is impossible if you have\ntwo proper thresholds to connect.",
+      "prerequisites": [
+        "minor-gateway"
+      ],
+      "icon": "🌐"
+    },
+    {
+      "id": "dimensional-gateway",
+      "name": "Dimensional Gateway",
+      "description": "Learn to create inter-dimensional gateways",
+      "paradigmId": "threshold_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dimensional_gateway"
+          },
+          "description": "Create gateways between dimensions"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Threshold magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The ultimate threshold: the boundary between worlds. Punch through\nthe membrane separating realities. Connect here to there, this world\nto that. The cost is immense. The dangers, legendary.",
+      "prerequisites": [
+        "major-gateway"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "invitation-sense",
+      "name": "Invitation Sense",
+      "description": "Learn to sense invitations and their strength",
+      "paradigmId": "threshold_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 45,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense invitations and permissions"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "detect_invitation"
+          },
+          "description": "Detect invitation status of thresholds"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Every threshold asks: \"Have you been invited?\" Learn to feel\nthe answer. Some invitations are explicit, some implied.\nKnow before you cross.",
+      "prerequisites": [
+        "boundary-respect"
+      ],
+      "icon": "💌"
+    },
+    {
+      "id": "invitation-require",
+      "name": "Require Invitation",
+      "description": "Learn to require invitation for passage",
+      "paradigmId": "threshold_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "require_invitation"
+          },
+          "description": "Make thresholds require invitation to cross"
+        },
+        {
+          "type": "defense",
+          "baseValue": 15,
+          "description": "Uninvited cannot harm you at your threshold"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Like vampires of legend - none may enter without invitation.\nYour threshold becomes sacred. Enemies who cross uninvited\nsuffer the consequence of violation.",
+      "prerequisites": [
+        "invitation-sense",
+        "seal-threshold"
+      ],
+      "icon": "🧛"
+    },
+    {
+      "id": "invitation-revoke",
+      "name": "Revoke Invitation",
+      "description": "Learn to revoke invitations",
+      "paradigmId": "threshold_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "revoke_invitation"
+          },
+          "description": "Revoke previously given invitations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "An invitation given can be taken back. The guest becomes trespasser.\nThe welcome becomes rejection. They must leave immediately,\nor face the threshold's wrath.",
+      "prerequisites": [
+        "invitation-sense"
+      ],
+      "icon": "🚫"
+    },
+    {
+      "id": "crossroads-power",
+      "name": "Crossroads Power",
+      "description": "Learn to draw power from crossroads",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 85,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "crossroads_power"
+          },
+          "description": "Draw power from crossroads"
+        },
+        {
+          "type": "resource_max",
+          "baseValue": 20,
+          "description": "Increased power at crossroads"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Where paths meet, where choices branch, power accumulates.\nCrossroads are where deals are made with dark entities,\nwhere fate can be changed, where all paths are possible.",
+      "prerequisites": [
+        "liminal-awareness",
+        "doorway-power"
+      ],
+      "icon": "✝️"
+    },
+    {
+      "id": "crossroads-deal",
+      "name": "Crossroads Deal",
+      "description": "Learn to make binding crossroads bargains",
+      "paradigmId": "threshold_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 130,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "crossroads_bargain"
+          },
+          "description": "Make binding deals at crossroads"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "At the crossroads, anything can be bargained. Souls, fates, futures.\nEntities lurk there, waiting for deals. The terms are always honored -\nby both sides, willing or not.",
+      "prerequisites": [
+        "crossroads-power"
+      ],
+      "icon": "🤝"
+    },
+    {
+      "id": "between-state",
+      "name": "Between State",
+      "description": "Learn to exist in between states",
+      "paradigmId": "threshold_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "enter_between"
+          },
+          "description": "Exist in transitional states"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Not here, not there - between. Not visible, not invisible - between.\nIn the between state, normal rules flex. You can be seen by some,\nnot by others. Touched by some, not by others.",
+      "prerequisites": [
+        "liminal-awareness",
+        "crossroads-power"
+      ],
+      "icon": "〰️"
+    },
+    {
+      "id": "permanent-liminal",
+      "name": "Permanent Liminality",
+      "description": "Learn to exist permanently in liminal space",
+      "paradigmId": "threshold_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "permanent_between"
+          },
+          "description": "Exist permanently in liminal space"
+        },
+        {
+          "type": "defense",
+          "baseValue": 25,
+          "description": "Protected by existing between"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Some threshold mages never fully return. They exist always\nin the in-between, never quite here, never quite there.\nImpossible to pin down, impossible to trap.",
+      "prerequisites": [
+        "between-state",
+        "dimensional-gateway"
+      ],
+      "icon": "🌗"
+    },
+    {
+      "id": "threshold-guardian",
+      "name": "Threshold Guardian",
+      "description": "Become a threshold guardian",
+      "paradigmId": "threshold_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 30,
+          "description": "Master threshold guardian"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "become_guardian"
+          },
+          "description": "Become a threshold guardian"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 10
+          },
+          "description": "Requires 10 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "You have walked so many thresholds that you become one with them.\nGuardian of passages, keeper of boundaries. All who wish to cross\nmust answer to you first.",
+      "prerequisites": [
+        "keyed-threshold",
+        "invitation-require"
+      ],
+      "icon": "⚔️"
+    },
+    {
+      "id": "threshold-master",
+      "name": "Threshold Master",
+      "description": "Achieve supreme mastery over thresholds",
+      "paradigmId": "threshold_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "master_thresholds"
+          },
+          "description": "Command all thresholds"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme threshold mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Threshold magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Every door answers to you. Every boundary bows. You walk between worlds\nas easily as others walk between rooms. The liminal is your home.\nThresholds are your domain. Nothing crosses without your knowledge.",
+      "prerequisites": [
+        "threshold-guardian",
+        "permanent-liminal",
+        "crossroads-deal"
+      ],
+      "icon": "👑"
+    }
+  ],
+  "entryNodes": [
+    "threshold-sense",
+    "liminal-awareness",
+    "boundary-respect"
+  ],
+  "connections": [
+    {
+      "from": "threshold-sense",
+      "to": "doorway-power"
+    },
+    {
+      "from": "boundary-respect",
+      "to": "seal-threshold"
+    },
+    {
+      "from": "seal-threshold",
+      "to": "keyed-threshold"
+    },
+    {
+      "from": "doorway-power",
+      "to": "minor-gateway"
+    },
+    {
+      "from": "minor-gateway",
+      "to": "major-gateway"
+    },
+    {
+      "from": "major-gateway",
+      "to": "dimensional-gateway"
+    },
+    {
+      "from": "boundary-respect",
+      "to": "invitation-sense"
+    },
+    {
+      "from": "invitation-sense",
+      "to": "invitation-require"
+    },
+    {
+      "from": "seal-threshold",
+      "to": "invitation-require"
+    },
+    {
+      "from": "invitation-sense",
+      "to": "invitation-revoke"
+    },
+    {
+      "from": "liminal-awareness",
+      "to": "crossroads-power"
+    },
+    {
+      "from": "doorway-power",
+      "to": "crossroads-power"
+    },
+    {
+      "from": "crossroads-power",
+      "to": "crossroads-deal"
+    },
+    {
+      "from": "liminal-awareness",
+      "to": "between-state"
+    },
+    {
+      "from": "crossroads-power",
+      "to": "between-state"
+    },
+    {
+      "from": "between-state",
+      "to": "permanent-liminal"
+    },
+    {
+      "from": "dimensional-gateway",
+      "to": "permanent-liminal"
+    },
+    {
+      "from": "keyed-threshold",
+      "to": "threshold-guardian"
+    },
+    {
+      "from": "invitation-require",
+      "to": "threshold-guardian"
+    },
+    {
+      "from": "threshold-guardian",
+      "to": "threshold-master"
+    },
+    {
+      "from": "permanent-liminal",
+      "to": "threshold-master"
+    },
+    {
+      "from": "crossroads-deal",
+      "to": "threshold-master"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "threshold_crossed",
+      "xpAmount": 5,
+      "description": "Cross a significant threshold"
+    },
+    {
+      "eventType": "gateway_created",
+      "xpAmount": 20,
+      "description": "Create a gateway",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "threshold_sealed",
+      "xpAmount": 10,
+      "description": "Seal a threshold"
+    },
+    {
+      "eventType": "invitation_managed",
+      "xpAmount": 8,
+      "description": "Grant or revoke an invitation"
+    },
+    {
+      "eventType": "liminal_power",
+      "xpAmount": 12,
+      "description": "Draw power from liminal state"
+    },
+    {
+      "eventType": "crossroads_bargain",
+      "xpAmount": 25,
+      "description": "Complete a crossroads bargain"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

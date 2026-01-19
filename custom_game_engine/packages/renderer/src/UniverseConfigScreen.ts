@@ -876,16 +876,23 @@ export class UniverseConfigScreen {
     this.container.appendChild(description);
 
     const statusContainer = document.createElement('div');
-    statusContainer.style.cssText = 'max-width: 600px; padding: 30px; background: rgba(0, 0, 0, 0.5); border: 2px solid #667eea; border-radius: 10px; text-align: center;';
+    statusContainer.style.cssText = 'max-width: 700px; padding: 30px; background: rgba(0, 0, 0, 0.5); border: 2px solid #667eea; border-radius: 10px; text-align: center;';
 
     const statusText = document.createElement('div');
+    statusText.id = 'universe-creation-status';
     statusText.textContent = 'Initializing universe and creating initial souls...';
-    statusText.style.cssText = 'font-size: 16px; color: #ffd700; margin-bottom: 20px;';
+    statusText.style.cssText = 'font-size: 16px; color: #ffd700; margin-bottom: 20px; min-height: 24px; font-family: monospace;';
     statusContainer.appendChild(statusText);
+
+    // Progress log container
+    const progressLog = document.createElement('div');
+    progressLog.id = 'universe-creation-log';
+    progressLog.style.cssText = 'max-height: 300px; overflow-y: auto; margin-top: 20px; text-align: left; font-size: 13px; color: #aaa; font-family: monospace; line-height: 1.8;';
+    statusContainer.appendChild(progressLog);
 
     const loader = document.createElement('div');
     loader.textContent = '⏳';
-    loader.style.cssText = 'font-size: 48px; animation: pulse 2s infinite;';
+    loader.style.cssText = 'font-size: 48px; animation: pulse 2s infinite; margin-top: 20px;';
     statusContainer.appendChild(loader);
 
     this.container.appendChild(statusContainer);
@@ -899,6 +906,27 @@ export class UniverseConfigScreen {
           this._onCreate(this.pendingConfig);
         }
       }, 100);
+    }
+  }
+
+  /**
+   * Update progress message during universe creation
+   */
+  updateProgress(message: string): void {
+    const statusText = document.getElementById('universe-creation-status');
+    const progressLog = document.getElementById('universe-creation-log');
+
+    if (statusText) {
+      statusText.textContent = message;
+    }
+
+    if (progressLog) {
+      const logEntry = document.createElement('div');
+      logEntry.textContent = `• ${message}`;
+      logEntry.style.cssText = 'color: #8fdf8f; margin-bottom: 5px;';
+      progressLog.appendChild(logEntry);
+      // Auto-scroll to bottom
+      progressLog.scrollTop = progressLog.scrollHeight;
     }
   }
 

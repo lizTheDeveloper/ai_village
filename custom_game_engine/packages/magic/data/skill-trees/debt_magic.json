@@ -1,0 +1,750 @@
+{
+  "id": "debt_skill_tree",
+  "paradigmId": "debt_magic",
+  "name": "Debt Magic Skill Tree",
+  "description": "Master the Fae art of debts, favors, and magical obligation",
+  "lore": "Among the Fae, all debts are real. Owe a favor and they own a piece of you.\nBe owed and you own a piece of them. The greatest lords are those owed the most.\nNever say \"thank you\" - it creates debt. Never accept freely - it binds.",
+  "nodes": [
+    {
+      "id": "debt-sense",
+      "name": "Debt Sense",
+      "description": "Learn to sense debts and obligations",
+      "paradigmId": "debt_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 25,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "perception",
+          "baseValue": 10,
+          "description": "Sense when someone owes you or you owe them"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "debt_perception"
+          },
+          "description": "Perceive the web of debts around you"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The Fae see what mortals cannot: the invisible threads of obligation\nthat bind all things. Every gift given, every favor done, every\npromise made - all create connections. Learn to see these threads.",
+      "levelCostMultiplier": 1.3,
+      "icon": "👁️"
+    },
+    {
+      "id": "gift-giving",
+      "name": "The Art of Giving",
+      "description": "Learn to give gifts that create magical debts",
+      "paradigmId": "debt_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_debt_gift"
+          },
+          "description": "Give gifts that create obligations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Never accept a gift from the Fae. Every gift creates obligation.\nThe greater the gift, the greater the debt. A life saved is a life owed.\nA secret shared is a secret owned. Give wisely.",
+      "icon": "🎁"
+    },
+    {
+      "id": "bargain-craft",
+      "name": "Bargain Craft",
+      "description": "Learn to craft magical bargains",
+      "paradigmId": "debt_magic",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "negotiate_debt"
+          },
+          "description": "Negotiate explicit debt terms"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "Bonus to debt magic"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Words matter. Exact words. The bargain is sealed in the speaking.\n\"I will give you what you need\" is not \"I will give you what you want.\"\nChoose your words with care.",
+      "levelCostMultiplier": 1.4,
+      "icon": "🤝"
+    },
+    {
+      "id": "rescue-debt",
+      "name": "Life Debt",
+      "description": "Learn to create life debts through rescue",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_life_debt"
+          },
+          "description": "Saving someone creates life debt"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Save a life and that life belongs to you. Not slavery - obligation.\nThe saved must repay, and a life debt can only be paid with life.\nService. Sacrifice. Or a life given in return.",
+      "prerequisites": [
+        "gift-giving"
+      ],
+      "icon": "💓"
+    },
+    {
+      "id": "secret-debt",
+      "name": "Secret Debt",
+      "description": "Learn to create debts through shared secrets",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "create_secret_debt"
+          },
+          "description": "Sharing secrets creates obligations"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "To share a secret is to share power. The one who receives the secret\nowes the giver. They must keep it, honor it, and someday repay\nwith a secret of equal value.",
+      "prerequisites": [
+        "bargain-craft"
+      ],
+      "icon": "🤫"
+    },
+    {
+      "id": "name-debt",
+      "name": "Name Binding",
+      "description": "Learn to use true names in debt creation",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "name_binding"
+          },
+          "description": "Use true names to enforce debts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "name_learned",
+          "params": {
+            "nameId": "any"
+          },
+          "description": "Must know at least one true name"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Speak their true name and the debt is sealed in their soul.\nThey cannot forget. They cannot escape. The name binds tighter\nthan any chain. This is why the Fae never give their true names.",
+      "prerequisites": [
+        "bargain-craft"
+      ],
+      "icon": "📛"
+    },
+    {
+      "id": "blood-oath",
+      "name": "Blood Oath",
+      "description": "Learn to seal debts with blood",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "blood_oath"
+          },
+          "description": "Create unbreakable blood-sealed debts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "blood_rite"
+          },
+          "description": "Must have performed a blood rite"
+        }
+      ],
+      "conditionMode": "any",
+      "lore": "Blood is life is power. An oath sealed in blood cannot be broken.\nNot by death, not by god, not by the debtor's own will.\nThe blood remembers. The blood enforces.",
+      "prerequisites": [
+        "name-debt"
+      ],
+      "icon": "🩸"
+    },
+    {
+      "id": "debt-trading",
+      "name": "Debt Trading",
+      "description": "Learn to trade debts like currency",
+      "paradigmId": "debt_magic",
+      "category": "specialization",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "trade_debt"
+          },
+          "description": "Trade debts with others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Debts can be sold. \"You owe me a favor. But now you owe HIM a favor.\"\nThe Fae courts run on debt trading. Favors flow like coin.\nA good debt trader never runs dry.",
+      "prerequisites": [
+        "debt-sense"
+      ],
+      "icon": "💱"
+    },
+    {
+      "id": "interest-accrual",
+      "name": "Interest Accrual",
+      "description": "Learn to make debts grow with interest",
+      "paradigmId": "debt_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "accrue_interest"
+          },
+          "description": "Debts owed to you grow over time"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Time is a multiplier. A small favor owed becomes a great service\nafter years of waiting. The Fae are patient. They let debts mature.\nA promise made in childhood can buy a kingdom when called.",
+      "prerequisites": [
+        "debt-trading"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "📈"
+    },
+    {
+      "id": "debt-calling",
+      "name": "Debt Calling",
+      "description": "Learn to call in debts owed to you",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "call_debt"
+          },
+          "description": "Force immediate payment of debts"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"I call upon the debt between us.\" The words that every debtor dreads.\nWhen a debt is called, it must be paid. Immediately. Completely.\nThe magic compels. There is no negotiation.",
+      "prerequisites": [
+        "gift-giving",
+        "debt-trading"
+      ],
+      "icon": "📢"
+    },
+    {
+      "id": "debt-transfer",
+      "name": "Debt Transfer",
+      "description": "Learn to transfer your own debts to others",
+      "paradigmId": "debt_magic",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "transfer_debt"
+          },
+          "description": "Transfer your debts to others"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The most dangerous art: making others pay your debts.\nFind someone willing to take your obligations. Or trick them.\nBut be warned - transferred debts have a way of returning.",
+      "prerequisites": [
+        "debt-trading",
+        "interest-accrual"
+      ],
+      "icon": "↔️"
+    },
+    {
+      "id": "favor-spending",
+      "name": "Favor Spending",
+      "description": "Learn to spend collected favors for power",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "spend_favor"
+          },
+          "description": "Spend favor debts for magical effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Debts are currency. Spend a favor owed to you for magical power.\nThe universe maintains the balance - the debt is paid, the power flows.\nThe greater the debt, the greater the effect.",
+      "prerequisites": [
+        "debt-sense",
+        "gift-giving"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "compulsion",
+      "name": "Debt Compulsion",
+      "description": "Learn to compel debtors to specific actions",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 90,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "debt_compulsion"
+          },
+          "description": "Compel actions from debtors"
+        },
+        {
+          "type": "unlock_technique",
+          "baseValue": 1,
+          "target": {
+            "techniqueId": "control"
+          },
+          "description": "Control technique through debt"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "\"You owe me. And I collect.\" The debtor's body moves on its own.\nThey cannot refuse. The debt demands payment, and payment it shall have.\nThis is the true power of being owed.",
+      "prerequisites": [
+        "debt-calling"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "soul-claim",
+      "name": "Soul Claim",
+      "description": "Learn to claim souls as debt payment",
+      "paradigmId": "debt_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "claim_soul"
+          },
+          "description": "Claim souls as payment for ultimate debts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 800
+          },
+          "description": "Requires 800 total XP in Debt magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Some debts can only be paid with the soul itself.\nThe ultimate collection. The final transaction.\nFew debts grow this large. Fewer still are called.",
+      "prerequisites": [
+        "blood-oath",
+        "compulsion"
+      ],
+      "icon": "👻"
+    },
+    {
+      "id": "debt-immunity",
+      "name": "Debt Immunity",
+      "description": "Learn to protect yourself from debt magic",
+      "paradigmId": "debt_magic",
+      "category": "specialization",
+      "tier": 2,
+      "xpCost": 80,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 15,
+          "description": "Resistance to debt-based magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "refuse_gift"
+          },
+          "description": "Refuse gifts without offense"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Never accept a gift. Never accept a favor. Never say thank you.\nThese simple rules protect you from the Fae debt web.\nBut they also mark you as one who knows. And the Fae notice.",
+      "prerequisites": [
+        "debt-sense"
+      ],
+      "levelCostMultiplier": 1.5,
+      "icon": "🛡️"
+    },
+    {
+      "id": "debt-dissolution",
+      "name": "Debt Dissolution",
+      "description": "Learn to dissolve your own debts",
+      "paradigmId": "debt_magic",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "dissolve_debt"
+          },
+          "description": "Dissolve debts you owe through magic"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Debts can be unmade. It costs more than paying would have.\nIt angers those you owed. It weakens your standing in the courts.\nBut sometimes freedom from obligation is worth any price.",
+      "prerequisites": [
+        "debt-immunity",
+        "debt-trading"
+      ],
+      "icon": "💔"
+    },
+    {
+      "id": "debt-lord",
+      "name": "Debt Lord",
+      "description": "Become a lord of debts",
+      "paradigmId": "debt_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 180,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 30,
+          "description": "Mastery of debt magic"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "debt_web"
+          },
+          "description": "Create complex webs of interconnected debts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 10
+          },
+          "description": "Requires 10 nodes unlocked"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "At the height of debt mastery, you see all obligations as one great web.\nYou can spin new threads, sever old ones, redirect payment flows.\nThe courts bow to those who control the web.",
+      "prerequisites": [
+        "debt-transfer",
+        "compulsion"
+      ],
+      "icon": "🕸️"
+    },
+    {
+      "id": "bankruptcy",
+      "name": "Declare Bankruptcy",
+      "description": "Learn the forbidden art of magical bankruptcy",
+      "paradigmId": "debt_magic",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "declare_bankruptcy"
+          },
+          "description": "Catastrophically void all debts"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The nuclear option. Void ALL debts - yours and those owed to you.\nThe backlash is catastrophic. Your standing destroyed. Your power gone.\nBut sometimes the only way out is to burn it all down.",
+      "prerequisites": [
+        "debt-dissolution"
+      ],
+      "icon": "💥"
+    },
+    {
+      "id": "primordial-debt",
+      "name": "Primordial Debt",
+      "description": "Touch the primordial debt of existence",
+      "paradigmId": "debt_magic",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "primordial_debt"
+          },
+          "description": "Access the first debt - existence itself"
+        },
+        {
+          "type": "paradigm_proficiency",
+          "baseValue": 50,
+          "description": "Supreme debt mastery"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 1200
+          },
+          "description": "Requires 1200 total XP in Debt magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Before the first Fae, there was the First Debt: existence owes non-existence.\nTo touch this primal obligation is to touch the fabric of reality.\nFew have dared. Fewer have survived. None have remained unchanged.",
+      "prerequisites": [
+        "debt-lord",
+        "soul-claim"
+      ],
+      "icon": "🌌"
+    }
+  ],
+  "entryNodes": [
+    "debt-sense",
+    "gift-giving",
+    "bargain-craft"
+  ],
+  "connections": [
+    {
+      "from": "gift-giving",
+      "to": "rescue-debt"
+    },
+    {
+      "from": "bargain-craft",
+      "to": "secret-debt"
+    },
+    {
+      "from": "bargain-craft",
+      "to": "name-debt"
+    },
+    {
+      "from": "name-debt",
+      "to": "blood-oath"
+    },
+    {
+      "from": "debt-sense",
+      "to": "debt-trading"
+    },
+    {
+      "from": "debt-trading",
+      "to": "interest-accrual"
+    },
+    {
+      "from": "gift-giving",
+      "to": "debt-calling"
+    },
+    {
+      "from": "debt-trading",
+      "to": "debt-calling"
+    },
+    {
+      "from": "debt-trading",
+      "to": "debt-transfer"
+    },
+    {
+      "from": "interest-accrual",
+      "to": "debt-transfer"
+    },
+    {
+      "from": "debt-sense",
+      "to": "favor-spending"
+    },
+    {
+      "from": "gift-giving",
+      "to": "favor-spending"
+    },
+    {
+      "from": "debt-calling",
+      "to": "compulsion"
+    },
+    {
+      "from": "blood-oath",
+      "to": "soul-claim"
+    },
+    {
+      "from": "compulsion",
+      "to": "soul-claim"
+    },
+    {
+      "from": "debt-sense",
+      "to": "debt-immunity"
+    },
+    {
+      "from": "debt-immunity",
+      "to": "debt-dissolution"
+    },
+    {
+      "from": "debt-trading",
+      "to": "debt-dissolution"
+    },
+    {
+      "from": "debt-transfer",
+      "to": "debt-lord"
+    },
+    {
+      "from": "compulsion",
+      "to": "debt-lord"
+    },
+    {
+      "from": "debt-dissolution",
+      "to": "bankruptcy"
+    },
+    {
+      "from": "debt-lord",
+      "to": "primordial-debt"
+    },
+    {
+      "from": "soul-claim",
+      "to": "primordial-debt"
+    }
+  ],
+  "xpSources": [
+    {
+      "eventType": "debt_created",
+      "xpAmount": 10,
+      "description": "Create a new debt",
+      "qualityMultiplier": true
+    },
+    {
+      "eventType": "debt_called",
+      "xpAmount": 15,
+      "description": "Successfully call in a debt"
+    },
+    {
+      "eventType": "debt_traded",
+      "xpAmount": 8,
+      "description": "Trade a debt with another"
+    },
+    {
+      "eventType": "favor_spent",
+      "xpAmount": 12,
+      "description": "Spend a favor for magical effect"
+    },
+    {
+      "eventType": "bargain_struck",
+      "xpAmount": 10,
+      "description": "Complete a magical bargain"
+    },
+    {
+      "eventType": "debt_grown",
+      "xpAmount": 5,
+      "description": "Let a debt accrue interest"
+    },
+    {
+      "eventType": "gift_refused",
+      "xpAmount": 3,
+      "description": "Refuse a gift to avoid debt"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": false,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "ritual_performed",
+        "params": {
+          "ritualId": "bankruptcy"
+        },
+        "description": "Declaring bankruptcy resets progress"
+      }
+    ]
+  },
+  "version": 1
+}

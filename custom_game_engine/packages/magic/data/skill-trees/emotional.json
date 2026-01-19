@@ -1,0 +1,650 @@
+{
+  "id": "emotional-tree",
+  "paradigmId": "emotional",
+  "name": "The Empathic Art",
+  "description": "Master emotions as magical force - sensing, storing, channeling, and embodying pure feeling.",
+  "lore": "Emotions are power. Joy, love, anger, fear - these aren't just feelings but\nforces that shape reality. A person consumed by rage can perform impossible\nfeats. A mother's love can shield her child from harm. Terror can freeze a\nwarrior in place. These aren't metaphors - they're literal truths that emotional\nmages learn to harness.\n\nThe path begins with awareness. You must learn to sense emotions in yourself and\nothers - to feel the warmth of joy, the heaviness of sorrow, the spark of anger.\nThen comes control: choosing what you feel instead of being ruled by it.\n\nWith this foundation, you can channel emotions into magic. Joy heals and creates.\nLove protects and bonds. Anger destroys. Fear paralyzes. Each emotion is a tool,\na weapon, a gift - depending on how you wield it.\n\nMore advanced techniques let you store emotions in objects, creating batteries\nof emotional power. You can project your feelings onto others, forcing them to\nfeel what you feel. You can drain emotions like a vampire, leaving others empty\nwhile you feast on their feelings. You can even transmute emotions - turning\nsorrow into joy, fear into courage.\n\nThe masters can create emotional constructs - weapons of rage-fire, shields of\nlove-light, shadows of pure terror made real. They can embody emotions completely,\nbecoming Joy incarnate or Fury made flesh.\n\nThe ultimate technique is emotion weaving - creating complex symphonies of feeling\nthat reshape reality itself. Not single emotions but intricate patterns: joy\nwoven with sorrow, love mixed with fear, courage tempered with humility. This is\nemotional magic at its peak.",
+  "nodes": [
+    {
+      "id": "emotion-sense",
+      "name": "Emotional Awareness",
+      "description": "Learn to sense and identify emotions",
+      "paradigmId": "emotional",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 30,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense emotions in yourself and others",
+          "target": {
+            "abilityId": "sense_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Emotions are forces - invisible but powerful. You learn to feel them in\nyourself and others: the warmth of joy, the heaviness of sorrow, the spark\nof anger. This awareness is the foundation of all emotional magic.",
+      "levelCostMultiplier": 1.3,
+      "icon": "💓"
+    },
+    {
+      "id": "emotional-clarity",
+      "name": "Emotional Clarity",
+      "description": "Master understanding of your own emotions",
+      "paradigmId": "emotional",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 60,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Achieve clarity about your emotional state",
+          "target": {
+            "abilityId": "emotional_clarity"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Before you can control others' emotions, you must master your own. Perfect\nclarity means knowing exactly what you feel and why. No confusion, no\nself-deception - just pure emotional truth.",
+      "prerequisites": [
+        "emotion-sense"
+      ]
+    },
+    {
+      "id": "empathy",
+      "name": "Deep Empathy",
+      "description": "Develop deep empathic connection with others",
+      "paradigmId": "emotional",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Feel others' emotions deeply",
+          "target": {
+            "abilityId": "empathy"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Empathy goes beyond sensing - you FEEL what they feel. Their joy becomes\nyour joy. Their pain becomes your pain. This connection is powerful but\ndangerous. Feel too much and you might lose yourself in others' emotions.",
+      "prerequisites": [
+        "emotion-sense"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "emotional-control",
+      "name": "Emotional Mastery",
+      "description": "Learn to control your emotional state",
+      "paradigmId": "emotional",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Control your emotional state at will",
+          "target": {
+            "abilityId": "control_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Choose what you feel. Summon joy when despairing. Suppress fear when\nterrified. Calm anger when enraged. This isn't suppression - it's mastery.\nYou feel fully, but you CHOOSE what to feel.",
+      "prerequisites": [
+        "emotional-clarity"
+      ]
+    },
+    {
+      "id": "joy-magic",
+      "name": "Joy Channeling",
+      "description": "Channel joy into magical effects",
+      "paradigmId": "emotional",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel joy into healing and creation",
+          "target": {
+            "abilityId": "joy_magic"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Joy is creation itself - new life, new growth, new possibilities. Channel\npure joy and you can heal wounds, inspire hope, create beauty from nothing.\nThe more genuine the joy, the stronger the effect.",
+      "prerequisites": [
+        "emotional-control"
+      ],
+      "icon": "😊"
+    },
+    {
+      "id": "love-magic",
+      "name": "Love Channeling",
+      "description": "Channel love into magical effects",
+      "paradigmId": "emotional",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel love into bonds and protection",
+          "target": {
+            "abilityId": "love_magic"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Love is the strongest force - connection, protection, sacrifice. Channel\nlove and you can shield those you care for, forge unbreakable bonds, even\ntake their pain upon yourself. But love magic requires genuine feeling -\nyou cannot fake it.",
+      "prerequisites": [
+        "emotional-control",
+        "empathy"
+      ],
+      "icon": "💕"
+    },
+    {
+      "id": "anger-magic",
+      "name": "Fury Channeling",
+      "description": "Channel anger into magical effects",
+      "paradigmId": "emotional",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 125,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel anger into destructive power",
+          "target": {
+            "abilityId": "anger_magic"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Anger is raw destructive force. Channel rage and you gain terrifying power -\nstrength to shatter stone, fire to burn enemies, fury that cannot be stopped.\nBut anger is dangerous. Lose control and you'll destroy everything, including\nyourself.",
+      "prerequisites": [
+        "emotional-control"
+      ],
+      "icon": "😠"
+    },
+    {
+      "id": "fear-magic",
+      "name": "Fear Projection",
+      "description": "Channel fear into magical effects",
+      "paradigmId": "emotional",
+      "category": "channeling",
+      "tier": 2,
+      "xpCost": 140,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Channel fear into terrifying effects",
+          "target": {
+            "abilityId": "fear_magic"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Fear paralyzes, horrifies, breaks the will. Channel your own fear or\nothers' and you can create nightmares made real, paralyze enemies with\nterror, reveal hidden fears. This is dark magic - wielding horror itself.",
+      "prerequisites": [
+        "emotional-control"
+      ],
+      "icon": "😱"
+    },
+    {
+      "id": "emotion-storage",
+      "name": "Emotion Storage",
+      "description": "Learn to store emotions in objects",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Store emotions in objects",
+          "target": {
+            "abilityId": "store_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "emotion_mage"
+          },
+          "description": "Must be taught by an emotional mage"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Emotions fade. But you can preserve them - capture a moment of pure joy\nin a crystal, bind rage to a weapon, store love in a locket. Later, release\nthe stored emotion for power or to relive the feeling.",
+      "prerequisites": [
+        "emotional-control",
+        "joy-magic"
+      ]
+    },
+    {
+      "id": "emotion-reservoir",
+      "name": "Emotion Reservoir",
+      "description": "Create vessels that hold vast emotional energy",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create large emotion storage vessels",
+          "target": {
+            "abilityId": "emotion_reservoir"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A single gem can hold one moment. But a reservoir - a specially prepared\ncrystal, a consecrated place, a work of art - can hold years of accumulated\nemotion. These become batteries of emotional power.",
+      "prerequisites": [
+        "emotion-storage"
+      ]
+    },
+    {
+      "id": "emotion-transfusion",
+      "name": "Emotion Transfusion",
+      "description": "Transfer stored emotions to others",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transfer stored emotions to others",
+          "target": {
+            "abilityId": "transfuse_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Give someone your stored joy when they despair. Transfer courage to the\nfearful. Share love with the lonely. Emotional transfusion is a gift -\nbut can also be a weapon. Force fear onto enemies. Inflict sorrow on the\njoyful.",
+      "prerequisites": [
+        "emotion-storage"
+      ]
+    },
+    {
+      "id": "emotion-projection",
+      "name": "Emotion Projection",
+      "description": "Project your emotions onto others",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Project emotions onto others",
+          "target": {
+            "abilityId": "project_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Make them feel what you feel. Project your joy and they become happy.\nProject your fear and they panic. This is manipulation - overriding their\nnatural emotional state with yours. Powerful but ethically questionable.",
+      "prerequisites": [
+        "empathy",
+        "emotional-control"
+      ]
+    },
+    {
+      "id": "emotion-draining",
+      "name": "Emotion Draining",
+      "description": "Drain emotions from others to fuel your magic",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 225,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Drain emotions from others",
+          "target": {
+            "abilityId": "drain_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Pull the emotions from others - their joy, their anger, their fear - and\nconsume them for power. This leaves them numb, empty, hollow. It's vampiric\nand cruel, but devastatingly effective.",
+      "prerequisites": [
+        "empathy",
+        "emotion-storage"
+      ],
+      "icon": "🧛"
+    },
+    {
+      "id": "emotion-amplification",
+      "name": "Emotion Amplification",
+      "description": "Amplify emotions to extreme intensity",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Amplify existing emotions",
+          "target": {
+            "abilityId": "amplify_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Take what's already there and magnify it. Turn mild happiness into\necstatic joy. Turn irritation into blinding rage. Turn concern into\nparalyzing terror. Subtle, effective, and dangerous.",
+      "prerequisites": [
+        "emotion-projection"
+      ]
+    },
+    {
+      "id": "emotion-transmutation",
+      "name": "Emotion Transmutation",
+      "description": "Transform one emotion into another",
+      "paradigmId": "emotional",
+      "category": "technique",
+      "tier": 4,
+      "xpCost": 275,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Transform one emotion into another",
+          "target": {
+            "abilityId": "transmute_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The alchemist's art applied to emotions: transform sorrow into joy, fear\ninto courage, hatred into love. This is incredibly difficult - emotions\nhave their own nature and resist change. But with skill, anything is\npossible.",
+      "prerequisites": [
+        "emotion-projection",
+        "emotion-draining"
+      ]
+    },
+    {
+      "id": "emotional-resonance",
+      "name": "Emotional Resonance",
+      "description": "Create emotional resonance in groups",
+      "paradigmId": "emotional",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create resonance between multiple people's emotions",
+          "target": {
+            "abilityId": "emotion_resonance"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Harmonize the emotions of many into one unified feeling. An entire crowd\nfeels the same joy, the same fury, the same fear. This is how you create\nmobs, inspire armies, unite nations - or tear them apart.",
+      "prerequisites": [
+        "emotion-amplification",
+        "empathy"
+      ]
+    },
+    {
+      "id": "emotional-construct",
+      "name": "Emotional Constructs",
+      "description": "Create constructs from pure emotional energy",
+      "paradigmId": "emotional",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Create physical constructs from pure emotion",
+          "target": {
+            "abilityId": "emotion_construct"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Emotion can become real. Shape rage into weapons of red fire. Form love\ninto shields of golden light. Create fear-shadows that terrify on sight.\nThese constructs are as real as any physical object - as long as the\nemotion remains strong.",
+      "prerequisites": [
+        "emotion-reservoir",
+        "joy-magic",
+        "anger-magic"
+      ]
+    },
+    {
+      "id": "emotional-embodiment",
+      "name": "Emotional Embodiment",
+      "description": "Become the living embodiment of an emotion",
+      "paradigmId": "emotional",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 450,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Embody a pure emotion completely",
+          "target": {
+            "abilityId": "embody_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "xp_accumulated",
+          "params": {
+            "xpRequired": 2500
+          },
+          "description": "Requires mastery of emotional magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Transcend humanity and become pure emotion made flesh. Become Joy itself -\nradiating healing and inspiration. Become Fury incarnate - unstoppable\ndestruction. Become Love eternal - infinite compassion and protection.\nIn this state, you are no longer human but something greater.",
+      "prerequisites": [
+        "emotional-construct",
+        "emotional-resonance"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "emotional-void",
+      "name": "Emotional Void",
+      "description": "Achieve perfect emotional emptiness",
+      "paradigmId": "emotional",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 400,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Enter a state of absolute emotional emptiness",
+          "target": {
+            "abilityId": "emotional_void"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "emotional-control",
+            "level": 5
+          },
+          "description": "Requires perfect emotional control"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The opposite of embodiment: feel nothing at all. No joy, no sorrow, no\nfear, no love. Just void. In this state, you're immune to all emotional\nmanipulation, but you also cannot channel emotional magic. It's perfect\nprotection at the cost of your power.",
+      "prerequisites": [
+        "emotional-control",
+        "emotion-draining"
+      ]
+    },
+    {
+      "id": "emotion-weaving",
+      "name": "Emotion Weaving",
+      "description": "Master the art of emotional weaving",
+      "paradigmId": "emotional",
+      "category": "mastery",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Weave complex emotional patterns and symphonies",
+          "target": {
+            "abilityId": "weave_emotion"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "love-magic",
+            "level": 1
+          },
+          "description": "Must know love magic"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "joy-magic",
+            "level": 1
+          },
+          "description": "Must know joy magic"
+        },
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "anger-magic",
+            "level": 1
+          },
+          "description": "Must know anger magic"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Emotions need not be pure. Weave joy with sorrow, love with fear, courage\nwith humility. Create complex emotional symphonies - patterns of feeling\nso intricate they can reshape reality. This is the pinnacle of emotional\nmagic: not single notes but entire compositions.",
+      "prerequisites": [
+        "emotional-embodiment",
+        "emotion-transmutation"
+      ],
+      "hidden": true,
+      "icon": "🎭"
+    }
+  ],
+  "entryNodes": [
+    "emotion-sense"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "emotion_sensed",
+      "xpAmount": 10,
+      "description": "Successfully sense emotions in another"
+    },
+    {
+      "eventType": "emotion_stored",
+      "xpAmount": 25,
+      "description": "Store an emotion in an object"
+    },
+    {
+      "eventType": "emotion_channeled",
+      "xpAmount": 30,
+      "description": "Channel an emotion into a magical effect"
+    },
+    {
+      "eventType": "emotion_projected",
+      "xpAmount": 50,
+      "description": "Project an emotion onto another"
+    },
+    {
+      "eventType": "emotion_drained",
+      "xpAmount": 60,
+      "description": "Drain emotion from another"
+    },
+    {
+      "eventType": "emotion_transmuted",
+      "xpAmount": 100,
+      "description": "Transmute one emotion into another"
+    },
+    {
+      "eventType": "construct_created",
+      "xpAmount": 150,
+      "description": "Create an emotional construct"
+    },
+    {
+      "eventType": "resonance_achieved",
+      "xpAmount": 200,
+      "description": "Create emotional resonance in a group"
+    }
+  ],
+  "rules": {
+    "allowRespec": true,
+    "permanentProgress": false,
+    "requiresInnateAbility": false
+  },
+  "version": 1
+}

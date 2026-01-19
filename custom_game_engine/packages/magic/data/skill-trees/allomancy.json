@@ -1,0 +1,1164 @@
+{
+  "id": "allomancy-tree",
+  "paradigmId": "allomancy",
+  "name": "The Art of Allomancy",
+  "description": "Burn metals to gain supernatural powers. Bloodline determines which metals you can burn.",
+  "lore": "Allomancy is genetic - you either have the blood, or you don't. Those with\nAllomancer ancestry may be Mistings (one metal) or Mistborn (all metals).\nBut the power lies dormant until Snapping - a moment of intense trauma\nthat breaks the barriers and lets the power through.",
+  "nodes": [
+    {
+      "id": "snapped",
+      "name": "Snapped",
+      "description": "The breaking point that awakens Allomantic potential",
+      "paradigmId": "allomancy",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can feel metal reserves",
+          "target": {
+            "abilityId": "metal_sense_internal"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "snapping",
+          "params": {},
+          "description": "Must experience a snapping event (severe trauma that awakens powers)",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Snapping is the moment of trauma that unlocks Allomancy. For many, it happens\nin childhood - a moment of intense fear, pain, or grief that breaks something inside\nand lets the power through. Not all with the bloodline will Snap. Some go their\nwhole lives never knowing what they could have been.",
+      "hidden": true,
+      "icon": "💔"
+    },
+    {
+      "id": "metal-awareness",
+      "name": "Metal Awareness",
+      "description": "Learn to sense metals around you",
+      "paradigmId": "allomancy",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "metal_sense",
+          "baseValue": 1,
+          "description": "Sense nearby metals"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "burn-control",
+      "name": "Burn Control",
+      "description": "Control how quickly you burn metals",
+      "paradigmId": "allomancy",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "burn_rate_control",
+          "baseValue": 1,
+          "perLevelValue": 0.2,
+          "description": "Control burn rate from slow to fast"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Burning slowly conserves metal but provides weaker effects. Burning quickly is more powerful but depletes reserves faster.",
+      "prerequisites": [
+        "snapped"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "reserve-efficiency",
+      "name": "Efficient Reserves",
+      "description": "Extract more power from your metal reserves",
+      "paradigmId": "allomancy",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "reserve_efficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "+X% metal duration"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "burn-control"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "flaring",
+      "name": "Flaring",
+      "description": "Learn to flare metals for a dangerous burst of power",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "flare_control",
+          "baseValue": 1,
+          "description": "Can flare metals for burst power"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "magic_proficiency",
+          "params": {
+            "techniqueId": "enhance",
+            "proficiencyLevel": 2
+          },
+          "description": "Must have practiced burning metals extensively"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Flaring burns metals at an extreme rate, providing a massive boost at the cost of rapid depletion and physical strain.",
+      "prerequisites": [
+        "burn-control"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "safe-flaring",
+      "name": "Controlled Flaring",
+      "description": "Flare metals with reduced physical strain",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "flare_control",
+          "baseValue": 1,
+          "perLevelValue": 1,
+          "description": "Reduce flaring side effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "flaring"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "metal-steel",
+      "name": "Steel",
+      "description": "Push on nearby metals",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "Can burn Steel: Push on nearby metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "steel"
+          },
+          "description": "Must have consumed and survived burning Steel",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "push",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-iron",
+      "name": "Iron",
+      "description": "Pull on nearby metals",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "Can burn Iron: Pull on nearby metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "iron"
+          },
+          "description": "Must have consumed and survived burning Iron",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "pull",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-pewter",
+      "name": "Pewter",
+      "description": "Enhanced strength, speed, durability",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "Can burn Pewter: Enhanced strength, speed, durability"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "pewter"
+          },
+          "description": "Must have consumed and survived burning Pewter",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Pewter drag after",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "push",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-tin",
+      "name": "Tin",
+      "description": "Enhanced senses",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "Can burn Tin: Enhanced senses"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "tin"
+          },
+          "description": "Must have consumed and survived burning Tin",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Sensory overload risk",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "pull",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-zinc",
+      "name": "Zinc",
+      "description": "Riot - inflame emotions",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "zinc"
+          },
+          "description": "Can burn Zinc: Riot - inflame emotions"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "zinc"
+          },
+          "description": "Must have consumed and survived burning Zinc",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "push",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-brass",
+      "name": "Brass",
+      "description": "Soothe - dampen emotions",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "brass"
+          },
+          "description": "Can burn Brass: Soothe - dampen emotions"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "brass"
+          },
+          "description": "Must have consumed and survived burning Brass",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "pull",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-copper",
+      "name": "Copper",
+      "description": "Hide allomantic pulses (Smoker)",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "copper"
+          },
+          "description": "Can burn Copper: Hide allomantic pulses (Smoker)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "copper"
+          },
+          "description": "Must have consumed and survived burning Copper",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "push",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-bronze",
+      "name": "Bronze",
+      "description": "Detect allomantic pulses (Seeker)",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "bronze"
+          },
+          "description": "Can burn Bronze: Detect allomantic pulses (Seeker)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "bronze"
+          },
+          "description": "Must have consumed and survived burning Bronze",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "pull",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-aluminum",
+      "name": "Aluminum",
+      "description": "Wipe own metal reserves",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "aluminum"
+          },
+          "description": "Can burn Aluminum: Wipe own metal reserves"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "aluminum"
+          },
+          "description": "Must have consumed and survived burning Aluminum",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "enhancement",
+        "push",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-duralumin",
+      "name": "Duralumin",
+      "description": "Massively boost next metal burned",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "duralumin"
+          },
+          "description": "Can burn Duralumin: Massively boost next metal burned"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "duralumin"
+          },
+          "description": "Must have consumed and survived burning Duralumin",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Burns all reserves instantly",
+      "prerequisites": [
+        "snapped",
+        "reserve-efficiency"
+      ],
+      "hidden": true,
+      "tags": [
+        "enhancement",
+        "push",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-gold",
+      "name": "Gold",
+      "description": "See past self (who you could have been)",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "gold"
+          },
+          "description": "Can burn Gold: See past self (who you could have been)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "gold"
+          },
+          "description": "Must have consumed and survived burning Gold",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Psychologically traumatic",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "temporal",
+        "pull",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-atium",
+      "name": "Atium",
+      "description": "See moments into the future",
+      "paradigmId": "allomancy",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "atium"
+          },
+          "description": "Can burn Atium: See moments into the future"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "atium"
+          },
+          "description": "Must have consumed and survived burning Atium",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true,
+      "tags": [
+        "temporal",
+        "pull",
+        "legendary"
+      ]
+    },
+    {
+      "id": "mastery-steel",
+      "name": "Steel Mastery",
+      "description": "Master the use of Steel",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "+X% effectiveness when burning Steel"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-steel"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-iron",
+      "name": "Iron Mastery",
+      "description": "Master the use of Iron",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "+X% effectiveness when burning Iron"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-iron"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-pewter",
+      "name": "Pewter Mastery",
+      "description": "Master the use of Pewter",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "+X% effectiveness when burning Pewter"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-pewter"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-tin",
+      "name": "Tin Mastery",
+      "description": "Master the use of Tin",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "+X% effectiveness when burning Tin"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-tin"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "coinshot",
+      "name": "Coinshot",
+      "description": "Specialize in steel pushing, the art of the Coinshot",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "Expert steel pusher"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "coin_salvo"
+          },
+          "description": "Can push multiple coins simultaneously"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineStrength": 0.1
+          },
+          "description": "Must have Misting bloodline for steel",
+          "bypassable": true,
+          "bypassCost": 500
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Coinshots are the assassins and warriors of Allomancy, using steel to push on metals with deadly precision.",
+      "prerequisites": [
+        "mastery-steel"
+      ]
+    },
+    {
+      "id": "lurcher",
+      "name": "Lurcher",
+      "description": "Specialize in iron pulling, the art of the Lurcher",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "Expert iron puller"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "iron_grapple"
+          },
+          "description": "Can pull yourself to heavy metal objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-iron"
+      ]
+    },
+    {
+      "id": "thug",
+      "name": "Pewter Arm (Thug)",
+      "description": "Specialize in pewter burning, becoming a living weapon",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "Expert pewter burner"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "pewter_drag_resistance"
+          },
+          "description": "Reduced pewter drag after burning"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-pewter"
+      ]
+    },
+    {
+      "id": "tineye",
+      "name": "Tineye",
+      "description": "Specialize in tin burning, becoming a master of senses",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "Expert tin burner"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sensory_filter"
+          },
+          "description": "Can filter sensory overload"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-tin"
+      ]
+    },
+    {
+      "id": "soother",
+      "name": "Soother",
+      "description": "Master the art of calming and dampening emotions",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "brass"
+          },
+          "description": "Expert emotion dampener"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "targeted_soothing"
+          },
+          "description": "Can target specific emotions"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-brass"
+      ]
+    },
+    {
+      "id": "rioter",
+      "name": "Rioter",
+      "description": "Master the art of inflaming and inciting emotions",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "zinc"
+          },
+          "description": "Expert emotion inflamer"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "targeted_rioting"
+          },
+          "description": "Can target specific emotions to inflame"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-zinc"
+      ]
+    },
+    {
+      "id": "smoker",
+      "name": "Smoker",
+      "description": "Master the coppercloud, hiding Allomantic pulses",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "copper"
+          },
+          "description": "Expert coppercloud creator"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "extended_coppercloud"
+          },
+          "description": "Coppercloud covers larger area"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-copper"
+      ]
+    },
+    {
+      "id": "seeker",
+      "name": "Seeker",
+      "description": "Master the art of detecting Allomantic pulses",
+      "paradigmId": "allomancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "bronze"
+          },
+          "description": "Expert Allomantic detector"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "pulse_identification"
+          },
+          "description": "Can identify which metal is being burned"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-bronze"
+      ]
+    },
+    {
+      "id": "mistborn-awakening",
+      "name": "Mistborn Awakening",
+      "description": "Awaken as a full Mistborn, able to burn all metals",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can burn all metals",
+          "target": {
+            "abilityId": "full_allomancy"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineId": "mistborn",
+            "bloodlineStrength": 1
+          },
+          "description": "Must have full Mistborn bloodline"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "True Mistborn are exceedingly rare - perhaps one in a hundred thousand with any Allomantic blood will be born with the ability to burn all metals.",
+      "prerequisites": [
+        "snapped"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "metal-synergy",
+      "name": "Metal Synergy",
+      "description": "Gain bonuses when burning multiple metals simultaneously",
+      "paradigmId": "allomancy",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "description": "Bonus when burning multiple metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 4
+          },
+          "description": "Must have discovered at least 4 metals"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mistborn-awakening"
+      ],
+      "levelCostMultiplier": 2
+    }
+  ],
+  "entryNodes": [
+    "snapped"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "metal_burned",
+      "xpAmount": 5,
+      "description": "Burn any metal"
+    },
+    {
+      "eventType": "metal_discovered",
+      "xpAmount": 100,
+      "description": "Discover you can burn a new metal"
+    },
+    {
+      "eventType": "metal_flared",
+      "xpAmount": 15,
+      "description": "Flare a metal"
+    },
+    {
+      "eventType": "push_pull_success",
+      "xpAmount": 10,
+      "description": "Successfully push or pull on metal"
+    },
+    {
+      "eventType": "combat_with_allomancy",
+      "xpAmount": 25,
+      "description": "Use Allomancy in combat"
+    },
+    {
+      "eventType": "emotion_manipulation",
+      "xpAmount": 20,
+      "description": "Successfully manipulate emotions with zinc/brass"
+    },
+    {
+      "eventType": "detection_avoided",
+      "xpAmount": 30,
+      "description": "Hide from a Seeker using copper"
+    },
+    {
+      "eventType": "seeker_detection",
+      "xpAmount": 20,
+      "description": "Detect Allomancy with bronze"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": true,
+    "innateCondition": {
+      "type": "bloodline",
+      "params": {
+        "bloodlineId": "allomancer"
+      },
+      "description": "Must have Allomancer bloodline"
+    }
+  },
+  "version": 1
+}

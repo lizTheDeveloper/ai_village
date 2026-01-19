@@ -4,8 +4,8 @@
 
 import { validateBuilding } from './validator';
 import { visualizeGrid } from './visualizer';
-import { ALL_CRAFTING_BUILDINGS } from './crafting-buildings';
-import { ALL_BUILDINGS } from './building-library';
+import { ALL_CRAFTING_BUILDINGS } from './crafting-buildings-data';
+import { ALL_BUILDINGS } from './building-library-data';
 import { VoxelBuildingDefinition } from './types';
 
 console.log('═══════════════════════════════════════════════════════════════════════');

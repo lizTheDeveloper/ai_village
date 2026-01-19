@@ -6,7 +6,7 @@
  */
 
 import { Planet } from './Planet.js';
-import { BiosphereGenerator } from '../biosphere/BiosphereGenerator.js';
+import { BiosphereGenerator, type ProgressCallback } from '../biosphere/BiosphereGenerator.js';
 import { queueBiosphereSprites } from '../biosphere/queueBiosphereSprites.js';
 import type { PlanetConfig } from './PlanetTypes.js';
 import type { LLMProvider, GodCraftedDiscoverySystem } from '@ai-village/core';
@@ -26,6 +26,9 @@ export interface PlanetInitializationOptions {
 
   /** Path to sprite queue file (default: auto-detect) */
   spriteQueuePath?: string;
+
+  /** Optional progress callback for UI updates */
+  onProgress?: ProgressCallback;
 }
 
 /**
@@ -41,35 +44,41 @@ export async function initializePlanet(
     generateBiosphere = true,
     queueSprites = true,
     spriteQueuePath,
+    onProgress,
   } = options;
 
-  console.log(`[PlanetInitializer] Initializing planet: ${config.name} (${config.type})`);
+  const reportProgress = (message: string) => {
+    console.log(`[PlanetInitializer] ${message}`);
+    if (onProgress) onProgress(message);
+  };
+
+  reportProgress(`🪐 Initializing planet ${config.name}...`);
 
   // Step 1: Create planet with terrain generator
   const planet = new Planet(config, godCraftedSpawner);
 
   // Step 2: Generate biosphere if requested
   if (generateBiosphere) {
-    console.log(`[PlanetInitializer] Generating biosphere for ${config.name}...`);
+    reportProgress(`🌿 Beginning biosphere generation...`);
 
     try {
-      const biosphereGenerator = new BiosphereGenerator(llmProvider, config);
+      const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress);
       const biosphere = await biosphereGenerator.generateBiosphere();
 
       planet.setBiosphere(biosphere);
 
       console.log(
-        `[PlanetInitializer] Biosphere generated: ${biosphere.species.length} species, ` +
-        `${biosphere.sapientSpecies.length} sapient, art style: ${biosphere.artStyle}`
+        `[PlanetInitializer] Biosphere stats: ${biosphere.species.length} species, ` +
+        `${biosphere.sapientSpecies.length} sapient, ${biosphere.artStyle} style`
       );
 
       // Step 3: Queue sprites if requested
       if (queueSprites) {
-        console.log(`[PlanetInitializer] Queuing ${biosphere.species.length} sprites...`);
+        reportProgress(`🖼️ Preparing sprites...`);
 
         await queueBiosphereSprites(biosphere, spriteQueuePath);
 
-        console.log(`[PlanetInitializer] Sprites queued successfully`);
+        console.log(`[PlanetInitializer] Sprites queued`);
       }
     } catch (error) {
       console.error(`[PlanetInitializer] Failed to generate biosphere for ${config.name}:`, error);
@@ -77,7 +86,7 @@ export async function initializePlanet(
     }
   }
 
-  console.log(`[PlanetInitializer] Planet initialization complete: ${config.name}`);
+  reportProgress(`✅ Planet ${config.name} ready!`);
 
   return planet;
 }
