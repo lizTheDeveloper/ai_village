@@ -13,7 +13,11 @@
 import type { EntityImpl } from '@ai-village/core/ecs/Entity.js';
 import type { EventBus } from '@ai-village/core/events/EventBus.js';
 import { ComponentType as CT } from '@ai-village/core/types/ComponentType.js';
-import type { MagicComponent } from '@ai-village/core/components/MagicComponent.js';
+import type { SpellKnowledgeComponent } from '@ai-village/core/components/SpellKnowledgeComponent.js';
+import type { ManaPoolsComponent } from '@ai-village/core/components/ManaPoolsComponent.js';
+import type { ParadigmStateComponent } from '@ai-village/core/components/ParadigmStateComponent.js';
+import type { CastingStateComponent } from '@ai-village/core/components/CastingStateComponent.js';
+import type { SkillProgressComponent } from '@ai-village/core/components/SkillProgressComponent.js';
 import type { SpiritualComponent } from '@ai-village/core/components/SpiritualComponent.js';
 
 /**
@@ -64,18 +68,17 @@ export class DivineSpellManager {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     if (!spiritual) return;
 
-    // Get or check for MagicComponent
-    let magic = entity.getComponent<MagicComponent>(CT.Magic);
+    // Get or check for split magic components
+    let spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    let manaPools = entity.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent);
+    let paradigmState = entity.getComponent<ParadigmStateComponent>(CT.ParadigmStateComponent);
 
-    // If no magic component and faith is high enough, initialize one for divine paradigm
-    if (!magic && spiritual.faith >= 0.3) {
-      const newMagic: MagicComponent = {
-        type: 'magic',
-        magicUser: true,
-        homeParadigmId: 'divine',
-        activeParadigmId: 'divine',
-        knownParadigmIds: ['divine'],
-        paradigmState: {},
+    // If no magic components and faith is high enough, initialize them for divine paradigm
+    if (!spellKnowledge && !manaPools && !paradigmState && spiritual.faith >= 0.3) {
+      // Create ManaPoolsComponent
+      const newManaPools: ManaPoolsComponent = {
+        type: 'mana_pools',
+        version: 1,
         manaPools: [],
         resourcePools: {
           favor: {
@@ -86,24 +89,56 @@ export class DivineSpellManager {
             locked: 0,
           },
         },
+      };
+      entity.addComponent(newManaPools);
+      manaPools = newManaPools;
+
+      // Create SpellKnowledgeComponent
+      const newSpellKnowledge: SpellKnowledgeComponent = {
+        type: 'spell_knowledge',
+        version: 1,
         knownSpells: [],
+        knownParadigmIds: ['divine'],
         activeEffects: [],
         techniqueProficiency: {},
         formProficiency: {},
-        casting: false,
-        totalSpellsCast: 0,
-        totalMishaps: 0,
-        version: 1,
       };
-      entity.addComponent(newMagic);
-      magic = newMagic;
+      entity.addComponent(newSpellKnowledge);
+      spellKnowledge = newSpellKnowledge;
+
+      // Create ParadigmStateComponent
+      const newParadigmState: ParadigmStateComponent = {
+        type: 'paradigm_state',
+        version: 1,
+        homeParadigmId: 'divine',
+        activeParadigmId: 'divine',
+        paradigmState: {},
+      };
+      entity.addComponent(newParadigmState);
+      paradigmState = newParadigmState;
+
+      // Create CastingStateComponent
+      const newCastingState: CastingStateComponent = {
+        type: 'casting_state',
+        version: 1,
+        casting: false,
+      };
+      entity.addComponent(newCastingState);
+
+      // Create SkillProgressComponent
+      const newSkillProgress: SkillProgressComponent = {
+        type: 'skill_progress',
+        version: 1,
+        skillTreeState: {},
+      };
+      entity.addComponent(newSkillProgress);
     }
 
-    if (!magic) return;
+    if (!spellKnowledge) return;
 
     // Ensure divine paradigm is known
-    if (!magic.knownParadigmIds.includes('divine')) {
-      entity.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+    if (!spellKnowledge.knownParadigmIds.includes('divine')) {
+      entity.updateComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent, (current) => ({
         ...current,
         knownParadigmIds: [...current.knownParadigmIds, 'divine'],
       }));
@@ -126,10 +161,10 @@ export class DivineSpellManager {
     for (const threshold of spellThresholds) {
       if (effectiveFaith >= threshold.faithRequired) {
         // Check if spell is already known
-        const alreadyKnown = magic.knownSpells.some(s => s.spellId === threshold.spellId);
+        const alreadyKnown = spellKnowledge.knownSpells.some(s => s.spellId === threshold.spellId);
         if (!alreadyKnown) {
           // Check prerequisites (divine_regeneration requires divine_heal, divine_sanctuary requires divine_blessing)
-          const prereqMet = this.checkDivinePrerequisites(magic, threshold.spellId);
+          const prereqMet = this.checkDivinePrerequisites(spellKnowledge, threshold.spellId);
           if (prereqMet) {
             // Small random chance per answered prayer to receive divine revelation
             // Higher faith = higher chance
@@ -161,11 +196,11 @@ export class DivineSpellManager {
   /**
    * Check if prerequisites are met for a divine spell.
    *
-   * @param magic The entity's magic component
+   * @param spellKnowledge The entity's spell knowledge component
    * @param spellId The spell to check prerequisites for
    * @returns True if prerequisites are met
    */
-  checkDivinePrerequisites(magic: MagicComponent, spellId: string): boolean {
+  checkDivinePrerequisites(spellKnowledge: SpellKnowledgeComponent, spellId: string): boolean {
     const prerequisites: Record<string, string[]> = {
       'divine_heal': [], // No prerequisites
       'divine_blessing': [], // No prerequisites
@@ -176,7 +211,7 @@ export class DivineSpellManager {
 
     const required = prerequisites[spellId] ?? [];
     for (const prereq of required) {
-      if (!magic.knownSpells.some(s => s.spellId === prereq)) {
+      if (!spellKnowledge.knownSpells.some(s => s.spellId === prereq)) {
         return false;
       }
     }

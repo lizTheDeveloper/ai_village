@@ -7,6 +7,7 @@ This document covers the "pit of success" APIs for system and behavior developme
 1. **[BehaviorContext](./BEHAVIOR_CONTEXT.md)** - For agent behaviors
 2. **TypedEventEmitter** - For type-safe event emission (this doc)
 3. **SystemContext** - For system development (this doc)
+4. **SpatialQueryService** - Unified API for finding nearby entities (this doc)
 
 ## Philosophy
 
@@ -333,6 +334,135 @@ update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
 
 ---
 
+## SpatialQueryService
+
+### Problem
+
+Finding nearby entities had multiple inconsistent approaches:
+
+1. **`world.query().with(CT.X).executeEntities()`** - O(all entities), slow
+2. **`chunkSpatialQuery.getEntitiesInRadius()`** - Fast but required injection
+3. **`this.getEntitiesInRadius()`** - Behavior helper, hidden dependency
+4. **`world.getEntity(id)`** - Direct lookup, different API
+5. **Module-level injection** - Hidden dependencies, hard to test
+
+### Solution: Unified `world.spatialQuery`
+
+All spatial queries now go through a single, type-safe service accessible on World:
+
+```typescript
+// In behaviors via BehaviorContext (preferred)
+const nearby = ctx.getEntitiesInRadius(50, [CT.Plant, CT.Building]);
+const nearest = ctx.getNearestEntity([CT.Food], 100);
+
+// In systems via SystemContext (preferred)
+const nearby = ctx.getNearbyEntities(position, 50, [CT.Agent]);
+
+// Direct access when needed
+if (world.spatialQuery) {
+  const nearby = world.spatialQuery.getEntitiesInRadius(x, y, 50, [CT.Plant]);
+}
+```
+
+### API Reference
+
+#### SpatialQueryService Interface
+
+```typescript
+interface SpatialQueryService {
+  // Find entities within radius, sorted by distance (closest first)
+  getEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: ComponentType[],
+    options?: {
+      limit?: number;
+      excludeIds?: Set<EntityId>;
+      filter?: (entity: Entity) => boolean;
+    }
+  ): EntityWithDistance[];
+
+  // Find the single nearest entity
+  getNearestEntity(
+    x: number,
+    y: number,
+    componentTypes: ComponentType[],
+    options?: { maxRadius?: number; excludeIds?: Set<EntityId>; filter?: (entity: Entity) => boolean }
+  ): EntityWithDistance | null;
+
+  // Fast existence check (early exit)
+  hasEntityInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: ComponentType[]
+  ): boolean;
+
+  // Count entities without allocating array
+  countEntitiesInRadius(
+    x: number,
+    y: number,
+    radius: number,
+    componentTypes: ComponentType[]
+  ): number;
+
+  // O(1) building check in chunk
+  hasBuildingNearPosition(
+    worldX: number,
+    worldY: number,
+    buildingType: string
+  ): boolean;
+}
+
+interface EntityWithDistance {
+  entity: Entity;
+  distance: number;
+  distanceSquared: number;
+  position: { x: number; y: number };
+}
+```
+
+### Migration Guide
+
+```typescript
+// ❌ BEFORE: Module-level injection (removed)
+let chunkSpatialQuery: ChunkSpatialQuery | null = null;
+export function injectChunkSpatialQueryToX(q) { chunkSpatialQuery = q; }
+
+// Usage required null check
+if (chunkSpatialQuery) {
+  const nearby = chunkSpatialQuery.getEntitiesInRadius(x, y, 50, [CT.Plant]);
+}
+
+// ✅ AFTER: Unified world.spatialQuery
+// No injection needed - just use world.spatialQuery
+if (world.spatialQuery) {
+  const nearby = world.spatialQuery.getEntitiesInRadius(x, y, 50, [CT.Plant]);
+}
+
+// ✅ BEST: Use context APIs (they handle the null check)
+// In BehaviorContext:
+const nearby = ctx.getEntitiesInRadius(50, [CT.Plant]);
+
+// In SystemContext:
+const nearby = ctx.getNearbyEntities(position, 50, [CT.Plant]);
+```
+
+### Performance Characteristics
+
+| Method | Complexity | Use Case |
+|--------|------------|----------|
+| `getEntitiesInRadius()` | O(nearby chunks × entities/chunk) | Finding multiple entities |
+| `getNearestEntity()` | O(nearby chunks × entities/chunk) | Finding single closest |
+| `hasEntityInRadius()` | O(1) to O(nearby) | Existence check (early exit) |
+| `countEntitiesInRadius()` | O(nearby chunks × entities/chunk) | Counting without allocation |
+| `hasBuildingNearPosition()` | O(1) | Building existence in chunk |
+
+**Why it's fast**: Uses chunk-based spatial indexing. Instead of checking all ~4000 entities, only checks entities in nearby chunks (~50-200 entities).
+
+---
+
 ## Performance Benefits
 
 | Pattern | Before | After |
@@ -351,8 +481,18 @@ update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
 |------|-----|
 | Writing agent behaviors | **BehaviorContext** |
 | Writing systems | **SystemContext / BaseSystem** |
+| Finding nearby entities | **world.spatialQuery** (via ctx in behaviors/systems) |
 | Emitting events | **SystemEventManager** |
 | Subscribing to events | **SystemEventManager** |
+
+### ❌ Deprecated Patterns (Do NOT Use)
+
+| Pattern | Why It's Wrong | Use Instead |
+|---------|----------------|-------------|
+| `world.query().with(CT.X).executeEntities()` | O(all entities), slow | `world.spatialQuery.getEntitiesInRadius()` |
+| `injectChunkSpatialQueryToX()` | Module-level injection removed | `world.spatialQuery` |
+| `let chunkSpatialQuery = null` | Global mutable state | `world.spatialQuery` |
+| `Math.sqrt()` for distance comparison | Expensive | Compare `distanceSquared` instead |
 
 All three APIs share the same philosophy:
 1. **Pre-fetch common data** - No boilerplate
@@ -367,3 +507,5 @@ All three APIs share the same philosophy:
 - `packages/core/src/behavior/BehaviorContext.ts` - BehaviorContext
 - `packages/core/src/events/TypedEventEmitter.ts` - SystemEventManager
 - `packages/core/src/ecs/SystemContext.ts` - SystemContext, BaseSystem
+- `packages/core/src/services/SpatialQueryService.ts` - SpatialQueryService interface
+- `packages/world/src/chunks/ChunkSpatialQuery.ts` - SpatialQueryService implementation

@@ -1,0 +1,20 @@
+{
+  "id": "sheep_white",
+  "name": "white woolly sheep",
+  "description": "white woolly sheep",
+  "category": "animal",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-13T02:15:02.023Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
+}

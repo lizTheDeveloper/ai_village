@@ -1,7 +1,7 @@
 {
-  "id": "sheep_white",
+  "id": "sheep",
   "base_species": "sheep",
-  "description": "white sheep with fluffy wool",
+  "description": "white sheep with wool",
   "size": 48,
   "directions": [
     "south",
@@ -13,5 +13,5 @@
     "east",
     "southeast"
   ],
-  "regenerated_at": "2026-01-19T02:55:40.174Z"
+  "regenerated_at": "2026-01-19T02:51:10.751Z"
 }

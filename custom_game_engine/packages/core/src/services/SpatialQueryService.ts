@@ -86,4 +86,14 @@ export interface SpatialQueryService {
     radius: number,
     componentTypes: ComponentType[]
   ): number;
+
+  /**
+   * Check if a specific building type exists or is being built near a position.
+   * O(1) per chunk lookup - much faster than scanning all entities.
+   */
+  hasBuildingNearPosition(
+    worldX: number,
+    worldY: number,
+    buildingType: string
+  ): boolean;
 }

@@ -205,6 +205,58 @@ export { createGoalsComponent, formatGoalsForPrompt, formatGoalsSectionForPrompt
 // export * from './EquipmentSlotsComponent.js';
 // Magic system (forward-compatibility - Phase 30)
 export * from './MagicComponent.js';
+
+// Magic component splits (Phase 2 refactor)
+export * from './ManaPoolsComponent.js';
+export {
+  createManaPoolsComponent,
+  createManaPoolsComponentWithSource,
+  getMana,
+  getAvailableMana,
+  type ManaPoolsComponent,
+  type ManaPool,
+  type ResourcePool,
+} from './ManaPoolsComponent.js';
+
+export * from './SpellKnowledgeComponent.js';
+export {
+  createSpellKnowledgeComponent,
+  createSpellKnowledgeComponentWithParadigm,
+  knowsSpell,
+  getSpellProficiency,
+  type SpellKnowledgeComponent,
+  type KnownSpell,
+} from './SpellKnowledgeComponent.js';
+
+export * from './CastingStateComponent.js';
+export {
+  createCastingStateComponent,
+  isCasting,
+  getCastProgress,
+  type CastingStateComponent,
+} from './CastingStateComponent.js';
+
+export * from './SkillProgressComponent.js';
+export {
+  createSkillProgressComponent,
+  createSkillProgressComponentWithParadigm,
+  getParadigmXP,
+  getUnlockedNodes,
+  isNodeUnlocked,
+  type SkillProgressComponent,
+  type SkillTreeParadigmState,
+} from './SkillProgressComponent.js';
+
+export * from './ParadigmStateComponent.js';
+export {
+  createParadigmStateComponent,
+  createParadigmStateComponentWithParadigm,
+  getParadigmState,
+  hasParadigm,
+  type ParadigmStateComponent,
+  type ParadigmSpecificState,
+} from './ParadigmStateComponent.js';
+
 // Spiritual/prayer system (forward-compatibility - Phase 27)
 export * from './SpiritualComponent.js';
 export { createSpiritualComponent } from './SpiritualComponent.js';

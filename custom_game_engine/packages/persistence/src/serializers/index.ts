@@ -17,6 +17,13 @@ import { HiveCombatSerializer } from './HiveCombatSerializer.js';
 import { ManchiSerializer } from './ManchiSerializer.js';
 import { EquipmentSerializer } from './EquipmentSerializer.js';
 
+// Magic component serializers
+import { ManaPoolsSerializer } from './ManaPoolsSerializer.js';
+import { SpellKnowledgeSerializer } from './SpellKnowledgeSerializer.js';
+import { CastingStateSerializer } from './CastingStateSerializer.js';
+import { SkillProgressSerializer } from './SkillProgressSerializer.js';
+import { ParadigmStateSerializer } from './ParadigmStateSerializer.js';
+
 // Memory and state serializers
 import { EpisodicMemorySerializer } from './EpisodicMemorySerializer.js';
 import { RelationshipSerializer } from './RelationshipSerializer.js';
@@ -46,6 +53,13 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('hive_combat', new HiveCombatSerializer());
   componentSerializerRegistry.register('manchi', new ManchiSerializer());
   componentSerializerRegistry.register('equipment', new EquipmentSerializer());
+
+  // Register magic component serializers
+  componentSerializerRegistry.register('mana_pools', new ManaPoolsSerializer());
+  componentSerializerRegistry.register('spell_knowledge', new SpellKnowledgeSerializer());
+  componentSerializerRegistry.register('casting_state', new CastingStateSerializer());
+  componentSerializerRegistry.register('skill_progress', new SkillProgressSerializer());
+  componentSerializerRegistry.register('paradigm_state', new ParadigmStateSerializer());
 
   // Register memory and state serializers (these handle Maps and private fields properly)
   componentSerializerRegistry.register('episodic_memory', new EpisodicMemorySerializer());
@@ -211,6 +225,13 @@ export { PackCombatSerializer } from './PackCombatSerializer.js';
 export { HiveCombatSerializer } from './HiveCombatSerializer.js';
 export { ManchiSerializer } from './ManchiSerializer.js';
 export { EquipmentSerializer } from './EquipmentSerializer.js';
+
+// Export magic component serializers
+export { ManaPoolsSerializer } from './ManaPoolsSerializer.js';
+export { SpellKnowledgeSerializer } from './SpellKnowledgeSerializer.js';
+export { CastingStateSerializer } from './CastingStateSerializer.js';
+export { SkillProgressSerializer } from './SkillProgressSerializer.js';
+export { ParadigmStateSerializer } from './ParadigmStateSerializer.js';
 
 // Export additional memory serializers
 export * from './EpisodicMemorySerializer.js';

@@ -65,6 +65,15 @@ export class MagicSystem extends BaseSystem {
   protected onInitialize(world: World, eventBus: EventBus): void {
     // Initialize magic infrastructure (effect appliers, registries, etc.)
     if (!this.initialized) {
+      // Auto-migrate all entities from monolithic MagicComponent to split components
+      // This ensures backward compatibility with old saves
+      import('@ai-village/magic/MagicComponentMigration.js').then(({ migrateAllMagicComponents }) => {
+        const migratedCount = migrateAllMagicComponents(world, false); // Keep old component for now
+        if (migratedCount > 0) {
+          console.warn(`[MagicSystem] Auto-migrated ${migratedCount} entities to split magic components`);
+        }
+      });
+
       initMagicInfrastructure(world);
       this.effectExecutor = SpellEffectExecutor.getInstance();
       this.initialized = true;

@@ -17,10 +17,13 @@ import type { Entity, EntityImpl } from '@ai-village/core/ecs/Entity.js';
 import type { EventBus } from '@ai-village/core/events/EventBus.js';
 import { ComponentType as CT } from '@ai-village/core/types/ComponentType.js';
 import type {
-  MagicComponent,
   ComposedSpell,
   MagicSourceId,
 } from '@ai-village/core/components/MagicComponent.js';
+import type { ManaPoolsComponent } from '@ai-village/core/components/ManaPoolsComponent.js';
+import type { SpellKnowledgeComponent } from '@ai-village/core/components/SpellKnowledgeComponent.js';
+import type { CastingStateComponent } from '@ai-village/core/components/CastingStateComponent.js';
+import type { ParadigmStateComponent } from '@ai-village/core/components/ParadigmStateComponent.js';
 import type { PositionComponent } from '@ai-village/core/components/PositionComponent.js';
 import type { NeedsComponent } from '@ai-village/core/components/NeedsComponent.js';
 import type { SpiritualComponent } from '@ai-village/core/components/SpiritualComponent.js';

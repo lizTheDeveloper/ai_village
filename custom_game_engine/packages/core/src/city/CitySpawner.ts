@@ -737,28 +737,32 @@ export async function spawnCity(
     spawnedAgentIds.push(agentId);
 
     // Get the agent entity to customize it
-    const agentEntity = world.getEntityById(agentId);
+    const agentEntity = world.getEntity(agentId);
     if (!agentEntity) {
       continue;
     }
 
     // Add profession-appropriate starting items to agent's existing inventory
     const startingItems = getAgentStartingItems(profession);
-    const inventory = agentEntity.getComponent<typeof createInventoryComponent>('inventory');
+    const inventory = agentEntity.getComponent('inventory') as ReturnType<typeof createInventoryComponent> | undefined;
 
     if (inventory) {
       // Find empty slots and add items
       let itemIdx = 0;
       for (let slotIdx = 0; slotIdx < inventory.maxSlots && itemIdx < startingItems.length; slotIdx++) {
-        if (!inventory.slots[slotIdx]) {
-          inventory.slots[slotIdx] = startingItems[itemIdx];
-          itemIdx++;
+        const existingSlot = inventory.slots[slotIdx];
+        if (!existingSlot || existingSlot.itemId === null) {
+          const itemToAdd = startingItems[itemIdx];
+          if (itemToAdd) {
+            inventory.slots[slotIdx] = itemToAdd;
+            itemIdx++;
+          }
         }
       }
     }
 
     // Mark agent as belonging to this city
-    const identity = agentEntity.getComponent<{ name: string; cityId?: string }>('identity');
+    const identity = agentEntity.getComponent('identity') as { type: 'identity'; version: number; name: string; age: number; species: string; cityId?: string } | undefined;
     if (identity) {
       identity.cityId = cityId;
     }
