@@ -29,13 +29,12 @@ export {
   forcedSleepBehavior,
   seekSleepBehaviorWithContext,
   forcedSleepBehaviorWithContext,
-  injectChunkSpatialQueryToSleep,
 } from './SleepBehavior.js';
 
 // Resource behaviors
-export { GatherBehavior, gatherBehavior, gatherBehaviorWithContext, injectChunkSpatialQueryToGather } from './GatherBehavior.js';
-export { DepositItemsBehavior, depositItemsBehavior, depositItemsBehaviorWithContext, injectChunkSpatialQueryToDepositItems } from './DepositItemsBehavior.js';
-export { SeekFoodBehavior, seekFoodBehavior, seekFoodBehaviorWithContext, injectChunkSpatialQueryToSeekFood } from './SeekFoodBehavior.js';
+export { GatherBehavior, gatherBehavior, gatherBehaviorWithContext } from './GatherBehavior.js';
+export { DepositItemsBehavior, depositItemsBehavior, depositItemsBehaviorWithContext } from './DepositItemsBehavior.js';
+export { SeekFoodBehavior, seekFoodBehavior, seekFoodBehaviorWithContext } from './SeekFoodBehavior.js';
 
 // Social behaviors
 export { FollowAgentBehavior, followAgentBehavior, followAgentBehaviorWithContext } from './FollowAgentBehavior.js';
@@ -72,11 +71,10 @@ export {
   plantBehaviorWithContext,
   waterBehaviorWithContext,
   harvestBehaviorWithContext,
-  injectChunkSpatialQueryToFarmBehaviors,
 } from './FarmBehaviors.js';
 
 // Build behaviors
-export { BuildBehavior, buildBehavior, buildBehaviorWithContext, injectChunkSpatialQueryToBuild } from './BuildBehavior.js';
+export { BuildBehavior, buildBehavior, buildBehaviorWithContext } from './BuildBehavior.js';
 
 // Crafting behaviors
 export { CraftBehavior, craftBehavior, craftBehaviorWithContext } from './CraftBehavior.js';
@@ -92,7 +90,7 @@ export { CastSpellBehavior, castSpellBehavior, castSpellBehaviorWithContext } fr
 
 // Survival behaviors
 export { SeekWarmthBehavior, seekWarmthBehavior, seekWarmthBehaviorWithContext } from './SeekWarmthBehavior.js';
-export { SeekCoolingBehavior, seekCoolingBehavior, seekCoolingBehaviorWithContext, injectChunkSpatialQueryToSeekCooling } from './SeekCoolingBehavior.js';
+export { SeekCoolingBehavior, seekCoolingBehavior, seekCoolingBehaviorWithContext } from './SeekCoolingBehavior.js';
 export { FleeToHomeBehavior, fleeToHomeBehavior, fleeToHomeBehaviorWithContext } from './FleeToHomeBehavior.js';
 
 // Navigation behaviors
@@ -127,7 +125,7 @@ export * from './GroupPrayBehavior.js';
 export * from './MeditateBehavior.js';
 
 // Building maintenance behaviors
-export { RepairBehavior, repairBehavior, repairBehaviorWithContext, injectChunkSpatialQueryToRepair } from './RepairBehavior.js';
+export { RepairBehavior, repairBehavior, repairBehaviorWithContext } from './RepairBehavior.js';
 export * from './UpgradeBehavior.js';
 
 // Tile-Based Voxel Building Behaviors (Phase 4)

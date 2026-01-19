@@ -643,37 +643,7 @@ export {
   injectChunkSpatialQueryToMovement,
 } from './systems/MovementSystem.js';
 
-export {
-  injectChunkSpatialQueryToFarmBehaviors,
-} from './behavior/behaviors/FarmBehaviors.js';
-
-export {
-  injectChunkSpatialQueryToSeekFood,
-} from './behavior/behaviors/SeekFoodBehavior.js';
-
-export {
-  injectChunkSpatialQueryToSeekCooling,
-} from './behavior/behaviors/SeekCoolingBehavior.js';
-
-export {
-  injectChunkSpatialQueryToSleep,
-} from './behavior/behaviors/SleepBehavior.js';
-
-export {
-  injectChunkSpatialQueryToGather,
-} from './behavior/behaviors/GatherBehavior.js';
-
-export {
-  injectChunkSpatialQueryToBuild,
-} from './behavior/behaviors/BuildBehavior.js';
-
-export {
-  injectChunkSpatialQueryToDepositItems,
-} from './behavior/behaviors/DepositItemsBehavior.js';
-
-export {
-  injectChunkSpatialQueryToRepair,
-} from './behavior/behaviors/RepairBehavior.js';
+// Injection functions removed - use world.spatialQuery instead
 
 export {
   injectChunkSpatialQueryToBehaviors,

@@ -1,21 +1,5 @@
 {
-  "sprites": [
-    {
-      "folderId": "horse_brown",
-      "description": "brown horse, farm animal quadruped, four legs, mane and tail, natural standing pose",
-      "status": "failed",
-      "queuedAt": 1737234000000,
-      "traits": {
-        "category": "animals",
-        "size": 64,
-        "name": "brown horse",
-        "species": "horse",
-        "legs": 4,
-        "generationMode": "quadruped"
-      },
-      "error": "API 404: {\"detail\":\"Not Found\"}"
-    }
-  ],
+  "sprites": [],
   "animations": [],
   "soul_sprites": []
 }

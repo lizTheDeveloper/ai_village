@@ -596,28 +596,43 @@ async function processSoulSprite(job: any): Promise<boolean> {
 
   const generatedSprites: Record<string, string> = {}; // direction -> base64
 
+  // Direction descriptions for proper facing
+  const directionDescriptions: Record<string, string> = {
+    'south': 'facing toward the camera, front view from above',
+    'south-west': 'facing southwest, angled front-left view from above',
+    'west': 'facing left, side profile view from above',
+    'north-west': 'facing northwest, angled back-left view from above',
+    'north': 'facing away from camera, rear view from above',
+    'north-east': 'facing northeast, angled back-right view from above',
+    'east': 'facing right, side profile view from above',
+    'south-east': 'facing southeast, angled front-right view from above',
+  };
+
   // Step 1: Generate base sprites for each direction
   log(`  Step 1: Generating ${directions.length} directional sprites...`);
 
-  for (const direction of directions) {
+  for (let i = 0; i < directions.length; i++) {
+    const direction = directions[i];
+    const dirDesc = directionDescriptions[direction] || `facing ${direction}`;
     log(`    Generating ${direction}...`);
 
-    // Use generate-image-bitforge for directional sprites
+    // Build direction-specific description
+    const isQuadruped = isAnimal || job.legs === 4;
+    const fullDescription = isQuadruped
+      ? `${description} as a quadruped animal on all four legs, ${dirDesc}, natural animal pose, pixel art style, top-down perspective, transparent background`
+      : `${description}, ${dirDesc}, pixel art style, top-down perspective, transparent background`;
+
+    // Use generate-image-pixflux for directional sprites
     const params = {
-      description: `${description}, facing ${direction}`,
+      description: fullDescription,
       image_size: {
         width: config.size,
         height: config.size,
       },
-      view: 'high top-down',
-      direction: direction,
-      detail: config.detail,
-      shading: config.shading,
-      outline: config.outline,
       no_background: true,
     };
 
-    const result = await apiRequest('/generate-image-bitforge', 'POST', params);
+    const result = await apiRequest('/generate-image-pixflux', 'POST', params);
 
     if (!result.image?.base64) {
       throw new Error(`No image in response for direction ${direction}`);
@@ -631,8 +646,8 @@ async function processSoulSprite(job: any): Promise<boolean> {
     log(`    ✓ ${direction}.png`);
 
     // Rate limiting between directions
-    if (direction !== directions[directions.length - 1]) {
-      await sleep(1500);
+    if (i < directions.length - 1) {
+      await sleep(2000);
     }
   }
 
@@ -1260,30 +1275,54 @@ async function runDaemon(): Promise<void> {
             fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
 
           } else if (creatureType === 'alien') {
-            // Very alien creatures - generate PixFlux reference, then use Directions API
-            log(`  Generating alien creature: PixFlux reference + Directions API...`);
+            // Alien creatures - generate each direction separately using PixFlux
+            log(`  Generating alien creature: PixFlux per-direction...`);
 
-            // Step 1: Generate reference image using PixFlux
-            log(`  Step 1: Generating PixFlux reference image...`);
-            const referenceBase64 = await generateSingleImage(enhancedDescription, size, apiParams);
-            log(`  ✓ Reference image generated`);
-
-            // Step 2: Generate all 8 directions using PixFlux Directions
-            log(`  Step 2: Generating all 8 directions from reference...`);
-            const directionalImages = await generateDirections(referenceBase64, enhancedDescription, apiParams);
-            log(`  ✓ All 8 directions generated`);
-
-            // Save all directions
             const charDir = path.join(ASSETS_PATH, queueJob.folderId);
-            const rotationsDir = path.join(charDir, 'rotations');
-            fs.mkdirSync(rotationsDir, { recursive: true });
+            fs.mkdirSync(charDir, { recursive: true });
+
+            // Direction descriptions for proper facing
+            const directionDescriptions: Record<string, string> = {
+              'south': 'facing toward the camera, front view from above',
+              'south-west': 'facing southwest, angled front-left view from above',
+              'west': 'facing left, side profile view from above',
+              'north-west': 'facing northwest, angled back-left view from above',
+              'north': 'facing away from camera, rear view from above',
+              'north-east': 'facing northeast, angled back-right view from above',
+              'east': 'facing right, side profile view from above',
+              'south-east': 'facing southeast, angled front-right view from above',
+            };
 
             const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
-            for (const dir of directions) {
-              const imageBuffer = Buffer.from(directionalImages[dir], 'base64');
-              const destFile = path.join(rotationsDir, `${dir}.png`);
-              fs.writeFileSync(destFile, imageBuffer);
-              log(`    ✓ ${dir}.png`);
+
+            for (let i = 0; i < directions.length; i++) {
+              const dir = directions[i];
+              const dirDesc = directionDescriptions[dir];
+
+              // Build direction-specific description
+              const dirDescription = `${queueJob.description}, ${dirDesc}, pixel art style, top-down perspective, transparent background`;
+
+              log(`    [${dir}] Generating...`);
+
+              const result = await apiRequest('/generate-image-pixflux', 'POST', {
+                description: dirDescription,
+                image_size: { height: size, width: size },
+                no_background: true,
+                ...apiParams,
+              });
+
+              if (!result.image || !result.image.base64) {
+                throw new Error(`No image in API response for direction ${dir}`);
+              }
+
+              const imageBuffer = Buffer.from(result.image.base64, 'base64');
+              fs.writeFileSync(path.join(charDir, `${dir}.png`), imageBuffer);
+              log(`    [${dir}] ✓ Saved`);
+
+              // Rate limiting between directions (except last)
+              if (i < directions.length - 1) {
+                await sleep(2000);
+              }
             }
 
             // Save metadata
@@ -1291,7 +1330,7 @@ async function runDaemon(): Promise<void> {
               id: queueJob.folderId,
               category: queueJob.traits?.category || 'aliens',
               size,
-              description: enhancedDescription,
+              description: queueJob.description,
               original_description: queueJob.description,
               generated_at: new Date().toISOString(),
               directions: directions,

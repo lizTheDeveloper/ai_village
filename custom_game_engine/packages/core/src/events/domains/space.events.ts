@@ -296,6 +296,65 @@ export interface SpaceEvents {
     reason: string;
   };
 
+  // === Megastructure Construction Events (Phase 5) ===
+
+  /** Megastructure construction project started */
+  'construction_started': {
+    projectId: string;
+    megastructureType: string;
+    blueprintName: string;
+    targetLocation: {
+      tier: string;
+      entityId?: string;
+      coordinates?: { x: number; y: number; z: number };
+    };
+    estimatedYears: number;
+    requiredResources: Record<string, number>;
+  };
+
+  /** Megastructure construction progress milestone */
+  'construction_progress': {
+    projectId: string;
+    megastructureType: string;
+    milestone: number;
+    progress: number;
+    currentPhase: string;
+  };
+
+  /** Megastructure construction phase completed */
+  'construction_phase_complete': {
+    projectId: string;
+    megastructureType: string;
+    completedPhase: string;
+    nextPhaseIndex: number;
+  };
+
+  /** Megastructure construction completed */
+  'construction_complete': {
+    projectId: string;
+    megastructureType: string;
+    targetEntityId?: string;
+    constructionTimeYears: number;
+    totalCost: Record<string, number>;
+  };
+
+  /** Megastructure construction failed */
+  'construction_failed': {
+    projectId: string;
+    megastructureType: string;
+    reason: string;
+    progress: number;
+    resourcesLost: Record<string, number>;
+  };
+
+  /** Megastructure construction delayed */
+  'construction_delayed': {
+    projectId: string;
+    megastructureType: string;
+    delayTicks: number;
+    delayPercent: number;
+  };
+
   // === Megastructure Maintenance Events (Phase 5) ===
 
   /** Maintenance performed on megastructure */

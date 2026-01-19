@@ -55,14 +55,7 @@ class QueueWorker {
   }
 
   private async createCharacter(item: any, category: string): Promise<string> {
-    const isAnimal = category.startsWith('animals/');
-    let description = item.desc || item.description || '';
-
-    // Fix animal descriptions to be quadruped
-    if (isAnimal) {
-      const animalType = item.id.split('_')[0]; // e.g., "cow", "horse"
-      description = `Realistic ${animalType} as a quadruped animal on all four legs, ${description}, natural animal pose, top-down view`;
-    }
+    const description = item.desc || item.description || '';
 
     const response = await fetch('https://api.pixellab.ai/v1/characters', {
       method: 'POST',
@@ -90,6 +83,88 @@ class QueueWorker {
 
     const data = await response.json();
     return data.character_id;
+  }
+
+  // Generate animal sprite using PixFlux per-direction (not Characters API)
+  private async createAnimal(item: any): Promise<string> {
+    const description = item.desc || item.description || '';
+    const animalType = item.id.split('_')[0]; // e.g., "cow", "horse"
+    const size = item.size || 48;
+
+    const SPRITES_DIR = path.join(__dirname, '../packages/renderer/assets/sprites/pixellab');
+    const animalDir = path.join(SPRITES_DIR, item.id);
+    fs.mkdirSync(animalDir, { recursive: true });
+
+    // Direction descriptions for proper facing
+    const directionDescriptions: Record<string, string> = {
+      'south': 'facing toward the camera, front view from above',
+      'south-west': 'facing southwest, angled front-left view from above',
+      'west': 'facing left, side profile view from above',
+      'north-west': 'facing northwest, angled back-left view from above',
+      'north': 'facing away from camera, rear view from above',
+      'north-east': 'facing northeast, angled back-right view from above',
+      'east': 'facing right, side profile view from above',
+      'south-east': 'facing southeast, angled front-right view from above',
+    };
+
+    const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+
+    for (let i = 0; i < directions.length; i++) {
+      const dir = directions[i];
+      const dirDesc = directionDescriptions[dir];
+
+      // Build direction-specific description
+      const fullDescription = `${animalType} ${description} as a quadruped animal on all four legs, ${dirDesc}, natural animal pose, pixel art style, top-down perspective, transparent background`;
+
+      console.log(`    [${dir}] Generating...`);
+
+      const response = await fetch('https://api.pixellab.ai/v1/generate-image-pixflux', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${PIXELLAB_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: fullDescription,
+          image_size: { height: size, width: size },
+          no_background: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to generate ${dir}: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+      if (!data.image?.base64) {
+        throw new Error(`No image in response for direction ${dir}`);
+      }
+
+      const imageBuffer = Buffer.from(data.image.base64, 'base64');
+      fs.writeFileSync(path.join(animalDir, `${dir}.png`), imageBuffer);
+      console.log(`    [${dir}] ✓ Saved`);
+
+      // Rate limiting between directions (except last)
+      if (i < directions.length - 1) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+
+    // Save metadata
+    const metadata = {
+      id: item.id,
+      category: 'animals',
+      size,
+      description,
+      directions,
+      generated_at: new Date().toISOString(),
+      type: 'quadruped',
+    };
+    fs.writeFileSync(path.join(animalDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
+
+    // Return a fake job ID (since this is synchronous)
+    return `animal_${item.id}_${Date.now()}`;
   }
 
   private async createTileset(item: any): Promise<string> {
@@ -175,10 +250,19 @@ class QueueWorker {
 
     try {
       let jobId: string;
+      const isAnimal = category.startsWith('animals/');
 
-      console.log(`🚀 Starting: ${item.id} (${type})`);
+      console.log(`🚀 Starting: ${item.id} (${type}${isAnimal ? ' - animal' : ''})`);
 
-      if (type === 'character') {
+      if (type === 'character' && isAnimal) {
+        // Use PixFlux per-direction for animals (synchronous, completes immediately)
+        jobId = await this.createAnimal(item);
+        // Mark as immediately completed since createAnimal generates all sprites synchronously
+        this.completedIds.add(item.id);
+        console.log(`✅ Completed: ${item.id} (animal - all 8 directions generated)`);
+        return;
+      } else if (type === 'character') {
+        // Use Characters API for humanoids
         jobId = await this.createCharacter(item, category);
       } else if (type === 'tileset') {
         jobId = await this.createTileset(item);

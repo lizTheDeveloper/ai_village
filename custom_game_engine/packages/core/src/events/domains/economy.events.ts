@@ -279,6 +279,13 @@ export interface EconomyEvents {
     toolType: string;
     agentId?: EntityId;
   };
+
+  'production:tier_changed': {
+    entityId: EntityId;
+    oldTier: number;
+    newTier: number;
+    techLevel: number;
+  };
 }
 
 export type EconomyEventType = keyof EconomyEvents;

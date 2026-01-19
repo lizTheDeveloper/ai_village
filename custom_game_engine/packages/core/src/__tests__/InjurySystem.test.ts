@@ -327,9 +327,10 @@ describe('InjurySystem', () => {
         elapsed: 0,
       });
 
-      // Simulate 100 time units passing
-      for (let i = 0; i < 100; i++) {
-        system.update(world, Array.from(world.entities.values()), 1);
+      // Simulate 100 time units passing (system has throttleInterval=10, so runs every 10 ticks)
+      for (let i = 0; i < 100; i += 10) {
+        for (let j = 0; j < 10; j++) world.advanceTick();
+        system.update(world, Array.from(world.entities.values()), 10);
       }
 
       expect(agent.hasComponent('injury')).toBe(false);
@@ -346,9 +347,10 @@ describe('InjurySystem', () => {
         treated: false,
       });
 
-      // Simulate 100 time units passing
-      for (let i = 0; i < 100; i++) {
-        system.update(world, Array.from(world.entities.values()), 1);
+      // Simulate 100 time units passing (system has throttleInterval=10, so runs every 10 ticks)
+      for (let i = 0; i < 100; i += 10) {
+        for (let j = 0; j < 10; j++) world.advanceTick();
+        system.update(world, Array.from(world.entities.values()), 10);
       }
 
       // Should still have injury - elapsed increments but healing doesn't progress
@@ -367,9 +369,10 @@ describe('InjurySystem', () => {
         treated: true,
       });
 
-      // Simulate 100 time units passing
-      for (let i = 0; i < 100; i++) {
-        system.update(world, Array.from(world.entities.values()), 1);
+      // Simulate 100 time units passing (system has throttleInterval=10, so runs every 10 ticks)
+      for (let i = 0; i < 100; i += 10) {
+        for (let j = 0; j < 10; j++) world.advanceTick();
+        system.update(world, Array.from(world.entities.values()), 10);
       }
 
       expect(agent.hasComponent('injury')).toBe(false);

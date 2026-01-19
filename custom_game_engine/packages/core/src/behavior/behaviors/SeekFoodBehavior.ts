@@ -140,7 +140,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
     // wander directly as part of seeking food (exploring to find food)
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
-    if (movement) {
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    if (movement && position) {
       // Get or initialize wander angle
       let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
       if (wanderAngle === undefined) {

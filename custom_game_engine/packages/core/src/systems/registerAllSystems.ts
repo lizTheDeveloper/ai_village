@@ -106,6 +106,7 @@ import { FleetSystem } from './FleetSystem.js';
 import { SquadronSystem } from './SquadronSystem.js';
 
 // Megastructures (Phase 5: Grand Strategy)
+import { MegastructureConstructionSystem } from './MegastructureConstructionSystem.js';
 import { MegastructureMaintenanceSystem } from './MegastructureMaintenanceSystem.js';
 
 // Building & Construction
@@ -664,6 +665,10 @@ export function registerAllSystems(
   // ============================================================================
   // MEGASTRUCTURES (Phase 5: Grand Strategy)
   // ============================================================================
+  // Megastructure Construction (priority 300): Manages construction projects
+  // Advances construction progress, consumes resources, handles phases
+  gameLoop.systemRegistry.register(new MegastructureConstructionSystem());
+
   // Megastructure Maintenance (priority 310): Handles maintenance, degradation, and decay
   // Runs after construction systems to process operational structures
   gameLoop.systemRegistry.register(new MegastructureMaintenanceSystem());

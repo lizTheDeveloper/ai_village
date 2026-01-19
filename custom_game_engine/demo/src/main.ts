@@ -64,25 +64,13 @@ import {
   // Agent debug logging
   AgentDebugManager,
   // Chunk spatial query injection functions
-  injectChunkSpatialQuery,
-  injectChunkSpatialQueryForHearing,
-  injectChunkSpatialQueryForBrain,
-  injectChunkSpatialQueryToMovement,
-  injectChunkSpatialQueryToFarmBehaviors,
-  injectChunkSpatialQueryToSeekFood,
-  injectChunkSpatialQueryToSeekCooling,
-  injectChunkSpatialQueryToSleep,
-  injectChunkSpatialQueryToGather,
-  injectChunkSpatialQueryToBuild,
-  injectChunkSpatialQueryToDepositItems,
-  injectChunkSpatialQueryToRepair,
-  injectChunkSpatialQueryToBehaviors,
+  // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
 import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
-import { injectChunkSpatialQueryToTemperature } from '@ai-village/environment';
+// Injection function removed - use world.spatialQuery instead
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
   PlantSystem as BotanyPlantSystem,

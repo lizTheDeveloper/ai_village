@@ -615,7 +615,7 @@ export class WorldImpl implements WorldMutator {
     }
 
     // Original: getComponent(entityId, componentType)
-    const entity = this._entities.get(componentTypeOrEntityId as EntityId);
+    const entity = this._entities.get(entityTypeOrEntityId as EntityId);
     if (!entity) return undefined;
     return entity.components.get(componentType) as T | undefined;
   }

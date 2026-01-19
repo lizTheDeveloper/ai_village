@@ -258,7 +258,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
       }
 
       // Check plants (trees) for shade using ChunkSpatialQuery
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         this.SEARCH_RADIUS,
@@ -408,9 +408,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
     let heatSourceCenterX = 0;
     let heatSourceCenterY = 0;
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         HEAT_DETECTION_RADIUS,
