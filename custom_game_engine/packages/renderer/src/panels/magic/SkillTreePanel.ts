@@ -654,7 +654,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Find nodes that have current node as prerequisite
         const childNodes = tree.nodes.filter(n =>
           n.unlockConditions.some(c =>
-            c.type === 'node_unlocked' && (c as { type: string; nodeId: string }).nodeId === currentNodeId
+            c.type === 'node_unlocked' && (c as unknown as { type: string; nodeId: string }).nodeId === currentNodeId
           )
         );
         if (childNodes.length > 0 && childNodes[0]) {
@@ -666,7 +666,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Find nodes that current node depends on
         const prereqCondition = currentNode.unlockConditions.find(c => c.type === 'node_unlocked');
         if (prereqCondition) {
-          nextNodeId = (prereqCondition as { type: string; nodeId: string }).nodeId;
+          nextNodeId = (prereqCondition as unknown as { type: string; nodeId: string }).nodeId;
         }
         break;
 

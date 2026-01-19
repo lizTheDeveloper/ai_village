@@ -201,6 +201,9 @@ export class HealthBarRenderer {
     // Render each injury as a small icon
     for (let i = 0; i < injury.injuries.length; i++) {
       const injuryData = injury.injuries[i];
+      if (!injuryData) {
+        throw new Error(`Injury data at index ${i} is undefined`);
+      }
       const iconX = startX + i * (this.INJURY_ICON_SIZE + this.INJURY_ICON_SPACING);
 
       this.renderInjuryIcon(injuryData.type, iconX, iconY);

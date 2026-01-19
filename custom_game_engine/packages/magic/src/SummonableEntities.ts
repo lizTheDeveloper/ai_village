@@ -10,4 +10,37 @@
  */
 
 // Re-export everything from core package
-export * from '@ai-village/core/src/magic/SummonableEntities.js';
+// Note: Import from package root, not internal src path
+export type {
+  SummonableEntity,
+  EntityCategory,
+  EntityRank,
+  EntityPersonality,
+  EntityDemand,
+  DemandType,
+  NegotiationStyle,
+  DemandPattern,
+  EntityService,
+  ServiceTemplate,
+  ContractType,
+  EntityAppearance,
+  AppearancePattern,
+  BreachConsequence,
+  SummoningRequirement,
+  SummoningNegotiation,
+  NegotiationOffer,
+  ActiveContract,
+} from '@ai-village/core';
+
+export {
+  PERSONALITY_ARCHETYPES,
+  NEGOTIATION_PATTERNS,
+  DEMAND_PATTERNS,
+  SERVICE_TEMPLATES,
+  CONTRACT_TEMPLATES,
+  ENTITY_QUIRKS,
+  BREACH_PATTERNS,
+  APPEARANCE_PATTERNS,
+  SUMMONING_REQUIREMENT_PATTERNS,
+  EXAMPLE_SUMMONABLE_ENTITIES,
+} from '@ai-village/core';

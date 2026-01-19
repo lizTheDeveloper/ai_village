@@ -478,7 +478,7 @@ export class StructuredPromptBuilder {
    */
   private buildBuildingsKnowledge(agent: Entity, world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
     // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as WorldWithBuildingRegistry;
+    const worldWithRegistry = world as unknown as WorldWithBuildingRegistry;
     if (!world || !worldWithRegistry.buildingRegistry) {
       return '';
     }

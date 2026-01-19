@@ -67,7 +67,7 @@ export class GuardDutySerializer extends BaseComponentSerializer<GuardDutyCompon
       componentData.patrolRoute = [{ x: 0, y: 0, z: 0 }];
     }
 
-    return createGuardDutyComponent(componentData);
+    return createGuardDutyComponent(componentData as unknown as { [key: string]: any; assignmentType: "location" | "person" | "patrol"; alertness: number; responseRadius: number; });
   }
 
   validate(data: unknown): data is GuardDutyComponent {

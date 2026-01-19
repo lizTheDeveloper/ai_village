@@ -11,6 +11,7 @@ import {
   GameLoop,
   CityManager,
   type World,
+  type WorldMutator,
   type CityStats,
   type StrategicPriorities,
   type CityDecision,
@@ -294,7 +295,7 @@ export class HeadlessCitySimulator {
       const x = cityCenter.x + (Math.random() - 0.5) * spawnRadius;
       const y = cityCenter.y + (Math.random() - 0.5) * spawnRadius;
 
-      const agentId = createWanderingAgent(world, x, y); // Use default speed (2.0)
+      const agentId = createWanderingAgent(world as unknown as WorldMutator, x, y); // Use default speed (2.0)
 
       // Apply containment bounds if economy enabled
       if (cityBounds) {
@@ -309,7 +310,7 @@ export class HeadlessCitySimulator {
 
     // Run initial stabilization (following test pattern)
     for (let i = 0; i < 1000; i++) {
-      const gameLoopWithTick = this.gameLoop as GameLoopWithTick; gameLoopWithTick.tick(0.05);
+      const gameLoopWithTick = this.gameLoop as unknown as GameLoopWithTick; gameLoopWithTick.tick(0.05);
     }
 
     // Force initial stats update so UI shows correct values immediately
@@ -388,7 +389,7 @@ export class HeadlessCitySimulator {
 
   private tick(): void {
     // Run game systems
-    const gameLoopWithTick = this.gameLoop as GameLoopWithTick;
+    const gameLoopWithTick = this.gameLoop as unknown as GameLoopWithTick;
     gameLoopWithTick.tick(0.05);
 
     // Run city manager
@@ -417,8 +418,8 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   setPriorities(priorities: StrategicPriorities): void {
-    this.cityManager.setPriorities(priorities);
-    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
+    this.cityManager.setPriorities(priorities as unknown as import("@ai-village/core/dist/src/city/CityManager").StrategicPriorities);
+    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities as unknown as import("@ai-village/core/dist/src/city/CityManager").StrategicPriorities);
     this.emit('priorities-changed', priorities);
   }
 

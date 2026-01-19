@@ -445,15 +445,18 @@ export function recordMeal(
   // Comfort bonus
   const comfortBonus = isComfortFood ? 20 : isFavorite ? 10 : 0;
 
-  // Social bonus from shared meals - TODO: Implement this feature
-  // const recentSocialMeals = newRecentMeals.filter((m) => m.withCompanions).length;
-  // const socialBonus = (recentSocialMeals / newRecentMeals.length - 0.3) * 50; // Bonus if > 30% are social
+  // Social bonus from shared meals
+  // Calculate percentage of recent meals that were shared (social meals)
+  const recentSocialMeals = newRecentMeals.filter((m) => m.withCompanions).length;
+  const socialMealRatio = newRecentMeals.length > 0 ? recentSocialMeals / newRecentMeals.length : 0;
+  // Bonus if > 30% of meals are social: ranges from -15 (0% social) to +35 (100% social)
+  const socialBonus = (socialMealRatio - 0.3) * 50;
 
   const newFactors = {
     ...component.factors,
     foodVariety: varietyScore,
     foodSatisfaction: satisfactionScore + comfortBonus,
-    social: Math.max(-100, Math.min(100, component.factors.social + (meal.withCompanions ? 5 : -2))),
+    social: Math.max(-100, Math.min(100, component.factors.social + (meal.withCompanions ? 5 : -2) + socialBonus)),
     comfort: Math.max(-100, Math.min(100, component.factors.comfort + (isComfortFood ? 10 : 0))),
   };
 

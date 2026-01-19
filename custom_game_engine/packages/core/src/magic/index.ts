@@ -945,6 +945,41 @@ export {
 // Note: summoning/index.ts provides organizational views but is intentionally not
 // exported here to avoid duplicates with SummonableEntities.js
 
+// Export summonable entities types and data
+export type {
+  SummonableEntity,
+  EntityCategory,
+  EntityRank,
+  EntityPersonality,
+  EntityDemand,
+  DemandType,
+  NegotiationStyle,
+  DemandPattern,
+  EntityService,
+  ServiceTemplate,
+  ContractType,
+  EntityAppearance,
+  AppearancePattern,
+  BreachConsequence,
+  SummoningRequirement,
+  SummoningNegotiation,
+  NegotiationOffer,
+  ActiveContract,
+} from './SummonableEntities.js';
+
+export {
+  PERSONALITY_ARCHETYPES,
+  NEGOTIATION_PATTERNS,
+  DEMAND_PATTERNS,
+  SERVICE_TEMPLATES,
+  CONTRACT_TEMPLATES,
+  ENTITY_QUIRKS,
+  BREACH_PATTERNS,
+  APPEARANCE_PATTERNS,
+  SUMMONING_REQUIREMENT_PATTERNS,
+  EXAMPLE_SUMMONABLE_ENTITIES,
+} from './SummonableEntities.js';
+
 // ============================================================================
 // Magic Academies (Multi-Paradigm Institutions)
 // ============================================================================

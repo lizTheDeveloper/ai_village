@@ -94,6 +94,17 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   private competitions: Map<string, CompetitionData> = new Map();
   private lastCheckForNewCompetitions: number = 0;
 
+  // Performance optimization: deity entity cache
+  private deityCache = new Map<string, DeityComponent>();
+  private lastCacheUpdate = 0;
+  private readonly CACHE_REFRESH_INTERVAL = 100; // Refresh deity cache every 5 seconds
+
+  // Performance optimization: precomputed constants
+  private readonly MIN_BELIEVERS_TO_COMPETE = 5;
+  private readonly COMPETITION_CHANCE = 0.1;
+  private readonly MIN_COMPETITION_DURATION = 6000; // ~5 minutes
+  private readonly SCORE_LEAD_THRESHOLD = 2.0; // Need 2x score to win
+
   constructor(config: Partial<CompetitionConfig> = {}) {
     super();
     this.config = { ...DEFAULT_COMPETITION_CONFIG, ...config };
@@ -102,8 +113,29 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
+    // Early exit: no active competitions and not time to check for new ones
+    if (
+      this.competitions.size === 0 &&
+      currentTick - this.lastCheckForNewCompetitions < this.config.checkInterval
+    ) {
+      return;
+    }
+
+    // Refresh deity cache periodically
+    if (currentTick - this.lastCacheUpdate >= this.CACHE_REFRESH_INTERVAL) {
+      this.rebuildDeityCache(ctx.world);
+      this.lastCacheUpdate = currentTick;
+    }
+
+    // Early exit: no deities exist
+    if (this.deityCache.size === 0) {
+      return;
+    }
+
     // Update existing competitions every throttle interval (100 ticks)
-    this.updateCompetitions(ctx.world, currentTick);
+    if (this.competitions.size > 0) {
+      this.updateCompetitions(ctx.world, currentTick);
+    }
 
     // Check for new competitions less frequently (every 4800 ticks)
     if (currentTick - this.lastCheckForNewCompetitions >= this.config.checkInterval) {
@@ -113,33 +145,64 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   }
 
   /**
+   * Rebuild deity cache from world entities
+   */
+  private rebuildDeityCache(world: World): void {
+    this.deityCache.clear();
+
+    for (const entity of world.entities.values()) {
+      if (!entity.components.has(CT.Deity)) continue;
+
+      const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
+      if (deity) {
+        this.deityCache.set(entity.id, deity);
+      }
+    }
+  }
+
+  /**
    * Check for new competition opportunities
    */
   private checkForNewCompetitions(world: World, currentTick: number): void {
-    // Deities are ALWAYS simulated entities, so we iterate all
-    const deities = Array.from(world.entities.values())
-      .filter(e => e.components.has(CT.Deity));
+    // Use cached deity list
+    const deityIds = Array.from(this.deityCache.keys());
+
+    // Early exit: need at least 2 deities
+    if (deityIds.length < 2) {
+      return;
+    }
 
     // Check each pair of deities
-    for (let i = 0; i < deities.length; i++) {
-      for (let j = i + 1; j < deities.length; j++) {
-        const deity1Entity = deities[i];
-        const deity2Entity = deities[j];
+    for (let i = 0; i < deityIds.length; i++) {
+      for (let j = i + 1; j < deityIds.length; j++) {
+        const deity1Id = deityIds[i];
+        const deity2Id = deityIds[j];
 
-        if (!deity1Entity || !deity2Entity) continue;
+        if (!deity1Id || !deity2Id) continue;
 
-        const deity1 = deity1Entity.components.get(CT.Deity) as DeityComponent | undefined;
-        const deity2 = deity2Entity.components.get(CT.Deity) as DeityComponent | undefined;
+        const deity1 = this.deityCache.get(deity1Id);
+        const deity2 = this.deityCache.get(deity2Id);
 
         if (!deity1 || !deity2) continue;
 
-        // Check if they're already competing
-        const existingCompetition = this.findCompetitionBetween(deity1Entity.id, deity2Entity.id);
-        if (existingCompetition) continue;
+        // Check if they're already competing (inline for performance)
+        let alreadyCompeting = false;
+        for (const competition of this.competitions.values()) {
+          if (
+            competition.status === 'active' &&
+            ((competition.competitors[0] === deity1Id && competition.competitors[1] === deity2Id) ||
+             (competition.competitors[0] === deity2Id && competition.competitors[1] === deity1Id))
+          ) {
+            alreadyCompeting = true;
+            break;
+          }
+        }
 
-        // Check if they should compete
-        if (this.shouldCompete(deity1, deity2)) {
-          this.startCompetition(deity1Entity.id, deity2Entity.id, deity1, deity2, currentTick);
+        if (alreadyCompeting) continue;
+
+        // Check if they should compete (optimized inline)
+        if (this.shouldCompeteOptimized(deity1, deity2)) {
+          this.startCompetition(deity1Id, deity2Id, deity1, deity2, currentTick);
         }
       }
     }

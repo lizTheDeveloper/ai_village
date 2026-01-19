@@ -57,11 +57,11 @@ export function createGoddessOfWisdom(
 
   // Identity - Goddess of Wisdom
   const identity = createIdentityComponent(config.name);
-  (entity as EntityImpl).addComponent(identity);
+  (entity as unknown as EntityImpl).addComponent(identity);
 
   // Position - manifests at research/discovery location
   const position = createPositionComponent(location.x, location.y);
-  (entity as EntityImpl).addComponent(position);
+  (entity as unknown as EntityImpl).addComponent(position);
 
   // Tags - mark as deity and wisdom goddess
   const tags = createTagsComponent(
@@ -74,24 +74,24 @@ export function createGoddessOfWisdom(
     `origin:${config.origin}`, // Track cultural origin
     `scrutiny_style:${config.scrutinyStyle}`
   );
-  (entity as EntityImpl).addComponent(tags);
+  (entity as unknown as EntityImpl).addComponent(tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getWisdomGoddessSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as EntityImpl).addComponent(renderable);
+  (entity as unknown as EntityImpl).addComponent(renderable);
 
   // Episodic Memory - remembers all discoveries and judgments
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as EntityImpl).addComponent(memory);
+  (entity as unknown as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with researchers and inventors
   const relationships = createRelationshipComponent();
-  (entity as EntityImpl).addComponent(relationships);
+  (entity as unknown as EntityImpl).addComponent(relationships);
 
   // Conversation - can engage in dialogue about discoveries
   const conversation = createConversationComponent(100);
-  (entity as EntityImpl).addComponent(conversation);
+  (entity as unknown as EntityImpl).addComponent(conversation);
 
   return entity;
 }

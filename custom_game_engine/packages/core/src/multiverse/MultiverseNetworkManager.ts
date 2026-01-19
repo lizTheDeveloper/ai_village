@@ -598,7 +598,7 @@ export class MultiverseNetworkManager {
               possessedUniverseId?: string;
               possessedMultiverseId?: string;
             };
-            (deityEntity as UpdateableEntity).updateComponent<CrossUniversePlayerControl>('player_control', {
+            (deityEntity as unknown as UpdateableEntity).updateComponent<CrossUniversePlayerControl>('player_control', {
               ...(typedPlayerControl || {}),
               deityUniverseId: passage.from.universeId,
               deityMultiverseId: sourceMultiverseId,

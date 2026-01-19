@@ -54,11 +54,11 @@ export function createGodOfDeath(
 
   // Identity - God of Death
   const identity = createIdentityComponent(config.name);
-  (entity as EntityImpl).addComponent(identity);
+  (entity as unknown as EntityImpl).addComponent(identity);
 
   // Position - manifests at death location
   const position = createPositionComponent(location.x, location.y);
-  (entity as EntityImpl).addComponent(position);
+  (entity as unknown as EntityImpl).addComponent(position);
 
   // Tags - mark as deity and death god
   const tags = createTagsComponent(
@@ -69,24 +69,24 @@ export function createGodOfDeath(
     'conversational', // Can be talked to
     `origin:${config.origin}` // Track cultural origin
   );
-  (entity as EntityImpl).addComponent(tags);
+  (entity as unknown as EntityImpl).addComponent(tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getDeathGodSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as EntityImpl).addComponent(renderable);
+  (entity as unknown as EntityImpl).addComponent(renderable);
 
   // Episodic Memory - remembers all death bargains and interactions
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as EntityImpl).addComponent(memory);
+  (entity as unknown as EntityImpl).addComponent(memory);
 
   // Relationship - tracks relationships with mortals and player
   const relationships = createRelationshipComponent();
-  (entity as EntityImpl).addComponent(relationships);
+  (entity as unknown as EntityImpl).addComponent(relationships);
 
   // Conversation - can engage in dialogue
   const conversation = createConversationComponent(100); // Gods have long conversation histories
-  (entity as EntityImpl).addComponent(conversation);
+  (entity as unknown as EntityImpl).addComponent(conversation);
 
   return entity;
 }

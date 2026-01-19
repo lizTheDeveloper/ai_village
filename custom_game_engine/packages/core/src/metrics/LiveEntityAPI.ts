@@ -9,6 +9,7 @@
 
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 import { spawnCity, getCityTemplates, type CitySpawnConfig, type CityTemplate } from '../city/CitySpawner.js';
@@ -17,6 +18,7 @@ import { spawnCity, getCityTemplates, type CitySpawnConfig, type CityTemplate } 
 import { DeityComponent } from '../components/DeityComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -324,8 +326,8 @@ export class LiveEntityAPI {
     const entity = this.world.createEntity();
     const entityId = entity.id;
 
-    // Set position via component (assuming PositionComponent exists)
-    // TODO: Add proper position component initialization
+    // Add position component - EntityImpl cast required for mutation methods
+    (entity as EntityImpl).addComponent(createPositionComponent(x, y, 0));
 
     if (!entity) {
       return {

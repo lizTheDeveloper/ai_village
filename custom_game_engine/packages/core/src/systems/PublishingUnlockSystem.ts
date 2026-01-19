@@ -21,7 +21,7 @@ export class PublishingUnlockSystem extends BaseSystem {
   public readonly id: SystemId = 'publishing_unlock';
   public readonly priority = 15; // Early, to detect unlocks quickly
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS (mostly event-driven)
+  protected readonly throttleInterval = 50; // Check every 50 ticks (2.5 seconds at 20 TPS)
 
   // Track published papers (paper ID → publication tick)
   private publishedPapers: Set<string> = new Set();
@@ -34,6 +34,10 @@ export class PublishingUnlockSystem extends BaseSystem {
     | ((techId: string, papers: Set<string>) => boolean)
     | null = null;
   private getAllPublishingSets: (() => any[]) | null = null;
+
+  // Performance optimizations
+  private lastUpdate = 0;
+  private readonly UPDATE_INTERVAL = 50; // Every 50 ticks (2.5 seconds)
 
   constructor(eventBus: CoreEventBus) {
     super();
@@ -63,9 +67,20 @@ export class PublishingUnlockSystem extends BaseSystem {
     });
   }
 
-  protected onUpdate(_ctx: SystemContext): void {
-    // Mostly event-driven system
-    // Could add periodic unlock checks if needed
+  protected onUpdate(ctx: SystemContext): void {
+    // Throttling: Skip update if interval hasn't elapsed
+    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastUpdate = ctx.world.tick;
+
+    // Early exit: No need to check if no papers published
+    if (this.publishedPapers.size === 0) {
+      return;
+    }
+
+    // Periodic check for unlocks (event-driven, but with periodic backup)
+    this.checkAllUnlocks();
   }
 
   /**

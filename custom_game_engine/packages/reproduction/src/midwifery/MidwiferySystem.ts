@@ -120,6 +120,29 @@ export class MidwiferySystem extends BaseSystem {
   private reproductionSystem: ReproductionSystem | null = null;
   private lastMidwiferyUpdateTick: Tick = 0;
 
+  // =========================================================================
+  // Performance Optimizations - GC Reduction
+  // =========================================================================
+
+  /** Update interval: every 100 ticks (5 seconds at 20 TPS) */
+  private readonly UPDATE_INTERVAL = 100;
+  private lastUpdate = 0;
+
+  /** Map-based caching for O(1) component access */
+  private readonly pregnancyCache = new Map<string, PregnancyComponent>();
+  private readonly laborCache = new Map<string, LaborComponent>();
+  private readonly postpartumCache = new Map<string, PostpartumComponent>();
+  private readonly infantCache = new Map<string, InfantComponent>();
+  private readonly nursingCache = new Map<string, NursingComponent>();
+
+  /** Precomputed constants */
+  private readonly ticksPerDay = 20 * 60 * 24;
+  private readonly ticksPerMinute = 20 * 60;
+
+  /** Reusable working objects (zero allocations in hot paths) */
+  private readonly workingRiskFactors: PregnancyRiskFactor[] = [];
+  private readonly workingComplications: BirthComplication[] = [];
+
   protected onInitialize(world: World, eventBus: EventBus): void {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
     // Note: world.getSystem may not be available in all contexts (e.g., tests)
@@ -136,6 +159,40 @@ export class MidwiferySystem extends BaseSystem {
     this.events.subscribe('conception', (event) => {
       this.handleConception(event.data);
     });
+
+    // Build initial caches for O(1) component access
+    this.rebuildCaches(world);
+  }
+
+  /**
+   * Rebuild all component caches for O(1) access
+   * Called on initialize and periodically to sync with entity changes
+   */
+  private rebuildCaches(world: World): void {
+    this.pregnancyCache.clear();
+    this.laborCache.clear();
+    this.postpartumCache.clear();
+    this.infantCache.clear();
+    this.nursingCache.clear();
+
+    for (const entity of world.entities.values()) {
+      const impl = entity as EntityImpl;
+
+      const pregnancy = impl.getComponent<PregnancyComponent>('pregnancy');
+      if (pregnancy) this.pregnancyCache.set(entity.id, pregnancy);
+
+      const labor = impl.getComponent<LaborComponent>('labor');
+      if (labor) this.laborCache.set(entity.id, labor);
+
+      const postpartum = impl.getComponent<PostpartumComponent>('postpartum');
+      if (postpartum) this.postpartumCache.set(entity.id, postpartum);
+
+      const infant = impl.getComponent<InfantComponent>('infant');
+      if (infant) this.infantCache.set(entity.id, infant);
+
+      const nursing = impl.getComponent<NursingComponent>('nursing');
+      if (nursing) this.nursingCache.set(entity.id, nursing);
+    }
   }
 
   protected onUpdate(ctx: SystemContext): void {

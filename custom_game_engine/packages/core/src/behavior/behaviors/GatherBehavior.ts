@@ -1194,7 +1194,12 @@ export class GatherBehavior extends BaseBehavior {
     const baseSeedCount = 5;
     const healthMod = plantComp.health / 100;
     const stageMod = plantComp.stage === 'seeding' ? 1.5 : 1.0;
-    const farmingSkill = ENERGY_MODERATE; // Default skill (TODO: get from agent skills when implemented)
+
+    // Get farming skill from agent's skills component (0-5 level scale)
+    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const farmingLevel = skillsComp?.levels?.farming ?? 0;
+    // Convert skill level (0-5) to 0-100 scale for formula compatibility
+    const farmingSkill = farmingLevel * 20; // 0→0, 1→20, 2→40, 3→60, 4→80, 5→100
     const skillMod = 0.5 + (farmingSkill / 100);
 
     const seedYield = Math.floor(baseSeedCount * healthMod * stageMod * skillMod * workSpeedMultiplier);
@@ -1216,8 +1221,6 @@ export class GatherBehavior extends BaseBehavior {
     const seedItemId = createSeedItemId(plantComp.speciesId);
 
     // Calculate seed quality based on farming skill and plant health
-    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
-    const farmingLevel = skillsComp?.levels.farming ?? 0;
     // Seeds get quality based on plant health and farming skill
     // Formula: base 50 + (skill * 8) + (health / 10) - gives range ~50-100
     const seedQuality = Math.min(100, Math.max(0,

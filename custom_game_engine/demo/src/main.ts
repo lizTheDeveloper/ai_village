@@ -179,7 +179,7 @@ import {
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig } from '@ai-village/world';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 
 // ============================================================================
@@ -4309,6 +4309,45 @@ async function main() {
       }
 
     } else {
+    }
+
+    // Initialize homeworld with biosphere generation
+    console.log('[WorldInit] Initializing homeworld planet...');
+    const planetType = universeConfig?.planetType || 'terrestrial';
+    const planetSeed = `universe:main:homeworld:${Date.now()}`;
+
+    let homeworldConfig;
+    if (planetType === 'random') {
+      // Generate random planet configuration
+      homeworldConfig = generateRandomPlanetConfig(planetSeed);
+      console.log(`[WorldInit] Random world selected: ${homeworldConfig.type}`);
+    } else {
+      // Use selected planet type with some randomization
+      homeworldConfig = generateRandomPlanetConfig(planetSeed, {
+        type: planetType as any,
+        name: 'Homeworld',
+        id: 'planet:homeworld',
+      });
+    }
+
+    try {
+      const homeworld = await initializePlanet(homeworldConfig, {
+        llmProvider,
+        godCraftedSpawner: godCraftedDiscoverySystem,
+        generateBiosphere: true,
+        queueSprites: true,
+      });
+
+      // Store homeworld reference on world for future access
+      (gameLoop.world as any)._homeworld = homeworld;
+
+      console.log(`[WorldInit] Homeworld initialized: ${homeworld.name} (${homeworld.type})`);
+      if (homeworld.biosphere) {
+        console.log(`[WorldInit] Biosphere generated: ${homeworld.biosphere.species.length} species, ${homeworld.biosphere.sapientSpecies.length} sapient`);
+      }
+    } catch (error) {
+      console.error('[WorldInit] Failed to initialize homeworld:', error);
+      console.warn('[WorldInit] Continuing without biosphere generation');
     }
 
     // Create initial entities

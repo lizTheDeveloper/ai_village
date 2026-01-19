@@ -187,7 +187,7 @@ function generatePlanetConfigFromType(
       break;
 
     case 'volcanic':
-      base.allowedBiomes = ['volcanic', 'mountains', 'scrubland'];
+      base.allowedBiomes = ['lava_field', 'ash_plain', 'obsidian_waste', 'mountains', 'scrubland'];
       base.hasLavaFlows = true;
       base.temperatureOffset = 0.6;
       base.atmosphereDensity = 0.8;
@@ -224,20 +224,20 @@ function generatePlanetConfigFromType(
       break;
 
     case 'magical':
-      base.allowedBiomes = ['magical', 'forest', 'mountains', 'plains'];
+      base.allowedBiomes = ['mana_spring', 'ley_nexus', 'forest', 'mountains', 'plains'];
       base.hasFloatingIslands = true;
       base.atmosphereType = 'nitrogen_oxygen';
       break;
 
     case 'fungal':
-      base.allowedBiomes = ['fungal', 'wetland', 'forest'];
+      base.allowedBiomes = ['mushroom_forest', 'mycelium_network', 'bioluminescent_marsh', 'wetland', 'forest'];
       base.hasGiantMushrooms = true;
       base.moistureOffset = 0.5;
       base.atmosphereType = 'nitrogen_oxygen';
       break;
 
     case 'crystal':
-      base.allowedBiomes = ['crystal', 'mountains'];
+      base.allowedBiomes = ['crystal_plains', 'geode_caves', 'prismatic_forest', 'mountains'];
       base.hasCrystalFormations = true;
       base.atmosphereType = 'nitrogen_oxygen';
       break;
@@ -277,9 +277,9 @@ function generatePlanetName(seed: string): string {
     hash = hash & hash;
   }
 
-  const prefix = prefixes[Math.abs(hash) % prefixes.length];
-  const body = bodies[Math.abs(hash >> 8) % bodies.length];
-  const suffix = suffixes[Math.abs(hash >> 16) % suffixes.length];
+  const prefix = prefixes[Math.abs(hash) % prefixes.length]!;
+  const body = bodies[Math.abs(hash >> 8) % bodies.length]!;
+  const suffix = suffixes[Math.abs(hash >> 16) % suffixes.length]!;
 
   // Randomly choose naming pattern
   const pattern = Math.abs(hash) % 4;

@@ -274,8 +274,8 @@ class UI {
     simulator: HeadlessCitySimulator;
     ui: UI;
   }
-  (window as WindowWithDebug).simulator = simulator;
-  (window as WindowWithDebug).ui = ui;
+  (window as unknown as WindowWithDebug).simulator = simulator;
+  (window as unknown as WindowWithDebug).ui = ui;
 
   console.log('✅ City Simulator initialized!');
   console.log(`- Preset: ${preset}`);
