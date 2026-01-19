@@ -285,7 +285,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
         level: Math.floor(Math.log2(context.casterMagic.totalSpellsCast + 1)),
       });
       result.appliedValues['dotDamage'] = dotValue.value;
-      result.appliedValues['dotType'] = effect.dotType;
+      // dotType is stored in the effect itself, not in appliedValues (which is Record<string, number>)
     }
 
     return result;

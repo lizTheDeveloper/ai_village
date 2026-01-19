@@ -340,8 +340,8 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       adaptationType,
       modifications: {
         costModifier: effect.parameters.costModifier as number | undefined,
-        additionalChannels: effect.parameters.additionalChannels as ChannelData[] | undefined,
-        additionalRisks: effect.parameters.additionalRisks as RiskData[] | undefined,
+        additionalChannels: (effect.parameters.additionalChannels as any)?.map((c: any) => c.type as any),
+        additionalRisks: (effect.parameters.additionalRisks as any)?.map((r: any) => r.type as any),
       },
     });
 

@@ -386,7 +386,7 @@ export class SaveLoadService {
       // Restore god-crafted queue
       if (saveFile.godCraftedQueue) {
         // Type assertion: We trust the serialized queue data structure
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue);
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
       }
 
       // Deserialize universe(s) first, before creating passages
@@ -575,7 +575,7 @@ export class SaveLoadService {
 
       if (saveFile.godCraftedQueue) {
         // Type assertion: We trust the serialized queue data structure
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue);
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
       }
 
       // Deserialize universe(s) first, before creating passages

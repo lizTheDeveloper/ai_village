@@ -24,7 +24,7 @@ export class ManaPoolsSerializer extends BaseComponentSerializer<ManaPoolsCompon
     const comp = createManaPoolsComponent();
     comp.manaPools = d.manaPools as any[] || [];
     comp.resourcePools = d.resourcePools as any || {};
-    comp.primarySource = d.primarySource as string | undefined;
+    comp.primarySource = d.primarySource as any;
     return comp;
   }
 

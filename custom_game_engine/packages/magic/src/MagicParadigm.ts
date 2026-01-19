@@ -368,6 +368,7 @@ export type MagicRiskConsequence =
   | 'attention_gained'    // Powerful entity notices you
   | 'paradox_spirit'      // Reality sends enforcers
   | 'addiction_worsens'   // Dependency deepens
+  | 'feedback_loop'       // Catastrophic feedback from split focus
   | 'memory_loss'         // Forget something
   | 'aging'               // Instantly age
   | 'wild_surge'          // Random magical effect

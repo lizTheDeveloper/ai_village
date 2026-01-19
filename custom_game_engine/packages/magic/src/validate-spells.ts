@@ -73,10 +73,14 @@ function validateSpells() {
 
   // Sample a few spells
   console.log('\nSample spells:');
-  console.log(`  ${DIVINE_SPELLS[0].name} (${DIVINE_SPELLS[0].id})`);
-  console.log(`    ${DIVINE_SPELLS[0].description.substring(0, 80)}...`);
-  console.log(`  ${ACADEMIC_SPELLS[0].name} (${ACADEMIC_SPELLS[0].id})`);
-  console.log(`    ${ACADEMIC_SPELLS[0].description.substring(0, 80)}...`);
+  if (DIVINE_SPELLS[0]) {
+    console.log(`  ${DIVINE_SPELLS[0].name} (${DIVINE_SPELLS[0].id})`);
+    console.log(`    ${DIVINE_SPELLS[0].description?.substring(0, 80)}...`);
+  }
+  if (ACADEMIC_SPELLS[0]) {
+    console.log(`  ${ACADEMIC_SPELLS[0].name} (${ACADEMIC_SPELLS[0].id})`);
+    console.log(`    ${ACADEMIC_SPELLS[0].description?.substring(0, 80)}...`);
+  }
 
   console.log('\n✅ Validation complete!');
 }

@@ -38,24 +38,24 @@ export class ConflictSerializer extends BaseComponentSerializer<ConflictComponen
   protected deserializeData(data: unknown): ConflictComponent {
     const d = data as Record<string, unknown>;
     return createConflictComponent({
-      conflictType: d.conflictType as string,
+      conflictType: d.conflictType as any,
       target: d.target as string,
       state: d.state as string,
       startTime: d.startTime as number,
-      huntingState: d.huntingState as string | undefined,
+      huntingState: d.huntingState as any,
       cause: d.cause as string | undefined,
       surprise: d.surprise as boolean | undefined,
-      modifiers: d.modifiers as Record<string, number> | undefined,
+      modifiers: d.modifiers as any,
       attackerPower: d.attackerPower as number | undefined,
       defenderPower: d.defenderPower as number | undefined,
-      outcome: d.outcome as string | undefined,
+      outcome: d.outcome as any,
       winner: d.winner as string | undefined,
       combatants: d.combatants as string[] | undefined,
-      trigger: d.trigger as string | undefined,
+      trigger: d.trigger as any,
       metadata: d.metadata as Record<string, unknown> | undefined,
-      method: d.method as string | undefined,
+      method: d.method as any,
       targetFollower: d.targetFollower as string | undefined,
-      consequence: d.consequence as string | undefined,
+      consequence: d.consequence as any,
       lethal: d.lethal as boolean | undefined,
     });
   }

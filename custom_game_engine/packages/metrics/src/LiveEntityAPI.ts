@@ -14,7 +14,6 @@ import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/cor
 // TODO: Re-export these from core or import directly from source files
 // import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
-import type { IdentityComponent, PositionComponent, AgentComponent } from '@ai-village/core';
 import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
 
 /**
