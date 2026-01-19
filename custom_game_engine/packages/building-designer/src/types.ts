@@ -146,6 +146,82 @@ export interface MaterialProperties {
 }
 
 /**
+ * Special effects that materials can provide.
+ */
+export interface MaterialSpecialEffect {
+  /** Effect type - extensible to support any material-specific effects */
+  type: string;
+  magnitude: number;  // Strength of effect
+  radius?: number;    // Area of effect (if applicable)
+  description: string;
+}
+
+/**
+ * Complete effect properties for a material.
+ * Every material has these - even mundane ones have subtle effects.
+ */
+export interface MaterialEffectProperties {
+  // === Physical Properties ===
+  /** Heat retention (0-100) */
+  insulation: number;
+  /** Resistance to damage (0-100) */
+  durability: number;
+  /** How reality-bending the material is (0-100) */
+  weirdness: number;
+  /** Upkeep difficulty (0-100) */
+  maintenance: number;
+  /** Weight per unit volume (0-100, 50 = normal) */
+  density: number;
+
+  // === Basic Flags ===
+  edible: boolean;
+  alive: boolean;
+  glows: boolean;
+  intangible: boolean;
+  flammable: boolean;
+  conducts_magic: boolean;
+  conducts_electricity: boolean;
+
+  // === Magical Properties ===
+  /** Mana regeneration modifier (1.0 = normal, 2.0 = double) */
+  manaRegen: number;
+  /** Spell power modifier (percentage bonus, 0 = none) */
+  spellPower: number;
+  /** Casting cost modifier (negative = cheaper) */
+  costModifier: number;
+  /** Spell range modifier (percentage bonus) */
+  rangeModifier: number;
+  /** Spell duration modifier (percentage bonus) */
+  durationModifier: number;
+  /** Protection/resistance bonus */
+  protection: number;
+
+  // === Paradigm Affinities ===
+  /** Which magic paradigms this material enhances */
+  paradigmAffinities: Partial<Record<MagicParadigm, number>>;
+
+  // === Elemental Properties ===
+  /** Feng shui element this material resonates with */
+  element: FengShuiElement | null;
+  /** Strength of elemental resonance (0-100) */
+  elementalStrength: number;
+
+  // === Special Effects ===
+  /** Unique effects this material provides */
+  specialEffects: MaterialSpecialEffect[];
+
+  // === Mood/Psychological ===
+  /** Mood modifier for occupants */
+  moodModifier: number;
+  /** Psychological effects (comfort, unease, etc.) */
+  atmosphere: 'comforting' | 'neutral' | 'unsettling' | 'terrifying' | 'euphoric' | 'dreamy' | 'energizing' | 'calming';
+
+  // === Description ===
+  description: string;
+  lore?: string;
+}
+
+/**
  * Construction properties for common materials.
  * Exotic materials use MATERIAL_EFFECTS for their full property set.
  */

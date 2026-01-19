@@ -139,7 +139,7 @@ export class WorldSerializer {
         // Dynamic import to break circular dependency: core -> world -> reproduction -> core
         // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
         const { chunkSerializer } = await import('@ai-village/world');
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -297,7 +297,7 @@ export class WorldSerializer {
     let terrain = null;
     if (chunkManager) {
       const { chunkSerializer } = await import('@ai-village/world');
-      terrain = chunkSerializer.serializeChunks(chunkManager);
+      terrain = chunkSerializer.serializeChunks(chunkManager as any);
     }
 
     // Serialize zones using ZoneManager

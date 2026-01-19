@@ -4,7 +4,8 @@
  */
 
 import { Material, MaterialEffectProperties } from './types.js';
-import materialEffectsData from '../data/material-effects.json' assert { type: 'json' };
+// @ts-ignore - JSON import
+import materialEffectsData from '../data/material-effects.json';
 
 /**
  * Complete material effect definitions loaded from JSON.

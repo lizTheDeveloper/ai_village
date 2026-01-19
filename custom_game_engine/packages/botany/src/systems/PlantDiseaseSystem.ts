@@ -188,7 +188,7 @@ export class PlantDiseaseSystem extends BaseSystem {
     const activeEntities = ctx.activeEntities;
 
     // Get current game day for tracking
-    const gameDay = this.getCurrentGameDay(world);
+    const gameDay = this.getCurrentGameDay(world as any);
 
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;

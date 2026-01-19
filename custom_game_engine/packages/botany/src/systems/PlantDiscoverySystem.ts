@@ -432,7 +432,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Check if this plant has medicinal properties that work with this application
     const medicinalPrep = props.medicinal?.preparation;
-    if (props.medicinal && medicinalPrep?.includes(applicationMethod)) {
+    if (props.medicinal && medicinalPrep?.includes(applicationMethod as any)) {
       const appEffectiveness = props.medicinal.effectiveness ?? 0.5;
       effects.push({
         type: 'healing',

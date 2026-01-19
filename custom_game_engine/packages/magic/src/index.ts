@@ -117,7 +117,6 @@ export {
 // ============================================================================
 
 export type {
-  SpellValidationResult,
   SpellCost,
   EvaluatedRisk,
   SpellBonus,

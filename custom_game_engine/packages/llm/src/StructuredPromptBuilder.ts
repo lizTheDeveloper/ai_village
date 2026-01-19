@@ -248,7 +248,7 @@ export class StructuredPromptBuilder {
     // Use PromptRenderer to generate prompts for all schema'd components
     // This will skip components that don't have schemas registered
     // Pass world for entity name resolution in relationships, etc.
-    const schemaPrompt = PromptRenderer.renderEntity(agent, world);
+    const schemaPrompt = PromptRenderer.renderEntity(agent as unknown as { id: string; components: Map<string, any> }, world);
 
     if (!schemaPrompt) {
       return '';
@@ -486,13 +486,13 @@ export class StructuredPromptBuilder {
    * Shows what buildings the agent knows how to construct with costs.
    */
   private buildBuildingsKnowledge(agent: Entity, world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
-    // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as WorldWithBuildingRegistry;
-    if (!world || !worldWithRegistry.buildingRegistry) {
+    // Check for buildingRegistry (private property accessed via any)
+    const worldAny = world as any;
+    if (!world || !worldAny.buildingRegistry) {
       return '';
     }
 
-    const registry = worldWithRegistry.buildingRegistry;
+    const registry = worldAny.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings;

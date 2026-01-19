@@ -168,7 +168,7 @@ export class ExecutorPromptBuilder {
    * Auto-generates prompts for all schema'd components.
    */
   private buildSchemaPrompt(agent: Entity, world: World): string {
-    const schemaPrompt = PromptRenderer.renderEntity(agent, world);
+    const schemaPrompt = PromptRenderer.renderEntity(agent as unknown as { id: string; components: Map<string, any> }, world);
 
     if (!schemaPrompt) {
       return '';
@@ -488,13 +488,13 @@ export class ExecutorPromptBuilder {
     inventory: InventoryComponent | undefined,
     skills: SkillsComponent | undefined
   ): string {
-    // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as WorldWithBuildingRegistry;
-    if (!worldWithRegistry.buildingRegistry) {
+    // Check for buildingRegistry (private property accessed via any)
+    const worldAny = world as any;
+    if (!worldAny.buildingRegistry) {
       return '';
     }
 
-    const registry = worldWithRegistry.buildingRegistry;
+    const registry = worldAny.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings: any[];

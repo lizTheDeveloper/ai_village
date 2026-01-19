@@ -210,8 +210,9 @@ export function calculateBuildingEffects(
   const paradigmTotals: Partial<Record<MagicParadigm, number>> = {};
   for (const props of [wallProps, floorProps, doorProps]) {
     for (const [paradigm, bonus] of Object.entries(props.paradigmAffinities)) {
+      const bonusNum = typeof bonus === 'number' ? bonus : 0;
       paradigmTotals[paradigm as MagicParadigm] =
-        (paradigmTotals[paradigm as MagicParadigm] ?? 0) + (bonus ?? 0);
+        (paradigmTotals[paradigm as MagicParadigm] ?? 0) + bonusNum;
     }
   }
 
@@ -280,9 +281,10 @@ export function getDominantParadigm(
   for (const mat of [materials.wall, materials.floor, materials.door]) {
     const props = MATERIAL_EFFECTS[mat];
     for (const [paradigm, bonus] of Object.entries(props.paradigmAffinities)) {
-      if (bonus && bonus > 0) {
+      const bonusValue = typeof bonus === 'number' ? bonus : 0;
+      if (bonusValue > 0) {
         totals[paradigm as MagicParadigm] =
-          (totals[paradigm as MagicParadigm] ?? 0) + bonus;
+          (totals[paradigm as MagicParadigm] ?? 0) + bonusValue;
       }
     }
   }

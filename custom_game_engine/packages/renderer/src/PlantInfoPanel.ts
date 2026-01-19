@@ -333,9 +333,11 @@ export class PlantInfoPanel implements IWindowPanel {
 
         if (mag.effects && mag.effects.length > 0) {
           const effect = mag.effects[0];
-          const effectText = effect.description || effect.type;
-          const truncated = effectText.length > 30 ? effectText.slice(0, 27) + '...' : effectText;
-          drawText(`Effect: ${truncated}`, '#FFD700');
+          if (effect) {
+            const effectText = effect.description || effect.type;
+            const truncated = effectText.length > 30 ? effectText.slice(0, 27) + '...' : effectText;
+            drawText(`Effect: ${truncated}`, '#FFD700');
+          }
         }
 
         if (mag.harvestConditions) {
@@ -614,7 +616,7 @@ export class PlantInfoPanel implements IWindowPanel {
   private getSpeciesDisplayName(speciesId: string): string {
     try {
       const species = getPlantSpecies(speciesId);
-      return species.displayName || species.name;
+      return species.name;
     } catch (error) {
       // Fallback: convert kebab-case to Title Case if species not found
       return speciesId
