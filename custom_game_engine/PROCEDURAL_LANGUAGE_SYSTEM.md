@@ -35,56 +35,229 @@ A generative alien language system that creates unique languages for each planet
 
 ## 1. Phoneme Inventory
 
-**Universal phoneme sets** that can be mixed to create distinct languages.
+**Universal phoneme sets with descriptive metadata** that can be mixed to create distinct languages. Each phoneme has tags that Tracery uses to describe the language's character.
 
-### Phoneme Categories
+### Phoneme Schema
 
 ```typescript
+interface PhonemeMetadata {
+  sound: string;              // The phoneme symbol (e.g., 'kh', 'l', 'a')
+  category: 'consonant' | 'vowel' | 'cluster' | 'tone';
+
+  // Descriptive qualities (used by Tracery to describe language)
+  qualities: {
+    texture: string[];        // guttural, liquid, percussive, sibilant, nasal, breathy
+    hardness: string[];       // harsh, soft, crisp, smooth, rough
+    position: string[];       // front, back, central, high, low
+    manner: string[];         // flowing, clipped, resonant, sharp, rounded
+  };
+
+  // Phonetic classification
+  type?: string;              // stop, fricative, nasal, liquid, glide, close, mid, open
+}
+
 interface PhonemeInventory {
-  // Consonants
-  stops: string[];           // p, t, k, b, d, g
-  fricatives: string[];      // f, s, sh, v, z, th
-  nasals: string[];          // m, n, ng
-  liquids: string[];         // l, r
-  glides: string[];          // w, y
-
-  // Vowels
-  closeVowels: string[];     // i, u
-  midVowels: string[];       // e, o
-  openVowels: string[];      // a, ä
-
-  // Special features
-  clusters: string[];        // consonant clusters (tr, kr, fl, etc.)
-  affricates: string[];      // ch, j
-  clicks: string[];          // !, |, ||
-  tones: string[];           // ', `, ˆ (tone markers)
-
-  // Syllable structure patterns
-  syllablePatterns: string[]; // CV, CVC, CVCC, V, VC, etc.
+  consonants: PhonemeMetadata[];
+  vowels: PhonemeMetadata[];
+  clusters: PhonemeMetadata[];
+  tones: PhonemeMetadata[];
+  syllablePatterns: string[];
 }
 ```
 
-### Example Phoneme Sets
+### Phoneme Library with Descriptive Metadata
 
 ```typescript
 const UNIVERSAL_PHONEMES: PhonemeInventory = {
-  stops: ['p', 't', 'k', 'b', 'd', 'g', 'q', "'"],
-  fricatives: ['f', 's', 'sh', 'v', 'z', 'th', 'kh', 'x', 'h'],
-  nasals: ['m', 'n', 'ng'],
-  liquids: ['l', 'r', 'rr'],
-  glides: ['w', 'y'],
+  consonants: [
+    // STOPS - Percussive, clipped
+    { sound: 'p', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['crisp'], position: ['front'], manner: ['clipped', 'sharp'] } },
+    { sound: 't', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['crisp'], position: ['front'], manner: ['clipped', 'sharp'] } },
+    { sound: 'k', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['crisp'], position: ['back'], manner: ['clipped'] } },
+    { sound: 'b', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['soft'], position: ['front'], manner: ['clipped'] } },
+    { sound: 'd', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['soft'], position: ['front'], manner: ['clipped'] } },
+    { sound: 'g', category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['soft'], position: ['back'], manner: ['clipped'] } },
+    { sound: 'q', category: 'consonant', type: 'stop',
+      qualities: { texture: ['guttural', 'percussive'], hardness: ['harsh'], position: ['back'], manner: ['clipped', 'sharp'] } },
+    { sound: "'", category: 'consonant', type: 'stop',
+      qualities: { texture: ['percussive'], hardness: ['harsh'], position: ['back'], manner: ['clipped', 'sharp'] } },
 
-  closeVowels: ['i', 'u', 'ü'],
-  midVowels: ['e', 'o', 'ö'],
-  openVowels: ['a', 'ä'],
+    // FRICATIVES - Sibilant, harsh or soft
+    { sound: 'f', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 's', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['crisp'], position: ['front'], manner: ['sharp'] } },
+    { sound: 'sh', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'v', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'z', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'th', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['sibilant'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'kh', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['guttural'], hardness: ['harsh', 'rough'], position: ['back'], manner: ['sharp'] } },
+    { sound: 'x', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['guttural'], hardness: ['harsh'], position: ['back'], manner: ['sharp'] } },
+    { sound: 'h', category: 'consonant', type: 'fricative',
+      qualities: { texture: ['breathy'], hardness: ['soft'], position: ['back'], manner: ['flowing'] } },
 
-  clusters: ['tr', 'kr', 'fl', 'bl', 'gr', 'pr', 'st', 'sk', 'sn'],
-  affricates: ['ch', 'j', 'ts', 'dz'],
-  clicks: ['!', '|', '||'],
-  tones: ["'", "`", "^"],
+    // NASALS - Resonant, soft
+    { sound: 'm', category: 'consonant', type: 'nasal',
+      qualities: { texture: ['nasal'], hardness: ['soft'], position: ['front'], manner: ['resonant', 'rounded'] } },
+    { sound: 'n', category: 'consonant', type: 'nasal',
+      qualities: { texture: ['nasal'], hardness: ['soft'], position: ['front'], manner: ['resonant'] } },
+    { sound: 'ng', category: 'consonant', type: 'nasal',
+      qualities: { texture: ['nasal'], hardness: ['soft'], position: ['back'], manner: ['resonant'] } },
+
+    // LIQUIDS - Flowing, smooth
+    { sound: 'l', category: 'consonant', type: 'liquid',
+      qualities: { texture: ['liquid'], hardness: ['soft', 'smooth'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'r', category: 'consonant', type: 'liquid',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['central'], manner: ['flowing', 'resonant'] } },
+    { sound: 'rr', category: 'consonant', type: 'liquid',
+      qualities: { texture: ['liquid'], hardness: ['rough'], position: ['central'], manner: ['resonant'] } },
+
+    // GLIDES - Smooth, flowing
+    { sound: 'w', category: 'consonant', type: 'glide',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['back'], manner: ['flowing', 'rounded'] } },
+    { sound: 'y', category: 'consonant', type: 'glide',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['front'], manner: ['flowing'] } },
+
+    // AFFRICATES - Complex, percussive
+    { sound: 'ch', category: 'consonant', type: 'affricate',
+      qualities: { texture: ['sibilant', 'percussive'], hardness: ['crisp'], position: ['front'], manner: ['sharp'] } },
+    { sound: 'j', category: 'consonant', type: 'affricate',
+      qualities: { texture: ['sibilant', 'percussive'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+  ],
+
+  vowels: [
+    // CLOSE VOWELS - High, tight
+    { sound: 'i', category: 'vowel', type: 'close',
+      qualities: { texture: ['liquid'], hardness: ['crisp'], position: ['front', 'high'], manner: ['sharp'] } },
+    { sound: 'u', category: 'vowel', type: 'close',
+      qualities: { texture: ['liquid'], hardness: ['soft'], position: ['back', 'high'], manner: ['rounded'] } },
+    { sound: 'ü', category: 'vowel', type: 'close',
+      qualities: { texture: ['liquid'], hardness: ['crisp'], position: ['front', 'high'], manner: ['rounded'] } },
+
+    // MID VOWELS - Balanced
+    { sound: 'e', category: 'vowel', type: 'mid',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['front', 'central'], manner: ['flowing'] } },
+    { sound: 'o', category: 'vowel', type: 'mid',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['back', 'central'], manner: ['rounded', 'flowing'] } },
+    { sound: 'ö', category: 'vowel', type: 'mid',
+      qualities: { texture: ['liquid'], hardness: ['smooth'], position: ['front', 'central'], manner: ['rounded'] } },
+
+    // OPEN VOWELS - Low, resonant
+    { sound: 'a', category: 'vowel', type: 'open',
+      qualities: { texture: ['liquid'], hardness: ['soft'], position: ['central', 'low'], manner: ['resonant', 'flowing'] } },
+    { sound: 'ä', category: 'vowel', type: 'open',
+      qualities: { texture: ['liquid'], hardness: ['soft'], position: ['front', 'low'], manner: ['resonant'] } },
+  ],
+
+  clusters: [
+    { sound: 'tr', category: 'cluster', type: 'complex',
+      qualities: { texture: ['percussive', 'liquid'], hardness: ['crisp'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'kr', category: 'cluster', type: 'complex',
+      qualities: { texture: ['percussive', 'liquid'], hardness: ['harsh'], position: ['back'], manner: ['flowing'] } },
+    { sound: 'fl', category: 'cluster', type: 'complex',
+      qualities: { texture: ['sibilant', 'liquid'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'bl', category: 'cluster', type: 'complex',
+      qualities: { texture: ['percussive', 'liquid'], hardness: ['soft'], position: ['front'], manner: ['flowing'] } },
+    { sound: 'gr', category: 'cluster', type: 'complex',
+      qualities: { texture: ['percussive', 'liquid'], hardness: ['rough'], position: ['back'], manner: ['resonant'] } },
+    { sound: 'st', category: 'cluster', type: 'complex',
+      qualities: { texture: ['sibilant', 'percussive'], hardness: ['crisp'], position: ['front'], manner: ['sharp'] } },
+    { sound: 'sk', category: 'cluster', type: 'complex',
+      qualities: { texture: ['sibilant', 'percussive'], hardness: ['crisp'], position: ['back'], manner: ['sharp'] } },
+  ],
+
+  tones: [
+    { sound: "'", category: 'tone', type: 'high',
+      qualities: { texture: ['tonal'], hardness: ['crisp'], position: ['high'], manner: ['sharp'] } },
+    { sound: "`", category: 'tone', type: 'low',
+      qualities: { texture: ['tonal'], hardness: ['soft'], position: ['low'], manner: ['resonant'] } },
+    { sound: "^", category: 'tone', type: 'rising',
+      qualities: { texture: ['tonal'], hardness: ['smooth'], position: ['central'], manner: ['flowing'] } },
+  ],
 
   syllablePatterns: ['CV', 'CVC', 'CVCC', 'V', 'VC', 'CCV', 'CCVC'],
 };
+```
+
+### Language Character Analysis
+
+After selecting phonemes for a language, analyze their qualities to generate a Tracery description:
+
+```typescript
+interface LanguageCharacter {
+  primaryTexture: string;     // e.g., 'guttural', 'liquid', 'percussive'
+  secondaryTexture?: string;  // Optional secondary quality
+  primaryHardness: string;    // e.g., 'harsh', 'soft', 'crisp'
+  primaryManner: string;      // e.g., 'flowing', 'clipped', 'sharp'
+  positions: string[];        // e.g., ['back', 'low'] for deep sounds
+}
+
+class PhonemeAnalyzer {
+  /**
+   * Analyze selected phonemes to determine language character
+   */
+  analyzeLanguageCharacter(selectedPhonemes: PhonemeMetadata[]): LanguageCharacter {
+    const qualityCounts: Record<string, number> = {};
+
+    // Count all quality occurrences
+    for (const phoneme of selectedPhonemes) {
+      for (const qualityType of Object.values(phoneme.qualities)) {
+        for (const quality of qualityType) {
+          qualityCounts[quality] = (qualityCounts[quality] || 0) + 1;
+        }
+      }
+    }
+
+    // Find dominant qualities by category
+    const textures = this.filterByCategory(qualityCounts, ['guttural', 'liquid', 'percussive', 'sibilant', 'nasal', 'breathy']);
+    const hardnesses = this.filterByCategory(qualityCounts, ['harsh', 'soft', 'crisp', 'smooth', 'rough']);
+    const manners = this.filterByCategory(qualityCounts, ['flowing', 'clipped', 'sharp', 'resonant', 'rounded']);
+    const positions = this.filterByCategory(qualityCounts, ['front', 'back', 'central', 'high', 'low']);
+
+    return {
+      primaryTexture: this.getTopQuality(textures),
+      secondaryTexture: this.getSecondQuality(textures),
+      primaryHardness: this.getTopQuality(hardnesses),
+      primaryManner: this.getTopQuality(manners),
+      positions: this.getTopQualities(positions, 2),
+    };
+  }
+
+  private filterByCategory(counts: Record<string, number>, categories: string[]): Record<string, number> {
+    return Object.fromEntries(
+      Object.entries(counts).filter(([key]) => categories.includes(key))
+    );
+  }
+
+  private getTopQuality(counts: Record<string, number>): string {
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return sorted[0]?.[0] || 'neutral';
+  }
+
+  private getSecondQuality(counts: Record<string, number>): string | undefined {
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return sorted[1]?.[0];
+  }
+
+  private getTopQualities(counts: Record<string, number>, n: number): string[] {
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map(([key]) => key);
+  }
+}
 ```
 
 ## 2. Language Generator
@@ -100,12 +273,19 @@ interface LanguageConfig {
   planetType: string;            // Links to planet
   seed: string;                  // Deterministic generation
 
-  // Phoneme selection (subsets of universal inventory)
-  selectedConsonants: string[];
+  // Phoneme selection (actual phoneme metadata objects)
+  selectedPhonemes: PhonemeMetadata[];  // Complete phoneme objects with qualities
+
+  // Legacy flat arrays (for Tracery compatibility)
+  selectedConsonants: string[];  // Just the sound strings
   selectedVowels: string[];
   selectedClusters: string[];
   allowedClusters: boolean;
   allowedTones: boolean;
+
+  // Language character (analyzed from phonemes)
+  character: LanguageCharacter;  // NEW: Dominant qualities
+  description: string;           // NEW: Tracery-generated description
 
   // Phonotactic constraints
   syllablePatterns: string[];    // Which patterns this language uses
@@ -200,9 +380,160 @@ class LanguageGenerator {
 
 ## 3. Tracery Grammar Integration
 
-Use Tracery to generate words based on the language's phoneme inventory.
+Use Tracery to generate both **words** (from phonemes) and **language descriptions** (from analyzed qualities).
 
-### Grammar Generation
+### Language Description Grammar
+
+Generate poetic descriptions of the language based on analyzed phoneme qualities:
+
+```typescript
+class LanguageDescriptionGrammar {
+  /**
+   * Build Tracery grammar to describe the language's character
+   */
+  buildDescriptionGrammar(character: LanguageCharacter, planetType: string): TraceryGrammar {
+    // Build contextual adjectives based on planet type
+    const contextAdjectives = this.getContextAdjectives(planetType);
+
+    return {
+      origin: [
+        'A #hardness# #texture# language with #manner# sounds',
+        '#texture.capitalize# and #hardness#, like #metaphor#',
+        'A #manner# tongue, #texture# and #hardness#',
+        'Their speech is #texture# and #hardness#, #manner# like #metaphor#',
+        '#context_adj# has shaped their #texture# #hardness# tongue',
+      ],
+
+      // Core qualities (from phoneme analysis)
+      texture: [character.primaryTexture],
+      hardness: [character.primaryHardness],
+      manner: [character.primaryManner],
+
+      // Secondary textures for variety
+      texture_secondary: character.secondaryTexture ? [character.secondaryTexture] : ['resonant'],
+
+      // Context-specific adjectives
+      context_adj: contextAdjectives,
+
+      // Metaphors based on texture + hardness combinations
+      metaphor: this.buildMetaphors(character),
+
+      // Modifiers
+      'texture.capitalize': [
+        character.primaryTexture.charAt(0).toUpperCase() + character.primaryTexture.slice(1)
+      ],
+    };
+  }
+
+  /**
+   * Generate metaphors based on language character
+   */
+  private buildMetaphors(character: LanguageCharacter): string[] {
+    const metaphors: string[] = [];
+
+    // Texture-based metaphors
+    if (character.primaryTexture === 'guttural') {
+      if (character.primaryHardness === 'harsh') {
+        metaphors.push('stones grinding in a volcanic mill', 'thunder in deep valleys', 'fire crackling on obsidian');
+      } else {
+        metaphors.push('rumbling earth', 'distant avalanches');
+      }
+    }
+
+    if (character.primaryTexture === 'liquid') {
+      if (character.primaryManner === 'flowing') {
+        metaphors.push('water over smooth stones', 'rivers finding their course', 'rain on leaves');
+      } else {
+        metaphors.push('droplets on glass', 'mist through branches');
+      }
+    }
+
+    if (character.primaryTexture === 'percussive') {
+      if (character.primaryManner === 'clipped') {
+        metaphors.push('hammered metal', 'footfalls on stone', 'breaking ice');
+      } else {
+        metaphors.push('drumbeats', 'stones clicking together');
+      }
+    }
+
+    if (character.primaryTexture === 'sibilant') {
+      if (character.primaryManner === 'sharp') {
+        metaphors.push('wind through narrow canyons', 'sand scouring rock', 'hissing steam');
+      } else {
+        metaphors.push('whispers in tall grass', 'waves on distant shores');
+      }
+    }
+
+    if (character.primaryTexture === 'nasal') {
+      metaphors.push('wind in hollow reeds', 'humming in deep caves', 'resonant chimes');
+    }
+
+    if (character.primaryTexture === 'breathy') {
+      metaphors.push('sighs of wind', 'morning mist rising', 'breath on cold air');
+    }
+
+    // Fallback
+    if (metaphors.length === 0) {
+      metaphors.push('the sounds of their world');
+    }
+
+    return metaphors;
+  }
+
+  /**
+   * Get context adjectives based on planet type
+   */
+  private getContextAdjectives(planetType: string): string[] {
+    const contextMap: Record<string, string[]> = {
+      volcanic: ['The volcanic wasteland', 'Fire and stone', 'Their harsh world'],
+      ocean: ['The endless ocean', 'Water and tide', 'The depths'],
+      forest: ['Dense forests', 'Ancient trees', 'Green shadow'],
+      desert: ['The burning sands', 'Endless dunes', 'Scorching winds'],
+      arctic: ['Frozen wastes', 'Ice and snow', 'The long dark'],
+      mountain: ['High peaks', 'Stone and sky', 'Thin air'],
+    };
+
+    return contextMap[planetType] || ['Their world'];
+  }
+
+  /**
+   * Generate a description using Tracery
+   */
+  generateDescription(character: LanguageCharacter, planetType: string): string {
+    const grammar = this.buildDescriptionGrammar(character, planetType);
+    const tracery = require('tracery-grammar');
+    const gen = tracery.createGrammar(grammar);
+    gen.addModifiers(tracery.baseEngModifiers); // For .capitalize
+    return gen.flatten('#origin#');
+  }
+}
+```
+
+**Example Outputs:**
+
+```typescript
+// Volcanic planet with kh, x, r, k, a, i
+// → character: { primaryTexture: 'guttural', primaryHardness: 'harsh', primaryManner: 'sharp' }
+generateDescription() →
+  "A harsh guttural language with sharp sounds"
+  "Guttural and harsh, like stones grinding in a volcanic mill"
+  "Fire and stone has shaped their guttural harsh tongue"
+
+// Ocean planet with l, w, r, m, o, u, a
+// → character: { primaryTexture: 'liquid', primaryHardness: 'soft', primaryManner: 'flowing' }
+generateDescription() →
+  "A soft liquid language with flowing sounds"
+  "Liquid and soft, like water over smooth stones"
+  "The endless ocean has shaped their liquid soft tongue"
+
+// Desert planet with s, t, k, f, i, a, sharp vowels
+// → character: { primaryTexture: 'sibilant', primaryHardness: 'crisp', primaryManner: 'sharp' }
+generateDescription() →
+  "A crisp sibilant language with sharp sounds"
+  "Their speech is sibilant and crisp, sharp like wind through narrow canyons"
+```
+
+### Word Generation Grammar
 
 ```typescript
 interface TraceryGrammar {
@@ -1037,14 +1368,13 @@ export function generatePersonalityPrompt(options: PersonalityPromptOptions): st
   // Add language/culture section
   if (language) {
     prompt += `Your People:\n`;
-    prompt += `- You speak ${language.name || 'your ancestral tongue'}, `;
-    prompt += `a language shaped by ${language.planetType} landscapes. `;
 
-    // Show phonetic character
-    if (language.selectedConsonants.includes('kh') || language.selectedConsonants.includes('x')) {
-      prompt += `It's a harsh, guttural language with sharp sounds that echo through volcanic valleys.\n`;
-    } else if (language.selectedConsonants.includes('l') || language.selectedConsonants.includes('w')) {
-      prompt += `It's a flowing, liquid language like water over stones.\n`;
+    // Use Tracery-generated language description
+    if (language.description) {
+      prompt += `- You speak ${language.name || 'your ancestral tongue'}. ${language.description}.\n`;
+    } else {
+      // Fallback if description not generated
+      prompt += `- You speak ${language.name || 'your ancestral tongue'}, a language shaped by ${language.planetType} landscapes.\n`;
     }
 
     // Show morpheme awareness
@@ -1061,6 +1391,22 @@ export function generatePersonalityPrompt(options: PersonalityPromptOptions): st
   prompt += 'Your Personality:\n';
   // ... existing personality code
 }
+
+/**
+ * Helper: Get common morphemes from dictionary
+ */
+function getCommonMorphemes(languageId: string, limit: number): Array<{ morpheme: string; meaning: string }> {
+  const dict = dictionaryService.getDictionary(languageId);
+
+  // Sort morphemes by frequency, return top N
+  return Object.entries(dict.morphemeLibrary)
+    .sort((a, b) => b[1].frequency - a[1].frequency)
+    .slice(0, limit)
+    .map(([morpheme, data]) => ({
+      morpheme,
+      meaning: data.meaning,
+    }));
+}
 ```
 
 **Example Output in System Prompt**:
@@ -1068,11 +1414,18 @@ export function generatePersonalityPrompt(options: PersonalityPromptOptions): st
 You are Kor'xa Thakrin, a volcanic-dweller villager in this settlement.
 
 Your People:
-- You speak Khartongue, a language shaped by volcanic landscapes. It's a harsh, guttural language with sharp sounds that echo through volcanic valleys.
+- You speak Khartongue. Fire and stone has shaped their guttural harsh tongue.
 - You know the old roots: "khar" (fire), "xa" (flow), "vik" (shadow), "ri" (through). These sounds carry weight in your tongue.
 
 Your Personality:
 - You're methodical and patient, like cooling lava...
+```
+
+Alternative Tracery-generated descriptions:
+```
+- You speak Khartongue. A harsh guttural language with sharp sounds.
+- You speak Khartongue. Guttural and harsh, like stones grinding in a volcanic mill.
+- You speak Khartongue. Their speech is guttural and harsh, sharp like thunder in deep valleys.
 ```
 
 #### 2. World Context (Current Location)
