@@ -1,4 +1,4 @@
-import { BaseSystem } from '../ecs/System.js';
+import { BaseSystem } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 
 /**
@@ -16,18 +16,18 @@ import type { World } from '../ecs/World.js';
  * Priority: 990 (late utility)
  */
 export class QueryCacheMonitorSystem extends BaseSystem {
+  readonly id = 'query_cache_monitor' as const;
+  readonly priority = 990; // Late utility
+  readonly requiredComponents = [] as const; // No entity filtering needed
+
   private readonly LOG_INTERVAL = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
   private lastLog = 0;
 
-  constructor() {
-    super('query_cache_monitor', 990);
-  }
+  protected onUpdate(ctx: { world: World }): void {
+    if (ctx.world.tick - this.lastLog < this.LOG_INTERVAL) return;
+    this.lastLog = ctx.world.tick;
 
-  update(world: World): void {
-    if (world.tick - this.lastLog < this.LOG_INTERVAL) return;
-    this.lastLog = world.tick;
-
-    const stats = world.queryCache.getStats();
+    const stats = ctx.world.queryCache.getStats();
 
     // Only log if there's meaningful activity
     if (stats.hits + stats.misses === 0) return;

@@ -9,12 +9,16 @@
  * - Output type (articles, shows, broadcasts)
  * - Quality tier (excellent, good, adequate, poor)
  *
+ * Templates are now loaded from JSON data files to separate
+ * content from code structure.
+ *
  * Usage:
  *   const template = selectTemplate('newspaper_reporter', 'article', quality);
  *   const content = fillTemplate(template, context);
  */
 
 import type { ProfessionRole } from '../components/ProfessionComponent.js';
+import professionTemplatesData from '../../data/profession-templates.json';
 
 /**
  * Template with placeholders for variable substitution.
@@ -45,147 +49,20 @@ export interface TemplateContext {
 }
 
 // ============================================================================
-// NEWSPAPER ARTICLE TEMPLATES
+// Template Data Loading
 // ============================================================================
 
-const NEWSPAPER_ARTICLE_TEMPLATES: ContentTemplate[] = [
-  {
-    template: '{{cityName}} Population Reaches {{population}} - Mayor Celebrates Growth',
-    requiredContext: ['cityName', 'population'],
-    qualityRange: { min: 0.6, max: 1.0 },
-  },
-  {
-    template: 'Local Weather Forecast: {{weather}} Expected Through Week',
-    requiredContext: ['weather'],
-    qualityRange: { min: 0.4, max: 0.8 },
-  },
-  {
-    template: 'Breaking: New Construction Project Announced in Downtown {{cityName}}',
-    requiredContext: ['cityName'],
-    qualityRange: { min: 0.7, max: 1.0 },
-  },
-  {
-    template: 'City Council Debates Infrastructure Improvements',
-    requiredContext: [],
-    qualityRange: { min: 0.5, max: 0.9 },
-  },
-  {
-    template: 'Local Business {{randomPlace}} Celebrates Grand Opening',
-    requiredContext: ['randomPlace'],
-    qualityRange: { min: 0.4, max: 0.7 },
-  },
-  {
-    template: 'Opinion: Why {{cityName}} Needs Better Public Transit',
-    requiredContext: ['cityName'],
-    qualityRange: { min: 0.6, max: 0.9 },
-  },
-  {
-    template: 'Community Spotlight: Meet {{randomName}}, Local Artisan',
-    requiredContext: ['randomName'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-  {
-    template: 'Market Report: Prices {{randomNumber}}% This Quarter',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.4, max: 0.7 },
-  },
-];
+const data = professionTemplatesData as {
+  newspaper_article_templates: ContentTemplate[];
+  tv_episode_templates: ContentTemplate[];
+  radio_broadcast_templates: ContentTemplate[];
+  service_templates: ContentTemplate[];
+};
 
-// ============================================================================
-// TV SHOW EPISODE TEMPLATES
-// ============================================================================
-
-const TV_EPISODE_TEMPLATES: ContentTemplate[] = [
-  {
-    template: 'Episode: "The Mystery of {{randomPlace}}" - Drama unfolds in {{cityName}}',
-    requiredContext: ['randomPlace', 'cityName'],
-    qualityRange: { min: 0.7, max: 1.0 },
-  },
-  {
-    template: 'Sitcom Special: "{{randomName}}\'s Big Day"',
-    requiredContext: ['randomName'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-  {
-    template: 'News Magazine: Investigating {{cityName}}\'s Growth',
-    requiredContext: ['cityName'],
-    qualityRange: { min: 0.6, max: 0.9 },
-  },
-  {
-    template: 'Talk Show: Interview with {{randomName}}',
-    requiredContext: ['randomName'],
-    qualityRange: { min: 0.4, max: 0.7 },
-  },
-  {
-    template: 'Documentary: Life in {{cityName}} - Population {{population}}',
-    requiredContext: ['cityName', 'population'],
-    qualityRange: { min: 0.7, max: 1.0 },
-  },
-];
-
-// ============================================================================
-// RADIO BROADCAST TEMPLATES
-// ============================================================================
-
-const RADIO_BROADCAST_TEMPLATES: ContentTemplate[] = [
-  {
-    template: 'Morning Show: {{agentName}} Plays Top Hits and Local News',
-    requiredContext: ['agentName'],
-    qualityRange: { min: 0.6, max: 0.9 },
-  },
-  {
-    template: 'Drive Time: Traffic Report for {{cityName}} - {{weather}}',
-    requiredContext: ['cityName', 'weather'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-  {
-    template: 'Talk Radio: Callers Discuss {{cityName}}\'s Future',
-    requiredContext: ['cityName'],
-    qualityRange: { min: 0.4, max: 0.7 },
-  },
-  {
-    template: 'Music Hour: {{agentName}} Spins Classic Tracks',
-    requiredContext: ['agentName'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-  {
-    template: 'News Update: {{population}} Residents Now Call {{cityName}} Home',
-    requiredContext: ['population', 'cityName'],
-    qualityRange: { min: 0.6, max: 0.9 },
-  },
-];
-
-// ============================================================================
-// SERVICE OUTPUT TEMPLATES
-// ============================================================================
-
-const SERVICE_TEMPLATES: ContentTemplate[] = [
-  {
-    template: 'Treated {{randomNumber}} patients with excellent care',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.7, max: 1.0 },
-  },
-  {
-    template: 'Taught {{randomNumber}} students valuable lessons',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.6, max: 0.9 },
-  },
-  {
-    template: 'Processed {{randomNumber}} administrative forms',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.4, max: 0.7 },
-  },
-  {
-    template: 'Assisted {{randomNumber}} library patrons with research',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-  {
-    template: 'Completed {{randomNumber}} shop transactions',
-    requiredContext: ['randomNumber'],
-    qualityRange: { min: 0.5, max: 0.8 },
-  },
-];
+const NEWSPAPER_ARTICLE_TEMPLATES: ContentTemplate[] = data.newspaper_article_templates;
+const TV_EPISODE_TEMPLATES: ContentTemplate[] = data.tv_episode_templates;
+const RADIO_BROADCAST_TEMPLATES: ContentTemplate[] = data.radio_broadcast_templates;
+const SERVICE_TEMPLATES: ContentTemplate[] = data.service_templates;
 
 // ============================================================================
 // TEMPLATE SELECTION

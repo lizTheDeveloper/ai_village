@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createTestWorld } from '../../test-utils/createTestWorld.js';
-import type { World } from '../World.js';
-import { CT } from '../../components/types.js';
+import { WorldImpl, type World } from '../World.js';
+import { EventBus } from '../../events/EventBus.js';
+
+function createTestWorld(): World {
+  const eventBus = new EventBus();
+  return new WorldImpl(eventBus);
+}
 
 describe('QueryCache Integration', () => {
   let world: World;
@@ -20,7 +24,7 @@ describe('QueryCache Integration', () => {
       (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
 
       // Query 1: Cache miss
-      const results1 = world.query().with(CT.Agent).executeEntities();
+      const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(2);
 
       const stats1 = world.queryCache.getStats();
@@ -28,7 +32,7 @@ describe('QueryCache Integration', () => {
       expect(stats1.hits).toBe(0);
 
       // Query 2: Same query, cache hit
-      const results2 = world.query().with(CT.Agent).executeEntities();
+      const results2 = world.query().with('agent').executeEntities();
       expect(results2).toHaveLength(2);
 
       const stats2 = world.queryCache.getStats();
@@ -41,7 +45,7 @@ describe('QueryCache Integration', () => {
       (agent1 as any).addComponent({ type: 'agent', name: 'Alice' });
 
       // Query 1: Cache miss
-      const results1 = world.query().with(CT.Agent).executeEntities();
+      const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(1);
 
       // Add entity: Version increments
@@ -49,7 +53,7 @@ describe('QueryCache Integration', () => {
       (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
 
       // Query 2: Cache invalidated, cache miss
-      const results2 = world.query().with(CT.Agent).executeEntities();
+      const results2 = world.query().with('agent').executeEntities();
       expect(results2).toHaveLength(2);
 
       const stats = world.queryCache.getStats();
@@ -62,14 +66,14 @@ describe('QueryCache Integration', () => {
       const entity = world.createEntity();
 
       // Query agents: Empty
-      const results1 = world.query().with(CT.Agent).executeEntities();
+      const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(0);
 
       // Add agent component: Version increments
       (entity as any).addComponent({ type: 'agent', name: 'Alice' });
 
       // Query again: Should find new agent
-      const results2 = world.query().with(CT.Agent).executeEntities();
+      const results2 = world.query().with('agent').executeEntities();
       expect(results2).toHaveLength(1);
 
       const stats = world.queryCache.getStats();
@@ -81,14 +85,14 @@ describe('QueryCache Integration', () => {
       (agent as any).addComponent({ type: 'agent', name: 'Alice' });
 
       // Query 1: Find agent
-      const results1 = world.query().with(CT.Agent).executeEntities();
+      const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(1);
 
       // Remove component: Version increments
       (agent as any).removeComponent('agent');
 
       // Query 2: Agent gone
-      const results2 = world.query().with(CT.Agent).executeEntities();
+      const results2 = world.query().with('agent').executeEntities();
       expect(results2).toHaveLength(0);
 
       const stats = world.queryCache.getStats();
@@ -103,14 +107,14 @@ describe('QueryCache Integration', () => {
       (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
 
       // Query 1: Find 2 agents
-      const results1 = world.query().with(CT.Agent).executeEntities();
+      const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(2);
 
       // Destroy entity: Version increments
       (world as any).destroyEntity(agent1.id, 'test');
 
       // Query 2: Only 1 agent remains
-      const results2 = world.query().with(CT.Agent).executeEntities();
+      const results2 = world.query().with('agent').executeEntities();
       expect(results2).toHaveLength(1);
 
       const stats = world.queryCache.getStats();
@@ -125,7 +129,7 @@ describe('QueryCache Integration', () => {
 
       // 1 miss, then 9 hits
       for (let i = 0; i < 10; i++) {
-        world.query().with(CT.Agent).executeEntities();
+        world.query().with('agent').executeEntities();
       }
 
       const stats = world.queryCache.getStats();
@@ -143,18 +147,18 @@ describe('QueryCache Integration', () => {
       (building as any).addComponent({ type: 'building', buildingType: 'house' });
 
       // Query agents: Miss
-      world.query().with(CT.Agent).executeEntities();
+      world.query().with('agent').executeEntities();
 
       // Query buildings: Miss
-      world.query().with(CT.Building).executeEntities();
+      world.query().with('building').executeEntities();
 
       // Query agents with position: Miss
-      world.query().with(CT.Agent).with(CT.Position).executeEntities();
+      world.query().with('agent').with('position').executeEntities();
 
       // Repeat all queries: 3 hits
-      world.query().with(CT.Agent).executeEntities();
-      world.query().with(CT.Building).executeEntities();
-      world.query().with(CT.Agent).with(CT.Position).executeEntities();
+      world.query().with('agent').executeEntities();
+      world.query().with('building').executeEntities();
+      world.query().with('agent').with('position').executeEntities();
 
       const stats = world.queryCache.getStats();
       expect(stats.size).toBe(3); // 3 different queries cached
@@ -173,16 +177,16 @@ describe('QueryCache Integration', () => {
       // Query living agents: Miss
       const results1 = world
         .query()
-        .with(CT.Agent)
-        .without(CT.Dead)
+        .with('agent')
+        .without('dead')
         .executeEntities();
       expect(results1).toHaveLength(1);
 
       // Repeat: Hit
       const results2 = world
         .query()
-        .with(CT.Agent)
-        .without(CT.Dead)
+        .with('agent')
+        .without('dead')
         .executeEntities();
       expect(results2).toHaveLength(1);
 

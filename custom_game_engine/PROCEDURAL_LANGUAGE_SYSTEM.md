@@ -1011,6 +1011,311 @@ After exploring: 25 words (15 places, 8 people, 2 items)
 After 100 generations: 200+ words, 50 recognized morphemes
 ```
 
+## 14. LLM Context Integration
+
+### How Language Information Flows into Agent Prompts
+
+Language context is injected at three levels of the agent prompt system:
+
+#### 1. System Prompt (Identity & Culture)
+
+Language and cultural context is added to the agent's system prompt via `buildSystemPrompt()` in `StructuredPromptBuilder.ts`.
+
+**Integration Point**: Extend `PersonalityPromptTemplates.ts` to include species language information.
+
+```typescript
+// In PersonalityPromptTemplates.ts
+export function generatePersonalityPrompt(options: PersonalityPromptOptions): string {
+  const { name, personality, entityId } = options;
+
+  // Get agent's species and language
+  const species = options.species;  // NEW: passed from entity
+  const language = options.language; // NEW: from planet/species
+
+  let prompt = `You are ${name}, a ${species} villager in this settlement.\n\n`;
+
+  // Add language/culture section
+  if (language) {
+    prompt += `Your People:\n`;
+    prompt += `- You speak ${language.name || 'your ancestral tongue'}, `;
+    prompt += `a language shaped by ${language.planetType} landscapes. `;
+
+    // Show phonetic character
+    if (language.selectedConsonants.includes('kh') || language.selectedConsonants.includes('x')) {
+      prompt += `It's a harsh, guttural language with sharp sounds that echo through volcanic valleys.\n`;
+    } else if (language.selectedConsonants.includes('l') || language.selectedConsonants.includes('w')) {
+      prompt += `It's a flowing, liquid language like water over stones.\n`;
+    }
+
+    // Show morpheme awareness
+    const commonMorphemes = getCommonMorphemes(language.id, 5);
+    if (commonMorphemes.length > 0) {
+      prompt += `- You know the old roots: `;
+      prompt += commonMorphemes.map(m => `"${m.morpheme}" (${m.meaning})`).join(', ');
+      prompt += `. These sounds carry weight in your tongue.\n`;
+    }
+
+    prompt += `\n`;
+  }
+
+  prompt += 'Your Personality:\n';
+  // ... existing personality code
+}
+```
+
+**Example Output in System Prompt**:
+```
+You are Kor'xa Thakrin, a volcanic-dweller villager in this settlement.
+
+Your People:
+- You speak Khartongue, a language shaped by volcanic landscapes. It's a harsh, guttural language with sharp sounds that echo through volcanic valleys.
+- You know the old roots: "khar" (fire), "xa" (flow), "vik" (shadow), "ri" (through). These sounds carry weight in your tongue.
+
+Your Personality:
+- You're methodical and patient, like cooling lava...
+```
+
+#### 2. World Context (Current Location)
+
+Place names with translations are added to world context via `WorldContextBuilder.ts`.
+
+**Integration Point**: Extend `buildVisionContext()` to include place name translations for visible landmarks.
+
+```typescript
+// In WorldContextBuilder.ts
+private buildVisionContext(...): string {
+  // ... existing vision code
+
+  // LOCATION NAMES WITH TRANSLATIONS
+  if (vision.currentLocation) {
+    const locationName = this.getLocationNameWithTranslation(vision.currentLocation, world);
+    if (locationName) {
+      context += locationName;
+    }
+  }
+
+  // DISTANT LANDMARKS with translations
+  const landmarks = vision.distantLandmarks ?? [];
+  if (landmarks.length > 0) {
+    context += this.buildLandmarkContext(landmarks, world);
+  }
+
+  return context;
+}
+
+/**
+ * Get current location name with translation
+ */
+private getLocationNameWithTranslation(locationId: string, world: World): string | null {
+  const location = world.getEntity(locationId);
+  if (!location) return null;
+
+  const identity = location.components.get('identity') as IdentityComponent | undefined;
+  const geographic = location.components.get('geographic_feature') as GeographicFeatureComponent | undefined;
+
+  if (!identity?.nativeName) return null;
+
+  // Get translation from dictionary
+  const language = world.planet?.getLanguage();
+  if (!language) return `- Location: ${identity.nativeName}\n`;
+
+  const translation = dictionaryService.lookup(language.id, identity.nativeName);
+
+  if (translation) {
+    return `- Location: ${identity.nativeName} (${translation.translation})\n`;
+  }
+
+  return `- Location: ${identity.nativeName}\n`;
+}
+
+/**
+ * Build landmark context with translations
+ */
+private buildLandmarkContext(landmarks: string[], world: World): string {
+  const language = world.planet?.getLanguage();
+  if (!language) return '';
+
+  const landmarkDescriptions: string[] = [];
+
+  for (const landmarkId of landmarks.slice(0, 5)) {
+    const landmark = world.getEntity(landmarkId);
+    if (!landmark) continue;
+
+    const identity = landmark.components.get('identity') as IdentityComponent | undefined;
+    if (!identity?.nativeName) continue;
+
+    const translation = dictionaryService.lookup(language.id, identity.nativeName);
+
+    if (translation) {
+      landmarkDescriptions.push(`${identity.nativeName} (${translation.translation})`);
+    } else {
+      landmarkDescriptions.push(identity.nativeName);
+    }
+  }
+
+  if (landmarkDescriptions.length > 0) {
+    return `- Landmarks visible: ${landmarkDescriptions.join(', ')} in the distance\n`;
+  }
+
+  return '';
+}
+```
+
+**Example Output in World Context**:
+```
+Current Situation:
+- Hunger: 45% (could eat)
+- Energy: 72% (rested)
+- Location: Xakri'khar (Fire-Flow River)
+- Landmarks visible: Korthak (Stone-Peak), Vikhareth (Shadow-Fire Settlement) in the distance
+- You see nearby: Mira (gathering berries)
+```
+
+#### 3. Episodic Memories (Past Events)
+
+Place name translations are added to episodic memories so agents understand what locations mean.
+
+**Integration Point**: Extend `buildEpisodicMemories()` in `StructuredPromptBuilder.ts`.
+
+```typescript
+// In StructuredPromptBuilder.ts
+private buildEpisodicMemories(
+  episodicMemory: EpisodicMemoryComponent | undefined,
+  world: World
+): string {
+  if (!episodicMemory?.memories || episodicMemory.memories.length === 0) {
+    return '- No significant memories yet\n';
+  }
+
+  const language = world.planet?.getLanguage();
+  let memoriesText = '';
+
+  const recentMemories = episodicMemory.memories
+    .slice(-10)
+    .sort((a, b) => b.emotionalImpact - a.emotionalImpact)
+    .slice(0, 5);
+
+  for (const memory of recentMemories) {
+    let memoryText = memory.description;
+
+    // Enhance memory with place name translations
+    if (memory.location && language) {
+      memoryText = this.enrichMemoryWithTranslations(memoryText, memory.location, language, world);
+    }
+
+    const emotionTag = memory.emotionalImpact > 0.7 ? ' [vivid]' : '';
+    memoriesText += `- ${memoryText}${emotionTag}\n`;
+  }
+
+  return memoriesText;
+}
+
+/**
+ * Enrich memory text with place name translations
+ *
+ * Example: "You courted Mira at Talaxian Lake"
+ * Becomes: "You courted Mira at Talaxian Lake (Lover's Lake)"
+ */
+private enrichMemoryWithTranslations(
+  memoryText: string,
+  locationId: string,
+  language: LanguageConfig,
+  world: World
+): string {
+  const location = world.getEntity(locationId);
+  if (!location) return memoryText;
+
+  const identity = location.components.get('identity') as IdentityComponent | undefined;
+  if (!identity?.nativeName) return memoryText;
+
+  const translation = dictionaryService.lookup(language.id, identity.nativeName);
+  if (!translation) return memoryText;
+
+  // Replace native name with "NativeName (Translation)"
+  const nativeNamePattern = new RegExp(`\\b${identity.nativeName}\\b`, 'g');
+  return memoryText.replace(
+    nativeNamePattern,
+    `${identity.nativeName} (${translation.translation})`
+  );
+}
+```
+
+**Example Output in Memories**:
+```
+Memories:
+- You courted Mira at Talaxian Lake (Lover's Lake) [vivid]
+- You built a campfire with Kor near Vikhareth (Shadow-Fire Settlement)
+- You saw a strange light above Korthak (Stone-Peak)
+- You gathered berries along Xakri'khar (Fire-Flow River)
+```
+
+### Complete Prompt Example
+
+Here's what a complete agent prompt looks like with language integration:
+
+```
+SYSTEM PROMPT:
+You are Kor'xa Thakrin, a volcanic-dweller villager in this settlement.
+
+Your People:
+- You speak Khartongue, a language shaped by volcanic landscapes. It's a harsh, guttural language with sharp sounds that echo through volcanic valleys.
+- You know the old roots: "khar" (fire), "xa" (flow), "vik" (shadow), "ri" (through). These sounds carry weight in your tongue.
+
+Your Personality:
+- You're methodical and patient, like cooling lava. Tasks get done—eventually, thoroughly, without fuss.
+- [... more personality traits ...]
+
+---
+
+Current Situation:
+- Hunger: 45% (could eat)
+- Energy: 72% (rested)
+- Location: Xakri'khar (Fire-Flow River)
+- Landmarks visible: Korthak (Stone-Peak), Vikhareth (Shadow-Fire Settlement) in the distance
+- You see nearby: Mira (gathering berries), 3 berry bushes
+
+Memories:
+- You courted Mira at Talaxian Lake (Lover's Lake) [vivid]
+- You built a campfire with Kor near Vikhareth (Shadow-Fire Settlement)
+- You saw a strange light above Korthak (Stone-Peak)
+
+Buildings you can construct:
+- campfire (10 stone + 5 wood) - provides warmth
+- storage-chest (10 wood) - storage
+
+Available Actions:
+["wander", "gather", "build", "talk", "pick_berries"]
+
+What do you want to do next?
+```
+
+### Key Benefits
+
+1. **Cultural Immersion**: Agents understand their language's character and history
+2. **Place Meaning**: Location names aren't arbitrary - "Fire-Flow River" tells you what to expect
+3. **Memory Enrichment**: Past events carry linguistic context - "Lover's Lake" explains why it's special
+4. **Morpheme Awareness**: Agents recognize word roots ("khar" = fire) making new names interpretable
+5. **Consistent World**: Same language rules apply everywhere, creating coherent alien culture
+
+### Data Flow Summary
+
+```
+Planet Generation
+    ↓
+Language Config Created
+    ↓
+Place Names Generated (Tracery)
+    ↓
+LLM Translates Names → Dictionary
+    ↓
+Agent Prompt Building:
+  ├─→ System Prompt: Language identity, morpheme knowledge
+  ├─→ World Context: Current location with translation
+  └─→ Memories: Past locations with translations
+    ↓
+Agent Decision (LLM knows what names mean)
+```
+
 ---
 
 **Next Steps**: Review spec → Implement Phase 1 (core system) → Test with volcanic planet → Iterate

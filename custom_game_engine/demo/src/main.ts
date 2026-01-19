@@ -4211,6 +4211,9 @@ async function main() {
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
+    // Declare soul creation promise at higher scope so it's accessible later
+    let soulCreationPromise: Promise<void> | null = null;
+
     // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
     // (skip in SharedWorker mode - worker is already running)
     if (!isSharedWorkerMode) {
@@ -4220,7 +4223,7 @@ async function main() {
     }
 
     // Start creating souls for the initial agents (non-blocking - runs in parallel)
-    const soulCreationPromise = createSoulsForInitialAgents(
+    soulCreationPromise = createSoulsForInitialAgents(
       gameLoop,
       agentIds,
       llmProvider,
