@@ -1043,6 +1043,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new CityDirectorSystem());
   gameLoop.systemRegistry.register(new VillageGovernanceSystem());
   gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
+  gameLoop.systemRegistry.register(new GovernorDecisionSystem());  // Phase 6: AI Governance
 
   // ============================================================================
   // METRICS (Optional)

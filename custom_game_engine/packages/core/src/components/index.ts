@@ -157,7 +157,7 @@ export * from './ChunkProductionStateComponent.js';
 export { createChunkProductionState, getTotalProductionRate, getTotalConsumptionRate, canProduce, fastForwardProduction } from './ChunkProductionStateComponent.js';
 export type { ChunkProductionStateComponent, ProductionRate } from './ChunkProductionStateComponent.js';
 export * from './FactoryAIComponent.js';
-export { createFactoryAI, recordDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary, recordProduction, recordConsumption, calculateItemsPerMinute, resetProductionTracking } from './FactoryAIComponent.js';
+export { createFactoryAI, recordDecision as recordFactoryDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary, recordProduction, recordConsumption, calculateItemsPerMinute, resetProductionTracking } from './FactoryAIComponent.js';
 export type { FactoryAIComponent, FactoryGoal, FactoryHealth, ProductionBottleneck, FactoryStats, FactoryDecision, ResourceRequest } from './FactoryAIComponent.js';
 export type { MoodComponent } from './MoodComponent.js';
 // Food preferences
@@ -877,7 +877,6 @@ export type {
 } from './CanonEventComponent.js';
 
 // Grand Strategy - AI Governance (Phase 6)
-export * from './GovernorComponent.js';
 export type {
   GovernorComponent,
   PoliticalTier,
@@ -887,7 +886,7 @@ export type {
 } from './GovernorComponent.js';
 export {
   createGovernorComponent,
-  recordDecision,
+  recordDecision as recordGovernorDecision,
   updateDecisionOutcome,
   updateApproval,
   updateConstituencyApproval,

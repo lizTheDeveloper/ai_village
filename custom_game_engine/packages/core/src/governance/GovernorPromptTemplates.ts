@@ -13,168 +13,21 @@
 
 import type { Entity } from '../ecs/Entity.js';
 import type { ComponentType as CT } from '../types/ComponentType.js';
+import type {
+  GalacticCouncilContext,
+  EmpireContext,
+  NationContext,
+  ProvinceGovernorContext,
+  Crisis,
+  CrisisProtocol,
+} from './GovernorContextBuilders.js';
 
 // ============================================================================
-// Context Interfaces
+// Context Interfaces - imported from GovernorContextBuilders.ts
 // ============================================================================
 
-/**
- * Galactic Council context - multi-species assembly
- */
-export interface GalacticCouncilContext {
-  galaxyState: {
-    totalStars: number;
-    totalPlanets: number;
-    totalPopulation: number;
-    speciesCount: number;
-  };
-
-  speciesRepresented: Array<{
-    speciesName: string;
-    homeworld: string;
-    population: number;
-    temperament: string; // aggressive, diplomatic, isolationist
-  }>;
-
-  currentCrises: Array<{
-    type: string; // war, famine, plague, extinction
-    severity: number; // 0-1
-    affectedSpecies: string[];
-  }>;
-
-  proposals: Array<{
-    proposedBy: string;
-    proposal: string;
-    support: number; // votes in favor
-    opposition: number;
-  }>;
-}
-
-/**
- * Empire context - grand strategy
- */
-export interface EmpireContext {
-  empire: {
-    name: string;
-    population: number;
-    territory: number; // star systems
-    species: string;
-  };
-
-  nations: Array<{
-    name: string;
-    population: number;
-    loyalty: number; // 0-1
-    militaryStrength: number;
-    resources: Record<string, number>;
-  }>;
-
-  diplomaticRelations: Array<{
-    targetEmpire: string;
-    relation: 'allied' | 'neutral' | 'rival' | 'war';
-    trustLevel: number; // 0-1
-  }>;
-
-  threats: Array<{
-    type: string;
-    severity: number;
-    description: string;
-  }>;
-
-  advisorRecommendations: Array<{
-    advisor: string; // 'military', 'economic', 'diplomatic', 'research'
-    recommendation: string;
-  }>;
-}
-
-/**
- * Nation context - national policy
- */
-export interface NationContext {
-  nation: {
-    name: string;
-    governmentType: 'monarchy' | 'democracy' | 'oligarchy';
-    population: number;
-    territory: number; // provinces
-  };
-
-  provinces: Array<{
-    name: string;
-    population: number;
-    resources: Record<string, number>;
-    happiness: number; // 0-1
-  }>;
-
-  economy: {
-    gdp: number;
-    taxRate: number;
-    reserves: Record<string, number>;
-  };
-
-  military: {
-    strength: number;
-    deployments: Array<{ location: string; size: number }>;
-  };
-
-  neighbors: Array<{
-    name: string;
-    relation: 'allied' | 'neutral' | 'hostile';
-  }>;
-
-  pendingProposals: Array<{
-    type: string;
-    proposer: string;
-    description: string;
-  }>;
-}
-
-/**
- * Province/City context - local governance (extends existing CivilizationContext)
- */
-export interface ProvinceGovernorContext {
-  // Base civilization data
-  population: number;
-  foodSupply: number;
-  foodDaysRemaining: number;
-  keyResources: string[];
-  criticalNeeds: string[];
-  strategicFocus: string;
-
-  // Province-specific data
-  provinceData: {
-    name: string;
-    tier: 'village' | 'town' | 'city' | 'metropolis';
-    buildings: Array<{ type: string; status: string }>;
-    neighbors: Array<{ name: string; distance: number; relation: string }>;
-  };
-
-  nationalDirectives: Array<{
-    type: string;
-    priority: number;
-    description: string;
-  }>;
-}
-
-/**
- * Crisis for emergency decision-making
- */
-export interface Crisis {
-  type: string;
-  severity: number; // 0-1
-  description: string;
-  affectedEntities: string[];
-  requiredResponseTicks: number;
-}
-
-/**
- * Crisis protocol
- */
-export interface CrisisProtocol {
-  type: string;
-  severity: number;
-  requiredResponse: number; // Ticks until action required
-  llmBudgetOverride: boolean; // Can skip cooldown
-}
+// All context interfaces are imported from GovernorContextBuilders.ts
+// See that file for full interface definitions and builder functions
 
 // ============================================================================
 // Galactic Council Prompt
