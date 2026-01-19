@@ -141,7 +141,7 @@ export class ColonizationSystem extends BaseSystem {
       if (!colonization) continue;
 
       if (colonization.isColonized) {
-        this.processColonizedHost(ctx.world, entity, colonization, currentTick);
+        this.processColonizedHost(ctx.world as any, entity, colonization, currentTick);
       } else if (colonization.previouslyColonized) {
         this.processRecoveringHost(colonization);
       }
@@ -153,7 +153,7 @@ export class ColonizationSystem extends BaseSystem {
   // ==========================================================================
 
   private processColonizedHost(
-    world: WorldMutator,
+    world: World,
     entity: Entity,
     colonization: ParasiticColonizationComponent,
     currentTick: Tick,

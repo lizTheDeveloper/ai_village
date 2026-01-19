@@ -114,15 +114,15 @@ export class ParasiticReproductionSystem extends BaseSystem {
       const collective = entity.getComponent<CollectiveMindComponent>('collective_mind');
       if (!collective) continue;
 
-      this.processCollective(ctx.world, entity.id, collective, currentTick);
+      this.processCollective(ctx.world as any, entity.id, collective, currentTick);
     }
 
     // Process scheduled colonizations
-    this.processScheduledColonizations(ctx.world, currentTick);
+    this.processScheduledColonizations(ctx.world as any, currentTick);
   }
 
   private processCollective(
-    world: WorldMutator,
+    world: World,
     _collectiveEntityId: EntityId,
     collective: CollectiveMindComponent,
     currentTick: Tick,
@@ -165,7 +165,7 @@ export class ParasiticReproductionSystem extends BaseSystem {
     }
   }
 
-  private processScheduledColonizations(world: WorldMutator, currentTick: Tick): void {
+  private processScheduledColonizations(world: World, currentTick: Tick): void {
     const toProcess: Array<{ targetId: EntityId; collectiveId: string }> = [];
 
     for (const [targetId, schedule] of this.scheduledColonizations) {
@@ -237,7 +237,7 @@ export class ParasiticReproductionSystem extends BaseSystem {
     lineage.hostHistory.push(targetId);
   }
 
-  private findCollective(world: WorldMutator, collectiveId: string): Entity | null {
+  private findCollective(world: World, collectiveId: string): Entity | null {
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');

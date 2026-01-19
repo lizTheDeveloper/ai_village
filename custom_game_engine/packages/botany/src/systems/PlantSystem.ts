@@ -345,7 +345,7 @@ export class PlantSystem extends BaseSystem {
         const species = this.getSpecies(plant.speciesId);
 
         // Get environment for this plant
-        const environment = this.getEnvironment(plant.position, world);
+        const environment = this.getEnvironment(plant.position, world as any);
 
         // Apply weather effects (every frame for immediate response)
         this.applyWeatherEffects(plant, environment);
@@ -361,12 +361,12 @@ export class PlantSystem extends BaseSystem {
 
         // Hourly updates - stage progress and event emission
         if (shouldUpdate) {
-          this.updatePlantHourly(plant, species, environment, world, entity.id, hoursToProcess);
+          this.updatePlantHourly(plant, species, environment, world as any, entity.id, hoursToProcess);
         }
 
         // Check for stage transition
         if (plant.stageProgress >= 1.0) {
-          this.attemptStageTransition(plant, species, environment, world, entity.id);
+          this.attemptStageTransition(plant, species, environment, world as any, entity.id);
         }
 
         // Check for death
@@ -395,7 +395,7 @@ export class PlantSystem extends BaseSystem {
     // MIDNIGHT FRUIT REGENERATION: All plants regenerate fruit once per day at midnight
     // This runs only when the day has just changed (midnight)
     if (this.dayStarted) {
-      this.regenerateFruitAtMidnight(entities, world);
+      this.regenerateFruitAtMidnight(entities, world as any);
     }
 
     // Reset accumulated time and flags after update
@@ -628,7 +628,7 @@ export class PlantSystem extends BaseSystem {
     plant: PlantComponent,
     species: PlantSpecies,
     environment: Environment,
-    world: WorldMutator,
+    world: World,
     entityId: string,
     hoursElapsed: number
   ): void {
@@ -773,7 +773,7 @@ export class PlantSystem extends BaseSystem {
     plant: PlantComponent,
     species: PlantSpecies,
     environment: Environment,
-    world: WorldMutator,
+    world: World,
     entityId: string
   ): void {
     if (!species.stageTransitions) {
@@ -1302,7 +1302,7 @@ export class PlantSystem extends BaseSystem {
    * - Plant health (higher health = more fruit)
    * - Genetic yield modifier
    */
-  private regenerateFruitAtMidnight(entities: ReadonlyArray<Entity>, _world: WorldMutator): void {
+  private regenerateFruitAtMidnight(entities: ReadonlyArray<Entity>, _world: World): void {
     let plantsRegenerated = 0;
 
     for (const entity of entities) {

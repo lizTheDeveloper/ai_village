@@ -16,11 +16,9 @@ export type { EntityId, SystemId } from './types.js';
 // Re-export ComponentType enum for test compatibility
 export { ComponentType } from './types/ComponentType.js';
 export * from './ecs/index.js';
-// Explicit ECS type re-exports for renderer package (excluding World which comes from World.js)
-export type { WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
-export { EntityImpl, createEntityId } from './ecs/index.js';
-// Export concrete World class (not just the interface from ecs/index.js)
-export { World } from './World.js';
+// Explicit ECS type re-exports for renderer package
+export type { World, WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
+export { WorldImpl, EntityImpl, createEntityId } from './ecs/index.js';
 export * from './events/index.js';
 // Explicit EventBus type re-export
 export type { EventBus } from './events/index.js';
