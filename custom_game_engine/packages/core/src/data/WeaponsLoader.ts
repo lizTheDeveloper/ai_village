@@ -7,9 +7,15 @@
 
 import type { ItemDefinition } from '../items/ItemDefinition.js';
 import { defineItem } from '../items/ItemDefinition.js';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-// Import JSON data (will be populated incrementally)
-import weaponsData from './weapons.json' assert { type: 'json' };
+// Load JSON data
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const weaponsDataPath = path.join(__dirname, 'weapons.json');
+const weaponsData = JSON.parse(fs.readFileSync(weaponsDataPath, 'utf8'));
 
 /**
  * Convert JSON weapon data to ItemDefinition

@@ -288,11 +288,11 @@ export class MetricsAnalysis {
    * Detect primary cause of death
    */
   private detectPrimaryDeathCause(): Insight | null {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as Record<string, { causeOfDeath?: string }>;
     const causes = new Map<string, number>();
     let totalDeaths = 0;
 
-    for (const metrics of Object.values(lifecycleMetrics) as Array<{ causeOfDeath?: string }>) {
+    for (const metrics of Object.values(lifecycleMetrics)) {
       if (metrics.causeOfDeath) {
         causes.set(metrics.causeOfDeath, (causes.get(metrics.causeOfDeath) || 0) + 1);
         totalDeaths++;
@@ -493,9 +493,9 @@ export class MetricsAnalysis {
     const data: number[][] = [];
 
     if (metric1 === 'intelligence' && metric2 === 'lifespan') {
-      const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+      const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as Record<string, { initialStats?: { intelligence?: number }, lifespan?: number }>;
 
-      for (const metrics of Object.values(lifecycleMetrics) as Array<{ initialStats?: { intelligence?: number }, lifespan?: number }>) {
+      for (const metrics of Object.values(lifecycleMetrics)) {
         const intelligence = metrics.initialStats?.intelligence;
         const lifespan = metrics.lifespan;
 
@@ -504,9 +504,9 @@ export class MetricsAnalysis {
         }
       }
     } else if (metric1 === 'hunger_crises' && metric2 === 'health') {
-      const needsMetrics = this.collector.getMetric('needs_metrics');
+      const needsMetrics = this.collector.getMetric('needs_metrics') as Record<string, { hungerCrisisEvents: number, health: Array<{ value: number }> }>;
 
-      for (const metrics of Object.values(needsMetrics) as Array<{ hungerCrisisEvents: number, health: Array<{ value: number }> }>) {
+      for (const metrics of Object.values(needsMetrics)) {
         const hungerCrises = metrics.hungerCrisisEvents;
         const avgHealth = metrics.health.reduce((sum: number, d: { value: number }) => sum + d.value, 0) / metrics.health.length;
 
@@ -746,7 +746,7 @@ export class MetricsAnalysis {
    * Detect trade route pattern
    */
   private detectTradeRoutes(): RecognizedPattern | null {
-    const spatialMetrics = this.collector.getMetric('spatial_metrics');
+    const spatialMetrics = this.collector.getMetric('spatial_metrics') as Record<string, any>;
 
     // spatialMetrics has a flattened structure where agent metrics are at top level
     // Look for agents with significant distance traveled (indicates repeated movement)

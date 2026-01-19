@@ -1,1459 +1,4784 @@
 {
-  "creative": {
-    "living": [
-      {
-        "id": "bone_scythe",
-        "name": "Bone Scythe of the Harvester",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 800,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 28,
-          "damageType": "necrotic",
-          "range": 2,
-          "attackSpeed": 0.7,
-          "durabilityLoss": 0.002,
-          "twoHanded": true,
-          "category": "polearm",
-          "attackType": "melee",
-          "special": ["lifesteal", "bleeding"]
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["heals_from_kills"],
-          "manaPerUse": 2
-        }
+  "creative": [
+    {
+      "id": "bone_scythe",
+      "name": "Bone Scythe of the Harvester",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 28,
+        "range": 2,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.002,
+        "damageType": "necrotic",
+        "category": "polearm",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "lifesteal",
+          "bleeding"
+        ]
       },
-      {
-        "id": "tentacle_whip",
-        "name": "Abyssal Tentacle",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 600,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 12,
-          "damageType": "void",
-          "range": 4,
-          "attackSpeed": 1.4,
-          "durabilityLoss": 0.001,
-          "category": "whip",
-          "attackType": "melee",
-          "special": ["grappling", "reach"]
-        },
-        "magical": {
-          "magicType": "void",
-          "effects": ["pulls_enemies", "writhes_independently"]
-        }
-      },
-      {
-        "id": "living_blade",
-        "name": "Symbiotic Blade",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 1,
-        "baseValue": 1200,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 22,
-          "damageType": "slashing",
-          "range": 1,
-          "attackSpeed": 1.3,
-          "durabilityLoss": 0,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing", "lifesteal"],
-          "critChance": 0.15,
-          "critMultiplier": 2.2
-        },
-        "magical": {
-          "magicType": "chaos",
-          "effects": ["bonds_to_wielder", "grows_stronger_with_kills"],
-          "cursed": true
-        }
-      },
-      {
-        "id": "tooth_dagger",
-        "name": "Dragon Tooth Dagger",
-        "category": "equipment",
-        "weight": 0.8,
-        "stackSize": 1,
-        "baseValue": 900,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 18,
-          "damageType": "piercing",
-          "range": 1,
-          "attackSpeed": 1.8,
-          "durabilityLoss": 0.003,
-          "category": "dagger",
-          "attackType": "melee",
-          "special": ["armor_piercing", "poison"]
-        },
-        "magical": {
-          "magicType": "nature",
-          "effects": ["injects_venom", "senses_prey"]
-        }
-      },
-      {
-        "id": "swarm_orb",
-        "name": "Hive Orb",
-        "category": "equipment",
-        "weight": 1.0,
-        "stackSize": 1,
-        "baseValue": 750,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 5,
-          "damageType": "poison",
-          "range": 8,
-          "attackSpeed": 2.0,
-          "durabilityLoss": 0.005,
-          "aoeRadius": 2,
-          "category": "orb",
-          "attackType": "ranged",
-          "special": ["poison", "swarming"]
-        },
-        "magical": {
-          "magicType": "nature",
-          "effects": ["releases_insect_swarm", "swarm_returns"],
-          "manaPerUse": 3
-        }
-      },
-      {
-        "id": "fungal_staff",
-        "name": "Mycelium Staff",
-        "category": "equipment",
-        "weight": 2.5,
-        "stackSize": 1,
-        "baseValue": 650,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 10,
-          "damageType": "poison",
-          "range": 6,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.002,
-          "aoeRadius": 3,
-          "twoHanded": true,
-          "category": "staff",
-          "attackType": "magic",
-          "special": ["poison", "stunning"]
-        },
-        "magical": {
-          "magicType": "nature",
-          "effects": ["spore_cloud", "spreads_fungal_network"],
-          "spellPowerBonus": 12,
-          "manaPerUse": 4
-        }
-      },
-      {
-        "id": "blood_weapon",
-        "name": "Hemomancer's Focus",
-        "category": "equipment",
-        "weight": 0.5,
-        "stackSize": 1,
-        "baseValue": 1100,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 25,
-          "damageType": "necrotic",
-          "range": 5,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0,
-          "category": "orb",
-          "attackType": "magic",
-          "special": ["lifesteal", "bleeding"]
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["uses_wielder_blood", "damage_scales_with_missing_health"],
-          "cursed": true,
-          "spellPowerBonus": 25
-        }
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 2,
+        "effects": [
+          "heals_from_kills"
+        ]
       }
-    ],
-    "conceptual": [
-      {
-        "id": "blade_of_unmaking",
-        "name": "Blade of Unmaking",
-        "category": "equipment",
-        "weight": 0.1,
-        "stackSize": 1,
-        "baseValue": 5000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 40,
-          "damageType": "void",
-          "range": 1,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0.05,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing", "disintegrating"]
-        },
-        "magical": {
-          "magicType": "entropy",
-          "effects": ["erases_from_existence", "cannot_be_healed"],
-          "cursed": true
-        }
+    },
+    {
+      "id": "tentacle_whip",
+      "name": "Abyssal Tentacle",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 600,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 12,
+        "range": 4,
+        "attackSpeed": 1.4,
+        "durabilityLoss": 0.001,
+        "damageType": "void",
+        "category": "whip",
+        "attackType": "melee",
+        "special": [
+          "grappling",
+          "reach"
+        ]
       },
-      {
-        "id": "memory_dagger",
-        "name": "Blade of Forgotten Names",
-        "category": "equipment",
-        "weight": 0.3,
-        "stackSize": 1,
-        "baseValue": 2000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 15,
-          "damageType": "psionic",
-          "range": 1,
-          "attackSpeed": 1.5,
-          "durabilityLoss": 0.008,
-          "category": "dagger",
-          "attackType": "melee",
-          "special": ["stunning"]
-        },
-        "magical": {
-          "magicType": "psychic",
-          "effects": ["steals_memories", "victim_forgets_attacker"]
-        }
-      },
-      {
-        "id": "paradox_bow",
-        "name": "Bow of Temporal Paradox",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 1,
-        "baseValue": 3500,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 20,
-          "damageType": "force",
-          "range": 30,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.01,
-          "twoHanded": true,
-          "category": "bow",
-          "attackType": "ranged",
-          "special": ["armor_piercing"],
-          "projectile": {
-            "speed": 100,
-            "arc": false,
-            "penetration": 3
-          }
-        },
-        "magical": {
-          "magicType": "chaos",
-          "effects": ["arrow_hits_before_fired", "wounds_appear_in_past"],
-          "manaPerUse": 10
-        }
-      },
-      {
-        "id": "echo_hammer",
-        "name": "Hammer of Reverberating Doom",
-        "category": "equipment",
-        "weight": 8.0,
-        "stackSize": 1,
-        "baseValue": 1500,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 35,
-          "damageType": "force",
-          "range": 2,
-          "attackSpeed": 0.4,
-          "durabilityLoss": 0.008,
-          "twoHanded": true,
-          "aoeRadius": 2,
-          "category": "hammer",
-          "attackType": "melee",
-          "special": ["stunning", "knockback"]
-        },
-        "magical": {
-          "magicType": "order",
-          "effects": ["impact_echoes_three_times", "shockwave"]
-        }
-      },
-      {
-        "id": "silence_knife",
-        "name": "Knife of Utter Silence",
-        "category": "equipment",
-        "weight": 0.4,
-        "stackSize": 1,
-        "baseValue": 1800,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 12,
-          "damageType": "void",
-          "range": 1,
-          "attackSpeed": 2.0,
-          "durabilityLoss": 0.005,
-          "category": "dagger",
-          "attackType": "melee",
-          "special": ["stealth"],
-          "critChance": 0.25,
-          "critMultiplier": 3.0
-        },
-        "magical": {
-          "magicType": "void",
-          "effects": ["absorbs_all_sound", "victims_cannot_scream", "silences_magic"]
-        }
-      },
-      {
-        "id": "dream_staff",
-        "name": "Staff of Waking Dreams",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 2200,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 18,
-          "damageType": "psionic",
-          "range": 10,
-          "attackSpeed": 0.7,
-          "durabilityLoss": 0.006,
-          "twoHanded": true,
-          "aoeRadius": 3,
-          "category": "staff",
-          "attackType": "magic",
-          "special": ["stunning"]
-        },
-        "magical": {
-          "magicType": "psychic",
-          "effects": ["pulls_nightmares_into_reality", "enemies_hallucinate"],
-          "spellPowerBonus": 30,
-          "manaPerUse": 8
-        }
-      },
-      {
-        "id": "gravity_mace",
-        "name": "Singularity Mace",
-        "category": "equipment",
-        "weight": 50.0,
-        "stackSize": 1,
-        "baseValue": 4000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 60,
-          "damageType": "force",
-          "range": 2,
-          "attackSpeed": 0.2,
-          "durabilityLoss": 0.01,
-          "twoHanded": true,
-          "aoeRadius": 3,
-          "category": "mace",
-          "attackType": "melee",
-          "special": ["stunning", "knockback"]
-        },
-        "magical": {
-          "magicType": "void",
-          "effects": ["pulls_enemies_toward_impact", "creates_gravity_well"],
-          "manaPerUse": 15
-        }
+      "magical": {
+        "magicType": "void",
+        "effects": [
+          "pulls_enemies",
+          "writhes_independently"
+        ]
       }
-    ],
-    "musical": [
-      {
-        "id": "war_horn",
-        "name": "Dreadhorn of the Ancients",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 600,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 8,
-          "damageType": "force",
-          "range": 15,
-          "attackSpeed": 0.3,
-          "durabilityLoss": 0.01,
-          "aoeRadius": 8,
-          "category": "heavy",
-          "attackType": "ranged",
-          "special": ["stunning", "fear"]
-        },
-        "magical": {
-          "magicType": "evocation",
-          "effects": ["causes_fear", "shatters_morale"]
-        }
+    },
+    {
+      "id": "living_blade",
+      "name": "Symbiotic Blade",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 22,
+        "range": 1,
+        "attackSpeed": 1.3,
+        "durabilityLoss": 0,
+        "critChance": 0.15,
+        "critMultiplier": 2.2,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "lifesteal"
+        ]
       },
-      {
-        "id": "sonic_lute",
-        "name": "Lute of Shattering Chords",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 800,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 15,
-          "damageType": "force",
-          "range": 12,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.008,
-          "twoHanded": true,
-          "category": "staff",
-          "attackType": "ranged",
-          "special": ["stunning"],
-          "projectile": {
-            "speed": 30,
-            "arc": false,
-            "penetration": 2
-          }
-        },
-        "magical": {
-          "magicType": "evocation",
-          "effects": ["sonic_waves", "can_shatter_objects"],
-          "spellPowerBonus": 15
-        }
-      },
-      {
-        "id": "death_whistle",
-        "name": "Aztec Death Whistle",
-        "category": "equipment",
-        "weight": 0.2,
-        "stackSize": 1,
-        "baseValue": 400,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 5,
-          "damageType": "psionic",
-          "range": 10,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.005,
-          "aoeRadius": 5,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["fear", "stunning"]
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["screams_of_the_dead", "causes_terror"]
-        }
-      },
-      {
-        "id": "thunder_drums",
-        "name": "War Drums of the Storm Giant",
-        "category": "equipment",
-        "weight": 15.0,
-        "stackSize": 1,
-        "baseValue": 1200,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 25,
-          "damageType": "lightning",
-          "range": 20,
-          "attackSpeed": 0.4,
-          "durabilityLoss": 0.012,
-          "twoHanded": true,
-          "aoeRadius": 6,
-          "category": "heavy",
-          "attackType": "ranged",
-          "special": ["stunning", "knockback"]
-        },
-        "magical": {
-          "magicType": "lightning",
-          "effects": ["calls_thunder", "rhythm_stuns_enemies"],
-          "manaPerUse": 5
-        }
-      },
-      {
-        "id": "resonance_blade",
-        "name": "Tuning Fork Blade",
-        "category": "equipment",
-        "weight": 2.5,
-        "stackSize": 1,
-        "baseValue": 700,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 16,
-          "damageType": "force",
-          "range": 1,
-          "attackSpeed": 1.2,
-          "durabilityLoss": 0.006,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing"]
-        },
-        "magical": {
-          "magicType": "evocation",
-          "effects": ["vibrates_at_resonant_frequency", "shatters_armor"]
-        }
+      "magical": {
+        "magicType": "chaos",
+        "cursed": true,
+        "effects": [
+          "bonds_to_wielder",
+          "grows_stronger_with_kills"
+        ]
       }
-    ],
-    "trick": [
-      {
-        "id": "cane_sword",
-        "name": "Gentleman's Walking Cane",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 1,
-        "baseValue": 300,
-        "rarity": "uncommon",
-        "weapon": {
-          "damage": 12,
-          "damageType": "piercing",
-          "range": 1,
-          "attackSpeed": 1.4,
-          "durabilityLoss": 0.008,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["stealth"],
-          "critChance": 0.12,
-          "critMultiplier": 2.0
-        }
+    },
+    {
+      "id": "tooth_dagger",
+      "name": "Dragon Tooth Dagger",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 18,
+        "range": 1,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0.003,
+        "damageType": "piercing",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "poison"
+        ]
       },
-      {
-        "id": "whip_sword",
-        "name": "Urumi - Flexible Blade",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 500,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 14,
-          "damageType": "slashing",
-          "range": 3,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0.01,
-          "category": "whip",
-          "attackType": "melee",
-          "special": ["reach", "bleeding"]
-        }
-      },
-      {
-        "id": "gunblade",
-        "name": "Gunblade",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 900,
-        "rarity": "epic",
-        "weapon": {
-          "damage": 20,
-          "damageType": "slashing",
-          "range": 1,
-          "attackSpeed": 0.9,
-          "durabilityLoss": 0.01,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["explosive"],
-          "ammo": {
-            "ammoType": "pistol_ammo",
-            "ammoPerShot": 1,
-            "magazineSize": 6,
-            "reloadTime": 40
-          }
-        }
-      },
-      {
-        "id": "sawcleaver",
-        "name": "Saw Cleaver",
-        "category": "equipment",
-        "weight": 5.0,
-        "stackSize": 1,
-        "baseValue": 700,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 22,
-          "damageType": "slashing",
-          "range": 2,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.012,
-          "twoHanded": true,
-          "category": "axe",
-          "attackType": "melee",
-          "special": ["bleeding", "serrated"]
-        }
-      },
-      {
-        "id": "threaded_cane",
-        "name": "Threaded Cane",
-        "category": "equipment",
-        "weight": 1.8,
-        "stackSize": 1,
-        "baseValue": 650,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 10,
-          "damageType": "slashing",
-          "range": 4,
-          "attackSpeed": 1.3,
-          "durabilityLoss": 0.008,
-          "category": "whip",
-          "attackType": "melee",
-          "special": ["reach", "bleeding"],
-          "critChance": 0.10,
-          "critMultiplier": 1.8
-        }
-      },
-      {
-        "id": "blade_fan",
-        "name": "Iron War Fan - Tessen",
-        "category": "equipment",
-        "weight": 0.8,
-        "stackSize": 1,
-        "baseValue": 400,
-        "rarity": "uncommon",
-        "weapon": {
-          "damage": 8,
-          "damageType": "slashing",
-          "range": 1,
-          "attackSpeed": 1.8,
-          "durabilityLoss": 0.006,
-          "category": "dagger",
-          "attackType": "melee",
-          "special": ["stealth", "parrying"],
-          "critChance": 0.15,
-          "critMultiplier": 1.6
-        }
-      },
-      {
-        "id": "chain_sickle",
-        "name": "Kusarigama",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 450,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 12,
-          "damageType": "slashing",
-          "range": 4,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0.01,
-          "twoHanded": true,
-          "category": "chain",
-          "attackType": "melee",
-          "special": ["grappling", "reach"]
-        }
-      },
-      {
-        "id": "shield_blade",
-        "name": "Lantern Shield",
-        "category": "equipment",
-        "weight": 6.0,
-        "stackSize": 1,
-        "baseValue": 550,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 10,
-          "damageType": "piercing",
-          "range": 1,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.008,
-          "category": "fist",
-          "attackType": "melee",
-          "special": ["parrying", "blinding"]
-        }
+      "magical": {
+        "magicType": "nature",
+        "effects": [
+          "injects_venom",
+          "senses_prey"
+        ]
       }
-    ],
-    "elemental_oddities": [
-      {
-        "id": "frost_breath_vial",
-        "name": "Bottled Blizzard",
-        "category": "equipment",
-        "weight": 0.5,
-        "stackSize": 3,
-        "baseValue": 300,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 20,
-          "damageType": "frost",
-          "range": 8,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.2,
-          "aoeRadius": 4,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["freezing"],
-          "projectile": {
-            "speed": 15,
-            "arc": true,
-            "penetration": 1
-          }
-        }
+    },
+    {
+      "id": "swarm_orb",
+      "name": "Hive Orb",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 750,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 5,
+        "range": 8,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.005,
+        "aoeRadius": 2,
+        "damageType": "poison",
+        "category": "orb",
+        "attackType": "ranged",
+        "special": [
+          "poison",
+          "swarming"
+        ]
       },
-      {
-        "id": "storm_jar",
-        "name": "Jar of Captive Lightning",
-        "category": "equipment",
-        "weight": 1.0,
-        "stackSize": 3,
-        "baseValue": 400,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 30,
-          "damageType": "lightning",
-          "range": 10,
-          "attackSpeed": 0.4,
-          "durabilityLoss": 0.25,
-          "aoeRadius": 5,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["stunning", "chain_lightning"],
-          "projectile": {
-            "speed": 20,
-            "arc": true,
-            "penetration": 1
-          }
-        }
-      },
-      {
-        "id": "magma_heart",
-        "name": "Heart of the Volcano",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 1500,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 35,
-          "damageType": "fire",
-          "range": 6,
-          "attackSpeed": 0.6,
-          "durabilityLoss": 0.015,
-          "aoeRadius": 3,
-          "category": "orb",
-          "attackType": "magic",
-          "special": ["burning", "explosive"]
-        },
-        "magical": {
-          "magicType": "fire",
-          "effects": ["erupts_on_command", "leaves_lava_pools"],
-          "manaPerUse": 10,
-          "spellPowerBonus": 20
-        }
-      },
-      {
-        "id": "wind_fan",
-        "name": "Tempest Fan",
-        "category": "equipment",
-        "weight": 0.5,
-        "stackSize": 1,
-        "baseValue": 600,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 8,
-          "damageType": "force",
-          "range": 12,
-          "attackSpeed": 1.2,
-          "durabilityLoss": 0.005,
-          "aoeRadius": 4,
-          "category": "staff",
-          "attackType": "magic",
-          "special": ["knockback"]
-        },
-        "magical": {
-          "magicType": "air",
-          "effects": ["creates_gusts", "deflects_projectiles"],
-          "manaPerUse": 3
-        }
-      },
-      {
-        "id": "quicksand_pouch",
-        "name": "Pouch of Hungry Earth",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 5,
-        "baseValue": 250,
-        "rarity": "uncommon",
-        "weapon": {
-          "damage": 5,
-          "damageType": "bludgeoning",
-          "range": 8,
-          "attackSpeed": 0.6,
-          "durabilityLoss": 0.15,
-          "aoeRadius": 3,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["stunning", "grappling"],
-          "projectile": {
-            "speed": 10,
-            "arc": true,
-            "penetration": 1
-          }
-        },
-        "magical": {
-          "magicType": "earth",
-          "effects": ["creates_quicksand", "slows_enemies"]
-        }
-      },
-      {
-        "id": "aurora_prism",
-        "name": "Prism of the Northern Lights",
-        "category": "equipment",
-        "weight": 0.3,
-        "stackSize": 1,
-        "baseValue": 1800,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 25,
-          "damageType": "radiant",
-          "range": 15,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.008,
-          "category": "orb",
-          "attackType": "magic",
-          "special": ["blinding"]
-        },
-        "magical": {
-          "magicType": "radiant",
-          "effects": ["splits_into_rainbow_beams", "each_color_different_effect"],
-          "spellPowerBonus": 25,
-          "manaPerUse": 6
-        }
+      "magical": {
+        "magicType": "nature",
+        "manaPerUse": 3,
+        "effects": [
+          "releases_insect_swarm",
+          "swarm_returns"
+        ]
       }
-    ],
-    "cursed": [
-      {
-        "id": "betrayer_blade",
-        "name": "Blade of the Betrayer",
-        "category": "equipment",
-        "weight": 2.5,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 45,
-          "damageType": "necrotic",
-          "range": 1,
-          "attackSpeed": 1.2,
-          "durabilityLoss": 0,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing", "lifesteal"],
-          "critChance": 0.20,
-          "critMultiplier": 2.5
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["cannot_be_dropped", "attacks_allies_randomly", "whispers_paranoia"],
-          "cursed": true
-        }
+    },
+    {
+      "id": "fungal_staff",
+      "name": "Mycelium Staff",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 650,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 6,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.002,
+        "aoeRadius": 3,
+        "damageType": "poison",
+        "category": "staff",
+        "attackType": "magic",
+        "twoHanded": true,
+        "special": [
+          "poison",
+          "stunning"
+        ]
       },
-      {
-        "id": "hungry_axe",
-        "name": "The Famished",
-        "category": "equipment",
-        "weight": 7.0,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 50,
-          "damageType": "slashing",
-          "range": 2,
-          "attackSpeed": 0.7,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "category": "axe",
-          "attackType": "melee",
-          "special": ["bleeding", "lifesteal"]
-        },
-        "magical": {
-          "magicType": "entropy",
-          "effects": ["demands_kills_daily", "drains_wielder_if_unfed", "grows_larger_with_kills"],
-          "cursed": true
-        }
-      },
-      {
-        "id": "mirror_shield",
-        "name": "Shield of Reflected Sins",
-        "category": "equipment",
-        "weight": 8.0,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 0,
-          "damageType": "force",
-          "range": 1,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.001,
-          "category": "fist",
-          "attackType": "melee",
-          "special": ["parrying", "reflecting"]
-        },
-        "magical": {
-          "magicType": "psychic",
-          "effects": ["reflects_damage_to_attacker", "shows_wielder_their_sins", "causes_nightmares"],
-          "cursed": true
-        }
-      },
-      {
-        "id": "puppet_strings",
-        "name": "Strings of the Puppeteer",
-        "category": "equipment",
-        "weight": 0.1,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 5,
-          "damageType": "psionic",
-          "range": 10,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0.002,
-          "category": "whip",
-          "attackType": "ranged",
-          "special": ["grappling"]
-        },
-        "magical": {
-          "magicType": "psychic",
-          "effects": ["controls_weak_minded", "wielder_slowly_loses_free_will"],
-          "cursed": true,
-          "manaPerUse": 15
-        }
-      },
-      {
-        "id": "doom_bell",
-        "name": "Bell of the Final Hour",
-        "category": "equipment",
-        "weight": 5.0,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 100,
-          "damageType": "necrotic",
-          "range": 20,
-          "attackSpeed": 0.1,
-          "durabilityLoss": 0.1,
-          "aoeRadius": 10,
-          "twoHanded": true,
-          "category": "heavy",
-          "attackType": "ranged",
-          "special": ["fear", "stunning"]
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["kills_weak_enemies_instantly", "ages_wielder_with_each_ring", "summons_death"],
-          "cursed": true,
-          "manaPerUse": 50
-        }
+      "magical": {
+        "magicType": "nature",
+        "manaPerUse": 4,
+        "spellPowerBonus": 12,
+        "effects": [
+          "spore_cloud",
+          "spreads_fungal_network"
+        ]
       }
-    ],
-    "weird_science": [
-      {
-        "id": "shrink_ray",
-        "name": "Miniaturization Ray",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 2000,
-        "rarity": "legendary",
-        "clarketechTier": 7,
-        "researchRequired": "nanofabrication",
-        "weapon": {
-          "damage": 5,
-          "damageType": "force",
-          "range": 15,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.02,
-          "category": "pistol",
-          "attackType": "ranged",
-          "special": ["stunning"],
-          "ammo": {
-            "ammoType": "energy_cell",
-            "ammoPerShot": 5,
-            "magazineSize": 20,
-            "reloadTime": 60
-          },
-          "projectile": {
-            "speed": 50,
-            "arc": false,
-            "penetration": 1
-          }
-        },
-        "magical": {
-          "magicType": "transmutation",
-          "effects": ["shrinks_target", "effect_temporary"]
-        }
+    },
+    {
+      "id": "blade_of_unmaking",
+      "name": "Blade of Unmaking",
+      "category": "equipment",
+      "weight": 0.1,
+      "stackSize": 1,
+      "baseValue": 5000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 40,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.05,
+        "damageType": "void",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "disintegrating"
+        ]
       },
-      {
-        "id": "tesla_glove",
-        "name": "Tesla Gauntlet",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 800,
-        "rarity": "epic",
-        "clarketechTier": 6,
-        "researchRequired": "advanced_electronics",
-        "weapon": {
-          "damage": 18,
-          "damageType": "lightning",
-          "range": 4,
-          "attackSpeed": 1.5,
-          "durabilityLoss": 0.01,
-          "category": "fist",
-          "attackType": "melee",
-          "special": ["chain_lightning", "stunning"],
-          "powerCost": 2
-        }
-      },
-      {
-        "id": "probability_gun",
-        "name": "Probability Manipulator",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 1,
-        "baseValue": 3000,
-        "rarity": "legendary",
-        "clarketechTier": 7,
-        "researchRequired": "quantum_computing",
-        "weapon": {
-          "damage": 1,
-          "damageType": "force",
-          "range": 20,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.015,
-          "category": "pistol",
-          "attackType": "ranged",
-          "ammo": {
-            "ammoType": "energy_cell",
-            "ammoPerShot": 3,
-            "magazineSize": 15,
-            "reloadTime": 40
-          },
-          "projectile": {
-            "speed": 80,
-            "arc": false,
-            "penetration": 1
-          }
-        },
-        "magical": {
-          "magicType": "chaos",
-          "effects": ["random_damage_1_to_100", "random_effect_on_hit", "might_backfire"]
-        }
-      },
-      {
-        "id": "portal_gun",
-        "name": "Dimensional Aperture Device",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 5000,
-        "rarity": "legendary",
-        "clarketechTier": 7,
-        "researchRequired": ["local_teleportation", "stable_inter_universe_portals"],
-        "weapon": {
-          "damage": 0,
-          "damageType": "void",
-          "range": 30,
-          "attackSpeed": 0.3,
-          "durabilityLoss": 0.02,
-          "category": "rifle",
-          "attackType": "ranged",
-          "ammo": {
-            "ammoType": "energy_cell",
-            "ammoPerShot": 10,
-            "magazineSize": 30,
-            "reloadTime": 80
-          },
-          "projectile": {
-            "speed": 100,
-            "arc": false,
-            "penetration": 10
-          }
-        },
-        "magical": {
-          "magicType": "conjuration",
-          "effects": ["creates_linked_portals", "can_redirect_attacks", "unstable_portals_dangerous"],
-          "manaPerUse": 20
-        }
-      },
-      {
-        "id": "gravity_boots",
-        "name": "Graviton Boots",
-        "category": "equipment",
-        "weight": 5.0,
-        "stackSize": 1,
-        "baseValue": 1200,
-        "rarity": "epic",
-        "clarketechTier": 7,
-        "researchRequired": "anti_gravity",
-        "weapon": {
-          "damage": 25,
-          "damageType": "force",
-          "range": 1,
-          "attackSpeed": 0.6,
-          "durabilityLoss": 0.01,
-          "aoeRadius": 2,
-          "category": "fist",
-          "attackType": "melee",
-          "special": ["knockback", "stunning"],
-          "powerCost": 3
-        },
-        "magical": {
-          "magicType": "void",
-          "effects": ["ground_pound", "low_gravity_jumps"]
-        }
-      },
-      {
-        "id": "freeze_ray",
-        "name": "Absolute Zero Projector",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 1800,
-        "rarity": "legendary",
-        "clarketechTier": 6,
-        "researchRequired": "cryogenic_suspension",
-        "weapon": {
-          "damage": 15,
-          "damageType": "frost",
-          "range": 12,
-          "attackSpeed": 0.4,
-          "durabilityLoss": 0.015,
-          "aoeRadius": 2,
-          "twoHanded": true,
-          "category": "beam",
-          "attackType": "ranged",
-          "special": ["freezing"],
-          "powerCost": 4,
-          "projectile": {
-            "speed": 100,
-            "arc": false,
-            "penetration": 1
-          }
-        }
+      "magical": {
+        "magicType": "entropy",
+        "cursed": true,
+        "effects": [
+          "erases_from_existence",
+          "cannot_be_healed"
+        ]
       }
-    ],
-    "improvised": [
-      {
-        "id": "frying_pan",
-        "name": "Cast Iron Skillet of Justice",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 50,
-        "rarity": "common",
-        "weapon": {
-          "damage": 12,
-          "damageType": "bludgeoning",
-          "range": 1,
-          "attackSpeed": 0.9,
-          "durabilityLoss": 0.002,
-          "category": "mace",
-          "attackType": "melee",
-          "special": ["stunning"]
-        }
+    },
+    {
+      "id": "memory_dagger",
+      "name": "Blade of Forgotten Names",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 15,
+        "range": 1,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.008,
+        "damageType": "psionic",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
       },
-      {
-        "id": "broken_bottle",
-        "name": "Broken Bottle",
-        "category": "equipment",
-        "weight": 0.3,
-        "stackSize": 1,
-        "baseValue": 1,
-        "rarity": "common",
-        "weapon": {
-          "damage": 6,
-          "damageType": "slashing",
-          "range": 1,
-          "attackSpeed": 1.6,
-          "durabilityLoss": 0.15,
-          "category": "dagger",
-          "attackType": "melee",
-          "special": ["bleeding"]
-        }
-      },
-      {
-        "id": "sock_of_coins",
-        "name": "Coin-Filled Sock",
-        "category": "equipment",
-        "weight": 1.0,
-        "stackSize": 1,
-        "baseValue": 100,
-        "rarity": "common",
-        "weapon": {
-          "damage": 10,
-          "damageType": "bludgeoning",
-          "range": 1,
-          "attackSpeed": 1.2,
-          "durabilityLoss": 0.02,
-          "category": "mace",
-          "attackType": "melee",
-          "special": ["stunning"]
-        }
-      },
-      {
-        "id": "chair_leg",
-        "name": "Trusty Chair Leg",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 1,
-        "baseValue": 5,
-        "rarity": "common",
-        "weapon": {
-          "damage": 8,
-          "damageType": "bludgeoning",
-          "range": 1,
-          "attackSpeed": 1.3,
-          "durabilityLoss": 0.03,
-          "category": "mace",
-          "attackType": "melee"
-        }
-      },
-      {
-        "id": "bag_of_rats",
-        "name": "Sack of Angry Rats",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 30,
-        "rarity": "uncommon",
-        "weapon": {
-          "damage": 8,
-          "damageType": "piercing",
-          "range": 3,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0.1,
-          "aoeRadius": 2,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["poison", "swarming"],
-          "projectile": {
-            "speed": 8,
-            "arc": true,
-            "penetration": 1
-          }
-        }
-      },
-      {
-        "id": "beehive",
-        "name": "Portable Beehive",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 80,
-        "rarity": "rare",
-        "weapon": {
-          "damage": 3,
-          "damageType": "poison",
-          "range": 5,
-          "attackSpeed": 0.3,
-          "durabilityLoss": 0.2,
-          "aoeRadius": 4,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["poison", "swarming", "fear"],
-          "projectile": {
-            "speed": 6,
-            "arc": true,
-            "penetration": 1
-          }
-        }
-      },
-      {
-        "id": "hot_soup",
-        "name": "Scalding Hot Soup",
-        "category": "equipment",
-        "weight": 1.5,
-        "stackSize": 3,
-        "baseValue": 15,
-        "rarity": "common",
-        "weapon": {
-          "damage": 10,
-          "damageType": "fire",
-          "range": 3,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0.5,
-          "aoeRadius": 1,
-          "category": "throwing",
-          "attackType": "ranged",
-          "special": ["burning", "blinding"],
-          "projectile": {
-            "speed": 10,
-            "arc": true,
-            "penetration": 1
-          }
-        }
+      "magical": {
+        "magicType": "psychic",
+        "effects": [
+          "steals_memories",
+          "victim_forgets_attacker"
+        ]
       }
-    ],
-    "mythological": [
-      {
-        "id": "gungnir",
-        "name": "Gungnir - Spear of Odin",
-        "category": "equipment",
-        "weight": 4.0,
-        "stackSize": 1,
-        "baseValue": 10000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 50,
-          "damageType": "force",
-          "range": 3,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "category": "spear",
-          "attackType": "melee",
-          "special": ["armor_piercing"],
-          "critChance": 1.0,
-          "critMultiplier": 2.0
-        },
-        "magical": {
-          "magicType": "divine",
-          "effects": ["never_misses_when_thrown", "returns_to_hand", "marks_for_death"]
-        }
+    },
+    {
+      "id": "paradox_bow",
+      "name": "Bow of Temporal Paradox",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 20,
+        "range": 30,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.01,
+        "damageType": "force",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing"
+        ]
       },
-      {
-        "id": "mjolnir",
-        "name": "Mjolnir - Hammer of Thor",
-        "category": "equipment",
-        "weight": 100.0,
-        "stackSize": 1,
-        "baseValue": 10000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 80,
-          "damageType": "lightning",
-          "range": 2,
-          "attackSpeed": 0.5,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "aoeRadius": 3,
-          "category": "hammer",
-          "attackType": "melee",
-          "special": ["stunning", "chain_lightning", "knockback"]
-        },
-        "magical": {
-          "magicType": "lightning",
-          "effects": ["only_worthy_can_lift", "returns_when_thrown", "calls_lightning"]
-        }
-      },
-      {
-        "id": "kusanagi",
-        "name": "Kusanagi-no-Tsurugi",
-        "category": "equipment",
-        "weight": 2.0,
-        "stackSize": 1,
-        "baseValue": 8000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 40,
-          "damageType": "slashing",
-          "range": 1,
-          "attackSpeed": 1.2,
-          "durabilityLoss": 0,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing"],
-          "critChance": 0.20,
-          "critMultiplier": 2.5
-        },
-        "magical": {
-          "magicType": "air",
-          "effects": ["controls_wind", "wind_blade_projectiles", "cannot_be_broken"]
-        }
-      },
-      {
-        "id": "gae_bolg",
-        "name": "Gáe Bolg - Spear of Mortal Pain",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 7000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 35,
-          "damageType": "piercing",
-          "range": 3,
-          "attackSpeed": 0.7,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "category": "spear",
-          "attackType": "melee",
-          "special": ["armor_piercing", "bleeding"]
-        },
-        "magical": {
-          "magicType": "necromancy",
-          "effects": ["wounds_cannot_heal", "barbs_multiply_inside_body", "reverses_causality"],
-          "cursed": true
-        }
-      },
-      {
-        "id": "ruyi_jingu_bang",
-        "name": "Ruyi Jingu Bang - Monkey King Staff",
-        "category": "equipment",
-        "weight": 1.0,
-        "stackSize": 1,
-        "baseValue": 9000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 45,
-          "damageType": "bludgeoning",
-          "range": 10,
-          "attackSpeed": 1.0,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "category": "staff",
-          "attackType": "melee",
-          "special": ["reach", "knockback"]
-        },
-        "magical": {
-          "magicType": "transmutation",
-          "effects": ["grows_and_shrinks_at_will", "weighs_8_tons_to_others", "can_multiply"]
-        }
-      },
-      {
-        "id": "excalibur",
-        "name": "Excalibur",
-        "category": "equipment",
-        "weight": 3.0,
-        "stackSize": 1,
-        "baseValue": 10000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 55,
-          "damageType": "radiant",
-          "range": 2,
-          "attackSpeed": 0.9,
-          "durabilityLoss": 0,
-          "category": "sword",
-          "attackType": "melee",
-          "special": ["armor_piercing", "blinding"]
-        },
-        "magical": {
-          "magicType": "holy",
-          "effects": ["blinds_enemies_with_light", "grants_rightful_rule", "scabbard_prevents_bleeding"]
-        }
-      },
-      {
-        "id": "trident_of_poseidon",
-        "name": "Trident of the Sea God",
-        "category": "equipment",
-        "weight": 5.0,
-        "stackSize": 1,
-        "baseValue": 9000,
-        "rarity": "legendary",
-        "weapon": {
-          "damage": 45,
-          "damageType": "force",
-          "range": 3,
-          "attackSpeed": 0.8,
-          "durabilityLoss": 0,
-          "twoHanded": true,
-          "category": "spear",
-          "attackType": "melee",
-          "special": ["reach"]
-        },
-        "magical": {
-          "magicType": "water",
-          "effects": ["controls_water", "creates_earthquakes", "commands_sea_creatures"],
-          "spellPowerBonus": 50
-        }
+      "magical": {
+        "magicType": "chaos",
+        "manaPerUse": 10,
+        "effects": [
+          "arrow_hits_before_fired",
+          "wounds_appear_in_past"
+        ]
       }
-    ]
-  }
+    },
+    {
+      "id": "echo_hammer",
+      "name": "Hammer of Reverberating Doom",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 35,
+        "range": 2,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.008,
+        "aoeRadius": 2,
+        "damageType": "force",
+        "category": "hammer",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "stunning",
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "order",
+        "effects": [
+          "impact_echoes_three_times",
+          "shockwave"
+        ]
+      }
+    },
+    {
+      "id": "silence_knife",
+      "name": "Knife of Utter Silence",
+      "category": "equipment",
+      "weight": 0.4,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 12,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.005,
+        "critChance": 0.25,
+        "critMultiplier": 3.0,
+        "damageType": "void",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "stealth"
+        ]
+      },
+      "magical": {
+        "magicType": "void",
+        "effects": [
+          "absorbs_all_sound",
+          "victims_cannot_scream",
+          "silences_magic"
+        ]
+      }
+    },
+    {
+      "id": "dream_staff",
+      "name": "Staff of Waking Dreams",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 2200,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 18,
+        "range": 10,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.006,
+        "aoeRadius": 3,
+        "damageType": "psionic",
+        "category": "staff",
+        "attackType": "magic",
+        "twoHanded": true,
+        "special": [
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "psychic",
+        "manaPerUse": 8,
+        "spellPowerBonus": 30,
+        "effects": [
+          "pulls_nightmares_into_reality",
+          "enemies_hallucinate"
+        ]
+      }
+    },
+    {
+      "id": "gravity_mace",
+      "name": "Singularity Mace",
+      "category": "equipment",
+      "weight": 50.0,
+      "stackSize": 1,
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 60,
+        "range": 2,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.01,
+        "aoeRadius": 3,
+        "damageType": "force",
+        "category": "mace",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "stunning",
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "void",
+        "manaPerUse": 15,
+        "effects": [
+          "pulls_enemies_toward_impact",
+          "creates_gravity_well"
+        ]
+      }
+    },
+    {
+      "id": "war_horn",
+      "name": "Dreadhorn of the Ancients",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 600,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 8,
+        "range": 15,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.01,
+        "aoeRadius": 8,
+        "damageType": "force",
+        "category": "heavy",
+        "attackType": "ranged",
+        "special": [
+          "stunning",
+          "fear"
+        ]
+      },
+      "magical": {
+        "magicType": "evocation",
+        "effects": [
+          "causes_fear",
+          "shatters_morale"
+        ]
+      }
+    },
+    {
+      "id": "sonic_lute",
+      "name": "Lute of Shattering Chords",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 15,
+        "range": 12,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.008,
+        "damageType": "force",
+        "category": "staff",
+        "attackType": "ranged",
+        "twoHanded": true,
+        "special": [
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "evocation",
+        "spellPowerBonus": 15,
+        "effects": [
+          "sonic_waves",
+          "can_shatter_objects"
+        ]
+      }
+    },
+    {
+      "id": "death_whistle",
+      "name": "Aztec Death Whistle",
+      "category": "equipment",
+      "weight": 0.2,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 5,
+        "range": 10,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.005,
+        "aoeRadius": 5,
+        "damageType": "psionic",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "fear",
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "effects": [
+          "screams_of_the_dead",
+          "causes_terror"
+        ]
+      }
+    },
+    {
+      "id": "thunder_drums",
+      "name": "War Drums of the Storm Giant",
+      "category": "equipment",
+      "weight": 15.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 25,
+        "range": 20,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.012,
+        "aoeRadius": 6,
+        "damageType": "lightning",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true,
+        "special": [
+          "stunning",
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "lightning",
+        "manaPerUse": 5,
+        "effects": [
+          "calls_thunder",
+          "rhythm_stuns_enemies"
+        ]
+      }
+    },
+    {
+      "id": "resonance_blade",
+      "name": "Tuning Fork Blade",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 16,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.006,
+        "damageType": "force",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "evocation",
+        "effects": [
+          "vibrates_at_resonant_frequency",
+          "shatters_armor"
+        ]
+      }
+    },
+    {
+      "id": "whip_sword",
+      "name": "Urumi - Flexible Blade",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 500,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 14,
+        "range": 3,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.01,
+        "damageType": "slashing",
+        "category": "whip",
+        "attackType": "melee",
+        "special": [
+          "reach",
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "gunblade",
+      "name": "Gunblade",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 20,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.01,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "explosive"
+        ]
+      }
+    },
+    {
+      "id": "sawcleaver",
+      "name": "Saw Cleaver",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 22,
+        "range": 2,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.012,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "bleeding",
+          "serrated"
+        ]
+      }
+    },
+    {
+      "id": "threaded_cane",
+      "name": "Threaded Cane",
+      "category": "equipment",
+      "weight": 1.8,
+      "stackSize": 1,
+      "baseValue": 650,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 4,
+        "attackSpeed": 1.3,
+        "durabilityLoss": 0.008,
+        "critChance": 0.1,
+        "critMultiplier": 1.8,
+        "damageType": "slashing",
+        "category": "whip",
+        "attackType": "melee",
+        "special": [
+          "reach",
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "blade_fan",
+      "name": "Iron War Fan - Tessen",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0.006,
+        "critChance": 0.15,
+        "critMultiplier": 1.6,
+        "damageType": "slashing",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "stealth",
+          "parrying"
+        ]
+      }
+    },
+    {
+      "id": "chain_sickle",
+      "name": "Kusarigama",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 450,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 12,
+        "range": 4,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.01,
+        "damageType": "slashing",
+        "category": "chain",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "grappling",
+          "reach"
+        ]
+      }
+    },
+    {
+      "id": "shield_blade",
+      "name": "Lantern Shield",
+      "category": "equipment",
+      "weight": 6.0,
+      "stackSize": 1,
+      "baseValue": 550,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.008,
+        "damageType": "piercing",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "parrying",
+          "blinding"
+        ]
+      }
+    },
+    {
+      "id": "frost_breath_vial",
+      "name": "Bottled Blizzard",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 3,
+      "baseValue": 300,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 20,
+        "range": 8,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.2,
+        "aoeRadius": 4,
+        "damageType": "frost",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "freezing"
+        ]
+      }
+    },
+    {
+      "id": "storm_jar",
+      "name": "Jar of Captive Lightning",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 3,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 30,
+        "range": 10,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.25,
+        "aoeRadius": 5,
+        "damageType": "lightning",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "stunning",
+          "chain_lightning"
+        ]
+      }
+    },
+    {
+      "id": "magma_heart",
+      "name": "Heart of the Volcano",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 6,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.015,
+        "aoeRadius": 3,
+        "damageType": "fire",
+        "category": "orb",
+        "attackType": "magic",
+        "special": [
+          "burning",
+          "explosive"
+        ]
+      },
+      "magical": {
+        "magicType": "fire",
+        "manaPerUse": 10,
+        "spellPowerBonus": 20,
+        "effects": [
+          "erupts_on_command",
+          "leaves_lava_pools"
+        ]
+      }
+    },
+    {
+      "id": "wind_fan",
+      "name": "Tempest Fan",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 600,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 8,
+        "range": 12,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "aoeRadius": 4,
+        "damageType": "force",
+        "category": "staff",
+        "attackType": "magic",
+        "special": [
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "air",
+        "manaPerUse": 3,
+        "effects": [
+          "creates_gusts",
+          "deflects_projectiles"
+        ]
+      }
+    },
+    {
+      "id": "quicksand_pouch",
+      "name": "Pouch of Hungry Earth",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 5,
+      "baseValue": 250,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 5,
+        "range": 8,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.15,
+        "aoeRadius": 3,
+        "damageType": "bludgeoning",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "stunning",
+          "grappling"
+        ]
+      },
+      "magical": {
+        "magicType": "earth",
+        "effects": [
+          "creates_quicksand",
+          "slows_enemies"
+        ]
+      }
+    },
+    {
+      "id": "aurora_prism",
+      "name": "Prism of the Northern Lights",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 25,
+        "range": 15,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.008,
+        "damageType": "radiant",
+        "category": "orb",
+        "attackType": "magic",
+        "special": [
+          "blinding"
+        ]
+      },
+      "magical": {
+        "magicType": "radiant",
+        "manaPerUse": 6,
+        "spellPowerBonus": 25,
+        "effects": [
+          "splits_into_rainbow_beams",
+          "each_color_different_effect"
+        ]
+      }
+    },
+    {
+      "id": "betrayer_blade",
+      "name": "Blade of the Betrayer",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 45,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0,
+        "critChance": 0.2,
+        "critMultiplier": 2.5,
+        "damageType": "necrotic",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "lifesteal"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "cursed": true,
+        "effects": [
+          "cannot_be_dropped",
+          "attacks_allies_randomly",
+          "whispers_paranoia"
+        ]
+      }
+    },
+    {
+      "id": "hungry_axe",
+      "name": "The Famished",
+      "category": "equipment",
+      "weight": 7.0,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 50,
+        "range": 2,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "bleeding",
+          "lifesteal"
+        ]
+      },
+      "magical": {
+        "magicType": "entropy",
+        "cursed": true,
+        "effects": [
+          "demands_kills_daily",
+          "drains_wielder_if_unfed",
+          "grows_larger_with_kills"
+        ]
+      }
+    },
+    {
+      "id": "mirror_shield",
+      "name": "Shield of Reflected Sins",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 0,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.001,
+        "damageType": "force",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "parrying",
+          "reflecting"
+        ]
+      },
+      "magical": {
+        "magicType": "psychic",
+        "cursed": true,
+        "effects": [
+          "reflects_damage_to_attacker",
+          "shows_wielder_their_sins",
+          "causes_nightmares"
+        ]
+      }
+    },
+    {
+      "id": "puppet_strings",
+      "name": "Strings of the Puppeteer",
+      "category": "equipment",
+      "weight": 0.1,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 5,
+        "range": 10,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.002,
+        "damageType": "psionic",
+        "category": "whip",
+        "attackType": "ranged",
+        "special": [
+          "grappling"
+        ]
+      },
+      "magical": {
+        "magicType": "psychic",
+        "manaPerUse": 15,
+        "cursed": true,
+        "effects": [
+          "controls_weak_minded",
+          "wielder_slowly_loses_free_will"
+        ]
+      }
+    },
+    {
+      "id": "doom_bell",
+      "name": "Bell of the Final Hour",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 100,
+        "range": 20,
+        "attackSpeed": 0.1,
+        "durabilityLoss": 0.1,
+        "aoeRadius": 10,
+        "damageType": "necrotic",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true,
+        "special": [
+          "fear",
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 50,
+        "cursed": true,
+        "effects": [
+          "kills_weak_enemies_instantly",
+          "ages_wielder_with_each_ring",
+          "summons_death"
+        ]
+      }
+    },
+    {
+      "id": "shrink_ray",
+      "name": "Miniaturization Ray",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": "nanofabrication",
+      "weapon": {
+        "damage": 5,
+        "range": 15,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.02,
+        "damageType": "force",
+        "category": "pistol",
+        "attackType": "ranged",
+        "special": [
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "transmutation",
+        "effects": [
+          "shrinks_target",
+          "effect_temporary"
+        ]
+      }
+    },
+    {
+      "id": "tesla_glove",
+      "name": "Tesla Gauntlet",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "clarketechTier": 6,
+      "researchRequired": "advanced_electronics",
+      "weapon": {
+        "damage": 18,
+        "range": 4,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.01,
+        "powerCost": 2,
+        "damageType": "lightning",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "chain_lightning",
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "probability_gun",
+      "name": "Probability Manipulator",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": "quantum_computing",
+      "weapon": {
+        "damage": 1,
+        "range": 20,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.015,
+        "damageType": "force",
+        "category": "pistol",
+        "attackType": "ranged"
+      },
+      "magical": {
+        "magicType": "chaos",
+        "effects": [
+          "random_damage_1_to_100",
+          "random_effect_on_hit",
+          "might_backfire"
+        ]
+      }
+    },
+    {
+      "id": "portal_gun",
+      "name": "Dimensional Aperture Device",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 5000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "local_teleportation",
+        "stable_inter_universe_portals"
+      ],
+      "weapon": {
+        "damage": 0,
+        "range": 30,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.02,
+        "damageType": "void",
+        "category": "rifle",
+        "attackType": "ranged"
+      },
+      "magical": {
+        "magicType": "conjuration",
+        "manaPerUse": 20,
+        "effects": [
+          "creates_linked_portals",
+          "can_redirect_attacks",
+          "unstable_portals_dangerous"
+        ]
+      }
+    },
+    {
+      "id": "gravity_boots",
+      "name": "Graviton Boots",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "anti_gravity",
+      "weapon": {
+        "damage": 25,
+        "range": 1,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.01,
+        "aoeRadius": 2,
+        "powerCost": 3,
+        "damageType": "force",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "knockback",
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "void",
+        "effects": [
+          "ground_pound",
+          "low_gravity_jumps"
+        ]
+      }
+    },
+    {
+      "id": "freeze_ray",
+      "name": "Absolute Zero Projector",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "clarketechTier": 6,
+      "researchRequired": "cryogenic_suspension",
+      "weapon": {
+        "damage": 15,
+        "range": 12,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.015,
+        "aoeRadius": 2,
+        "powerCost": 4,
+        "damageType": "frost",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true,
+        "special": [
+          "freezing"
+        ]
+      }
+    },
+    {
+      "id": "frying_pan",
+      "name": "Cast Iron Skillet of Justice",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 50,
+      "rarity": "common",
+      "weapon": {
+        "damage": 12,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.002,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "broken_bottle",
+      "name": "Broken Bottle",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 1,
+      "rarity": "common",
+      "weapon": {
+        "damage": 6,
+        "range": 1,
+        "attackSpeed": 1.6,
+        "durabilityLoss": 0.15,
+        "damageType": "slashing",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "sock_of_coins",
+      "name": "Coin-Filled Sock",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "common",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.02,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "chair_leg",
+      "name": "Trusty Chair Leg",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 5,
+      "rarity": "common",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 1.3,
+        "durabilityLoss": 0.03,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "bag_of_rats",
+      "name": "Sack of Angry Rats",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 30,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 8,
+        "range": 3,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.1,
+        "aoeRadius": 2,
+        "damageType": "piercing",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "poison",
+          "swarming"
+        ]
+      }
+    },
+    {
+      "id": "beehive",
+      "name": "Portable Beehive",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 3,
+        "range": 5,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.2,
+        "aoeRadius": 4,
+        "damageType": "poison",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "poison",
+          "swarming",
+          "fear"
+        ]
+      }
+    },
+    {
+      "id": "hot_soup",
+      "name": "Scalding Hot Soup",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 3,
+      "baseValue": 15,
+      "rarity": "common",
+      "weapon": {
+        "damage": 10,
+        "range": 3,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.5,
+        "aoeRadius": 1,
+        "damageType": "fire",
+        "category": "throwing",
+        "attackType": "ranged",
+        "special": [
+          "burning",
+          "blinding"
+        ]
+      }
+    },
+    {
+      "id": "gungnir",
+      "name": "Gungnir - Spear of Odin",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 10000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 50,
+        "range": 3,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0,
+        "critChance": 1.0,
+        "critMultiplier": 2.0,
+        "damageType": "force",
+        "category": "spear",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "divine",
+        "effects": [
+          "never_misses_when_thrown",
+          "returns_to_hand",
+          "marks_for_death"
+        ]
+      }
+    },
+    {
+      "id": "mjolnir",
+      "name": "Mjolnir - Hammer of Thor",
+      "category": "equipment",
+      "weight": 100.0,
+      "stackSize": 1,
+      "baseValue": 10000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 80,
+        "range": 2,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0,
+        "aoeRadius": 3,
+        "damageType": "lightning",
+        "category": "hammer",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "stunning",
+          "chain_lightning",
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "lightning",
+        "effects": [
+          "only_worthy_can_lift",
+          "returns_when_thrown",
+          "calls_lightning"
+        ]
+      }
+    },
+    {
+      "id": "kusanagi",
+      "name": "Kusanagi-no-Tsurugi",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 8000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 40,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0,
+        "critChance": 0.2,
+        "critMultiplier": 2.5,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "air",
+        "effects": [
+          "controls_wind",
+          "wind_blade_projectiles",
+          "cannot_be_broken"
+        ]
+      }
+    },
+    {
+      "id": "gae_bolg",
+      "name": "G\u00e1e Bolg - Spear of Mortal Pain",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 7000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 3,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0,
+        "damageType": "piercing",
+        "category": "spear",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "bleeding"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "cursed": true,
+        "effects": [
+          "wounds_cannot_heal",
+          "barbs_multiply_inside_body",
+          "reverses_causality"
+        ]
+      }
+    },
+    {
+      "id": "ruyi_jingu_bang",
+      "name": "Ruyi Jingu Bang - Monkey King Staff",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 9000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 45,
+        "range": 10,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0,
+        "damageType": "bludgeoning",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "reach",
+          "knockback"
+        ]
+      },
+      "magical": {
+        "magicType": "transmutation",
+        "effects": [
+          "grows_and_shrinks_at_will",
+          "weighs_8_tons_to_others",
+          "can_multiply"
+        ]
+      }
+    },
+    {
+      "id": "excalibur",
+      "name": "Excalibur",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 10000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 55,
+        "range": 2,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0,
+        "damageType": "radiant",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "blinding"
+        ]
+      },
+      "magical": {
+        "magicType": "holy",
+        "effects": [
+          "blinds_enemies_with_light",
+          "grants_rightful_rule",
+          "scabbard_prevents_bleeding"
+        ]
+      }
+    },
+    {
+      "id": "trident_of_poseidon",
+      "name": "Trident of the Sea God",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 9000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 45,
+        "range": 3,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0,
+        "damageType": "force",
+        "category": "spear",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "reach"
+        ]
+      },
+      "magical": {
+        "magicType": "water",
+        "spellPowerBonus": 50,
+        "effects": [
+          "controls_water",
+          "creates_earthquakes",
+          "commands_sea_creatures"
+        ]
+      }
+    }
+  ],
+  "melee": [
+    {
+      "id": "club_wood",
+      "name": "Wooden Club",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 5,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 4,
+        "range": 1,
+        "attackSpeed": 1.3,
+        "durabilityLoss": 0.02,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "stone_axe_weapon",
+      "name": "Stone Handaxe",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 8,
+      "rarity": "common",
+      "baseMaterial": "stone",
+      "weapon": {
+        "damage": 6,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.03,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "flint_spear",
+      "name": "Flint Spear",
+      "category": "equipment",
+      "weight": 1.8,
+      "stackSize": 1,
+      "baseValue": 10,
+      "rarity": "common",
+      "baseMaterial": "flint",
+      "weapon": {
+        "damage": 5,
+        "range": 2,
+        "attackSpeed": 1.1,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "spear",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "bone_knife",
+      "name": "Bone Knife",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 6,
+      "rarity": "common",
+      "baseMaterial": "bone",
+      "weapon": {
+        "damage": 3,
+        "range": 1,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0.025,
+        "critChance": 0.1,
+        "critMultiplier": 2.0,
+        "damageType": "piercing",
+        "category": "dagger",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "iron_sword",
+      "name": "Iron Sword",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 50,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.01,
+        "critChance": 0.05,
+        "critMultiplier": 1.5,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "steel_sword",
+      "name": "Steel Sword",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 14,
+        "range": 1,
+        "attackSpeed": 1.3,
+        "durabilityLoss": 0.008,
+        "critChance": 0.08,
+        "critMultiplier": 1.8,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "greatsword_iron",
+      "name": "Iron Greatsword",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "uncommon",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 18,
+        "range": 1,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.015,
+        "critChance": 0.1,
+        "critMultiplier": 2.0,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "greatsword_steel",
+      "name": "Steel Greatsword",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 150,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 24,
+        "range": 1,
+        "attackSpeed": 0.75,
+        "durabilityLoss": 0.012,
+        "critChance": 0.12,
+        "critMultiplier": 2.2,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rapier",
+      "name": "Rapier",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 120,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 1.6,
+        "durabilityLoss": 0.01,
+        "critChance": 0.15,
+        "critMultiplier": 2.0,
+        "damageType": "piercing",
+        "category": "sword",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "scimitar",
+      "name": "Scimitar",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 110,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 12,
+        "range": 1,
+        "attackSpeed": 1.4,
+        "durabilityLoss": 0.01,
+        "critChance": 0.1,
+        "critMultiplier": 1.8,
+        "damageType": "slashing",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "iron_spear",
+      "name": "Iron Spear",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 40,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 8,
+        "range": 2,
+        "attackSpeed": 1.1,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "spear",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "pike",
+      "name": "Pike",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 60,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 12,
+        "range": 3,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.012,
+        "damageType": "piercing",
+        "category": "polearm",
+        "attackType": "melee",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "halberd",
+      "name": "Halberd",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 120,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 16,
+        "range": 2,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.015,
+        "damageType": "slashing",
+        "category": "polearm",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing"
+        ]
+      }
+    },
+    {
+      "id": "glaive",
+      "name": "Glaive",
+      "category": "equipment",
+      "weight": 4.5,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 14,
+        "range": 2,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.012,
+        "damageType": "slashing",
+        "category": "polearm",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "battleaxe_iron",
+      "name": "Iron Battleaxe",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 70,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 14,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.012,
+        "critChance": 0.12,
+        "critMultiplier": 2.0,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "battleaxe_steel",
+      "name": "Steel Battleaxe",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 130,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 18,
+        "range": 1,
+        "attackSpeed": 0.95,
+        "durabilityLoss": 0.01,
+        "critChance": 0.14,
+        "critMultiplier": 2.2,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "greataxe",
+      "name": "Greataxe",
+      "category": "equipment",
+      "weight": 6.0,
+      "stackSize": 1,
+      "baseValue": 160,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 22,
+        "range": 1,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.015,
+        "critChance": 0.15,
+        "critMultiplier": 2.5,
+        "damageType": "slashing",
+        "category": "axe",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing"
+        ]
+      }
+    },
+    {
+      "id": "mace_iron",
+      "name": "Iron Mace",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 55,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.008,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "morningstar",
+      "name": "Morningstar",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 90,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 14,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.01,
+        "critChance": 0.08,
+        "critMultiplier": 1.8,
+        "damageType": "bludgeoning",
+        "category": "mace",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      }
+    },
+    {
+      "id": "warhammer_iron",
+      "name": "Iron Warhammer",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 16,
+        "range": 1,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.008,
+        "damageType": "bludgeoning",
+        "category": "hammer",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "maul",
+      "name": "Steel Maul",
+      "category": "equipment",
+      "weight": 7.0,
+      "stackSize": 1,
+      "baseValue": 140,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 24,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.006,
+        "critChance": 0.1,
+        "critMultiplier": 2.5,
+        "damageType": "bludgeoning",
+        "category": "hammer",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "iron_dagger",
+      "name": "Iron Dagger",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 25,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 5,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.01,
+        "critChance": 0.15,
+        "critMultiplier": 2.5,
+        "damageType": "piercing",
+        "category": "dagger",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "steel_dagger",
+      "name": "Steel Dagger",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 50,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 7,
+        "range": 1,
+        "attackSpeed": 2.2,
+        "durabilityLoss": 0.008,
+        "critChance": 0.18,
+        "critMultiplier": 2.8,
+        "damageType": "piercing",
+        "category": "dagger",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "stiletto",
+      "name": "Stiletto",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 70,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 4,
+        "range": 1,
+        "attackSpeed": 2.5,
+        "durabilityLoss": 0.01,
+        "critChance": 0.25,
+        "critMultiplier": 3.0,
+        "damageType": "piercing",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      }
+    },
+    {
+      "id": "brass_knuckles",
+      "name": "Brass Knuckles",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 30,
+      "rarity": "common",
+      "baseMaterial": "brass",
+      "weapon": {
+        "damage": 6,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.005,
+        "damageType": "bludgeoning",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "cestus",
+      "name": "Cestus",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 40,
+      "rarity": "uncommon",
+      "baseMaterial": "leather",
+      "weapon": {
+        "damage": 4,
+        "range": 1,
+        "attackSpeed": 2.5,
+        "durabilityLoss": 0.008,
+        "critChance": 0.12,
+        "critMultiplier": 2.0,
+        "damageType": "bludgeoning",
+        "category": "fist",
+        "attackType": "melee"
+      }
+    },
+    {
+      "id": "spiked_gauntlet",
+      "name": "Spiked Gauntlet",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0.01,
+        "critChance": 0.15,
+        "critMultiplier": 2.2,
+        "damageType": "piercing",
+        "category": "fist",
+        "attackType": "melee",
+        "special": [
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "leather_whip",
+      "name": "Leather Whip",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 35,
+      "rarity": "common",
+      "baseMaterial": "leather",
+      "weapon": {
+        "damage": 4,
+        "range": 2,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.02,
+        "damageType": "slashing",
+        "category": "whip",
+        "attackType": "melee",
+        "special": [
+          "bleeding"
+        ]
+      }
+    },
+    {
+      "id": "chain_whip",
+      "name": "Chain Whip",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 70,
+      "rarity": "uncommon",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 8,
+        "range": 2,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.01,
+        "damageType": "bludgeoning",
+        "category": "chain",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      }
+    },
+    {
+      "id": "flail",
+      "name": "Flail",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 12,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.012,
+        "critChance": 0.1,
+        "critMultiplier": 2.0,
+        "damageType": "bludgeoning",
+        "category": "chain",
+        "attackType": "melee",
+        "special": [
+          "shield_breaker"
+        ]
+      }
+    }
+  ],
+  "firearms": [
+    {
+      "id": "flintlock_pistol",
+      "name": "Flintlock Pistol",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 1,
+      "baseValue": 150,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 15,
+        "range": 10,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "musket",
+      "name": "Musket",
+      "category": "equipment",
+      "weight": 4.5,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 25,
+        "range": 30,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "blunderbuss",
+      "name": "Blunderbuss",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 180,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 20,
+        "range": 8,
+        "attackSpeed": 0.25,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "revolver",
+      "name": "Revolver",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 250,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 18,
+        "range": 15,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "revolver_magnum",
+      "name": "Magnum Revolver",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 28,
+        "range": 18,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.012,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "pistol_auto",
+      "name": "Automatic Pistol",
+      "category": "equipment",
+      "weight": 0.9,
+      "stackSize": 1,
+      "baseValue": 300,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 12,
+        "range": 12,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.008,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "pistol_heavy",
+      "name": "Heavy Pistol",
+      "category": "equipment",
+      "weight": 1.3,
+      "stackSize": 1,
+      "baseValue": 350,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 22,
+        "range": 15,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "machine_pistol",
+      "name": "Machine Pistol",
+      "category": "equipment",
+      "weight": 1.1,
+      "stackSize": 1,
+      "baseValue": 450,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 8,
+        "range": 10,
+        "attackSpeed": 3.0,
+        "durabilityLoss": 0.015,
+        "damageType": "piercing",
+        "category": "pistol",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "rifle_bolt",
+      "name": "Bolt-Action Rifle",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 350,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 30,
+        "range": 50,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rifle_lever",
+      "name": "Lever-Action Rifle",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 300,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 22,
+        "range": 35,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rifle_semi",
+      "name": "Semi-Auto Rifle",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 450,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 24,
+        "range": 40,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.012,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rifle_auto",
+      "name": "Automatic Rifle",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 550,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 20,
+        "range": 40,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.015,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rifle_sniper",
+      "name": "Sniper Rifle",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 50,
+        "range": 80,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.012,
+        "minRange": 5,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rifle_anti_material",
+      "name": "Anti-Material Rifle",
+      "category": "equipment",
+      "weight": 12.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 100,
+        "range": 100,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.02,
+        "minRange": 10,
+        "damageType": "piercing",
+        "category": "rifle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "shotgun_double",
+      "name": "Double-Barrel Shotgun",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 280,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 35,
+        "range": 8,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.015,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "shotgun_pump",
+      "name": "Pump Shotgun",
+      "category": "equipment",
+      "weight": 3.8,
+      "stackSize": 1,
+      "baseValue": 350,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 30,
+        "range": 10,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.012,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "shotgun_semi",
+      "name": "Semi-Auto Shotgun",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 500,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 28,
+        "range": 10,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.015,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "shotgun_auto",
+      "name": "Automatic Shotgun",
+      "category": "equipment",
+      "weight": 4.5,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 25,
+        "range": 8,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "shotgun_sawed",
+      "name": "Sawed-Off Shotgun",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 40,
+        "range": 5,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.015,
+        "damageType": "piercing",
+        "category": "shotgun",
+        "attackType": "ranged",
+        "twoHanded": false
+      }
+    },
+    {
+      "id": "smg_compact",
+      "name": "Compact SMG",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 8,
+        "range": 15,
+        "attackSpeed": 4.0,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "smg",
+        "attackType": "ranged",
+        "twoHanded": false
+      }
+    },
+    {
+      "id": "smg",
+      "name": "Submachine Gun",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 450,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 20,
+        "attackSpeed": 3.0,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "smg",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "smg_tactical",
+      "name": "Tactical SMG",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 550,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 12,
+        "range": 25,
+        "attackSpeed": 2.5,
+        "durabilityLoss": 0.018,
+        "damageType": "piercing",
+        "category": "smg",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "lmg",
+      "name": "Light Machine Gun",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 18,
+        "range": 40,
+        "attackSpeed": 3.0,
+        "durabilityLoss": 0.02,
+        "damageType": "piercing",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "minigun",
+      "name": "Minigun",
+      "category": "equipment",
+      "weight": 15.0,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 8,
+        "range": 35,
+        "attackSpeed": 10.0,
+        "durabilityLoss": 0.05,
+        "damageType": "piercing",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "grenade_launcher",
+      "name": "Grenade Launcher",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 60,
+        "range": 30,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.02,
+        "aoeRadius": 3,
+        "minRange": 5,
+        "damageType": "fire",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "rocket_launcher",
+      "name": "Rocket Launcher",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 150,
+        "range": 50,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.03,
+        "aoeRadius": 5,
+        "minRange": 10,
+        "damageType": "fire",
+        "category": "heavy",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    }
+  ],
+  "magic": [
+    {
+      "id": "oak_staff",
+      "name": "Oak Staff",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 50,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 5,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.01,
+        "damageType": "bludgeoning",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true
+      },
+      "magical": {
+        "magicType": "nature",
+        "spellPowerBonus": 0.1,
+        "manaRegen": 0.05
+      }
+    },
+    {
+      "id": "ash_staff",
+      "name": "Ash Staff",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "ash_wood",
+      "weapon": {
+        "damage": 6,
+        "range": 1,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.008,
+        "damageType": "bludgeoning",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.15,
+        "manaRegen": 0.08
+      }
+    },
+    {
+      "id": "arcane_staff",
+      "name": "Arcane Staff",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 300,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.008,
+        "damageType": "magic",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.25,
+        "manaRegen": 0.1
+      }
+    },
+    {
+      "id": "fire_staff",
+      "name": "Staff of Flames",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "damageType": "fire",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "burning"
+        ]
+      },
+      "magical": {
+        "magicType": "fire",
+        "spellPowerBonus": 0.3,
+        "manaRegen": 0.05
+      }
+    },
+    {
+      "id": "frost_staff",
+      "name": "Staff of Winter",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "damageType": "frost",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "freezing"
+        ]
+      },
+      "magical": {
+        "magicType": "ice",
+        "spellPowerBonus": 0.3,
+        "manaRegen": 0.05
+      }
+    },
+    {
+      "id": "lightning_staff",
+      "name": "Staff of Storms",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "damageType": "lightning",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "chain_lightning"
+        ]
+      },
+      "magical": {
+        "magicType": "lightning",
+        "spellPowerBonus": 0.3,
+        "manaRegen": 0.05
+      }
+    },
+    {
+      "id": "staff_archmage",
+      "name": "Archmage Staff",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 1000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 15,
+        "range": 2,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.005,
+        "damageType": "magic",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.5,
+        "manaRegen": 0.2
+      }
+    },
+    {
+      "id": "staff_elements",
+      "name": "Staff of the Elements",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 12,
+        "range": 2,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.005,
+        "damageType": "magic",
+        "category": "staff",
+        "attackType": "melee",
+        "twoHanded": true
+      },
+      "magical": {
+        "magicType": "elemental",
+        "spellPowerBonus": 0.4,
+        "manaRegen": 0.15,
+        "grantsSpells": [
+          "fireball",
+          "ice_storm",
+          "chain_lightning"
+        ]
+      }
+    },
+    {
+      "id": "wand_basic",
+      "name": "Wand",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 10,
+        "range": 15,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.003,
+        "damageType": "magic",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.15
+      }
+    },
+    {
+      "id": "wand_fire",
+      "name": "Wand of Fire",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 15,
+        "range": 12,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "damageType": "fire",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "fire",
+        "spellPowerBonus": 0.2
+      }
+    },
+    {
+      "id": "wand_frost",
+      "name": "Wand of Frost",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 12,
+        "range": 12,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "damageType": "frost",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "ice",
+        "spellPowerBonus": 0.2
+      }
+    },
+    {
+      "id": "wand_lightning",
+      "name": "Wand of Lightning",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 14,
+        "range": 15,
+        "attackSpeed": 1.4,
+        "durabilityLoss": 0.005,
+        "damageType": "lightning",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "lightning",
+        "spellPowerBonus": 0.2
+      }
+    },
+    {
+      "id": "wand_death",
+      "name": "Wand of Death",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 500,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 20,
+        "range": 12,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.008,
+        "damageType": "necrotic",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "spellPowerBonus": 0.3
+      }
+    },
+    {
+      "id": "wand_master",
+      "name": "Master Wand",
+      "category": "equipment",
+      "weight": 0.4,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 25,
+        "range": 20,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.003,
+        "damageType": "magic",
+        "category": "wand",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.4,
+        "manaRegen": 0.1
+      }
+    },
+    {
+      "id": "crystal_orb",
+      "name": "Crystal Orb",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 150,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 3,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.001,
+        "damageType": "magic",
+        "category": "orb",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "divination",
+        "spellPowerBonus": 0.3,
+        "manaRegen": 0.15
+      }
+    },
+    {
+      "id": "orb_fire",
+      "name": "Orb of Flame",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 300,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 5,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.002,
+        "damageType": "fire",
+        "category": "orb",
+        "attackType": "melee",
+        "special": [
+          "burning"
+        ]
+      },
+      "magical": {
+        "magicType": "fire",
+        "spellPowerBonus": 0.35,
+        "manaRegen": 0.1
+      }
+    },
+    {
+      "id": "orb_shadow",
+      "name": "Shadow Orb",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 400,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 8,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.002,
+        "damageType": "necrotic",
+        "category": "orb",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "shadow",
+        "spellPowerBonus": 0.4,
+        "manaRegen": 0.12
+      }
+    },
+    {
+      "id": "orb_chaos",
+      "name": "Orb of Chaos",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.003,
+        "damageType": "magic",
+        "category": "orb",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "chaos",
+        "spellPowerBonus": 0.5,
+        "manaRegen": 0.2
+      }
+    },
+    {
+      "id": "orb_souls",
+      "name": "Orb of Souls",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 5,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.001,
+        "damageType": "necrotic",
+        "category": "orb",
+        "attackType": "melee",
+        "special": [
+          "lifesteal"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "spellPowerBonus": 0.45,
+        "manaRegen": 0.25
+      }
+    },
+    {
+      "id": "grimoire_apprentice",
+      "name": "Apprentice Grimoire",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "uncommon",
+      "weapon": {
+        "damage": 2,
+        "range": 1,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.001,
+        "damageType": "bludgeoning",
+        "category": "grimoire",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "arcane",
+        "spellPowerBonus": 0.2,
+        "manaRegen": 0.1,
+        "grantsSpells": [
+          "magic_missile",
+          "mage_armor"
+        ]
+      }
+    },
+    {
+      "id": "grimoire_fire",
+      "name": "Grimoire of Pyromancy",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 500,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 3,
+        "range": 1,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.001,
+        "damageType": "fire",
+        "category": "grimoire",
+        "attackType": "melee",
+        "special": [
+          "burning"
+        ]
+      },
+      "magical": {
+        "magicType": "fire",
+        "spellPowerBonus": 0.35,
+        "manaRegen": 0.08,
+        "grantsSpells": [
+          "fireball",
+          "flame_strike",
+          "wall_of_fire"
+        ]
+      }
+    },
+    {
+      "id": "grimoire_necromancy",
+      "name": "Grimoire of the Dead",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 1,
+        "range": 1,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.0001,
+        "damageType": "necrotic",
+        "category": "grimoire",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "spellPowerBonus": 0.4,
+        "manaRegen": 0.05,
+        "cursed": true,
+        "grantsSpells": [
+          "raise_dead",
+          "soul_drain",
+          "death_bolt"
+        ]
+      }
+    },
+    {
+      "id": "grimoire_summoning",
+      "name": "Grimoire of Summoning",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 2,
+        "range": 1,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.001,
+        "damageType": "magic",
+        "category": "grimoire",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "conjuration",
+        "spellPowerBonus": 0.35,
+        "manaRegen": 0.1,
+        "grantsSpells": [
+          "summon_familiar",
+          "summon_elemental",
+          "planar_ally"
+        ]
+      }
+    },
+    {
+      "id": "grimoire_forbidden",
+      "name": "Forbidden Grimoire",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 5000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 10,
+        "range": 1,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.0001,
+        "damageType": "void",
+        "category": "grimoire",
+        "attackType": "melee"
+      },
+      "magical": {
+        "magicType": "entropy",
+        "spellPowerBonus": 0.8,
+        "manaRegen": 0.3,
+        "cursed": true,
+        "grantsSpells": [
+          "void_tear",
+          "reality_break",
+          "entropy_cascade"
+        ]
+      }
+    }
+  ],
+  "exotic": [
+    {
+      "id": "energy_blade",
+      "name": "Energy Blade",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 40,
+        "range": 1,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.001,
+        "powerCost": 0.1,
+        "critChance": 0.12,
+        "critMultiplier": 2.0,
+        "damageType": "plasma",
+        "category": "energy_blade",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "burning"
+        ]
+      }
+    },
+    {
+      "id": "energy_blade_dual",
+      "name": "Dual Energy Blade",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.001,
+        "powerCost": 0.2,
+        "critChance": 0.15,
+        "critMultiplier": 2.2,
+        "damageType": "plasma",
+        "category": "energy_blade",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "burning"
+        ]
+      }
+    },
+    {
+      "id": "energy_blade_great",
+      "name": "Great Energy Blade",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 55,
+        "range": 2,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.001,
+        "powerCost": 0.3,
+        "critChance": 0.1,
+        "critMultiplier": 2.5,
+        "damageType": "plasma",
+        "category": "energy_blade",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "burning"
+        ]
+      }
+    },
+    {
+      "id": "energy_dagger",
+      "name": "Energy Dagger",
+      "category": "equipment",
+      "weight": 0.2,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 20,
+        "range": 1,
+        "attackSpeed": 2.5,
+        "durabilityLoss": 0.001,
+        "powerCost": 0.05,
+        "critChance": 0.2,
+        "critMultiplier": 3.0,
+        "damageType": "plasma",
+        "category": "energy_blade",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "burning"
+        ]
+      }
+    },
+    {
+      "id": "force_hammer",
+      "name": "Force Hammer",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 25,
+        "range": 1,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.005,
+        "aoeRadius": 2,
+        "damageType": "force",
+        "category": "force_weapon",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "stunning",
+          "shield_breaker"
+        ]
+      },
+      "magical": {
+        "magicType": "telekinesis",
+        "manaPerUse": 5
+      }
+    },
+    {
+      "id": "force_lance",
+      "name": "Force Lance",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 20,
+        "range": 3,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.003,
+        "damageType": "force",
+        "category": "force_weapon",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "telekinesis",
+        "manaPerUse": 3
+      }
+    },
+    {
+      "id": "force_gauntlets",
+      "name": "Force Gauntlets",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 15,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.004,
+        "damageType": "force",
+        "category": "force_weapon",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "telekinesis",
+        "manaPerUse": 2
+      }
+    },
+    {
+      "id": "force_blade",
+      "name": "Force Blade",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 30,
+        "range": 1,
+        "attackSpeed": 1.4,
+        "durabilityLoss": 0.002,
+        "critChance": 0.12,
+        "critMultiplier": 2.0,
+        "damageType": "force",
+        "category": "force_weapon",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "shield_breaker"
+        ]
+      },
+      "magical": {
+        "magicType": "telekinesis",
+        "manaPerUse": 4
+      }
+    },
+    {
+      "id": "psionic_blade",
+      "name": "Psionic Blade",
+      "category": "equipment",
+      "weight": 0.1,
+      "stackSize": 1,
+      "baseValue": 2500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 25,
+        "range": 1,
+        "attackSpeed": 1.8,
+        "durabilityLoss": 0,
+        "damageType": "psionic",
+        "category": "psionic_weapon",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "psychic",
+        "manaPerUse": 5
+      }
+    },
+    {
+      "id": "mind_lash",
+      "name": "Mind Lash",
+      "category": "equipment",
+      "weight": 0.0,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 18,
+        "range": 3,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0,
+        "damageType": "psionic",
+        "category": "psionic_weapon",
+        "attackType": "melee",
+        "special": [
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "psychic",
+        "manaPerUse": 4
+      }
+    },
+    {
+      "id": "thought_spike",
+      "name": "Thought Spike",
+      "category": "equipment",
+      "weight": 0.0,
+      "stackSize": 1,
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 10,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0,
+        "damageType": "psionic",
+        "category": "psionic_weapon",
+        "attackType": "magic"
+      },
+      "magical": {
+        "magicType": "psychic",
+        "manaPerUse": 10
+      }
+    },
+    {
+      "id": "soul_reaver",
+      "name": "Soul Reaver",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 30,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.002,
+        "damageType": "necrotic",
+        "category": "soul_weapon",
+        "attackType": "melee",
+        "special": [
+          "lifesteal"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 3,
+        "cursed": true
+      }
+    },
+    {
+      "id": "death_scythe",
+      "name": "Death Scythe",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 45,
+        "range": 2,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.003,
+        "critChance": 0.15,
+        "critMultiplier": 2.5,
+        "damageType": "necrotic",
+        "category": "soul_weapon",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "lifesteal",
+          "bleeding"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 5,
+        "cursed": true
+      }
+    },
+    {
+      "id": "soul_drinker",
+      "name": "Soul Drinker Dagger",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 1,
+      "baseValue": 2500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 18,
+        "range": 1,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.002,
+        "critChance": 0.2,
+        "critMultiplier": 2.5,
+        "damageType": "necrotic",
+        "category": "soul_weapon",
+        "attackType": "melee",
+        "special": [
+          "lifesteal"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 2,
+        "cursed": true
+      }
+    },
+    {
+      "id": "wraith_blade",
+      "name": "Wraith Blade",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 25,
+        "range": 1,
+        "attackSpeed": 1.6,
+        "durabilityLoss": 0.001,
+        "damageType": "necrotic",
+        "category": "soul_weapon",
+        "attackType": "melee",
+        "special": [
+          "lifesteal",
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "necromancy",
+        "manaPerUse": 4,
+        "cursed": true
+      }
+    },
+    {
+      "id": "blessed_blade",
+      "name": "Blessed Blade",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 20,
+        "range": 1,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "damageType": "radiant",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "anti_magic"
+        ]
+      },
+      "magical": {
+        "magicType": "holy",
+        "manaPerUse": 0
+      }
+    },
+    {
+      "id": "holy_avenger",
+      "name": "Holy Avenger",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.003,
+        "critChance": 0.12,
+        "critMultiplier": 2.2,
+        "damageType": "radiant",
+        "category": "sword",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "anti_magic",
+          "burning"
+        ]
+      },
+      "magical": {
+        "magicType": "holy",
+        "manaPerUse": 0
+      }
+    },
+    {
+      "id": "dawn_mace",
+      "name": "Dawn Mace",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 2500,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 18,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.005,
+        "damageType": "radiant",
+        "category": "mace",
+        "attackType": "melee",
+        "special": [
+          "anti_magic",
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "holy",
+        "manaPerUse": 0
+      }
+    },
+    {
+      "id": "celestial_spear",
+      "name": "Celestial Spear",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 28,
+        "range": 2,
+        "attackSpeed": 1.1,
+        "durabilityLoss": 0.004,
+        "damageType": "radiant",
+        "category": "spear",
+        "attackType": "melee",
+        "special": [
+          "anti_magic",
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "holy",
+        "manaPerUse": 0
+      }
+    },
+    {
+      "id": "void_dagger",
+      "name": "Void Dagger",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseValue": 5000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 35,
+        "range": 1,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.01,
+        "critChance": 0.18,
+        "critMultiplier": 3.0,
+        "damageType": "void",
+        "category": "dagger",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "entropy",
+        "manaPerUse": 10,
+        "cursed": true
+      }
+    },
+    {
+      "id": "entropy_blade",
+      "name": "Entropy Blade",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 6000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 45,
+        "range": 1,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.015,
+        "critChance": 0.12,
+        "critMultiplier": 2.5,
+        "damageType": "void",
+        "category": "sword",
+        "attackType": "melee",
+        "special": [
+          "armor_piercing",
+          "anti_magic"
+        ]
+      },
+      "magical": {
+        "magicType": "entropy",
+        "manaPerUse": 15,
+        "cursed": true
+      }
+    },
+    {
+      "id": "oblivion_hammer",
+      "name": "Oblivion Hammer",
+      "category": "equipment",
+      "weight": 6.0,
+      "stackSize": 1,
+      "baseValue": 7000,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 60,
+        "range": 1,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.02,
+        "aoeRadius": 2,
+        "damageType": "void",
+        "category": "hammer",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing",
+          "anti_magic",
+          "stunning"
+        ]
+      },
+      "magical": {
+        "magicType": "entropy",
+        "manaPerUse": 20,
+        "cursed": true
+      }
+    },
+    {
+      "id": "null_lance",
+      "name": "Null Lance",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 5500,
+      "rarity": "legendary",
+      "weapon": {
+        "damage": 40,
+        "range": 3,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.012,
+        "damageType": "void",
+        "category": "polearm",
+        "attackType": "melee",
+        "twoHanded": true,
+        "special": [
+          "armor_piercing"
+        ]
+      },
+      "magical": {
+        "magicType": "entropy",
+        "manaPerUse": 12,
+        "cursed": true
+      }
+    }
+  ],
+  "ranged": [
+    {
+      "id": "shortbow_wood",
+      "name": "Wooden Shortbow",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 30,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 6,
+        "range": 15,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "hunting_bow",
+      "name": "Hunting Bow",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 1,
+      "baseValue": 50,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 8,
+        "range": 18,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.005,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "longbow_yew",
+      "name": "Yew Longbow",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "yew",
+      "weapon": {
+        "damage": 10,
+        "range": 25,
+        "attackSpeed": 0.9,
+        "durabilityLoss": 0.005,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "composite_bow",
+      "name": "Composite Bow",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 1,
+      "baseValue": 150,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 12,
+        "range": 20,
+        "attackSpeed": 1.1,
+        "durabilityLoss": 0.006,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "recurve_bow",
+      "name": "Recurve Bow",
+      "category": "equipment",
+      "weight": 1.3,
+      "stackSize": 1,
+      "baseValue": 180,
+      "rarity": "rare",
+      "weapon": {
+        "damage": 14,
+        "range": 22,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.005,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "warbow",
+      "name": "War Bow",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "epic",
+      "baseMaterial": "yew",
+      "weapon": {
+        "damage": 16,
+        "range": 30,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.006,
+        "damageType": "piercing",
+        "category": "bow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "crossbow_light",
+      "name": "Light Crossbow",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 80,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 12,
+        "range": 20,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.008,
+        "damageType": "piercing",
+        "category": "crossbow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "crossbow_hunting",
+      "name": "Hunting Crossbow",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 120,
+      "rarity": "uncommon",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 15,
+        "range": 25,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.008,
+        "damageType": "piercing",
+        "category": "crossbow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "crossbow_heavy",
+      "name": "Heavy Crossbow",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 200,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 20,
+        "range": 30,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "crossbow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "repeating_crossbow",
+      "name": "Repeating Crossbow",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 300,
+      "rarity": "epic",
+      "weapon": {
+        "damage": 8,
+        "range": 15,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.012,
+        "damageType": "piercing",
+        "category": "crossbow",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "hand_crossbow",
+      "name": "Hand Crossbow",
+      "category": "equipment",
+      "weight": 1.5,
+      "stackSize": 1,
+      "baseValue": 100,
+      "rarity": "uncommon",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 8,
+        "range": 12,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.01,
+        "damageType": "piercing",
+        "category": "crossbow",
+        "attackType": "ranged",
+        "twoHanded": false
+      }
+    },
+    {
+      "id": "sling_leather",
+      "name": "Leather Sling",
+      "category": "equipment",
+      "weight": 0.2,
+      "stackSize": 1,
+      "baseValue": 10,
+      "rarity": "common",
+      "baseMaterial": "leather",
+      "weapon": {
+        "damage": 5,
+        "range": 15,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.002,
+        "damageType": "bludgeoning",
+        "category": "sling",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "staff_sling",
+      "name": "Staff Sling",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 25,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 8,
+        "range": 20,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.003,
+        "damageType": "bludgeoning",
+        "category": "sling",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "throwing_knife",
+      "name": "Throwing Knife",
+      "category": "equipment",
+      "weight": 0.3,
+      "stackSize": 10,
+      "baseValue": 15,
+      "rarity": "common",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 4,
+        "range": 8,
+        "attackSpeed": 2.0,
+        "durabilityLoss": 0.05,
+        "damageType": "piercing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "throwing_axe",
+      "name": "Throwing Axe",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 5,
+      "baseValue": 25,
+      "rarity": "common",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 8,
+        "range": 10,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.08,
+        "damageType": "slashing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "javelin",
+      "name": "Javelin",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 5,
+      "baseValue": 20,
+      "rarity": "common",
+      "baseMaterial": "wood",
+      "weapon": {
+        "damage": 10,
+        "range": 12,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.1,
+        "damageType": "piercing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "javelin_iron",
+      "name": "Iron Javelin",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 5,
+      "baseValue": 40,
+      "rarity": "uncommon",
+      "baseMaterial": "iron",
+      "weapon": {
+        "damage": 14,
+        "range": 15,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.08,
+        "damageType": "piercing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "shuriken",
+      "name": "Shuriken",
+      "category": "equipment",
+      "weight": 0.1,
+      "stackSize": 20,
+      "baseValue": 10,
+      "rarity": "uncommon",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 3,
+        "range": 8,
+        "attackSpeed": 3.0,
+        "durabilityLoss": 0.03,
+        "damageType": "slashing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "bolas",
+      "name": "Bolas",
+      "category": "equipment",
+      "weight": 0.5,
+      "stackSize": 5,
+      "baseValue": 30,
+      "rarity": "uncommon",
+      "baseMaterial": "leather",
+      "weapon": {
+        "damage": 2,
+        "range": 10,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.1,
+        "damageType": "bludgeoning",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "chakram",
+      "name": "Chakram",
+      "category": "equipment",
+      "weight": 0.4,
+      "stackSize": 3,
+      "baseValue": 80,
+      "rarity": "rare",
+      "baseMaterial": "steel",
+      "weapon": {
+        "damage": 10,
+        "range": 12,
+        "attackSpeed": 1.5,
+        "durabilityLoss": 0.04,
+        "damageType": "slashing",
+        "category": "throwing",
+        "attackType": "ranged"
+      }
+    }
+  ],
+  "energy": [
+    {
+      "id": "laser_pistol",
+      "name": "Laser Pistol",
+      "category": "equipment",
+      "weight": 0.8,
+      "stackSize": 1,
+      "baseValue": 500,
+      "rarity": "rare",
+      "clarketechTier": 6,
+      "researchRequired": "laser_weapons",
+      "weapon": {
+        "damage": 15,
+        "range": 20,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.005,
+        "damageType": "laser",
+        "category": "laser",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "laser_carbine",
+      "name": "Laser Carbine",
+      "category": "equipment",
+      "weight": 2.0,
+      "stackSize": 1,
+      "baseValue": 700,
+      "rarity": "rare",
+      "clarketechTier": 6,
+      "researchRequired": "laser_weapons",
+      "weapon": {
+        "damage": 20,
+        "range": 35,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.006,
+        "damageType": "laser",
+        "category": "laser",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "laser_rifle",
+      "name": "Laser Rifle",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "epic",
+      "clarketechTier": 6,
+      "researchRequired": "laser_weapons",
+      "weapon": {
+        "damage": 25,
+        "range": 50,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.008,
+        "damageType": "laser",
+        "category": "laser",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "laser_sniper",
+      "name": "Laser Sniper Rifle",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 1500,
+      "rarity": "legendary",
+      "clarketechTier": 6,
+      "researchRequired": "laser_weapons",
+      "weapon": {
+        "damage": 45,
+        "range": 100,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.01,
+        "minRange": 8,
+        "damageType": "laser",
+        "category": "laser",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "laser_cannon",
+      "name": "Laser Cannon",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 2000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "laser_weapons",
+        "advanced_electronics"
+      ],
+      "weapon": {
+        "damage": 50,
+        "range": 80,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.015,
+        "aoeRadius": 1,
+        "damageType": "laser",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "plasma_pistol",
+      "name": "Plasma Pistol",
+      "category": "equipment",
+      "weight": 1.2,
+      "stackSize": 1,
+      "baseValue": 600,
+      "rarity": "rare",
+      "clarketechTier": 7,
+      "researchRequired": "plasma_weapons",
+      "weapon": {
+        "damage": 20,
+        "range": 15,
+        "attackSpeed": 0.8,
+        "durabilityLoss": 0.01,
+        "aoeRadius": 1,
+        "damageType": "plasma",
+        "category": "plasma",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "plasma_rifle",
+      "name": "Plasma Rifle",
+      "category": "equipment",
+      "weight": 4.0,
+      "stackSize": 1,
+      "baseValue": 1000,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "plasma_weapons",
+      "weapon": {
+        "damage": 35,
+        "range": 30,
+        "attackSpeed": 0.5,
+        "durabilityLoss": 0.015,
+        "aoeRadius": 2,
+        "damageType": "plasma",
+        "category": "plasma",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "plasma_repeater",
+      "name": "Plasma Repeater",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 1400,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "plasma_weapons",
+      "weapon": {
+        "damage": 25,
+        "range": 25,
+        "attackSpeed": 1.2,
+        "durabilityLoss": 0.02,
+        "aoeRadius": 1,
+        "damageType": "plasma",
+        "category": "plasma",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "plasma_cannon",
+      "name": "Plasma Cannon",
+      "category": "equipment",
+      "weight": 12.0,
+      "stackSize": 1,
+      "baseValue": 2500,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "plasma_weapons",
+        "nanofabrication"
+      ],
+      "weapon": {
+        "damage": 80,
+        "range": 40,
+        "attackSpeed": 0.2,
+        "durabilityLoss": 0.025,
+        "aoeRadius": 4,
+        "minRange": 5,
+        "damageType": "plasma",
+        "category": "plasma",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "plasma_caster",
+      "name": "Plasma Caster",
+      "category": "equipment",
+      "weight": 15.0,
+      "stackSize": 1,
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "plasma_weapons",
+        "nanofabrication"
+      ],
+      "weapon": {
+        "damage": 120,
+        "range": 50,
+        "attackSpeed": 0.15,
+        "durabilityLoss": 0.03,
+        "aoeRadius": 6,
+        "minRange": 8,
+        "damageType": "plasma",
+        "category": "plasma",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "particle_pistol",
+      "name": "Particle Pistol",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 800,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "particle_weapons",
+      "weapon": {
+        "damage": 18,
+        "range": 18,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.008,
+        "damageType": "particle",
+        "category": "particle",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "particle_rifle",
+      "name": "Particle Rifle",
+      "category": "equipment",
+      "weight": 3.5,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "particle_weapons",
+      "weapon": {
+        "damage": 30,
+        "range": 60,
+        "attackSpeed": 0.6,
+        "durabilityLoss": 0.012,
+        "damageType": "particle",
+        "category": "particle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "particle_accelerator",
+      "name": "Particle Accelerator",
+      "category": "equipment",
+      "weight": 10.0,
+      "stackSize": 1,
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "particle_weapons",
+        "advanced_electronics"
+      ],
+      "weapon": {
+        "damage": 60,
+        "range": 80,
+        "attackSpeed": 0.3,
+        "durabilityLoss": 0.02,
+        "damageType": "particle",
+        "category": "particle",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "ion_pistol",
+      "name": "Ion Pistol",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "baseValue": 600,
+      "rarity": "rare",
+      "clarketechTier": 6,
+      "researchRequired": "ion_weapons",
+      "weapon": {
+        "damage": 10,
+        "range": 15,
+        "attackSpeed": 1.0,
+        "durabilityLoss": 0.008,
+        "damageType": "ion",
+        "category": "laser",
+        "attackType": "ranged"
+      }
+    },
+    {
+      "id": "ion_rifle",
+      "name": "Ion Rifle",
+      "category": "equipment",
+      "weight": 3.0,
+      "stackSize": 1,
+      "baseValue": 900,
+      "rarity": "epic",
+      "clarketechTier": 6,
+      "researchRequired": "ion_weapons",
+      "weapon": {
+        "damage": 18,
+        "range": 35,
+        "attackSpeed": 0.7,
+        "durabilityLoss": 0.01,
+        "damageType": "ion",
+        "category": "laser",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "ion_cannon",
+      "name": "Ion Cannon",
+      "category": "equipment",
+      "weight": 8.0,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "ion_weapons",
+        "advanced_electronics"
+      ],
+      "weapon": {
+        "damage": 30,
+        "range": 50,
+        "attackSpeed": 0.4,
+        "durabilityLoss": 0.015,
+        "aoeRadius": 3,
+        "damageType": "ion",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "beam_rifle",
+      "name": "Continuous Beam Rifle",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "baseValue": 1200,
+      "rarity": "epic",
+      "clarketechTier": 7,
+      "researchRequired": "beam_weapons",
+      "weapon": {
+        "damage": 8,
+        "range": 40,
+        "attackSpeed": 5.0,
+        "durabilityLoss": 0.02,
+        "powerCost": 1,
+        "damageType": "laser",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "plasma_beam",
+      "name": "Plasma Beam Projector",
+      "category": "equipment",
+      "weight": 7.0,
+      "stackSize": 1,
+      "baseValue": 1800,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "beam_weapons",
+        "plasma_weapons"
+      ],
+      "weapon": {
+        "damage": 12,
+        "range": 30,
+        "attackSpeed": 4.0,
+        "durabilityLoss": 0.025,
+        "aoeRadius": 1,
+        "powerCost": 2,
+        "damageType": "plasma",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    },
+    {
+      "id": "particle_beam",
+      "name": "Particle Beam Cannon",
+      "category": "equipment",
+      "weight": 12.0,
+      "stackSize": 1,
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "clarketechTier": 7,
+      "researchRequired": [
+        "beam_weapons",
+        "particle_weapons"
+      ],
+      "weapon": {
+        "damage": 15,
+        "range": 60,
+        "attackSpeed": 3.0,
+        "durabilityLoss": 0.03,
+        "powerCost": 3,
+        "damageType": "particle",
+        "category": "beam",
+        "attackType": "ranged",
+        "twoHanded": true
+      }
+    }
+  ]
 }

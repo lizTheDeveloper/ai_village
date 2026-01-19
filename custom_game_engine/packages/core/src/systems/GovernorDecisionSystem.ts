@@ -46,6 +46,13 @@ import {
   recordDecision,
 } from '../components/GovernorComponent.js';
 import type { PoliticalEntityComponent } from '../components/PoliticalEntityComponent.js';
+import {
+  buildNationContext,
+  buildEmpireContext,
+  buildGalacticCouncilContext,
+  buildProvinceGovernorContext,
+  buildVillageContext,
+} from '../governance/GovernorContextBuilders.js';
 
 // ============================================================================
 // Types
@@ -346,14 +353,19 @@ export class GovernorDecisionSystem extends BaseSystem {
     politicalEntity: PoliticalEntityComponent | null,
     world: World
   ): Record<string, unknown> {
-    // TODO: Implement full galactic council context
-    return {
-      tier: 'galactic_council',
-      jurisdiction: govComp.jurisdiction,
-      population: politicalEntity?.population ?? 0,
-      crises: politicalEntity?.pendingCrises ?? [],
-      directives: politicalEntity?.pendingDirectives ?? [],
-    };
+    try {
+      return buildGalacticCouncilContext(governor, world) as unknown as Record<string, unknown>;
+    } catch (error) {
+      // Fallback to minimal context if council component not found
+      console.warn(`[GovernorDecisionSystem] Failed to build galactic council context: ${error}`);
+      return {
+        tier: 'galactic_council',
+        jurisdiction: govComp.jurisdiction,
+        population: politicalEntity?.population ?? 0,
+        crises: politicalEntity?.pendingCrises ?? [],
+        directives: politicalEntity?.pendingDirectives ?? [],
+      };
+    }
   }
 
   /**
@@ -365,15 +377,20 @@ export class GovernorDecisionSystem extends BaseSystem {
     politicalEntity: PoliticalEntityComponent | null,
     world: World
   ): Record<string, unknown> {
-    // TODO: Implement full empire context
-    return {
-      tier: 'empire',
-      jurisdiction: govComp.jurisdiction,
-      population: politicalEntity?.population ?? 0,
-      nations: politicalEntity?.childEntityIds ?? [],
-      crises: politicalEntity?.pendingCrises ?? [],
-      directives: politicalEntity?.pendingDirectives ?? [],
-    };
+    try {
+      return buildEmpireContext(governor, world) as unknown as Record<string, unknown>;
+    } catch (error) {
+      // Fallback to minimal context if empire component not found
+      console.warn(`[GovernorDecisionSystem] Failed to build empire context: ${error}`);
+      return {
+        tier: 'empire',
+        jurisdiction: govComp.jurisdiction,
+        population: politicalEntity?.population ?? 0,
+        nations: [],
+        crises: politicalEntity?.pendingCrises ?? [],
+        directives: politicalEntity?.pendingDirectives ?? [],
+      };
+    }
   }
 
   /**
@@ -385,15 +402,20 @@ export class GovernorDecisionSystem extends BaseSystem {
     politicalEntity: PoliticalEntityComponent | null,
     world: World
   ): Record<string, unknown> {
-    // TODO: Implement full nation context
-    return {
-      tier: 'nation',
-      jurisdiction: govComp.jurisdiction,
-      population: politicalEntity?.population ?? 0,
-      provinces: politicalEntity?.childEntityIds ?? [],
-      crises: politicalEntity?.pendingCrises ?? [],
-      directives: politicalEntity?.pendingDirectives ?? [],
-    };
+    try {
+      return buildNationContext(governor, world) as unknown as Record<string, unknown>;
+    } catch (error) {
+      // Fallback to minimal context if nation component not found
+      console.warn(`[GovernorDecisionSystem] Failed to build nation context: ${error}`);
+      return {
+        tier: 'nation',
+        jurisdiction: govComp.jurisdiction,
+        population: politicalEntity?.population ?? 0,
+        provinces: [],
+        crises: politicalEntity?.pendingCrises ?? [],
+        directives: politicalEntity?.pendingDirectives ?? [],
+      };
+    }
   }
 
   /**
@@ -405,16 +427,20 @@ export class GovernorDecisionSystem extends BaseSystem {
     politicalEntity: PoliticalEntityComponent | null,
     world: World
   ): Record<string, unknown> {
-    // TODO: Implement full province context
-    // This should integrate with existing MayorNegotiator CivilizationContext
-    return {
-      tier: 'province',
-      jurisdiction: govComp.jurisdiction,
-      population: politicalEntity?.population ?? 0,
-      villages: politicalEntity?.childEntityIds ?? [],
-      crises: politicalEntity?.pendingCrises ?? [],
-      directives: politicalEntity?.pendingDirectives ?? [],
-    };
+    try {
+      return buildProvinceGovernorContext(governor, world) as unknown as Record<string, unknown>;
+    } catch (error) {
+      // Fallback to minimal context if province component not found
+      console.warn(`[GovernorDecisionSystem] Failed to build province context: ${error}`);
+      return {
+        tier: 'province',
+        jurisdiction: govComp.jurisdiction,
+        population: politicalEntity?.population ?? 0,
+        cities: [],
+        crises: politicalEntity?.pendingCrises ?? [],
+        directives: politicalEntity?.pendingDirectives ?? [],
+      };
+    }
   }
 
   /**
@@ -426,12 +452,17 @@ export class GovernorDecisionSystem extends BaseSystem {
     politicalEntity: PoliticalEntityComponent | null,
     world: World
   ): Record<string, unknown> {
-    // Village tier doesn't use LLM
-    return {
-      tier: 'village',
-      jurisdiction: govComp.jurisdiction,
-      population: politicalEntity?.population ?? 0,
-    };
+    try {
+      return buildVillageContext(governor, world) as unknown as Record<string, unknown>;
+    } catch (error) {
+      // Fallback to minimal context if village component not found
+      console.warn(`[GovernorDecisionSystem] Failed to build village context: ${error}`);
+      return {
+        tier: 'village',
+        jurisdiction: govComp.jurisdiction,
+        population: politicalEntity?.population ?? 0,
+      };
+    }
   }
 
   /**

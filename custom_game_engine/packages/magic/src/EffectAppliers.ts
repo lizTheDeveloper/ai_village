@@ -388,10 +388,10 @@ export function registerStandardAppliers(): void {
     new TemporalEffectApplier(),
     new SoulEffectApplier(),
     new ParadigmEffectApplier(),
-    new DispelEffectApplier(),
-    new MentalEffectApplier(),
-    new TeleportEffectApplier(),
-    new EnvironmentalEffectApplier(),
+    DispelEffectApplier,
+    MentalEffectApplier,
+    TeleportEffectApplier,
+    EnvironmentalEffectApplier,
   ];
 
   for (const applier of applierInstances) {

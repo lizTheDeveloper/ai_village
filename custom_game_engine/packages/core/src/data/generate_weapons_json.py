@@ -50,11 +50,11 @@ def extract_weapon(match):
     if value_match:
         weapon['baseValue'] = int(value_match.group(1))
 
-    rarity_match = re.search(r'rarity:\s*"([^"]+)"', props)
+    rarity_match = re.search(r"rarity:\s*'([^']+)'", props)
     if rarity_match:
         weapon['rarity'] = rarity_match.group(1)
 
-    material_match = re.search(r'baseMaterial:\s*"([^"]+)"', props)
+    material_match = re.search(r"baseMaterial:\s*'([^']+)'", props)
     if material_match:
         weapon['baseMaterial'] = material_match.group(1)
 
@@ -62,14 +62,14 @@ def extract_weapon(match):
     if tech_match:
         weapon['clarketechTier'] = int(tech_match.group(1))
 
-    research_match = re.search(r'researchRequired:\s*(\[.*?\]|"[^"]+")', props, re.DOTALL)
+    research_match = re.search(r"researchRequired:\s*(\[.*?\]|'[^']+')", props, re.DOTALL)
     if research_match:
         research_str = research_match.group(1)
         if research_str.startswith('['):
             # Array
             weapon['researchRequired'] = [
                 r.strip().strip('"\'')
-                for r in re.findall(r'"([^"]+)"', research_str)
+                for r in re.findall(r"'([^']+)'", research_str)
             ]
         else:
             weapon['researchRequired'] = research_str.strip('"\'')
@@ -80,22 +80,25 @@ def extract_weapon(match):
         weapon_trait_str = weapon_trait_match.group(1)
         weapon_trait = {}
 
-        # Extract numeric fields
+            # Extract numeric fields
         for field in ['damage', 'range', 'attackSpeed', 'durabilityLoss', 'aoeRadius', 'minRange', 'powerCost', 'critChance', 'critMultiplier']:
-            field_match = re.search(rf'{field}:\s*([0-9.]+)', weapon_trait_str)
+            pattern = field + r':\s*([0-9.]+)'
+            field_match = re.search(pattern, weapon_trait_str)
             if field_match:
                 val = field_match.group(1)
                 weapon_trait[field] = float(val) if '.' in val else int(val)
 
         # Extract string fields
         for field in ['damageType', 'category', 'attackType']:
-            field_match = re.search(rf'{field}:\s*"([^"]+)"', weapon_trait_str)
+            pattern = field + r":\s*'([^']+)'"
+            field_match = re.search(pattern, weapon_trait_str)
             if field_match:
                 weapon_trait[field] = field_match.group(1)
 
         # Extract boolean fields
         for field in ['twoHanded']:
-            field_match = re.search(rf'{field}:\s*(true|false)', weapon_trait_str)
+            pattern = field + r':\s*(true|false)'
+            field_match = re.search(pattern, weapon_trait_str)
             if field_match:
                 weapon_trait[field] = field_match.group(1) == 'true'
 
@@ -130,16 +133,19 @@ def extract_weapon(match):
             proj_str = proj_match.group(1)
             projectile = {}
             for field in ['speed', 'penetration']:
-                field_match = re.search(rf'{field}:\s*([0-9.]+)', proj_str)
+                pattern = field + r':\s*([0-9.]+)'
+                field_match = re.search(pattern, proj_str)
                 if field_match:
                     val = field_match.group(1)
                     projectile[field] = float(val) if '.' in val else int(val)
             for field in ['arc']:
-                field_match = re.search(rf'{field}:\s*(true|false)', proj_str)
+                pattern = field + r':\s*(true|false)'
+                field_match = re.search(pattern, proj_str)
                 if field_match:
                     projectile[field] = field_match.group(1) == 'true'
             for field in ['dropoff']:
-                field_match = re.search(rf'{field}:\s*([0-9.]+)', proj_str)
+                pattern = field + r':\s*([0-9.]+)'
+                field_match = re.search(pattern, proj_str)
                 if field_match:
                     projectile[field] = float(field_match.group(1))
             weapon_trait['projectile'] = projectile
@@ -154,20 +160,23 @@ def extract_weapon(match):
 
         # Extract string fields
         for field in ['magicType']:
-            field_match = re.search(rf'{field}:\s*"([^"]+)"', magical_str)
+            pattern = field + r":\s*'([^']+)'"
+            field_match = re.search(pattern, magical_str)
             if field_match:
                 magical[field] = field_match.group(1)
 
         # Extract numeric fields
         for field in ['manaPerUse', 'spellPowerBonus', 'manaRegen']:
-            field_match = re.search(rf'{field}:\s*([0-9.]+)', magical_str)
+            pattern = field + r':\s*([0-9.]+)'
+            field_match = re.search(pattern, magical_str)
             if field_match:
                 val = field_match.group(1)
                 magical[field] = float(val) if '.' in val else int(val)
 
         # Extract boolean fields
         for field in ['cursed']:
-            field_match = re.search(rf'{field}:\s*(true|false)', magical_str)
+            pattern = field + r':\s*(true|false)'
+            field_match = re.search(pattern, magical_str)
             if field_match:
                 magical[field] = field_match.group(1) == 'true'
 
@@ -198,8 +207,8 @@ def extract_weapons_from_file(filepath):
     with open(filepath, 'r') as f:
         content = f.read()
 
-    # Find all defineItem calls
-    pattern = r'defineItem\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*\{(.*?)\}\s*\)'
+    # Find all defineItem calls - uses single quotes
+    pattern = r"defineItem\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*\{(.*?)\}\s*\)"
 
     weapons = []
     for match in re.finditer(pattern, content, re.DOTALL):
