@@ -6,7 +6,7 @@
  */
 
 import type { CourtshipParadigm } from './types';
-import paradigmsData from '../data/courtship-paradigms.json';
+import paradigmsData from '../../data/courtship-paradigms.json';
 
 // ============================================================================
 // Load Paradigms from JSON

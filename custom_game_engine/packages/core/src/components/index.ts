@@ -156,7 +156,6 @@ export type { MachinePlacementComponent, PlacementRequirement } from './MachineP
 export * from './ChunkProductionStateComponent.js';
 export { createChunkProductionState, getTotalProductionRate, getTotalConsumptionRate, canProduce, fastForwardProduction } from './ChunkProductionStateComponent.js';
 export type { ChunkProductionStateComponent, ProductionRate } from './ChunkProductionStateComponent.js';
-export * from './FactoryAIComponent.js';
 export { createFactoryAI, recordDecision as recordFactoryDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary, recordProduction, recordConsumption, calculateItemsPerMinute, resetProductionTracking } from './FactoryAIComponent.js';
 export type { FactoryAIComponent, FactoryGoal, FactoryHealth, ProductionBottleneck, FactoryStats, FactoryDecision, ResourceRequest } from './FactoryAIComponent.js';
 export type { MoodComponent } from './MoodComponent.js';
@@ -887,16 +886,16 @@ export type {
 export {
   createGovernorComponent,
   recordDecision as recordGovernorDecision,
-  updateDecisionOutcome,
-  updateApproval,
+  updateDecisionOutcome as updateGovernorDecisionOutcome,
+  updateApproval as updateGovernorApproval,
   updateConstituencyApproval,
-  canMakeDecision,
-  isTermExpired,
-  getRecentDecision,
-  getDecisionsByOutcome,
-  getAveragePopularityImpact,
-  TIER_COOLDOWNS,
-  TIER_MODELS,
+  canMakeDecision as canGovernorMakeDecision,
+  isTermExpired as isGovernorTermExpired,
+  getRecentDecision as getRecentGovernorDecision,
+  getDecisionsByOutcome as getGovernorDecisionsByOutcome,
+  getAveragePopularityImpact as getGovernorAveragePopularityImpact,
+  TIER_COOLDOWNS as GOVERNOR_TIER_COOLDOWNS,
+  TIER_MODELS as GOVERNOR_TIER_MODELS,
 } from './GovernorComponent.js';
 
 export * from './PoliticalEntityComponent.js';

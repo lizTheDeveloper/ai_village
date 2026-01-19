@@ -6,7 +6,7 @@
  */
 
 import type { CourtshipTactic } from './types';
-import tacticsData from '../data/courtship-tactics.json';
+import tacticsData from '../../data/courtship-tactics.json';
 
 // ============================================================================
 // Load Tactics from JSON

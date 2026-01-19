@@ -13,7 +13,7 @@
  */
 
 import type { EntityImpl } from '../ecs/Entity.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
+import { ComponentType as CT } from '../types/ComponentType.ts';
 import type { MagicComponent } from '../components/MagicComponent.js';
 import type { ManaPoolsComponent } from '../components/ManaPoolsComponent.js';
 import type { SpellKnowledgeComponent } from '../components/SpellKnowledgeComponent.js';

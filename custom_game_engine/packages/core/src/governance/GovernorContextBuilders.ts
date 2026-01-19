@@ -79,12 +79,28 @@ export interface NationalDirective {
  * ProvinceGovernorContext - Context for province-level governance
  * Extends CivilizationContext with province-specific data
  */
-export interface ProvinceGovernorContext extends CivilizationContext {
-  /** Province-specific metadata */
-  provinceData: ProvinceData;
+export interface ProvinceGovernorContext {
+  // Base civilization data
+  population: number;
+  foodSupply: number;
+  foodDaysRemaining: number;
+  keyResources: string[];
+  criticalNeeds: string[];
+  strategicFocus: string;
 
-  /** Directives from parent nation */
-  nationalDirectives: NationalDirective[];
+  // Province-specific data
+  provinceData: {
+    name: string;
+    tier: 'village' | 'town' | 'city' | 'metropolis';
+    buildings: Array<{ type: string; status: string }>;
+    neighbors: Array<{ name: string; distance: number; relation: string }>;
+  };
+
+  nationalDirectives: Array<{
+    type: string;
+    priority: number;
+    description: string;
+  }>;
 }
 
 /**
@@ -144,42 +160,56 @@ export function buildProvinceGovernorContext(
     criticalNeeds.push('strengthen_military');
   }
 
-  // Build neighbor relations
+  // Build neighbor relations with distance placeholder
   const neighbors = Array.from(province.neighborProvinceRelations.values()).map((rel) => ({
     name: rel.provinceName,
+    distance: 100, // Placeholder - would need spatial calculation
     relation: rel.relationship,
   }));
 
-  // Build national directives (placeholder - needs nation tier integration)
-  const nationalDirectives: NationalDirective[] = [];
+  // Build national directives as plain objects
+  const nationalDirectives: Array<{
+    type: string;
+    priority: number;
+    description: string;
+  }> = [];
   if (province.parentNationId) {
     // In Phase 3+, query nation entity for directives
     // For now, infer from province policies
     for (const policy of province.policies) {
       nationalDirectives.push({
         type: policy.category,
-        priority: policy.priority,
+        priority: policy.priority === 'low' ? 1 : policy.priority === 'medium' ? 2 : 3,
         description: policy.description,
       });
     }
   }
 
+  // Map total buildings to array format
+  const buildingsArray: Array<{ type: string; status: string }> = [];
+  for (const city of cities) {
+    // In real implementation, would query city buildings
+    // For now, create placeholder
+    buildingsArray.push({
+      type: 'placeholder',
+      status: 'operational',
+    });
+  }
+
   return {
-    // Base CivilizationContext
+    // Base civilization data
     population: totalPopulation,
     foodSupply: totalFood,
     foodDaysRemaining,
     keyResources,
     criticalNeeds,
     strategicFocus: province.economy.economicFocus,
-    storageCapacity: 0, // Placeholder
-    wealth: province.economy.taxRevenue,
 
     // Province-specific
     provinceData: {
       name: province.provinceName,
-      tier: 'province',
-      buildings: cities.reduce((sum, city) => sum + 1, 0), // Placeholder
+      tier: 'city', // Province tier (city is closest match)
+      buildings: buildingsArray,
       neighbors,
     },
     nationalDirectives,
@@ -218,12 +248,11 @@ export interface NationMilitary {
 }
 
 /**
- * Diplomatic relation with another nation
+ * Diplomatic relation with another nation (for neighbors array)
  */
 export interface NationDiplomaticRelation {
-  targetNation: string;
-  relation: 'allied' | 'friendly' | 'neutral' | 'tense' | 'hostile' | 'at_war';
-  trustLevel: number; // 0-1
+  name: string;
+  relation: 'allied' | 'neutral' | 'hostile';
 }
 
 /**
@@ -262,31 +291,41 @@ export interface NationContext {
   /** Nation metadata */
   nation: {
     name: string;
+    governmentType: 'monarchy' | 'democracy' | 'oligarchy';
     population: number;
-    territory: string; // E.g., "Northern Continent"
-    species: string; // Dominant species
+    territory: number; // Number of provinces
   };
 
   /** Provinces under nation control */
-  provinces: NationProvinceRecord[];
-
-  /** Diplomatic relations with other nations */
-  diplomaticRelations: NationDiplomaticRelation[];
-
-  /** Current threats to the nation */
-  threats: NationThreat[];
-
-  /** Advisor recommendations */
-  advisorRecommendations: AdvisorRecommendation[];
+  provinces: Array<{
+    name: string;
+    population: number;
+    resources: Record<string, number>;
+    happiness: number; // 0-1
+  }>;
 
   /** Economy overview */
-  economy: NationEconomy;
+  economy: {
+    gdp: number;
+    taxRate: number;
+    reserves: Record<string, number>;
+  };
 
   /** Military overview */
-  military: NationMilitary;
+  military: {
+    strength: number;
+    deployments: Array<{ location: string; size: number }>;
+  };
+
+  /** Neighboring nations */
+  neighbors: NationDiplomaticRelation[];
 
   /** Pending proposals for consideration */
-  pendingProposals: NationProposal[];
+  pendingProposals: Array<{
+    type: string;
+    proposer: string;
+    description: string;
+  }>;
 }
 
 /**
@@ -346,21 +385,38 @@ export interface EmpireContext {
   empire: {
     name: string;
     population: number;
-    territory: string; // E.g., "3 star systems"
+    territory: number; // Star systems
     species: string; // Imperial species
   };
 
   /** Vassal nations under empire */
-  nations: EmpireNationRecord[];
+  nations: Array<{
+    name: string;
+    population: number;
+    loyalty: number; // 0-1
+    militaryStrength: number;
+    resources: Record<string, number>;
+  }>;
 
   /** Diplomatic relations with other empires */
-  diplomaticRelations: EmpireDiplomaticRelation[];
+  diplomaticRelations: Array<{
+    targetEmpire: string;
+    relation: 'allied' | 'neutral' | 'rival' | 'war';
+    trustLevel: number; // 0-1
+  }>;
 
   /** Current threats to the empire */
-  threats: EmpireThreat[];
+  threats: Array<{
+    type: string;
+    severity: number;
+    description: string;
+  }>;
 
   /** Advisor recommendations */
-  advisorRecommendations: AdvisorRecommendation[];
+  advisorRecommendations: Array<{
+    advisor: string; // 'military', 'economic', 'diplomatic', 'research'
+    recommendation: string;
+  }>;
 }
 
 /**
@@ -403,8 +459,8 @@ export interface SpeciesRepresentation {
  * Galactic crisis
  */
 export interface GalacticCrisis {
-  type: 'war' | 'plague' | 'cosmic_anomaly' | 'resource_shortage';
-  severity: 'low' | 'moderate' | 'high' | 'galaxy-threatening';
+  type: string; // war, plague, cosmic_anomaly, resource_shortage
+  severity: number; // 0-1
   affectedSpecies: string[];
 }
 

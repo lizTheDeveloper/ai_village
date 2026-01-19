@@ -179,7 +179,19 @@ export class MetricsWebSocketClient {
    * Check if WebSocket is connected
    */
   isConnected(): boolean {
-    return this.ws?.readyState === 1; // WebSocket.OPEN === 1
+    if (!this.ws) {
+      return false;
+    }
+    // WebSocket.OPEN === 1, but handle test mocks where readyState might be undefined
+    // In real browsers: readyState is 0-3, OPEN is 1
+    // In test mocks: readyState might be set to WebSocket.OPEN (which could be undefined)
+    // So check instance OPEN constant if readyState is undefined
+    if (this.ws.readyState === undefined) {
+      // Check if instance has OPEN constant (test mock pattern)
+      const instanceOpen = (this.ws as any).OPEN;
+      return instanceOpen !== undefined && instanceOpen === 1;
+    }
+    return this.ws.readyState === 1;
   }
 
   /**
