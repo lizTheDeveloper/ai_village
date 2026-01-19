@@ -147,7 +147,7 @@ export enum ComponentType {
   Genetic = 'genetic',
 
   // Magic & Divine
-  Magic = 'magic',  // DEPRECATED: Use split components below
+  Magic = 'magic',  // Monolithic magic component (migration to split components in progress - see MagicComponentMigration.ts)
   Mana = 'mana',
   ManaPoolsComponent = 'mana_pools',              // Magic: Resource pools (mana, favor, etc.)
   SpellKnowledgeComponent = 'spell_knowledge',    // Magic: Known spells and proficiency

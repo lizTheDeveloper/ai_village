@@ -3,6 +3,9 @@
  */
 
 import type { Versioned } from './types.js';
+// Import from root package.json to get the game engine version
+// TypeScript will handle this with resolveJsonModule enabled
+import packageJson from '../../../../package.json';
 
 /**
  * Compute SHA-256 checksum of data.
@@ -230,14 +233,13 @@ export function assertOneOf<T>(
  * Get game version from package.json or environment.
  */
 export function getGameVersion(): string {
-  // Try to get from environment variable
+  // Try to get from environment variable (highest priority)
   if (typeof process !== 'undefined' && process.env.GAME_VERSION) {
     return process.env.GAME_VERSION;
   }
 
-  // Fallback to hardcoded version
-  // TODO: Read from package.json at build time
-  return '0.1.0';
+  // Read from package.json (imported at build time)
+  return packageJson.version;
 }
 
 /**

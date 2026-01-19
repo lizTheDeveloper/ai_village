@@ -2858,6 +2858,15 @@ function setupDebugAPI(
       return devPanelInstance.getSelectedAgentId();
     },
 
+    // Player and Universe ID access
+    getPlayerId: () => {
+      return localStorage.getItem('ai-village-player-id') || 'local-player';
+    },
+
+    getUniverseId: () => {
+      return gameLoop.universeId || 'local-universe';
+    },
+
     // Migration API for syncing local saves to server
     checkMigrationStatus: async () => {
       const storage = saveLoadService.getStorageBackend();

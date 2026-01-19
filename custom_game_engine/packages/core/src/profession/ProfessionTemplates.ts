@@ -53,16 +53,18 @@ export interface TemplateContext {
 // ============================================================================
 
 const data = professionTemplatesData as {
-  newspaper_article_templates: ContentTemplate[];
-  tv_episode_templates: ContentTemplate[];
-  radio_broadcast_templates: ContentTemplate[];
-  service_templates: ContentTemplate[];
+  template_categories: {
+    newspaper_article: ContentTemplate[];
+    tv_episode: ContentTemplate[];
+    radio_broadcast: ContentTemplate[];
+    service_output: ContentTemplate[];
+  };
 };
 
-const NEWSPAPER_ARTICLE_TEMPLATES: ContentTemplate[] = data.newspaper_article_templates;
-const TV_EPISODE_TEMPLATES: ContentTemplate[] = data.tv_episode_templates;
-const RADIO_BROADCAST_TEMPLATES: ContentTemplate[] = data.radio_broadcast_templates;
-const SERVICE_TEMPLATES: ContentTemplate[] = data.service_templates;
+const NEWSPAPER_ARTICLE_TEMPLATES: ContentTemplate[] = data.template_categories.newspaper_article;
+const TV_EPISODE_TEMPLATES: ContentTemplate[] = data.template_categories.tv_episode;
+const RADIO_BROADCAST_TEMPLATES: ContentTemplate[] = data.template_categories.radio_broadcast;
+const SERVICE_TEMPLATES: ContentTemplate[] = data.template_categories.service_output;
 
 // ============================================================================
 // TEMPLATE SELECTION

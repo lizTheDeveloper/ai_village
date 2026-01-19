@@ -48,6 +48,8 @@ Quick links to essential docs:
 
 **Convention:** READMEs include Overview, Core Concepts, API, Examples, Architecture, Troubleshooting. Missing README? Use [README_TEMPLATE.md](./custom_game_engine/README_TEMPLATE.md) (botany as reference).
 
+**Examples:** Many packages include example files demonstrating usage patterns. Check the "Examples" section in each package README for links to example code (21+ example files across 6 packages).
+
 ## Session Devlogs
 
 Place session summaries/work logs in `devlogs/` named like `ECONOMY-FIXES-01-02.md`.

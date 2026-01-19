@@ -15,6 +15,7 @@ import type {
   PeerId,
   RemotePassage,
 } from '@ai-village/core';
+import { getUniverseId } from './utils/GameStateHelpers.js';
 
 interface Button {
   x: number;
@@ -674,8 +675,7 @@ export class NetworkPanel implements IWindowPanel {
     if (!remoteUniverseId) return;
 
     try {
-      // TODO: Get local universe ID from game state
-      const localUniverseId = 'local-universe'; // Placeholder
+      const localUniverseId = getUniverseId();
 
       await this.networkManager.createRemotePassage({
         localUniverseId,

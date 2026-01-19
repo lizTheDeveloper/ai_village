@@ -285,8 +285,7 @@ export class LandmarkNamingSystem extends BaseSystem {
     // Add personality context
     prompt += `Your personality:\n`;
     prompt += `- Openness: ${personality.openness.toFixed(2)} (${personality.openness > 0.7 ? 'imaginative' : personality.openness > 0.3 ? 'balanced' : 'traditional'})\n`;
-    // TODO: Add humor trait to PersonalityComponent if needed
-    // prompt += `- Humor: ${personality.humor.toFixed(2)} (${personality.humor > 0.7 ? 'very funny' : personality.humor > 0.3 ? 'moderately humorous' : 'serious'})\n`;
+    prompt += `- Humor: ${personality.humor.toFixed(2)} (${personality.humor > 0.7 ? 'very funny' : personality.humor > 0.3 ? 'moderately humorous' : 'serious'})\n`;
 
     // Add recent memories for context
     const recentMemories = memory.getRecentMemories(5);

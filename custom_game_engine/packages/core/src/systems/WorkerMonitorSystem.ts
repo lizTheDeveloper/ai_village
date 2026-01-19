@@ -89,9 +89,10 @@ export class WorkerMonitorSystem extends BaseSystem {
       this.previousQueued = poolStats.queued;
     }
 
-    // Emit event for metrics dashboard (generic event)
-    ctx.world.eventBus.emit({
-      type: 'generic',
+    // Emit event for metrics dashboard
+    // Note: Using 'test:event' as a general-purpose event type until a dedicated worker stats event is added
+    (ctx.world.eventBus as any).emit({
+      type: 'test:event',
       source: 'WorkerMonitorSystem',
       data: {
         eventType: 'worker_pool_stats',

@@ -11,6 +11,7 @@ export interface PersonalityTraits {
   generosity?: number;
   leadership?: number;
   spirituality?: number;
+  humor?: number;
 }
 
 /**
@@ -49,6 +50,9 @@ export class PersonalityComponent extends ComponentBase {
 
   /** Spirituality: 0 = skeptical/rational, 1 = deeply spiritual/divine connection */
   public spirituality: number;
+
+  /** Humor: 0 = serious/somber, 1 = funny/whimsical */
+  public humor: number;
 
   constructor(traits: PersonalityTraits) {
     super();
@@ -97,6 +101,9 @@ export class PersonalityComponent extends ComponentBase {
       traits.leadership ?? traits.extraversion * 0.6 + traits.conscientiousness * 0.4;
     this.spirituality =
       traits.spirituality ?? traits.openness * 0.5 + (1 - traits.neuroticism) * 0.3;
+    // Humor derived from openness (creative humor) and extraversion (social humor)
+    this.humor =
+      traits.humor ?? traits.openness * 0.5 + traits.extraversion * 0.3;
 
     // Validate derived traits if provided
     if (traits.workEthic !== undefined) validateRange(traits.workEthic, 'workEthic');
@@ -104,6 +111,7 @@ export class PersonalityComponent extends ComponentBase {
     if (traits.generosity !== undefined) validateRange(traits.generosity, 'generosity');
     if (traits.leadership !== undefined) validateRange(traits.leadership, 'leadership');
     if (traits.spirituality !== undefined) validateRange(traits.spirituality, 'spirituality');
+    if (traits.humor !== undefined) validateRange(traits.humor, 'humor');
   }
 
   /** Clone this component */
@@ -170,6 +178,13 @@ export function getPersonalityDescription(personality: PersonalityComponent): st
     traits.push('deeply spiritual with divine connection');
   } else if (personality.spirituality < 0.3) {
     traits.push('skeptical and rational-minded');
+  }
+
+  // Humor
+  if (personality.humor > 0.7) {
+    traits.push('funny and whimsical');
+  } else if (personality.humor < 0.3) {
+    traits.push('serious and somber');
   }
 
   return traits.length > 0 ? traits.join(', ') : 'balanced temperament';

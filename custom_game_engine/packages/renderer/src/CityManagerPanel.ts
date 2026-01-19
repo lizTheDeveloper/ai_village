@@ -26,7 +26,8 @@ export class CityManagerPanel implements IWindowPanel {
   private lastScreenY: number = 0;
 
   // Cached city director data
-  private cityDirector: CityDirectorComponent | null = null;
+  private cityDirectors: CityDirectorComponent[] = [];
+  private selectedCityIndex: number = 0;
 
   getId(): string {
     return 'city-manager';
@@ -56,21 +57,24 @@ export class CityManagerPanel implements IWindowPanel {
    * Update the panel with current city director data.
    */
   update(world: World): void {
-    // Find the city director entity
-    const cityDirectors = world.query().with('city_director').executeEntities();
+    // Find all city director entities
+    const cityDirectorEntities = world.query().with('city_director').executeEntities();
 
-    if (cityDirectors.length === 0) {
-      this.cityDirector = null;
+    if (cityDirectorEntities.length === 0) {
+      this.cityDirectors = [];
+      this.selectedCityIndex = 0;
       return;
     }
 
-    // Get first city director (TODO: support multiple cities)
-    const directorEntity = cityDirectors[0];
-    if (!directorEntity) {
-      this.cityDirector = null;
-      return;
+    // Get all city directors
+    this.cityDirectors = cityDirectorEntities
+      .map(entity => entity.getComponent('city_director') as CityDirectorComponent)
+      .filter(director => director !== undefined);
+
+    // Clamp selected index to valid range
+    if (this.selectedCityIndex >= this.cityDirectors.length) {
+      this.selectedCityIndex = 0;
     }
-    this.cityDirector = directorEntity.getComponent('city_director') as CityDirectorComponent;
   }
 
   /**
@@ -87,6 +91,36 @@ export class CityManagerPanel implements IWindowPanel {
       clickY > panelY + this.panelHeight
     ) {
       return false;
+    }
+
+    // Check if click is on city selector buttons (if multiple cities)
+    if (this.cityDirectors.length > 1) {
+      const buttonWidth = 60;
+      const buttonHeight = 18;
+      // Calculate button Y position (after "City X of Y" text)
+      const selectorY = panelY + this.padding + this.lineHeight;
+
+      // Previous button
+      if (
+        clickX >= panelX + this.padding &&
+        clickX <= panelX + this.padding + buttonWidth &&
+        clickY >= selectorY &&
+        clickY <= selectorY + buttonHeight
+      ) {
+        this.selectedCityIndex = (this.selectedCityIndex - 1 + this.cityDirectors.length) % this.cityDirectors.length;
+        return true;
+      }
+
+      // Next button
+      if (
+        clickX >= panelX + this.padding + buttonWidth + 10 &&
+        clickX <= panelX + this.padding + buttonWidth + 10 + buttonWidth &&
+        clickY >= selectorY &&
+        clickY <= selectorY + buttonHeight
+      ) {
+        this.selectedCityIndex = (this.selectedCityIndex + 1) % this.cityDirectors.length;
+        return true;
+      }
     }
 
     return true; // Click was handled
@@ -141,7 +175,13 @@ export class CityManagerPanel implements IWindowPanel {
     ctx.strokeRect(x, y, actualWidth, actualHeight);
 
     // No city director found
-    if (!this.cityDirector) {
+    if (this.cityDirectors.length === 0) {
+      this.renderNoCity(ctx, x, y, actualWidth, actualHeight);
+      return;
+    }
+
+    const cityDirector = this.cityDirectors[this.selectedCityIndex];
+    if (!cityDirector) {
       this.renderNoCity(ctx, x, y, actualWidth, actualHeight);
       return;
     }
@@ -154,17 +194,22 @@ export class CityManagerPanel implements IWindowPanel {
 
     let currentY = y + this.padding - this.scrollOffset;
 
+    // City selector if multiple cities
+    if (this.cityDirectors.length > 1) {
+      currentY = this.renderCitySelector(ctx, x, currentY, actualWidth);
+    }
+
     // City name header
-    currentY = this.renderPanelHeader(ctx, x, currentY, actualWidth);
+    currentY = this.renderPanelHeader(ctx, x, currentY, actualWidth, cityDirector);
 
     // City stats
-    currentY = this.renderStats(ctx, x, currentY, actualWidth);
+    currentY = this.renderStats(ctx, x, currentY, actualWidth, cityDirector);
 
     // Strategic priorities
-    currentY = this.renderPriorities(ctx, x, currentY, actualWidth);
+    currentY = this.renderPriorities(ctx, x, currentY, actualWidth, cityDirector);
 
     // Current focus and reasoning
-    currentY = this.renderFocus(ctx, x, currentY, actualWidth);
+    currentY = this.renderFocus(ctx, x, currentY, actualWidth, cityDirector);
 
     // Calculate max scroll offset
     const contentHeight = currentY - (y + this.padding);
@@ -186,27 +231,51 @@ export class CityManagerPanel implements IWindowPanel {
     ctx.textAlign = 'left';
   }
 
-  private renderPanelHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
-    if (!this.cityDirector) return y;
+  private renderCitySelector(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
+    ctx.fillStyle = '#AAA';
+    ctx.font = '11px monospace';
+    ctx.fillText(`City ${this.selectedCityIndex + 1} of ${this.cityDirectors.length}`, x + this.padding, y);
+    y += this.lineHeight;
 
+    // Draw prev/next buttons
+    ctx.fillStyle = '#555';
+    const buttonWidth = 60;
+    const buttonHeight = 18;
+    const buttonY = y;
+
+    // Previous button
+    ctx.fillRect(x + this.padding, buttonY, buttonWidth, buttonHeight);
+    ctx.fillStyle = '#FFF';
+    ctx.font = '11px monospace';
+    ctx.fillText('< Prev', x + this.padding + 8, buttonY + 13);
+
+    // Next button
+    ctx.fillStyle = '#555';
+    ctx.fillRect(x + this.padding + buttonWidth + 10, buttonY, buttonWidth, buttonHeight);
+    ctx.fillStyle = '#FFF';
+    ctx.fillText('Next >', x + this.padding + buttonWidth + 18, buttonY + 13);
+
+    y += buttonHeight + 8;
+    return y;
+  }
+
+  private renderPanelHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, cityDirector: CityDirectorComponent): number {
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(this.cityDirector.cityName, x + this.padding, y);
+    ctx.fillText(cityDirector.cityName, x + this.padding, y);
     y += this.lineHeight + 4;
 
     ctx.fillStyle = '#AAA';
     ctx.font = '11px monospace';
-    const mode = this.cityDirector.useLLM ? 'LLM-driven' : 'Rule-based';
+    const mode = cityDirector.useLLM ? 'LLM-driven' : 'Rule-based';
     ctx.fillText(`Mode: ${mode}`, x + this.padding, y);
     y += this.lineHeight + 8;
 
     return y;
   }
 
-  private renderStats(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
-    if (!this.cityDirector) return y;
-
-    const stats = this.cityDirector.stats;
+  private renderStats(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, cityDirector: CityDirectorComponent): number {
+    const stats = cityDirector.stats;
 
     // Section header
     ctx.fillStyle = '#FFD700';
@@ -235,10 +304,8 @@ export class CityManagerPanel implements IWindowPanel {
     return y;
   }
 
-  private renderPriorities(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
-    if (!this.cityDirector) return y;
-
-    const priorities = this.cityDirector.priorities;
+  private renderPriorities(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, cityDirector: CityDirectorComponent): number {
+    const priorities = cityDirector.priorities;
 
     // Section header
     ctx.fillStyle = '#FFD700';
@@ -248,7 +315,7 @@ export class CityManagerPanel implements IWindowPanel {
 
     ctx.fillStyle = '#AAA';
     ctx.font = '11px monospace';
-    ctx.fillText(`Influence: ${(this.cityDirector.cityInfluence * 100).toFixed(0)}% city, ${((1 - this.cityDirector.cityInfluence) * 100).toFixed(0)}% personal`, x + this.padding, y);
+    ctx.fillText(`Influence: ${(cityDirector.cityInfluence * 100).toFixed(0)}% city, ${((1 - cityDirector.cityInfluence) * 100).toFixed(0)}% personal`, x + this.padding, y);
     y += this.lineHeight + 4;
 
     // Priority bars
@@ -297,10 +364,8 @@ export class CityManagerPanel implements IWindowPanel {
     return y;
   }
 
-  private renderFocus(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
-    if (!this.cityDirector) return y;
-
-    const reasoning = this.cityDirector.reasoning;
+  private renderFocus(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, cityDirector: CityDirectorComponent): number {
+    const reasoning = cityDirector.reasoning;
 
     // Section header
     ctx.fillStyle = '#FFD700';

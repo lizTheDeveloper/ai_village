@@ -169,6 +169,9 @@ export class DeityComponent extends ComponentBase {
   // Control
   public controller: 'player' | 'ai' | 'dormant';
 
+  // Emergence tracking
+  public emergenceTick?: number;  // Tick when deity first gained a believer
+
   constructor(
     primaryName: string = 'The Nameless',
     controller: 'player' | 'ai' | 'dormant' = 'dormant'
@@ -275,8 +278,14 @@ export class DeityComponent extends ComponentBase {
 
   /**
    * Add a believer
+   * @param agentId - Agent entity ID
+   * @param currentTick - Current game tick (sets emergenceTick on first believer)
    */
-  addBeliever(agentId: string): void {
+  addBeliever(agentId: string, currentTick?: number): void {
+    // Track emergence tick when first believer is added
+    if (this.believers.size === 0 && currentTick !== undefined && this.emergenceTick === undefined) {
+      this.emergenceTick = currentTick;
+    }
     this.believers.add(agentId);
   }
 

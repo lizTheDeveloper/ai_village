@@ -996,6 +996,16 @@ if (check.canUnlock) {
 
 ---
 
+## Examples
+
+For detailed code examples demonstrating magic system features, see:
+
+- **[src/MagicSourceGenerator.example.ts](src/MagicSourceGenerator.example.ts)** - Magic resource pool generation across paradigms (academic mana pools, divine favor, breath economy, multi-paradigm characters, leveling mechanics, regeneration patterns)
+
+**Usage:** This example demonstrates how to create and manage magic resource pools for different paradigms. Essential reading before implementing paradigm-specific resource management.
+
+---
+
 ## Architecture & Data Flow
 
 ### System Execution Order

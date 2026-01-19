@@ -378,7 +378,167 @@ export class AnimalRosterPanel implements IWindowPanel {
   }
 
   private showAllAnimalsModal(): void {
-    // TODO: Implement all animals modal (similar to AgentRosterPanel)
+    // Create modal backdrop
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10001;
+    `;
+
+    // Create modal content
+    const content = document.createElement('div');
+    content.style.cssText = `
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      background: linear-gradient(135deg, #2e1a1a 0%, #3e2116 50%, #604610 100%);
+      border: 2px solid #8B4513;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+    `;
+
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(139, 69, 19, 0.3);
+    `;
+
+    const title = document.createElement('h2');
+    title.textContent = `All Animals (${this.animals.size})`;
+    title.style.cssText = `
+      color: #8B4513;
+      margin: 0;
+      font-size: 24px;
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+      background: transparent;
+      border: 2px solid #8B4513;
+      color: #8B4513;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+      transition: all 0.2s;
+    `;
+    closeBtn.addEventListener('click', () => modal.remove());
+
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    // Animal grid
+    const grid = document.createElement('div');
+    grid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+    `;
+
+    // Sort animals by species then by ID
+    const sortedAnimals = Array.from(this.animals.values())
+      .sort((a, b) => {
+        const speciesCompare = a.species.localeCompare(b.species);
+        if (speciesCompare !== 0) return speciesCompare;
+        return a.id.localeCompare(b.id);
+      });
+
+    for (const animal of sortedAnimals) {
+      const card = this.createModalAnimalCard(animal, modal);
+      grid.appendChild(card);
+    }
+
+    content.appendChild(header);
+    content.appendChild(grid);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    // Click outside to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  }
+
+  private createModalAnimalCard(animal: AnimalInfo, modal: HTMLDivElement): HTMLDivElement {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+      border: 2px solid #8B4513;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    `;
+
+    // Sprite
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    canvas.style.cssText = `
+      width: 100%;
+      height: 100px;
+      image-rendering: pixelated;
+      margin-bottom: 8px;
+    `;
+    this.loadAnimalSprite(canvas, animal.spriteFolder);
+
+    // Species name
+    const speciesName = animal.species.charAt(0).toUpperCase() + animal.species.slice(1);
+    const name = document.createElement('div');
+    name.textContent = speciesName;
+    name.style.cssText = `
+      color: #8B4513;
+      font-size: 13px;
+      font-weight: bold;
+      word-wrap: break-word;
+    `;
+
+    // Hover effects
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'scale(1.05)';
+      card.style.boxShadow = '0 0 20px rgba(139, 69, 19, 0.6)';
+      card.style.borderColor = '#ffed4e';
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'scale(1)';
+      card.style.boxShadow = 'none';
+      card.style.borderColor = '#8B4513';
+    });
+
+    // Click to focus and close modal
+    card.addEventListener('click', () => {
+      this.touchAnimal(animal.id);
+      this.setSelectedAnimal(animal.id);
+      if (this.onAnimalClickCallback) {
+        this.onAnimalClickCallback(animal.id);
+      }
+      modal.remove();
+    });
+
+    card.appendChild(canvas);
+    card.appendChild(name);
+    return card;
   }
 
   /**

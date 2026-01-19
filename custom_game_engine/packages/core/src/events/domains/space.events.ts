@@ -200,6 +200,15 @@ export interface SpaceEvents {
     };
   };
 
+  /** Fleet morale decreased */
+  'fleet:morale_decreased': {
+    fleetId: string;
+    navyId: string;
+    unpaidPercentage: number;
+    moraleReduction: number;
+    newReadiness: number;
+  };
+
   /** Fleet straggler detected (high straggler risk) */
   'fleet:straggler_detected': {
     fleetId: string;
@@ -326,6 +335,14 @@ export interface SpaceEvents {
     totalCrew: number;
     crewCanPay: number;
     unpaidCrew: number;
+  };
+
+  /** Navy research progress */
+  'navy:research_progress': {
+    navyId: string;
+    rdBudget: number;
+    betaSpaceProgress: number;
+    activeProjects: number;
   };
 
   // === Squadron Events ===

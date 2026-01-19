@@ -1145,13 +1145,14 @@ export class WindowManager {
    * Subscribe to view registry changes to auto-add new views.
    * When new views are registered, they are automatically added to the window system.
    *
+   * @param viewRegistry - The ViewRegistry instance to subscribe to
    * @param createPanelsCallback - Function that creates panels from the registry
    * @returns Unsubscribe function
    */
   public subscribeToViewRegistry(
+    viewRegistry: { subscribe: (listener: () => void) => () => void },
     createPanelsCallback: () => Array<{ panel: IWindowPanel; config: WindowConfig }>
   ): () => void {
-    // Import viewRegistry only when needed to avoid circular dependencies
     const onViewRegistryChange = (): void => {
       const newPanels = createPanelsCallback();
       this.registerViewPanels(newPanels);
@@ -1160,13 +1161,10 @@ export class WindowManager {
     // Call immediately to register existing views
     onViewRegistryChange();
 
-    // Subscribe to future changes (if viewRegistry has subscribe method)
-    // For now, we only register once on setup
-    // TODO: Wire up viewRegistry.subscribe() when needed
+    // Subscribe to future changes
+    const unsubscribe = viewRegistry.subscribe(onViewRegistryChange);
 
-    return () => {
-      // Unsubscribe logic would go here
-    };
+    return unsubscribe;
   }
 
   /**

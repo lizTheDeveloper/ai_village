@@ -9,11 +9,11 @@ export type AgentBehavior =
   | 'follow_agent'
   | 'follow_reporting_target'  // Reporter behavior - follow entity while maintaining safe distance
   | 'talk'
-  | 'pick'         // Unified: gather, harvest, collect, get (resources, food, seeds)
-  | 'gather'       // Legacy - aliased to 'pick'
-  | 'harvest'      // Legacy - aliased to 'pick'
-  | 'gather_seeds' // Legacy - aliased to 'pick'
-  | 'seek_food'    // Legacy - aliased to 'pick'
+  | 'pick'         // Unified: direct resource interaction (pick berries, collect items)
+  | 'gather'       // Gather resources, seeds, materials (harvest-like but broader)
+  | 'harvest'      // Harvest plants (not a behavior - used as context/domain term only)
+  | 'gather_seeds' // Specialized: gather seeds from plants (may be aliased to 'gather')
+  | 'seek_food'    // Autonomic: find and eat food when hungry
   | 'explore'
   | 'approach'
   | 'observe'

@@ -14,6 +14,30 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import { CompanionComponent } from '../components/CompanionComponent.js';
 
 /**
+ * Counter for generating unique Ophanim companion names
+ */
+let ophanimimInstanceCounter = 0;
+
+/**
+ * Generate a unique name for an Ophanim companion
+ * Uses format: "Ophanim" for first, "Ophanim-2" for second, etc.
+ */
+function generateOphanimimName(): string {
+  ophanimimInstanceCounter++;
+  if (ophanimimInstanceCounter === 1) {
+    return 'Ophanim';
+  }
+  return `Ophanim-${ophanimimInstanceCounter}`;
+}
+
+/**
+ * Reset the Ophanim instance counter (for testing or new game sessions)
+ */
+export function resetOphanimimCounter(): void {
+  ophanimimInstanceCounter = 0;
+}
+
+/**
  * Create the Ophanim companion entity
  *
  * @param world - The world to create the entity in
@@ -23,10 +47,10 @@ import { CompanionComponent } from '../components/CompanionComponent.js';
 export function createOphanimimCompanion(world: World, currentTick: number): Entity {
   const entity = world.createEntity();
 
-  // Identity - Ophanim companion (name TBD)
+  // Identity - Ophanim companion with unique name
   const identityComp = entity.components.get(CT.Identity) as { name: string } | undefined;
   if (identityComp) {
-    identityComp.name = 'Ophanim'; // TODO: Generate unique name
+    identityComp.name = generateOphanimimName();
   }
 
   // Position - UI-only entity, no physical position needed

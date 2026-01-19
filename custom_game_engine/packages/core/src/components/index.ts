@@ -124,7 +124,7 @@ export type { RecordingComponent, MediaType, RecordingCategory, RecordingStatus 
 export { createVideoReplayComponent, captureFrame, completeReplay, getFrameAtTick, getFrameByIndex, getAllReplayEntities, getPrimarySubject, compressReplay } from './VideoReplayComponent.js';
 export type { VideoReplayComponent, ReplayFrame, ReplayEntity } from './VideoReplayComponent.js';
 export { createUniversityComponent, hireUniversityEmployee, fireUniversityEmployee, proposeResearch, fundResearch, startResearch, completeResearch, createUniversityCourse, enrollStudent, giveLecture, setupPreprintServer, setupResearchBlog, setupSocialMedia, publishResearch, recordCitation, recordPaperView, shareOnSocialMedia } from './UniversityComponent.js';
-export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicDepartment, ResearchProject, ResearchStatus, Course, Lecture, SkillTransfer, PublicationVenue, PublicationChannel, PublicationRecord } from './UniversityComponent.js';
+export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicDepartment, ResearchProject as UniversityResearchProject, ResearchStatus, Course, Lecture, SkillTransfer, PublicationVenue, PublicationChannel, PublicationRecord } from './UniversityComponent.js';
 // Research component
 export * from './ResearchStateComponent.js';
 // Technology unlock tracker
@@ -978,9 +978,9 @@ export type {
   DynastyRuler,
   SeparatistMovement,
   EmpireRelation,
-  ImperialWar,
+  ImperialWar as EmpireGovernanceImperialWar,
   MilitaryContribution,
-  ImperialTreaty,
+  ImperialTreaty as EmpireGovernanceImperialTreaty,
 } from './EmpireGovernanceComponent.js';
 export { createEmpireGovernanceComponent } from './EmpireGovernanceComponent.js';
 
@@ -996,6 +996,63 @@ export type {
   FederalWar,
 } from './FederationGovernanceComponent.js';
 export { createFederationGovernanceComponent } from './FederationGovernanceComponent.js';
+
+// Nation Component (06-POLITICAL-HIERARCHY.md - Tier 3)
+export * from './NationComponent.js';
+export type {
+  NationComponent,
+  NationProvinceRecord,
+  WarState as NationWarState,
+  Battle as NationBattle,
+  Treaty as NationTreaty,
+  NationRelation as NationToNationRelation,
+  NationDiplomaticEvent as NationDiplomaticEventType,
+  ResearchProject,
+  NationalLaw as NationLaw,
+  NationalPolicy as NationPolicy,
+} from './NationComponent.js';
+export {
+  createNationComponent,
+  declareWar,
+  signTreaty,
+  endWar,
+  updateLegitimacy,
+  updateStability,
+  isAtWar,
+  hasTreatyWith,
+  getActiveResearchProjects,
+  getCompletedResearchProjects,
+} from './NationComponent.js';
+
+// Empire Component (06-POLITICAL-HIERARCHY.md - Tier 4)
+export * from './EmpireComponent.js';
+export type {
+  EmpireComponent,
+  Dynasty as EmpireDynasty,
+  DynastyRuler as EmpireDynastyRuler,
+  SeparatistMovement as EmpireSeparatistMovement,
+  EmpireNationRecord,
+  EmpireRelation as EmpireToEmpireRelation,
+  EmpireDiplomaticEvent,
+  ImperialWar,
+  MilitaryContribution as EmpireMilitaryContribution,
+  ImperialTreaty,
+} from './EmpireComponent.js';
+export {
+  createEmpireComponent,
+  addVassal,
+  addCoreNation,
+  declareImperialWar,
+  collectTribute,
+  setVassalAutonomy,
+  createSeparatistMovement,
+  suppressSeparatistMovement,
+  grantIndependence,
+  updateDynasty,
+  isStable,
+  isAtWar as isEmpireAtWar,
+  getAverageVassalLoyalty,
+} from './EmpireComponent.js';
 
 // Galactic Council (Grand Strategy - Tier 6)
 export * from './GalacticCouncilComponent.js';

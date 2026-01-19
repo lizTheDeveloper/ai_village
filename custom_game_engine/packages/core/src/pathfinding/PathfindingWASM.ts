@@ -186,10 +186,14 @@ export class PathfindingWASM {
 
     const path: PathPoint[] = [];
     for (let i = 0; i < pathLength; i++) {
-      path.push({
-        x: outputXView[i],
-        y: outputYView[i],
-      });
+      const x = outputXView[i];
+      const y = outputYView[i];
+
+      if (x === undefined || y === undefined) {
+        throw new Error(`Invalid path data at index ${i}`);
+      }
+
+      path.push({ x, y });
     }
 
     return path;

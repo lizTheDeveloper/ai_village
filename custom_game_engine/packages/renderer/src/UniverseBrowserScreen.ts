@@ -13,6 +13,7 @@
 import { saveLoadService } from '@ai-village/core';
 import type { PersistenceSaveMetadata as SaveMetadata } from '@ai-village/core';
 import { MultiverseTimelineView, type TimelineUniverse, type TimelineSnapshot } from './MultiverseTimelineView.js';
+import { getPlayerId } from './utils/GameStateHelpers.js';
 
 export interface UniverseBrowserResult {
   action: 'create_new' | 'load_local' | 'load_server';
@@ -1015,7 +1016,7 @@ export class UniverseBrowserScreen {
         body: JSON.stringify({
           snapshotTick: snapshot.tick,
           name: newName,
-          ownerId: 'local-player', // TODO: Get actual player ID
+          ownerId: getPlayerId(),
         }),
       });
 

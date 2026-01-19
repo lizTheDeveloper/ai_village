@@ -39,6 +39,9 @@ export interface DevRenderOptions {
 export class DevRenderer {
   private widgets: Map<string, FieldWidget[]> = new Map();
   private focusedWidget: { componentType: string; fieldName: string } | null = null;
+  private hoveredWidget: { componentType: string; fieldName: string } | null = null;
+  private lastMouseX: number = 0;
+  private lastMouseY: number = 0;
 
   constructor(
     private options: DevRenderOptions = {}
@@ -143,6 +146,10 @@ export class DevRenderer {
         this.focusedWidget?.componentType === componentType &&
         this.focusedWidget?.fieldName === fieldWidget.fieldName;
 
+      const isHovered =
+        this.hoveredWidget?.componentType === componentType &&
+        this.hoveredWidget?.fieldName === fieldWidget.fieldName;
+
       // Render widget
       const widgetContext: WidgetRenderContext = {
         ctx,
@@ -151,7 +158,7 @@ export class DevRenderer {
         width,
         height: 24, // Standard height
         focused: isFocused,
-        hovered: false, // TODO: Implement hover detection
+        hovered: isHovered,
       };
 
       const heightConsumed = fieldWidget.widget.render(widgetContext);
@@ -172,6 +179,58 @@ export class DevRenderer {
       const currentValue = (componentData as Record<string, unknown>)[fieldWidget.fieldName];
       fieldWidget.widget.setValue(currentValue);
     }
+  }
+
+  /**
+   * Update mouse position and detect hover
+   */
+  handleMouseMove(
+    componentType: string,
+    mouseX: number,
+    mouseY: number,
+    componentX: number,
+    componentY: number,
+    componentWidth: number
+  ): void {
+    this.lastMouseX = mouseX;
+    this.lastMouseY = mouseY;
+
+    const fieldWidgets = this.widgets.get(componentType);
+    if (!fieldWidgets) {
+      this.hoveredWidget = null;
+      return;
+    }
+
+    let currentY = componentY;
+    let currentGroup: string | null = null;
+
+    for (const fieldWidget of fieldWidgets) {
+      // Account for group headers
+      if (this.options.showGroups && fieldWidget.group !== currentGroup) {
+        if (currentGroup !== null) {
+          currentY += this.options.groupSpacing!;
+        }
+        currentY += 20; // Group header height
+        currentGroup = fieldWidget.group;
+      }
+
+      const widgetHeight = 24; // Standard height
+
+      // Check if mouse is over this widget
+      if (
+        mouseY >= currentY &&
+        mouseY < currentY + widgetHeight &&
+        mouseX >= componentX &&
+        mouseX < componentX + componentWidth
+      ) {
+        this.hoveredWidget = { componentType, fieldName: fieldWidget.fieldName };
+        return;
+      }
+
+      currentY += widgetHeight + this.options.fieldSpacing!;
+    }
+
+    this.hoveredWidget = null;
   }
 
   /**

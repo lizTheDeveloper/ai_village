@@ -162,12 +162,36 @@ export class FleetCombatSystem extends BaseSystem {
     // Update fleet components with losses
     fleet1Entity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      totalShips: Math.floor(fleet1Remaining),
+      squadrons: {
+        ...f.squadrons,
+        totalShips: Math.floor(fleet1Remaining),
+      },
+      combat: {
+        ...f.combat,
+        combatHistory: {
+          ...f.combat.combatHistory,
+          battlesWon: f.combat.combatHistory.battlesWon + (victor === fleet1.fleetId ? 1 : 0),
+          battlesLost: f.combat.combatHistory.battlesLost + (victor === fleet2.fleetId ? 1 : 0),
+          shipsLost: f.combat.combatHistory.shipsLost + shipsLost1,
+        },
+      },
     }));
 
     fleet2Entity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      totalShips: Math.floor(fleet2Remaining),
+      squadrons: {
+        ...f.squadrons,
+        totalShips: Math.floor(fleet2Remaining),
+      },
+      combat: {
+        ...f.combat,
+        combatHistory: {
+          ...f.combat.combatHistory,
+          battlesWon: f.combat.combatHistory.battlesWon + (victor === fleet2.fleetId ? 1 : 0),
+          battlesLost: f.combat.combatHistory.battlesLost + (victor === fleet1.fleetId ? 1 : 0),
+          shipsLost: f.combat.combatHistory.shipsLost + shipsLost2,
+        },
+      },
     }));
 
     return {
@@ -203,12 +227,12 @@ export class FleetCombatSystem extends BaseSystem {
     }
 
     // Initial ship counts
-    let N = squadron1.shipIds.length;
-    let M = squadron2.shipIds.length;
+    let N = squadron1.ships.shipIds.length;
+    let M = squadron2.ships.shipIds.length;
 
     // Base firepower (use combat strength / ship count)
-    const alpha = squadron1.combatStrength / squadron1.shipIds.length;
-    const beta = squadron2.combatStrength / squadron2.shipIds.length;
+    const alpha = squadron1.combat.totalFirepower / squadron1.ships.shipIds.length;
+    const beta = squadron2.combat.totalFirepower / squadron2.ships.shipIds.length;
 
     // Formation bonuses
     const formationBonus1 = calculateFormationBonus(squadron1.formation, squadron2.formation);
@@ -232,8 +256,8 @@ export class FleetCombatSystem extends BaseSystem {
     // Calculate results
     const squadron1Remaining = Math.max(0, N);
     const squadron2Remaining = Math.max(0, M);
-    const shipsLost1 = squadron1.shipIds.length - squadron1Remaining;
-    const shipsLost2 = squadron2.shipIds.length - squadron2Remaining;
+    const shipsLost1 = squadron1.ships.shipIds.length - squadron1Remaining;
+    const shipsLost2 = squadron2.ships.shipIds.length - squadron2Remaining;
     const victor = squadron1Remaining > squadron2Remaining ? squadron1.squadronId : squadron2.squadronId;
 
     // Emit events
@@ -300,8 +324,8 @@ export class FleetCombatSystem extends BaseSystem {
 
     // Battle for each contested system
     for (const systemId of contestedSystems) {
-      const armada1Strength = armada1.armadaStrength * armada1.morale.average;
-      const armada2Strength = armada2.armadaStrength * armada2.morale.average;
+      const armada1Strength = armada1.strength.effectiveCombatPower * armada1.morale.average;
+      const armada2Strength = armada2.strength.effectiveCombatPower * armada2.morale.average;
 
       // Win chance calculation
       const armada1WinChance = armada1Strength / (armada1Strength + armada2Strength);
@@ -342,7 +366,10 @@ export class FleetCombatSystem extends BaseSystem {
         morale: {
           ...a.morale,
           trend: 'rising',
-          recentVictories: a.morale.recentVictories + 1,
+          factors: {
+            ...a.morale.factors,
+            recentVictories: a.morale.factors.recentVictories + systemsConquered.length,
+          },
         },
       }));
     } else {
@@ -351,7 +378,10 @@ export class FleetCombatSystem extends BaseSystem {
         morale: {
           ...a.morale,
           trend: 'falling',
-          recentDefeats: a.morale.recentDefeats + 1,
+          factors: {
+            ...a.morale.factors,
+            recentDefeats: a.morale.factors.recentDefeats + systemsLost.length,
+          },
         },
       }));
     }
@@ -399,18 +429,29 @@ export function calculateFormationBonus(
   formation2: SquadronFormation
 ): number {
   // Formation advantage matrix (spec line 1163-1169)
-  const advantages: Record<SquadronFormation, Partial<Record<SquadronFormation, number>>> = {
-    line: {
-      scattered: 0.10, // Line ahead beats scattered
+  // Uses actual SquadronFormation type values
+  const advantages: Partial<Record<SquadronFormation, Partial<Record<SquadronFormation, number>>>> = {
+    line_ahead: {
+      scattered: 0.10, // Line ahead beats scattered (coordinated broadside)
+      line_abreast: 0.05, // Slight advantage over wide front
+    },
+    line_abreast: {
+      echelon: 0.10, // Wide front counters diagonal approach
     },
     wedge: {
-      line: 0.20, // Wedge beats line abreast (focus fire)
+      line_abreast: 0.20, // Focus fire pierces wide formation
+      line_ahead: 0.15, // V-formation flanks line
     },
     sphere: {
-      wedge: 0.20, // Sphere beats wedge (flagship defense)
+      wedge: 0.20, // Defensive ball absorbs focused attack
+      echelon: 0.10, // 360 defense counters flanking
+    },
+    echelon: {
+      line_ahead: 0.15, // Diagonal flanks line
+      scattered: 0.10, // Coordinated flanking beats chaos
     },
     scattered: {
-      // Scattered has no advantages
+      // Scattered has no advantages - pure chaos
     },
   };
 

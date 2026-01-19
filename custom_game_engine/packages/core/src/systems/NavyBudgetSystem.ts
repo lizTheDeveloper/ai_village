@@ -24,6 +24,7 @@ import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
+import type { SquadronComponent } from '../components/SquadronComponent.js';
 import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
 
 // ============================================================================
@@ -115,16 +116,17 @@ export class NavyBudgetSystem extends BaseSystem {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return;
 
-    const budget = navy.budget;
+    const budget = navy.economy.annualBudget;
     const warnings: string[] = [];
 
-    // Budget allocation (from doctrine profile)
+    // Budget allocation (from doctrine and strategic posture)
+    const baseAllocation = navy.economy.budgetAllocation;
     const allocation: BudgetAllocation = {
-      newConstruction: navy.doctrineProfile.offense * 0.5, // Offensive = more construction
-      maintenance: navy.doctrineProfile.defense * 0.4,     // Defensive = more maintenance
-      personnel: navy.doctrineProfile.logistics * 0.3,     // Logistics = crew support
-      R_D: 0.1, // Fixed 10% R&D
-      reserves: 0.1, // Fixed 10% reserves
+      newConstruction: baseAllocation.newConstruction,
+      maintenance: baseAllocation.maintenance,
+      personnel: baseAllocation.personnel,
+      R_D: baseAllocation.researchAndDevelopment,
+      reserves: baseAllocation.reserves,
     };
 
     // Normalize allocation to sum to 1.0
@@ -157,11 +159,11 @@ export class NavyBudgetSystem extends BaseSystem {
     const crewPaid = this.processPersonnel(world, navyEntity, personnelBudget, warnings);
 
     // ========================================================================
-    // 4. R&D (placeholder - not implemented yet)
+    // 4. R&D (Research & Development)
     // ========================================================================
 
     const rdBudget = budget * allocation.R_D;
-    // TODO: Research projects (spec line 1073-1079)
+    this.processResearchAndDevelopment(world, navyEntity, rdBudget);
 
     // ========================================================================
     // Update Navy Component
@@ -234,18 +236,25 @@ export class NavyBudgetSystem extends BaseSystem {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return 0;
 
-    // Ship cost (simplified - based on ship type)
-    // TODO: Use proper ship costs from SpaceshipComponent configs
-    const avgShipCost = 10000; // Placeholder
+    // Calculate average ship cost based on navy's preferred ship types
+    // If no preferred types, use default mix
+    const preferredTypes = navy.doctrine.preferredShipTypes.length > 0
+      ? navy.doctrine.preferredShipTypes
+      : (['threshold_ship', 'courier_ship', 'brainship'] as SpaceshipType[]);
+
+    const avgShipCost = preferredTypes.reduce((sum, type) => sum + getShipCost(type), 0) / preferredTypes.length;
 
     const shipsAffordable = Math.floor(constructionBudget / avgShipCost);
-    const shipsBuilt = Math.min(shipsAffordable, 10); // Max 10 ships per year
+    const shipsBuilt = Math.min(shipsAffordable, navy.economy.shipyardCapacity); // Limited by shipyard capacity
 
     if (shipsBuilt > 0) {
       // Update navy ship count
       navyEntity.updateComponent<NavyComponent>(CT.Navy, (n) => ({
         ...n,
-        totalShips: n.totalShips + shipsBuilt,
+        assets: {
+          ...n.assets,
+          totalShips: n.assets.totalShips + shipsBuilt,
+        },
       }));
 
       // Emit event
@@ -286,9 +295,9 @@ export class NavyBudgetSystem extends BaseSystem {
     const maintenanceCostPerShip = navy.economy.maintenanceCost;
     const shipsCanMaintain = Math.floor(maintenanceBudget / maintenanceCostPerShip);
 
-    if (shipsCanMaintain < navy.totalShips) {
+    if (shipsCanMaintain < navy.assets.totalShips) {
       // Under-funded! Ships degrade
-      const degradedShips = navy.totalShips - shipsCanMaintain;
+      const degradedShips = navy.assets.totalShips - shipsCanMaintain;
       warnings.push(`Cannot maintain ${degradedShips} ships - hull integrity degrading`);
 
       // Emit maintenance crisis event
@@ -297,13 +306,14 @@ export class NavyBudgetSystem extends BaseSystem {
         source: navyEntity.id,
         data: {
           navyId: navy.navyId,
-          totalShips: navy.totalShips,
+          totalShips: navy.assets.totalShips,
           shipsCanMaintain,
           degradedShips,
         },
       });
 
-      // TODO: Actually degrade ship hull integrity (requires iterating fleets)
+      // Degrade ship hull integrity
+      this.degradeShipHulls(world, navy.navyId, degradedShips);
     }
 
     return shipsCanMaintain;
@@ -329,12 +339,12 @@ export class NavyBudgetSystem extends BaseSystem {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return 0;
 
-    const personnelCostPerCrew = 10; // Placeholder
+    const personnelCostPerCrew = navy.economy.personnelCost;
     const crewCanPay = Math.floor(personnelBudget / personnelCostPerCrew);
 
-    if (crewCanPay < navy.totalCrew) {
+    if (crewCanPay < navy.assets.totalCrew) {
       // Morale crisis (unpaid sailors)
-      const unpaidCrew = navy.totalCrew - crewCanPay;
+      const unpaidCrew = navy.assets.totalCrew - crewCanPay;
       warnings.push(`Cannot pay ${unpaidCrew} crew - morale plummeting`);
 
       // Emit morale crisis event (could trigger mutiny events)
@@ -343,16 +353,190 @@ export class NavyBudgetSystem extends BaseSystem {
         source: navyEntity.id,
         data: {
           navyId: navy.navyId,
-          totalCrew: navy.totalCrew,
+          totalCrew: navy.assets.totalCrew,
           crewCanPay,
           unpaidCrew,
         },
       });
 
-      // TODO: Reduce fleet morale (requires iterating fleets)
+      // Reduce fleet morale
+      this.reduceFleetMorale(world, navy.navyId, unpaidCrew, navy.assets.totalCrew);
     }
 
     return crewCanPay;
+  }
+
+  // ========================================================================
+  // Research & Development
+  // ========================================================================
+
+  /**
+   * Process R&D budget allocation
+   *
+   * Per spec (line 1073-1079):
+   * - Allocate R&D budget to research projects
+   * - Advance β-space research (coherence, decoherence, observation)
+   * - Progress ship type research projects
+   */
+  private processResearchAndDevelopment(
+    world: World,
+    navyEntity: EntityImpl,
+    rdBudget: number
+  ): void {
+    const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
+    if (!navy) return;
+
+    // Split R&D budget: 50% β-space research, 50% ship research
+    const betaSpaceBudget = rdBudget * 0.5;
+    const shipResearchBudget = rdBudget * 0.5;
+
+    // β-space research progress (1000 budget = 0.01 progress per category)
+    const betaSpaceProgress = betaSpaceBudget / 100000;
+
+    navyEntity.updateComponent<NavyComponent>(CT.Navy, (n) => ({
+      ...n,
+      technology: {
+        ...n.technology,
+        betaSpaceResearch: {
+          coherenceThresholdReduction:
+            n.technology.betaSpaceResearch.coherenceThresholdReduction + betaSpaceProgress * 0.4,
+          decoherenceRateMitigation:
+            n.technology.betaSpaceResearch.decoherenceRateMitigation + betaSpaceProgress * 0.3,
+          observationPrecisionImprovement:
+            n.technology.betaSpaceResearch.observationPrecisionImprovement + betaSpaceProgress * 0.3,
+        },
+      },
+    }));
+
+    // Ship research projects
+    if (navy.technology.researchProjects.length > 0) {
+      const budgetPerProject = shipResearchBudget / navy.technology.researchProjects.length;
+
+      navyEntity.updateComponent<NavyComponent>(CT.Navy, (n) => ({
+        ...n,
+        technology: {
+          ...n.technology,
+          researchProjects: n.technology.researchProjects.map((project) => {
+            const progressIncrease = Math.min(budgetPerProject / project.cost, 1.0 - project.progress);
+            return {
+              ...project,
+              progress: project.progress + progressIncrease,
+            };
+          }),
+        },
+      }));
+    }
+
+    // Emit R&D progress event
+    world.eventBus.emit({
+      type: 'navy:research_progress',
+      source: navyEntity.id,
+      data: {
+        navyId: navy.navyId,
+        rdBudget,
+        betaSpaceProgress,
+        activeProjects: navy.technology.researchProjects.length,
+      },
+    });
+  }
+
+  // ========================================================================
+  // Fleet Effects
+  // ========================================================================
+
+  /**
+   * Degrade ship hull integrity for under-maintained ships
+   *
+   * Finds all fleets belonging to this navy and degrades their ships
+   */
+  private degradeShipHulls(world: World, navyId: string, degradedShipCount: number): void {
+    // Query all fleets (they don't have navy reference, so we check all)
+    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+
+    let shipsProcessed = 0;
+    const degradationPerShip = 0.1; // 10% hull integrity loss
+
+    for (const fleetEntity of fleetEntities) {
+      if (shipsProcessed >= degradedShipCount) break;
+
+      const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
+      if (!fleet) continue;
+
+      // Query squadrons in this fleet
+      const squadronEntities = world
+        .query()
+        .with(CT.Squadron)
+        .executeEntities()
+        .filter((e) => {
+          const squadron = e.getComponent<SquadronComponent>(CT.Squadron);
+          return squadron && fleet.squadrons.squadronIds.includes(squadron.squadronId);
+        });
+
+      for (const squadronEntity of squadronEntities) {
+        if (shipsProcessed >= degradedShipCount) break;
+
+        const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+        if (!squadron) continue;
+
+        // Update squadron hull integrity tracking
+        const currentHullIntegrity = squadron.combat.avgHullIntegrity;
+        const newHullIntegrity = Math.max(0, currentHullIntegrity - degradationPerShip);
+
+        (squadronEntity as EntityImpl).updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
+          ...s,
+          combat: {
+            ...s.combat,
+            avgHullIntegrity: newHullIntegrity,
+          },
+        }));
+
+        shipsProcessed += squadron.ships.shipIds.length;
+      }
+    }
+  }
+
+  /**
+   * Reduce fleet morale due to unpaid crew
+   *
+   * Finds all fleets and reduces their readiness based on unpaid crew percentage
+   */
+  private reduceFleetMorale(
+    world: World,
+    navyId: string,
+    unpaidCrew: number,
+    totalCrew: number
+  ): void {
+    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+
+    const unpaidPercentage = unpaidCrew / totalCrew;
+    const moraleReduction = unpaidPercentage * 0.5; // Up to 50% readiness loss
+
+    for (const fleetEntity of fleetEntities) {
+      const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
+      if (!fleet) continue;
+
+      // Reduce fleet readiness
+      (fleetEntity as EntityImpl).updateComponent<FleetComponent>(CT.Fleet, (f) => ({
+        ...f,
+        status: {
+          ...f.status,
+          readiness: Math.max(0, f.status.readiness - moraleReduction),
+        },
+      }));
+
+      // Emit morale event for each affected fleet
+      world.eventBus.emit({
+        type: 'fleet:morale_decreased',
+        source: fleetEntity.id,
+        data: {
+          fleetId: fleet.fleetId,
+          navyId,
+          unpaidPercentage,
+          moraleReduction,
+          newReadiness: Math.max(0, fleet.status.readiness - moraleReduction),
+        },
+      });
+    }
   }
 }
 
@@ -362,22 +546,29 @@ export class NavyBudgetSystem extends BaseSystem {
 
 /**
  * Calculate ship construction cost based on ship type
+ *
+ * Cost is derived from ship mass with a multiplier (1 mass unit = 10 currency)
+ * Larger ships are more expensive, reflecting construction complexity
  */
 export function getShipCost(shipType: SpaceshipType): number {
-  // Based on ship mass from SpaceshipComponent configs
-  const costs: Record<SpaceshipType, number> = {
-    worldship: 1000000,
-    courier_ship: 1000,
-    threshold_ship: 10000,
-    brainship: 5000,
-    story_ship: 20000,
-    gleisner_vessel: 5000,
-    svetz_retrieval: 8000,
-    probability_scout: 500,
-    timeline_merger: 50000,
+  // Mass-based costs from SpaceshipComponent getShipTypeConfig
+  // Cost = mass * 10 (base cost per mass unit)
+  const massToCostMultiplier = 10;
+
+  const massValues: Record<SpaceshipType, number> = {
+    worldship: 1000000,        // Massive generation ship
+    courier_ship: 10,          // Tiny 2-person ship
+    threshold_ship: 1000,      // Medium ship
+    brainship: 500,            // Medium ship with ship-brain
+    story_ship: 2000,          // Large narrative ship
+    gleisner_vessel: 500,      // Medium digital ship
+    svetz_retrieval: 800,      // Medium-large temporal ship
+    probability_scout: 50,     // Small solo scout
+    timeline_merger: 5000,     // Very large crew ship
   };
 
-  return costs[shipType] || 10000;
+  const mass = massValues[shipType] || 1000;
+  return mass * massToCostMultiplier;
 }
 
 /**

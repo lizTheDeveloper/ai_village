@@ -335,6 +335,14 @@ const scientist = emergenceSystem.attemptEmergence(
 );
 ```
 
+## Examples
+
+For detailed renormalization group and multi-scale simulation examples, see:
+
+- **[examples/statistical-simulation-demo.ts](examples/statistical-simulation-demo.ts)** - Statistical simulation demonstration (renormalization group mechanics, scale hierarchies, coarse-graining, emergent behavior across 7 orders of magnitude)
+
+**Usage:** This example demonstrates how the hierarchy simulator uses renormalization group theory to efficiently model ringworld-scale civilizations. Essential reading for understanding multi-tier simulation and scale transitions.
+
 ## Usage Examples
 
 ### Creating a Hierarchy

@@ -597,6 +597,18 @@ const prompt = generateBuildingPrompt({
 
 ---
 
+## Examples
+
+For detailed building design examples and demonstrations, see:
+
+- **[src/showcase-buildings.ts](src/showcase-buildings.ts)** - 10 fully-designed showcase buildings (wizard tower, dwarven forge, fairy mushroom, market hall, elemental temple, hobbit hole, giant hall, apothecary, watchtower, underground vault) with multi-floor layouts, species-specific dimensions, validation, and lore
+- **[src/examples.ts](src/examples.ts)** - Building design examples by tier (tier 1-5 buildings including huts, forges, towers, temples), demonstrating layout patterns, material choices, and functionality integration
+- **[src/multifloor-demo.ts](src/multifloor-demo.ts)** - Multi-floor building demonstrations (variable ceiling heights, stairs, vertical navigation, floor-specific layouts)
+
+**Usage:** These examples demonstrate complete building designs with proper validation, ASCII layouts, multi-floor structures, and species-specific requirements. Essential reference for creating custom buildings.
+
+---
+
 ## Usage Examples
 
 ### Example 1: Creating a Simple Building

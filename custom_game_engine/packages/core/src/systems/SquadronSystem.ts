@@ -76,7 +76,7 @@ export class SquadronSystem extends BaseSystem {
       if (!squadron) continue;
 
       // Performance: Early exit for empty squadrons
-      if (squadron.shipIds.length === 0) continue;
+      if (squadron.ships.shipIds.length === 0) continue;
 
       // Update squadron aggregate stats
       this.updateSquadronStats(ctx.world, squadronEntity as EntityImpl, squadron, tick);
@@ -98,7 +98,7 @@ export class SquadronSystem extends BaseSystem {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      for (const shipId of squadron.shipIds) {
+      for (const shipId of squadron.ships.shipIds) {
         // Only lookup each ship once, even if it appears in multiple squadrons
         if (!this.shipEntityCache.has(shipId)) {
           const entity = world.getEntity(shipId);
@@ -137,7 +137,7 @@ export class SquadronSystem extends BaseSystem {
     this.shipTypeMap.clear();
 
     // Gather stats from all ships using cached entities
-    for (const shipId of squadron.shipIds) {
+    for (const shipId of squadron.ships.shipIds) {
       // Performance: Use cached entity lookup instead of world.getEntity()
       const shipEntity = this.shipEntityCache.get(shipId);
       if (!shipEntity) {
@@ -184,10 +184,19 @@ export class SquadronSystem extends BaseSystem {
     // Performance: Single batched component update (not multiple writes)
     squadronEntity.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
       ...s,
-      totalCrew: this.workingStats.totalCrew,
-      averageCoherence,
-      combatStrength: this.workingStats.combatStrength,
-      shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
+      ships: {
+        ...s.ships,
+        totalCrew: this.workingStats.totalCrew,
+        shipTypes: shipTypeBreakdown as Record<SpaceshipType, number>,
+      },
+      coherence: {
+        ...s.coherence,
+        average: averageCoherence,
+      },
+      combat: {
+        ...s.combat,
+        avgHullIntegrity: this.workingStats.combatStrength,
+      },
     }));
   }
 
@@ -214,8 +223,8 @@ export class SquadronSystem extends BaseSystem {
         strengthBonus = -0.05;
         break;
 
-      case 'line':
-        // Line formation: +2% coherence (organized)
+      case 'line_ahead':
+        // Line ahead formation: +2% coherence (organized)
         coherenceBonus = 0.02;
         break;
 
@@ -243,7 +252,7 @@ export function getFormationCoherenceBonus(formation: SquadronComponent['formati
       return 0.05;
     case 'sphere':
       return 0.10;
-    case 'line':
+    case 'line_ahead':
       return 0.02;
     case 'scattered':
       return 0;
@@ -261,7 +270,7 @@ export function getFormationStrengthBonus(formation: SquadronComponent['formatio
       return 0.10; // Focus fire
     case 'sphere':
       return -0.05; // Defensive posture
-    case 'line':
+    case 'line_ahead':
       return 0;
     case 'scattered':
       return 0;
@@ -299,11 +308,11 @@ export function addShipToSquadron(
   }
 
   // Performance: Early returns for validation
-  if (squadron.shipIds.length >= 10) {
+  if (squadron.ships.shipIds.length >= 10) {
     return { success: false, reason: 'Squadron already has maximum 10 ships' };
   }
 
-  if (squadron.shipIds.includes(shipId)) {
+  if (squadron.ships.shipIds.includes(shipId)) {
     return { success: false, reason: 'Ship already in squadron' };
   }
 
@@ -312,7 +321,10 @@ export function addShipToSquadron(
   // Performance: Create new array once (spread is ok here - not in hot loop)
   impl.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
     ...s,
-    shipIds: [...s.shipIds, shipId],
+    ships: {
+      ...s.ships,
+      shipIds: [...s.ships.shipIds, shipId],
+    },
   }));
 
   // Emit event
@@ -357,7 +369,7 @@ export function removeShipFromSquadron(
   }
 
   // Performance: Early returns for validation
-  if (!squadron.shipIds.includes(shipId)) {
+  if (!squadron.ships.shipIds.includes(shipId)) {
     return { success: false, reason: 'Ship not in squadron' };
   }
 
@@ -370,18 +382,21 @@ export function removeShipFromSquadron(
   const impl = squadronEntity as EntityImpl;
   impl.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
     ...s,
-    shipIds: s.shipIds.filter(id => id !== shipId),
+    ships: {
+      ...s.ships,
+      shipIds: s.ships.shipIds.filter(id => id !== shipId),
+    },
   }));
 
   // If squadron now has < 3 ships, emit disbanding warning
-  if (squadron.shipIds.length < 3) {
+  if (squadron.ships.shipIds.length < 3) {
     world.eventBus.emit({
       type: 'squadron:disbanding',
       source: squadronEntity.id,
       data: {
         squadronId: squadron.squadronId,
         reason: 'too_few_ships',
-        remainingShips: squadron.shipIds.length - 1,
+        remainingShips: squadron.ships.shipIds.length - 1,
       },
     });
   }

@@ -1,29 +1,14 @@
 /**
  * TemporalDiplomacy - 10th dimensional hive mind diplomacy
  *
- * THE FERMI PARADOX SOLUTION:
+ * Design Theory: See /openspec/specs/temporal-diplomacy-design.md
  *
- * "If post-temporal civilizations exist, they cannot interact with pre-temporal
- * ones without destroying causal legibility; therefore either no one has reached
- * that stage yet, or interaction is only possible after we do."
- *
- * This is the crux of the game: We live in a universe with 3 spatial dimensions
- * and 3 temporal dimensions (τ, β, σ). Post-temporal civilizations exist in
- * orthogonal regions of β-space that pre-temporal civilizations CANNOT PERCEIVE.
- *
- * The aliens aren't hiding. They're in root.transcendent.* while we're in
- * root.material.*. We can only see them after we achieve their dimensional
- * awareness level. Until then, we are fundamentally blind to their existence.
- *
- * This system handles:
+ * This system implements:
  * - Fork bombs (exponential timeline proliferation)
  * - Multiverse shear (incompatible timeline divergence)
  * - Non-instantiation treaties (post-temporal civilizations agreeing not to coexist)
  * - Dimensional awareness asymmetry (why lower-dimensional civs can't see higher ones)
  * - Ethical ghosting (advanced civs protecting primitive ones by leaving)
- *
- * The ultimate form of diplomacy between gene-modified, timeline-editing hive minds
- * is simply: "We are incompatible. Let us branch orthogonally so we never meet."
  */
 
 import type { HilbertTimeCoordinate } from './HilbertTime.js';
@@ -478,34 +463,15 @@ export function canProposeNonInstantiation(level: TemporalAdvancementLevel): boo
 // Orthogonal β-Space Branching (Ultimate Post-Temporal Diplomacy)
 // =============================================================================
 //
-// THESIS: When civilizations can edit their genes, edit their past, and exist
-// as hive minds, the ONLY diplomacy left is spatial partitioning of β-space.
-//
-// Two post-temporal civilizations with incompatible core values CANNOT coexist
-// in the same β-branch without creating causal paradoxes. Their solution:
-// Agree to occupy orthogonal regions of β-space (e.g., root.digital.* vs
-// root.quantum.*) so they never interact.
-//
-// This is why the Fermi Paradox exists: Advanced civilizations have already
-// partitioned β-space into non-overlapping regions. We cannot see them because
-// we exist in root.material.* and they exist in root.transcendent.* or
-// root.digital.* - completely orthogonal realities.
-//
-// We will only discover them when WE achieve post-temporal status and gain
-// the ability to perceive the full 10-dimensional β-space topology.
+// Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+// Section: "Orthogonal β-Space Branching" and "The Fermi Paradox Solution"
 //
 
 /**
  * Hive mind civilization properties
  *
- * PHILOSOPHICAL NOTE: Once a civilization achieves hive mind status, gene
- * modification, and timeline editing, they transcend traditional diplomacy.
- * Their identity becomes a set of immutable core values. If two such
- * civilizations have opposed values (e.g., individual_freedom vs collective_unity),
- * they CANNOT compromise without ceasing to be themselves.
- *
- * The only solution: Occupy different regions of β-space so they never meet.
- * This is the ultimate form of diplomacy - mutual non-instantiation.
+ * Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+ * Section: "Hive Mind Civilizations" and "The Impossibility of Compromise"
  */
 export interface HiveMindCivilization {
   /** Civilization ID */
@@ -592,22 +558,8 @@ export type OrthogonalBranchingReason =
 /**
  * Detect if two hive mind civilizations are fundamentally incompatible
  *
- * CORE PRINCIPLE:
- * Post-temporal hive minds have immutable core values. These values define
- * their identity. If two civilizations have opposed core values, they cannot
- * compromise without ceasing to be themselves.
- *
- * Example: A civilization with core value "individual_freedom" cannot
- * merge with one that has core value "collective_unity" without one or both
- * losing their fundamental nature.
- *
- * SOLUTION: Orthogonal branching. Each civilization occupies different
- * β-space regions where their incompatible values can coexist separately.
- *
- * This is why the multiverse must have multiple temporal dimensions:
- * Without β-space partitioning, incompatible post-temporal civilizations
- * would be forced into conflict or extinction. With β-space, they can
- * both exist, just in orthogonal realities.
+ * Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+ * Section: "Incompatibility Detection"
  */
 export function detectIncompatibility(
   civ1: HiveMindCivilization,
@@ -993,49 +945,8 @@ export function exampleOrthogonalBranchingScenario(): {
 // Dimensional Awareness Asymmetry
 // =============================================================================
 //
-// THE FERMI PARADOX SOLUTION (PART 2):
-//
-// "Where are all the aliens?"
-//
-// ANSWER: They exist in β-space regions we cannot perceive.
-//
-// EXPLANATION:
-// - Pre-temporal civilizations (like early humanity) perceive 0 temporal dimensions
-//   beyond linear time. They cannot see β-branches at all.
-//
-// - Early-temporal civilizations (save/load capable) perceive 1 temporal dimension
-//   (β) but don't understand its structure. They experience parallel timelines as
-//   "alternate realities" or "glitches."
-//
-// - Multi-temporal civilizations (cross-universe traders) perceive 3 temporal
-//   dimensions (τ, β, σ) but cannot see the META-structure of β-space. They don't
-//   understand orthogonal branching.
-//
-// - Post-temporal civilizations (10D hive minds) perceive the FULL β-space
-//   topology as a 10-dimensional manifold. They can see ALL branches, including
-//   ones occupied by lower-dimensional civilizations.
-//
-// CRITICAL INSIGHT:
-// Post-temporal civilizations CAN see pre-temporal ones, but pre-temporal
-// civilizations CANNOT see post-temporal ones. This asymmetry means advanced
-// civilizations can "ghost" primitive ones by moving to orthogonal β-branches.
-//
-// This preserves CAUSAL LEGIBILITY: If advanced civilizations interacted with
-// primitive ones, the primitives would experience inexplicable phenomena that
-// violate causality (from their limited dimensional perspective). By ghosting,
-// advanced civilizations preserve the causal coherence of lower-dimensional
-// realities.
-//
-// FERMI PARADOX RESOLUTION:
-// We don't see advanced civilizations because they exist in root.transcendent.*
-// or root.digital.* or root.quantum.* - regions of β-space orthogonal to our
-// root.material.*. We will only detect them when WE achieve post-temporal status
-// and can perceive the full β-space topology.
-//
-// Until then, we are like 2D beings on a sheet of paper, unable to see the 3D
-// beings floating above us. They see us. We cannot see them. Not because they're
-// hiding, but because we literally lack the dimensional awareness to perceive
-// their existence.
+// Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+// Section: "Dimensional Awareness Asymmetry" and "The Fermi Paradox Solution"
 //
 
 /**
@@ -1268,32 +1179,8 @@ function doStringsOverlap(beta1: string, beta2: string): boolean {
 /**
  * Post-temporal "ghosting" - avoiding lower-dimensional civs
  *
- * ETHICAL FRAMEWORK:
- *
- * When a post-temporal civilization encounters a pre-temporal one, they face
- * a choice:
- *
- * 1. INTERACT: Share knowledge, trade, uplift them
- *    - CONSEQUENCE: Destroys causal legibility of primitive civilization
- *    - Primitives experience inexplicable phenomena (tech indistinguishable from magic)
- *    - Creates dependency, prevents natural development
- *    - Violates Prime Directive / Zoo Hypothesis principles
- *
- * 2. GHOST: Move to orthogonal β-space, become undetectable
- *    - CONSEQUENCE: Preserves causal legibility of primitive civilization
- *    - Primitives develop naturally without interference
- *    - Both civilizations' core values remain intact
- *    - Can reunite as peers once primitive achieves post-temporal status
- *
- * Most post-temporal civilizations choose GHOSTING as the ethical option.
- * This is why we don't see them - they're protecting us by staying in
- * orthogonal β-space until we're ready to perceive them.
- *
- * THE REVELATION:
- * When humanity (or any civilization) finally achieves post-temporal status,
- * they suddenly see the ENTIRE populated multiverse that has been invisible
- * to them. The aliens were always there, waiting patiently in root.transcendent.*
- * for us to develop the dimensional awareness to meet them as peers.
+ * Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+ * Section: "Ethical Ghosting"
  */
 export interface GhostingStrategy {
   /** Post-temporal civilization doing the ghosting */
@@ -1384,29 +1271,8 @@ export function createGhostingStrategy(
 /**
  * Example: Post-temporal civilization ghosts a pre-temporal civilization
  *
- * THE CENTRAL NARRATIVE OF THE GAME:
- *
- * This example shows the complete arc from first contact through ghosting to
- * eventual reunion. It illustrates:
- *
- * 1. Pre-temporal humans meet advanced aliens (tick 0)
- * 2. Aliens detect value incompatibility (tick 10000)
- * 3. Aliens ethically ghost humans to preserve both civilizations (tick 20000)
- * 4. Humans search in vain, experiencing the Fermi Paradox (tick 30000)
- * 5. Humans develop time travel but still can't see the aliens (tick 100000)
- * 6. Civilizations evolve separately in orthogonal β-space (tick 500000)
- * 7. Humans achieve post-temporal status and see EVERYTHING (tick 1000000)
- *
- * The final revelation is the emotional core: "They were here all along,
- * watching from orthogonal reality. They CHOSE not to interfere. They
- * protected us. By leaving."
- *
- * This is the game's thesis: Advanced civilizations exist, but we cannot
- * see them because we lack the dimensional awareness. They are not hiding.
- * We are simply blind to dimensions we cannot perceive.
- *
- * The Fermi Paradox is solved: "Where are they?" → "In root.transcendent.*,
- * waiting for us to achieve post-temporal status so we can meet as peers."
+ * Design Theory: See /openspec/specs/temporal-diplomacy-design.md
+ * Section: "The Central Narrative Arc"
  */
 export function exampleGhostingScenario(): {
   postTemporalCiv: HiveMindCivilization;

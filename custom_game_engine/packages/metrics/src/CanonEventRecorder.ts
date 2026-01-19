@@ -235,21 +235,107 @@ export class CanonEventRecorder {
   /**
    * Extract runtime definitions from world
    */
-  private extractRuntimeDefinitions(_world: World): RuntimeDefinitions {
-    // TODO: Implement extraction from:
-    // - RecipeRegistry for discovered recipes
-    // - ItemRegistry for custom items
-    // - LandmarkNamingSystem for named landmarks
-    // - Sacred site entities
-    // - Cultural belief components
+  private extractRuntimeDefinitions(world: World): RuntimeDefinitions {
+    // Extract runtime-generated/discovered content
+    // Note: Static registries (RecipeRegistry, ItemRegistry, ResearchRegistry) are populated
+    // at startup and don't track "discovery" metadata. Future enhancement would be to track
+    // when agents discover/create recipes, items, research in separate discovery tracking.
+    // For now, we capture what's registered but can't distinguish runtime-generated from static.
+
+    const recipes: RuntimeDefinitions['recipes'] = [];
+    const items: RuntimeDefinitions['items'] = [];
+
+    // RecipeRegistry and ItemRegistry are global singletons, but they don't track
+    // discovery metadata (discoveredBy, discoveredAt). This would require enhancement
+    // to those systems to track when agents discover/create recipes.
+    // TODO: Add discovery tracking to RecipeRegistry/ItemRegistry for proper runtime extraction
+
+    // Extract sacred sites (from relevant components if they exist)
+    // Sacred sites may be stored in various ways - as tagged buildings, special entities, etc.
+    // Without a dedicated SacredSite component, we rely on tags or building types
+    const sacredSites: RuntimeDefinitions['sacredSites'] = [];
+    const sacredBuildings = world.query().with(CT.Building).executeEntities();
+    for (const entity of sacredBuildings) {
+      const buildingComp = entity.getComponent(CT.Building) as { buildingType?: string; name?: string } | undefined;
+      const tags = entity.getComponent(CT.Tags) as { tags?: string[] } | undefined;
+      const posComp = entity.getComponent(CT.Position) as { x?: number; y?: number } | undefined;
+
+      // Check if this is a sacred site (temple, shrine, or tagged as sacred)
+      const isSacred = buildingComp?.buildingType?.includes('temple') ||
+                       buildingComp?.buildingType?.includes('shrine') ||
+                       tags?.tags?.includes('sacred');
+
+      if (isSacred && posComp) {
+        sacredSites.push({
+          id: entity.id,
+          name: buildingComp?.name ?? 'Sacred Site',
+          namedBy: undefined, // Not tracked currently
+          namedAt: undefined, // Not tracked currently
+          position: { x: posComp.x ?? 0, y: posComp.y ?? 0 },
+          significance: `Sacred building: ${buildingComp?.buildingType ?? 'unknown'}`,
+        });
+      }
+    }
+
+    // Extract landmarks (from NamedLandmarks singleton if it exists)
+    const landmarks: RuntimeDefinitions['landmarks'] = [];
+    const namedLandmarksEntities = world.query().with(CT.NamedLandmarks).executeEntities();
+    if (namedLandmarksEntities.length > 0) {
+      const namedLandmarks = namedLandmarksEntities[0]?.getComponent(CT.NamedLandmarks) as {
+        landmarks?: Array<{ id: string; name: string; position: { x: number; y: number }; namedBy?: string; namedAt?: number }>;
+      } | undefined;
+
+      if (namedLandmarks?.landmarks) {
+        for (const landmark of namedLandmarks.landmarks) {
+          landmarks.push({
+            id: landmark.id,
+            name: landmark.name,
+            namedBy: landmark.namedBy,
+            namedAt: landmark.namedAt,
+            position: landmark.position,
+          });
+        }
+      }
+    }
+
+    // Extract cultural beliefs (from belief components on agents)
+    const culturalBeliefs: RuntimeDefinitions['culturalBeliefs'] = [];
+    const beliefEntities = world.query().with(CT.Belief).executeEntities();
+    for (const entity of beliefEntities) {
+      const beliefComp = entity.getComponent(CT.Belief) as { content?: string; emergedAt?: number; believedBy?: string[] } | undefined;
+
+      if (beliefComp?.content) {
+        culturalBeliefs.push({
+          content: beliefComp.content,
+          emergedAt: beliefComp.emergedAt ?? 0,
+          believedBy: beliefComp.believedBy ?? [],
+        });
+      }
+    }
+
+    // Extract custom building variants (from building entities with custom data)
+    const customBuildings: RuntimeDefinitions['customBuildings'] = [];
+    const buildingEntities = world.query().with(CT.Building).executeEntities();
+    for (const entity of buildingEntities) {
+      const buildingComp = entity.getComponent(CT.Building) as { customVariant?: boolean; name?: string; baseType?: string; modifications?: unknown } | undefined;
+
+      if (buildingComp?.customVariant) {
+        customBuildings.push({
+          id: entity.id,
+          name: buildingComp.name ?? 'Custom Building',
+          baseType: buildingComp.baseType ?? 'unknown',
+          modifications: buildingComp.modifications ?? {},
+        });
+      }
+    }
 
     return {
-      recipes: [],
-      items: [],
-      sacredSites: [],
-      landmarks: [],
-      culturalBeliefs: [],
-      customBuildings: [],
+      recipes,
+      items,
+      sacredSites,
+      landmarks,
+      culturalBeliefs,
+      customBuildings,
     };
   }
 
@@ -258,6 +344,27 @@ export class CanonEventRecorder {
    */
   private extractGenealogy(world: World): GenealogicalContext {
     const ensouledAgents = this.getEnsouledAgents(world);
+
+    // Historical tracking: Try to get from various sources
+    // 1. Try CensusBureau component (tracks population stats)
+    let totalSoulsCreated = ensouledAgents.length;
+    let totalDeaths = 0;
+    let totalBirths = ensouledAgents.length;
+
+    const censusBureauEntities = world.query().with(CT.CensusBureau).executeEntities();
+    if (censusBureauEntities.length > 0) {
+      const censusBureau = censusBureauEntities[0]?.getComponent(CT.CensusBureau) as {
+        totalBirths?: number;
+        totalDeaths?: number;
+        totalSoulsCreated?: number;
+      } | undefined;
+
+      if (censusBureau) {
+        totalBirths = censusBureau.totalBirths ?? totalBirths;
+        totalDeaths = censusBureau.totalDeaths ?? totalDeaths;
+        totalSoulsCreated = censusBureau.totalSoulsCreated ?? totalBirths;
+      }
+    }
 
     // Count unions (relationship components with union type)
     const unionCount = world
@@ -269,7 +376,7 @@ export class CanonEventRecorder {
         return rel?.type === 'union' || rel?.isMarried;
       }).length;
 
-    // Track lineages
+    // Track lineages by finding generation 0 ancestors
     const lineages = new Map<string, {
       founderId: string;
       founderName: string;
@@ -277,14 +384,43 @@ export class CanonEventRecorder {
       livingMembers: number;
     }>();
 
+    // Helper to find the founder (generation 0 ancestor) by walking parent chain
+    const findFounder = (agent: Entity): { id: string; name: string } | null => {
+      const geneticComp = agent.getComponent(CT.Genetic) as { generation?: number; parentIds?: [string, string] } | undefined;
+
+      // If generation 0, this agent is the founder
+      if (geneticComp?.generation === 0) {
+        const agentComp = agent.getComponent(CT.Agent) as { name?: string } | undefined;
+        return {
+          id: agent.id,
+          name: agentComp?.name ?? 'Unknown Founder',
+        };
+      }
+
+      // If has parents, walk up the parent chain
+      if (geneticComp?.parentIds && geneticComp.parentIds[0]) {
+        const parent = world.getEntity(geneticComp.parentIds[0]);
+        if (parent) {
+          return findFounder(parent);
+        }
+      }
+
+      // Fallback: this agent is treated as founder if we can't find parent
+      const agentComp = agent.getComponent(CT.Agent) as { name?: string } | undefined;
+      return {
+        id: agent.id,
+        name: agentComp?.name ?? 'Unknown Founder',
+      };
+    };
+
     for (const agent of ensouledAgents) {
-      const agentComp = agent.getComponent(CT.Agent) as { name?: string; generation?: number } | undefined;
-      const generation = agentComp?.generation ?? 0;
+      const geneticComp = agent.getComponent(CT.Genetic) as { generation?: number } | undefined;
+      const generation = geneticComp?.generation ?? 0;
 
       // Find founder (generation 0 ancestor)
-      // TODO: Implement proper lineage tracking
-      const founderId = agent.id;
-      const founderName = agentComp?.name ?? 'Unknown';
+      const founder = findFounder(agent);
+      const founderId = founder?.id ?? agent.id;
+      const founderName = founder?.name ?? 'Unknown Founder';
 
       if (!lineages.has(founderId)) {
         lineages.set(founderId, {
@@ -323,10 +459,10 @@ export class CanonEventRecorder {
     }
 
     return {
-      totalSoulsCreated: ensouledAgents.length,  // TODO: Track historical count
+      totalSoulsCreated,
       livingEnsouled: ensouledAgents.length,
-      totalDeaths: 0,  // TODO: Track from metrics
-      totalBirths: ensouledAgents.length,  // TODO: Track from metrics
+      totalDeaths,
+      totalBirths,
       totalUnions: unionCount,
       lineages: Array.from(lineages.values()),
       reincarnationChains,

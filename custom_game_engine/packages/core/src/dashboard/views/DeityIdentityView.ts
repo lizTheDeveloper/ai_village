@@ -133,10 +133,9 @@ export const DeityIdentityView: DashboardView<DeityIdentityViewData> = {
         }
       }
 
-      // Calculate age (ticks since first believer)
-      // TODO: Track emergence tick in deity component
+      // Calculate age (ticks since emergence/first believer)
       const believerCount = deityComp.believers?.size ?? 0;
-      const age = believerCount > 0 ? world.tick : 0;
+      const age = deityComp.emergenceTick !== undefined ? (world.tick - deityComp.emergenceTick) : 0;
 
       return {
         timestamp: Date.now(),

@@ -40,6 +40,11 @@ class PriorityQueue {
     if (this.nodes.length === 0) return null;
 
     const result = this.nodes[0];
+    if (!result) {
+      // Should never happen since we checked length > 0
+      throw new Error('Priority queue corrupted: no node at index 0');
+    }
+
     const last = this.nodes.pop();
 
     if (this.nodes.length > 0 && last) {
@@ -52,10 +57,16 @@ class PriorityQueue {
 
   private bubbleUp(index: number): void {
     const node = this.nodes[index];
+    if (!node) {
+      throw new Error(`BubbleUp: No node at index ${index}`);
+    }
 
     while (index > 0) {
       const parentIndex = (index - 1) >> 1;
       const parent = this.nodes[parentIndex];
+      if (!parent) {
+        throw new Error(`BubbleUp: No parent at index ${parentIndex}`);
+      }
 
       if (node.f >= parent.f) break;
 
@@ -69,23 +80,34 @@ class PriorityQueue {
   private bubbleDown(index: number): void {
     const length = this.nodes.length;
     const node = this.nodes[index];
+    if (!node) {
+      throw new Error(`BubbleDown: No node at index ${index}`);
+    }
 
     while (true) {
       const leftIndex = (index << 1) + 1;
       const rightIndex = leftIndex + 1;
       let smallestIndex = index;
 
-      if (leftIndex < length && this.nodes[leftIndex].f < this.nodes[smallestIndex].f) {
+      const leftNode = this.nodes[leftIndex];
+      const smallestNode = this.nodes[smallestIndex];
+      if (leftIndex < length && leftNode && smallestNode && leftNode.f < smallestNode.f) {
         smallestIndex = leftIndex;
       }
 
-      if (rightIndex < length && this.nodes[rightIndex].f < this.nodes[smallestIndex].f) {
+      const rightNode = this.nodes[rightIndex];
+      const updatedSmallestNode = this.nodes[smallestIndex];
+      if (rightIndex < length && rightNode && updatedSmallestNode && rightNode.f < updatedSmallestNode.f) {
         smallestIndex = rightIndex;
       }
 
       if (smallestIndex === index) break;
 
-      this.nodes[index] = this.nodes[smallestIndex];
+      const swapNode = this.nodes[smallestIndex];
+      if (!swapNode) {
+        throw new Error(`BubbleDown: No node at swap index ${smallestIndex}`);
+      }
+      this.nodes[index] = swapNode;
       index = smallestIndex;
     }
 
@@ -267,7 +289,12 @@ export class PathfindingJS {
       closedSet.add(currentKey);
 
       // Explore neighbors
-      for (const [dx, dy] of directions) {
+      for (const direction of directions) {
+        const dx = direction[0];
+        const dy = direction[1];
+        if (dx === undefined || dy === undefined) {
+          throw new Error('Invalid direction tuple');
+        }
         const neighborX = current.x + dx;
         const neighborY = current.y + dy;
 

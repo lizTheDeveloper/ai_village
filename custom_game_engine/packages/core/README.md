@@ -1481,6 +1481,28 @@ capabilityRegistry.registerAction(myAction);
 
 ---
 
+## Examples
+
+For detailed code examples demonstrating core package features, see:
+
+### Utility Examples
+- **[src/utils/ObjectPool.example.ts](src/utils/ObjectPool.example.ts)** - Performance-optimized object pooling (vector pools, bounding boxes, batch operations, proper cleanup patterns)
+- **[src/utils/NDimensionalSpatialGrid.example.ts](src/utils/NDimensionalSpatialGrid.example.ts)** - N-dimensional spatial indexing (2D position grids, 4D environmental queries, multi-attribute searches)
+
+### Magic System Examples
+- **[src/magic/MagicSourceGenerator.example.ts](src/magic/MagicSourceGenerator.example.ts)** - Magic resource pool generation (mana pools, divine favor, breath economy, multi-paradigm characters, leveling)
+
+### Help System Examples
+- **[src/help/documentedItems.example.ts](src/help/documentedItems.example.ts)** - Self-documenting items (embedding help entries, crafting recipes, tips/warnings, LLM-readable documentation)
+- **[src/help/documentedDivinity.example.ts](src/help/documentedDivinity.example.ts)** - Divine power documentation (miracles, blessings, curses, theological guidance)
+- **[src/help/documentedCrafting.example.ts](src/help/documentedCrafting.example.ts)** - Crafting recipe documentation (tools, weapons, building materials, skill requirements)
+- **[src/help/documentedMagic.example.ts](src/help/documentedMagic.example.ts)** - Spell documentation (paradigm-specific spells, costs, effects, mishap warnings)
+- **[src/help/documentedMagicItems.example.ts](src/help/documentedMagicItems.example.ts)** - Enchanted item documentation (artifacts, runes, magical equipment, attunement)
+
+**Usage:** These examples demonstrate best practices for using core package features. Read them before implementing similar functionality to avoid common pitfalls.
+
+---
+
 ## Performance Considerations
 
 **The ECS runs at 20 TPS (ticks per second). Each tick has 50ms budget.**

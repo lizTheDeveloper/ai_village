@@ -64,7 +64,7 @@ export class FleetSystem extends BaseSystem {
       if (!fleet) continue;
 
       // PERF: Early exit for empty fleets
-      if (fleet.squadronIds.length === 0) continue;
+      if (fleet.squadrons.squadronIds.length === 0) continue;
 
       // Update fleet aggregate stats from squadrons
       this.updateFleetStats(ctx.world, fleetEntity as EntityImpl, fleet, tick);
@@ -110,7 +110,7 @@ export class FleetSystem extends BaseSystem {
     this.shipTypeMap.clear();
 
     // Gather stats from all squadrons
-    for (const squadronId of fleet.squadronIds) {
+    for (const squadronId of fleet.squadrons.squadronIds) {
       // PERF: Use cached squadron lookup instead of query
       const squadronEntity = this.squadronCache.get(squadronId);
 
@@ -130,20 +130,20 @@ export class FleetSystem extends BaseSystem {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      const squadronShipCount = squadron.shipIds.length;
-      const squadronCrewCount = squadron.totalCrew;
+      const squadronShipCount = squadron.ships.shipIds.length;
+      const squadronCrewCount = squadron.ships.totalCrew;
 
       stats.totalShips += squadronShipCount;
       stats.totalCrew += squadronCrewCount;
 
       // Weight coherence by squadron crew size
-      stats.weightedCoherence += squadron.averageCoherence * squadronCrewCount;
+      stats.weightedCoherence += squadron.coherence.average * squadronCrewCount;
 
       // Fleet strength is sum of squadron combat strengths
-      stats.fleetStrength += squadron.combatStrength;
+      stats.fleetStrength += squadron.combat.totalFirepower;
 
       // PERF: Aggregate ship types using Map (faster than object literal)
-      for (const [shipType, count] of Object.entries(squadron.shipTypeBreakdown)) {
+      for (const [shipType, count] of Object.entries(squadron.ships.shipTypes)) {
         this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
@@ -152,7 +152,7 @@ export class FleetSystem extends BaseSystem {
     const fleetCoherence = stats.totalCrew > 0 ? stats.weightedCoherence / stats.totalCrew : 0;
 
     // Apply supply penalty to strength and coherence
-    const supplyPenalty = fleet.supplyLevel;
+    const supplyPenalty = fleet.logistics.fuelReserves;
     const adjustedStrength = stats.fleetStrength * supplyPenalty;
     const adjustedCoherence = fleetCoherence * supplyPenalty;
 
@@ -165,11 +165,19 @@ export class FleetSystem extends BaseSystem {
     // PERF: Batch all component updates in single call
     fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      totalShips: stats.totalShips,
-      totalCrew: stats.totalCrew,
-      fleetCoherence: adjustedCoherence,
-      fleetStrength: adjustedStrength,
-      shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
+      squadrons: {
+        ...f.squadrons,
+        totalShips: stats.totalShips,
+        totalCrew: stats.totalCrew,
+      },
+      coherence: {
+        ...f.coherence,
+        average: adjustedCoherence,
+      },
+      status: {
+        ...f.status,
+        readiness: adjustedStrength,
+      },
     }));
   }
 
@@ -184,7 +192,7 @@ export class FleetSystem extends BaseSystem {
   ): void {
     // Supply degrades by 1% per game hour (1200 ticks)
     // Only degrade if fleet has an active mission
-    if (!fleet.currentMission) return;
+    if (!fleet.mission || !fleet.mission.type) return;
 
     const SUPPLY_DEGRADATION_PER_HOUR = 0.01;
     const TICKS_PER_HOUR = 1200;
@@ -192,16 +200,19 @@ export class FleetSystem extends BaseSystem {
     // Calculate degradation since last update
     const degradation = SUPPLY_DEGRADATION_PER_HOUR * (this.throttleInterval / TICKS_PER_HOUR);
 
-    const newSupplyLevel = Math.max(0, fleet.supplyLevel - degradation);
+    const newSupplyLevel = Math.max(0, fleet.logistics.fuelReserves - degradation);
 
     // Update supply level
     fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      supplyLevel: newSupplyLevel,
+      logistics: {
+        ...f.logistics,
+        fuelReserves: newSupplyLevel,
+      },
     }));
 
     // Emit warning if supply is critically low
-    if (newSupplyLevel < 0.2 && fleet.supplyLevel >= 0.2) {
+    if (newSupplyLevel < 0.2 && fleet.logistics.fuelReserves >= 0.2) {
       world.eventBus.emit({
         type: 'fleet:low_supply',
         source: fleetEntity.id,
@@ -243,11 +254,11 @@ export function addSquadronToFleet(
     return { success: false, reason: 'Entity is not a fleet' };
   }
 
-  if (fleet.squadronIds.length >= 10) {
+  if (fleet.squadrons.squadronIds.length >= 10) {
     return { success: false, reason: 'Fleet already has maximum 10 squadrons' };
   }
 
-  if (fleet.squadronIds.includes(squadronId)) {
+  if (fleet.squadrons.squadronIds.includes(squadronId)) {
     return { success: false, reason: 'Squadron already in fleet' };
   }
 
@@ -255,7 +266,10 @@ export function addSquadronToFleet(
   const impl = fleetEntity as EntityImpl;
   impl.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
     ...f,
-    squadronIds: [...f.squadronIds, squadronId],
+    squadrons: {
+      ...f.squadrons,
+      squadronIds: [...f.squadrons.squadronIds, squadronId],
+    },
   }));
 
   // Emit event
@@ -296,7 +310,7 @@ export function removeSquadronFromFleet(
     return { success: false, reason: 'Entity is not a fleet' };
   }
 
-  if (!fleet.squadronIds.includes(squadronId)) {
+  if (!fleet.squadrons.squadronIds.includes(squadronId)) {
     return { success: false, reason: 'Squadron not in fleet' };
   }
 
@@ -309,18 +323,21 @@ export function removeSquadronFromFleet(
   const impl = fleetEntity as EntityImpl;
   impl.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
     ...f,
-    squadronIds: f.squadronIds.filter(id => id !== squadronId),
+    squadrons: {
+      ...f.squadrons,
+      squadronIds: f.squadrons.squadronIds.filter(id => id !== squadronId),
+    },
   }));
 
   // If fleet now has < 3 squadrons, emit disbanding warning
-  if (fleet.squadronIds.length < 3) {
+  if (fleet.squadrons.squadronIds.length < 3) {
     world.eventBus.emit({
       type: 'fleet:disbanding',
       source: fleetEntity.id,
       data: {
         fleetId: fleet.fleetId,
         reason: 'too_few_squadrons',
-        remainingSquadrons: fleet.squadronIds.length - 1,
+        remainingSquadrons: fleet.squadrons.squadronIds.length - 1,
       },
     });
   }

@@ -8,55 +8,10 @@
  * Based on PROCEDURAL_LANGUAGE_SYSTEM.md specification.
  */
 
-/**
- * Phoneme metadata with descriptive qualities
- */
-export interface PhonemeMetadata {
-  /** The phoneme symbol (e.g., 'kh', 'l', 'a') */
-  sound: string;
+import type { PhonemeInventory, PhonemeMetadata } from './types.js';
 
-  /** Phoneme category */
-  category: 'consonant' | 'vowel' | 'cluster' | 'tone';
-
-  /** Descriptive qualities used by Tracery to describe language */
-  qualities: {
-    /** guttural, liquid, percussive, sibilant, nasal, breathy */
-    texture: string[];
-    /** harsh, soft, crisp, smooth, rough */
-    hardness: string[];
-    /** front, back, central, high, low */
-    position: string[];
-    /** flowing, clipped, resonant, sharp, rounded */
-    manner: string[];
-  };
-
-  /** Phonetic classification */
-  type?: string;
-
-  /** Typological information */
-  typology?: {
-    /** How common this phoneme is cross-linguistically */
-    frequency: 'universal' | 'common' | 'uncommon' | 'rare';
-    /** Phonemes that should exist before this one */
-    prerequisites?: string[];
-    /** Phonemes that shouldn't co-exist with this one */
-    incompatibleWith?: string[];
-  };
-
-  /** Body plan restrictions (for alien phonemes) */
-  bodyPlanRestriction?: string[];
-}
-
-/**
- * Complete phoneme inventory organized by category
- */
-export interface PhonemeInventory {
-  consonants: PhonemeMetadata[];
-  vowels: PhonemeMetadata[];
-  clusters: PhonemeMetadata[];
-  tones: PhonemeMetadata[];
-  syllablePatterns: string[];
-}
+// Re-export types for convenience
+export type { PhonemeInventory, PhonemeMetadata };
 
 /**
  * Universal phoneme inventory

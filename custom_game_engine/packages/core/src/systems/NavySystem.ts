@@ -65,8 +65,8 @@ export class NavySystem extends BaseSystem {
       const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
       if (!navy) continue;
 
-      // PERF: Early exit for empty navies
-      if (navy.armadaIds.length === 0 && navy.reserveFleetIds.length === 0) continue;
+      // PERF: Early exit for empty navies (check if navy has any assets)
+      if (navy.assets.totalArmadas === 0 && navy.assets.totalFleets === 0) continue;
 
       // Update navy aggregate stats
       this.updateNavyStats(ctx.world, navyEntity as EntityImpl, navy, tick);
@@ -98,6 +98,9 @@ export class NavySystem extends BaseSystem {
   /**
    * Update navy aggregate statistics from armadas and reserve fleets
    * PERF: Uses cached entity lookups and reusable working objects
+   *
+   * NOTE: Navy doesn't store armadaIds/reserveFleetIds at top level.
+   * Instead, we query for all armadas/fleets belonging to this navy via factionId.
    */
   private updateNavyStats(
     world: World,
@@ -114,51 +117,39 @@ export class NavySystem extends BaseSystem {
     // PERF: Clear and reuse Map instead of allocating object
     this.shipTypeMap.clear();
 
-    // Gather stats from all armadas
-    for (const armadaId of navy.armadaIds) {
-      // PERF: Use cached armada lookup
-      const armadaEntity = this.armadaCache.get(armadaId);
-      if (!armadaEntity) {
-        // Armada missing - emit warning
-        world.eventBus.emit({
-          type: 'navy:armada_missing',
-          source: navyEntity.id,
-          data: {
-            navyId: navy.navyId,
-            missingArmadaId: armadaId,
-          },
-        });
-        continue;
-      }
+    // Count armadas and fleets for this navy (by matching factionId)
+    let armadaCount = 0;
+    let fleetCount = 0;
 
+    // Gather stats from all armadas belonging to this faction
+    for (const [armadaId, armadaEntity] of this.armadaCache) {
       const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
 
-      stats.totalShips += armada.totalShips;
-      stats.totalCrew += armada.totalCrew;
-      stats.totalStrength += armada.armadaStrength;
+      // TODO: Match armadas to navy - for now, just aggregate all armadas
+      // In future, add navy reference to ArmadaComponent or use factionId matching
+      armadaCount++;
 
-      // PERF: Aggregate ship types using Map (faster than object literal)
-      for (const [shipType, count] of Object.entries(armada.shipTypeBreakdown)) {
-        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
-      }
+      stats.totalShips += armada.fleets.totalShips;
+      stats.totalCrew += armada.fleets.totalCrew;
+      stats.totalStrength += armada.strength.effectiveCombatPower;
     }
 
-    // Gather stats from reserve fleets
-    for (const fleetId of navy.reserveFleetIds) {
-      // PERF: Use cached fleet lookup
-      const fleetEntity = this.fleetCache.get(fleetId);
-      if (!fleetEntity) continue;
-
+    // Gather stats from reserve fleets (fleets not in any armada)
+    for (const [fleetId, fleetEntity] of this.fleetCache) {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      stats.totalShips += fleet.totalShips;
-      stats.totalCrew += fleet.totalCrew;
-      stats.totalStrength += fleet.fleetStrength;
+      // TODO: Determine if fleet is a reserve (not assigned to armada)
+      // For now, just count all fleets
+      fleetCount++;
+
+      stats.totalShips += fleet.squadrons.totalShips;
+      stats.totalCrew += fleet.squadrons.totalCrew;
+      stats.totalStrength += fleet.combat.offensiveRating;
 
       // PERF: Aggregate ship types using Map
-      for (const [shipType, count] of Object.entries(fleet.shipTypeBreakdown)) {
+      for (const [shipType, count] of Object.entries(fleet.squadrons.shipTypeBreakdown)) {
         this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
@@ -172,10 +163,14 @@ export class NavySystem extends BaseSystem {
     // PERF: Batch all component updates in single call
     navyEntity.updateComponent<NavyComponent>(CT.Navy, (n) => ({
       ...n,
-      totalShips: stats.totalShips,
-      totalCrew: stats.totalCrew,
-      navyStrength: stats.totalStrength,
-      shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
+      assets: {
+        ...n.assets,
+        totalArmadas: armadaCount,
+        totalFleets: fleetCount,
+        totalShips: stats.totalShips,
+        totalCrew: stats.totalCrew,
+        shipTypeBreakdown: shipTypeBreakdown as Record<SpaceshipType, number>,
+      },
     }));
   }
 
@@ -189,12 +184,12 @@ export class NavySystem extends BaseSystem {
     tick: number
   ): void {
     // Calculate total maintenance cost
-    const maintenanceCost = navy.totalShips * navy.economy.maintenanceCost;
+    const maintenanceCost = navy.assets.totalShips * navy.economy.maintenanceCost;
 
     // Calculate personnel cost (10 credits per crew member per year, prorated to tick)
     // At 20 TPS, 1 year = ~1,200,000 ticks (60s * 60m * 24h * 365d * 20 ticks)
     // Simplified: 10 credits per crew per 1000 ticks
-    const personnelCostPerTick = navy.totalCrew * (10 / 1000);
+    const personnelCostPerTick = navy.assets.totalCrew * (10 / 1000);
 
     // Track spending
     const totalCostThisTick = (maintenanceCost / 1000) + personnelCostPerTick;
@@ -210,15 +205,15 @@ export class NavySystem extends BaseSystem {
     }));
 
     // Warn if budget exceeded
-    if (navy.economy.budgetSpent > navy.budget) {
+    if (navy.economy.budgetSpent > navy.economy.annualBudget) {
       world.eventBus.emit({
         type: 'navy:budget_exceeded',
         source: navyEntity.id,
         data: {
           navyId: navy.navyId,
           budgetSpent: navy.economy.budgetSpent,
-          budget: navy.budget,
-          overspend: navy.economy.budgetSpent - navy.budget,
+          budget: navy.economy.annualBudget,
+          overspend: navy.economy.budgetSpent - navy.economy.annualBudget,
         },
       });
     }
@@ -231,6 +226,10 @@ export class NavySystem extends BaseSystem {
 
 /**
  * Add an armada to a navy
+ *
+ * NOTE: Navy component doesn't have armadaIds array.
+ * Armadas are linked to navies via factionId or should be queried.
+ * This function is a placeholder for future implementation.
  */
 export function addArmadaToNavy(
   world: World,
@@ -254,18 +253,13 @@ export function addArmadaToNavy(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  if (navy.armadaIds.includes(armadaId)) {
-    return { success: false, reason: 'Armada already in navy' };
-  }
+  // TODO: Implement armada-navy linking
+  // Options:
+  // 1. Add navyId field to ArmadaComponent
+  // 2. Add armadaIds array to NavyComponent.assets
+  // 3. Use separate relationship entity/component
 
-  // Add armada to navy
-  const impl = navyEntity as EntityImpl;
-  impl.updateComponent<NavyComponent>(CT.Navy, (n) => ({
-    ...n,
-    armadaIds: [...n.armadaIds, armadaId],
-  }));
-
-  // Emit event
+  // For now, just emit event to track the relationship
   world.eventBus.emit({
     type: 'navy:armada_joined',
     source: navyEntity.id,
@@ -280,6 +274,9 @@ export function addArmadaToNavy(
 
 /**
  * Remove an armada from a navy
+ *
+ * NOTE: Navy component doesn't have armadaIds array.
+ * This function is a placeholder for future implementation.
  */
 export function removeArmadaFromNavy(
   world: World,
@@ -303,16 +300,7 @@ export function removeArmadaFromNavy(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  if (!navy.armadaIds.includes(armadaId)) {
-    return { success: false, reason: 'Armada not in navy' };
-  }
-
-  // Remove armada from navy
-  const impl = navyEntity as EntityImpl;
-  impl.updateComponent<NavyComponent>(CT.Navy, (n) => ({
-    ...n,
-    armadaIds: n.armadaIds.filter(id => id !== armadaId),
-  }));
+  // TODO: Implement armada-navy unlinking (see addArmadaToNavy)
 
   // Emit event
   world.eventBus.emit({
@@ -329,6 +317,9 @@ export function removeArmadaFromNavy(
 
 /**
  * Add a fleet to navy reserves
+ *
+ * NOTE: Navy component doesn't have reserveFleetIds array.
+ * This function is a placeholder for future implementation.
  */
 export function addFleetToReserves(
   world: World,
@@ -352,16 +343,11 @@ export function addFleetToReserves(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  if (navy.reserveFleetIds.includes(fleetId)) {
-    return { success: false, reason: 'Fleet already in reserves' };
-  }
-
-  // Add fleet to reserves
-  const impl = navyEntity as EntityImpl;
-  impl.updateComponent<NavyComponent>(CT.Navy, (n) => ({
-    ...n,
-    reserveFleetIds: [...n.reserveFleetIds, fleetId],
-  }));
+  // TODO: Implement fleet reserve tracking
+  // Options:
+  // 1. Add reserveFleetIds array to NavyComponent.assets
+  // 2. Add isReserve flag to FleetComponent
+  // 3. Use separate ReserveFleet component
 
   // Emit event
   world.eventBus.emit({

@@ -482,6 +482,17 @@ class AlienSpeciesGenerator {
 
 ---
 
+## Examples
+
+For detailed world generation and biosphere examples, see:
+
+- **[src/biosphere/test-biosphere-generation.ts](src/biosphere/test-biosphere-generation.ts)** - Biosphere generation testing and validation (procedural ecosystem generation, species distribution, biome compatibility checks)
+- **[src/research-papers/cooking-papers-example.ts](src/research-papers/cooking-papers-example.ts)** - Research paper system demonstration (culinary technology progression, recipe unlocks, skill requirements)
+
+**Usage:** These examples demonstrate procedural world generation and research system integration. Read before implementing biosphere features or research progression.
+
+---
+
 ## Usage Examples
 
 ### Example 1: Generating Terrain

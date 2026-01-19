@@ -390,7 +390,7 @@ export class InvasionSystem extends BaseSystem {
         outcome: 'partial_conquest',
         occupiedSystems: getStrategicSystems(targetWorld),
         casualties: {
-          attackerLosses: (attackerFleet.totalShips * 0.3) | 0,
+          attackerLosses: (attackerFleet.squadrons.totalShips * 0.3) | 0,
           defenderLosses: (defenderForces.totalShips * 0.7) | 0,
         },
       };
@@ -400,7 +400,7 @@ export class InvasionSystem extends BaseSystem {
         success: false,
         outcome: 'invasion_repelled',
         casualties: {
-          attackerLosses: (attackerFleet.totalShips * 0.6) | 0,
+          attackerLosses: (attackerFleet.squadrons.totalShips * 0.6) | 0,
           defenderLosses: (defenderForces.totalShips * 0.4) | 0,
         },
       };

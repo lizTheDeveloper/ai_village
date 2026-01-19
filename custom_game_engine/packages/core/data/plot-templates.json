@@ -1360,5 +1360,7 @@
         "max_concurrent": 1
       }
     }
-  ]
+  ],
+  "medium_plot_templates": [],
+  "large_plot_templates": []
 }

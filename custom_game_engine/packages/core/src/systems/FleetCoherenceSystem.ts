@@ -157,8 +157,8 @@ export class FleetCoherenceSystem extends BaseSystem {
     if (!fleet) return;
 
     // Reset working stats
-    this.workingFleetStats.squadrons.totalShips = 0;
-    this.workingFleetStats.ships.totalCrew = 0;
+    this.workingFleetStats.totalShips = 0;
+    this.workingFleetStats.totalCrew = 0;
     this.workingFleetStats.avgCoherence = 0;
     this.workingFleetStats.lowCoherence = 0;
     this.workingFleetStats.mediumCoherence = 0;
@@ -185,8 +185,8 @@ export class FleetCoherenceSystem extends BaseSystem {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      this.workingFleetStats.squadrons.totalShips += squadron.ships.shipIds.length;
-      this.workingFleetStats.ships.totalCrew += squadron.ships.totalCrew;
+      this.workingFleetStats.totalShips += squadron.ships.shipIds.length;
+      this.workingFleetStats.totalCrew += squadron.ships.totalCrew;
       coherences.push(squadron.coherence.average);
 
       // Categorize squadron coherence
@@ -228,9 +228,21 @@ export class FleetCoherenceSystem extends BaseSystem {
     // Update fleet component
     fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
-      totalShips: this.workingFleetStats.squadrons.totalShips,
-      totalCrew: this.workingFleetStats.ships.totalCrew,
-      fleetCoherence: effectiveCoherence,
+      squadrons: {
+        ...f.squadrons,
+        totalShips: this.workingFleetStats.totalShips,
+        totalCrew: this.workingFleetStats.totalCrew,
+      },
+      coherence: {
+        ...f.coherence,
+        average: effectiveCoherence,
+        distribution: {
+          low: this.workingFleetStats.lowCoherence,
+          medium: this.workingFleetStats.mediumCoherence,
+          high: this.workingFleetStats.highCoherence,
+        },
+        fleetCoherenceRating: effectiveCoherence < 0.5 ? 'poor' : effectiveCoherence >= 0.7 ? 'excellent' : 'adequate',
+      },
     }));
 
     // Emit coherence update event
@@ -240,8 +252,8 @@ export class FleetCoherenceSystem extends BaseSystem {
       data: {
         fleetId: fleet.fleetId,
         coherence: effectiveCoherence,
-        totalShips: this.workingFleetStats.squadrons.totalShips,
-        totalCrew: this.workingFleetStats.ships.totalCrew,
+        totalShips: this.workingFleetStats.totalShips,
+        totalCrew: this.workingFleetStats.totalCrew,
         distribution: {
           low: this.workingFleetStats.lowCoherence,
           medium: this.workingFleetStats.mediumCoherence,
@@ -277,8 +289,8 @@ export class FleetCoherenceSystem extends BaseSystem {
     if (!armada) return;
 
     // Reset working stats
-    this.workingArmadaStats.squadrons.totalShips = 0;
-    this.workingArmadaStats.ships.totalCrew = 0;
+    this.workingArmadaStats.totalShips = 0;
+    this.workingArmadaStats.totalCrew = 0;
     this.workingArmadaStats.avgCoherence = 0;
 
     const coherences: number[] = [];
@@ -302,8 +314,8 @@ export class FleetCoherenceSystem extends BaseSystem {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      this.workingArmadaStats.squadrons.totalShips += fleet.squadrons.totalShips;
-      this.workingArmadaStats.ships.totalCrew += fleet.ships.totalCrew;
+      this.workingArmadaStats.totalShips += fleet.squadrons.totalShips;
+      this.workingArmadaStats.totalCrew += fleet.squadrons.totalCrew;
       coherences.push(fleet.coherence.average);
     }
 
@@ -312,16 +324,22 @@ export class FleetCoherenceSystem extends BaseSystem {
       this.workingArmadaStats.avgCoherence = coherences.reduce((sum, c) => sum + c, 0) / coherences.length;
     }
 
-    // Apply supply modifier
-    const supplyModifier = armada.logistics.fuelReserves;
-    const effectiveCoherence = this.workingArmadaStats.avgCoherence * supplyModifier;
+    // Apply morale modifier (armadas use morale instead of supply at this level)
+    const moraleModifier = armada.morale.average;
+    const effectiveCoherence = this.workingArmadaStats.avgCoherence * moraleModifier;
 
     // Update armada component
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,
-      totalShips: this.workingArmadaStats.squadrons.totalShips,
-      totalCrew: this.workingArmadaStats.ships.totalCrew,
-      armadaCoherence: effectiveCoherence,
+      fleets: {
+        ...a.fleets,
+        totalShips: this.workingArmadaStats.totalShips,
+        totalCrew: this.workingArmadaStats.totalCrew,
+      },
+      strength: {
+        ...a.strength,
+        effectiveCombatPower: effectiveCoherence * a.strength.shipCount,
+      },
     }));
   }
 }

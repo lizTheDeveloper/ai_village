@@ -369,7 +369,7 @@ export class ProductionRenderer {
 
     job.status = 'complete';
     job.completedAt = Date.now();
-    job.renderQuality = 95; // TODO: Actual quality assessment
+    job.renderQuality = this.assessRenderQuality(job.request, resolution, rendered.imageData);
   }
 
   /**
@@ -488,6 +488,92 @@ export class ProductionRenderer {
       imageUrl: `/assets/productions/placeholder_${resolution}.png`,
       imageData: undefined,
     };
+  }
+
+  /**
+   * Assess render quality based on multiple factors
+   */
+  private assessRenderQuality(request: RenderRequest, resolution: number, imageData?: string): number {
+    let quality = 50; // Base quality
+
+    // Quality level contribution (40 points max)
+    switch (request.qualityLevel) {
+      case QualityLevel.Broadcast:
+        quality += 10;
+        break;
+      case QualityLevel.Premium:
+        quality += 20;
+        break;
+      case QualityLevel.Cinematic:
+        quality += 30;
+        break;
+      case QualityLevel.Ultra:
+        quality += 40;
+        break;
+    }
+
+    // Resolution contribution (20 points max)
+    const resolutionScore = Math.min(20, (resolution / 1024) * 20);
+    quality += resolutionScore;
+
+    // Costume complexity contribution (10 points max)
+    if (request.costume) {
+      if (request.costume.costumeType === 'royal' || request.costume.costumeType === 'gladiator') {
+        quality += 10;
+      } else if (request.costume.costumeType === 'noble' || request.costume.costumeType === 'performer') {
+        quality += 7;
+      } else if (request.costume.costumeType === 'merchant' || request.costume.costumeType === 'custom') {
+        quality += 5;
+      } else {
+        quality += 3;
+      }
+
+      // Bonus for accessories
+      if (request.costume.accessories && request.costume.accessories.length > 0) {
+        quality += Math.min(5, request.costume.accessories.length * 2);
+      }
+    }
+
+    // Equipment complexity contribution (10 points max)
+    if (request.equipment && request.equipment.length > 0) {
+      quality += Math.min(10, request.equipment.length * 3);
+    }
+
+    // Makeup effects contribution (5 points max)
+    if (request.makeup) {
+      if (request.makeup.style === 'dramatic' || request.makeup.style === 'fantasy') {
+        quality += 5;
+      } else if (request.makeup.style === 'stage') {
+        quality += 3;
+      } else {
+        quality += 1;
+      }
+
+      if (request.makeup.effects && request.makeup.effects.length > 0) {
+        quality += Math.min(3, request.makeup.effects.length);
+      }
+    }
+
+    // Animation contribution (10 points max)
+    if (request.animation) {
+      quality += 5;
+      if (request.frameCount && request.frameCount > 4) {
+        quality += Math.min(5, request.frameCount / 4);
+      }
+    }
+
+    // Budget contribution (5 points max)
+    if (request.budget) {
+      quality += Math.min(5, request.budget / 200);
+    }
+
+    // Image data analysis (if available) - penalize if missing
+    if (!imageData) {
+      quality -= 10;
+    }
+
+    // Clamp to 0-100
+    return Math.max(0, Math.min(100, Math.round(quality)));
   }
 
   /**

@@ -10,8 +10,8 @@ export interface ConversationMessage {
 
 export interface ConversationComponent extends Component {
   type: 'conversation';
-  partnerId: EntityId | null; // DEPRECATED: for backward compat, use participantIds instead
-  participantIds: EntityId[]; // All agents in this conversation (including self)
+  partnerId: EntityId | null; // Primary partner for 1:1 conversations (use participantIds for group conversations)
+  participantIds: EntityId[]; // All agents in this conversation (including self) - enables multi-party conversations
   conversationCenterX?: number; // Center point for spatial stickiness
   conversationCenterY?: number; // Center point for spatial stickiness
   messages: ConversationMessage[]; // Recent conversation history

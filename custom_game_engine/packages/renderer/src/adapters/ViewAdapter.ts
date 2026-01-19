@@ -47,6 +47,14 @@ import type { World } from '@ai-village/core';
  * });
  * ```
  */
+/** Async data loading state */
+interface AsyncDataState<TData> {
+  loading: boolean;
+  error: Error | null;
+  data: TData | null;
+  timestamp: number;
+}
+
 export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPanel {
   private view: DashboardView<TData>;
   private visible: boolean = false;
@@ -55,6 +63,13 @@ export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPa
   private cachedData: TData | null = null;
   private lastDataFetchTime: number = 0;
   private readonly DATA_CACHE_MS = 100; // Cache data for 100ms to avoid redundant fetches
+  private asyncState: AsyncDataState<TData> = {
+    loading: false,
+    error: null,
+    data: null,
+    timestamp: 0,
+  };
+  private pendingAsyncFetch: Promise<TData> | null = null;
 
   constructor(view: DashboardView<TData>) {
     // Validate view (no silent fallbacks per CLAUDE.md)
@@ -134,6 +149,7 @@ export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPa
     // Invalidate cache when visibility changes
     if (visible) {
       this.cachedData = null;
+      this.asyncState.data = null;
     }
   }
 
@@ -159,6 +175,33 @@ export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPa
 
     // Fetch data
     const data = this.fetchData();
+
+    // Handle async loading state
+    if (this.asyncState.loading) {
+      ctx.fillStyle = defaultTheme.colors.textMuted;
+      ctx.font = defaultTheme.fonts.normal;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Loading...', x + width / 2, y + height / 2);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      return;
+    }
+
+    // Handle async error state
+    if (this.asyncState.error) {
+      ctx.fillStyle = defaultTheme.colors.error;
+      ctx.font = defaultTheme.fonts.bold;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Error loading data', x + width / 2, y + height / 2 - 10);
+      ctx.fillStyle = defaultTheme.colors.textMuted;
+      ctx.font = '12px monospace';
+      ctx.fillText(this.asyncState.error.message, x + width / 2, y + height / 2 + 10);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      return;
+    }
 
     if (!data) {
       // Render "Loading..." or error message
@@ -260,14 +303,19 @@ export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPa
   // ============================================================================
 
   /**
-   * Fetch data from the view with caching
+   * Fetch data from the view with caching and async state management
    */
   private fetchData(): TData | null {
     const now = Date.now();
 
-    // Return cached data if fresh
+    // Return cached sync data if fresh
     if (this.cachedData && (now - this.lastDataFetchTime) < this.DATA_CACHE_MS) {
       return this.cachedData;
+    }
+
+    // Return cached async data if fresh and not loading
+    if (this.asyncState.data && !this.asyncState.loading && (now - this.asyncState.timestamp) < this.DATA_CACHE_MS) {
+      return this.asyncState.data;
     }
 
     // Build view context
@@ -282,23 +330,53 @@ export class ViewAdapter<TData extends ViewData = ViewData> implements IWindowPa
 
       // Handle async data fetch
       if (result instanceof Promise) {
-        // For now, return null and show loading
-        // TODO: Implement async data loading with state management
-        result.then(data => {
-          this.cachedData = data;
-          this.lastDataFetchTime = now;
-        }).catch(error => {
-          console.error(`[ViewAdapter] Error fetching data for view '${this.view.id}':`, error);
-        });
-        return null;
+        // Don't start a new fetch if one is already pending
+        if (this.pendingAsyncFetch === result) {
+          return this.asyncState.data;
+        }
+
+        this.pendingAsyncFetch = result;
+        this.asyncState.loading = true;
+        this.asyncState.error = null;
+
+        result
+          .then(data => {
+            // Only update if this is still the pending fetch
+            if (this.pendingAsyncFetch === result) {
+              this.asyncState.data = data;
+              this.asyncState.timestamp = Date.now();
+              this.asyncState.loading = false;
+              this.asyncState.error = null;
+              this.pendingAsyncFetch = null;
+            }
+          })
+          .catch(error => {
+            // Only update if this is still the pending fetch
+            if (this.pendingAsyncFetch === result) {
+              console.error(`[ViewAdapter] Error fetching data for view '${this.view.id}':`, error);
+              this.asyncState.loading = false;
+              this.asyncState.error = error instanceof Error ? error : new Error(String(error));
+              this.pendingAsyncFetch = null;
+            }
+          });
+
+        // Return existing data while loading (or null if no data yet)
+        return this.asyncState.data;
       }
 
       // Sync data fetch
       this.cachedData = result;
       this.lastDataFetchTime = now;
+      // Clear async state since we got sync data
+      this.asyncState.data = null;
+      this.asyncState.loading = false;
+      this.asyncState.error = null;
+      this.pendingAsyncFetch = null;
       return result;
     } catch (error) {
       console.error(`[ViewAdapter] Error fetching data for view '${this.view.id}':`, error);
+      this.asyncState.error = error instanceof Error ? error : new Error(String(error));
+      this.asyncState.loading = false;
       return null;
     }
   }

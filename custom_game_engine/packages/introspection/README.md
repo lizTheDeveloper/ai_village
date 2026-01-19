@@ -709,6 +709,18 @@ class SchedulerRenderCache<T = any> {
 
 ---
 
+## Examples
+
+For detailed introspection system examples, see:
+
+- **[example-usage.ts](example-usage.ts)** - Phase 1B component registry demonstration (schema definition, registration, queries, category filtering, auto-registration, validation)
+- **[examples/phase1c-example.ts](examples/phase1c-example.ts)** - Advanced schema features and component type inference
+- **[examples/phase2b-mutation-demo.ts](examples/phase2b-mutation-demo.ts)** - Mutation system demonstration (validated mutations, event emission, undo/redo stack, reversible operations)
+
+**Usage:** These examples demonstrate core introspection patterns including schema definition, component registry usage, and mutation system integration. Read before implementing schemas or mutations.
+
+---
+
 ## Usage Examples
 
 ### Example 1: Defining a Component Schema
