@@ -4,11 +4,6 @@
  * Defines diseases, pests, and their effects on plants
  */
 
-// Import disease and pest data from botany package
-// Note: These are loaded from JSON to allow easier data management
-import diseasesData from '@ai-village/botany/src/data/diseases.json';
-import pestsData from '@ai-village/botany/src/data/pests.json';
-
 /**
  * Disease severity levels
  */
@@ -223,11 +218,29 @@ export interface PlantHealthStatus {
 }
 
 /**
- * Default diseases (loaded from JSON)
+ * Default diseases (loaded from botany package data)
+ * @deprecated Import from @ai-village/botany instead
  */
-export const DEFAULT_DISEASES: PlantDisease[] = diseasesData as PlantDisease[];
+export let DEFAULT_DISEASES: PlantDisease[] = [];
 
 /**
- * Default pests (loaded from JSON)
+ * Default pests (loaded from botany package data)
+ * @deprecated Import from @ai-village/botany instead
  */
-export const DEFAULT_PESTS: PlantPest[] = pestsData as PlantPest[];
+export let DEFAULT_PESTS: PlantPest[] = [];
+
+/**
+ * Set the default diseases (called by botany package during initialization)
+ * @internal
+ */
+export function setDefaultDiseases(diseases: PlantDisease[]): void {
+  DEFAULT_DISEASES = diseases;
+}
+
+/**
+ * Set the default pests (called by botany package during initialization)
+ * @internal
+ */
+export function setDefaultPests(pests: PlantPest[]): void {
+  DEFAULT_PESTS = pests;
+}

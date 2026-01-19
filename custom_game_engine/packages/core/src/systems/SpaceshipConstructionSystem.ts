@@ -56,6 +56,10 @@ export interface SpaceshipConstructionProject {
   startedAt: number;
   /** Total ticks required for construction */
   totalTicks: number;
+  /** Ticks elapsed since construction started */
+  ticksElapsed: number;
+  /** Ticks remaining until construction complete */
+  ticksRemaining: number;
   /** Created spaceship entity ID (once construction begins) */
   spaceshipEntityId?: string;
 }

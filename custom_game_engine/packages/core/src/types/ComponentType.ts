@@ -71,6 +71,9 @@ export enum ComponentType {
   CensusBureau = 'census_bureau',
   VillageGovernance = 'village_governance',
   ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance
+  NationGovernance = 'nation_governance',  // Political hierarchy: national governance
+  EmpireGovernance = 'empire_governance',  // Political hierarchy: imperial governance
+  GalacticCouncil = 'galactic_council',  // Political hierarchy: galactic governance
   Governor = 'governor',  // Phase 6: AI Governance - LLM-powered political decision making
   PoliticalEntity = 'political_entity',  // Phase 6: Political entity in hierarchy
   HealthClinic = 'health_clinic',

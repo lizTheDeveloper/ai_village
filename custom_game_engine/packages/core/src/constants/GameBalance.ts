@@ -5,31 +5,33 @@
  * All values are documented with their purpose and units.
  */
 
+import constantsData from '../data/constants.json';
+
 /**
  * Behavior priority levels for agent decision-making.
  * Higher values override lower priority behaviors.
  */
 export const BEHAVIOR_PRIORITIES = {
   /** Critical survival needs (e.g., forced_sleep when exhausted) */
-  CRITICAL_SURVIVAL: 100,
+  CRITICAL_SURVIVAL: constantsData.behaviorPriorities.criticalSurvival,
 
   /** Immediate danger responses (e.g., flee from threats) */
-  DANGER: 95,
+  DANGER: constantsData.behaviorPriorities.danger,
 
   /** High priority tasks (e.g., find_food when very hungry) */
-  HIGH: 80,
+  HIGH: constantsData.behaviorPriorities.high,
 
   /** Important but not urgent tasks (e.g., deposit_items) */
-  IMPORTANT: 60,
+  IMPORTANT: constantsData.behaviorPriorities.important,
 
   /** Moderate priority activities (e.g., seek_food) */
-  MODERATE: 40,
+  MODERATE: constantsData.behaviorPriorities.moderate,
 
   /** Low priority optional activities (e.g., socialize) */
-  LOW: 20,
+  LOW: constantsData.behaviorPriorities.low,
 
   /** Default/idle behaviors (e.g., wander) */
-  DEFAULT: 10,
+  DEFAULT: constantsData.behaviorPriorities.default,
 } as const;
 
 /**
@@ -39,22 +41,22 @@ export const BEHAVIOR_PRIORITIES = {
  */
 export const AI_CONFIG = {
   /** Cooldown between LLM requests in ticks (at 20 TPS = 60 seconds) */
-  LLM_COOLDOWN_TICKS: 1200,
+  LLM_COOLDOWN_TICKS: constantsData.ai.llmCooldownTicks,
 
   /** Base think interval for agents in ticks */
-  DEFAULT_THINK_INTERVAL: 20,
+  DEFAULT_THINK_INTERVAL: constantsData.ai.defaultThinkInterval,
 
   /** Vision range in tiles (clear day, open terrain: ~500m; forest/fog: less) */
-  VISION_RANGE_TILES: 500,
+  VISION_RANGE_TILES: constantsData.ai.visionRangeTiles,
 
   /** Hearing range in tiles (normal sounds: ~50m; loud sounds detected further) */
-  HEARING_RANGE_TILES: 50,
+  HEARING_RANGE_TILES: constantsData.ai.hearingRangeTiles,
 
   /** Interaction range in tiles (arm's reach: ~2m) */
-  INTERACTION_RANGE_TILES: 2.0,
+  INTERACTION_RANGE_TILES: constantsData.ai.interactionRangeTiles,
 
   /** Probability of random gathering behavior */
-  RANDOM_GATHER_CHANCE: 0.15,
+  RANDOM_GATHER_CHANCE: constantsData.ai.randomGatherChance,
 } as const;
 
 /**
@@ -62,13 +64,13 @@ export const AI_CONFIG = {
  */
 export const SLEEP_THRESHOLDS = {
   /** Sleep drive level that triggers forced sleep */
-  FORCED_SLEEP_THRESHOLD: 85,
+  FORCED_SLEEP_THRESHOLD: constantsData.sleep.forcedThreshold,
 
   /** Sleep drive level that makes agents start considering sleep */
-  TIRED_THRESHOLD: 70,
+  TIRED_THRESHOLD: constantsData.sleep.tiredThreshold,
 
   /** Sleep drive level for well-rested state */
-  WELL_RESTED_THRESHOLD: 30,
+  WELL_RESTED_THRESHOLD: constantsData.sleep.wellRestedThreshold,
 } as const;
 
 /**
@@ -78,19 +80,19 @@ export const SLEEP_THRESHOLDS = {
  */
 export const SOCIAL_CONFIG = {
   /** Distance in tiles for detecting nearby agents for social interactions (~30m) */
-  NEARBY_AGENT_RANGE: 30,
+  NEARBY_AGENT_RANGE: constantsData.social.nearbyAgentRange,
 
   /** Maximum number of agents in a meeting */
-  MAX_MEETING_SIZE: 6,
+  MAX_MEETING_SIZE: constantsData.social.maxMeetingSize,
 
   /** Minimum trust level for sharing information */
-  MIN_TRUST_FOR_SHARING: 0.3,
+  MIN_TRUST_FOR_SHARING: constantsData.social.minTrustForSharing,
 
   /** Shouting/calling range (~100m) */
-  SHOUT_RANGE: 100,
+  SHOUT_RANGE: constantsData.social.shoutRange,
 
   /** Conversation range (close enough to talk: ~5m) */
-  CONVERSATION_RANGE: 5,
+  CONVERSATION_RANGE: constantsData.social.conversationRange,
 } as const;
 
 /**
@@ -98,29 +100,29 @@ export const SOCIAL_CONFIG = {
  */
 export const FARMING_CONFIG = {
   /** Default farming skill for agents without skill system */
-  DEFAULT_FARMING_SKILL: 50,
+  DEFAULT_FARMING_SKILL: constantsData.farming.defaultFarmingSkill,
 
   /** Range in tiles for seed gathering */
-  SEED_GATHERING_RANGE: 2.0,
+  SEED_GATHERING_RANGE: constantsData.farming.seedGatheringRange,
 
   /** Range in tiles for watering plants */
-  WATERING_RANGE: 2.0,
+  WATERING_RANGE: constantsData.farming.wateringRange,
 
   /** Range in tiles for tilling soil */
-  TILLING_RANGE: 2.0,
+  TILLING_RANGE: constantsData.farming.tillingRange,
 } as const;
 
 /**
  * Plant growth stages (not magic numbers, but useful constants)
  */
 export const PLANT_STAGES = {
-  SEED: 'seed',
-  SEEDLING: 'seedling',
-  GROWING: 'growing',
-  MATURE: 'mature',
-  SEEDING: 'seeding',
-  SENESCENCE: 'senescence',
-  DEAD: 'dead',
+  SEED: constantsData.plantStages.seed,
+  SEEDLING: constantsData.plantStages.seedling,
+  GROWING: constantsData.plantStages.growing,
+  MATURE: constantsData.plantStages.mature,
+  SEEDING: constantsData.plantStages.seeding,
+  SENESCENCE: constantsData.plantStages.senescence,
+  DEAD: constantsData.plantStages.dead,
 } as const;
 
 /**
@@ -128,13 +130,13 @@ export const PLANT_STAGES = {
  */
 export const TIME_CONFIG = {
   /** Default ticks per second */
-  DEFAULT_TPS: 20,
+  DEFAULT_TPS: constantsData.time.ticksPerSecond,
 
   /** Ticks in one in-game hour */
-  TICKS_PER_HOUR: 1200,
+  TICKS_PER_HOUR: constantsData.time.ticksPerHour,
 
   /** Ticks in one in-game day (24 hours at 20 TPS = 1200 ticks/hour) */
-  TICKS_PER_DAY: 28800,
+  TICKS_PER_DAY: constantsData.time.ticksPerDay,
 } as const;
 
 /**
@@ -152,35 +154,35 @@ export const TIME_CONFIG = {
  */
 export const MOVEMENT_CONFIG = {
   /** Slow walk speed in tiles per second (strolling, sneaking: ~2 km/game-hour) */
-  SLOW_WALK_SPEED: 33,
+  SLOW_WALK_SPEED: constantsData.movement.slowWalkSpeed,
 
   /** Default walking speed in tiles per second (~5 km/game-hour) */
-  DEFAULT_MOVE_SPEED: 83,
+  DEFAULT_MOVE_SPEED: constantsData.movement.defaultMoveSpeed,
 
   /** Brisk walk / jog speed in tiles per second (~8 km/game-hour) */
-  BRISK_WALK_SPEED: 133,
+  BRISK_WALK_SPEED: constantsData.movement.briskWalkSpeed,
 
   /** Running speed in tiles per second (~15 km/game-hour) */
-  RUN_SPEED: 250,
+  RUN_SPEED: constantsData.movement.runSpeed,
 
   /** Sprint speed in tiles per second (~25 km/game-hour, exhausting) */
-  SPRINT_SPEED: 417,
+  SPRINT_SPEED: constantsData.movement.sprintSpeed,
 
   /** Horse walking speed in tiles per second (~6 km/game-hour) */
-  HORSE_WALK_SPEED: 100,
+  HORSE_WALK_SPEED: constantsData.movement.horseWalkSpeed,
 
   /** Horse trotting speed in tiles per second (~15 km/game-hour) */
-  HORSE_TROT_SPEED: 250,
+  HORSE_TROT_SPEED: constantsData.movement.horseTrotSpeed,
 
   /** Horse galloping speed in tiles per second (~40 km/game-hour) */
-  HORSE_GALLOP_SPEED: 667,
+  HORSE_GALLOP_SPEED: constantsData.movement.horseGallopSpeed,
 
   /** Minimum distance to consider destination reached (2m) */
-  DESTINATION_THRESHOLD: 2.0,
+  DESTINATION_THRESHOLD: constantsData.movement.destinationThreshold,
 
   /** Maximum pathfinding search radius (5km - can path across a city) */
-  MAX_PATHFINDING_RADIUS: 5000,
+  MAX_PATHFINDING_RADIUS: constantsData.movement.maxPathfindingRadius,
 
   /** Local pathfinding chunk (for immediate navigation: 500m) */
-  LOCAL_PATHFINDING_RADIUS: 500,
+  LOCAL_PATHFINDING_RADIUS: constantsData.movement.localPathfindingRadius,
 } as const;

@@ -13,6 +13,7 @@
 import type { Component } from '../ecs/Component.js';
 import type { PersonalityComponent } from './PersonalityComponent.js';
 import type { MagicSkillProgress } from '../magic/MagicSkillTree.js';
+import skillsData from '../data/skills.json';
 
 /**
  * Skill identifiers for all trainable skills.
@@ -43,88 +44,40 @@ export type SkillLevel = 0 | 1 | 2 | 3 | 4 | 5;
  * Human-readable skill level names.
  */
 export const SKILL_LEVEL_NAMES: Record<SkillLevel, string> = {
-  0: 'Untrained',
-  1: 'Novice',
-  2: 'Apprentice',
-  3: 'Journeyman',
-  4: 'Expert',
-  5: 'Master',
+  0: skillsData.skillLevelNames['0'],
+  1: skillsData.skillLevelNames['1'],
+  2: skillsData.skillLevelNames['2'],
+  3: skillsData.skillLevelNames['3'],
+  4: skillsData.skillLevelNames['4'],
+  5: skillsData.skillLevelNames['5'],
 };
 
 /**
  * XP required to reach each level.
  */
 export const XP_PER_LEVEL: Record<SkillLevel, number> = {
-  0: 0,
-  1: 100,
-  2: 300,
-  3: 700,
-  4: 1500,
-  5: 3000,
+  0: skillsData.xpPerLevel['0'],
+  1: skillsData.xpPerLevel['1'],
+  2: skillsData.xpPerLevel['2'],
+  3: skillsData.xpPerLevel['3'],
+  4: skillsData.xpPerLevel['4'],
+  5: skillsData.xpPerLevel['5'],
 };
 
 /**
  * All skill IDs for iteration.
  */
-export const ALL_SKILL_IDS: readonly SkillId[] = [
-  'building',
-  'architecture',
-  'farming',
-  'gathering',
-  'cooking',
-  'crafting',
-  'social',
-  'exploration',
-  'combat',
-  'hunting',
-  'stealth',
-  'animal_handling',
-  'medicine',
-  'research',
-  'magic',
-] as const;
+export const ALL_SKILL_IDS: readonly SkillId[] = skillsData.skillIds as any;
 
 /**
  * Skill icons for UI display.
  */
-export const SKILL_ICONS: Record<SkillId, string> = {
-  building: '🏗️',
-  architecture: '🏛️',
-  farming: '🌾',
-  gathering: '🪓',
-  cooking: '🍳',
-  crafting: '🔨',
-  social: '💬',
-  exploration: '🧭',
-  combat: '⚔️',
-  hunting: '🏹',
-  stealth: '🥷',
-  animal_handling: '🐾',
-  medicine: '💊',
-  research: '📚',
-  magic: '✨',
-};
+export const SKILL_ICONS: Record<SkillId, string> = skillsData.skillIcons as any;
 
 /**
  * Skill display names.
  */
-export const SKILL_NAMES: Record<SkillId, string> = {
-  building: 'Building',
-  architecture: 'Architecture',
-  farming: 'Farming',
-  gathering: 'Gathering',
-  cooking: 'Cooking',
-  crafting: 'Crafting',
-  social: 'Social',
-  exploration: 'Exploration',
-  combat: 'Combat',
-  hunting: 'Hunting',
-  stealth: 'Stealth',
-  animal_handling: 'Animal Handling',
-  medicine: 'Medicine',
-  research: 'Research',
-  magic: 'Magic',
-};
+export const SKILL_NAMES: Record<SkillId, string> = skillsData.skillNames as any;
 
 /**
  * Skill prerequisite requirements.
@@ -138,39 +91,7 @@ export interface SkillPrerequisite {
 /**
  * Prerequisites for each skill (skill tree).
  */
-export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = {
-  // Basic skills (no prerequisites)
-  gathering: [],
-  exploration: [],
-  social: [],
-  magic: [], // Magic has no prerequisites
-
-  // Tier 1 (require basic skills)
-  farming: [{ skill: 'gathering', level: 1 }],
-  building: [{ skill: 'gathering', level: 1 }],
-  combat: [{ skill: 'exploration', level: 1 }],
-  hunting: [{ skill: 'exploration', level: 1 }],
-  stealth: [{ skill: 'exploration', level: 1 }],
-  animal_handling: [{ skill: 'exploration', level: 1 }],
-  research: [{ skill: 'social', level: 1 }], // Research requires social skills (learning from others)
-
-  // Tier 2 (require tier 1)
-  cooking: [
-    { skill: 'gathering', level: 2 },
-    { skill: 'farming', level: 1 },
-  ],
-  crafting: [
-    { skill: 'gathering', level: 2 },
-    { skill: 'building', level: 1 },
-  ],
-  medicine: [
-    { skill: 'gathering', level: 2 },
-    { skill: 'farming', level: 1 },
-  ],
-  architecture: [
-    { skill: 'building', level: 2 }, // Need solid building foundation before learning harmony
-  ],
-};
+export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = skillsData.skillPrerequisites as any;
 
 // ============================================
 // TASK FAMILIARITY (generalized recipe experience)
@@ -565,78 +486,7 @@ export interface SkillSynergy {
 /**
  * All skill synergies in the game.
  */
-export const SKILL_SYNERGIES: SkillSynergy[] = [
-  // Food production chain
-  {
-    id: 'farm_to_table',
-    name: 'Farm to Table',
-    skills: ['gathering', 'farming', 'cooking'],
-    description: '+10% quality for food-related actions, 10% XP sharing',
-    qualityBonus: 0.1,
-    xpSharing: 0.1,
-    speedBonus: 0,
-  },
-  // Construction chain
-  {
-    id: 'master_builder',
-    name: 'Master Builder',
-    skills: ['gathering', 'building', 'crafting'],
-    description: '+15% build speed, 10% material efficiency',
-    qualityBonus: 0,
-    xpSharing: 0.1,
-    speedBonus: 0.15,
-  },
-  // Wilderness chain
-  {
-    id: 'nature_affinity',
-    name: 'Nature Affinity',
-    skills: ['exploration', 'gathering', 'animal_handling'],
-    description: 'Animals less likely to flee, +10% movement speed in wilderness',
-    qualityBonus: 0,
-    xpSharing: 0.1,
-    speedBonus: 0.1,
-  },
-  // Caretaker chain
-  {
-    id: 'caretaker',
-    name: 'Caretaker',
-    skills: ['social', 'cooking', 'medicine'],
-    description: '+25% healing effectiveness, meals give mood boost',
-    qualityBonus: 0.15,
-    xpSharing: 0.1,
-    speedBonus: 0,
-  },
-  // Combat support chain
-  {
-    id: 'battle_medic',
-    name: 'Battle Medic',
-    skills: ['combat', 'crafting', 'medicine'],
-    description: 'Can craft combat items, +30% self-healing',
-    qualityBonus: 0.1,
-    xpSharing: 0.1,
-    speedBonus: 0,
-  },
-  // Hunter chain - combat + cooking + hunting for superior butchering
-  {
-    id: 'hunter',
-    name: 'Hunter',
-    skills: ['combat', 'cooking', 'hunting'],
-    description: 'Expert butchering and meat processing, +15% hunting/butchering quality',
-    qualityBonus: 0.15,
-    xpSharing: 0.1,
-    speedBonus: 0.1,
-  },
-  // Wanderer chain
-  {
-    id: 'wandering_healer',
-    name: 'Wandering Healer',
-    skills: ['exploration', 'social', 'medicine'],
-    description: 'Discover remedies while exploring, spread knowledge socially',
-    qualityBonus: 0,
-    xpSharing: 0.15,
-    speedBonus: 0.1,
-  },
-];
+export const SKILL_SYNERGIES: SkillSynergy[] = skillsData.skillSynergies as any;
 
 /**
  * Check if a synergy is active for a given skills component.
@@ -888,23 +738,7 @@ export function getSpecializationBonus(
  * Default specializations by skill.
  * Each skill can have multiple methods/approaches.
  */
-export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = {
-  cooking: ['baking', 'grilling', 'stewing', 'preservation'],
-  crafting: ['woodworking', 'smithing', 'leatherworking', 'weaving'],
-  building: ['masonry', 'carpentry', 'thatching', 'plumbing'],
-  architecture: ['feng_shui', 'layout_planning', 'proportion_design', 'element_balance'],
-  farming: ['irrigation', 'composting', 'seed_selection', 'greenhouse'],
-  gathering: ['foraging', 'mining', 'logging', 'fishing'],
-  animal_handling: ['taming', 'training', 'breeding', 'veterinary'],
-  medicine: ['herbalism', 'surgery', 'diagnosis', 'first_aid'],
-  social: ['negotiation', 'leadership', 'teaching', 'entertainment'],
-  exploration: ['navigation', 'survival', 'cartography', 'climbing'],
-  combat: ['melee', 'ranged', 'defense', 'tactics'],
-  hunting: ['tracking', 'archery', 'trapping', 'butchering'],
-  stealth: ['sneaking', 'hiding', 'silent_movement', 'camouflage'],
-  research: ['theory', 'experimentation', 'documentation', 'analysis'],
-  magic: ['evocation', 'enchantment', 'divination', 'transmutation'],
-};
+export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = skillsData.skillSpecializations as any;
 
 /**
  * Get signature task (best/most practiced task) for a skill domain.

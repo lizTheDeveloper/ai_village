@@ -1319,8 +1319,6 @@ export class GameIntrospectionAPI {
           blueprintId: request.blueprintId,
           position: request.position,
           rotation: request.rotation || 0,
-          owner: request.owner,
-          tempId: tempBuildingId,
         },
       });
 

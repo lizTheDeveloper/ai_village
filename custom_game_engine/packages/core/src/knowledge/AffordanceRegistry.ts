@@ -11,9 +11,9 @@
  */
 
 // Load data from JSON files (outside src/ directory)
-import buildingsData from '../../data/affordances/buildings.json' with { type: 'json' };
-import itemsData from '../../data/affordances/items.json' with { type: 'json' };
-import recipesData from '../../data/affordances/recipes.json' with { type: 'json' };
+import buildingsData from '../../data/affordances/buildings.json';
+import itemsData from '../../data/affordances/items.json';
+import recipesData from '../../data/affordances/recipes.json';
 
 // ============================================================================
 // Core Affordance Types

@@ -648,6 +648,9 @@ export interface ActiveEffect {
 
   /** Paradigm that cast this (for dispel matching) */
   paradigmId?: string;
+
+  /** Power level of the effect (used for dispel resistance) */
+  power?: number;
 }
 
 // ============================================================================

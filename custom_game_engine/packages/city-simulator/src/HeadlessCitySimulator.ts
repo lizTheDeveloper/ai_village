@@ -21,6 +21,7 @@ import {
   createRenderableComponent,
   createBuildingComponent,
   createInventoryComponent,
+  createResourceComponent,
   createTimeComponent,
   createWeatherComponent,
   createNamedLandmarksComponent,
@@ -418,8 +419,8 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   setPriorities(priorities: StrategicPriorities): void {
-    this.cityManager.setPriorities(priorities as unknown as import("@ai-village/core/dist/src/city/CityManager").StrategicPriorities);
-    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities as unknown as import("@ai-village/core/dist/src/city/CityManager").StrategicPriorities);
+    this.cityManager.setPriorities(priorities);
+    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
     this.emit('priorities-changed', priorities);
   }
 
@@ -581,16 +582,7 @@ export class HeadlessCitySimulator {
 
       const tree = new EntityImpl(createEntityId(), 0);
       tree.addComponent(createPositionComponent(x, y));
-      tree.addComponent({
-        type: 'resource',
-        version: 1,
-        // Note: resourceType removed - use tags or voxel_resource instead
-        amount: 20 + Math.floor(Math.random() * 30),
-        maxAmount: 50,
-        harvestable: true,
-        harvestRate: 1,
-        regenerationRate: 0.001,
-      });
+      tree.addComponent(createResourceComponent('wood', 20 + Math.floor(Math.random() * 30), 0.001, 1.0));
       tree.addComponent(createRenderableComponent('tree', 'object'));
       world.addEntity(tree);
     }
@@ -602,16 +594,7 @@ export class HeadlessCitySimulator {
 
       const stone = new EntityImpl(createEntityId(), 0);
       stone.addComponent(createPositionComponent(x, y));
-      stone.addComponent({
-        type: 'resource',
-        version: 1,
-        // Note: resourceType removed - use tags or voxel_resource instead
-        amount: 15 + Math.floor(Math.random() * 25),
-        maxAmount: 40,
-        harvestable: true,
-        harvestRate: 0.8,
-        regenerationRate: 0,
-      });
+      stone.addComponent(createResourceComponent('stone', 15 + Math.floor(Math.random() * 25), 0, 0.8));
       stone.addComponent(createRenderableComponent('rock', 'object'));
       world.addEntity(stone);
     }
@@ -623,16 +606,7 @@ export class HeadlessCitySimulator {
 
       const food = new EntityImpl(createEntityId(), 0);
       food.addComponent(createPositionComponent(x, y));
-      food.addComponent({
-        type: 'resource',
-        version: 1,
-        // Note: resourceType removed - use tags or voxel_resource instead
-        amount: 15 + Math.floor(Math.random() * 10),
-        maxAmount: 25,
-        harvestable: true,
-        harvestRate: 1.5,
-        regenerationRate: 0.01,
-      });
+      food.addComponent(createResourceComponent('food', 15 + Math.floor(Math.random() * 10), 0.01, 1.5));
       food.addComponent(createRenderableComponent('blueberry-bush', 'object'));
       world.addEntity(food);
     }

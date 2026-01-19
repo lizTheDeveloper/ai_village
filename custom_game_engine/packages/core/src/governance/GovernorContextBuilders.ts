@@ -634,18 +634,21 @@ export function buildEmpireContext(emperor: Entity, world: World): EmpireContext
 
   // Build diplomaticRelations array from empire.foreignPolicy.diplomaticRelations Map
   const diplomaticRelations = Array.from(empire.foreignPolicy.diplomaticRelations.values()).map(
-    (relation) => ({
-      targetEmpire: relation.empireName,
-      relation:
+    (relation) => {
+      const mappedRelation:  'allied' | 'neutral' | 'rival' | 'war' =
         relation.relationship === 'allied'
           ? 'allied'
           : relation.relationship === 'at_war'
             ? 'war'
             : relation.relationship === 'rival' || relation.relationship === 'hostile'
               ? 'rival'
-              : 'neutral',
-      trustLevel: relation.respectLevel,
-    })
+              : 'neutral';
+      return {
+        targetEmpire: relation.empireName,
+        relation: mappedRelation,
+        trustLevel: relation.respectLevel,
+      };
+    }
   );
 
   // Build threats array from empire.stability.separatistMovements

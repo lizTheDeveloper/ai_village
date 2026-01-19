@@ -370,7 +370,7 @@ export class MetricsLiveStream {
       avgEnergy,
       avgHunger,
       behaviorDistribution,
-      networkDensity: allMetrics.social?.socialNetworkDensity ?? 0,
+      networkDensity: (allMetrics.social as any)?.socialNetworkDensity ?? 0,
     };
 
     this.emit({ type: 'snapshot', data: snapshot });

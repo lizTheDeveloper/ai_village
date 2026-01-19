@@ -13,20 +13,7 @@ import {
   ComponentType as CT,
   EntityImpl,
 } from '@ai-village/core';
-
-/**
- * Ecology parameters for wild plant populations
- */
-export interface PopulationConfig {
-  /** Maximum plants per chunk/zone */
-  maxDensity: number;
-  /** Minimum plants to maintain */
-  minPopulation: number;
-  /** Chance for natural spawning per tick */
-  spawnChance: number;
-  /** Radius to check for overcrowding */
-  crowdingRadius: number;
-}
+import { DEFAULT_POPULATION_CONFIG, type PopulationConfig } from '../data/index.js';
 
 /**
  * Seed bank entry - dormant seeds in soil
@@ -88,10 +75,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
   constructor(config?: Partial<PopulationConfig>) {
     super();
     this.config = {
-      maxDensity: 10,        // Max 10 plants per chunk
-      minPopulation: 2,       // Keep at least 2 per biome type
-      spawnChance: 0.1,       // 10% chance per update
-      crowdingRadius: 2,      // Plants need 2 tiles of space
+      ...DEFAULT_POPULATION_CONFIG,
       ...config
     };
   }

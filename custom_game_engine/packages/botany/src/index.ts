@@ -16,10 +16,18 @@ export { PlantDiscoverySystem, type PlantUseResult, type PlantEffect } from './s
 export { PlantDiseaseSystem, type PlantDiseaseSystemConfig } from './systems/PlantDiseaseSystem.js';
 export {
   WildPlantPopulationSystem,
-  type PopulationConfig,
   type SeedBankEntry,
   type BiomeDistribution,
 } from './systems/WildPlantPopulationSystem.js';
+
+// Data exports
+export {
+  DEFAULT_DISEASES,
+  DEFAULT_PESTS,
+  DEFAULT_POPULATION_CONFIG,
+  initializeBotanyData,
+  type PopulationConfig,
+} from './data/index.js';
 
 // Re-export core types for convenience
 export type {

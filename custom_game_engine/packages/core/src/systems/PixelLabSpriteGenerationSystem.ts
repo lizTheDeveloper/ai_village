@@ -296,6 +296,12 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   }
 
   private getDirectionImagePath(characterId: string, direction: string): string {
+    // Browser compatibility: return placeholder path
+    if (typeof window !== 'undefined') {
+      return `/assets/sprites/pixellab/${characterId}/rotations/${direction}.png`;
+    }
+
+    // Node.js path resolution
     const path = require('path');
     const { fileURLToPath } = require('url');
 
@@ -516,6 +522,12 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
     characterId: string,
     direction: string
   ): Promise<void> {
+    // Browser compatibility: skip file system operations
+    if (typeof window !== 'undefined') {
+      console.warn(`[PixelLabSprite] File system operations not supported in browser - skipping download for ${characterId}/${direction}`);
+      return;
+    }
+
     try {
       // Download the image
       const response = await fetch(imageUrl);

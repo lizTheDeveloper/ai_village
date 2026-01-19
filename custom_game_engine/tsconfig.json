@@ -26,6 +26,7 @@
     { "path": "./packages/introspection" },
     { "path": "./packages/building-designer" },
     { "path": "./packages/core" },
+    { "path": "./packages/botany" },
     { "path": "./packages/reproduction" },
     { "path": "./packages/agents" },
     { "path": "./packages/llm" },

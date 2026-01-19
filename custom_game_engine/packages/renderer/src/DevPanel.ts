@@ -2196,8 +2196,8 @@ export class DevPanel implements IWindowPanel {
               break;
             }
 
-            // Try to get AngelSystem from gameLoop
-            const angelSystem = this.world.gameLoop?.systemRegistry.getSystem('AngelSystem');
+            // Try to get AngelSystem from world
+            const angelSystem = this.world.getSystem('AngelSystem');
             if (!angelSystem || !('createAngel' in angelSystem)) {
               this.log('ERROR: AngelSystem not found or missing createAngel method');
               this.log('Angel spawning requires AngelSystem to be registered');
@@ -2376,7 +2376,7 @@ export class DevPanel implements IWindowPanel {
     if (!this.world || !this.selectedBlueprintId) return;
 
     // Get TileConstructionSystem from world
-    const tileConstructionSystem = this.world.getSystem?.('tile_construction');
+    const tileConstructionSystem = this.world.getSystem?.('tile_construction') as any;
     if (!tileConstructionSystem) {
       throw new Error('TileConstructionSystem not found in world');
     }

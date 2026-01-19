@@ -928,3 +928,73 @@ export {
   hasSingleGovernor,
   isUngoverned,
 } from './PoliticalEntityComponent.js';
+
+// Province Governance (Grand Strategy - Tier 2)
+export * from './ProvinceGovernanceComponent.js';
+export type {
+  ProvinceGovernanceComponent,
+  ProvinceCityRecord,
+  ProvincialLaw,
+  ProvincialPolicy,
+  ProvincialMilitary,
+} from './ProvinceGovernanceComponent.js';
+export { createProvinceGovernanceComponent } from './ProvinceGovernanceComponent.js';
+
+// Nation Governance (Grand Strategy - Tier 3)
+export * from './NationGovernanceComponent.js';
+export type {
+  NationGovernanceComponent,
+  WarState,
+  Battle,
+  Treaty,
+  NationRelation,
+  NationDiplomaticEvent,
+  ResearchProject as NationalResearchProject,
+  TechCategory,
+  NationalLaw,
+  NationalPolicy,
+} from './NationGovernanceComponent.js';
+export { createNationGovernanceComponent } from './NationGovernanceComponent.js';
+
+// Empire Governance (Grand Strategy - Tier 4)
+export * from './EmpireGovernanceComponent.js';
+export type {
+  EmpireGovernanceComponent,
+  Dynasty,
+  DynastyRuler,
+  SeparatistMovement,
+  EmpireRelation,
+  ImperialWar,
+  MilitaryContribution,
+  ImperialTreaty,
+} from './EmpireGovernanceComponent.js';
+export { createEmpireGovernanceComponent } from './EmpireGovernanceComponent.js';
+
+// Federation Governance (Grand Strategy - Tier 5)
+export * from './FederationGovernanceComponent.js';
+export type {
+  FederationGovernanceComponent,
+  FederalRepresentative,
+  JointOperation,
+  FederalLaw,
+  FederationRelation,
+  FederalTreaty,
+  FederalWar,
+} from './FederationGovernanceComponent.js';
+export { createFederationGovernanceComponent } from './FederationGovernanceComponent.js';
+
+// Galactic Council (Grand Strategy - Tier 6)
+export * from './GalacticCouncilComponent.js';
+export type {
+  GalacticCouncilComponent,
+  Species,
+  GalacticDelegate,
+  PeacekeepingMission,
+  UniversalLaw,
+  LawViolation,
+  GalacticDispute,
+  GalacticResearchProject,
+  ExistentialThreat,
+  EvacuationPlan,
+} from './GalacticCouncilComponent.js';
+export { createGalacticCouncilComponent } from './GalacticCouncilComponent.js';
