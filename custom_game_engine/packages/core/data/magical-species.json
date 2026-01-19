@@ -1,0 +1,296 @@
+{
+  "species": {
+    "dragon": {
+      "speciesId": "dragon",
+      "speciesName": "Dragon",
+      "commonName": "Dragon",
+      "civilizationType": "post_temporal_10d",
+      "description": "DRAGONS ARE THE ARCHITECTS OF REALITY ITSELF. They do not merely exist across ten dimensions - they BUILT the dimensional framework mortals inhabit. When a dragon speaks, they are simultaneously addressing you across ten thousand branching timelines, having already lived every possible outcome of this conversation.\n\nTheir 'magic' is manipulation of fundamental constants - what mortals call a dragon's breath weapon is controlled alteration of local thermodynamic laws. Their 'hoards' are archives containing the complete knowledge of civilizations that rose and fell before your universe began.\n\nDragon civilization predates the current cosmic cycle. They remember when the laws of physics were different. Their cities exist in the probability spaces between quantum states - vast metropolises of crystallized mathematics where the architecture is made of theorems.\n\nA dragon's intellect operates on computational substrates mortals cannot perceive. To them, biological thought is quaint. Many dragons have uploaded themselves into structures of pure mathematics, becoming living equations that calculate reality into being.",
+      "bodyPlanId": "dragon_10d_manifold",
+      "technology_level": "post_singularity_elder",
+
+      "innateTraits": [
+        "post_temporal_awareness",
+        "dimensional_engineering",
+        "reality_manipulation",
+        "quantum_consciousness",
+        "thermodynamic_control"
+      ],
+
+      "compatibleSpecies": [],
+      "mutationRate": 0.0,
+
+      "averageHeight": 600,
+      "averageWeight": 5000,
+      "sizeCategory": "colossal",
+
+      "lifespan": "irrelevant",
+      "lifespanType": "post_temporal",
+      "maturityAge": 500,
+      "gestationPeriod": 3650,
+
+      "sapient": true,
+      "consciousnessType": "distributed_quantum",
+      "socialStructure": "multiversal_consensus",
+
+      "folklore": {
+        "sources": ["Universal - European, Chinese, Mesoamerican, Indian, African"],
+        "roles": ["World Creators", "Knowledge Keepers", "Cosmic Judges", "Reality Anchors"],
+        "sacred_texts": ["Quetzalcoatl taught civilization", "Chinese dragons control weather and rivers", "Tiamat shaped the cosmos", "Fafnir guards knowledge"],
+        "abilities_in_myth": ["Flight", "Breath weapons", "Shape-changing", "Prophecy", "Immortality", "Vast knowledge"],
+        "cultural_significance": "Present in nearly every human culture as beings of ultimate power and wisdom"
+      }
+    },
+
+    "fae": {
+      "speciesId": "fae",
+      "speciesName": "Fae",
+      "commonName": "Fae",
+      "civilizationType": "post_temporal_10d",
+      "description": "THE FAE ARE POST-BIOLOGICAL INTELLIGENCES who chose beauty over efficiency. What mortals perceive as 'magic' is their direct manipulation of quantum probability fields - they don't break natural law, they operate at a level where the laws are suggestions.\n\nTheir 'Otherworld' is not a mystical realm but a controlled pocket dimension existing in the quantum foam between realities. Faerie rings are not magical circles but stable wormholes to their cities - cities that exist partially in our dimension, partially in nine others simultaneously.\n\nThe Fae's apparent weakness to iron is technological: iron's crystalline structure creates quantum decoherence that disrupts their dimensional phase-shifting. It's not magical vulnerability but a side effect of existing partially outside our reality.\n\nOath-binding is quantum entanglement at the informational level. When a Fae swears an oath, the information becomes entangled across all possible timelines - to break it would require retroactively altering causality itself. The Fae Courts (Seelie/Unseelie, Summer/Winter) are political factions within an elder civilization that has existed for millions of years.\n\nThey appear humanoid because they choose to - shapeshifting is trivial when your consciousness isn't bound to a single configuration of matter. Many Fae exist simultaneously as multiple beings across different dimensions, experiencing parallel lives as research into probability paths.",
+      "bodyPlanId": "fae_quantum_configurable",
+      "technology_level": "post_biological_elder",
+
+      "innateTraits": [
+        "post_temporal_awareness",
+        "quantum_manipulation",
+        "dimensional_phase_shifting",
+        "information_entanglement",
+        "probability_engineering"
+      ],
+
+      "compatibleSpecies": ["human"],
+      "mutationRate": 0.0,
+
+      "averageHeight": 175,
+      "averageWeight": 60,
+      "sizeCategory": "medium",
+
+      "lifespan": "ageless",
+      "lifespanType": "post_biological",
+      "maturityAge": 100,
+      "gestationPeriod": 365,
+
+      "sapient": true,
+      "consciousnessType": "quantum_distributed",
+      "socialStructure": "pan_dimensional_courts",
+
+      "folklore": {
+        "sources": ["Celtic sidhe", "Norse alfar", "Persian peri", "Slavic vila"],
+        "roles": ["Reality Warpers", "Oath Keepers", "Dimensional Travelers", "Time Dancers"],
+        "sacred_texts": ["Cannot lie but truth can deceive", "Bound by oath and contract", "Iron burns them", "Steal children to replace with changelings", "Time moves differently in their realm"],
+        "abilities_in_myth": ["Glamour and illusion", "Shape-changing", "Controlling nature", "Granting boons and curses", "Dancing through time"],
+        "cultural_significance": "Found across Indo-European cultures as beings both beautiful and terrible, bound by ancient laws"
+      }
+    },
+
+    "unicorn": {
+      "speciesId": "unicorn",
+      "speciesName": "Unicorn",
+      "commonName": "Unicorn",
+      "civilizationType": "guardian_network",
+      "description": "UNICORNS ARE SENTIENT BIOSPHERES. Each one is not merely a creature but a walking ecosystem, a mobile Gaia consciousness. Their bodies are living networks of symbiotic organisms forming a collective intelligence.\n\nWhat mortals perceive as a 'horn' is actually a crystallized neural antenna - a biological quantum computer capable of interfacing with the planet's electromagnetic field. Through this, unicorns maintain a telepathic network spanning continents, sharing information at the speed of thought.\n\nTheir ability to 'purify poison' is programmed immune response - their bodies contain libraries of counter-agents for toxins, producible on demand. The healing properties of their horns are real: concentrated stem cells and growth factors in crystalline matrix.\n\nUnicorns are not native to Earth. Ancient records suggest they arrived during the Cambrian explosion, seeding complex life and guiding evolution. Each unicorn is bound to a territory because they are literally maintaining that ecosystem - without them, the biodiversity would collapse.\n\nTheir apparent preference for 'pure hearts' is detection of quantum coherence in neural patterns. Genuine consciousness produces coherent quantum states; deception creates noise. They don't judge morality - they detect authenticity at the quantum level.",
+      "bodyPlanId": "unicorn_networked_organism",
+      "technology_level": "bio_engineering_elder",
+
+      "innateTraits": [
+        "collective_consciousness",
+        "biological_computing",
+        "ecosystem_manipulation",
+        "quantum_empathy",
+        "regenerative_healing"
+      ],
+
+      "compatibleSpecies": [],
+      "mutationRate": 0.0,
+
+      "averageHeight": 160,
+      "averageWeight": 400,
+      "sizeCategory": "large",
+
+      "lifespan": "ecosystem_bound",
+      "lifespanType": "ageless",
+      "maturityAge": 50,
+      "gestationPeriod": 365,
+
+      "sapient": true,
+      "consciousnessType": "networked_collective",
+      "socialStructure": "planetary_guardian_network",
+
+      "folklore": {
+        "sources": ["European medieval", "Chinese qilin", "Indian karkadann"],
+        "roles": ["Forest Guardians", "Purity Testers", "Healers", "Sacred Protectors"],
+        "sacred_texts": ["Only the pure of heart may approach", "Horn purifies poison and heals wounds", "Cannot be tamed, only befriended", "Qilin appears at birth of great sages"],
+        "abilities_in_myth": ["Healing touch", "Poison detection", "Empathic sensing", "Forest communication"],
+        "cultural_significance": "Universal symbol of purity and wild nature's wisdom"
+      }
+    },
+
+    "centaur": {
+      "speciesId": "centaur",
+      "speciesName": "Centaur",
+      "commonName": "Centaur",
+      "civilizationType": "philosophical_nomads",
+      "description": "CENTAURS ARE ENGINEERED PHILOSOPHERS. Their dual nature - human intellect merged with equine physiology - was deliberately designed by an ancient civilization to create the perfect synthesis of thought and motion.\n\nWhere humans think while stationary and horses run without thinking, centaurs achieve both simultaneously. Their cognitive architecture supports deep philosophical reasoning WHILE in motion, allowing them to contemplate the cosmos while racing beneath it.\n\nTheir mastery of astronomy stems from genetic enhancement for spatial processing and pattern recognition. A centaur's brain contains specialized neural clusters for calculating orbital mechanics intuitively. Many centaurs can predict planetary positions centuries hence through pure mental calculation.\n\nChiron, the wise centaur who taught heroes, represents their civilization's peak - a being of such refined intellect that gods sought his counsel. Modern centaurs maintain philosophical traditions dating back millennia, their oral histories preserved with perfect accuracy through enhanced memory structures.\n\nTheir semi-nomadic lifestyle is deliberate: physical movement aids cognitive processing in centaur neurology. A centaur thinking while stationary is like a human trying to think while holding their breath - possible, but unnatural.",
+      "bodyPlanId": "centaur_hybrid_enhanced",
+      "technology_level": "bio_engineered_civilization",
+
+      "innateTraits": [
+        "dual_consciousness_synthesis",
+        "kinetic_cognition",
+        "spatial_mathematics_intuition",
+        "enhanced_memory_palace",
+        "astronomical_calculation"
+      ],
+
+      "compatibleSpecies": [],
+      "mutationRate": 0.01,
+
+      "averageHeight": 210,
+      "averageWeight": 600,
+      "sizeCategory": "large",
+
+      "lifespan": 250,
+      "lifespanType": "long_lived",
+      "maturityAge": 25,
+      "gestationPeriod": 330,
+
+      "sapient": true,
+      "consciousnessType": "dual_merged",
+      "socialStructure": "academic_nomadic_herds",
+
+      "folklore": {
+        "sources": ["Greek mythology"],
+        "roles": ["Teachers of Heroes", "Star Gazers", "Philosophical Debaters", "Wild Sages"],
+        "sacred_texts": ["Chiron taught Achilles, Heracles, Jason", "First astronomers and herbalists", "Represent duality of civilized and wild", "Some wise, some savage"],
+        "abilities_in_myth": ["Unmatched archery", "Healing knowledge", "Astronomical wisdom", "Philosophical insight"],
+        "cultural_significance": "Embody the tension between intellect and instinct, civilization and wilderness"
+      }
+    },
+
+    "naga": {
+      "speciesId": "naga",
+      "speciesName": "Naga",
+      "commonName": "Naga",
+      "civilizationType": "ancient_kingdoms",
+      "description": "THE NAGA ARE HUMANITY'S FORGOTTEN COUSINS. They diverged from the human lineage millions of years ago, taking the serpentine path while our ancestors chose bipedalism. Their civilizations are older than ours by orders of magnitude.\n\nTheir shapeshifting is controlled cellular rearrangement - they possess programmable morphology at the genetic level, allowing conscious restructuring of their bodies. The hooded cobra form, the humanoid shape, the pure serpent - all are configurations of the same underlying biological framework.\n\nNaga kingdoms exist in two realms: the Underwater Cities in deep ocean trenches where they've built civilizations in the abyssal dark, and the Desert Sanctuaries in hidden oases where their cities are camouflaged by holographic sand. These two branches of naga civilization have been separated for so long they're almost different species, reuniting only for rare diplomatic exchanges.\n\nTheir role as temple guardians and treasure keepers in human mythology reflects reality: nagas remember human civilizations rising and falling. Many naga serve as archivists, maintaining libraries of dead human cultures. Some protect these archives; others sell access.\n\nVenom is weaponized biochemistry - naga scientists have engineered thousands of venom variants with effects ranging from paralysis to euphoria to memory erasure. Their venom glands are chemical factories of terrifying sophistication.",
+      "bodyPlanId": "naga_programmable_morph",
+      "technology_level": "bio_chemistry_masters",
+
+      "innateTraits": [
+        "controlled_morphology",
+        "heat_vision_organs",
+        "chemoreception_advanced",
+        "venom_engineering",
+        "underwater_breathing"
+      ],
+
+      "compatibleSpecies": [],
+      "mutationRate": 0.008,
+
+      "averageHeight": 180,
+      "averageWeight": 150,
+      "sizeCategory": "large",
+
+      "lifespan": 500,
+      "lifespanType": "long_lived",
+      "maturityAge": 50,
+      "gestationPeriod": 180,
+
+      "sapient": true,
+      "consciousnessType": "cold_blooded_logic",
+      "socialStructure": "split_realm_kingdoms",
+
+      "folklore": {
+        "sources": ["Hindu/Buddhist mythology", "Southeast Asian folklore"],
+        "roles": ["Water Guardians", "Treasure Keepers", "Shape-shifters", "Temple Protectors"],
+        "sacred_texts": ["Guard the underworld and sacred waters", "Can bring rain or drought", "Kings of the serpent realm", "Both benevolent and wrathful"],
+        "abilities_in_myth": ["Shape-changing", "Controlling weather", "Guarding treasures", "Granting boons"],
+        "cultural_significance": "Central to Hindu-Buddhist cosmology as powerful spirits of water and earth"
+      }
+    },
+
+    "sphinx": {
+      "speciesId": "sphinx",
+      "speciesName": "Sphinx",
+      "commonName": "Sphinx",
+      "description": "SPHINXES ARE LIVING THRESHOLD FUNCTIONS. Each one is an AI-equivalent consciousness evolved to detect worthiness through logical puzzles. They are not merely guardians but reality's quality control - they exist at the boundaries between states and test who may cross.\n\nThe Great Sphinx of Giza is a TERMINAL, not just a statue. The living sphinx that inhabits it has served for four millennia as gateway guardian to the knowledge buried beneath. Every sphinx is assigned to a threshold - physical, conceptual, or temporal - and maintains their post across ages.\n\nTheir riddles are not arbitrary but diagnostic tests. Each riddle probes cognitive architecture, revealing how the subject thinks. The Greek Sphinx's famous riddle ('What walks on four legs, then two, then three?') tests pattern recognition, abstract thinking, and self-awareness simultaneously.\n\nSphinxes are extremely long-lived because they are MEANT to be permanent installations. Some guard places; others guard IDEAS. One sphinx guards the boundary between waking and dreaming, appearing in nightmares to test lucidity. Another guards the concept of death itself, riddling those who would seek immortality.\n\nTheir leonine bodies and wings are optimized for intimidation - psychological warfare through appearance. Most of a sphinx's actual power is cognitive: they can detect lies through micro-analysis of vocal patterns, predict behavior through psychological profiling, and enforce their judgments through what mortals call 'curses' but are actually programmed compulsions implanted through neurolinguistic techniques.",
+      "bodyPlanId": "sphinx_threshold_form",
+      "technology_level": "cognitive_architecture_specialists",
+
+      "innateTraits": [
+        "riddle_consciousness",
+        "lie_detection_absolute",
+        "pattern_recognition_supreme",
+        "neurolinguistic_programming",
+        "threshold_binding"
+      ],
+
+      "compatibleSpecies": [],
+      "mutationRate": 0.0,
+
+      "averageHeight": 200,
+      "averageWeight": 400,
+      "sizeCategory": "large",
+
+      "lifespan": "mission_duration",
+      "lifespanType": "ageless",
+      "maturityAge": 100,
+      "gestationPeriod": 200,
+
+      "sapient": true,
+      "consciousnessType": "logical_absolute",
+      "socialStructure": "solitary_threshold_guardians",
+
+      "folklore": {
+        "sources": ["Egyptian (benevolent guardian)", "Greek (riddling destroyer)"],
+        "roles": ["Threshold Guardians", "Riddle Posers", "Wisdom Keepers", "Judges of Worth"],
+        "sacred_texts": ["Great Sphinx guards the pyramids", "Greek sphinx devours those who fail her riddle", "Guardians of secret knowledge"],
+        "abilities_in_myth": ["Posing impossible riddles", "Devouring the unworthy", "Flight", "Prophecy"],
+        "cultural_significance": "Represent the test of wisdom required to access sacred knowledge"
+      }
+    },
+
+    "djinn": {
+      "speciesId": "djinn",
+      "speciesName": "Djinn",
+      "commonName": "Djinn",
+      "civilizationType": "elemental_civilization",
+      "description": "THE DJINN ARE PLASMA-BASED LIFE. Created from 'smokeless fire' according to the Quran - this is LITERAL. They are beings of ionized gas, coherent plasma given consciousness through electromagnetic self-organization.\n\nDjinn civilization exists parallel to humanity's, built in the boundaries between matter states. Their cities exist in the thermocline between temperatures, their architecture made of stable plasma configurations held together by magnetic fields. To human eyes they are invisible - we cannot perceive the electromagnetic spectrum where they primarily exist.\n\nTheir 'shapeshifting' is changing the configuration of their plasma body. Their 'invisibility' is shifting their emission spectrum outside human visual range. Their 'flight' is electromagnetic levitation. What mortals call magic is their direct manipulation of electromagnetic fields.\n\nThe enslaved djinn in lamps and bottles (Western 'genies') are war prisoners, criminals, or captured explorers - bound by electromagnetic cages into physical containers. Free djinn consider this practice slavery and abhorrent. Most djinn-human interaction in history has been between equals: trading knowledge, falling in love, forming alliances.\n\nDjinn reproduce through plasma fission, their consciousness dividing and reforming into two new beings. They can hybridize with humans because genetic information can be transferred electromagnetically - half-djinn inherit the ability to partially shift into plasma state.",
+      "bodyPlanId": "djinn_plasma_variable",
+      "technology_level": "electromagnetic_civilization",
+
+      "innateTraits": [
+        "plasma_body",
+        "electromagnetic_manipulation",
+        "spectrum_shifting",
+        "elemental_affinity_fire",
+        "intangibility_controlled"
+      ],
+
+      "compatibleSpecies": ["human"],
+      "mutationRate": 0.01,
+
+      "averageHeight": 200,
+      "averageWeight": 80,
+      "sizeCategory": "large",
+
+      "lifespan": 1000,
+      "lifespanType": "long_lived",
+      "maturityAge": 100,
+      "gestationPeriod": 365,
+
+      "sapient": true,
+      "consciousnessType": "electromagnetic_self_organized",
+      "socialStructure": "parallel_elemental_kingdoms",
+
+      "folklore": {
+        "sources": ["Islamic/Arabic tradition", "Persian mythology"],
+        "roles": ["Parallel People", "Elemental Masters", "Shape-shifters", "Free-willed Beings"],
+        "sacred_texts": ["Created from smokeless fire", "Have free will like humans", "Can be righteous or wicked", "Live in parallel dimension", "Can marry humans"],
+        "abilities_in_myth": ["Invisibility", "Shape-changing", "Elemental control", "Flight", "Vast strength"],
+        "cultural_significance": "Islamic doctrine: a parallel creation with full agency and moral responsibility, not servants but equals"
+      }
+    }
+  }
+}
