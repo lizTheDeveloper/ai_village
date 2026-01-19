@@ -14,6 +14,7 @@ import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/cor
 // TODO: Re-export these from core or import directly from source files
 // import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
+import type { IdentityComponent, PositionComponent, AgentComponent } from '@ai-village/core';
 import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
 
 /**
@@ -2214,7 +2215,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const identity = entity.getComponent<IdentityComponent>('identity');
+    const identity = entity.getComponent('identity') as IdentityComponent | undefined;
     const agentName = identity?.name || 'Unknown';
 
     this.agentDebugManager.startLogging(agentId, agentName);
@@ -2280,7 +2281,7 @@ export class LiveEntityAPI {
     // Get agent names for each tracked ID
     const agentsWithNames = trackedAgents.map(agentId => {
       const entity = this.world.getEntity(agentId);
-      const identity = entity?.getComponent<IdentityComponent>('identity');
+      const identity = entity?.getComponent('identity') as IdentityComponent | undefined;
       return {
         id: agentId,
         name: identity?.name || 'Unknown',
@@ -2424,14 +2425,14 @@ export class LiveEntityAPI {
 
     const normalizedSearch = name.toLowerCase();
     const matches = agents.filter((entity) => {
-      const identity = entity.getComponent<IdentityComponent>('identity');
+      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
       return identity?.name?.toLowerCase().includes(normalizedSearch);
     });
 
     const results = matches.map((entity) => {
-      const identity = entity.getComponent<IdentityComponent>('identity');
-      const position = entity.getComponent<PositionComponent>('position');
-      const agent = entity.getComponent<AgentComponent>('agent');
+      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+      const position = entity.getComponent('position') as PositionComponent | undefined;
+      const agent = entity.getComponent('agent') as AgentComponent | undefined;
 
       return {
         id: entity.id,

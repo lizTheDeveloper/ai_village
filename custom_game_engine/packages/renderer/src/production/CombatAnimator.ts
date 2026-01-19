@@ -393,11 +393,26 @@ export class CombatAnimator {
       const actors: CombatReplayFrame['actors'] = [];
 
       for (const [actorId, state] of actorStates.entries()) {
+        // Calculate direction based on participant position in combat
+        // For typical 2-participant combat: participant 0 faces east (right), participant 1 faces west (left)
+        // For multi-participant: use round-robin pattern (east, west, south, north)
+        const participantIndex = recording.participants.findIndex((p) => p.id === actorId);
+        let direction: Direction = 'south';
+
+        if (recording.participants.length === 2) {
+          // Classic duel: face each other (east vs west)
+          direction = participantIndex === 0 ? 'east' : 'west';
+        } else if (participantIndex >= 0) {
+          // Multi-participant: round-robin through cardinal directions
+          const directions: Direction[] = ['east', 'west', 'south', 'north'];
+          direction = directions[participantIndex % directions.length] ?? 'south';
+        }
+
         actors.push({
           actorId,
           animationHash: state.animationHash,
           frameIndex: state.frameIndex,
-          direction: 'south', // TODO: Calculate from positions
+          direction,
         });
 
         // Advance animation state

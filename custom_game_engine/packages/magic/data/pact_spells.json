@@ -1,0 +1,186 @@
+[
+  {
+    "id": "pact_summon_minor",
+    "name": "Call Lesser Entity",
+    "paradigmId": "pact",
+    "technique": "create",
+    "form": "spirit",
+    "source": "void",
+    "effectId": "heal_effect",
+    "description": "Reach across dimensional boundaries and summon something small. Imps are traditional. Sprites if you're optimistic. You offer terms\u2014usually service for service, equivalent exchange. The entity appears, hears your proposal, accepts or vanishes. Negotiations at the cosmic scale: surprisingly bureaucratic.",
+    "school": "summoning",
+    "icon": "\ud83d\udc79",
+    "manaCost": 40,
+    "castTime": 120,
+    "range": 5,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "pact",
+      "summoning",
+      "negotiation"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Entity summoning - pulling beings across planes draws scrutiny",
+      "forbiddenCategories": [
+        "planar_travel"
+      ]
+    }
+  },
+  {
+    "id": "pact_seal_contract",
+    "name": "Seal the Bargain",
+    "paradigmId": "pact",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "void",
+    "effectId": "heal_effect",
+    "description": "Formalize a pact with metaphysical contract. Both parties agree to terms; you invoke this spell; reality enforces compliance. Break the contract and cosmic consequences follow\u2014automatic, impartial, often creative. This is magic as legal system: binding, bilateral, and absolutely serious.",
+    "school": "binding",
+    "icon": "\ud83d\udcdc",
+    "manaCost": 30,
+    "castTime": 60,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "pact",
+      "contract",
+      "binding"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Contract sealing - formalizing otherworldly agreements"
+    }
+  },
+  {
+    "id": "pact_invoke_patron",
+    "name": "Call Upon Patron",
+    "paradigmId": "pact",
+    "technique": "create",
+    "form": "spirit",
+    "source": "void",
+    "effectId": "lightning_strike_effect",
+    "description": "Ask your patron for direct intervention. This isn't prayer\u2014it's contractual obligation. You've paid (or are paying) for services; now you invoke them. Powerful entities respond according to agreement terms. Usually helpful. Occasionally pedantic about exact wording. Always watching the balance.",
+    "school": "invocation",
+    "icon": "\ud83d\udcde",
+    "manaCost": 60,
+    "castTime": 40,
+    "range": 0,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "tags": [
+      "pact",
+      "patron",
+      "invocation"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Patron invocation - calling upon powerful entity for direct intervention"
+    }
+  },
+  {
+    "id": "pact_borrow_power",
+    "name": "Borrowed Might",
+    "paradigmId": "pact",
+    "technique": "enhance",
+    "form": "body",
+    "source": "void",
+    "effectId": "heal_effect",
+    "description": "Channel your patron's power temporarily. For five minutes, you're enhanced beyond mortal limits\u2014stronger, faster, tougher. The power is lent, not given. You'll return it, possibly with interest depending on contract fine print. Reading the entire pact is always recommended. Few do.",
+    "school": "invocation",
+    "icon": "\ud83d\udcaa",
+    "manaCost": 50,
+    "castTime": 30,
+    "range": 0,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.14,
+    "tags": [
+      "pact",
+      "buff",
+      "borrowed"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Power borrowing - channeling otherworldly might temporarily"
+    }
+  },
+  {
+    "id": "pact_mark_target",
+    "name": "Mark of the Bargain",
+    "paradigmId": "pact",
+    "technique": "create",
+    "form": "spirit",
+    "source": "void",
+    "effectId": "heal_effect",
+    "description": "Place your patron's mark on a target. It's invisible to most, but your patron (and you) always know where they are. Tracking. Targeting. Sometimes protection, sometimes threat. The mark fades after half an hour unless made permanent through additional pact terms.",
+    "school": "binding",
+    "icon": "\ud83c\udfaf",
+    "manaCost": 35,
+    "castTime": 25,
+    "range": 15,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.09,
+    "tags": [
+      "pact",
+      "mark",
+      "tracking"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Mark placement - cosmic tracking visible to otherworldly eyes"
+    }
+  },
+  {
+    "id": "pact_break_deal",
+    "name": "Void the Contract",
+    "paradigmId": "pact",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "void",
+    "effectId": "heal_effect",
+    "description": "Terminate a pact early. This is dangerous\u2014breaking cosmic contracts has consequences. You'll pay penalties, lose benefits, possibly anger entities with long memories. But sometimes it's necessary. The spell severs the connection cleanly, if not kindly. Freedom has costs.",
+    "school": "binding",
+    "icon": "\ud83d\udd13",
+    "manaCost": 100,
+    "castTime": 180,
+    "range": 0,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.3,
+    "tags": [
+      "pact",
+      "break",
+      "freedom",
+      "risky"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Pact magic: Contract violation - breaking cosmic agreements sends ripples through reality"
+    }
+  }
+]

@@ -99,7 +99,7 @@ export function ensureCourtshipComponent(
   speciesId: string
 ): CourtshipComponent {
   const CT = { Courtship: 'courtship' as const };
-  let comp = entity.getComponent<CourtshipComponent>(CT.Courtship);
+  let comp = entity.getComponent(CT.Courtship) as CourtshipComponent | undefined;
   if (!comp) {
     comp = createCourtshipComponent(speciesId);
     entity.addComponent(comp);

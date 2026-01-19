@@ -260,8 +260,9 @@ export class ContextActionRegistry {
       category: 'social',
       isApplicable: (ctx) => ctx.targetType === 'agent',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'conversation:start', source: 'world', data: {
-          targetId: ctx.targetEntity
+        eventBus.emit({ type: 'conversation:started', source: 'world', data: {
+          participants: ctx.targetEntity ? [ctx.targetEntity] : [],
+          initiator: ctx.targetEntity || ''
         } });
       }
     });
@@ -399,7 +400,7 @@ export class ContextActionRegistry {
         if (firstSelected) {
           eventBus.emit({ type: 'action:assign_worker', source: 'world', data: {
             workerId: firstSelected.id,
-            resourceId: ctx.targetEntity
+            buildingId: ctx.targetEntity
           } });
         }
       }
@@ -499,7 +500,6 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'ui:building_placement:open', source: 'world', data: {
-              category: 'residential',
               position: ctx.worldPosition
             } });
           }
@@ -511,7 +511,6 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'ui:building_placement:open', source: 'world', data: {
-              category: 'production',
               position: ctx.worldPosition
             } });
           }
@@ -530,8 +529,7 @@ export class ContextActionRegistry {
       isApplicable: (ctx) => ctx.targetType === 'empty_tile',
       execute: (ctx, _world, eventBus) => {
         eventBus.emit({ type: 'action:place_waypoint', source: 'world', data: {
-          x: ctx.worldPosition.x,
-          y: ctx.worldPosition.y
+          position: ctx.worldPosition
         } });
       }
     });
@@ -546,8 +544,7 @@ export class ContextActionRegistry {
       isApplicable: () => true,
       execute: (ctx, _world, eventBus) => {
         eventBus.emit({ type: 'camera:focus', source: 'world', data: {
-          x: ctx.worldPosition.x,
-          y: ctx.worldPosition.y
+          position: ctx.worldPosition
         } });
       }
     });
@@ -561,8 +558,7 @@ export class ContextActionRegistry {
       isApplicable: () => true, // Always show - provides fallback for debugging
       execute: (ctx, _world, eventBus) => {
         eventBus.emit({ type: 'ui:panel:open', source: 'world', data: {
-          panelType: 'tile_inspector',
-          position: ctx.worldPosition
+          panelType: 'tile_inspector'
         } });
       }
     });
@@ -579,12 +575,10 @@ export class ContextActionRegistry {
       execute: (ctx, _world, eventBus) => {
         // Emit move action for each selected entity
         const selected = ctx.getSelectedEntities(_world);
-        for (const entity of selected) {
-          eventBus.emit({ type: 'action:move', source: 'world', data: {
-            entityId: entity.id,
-            target: ctx.worldPosition
-          } });
-        }
+        eventBus.emit({ type: 'action:move', source: 'world', data: {
+          target: ctx.worldPosition,
+          entities: selected.map(e => e.id)
+        } });
       }
     });
 
@@ -598,7 +592,7 @@ export class ContextActionRegistry {
       isApplicable: (ctx) => ctx.getSelectedCount() > 1,
       execute: (ctx, _world, eventBus) => {
         eventBus.emit({ type: 'action:create_group', source: 'world', data: {
-          agentIds: ctx.selectedEntities
+          entities: ctx.selectedEntities
         } });
       }
     });
@@ -611,9 +605,9 @@ export class ContextActionRegistry {
       category: 'movement',
       isApplicable: (ctx) => ctx.hasSelection() && ctx.targetType === 'empty_tile',
       execute: (ctx, _world, eventBus) => {
-        eventBus.emit({ type: 'action:scatter', source: 'world', data: {
-          agentIds: ctx.selectedEntities,
-          center: ctx.worldPosition
+        eventBus.emit({ type: 'action:move', source: 'world', data: {
+          target: ctx.worldPosition,
+          entities: ctx.selectedEntities
         } });
       }
     });
@@ -633,9 +627,8 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
-              agentIds: ctx.selectedEntities,
-              formationType: 'line',
-              position: ctx.worldPosition
+              groupId: ctx.selectedEntities[0] || '',
+              formation: 'line'
             } });
           }
         },
@@ -646,9 +639,8 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
-              agentIds: ctx.selectedEntities,
-              formationType: 'column',
-              position: ctx.worldPosition
+              groupId: ctx.selectedEntities[0] || '',
+              formation: 'column'
             } });
           }
         },
@@ -659,9 +651,8 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
-              agentIds: ctx.selectedEntities,
-              formationType: 'circle',
-              position: ctx.worldPosition
+              groupId: ctx.selectedEntities[0] || '',
+              formation: 'circle'
             } });
           }
         },
@@ -672,9 +663,8 @@ export class ContextActionRegistry {
           isApplicable: () => true,
           execute: (ctx, _world, eventBus) => {
             eventBus.emit({ type: 'action:set_formation', source: 'world', data: {
-              agentIds: ctx.selectedEntities,
-              formationType: 'spread',
-              position: ctx.worldPosition
+              groupId: ctx.selectedEntities[0] || '',
+              formation: 'spread'
             } });
           }
         }

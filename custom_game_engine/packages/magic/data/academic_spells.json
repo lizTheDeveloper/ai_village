@@ -1,0 +1,1252 @@
+[
+  {
+    "id": "academic_ignite",
+    "name": "Ignite",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "fire",
+    "source": "arcane",
+    "effectId": "ignite_effect",
+    "description": "Create a small flame. Your first real spell, and it's delightfully simple: channel mana into heat, concentrate it at a point, watch combustion happen. Every wizard remembers their first Ignite\u2014usually because they set something on fire that wasn't supposed to burn.",
+    "school": "evocation",
+    "icon": "\ud83d\udd25",
+    "manaCost": 5,
+    "castTime": 10,
+    "range": 10,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "fire",
+      "damage",
+      "basic"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Even basic spells from systematic study draw creator attention",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_firebolt",
+    "name": "Fire Bolt",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "fire",
+    "source": "arcane",
+    "effectId": "ignite_effect",
+    "description": "Project flame at a target. Ignite, but with trajectory. You're essentially throwing heat\u2014not physically hurling fire, but convincing reality that fire should exist over there instead of here. Distance introduces complications. Wind exists. Targets move. Advanced students learn to compensate.",
+    "school": "evocation",
+    "icon": "\ud83d\udd25",
+    "manaCost": 15,
+    "castTime": 20,
+    "range": 15,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.06,
+    "prerequisites": [
+      "academic_ignite"
+    ],
+    "tags": [
+      "fire",
+      "damage",
+      "ranged"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Systematic projectile magic - clear evidence of magical training",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_fireball",
+    "name": "Fireball",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "fire",
+    "source": "arcane",
+    "effectId": "fireball_effect",
+    "description": "The classic. Every wizard's favorite. Create a sphere of concentrated fire and hurl it at your enemies. It explodes on impact, because fire, when compressed enough, has opinions about being compressed. Academies teach Fireball in year three. Rebuilding what students destroy takes year four.",
+    "school": "evocation",
+    "icon": "\ud83d\udca5",
+    "manaCost": 45,
+    "castTime": 40,
+    "range": 20,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "prerequisites": [
+      "academic_firebolt"
+    ],
+    "tags": [
+      "fire",
+      "damage",
+      "aoe"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Classic academic spell with mass destruction potential - immediate intervention",
+      "forbiddenCategories": [
+        "academic_study",
+        "mass_destruction"
+      ]
+    }
+  },
+  {
+    "id": "academic_flame_wall",
+    "name": "Wall of Flames",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "fire",
+    "source": "arcane",
+    "effectId": "fireball_effect",
+    "description": "Summon a vertical sheet of fire. It hangs in the air, burning nothing but itself, sustained by continuous mana feed. Crossing it is painful but technically possible if you're fast and desperate. The wall serves less as absolute barrier and more as \"strong suggestion to go another way.\"",
+    "school": "evocation",
+    "icon": "\ud83d\udd25",
+    "manaCost": 60,
+    "castTime": 50,
+    "range": 15,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "prerequisites": [
+      "academic_fireball"
+    ],
+    "tags": [
+      "fire",
+      "control",
+      "area"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Sustained fire barrier - clear systematic magic application",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_immolation",
+    "name": "Total Immolation",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "fire",
+    "source": "arcane",
+    "effectId": "fireball_effect",
+    "description": "The theoretical maximum of fire magic: spontaneous, complete combustion of everything in a targeted area. Air ignites. Stone melts. Witnesses report seeing the sun touch ground. The Academy officially forbids teaching this spell, which is exactly why advanced students research it anyway.",
+    "school": "evocation",
+    "icon": "\u2600\ufe0f",
+    "manaCost": 120,
+    "castTime": 80,
+    "range": 25,
+    "powerLevel": 9,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.35,
+    "prerequisites": [
+      "academic_fireball",
+      "academic_flame_wall"
+    ],
+    "tags": [
+      "fire",
+      "damage",
+      "legendary",
+      "dangerous"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 9,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Maximum destructive academic magic - Supreme Creator WILL respond",
+      "forbiddenCategories": [
+        "academic_study",
+        "mass_destruction"
+      ]
+    }
+  },
+  {
+    "id": "academic_frost_touch",
+    "name": "Frost Touch",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "frost_bolt_effect",
+    "description": "Freeze what you touch. Thermodynamically questionable\u2014you're removing heat faster than radiation alone explains\u2014but it works. Students practice on water. Competent casters freeze enemies' hands. Master casters create ice sculptures. All equally valid applications of thermal manipulation.",
+    "school": "evocation",
+    "icon": "\u2744\ufe0f",
+    "manaCost": 8,
+    "castTime": 10,
+    "range": 1,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.04,
+    "tags": [
+      "ice",
+      "damage",
+      "touch"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Basic thermal manipulation from systematic study",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_frost_bolt",
+    "name": "Frost Bolt",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "frost_bolt_effect",
+    "description": "Project freezing energy at range. Ice magic, unlike fire, is subtle. No flames, no explosion\u2014just rapid thermal drain. Targets feel cold spreading through them, movement slowing as cellular water crystallizes. Less dramatic than fire. More effective at making people reconsider their choices.",
+    "school": "evocation",
+    "icon": "\u2744\ufe0f",
+    "manaCost": 20,
+    "castTime": 25,
+    "range": 15,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "prerequisites": [
+      "academic_frost_touch"
+    ],
+    "tags": [
+      "ice",
+      "damage",
+      "control"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Ranged thermal drain - trained spellcaster signature",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_ice_spear",
+    "name": "Glacial Spear",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "frost_bolt_effect",
+    "description": "Condense water vapor into a spear of solid ice and hurl it. It's both projectile and cold damage\u2014kinetic impact plus thermal drain. The spear shatters on contact, fragments embedding in target. Physics teachers use this as an example of \"elegantly efficient violence.\"",
+    "school": "evocation",
+    "icon": "\ud83d\udd37",
+    "manaCost": 35,
+    "castTime": 30,
+    "range": 20,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.11,
+    "prerequisites": [
+      "academic_frost_bolt"
+    ],
+    "tags": [
+      "ice",
+      "damage",
+      "piercing"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Physical ice projectile - clear magical engineering",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_blizzard",
+    "name": "Localized Blizzard",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "frost_bolt_effect",
+    "description": "Summon winter in a fifteen-foot radius. Wind, snow, plummeting temperature\u2014all the worst parts of a blizzard without requiring actual weather. Inside the effect, visibility drops to inches. Movement becomes treacherous. You, having cast it, know exactly where everything is. Your enemies do not.",
+    "school": "evocation",
+    "icon": "\ud83c\udf28\ufe0f",
+    "manaCost": 70,
+    "castTime": 60,
+    "range": 15,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.16,
+    "prerequisites": [
+      "academic_ice_spear"
+    ],
+    "tags": [
+      "ice",
+      "area",
+      "control",
+      "weather"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Localized weather control - sophisticated systematic magic",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_absolute_zero",
+    "name": "Approach Absolute Zero",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "frost_bolt_effect",
+    "description": "Drain thermal energy so completely that molecular motion nearly stops. Theoretically impossible\u2014you can't actually reach absolute zero\u2014but you can get close enough that the difference stops mattering. Everything in the area becomes brittle as glass. Touch it and it shatters. Beautiful. Horrifying. Very illegal in populated areas.",
+    "school": "evocation",
+    "icon": "\u2744\ufe0f",
+    "manaCost": 100,
+    "castTime": 90,
+    "range": 10,
+    "powerLevel": 8,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.28,
+    "prerequisites": [
+      "academic_blizzard"
+    ],
+    "tags": [
+      "ice",
+      "damage",
+      "legendary",
+      "physics"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 8,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Physics violation spell - approaching absolute zero warps reality itself",
+      "forbiddenCategories": [
+        "academic_study",
+        "reality_warping"
+      ]
+    }
+  },
+  {
+    "id": "academic_spark",
+    "name": "Spark",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Create a small static discharge. Useful for lighting candles, annoying colleagues, and demonstrating basic principles of electrical magic. The spell every apprentice learns while their teacher explains voltage, current, and why you shouldn't practice this in the bath.",
+    "school": "evocation",
+    "icon": "\u26a1",
+    "manaCost": 5,
+    "castTime": 5,
+    "range": 3,
+    "powerLevel": 1,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "lightning",
+      "utility",
+      "basic"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 1,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Basic electrical magic - evidence of formal training",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_shock",
+    "name": "Shocking Grasp",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Channel electricity through touch. Your hand becomes a live wire. Contact delivers a painful jolt\u2014not enough to kill (usually), but enough to make most people reconsider whatever they were doing. Particularly effective on enemies in metal armor, which becomes unhelpfully conductive.",
+    "school": "evocation",
+    "icon": "\u26a1",
+    "manaCost": 12,
+    "castTime": 10,
+    "range": 1,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.06,
+    "prerequisites": [
+      "academic_spark"
+    ],
+    "tags": [
+      "lightning",
+      "damage",
+      "touch"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Contact electrical discharge - systematic application",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_lightning_bolt",
+    "name": "Lightning Bolt",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Call down lightning. Not metaphorical lightning\u2014actual electrical discharge. You create a potential difference so extreme that reality responds with a bolt. Instantaneous. Loud. Leaves a smell of ozone and singed regrets. The spell that makes you feel like a storm god, at least for a moment.",
+    "school": "evocation",
+    "icon": "\u26a1",
+    "manaCost": 35,
+    "castTime": 30,
+    "range": 25,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "prerequisites": [
+      "academic_shock"
+    ],
+    "tags": [
+      "lightning",
+      "damage",
+      "instant"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Calling lightning - unnatural weather manipulation",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_chain_lightning",
+    "name": "Chain Lightning",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Lightning that jumps between targets. You provide the initial bolt; physics handles distribution. Current seeks the path of least resistance, which usually means \"the next closest enemy.\" Each jump weakens the charge, but three or four targets still receive attention. Extremely satisfying against groups.",
+    "school": "evocation",
+    "icon": "\u26a1",
+    "manaCost": 65,
+    "castTime": 45,
+    "range": 20,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.18,
+    "prerequisites": [
+      "academic_lightning_bolt"
+    ],
+    "tags": [
+      "lightning",
+      "damage",
+      "chain",
+      "area"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Multi-target lightning - mass destruction potential",
+      "forbiddenCategories": [
+        "academic_study",
+        "mass_destruction"
+      ]
+    }
+  },
+  {
+    "id": "academic_call_storm",
+    "name": "Call the Storm",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Summon an actual storm. Clouds gather. Wind rises. Rain falls. Lightning strikes wherever you direct it, which is as close to godhood as mortal magic gets. The storm persists for half an hour, weather permitting. Local meteorologists despise this spell. Farmers have mixed feelings.",
+    "school": "evocation",
+    "icon": "\ud83c\udf29\ufe0f",
+    "manaCost": 110,
+    "castTime": 120,
+    "range": 50,
+    "powerLevel": 8,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.25,
+    "prerequisites": [
+      "academic_chain_lightning"
+    ],
+    "tags": [
+      "lightning",
+      "weather",
+      "area",
+      "legendary"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 8,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Summoning actual storms - playing god with weather itself",
+      "forbiddenCategories": [
+        "academic_study",
+        "mass_destruction"
+      ]
+    }
+  },
+  {
+    "id": "academic_mend",
+    "name": "Mend",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Repair small breaks in inanimate objects. You're not fixing them\u2014you're convincing them to remember being whole and return to that state. Works on torn cloth, cracked pottery, snapped wood. The repair is real, permanent, and often leaves no seam. Your mother would be so proud.",
+    "school": "transmutation",
+    "icon": "\ud83d\udd27",
+    "manaCost": 8,
+    "castTime": 30,
+    "range": 1,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "transmutation",
+      "utility",
+      "repair"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Matter manipulation - evidence of formal transmutation training",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_shape_stone",
+    "name": "Shape Stone",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Mold stone like clay. The rock becomes temporarily plastic\u2014not liquid, just... compliant. You have about a minute to shape it before molecular structure reasserts itself. Sculptors use this for art. Practical wizards use it for making doors where there weren't doors before.",
+    "school": "transmutation",
+    "icon": "\ud83d\uddff",
+    "manaCost": 25,
+    "castTime": 60,
+    "range": 5,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.07,
+    "tags": [
+      "transmutation",
+      "utility",
+      "earth"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Stone shaping - advanced material manipulation",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_transmute_minor",
+    "name": "Minor Transmutation",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Change one substance into a similar substance. Wood to stone. Iron to copper. Water to wine, if you're feeling biblical. The effect is temporary\u2014an hour, maybe\u2014and you can't violate conservation of mass. But for that hour, you've convinced reality that this is, in fact, that.",
+    "school": "transmutation",
+    "icon": "\ud83d\udd04",
+    "manaCost": 40,
+    "castTime": 90,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "tags": [
+      "transmutation",
+      "utility",
+      "alchemy"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Substance transmutation - classic alchemy, highly forbidden",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_enlarge",
+    "name": "Enlargement",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Make something bigger. The target doubles in size, which means eight times the mass\u2014physics makes this complicated. Clothes stretch. Strength increases proportionally. The spell ends after ten minutes, at which point shrinking back happens suddenly and is reportedly \"deeply uncomfortable.\"",
+    "school": "transmutation",
+    "icon": "\ud83d\udccf",
+    "manaCost": 35,
+    "castTime": 40,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.09,
+    "tags": [
+      "transmutation",
+      "buff",
+      "size"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Size manipulation - defying physics through systematic magic",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_polymorph",
+    "name": "Polymorph",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Transform a creature into a different creature. This is the big one\u2014the spell that makes your teacher warn about \"playing god.\" The target's mind stays intact; their body becomes something else entirely. Sheep are traditional. Half an hour later, they're themselves again, traumatized but educated.",
+    "school": "transmutation",
+    "icon": "\ud83d\udc11",
+    "manaCost": 85,
+    "castTime": 90,
+    "range": 10,
+    "powerLevel": 7,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.22,
+    "tags": [
+      "transmutation",
+      "control",
+      "shapeshift",
+      "advanced"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 7,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Reshaping living beings - playing god with creation itself",
+      "forbiddenCategories": [
+        "academic_study",
+        "reality_warping"
+      ]
+    }
+  },
+  {
+    "id": "academic_shield",
+    "name": "Mage Shield",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "minor_ward_effect",
+    "description": "Summon a disc of force that floats near you, intercepting blows. It's not a physical shield\u2014more like hardened space. Arrows deflect. Swords skid off. The shield moves with you, anticipating danger. This is the spell that lets wizards pretend they don't need armor.",
+    "school": "abjuration",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 10,
+    "castTime": 5,
+    "range": 0,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "protection",
+      "defense",
+      "personal"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Reactive force barrier - evidence of defensive magic training",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_minor_ward",
+    "name": "Minor Ward",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "minor_ward_effect",
+    "description": "Create a light protective barrier around yourself. Think of it as magical bubble wrap: it absorbs small impacts, deflects minor hazards, makes you generally harder to hurt. Won't stop a sword, but it might turn a killing blow into merely terrible.",
+    "school": "abjuration",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 15,
+    "castTime": 20,
+    "range": 0,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "protection",
+      "defense",
+      "duration"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Sustained protective ward - systematic defensive application",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_major_shield",
+    "name": "Major Shield",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "major_shield_effect",
+    "description": "Create a powerful protective shield. This is Minor Ward's ambitious older sibling\u2014thicker barrier, longer duration, better coverage. You could walk through a battlefield with this and emerge annoyed but unharmed. Arrows bounce. Spells dissipate. Swords ring uselessly.",
+    "school": "abjuration",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 40,
+    "castTime": 50,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "prerequisites": [
+      "academic_minor_ward"
+    ],
+    "tags": [
+      "protection",
+      "defense",
+      "duration"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Enhanced warding - advanced protective techniques",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_dispel_magic",
+    "name": "Dispel Magic",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Unravel another mage's spell. You're essentially untying magical knots\u2014pulling apart the structure until it collapses. Simple spells dissolve easily. Complex ones resist. Ancient enchantments sometimes have the magical equivalent of security systems. Still, when it works, watching your enemy's magic simply stop is deeply satisfying.",
+    "school": "abjuration",
+    "icon": "\ud83d\udeab",
+    "manaCost": 30,
+    "castTime": 30,
+    "range": 15,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "protection",
+      "dispel",
+      "counter"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Counter-magic - understanding magical structure is deeply forbidden",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_counterspell",
+    "name": "Counterspell",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Interrupt a spell as it's being cast. You identify the structure mid-formation and inject chaos at exactly the right moment. The enemy spell collapses. Their mana wastes. You smile smugly. This is the spell that makes wizard duels interesting\u2014when neither side can complete their favorite techniques.",
+    "school": "abjuration",
+    "icon": "\u26d4",
+    "manaCost": 25,
+    "castTime": 1,
+    "range": 20,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "tags": [
+      "protection",
+      "counter",
+      "instant"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Spell interruption - directly countering magic requires deep systematic knowledge",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_antimagic_field",
+    "name": "Antimagic Field",
+    "paradigmId": "academic",
+    "technique": "protect",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "major_shield_effect",
+    "description": "Create a zone where magic simply doesn't work. No spells in. No spells out. Existing enchantments suppress. It's the magical equivalent of a dead zone\u2014reality enforcing mundane physics only. Inside, wizards are just people with pointy hats and expensive education. Humbling. Sometimes necessary.",
+    "school": "abjuration",
+    "icon": "\ud83d\udeab",
+    "manaCost": 95,
+    "castTime": 90,
+    "range": 10,
+    "powerLevel": 8,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.2,
+    "tags": [
+      "protection",
+      "antimagic",
+      "area",
+      "legendary"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 8,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Nullifying magic itself - supreme understanding of magical theory",
+      "forbiddenCategories": [
+        "academic_study",
+        "reality_warping"
+      ]
+    }
+  },
+  {
+    "id": "academic_ghost_sound",
+    "name": "Phantom Sound",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Create illusory sound. Voices. Footsteps. Screaming. Whatever you imagine. The sound is real\u2014air actually vibrates\u2014but the source is fictional. Useful for distraction, misdirection, and convincing people there's someone else in the room. The first spell of every competent liar.",
+    "school": "illusion",
+    "icon": "\ud83d\udd0a",
+    "manaCost": 6,
+    "castTime": 10,
+    "range": 15,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "illusion",
+      "sound",
+      "utility"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Sound fabrication - basic deception magic training",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_minor_illusion",
+    "name": "Minor Illusion",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Create a simple visual illusion. A chair that isn't there. A door where there's wall. The image is static\u2014no movement\u2014and breaks if touched. But for pure \"make people see something false,\" this is your entry point. Apprentices practice by hiding their spell components from teachers.",
+    "school": "illusion",
+    "icon": "\ud83d\udc41\ufe0f",
+    "manaCost": 10,
+    "castTime": 15,
+    "range": 10,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.04,
+    "tags": [
+      "illusion",
+      "visual",
+      "static"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 2,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Visual illusion - academic light manipulation",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_invisibility",
+    "name": "Invisibility",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Bend light around the target until they can't be seen. Not actual transparency\u2014the matter's still there\u2014but perfect optical camouflage. Ten minutes of being unseen. Ends if you attack someone, which is fair. Invisible assassins would be unreasonably overpowered, even by wizard standards.",
+    "school": "illusion",
+    "icon": "\ud83d\udc7b",
+    "manaCost": 35,
+    "castTime": 40,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.09,
+    "prerequisites": [
+      "academic_minor_illusion"
+    ],
+    "tags": [
+      "illusion",
+      "stealth",
+      "buff"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Light bending - advanced optical manipulation",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_major_illusion",
+    "name": "Major Illusion",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Create a complex, moving illusion. People, creatures, landscapes\u2014anything visual and auditory. The illusion responds to your mental direction, moves naturally, seems real. Touch still breaks it, but from a distance, it's indistinguishable from reality. The spell that makes reality optional.",
+    "school": "illusion",
+    "icon": "\ud83c\udfad",
+    "manaCost": 45,
+    "castTime": 60,
+    "range": 20,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "prerequisites": [
+      "academic_minor_illusion"
+    ],
+    "tags": [
+      "illusion",
+      "complex",
+      "interactive"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Complex illusion - sophisticated sensory manipulation",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_phantasmal_killer",
+    "name": "Phantasmal Assassin",
+    "paradigmId": "academic",
+    "technique": "create",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "lightning_strike_effect",
+    "description": "Create an illusion so terrifying that the target's mind makes it real. Only they can see it\u2014their personal nightmare given form. If they believe it can kill them, their body might agree. Psychosomatic damage. Ethically questionable. Horrifyingly effective. The Academy debates banning this spell annually.",
+    "school": "illusion",
+    "icon": "\ud83d\udc80",
+    "manaCost": 65,
+    "castTime": 50,
+    "range": 15,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.18,
+    "prerequisites": [
+      "academic_major_illusion"
+    ],
+    "tags": [
+      "illusion",
+      "psychic",
+      "damage",
+      "fear"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Mind-killing illusion - weaponized psychology, ethically forbidden",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_detect_magic",
+    "name": "Detect Magic",
+    "paradigmId": "academic",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "detect_magic_effect",
+    "description": "Sense magical auras in the area. Active spells shimmer. Enchanted objects glow faintly. You see the invisible infrastructure of magic that pervades everything. It's like developing new senses\u2014suddenly the world is full of light only you can see. First-time casters often report feeling \"less alone.\"",
+    "school": "divination",
+    "icon": "\ud83d\udc41\ufe0f",
+    "manaCost": 10,
+    "castTime": 30,
+    "range": 30,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "detection",
+      "utility"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Perceiving magic itself - studying the structure of reality is deeply forbidden",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_identify",
+    "name": "Identify Enchantment",
+    "paradigmId": "academic",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "detect_magic_effect",
+    "description": "Understand what a magical item does. You examine the enchantment's structure, trace its patterns, read its purpose like text. Simple items reveal themselves immediately. Complex artifacts require interpretation. Ancient relics sometimes respond poorly to unauthorized analysis. Still, usually worth the risk.",
+    "school": "divination",
+    "icon": "\ud83d\udd0d",
+    "manaCost": 25,
+    "castTime": 60,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.07,
+    "tags": [
+      "detection",
+      "utility",
+      "analysis"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Analyzing enchantments - understanding magical theory is deeply forbidden",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_clairvoyance",
+    "name": "Clairvoyance",
+    "paradigmId": "academic",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "arcane",
+    "effectId": "detect_magic_effect",
+    "description": "See a distant location as if you were there. You create an invisible sensor\u2014a point of perception\u2014and route its input to your mind. See through walls. Scout ahead. Spy on conversations. Deeply useful. Thoroughly invasive. Illegal in most civilized nations without a warrant.",
+    "school": "divination",
+    "icon": "\ud83d\udd2e",
+    "manaCost": 50,
+    "castTime": 90,
+    "range": 1000,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.11,
+    "tags": [
+      "detection",
+      "scrying",
+      "remote"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Remote viewing - invasive perception magic, highly detectable",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_heal",
+    "name": "Heal Wounds",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "heal_effect",
+    "description": "Accelerate natural healing in a target. You're not divine\u2014you can't perform miracles\u2014but you can convince cells to repair faster. Wounds close. Bones knit. The body does what it normally does, just much quicker. Academic healing lacks divine grace but makes up for it with reliable, reproducible results.",
+    "school": "restoration",
+    "icon": "\ud83d\udc9a",
+    "manaCost": 30,
+    "castTime": 60,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "healing",
+      "support"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Systematic healing - learned medicine-magic",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  },
+  {
+    "id": "academic_regeneration",
+    "name": "Regeneration",
+    "paradigmId": "academic",
+    "technique": "enhance",
+    "form": "body",
+    "source": "arcane",
+    "effectId": "regeneration_effect",
+    "description": "Grant gradual health regeneration over time. For the next ten minutes, the target heals continuously\u2014slowly, but steadily. Minor wounds close completely. Major ones improve significantly. It's maintenance healing: keeping people alive through prolonged danger rather than dramatic recovery.",
+    "school": "restoration",
+    "icon": "\ud83d\udc97",
+    "manaCost": 20,
+    "castTime": 40,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "healing",
+      "support",
+      "duration"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "ACADEMIC MAGIC: Sustained healing - systematic biological magic",
+      "forbiddenCategories": [
+        "academic_study"
+      ]
+    }
+  }
+]

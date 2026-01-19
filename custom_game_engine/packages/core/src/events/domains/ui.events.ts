@@ -108,6 +108,12 @@ export interface UIEvents {
     entityId?: EntityId;
     position?: { x: number; y: number };
   };
+
+  /** Stance changed for entities */
+  'ui:stance:changed': {
+    entityIds: EntityId[];
+    stance: string;
+  };
 }
 
 export type UIEventType = keyof UIEvents;

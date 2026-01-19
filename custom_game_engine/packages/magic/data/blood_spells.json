@@ -1,0 +1,306 @@
+[
+  {
+    "id": "blood_sacrifice_minor",
+    "name": "Lesser Blood Offering",
+    "paradigmId": "blood",
+    "technique": "create",
+    "form": "body",
+    "source": "blood",
+    "effectId": "heal_effect",
+    "description": "Pay in blood for power. You open a small cut\u2014nothing dramatic, just enough to matter\u2014and the magic responds. Blood has memory. Blood has weight. The universe accepts it as currency. This is the fundamental exchange: your vitality for immediate effect. The cut heals, but the cost remains.",
+    "school": "hemomancy",
+    "icon": "\ud83e\ude78",
+    "manaCost": 0,
+    "castTime": 20,
+    "range": 0,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "blood",
+      "sacrifice",
+      "cost"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Life force sacrifice - draws attention through vitality manipulation"
+    }
+  },
+  {
+    "id": "blood_bolt",
+    "name": "Crimson Bolt",
+    "paradigmId": "blood",
+    "technique": "create",
+    "form": "body",
+    "source": "blood",
+    "effectId": "ignite_effect",
+    "description": "Shape your blood into a projectile. It leaves your body as liquid and hardens mid-flight into something like glass\u2014sharp, fast, deeply personal. The bolt carries a fragment of your life force. Hits harder than it should. Leaves enemies unsettled in ways normal weapons don't.",
+    "school": "hemomancy",
+    "icon": "\ud83e\ude78",
+    "manaCost": 0,
+    "castTime": 15,
+    "range": 15,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "blood",
+      "damage",
+      "projectile"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Weaponized blood - life force converted to damage"
+    }
+  },
+  {
+    "id": "blood_bond",
+    "name": "Sanguine Link",
+    "paradigmId": "blood",
+    "technique": "enhance",
+    "form": "body",
+    "source": "blood",
+    "effectId": "heal_effect",
+    "description": "Mingle your blood with another's. For the next hour, you share wounds\u2014damage to either distributes between both. Useful for protecting the fragile. Terrifying when you realize your enemy can hurt you by hurting themselves. Blood bonds are intimate magic, whether you want them to be or not.",
+    "school": "binding",
+    "icon": "\ud83d\udd17",
+    "manaCost": 0,
+    "castTime": 60,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "tags": [
+      "blood",
+      "bond",
+      "sharing"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Life-binding - connecting vital energies is noticeable"
+    }
+  },
+  {
+    "id": "blood_puppet",
+    "name": "Crimson Strings",
+    "paradigmId": "blood",
+    "technique": "create",
+    "form": "body",
+    "source": "blood",
+    "effectId": "lightning_strike_effect",
+    "description": "Control someone through their blood. You don't possess their mind\u2014that's different magic\u2014but you can pull their limbs, force movement, make the body betray its owner. Deeply unpleasant for everyone involved. The kind of spell that gets you banned from civilized society. Works beautifully.",
+    "school": "hemomancy",
+    "icon": "\ud83c\udfad",
+    "manaCost": 0,
+    "castTime": 40,
+    "range": 10,
+    "powerLevel": 6,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.25,
+    "tags": [
+      "blood",
+      "control",
+      "forbidden"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Blood puppet - controlling beings through their blood violates bodily autonomy"
+    }
+  },
+  {
+    "id": "blood_heal_transfer",
+    "name": "Vitality Transfer",
+    "paradigmId": "blood",
+    "technique": "enhance",
+    "form": "body",
+    "source": "blood",
+    "effectId": "heal_effect",
+    "description": "Take someone's wounds into yourself. Their injuries close; yours open. The damage doesn't vanish\u2014conservation of suffering\u2014but it redistributes. Profoundly useful. Possibly heroic. Definitely hurts. Blood mages report this is either the kindest or cruelest spell they know, depending on context.",
+    "school": "hemomancy",
+    "icon": "\ud83d\udc89",
+    "manaCost": 0,
+    "castTime": 30,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "tags": [
+      "blood",
+      "healing",
+      "transfer"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Wound transfer - heroic self-sacrifice, somewhat less suspicious"
+    }
+  },
+  {
+    "id": "blood_boil",
+    "name": "Boiling Blood",
+    "paradigmId": "blood",
+    "technique": "create",
+    "form": "body",
+    "source": "blood",
+    "effectId": "fireball_effect",
+    "description": "Raise the temperature of someone's blood. Not metaphorically\u2014literally heating hemoglobin until it bubbles. The target feels fever spike into agony. Most lose consciousness within seconds. Mortality rate is high. This is the spell that makes people understand why blood magic is feared.",
+    "school": "hemomancy",
+    "icon": "\ud83c\udf21\ufe0f",
+    "manaCost": 0,
+    "castTime": 35,
+    "range": 12,
+    "powerLevel": 7,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.3,
+    "tags": [
+      "blood",
+      "damage",
+      "lethal",
+      "feared"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 7,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Blood boiling - horrific attack spell, Supreme Creator disapproves strongly",
+      "forbiddenCategories": [
+        "mass_destruction"
+      ]
+    }
+  },
+  {
+    "id": "blood_scrying",
+    "name": "Trace the Bloodline",
+    "paradigmId": "blood",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "blood",
+    "effectId": "detect_magic_effect",
+    "description": "Find someone through blood connection. Given a sample\u2014a drop, a smear\u2014you trace back to its source. Blood knows where it came from. You follow that knowledge across any distance. Privacy laws hate this spell. Detectives love it. Everyone agrees it's uncomfortably effective.",
+    "school": "divination",
+    "icon": "\ud83d\udd0d",
+    "manaCost": 0,
+    "castTime": 90,
+    "range": 1000,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.14,
+    "tags": [
+      "blood",
+      "tracking",
+      "divination"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Bloodline tracking - invasive but not forbidden"
+    }
+  },
+  {
+    "id": "blood_strengthen",
+    "name": "Surge of Vitality",
+    "paradigmId": "blood",
+    "technique": "enhance",
+    "form": "body",
+    "source": "blood",
+    "effectId": "heal_effect",
+    "description": "Burn your life force for temporary strength. Muscles swell. Reflexes sharpen. You become briefly superhuman by converting longevity into immediate capability. The effect fades after five minutes. You'll feel it later\u2014exhaustion, accelerated aging, the bill coming due. Worth it in emergencies.",
+    "school": "vitality",
+    "icon": "\ud83d\udcaa",
+    "manaCost": 0,
+    "castTime": 20,
+    "range": 0,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "blood",
+      "buff",
+      "strength"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Vitality surge - burning life for power"
+    }
+  },
+  {
+    "id": "blood_regenerate",
+    "name": "Forced Regeneration",
+    "paradigmId": "blood",
+    "technique": "enhance",
+    "form": "body",
+    "source": "blood",
+    "effectId": "regeneration_effect",
+    "description": "Accelerate your healing to unnatural rates. Wounds close in seconds. Broken bones set themselves. You're burning through vitality reserves normally saved for decades of life. Ten minutes of regeneration might cost weeks off your lifespan. The math is unfavorable but the alternative is death.",
+    "school": "vitality",
+    "icon": "\ud83e\ude79",
+    "manaCost": 0,
+    "castTime": 40,
+    "range": 0,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.18,
+    "tags": [
+      "blood",
+      "healing",
+      "regeneration"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Blood magic: Accelerated regeneration - burning years for minutes"
+    }
+  },
+  {
+    "id": "blood_drain",
+    "name": "Vampiric Touch",
+    "paradigmId": "blood",
+    "technique": "create",
+    "form": "body",
+    "source": "blood",
+    "effectId": "heal_effect",
+    "description": "Steal life force through contact. Your touch draws vitality from the target into yourself. Their wounds become your healing. Their exhaustion becomes your energy. Technically not vampirism\u2014you're not drinking blood\u2014but the emotional experience is similar. Most targets strongly object.",
+    "school": "vitality",
+    "icon": "\ud83e\udddb",
+    "manaCost": 0,
+    "castTime": 25,
+    "range": 1,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.16,
+    "tags": [
+      "blood",
+      "drain",
+      "vampire"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Vampiric touch - stealing life force from others crosses ethical lines"
+    }
+  }
+]

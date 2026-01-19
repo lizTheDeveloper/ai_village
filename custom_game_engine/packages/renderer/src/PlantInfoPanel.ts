@@ -275,6 +275,144 @@ export class PlantInfoPanel implements IWindowPanel {
 
     currentY += 4;
 
+    // Species Properties - show rich info from registry
+    try {
+      const species = getPlantSpecies(plant.speciesId);
+
+      // Basic info
+      drawText('--- Species Info ---', '#9370DB');
+      drawText(`Category: ${species.category}`, '#CCCCCC');
+      drawText(`Rarity: ${species.rarity}`, '#CCCCCC');
+      if (species.biomes && species.biomes.length > 0) {
+        const biomesStr = species.biomes.slice(0, 3).join(', ');
+        drawText(`Biomes: ${biomesStr}`, '#90EE90');
+      }
+
+      currentY += 4;
+
+      // Medicinal properties
+      if (species.properties?.medicinal) {
+        const med = species.properties.medicinal;
+        drawText('--- Medicinal ---', '#00CED1');
+
+        if (med.treats && med.treats.length > 0) {
+          const treatsStr = med.treats.slice(0, 3).join(', ');
+          drawText(`Treats: ${treatsStr}`, '#90EE90');
+        }
+
+        if (med.effectiveness !== undefined) {
+          const effectPercent = Math.round(med.effectiveness * 100);
+          drawText(`Effectiveness: ${effectPercent}%`, '#CCCCCC');
+        }
+
+        if (med.preparation && med.preparation.length > 0) {
+          const prepStr = med.preparation.slice(0, 2).join(', ');
+          drawText(`Prep: ${prepStr}`, '#FFD700');
+        }
+
+        if (med.synergiesWith && med.synergiesWith.length > 0) {
+          const synStr = med.synergiesWith.slice(0, 2).join(', ');
+          drawText(`Synergies: ${synStr}`, '#7FFFD4');
+        }
+
+        if (med.toxicIfOverused) {
+          drawText('⚠️ Toxic if overused', '#FF6347');
+        }
+
+        currentY += 4;
+      }
+
+      // Magical properties
+      if (species.properties?.magical) {
+        const mag = species.properties.magical;
+        drawText('--- Magical ---', '#9370DB');
+        drawText(`Type: ${mag.magicType}`, '#DA70D6');
+
+        const potencyPercent = Math.round(mag.potency * 100);
+        drawText(`Potency: ${potencyPercent}%`, '#CCCCCC');
+
+        if (mag.effects && mag.effects.length > 0) {
+          const effect = mag.effects[0];
+          const effectText = effect.description || effect.type;
+          const truncated = effectText.length > 30 ? effectText.slice(0, 27) + '...' : effectText;
+          drawText(`Effect: ${truncated}`, '#FFD700');
+        }
+
+        if (mag.harvestConditions) {
+          const conditions: string[] = [];
+          if (mag.harvestConditions.moonPhase) conditions.push(mag.harvestConditions.moonPhase);
+          if (mag.harvestConditions.timeOfDay) conditions.push(mag.harvestConditions.timeOfDay);
+          if (conditions.length > 0) {
+            drawText(`Harvest: ${conditions.join(', ')}`, '#87CEEB');
+          }
+        }
+
+        currentY += 4;
+      }
+
+      // Edible & taste properties
+      if (species.properties?.edible || species.properties?.nutritionValue) {
+        drawText('--- Edible ---', '#FFD700');
+
+        if (species.properties.nutritionValue !== undefined) {
+          drawText(`Nutrition: ${species.properties.nutritionValue}`, '#90EE90');
+        }
+
+        if (species.properties.taste) {
+          const taste = species.properties.taste;
+          const flavors: string[] = [];
+          if (taste.sweet > 0.3) flavors.push('sweet');
+          if (taste.bitter > 0.3) flavors.push('bitter');
+          if (taste.sour > 0.3) flavors.push('sour');
+          if (taste.savory > 0.3) flavors.push('savory');
+          if (taste.spicy > 0.3) flavors.push('spicy');
+          if (taste.aromatic > 0.3) flavors.push('aromatic');
+          if (flavors.length > 0) {
+            drawText(`Taste: ${flavors.join(', ')}`, '#FFB6C1');
+          }
+        }
+
+        if (species.properties.toxic) {
+          drawText('⚠️ Toxic', '#FF0000');
+        }
+
+        currentY += 4;
+      }
+
+      // Crafting properties
+      if (species.properties?.crafting) {
+        const craft = species.properties.crafting;
+        drawText('--- Crafting ---', '#D2691E');
+
+        if (craft.dye) {
+          drawText(`Dye: ${craft.dye.color}`, '#FFD700');
+        }
+
+        if (craft.fiber) {
+          const strength = Math.round(craft.fiber.strength * 100);
+          drawText(`Fiber: ${strength}% strength`, '#8B4513');
+        }
+
+        if (craft.oil) {
+          drawText(`Oil: ${craft.oil.type}`, '#FFD700');
+        }
+
+        if (craft.scent) {
+          const scentText = craft.scent.profile;
+          const truncated = scentText.length > 30 ? scentText.slice(0, 27) + '...' : scentText;
+          drawText(`Scent: ${truncated}`, '#DDA0DD');
+        }
+
+        if (craft.poison) {
+          drawText(`Poison: ${craft.poison.type}`, '#8B008B');
+        }
+
+        currentY += 4;
+      }
+    } catch (error) {
+      // Species not found in registry - skip species properties section
+    }
+
     // Position
     const position = selectedEntity.components.get('position') as { x: number; y: number } | undefined;
     if (position) {

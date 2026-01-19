@@ -489,7 +489,7 @@ export class ExecutorPromptBuilder {
     skills: SkillsComponent | undefined
   ): string {
     // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as unknown as WorldWithBuildingRegistry;
+    const worldWithRegistry = world as WorldWithBuildingRegistry;
     if (!worldWithRegistry.buildingRegistry) {
       return '';
     }

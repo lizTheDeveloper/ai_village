@@ -2433,7 +2433,6 @@ export class DevPanel implements IWindowPanel {
             material: parsed.materialId as WallMaterial,
             condition: 100,
             insulation: this.getWallInsulation(parsed.materialId as WallMaterial),
-            constructedAt: this.world.tick,
           };
           break;
 
@@ -2441,7 +2440,6 @@ export class DevPanel implements IWindowPanel {
           tile.door = {
             material: parsed.materialId as DoorMaterial,
             state: 'closed',
-            constructedAt: this.world.tick,
           };
           break;
 
@@ -2450,7 +2448,6 @@ export class DevPanel implements IWindowPanel {
             material: parsed.materialId as WindowMaterial,
             condition: 100,
             lightsThrough: true,
-            constructedAt: this.world.tick,
           };
           break;
 

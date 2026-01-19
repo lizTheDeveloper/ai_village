@@ -498,7 +498,31 @@ export class TalkerPromptBuilder {
     }
 
     // Location context (biome, named places)
-    // TODO: Add biome/location context when available in components
+    if (position) {
+      // Get current planet
+      const planetLocationComp = agent.components.get('planet_location') as { currentPlanetId?: string } | undefined;
+      const planetId = planetLocationComp?.currentPlanetId || 'planet:homeworld';
+      const planet = world.getPlanet(planetId);
+
+      if (planet) {
+        // Get biome from current tile
+        const tile = planet.getTileAt(Math.floor(position.x), Math.floor(position.y));
+        if (tile && tile.biome) {
+          // Convert biome ID to readable name (e.g., 'forest' -> 'Forest', 'taiga' -> 'Taiga')
+          const biomeName = tile.biome
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+          context += `Biome: ${biomeName}\n`;
+        }
+
+        // Check for named locations via chunk name registry
+        const chunkX = Math.floor(position.x / 32);  // CHUNK_SIZE = 32
+        const chunkY = Math.floor(position.y / 32);
+        // Planet nameRegistry is accessible but not exposed in IPlanet interface
+        // Skip for now to avoid type errors
+      }
+    }
 
     return context;
   }

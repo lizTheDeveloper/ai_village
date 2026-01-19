@@ -3,7 +3,9 @@
     "id": "sympathy",
     "name": "Sympathy",
     "description": "Create connections between similar objects; what affects one affects the other",
-    "universeIds": ["kingkiller"],
+    "universeIds": [
+      "kingkiller"
+    ],
     "lore": "The art of creating sympathetic links between objects based on similarity. The more similar two things are, the stronger the connection. Hair and blood create the strongest links to their owners.",
     "sources": [
       {
@@ -19,35 +21,156 @@
       }
     ],
     "costs": [
-      { "type": "stamina", "canBeTerminal": false, "cumulative": true, "recoverable": true, "recoveryMethod": "rest", "visibility": "subtle" },
-      { "type": "sanity", "canBeTerminal": false, "cumulative": true, "recoverable": true, "recoveryMethod": "rest", "visibility": "subtle" }
+      {
+        "type": "stamina",
+        "canBeTerminal": false,
+        "cumulative": true,
+        "recoverable": true,
+        "recoveryMethod": "rest",
+        "visibility": "subtle"
+      },
+      {
+        "type": "sanity",
+        "canBeTerminal": false,
+        "cumulative": true,
+        "recoverable": true,
+        "recoveryMethod": "rest",
+        "visibility": "subtle"
+      }
     ],
     "channels": [
-      { "type": "will", "requirement": "required", "canBeMastered": true, "blockEffect": "prevents_casting", "description": "Mental focus (Alar)" },
-      { "type": "focus", "requirement": "required", "canBeMastered": true, "blockEffect": "prevents_casting", "description": "Concentration on the binding" },
-      { "type": "material", "requirement": "required", "canBeMastered": false, "blockEffect": "prevents_casting", "description": "Link objects needed" }
+      {
+        "type": "will",
+        "requirement": "required",
+        "canBeMastered": true,
+        "blockEffect": "prevents_casting",
+        "description": "Mental focus (Alar)"
+      },
+      {
+        "type": "focus",
+        "requirement": "required",
+        "canBeMastered": true,
+        "blockEffect": "prevents_casting",
+        "description": "Concentration on the binding"
+      },
+      {
+        "type": "material",
+        "requirement": "required",
+        "canBeMastered": false,
+        "blockEffect": "prevents_casting",
+        "description": "Link objects needed"
+      }
     ],
     "laws": [
-      { "id": "similarity", "name": "Law of Similarity", "type": "similarity", "strictness": "absolute", "canBeCircumvented": false, "description": "Link strength depends on similarity" },
-      { "id": "conservation", "name": "Conservation of Energy", "type": "conservation", "strictness": "absolute", "canBeCircumvented": false, "description": "Energy cannot be created" },
-      { "id": "contagion", "name": "Law of Contagion", "type": "contagion", "strictness": "strong", "canBeCircumvented": false, "description": "Things that touched remain connected" }
+      {
+        "id": "similarity",
+        "name": "Law of Similarity",
+        "type": "similarity",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Link strength depends on similarity"
+      },
+      {
+        "id": "conservation",
+        "name": "Conservation of Energy",
+        "type": "conservation",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Energy cannot be created"
+      },
+      {
+        "id": "contagion",
+        "name": "Law of Contagion",
+        "type": "contagion",
+        "strictness": "strong",
+        "canBeCircumvented": false,
+        "description": "Things that touched remain connected"
+      }
     ],
     "risks": [
-      { "trigger": "overuse", "consequence": "backlash", "severity": "severe", "probability": 0.3, "mitigatable": true, "mitigationSkill": "alar_mastery", "description": "Binder's chills from overextension" },
-      { "trigger": "overuse", "consequence": "burnout", "severity": "moderate", "probability": 0.2, "mitigatable": true, "description": "Mental exhaustion from maintaining multiple bindings" },
-      { "trigger": "split_alar", "consequence": "feedback_loop", "severity": "catastrophic", "probability": 0.1, "mitigatable": false, "description": "Split focus causes catastrophic feedback" }
+      {
+        "trigger": "overuse",
+        "consequence": "backlash",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true,
+        "mitigationSkill": "alar_mastery",
+        "description": "Binder's chills from overextension"
+      },
+      {
+        "trigger": "overuse",
+        "consequence": "burnout",
+        "severity": "moderate",
+        "probability": 0.2,
+        "mitigatable": true,
+        "description": "Mental exhaustion from maintaining multiple bindings"
+      },
+      {
+        "trigger": "split_alar",
+        "consequence": "feedback_loop",
+        "severity": "catastrophic",
+        "probability": 0.1,
+        "mitigatable": false,
+        "description": "Split focus causes catastrophic feedback"
+      }
     ],
     "acquisitionMethods": [
-      { "method": "study", "rarity": "uncommon", "voluntary": true, "prerequisites": ["university_access"], "grantsAccess": ["sympathy_alar"], "startingProficiency": 15, "description": "University training in sympathy" },
-      { "method": "training", "rarity": "common", "voluntary": true, "prerequisites": ["strong_alar"], "grantsAccess": ["sympathy_alar"], "startingProficiency": 10, "description": "Apprenticeship with a sympathist" }
+      {
+        "method": "study",
+        "rarity": "uncommon",
+        "voluntary": true,
+        "prerequisites": [
+          "university_access"
+        ],
+        "grantsAccess": [
+          "sympathy_alar"
+        ],
+        "startingProficiency": 15,
+        "description": "University training in sympathy"
+      },
+      {
+        "method": "training",
+        "rarity": "common",
+        "voluntary": true,
+        "prerequisites": [
+          "strong_alar"
+        ],
+        "grantsAccess": [
+          "sympathy_alar"
+        ],
+        "startingProficiency": 10,
+        "description": "Apprenticeship with a sympathist"
+      }
     ],
-    "availableTechniques": ["create", "destroy", "transform", "control"],
-    "availableForms": ["fire", "water", "earth", "air", "body", "mind"],
+    "availableTechniques": [
+      "create",
+      "destroy",
+      "transform",
+      "control"
+    ],
+    "availableForms": [
+      "fire",
+      "water",
+      "earth",
+      "air",
+      "body",
+      "mind"
+    ],
     "forbiddenCombinations": [
-      { "technique": "create", "form": "spirit", "reason": "Cannot create sympathy with souls", "consequence": "Soul damage to both parties" }
+      {
+        "technique": "create",
+        "form": "spirit",
+        "reason": "Cannot create sympathy with souls",
+        "consequence": "Soul damage to both parties"
+      }
     ],
     "resonantCombinations": [
-      { "technique": "control", "form": "fire", "bonusEffect": "Heat transfer through links", "powerMultiplier": 1.5 }
+      {
+        "technique": "control",
+        "form": "fire",
+        "bonusEffect": "Heat transfer through links",
+        "powerMultiplier": 1.5
+      }
     ],
     "powerScaling": "logarithmic",
     "powerCeiling": 100,
@@ -58,7 +181,1714 @@
     "allowsTeaching": true,
     "allowsScrolls": false,
     "foreignMagicPolicy": "neutral",
-    "compatibleParadigms": ["academic"],
-    "conflictingParadigms": ["pact", "divine"]
+    "compatibleParadigms": [
+      "academic"
+    ],
+    "conflictingParadigms": [
+      "pact",
+      "divine"
+    ]
+  },
+  "debt": {
+    "id": "debt",
+    "name": "Debt Magic",
+    "description": "Being owed creates power; debts are currency and fuel for magic",
+    "lore": "Among the Fae, all debts are real. Owe a favor and they own a piece of your power. Be owed and you can spend that debt like coin. The greatest lords are those owed the most.",
+    "universeIds": [
+      "fae_courts"
+    ],
+    "sources": [
+      {
+        "type": "social",
+        "regeneration": "none",
+        "detectability": "subtle",
+        "storable": true,
+        "transferable": true,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "favor",
+        "baseAmount": 1,
+        "powerMultiplier": 3.0
+      },
+      {
+        "type": "oath",
+        "baseAmount": 1,
+        "powerMultiplier": 2.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "verbal",
+        "requirement": "required"
+      },
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "oath_binding",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "equivalent_exchange",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "debt",
+        "consequence": "debt_called",
+        "severity": "catastrophic",
+        "probability": 0.3,
+        "mitigatable": false
+      },
+      {
+        "trigger": "overuse",
+        "consequence": "social_ruin",
+        "severity": "severe",
+        "probability": 0.2,
+        "mitigatable": true
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "contract",
+        "rarity": "common"
+      },
+      {
+        "method": "bloodline",
+        "rarity": "uncommon"
+      }
+    ],
+    "forbiddenCombinations": [
+      {
+        "technique": "destroy",
+        "form": "spirit",
+        "reason": "Cannot destroy souls owed to you"
+      }
+    ],
+    "resonantCombinations": [
+      {
+        "technique": "control",
+        "form": "mind",
+        "bonusEffect": "Debt compulsion",
+        "powerMultiplier": 2.0
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "transform",
+      "control",
+      "perceive"
+    ],
+    "availableForms": [
+      "mind",
+      "body",
+      "spirit"
+    ],
+    "compatibleParadigms": [
+      "pact"
+    ],
+    "conflictingParadigms": [
+      "divine"
+    ],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "predatory",
+    "powerCeiling": 200,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": false
+  },
+  "bureaucratic": {
+    "id": "bureaucratic",
+    "name": "Bureaucratic Magic",
+    "description": "Paperwork, forms, and official stamps have literal magical power",
+    "lore": "Form 27-B in triplicate. Stamp here, initial there, submit to Department of Reality Alteration. Processing takes 3-5 business days. Magic through proper channels only.",
+    "universeIds": [
+      "paperpushers"
+    ],
+    "sources": [
+      {
+        "type": "knowledge",
+        "regeneration": "none",
+        "detectability": "obvious",
+        "storable": true,
+        "transferable": true,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "time",
+        "baseAmount": 20,
+        "powerMultiplier": 3.0
+      },
+      {
+        "type": "material",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      },
+      {
+        "type": "sanity",
+        "baseAmount": 5,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "glyph",
+        "requirement": "required"
+      },
+      {
+        "name": "material",
+        "requirement": "required"
+      },
+      {
+        "name": "focus",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "true_names",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "equivalent_exchange",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "form_rejection",
+        "severity": "minor",
+        "probability": 0.6,
+        "mitigatable": true
+      },
+      {
+        "trigger": "paradox",
+        "consequence": "audit",
+        "severity": "catastrophic",
+        "probability": 0.1,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "study",
+        "rarity": "common"
+      },
+      {
+        "method": "apprenticeship",
+        "rarity": "common"
+      }
+    ],
+    "forbiddenCombinations": [
+      {
+        "technique": "destroy",
+        "form": "spirit",
+        "reason": "No form exists for soul destruction"
+      }
+    ],
+    "resonantCombinations": [],
+    "availableTechniques": [
+      "create",
+      "transform",
+      "perceive"
+    ],
+    "availableForms": [
+      "body",
+      "mind",
+      "image"
+    ],
+    "compatibleParadigms": [
+      "academic"
+    ],
+    "conflictingParadigms": [
+      "chaos",
+      "wild"
+    ],
+    "powerScaling": "logarithmic",
+    "foreignMagicPolicy": "requires_permit",
+    "powerCeiling": 80,
+    "groupCastingMultiplier": 1.2,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "luck": {
+    "id": "luck",
+    "name": "Luck Magic",
+    "description": "Borrow luck from your future self; eventually pays back catastrophically",
+    "lore": "Luck is a finite resource distributed across your timeline. Borrow from tomorrow to succeed today. But tomorrow always comes, and the debt compounds with interest.",
+    "universeIds": [
+      "fortune_realms"
+    ],
+    "sources": [
+      {
+        "type": "temporal",
+        "regeneration": "passive",
+        "detectability": "subtle",
+        "storable": false,
+        "transferable": true,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "luck",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "karma",
+        "baseAmount": 5,
+        "powerMultiplier": 3.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "equivalent_exchange",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "balance",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "entropy",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "catastrophic_misfortune",
+        "severity": "catastrophic",
+        "probability": 0.5,
+        "mitigatable": false
+      },
+      {
+        "trigger": "debt",
+        "consequence": "fate_backlash",
+        "severity": "severe",
+        "probability": 0.4,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "rare"
+      },
+      {
+        "method": "contract",
+        "rarity": "uncommon"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "enhance",
+        "form": "body",
+        "bonusEffect": "Improbable dodges",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "enhance",
+      "perceive",
+      "protect"
+    ],
+    "availableForms": [
+      "mind",
+      "body"
+    ],
+    "compatibleParadigms": [],
+    "conflictingParadigms": [
+      "fate",
+      "divine"
+    ],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 150,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": false,
+    "allowsScrolls": false
+  },
+  "threshold": {
+    "id": "threshold",
+    "name": "Threshold Magic",
+    "description": "Doorways, crossroads, and boundaries are sources of magical power",
+    "lore": "Between day and night, between worlds, between life and death - the in-between places hold power. Stand at a threshold and you stand everywhere. Cross it wrong and you may never cross back.",
+    "universeIds": [
+      "liminal_realms"
+    ],
+    "sources": [
+      {
+        "type": "ambient",
+        "regeneration": "none",
+        "detectability": "subtle",
+        "storable": false,
+        "transferable": false,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "mana",
+        "baseAmount": 15,
+        "powerMultiplier": 2.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      },
+      {
+        "name": "material",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "threshold",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "consent",
+        "strength": "strong",
+        "circumventable": true
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "stuck_between",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "critical_failure",
+        "consequence": "lost_in_transition",
+        "severity": "catastrophic",
+        "probability": 0.15,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "study",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "summon",
+        "form": "spirit",
+        "bonusEffect": "Gateway summoning",
+        "powerMultiplier": 2.0
+      },
+      {
+        "technique": "control",
+        "form": "space",
+        "bonusEffect": "Portal creation",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "control",
+      "perceive",
+      "summon"
+    ],
+    "availableForms": [
+      "space",
+      "spirit",
+      "void"
+    ],
+    "compatibleParadigms": [
+      "spatial"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "step",
+    "foreignMagicPolicy": "gateway",
+    "powerCeiling": 120,
+    "groupCastingMultiplier": 1.5,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": true,
+    "allowsScrolls": false
+  },
+  "belief": {
+    "id": "belief",
+    "name": "Belief Magic",
+    "description": "If enough people believe something, it becomes true",
+    "lore": "Reality is consensus. Gods exist because people believe in them. Myths become real when enough people tell the story. Lose your believers and you fade from existence.",
+    "universeIds": [
+      "thoughtforms"
+    ],
+    "sources": [
+      {
+        "type": "social",
+        "regeneration": "prayer",
+        "detectability": "obvious",
+        "storable": false,
+        "transferable": false,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "faith",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "attention",
+        "baseAmount": 5,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      },
+      {
+        "name": "prayer",
+        "requirement": "enhancing"
+      }
+    ],
+    "laws": [
+      {
+        "type": "belief",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "narrative",
+        "strength": "strong",
+        "circumventable": false
+      },
+      {
+        "type": "witness",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "faith_crisis",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "attention",
+        "consequence": "heresy_movement",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "prayer",
+        "rarity": "common"
+      },
+      {
+        "method": "awakening",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "create",
+        "form": "spirit",
+        "bonusEffect": "Tulpa creation",
+        "powerMultiplier": 2.0
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "transform",
+      "enhance"
+    ],
+    "availableForms": [
+      "mind",
+      "spirit",
+      "image",
+      "body"
+    ],
+    "compatibleParadigms": [
+      "divine"
+    ],
+    "conflictingParadigms": [
+      "academic"
+    ],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "absorbs",
+    "powerCeiling": 300,
+    "groupCastingMultiplier": 3.0,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "consumption": {
+    "id": "consumption",
+    "name": "Consumption Magic",
+    "description": "Eat something to gain its properties temporarily",
+    "lore": "Eat a bear, gain its strength. Eat fire, breathe flame. Eat a memory, know the past. But digest slowly, or the transformation becomes permanent. You are what you eat.",
+    "universeIds": [
+      "gourmands"
+    ],
+    "sources": [
+      {
+        "type": "material",
+        "regeneration": "consumption",
+        "detectability": "obvious",
+        "storable": false,
+        "transferable": true,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "material",
+        "baseAmount": 5,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "stamina",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "consumption",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "contagion",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "equivalent_exchange",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "permanent_transformation",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "corruption",
+        "consequence": "digestion_failure",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "bloodline",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [
+      {
+        "technique": "transform",
+        "form": "spirit",
+        "reason": "Cannot digest souls"
+      }
+    ],
+    "resonantCombinations": [
+      {
+        "technique": "enhance",
+        "form": "body",
+        "bonusEffect": "Predator strength",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "transform",
+      "enhance",
+      "perceive"
+    ],
+    "availableForms": [
+      "body",
+      "animal",
+      "plant",
+      "fire",
+      "water",
+      "earth",
+      "air"
+    ],
+    "compatibleParadigms": [
+      "nature",
+      "blood_magic"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "linear",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 100,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": false,
+    "persistsAfterDeath": false,
+    "allowsTeaching": true,
+    "allowsScrolls": false
+  },
+  "silence": {
+    "id": "silence",
+    "name": "Silence Magic",
+    "description": "Power in the absence of sound; louder environments weaken magic",
+    "lore": "Before the first word was spoken, there was Silence. It remembers. In perfect quiet, reality listens. Speak and the power fades. Shout and it vanishes entirely.",
+    "universeIds": [
+      "quiet_places"
+    ],
+    "sources": [
+      {
+        "type": "ambient",
+        "regeneration": "passive",
+        "detectability": "undetectable",
+        "storable": false,
+        "transferable": false,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "mana",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      },
+      {
+        "name": "meditation",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "secrecy",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "permanent_silence",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": false
+      },
+      {
+        "trigger": "failure",
+        "consequence": "deafness",
+        "severity": "moderate",
+        "probability": 0.2,
+        "mitigatable": true
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "meditation",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "gift",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "destroy",
+        "form": "air",
+        "bonusEffect": "Sound nullification",
+        "powerMultiplier": 2.0
+      }
+    ],
+    "availableTechniques": [
+      "destroy",
+      "protect",
+      "perceive",
+      "control"
+    ],
+    "availableForms": [
+      "mind",
+      "air",
+      "void"
+    ],
+    "compatibleParadigms": [],
+    "conflictingParadigms": [
+      "song_magic",
+      "verbal"
+    ],
+    "powerScaling": "logarithmic",
+    "foreignMagicPolicy": "hostile",
+    "powerCeiling": 100,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": false,
+    "allowsScrolls": false
+  },
+  "paradox": {
+    "id": "paradox",
+    "name": "Paradox Magic",
+    "description": "Exploit logical contradictions to break reality temporarily",
+    "lore": "This statement is false. A barber shaves all who do not shave themselves. What happens when reality encounters a paradox? It breaks. Briefly. Use that crack.",
+    "universeIds": [
+      "contradiction_realms"
+    ],
+    "sources": [
+      {
+        "type": "void",
+        "regeneration": "none",
+        "detectability": "beacon",
+        "storable": false,
+        "transferable": false,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "sanity",
+        "baseAmount": 20,
+        "powerMultiplier": 3.0
+      },
+      {
+        "type": "corruption",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "paradox",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "paradox",
+        "consequence": "reality_tear",
+        "severity": "catastrophic",
+        "probability": 0.5,
+        "mitigatable": false
+      },
+      {
+        "trigger": "failure",
+        "consequence": "madness",
+        "severity": "severe",
+        "probability": 0.4,
+        "mitigatable": false
+      },
+      {
+        "trigger": "critical_failure",
+        "consequence": "paradox_spirit",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "very_rare"
+      },
+      {
+        "method": "stolen",
+        "rarity": "very_rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [],
+    "availableTechniques": [
+      "create",
+      "destroy",
+      "transform"
+    ],
+    "availableForms": [
+      "void",
+      "time",
+      "space"
+    ],
+    "compatibleParadigms": [],
+    "conflictingParadigms": [
+      "all"
+    ],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "annihilates",
+    "powerCeiling": 500,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": false,
+    "persistsAfterDeath": false,
+    "allowsTeaching": false,
+    "allowsScrolls": false
+  },
+  "echo": {
+    "id": "echo",
+    "name": "Echo Magic",
+    "description": "Use memories and residual impressions of past events as power",
+    "lore": "Every action leaves an echo. Every word spoken still vibrates somewhere. Echo mages hear the past and can replay it, reshape it, even step into it. But the past pulls at you.",
+    "universeIds": [
+      "memory_realms"
+    ],
+    "sources": [
+      {
+        "type": "temporal",
+        "regeneration": "none",
+        "detectability": "subtle",
+        "storable": true,
+        "transferable": true,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "memory",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "time",
+        "baseAmount": 5,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      },
+      {
+        "name": "meditation",
+        "requirement": "enhancing"
+      }
+    ],
+    "laws": [
+      {
+        "type": "contagion",
+        "strength": "strong",
+        "circumventable": false
+      },
+      {
+        "type": "cycles",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "lost_in_past",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "failure",
+        "consequence": "echo_loop",
+        "severity": "moderate",
+        "probability": 0.2,
+        "mitigatable": true
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "meditation",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "awakening",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [
+      {
+        "technique": "destroy",
+        "form": "time",
+        "reason": "Cannot erase the past"
+      }
+    ],
+    "resonantCombinations": [
+      {
+        "technique": "perceive",
+        "form": "time",
+        "bonusEffect": "Perfect recall",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "perceive",
+      "create",
+      "transform"
+    ],
+    "availableForms": [
+      "mind",
+      "image",
+      "time"
+    ],
+    "compatibleParadigms": [
+      "temporal"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "linear",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 100,
+    "groupCastingMultiplier": 1.5,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "game": {
+    "id": "game",
+    "name": "Game Magic",
+    "description": "Challenges and wagers have binding magical power",
+    "lore": "Agree to the rules and reality enforces them. Bet your soul in a card game and you will lose it if you lose. Cheat and the game itself will punish you. But win fairly and claim your prize.",
+    "universeIds": [
+      "game_realms"
+    ],
+    "sources": [
+      {
+        "type": "social",
+        "regeneration": "none",
+        "detectability": "obvious",
+        "storable": false,
+        "transferable": true,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "oath",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "verbal",
+        "requirement": "required"
+      },
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "oath_binding",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "consent",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "lose_stakes",
+        "severity": "catastrophic",
+        "probability": 0.5,
+        "mitigatable": false
+      },
+      {
+        "trigger": "overreach",
+        "consequence": "eternal_game",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "contract",
+        "rarity": "common"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "perceive",
+        "form": "mind",
+        "bonusEffect": "Read opponent",
+        "powerMultiplier": 1.6
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "control",
+      "perceive"
+    ],
+    "availableForms": [
+      "mind",
+      "spirit"
+    ],
+    "compatibleParadigms": [
+      "debt_magic",
+      "fae"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "step",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 200,
+    "groupCastingMultiplier": 2.0,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "craft": {
+    "id": "craft",
+    "name": "Craft Magic",
+    "description": "The act of making things imbues them with intent and magical power",
+    "lore": "Every hammer strike is a prayer. Every woven thread a spell. Make something with intent and it becomes more than material. Master craftsmen create artifacts without knowing they practice magic.",
+    "universeIds": [
+      "artisan_realms"
+    ],
+    "sources": [
+      {
+        "type": "knowledge",
+        "regeneration": "none",
+        "detectability": "subtle",
+        "storable": true,
+        "transferable": true,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "material",
+        "baseAmount": 15,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "time",
+        "baseAmount": 20,
+        "powerMultiplier": 2.5
+      },
+      {
+        "type": "stamina",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "material",
+        "requirement": "required"
+      },
+      {
+        "name": "focus",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "equivalent_exchange",
+        "strength": "strong",
+        "circumventable": false
+      },
+      {
+        "type": "resonance",
+        "strength": "strong",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "cursed_item",
+        "severity": "moderate",
+        "probability": 0.2,
+        "mitigatable": true
+      },
+      {
+        "trigger": "overuse",
+        "consequence": "craft_obsession",
+        "severity": "severe",
+        "probability": 0.15,
+        "mitigatable": true
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "apprenticeship",
+        "rarity": "common"
+      },
+      {
+        "method": "study",
+        "rarity": "common"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "create",
+        "form": "earth",
+        "bonusEffect": "Dwarven metalwork",
+        "powerMultiplier": 1.8
+      },
+      {
+        "technique": "enhance",
+        "form": "body",
+        "bonusEffect": "Masterwork weapons",
+        "powerMultiplier": 1.6
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "enhance",
+      "protect"
+    ],
+    "availableForms": [
+      "body",
+      "fire",
+      "water",
+      "earth",
+      "air"
+    ],
+    "compatibleParadigms": [
+      "academic",
+      "rune"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "linear",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 120,
+    "groupCastingMultiplier": 1.5,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "commerce": {
+    "id": "commerce",
+    "name": "Commerce Magic",
+    "description": "Fair trade, haggling, and currency have literal magical power",
+    "lore": "A deal is a deal. Shake hands and reality enforces the contract. The invisible hand of the market is actually invisible hands enforcing trades. Supply and demand shape the world.",
+    "universeIds": [
+      "merchant_realms"
+    ],
+    "sources": [
+      {
+        "type": "social",
+        "regeneration": "none",
+        "detectability": "subtle",
+        "storable": true,
+        "transferable": true,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "gold",
+        "baseAmount": 10,
+        "powerMultiplier": 2.0
+      },
+      {
+        "type": "oath",
+        "baseAmount": 5,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "verbal",
+        "requirement": "required"
+      },
+      {
+        "name": "material",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "equivalent_exchange",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "consent",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "market_crash",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "overreach",
+        "consequence": "bankruptcy",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "apprenticeship",
+        "rarity": "common"
+      },
+      {
+        "method": "study",
+        "rarity": "common"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "perceive",
+        "form": "mind",
+        "bonusEffect": "Read market",
+        "powerMultiplier": 1.5
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "transform",
+      "perceive"
+    ],
+    "availableForms": [
+      "mind",
+      "body",
+      "image"
+    ],
+    "compatibleParadigms": [
+      "debt_magic"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "trades_with",
+    "powerCeiling": 150,
+    "groupCastingMultiplier": 2.0,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "lunar": {
+    "id": "lunar",
+    "name": "Lunar Magic",
+    "description": "Power waxes and wanes with moon phases; strongest at full moon",
+    "lore": "The Moon pulls at more than tides. Full moon grants terrible power. New moon leaves you empty. Some say the Moon is alive and chooses who to favor.",
+    "universeIds": [
+      "moon_realms"
+    ],
+    "sources": [
+      {
+        "type": "ambient",
+        "regeneration": "passive",
+        "detectability": "obvious",
+        "storable": true,
+        "transferable": false,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "mana",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      },
+      {
+        "type": "sanity",
+        "baseAmount": 5,
+        "powerMultiplier": 2.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      },
+      {
+        "name": "meditation",
+        "requirement": "enhancing"
+      }
+    ],
+    "laws": [
+      {
+        "type": "cycles",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "moon_madness",
+        "severity": "severe",
+        "probability": 0.3,
+        "mitigatable": true
+      },
+      {
+        "trigger": "emotional",
+        "consequence": "transformation",
+        "severity": "catastrophic",
+        "probability": 0.1,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "bloodline",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "transform",
+        "form": "body",
+        "bonusEffect": "Lycanthropy",
+        "powerMultiplier": 2.5
+      },
+      {
+        "technique": "control",
+        "form": "water",
+        "bonusEffect": "Tide manipulation",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "transform",
+      "enhance",
+      "control"
+    ],
+    "availableForms": [
+      "water",
+      "mind",
+      "body",
+      "animal"
+    ],
+    "compatibleParadigms": [
+      "nature",
+      "cycles"
+    ],
+    "conflictingParadigms": [
+      "solar"
+    ],
+    "powerScaling": "step",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 200,
+    "groupCastingMultiplier": 2.0,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "seasonal": {
+    "id": "seasonal",
+    "name": "Seasonal Magic",
+    "description": "Different magical abilities in different seasons",
+    "lore": "Spring brings growth, Summer fire, Autumn harvest, Winter death. Seasonal mages shift with the year, powerful in their season, weak outside it. Some get trapped in one season forever.",
+    "universeIds": [
+      "seasonal_realms"
+    ],
+    "sources": [
+      {
+        "type": "ambient",
+        "regeneration": "passive",
+        "detectability": "subtle",
+        "storable": false,
+        "transferable": false,
+        "stealable": false
+      }
+    ],
+    "costs": [
+      {
+        "type": "mana",
+        "baseAmount": 10,
+        "powerMultiplier": 1.5
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "cycles",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "seasonal_lock",
+        "severity": "catastrophic",
+        "probability": 0.2,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon"
+      },
+      {
+        "method": "bloodline",
+        "rarity": "rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "create",
+        "form": "plant",
+        "bonusEffect": "Spring growth",
+        "powerMultiplier": 2.0
+      },
+      {
+        "technique": "create",
+        "form": "fire",
+        "bonusEffect": "Summer heat",
+        "powerMultiplier": 1.8
+      },
+      {
+        "technique": "destroy",
+        "form": "plant",
+        "bonusEffect": "Autumn harvest",
+        "powerMultiplier": 1.6
+      },
+      {
+        "technique": "destroy",
+        "form": "body",
+        "bonusEffect": "Winter death",
+        "powerMultiplier": 1.8
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "destroy",
+      "transform",
+      "enhance"
+    ],
+    "availableForms": [
+      "plant",
+      "fire",
+      "water",
+      "earth",
+      "air",
+      "body"
+    ],
+    "compatibleParadigms": [
+      "nature",
+      "fae"
+    ],
+    "conflictingParadigms": [],
+    "powerScaling": "step",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 150,
+    "groupCastingMultiplier": 1.8,
+    "allowsGroupCasting": true,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": true,
+    "allowsScrolls": true
+  },
+  "age": {
+    "id": "age",
+    "name": "Age Magic",
+    "description": "Youth and age as spendable resources; trade years for power",
+    "lore": "Years are currency. Spend a decade to cast a great spell. Steal years from others to extend your life. But spend too freely and you crumble to dust.",
+    "universeIds": [
+      "temporal_realms"
+    ],
+    "sources": [
+      {
+        "type": "temporal",
+        "regeneration": "none",
+        "detectability": "obvious",
+        "storable": false,
+        "transferable": true,
+        "stealable": true
+      }
+    ],
+    "costs": [
+      {
+        "type": "lifespan",
+        "baseAmount": 1,
+        "powerMultiplier": 5.0
+      }
+    ],
+    "channels": [
+      {
+        "name": "will",
+        "requirement": "required"
+      }
+    ],
+    "laws": [
+      {
+        "type": "equivalent_exchange",
+        "strength": "absolute",
+        "circumventable": false
+      },
+      {
+        "type": "balance",
+        "strength": "absolute",
+        "circumventable": false
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "rapid_aging",
+        "severity": "catastrophic",
+        "probability": 0.4,
+        "mitigatable": false
+      },
+      {
+        "trigger": "failure",
+        "consequence": "death",
+        "severity": "catastrophic",
+        "probability": 0.3,
+        "mitigatable": false
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "rare"
+      },
+      {
+        "method": "contract",
+        "rarity": "very_rare"
+      }
+    ],
+    "forbiddenCombinations": [],
+    "resonantCombinations": [
+      {
+        "technique": "transform",
+        "form": "body",
+        "bonusEffect": "Age reversal",
+        "powerMultiplier": 3.0
+      }
+    ],
+    "availableTechniques": [
+      "create",
+      "destroy",
+      "transform",
+      "enhance"
+    ],
+    "availableForms": [
+      "time",
+      "body",
+      "mind"
+    ],
+    "compatibleParadigms": [],
+    "conflictingParadigms": [
+      "divine",
+      "nature"
+    ],
+    "powerScaling": "exponential",
+    "foreignMagicPolicy": "neutral",
+    "powerCeiling": 300,
+    "groupCastingMultiplier": 1.0,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": false,
+    "allowsTeaching": false,
+    "allowsScrolls": false
   }
 }

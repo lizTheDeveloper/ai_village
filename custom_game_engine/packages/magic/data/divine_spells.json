@@ -1,0 +1,825 @@
+[
+  {
+    "id": "divine_heal",
+    "name": "Divine Healing",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Channel divine power to mend wounds. The gods, it turns out, have surprisingly practical applications beyond smiting the unfaithful and demanding tribute. This is the entry-level miracle: predictable, safe, and only occasionally prone to curing ailments the patient didn't know they had.",
+    "school": "restoration",
+    "icon": "\u2728",
+    "manaCost": 25,
+    "castTime": 40,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "divine",
+      "healing",
+      "support"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Divine healing is god-granted and natural - rarely draws attention"
+    }
+  },
+  {
+    "id": "divine_mend_bone",
+    "name": "Mend Bone",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Your god reaches into the target and sets their bones with the tender care of someone who designed the skeletal system in the first place and knows exactly where everything goes. Hurts considerably more than regular healing. This is theologically classified as \"building character.\"",
+    "school": "restoration",
+    "icon": "\ud83e\uddb4",
+    "manaCost": 35,
+    "castTime": 80,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.04,
+    "prerequisites": [
+      "divine_heal"
+    ],
+    "tags": [
+      "divine",
+      "healing",
+      "bones"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "God-granted healing of natural injuries"
+    }
+  },
+  {
+    "id": "divine_cure_poison",
+    "name": "Purify Toxin",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Toxins are, fundamentally, just molecules in the wrong place. Your deity corrects this spatial misunderstanding. The poison doesn't vanish\u2014that would violate conservation of mass\u2014it simply finds itself suddenly outside the body, usually via the most expedient route. Standing downwind is inadvisable.",
+    "school": "restoration",
+    "icon": "\u2620\ufe0f",
+    "manaCost": 30,
+    "castTime": 30,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "divine",
+      "healing",
+      "poison"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Natural divine cleansing"
+    }
+  },
+  {
+    "id": "divine_cure_disease",
+    "name": "Cleansing Touch",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Disease is a theological problem: life consuming life in patterns the gods find aesthetically displeasing. You negotiate with your deity for corrective action. The prayer takes time because you're essentially filing form 77-D (\"Request for Miraculous Intervention, Biological\") in triplicate.",
+    "school": "restoration",
+    "icon": "\ud83e\ude79",
+    "manaCost": 40,
+    "castTime": 60,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "divine",
+      "healing",
+      "disease"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Divine disease cleansing - natural faith healing"
+    }
+  },
+  {
+    "id": "divine_regeneration",
+    "name": "Blessed Regeneration",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "regeneration_effect",
+    "description": "Grant ongoing divine healing over time. The target becomes a small, temporary branch office of divine healing energy. Wounds close. Cells replicate with unusual enthusiasm. The effect fades after a minute, at which point biology resumes its normal pace of begrudging repair.",
+    "school": "restoration",
+    "icon": "\ud83d\udcab",
+    "manaCost": 35,
+    "castTime": 50,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.04,
+    "prerequisites": [
+      "divine_heal"
+    ],
+    "tags": [
+      "divine",
+      "healing",
+      "duration"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Ongoing divine healing - natural faith magic"
+    }
+  },
+  {
+    "id": "divine_restore_limb",
+    "name": "Restoration of the Flesh",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Regrowing lost limbs is technically possible, though it requires convincing your deity to essentially rewind local time for specific body parts while leaving the rest alone. The divine bureaucracy categorizes this as \"Selective Temporal Reversal, Biological Only,\" which requires filling out seventeen forms and a personal letter explaining why you deserve fingers again.",
+    "school": "restoration",
+    "icon": "\ud83d\udd90\ufe0f",
+    "manaCost": 75,
+    "castTime": 180,
+    "range": 1,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "prerequisites": [
+      "divine_mend_bone",
+      "divine_regeneration"
+    ],
+    "tags": [
+      "divine",
+      "healing",
+      "advanced"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Significant divine miracle - limb regrowth approaches forbidden territory"
+    }
+  },
+  {
+    "id": "divine_resurrection_minor",
+    "name": "Breath of Second Chances",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Death, from a divine perspective, is more of a suggestion than a rule. Recently deceased individuals\u2014we're talking minutes here, not days\u2014can be persuaded to return if you ask very nicely and your god happens to be in a lenient mood. The formerly dead often report the experience as \"deeply uncomfortable\" and \"theologically confusing.\"",
+    "school": "restoration",
+    "icon": "\ud83d\udd4a\ufe0f",
+    "manaCost": 150,
+    "castTime": 300,
+    "range": 1,
+    "powerLevel": 8,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.25,
+    "prerequisites": [
+      "divine_restore_limb"
+    ],
+    "tags": [
+      "divine",
+      "healing",
+      "resurrection",
+      "legendary"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 8,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Resurrection defies the natural order - immediate Supreme Creator intervention guaranteed",
+      "forbiddenCategories": [
+        "resurrection"
+      ]
+    }
+  },
+  {
+    "id": "divine_blessing",
+    "name": "Divine Blessing",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "minor_ward_effect",
+    "description": "Bestow divine protection upon a target. The gods, when asked politely, will occasionally extend a metaphorical hand to deflect harm. This manifests as a faint shimmer\u2014barely visible\u2014that suggests the universe is, for the next five minutes, mildly biased in the target's favor.",
+    "school": "protection",
+    "icon": "\ud83d\ude4f",
+    "manaCost": 40,
+    "castTime": 60,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "divine",
+      "protection",
+      "buff"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Divine blessing - natural god-granted protection"
+    }
+  },
+  {
+    "id": "divine_sanctuary",
+    "name": "Sanctuary",
+    "paradigmId": "divine",
+    "technique": "protect",
+    "form": "body",
+    "source": "divine",
+    "effectId": "major_shield_effect",
+    "description": "Create a powerful divine shield around yourself. You become, temporarily, a walking temple\u2014sacred ground that violence finds philosophically troubling. Attackers experience a profound sense that harming you would be in poor taste. Most take the hint.",
+    "school": "protection",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 60,
+    "castTime": 80,
+    "range": 0,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.05,
+    "prerequisites": [
+      "divine_blessing"
+    ],
+    "tags": [
+      "divine",
+      "protection",
+      "defense"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Personal divine protection - sanctioned by the faithful's deity"
+    }
+  },
+  {
+    "id": "divine_circle_of_protection",
+    "name": "Circle of Warding",
+    "paradigmId": "divine",
+    "technique": "protect",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "major_shield_effect",
+    "description": "Inscribe a protective circle that repels malevolent entities. The boundary isn't physical\u2014you can't touch it\u2014but spirits, demons, and other incorporeal nuisances find they simply can't cross. They mill about outside looking frustrated, which is deeply satisfying.",
+    "school": "protection",
+    "icon": "\u2b55",
+    "manaCost": 70,
+    "castTime": 120,
+    "range": 10,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "prerequisites": [
+      "divine_sanctuary"
+    ],
+    "tags": [
+      "divine",
+      "protection",
+      "area",
+      "spirit"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Warding circle - legitimate divine protection against malevolent entities"
+    }
+  },
+  {
+    "id": "divine_shield_of_faith",
+    "name": "Shield of Unwavering Faith",
+    "paradigmId": "divine",
+    "technique": "protect",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "major_shield_effect",
+    "description": "Your certainty becomes armor. The strength of your belief\u2014literal, measurable faith\u2014condenses into a translucent barrier. The more devout you are, the stronger it holds. Doubt weakens it. This is one of the few spells where sincerity is mechanically relevant.",
+    "school": "protection",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 55,
+    "castTime": 45,
+    "range": 3,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.06,
+    "prerequisites": [
+      "divine_blessing"
+    ],
+    "tags": [
+      "divine",
+      "protection",
+      "faith"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Faith-based protection - sincere belief channels divine favor naturally"
+    }
+  },
+  {
+    "id": "divine_smite",
+    "name": "Divine Smite",
+    "paradigmId": "divine",
+    "technique": "create",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "lightning_strike_effect",
+    "description": "Call down divine wrath upon an enemy. Your deity, having observed the target's behavior and found it wanting, delivers corrective action in the form of concentrated holy energy. It's less \"smiting\" in the Old Testament sense and more \"extremely firm celestial feedback.\"",
+    "school": "smiting",
+    "icon": "\u2694\ufe0f",
+    "manaCost": 50,
+    "castTime": 30,
+    "range": 15,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "divine",
+      "damage",
+      "holy"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Divine judgment - deity-sanctioned offensive magic"
+    }
+  },
+  {
+    "id": "divine_righteous_fire",
+    "name": "Flame of Judgment",
+    "paradigmId": "divine",
+    "technique": "create",
+    "form": "fire",
+    "source": "divine",
+    "effectId": "fireball_effect",
+    "description": "Holy fire that burns the wicked. Theologically, this is fascinating: the flame discriminates based on moral standing. Innocents feel only warmth. The guilty burn. How it determines guilt remains a point of theological debate, though \"asks the god directly\" seems likely.",
+    "school": "smiting",
+    "icon": "\ud83d\udd25",
+    "manaCost": 45,
+    "castTime": 40,
+    "range": 12,
+    "powerLevel": 5,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "prerequisites": [
+      "divine_smite"
+    ],
+    "tags": [
+      "divine",
+      "damage",
+      "fire",
+      "judgment"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Holy fire - divine judgment manifested through faithful servant"
+    }
+  },
+  {
+    "id": "divine_pillar_of_light",
+    "name": "Pillar of Celestial Wrath",
+    "paradigmId": "divine",
+    "technique": "create",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "lightning_strike_effect",
+    "description": "A column of pure divine energy descends from the heavens. Subtle it is not. The entire neighborhood notices. Birds flee. The pious prostrate themselves. The guilty reconsider their life choices. The spell is less about damage\u2014though there's plenty\u2014and more about making a point.",
+    "school": "smiting",
+    "icon": "\ud83c\udf1f",
+    "manaCost": 80,
+    "castTime": 60,
+    "range": 20,
+    "powerLevel": 6,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "prerequisites": [
+      "divine_smite",
+      "divine_righteous_fire"
+    ],
+    "tags": [
+      "divine",
+      "damage",
+      "area",
+      "flashy"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Major divine manifestation - flashy but sanctioned by deity"
+    }
+  },
+  {
+    "id": "divine_banishment",
+    "name": "Divine Banishment",
+    "paradigmId": "divine",
+    "technique": "create",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "lightning_strike_effect",
+    "description": "Forcibly relocate an unwanted entity to another plane of existence. Your god essentially files an eviction notice with cosmic bureaucracy. Demons, spirits, and other planar tourists find themselves suddenly elsewhere\u2014usually their home dimension, occasionally somewhere embarrassing.",
+    "school": "smiting",
+    "icon": "\ud83d\udeaa",
+    "manaCost": 90,
+    "castTime": 90,
+    "range": 10,
+    "powerLevel": 7,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.18,
+    "prerequisites": [
+      "divine_pillar_of_light"
+    ],
+    "tags": [
+      "divine",
+      "banish",
+      "planar"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 7,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Planar manipulation - approaches forbidden territory but divine source provides some protection",
+      "forbiddenCategories": [
+        "planar_travel"
+      ]
+    }
+  },
+  {
+    "id": "divine_turn_undead",
+    "name": "Rebuke the Restless",
+    "paradigmId": "divine",
+    "technique": "create",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "lightning_strike_effect",
+    "description": "The undead, being fundamentally contrary to the natural order, find divine energy deeply unpleasant. You channel your god's disapproval directly at them. Lesser undead flee. Stronger ones flinch. The truly powerful ones look mildly annoyed, which is still something.",
+    "school": "smiting",
+    "icon": "\ud83d\udc80",
+    "manaCost": 35,
+    "castTime": 20,
+    "range": 15,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.06,
+    "tags": [
+      "divine",
+      "undead",
+      "control"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Repelling undead - divine magic correcting cosmic violations"
+    }
+  },
+  {
+    "id": "divine_bless_weapon",
+    "name": "Consecrated Edge",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "minor_ward_effect",
+    "description": "Imbue a weapon with divine favor. The blade doesn't glow\u2014that would be tacky\u2014but it cuts with the certainty of righteousness. Particularly effective against creatures who are, technically speaking, abominations. Regular mortals notice only that you seem unusually confident.",
+    "school": "blessing",
+    "icon": "\u2694\ufe0f",
+    "manaCost": 30,
+    "castTime": 40,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.04,
+    "tags": [
+      "divine",
+      "weapon",
+      "buff"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Minor weapon blessing - temporary divine favor"
+    }
+  },
+  {
+    "id": "divine_bless_courage",
+    "name": "Blessing of Valor",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "minor_ward_effect",
+    "description": "Fear, from a divine perspective, is a failure of perspective. You grant targets the ability to see their situation through divine eyes\u2014specifically, eyes that know how the story ends. Courage becomes less an emotion and more a rational assessment that everything will, probably, work out.",
+    "school": "blessing",
+    "icon": "\ud83d\udcaa",
+    "manaCost": 25,
+    "castTime": 30,
+    "range": 5,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "divine",
+      "buff",
+      "mental"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Mental blessing - faith-based courage enhancement"
+    }
+  },
+  {
+    "id": "divine_bless_endurance",
+    "name": "Blessing of Fortitude",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "minor_ward_effect",
+    "description": "The target becomes temporarily more durable\u2014not stronger, but harder to break. Exhaustion happens more slowly. Pain feels distant. This isn't numbing; the body still reports damage, but the divine override says \"noted, continuing anyway.\"",
+    "school": "blessing",
+    "icon": "\ud83c\udfc3",
+    "manaCost": 35,
+    "castTime": 50,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "divine",
+      "buff",
+      "endurance"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Endurance blessing - divine body support"
+    }
+  },
+  {
+    "id": "divine_bless_wisdom",
+    "name": "Blessing of Clarity",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Grant temporary divine insight. The target experiences ten minutes of unusual clarity\u2014not intelligence exactly, but the ability to see patterns, connections, and which decisions are profoundly stupid. Afterward, they often report feeling \"disappointed in past me.\"",
+    "school": "blessing",
+    "icon": "\ud83e\udde0",
+    "manaCost": 40,
+    "castTime": 60,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.06,
+    "tags": [
+      "divine",
+      "buff",
+      "wisdom"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Wisdom blessing - divine insight through prayer"
+    }
+  },
+  {
+    "id": "divine_detect_evil",
+    "name": "Sense Malevolence",
+    "paradigmId": "divine",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "detect_magic_effect",
+    "description": "Evil, it turns out, has a distinct metaphysical scent. Not literal smell\u2014more like a wrongness that catches in your divine perception. You detect creatures and objects that offend cosmic order. This is surprisingly useful, though \"radiates evil\" is sometimes just \"having a bad day.\"",
+    "school": "divination",
+    "icon": "\ud83d\udc41\ufe0f",
+    "manaCost": 20,
+    "castTime": 30,
+    "range": 20,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.03,
+    "tags": [
+      "divine",
+      "detection",
+      "alignment"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Divine perception - sensing cosmic alignment is natural for the faithful"
+    }
+  },
+  {
+    "id": "divine_augury",
+    "name": "Glimpse of Providence",
+    "paradigmId": "divine",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "detect_magic_effect",
+    "description": "Ask your deity for guidance about a proposed course of action. The response comes as intuition: \"favorable,\" \"unfavorable,\" or \"the gods are busy, try again later.\" Accuracy varies. Deities see futures as probability clouds, not certainties. Free will remains inconveniently relevant.",
+    "school": "divination",
+    "icon": "\ud83d\udd2e",
+    "manaCost": 50,
+    "castTime": 180,
+    "range": 0,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "divine",
+      "divination",
+      "future"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Asking deity for guidance - proper use of divine communication"
+    }
+  },
+  {
+    "id": "divine_tongues",
+    "name": "Gift of Tongues",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Grant understanding of all languages. The spell doesn't teach languages\u2014that would take years\u2014it simply routes all speech through divine translation services. Words you hear emerge in your native tongue. Words you speak arrive in the listener's. The gods' customer service, it seems, includes interpretation.",
+    "school": "divination",
+    "icon": "\ud83d\udde3\ufe0f",
+    "manaCost": 35,
+    "castTime": 40,
+    "range": 5,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.04,
+    "tags": [
+      "divine",
+      "language",
+      "communication"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Divine translation service - gods facilitate communication between their creations"
+    }
+  },
+  {
+    "id": "divine_purify_water",
+    "name": "Sanctify Water",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "body",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Render water safe and pure. Contaminants don't vanish\u2014they transform into harmless sediment that settles at the bottom. The water itself gains a faint shimmer, the visual equivalent of \"blessed by management.\" Tastes slightly better than normal. Theologians debate whether this is placebo or genuine divine enhancement.",
+    "school": "purification",
+    "icon": "\ud83d\udca7",
+    "manaCost": 15,
+    "castTime": 30,
+    "range": 5,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "divine",
+      "utility",
+      "purification"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "undetectable",
+      "powerLevel": 2,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Water purification - basic divine utility, indistinguishable from natural processes"
+    }
+  },
+  {
+    "id": "divine_consecrate_ground",
+    "name": "Consecration",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "major_shield_effect",
+    "description": "Declare an area sacred to your deity. The ground becomes holy\u2014not metaphorically, but in ways that affect local reality. Undead feel uncomfortable. Fiends avoid it. The faithful gain subtle benefits. Desecrating consecrated ground requires significant effort and is considered extremely rude.",
+    "school": "purification",
+    "icon": "\u26ea",
+    "manaCost": 80,
+    "castTime": 300,
+    "range": 15,
+    "powerLevel": 6,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "tags": [
+      "divine",
+      "area",
+      "permanent",
+      "holy"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Holy ground creation - permanent but legitimate divine territory marking"
+    }
+  },
+  {
+    "id": "divine_remove_curse",
+    "name": "Unbinding Grace",
+    "paradigmId": "divine",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "divine",
+    "effectId": "heal_effect",
+    "description": "Curses are, essentially, persistent negative contracts with reality. You petition your deity to void the contract. Simple curses dissolve immediately. Complex ones require negotiation. Ancient curses sometimes have divine legal teams and counterclaim for breach of cosmic contract.",
+    "school": "purification",
+    "icon": "\ud83d\udd13",
+    "manaCost": 65,
+    "castTime": 120,
+    "range": 1,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.14,
+    "tags": [
+      "divine",
+      "curse",
+      "dispel"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Divine contract voiding - proper use of deity authority to correct cosmic wrongs"
+    }
+  }
+]

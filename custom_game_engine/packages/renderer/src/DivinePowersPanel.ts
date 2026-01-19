@@ -209,6 +209,14 @@ export class DivinePowersPanel implements IWindowPanel {
         // Sort by faith (highest first)
         believerList.sort((a, b) => b.faith - a.faith);
 
+        // Count angels - entities with 'angel' component
+        let angelCount = 0;
+        for (const angelEntity of world.entities.values()) {
+          if (angelEntity.components.has('angel')) {
+            angelCount++;
+          }
+        }
+
         // Build domains from identity
         const domains: Record<string, number> = {};
         if (deityComp.identity?.domain) {
@@ -228,7 +236,7 @@ export class DivinePowersPanel implements IWindowPanel {
           totalSpent: deityComp.belief?.totalBeliefSpent ?? 0,
           believerCount,
           believerList,
-          angelCount: 0, // TODO: Track angels separately
+          angelCount,
           pendingPrayers: deityComp.prayerQueue?.length ?? 0,
           domains,
           identity: {

@@ -1,0 +1,275 @@
+[
+  {
+    "id": "name_speak_fire",
+    "name": "Speak to Fire",
+    "paradigmId": "name",
+    "technique": "create",
+    "form": "fire",
+    "source": "ancestral",
+    "effectId": "ignite_effect",
+    "description": "Say the true name of fire. Not \"fire\" in human language\u2014the actual name, the word that fire recognizes as itself. Spoken correctly, fire obeys. You don't create flames; you call them into being by addressing them directly. They come because you know what to say.",
+    "school": "speaking",
+    "icon": "\ud83d\udd25",
+    "manaCost": 15,
+    "castTime": 20,
+    "range": 10,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.06,
+    "tags": [
+      "name",
+      "fire",
+      "command"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Name magic: Speaking to elements - ancestral tradition, natural communion"
+    }
+  },
+  {
+    "id": "name_command_wind",
+    "name": "Command the Wind",
+    "paradigmId": "name",
+    "technique": "create",
+    "form": "spirit",
+    "source": "ancestral",
+    "effectId": "heal_effect",
+    "description": "Speak wind's name and it listens. Gentle breeze or roaring gale\u2014it depends on your tone. Wind is capricious, more playful than fire, but bound by the same principle: true names compel. You ask nicely in the language of creation and wind, flattered by recognition, complies.",
+    "school": "speaking",
+    "icon": "\ud83d\udca8",
+    "manaCost": 20,
+    "castTime": 30,
+    "range": 20,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "name",
+      "wind",
+      "command"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Name magic: Wind speaking - traditional elemental communion"
+    }
+  },
+  {
+    "id": "name_bind_spirit",
+    "name": "Bind by True Name",
+    "paradigmId": "name",
+    "technique": "create",
+    "form": "spirit",
+    "source": "ancestral",
+    "effectId": "lightning_strike_effect",
+    "description": "Know a spirit's true name and you own it\u2014not possession, but binding. The name is a leash, a contract written into cosmic fabric. The spirit must obey direct commands for half an hour. Afterward, it remembers. Most spirits find this deeply humiliating and hold impressive grudges.",
+    "school": "binding",
+    "icon": "\ud83d\udc7b",
+    "manaCost": 45,
+    "castTime": 60,
+    "range": 15,
+    "powerLevel": 5,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.2,
+    "tags": [
+      "name",
+      "binding",
+      "spirit"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 5,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Name magic: Spirit binding - compulsion through true names draws some attention"
+    }
+  },
+  {
+    "id": "name_speak_stone",
+    "name": "Converse with Stone",
+    "paradigmId": "name",
+    "technique": "enhance",
+    "form": "body",
+    "source": "ancestral",
+    "effectId": "heal_effect",
+    "description": "Address stone by its true name and it becomes malleable. You're not changing it\u2014you're asking it to change. Stone is patient, slow, but responsive when spoken to correctly. It flows, reshapes, creates passages. The effect is permanent because you've negotiated with stone itself.",
+    "school": "speaking",
+    "icon": "\ud83d\uddff",
+    "manaCost": 25,
+    "castTime": 40,
+    "range": 10,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.1,
+    "tags": [
+      "name",
+      "stone",
+      "shaping"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Name magic: Stone negotiation - respectful elemental communion"
+    }
+  },
+  {
+    "id": "name_true_strike",
+    "name": "Strike True",
+    "paradigmId": "name",
+    "technique": "enhance",
+    "form": "body",
+    "source": "ancestral",
+    "effectId": "lightning_strike_effect",
+    "description": "Speak the true name of your target and your attack cannot miss. You're not improving aim\u2014you're invoking metaphysical certainty. The name creates connection. The weapon follows connection to conclusion. Reality adjusts to make the statement \"this hits\" factually correct.",
+    "school": "speaking",
+    "icon": "\ud83c\udfaf",
+    "manaCost": 30,
+    "castTime": 25,
+    "range": 25,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.12,
+    "tags": [
+      "name",
+      "accuracy",
+      "attack"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Name magic: True strike - using true names offensively is somewhat noticeable"
+    }
+  },
+  {
+    "id": "name_learn_object",
+    "name": "Know the Thing",
+    "paradigmId": "name",
+    "technique": "perceive",
+    "form": "body",
+    "source": "ancestral",
+    "effectId": "detect_magic_effect",
+    "description": "Learn an object's true name through study. Two minutes of focused attention\u2014touching it, examining it, listening to what it is beneath what it seems. The name emerges as intuition, as knowing without being told. Simple objects have simple names. Ancient artifacts have names like poetry.",
+    "school": "knowing",
+    "icon": "\ud83d\udcd6",
+    "manaCost": 35,
+    "castTime": 120,
+    "range": 1,
+    "powerLevel": 4,
+    "hotkeyable": false,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "name",
+      "learning",
+      "study"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 4,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Name magic: Object divination - learning names through meditation"
+    }
+  },
+  {
+    "id": "name_learn_person",
+    "name": "Discern True Name",
+    "paradigmId": "name",
+    "technique": "perceive",
+    "form": "spirit",
+    "source": "ancestral",
+    "effectId": "detect_magic_effect",
+    "description": "Learn someone's true name. This takes time\u2014conversation, observation, understanding who they really are beneath masks and pretense. When you finally hear it (and you will hear it, silent but certain), you gain power over them. They'll know immediately. Trust never quite recovers.",
+    "school": "knowing",
+    "icon": "\ud83d\udd0d",
+    "manaCost": 60,
+    "castTime": 300,
+    "range": 1,
+    "powerLevel": 6,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.25,
+    "tags": [
+      "name",
+      "learning",
+      "power"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 6,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Name magic: True name divination - gaining power over a person through their name"
+    }
+  },
+  {
+    "id": "name_change_self",
+    "name": "Rename Yourself",
+    "paradigmId": "name",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "ancestral",
+    "effectId": "heal_effect",
+    "description": "Change your own true name. This is profound magic\u2014not identity theft, but identity reformation. You become, at fundamental level, someone else. Old bindings break. Old connections sever. You escape fate, prediction, anyone who knew your old name. The cost is continuity: you're no longer quite who you were.",
+    "school": "changing",
+    "icon": "\ud83e\udd8b",
+    "manaCost": 150,
+    "castTime": 600,
+    "range": 0,
+    "powerLevel": 8,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.4,
+    "tags": [
+      "name",
+      "transformation",
+      "legendary"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "high",
+      "powerLevel": 8,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Name magic: Self-renaming - identity reformation is powerful but personal"
+    }
+  },
+  {
+    "id": "name_unmake",
+    "name": "Speak Unmaking",
+    "paradigmId": "name",
+    "technique": "create",
+    "form": "spirit",
+    "source": "ancestral",
+    "effectId": "lightning_strike_effect",
+    "description": "Say the true name of something backward. This is ontological deletion\u2014not destroying, but asserting nonexistence. The thing hears its name inverted and, confused by the paradox, ceases. Works on objects, magical constructs, occasionally concepts. Living things resist fiercely. Reality finds this spell philosophically troubling.",
+    "school": "changing",
+    "icon": "\ud83c\udf00",
+    "manaCost": 100,
+    "castTime": 90,
+    "range": 15,
+    "powerLevel": 9,
+    "hotkeyable": false,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.35,
+    "tags": [
+      "name",
+      "destruction",
+      "forbidden"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "critical",
+      "powerLevel": 9,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "FORBIDDEN: Unmaking - erasing existence through reversed naming warps reality itself",
+      "forbiddenCategories": [
+        "reality_warping"
+      ]
+    }
+  }
+]

@@ -9,6 +9,7 @@
 import type { MagicParadigm } from './MagicParadigm.js';
 import coreParadigmsData from '../data/core-paradigms.json';
 import animistData from '../data/animist-paradigms.json';
+import creativeParadigmsData from '../data/creative-paradigms.json';
 
 /**
  * Load and validate a paradigm from JSON data
@@ -47,4 +48,34 @@ export function loadExampleKami(): any[] {
  */
 export function loadAllomanticMetals(): any[] {
   return animistData.allomantic_metals || [];
+}
+
+/**
+ * Load animist paradigms from JSON
+ */
+export function loadAnimistParadigms(): Record<string, MagicParadigm> {
+  const paradigms: Record<string, MagicParadigm> = {};
+
+  for (const [key, data] of Object.entries(animistData)) {
+    // Skip helper data (example_kami, allomantic_metals)
+    if (key === 'example_kami' || key === 'allomantic_metals') {
+      continue;
+    }
+    paradigms[key] = validateParadigm(data);
+  }
+
+  return paradigms;
+}
+
+/**
+ * Load creative paradigms from JSON
+ */
+export function loadCreativeParadigms(): Record<string, MagicParadigm> {
+  const paradigms: Record<string, MagicParadigm> = {};
+
+  for (const [key, data] of Object.entries(creativeParadigmsData)) {
+    paradigms[key] = validateParadigm(data);
+  }
+
+  return paradigms;
 }

@@ -555,10 +555,12 @@ export class SkillTreePanel implements IWindowPanel {
         const eventBus = world.getEventBus() as EventBus;
         eventBus.emit({
           type: 'magic:skill_node_unlocked',
-          entityId: this.selectedEntity.id,
-          paradigmId: activeParadigmId,
-          nodeId: nodeId,
-          xpSpent: evaluation.xpCost
+          source: 'world',
+          data: {
+            nodeId: nodeId,
+            agentId: this.selectedEntity.id,
+            skillTree: activeParadigmId
+          }
         });
 
         // Apply effects via SkillTreeManager

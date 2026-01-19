@@ -1,0 +1,272 @@
+[
+  {
+    "id": "breath_awaken_rope",
+    "name": "Awaken Rope",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Give rope the breath of life. You invest one Breath\u2014a fragment of your vital essence\u2014and speak a Command. The rope wakes. Moves. Obeys. It's not alive, exactly, but animated. Autonomous. When the Breath fades after ten minutes, the rope returns to ordinary cordage, remembering nothing.",
+    "school": "awakening",
+    "icon": "\ud83e\udea2",
+    "manaCost": 50,
+    "castTime": 30,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "breath",
+      "awakening",
+      "basic"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Basic awakening - animating objects through life essence"
+    }
+  },
+  {
+    "id": "breath_awaken_cloth",
+    "name": "Awaken Cloth",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Breathe life into fabric. Cloaks become shields. Tapestries become walls. The cloth moves at your Command\u2014wrapping, protecting, entangling. It drains color as it awakens; brilliant dyes fade to gray as life-force redistributes. The exchange is always visible: magic has aesthetic cost.",
+    "school": "awakening",
+    "icon": "\ud83e\uddf5",
+    "manaCost": 50,
+    "castTime": 35,
+    "range": 1,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.06,
+    "tags": [
+      "breath",
+      "awakening",
+      "fabric"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Cloth awakening - animating fabric through vital breath"
+    }
+  },
+  {
+    "id": "breath_awaken_smoke",
+    "name": "Awaken Smoke",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Grant consciousness to smoke. This is advanced\u2014smoke has no form, no structure, just particles suspended in air. Yet Awakened smoke moves with purpose, obscures specifically, forms shapes on command. Expensive. Beautiful. The kind of magic that makes spectators stop and stare.",
+    "school": "awakening",
+    "icon": "\ud83d\udca8",
+    "manaCost": 100,
+    "castTime": 40,
+    "range": 10,
+    "powerLevel": 4,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.15,
+    "tags": [
+      "breath",
+      "awakening",
+      "smoke"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 4,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Advanced awakening - animating formless matter"
+    }
+  },
+  {
+    "id": "breath_heighten_first",
+    "name": "First Heightening",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Accumulate fifty Breaths and reality notices. Your aura becomes visible\u2014subtle, but there\u2014radiating vitality. Colors seem brighter near you. People unconsciously defer. This isn't a spell you cast; it's a state of being. The first step toward something more than human.",
+    "school": "heightening",
+    "icon": "\u2728",
+    "manaCost": 0,
+    "castTime": 0,
+    "range": 0,
+    "powerLevel": 2,
+    "hotkeyable": false,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.0,
+    "tags": [
+      "breath",
+      "heightening",
+      "passive"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 2,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Breath magic: Passive heightening - natural accumulation of life force"
+    }
+  },
+  {
+    "id": "breath_heighten_second",
+    "name": "Second Heightening",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Two hundred Breaths grants perfect pitch and color recognition. Your senses sharpen\u2014not superhuman, but perfectly calibrated. You hear harmonics others miss. See color gradations invisible to normal sight. Useful for Awakening, where precision matters. The world becomes more vivid.",
+    "school": "heightening",
+    "icon": "\ud83c\udfa8",
+    "manaCost": 0,
+    "castTime": 0,
+    "range": 0,
+    "powerLevel": 3,
+    "hotkeyable": false,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.0,
+    "tags": [
+      "breath",
+      "heightening",
+      "senses"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 3,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Breath magic: Passive heightening - enhanced perception through accumulated breath"
+    }
+  },
+  {
+    "id": "breath_command_protect",
+    "name": "Command: Protect Me",
+    "paradigmId": "breath",
+    "technique": "protect",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "minor_ward_effect",
+    "description": "The fundamental defensive Command. Whatever you've Awakened interposes itself between you and harm. Awakened cloth becomes armor. Awakened rope becomes barrier. The magic is literal-minded\u2014you said \"protect,\" it protects, even at cost of its own destruction.",
+    "school": "commands",
+    "icon": "\ud83d\udee1\ufe0f",
+    "manaCost": 50,
+    "castTime": 20,
+    "range": 5,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.04,
+    "tags": [
+      "breath",
+      "command",
+      "protection"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Defensive command - directing awakened objects to protect"
+    }
+  },
+  {
+    "id": "breath_command_attack",
+    "name": "Command: Strike",
+    "paradigmId": "breath",
+    "technique": "create",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "ignite_effect",
+    "description": "Direct your Awakened creation to attack. The Command is simple; execution varies by medium. Awakened rope strangles. Awakened cloth smothers. Awakened smoke chokes. The magic interprets \"strike\" literally, creatively, often disturbingly. Specificity in Commands is recommended.",
+    "school": "commands",
+    "icon": "\u2694\ufe0f",
+    "manaCost": 50,
+    "castTime": 15,
+    "range": 10,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.08,
+    "tags": [
+      "breath",
+      "command",
+      "attack"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Offensive command - directing awakened objects to attack"
+    }
+  },
+  {
+    "id": "breath_command_fetch",
+    "name": "Command: Fetch",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "body",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Make your Awakened object retrieve something. Point. Say \"Fetch.\" The object obeys within its capabilities. Awakened rope slithers across floors, wraps around the target item, pulls it back. Simple. Useful. Makes you feel like you've trained reality itself to heel.",
+    "school": "commands",
+    "icon": "\ud83c\udfaf",
+    "manaCost": 50,
+    "castTime": 25,
+    "range": 15,
+    "powerLevel": 3,
+    "hotkeyable": true,
+    "leavesMagicalSignature": true,
+    "baseMishapChance": 0.05,
+    "tags": [
+      "breath",
+      "command",
+      "utility"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "moderate",
+      "powerLevel": 3,
+      "leavesMagicalSignature": true,
+      "detectionNotes": "Breath magic: Utility command - basic awakened object manipulation"
+    }
+  },
+  {
+    "id": "breath_return",
+    "name": "Return Breath",
+    "paradigmId": "breath",
+    "technique": "enhance",
+    "form": "spirit",
+    "source": "psionic",
+    "effectId": "heal_effect",
+    "description": "Reclaim Breath from an Awakened object. The life drains away; the object becomes mundane again; your Breath returns intact. This is recycling on an ontological scale\u2014no waste, just conversion. Most Awakeners treat Breath as currency, investing and recovering as needed.",
+    "school": "awakening",
+    "icon": "\ud83d\udd04",
+    "manaCost": 0,
+    "castTime": 60,
+    "range": 1,
+    "powerLevel": 2,
+    "hotkeyable": true,
+    "leavesMagicalSignature": false,
+    "baseMishapChance": 0.02,
+    "tags": [
+      "breath",
+      "recovery",
+      "utility"
+    ],
+    "creatorDetection": {
+      "detectionRisk": "low",
+      "powerLevel": 2,
+      "leavesMagicalSignature": false,
+      "detectionNotes": "Breath magic: Breath recovery - reclaiming invested life force"
+    }
+  }
+]
