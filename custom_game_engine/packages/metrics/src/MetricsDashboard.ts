@@ -173,7 +173,7 @@ export class MetricsDashboard {
     } catch (e) {
       // Fallback to session metrics
       try {
-        const sessionMetrics = this.collector.getMetric('session_metrics');
+        const sessionMetrics = this.collector.getMetric('session_metrics') as any;
         this.state.liveMetrics.population = sessionMetrics.totalBirths - sessionMetrics.totalDeaths;
       } catch {
         // Ignore if no data
@@ -192,7 +192,7 @@ export class MetricsDashboard {
 
     // Update resource stockpiles
     try {
-      const economicMetrics = this.collector.getMetric('economic_metrics');
+      const economicMetrics = this.collector.getMetric('economic_metrics') as any;
       for (const [resourceType, stockpile] of Object.entries(economicMetrics.stockpiles)) {
         if (Array.isArray(stockpile) && stockpile.length > 0) {
           this.state.liveMetrics.resourceStockpiles[resourceType] = stockpile[stockpile.length - 1].value;
@@ -280,7 +280,7 @@ export class MetricsDashboard {
    * Generate resource balance chart
    */
   private generateResourceBalanceChart(chartType: ChartType): ChartData {
-    const economicMetrics = this.collector.getMetric('economic_metrics');
+    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
     const datasets: Array<{ label: string; data: number[] }> = [];
 
     for (const [resourceType, stockpile] of Object.entries(economicMetrics.stockpiles)) {
@@ -304,7 +304,7 @@ export class MetricsDashboard {
    * Generate intelligence distribution histogram
    */
   private generateIntelligenceDistribution(chartType: ChartType): ChartData {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
     const intelligenceValues: number[] = [];
 
     for (const metrics of Object.values(lifecycleMetrics) as Array<{ initialStats?: { intelligence?: number } }>) {
@@ -342,7 +342,7 @@ export class MetricsDashboard {
    * Generate spatial heatmap
    */
   private generateSpatialHeatmap(chartType: ChartType): ChartData {
-    const spatialMetrics = this.collector.getMetric('spatial_metrics');
+    const spatialMetrics = this.collector.getMetric('spatial_metrics') as any;
 
     return {
       type: chartType,
@@ -357,7 +357,7 @@ export class MetricsDashboard {
    */
   private generateSocialNetworkGraph(chartType: ChartType): ChartData {
     // Build graph from social metrics
-    const socialMetrics = this.collector.getMetric('social_metrics');
+    const socialMetrics = this.collector.getMetric('social_metrics') as any;
     const nodes: Array<{ id: string; label: string }> = [];
     const edges: Array<{ from: string; to: string }> = [];
 
@@ -366,7 +366,7 @@ export class MetricsDashboard {
     // In a real implementation, this would track all relationships
 
     // Create unique nodes from agents in lifecycle
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
     const agentIds = Object.keys(lifecycleMetrics);
 
     for (const agentId of agentIds) {
@@ -427,7 +427,7 @@ export class MetricsDashboard {
     this.state.alerts = this.state.alerts.filter(alert => {
       // Check if alert condition still exists
       if (alert.metric === 'food_stockpile') {
-        const economicMetrics = this.collector.getMetric('economic_metrics');
+        const economicMetrics = this.collector.getMetric('economic_metrics') as any;
         const foodStockpile = economicMetrics.stockpiles['food'];
         if (foodStockpile && foodStockpile.length > 0) {
           const latestAmount = foodStockpile[foodStockpile.length - 1].value;
@@ -441,7 +441,7 @@ export class MetricsDashboard {
 
     // Check for low food stockpile
     try {
-      const economicMetrics = this.collector.getMetric('economic_metrics');
+      const economicMetrics = this.collector.getMetric('economic_metrics') as any;
       const foodStockpile = economicMetrics.stockpiles['food'];
       if (foodStockpile && foodStockpile.length > 0) {
         const latestAmount = foodStockpile[foodStockpile.length - 1].value;
@@ -462,7 +462,7 @@ export class MetricsDashboard {
 
     // Check for FPS drop
     try {
-      const performanceMetrics = this.collector.getMetric('performance_metrics');
+      const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
       if (performanceMetrics.fps.length > 0) {
         const latestFps = performanceMetrics.fps[performanceMetrics.fps.length - 1].value;
         if (latestFps < 30 && !this.state.alerts.some(a => a.metric === 'fps')) {
@@ -482,7 +482,7 @@ export class MetricsDashboard {
 
     // Check for milestones
     try {
-      const emergentMetrics = this.collector.getMetric('emergent_metrics');
+      const emergentMetrics = this.collector.getMetric('emergent_metrics') as any;
       for (const milestone of emergentMetrics.milestones) {
         // Only create alert for recent milestones (last 5 seconds)
         if (Date.now() - milestone.timestamp < 5000) {

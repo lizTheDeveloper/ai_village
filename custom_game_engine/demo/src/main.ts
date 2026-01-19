@@ -3830,12 +3830,12 @@ async function main() {
   );
 
   // Create ChunkSpatialQuery and attach to world (unified approach)
-  (world as any).setSpatialQuery(chunkSpatialQuery);
+  (gameLoop.world as any).setSpatialQuery(chunkSpatialQuery);
   console.log('[Main] SpatialQueryService attached to world');
 
   // Injection functions removed - world.spatialQuery is used instead
   // Set spatialQuery on World - systems/behaviors will access via world.spatialQuery
-  world.setSpatialQuery(chunkSpatialQuery);
+  gameLoop.world.setSpatialQuery(chunkSpatialQuery);
   console.log('[Main] ChunkSpatialQuery set on world.spatialQuery');
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)

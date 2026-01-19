@@ -1635,7 +1635,7 @@ export function gatherBehaviorWithContext(ctx: import('../BehaviorContext.js').B
     }
     const minimalWorld: MinimalWorld = {
       tick: ctx.tick,
-      eventBus: { emit: (e: unknown) => ctx.emit(e) }
+      eventBus: { emit: (e: any) => ctx.emit(e) }
     };
     if (target.type === 'resource') {
       const targetImpl = target.entity as EntityImpl;

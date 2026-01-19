@@ -779,7 +779,7 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
   const world: WorldWithTiles = {
     tick: ctx.tick,
     getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
-    eventBus: { emit: (e: unknown) => ctx.emit(e) }
+    eventBus: { emit: (e: any) => ctx.emit(e) }
   };
   return behavior.execute(ctx.entity, world as unknown as World);
 }
@@ -803,7 +803,7 @@ export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     tick: ctx.tick,
     getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: unknown) => ctx.emit(e) },
+    eventBus: { emit: (e: any) => ctx.emit(e) },
   };
 
   return behavior.execute(ctx.entity, world as unknown as World);

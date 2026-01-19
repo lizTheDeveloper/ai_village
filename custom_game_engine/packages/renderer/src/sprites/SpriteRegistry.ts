@@ -8,6 +8,8 @@
  * match while flagging that a better sprite should be generated.
  */
 
+import spriteRegistryData from '../../data/sprite-registry.json' assert { type: 'json' };
+
 export type BodyType = 'humanoid' | 'quadruped' | 'avian' | 'serpentine' | 'insectoid';
 export type ClothingType = 'peasant' | 'common' | 'merchant' | 'noble' | 'royal';
 
@@ -56,11 +58,7 @@ let skinToneMap: Record<string, string> = {};
  */
 async function loadSpriteRegistry(): Promise<void> {
   try {
-    const response = await fetch('/packages/renderer/data/sprite-registry.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load sprite registry: ${response.statusText}`);
-    }
-    const data: SpriteRegistryData = await response.json();
+    const data = spriteRegistryData as unknown as SpriteRegistryData;
     SPRITE_MAPPINGS = data.spriteMappings;
     hairColorMap = data.hairColorNormalization;
     skinToneMap = data.skinToneNormalization;

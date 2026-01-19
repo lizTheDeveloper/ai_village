@@ -193,7 +193,7 @@ const TECH_LEVEL_TO_TIER: readonly ProductionTier[] = [
  */
 export function getTierFromTechLevel(techLevel: number): ProductionTier {
   const level = Math.max(1, Math.min(10, techLevel | 0));
-  return TECH_LEVEL_TO_TIER[level - 1];
+  return TECH_LEVEL_TO_TIER[level - 1]!;
 }
 
 // ============================================================================
@@ -241,7 +241,7 @@ for (let i = 0; i < LOG10_CACHE_SIZE; i++) {
 function fastLog10(value: number): number {
   const n = (value + 1) | 0; // Fast floor
   if (n < LOG10_CACHE_SIZE) {
-    return LOG10_CACHE[n];
+    return LOG10_CACHE[n]!;
   }
   return Math.log10(value + 1);
 }

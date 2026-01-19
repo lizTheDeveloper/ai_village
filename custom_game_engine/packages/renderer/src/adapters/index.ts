@@ -7,6 +7,7 @@
  */
 
 import { PanelAdapter, type PanelConfig } from './PanelAdapter.js';
+import panelConfigsDataRaw from '../../data/panel-configs.json' assert { type: 'json' };
 
 // ============================================================================
 // JSON Data Loading
@@ -34,11 +35,7 @@ let panelDataMap: Map<string, PanelData> = new Map();
  */
 async function loadPanelConfigs(): Promise<void> {
   try {
-    const response = await fetch('/packages/renderer/data/panel-configs.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load panel configs: ${response.statusText}`);
-    }
-    const data: PanelConfigsData = await response.json();
+    const data = panelConfigsDataRaw as unknown as PanelConfigsData;
     data.panels.forEach((panel) => {
       panelDataMap.set(panel.id, panel);
     });

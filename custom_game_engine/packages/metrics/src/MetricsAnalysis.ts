@@ -196,7 +196,7 @@ export class MetricsAnalysis {
    * Detect resource shortage
    */
   private detectResourceShortage(): Insight | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics');
+    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
 
     for (const [resourceType, gathered] of Object.entries(economicMetrics.resourcesGathered)) {
       const consumed = economicMetrics.resourcesConsumed[resourceType];
@@ -393,7 +393,7 @@ export class MetricsAnalysis {
    */
   private detectStockpileAnomalies(resourceType: string): Anomaly[] {
     const anomalies: Anomaly[] = [];
-    const economicMetrics = this.collector.getMetric('economic_metrics');
+    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
     const stockpile = economicMetrics.stockpiles[resourceType];
 
     if (!stockpile || stockpile.length < 2) return anomalies;
@@ -422,7 +422,7 @@ export class MetricsAnalysis {
    */
   private detectFPSAnomalies(): Anomaly[] {
     const anomalies: Anomaly[] = [];
-    const performanceMetrics = this.collector.getMetric('performance_metrics');
+    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
     const fpsData = performanceMetrics.fps;
 
     if (fpsData.length < 10) return anomalies;
@@ -722,7 +722,7 @@ export class MetricsAnalysis {
    * Detect specialization pattern
    */
   private detectSpecialization(): RecognizedPattern | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics');
+    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
     const resourcesGathered = economicMetrics.resourcesGathered;
 
     // Check if different agents specialize in different resources
@@ -783,7 +783,7 @@ export class MetricsAnalysis {
    * Detect social clustering
    */
   private detectSocialClustering(): RecognizedPattern | null {
-    const socialMetrics = this.collector.getMetric('social_metrics');
+    const socialMetrics = this.collector.getMetric('social_metrics') as any;
 
     // Look for clustering when there are enough relationships and conversations
     // Use relationshipsFormed as the primary signal since conversations trigger relationship events
@@ -811,7 +811,7 @@ export class MetricsAnalysis {
    */
   findPerformanceBottlenecks(): PerformanceBottleneck[] {
     const bottlenecks: PerformanceBottleneck[] = [];
-    const performanceMetrics = this.collector.getMetric('performance_metrics');
+    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
     const systemTiming = performanceMetrics.systemTiming as Record<string, number>;
 
     for (const [system, duration] of Object.entries(systemTiming)) {
@@ -846,7 +846,7 @@ export class MetricsAnalysis {
    */
   getOptimizationSuggestions(): OptimizationSuggestion[] {
     const suggestions: OptimizationSuggestion[] = [];
-    const spatialMetrics = this.collector.getMetric('spatial_metrics');
+    const spatialMetrics = this.collector.getMetric('spatial_metrics') as any;
 
     // Check pathfinding failure rate
     if (spatialMetrics.pathfindingFailures > 50) {
@@ -865,7 +865,7 @@ export class MetricsAnalysis {
    * Calculate overall performance score
    */
   calculatePerformanceScore(): number {
-    const performanceMetrics = this.collector.getMetric('performance_metrics');
+    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
 
     if (performanceMetrics.fps.length === 0) {
       return 0;

@@ -136,7 +136,8 @@ export class MultiverseNetworkManager {
         this.handleNewConnection(ws as WebSocketLike);
       });
 
-      this.wsServer.on('error', (error: Error) => {
+      this.wsServer.on('error', (...args: unknown[]) => {
+        const error = args[0] as Error;
         console.error('[NetworkManager] Server error:', error);
       });
 
@@ -470,7 +471,7 @@ export class MultiverseNetworkManager {
       type: 'entity_transfer',
       passageId,
       targetUniverseId: passage.to.universeId,
-      entity: serializedEntity,
+      entity: serializedEntity as VersionedEntity,
       checksum,
     };
 
@@ -1069,7 +1070,7 @@ export class MultiverseNetworkManager {
       type: 'universe_snapshot',
       universeId: subscription.universeId,
       tick: universe.universeTick.toString(),
-      entities: serializedEntities,
+      entities: serializedEntities as VersionedEntity[],
     };
 
     this.send(subscription.peerId, snapshot);

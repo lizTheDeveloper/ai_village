@@ -123,7 +123,7 @@ export class StructuredPromptBuilder {
     const jealousyText = this.buildJealousyContext(jealousy, personality, world);
 
     // Hunting Context: Nearby animals and hunger motivation
-    const huntingText = this.buildHuntingContext(needs, vision, inventory, skills, world);
+    const huntingText = this.buildHuntingContext(agent, needs, vision, inventory, skills, world);
 
     // World Context: Current situation (what's happening now)
     const worldContext = this.buildWorldContext(needs, vision, inventory, world, temperature, legacyMemory, conversation, agent);
@@ -367,6 +367,7 @@ export class StructuredPromptBuilder {
    * Suggests hunting when agent is hungry or needs resources.
    */
   private buildHuntingContext(
+    agent: Entity,
     needs: NeedsComponent | undefined,
     vision: VisionComponent | undefined,
     inventory: InventoryComponent | undefined,
@@ -378,6 +379,9 @@ export class StructuredPromptBuilder {
       return '';
     }
 
+    // Get agent position for distance calculation
+    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+
     // Find visible animals
     const visibleAnimals: Array<{ id: string; species: string; distance: number }> = [];
 
@@ -387,11 +391,16 @@ export class StructuredPromptBuilder {
 
       const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
-        // Calculate distance (simplified - assume we have position)
+        // Calculate actual distance between agent and animal
+        const animalPos = entity.components.get('position') as { x: number; y: number } | undefined;
+        const distance = agentPos && animalPos
+          ? Math.sqrt((agentPos.x - animalPos.x) ** 2 + (agentPos.y - animalPos.y) ** 2)
+          : 0;
+
         visibleAnimals.push({
           id: entityId,
           species: animal.speciesId || 'animal',
-          distance: 0, // TODO: calculate actual distance
+          distance: Math.round(distance * 10) / 10, // Round to 1 decimal place
         });
       }
     }

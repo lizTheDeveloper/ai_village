@@ -88,7 +88,7 @@ export class PredatorAttackSystem extends BaseSystem {
     }
   }
 
-  private processPredator(world: World, predator: Entity, agents: Entity[]): void {
+  private processPredator(world: World, predator: Entity, agents: readonly Entity[]): void {
     const animal = world.getComponent<AnimalComponent>(predator.id, 'animal');
     const predatorPos = world.getComponent<PositionComponent>(predator.id, 'position');
 

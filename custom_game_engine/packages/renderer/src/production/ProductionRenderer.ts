@@ -383,6 +383,7 @@ export class ProductionRenderer {
     // Extract entity traits
     const speciesComp = entity.getComponent('species') as { species?: string } | undefined;
     const genderComp = entity.getComponent('gender') as { gender?: string } | undefined;
+    const bodyComp = entity.getComponent('body') as { bodyPlanId?: string } | undefined;
     const genetics = entity.getComponent('genetics') as {
       hair_color?: string;
       skin_tone?: string;
@@ -390,6 +391,16 @@ export class ProductionRenderer {
     } | undefined;
     const species = speciesComp?.species ?? 'human';
     const gender = genderComp?.gender;
+
+    // Derive body type from bodyPlanId (e.g., 'humanoid_standard' -> 'humanoid')
+    let bodyType = 'humanoid'; // default
+    if (bodyComp?.bodyPlanId) {
+      if (bodyComp.bodyPlanId.startsWith('humanoid')) bodyType = 'humanoid';
+      else if (bodyComp.bodyPlanId.startsWith('quadruped')) bodyType = 'quadruped';
+      else if (bodyComp.bodyPlanId.startsWith('avian')) bodyType = 'avian';
+      else if (bodyComp.bodyPlanId.startsWith('insectoid')) bodyType = 'insectoid';
+      else if (bodyComp.bodyPlanId.startsWith('serpentine')) bodyType = 'serpentine';
+    }
 
     // Build costume description
     let costumeDesc = 'simple clothing';
@@ -425,7 +436,7 @@ export class ProductionRenderer {
     return {
       species,
       gender,
-      bodyType: 'humanoid', // TODO: Get from entity
+      bodyType,
       hairColor: genetics?.hair_color,
       skinTone: genetics?.skin_tone,
       eyeColor: genetics?.eye_color,

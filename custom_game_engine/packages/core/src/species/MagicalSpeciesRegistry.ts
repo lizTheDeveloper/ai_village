@@ -104,7 +104,7 @@ export const TRAIT_LABYRINTH_MIND: SpeciesTrait = {
   id: 'labyrinth_mind',
   name: 'Labyrinth Mind',
   description: 'Perfect spatial reasoning and memory',
-  category: 'mental',
+  category: 'sensory',
   skillBonus: { navigation: 0.6, architecture: 0.4 },
   abilitiesGranted: ['never_lost'],
 };
