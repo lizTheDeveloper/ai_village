@@ -578,19 +578,18 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     const currentStageIndex = mega.decayStageIndex;
     const nextStageIndex = currentStageIndex + 1;
 
-    if (
-      nextStageIndex < config.decayStages.length &&
-      mega.yearsInDecay >= config.decayStages[nextStageIndex].yearsAfterCollapse
-    ) {
+    if (nextStageIndex < config.decayStages.length) {
       const nextStage = config.decayStages[nextStageIndex];
       if (!nextStage) {
         throw new Error(`Missing decay stage at index ${nextStageIndex} for ${mega.structureType}`);
       }
 
-      mega.decayStageIndex = nextStageIndex;
-      mega.archaeologicalValue = nextStage.archaeologicalValue;
+      if (mega.yearsInDecay >= nextStage.yearsAfterCollapse) {
+        mega.decayStageIndex = nextStageIndex;
+        mega.archaeologicalValue = nextStage.archaeologicalValue;
 
-      this.emitDecayStageEvent(world, entity, mega, nextStage);
+        this.emitDecayStageEvent(world, entity, mega, nextStage);
+      }
     }
   }
 

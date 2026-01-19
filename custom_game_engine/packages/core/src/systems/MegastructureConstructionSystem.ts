@@ -60,7 +60,7 @@ export class MegastructureConstructionSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.ConstructionProject];
   public readonly activationComponents = ['construction_project'] as const;
   public readonly metadata = {
-    category: 'construction' as const,
+    category: 'infrastructure' as const,
     description: 'Manages megastructure construction projects',
     dependsOn: ['economy', 'inventory'] as const,
     writesComponents: [CT.ConstructionProject, CT.Inventory] as const,
@@ -262,25 +262,47 @@ export class MegastructureConstructionSystem extends BaseSystem {
       const managerEntity = this.inventoryCache.get(project.coordination.managerEntityId);
       if (managerEntity) {
         const inventory = managerEntity.getComponent<InventoryComponent>(CT.Inventory);
-        if (inventory) {
+        if (inventory && inventory.slots) {
           for (const [itemId, totalNeeded] of Object.entries(phaseResourcesNeeded)) {
             const amountToConsume = Math.ceil(totalNeeded * consumptionRate);
-            const availableInInventory = inventory.items[itemId]?.quantity || 0;
 
-            if (availableInInventory >= amountToConsume) {
-              // Consume resources
+            // Find slots with this item
+            let remainingToConsume = amountToConsume;
+            const slotsToUpdate: number[] = [];
+
+            for (let i = 0; i < inventory.slots.length && remainingToConsume > 0; i++) {
+              const slot = inventory.slots[i];
+              if (slot && slot.itemId === itemId) {
+                slotsToUpdate.push(i);
+                const consumed = Math.min(slot.quantity, remainingToConsume);
+                remainingToConsume -= consumed;
+              }
+            }
+
+            // If we have enough resources, consume them
+            if (remainingToConsume === 0) {
               ctx.components(managerEntity).update<InventoryComponent>(CT.Inventory, (inv) => {
-                const updatedItems = { ...inv.items };
-                if (updatedItems[itemId]) {
-                  updatedItems[itemId] = {
-                    ...updatedItems[itemId],
-                    quantity: updatedItems[itemId].quantity - amountToConsume,
-                  };
-                  if (updatedItems[itemId].quantity <= 0) {
-                    delete updatedItems[itemId];
+                const updatedSlots = [...inv.slots];
+                let toConsume = amountToConsume;
+
+                for (const slotIdx of slotsToUpdate) {
+                  const slot = updatedSlots[slotIdx];
+                  if (slot && toConsume > 0) {
+                    const consumed = Math.min(slot.quantity, toConsume);
+                    updatedSlots[slotIdx] = {
+                      ...slot,
+                      quantity: slot.quantity - consumed,
+                    };
+                    toConsume -= consumed;
+
+                    // Remove empty slots
+                    if (updatedSlots[slotIdx].quantity <= 0) {
+                      updatedSlots.splice(slotIdx, 1);
+                    }
                   }
                 }
-                return { ...inv, items: updatedItems };
+
+                return { ...inv, slots: updatedSlots } as InventoryComponent;
               });
 
               // Track delivery
@@ -377,8 +399,19 @@ export class MegastructureConstructionSystem extends BaseSystem {
       projectEntity.id
     );
 
-    // Remove construction project component (project is complete)
-    ctx.components(projectEntity).remove(CT.ConstructionProject);
+    // Mark project as complete by setting progress to 100%
+    // Don't remove component - preserve for historical record per CONSERVATION_OF_GAME_MATTER
+    ctx.components(projectEntity).update<ConstructionProjectComponent>(
+      CT.ConstructionProject,
+      (current) => ({
+        ...current,
+        progress: {
+          ...current.progress,
+          overallProgress: 1.0,
+          phaseProgress: 1.0,
+        },
+      })
+    );
   }
 
   /**
@@ -562,7 +595,7 @@ export function startMegastructureProject(
 
   // Create construction project entity
   const projectEntity = world.createEntity();
-  projectEntity.addComponent({
+  (projectEntity as any).addComponent({
     type: 'construction_project',
     version: 1,
     projectId,

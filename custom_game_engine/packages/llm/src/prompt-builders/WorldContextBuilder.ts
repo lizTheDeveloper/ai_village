@@ -22,12 +22,6 @@ import type { BuildingComponent } from '@ai-village/core';
 import { HarmonyContextBuilder } from './HarmonyContextBuilder.js';
 import { promptCache } from '../PromptCacheManager.js';
 
-// Chunk spatial query injection for O(1) building lookups
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToWorldContextBuilder(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /**
  * Builds world context sections for agent prompts.
@@ -566,9 +560,9 @@ export class WorldContextBuilder {
     const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
-    // FAST PATH: O(1) lookup using ChunkSpatialQuery
-    if (chunkSpatialQuery) {
-      return chunkSpatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
+    // FAST PATH: O(1) lookup using world.spatialQuery
+    if (world.spatialQuery) {
+      return world.spatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
     }
 
     // FALLBACK: Scan entities (for compatibility/tests)

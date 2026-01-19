@@ -17,27 +17,6 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { safeUpdateComponent } from '../../utils/componentUtils.js';
 import { getPosition, getAgent } from '../../utils/componentHelpers.js';
 
-/**
- * Centralized ChunkSpatialQuery instance for all behaviors.
- * Injected once at startup, shared by all behavior classes.
- */
-let sharedChunkSpatialQuery: any | null = null;
-
-/**
- * Inject ChunkSpatialQuery for all behaviors to use.
- * Call this once during game initialization.
- */
-export function injectChunkSpatialQueryToBehaviors(spatialQuery: any): void {
-  sharedChunkSpatialQuery = spatialQuery;
-}
-
-/**
- * Get the shared ChunkSpatialQuery instance.
- * Returns null if not yet injected (behaviors should fall back to global query).
- */
-export function getSharedChunkSpatialQuery(): any | null {
-  return sharedChunkSpatialQuery;
-}
 
 /**
  * Result of behavior execution
@@ -109,7 +88,7 @@ export abstract class BaseBehavior implements IBehavior {
   }
 
   /**
-   * Get entities in radius using ChunkSpatialQuery (fast) with fallback to global query.
+   * Get entities in radius using world.spatialQuery (fast) with fallback to global query.
    * This is the preferred method for spatial queries in behaviors.
    *
    * @param world - The game world
@@ -132,14 +111,9 @@ export abstract class BaseBehavior implements IBehavior {
       filter?: (entity: Entity) => boolean;
     }
   ): Array<{ entity: Entity; distance: number; distanceSquared: number; position: { x: number; y: number } }> {
-    // Prefer world.spatialQuery (new unified approach)
+    // Use world.spatialQuery (unified approach)
     if (world.spatialQuery) {
       return world.spatialQuery.getEntitiesInRadius(x, y, radius, componentTypes, options);
-    }
-
-    // Legacy: Try shared injection (for transition period)
-    if (sharedChunkSpatialQuery) {
-      return sharedChunkSpatialQuery.getEntitiesInRadius(x, y, radius, componentTypes, options);
     }
 
     // Fallback: Global query (slower, scans all entities)
@@ -148,7 +122,7 @@ export abstract class BaseBehavior implements IBehavior {
 
   /**
    * Find the nearest entity matching criteria.
-   * Uses ChunkSpatialQuery when available for performance.
+   * Uses world.spatialQuery when available for performance.
    */
   protected getNearestEntity(
     world: World,
@@ -161,14 +135,9 @@ export abstract class BaseBehavior implements IBehavior {
       filter?: (entity: Entity) => boolean;
     }
   ): { entity: Entity; distance: number; distanceSquared: number; position: { x: number; y: number } } | null {
-    // Prefer world.spatialQuery (new unified approach)
+    // Use world.spatialQuery (unified approach)
     if (world.spatialQuery) {
       return world.spatialQuery.getNearestEntity(x, y, componentTypes, options);
-    }
-
-    // Legacy: Try shared injection (for transition period)
-    if (sharedChunkSpatialQuery) {
-      return sharedChunkSpatialQuery.getNearestEntity(x, y, componentTypes, options);
     }
 
     // Fallback: use getEntitiesInRadius and take first
@@ -191,14 +160,9 @@ export abstract class BaseBehavior implements IBehavior {
     radius: number,
     componentTypes: string[]
   ): boolean {
-    // Prefer world.spatialQuery (new unified approach)
+    // Use world.spatialQuery (unified approach)
     if (world.spatialQuery) {
       return world.spatialQuery.hasEntityInRadius(x, y, radius, componentTypes);
-    }
-
-    // Legacy: Try shared injection (for transition period)
-    if (sharedChunkSpatialQuery) {
-      return sharedChunkSpatialQuery.hasEntityInRadius(x, y, radius, componentTypes);
     }
 
     // Fallback
@@ -206,7 +170,7 @@ export abstract class BaseBehavior implements IBehavior {
   }
 
   /**
-   * Fallback global query when ChunkSpatialQuery is not available.
+   * Fallback global query when world.spatialQuery is not available.
    * Scans all entities with matching components and filters by distance.
    */
   private globalQueryEntitiesInRadius(

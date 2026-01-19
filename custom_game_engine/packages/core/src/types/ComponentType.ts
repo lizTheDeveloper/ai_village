@@ -138,8 +138,13 @@ export enum ComponentType {
   Genetic = 'genetic',
 
   // Magic & Divine
-  Magic = 'magic',
+  Magic = 'magic',  // DEPRECATED: Use split components below
   Mana = 'mana',
+  ManaPoolsComponent = 'mana_pools',              // Magic: Resource pools (mana, favor, etc.)
+  SpellKnowledgeComponent = 'spell_knowledge',    // Magic: Known spells and proficiency
+  CastingStateComponent = 'casting_state',        // Magic: Active casting state
+  SkillProgressComponent = 'skill_progress',      // Magic: Skill tree progression
+  ParadigmStateComponent = 'paradigm_state',      // Magic: Paradigm-specific state
 
   // World & Time
   Time = 'time',

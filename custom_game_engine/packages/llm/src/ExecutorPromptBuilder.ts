@@ -68,13 +68,6 @@ export interface ExecutorPrompt {
 }
 
 /**
- * Interface for chunk spatial query (injected at runtime)
- */
-interface ChunkSpatialQuery {
-  hasBuildingNearPosition(x: number, y: number, buildingType: string): boolean;
-}
-
-/**
  * Extended World interface with buildingRegistry
  */
 interface WorldWithBuildingRegistry extends World {
@@ -82,13 +75,6 @@ interface WorldWithBuildingRegistry extends World {
     get(buildingType: string): any;
     getUnlocked(): any[];
   };
-}
-
-// Chunk spatial query injection for O(1) building lookups
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-export function injectChunkSpatialQueryToExecutorPromptBuilder(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
 }
 
 /**
@@ -205,9 +191,9 @@ export class ExecutorPromptBuilder {
     const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
-    // FAST PATH: O(1) lookup using ChunkSpatialQuery
-    if (chunkSpatialQuery) {
-      return chunkSpatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
+    // FAST PATH: O(1) lookup using world.spatialQuery
+    if (world.spatialQuery) {
+      return world.spatialQuery.hasBuildingNearPosition(agentPos.x, agentPos.y, 'campfire');
     }
 
     // FALLBACK: Scan entities (for compatibility/tests)

@@ -1096,6 +1096,15 @@ export {
 } from './validation/EffectValidationPipeline.js';
 
 export type {
+  ValidationResult as SpellValidationResult,
+  AffordabilityResult as SpellAffordabilityResult,
+} from './validation/SpellValidator.js';
+
+export {
+  SpellValidator,
+} from './validation/SpellValidator.js';
+
+export type {
   EvaluationScores,
   EvaluationReport,
 } from './evaluation/EffectEvaluationService.js';
@@ -1175,6 +1184,17 @@ export {
 export {
   ExpressionEvaluator,
 } from './ExpressionEvaluator.js';
+
+// ============================================================================
+// Magic Managers (Phase 3: Extracted from MagicSystem)
+// ============================================================================
+export {
+  SkillTreeManager,
+  SpellProficiencyManager,
+  ManaRegenerationManager,
+  DivineSpellManager,
+  SpellCastingManager,
+} from './managers/index.js';
 
 // ============================================================================
 // Magic Cost System

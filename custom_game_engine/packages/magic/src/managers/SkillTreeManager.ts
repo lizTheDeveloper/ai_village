@@ -15,7 +15,10 @@ import type { World } from '@ai-village/core/ecs/World.js';
 import type { EntityImpl } from '@ai-village/core/ecs/Entity.js';
 import type { EventBus } from '@ai-village/core/events/EventBus.js';
 import { ComponentType as CT } from '@ai-village/core/types/ComponentType.js';
-import type { MagicComponent } from '@ai-village/core/components/MagicComponent.js';
+import type { SkillProgressComponent } from '@ai-village/core/components/SkillProgressComponent.js';
+import type { SpellKnowledgeComponent } from '@ai-village/core/components/SpellKnowledgeComponent.js';
+import type { ManaPoolsComponent } from '@ai-village/core/components/ManaPoolsComponent.js';
+import type { ParadigmStateComponent } from '@ai-village/core/components/ParadigmStateComponent.js';
 import { MagicSkillTreeRegistry } from '../MagicSkillTreeRegistry.js';
 import { evaluateNode, type EvaluationContext } from '../MagicSkillTreeEvaluator.js';
 
@@ -54,11 +57,11 @@ export class SkillTreeManager {
    * @param xpAmount The amount of XP to grant
    */
   grantSkillXP(entity: EntityImpl, paradigmId: string, xpAmount: number): void {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return;
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    if (!skillProgress) return;
 
-    // Update skill tree state in magic component
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    // Update skill tree state in skill progress component
+    entity.updateComponent<SkillProgressComponent>(CT.SkillProgressComponent, (current) => {
       const skillTreeState = current.skillTreeState ?? {};
       const paradigmState = skillTreeState[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
 
@@ -95,10 +98,10 @@ export class SkillTreeManager {
     const tree = this.skillTreeRegistry.getTree(paradigmId);
     if (!tree) return;
 
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic?.skillTreeState?.[paradigmId]) return;
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    if (!skillProgress?.skillTreeState?.[paradigmId]) return;
 
-    const state = magic.skillTreeState[paradigmId];
+    const state = skillProgress.skillTreeState[paradigmId];
     if (!state) return;
 
     // Build evaluation context
@@ -133,15 +136,15 @@ export class SkillTreeManager {
    * @returns True if unlocked successfully
    */
   unlockSkillNode(entity: EntityImpl, paradigmId: string, nodeId: string, xpCost: number): boolean {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic?.skillTreeState?.[paradigmId]) return false;
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    if (!skillProgress?.skillTreeState?.[paradigmId]) return false;
 
-    const state = magic.skillTreeState[paradigmId];
+    const state = skillProgress.skillTreeState[paradigmId];
     if (!state || state.xp < xpCost) return false;
     if (state.unlockedNodes.includes(nodeId)) return false;
 
     // Deduct XP and add node to unlocked list
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    entity.updateComponent<SkillProgressComponent>(CT.SkillProgressComponent, (current) => {
       const skillTreeState = current.skillTreeState ?? {};
       const paradigmState = skillTreeState[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
 
@@ -237,10 +240,10 @@ export class SkillTreeManager {
     if (unlockingNodes.length === 0) return true; // Spell not gated by skill tree
 
     // Check if entity has unlocked any of these nodes
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic?.skillTreeState?.[paradigmId]) return false;
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    if (!skillProgress?.skillTreeState?.[paradigmId]) return false;
 
-    const state = magic.skillTreeState[paradigmId];
+    const state = skillProgress.skillTreeState[paradigmId];
     return unlockingNodes.some(node => state?.unlockedNodes.includes(node.id));
   }
 
@@ -251,12 +254,12 @@ export class SkillTreeManager {
    * @returns Array of spell IDs unlocked via skill trees
    */
   getUnlockedSpellsFromSkillTrees(entity: EntityImpl): string[] {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic?.skillTreeState) return [];
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    if (!skillProgress?.skillTreeState) return [];
 
     const unlockedSpells: string[] = [];
 
-    for (const [paradigmId, state] of Object.entries(magic.skillTreeState)) {
+    for (const [paradigmId, state] of Object.entries(skillProgress.skillTreeState)) {
       if (!state) continue;
 
       const tree = this.skillTreeRegistry.getTree(paradigmId);
@@ -296,8 +299,8 @@ export class SkillTreeManager {
     const tree = this.skillTreeRegistry.getTree(paradigmId);
     if (!tree) return undefined;
 
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    const state = magic?.skillTreeState?.[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
+    const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+    const state = skillProgress?.skillTreeState?.[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
 
     // Build evaluation context
     const evalContext = this.buildEvaluationContext(entity, paradigmId, state);
@@ -336,7 +339,9 @@ export class SkillTreeManager {
   ): EvaluationContext | undefined {
     if (!this.world) return undefined;
 
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    const spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    const manaPools = entity.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent);
+    const paradigmState = entity.getComponent<ParadigmStateComponent>(CT.ParadigmStateComponent);
 
     // Build MagicSkillProgress from the state
     const progress = {
@@ -357,19 +362,19 @@ export class SkillTreeManager {
       world: this.world,
       agentId: entity.id,
       progress,
-      magicComponent: magic ? {
-        paradigmState: magic.paradigmState as Record<string, unknown>,
-        techniqueProficiency: magic.techniqueProficiency as Record<string, number>,
-        formProficiency: magic.formProficiency as Record<string, number>,
-        corruption: magic.corruption,
-        favorLevel: magic.favorLevel,
-        manaPools: magic.manaPools.map(p => ({
+      magicComponent: (spellKnowledge && manaPools && paradigmState) ? {
+        paradigmState: paradigmState.paradigmState as Record<string, unknown>,
+        techniqueProficiency: spellKnowledge.techniqueProficiency as Record<string, number>,
+        formProficiency: spellKnowledge.formProficiency as Record<string, number>,
+        corruption: paradigmState.corruption,
+        favorLevel: paradigmState.favorLevel,
+        manaPools: manaPools.manaPools.map(p => ({
           source: p.source,
           current: p.current,
           maximum: p.maximum,
         })),
         resourcePools: Object.fromEntries(
-          Object.entries(magic.resourcePools).map(([key, pool]) => [
+          Object.entries(manaPools.resourcePools).map(([key, pool]) => [
             key,
             { current: pool?.current ?? 0, maximum: pool?.maximum ?? 100 },
           ])

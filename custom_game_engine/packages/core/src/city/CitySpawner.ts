@@ -5,11 +5,15 @@
  * Cities can be observed to see emergent behavior, not scripted actions.
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import { ComponentType as _CT } from '../types/ComponentType.js';
 import { createCityDirectorComponent } from '../components/CityDirectorComponent.js';
 import { createInventoryComponent, type InventorySlot } from '../components/InventoryComponent.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { createBuildingComponent, BuildingType } from '../components/BuildingComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
+import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 
 /**
  * Available city templates for spawning
@@ -569,10 +573,64 @@ function generateCityName(_template: CityTemplate): string {
 }
 
 /**
+ * Map building type strings to BuildingType enum values.
+ * For types not in enum, returns default storage-chest.
+ */
+function mapToBuildingType(buildingTypeString: string): BuildingType {
+  // Map common building type strings to BuildingType enum
+  const mapping: Record<string, BuildingType> = {
+    'house': BuildingType.Bed, // Use bed as placeholder for house
+    'farm': BuildingType.Campfire, // Use campfire as placeholder
+    'blacksmith': BuildingType.Forge,
+    'tavern': BuildingType.Campfire, // Use campfire as placeholder
+    'storage-chest': BuildingType.StorageChest,
+    'shop': BuildingType.MarketStall,
+    'warehouse': BuildingType.StorageChest,
+    'market': BuildingType.MarketStall,
+    'mine': BuildingType.StorageChest, // Use storage as placeholder
+    'forge': BuildingType.Forge,
+    'university': BuildingType.University,
+    'library': BuildingType.StorageChest, // Use storage as placeholder
+    'laboratory': BuildingType.StorageChest, // Use storage as placeholder
+    'dormitory': BuildingType.Bed,
+    'factory': BuildingType.Workbench,
+    'workshop': BuildingType.Workbench,
+    'barn': BuildingType.Barn,
+    'mill': BuildingType.Workbench,
+    'granary': BuildingType.StorageChest,
+    'barracks': BuildingType.Bed,
+    'armory': BuildingType.StorageChest,
+    'training_ground': BuildingType.Campfire, // Use campfire as placeholder
+    'watchtower': BuildingType.Campfire, // Use campfire as placeholder
+    'smithy': BuildingType.Forge,
+    'tower': BuildingType.Campfire, // Use campfire as placeholder
+    'alchemy_lab': BuildingType.Workbench,
+    'ritual_circle': BuildingType.Campfire,
+    'tent': BuildingType.Bedroll,
+    'campfire': BuildingType.Campfire,
+    'hall': BuildingType.Bed,
+    'brewery': BuildingType.Workbench,
+    'vault': BuildingType.StorageChest,
+    'treehouse': BuildingType.Bed,
+    'garden': BuildingType.Campfire,
+    'archery_range': BuildingType.Campfire,
+    'shrine': BuildingType.Campfire,
+    'dock': BuildingType.Campfire,
+    'observatory': BuildingType.Campfire,
+    'temple': BuildingType.Campfire,
+    'well': BuildingType.Well,
+    'storage-box': BuildingType.StorageBox,
+    'workbench': BuildingType.Workbench,
+  };
+
+  return mapping[buildingTypeString] ?? BuildingType.StorageChest;
+}
+
+/**
  * Spawn an NPC city in the world
  */
 export async function spawnCity(
-  world: World,
+  world: WorldMutator,
   config: CitySpawnConfig
 ): Promise<SpawnedCityInfo> {
   const template = CITY_TEMPLATES[config.template];
@@ -611,11 +669,30 @@ export async function spawnCity(
 
   for (const buildingSpec of template.buildings) {
     for (let i = 0; i < buildingSpec.count; i++) {
-      // TODO: Implement proper building spawning with buildingSpec.type and position
-      // Position would be calculated based on grid: row/col from buildingIndex
-      // For now, create basic entity - this needs to integrate with building system
+      // Calculate position in grid pattern
+      const row = Math.floor(buildingIndex / gridSize);
+      const col = buildingIndex % gridSize;
+      const buildingX = config.x - radius + (col * spacing) + spacing / 2;
+      const buildingY = config.y - radius + (row * spacing) + spacing / 2;
+
+      // Create building entity
       const buildingEntity = world.createEntity();
       spawnedBuildingIds.push(buildingEntity.id);
+
+      // Map building type string to BuildingType enum
+      const buildingType = mapToBuildingType(buildingSpec.type);
+
+      // Add building components (pattern from CityBuildingGenerationSystem)
+      // Buildings start complete in spawned cities (instant construction)
+      (buildingEntity as EntityImpl).addComponent(
+        createBuildingComponent(buildingType, 1, 100)
+      );
+      (buildingEntity as EntityImpl).addComponent(
+        createPositionComponent(buildingX, buildingY)
+      );
+      (buildingEntity as EntityImpl).addComponent(
+        createRenderableComponent(buildingSpec.type, 'building')
+      );
 
       // Add inventory with starting items
       const startingItems = getBuildingStartingItems(buildingSpec.type);
@@ -642,38 +719,52 @@ export async function spawnCity(
     // Assign profession based on template
     const profession = professions[i % professions.length] || 'villager';
 
-    // TODO: Implement proper agent spawning with profession, position, and LLM settings
-    // Position would be distributed in circle: angle/radius calculated from i
-    // For now, create basic entity - this needs to integrate with agent spawner system
-    const agentEntity = world.createEntity();
-    spawnedAgentIds.push(agentEntity.id);
+    // Calculate position in circular distribution around city center
+    const angle = (i / agentCount) * Math.PI * 2;
+    const spawnRadius = radius * 0.8; // Spawn agents within 80% of city radius
+    const agentX = config.x + Math.cos(angle) * spawnRadius;
+    const agentY = config.y + Math.sin(angle) * spawnRadius;
 
-    // Add inventory with profession-appropriate starting items
+    // Create agent using existing agent creation functions
+    // Use LLM agents if configured, otherwise use wandering agents (scripted)
+    let agentId: string;
+    if (useLLM) {
+      agentId = createLLMAgent(world, agentX, agentY, 2.0);
+    } else {
+      agentId = createWanderingAgent(world, agentX, agentY, 2.0);
+    }
+
+    spawnedAgentIds.push(agentId);
+
+    // Get the agent entity to customize it
+    const agentEntity = world.getEntityById(agentId);
+    if (!agentEntity) {
+      continue;
+    }
+
+    // Add profession-appropriate starting items to agent's existing inventory
     const startingItems = getAgentStartingItems(profession);
-    const inventory = createInventoryComponent(24, 100); // Standard agent capacity
+    const inventory = agentEntity.getComponent<typeof createInventoryComponent>('inventory');
 
-    // Fill inventory slots with starting items
-    for (let slotIdx = 0; slotIdx < startingItems.length && slotIdx < inventory.maxSlots; slotIdx++) {
-      const item = startingItems[slotIdx];
-      if (item) {
-        inventory.slots[slotIdx] = item;
+    if (inventory) {
+      // Find empty slots and add items
+      let itemIdx = 0;
+      for (let slotIdx = 0; slotIdx < inventory.maxSlots && itemIdx < startingItems.length; slotIdx++) {
+        if (!inventory.slots[slotIdx]) {
+          inventory.slots[slotIdx] = startingItems[itemIdx];
+          itemIdx++;
+        }
       }
     }
 
-    // Add inventory to agent
-    (agentEntity as EntityImpl).addComponent(inventory);
-
-    // Set agent's profession if they have a profession component
-    const professionComponent = agentEntity.components.get('profession');
-    if (professionComponent && typeof professionComponent === 'object' && 'currentProfession' in professionComponent) {
-      (professionComponent as { currentProfession: string }).currentProfession = profession;
-    }
-
     // Mark agent as belonging to this city
-    const identity = agentEntity.components.get('identity');
-    if (identity && typeof identity === 'object' && 'cityId' in identity) {
-      (identity as { cityId: string }).cityId = cityId;
+    const identity = agentEntity.getComponent<{ name: string; cityId?: string }>('identity');
+    if (identity) {
+      identity.cityId = cityId;
     }
+
+    // Note: Profession system is not yet implemented in the codebase
+    // When it is, we can set: agent.profession.currentProfession = profession;
   }
 
   // Count buildings by district type

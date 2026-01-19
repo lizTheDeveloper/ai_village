@@ -54,12 +54,6 @@ let terrainCache: TerrainCache | null = null;
 let terrainDescriptionCacheStatic: TerrainDescriptionCacheStatic | null = null;
 
 /**
- * Chunk spatial query service injected at runtime from @ai-village/world.
- * Used for efficient spatial entity queries.
- */
-let chunkSpatialQuery: any | null = null; // ChunkSpatialQuery from @ai-village/world
-
-/**
  * Inject terrain services from @ai-village/world at runtime.
  * Called by the application bootstrap to avoid circular dependencies.
  */
@@ -71,14 +65,6 @@ export function injectTerrainServices(
   terrainAnalyzer = analyzer;
   terrainCache = cache;
   terrainDescriptionCacheStatic = descriptionCache;
-}
-
-/**
- * Inject chunk spatial query service from @ai-village/world.
- * Called by the application bootstrap.
- */
-export function injectChunkSpatialQuery(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
 }
 
 /**
@@ -303,7 +289,7 @@ export class VisionProcessor {
   /**
    * Detect plants with tiered awareness.
    *
-   * OPTIMIZATION: Uses ChunkSpatialQuery instead of global query.
+   * OPTIMIZATION: Uses world.spatialQuery instead of global query.
    * - Previous: Queried ALL plants globally (~100-500 plants)
    * - New: Queries only plants in relevant chunks (~10-50 plants)
    * - Performance: 10-50× reduction in entities checked
@@ -317,10 +303,10 @@ export class VisionProcessor {
     nearbyPlants: TieredEntity[],
     seenPlantIds: string[]
   ): void {
-    // Use chunk spatial query if available, otherwise fall back to global query
-    if (chunkSpatialQuery) {
+    // Use world.spatialQuery if available, otherwise fall back to global query
+    if (world.spatialQuery) {
       // Get plants in area range using chunk-based filtering
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         areaRange,
@@ -376,7 +362,7 @@ export class VisionProcessor {
         }
       }
     } else {
-      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Fallback: Chunk-based iteration (for tests or when world.spatialQuery unavailable)
       // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(position.x / CHUNK_SIZE);
@@ -447,7 +433,7 @@ export class VisionProcessor {
   /**
    * Detect agents with tiered awareness.
    *
-   * OPTIMIZATION: Uses ChunkSpatialQuery instead of global query.
+   * OPTIMIZATION: Uses world.spatialQuery instead of global query.
    * - Previous: Queried ALL agents globally (~20-50 agents)
    * - New: Queries only agents in relevant chunks (~5-15 agents)
    * - Performance: 3-10× reduction in entities checked
@@ -462,10 +448,10 @@ export class VisionProcessor {
     nearbyAgents: TieredEntity[],
     seenAgentIds: string[]
   ): void {
-    // Use chunk spatial query if available, otherwise fall back to global query
-    if (chunkSpatialQuery) {
+    // Use world.spatialQuery if available, otherwise fall back to global query
+    if (world.spatialQuery) {
       // Get agents in area range using chunk-based filtering
-      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const agentsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         areaRange,
@@ -515,7 +501,7 @@ export class VisionProcessor {
         }
       }
     } else {
-      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Fallback: Chunk-based iteration (for tests or when world.spatialQuery unavailable)
       // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(position.x / CHUNK_SIZE);

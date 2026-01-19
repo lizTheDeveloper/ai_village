@@ -12,7 +12,9 @@
 
 import type { EntityImpl } from '@ai-village/core/ecs/Entity.js';
 import { ComponentType as CT } from '@ai-village/core/types/ComponentType.js';
-import type { MagicComponent, MagicSourceId } from '@ai-village/core/components/MagicComponent.js';
+import type { ManaPoolsComponent } from '@ai-village/core/components/ManaPoolsComponent.js';
+import type { ParadigmStateComponent } from '@ai-village/core/components/ParadigmStateComponent.js';
+import type { MagicSourceId } from '@ai-village/core/components/MagicComponent.js';
 import type { SpiritualComponent } from '@ai-village/core/components/SpiritualComponent.js';
 import { costRecoveryManager } from '../costs/CostRecoveryManager.js';
 
@@ -35,39 +37,49 @@ export class ManaRegenerationManager {
    * Handles both mana pools and paradigm-specific resource pools.
    *
    * @param entity The entity to regenerate resources for
-   * @param magic The entity's magic component
+   * @param manaPools The entity's mana pools component
    * @param deltaTime Time since last update (ms)
    */
-  applyMagicRegeneration(entity: EntityImpl, magic: MagicComponent, deltaTime: number): void {
-    // Clone the magic component to apply changes
-    const updatedMagic = { ...magic };
+  applyMagicRegeneration(entity: EntityImpl, manaPools: ManaPoolsComponent, deltaTime: number): void {
+    // Clone the mana pools component to apply changes
+    const updatedPools = { ...manaPools };
 
     // Deep clone mana pools and resource pools for mutation
-    updatedMagic.manaPools = magic.manaPools.map(pool => ({ ...pool }));
-    updatedMagic.resourcePools = { ...magic.resourcePools };
-    for (const key of Object.keys(updatedMagic.resourcePools)) {
-      const pool = updatedMagic.resourcePools[key as keyof typeof updatedMagic.resourcePools];
+    updatedPools.manaPools = manaPools.manaPools.map(pool => ({ ...pool }));
+    updatedPools.resourcePools = { ...manaPools.resourcePools };
+    for (const key of Object.keys(updatedPools.resourcePools)) {
+      const pool = updatedPools.resourcePools[key as keyof typeof updatedPools.resourcePools];
       if (pool) {
-        updatedMagic.resourcePools[key as keyof typeof updatedMagic.resourcePools] = { ...pool };
+        updatedPools.resourcePools[key as keyof typeof updatedPools.resourcePools] = { ...pool };
       }
     }
 
+    // Build a temporary magic-like object for CostRecoveryManager compatibility
+    const tempMagic = {
+      manaPools: updatedPools.manaPools,
+      resourcePools: updatedPools.resourcePools,
+    };
+
     // Apply passive regeneration via CostRecoveryManager
-    costRecoveryManager.applyPassiveRegeneration(updatedMagic, deltaTime);
+    costRecoveryManager.applyPassiveRegeneration(tempMagic as any, deltaTime);
+
+    // Copy back the regenerated values
+    updatedPools.manaPools = tempMagic.manaPools;
+    updatedPools.resourcePools = tempMagic.resourcePools;
 
     // Check if anything changed
-    const manaChanged = magic.manaPools.some((pool, i) =>
-      pool.current !== updatedMagic.manaPools[i]?.current
+    const manaChanged = manaPools.manaPools.some((pool, i) =>
+      pool.current !== updatedPools.manaPools[i]?.current
     );
 
-    const resourceChanged = Object.keys(magic.resourcePools).some(key => {
-      const oldPool = magic.resourcePools[key as keyof typeof magic.resourcePools];
-      const newPool = updatedMagic.resourcePools[key as keyof typeof updatedMagic.resourcePools];
+    const resourceChanged = Object.keys(manaPools.resourcePools).some(key => {
+      const oldPool = manaPools.resourcePools[key as keyof typeof manaPools.resourcePools];
+      const newPool = updatedPools.resourcePools[key as keyof typeof updatedPools.resourcePools];
       return oldPool?.current !== newPool?.current;
     });
 
     if (manaChanged || resourceChanged) {
-      entity.updateComponent<MagicComponent>(CT.Magic, () => updatedMagic);
+      entity.updateComponent<ManaPoolsComponent>(CT.ManaPoolsComponent, () => updatedPools);
     }
   }
 
@@ -76,24 +88,27 @@ export class ManaRegenerationManager {
   // =========================================================================
 
   /**
-   * Synchronize faith (SpiritualComponent) with divine favor (MagicComponent).
+   * Synchronize faith (SpiritualComponent) with divine favor (ManaPoolsComponent).
    * This ensures bidirectional consistency:
    * - Changes to divine favor affect agent's faith
    * - Changes to faith affect divine magic costs
    *
    * @param entity The entity to synchronize
-   * @param magic The entity's magic component
+   * @param manaPools The entity's mana pools component
+   * @param paradigmState The entity's paradigm state component
    */
-  syncFaithAndFavor(entity: EntityImpl, magic: MagicComponent): void {
+  syncFaithAndFavor(entity: EntityImpl, manaPools: ManaPoolsComponent, paradigmState: ParadigmStateComponent): void {
     // Only sync for divine paradigm users
-    if (magic.activeParadigmId !== 'divine' && !magic.knownParadigmIds.includes('divine')) {
+    const spellKnowledge = entity.getComponent(CT.SpellKnowledgeComponent);
+    const knownParadigmIds = spellKnowledge ? (spellKnowledge as any).knownParadigmIds : [];
+    if (paradigmState.activeParadigmId !== 'divine' && !knownParadigmIds.includes('divine')) {
       return;
     }
 
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     if (!spiritual) return;
 
-    const favorPool = magic.resourcePools.favor;
+    const favorPool = manaPools.resourcePools.favor;
     if (!favorPool) return;
 
     // Calculate normalized favor (0-1)
@@ -119,10 +134,10 @@ export class ManaRegenerationManager {
         }));
       }
 
-      // Update magic component if favor needs adjustment
+      // Update mana pools component if favor needs adjustment
       const targetFavor = syncedValue * favorPool.maximum;
       if (Math.abs(favorPool.current - targetFavor) > 1) {
-        entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+        entity.updateComponent<ManaPoolsComponent>(CT.ManaPoolsComponent, (current) => {
           const updatedPools = { ...current.resourcePools };
           if (updatedPools.favor) {
             updatedPools.favor = {
@@ -151,10 +166,10 @@ export class ManaRegenerationManager {
    * @param amount The amount to grant
    */
   grantMana(entity: EntityImpl, source: MagicSourceId, amount: number): void {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return;
+    const manaPools = entity.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent);
+    if (!manaPools) return;
 
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    entity.updateComponent<ManaPoolsComponent>(CT.ManaPoolsComponent, (current) => {
       const updatedPools = current.manaPools.map((pool) => {
         if (pool.source === source) {
           return {
@@ -180,7 +195,7 @@ export class ManaRegenerationManager {
    * @param amount The amount to deduct
    */
   deductMana(entity: EntityImpl, source: MagicSourceId, amount: number): void {
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    entity.updateComponent<ManaPoolsComponent>(CT.ManaPoolsComponent, (current) => {
       const updatedPools = current.manaPools.map((pool) => {
         if (pool.source === source) {
           return {

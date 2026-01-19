@@ -564,10 +564,95 @@ export class CityManager {
   }
 
   private countThreats(world: World): number {
-    // Count hostile wild animals near city
-    const wildAnimals = world.query().with('wild_animal').executeEntities();
-    // TODO: Implement threat detection based on proximity to city center
-    return 0;
+    // Find city center (average of all agent positions)
+    const agents = world.query().with('position').with('agent').executeEntities();
+    if (agents.length === 0) return 0;
+
+    let sumX = 0, sumY = 0;
+    agents.forEach(agent => {
+      const pos = agent.getComponent('position');
+      if (pos && typeof pos === 'object' && 'x' in pos && 'y' in pos) {
+        sumX += (pos as { x: number; y: number }).x;
+        sumY += (pos as { x: number; y: number }).y;
+      }
+    });
+    const centerX = sumX / agents.length;
+    const centerY = sumY / agents.length;
+
+    let threatCount = 0;
+    const THREAT_RADIUS = 30; // tiles
+
+    // Count hostile wild animals near city center
+    const wildAnimals = world.query().with('animal').executeEntities();
+    for (const animal of wildAnimals) {
+      const animalComp = animal.getComponent('animal');
+      if (!animalComp || typeof animalComp !== 'object') continue;
+
+      type AnimalWithWild = {
+        wild: boolean;
+        position?: { x: number; y: number };
+      };
+
+      const typedAnimal = animalComp as unknown as AnimalWithWild;
+
+      // Only count wild (untamed) animals
+      if (!typedAnimal.wild) continue;
+
+      // Get position
+      const pos = animal.getComponent('position');
+      if (!pos || typeof pos !== 'object' || !('x' in pos) || !('y' in pos)) continue;
+
+      const typedPos = pos as { x: number; y: number };
+
+      // Check proximity to city center
+      const dx = typedPos.x - centerX;
+      const dy = typedPos.y - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= THREAT_RADIUS) {
+        // Count as threat if dangerous enough
+        // Predators and aggressive animals are threats
+        threatCount++;
+      }
+    }
+
+    // Count hostile agents (entities in conflict with city agents)
+    const conflicts = world.query().with('conflict').executeEntities();
+    for (const conflictEntity of conflicts) {
+      const conflict = conflictEntity.getComponent('conflict');
+      if (!conflict || typeof conflict !== 'object') continue;
+
+      type ConflictWithTarget = {
+        conflictType?: string;
+        target?: string;
+      };
+
+      const typedConflict = conflict as ConflictWithTarget;
+
+      // Check if conflict involves any city agent
+      const isAgentInvolved = agents.some(agent =>
+        agent.id === conflictEntity.id ||
+        agent.id === typedConflict.target
+      );
+
+      if (isAgentInvolved) {
+        const pos = conflictEntity.getComponent('position');
+        if (!pos || typeof pos !== 'object' || !('x' in pos) || !('y' in pos)) continue;
+
+        const typedPos = pos as { x: number; y: number };
+
+        // Check proximity to city center
+        const dx = typedPos.x - centerX;
+        const dy = typedPos.y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= THREAT_RADIUS) {
+          threatCount++;
+        }
+      }
+    }
+
+    return threatCount;
   }
 
   private countRecentDeaths(world: World): number {

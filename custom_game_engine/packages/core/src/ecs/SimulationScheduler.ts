@@ -321,7 +321,7 @@ export class SimulationScheduler {
     let mode = SimulationMode.PASSIVE;
     let range = 15;
     let updateFrequency = 1;
-    // let isEssential = false;  // TODO: implement essential entity tracking
+    let isEssential = false;
 
     // Check all components to find the most permissive simulation mode
     for (const [componentType] of entity.components.entries()) {
@@ -330,7 +330,7 @@ export class SimulationScheduler {
       // ALWAYS takes precedence
       if (config.mode === SimulationMode.ALWAYS || config.essential) {
         mode = SimulationMode.ALWAYS;
-        // isEssential = true;  // TODO: implement essential entity tracking
+        isEssential = true;
         break;
       }
 
@@ -340,6 +340,16 @@ export class SimulationScheduler {
         range = config.range || 15;
         updateFrequency = config.updateFrequency || 1;
       }
+    }
+
+    // Check for runtime essential status (dynamic conditions)
+    if (!isEssential) {
+      isEssential = this.isEntityEssential(entity);
+    }
+
+    // Essential entities are promoted to ALWAYS mode
+    if (isEssential && mode === SimulationMode.PROXIMITY) {
+      mode = SimulationMode.ALWAYS;
     }
 
     // ALWAYS entities always simulate
@@ -365,6 +375,42 @@ export class SimulationScheduler {
       }
 
       return this.checkUpdateFrequency(entity.id, currentTick, updateFrequency);
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if an entity is essential and should always be simulated
+   *
+   * Essential entities include:
+   * - Entities in active conversations
+   * - Tamed animals
+   * - Animals with owners
+   * - Companion entities
+   */
+  private isEntityEssential(entity: Entity): boolean {
+    // Check for active conversation
+    const conversationComponent = entity.components.get('conversation');
+    if (conversationComponent && typeof conversationComponent === 'object') {
+      const conversation = conversationComponent as { isActive?: boolean };
+      if (conversation.isActive === true) {
+        return true; // Active conversation participant
+      }
+    }
+
+    // Check for tamed animals or animals with owners
+    const animalComponent = entity.components.get('animal');
+    if (animalComponent && typeof animalComponent === 'object') {
+      const animal = animalComponent as { wild?: boolean; ownerId?: string };
+      if (animal.wild === false || animal.ownerId !== undefined) {
+        return true; // Tamed animal or has owner
+      }
+    }
+
+    // Check for companion component (Ophanim companion)
+    if (entity.components.has('companion')) {
+      return true; // Companion is always essential
     }
 
     return false;

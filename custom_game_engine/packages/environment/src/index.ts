@@ -17,7 +17,7 @@ export type { TimeComponent, DayPhase } from './systems/TimeSystem.js';
 
 export { WeatherSystem } from './systems/WeatherSystem.js';
 
-export { TemperatureSystem, injectChunkSpatialQueryToTemperature } from './systems/TemperatureSystem.js';
+export { TemperatureSystem } from './systems/TemperatureSystem.js';
 
 export { SoilSystem, FERTILIZERS } from './systems/SoilSystem.js';
 export type { Tile, FertilizerType } from './systems/SoilSystem.js';

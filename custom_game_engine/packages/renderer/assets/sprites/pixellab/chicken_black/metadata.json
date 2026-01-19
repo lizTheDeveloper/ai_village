@@ -1,7 +1,7 @@
 {
-  "id": "chicken_brown",
+  "id": "chicken_black",
   "base_species": "chicken",
-  "description": "brown hen",
+  "description": "black rooster",
   "size": 48,
   "directions": [
     "south",
@@ -13,5 +13,5 @@
     "east",
     "southeast"
   ],
-  "regenerated_at": "2026-01-19T02:46:47.729Z"
+  "regenerated_at": "2026-01-19T02:44:22.688Z"
 }

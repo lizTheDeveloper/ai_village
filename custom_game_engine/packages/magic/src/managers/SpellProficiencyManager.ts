@@ -13,7 +13,8 @@
 import type { EntityImpl } from '@ai-village/core/ecs/Entity.js';
 import type { EventBus } from '@ai-village/core/events/EventBus.js';
 import { ComponentType as CT } from '@ai-village/core/types/ComponentType.js';
-import type { MagicComponent } from '@ai-village/core/components/MagicComponent.js';
+import type { SpellKnowledgeComponent } from '@ai-village/core/components/SpellKnowledgeComponent.js';
+import type { ParadigmStateComponent } from '@ai-village/core/components/ParadigmStateComponent.js';
 import { SpellRegistry } from '../SpellRegistry.js';
 
 /**
@@ -55,21 +56,22 @@ export class SpellProficiencyManager {
    * @returns True if learned successfully
    */
   learnSpell(entity: EntityImpl, spellId: string, initialProficiency: number = 0): boolean {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return false;
+    const spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    if (!spellKnowledge) return false;
 
     // Check if already known
-    if (magic.knownSpells.some((s) => s.spellId === spellId)) {
+    if (spellKnowledge.knownSpells.some((s) => s.spellId === spellId)) {
       return false;
     }
 
     // Get spell info from registry for the event
     const spellRegistry = SpellRegistry.getInstance();
     const spellDef = spellRegistry.getSpell(spellId);
-    const paradigmId = spellDef?.paradigmId ?? magic.activeParadigmId ?? 'academic';
+    const paradigmState = entity.getComponent<ParadigmStateComponent>(CT.ParadigmStateComponent);
+    const paradigmId = spellDef?.paradigmId ?? paradigmState?.activeParadigmId ?? 'academic';
 
     // Add to known spells
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => ({
+    entity.updateComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent, (current) => ({
       ...current,
       knownSpells: [
         ...current.knownSpells,
@@ -107,7 +109,7 @@ export class SpellProficiencyManager {
    * @param knownSpell The spell that was cast
    */
   updateSpellProficiency(entity: EntityImpl, knownSpell: { spellId: string }): void {
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    entity.updateComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent, (current) => {
       const updated = current.knownSpells.map((s) => {
         if (s.spellId === knownSpell.spellId) {
           return {
@@ -135,7 +137,7 @@ export class SpellProficiencyManager {
    * @param spellId The spell that was cast
    */
   incrementSpellProficiency(entity: EntityImpl, spellId: string): void {
-    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+    entity.updateComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent, (current) => {
       const knownSpells = current.knownSpells.map(spell => {
         if (spell.spellId === spellId) {
           return {
@@ -150,7 +152,6 @@ export class SpellProficiencyManager {
       return {
         ...current,
         knownSpells,
-        totalSpellsCast: current.totalSpellsCast + 1,
       };
     });
   }
@@ -167,10 +168,10 @@ export class SpellProficiencyManager {
    * @returns Proficiency (0-100) or 0 if spell not known
    */
   getProficiency(entity: EntityImpl, spellId: string): number {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return 0;
+    const spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    if (!spellKnowledge) return 0;
 
-    const spell = magic.knownSpells.find(s => s.spellId === spellId);
+    const spell = spellKnowledge.knownSpells.find(s => s.spellId === spellId);
     return spell?.proficiency ?? 0;
   }
 
@@ -182,10 +183,10 @@ export class SpellProficiencyManager {
    * @returns True if spell is known
    */
   knowsSpell(entity: EntityImpl, spellId: string): boolean {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return false;
+    const spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    if (!spellKnowledge) return false;
 
-    return magic.knownSpells.some(s => s.spellId === spellId);
+    return spellKnowledge.knownSpells.some(s => s.spellId === spellId);
   }
 
   /**
@@ -195,10 +196,10 @@ export class SpellProficiencyManager {
    * @returns Array of known spells
    */
   getKnownSpells(entity: EntityImpl): Array<{ spellId: string; proficiency: number; timesCast: number }> {
-    const magic = entity.getComponent<MagicComponent>(CT.Magic);
-    if (!magic) return [];
+    const spellKnowledge = entity.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent);
+    if (!spellKnowledge) return [];
 
-    return magic.knownSpells.map(s => ({
+    return spellKnowledge.knownSpells.map(s => ({
       spellId: s.spellId,
       proficiency: s.proficiency,
       timesCast: s.timesCast,

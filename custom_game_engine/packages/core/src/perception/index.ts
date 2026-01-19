@@ -13,7 +13,6 @@
 export {
   VisionProcessor,
   processVision,
-  injectChunkSpatialQuery,
   type VisionResult,
 } from './VisionProcessor.js';
 
@@ -23,7 +22,6 @@ export {
   processHearing,
   canHear,
   getAgentsInHearingRange,
-  injectChunkSpatialQueryForHearing,
   type HeardSpeech,
   type HearingResult,
 } from './HearingProcessor.js';

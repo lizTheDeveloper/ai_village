@@ -633,26 +633,8 @@ export {
 // ============================================================================
 // Chunk Spatial Query Injection
 // ============================================================================
-// Chunk spatial query injection functions
-export {
-  injectChunkSpatialQuery,
-  injectChunkSpatialQueryForHearing,
-} from './perception/index.js';
-
-export {
-  injectChunkSpatialQueryToMovement,
-} from './systems/MovementSystem.js';
-
-// Injection functions removed - use world.spatialQuery instead
-
-export {
-  injectChunkSpatialQueryToBehaviors,
-  getSharedChunkSpatialQuery,
-} from './behavior/behaviors/BaseBehavior.js';
-
-export {
-  injectChunkSpatialQueryForBrain,
-} from './systems/AgentBrainSystem.js';
+// Chunk spatial query injection - MIGRATED to world.spatialQuery
+// All injection functions removed - spatial queries now use world.spatialQuery
 
 // ============================================================================
 // Extracted Behavior Implementations

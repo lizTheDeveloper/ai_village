@@ -33,45 +33,8 @@ export interface HearingResult {
   heardSpeech: HeardSpeech[];
 }
 
-/**
- * Spatial query result from ChunkSpatialQuery.
- * Matches the interface from @ai-village/world package.
- */
-interface SpatialQueryResult {
-  entity: Entity;
-  distance: number;
-}
-
-/**
- * Minimal interface for ChunkSpatialQuery service from @ai-village/world.
- * Used for efficient spatial entity queries.
- */
-interface ChunkSpatialQuery {
-  getEntitiesInRadius(
-    x: number,
-    y: number,
-    radius: number,
-    componentTypes: string[],
-    options?: { excludeIds?: Set<string> }
-  ): SpatialQueryResult[];
-}
-
 /** Default hearing range in tiles */
 const DEFAULT_HEARING_RANGE = 50;
-
-/**
- * Chunk spatial query service injected at runtime from @ai-village/world.
- * Used for efficient spatial entity queries.
- */
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-/**
- * Inject chunk spatial query service from @ai-village/world.
- * Called by the application bootstrap.
- */
-export function injectChunkSpatialQueryForHearing(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /**
  * HearingProcessor Class
@@ -144,9 +107,9 @@ export class HearingProcessor {
   ): HeardSpeech[] {
     const heardSpeech: HeardSpeech[] = [];
 
-    // Use chunk spatial query if available for efficient spatial filtering
-    if (chunkSpatialQuery) {
-      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    // Use world.spatialQuery if available for efficient spatial filtering
+    if (world.spatialQuery) {
+      const agentsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         this.hearingRange,
@@ -180,7 +143,7 @@ export class HearingProcessor {
         }
       }
     } else {
-      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Fallback: Chunk-based iteration (for tests or when world.spatialQuery unavailable)
       // Uses world.getEntitiesInChunk() which is O(nearby) instead of O(all entities)
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(position.x / CHUNK_SIZE);
@@ -249,9 +212,9 @@ export class HearingProcessor {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return [];
 
-    // Use chunk spatial query if available
-    if (chunkSpatialQuery) {
-      const agentsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    // Use world.spatialQuery if available
+    if (world.spatialQuery) {
+      const agentsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         this.hearingRange,
@@ -261,9 +224,9 @@ export class HearingProcessor {
         }
       );
 
-      return agentsInRadius.map((result: SpatialQueryResult) => result.entity);
+      return agentsInRadius.map((result: { entity: Entity; distance: number }) => result.entity);
     } else {
-      // Fallback: Chunk-based iteration (for tests or when ChunkSpatialQuery unavailable)
+      // Fallback: Chunk-based iteration (for tests or when world.spatialQuery unavailable)
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(position.x / CHUNK_SIZE);
       const chunkY = Math.floor(position.y / CHUNK_SIZE);
