@@ -187,13 +187,11 @@ export class FleetCoherenceSystem extends BaseSystem {
     // PERF: Clear object literal by reassigning
     this.fleetEntityCache = Object.create(null);
 
-    for (let i = 0; i < armadas.length; i++) {
-      const armada = armadas[i].getComponent<ArmadaComponent>(CT.Armada);
+    for (const armadaEntity of armadas) {
+      const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
 
-      const fleetIds = armada.fleets.fleetIds;
-      for (let j = 0; j < fleetIds.length; j++) {
-        const fleetId = fleetIds[j];
+      for (const fleetId of armada.fleets.fleetIds) {
         if (!(fleetId in this.fleetEntityCache)) {
           this.fleetEntityCache[fleetId] = world.getEntity(fleetId) as EntityImpl | null;
         }
@@ -231,13 +229,8 @@ export class FleetCoherenceSystem extends BaseSystem {
     // PERF: Reset coherence buffer length (reuse array, no allocation)
     this.coherenceBufferLen = 0;
 
-    // PERF: Get squadron IDs once, use indexed loop
-    const squadronIds = fleet.squadrons.squadronIds;
-    const squadronCount = squadronIds.length;
-
     // Gather stats from all squadrons
-    for (let i = 0; i < squadronCount; i++) {
-      const squadronId = squadronIds[i];
+    for (const squadronId of fleet.squadrons.squadronIds) {
       // PERF: Object literal lookup (faster than Map.get)
       const squadronEntity = this.squadronEntityCache[squadronId];
       if (!squadronEntity) {
@@ -270,7 +263,7 @@ export class FleetCoherenceSystem extends BaseSystem {
     if (this.coherenceBufferLen > 0) {
       let sum = 0;
       for (let i = 0; i < this.coherenceBufferLen; i++) {
-        sum += this.coherenceBuffer[i];
+        sum += this.coherenceBuffer[i]!; // Non-null: pre-allocated buffer
       }
       stats.avgCoherence = sum / this.coherenceBufferLen;
     }
@@ -381,13 +374,8 @@ export class FleetCoherenceSystem extends BaseSystem {
     // PERF: Use pre-allocated buffer, reset length
     this.coherenceBufferLen = 0;
 
-    // PERF: Get fleet IDs once, use indexed loop
-    const fleetIds = armada.fleets.fleetIds;
-    const fleetCount = fleetIds.length;
-
     // Gather stats from all fleets
-    for (let i = 0; i < fleetCount; i++) {
-      const fleetId = fleetIds[i];
+    for (const fleetId of armada.fleets.fleetIds) {
       // PERF: Object literal lookup
       const fleetEntity = this.fleetEntityCache[fleetId];
       if (!fleetEntity) {
@@ -414,7 +402,7 @@ export class FleetCoherenceSystem extends BaseSystem {
     if (this.coherenceBufferLen > 0) {
       let sum = 0;
       for (let i = 0; i < this.coherenceBufferLen; i++) {
-        sum += this.coherenceBuffer[i];
+        sum += this.coherenceBuffer[i]!; // Non-null: pre-allocated buffer
       }
       stats.avgCoherence = sum / this.coherenceBufferLen;
     }

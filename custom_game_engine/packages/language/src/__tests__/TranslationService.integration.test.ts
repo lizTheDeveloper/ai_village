@@ -19,8 +19,12 @@ class MockLLMProvider implements LLMProvider {
   /**
    * Add mock response for a specific word
    */
-  addMockResponse(word: string, response: TranslationResponse): void {
-    this.responses.set(word, JSON.stringify(response));
+  addMockResponse(word: string, response: TranslationResponse | string): void {
+    if (typeof response === 'string') {
+      this.responses.set(word, response);  // Already a string (e.g., markdown-wrapped JSON)
+    } else {
+      this.responses.set(word, JSON.stringify(response));  // Object, needs stringification
+    }
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {

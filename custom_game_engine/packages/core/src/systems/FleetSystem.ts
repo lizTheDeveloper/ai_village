@@ -81,15 +81,13 @@ export class FleetSystem extends BaseSystem {
       this.cacheValidTick = tick;
     }
 
-    // PERF: Use indexed for-loop (faster than for-of)
-    for (let i = 0; i < fleetCount; i++) {
-      const fleetEntity = ctx.activeEntities[i];
+    // Process fleets
+    for (const fleetEntity of ctx.activeEntities) {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
       // PERF: Early exit for empty fleets
-      const squadronCount = fleet.squadrons.squadronIds.length;
-      if (squadronCount === 0) continue;
+      if (fleet.squadrons.squadronIds.length === 0) continue;
 
       // Update fleet aggregate stats from squadrons
       this.updateFleetStats(ctx.world, fleetEntity as EntityImpl, fleet, tick);
@@ -108,10 +106,8 @@ export class FleetSystem extends BaseSystem {
     this.squadronCache = Object.create(null);
 
     const squadronEntities = world.query().with(CT.Squadron).executeEntities();
-    const count = squadronEntities.length;
 
-    for (let i = 0; i < count; i++) {
-      const entity = squadronEntities[i];
+    for (const entity of squadronEntities) {
       const squadron = entity.getComponent<SquadronComponent>(CT.Squadron);
       if (squadron) {
         this.squadronCache[squadron.squadronId] = entity as EntityImpl;
@@ -139,13 +135,8 @@ export class FleetSystem extends BaseSystem {
     // PERF: Clear and reuse Map
     this.shipTypeMap.clear();
 
-    // PERF: Get squadron IDs once, use indexed loop
-    const squadronIds = fleet.squadrons.squadronIds;
-    const squadronCount = squadronIds.length;
-
     // Gather stats from all squadrons
-    for (let i = 0; i < squadronCount; i++) {
-      const squadronId = squadronIds[i];
+    for (const squadronId of fleet.squadrons.squadronIds) {
       // PERF: Object literal lookup (faster than Map.get)
       const squadronEntity = this.squadronCache[squadronId];
 

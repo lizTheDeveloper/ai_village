@@ -90,3 +90,21 @@ export {
   LanguageDescriptionGrammar,
   type TraceryGrammar,
 } from './LanguageDescriptionGrammar.js';
+
+// ==================== TRANSLATION SYSTEM (PHASE 2) ====================
+
+// Translation service with LLM integration
+export {
+  TranslationService,
+  type TranslationResponse,
+  type TranslationRequest,
+  type Morpheme,
+  type MorphemeDictionary,
+} from './TranslationService.js';
+
+// Morpheme dictionary storage
+export {
+  MorphemeDictionaryStorage,
+  type LanguageDictionary,
+  type WordTranslation,
+} from './MorphemeDictionaryStorage.js';

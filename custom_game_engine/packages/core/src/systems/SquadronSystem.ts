@@ -87,9 +87,8 @@ export class SquadronSystem extends BaseSystem {
       this.cacheValidTick = tick;
     }
 
-    // PERF: Use indexed for-loop (faster than for-of)
-    for (let i = 0; i < squadronCount; i++) {
-      const squadronEntity = ctx.activeEntities[i];
+    // Process squadrons
+    for (const squadronEntity of ctx.activeEntities) {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
@@ -112,15 +111,11 @@ export class SquadronSystem extends BaseSystem {
     // PERF: Clear by reassigning (faster than delete loop)
     this.shipEntityCache = Object.create(null);
 
-    const count = squadrons.length;
-    for (let i = 0; i < count; i++) {
-      const squadron = squadrons[i].getComponent<SquadronComponent>(CT.Squadron);
+    for (const squadronEntity of squadrons) {
+      const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      const shipIds = squadron.ships.shipIds;
-      const shipCount = shipIds.length;
-      for (let j = 0; j < shipCount; j++) {
-        const shipId = shipIds[j];
+      for (const shipId of squadron.ships.shipIds) {
         // PERF: Use 'in' check (faster for object literals)
         if (!(shipId in this.shipEntityCache)) {
           this.shipEntityCache[shipId] = world.getEntity(shipId) as EntityImpl | null;
@@ -157,13 +152,8 @@ export class SquadronSystem extends BaseSystem {
     this.resetWorkingStats();
     this.shipTypeMap.clear();
 
-    // PERF: Get ship IDs once, use indexed loop
-    const shipIds = squadron.ships.shipIds;
-    const shipCount = shipIds.length;
-
     // Gather stats from all ships using cached entities
-    for (let i = 0; i < shipCount; i++) {
-      const shipId = shipIds[i];
+    for (const shipId of squadron.ships.shipIds) {
       // PERF: Object literal lookup (faster than Map.get)
       const shipEntity = this.shipEntityCache[shipId];
       if (!shipEntity) {

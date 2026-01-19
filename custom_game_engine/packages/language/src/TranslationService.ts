@@ -217,19 +217,10 @@ Translate the word now. Respond with ONLY the JSON object:`;
     // Remove markdown code blocks if present
     let jsonText = text.trim();
 
-    console.log('[TranslationService] Input text type:', typeof text);
-    console.log('[TranslationService] Input text length:', text.length);
-    console.log('[TranslationService] First char code:', text.charCodeAt(0));  // Should be 96 for backtick, not 34 for quote
-    console.log('[TranslationService] First 100 chars:');
-    console.log(text.substring(0, 100));
-
     // Remove ```json ... ``` or ``` ... ``` wrappers
     const jsonCodeBlockMatch = jsonText.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/);
     if (jsonCodeBlockMatch) {
       jsonText = jsonCodeBlockMatch[1]!.trim();
-      console.log('[TranslationService] Extracted from markdown, length:', jsonText.length);
-    } else {
-      console.log('[TranslationService] No markdown match found');
     }
 
     try {

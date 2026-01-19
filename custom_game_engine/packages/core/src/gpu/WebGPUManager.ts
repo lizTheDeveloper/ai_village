@@ -48,13 +48,8 @@ export class WebGPUManager {
       this.device = await this.adapter.requestDevice();
       this.initialized = true;
 
-      // Log GPU info
-      const adapterInfo = await this.adapter.requestAdapterInfo();
+      // Log GPU info (basic info only - requestAdapterInfo may not be available)
       console.info('[WebGPU] Initialized successfully:', {
-        vendor: adapterInfo.vendor,
-        architecture: adapterInfo.architecture,
-        device: adapterInfo.device,
-        description: adapterInfo.description,
         limits: {
           maxComputeWorkgroupsPerDimension: this.device.limits.maxComputeWorkgroupsPerDimension,
           maxComputeInvocationsPerWorkgroup: this.device.limits.maxComputeInvocationsPerWorkgroup,

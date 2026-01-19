@@ -1,0 +1,479 @@
+[
+  {
+    "id": "treehouse_dwelling",
+    "name": "Canopy Treehouse",
+    "description": "A dwelling built into the branches of a massive tree, accessible by rope ladder.",
+    "category": "residential",
+    "tier": 3,
+    "layout": [
+      "  #####  ",
+      "  #...#  ",
+      "  W...W  ",
+      "  #...#  ",
+      "  ##D##  "
+    ],
+    "materials": {
+      "wall": "living_wood",
+      "floor": "wood",
+      "door": "bamboo"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 2, "restBonus": 1.5 } },
+      { "type": "observation", "params": { "visionRange": 20 } }
+    ],
+    "capacity": 2,
+    "style": "organic",
+    "lore": "Built in harmony with ancient trees, these dwellings sway gently in the wind."
+  },
+  {
+    "id": "underground_bunker",
+    "name": "Stone Bunker",
+    "description": "A fortified underground shelter with thick stone walls.",
+    "category": "residential",
+    "tier": 3,
+    "layout": [
+      "###########",
+      "#.........#",
+      "#.........#",
+      "W.........W",
+      "#.........#",
+      "#.........#",
+      "#....S....#",
+      "#.........#",
+      "#.........#",
+      "######D####"
+    ],
+    "materials": {
+      "wall": "granite",
+      "floor": "stone",
+      "door": "steel"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 4, "restBonus": 1.3 } },
+      { "type": "storage", "params": { "capacity": 100, "itemTypes": ["all"] } },
+      { "type": "defense", "params": { "armor": 50 } }
+    ],
+    "capacity": 4,
+    "style": "fortified",
+    "lore": "When the surface becomes dangerous, the depths provide safety."
+  },
+  {
+    "id": "wizards_tower",
+    "name": "Enchanter's Tower",
+    "description": "A mystical tower filled with arcane energy and strange materials.",
+    "category": "academic",
+    "tier": 5,
+    "layout": [
+      "   ###   ",
+      "  ##.##  ",
+      "  #...#  ",
+      "  #.K.#  ",
+      "  #...#  ",
+      "  #...#  ",
+      " ##...## ",
+      " W.....W ",
+      " #.....# ",
+      " #..T..# ",
+      " #.....# ",
+      " ####D## "
+    ],
+    "materials": {
+      "wall": "crystal",
+      "floor": "starlight",
+      "door": "enchanted_wood"
+    },
+    "functionality": [
+      { "type": "research", "params": { "magicBonus": 2.0 } },
+      { "type": "enchanting", "params": { "maxLevel": 10 } },
+      { "type": "sleeping", "params": { "beds": 1, "restBonus": 1.8 } }
+    ],
+    "capacity": 1,
+    "style": "arcane",
+    "lore": "The walls shimmer with contained power, and reality bends slightly near the workbench."
+  },
+  {
+    "id": "greenhouse_garden",
+    "name": "Crystal Greenhouse",
+    "description": "A glass-walled greenhouse for growing rare and exotic plants.",
+    "category": "production",
+    "tier": 4,
+    "layout": [
+      "###########",
+      "W.........W",
+      "W.........W",
+      "W...###...W",
+      "W...#K#...W",
+      "W...###...W",
+      "W.........W",
+      "W.........W",
+      "######D####"
+    ],
+    "materials": {
+      "wall": "glass",
+      "floor": "dirt",
+      "door": "wood"
+    },
+    "functionality": [
+      { "type": "farming", "params": { "cropBonus": 2.0, "specialCrops": true } },
+      { "type": "alchemy", "params": { "potionBonus": 1.5 } }
+    ],
+    "capacity": 2,
+    "style": "naturalist",
+    "lore": "Sunlight streams through crystal walls, nurturing plants that shouldn't exist in this climate."
+  },
+  {
+    "id": "blacksmith_forge",
+    "name": "Master Forge",
+    "description": "A proper smithy with forge, anvil, and quenching station.",
+    "category": "production",
+    "tier": 3,
+    "layout": [
+      "##########",
+      "#........#",
+      "W..K..K..W",
+      "#........#",
+      "#..####..#",
+      "#..#KK#..#",
+      "#..####..#",
+      "#........#",
+      "W...SS...W",
+      "#####D####"
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "brick",
+      "door": "iron"
+    },
+    "functionality": [
+      { "type": "smithing", "params": { "qualityBonus": 1.8, "metalTypes": ["iron", "steel", "mithril"] } },
+      { "type": "storage", "params": { "capacity": 50, "itemTypes": ["metal", "tools"] } }
+    ],
+    "capacity": 3,
+    "style": "industrial",
+    "lore": "The ring of hammer on anvil echoes through the streets, a sound of progress and prosperity."
+  },
+  {
+    "id": "alchemist_lab",
+    "name": "Alchemical Laboratory",
+    "description": "A workshop filled with bubbling potions and mysterious ingredients.",
+    "category": "production",
+    "tier": 4,
+    "layout": [
+      "############",
+      "#..........#",
+      "W..KKKK....W",
+      "#..........#",
+      "#.###..###.#",
+      "#.#S#..#S#.#",
+      "#.###..###.#",
+      "#..........#",
+      "W....TT....W",
+      "#..........#",
+      "######D#####"
+    ],
+    "materials": {
+      "wall": "stone",
+      "floor": "tile",
+      "door": "wood"
+    },
+    "functionality": [
+      { "type": "alchemy", "params": { "potionQuality": 2.0, "explosionRisk": 0.1 } },
+      { "type": "research", "params": { "chemistryBonus": 1.5 } },
+      { "type": "storage", "params": { "capacity": 100, "itemTypes": ["herbs", "reagents", "potions"] } }
+    ],
+    "capacity": 2,
+    "style": "scientific",
+    "lore": "Strange vapors rise from countless vials. The careful measure ingredients, for precision is life."
+  },
+  {
+    "id": "library_archive",
+    "name": "Grand Library",
+    "description": "A repository of knowledge with reading tables and endless shelves.",
+    "category": "academic",
+    "tier": 4,
+    "layout": [
+      "###############",
+      "#.............#",
+      "W.SSS...SSS...W",
+      "#.............#",
+      "#.............#",
+      "W...T.....T...W",
+      "#.............#",
+      "#.............#",
+      "W.SSS...SSS...W",
+      "#.............#",
+      "#######D#######"
+    ],
+    "materials": {
+      "wall": "wood",
+      "floor": "carpet",
+      "door": "enchanted_wood"
+    },
+    "functionality": [
+      { "type": "research", "params": { "knowledgeBonus": 2.5 } },
+      { "type": "storage", "params": { "capacity": 500, "itemTypes": ["books", "scrolls", "maps"] } },
+      { "type": "teaching", "params": { "skillBonus": 1.5 } }
+    ],
+    "capacity": 10,
+    "style": "scholarly",
+    "lore": "The silence is sacred here, broken only by turning pages and scratching quills."
+  },
+  {
+    "id": "temple_sanctuary",
+    "name": "Sacred Temple",
+    "description": "A holy place of worship with an altar and meditation spaces.",
+    "category": "religious",
+    "tier": 4,
+    "layout": [
+      "     #####     ",
+      "    ##...##    ",
+      "   ##.....##   ",
+      "  ##.......##  ",
+      " ##.........## ",
+      "##...........##",
+      "#.............#",
+      "W.....###.....W",
+      "#.....#K#.....#",
+      "W.....###.....W",
+      "#.............#",
+      "#.............#",
+      "##...........##",
+      " ######D###### "
+    ],
+    "materials": {
+      "wall": "marble",
+      "floor": "marble",
+      "door": "gold"
+    },
+    "functionality": [
+      { "type": "prayer", "params": { "faithBonus": 2.0 } },
+      { "type": "healing", "params": { "healingRate": 1.5 } },
+      { "type": "blessing", "params": { "duration": 86400 } }
+    ],
+    "capacity": 20,
+    "style": "divine",
+    "lore": "Here the faithful gather, and the divine touch lingers in the air like incense."
+  },
+  {
+    "id": "market_stall",
+    "name": "Trading Post",
+    "description": "A busy marketplace with counters and storage for goods.",
+    "category": "commercial",
+    "tier": 2,
+    "layout": [
+      "##########",
+      "#........#",
+      "W..CCCC..W",
+      "#........#",
+      "#..####..#",
+      "#..#SS#..#",
+      "#..####..#",
+      "#........#",
+      "#####D####"
+    ],
+    "materials": {
+      "wall": "wood",
+      "floor": "wood",
+      "door": "wood"
+    },
+    "functionality": [
+      { "type": "trading", "params": { "priceModifier": 0.9 } },
+      { "type": "storage", "params": { "capacity": 200, "itemTypes": ["all"] } }
+    ],
+    "capacity": 5,
+    "style": "commercial",
+    "lore": "The bustle of commerce, where gold changes hands and fortunes are made."
+  },
+  {
+    "id": "tavern_inn",
+    "name": "The Wanderer's Rest",
+    "description": "A cozy tavern with beds, tables, and a bar for weary travelers.",
+    "category": "hospitality",
+    "tier": 3,
+    "layout": [
+      "################",
+      "#..............#",
+      "W..TTTT..CCCC..W",
+      "#..............#",
+      "#..TTTT........#",
+      "W..............W",
+      "#..###..###..###",
+      "#..#B#..#B#..#B#",
+      "#..###..###..###",
+      "W..............W",
+      "#..............#",
+      "#########D######"
+    ],
+    "materials": {
+      "wall": "wood",
+      "floor": "wood",
+      "door": "wood"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 6, "restBonus": 1.3 } },
+      { "type": "food_service", "params": { "mealQuality": 1.5 } },
+      { "type": "social", "params": { "moodBonus": 1.2 } }
+    ],
+    "capacity": 15,
+    "style": "rustic",
+    "lore": "A warm hearth, cold ale, and soft beds await those who travel the long roads."
+  },
+  {
+    "id": "ice_palace_room",
+    "name": "Frozen Chamber",
+    "description": "A room carved from solid ice, glittering in ethereal light.",
+    "category": "residential",
+    "tier": 4,
+    "layout": [
+      "##########",
+      "#........#",
+      "W........W",
+      "#........#",
+      "#..####..#",
+      "#..#..#..#",
+      "#..####..#",
+      "#........#",
+      "W........W",
+      "#........#",
+      "######D###"
+    ],
+    "materials": {
+      "wall": "ice",
+      "floor": "frost",
+      "door": "crystal"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 2, "restBonus": 1.4 } },
+      { "type": "cold_storage", "params": { "preservationBonus": 2.0 } }
+    ],
+    "capacity": 2,
+    "style": "frozen",
+    "lore": "Walls of ice never melt, blessed by ancient winter magic."
+  },
+  {
+    "id": "mushroom_hut",
+    "name": "Fungal Dwelling",
+    "description": "A house grown from giant mushrooms, soft and organic.",
+    "category": "residential",
+    "tier": 2,
+    "layout": [
+      "  #####  ",
+      " ##...## ",
+      "##.....##",
+      "#.......#",
+      "W.......W",
+      "#.......#",
+      "##.....##",
+      " ####D## "
+    ],
+    "materials": {
+      "wall": "fungus",
+      "floor": "living_wood",
+      "door": "wax"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 2, "restBonus": 1.2 } },
+      { "type": "spore_production", "params": { "sporesPerDay": 10 } }
+    ],
+    "capacity": 2,
+    "style": "organic",
+    "lore": "The walls breathe softly, releasing gentle spores that bring peaceful dreams."
+  },
+  {
+    "id": "obsidian_fortress",
+    "name": "Dark Fortress",
+    "description": "A imposing structure of black obsidian, radiating power.",
+    "category": "military",
+    "tier": 5,
+    "layout": [
+      "###############",
+      "#.............#",
+      "W.............W",
+      "#.....###.....#",
+      "#.....#K#.....#",
+      "#.....###.....#",
+      "W.............W",
+      "#.............#",
+      "#.###.....###.#",
+      "#.#S#.....#S#.#",
+      "#.###.....###.#",
+      "W.............W",
+      "#.............#",
+      "#######D#######"
+    ],
+    "materials": {
+      "wall": "obsidian",
+      "floor": "darksteel",
+      "door": "stygian_iron"
+    },
+    "functionality": [
+      { "type": "defense", "params": { "armor": 100 } },
+      { "type": "weapon_crafting", "params": { "damageBonus": 1.5 } },
+      { "type": "storage", "params": { "capacity": 200, "itemTypes": ["weapons", "armor"] } }
+    ],
+    "capacity": 5,
+    "style": "ominous",
+    "lore": "Built for war, this fortress has never fallen. Dark power flows through its walls."
+  },
+  {
+    "id": "candy_cottage",
+    "name": "Gingerbread House",
+    "description": "A whimsical cottage made entirely of candy and sweets.",
+    "category": "residential",
+    "tier": 3,
+    "layout": [
+      " ####### ",
+      "##.....##",
+      "#.......#",
+      "W.......W",
+      "#...T...#",
+      "W.......W",
+      "#.......#",
+      "####D####"
+    ],
+    "materials": {
+      "wall": "gingerbread",
+      "floor": "candy",
+      "door": "chocolate"
+    },
+    "functionality": [
+      { "type": "sleeping", "params": { "beds": 2, "restBonus": 1.1 } },
+      { "type": "food_production", "params": { "sweetness": 10 } }
+    ],
+    "capacity": 2,
+    "style": "whimsical",
+    "lore": "A house good enough to eat, though doing so would be rude to the inhabitants."
+  },
+  {
+    "id": "bone_chapel",
+    "name": "Ossuary Chapel",
+    "description": "A sacred place built from the bones of the honored dead.",
+    "category": "religious",
+    "tier": 4,
+    "layout": [
+      "  #######  ",
+      " ##.....## ",
+      "##.......##",
+      "#.........#",
+      "W...###...W",
+      "#...#K#...#",
+      "W...###...W",
+      "#.........#",
+      "##.......##",
+      " #####D### "
+    ],
+    "materials": {
+      "wall": "bone",
+      "floor": "bone",
+      "door": "ivory"
+    },
+    "functionality": [
+      { "type": "prayer", "params": { "deathAffinity": 2.0 } },
+      { "type": "necromancy", "params": { "undeadControl": 5 } },
+      { "type": "memorial", "params": { "spiritCommunion": true } }
+    ],
+    "capacity": 8,
+    "style": "macabre",
+    "lore": "The bones remember. They whisper secrets of those who came before."
+  }
+]
