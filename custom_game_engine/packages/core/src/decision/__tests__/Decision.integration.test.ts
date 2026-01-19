@@ -283,7 +283,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(exhaustedAgent);
+      harness.world.addEntity(exhaustedAgent);
 
       // Healthy agent
       const healthyAgent = new EntityImpl(createEntityId(), 0);
@@ -304,7 +304,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(healthyAgent);
+      harness.world.addEntity(healthyAgent);
 
       const exhaustedComp = exhaustedAgent.getComponent(ComponentType.Agent) as any;
       const healthyComp = healthyAgent.getComponent(ComponentType.Agent) as any;

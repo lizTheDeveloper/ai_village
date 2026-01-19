@@ -102,7 +102,7 @@ describe('PlantSeedProduction Integration', () => {
 
     const entity = new EntityImpl(createEntityId(), 0);
     (entity as any).addComponent(plant);
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;
@@ -140,7 +140,7 @@ describe('PlantSeedProduction Integration', () => {
 
     const entity = new EntityImpl(createEntityId(), 0);
     (entity as any).addComponent(plant);
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;
@@ -180,7 +180,7 @@ describe('PlantSeedProduction Integration', () => {
 
     const entity = new EntityImpl(createEntityId(), 0);
     (entity as any).addComponent(plant);
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;

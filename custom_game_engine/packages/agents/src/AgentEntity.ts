@@ -58,14 +58,6 @@ import {
 } from '@ai-village/reproduction';
 
 /**
- * Internal interface for accessing World's _addEntity method.
- * This is used for proper spatial indexing when adding entities.
- */
-interface WorldInternal extends WorldMutator {
-  _addEntity(entity: EntityImpl): void;
-}
-
-/**
  * Determine the best vision profile based on agent skills.
  * Higher skill levels in relevant categories determine the profile.
  */

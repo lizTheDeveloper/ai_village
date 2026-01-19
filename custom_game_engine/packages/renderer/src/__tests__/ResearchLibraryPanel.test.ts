@@ -80,7 +80,7 @@ describe('ResearchLibraryPanel', () => {
 
     worldEntity.addComponent({ type: 'time', version: 1, currentTick: 100, ticksPerDay: 24 });
     worldEntity.addComponent(researchState);
-    (world as any)._addEntity(worldEntity);
+    world.addEntity(worldEntity);
 
     // Create panel
     panel = new ResearchLibraryPanel();
@@ -153,7 +153,7 @@ describe('ResearchLibraryPanel', () => {
 
       emptyWorldEntity.addComponent({ type: 'time', version: 1, currentTick: 0, ticksPerDay: 24 });
       emptyWorldEntity.addComponent(emptyResearchState);
-      (emptyWorld as any)._addEntity(emptyWorldEntity);
+      emptyWorld.addEntity(emptyWorldEntity);
 
       const mockCtx = {
         fillStyle: '',

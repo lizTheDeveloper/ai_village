@@ -104,7 +104,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Set entity in panel
       panel.setSelectedEntity(entity);
@@ -178,7 +178,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -236,7 +236,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -287,7 +287,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -340,7 +340,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -403,7 +403,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -478,7 +478,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -503,7 +503,7 @@ describe('SkillTreePanel Backend Integration', () => {
     it('should handle entity with no magic component gracefully', () => {
       const entity = new EntityImpl(createEntityId(), 0);
       // No magic component added
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -531,7 +531,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
@@ -573,7 +573,7 @@ describe('SkillTreePanel Backend Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 

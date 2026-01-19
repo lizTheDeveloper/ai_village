@@ -56,9 +56,6 @@ export interface BuildingAffordance {
   solves: string[];
 }
 
-// Load building affordances from JSON
-import buildingsData from '../../data/affordances/buildings.json';
-
 /**
  * Validate and load building affordances from JSON data.
  */
@@ -103,9 +100,6 @@ export interface ItemAffordance {
   /** What problems having this item solves */
   solves: string[];
 }
-
-// Load item affordances from JSON
-import itemsData from '../../data/affordances/items.json';
 
 /**
  * Validate and load item affordances from JSON data.
@@ -152,9 +146,6 @@ export interface RecipeAffordance {
   craftingTime: number;
   provides: string; // What problem this recipe solves
 }
-
-// Load recipe affordances from JSON
-import recipesData from '../../data/affordances/recipes.json';
 
 /**
  * Validate and load recipe affordances from JSON data.

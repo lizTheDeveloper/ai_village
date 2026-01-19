@@ -228,44 +228,14 @@ export function getSpritesForSpecies(species: string): string[] {
  * Normalize hair color names to match sprite naming
  */
 export function normalizeHairColor(color: string): string {
-  const colorMap: Record<string, string> = {
-    black: 'black',
-    dark: 'black',
-    ebony: 'black',
-    brown: 'brown',
-    chestnut: 'brown',
-    auburn: 'brown',
-    blonde: 'blonde',
-    blond: 'blonde',
-    golden: 'blonde',
-    yellow: 'blonde',
-    red: 'red',
-    ginger: 'red',
-    copper: 'red',
-    white: 'white',
-    silver: 'white',
-    gray: 'white',
-    grey: 'white',
-  };
-  return colorMap[color.toLowerCase()] || 'brown';
+  return hairColorMap[color.toLowerCase()] || 'brown';
 }
 
 /**
  * Normalize skin tone names to match sprite naming
  */
 export function normalizeSkinTone(tone: string): string {
-  const toneMap: Record<string, string> = {
-    light: 'light',
-    pale: 'light',
-    fair: 'light',
-    medium: 'medium',
-    tan: 'medium',
-    olive: 'medium',
-    dark: 'dark',
-    brown: 'dark',
-    deep: 'dark',
-  };
-  return toneMap[tone.toLowerCase()] || 'medium';
+  return skinToneMap[tone.toLowerCase()] || 'medium';
 }
 
 /**

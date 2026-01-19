@@ -139,15 +139,114 @@ const HUNGRY_STONE = SURREAL_MATERIALS.HUNGRY_STONE;
 const MIMIC_MATERIAL = SURREAL_MATERIALS.MIMIC_MATERIAL;
 
 // ============================================================================
-// LEGACY CODE - Kept for reference, all data now loaded from JSON
+// EXPORT - Materials can now be exported when validators are ready
+// ============================================================================
+
+/**
+ * Export all surreal material items as an array
+ * Includes all 71 materials from the JSON data file
+ */
+export const SURREAL_MATERIAL_ITEMS: ItemDefinition[] = Object.values(SURREAL_MATERIALS);
+
+/**
+ * Export the materials lookup object for direct access by key
+ */
+export { SURREAL_MATERIALS };
+
+/**
+ * Export specific materials for backwards compatibility
+ * These are kept for any code that may directly reference them
+ */
+export {
+  FLESH_BRICK,
+  FUNGUS_MATERIAL,
+  WOOD_MATERIAL,
+  CLAY_MATERIAL,
+  FIRE_MATERIAL,
+  CLOCKWORK_MATERIAL,
+  CANDY_MATERIAL,
+  CHOCOLATE_BEAM,
+  SHADOW_ESSENCE,
+  DREAM_CRYSTAL,
+  SOUND_CRYSTAL,
+  MEMORY_CRYSTAL,
+  STONE_MATERIAL,
+  METAL_MATERIAL,
+  DIAMOND_MATERIAL,
+  SAND_MATERIAL,
+  ICE_MATERIAL,
+  GLASS_MATERIAL,
+  PAPER_MATERIAL,
+  CRYSTAL_MATERIAL,
+  BONE_MATERIAL,
+  SMOKE_MATERIAL,
+  RUST_MATERIAL,
+  SILK_MATERIAL,
+  AMBER_MATERIAL,
+  SALT_MATERIAL,
+  WAX_MATERIAL,
+  COAL_MATERIAL,
+  POISON_MATERIAL,
+  PORCELAIN_MATERIAL,
+  CORAL_MATERIAL,
+  WATER_MATERIAL,
+  MITHRIL,
+  ADAMANTINE,
+  ORICHALCUM,
+  STARMETAL,
+  STARLIGHT_ESSENCE,
+  VOIDSTONE,
+  DRAGONSCALE,
+  PHOENIX_ASH,
+  CHITIN,
+  ECTOPLASM,
+  MOONSTONE,
+  SUNSTONE,
+  BLOODSTONE,
+  NULL_CRYSTAL,
+  QUICKSILVER,
+  AETHERIUM,
+  GRAVITY_STONE,
+  PHASE_QUARTZ,
+  BIO_LUMINESCENT_SLIME,
+  PHILOSOPHERS_STONE_FRAGMENT,
+  MORPHIC_CLAY,
+  CHRONIUM,
+  OBSIDIAN,
+  PETRIFIED_WOOD,
+  LIVING_VINE_MATERIAL,
+  RAMPANT_VINE,
+  EXPLOSIVE_FUNGUS,
+  CRYSTALLIZING_MOLD,
+  RUST_PLAGUE,
+  STICKY_SLIME,
+  LIVING_PAINT,
+  WHISPERING_WALLS,
+  GRAVITY_INVERTED_STONE,
+  PARADOX_MATERIAL,
+  TIME_DILATED_WOOD,
+  SINGING_METAL,
+  LAUGHING_GAS_CRYSTAL,
+  CURSED_GOLD,
+  HUNGRY_STONE,
+  MIMIC_MATERIAL,
+};
+
+// ============================================================================
+// LEGACY CODE - All hardcoded data moved to surreal-materials.json
 // ============================================================================
 
 /*
-const FLESH_BRICK_OLD: ItemDefinition = defineItem(
-  'material:flesh_brick',
-  'Flesh Brick',
-  'material',
-  {
+ * All material definitions have been moved to:
+ * custom_game_engine/packages/core/data/surreal-materials.json
+ *
+ * This allows for easier editing and management of material data without
+ * needing to modify TypeScript code. The data is loaded at module initialization
+ * and converted to ItemDefinition objects using the defineItem function.
+ *
+ * Original hardcoded definitions removed to reduce file size from 2600+ lines
+ * to ~200 lines. See git history for the original hardcoded version.
+ */
     weight: 2.0,
     stackSize: 20,
     baseMaterial: 'flesh',

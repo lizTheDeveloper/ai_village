@@ -381,12 +381,43 @@ export class SaveLoadService {
         godCraftedQueue.deserialize(saveFile.godCraftedQueue);
       }
 
-      // TODO: Restore passages (need to recreate passage connections)
-      // For now, passages are stored but not restored
-
-      // Deserialize universe(s)
+      // Deserialize universe(s) first, before creating passages
       for (const universeSnapshot of saveFile.universes) {
         await worldSerializer.deserializeWorld(universeSnapshot, world);
+      }
+
+      // Restore passages after universes are loaded
+      if (saveFile.passages && saveFile.passages.length > 0) {
+        for (const passageSnapshot of saveFile.passages) {
+          // Verify both universes exist before creating passage
+          const sourceUniverse = multiverseCoordinator.getUniverse(passageSnapshot.sourceUniverseId);
+          const targetUniverse = multiverseCoordinator.getUniverse(passageSnapshot.targetUniverseId);
+
+          if (sourceUniverse && targetUniverse) {
+            // Create passage connection in multiverse coordinator
+            multiverseCoordinator.createPassage(
+              passageSnapshot.id,
+              passageSnapshot.sourceUniverseId,
+              passageSnapshot.targetUniverseId,
+              passageSnapshot.type
+            );
+
+            // If passage was inactive in the save, deactivate it
+            if (!passageSnapshot.active) {
+              const passage = multiverseCoordinator.getPassage(passageSnapshot.id);
+              if (passage) {
+                passage.active = false;
+              }
+            }
+          } else {
+            // Log warning if universes don't exist
+            console.warn(
+              `[SaveLoad] Skipping passage ${passageSnapshot.id}: ` +
+              `${!sourceUniverse ? `source universe ${passageSnapshot.sourceUniverseId}` : ''} ` +
+              `${!targetUniverse ? `target universe ${passageSnapshot.targetUniverseId}` : ''} not found`
+            );
+          }
+        }
       }
 
       // Restore play time
@@ -531,8 +562,43 @@ export class SaveLoadService {
         godCraftedQueue.deserialize(saveFile.godCraftedQueue);
       }
 
+      // Deserialize universe(s) first, before creating passages
       for (const universeSnapshot of saveFile.universes) {
         await worldSerializer.deserializeWorld(universeSnapshot, world);
+      }
+
+      // Restore passages after universes are loaded
+      if (saveFile.passages && saveFile.passages.length > 0) {
+        for (const passageSnapshot of saveFile.passages) {
+          // Verify both universes exist before creating passage
+          const sourceUniverse = multiverseCoordinator.getUniverse(passageSnapshot.sourceUniverseId);
+          const targetUniverse = multiverseCoordinator.getUniverse(passageSnapshot.targetUniverseId);
+
+          if (sourceUniverse && targetUniverse) {
+            // Create passage connection in multiverse coordinator
+            multiverseCoordinator.createPassage(
+              passageSnapshot.id,
+              passageSnapshot.sourceUniverseId,
+              passageSnapshot.targetUniverseId,
+              passageSnapshot.type
+            );
+
+            // If passage was inactive in the save, deactivate it
+            if (!passageSnapshot.active) {
+              const passage = multiverseCoordinator.getPassage(passageSnapshot.id);
+              if (passage) {
+                passage.active = false;
+              }
+            }
+          } else {
+            // Log warning if universes don't exist
+            console.warn(
+              `[SaveLoad] Skipping passage ${passageSnapshot.id}: ` +
+              `${!sourceUniverse ? `source universe ${passageSnapshot.sourceUniverseId}` : ''} ` +
+              `${!targetUniverse ? `target universe ${passageSnapshot.targetUniverseId}` : ''} not found`
+            );
+          }
+        }
       }
 
       this.totalPlayTime = saveFile.header.playTime;

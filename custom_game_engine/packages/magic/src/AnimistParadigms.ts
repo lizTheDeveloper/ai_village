@@ -13,6 +13,7 @@
  */
 
 import type { MagicParadigm } from './MagicParadigm.js';
+import { loadExampleKami, loadAllomanticMetals } from './data-loader.js';
 
 // ============================================================================
 // Shinto/Animist Magic - The World of Endless Spirits
@@ -329,98 +330,7 @@ purification.`,
 /**
  * Example kami for a spirit-saturated world
  */
-export const EXAMPLE_KAMI: Kami[] = [
-  {
-    id: 'yama_no_kami',
-    name: 'The Mountain Father',
-    type: 'nature',
-    rank: 'major',
-    domain: 'The great mountain and all who dwell upon it',
-    preferredOfferings: ['sake', 'rice', 'mountain_flowers'],
-    taboos: ['cutting_ancient_trees', 'polluting_springs', 'disrespecting_elders'],
-    disposition: 'neutral',
-    blessings: ['safe_passage', 'hunting_luck', 'mineral_finding', 'weather_warning'],
-    curses: ['lost_paths', 'rockslides', 'predator_attention'],
-    shrineLocation: 'summit_shrine',
-    activeSeasons: ['spring', 'autumn'],
-    description: 'Ancient spirit of the mountain, grandfather to lesser spirits of peak and valley',
-    personality: 'Stern but fair, respects those who respect the mountain',
-  },
-  {
-    id: 'kawa_no_kami',
-    name: 'River-Running-Swift',
-    type: 'nature',
-    rank: 'regional',
-    domain: 'The great river from source to sea',
-    preferredOfferings: ['fish_released', 'flowers', 'sake'],
-    taboos: ['polluting_water', 'damming_flow', 'taking_too_many_fish'],
-    disposition: 'neutral',
-    blessings: ['safe_crossing', 'abundant_fish', 'flood_warning', 'water_purification'],
-    curses: ['drowning_currents', 'empty_nets', 'flash_floods'],
-    shrineLocation: 'river_bend_shrine',
-    activeSeasons: ['summer'],
-    description: 'Swift and changeable spirit of the river, life-giver and life-taker',
-    personality: 'Mercurial, respects those who understand water\'s dual nature',
-  },
-  {
-    id: 'katana_rei',
-    name: 'Bitter-Edge',
-    type: 'object',
-    rank: 'local',
-    domain: 'An ancient katana that has tasted many lives',
-    preferredOfferings: ['blade_oil', 'respect', 'worthy_opponents'],
-    taboos: ['dishonor', 'cowardice', 'striking_unarmed'],
-    disposition: 'wary',
-    blessings: ['perfect_cuts', 'battle_sense', 'intimidation'],
-    curses: ['blade_turns', 'attracts_challengers', 'bloodlust'],
-    description: 'Spirit of a blade forged in grief, awakened by bloodshed',
-    personality: 'Proud, demands worthy wielder, hungrier than it should be',
-  },
-  {
-    id: 'sofu_rei',
-    name: 'Grandfather Who Watches',
-    type: 'ancestor',
-    rank: 'minor',
-    domain: 'The family line and household',
-    preferredOfferings: ['incense', 'favorite_foods', 'news_of_descendants'],
-    taboos: ['neglecting_family', 'dishonoring_name', 'forgetting_ancestors'],
-    disposition: 'friendly',
-    blessings: ['family_luck', 'wisdom_dreams', 'protection_from_spirits'],
-    curses: ['misfortune', 'guilt_dreams', 'ancestral_disappointment'],
-    shrineLocation: 'household_shrine',
-    description: 'Spirit of a beloved grandfather, still watching over his line',
-    personality: 'Warm but expects proper respect, worries about the younger generation',
-  },
-  {
-    id: 'tsuji_kami',
-    name: 'The Crossroads Watcher',
-    type: 'place',
-    rank: 'local',
-    domain: 'The crossroads where four paths meet',
-    preferredOfferings: ['coins', 'food_for_travelers', 'prayers'],
-    taboos: ['violence_at_crossroads', 'blocking_paths', 'lies'],
-    disposition: 'neutral',
-    blessings: ['true_direction', 'chance_meetings', 'lost_things_found'],
-    curses: ['wrong_turns', 'lost_forever', 'bad_encounters'],
-    shrineLocation: 'crossroads_marker',
-    description: 'Spirit of the place between, watcher of travelers and choices',
-    personality: 'Enigmatic, speaks in riddles, knows all who pass',
-  },
-  {
-    id: 'inari_messenger',
-    name: 'White-Tail Swift',
-    type: 'animal',
-    rank: 'minor',
-    domain: 'Messenger of Inari, spirit fox',
-    preferredOfferings: ['fried_tofu', 'rice', 'respect'],
-    taboos: ['harming_foxes', 'mocking_inari', 'greed'],
-    disposition: 'wary',
-    blessings: ['merchant_luck', 'crop_growth', 'messages_delivered'],
-    curses: ['trickery_returned', 'rice_blight', 'misdirection'],
-    description: 'One of many fox spirits serving Inari, trickster and helper',
-    personality: 'Playful, tests mortals, rewards the clever and punishes the greedy',
-  },
-];
+export const EXAMPLE_KAMI: Kami[] = loadExampleKami();
 
 // ============================================================================
 // Sympathy Magic (Kingkiller Chronicle inspired)
@@ -621,38 +531,7 @@ export interface AllomanticMetal {
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
 }
 
-export const ALLOMANTIC_METALS: AllomanticMetal[] = [
-  // Physical - External
-  { id: 'steel', name: 'Steel', type: 'physical', direction: 'push',
-    effect: 'Push on nearby metals', rarity: 'common' },
-  { id: 'iron', name: 'Iron', type: 'physical', direction: 'pull',
-    effect: 'Pull on nearby metals', rarity: 'common' },
-  // Physical - Internal
-  { id: 'pewter', name: 'Pewter', type: 'physical', direction: 'push',
-    effect: 'Enhanced strength, speed, durability', drawback: 'Pewter drag after', rarity: 'common' },
-  { id: 'tin', name: 'Tin', type: 'physical', direction: 'pull',
-    effect: 'Enhanced senses', drawback: 'Sensory overload risk', rarity: 'common' },
-  // Mental - External
-  { id: 'zinc', name: 'Zinc', type: 'mental', direction: 'push',
-    effect: 'Riot - inflame emotions', rarity: 'uncommon' },
-  { id: 'brass', name: 'Brass', type: 'mental', direction: 'pull',
-    effect: 'Soothe - dampen emotions', rarity: 'uncommon' },
-  // Mental - Internal
-  { id: 'copper', name: 'Copper', type: 'mental', direction: 'push',
-    effect: 'Hide allomantic pulses (Smoker)', rarity: 'uncommon' },
-  { id: 'bronze', name: 'Bronze', type: 'mental', direction: 'pull',
-    effect: 'Detect allomantic pulses (Seeker)', rarity: 'uncommon' },
-  // Enhancement
-  { id: 'aluminum', name: 'Aluminum', type: 'enhancement', direction: 'push',
-    effect: 'Wipe own metal reserves', rarity: 'rare' },
-  { id: 'duralumin', name: 'Duralumin', type: 'enhancement', direction: 'push',
-    effect: 'Massively boost next metal burned', drawback: 'Burns all reserves instantly', rarity: 'rare' },
-  // Temporal
-  { id: 'gold', name: 'Gold', type: 'temporal', direction: 'pull',
-    effect: 'See past self (who you could have been)', drawback: 'Psychologically traumatic', rarity: 'rare' },
-  { id: 'atium', name: 'Atium', type: 'temporal', direction: 'pull',
-    effect: 'See moments into the future', rarity: 'legendary' },
-];
+export const ALLOMANTIC_METALS: AllomanticMetal[] = loadAllomanticMetals();
 
 /**
  * Allomancy Paradigm - Burn metals for power

@@ -12,6 +12,8 @@ import type {
   UniverseTickUpdate,
   Bounds,
 } from '@ai-village/core';
+import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
+import { renderSprite } from './SpriteRenderer.js';
 
 /**
  * View mode for rendering remote universe
@@ -60,6 +62,9 @@ export class RemoteUniverseView implements IWindowPanel {
   private readonly TILE_SIZE = 32;
   private readonly MIN_ZOOM = 0.25;
   private readonly MAX_ZOOM = 2.0;
+
+  // Sprite rendering
+  private pixelLabEntityRenderer: PixelLabEntityRenderer | null = null;
 
   // Dragging state
   private isDragging: boolean = false;
@@ -139,6 +144,14 @@ export class RemoteUniverseView implements IWindowPanel {
     height: number,
     _world?: any
   ): void {
+    // Initialize PixelLabEntityRenderer lazily on first render
+    if (!this.pixelLabEntityRenderer) {
+      this.pixelLabEntityRenderer = new PixelLabEntityRenderer(ctx, '/assets/sprites/pixellab');
+    }
+
+    // Update sprite animations
+    this.pixelLabEntityRenderer.updateAnimations(performance.now());
+
     // Clear background
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(x, y, width, height);
@@ -424,33 +437,74 @@ export class RemoteUniverseView implements IWindowPanel {
     const screenX = viewX + entityX * tileSize;
     const screenY = viewY + entityY * tileSize;
 
-    // Simple entity rendering (colored square)
-    // TODO: Use actual sprites/rendering from entity type
+    // Get renderable component for sprite info
+    const renderableComp = entity.components.find((c: any) => c.type === 'renderable');
+    const renderableData = renderableComp?.data as any;
 
-    // Helper to check component existence
-    const hasComponent = (type: string): boolean =>
-      entity.components.some((c) => c.type === type);
-
-    let color = '#888';
-    if (hasComponent('agent')) {
-      color = '#4a9eff';
-    } else if (hasComponent('plant')) {
-      color = '#44ff44';
-    } else if (hasComponent('building')) {
-      color = '#ff9944';
-    } else if (hasComponent('animal')) {
-      color = '#ff44ff';
+    // Convert VersionedEntity to minimal Entity-like object for sprite rendering
+    // PixelLabEntityRenderer expects Entity with components Map
+    const componentsMap = new Map();
+    for (const comp of entity.components) {
+      componentsMap.set(comp.type, comp.data);
     }
 
-    ctx.fillStyle = color;
-    ctx.fillRect(
-      screenX - tileSize / 4,
-      screenY - tileSize / 4,
-      tileSize / 2,
-      tileSize / 2
-    );
+    const entityLike = {
+      id: entity.id,
+      components: componentsMap,
+    } as any;
 
-    // Render entity ID for debugging
+    // Calculate sprite size
+    const spriteSize = tileSize;
+
+    // Try to render using PixelLab sprites first (for agents/animals)
+    let rendered = false;
+    if (this.pixelLabEntityRenderer) {
+      rendered = this.pixelLabEntityRenderer.renderPixelLabEntity(
+        entityLike,
+        screenX,
+        screenY,
+        spriteSize
+      );
+    }
+
+    // Fallback to basic sprite rendering if PixelLab didn't render
+    if (!rendered && renderableData?.spriteId) {
+      renderSprite(
+        ctx,
+        renderableData.spriteId,
+        screenX,
+        screenY,
+        spriteSize
+      );
+      rendered = true;
+    }
+
+    // Final fallback: colored square based on entity type
+    if (!rendered) {
+      const hasComponent = (type: string): boolean =>
+        entity.components.some((c) => c.type === type);
+
+      let color = '#888';
+      if (hasComponent('agent')) {
+        color = '#4a9eff';
+      } else if (hasComponent('plant')) {
+        color = '#44ff44';
+      } else if (hasComponent('building')) {
+        color = '#ff9944';
+      } else if (hasComponent('animal')) {
+        color = '#ff44ff';
+      }
+
+      ctx.fillStyle = color;
+      ctx.fillRect(
+        screenX - tileSize / 4,
+        screenY - tileSize / 4,
+        tileSize / 2,
+        tileSize / 2
+      );
+    }
+
+    // Render entity ID for debugging at higher zoom levels
     if (this.state.zoom > 0.8) {
       ctx.fillStyle = '#fff';
       ctx.font = `${Math.floor(10 * this.state.zoom)}px monospace`;

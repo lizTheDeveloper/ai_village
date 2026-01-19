@@ -203,7 +203,7 @@ describe('Performance Optimizations Integration', () => {
       const building1 = new EntityImpl(createEntityId(), 0);
       building1.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
       building1.addComponent(createPositionComponent(5, 5));
-      (world as any)._addEntity(building1);
+      world.addEntity(building1);
 
       // Create agent
       const agent = new EntityImpl(createEntityId(), 0);
@@ -219,7 +219,7 @@ describe('Performance Optimizations Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       const entities = Array.from(world.entities.values());
 
