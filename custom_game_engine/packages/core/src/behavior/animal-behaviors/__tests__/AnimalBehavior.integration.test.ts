@@ -67,7 +67,7 @@ describe('Animal Behavior Integration Tests', () => {
         hunger: 60,
         state: 'idle',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);
@@ -91,7 +91,7 @@ describe('Animal Behavior Integration Tests', () => {
         trustLevel: 20,
         state: 'idle',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Create a threat (agent) nearby to trigger actual fleeing behavior
       const agent = new EntityImpl(createEntityId(), 0);
@@ -101,7 +101,7 @@ describe('Animal Behavior Integration Tests', () => {
         version: 1,
         behavior: 'wander',
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);
@@ -122,7 +122,7 @@ describe('Animal Behavior Integration Tests', () => {
         energy: 20,
         state: 'idle',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);
@@ -144,7 +144,7 @@ describe('Animal Behavior Integration Tests', () => {
         hunger: 60,
         state: 'idle',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);
@@ -184,8 +184,8 @@ describe('Animal Behavior Integration Tests', () => {
         state: 'idle',
       }));
 
-      (harness.world as any)._addEntity(hungryAnimal);
-      (harness.world as any)._addEntity(tiredAnimal);
+      harness.world.addEntity(hungryAnimal);
+      harness.world.addEntity(tiredAnimal);
 
       // Update the system with both animals
       system.update(harness.world, [hungryAnimal, tiredAnimal], 0.05);
@@ -230,7 +230,7 @@ describe('Animal Behavior Integration Tests', () => {
         stress: 60,
         state: 'fleeing',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system - flee behavior finds no threat
       system.update(harness.world, [animal], 0.05);
@@ -251,7 +251,7 @@ describe('Animal Behavior Integration Tests', () => {
         energy: 98,
         state: 'sleeping',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);
@@ -272,7 +272,7 @@ describe('Animal Behavior Integration Tests', () => {
         hunger: 15,
         state: 'eating',
       }));
-      (harness.world as any)._addEntity(animal);
+      harness.world.addEntity(animal);
 
       // Update the system
       system.update(harness.world, [animal], 0.05);

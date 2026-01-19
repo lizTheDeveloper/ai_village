@@ -500,7 +500,7 @@ function createOreDeposit(
   (entity as any).addComponent(createTagsComponent(depositTag, 'obstacle', 'minable'));
   (entity as any).addComponent(createResourceComponent(resourceType, amount, 0)); // 0 = no regen
 
-  (harness.world as any)._addEntity(entity);
+  harness.world.addEntity(entity);
 
   return entity;
 }

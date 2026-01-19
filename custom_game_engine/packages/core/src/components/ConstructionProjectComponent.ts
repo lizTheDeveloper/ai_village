@@ -502,8 +502,13 @@ export function getEstimatedTicksRemaining(
   project: ConstructionProjectComponent,
   currentTick: number
 ): number {
-  return Math.max(0, project.timeline.estimatedCompletionTick - currentTick);
+  // Inline Math.max
+  const remaining = project.timeline.estimatedCompletionTick - currentTick;
+  return remaining > 0 ? remaining : 0;
 }
+
+// Precomputed constant for schedule slack
+const SCHEDULE_SLACK = 0.9;
 
 /**
  * Check if project is behind schedule
@@ -512,13 +517,21 @@ export function isBehindSchedule(
   project: ConstructionProjectComponent,
   currentTick: number
 ): boolean {
-  const expectedProgress = Math.min(
-    1.0,
-    (currentTick - project.timeline.startTick) /
-      (project.timeline.estimatedCompletionTick - project.timeline.startTick)
-  );
+  // Cache timeline reference
+  const timeline = project.timeline;
+  const elapsed = currentTick - timeline.startTick;
+  const total = timeline.estimatedCompletionTick - timeline.startTick;
 
-  return project.progress.overallProgress < expectedProgress * 0.9; // Allow 10% slack
+  // Inline Math.min
+  let expectedProgress: number;
+  if (total > 0) {
+    const ratio = elapsed / total;
+    expectedProgress = ratio > 1.0 ? 1.0 : ratio;
+  } else {
+    expectedProgress = 1.0;
+  }
+
+  return project.progress.overallProgress < expectedProgress * SCHEDULE_SLACK;
 }
 
 /**
@@ -567,7 +580,15 @@ export function getLaborProgress(project: ConstructionProjectComponent): {
 } {
   const required = project.requirements.laborRequired;
   const allocated = project.progress.laborAllocated;
-  const percent = required > 0 ? Math.min(1.0, allocated / required) : 1.0;
+
+  // Inline Math.min and conditional
+  let percent: number;
+  if (required > 0) {
+    const ratio = allocated / required;
+    percent = ratio > 1.0 ? 1.0 : ratio;
+  } else {
+    percent = 1.0;
+  }
 
   return { required, allocated, percent };
 }
@@ -582,7 +603,15 @@ export function getEnergyProgress(project: ConstructionProjectComponent): {
 } {
   const required = project.requirements.energyRequired;
   const allocated = project.progress.energyAllocated;
-  const percent = required > 0 ? Math.min(1.0, allocated / required) : 1.0;
+
+  // Inline Math.min and conditional
+  let percent: number;
+  if (required > 0) {
+    const ratio = allocated / required;
+    percent = ratio > 1.0 ? 1.0 : ratio;
+  } else {
+    percent = 1.0;
+  }
 
   return { required, allocated, percent };
 }

@@ -39,171 +39,51 @@ export interface SpriteLookupResult {
 }
 
 /**
- * Available sprite mappings based on downloaded PixelLab sprites
+ * Load sprite registry data from JSON
  */
-const SPRITE_MAPPINGS: SpriteMapping[] = [
-  // Human Males - Skin tone variants with black hair
-  {
-    folderId: 'human_male_black_light',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'black',
-    skinTone: 'light',
-    priority: 100,
-  },
-  {
-    folderId: 'human_male_black_medium',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'black',
-    skinTone: 'medium',
-    priority: 100,
-  },
-  {
-    folderId: 'human_male_black_dark',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'black',
-    skinTone: 'dark',
-    priority: 100,
-  },
+interface SpriteRegistryData {
+  spriteMappings: SpriteMapping[];
+  hairColorNormalization: Record<string, string>;
+  skinToneNormalization: Record<string, string>;
+}
 
-  // Human Males - Hair color variants (default skin)
-  {
-    folderId: 'human_male_black',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'black',
-    priority: 80,
-  },
-  {
-    folderId: 'human_male_brown',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'brown',
-    priority: 80,
-  },
-  {
-    folderId: 'human_male_blonde',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'blonde',
-    priority: 80,
-  },
-  {
-    folderId: 'human_male_blonde_light',
-    species: 'human',
-    gender: 'male',
-    hairColor: 'blonde',
-    skinTone: 'light',
-    priority: 100,
-  },
+let SPRITE_MAPPINGS: SpriteMapping[] = [];
+let hairColorMap: Record<string, string> = {};
+let skinToneMap: Record<string, string> = {};
 
-  // Human Females - Skin tone variants with black hair
-  {
-    folderId: 'human_female_black_light',
-    species: 'human',
-    gender: 'female',
-    hairColor: 'black',
-    skinTone: 'light',
-    priority: 100,
-  },
-  {
-    folderId: 'human_female_black_medium',
-    species: 'human',
-    gender: 'female',
-    hairColor: 'black',
-    skinTone: 'medium',
-    priority: 100,
-  },
-  {
-    folderId: 'human_female_black_dark',
-    species: 'human',
-    gender: 'female',
-    hairColor: 'black',
-    skinTone: 'dark',
-    priority: 100,
-  },
+/**
+ * Load sprite registry data from JSON file
+ */
+async function loadSpriteRegistry(): Promise<void> {
+  try {
+    const response = await fetch('/packages/renderer/data/sprite-registry.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load sprite registry: ${response.statusText}`);
+    }
+    const data: SpriteRegistryData = await response.json();
+    SPRITE_MAPPINGS = data.spriteMappings;
+    hairColorMap = data.hairColorNormalization;
+    skinToneMap = data.skinToneNormalization;
+  } catch (error) {
+    console.error('[SpriteRegistry] Failed to load sprite registry data:', error);
+    // Use fallback data
+    SPRITE_MAPPINGS = [
+      { folderId: 'villager', species: 'human', priority: 10 },
+    ];
+    hairColorMap = { brown: 'brown' };
+    skinToneMap = { medium: 'medium' };
+  }
+}
 
-  // Human Nonbinary
-  {
-    folderId: 'human_nonbinary_black',
-    species: 'human',
-    gender: 'nonbinary',
-    hairColor: 'black',
-    priority: 80,
-  },
+// Initialize on module load
+const registryPromise = loadSpriteRegistry();
 
-  // Fallbacks - Generic human by gender
-  { folderId: 'human_male_brown', species: 'human', gender: 'male', priority: 50 },
-  { folderId: 'human_female_black_medium', species: 'human', gender: 'female', priority: 50 },
-  { folderId: 'human_nonbinary_black', species: 'human', gender: 'nonbinary', priority: 50 },
-
-  // Animals - Chickens
-  { folderId: 'chicken_white', species: 'chicken', priority: 100 },
-  { folderId: 'chicken_brown', species: 'chicken', priority: 100 },
-  { folderId: 'chicken_black', species: 'chicken', priority: 100 },
-
-  // Animals - Cats
-  { folderId: 'cat_orange', species: 'cat', priority: 100 },
-  { folderId: 'cat_grey', species: 'cat', priority: 100 },
-  { folderId: 'cat_black', species: 'cat', priority: 100 },
-  { folderId: 'cat_white', species: 'cat', priority: 100 },
-
-  // Animals - Sheep
-  { folderId: 'sheep_white', species: 'sheep', priority: 100 },
-  { folderId: 'sheep_black', species: 'sheep', priority: 100 },
-  { folderId: 'sheep_grey', species: 'sheep', priority: 100 },
-
-  // Animals - Rabbits
-  { folderId: 'rabbit_white', species: 'rabbit', priority: 100 },
-  { folderId: 'rabbit_brown', species: 'rabbit', priority: 100 },
-  { folderId: 'rabbit_grey', species: 'rabbit', priority: 100 },
-
-  // Animals - Cows
-  { folderId: 'cow_black_white', species: 'cow', priority: 100 },
-  { folderId: 'cow_brown', species: 'cow', priority: 100 },
-  { folderId: 'cow_brown_white', species: 'cow', priority: 100 },
-
-  // Animals - Sheep
-  { folderId: 'sheep', species: 'sheep', priority: 100 },
-
-  // Animals - Horses
-  { folderId: 'horse_white', species: 'horse', priority: 100 },
-  { folderId: 'horse_brown', species: 'horse', priority: 100 },
-  { folderId: 'horse_black', species: 'horse', priority: 100 },
-  { folderId: 'horse_chestnut', species: 'horse', priority: 100 },
-
-  // Animals - Dogs
-  { folderId: 'dog_white', species: 'dog', priority: 100 },
-  { folderId: 'dog_brown', species: 'dog', priority: 100 },
-  { folderId: 'dog_black', species: 'dog', priority: 100 },
-  { folderId: 'dog_spotted', species: 'dog', priority: 100 },
-
-  // Animals - Deer
-  { folderId: 'deer', species: 'deer', priority: 100 },
-  { folderId: 'deer_brown', species: 'deer', priority: 100 },
-  { folderId: 'deer_spotted', species: 'deer', priority: 100 },
-
-  // Animals - Pigs
-  { folderId: 'pig_pink', species: 'pig', priority: 100 },
-  { folderId: 'pig_black', species: 'pig', priority: 100 },
-
-  // Animals - Goats
-  { folderId: 'goat_white', species: 'goat', priority: 100 },
-  { folderId: 'goat_brown', species: 'goat', priority: 100 },
-  { folderId: 'goat_black', species: 'goat', priority: 100 },
-
-  // Ultimate fallback - villager for any species
-  { folderId: 'villager', species: 'human', priority: 10 },
-  { folderId: 'villager', species: 'elf', priority: 5 },
-  { folderId: 'villager', species: 'dwarf', priority: 5 },
-  { folderId: 'villager', species: 'orc', priority: 5 },
-  { folderId: 'villager', species: 'celestial', priority: 5 },
-  { folderId: 'villager', species: 'demon', priority: 5 },
-  { folderId: 'villager', species: 'thrakeen', priority: 5 },
-  { folderId: 'villager', species: 'aquatic', priority: 5 },
-];
+/**
+ * Ensure sprite registry is loaded before use
+ */
+export async function ensureSpriteRegistryLoaded(): Promise<void> {
+  await registryPromise;
+}
 
 /**
  * Find the best matching sprite for given traits (simple version, backwards compatible)

@@ -40,7 +40,7 @@ describe('University Research Integration', () => {
       // Create university building entity
       const university = new EntityImpl(createEntityId(), 0);
       university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       // Emit building complete event
       eventBus.emitImmediate({
@@ -72,7 +72,7 @@ describe('University Research Integration', () => {
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
       university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       // Start a research project using the public API
       universitySystem.proposeResearch(
@@ -100,7 +100,7 @@ describe('University Research Integration', () => {
       const university = new EntityImpl(createEntityId(), 0);
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       const events: GameEvent[] = [];
       eventBus.on('university:research_started', (event) => events.push(event));
@@ -128,7 +128,7 @@ describe('University Research Integration', () => {
       const university = new EntityImpl(createEntityId(), 0);
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       const completionEvents: GameEvent[] = [];
       eventBus.on('university:research_completed', (event) => completionEvents.push(event));
@@ -173,7 +173,7 @@ describe('University Research Integration', () => {
       const techUnlock = createTechnologyUnlockComponent();
       techUnlock.playerCityId = 'test-city';
       techUnlockEntity.addComponent(techUnlock);
-      (world as any)._addEntity(techUnlockEntity);
+      world.addEntity(techUnlockEntity);
 
       // Create a player city
       const cityEntity = new EntityImpl(createEntityId(), 0);
@@ -185,13 +185,13 @@ describe('University Research Integration', () => {
       );
       cityEntity.addComponent(cityDirector);
       cityEntity.addComponent(createPositionComponent(100, 100));
-      (world as any)._addEntity(cityEntity);
+      world.addEntity(cityEntity);
 
       // Create university building in player city
       const university = new EntityImpl(createEntityId(), 0);
       university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
       university.addComponent(createPositionComponent(110, 110));
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       // Emit building complete event
       eventBus.emitImmediate({
@@ -220,13 +220,13 @@ describe('University Research Integration', () => {
       const techUnlock = createTechnologyUnlockComponent();
       techUnlock.universityCollaborationEnabled = true;
       techUnlockEntity.addComponent(techUnlock);
-      (world as any)._addEntity(techUnlockEntity);
+      world.addEntity(techUnlockEntity);
 
       // Create university
       const university = new EntityImpl(createEntityId(), 0);
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       // Start research
       universitySystem.proposeResearch(
@@ -256,13 +256,13 @@ describe('University Research Integration', () => {
       techUnlock.internetResearchBoostEnabled = true;
       techUnlock.globalResearchMultiplier = 3.0;
       techUnlockEntity.addComponent(techUnlock);
-      (world as any)._addEntity(techUnlockEntity);
+      world.addEntity(techUnlockEntity);
 
       // Create university
       const university = new EntityImpl(createEntityId(), 0);
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       // Start research
       universitySystem.proposeResearch(
@@ -291,7 +291,7 @@ describe('University Research Integration', () => {
       const university = new EntityImpl(createEntityId(), 0);
       const universityComp = createUniversityComponent('Test U', university.id, 1000);
       university.addComponent(universityComp);
-      (world as any)._addEntity(university);
+      world.addEntity(university);
 
       const statsEvents: GameEvent[] = [];
       eventBus.on('university:stats', (event) => statsEvents.push(event));
@@ -328,12 +328,12 @@ describe('University Research Integration', () => {
       const uni1 = new EntityImpl(createEntityId(), 0);
       const uni1Comp = createUniversityComponent('University 1', uni1.id, 1000);
       uni1.addComponent(uni1Comp);
-      (world as any)._addEntity(uni1);
+      world.addEntity(uni1);
 
       const uni2 = new EntityImpl(createEntityId(), 0);
       const uni2Comp = createUniversityComponent('University 2', uni2.id, 1000);
       uni2.addComponent(uni2Comp);
-      (world as any)._addEntity(uni2);
+      world.addEntity(uni2);
 
       // Start research at both
       universitySystem.proposeResearch(uni1.id, world, 'Research 1', 'agent-1', []);

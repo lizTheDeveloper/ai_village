@@ -1,0 +1,341 @@
+{
+  "spriteMappings": [
+    {
+      "folderId": "human_male_black_light",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "black",
+      "skinTone": "light",
+      "priority": 100
+    },
+    {
+      "folderId": "human_male_black_medium",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "black",
+      "skinTone": "medium",
+      "priority": 100
+    },
+    {
+      "folderId": "human_male_black_dark",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "black",
+      "skinTone": "dark",
+      "priority": 100
+    },
+    {
+      "folderId": "human_male_black",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "black",
+      "priority": 80
+    },
+    {
+      "folderId": "human_male_brown",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "brown",
+      "priority": 80
+    },
+    {
+      "folderId": "human_male_blonde",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "blonde",
+      "priority": 80
+    },
+    {
+      "folderId": "human_male_blonde_light",
+      "species": "human",
+      "gender": "male",
+      "hairColor": "blonde",
+      "skinTone": "light",
+      "priority": 100
+    },
+    {
+      "folderId": "human_female_black_light",
+      "species": "human",
+      "gender": "female",
+      "hairColor": "black",
+      "skinTone": "light",
+      "priority": 100
+    },
+    {
+      "folderId": "human_female_black_medium",
+      "species": "human",
+      "gender": "female",
+      "hairColor": "black",
+      "skinTone": "medium",
+      "priority": 100
+    },
+    {
+      "folderId": "human_female_black_dark",
+      "species": "human",
+      "gender": "female",
+      "hairColor": "black",
+      "skinTone": "dark",
+      "priority": 100
+    },
+    {
+      "folderId": "human_nonbinary_black",
+      "species": "human",
+      "gender": "nonbinary",
+      "hairColor": "black",
+      "priority": 80
+    },
+    {
+      "folderId": "human_male_brown",
+      "species": "human",
+      "gender": "male",
+      "priority": 50
+    },
+    {
+      "folderId": "human_female_black_medium",
+      "species": "human",
+      "gender": "female",
+      "priority": 50
+    },
+    {
+      "folderId": "human_nonbinary_black",
+      "species": "human",
+      "gender": "nonbinary",
+      "priority": 50
+    },
+    {
+      "folderId": "chicken_white",
+      "species": "chicken",
+      "priority": 100
+    },
+    {
+      "folderId": "chicken_brown",
+      "species": "chicken",
+      "priority": 100
+    },
+    {
+      "folderId": "chicken_black",
+      "species": "chicken",
+      "priority": 100
+    },
+    {
+      "folderId": "cat_orange",
+      "species": "cat",
+      "priority": 100
+    },
+    {
+      "folderId": "cat_grey",
+      "species": "cat",
+      "priority": 100
+    },
+    {
+      "folderId": "cat_black",
+      "species": "cat",
+      "priority": 100
+    },
+    {
+      "folderId": "cat_white",
+      "species": "cat",
+      "priority": 100
+    },
+    {
+      "folderId": "sheep_white",
+      "species": "sheep",
+      "priority": 100
+    },
+    {
+      "folderId": "sheep_black",
+      "species": "sheep",
+      "priority": 100
+    },
+    {
+      "folderId": "sheep_grey",
+      "species": "sheep",
+      "priority": 100
+    },
+    {
+      "folderId": "rabbit_white",
+      "species": "rabbit",
+      "priority": 100
+    },
+    {
+      "folderId": "rabbit_brown",
+      "species": "rabbit",
+      "priority": 100
+    },
+    {
+      "folderId": "rabbit_grey",
+      "species": "rabbit",
+      "priority": 100
+    },
+    {
+      "folderId": "cow_black_white",
+      "species": "cow",
+      "priority": 100
+    },
+    {
+      "folderId": "cow_brown",
+      "species": "cow",
+      "priority": 100
+    },
+    {
+      "folderId": "cow_brown_white",
+      "species": "cow",
+      "priority": 100
+    },
+    {
+      "folderId": "sheep",
+      "species": "sheep",
+      "priority": 100
+    },
+    {
+      "folderId": "horse_white",
+      "species": "horse",
+      "priority": 100
+    },
+    {
+      "folderId": "horse_brown",
+      "species": "horse",
+      "priority": 100
+    },
+    {
+      "folderId": "horse_black",
+      "species": "horse",
+      "priority": 100
+    },
+    {
+      "folderId": "horse_chestnut",
+      "species": "horse",
+      "priority": 100
+    },
+    {
+      "folderId": "dog_white",
+      "species": "dog",
+      "priority": 100
+    },
+    {
+      "folderId": "dog_brown",
+      "species": "dog",
+      "priority": 100
+    },
+    {
+      "folderId": "dog_black",
+      "species": "dog",
+      "priority": 100
+    },
+    {
+      "folderId": "dog_spotted",
+      "species": "dog",
+      "priority": 100
+    },
+    {
+      "folderId": "deer",
+      "species": "deer",
+      "priority": 100
+    },
+    {
+      "folderId": "deer_brown",
+      "species": "deer",
+      "priority": 100
+    },
+    {
+      "folderId": "deer_spotted",
+      "species": "deer",
+      "priority": 100
+    },
+    {
+      "folderId": "pig_pink",
+      "species": "pig",
+      "priority": 100
+    },
+    {
+      "folderId": "pig_black",
+      "species": "pig",
+      "priority": 100
+    },
+    {
+      "folderId": "goat_white",
+      "species": "goat",
+      "priority": 100
+    },
+    {
+      "folderId": "goat_brown",
+      "species": "goat",
+      "priority": 100
+    },
+    {
+      "folderId": "goat_black",
+      "species": "goat",
+      "priority": 100
+    },
+    {
+      "folderId": "villager",
+      "species": "human",
+      "priority": 10
+    },
+    {
+      "folderId": "villager",
+      "species": "elf",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "dwarf",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "orc",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "celestial",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "demon",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "thrakeen",
+      "priority": 5
+    },
+    {
+      "folderId": "villager",
+      "species": "aquatic",
+      "priority": 5
+    }
+  ],
+  "hairColorNormalization": {
+    "black": "black",
+    "dark": "black",
+    "ebony": "black",
+    "brown": "brown",
+    "chestnut": "brown",
+    "auburn": "brown",
+    "blonde": "blonde",
+    "blond": "blonde",
+    "golden": "blonde",
+    "yellow": "blonde",
+    "red": "red",
+    "ginger": "red",
+    "copper": "red",
+    "white": "white",
+    "silver": "white",
+    "gray": "white",
+    "grey": "white"
+  },
+  "skinToneNormalization": {
+    "light": "light",
+    "pale": "light",
+    "fair": "light",
+    "medium": "medium",
+    "tan": "medium",
+    "olive": "medium",
+    "dark": "dark",
+    "brown": "dark",
+    "deep": "dark"
+  }
+}

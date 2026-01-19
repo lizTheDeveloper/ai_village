@@ -628,43 +628,60 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   }
 
   /**
-   * Age ruins and update decay stage
+   * OPTIMIZED: Age ruins with reusable working objects
+   * Uses precomputed ticksPerYear and avoids allocations
    */
-  private ageRuins(world: World, entity: EntityImpl, mega: MegastructureComponent): void {
+  private ageRuinsOptimized(currentTick: number, mega: MegastructureComponent): void {
     const config = MAINTENANCE_CONFIGS[mega.structureType];
     if (!config) {
       throw new Error(`Missing maintenance config for megastructure type: ${mega.structureType}`);
     }
 
-    // Calculate years in decay (assuming 20 TPS and conversion to game years)
-    const ticksPerYear = 365 * 24 * 60 * 3; // Approximate
-    mega.yearsInDecay = (world.tick - mega.lastMaintenanceTick) / ticksPerYear;
+    // Calculate years in decay (using precomputed ticksPerYear)
+    mega.yearsInDecay = (currentTick - mega.lastMaintenanceTick) / this.ticksPerYear;
 
-    // Check if we should advance to next decay stage
+    // Early exit: already at final decay stage
     const currentStageIndex = mega.decayStageIndex;
     const nextStageIndex = currentStageIndex + 1;
-
-    if (nextStageIndex < config.decayStages.length) {
-      const nextStage = config.decayStages[nextStageIndex];
-      if (!nextStage) {
-        throw new Error(`Missing decay stage at index ${nextStageIndex} for ${mega.structureType}`);
-      }
-
-      if (mega.yearsInDecay >= nextStage.yearsAfterCollapse) {
-        mega.decayStageIndex = nextStageIndex;
-        mega.archaeologicalValue = nextStage.archaeologicalValue;
-
-        this.emitDecayStageEvent(world, entity, mega, nextStage);
-      }
+    if (nextStageIndex >= config.decayStages.length) {
+      return;
     }
+
+    // Reuse working object instead of allocating
+    const nextStage = config.decayStages[nextStageIndex];
+    if (!nextStage) {
+      throw new Error(`Missing decay stage at index ${nextStageIndex} for ${mega.structureType}`);
+    }
+
+    // Early exit: not ready for next stage yet
+    if (mega.yearsInDecay < nextStage.yearsAfterCollapse) {
+      return;
+    }
+
+    // Advance to next decay stage
+    mega.decayStageIndex = nextStageIndex;
+    mega.archaeologicalValue = nextStage.archaeologicalValue;
+
+    // Store stage in working object for event emission
+    this.workingDecayStage.stage = nextStage;
+    this.workingDecayStage.index = nextStageIndex;
   }
 
   /**
-   * Calculate maintenance cost for a megastructure
+   * OPTIMIZED: Memoized maintenance cost calculation
+   * Caches results by structure type
    */
   private calculateMaintenanceCost(mega: MegastructureComponent): number {
-    const config = MAINTENANCE_CONFIGS[mega.structureType];
-    return config.maintenanceCostPerYear;
+    const cacheKey = mega.structureType;
+    let cost = this.maintenanceCostCache.get(cacheKey);
+
+    if (cost === undefined) {
+      const config = MAINTENANCE_CONFIGS[mega.structureType];
+      cost = config.maintenanceCostPerYear;
+      this.maintenanceCostCache.set(cacheKey, cost);
+    }
+
+    return cost;
   }
 
   // ===== Event Emission =====

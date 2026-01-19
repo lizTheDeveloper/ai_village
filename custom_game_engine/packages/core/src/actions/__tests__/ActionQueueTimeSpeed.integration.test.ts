@@ -45,7 +45,7 @@ describe('ActionQueue Time Speed Integration', () => {
     interface WorldInternal {
       _addEntity(entity: Entity): void;
     }
-    (world as unknown as WorldInternal)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     // Create action registry and queue
     actionRegistry = new ActionRegistry();

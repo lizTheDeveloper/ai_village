@@ -53,7 +53,7 @@ describe('HuntingSystem Integration', () => {
       version: 0,
       items: [],
     });
-    (world as any)._addEntity(hunter);
+    world.addEntity(hunter);
 
     // Create passive prey (deer)
     const prey = new EntityImpl(createEntityId(), 0);
@@ -73,7 +73,7 @@ describe('HuntingSystem Integration', () => {
       awareness: 5,
       aggression: 0,
     });
-    (world as any)._addEntity(prey);
+    world.addEntity(prey);
 
     // Add favorable environment
     const env = new EntityImpl(createEntityId(), 0);
@@ -84,7 +84,7 @@ describe('HuntingSystem Integration', () => {
       weather: 'clear',
       timeOfDay: 'dawn',
     });
-    (world as any)._addEntity(env);
+    world.addEntity(env);
 
     // Initiate hunt
     hunter.addComponent(
@@ -145,7 +145,7 @@ describe('HuntingSystem Integration', () => {
       version: 0,
       items: [],
     });
-    (world as any)._addEntity(hunter);
+    world.addEntity(hunter);
 
     const prey = new EntityImpl(createEntityId(), 0);
     prey.addComponent({
@@ -164,7 +164,7 @@ describe('HuntingSystem Integration', () => {
       awareness: 7,
       aggression: 0,
     });
-    (world as any)._addEntity(prey);
+    world.addEntity(prey);
 
     const env = new EntityImpl(createEntityId(), 0);
     env.addComponent({
@@ -174,7 +174,7 @@ describe('HuntingSystem Integration', () => {
       weather: 'clear',
       timeOfDay: 'noon',
     });
-    (world as any)._addEntity(env);
+    world.addEntity(env);
 
     hunter.addComponent(
       createConflictComponent({
@@ -233,7 +233,7 @@ describe('HuntingSystem Integration', () => {
       version: 0,
       items: [],
     });
-    (world as any)._addEntity(hunter);
+    world.addEntity(hunter);
 
     const prey = new EntityImpl(createEntityId(), 0);
     prey.addComponent({
@@ -252,7 +252,7 @@ describe('HuntingSystem Integration', () => {
       awareness: 5,
       aggression: 0,
     });
-    (world as any)._addEntity(prey);
+    world.addEntity(prey);
 
     const env = new EntityImpl(createEntityId(), 0);
     env.addComponent({
@@ -262,7 +262,7 @@ describe('HuntingSystem Integration', () => {
       weather: 'clear',
       timeOfDay: 'dawn',
     });
-    (world as any)._addEntity(env);
+    world.addEntity(env);
 
     const initialInventoryLength = (hunter.getComponent('inventory') as any).items.length;
 
@@ -335,7 +335,7 @@ describe('HuntingSystem Integration', () => {
       version: 0,
       items: [],
     });
-    (world as any)._addEntity(hunter);
+    world.addEntity(hunter);
 
     const prey = new EntityImpl(createEntityId(), 0);
     prey.addComponent({
@@ -354,7 +354,7 @@ describe('HuntingSystem Integration', () => {
       awareness: 6,
       aggression: 0,
     });
-    (world as any)._addEntity(prey);
+    world.addEntity(prey);
 
     const env = new EntityImpl(createEntityId(), 0);
     env.addComponent({
@@ -364,7 +364,7 @@ describe('HuntingSystem Integration', () => {
       weather: 'clear',
       timeOfDay: 'dawn',
     });
-    (world as any)._addEntity(env);
+    world.addEntity(env);
 
     hunter.addComponent(
       createConflictComponent({
@@ -433,7 +433,7 @@ describe('HuntingSystem Integration', () => {
       version: 0,
       items: [],
     });
-    (world as any)._addEntity(hunter);
+    world.addEntity(hunter);
 
     // Create dangerous prey (bear)
     const prey = new EntityImpl(createEntityId(), 0);
@@ -453,7 +453,7 @@ describe('HuntingSystem Integration', () => {
       awareness: 7,
       aggression: 9,
     });
-    (world as any)._addEntity(prey);
+    world.addEntity(prey);
 
     const env = new EntityImpl(createEntityId(), 0);
     env.addComponent({
@@ -463,7 +463,7 @@ describe('HuntingSystem Integration', () => {
       weather: 'clear',
       timeOfDay: 'noon',
     });
-    (world as any)._addEntity(env);
+    world.addEntity(env);
 
     hunter.addComponent(
       createConflictComponent({

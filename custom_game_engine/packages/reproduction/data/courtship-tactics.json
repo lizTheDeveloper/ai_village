@@ -1,0 +1,447 @@
+{
+  "universal": [
+    {
+      "id": "conversation",
+      "name": "Conversation",
+      "category": "conversation",
+      "requirements": { "proximity": 3, "time": 200 },
+      "visibleToOthers": true,
+      "description": "Talk and get to know each other",
+      "baseAppeal": 0.3,
+      "appealModifiers": {
+        "personality": {
+          "extroverted": 0.5,
+          "introverted": -0.1
+        }
+      }
+    },
+    {
+      "id": "compliment",
+      "name": "Compliment",
+      "category": "conversation",
+      "requirements": { "proximity": 3, "time": 50 },
+      "visibleToOthers": false,
+      "description": "Give a sincere compliment",
+      "baseAppeal": 0.4,
+      "appealModifiers": {
+        "romanticInclination": 0.3,
+        "personality": {
+          "confident": -0.2,
+          "insecure": 0.3
+        }
+      }
+    },
+    {
+      "id": "shared_meal",
+      "name": "Share a Meal",
+      "category": "activity",
+      "requirements": {
+        "items": ["food"],
+        "proximity": 2,
+        "time": 400
+      },
+      "visibleToOthers": true,
+      "description": "Eat together and bond",
+      "baseAppeal": 0.5,
+      "appealModifiers": {
+        "personality": {
+          "social": 0.4
+        }
+      }
+    },
+    {
+      "id": "gift_giving",
+      "name": "Give Gift",
+      "category": "gift",
+      "requirements": {
+        "items": ["gift_item"],
+        "proximity": 2,
+        "time": 100
+      },
+      "visibleToOthers": true,
+      "description": "Offer a meaningful gift",
+      "baseAppeal": 0.6,
+      "appealModifiers": {
+        "romanticInclination": 0.4,
+        "personality": {
+          "materialistic": 0.5,
+          "ascetic": -0.3
+        }
+      }
+    },
+    {
+      "id": "physical_proximity",
+      "name": "Be Close",
+      "category": "proximity",
+      "requirements": { "proximity": 1.5, "time": 300 },
+      "visibleToOthers": true,
+      "description": "Stand close and share space",
+      "baseAppeal": 0.2,
+      "appealModifiers": {
+        "romanticInclination": 0.3
+      }
+    },
+    {
+      "id": "touch",
+      "name": "Gentle Touch",
+      "category": "proximity",
+      "requirements": { "proximity": 1, "time": 50 },
+      "visibleToOthers": true,
+      "description": "Light physical contact",
+      "baseAppeal": 0.5,
+      "appealModifiers": {
+        "romanticInclination": 0.5,
+        "personality": {
+          "touch_averse": -1.0,
+          "affectionate": 0.6
+        }
+      }
+    },
+    {
+      "id": "shared_activity",
+      "name": "Shared Activity",
+      "category": "activity",
+      "requirements": { "proximity": 5, "time": 600 },
+      "visibleToOthers": true,
+      "description": "Do an activity together",
+      "baseAppeal": 0.4,
+      "appealModifiers": {
+        "personality": {
+          "active": 0.4
+        }
+      }
+    },
+    {
+      "id": "humor",
+      "name": "Make Laugh",
+      "category": "conversation",
+      "requirements": { "proximity": 3, "time": 100 },
+      "visibleToOthers": true,
+      "description": "Share jokes and laughter",
+      "baseAppeal": 0.5,
+      "appealModifiers": {
+        "personality": {
+          "playful": 0.6,
+          "serious": -0.2
+        }
+      }
+    }
+  ],
+  "dwarf": [
+    {
+      "id": "craft_gift",
+      "name": "Craft Masterwork Gift",
+      "category": "crafting",
+      "requirements": {
+        "skills": { "crafting": 5 },
+        "items": ["metal", "gems"],
+        "time": 2000
+      },
+      "visibleToOthers": true,
+      "description": "Create a masterwork item for beloved",
+      "baseAppeal": 0.9,
+      "appealModifiers": {
+        "personality": {
+          "appreciates_quality": 0.8
+        }
+      }
+    },
+    {
+      "id": "share_ale",
+      "name": "Share Fine Ale",
+      "category": "activity",
+      "requirements": {
+        "items": ["ale"],
+        "proximity": 2,
+        "time": 600
+      },
+      "visibleToOthers": true,
+      "description": "Drink together and share stories",
+      "baseAppeal": 0.6,
+      "appealModifiers": {
+        "personality": {
+          "social": 0.5,
+          "traditional": 0.4
+        }
+      }
+    },
+    {
+      "id": "demonstrate_skill",
+      "name": "Demonstrate Skill",
+      "category": "display",
+      "requirements": {
+        "skills": { "crafting": 3 },
+        "proximity": 5,
+        "time": 400
+      },
+      "visibleToOthers": true,
+      "description": "Show off crafting or mining prowess",
+      "baseAppeal": 0.7,
+      "appealModifiers": {
+        "personality": {
+          "values_competence": 0.6
+        }
+      }
+    },
+    {
+      "id": "shared_project",
+      "name": "Work on Project Together",
+      "category": "activity",
+      "requirements": {
+        "proximity": 3,
+        "time": 1200
+      },
+      "visibleToOthers": true,
+      "description": "Build or craft something together",
+      "baseAppeal": 0.75,
+      "appealModifiers": {
+        "personality": {
+          "collaborative": 0.6,
+          "pragmatic": 0.5
+        }
+      }
+    },
+    {
+      "id": "show_wealth",
+      "name": "Display Wealth",
+      "category": "display",
+      "requirements": {
+        "items": ["gold", "gems"],
+        "proximity": 3,
+        "time": 200
+      },
+      "visibleToOthers": true,
+      "description": "Show financial security",
+      "baseAppeal": 0.5,
+      "appealModifiers": {
+        "personality": {
+          "pragmatic": 0.6,
+          "materialistic": 0.7
+        }
+      }
+    },
+    {
+      "id": "tell_saga",
+      "name": "Tell Ancestral Saga",
+      "category": "conversation",
+      "requirements": {
+        "proximity": 3,
+        "time": 800
+      },
+      "visibleToOthers": true,
+      "description": "Share family history and tales",
+      "baseAppeal": 0.6,
+      "appealModifiers": {
+        "personality": {
+          "traditional": 0.7,
+          "values_history": 0.6
+        }
+      }
+    }
+  ],
+  "bird_folk": [
+    {
+      "id": "aerial_dance",
+      "name": "Aerial Dance",
+      "category": "display",
+      "requirements": {
+        "skills": { "flying": 4 },
+        "location": { "type": "elevated", "minHeight": 5 },
+        "time": 800,
+        "energy": 20
+      },
+      "visibleToOthers": true,
+      "description": "Perform elaborate flight patterns",
+      "baseAppeal": 0.85,
+      "appealModifiers": {
+        "romanticInclination": 0.6,
+        "personality": {
+          "artistic": 0.5
+        }
+      }
+    },
+    {
+      "id": "plumage_display",
+      "name": "Plumage Display",
+      "category": "display",
+      "requirements": {
+        "proximity": 3,
+        "time": 200
+      },
+      "visibleToOthers": true,
+      "description": "Show off colorful feathers",
+      "baseAppeal": 0.6,
+      "appealModifiers": {
+        "personality": {
+          "values_beauty": 0.7
+        }
+      }
+    },
+    {
+      "id": "song",
+      "name": "Courtship Song",
+      "category": "display",
+      "requirements": {
+        "skills": { "music": 3 },
+        "proximity": 10,
+        "time": 400
+      },
+      "visibleToOthers": true,
+      "description": "Sing elaborate courtship melody",
+      "baseAppeal": 0.8,
+      "appealModifiers": {
+        "romanticInclination": 0.7,
+        "personality": {
+          "musical": 0.6
+        }
+      }
+    },
+    {
+      "id": "nest_construction",
+      "name": "Build Nest Together",
+      "category": "activity",
+      "requirements": {
+        "items": ["twigs", "grass"],
+        "time": 3000,
+        "location": { "type": "elevated", "minHeight": 3 }
+      },
+      "visibleToOthers": true,
+      "description": "Build a nest together",
+      "baseAppeal": 0.9,
+      "appealModifiers": {
+        "personality": {
+          "pragmatic": 0.6,
+          "homemaker": 0.8
+        }
+      }
+    }
+  ],
+  "mystif": [
+    {
+      "id": "mind_touch",
+      "name": "Mind Touch",
+      "category": "magic",
+      "requirements": {
+        "skills": { "psionics": 4 },
+        "proximity": 5,
+        "time": 200,
+        "energy": 15
+      },
+      "visibleToOthers": false,
+      "description": "Share thoughts and emotions telepathically",
+      "baseAppeal": 0.85,
+      "appealModifiers": {
+        "romanticInclination": 0.8,
+        "personality": {
+          "empathic": 0.7
+        }
+      }
+    },
+    {
+      "id": "aura_display",
+      "name": "Aura Display",
+      "category": "magic",
+      "requirements": {
+        "skills": { "magic": 3 },
+        "proximity": 4,
+        "time": 300,
+        "energy": 10
+      },
+      "visibleToOthers": true,
+      "description": "Display magical aura in beautiful patterns",
+      "baseAppeal": 0.7,
+      "appealModifiers": {
+        "personality": {
+          "magical": 0.6,
+          "artistic": 0.5
+        }
+      }
+    },
+    {
+      "id": "dream_meeting",
+      "name": "Dream Meeting",
+      "category": "magic",
+      "requirements": {
+        "skills": { "dreaming": 5 },
+        "time": 1000,
+        "energy": 25
+      },
+      "visibleToOthers": false,
+      "description": "Meet in the dream realm",
+      "baseAppeal": 0.95,
+      "appealModifiers": {
+        "romanticInclination": 0.9,
+        "personality": {
+          "mystical": 0.8
+        }
+      }
+    },
+    {
+      "id": "magic_sharing",
+      "name": "Share Magic",
+      "category": "magic",
+      "requirements": {
+        "skills": { "magic": 4 },
+        "proximity": 2,
+        "time": 600,
+        "energy": 20
+      },
+      "visibleToOthers": true,
+      "description": "Teach or share magical knowledge",
+      "baseAppeal": 0.75,
+      "appealModifiers": {
+        "personality": {
+          "curious": 0.6,
+          "magical": 0.7
+        }
+      }
+    }
+  ],
+  "negative": [
+    {
+      "id": "aggressive_display",
+      "name": "Aggressive Display",
+      "category": "dominance",
+      "requirements": { "proximity": 5, "time": 100 },
+      "visibleToOthers": true,
+      "description": "Show dominance aggressively",
+      "baseAppeal": -0.5,
+      "appealModifiers": {
+        "personality": {
+          "submissive": -0.8,
+          "aggressive": 0.3
+        }
+      }
+    },
+    {
+      "id": "dominance_combat",
+      "name": "Combat Display",
+      "category": "dominance",
+      "requirements": { "proximity": 5, "time": 400, "energy": 25 },
+      "visibleToOthers": true,
+      "description": "Fight to prove dominance",
+      "baseAppeal": -0.4,
+      "appealModifiers": {
+        "personality": {
+          "pacifist": -1.0,
+          "warrior": 0.5
+        }
+      }
+    },
+    {
+      "id": "hasty_approach",
+      "name": "Hasty Approach",
+      "category": "proximity",
+      "requirements": { "proximity": 1, "time": 50 },
+      "visibleToOthers": true,
+      "description": "Rush intimacy too quickly",
+      "baseAppeal": -0.3,
+      "appealModifiers": {
+        "personality": {
+          "cautious": -0.6,
+          "impulsive": 0.2
+        }
+      }
+    }
+  ]
+}

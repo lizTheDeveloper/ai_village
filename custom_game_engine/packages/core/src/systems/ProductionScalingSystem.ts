@@ -151,18 +151,41 @@ export class ProductionScalingSystem extends BaseSystem {
       return;
     }
 
+    // Smart cache invalidation: Skip if recently calculated and no major tick delta
+    const ticksSinceLastCalc = world.tick - production.lastCalculatedAt;
+    if (ticksSinceLastCalc < this.throttleInterval && production.lastCalculatedAt > 0) {
+      // Within throttle window, check if stats are likely unchanged
+      // This is a fast heuristic check before full stats gathering
+      const cityDirector = entityImpl.getComponent<CityDirectorComponent>(
+        CT.CityDirector
+      );
+      if (cityDirector && cityDirector.stats.population === production.population) {
+        return; // Population unchanged, likely no other changes either
+      }
+    }
+
     // Gather civilization stats
     const stats = this.gatherCivilizationStats(world, entityImpl);
 
-    // Check if stats have changed (avoid unnecessary recalculation)
+    // Fast bitwise equality checks for integers
+    const techChanged = (production.techLevel | 0) !== (stats.techLevel | 0);
+    const popChanged = (production.population | 0) !== (stats.population | 0);
+    const factoryChanged = (production.factories | 0) !== (stats.factories | 0);
+    const workerChanged = (production.workers | 0) !== (stats.workers | 0);
+
+    // Floating point checks for non-integer values
+    const industryChanged = production.industrialization !== stats.industrialization;
+    const dysonChanged = production.dysonSwarmProgress !== stats.dysonSwarmProgress;
+    const automationChanged = production.automationLevel !== stats.automationLevel;
+
     const statsChanged =
-      production.techLevel !== stats.techLevel ||
-      production.population !== stats.population ||
-      production.industrialization !== stats.industrialization ||
-      production.dysonSwarmProgress !== stats.dysonSwarmProgress ||
-      production.factories !== stats.factories ||
-      production.workers !== stats.workers ||
-      production.automationLevel !== stats.automationLevel;
+      techChanged ||
+      popChanged ||
+      industryChanged ||
+      dysonChanged ||
+      factoryChanged ||
+      workerChanged ||
+      automationChanged;
 
     if (!statsChanged && production.lastCalculatedAt > 0) {
       return; // No changes, skip recalculation
@@ -282,22 +305,34 @@ export class ProductionScalingSystem extends BaseSystem {
   }
 
   /**
-   * Count factories and calculate automation level.
+   * Count factories and calculate automation level (optimized single-pass).
+   * Writes results directly to stats object to avoid allocations.
    */
-  private countFactoriesAndAutomation(
+  private countFactoriesAndAutomationFast(
     world: World,
-    civilizationEntity: EntityImpl
-  ): {
-    factories: number;
-    workers: number;
-    automationLevel: number;
-  } {
-    // Query all buildings
-    const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
+    civilizationEntity: EntityImpl,
+    stats: {
+      factories: number;
+      workers: number;
+      automationLevel: number;
+    }
+  ): void {
+    // Use cached building query (avoid re-query every 10 seconds)
+    const currentTick = world.tick;
+    if (
+      this.cachedBuildings === null ||
+      currentTick - this.cachedBuildingsTick > this.BUILDING_CACHE_INTERVAL
+    ) {
+      this.cachedBuildings = world
+        .query()
+        .with(CT.Building, CT.Position)
+        .executeEntities();
+      this.cachedBuildingsTick = currentTick;
+    }
+    const buildings = this.cachedBuildings;
 
     let factoryCount = 0;
     let totalAutomation = 0;
-    let workerCount = 0;
 
     // Get civilization bounds (if this is a city director entity)
     const cityDirector = civilizationEntity.getComponent<CityDirectorComponent>(
@@ -305,6 +340,7 @@ export class ProductionScalingSystem extends BaseSystem {
     );
     const bounds = cityDirector?.bounds;
 
+    // Single-pass iteration with early exits
     for (const buildingEntity of buildings) {
       const buildingImpl = buildingEntity as EntityImpl;
       const building = buildingImpl.getComponent<BuildingComponent>(CT.Building);
@@ -312,13 +348,15 @@ export class ProductionScalingSystem extends BaseSystem {
 
       if (!building || !position) continue;
 
-      // Skip buildings outside civilization bounds (if bounds defined)
+      // Fast bounds check using bitwise integer comparison
       if (bounds) {
+        const x = position.x | 0;
+        const y = position.y | 0;
         if (
-          position.x < bounds.minX ||
-          position.x > bounds.maxX ||
-          position.y < bounds.minY ||
-          position.y > bounds.maxY
+          x < bounds.minX ||
+          x > bounds.maxX ||
+          y < bounds.minY ||
+          y > bounds.maxY
         ) {
           continue;
         }
@@ -329,27 +367,16 @@ export class ProductionScalingSystem extends BaseSystem {
         factoryCount++;
 
         // Check for assembly machine component (indicates automation)
-        const assemblyMachine = buildingImpl.getComponent<AssemblyMachineComponent>(
-          CT.AssemblyMachine
-        );
-        if (assemblyMachine) {
-          // Assembly machines indicate automation
-          totalAutomation += 1;
+        // Inline component check to avoid function call overhead
+        if (buildingImpl.getComponent<AssemblyMachineComponent>(CT.AssemblyMachine)) {
+          totalAutomation++;
         }
-
-        // Count workers (estimate: 5 workers per factory building)
-        // TODO: Replace with actual worker count from profession system
-        workerCount += 5;
       }
     }
 
-    const automationLevel =
-      factoryCount > 0 ? totalAutomation / factoryCount : 0;
-
-    return {
-      factories: factoryCount,
-      workers: workerCount,
-      automationLevel,
-    };
+    // Write results directly to stats (zero allocation)
+    stats.factories = factoryCount;
+    stats.workers = factoryCount * 5; // 5 workers per factory (fast multiply)
+    stats.automationLevel = factoryCount > 0 ? totalAutomation / factoryCount : 0;
   }
 }

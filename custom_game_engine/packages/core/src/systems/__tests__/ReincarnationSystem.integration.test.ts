@@ -84,7 +84,7 @@ describe('ReincarnationSystem Integration', () => {
       });
       (entity as any).addComponent(episodic);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Track events
       const events: string[] = [];
@@ -167,7 +167,7 @@ describe('ReincarnationSystem Integration', () => {
       });
       (entity as any).addComponent(episodic);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       let preservedMemoryCount = 0;
       world.eventBus.subscribe('soul:reincarnated', (event) => {
@@ -227,7 +227,7 @@ describe('ReincarnationSystem Integration', () => {
       }
       (entity as any).addComponent(episodic);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       let preservedMemoryCount = 0;
       world.eventBus.subscribe('soul:reincarnated', (event) => {
@@ -265,7 +265,7 @@ describe('ReincarnationSystem Integration', () => {
       (entity as any).addComponent(createIdentityComponent('Blank Slate'));
       (entity as any).addComponent(createPositionComponent(10, 10));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       let preservedMemoryCount = -1;
       world.eventBus.subscribe('soul:reincarnated', (event) => {
@@ -307,7 +307,7 @@ describe('ReincarnationSystem Integration', () => {
       (entity as any).addComponent(createIdentityComponent('Local Rebirth'));
       (entity as any).addComponent(createPositionComponent(deathX, deathY));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       let newEntityId: string | undefined;
       world.eventBus.subscribe('soul:reincarnated', (event) => {
@@ -360,7 +360,7 @@ describe('ReincarnationSystem Integration', () => {
       (entity as any).addComponent(createIdentityComponent('Faithful Soul'));
       (entity as any).addComponent(createPositionComponent(10, 10));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const deityId = 'reincarnation-goddess';
       let newEntityId: string | undefined;
@@ -408,7 +408,7 @@ describe('ReincarnationSystem Integration', () => {
         const entity = new EntityImpl(soulId, 0);
         (entity as any).addComponent(createIdentityComponent(`Entity ${soulId}`));
         (entity as any).addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
-        (world as any)._addEntity(entity);
+        world.addEntity(entity);
 
         world.eventBus.emit({
           type: 'soul:reincarnation_queued',
@@ -452,7 +452,7 @@ describe('ReincarnationSystem Integration', () => {
       (entity as any).addComponent(createIdentityComponent('Original'));
       (entity as any).addComponent(createPositionComponent(10, 10));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Verify entity exists
       expect(world.getEntity(entityId)).toBeDefined();

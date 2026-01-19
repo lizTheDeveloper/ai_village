@@ -32,7 +32,7 @@ describe('SpatialMemory Filtering Integration Tests', () => {
     agent = new EntityImpl(createEntityId(), 0);
     memoryComponent = new SpatialMemoryComponent({ maxMemories: 100, decayRate: 1.0 });
     agent.addComponent(memoryComponent);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
   });
 
   describe('Real-world agent memory scenario', () => {

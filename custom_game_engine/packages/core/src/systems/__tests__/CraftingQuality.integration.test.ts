@@ -51,7 +51,7 @@ describe('CraftingSystem Quality Integration', () => {
     agent.addComponent(skills);
 
     // Add to world
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
   });
 
   it('should produce quality items based on skill level', () => {
@@ -149,7 +149,7 @@ describe('CraftingSystem Quality Integration', () => {
     inventory.slots[0] = { itemId: 'wheat', quantity: 100, weight: 100, quality: 50 };
     agent.addComponent(inventory);
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const expertQualities: number[] = [];
     for (let i = 0; i < 10; i++) {

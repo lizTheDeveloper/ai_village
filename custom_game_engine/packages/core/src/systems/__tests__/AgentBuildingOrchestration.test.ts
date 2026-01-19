@@ -46,7 +46,7 @@ describe('Agent Building Orchestration - Phase 7', () => {
   // Helper to create and register an entity
   function createTestEntity(): EntityImpl {
     const entity = new EntityImpl(createEntityId(), world.tick);
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
     return entity;
   }
 

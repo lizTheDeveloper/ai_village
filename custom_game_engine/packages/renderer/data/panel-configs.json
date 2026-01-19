@@ -1,0 +1,192 @@
+{
+  "panels": [
+    {
+      "id": "resources",
+      "title": "Village Stockpile",
+      "defaultWidth": 280,
+      "defaultHeight": 200
+    },
+    {
+      "id": "memory",
+      "title": "Memory & Goals",
+      "defaultWidth": 400,
+      "defaultHeight": 600
+    },
+    {
+      "id": "agent-info",
+      "title": "Agent Info",
+      "defaultWidth": 300,
+      "defaultHeight": 530
+    },
+    {
+      "id": "animal-info",
+      "title": "Animal Info",
+      "defaultWidth": 300,
+      "defaultHeight": 450
+    },
+    {
+      "id": "plant-info",
+      "title": "Plant Info",
+      "defaultWidth": 320,
+      "defaultHeight": 480
+    },
+    {
+      "id": "tile-inspector",
+      "title": "Tile Inspector",
+      "defaultWidth": 384,
+      "defaultHeight": 504
+    },
+    {
+      "id": "economy",
+      "title": "Economy Dashboard",
+      "defaultWidth": 400,
+      "defaultHeight": 500
+    },
+    {
+      "id": "relationships",
+      "title": "Relationships",
+      "defaultWidth": 380,
+      "defaultHeight": 500
+    },
+    {
+      "id": "governance",
+      "title": "Governance Dashboard",
+      "defaultWidth": 400,
+      "defaultHeight": 500
+    },
+    {
+      "id": "notifications",
+      "title": "Notifications",
+      "defaultWidth": 400,
+      "defaultHeight": 300
+    },
+    {
+      "id": "crafting",
+      "title": "Crafting",
+      "defaultWidth": 800,
+      "defaultHeight": 600
+    },
+    {
+      "id": "inventory",
+      "title": "Inventory",
+      "defaultWidth": 800,
+      "defaultHeight": 600
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "defaultWidth": 600,
+      "defaultHeight": 500
+    },
+    {
+      "id": "llm-config",
+      "title": "Custom LLM Config",
+      "defaultWidth": 500,
+      "defaultHeight": 400
+    },
+    {
+      "id": "shop",
+      "title": "Shop",
+      "defaultWidth": 500,
+      "defaultHeight": 600
+    },
+    {
+      "id": "magic-systems",
+      "title": "Magic Systems",
+      "defaultWidth": 380,
+      "defaultHeight": 450,
+      "menuCategory": "magic"
+    },
+    {
+      "id": "spellbook",
+      "title": "Spellbook",
+      "defaultWidth": 420,
+      "defaultHeight": 550,
+      "menuCategory": "magic"
+    },
+    {
+      "id": "skill-tree",
+      "title": "Magic Skill Tree",
+      "defaultWidth": 800,
+      "defaultHeight": 600,
+      "menuCategory": "magic"
+    },
+    {
+      "id": "divine-powers",
+      "title": "Divine Powers",
+      "defaultWidth": 400,
+      "defaultHeight": 550,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "divine-chat",
+      "title": "Divine Chat",
+      "defaultWidth": 400,
+      "defaultHeight": 600,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "vision-composer",
+      "title": "Vision Composer",
+      "defaultWidth": 500,
+      "defaultHeight": 600,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "divine-communication",
+      "title": "Divine Communication",
+      "defaultWidth": 500,
+      "defaultHeight": 600,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "divine-analytics",
+      "title": "Divine Insights",
+      "defaultWidth": 700,
+      "defaultHeight": 550,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "sacred-geography",
+      "title": "Sacred Geography",
+      "defaultWidth": 600,
+      "defaultHeight": 500,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "angel-management",
+      "title": "Heavenly Host",
+      "defaultWidth": 550,
+      "defaultHeight": 500,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "prayers",
+      "title": "Prayers & Supplications",
+      "defaultWidth": 550,
+      "defaultHeight": 450,
+      "menuCategory": "divinity"
+    },
+    {
+      "id": "farm-management",
+      "title": "Farm Management",
+      "defaultWidth": 320,
+      "defaultHeight": 480,
+      "menuCategory": "farming"
+    },
+    {
+      "id": "dev-panel",
+      "title": "Dev Tools",
+      "defaultWidth": 450,
+      "defaultHeight": 650,
+      "menuCategory": "dev"
+    },
+    {
+      "id": "text-adventure",
+      "title": "Text Adventure (1D)",
+      "defaultWidth": 450,
+      "defaultHeight": 500,
+      "menuCategory": "settings"
+    }
+  ]
+}

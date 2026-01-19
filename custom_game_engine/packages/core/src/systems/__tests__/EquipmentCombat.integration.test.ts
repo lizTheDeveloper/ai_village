@@ -403,8 +403,8 @@ describe('Equipment + Combat Integration', () => {
     );
 
     // Add entities to world
-    (world as any)._addEntity(attacker);
-    (world as any)._addEntity(defender);
+    world.addEntity(attacker);
+    world.addEntity(defender);
 
     // Run equipment system first to calculate defense stats
     equipmentSystem.update(world, [attacker, defender], 0.1);
@@ -489,7 +489,7 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'iron_sword',
       });
 
-      (world as any)._addEntity(fighter);
+      world.addEntity(fighter);
       equipmentSystem.update(world, [fighter], 0.1);
 
       const equipment = world.getComponent(fighter.id, 'equipment') as EquipmentComponent;
@@ -505,7 +505,7 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'iron_sword',
       });
 
-      (world as any)._addEntity(fighter);
+      world.addEntity(fighter);
       equipmentSystem.update(world, [fighter], 0.1);
 
       const equipment = world.getComponent(fighter.id, 'equipment') as EquipmentComponent;
@@ -521,7 +521,7 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'iron_sword',
       });
 
-      (world as any)._addEntity(fighter);
+      world.addEntity(fighter);
       equipmentSystem.update(world, [fighter], 0.1);
 
       const equipment = world.getComponent(fighter.id, 'equipment') as EquipmentComponent;
@@ -546,8 +546,8 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'iron_sword',
       });
 
-      (world as any)._addEntity(heavyFighter);
-      (world as any)._addEntity(lightFighter);
+      world.addEntity(heavyFighter);
+      world.addEntity(lightFighter);
       equipmentSystem.update(world, [heavyFighter, lightFighter], 0.1);
 
       const heavyEquipment = world.getComponent(heavyFighter.id, 'equipment') as EquipmentComponent;
@@ -580,8 +580,8 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'war_hammer',  // Bludgeoning damage
       });
 
-      (world as any)._addEntity(slashingFighter);
-      (world as any)._addEntity(bludgeoningFighter);
+      world.addEntity(slashingFighter);
+      world.addEntity(bludgeoningFighter);
       equipmentSystem.update(world, [slashingFighter, bludgeoningFighter], 0.1);
 
       const equipment = world.getComponent(slashingFighter.id, 'equipment') as EquipmentComponent;
@@ -647,7 +647,7 @@ describe('Equipment + Combat Integration', () => {
         weapon: 'iron_sword',
       });
 
-      (world as any)._addEntity(fighter);
+      world.addEntity(fighter);
 
       // Verify equipment is equipped
       let equipment = world.getComponent(fighter.id, 'equipment') as EquipmentComponent;
@@ -713,7 +713,7 @@ describe('Equipment + Combat Integration', () => {
 
       for (const config of configurations) {
         const fighter = createFighter('Test Fighter', 5, config.config);
-        (world as any)._addEntity(fighter);
+        world.addEntity(fighter);
         equipmentSystem.update(world, [fighter], 0.1);
 
         const equipment = world.getComponent(fighter.id, 'equipment') as EquipmentComponent;

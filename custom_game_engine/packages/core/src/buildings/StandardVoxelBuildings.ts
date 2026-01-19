@@ -11,7 +11,14 @@
  */
 
 import type { BuildingBlueprint } from './BuildingBlueprintRegistry.js';
-import buildingsData from '../../data/buildings.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const buildingsPath = join(__dirname, '../../data/buildings.json');
+const buildingsData = JSON.parse(readFileSync(buildingsPath, 'utf-8')) as { buildings: BuildingBlueprint[] };
 
 // =============================================================================
 // DATA LOADER

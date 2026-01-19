@@ -866,7 +866,7 @@ describe('Behavior End-to-End Integration Tests', () => {
       }));
       // Note: NO position component
 
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const entities = Array.from(harness.world.entities.values());
 

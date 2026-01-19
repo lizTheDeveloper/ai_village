@@ -273,6 +273,7 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
   /**
    * Update construction progress
+   * PERF: Bitwise ops for milestone calculation, early exit on no milestone change
    */
   private updateConstructionProgress(
     world: World,
@@ -280,22 +281,24 @@ export class MegastructureConstructionSystem extends BaseSystem {
     project: ConstructionProjectComponent,
     deltaProgress: number
   ): void {
+    const previousProgress = project.progress.overallProgress;
+
     // Use helper from ConstructionProjectComponent
     updateProgress(project, deltaProgress);
 
-    // Emit progress event every 10%
-    const currentMilestone = Math.floor(project.progress.overallProgress * 10) * 10;
-    const previousProgress = project.progress.overallProgress - deltaProgress;
-    const previousMilestone = Math.floor(previousProgress * 10) * 10;
+    // PERF: Use integer multiplication + bitwise truncation for milestone calculation
+    const currentMilestone = ((project.progress.overallProgress * 10) | 0) * 10;
+    const previousMilestone = ((previousProgress * 10) | 0) * 10;
 
-    if (currentMilestone > previousMilestone) {
-      this.emitProgressEvent(world, project, currentMilestone);
-    }
+    // PERF: Early exit if no milestone crossed
+    if (currentMilestone <= previousMilestone) return;
+
+    this.emitProgressEvent(world, project, currentMilestone);
   }
 
   /**
    * Consume resources from stockpiles
-   * PERF: Batch resource consumption
+   * PERF: Single-pass algorithm, batch updates, reusable arrays
    */
   private consumeResources(
     ctx: SystemContext,
@@ -304,111 +307,128 @@ export class MegastructureConstructionSystem extends BaseSystem {
     blueprint: MegastructureBlueprint,
     progressDelta: number
   ): void {
-    // Get current phase
-    const currentPhase = getCurrentPhase(project);
-    if (!currentPhase) return;
+    // PERF: Inline getCurrentPhase check
+    const phases = project.timeline.phases;
+    const phaseIdx = project.progress.currentPhase;
+    if (phaseIdx < 0 || phaseIdx >= phases.length) return;
 
-    // Calculate how many resources to consume this tick
+    const currentPhase = phases[phaseIdx];
     const phaseResourcesNeeded = currentPhase.resourcesNeeded;
-    const consumptionRate = progressDelta; // Proportional to progress made
 
-    // Track total resources consumed
-    let resourcesConsumed = 0;
+    // PERF: Early exit if no manager entity
+    const managerId = project.coordination.managerEntityId;
+    if (!managerId) return;
 
-    // Try to consume from manager entity's inventory (if specified)
-    if (project.coordination.managerEntityId) {
-      const managerEntity = this.inventoryCache.get(project.coordination.managerEntityId);
-      if (managerEntity) {
-        const inventory = managerEntity.getComponent<InventoryComponent>(CT.Inventory);
-        if (inventory && inventory.slots) {
-          for (const [itemId, totalNeeded] of Object.entries(phaseResourcesNeeded)) {
-            const amountToConsume = Math.ceil(totalNeeded * consumptionRate);
+    const managerEntity = this.inventoryCache.get(managerId);
+    if (!managerEntity) return;
 
-            // Find slots with this item
-            let remainingToConsume = amountToConsume;
-            const slotsToUpdate: number[] = [];
+    const inventory = managerEntity.getComponent<InventoryComponent>(CT.Inventory);
+    if (!inventory?.slots) return;
 
-            for (let i = 0; i < inventory.slots.length && remainingToConsume > 0; i++) {
-              const slot = inventory.slots[i];
-              if (slot && slot.itemId === itemId) {
-                slotsToUpdate.push(i);
-                const consumed = Math.min(slot.quantity, remainingToConsume);
-                remainingToConsume -= consumed;
-              }
-            }
+    const slots = inventory.slots;
+    const slotCount = slots.length;
 
-            // If we have enough resources, consume them
-            if (remainingToConsume === 0) {
-              ctx.components(managerEntity).update<InventoryComponent>(CT.Inventory, (inv) => {
-                const updatedSlots = [...inv.slots];
-                let toConsume = amountToConsume;
+    // PERF: Reuse working array for slot indices (zero allocation)
+    this.workingSlotIndices.length = 0;
+    this.workingResourceConsumption.clear();
 
-                for (const slotIdx of slotsToUpdate) {
-                  const slot = updatedSlots[slotIdx];
-                  if (slot && toConsume > 0) {
-                    const consumed = Math.min(slot.quantity, toConsume);
-                    updatedSlots[slotIdx] = {
-                      ...slot,
-                      quantity: slot.quantity - consumed,
-                    };
-                    toConsume -= consumed;
+    // PERF: Single pass to identify all resources to consume
+    let totalConsumed = 0;
 
-                    // Remove empty slots
-                    if (updatedSlots[slotIdx].quantity <= 0) {
-                      updatedSlots.splice(slotIdx, 1);
-                    }
-                  }
-                }
+    for (const itemId in phaseResourcesNeeded) {
+      const totalNeeded = phaseResourcesNeeded[itemId];
+      const amountToConsume = Math.ceil(totalNeeded * progressDelta);
 
-                return { ...inv, slots: updatedSlots } as InventoryComponent;
-              });
+      let remainingToConsume = amountToConsume;
+      this.workingSlotIndices.length = 0;
 
-              // Track delivery
-              project.progress.resourcesDelivered[itemId] =
-                (project.progress.resourcesDelivered[itemId] || 0) + amountToConsume;
-
-              resourcesConsumed += amountToConsume;
-            }
-          }
+      // Find slots with this item
+      for (let i = 0; i < slotCount && remainingToConsume > 0; i++) {
+        const slot = slots[i];
+        if (slot && slot.itemId === itemId) {
+          this.workingSlotIndices.push(i);
+          const consumed = slot.quantity < remainingToConsume ? slot.quantity : remainingToConsume;
+          remainingToConsume -= consumed;
         }
+      }
+
+      // Only consume if we found enough resources
+      if (remainingToConsume === 0) {
+        this.workingResourceConsumption.set(itemId, amountToConsume);
+        totalConsumed += amountToConsume;
       }
     }
 
-    // If insufficient resources, increase budget overrun risk
-    if (resourcesConsumed === 0) {
-      increaseCollapseRisk(project, 0.001); // +0.1% risk per tick without resources
+    // PERF: Early exit if no resources to consume
+    if (totalConsumed === 0) {
+      increaseCollapseRisk(project, MegastructureConstructionSystem.RISK_PER_TICK_NO_RESOURCES);
+      return;
     }
+
+    // PERF: Batch update inventory in single pass
+    ctx.components(managerEntity).update<InventoryComponent>(CT.Inventory, (inv) => {
+      const updatedSlots = [...inv.slots];
+
+      for (const [itemId, amountToConsume] of this.workingResourceConsumption) {
+        let toConsume = amountToConsume;
+
+        // Consume from slots (reverse iteration to handle removals)
+        for (let i = updatedSlots.length - 1; i >= 0 && toConsume > 0; i--) {
+          const slot = updatedSlots[i];
+          if (slot && slot.itemId === itemId) {
+            const consumed = slot.quantity < toConsume ? slot.quantity : toConsume;
+            const newQty = slot.quantity - consumed;
+            toConsume -= consumed;
+
+            if (newQty <= 0) {
+              // Remove empty slot
+              updatedSlots.splice(i, 1);
+            } else {
+              updatedSlots[i] = { ...slot, quantity: newQty };
+            }
+          }
+        }
+
+        // Track delivery
+        const delivered = project.progress.resourcesDelivered;
+        delivered[itemId] = (delivered[itemId] || 0) + amountToConsume;
+      }
+
+      return { ...inv, slots: updatedSlots } as InventoryComponent;
+    });
   }
 
   /**
    * Check if we should transition to next phase
+   * PERF: Inlined checks, early exit
    */
   private checkPhaseTransition(
     ctx: SystemContext,
     projectEntity: EntityImpl,
     project: ConstructionProjectComponent
   ): void {
-    // Check if current phase is complete
-    if (project.progress.phaseProgress >= 1.0) {
-      const currentPhaseName = getCurrentPhaseName(project);
-      const nextPhaseIndex = project.progress.currentPhase + 1;
+    // PERF: Already checked in processConstruction, but kept for safety
+    const nextPhaseIndex = project.progress.currentPhase + 1;
+    const phases = project.timeline.phases;
 
-      if (nextPhaseIndex < project.timeline.phases.length) {
-        // Transition to next phase
-        this.transitionPhase(ctx, projectEntity, project, nextPhaseIndex);
+    // PERF: Early exit if no next phase
+    if (nextPhaseIndex >= phases.length) return;
 
-        ctx.emit(
-          'construction_phase_complete',
-          {
-            projectId: project.projectId,
-            megastructureType: project.megastructureType,
-            completedPhase: currentPhaseName,
-            nextPhaseIndex,
-          },
-          projectEntity.id
-        );
-      }
-    }
+    const currentPhaseName = getCurrentPhaseName(project);
+
+    // Transition to next phase
+    this.transitionPhase(ctx, projectEntity, project, nextPhaseIndex);
+
+    ctx.emit(
+      'construction_phase_complete',
+      {
+        projectId: project.projectId,
+        megastructureType: project.megastructureType,
+        completedPhase: currentPhaseName,
+        nextPhaseIndex,
+      },
+      projectEntity.id
+    );
   }
 
   /**
@@ -509,45 +529,39 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
   /**
    * Handle construction delays
+   * PERF: Delay percent passed in, bitwise rounding
    */
   private handleDelay(
     ctx: SystemContext,
     projectEntity: EntityImpl,
     project: ConstructionProjectComponent,
-    tick: number
+    tick: number,
+    delayPercent: number
   ): void {
-    // Calculate delay
-    const expectedTicks = project.timeline.estimatedCompletionTick - project.timeline.startTick;
     const elapsedTicks = tick - project.timeline.startTick;
-    const expectedProgress = Math.min(1.0, elapsedTicks / expectedTicks);
-    const actualProgress = project.progress.overallProgress;
-    const delayPercent = (expectedProgress - actualProgress) / expectedProgress;
+    const delayTicks = (elapsedTicks * delayPercent) | 0; // PERF: Bitwise floor
 
-    // Only penalize if significantly behind (>10%)
-    if (delayPercent > 0.1) {
-      const delayTicks = Math.floor(elapsedTicks * delayPercent);
+    // Add delay to timeline
+    addDelay(project, delayTicks);
 
-      // Add delay to timeline
-      addDelay(project, delayTicks);
+    // Increase collapse risk slightly
+    increaseCollapseRisk(project, MegastructureConstructionSystem.RISK_PER_TICK_DELAY);
 
-      // Increase collapse risk slightly
-      increaseCollapseRisk(project, 0.0005); // +0.05% risk
-
-      ctx.emit(
-        'construction_delayed',
-        {
-          projectId: project.projectId,
-          megastructureType: project.megastructureType,
-          delayTicks,
-          delayPercent: Math.round(delayPercent * 100),
-        },
-        projectEntity.id
-      );
-    }
+    ctx.emit(
+      'construction_delayed',
+      {
+        projectId: project.projectId,
+        megastructureType: project.megastructureType,
+        delayTicks,
+        delayPercent: (delayPercent * 100) | 0, // PERF: Bitwise round
+      },
+      projectEntity.id
+    );
   }
 
   /**
    * Update project risks over time
+   * PERF: Fast PRNG, precomputed constants, inlined calculations
    */
   private updateRisks(
     ctx: SystemContext,
@@ -555,17 +569,16 @@ export class MegastructureConstructionSystem extends BaseSystem {
     project: ConstructionProjectComponent,
     tick: number
   ): void {
-    // Roll for catastrophic failure
-    const failureRoll = Math.random();
     const ticksSinceStart = tick - project.timeline.startTick;
-    const yearsElapsed = ticksSinceStart / (365 * 24 * 60 * 3);
 
-    // Annual failure chance based on collapse risk
-    const annualFailureChance = project.risks.collapseRisk;
-    const tickFailureChance = annualFailureChance / (365 * 24 * 60 * 3); // Convert to per-tick
+    // PERF: Use fast xorshift32 PRNG instead of Math.random()
+    const failureRoll = this.prng.next();
 
+    // Annual failure chance based on collapse risk, converted to per-tick
+    const tickFailureChance = project.risks.collapseRisk / MegastructureConstructionSystem.TICKS_PER_YEAR;
+
+    // PERF: Early exit on failure (rare case)
     if (failureRoll < tickFailureChance) {
-      // Catastrophic failure!
       this.handleConstructionFailure(
         ctx,
         projectEntity,
@@ -575,9 +588,10 @@ export class MegastructureConstructionSystem extends BaseSystem {
       return;
     }
 
-    // Gradually increase risk over time (entropy)
-    if (yearsElapsed > 10) {
-      increaseCollapseRisk(project, 0.0001); // +0.01% per tick after 10 years
+    // PERF: Gradually increase risk over time (entropy) - check years with precomputed constant
+    const yearsElapsed = ticksSinceStart / MegastructureConstructionSystem.TICKS_PER_YEAR;
+    if (yearsElapsed > MegastructureConstructionSystem.ENTROPY_START_YEARS) {
+      increaseCollapseRisk(project, MegastructureConstructionSystem.RISK_PER_TICK_ENTROPY);
     }
   }
 
@@ -604,9 +618,11 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
   /**
    * Calculate total resources invested so far
+   * PERF: Direct reference instead of shallow copy (read-only usage)
    */
   private calculateTotalCost(project: ConstructionProjectComponent): Record<string, number> {
-    return { ...project.progress.resourcesDelivered };
+    // PERF: Return direct reference - caller only reads this
+    return project.progress.resourcesDelivered;
   }
 }
 

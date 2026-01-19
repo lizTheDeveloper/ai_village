@@ -55,7 +55,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(attacker);
+    world.addEntity(attacker);
 
     // Create defender entity with lower combat skill
     const defender = new EntityImpl(createEntityId(), 0);
@@ -85,7 +85,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(defender);
+    world.addEntity(defender);
 
     // Add conflict component to initiate combat
     attacker.addComponent(
@@ -152,7 +152,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(attacker);
+    world.addEntity(attacker);
 
     const defender = new EntityImpl(createEntityId(), 0);
     defender.addComponent({
@@ -181,7 +181,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(defender);
+    world.addEntity(defender);
 
     attacker.addComponent(
       createConflictComponent({
@@ -262,7 +262,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(attacker);
+    world.addEntity(attacker);
 
     const defender = new EntityImpl(createEntityId(), 0);
     defender.addComponent({
@@ -291,7 +291,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(defender);
+    world.addEntity(defender);
 
     attacker.addComponent(
       createConflictComponent({
@@ -349,7 +349,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(attacker);
+    world.addEntity(attacker);
 
     const defender = new EntityImpl(createEntityId(), 0);
     defender.addComponent({
@@ -378,7 +378,7 @@ describe('AgentCombatSystem Integration', () => {
       version: 0,
       relationships: {},
     });
-    (world as any)._addEntity(defender);
+    world.addEntity(defender);
 
     // Set initial friendly relationship
     const attackerRel = attacker.getComponent('relationship') as any;

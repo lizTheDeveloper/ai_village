@@ -58,7 +58,7 @@ describe('University NPC Research Integration', () => {
     );
     cityEntity.addComponent(cityDirector);
     cityEntity.addComponent(createPositionComponent(100, 100));
-    (world as any)._addEntity(cityEntity);
+    world.addEntity(cityEntity);
 
     console.log('✓ Created NPC city:', cityDirector.cityName);
 
@@ -66,7 +66,7 @@ describe('University NPC Research Integration', () => {
     const university = new EntityImpl(createEntityId(), 0);
     university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
     university.addComponent(createPositionComponent(100, 110));
-    (world as any)._addEntity(university);
+    world.addEntity(university);
 
     // Complete the university building
     eventBus.emitImmediate({
@@ -93,7 +93,7 @@ describe('University NPC Research Integration', () => {
       agent.addComponent(createAgentComponent(`Researcher ${i + 1}`, false));
       agent.addComponent(createPositionComponent(90 + i * 5, 100 + i * 5));
       agent.addComponent(createSteeringComponent());
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
       agents.push(agent);
     }
 
@@ -214,12 +214,12 @@ describe('University NPC Research Integration', () => {
     );
     cityEntity.addComponent(cityDirector);
     cityEntity.addComponent(createPositionComponent(100, 100));
-    (world as any)._addEntity(cityEntity);
+    world.addEntity(cityEntity);
 
     const university = new EntityImpl(createEntityId(), 0);
     university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
     university.addComponent(createPositionComponent(100, 110));
-    (world as any)._addEntity(university);
+    world.addEntity(university);
 
     eventBus.emitImmediate({
       type: 'building:complete',

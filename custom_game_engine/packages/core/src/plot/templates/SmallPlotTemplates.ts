@@ -6,128 +6,72 @@
  * Lesson value: 2-5 wisdom
  *
  * These are brief storylines that develop over multiple interactions.
+ *
+ * Plot templates are now loaded from JSON data files to separate
+ * narrative content from code structure.
  */
 
 import type { PlotLineTemplate } from '../PlotTypes.js';
+import plotTemplatesData from '../../data/plot-templates.json';
+
+/**
+ * Load and validate plot templates from JSON
+ */
+function loadPlotTemplates(): PlotLineTemplate[] {
+  const templates = plotTemplatesData.small_plot_templates as PlotLineTemplate[];
+
+  if (!templates || !Array.isArray(templates)) {
+    throw new Error('[SmallPlotTemplates] Failed to load plot templates from JSON');
+  }
+
+  // Validate each template has required fields
+  for (const template of templates) {
+    if (!template.id || !template.name || !template.scale || !template.stages || !template.transitions) {
+      throw new Error(`[SmallPlotTemplates] Invalid template structure: ${template.id || 'unknown'}`);
+    }
+  }
+
+  return templates;
+}
+
+// Load templates from JSON
+const LOADED_TEMPLATES = loadPlotTemplates();
+
+// Create a map for easy lookup by ID
+const TEMPLATE_MAP = new Map<string, PlotLineTemplate>(
+  LOADED_TEMPLATES.map(t => [t.id, t])
+);
 
 // =============================================================================
-// RELATIONSHIPS - FORMING
+// EXPORTED TEMPLATE CONSTANTS (for backwards compatibility)
 // =============================================================================
 
-export const firstFriendship: PlotLineTemplate = {
-  id: 'small_first_friendship',
-  name: 'A New Friend',
-  description: 'The journey of forming your first meaningful friendship',
-  scale: 'small',
-  fork_behavior: 'continue',
+export const firstFriendship: PlotLineTemplate = TEMPLATE_MAP.get('small_first_friendship')!;
+export const healingRift: PlotLineTemplate = TEMPLATE_MAP.get('small_healing_rift')!;
+export const learningNewSkill: PlotLineTemplate = TEMPLATE_MAP.get('small_learning_skill')!;
+export const findingMentor: PlotLineTemplate = TEMPLATE_MAP.get('small_finding_mentor')!;
+export const overcomingFear: PlotLineTemplate = TEMPLATE_MAP.get('small_overcoming_fear')!;
+export const processingGrief: PlotLineTemplate = TEMPLATE_MAP.get('small_processing_grief')!;
+export const findingPurpose: PlotLineTemplate = TEMPLATE_MAP.get('small_finding_purpose')!;
+export const settingPersonalGoal: PlotLineTemplate = TEMPLATE_MAP.get('small_personal_goal')!;
+export const standingUpForSelf: PlotLineTemplate = TEMPLATE_MAP.get('small_standing_up')!;
+export const makingAmends: PlotLineTemplate = TEMPLATE_MAP.get('small_making_amends')!;
+export const adaptingToChange: PlotLineTemplate = TEMPLATE_MAP.get('small_adapting_change')!;
+export const breakingHabit: PlotLineTemplate = TEMPLATE_MAP.get('small_breaking_habit')!;
+export const openingUp: PlotLineTemplate = TEMPLATE_MAP.get('small_opening_up')!;
+export const trustingAgain: PlotLineTemplate = TEMPLATE_MAP.get('small_trusting_again')!;
+export const findingBelonging: PlotLineTemplate = TEMPLATE_MAP.get('small_finding_belonging')!;
+export const helpingStranger: PlotLineTemplate = TEMPLATE_MAP.get('small_helping_stranger')!;
 
-  lesson: {
-    theme: 'Connection and trust',
-    domain: 'relationships',
-    insight: 'True friendship requires vulnerability and time.',
-    wisdom_value: 3,
-    repeatable: false,
-  },
+// =============================================================================
+// EXPORT ALL SMALL TEMPLATES
+// =============================================================================
 
-  entry_stage: 'alone',
-  completion_stages: ['friendship_formed'],
-  failure_stages: ['still_alone'],
+export const SMALL_PLOT_TEMPLATES: PlotLineTemplate[] = LOADED_TEMPLATES;
 
-  stages: [
-    {
-      stage_id: 'alone',
-      name: 'Before Friends',
-      description: 'You have no close friends yet.',
-      stage_attractors: [
-        {
-          attractor_id: 'seek_connection',
-          goal: { type: 'relationship_formed', parameters: {} },
-          strength: 0.4,
-          urgency: 0.3,
-        },
-      ],
-    },
-    {
-      stage_id: 'acquaintance',
-      name: 'Meeting Someone',
-      description: 'You have met someone who might become a friend.',
-      on_enter_effects: [
-        { type: 'queue_dream_hint', dream_type: 'prophetic_vision', content_hint: 'A face keeps appearing in your thoughts', intensity: 0.4 },
-      ],
-    },
-    {
-      stage_id: 'growing_closer',
-      name: 'Growing Closer',
-      description: 'Trust is building between you.',
-      stage_attractors: [
-        {
-          attractor_id: 'deepen_bond',
-          goal: { type: 'relationship_formed', parameters: {} },
-          strength: 0.5,
-          urgency: 0.4,
-        },
-      ],
-    },
-    {
-      stage_id: 'friendship_formed',
-      name: 'True Friends',
-      description: 'You have found a real friend.',
-      on_enter_effects: [
-        { type: 'modify_mood', delta: 25 },
-        { type: 'modify_mood_factor', factor: 'social', delta: 20 },
-        { type: 'prophetic_dream', vision_content: 'You see yourself and your new friend growing old together, sharing countless moments', urgency: 'medium' },
-      ],
-    },
-    {
-      stage_id: 'still_alone',
-      name: 'Connection Lost',
-      description: 'The potential friendship did not develop.',
-      on_enter_effects: [
-        { type: 'modify_mood', delta: -10 },
-      ],
-    },
-  ],
+// Total: 16 small templates (loaded from JSON)
 
-  transitions: [
-    {
-      from_stage: 'alone',
-      to_stage: 'acquaintance',
-      conditions: [{ type: 'any_relationship', min_trust: 10 }],
-    },
-    {
-      from_stage: 'acquaintance',
-      to_stage: 'growing_closer',
-      conditions: [{ type: 'any_relationship', min_trust: 25, min_affinity: 15 }],
-    },
-    {
-      from_stage: 'growing_closer',
-      to_stage: 'friendship_formed',
-      conditions: [{ type: 'any_relationship', min_trust: 50, min_affinity: 30 }],
-    },
-    {
-      from_stage: 'acquaintance',
-      to_stage: 'still_alone',
-      conditions: [{ type: 'personal_tick_elapsed', ticks: 5000 }],
-    },
-    {
-      from_stage: 'growing_closer',
-      to_stage: 'still_alone',
-      conditions: [{ type: 'social_isolation', min_ticks: 2000 }],
-    },
-  ],
-
-  assignment_rules: {
-    min_wisdom: 0,
-    triggers: [
-      { type: 'on_social_isolation', min_ticks: 500 },
-    ],
-    max_concurrent: 1,
-  },
-};
-
-export const healingRift: PlotLineTemplate = {
-  id: 'small_healing_rift',
-  name: 'Mending a Relationship',
+/**
   description: 'Repairing trust after a falling out',
   scale: 'small',
   fork_behavior: 'continue',

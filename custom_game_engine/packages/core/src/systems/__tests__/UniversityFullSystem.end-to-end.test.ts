@@ -61,7 +61,7 @@ describe('University Research System - Full E2E', () => {
     const techUnlockEntity = new EntityImpl(createEntityId(), 0);
     const techUnlock = createTechnologyUnlockComponent();
     techUnlockEntity.addComponent(techUnlock);
-    (world as any)._addEntity(techUnlockEntity);
+    world.addEntity(techUnlockEntity);
 
     console.log('✓ Technology unlock system initialized');
 
@@ -77,7 +77,7 @@ describe('University Research System - Full E2E', () => {
     );
     playerCityEntity.addComponent(playerCity);
     playerCityEntity.addComponent(createPositionComponent(100, 100));
-    (world as any)._addEntity(playerCityEntity);
+    world.addEntity(playerCityEntity);
 
     techUnlock.playerCityId = 'player-city-1';
 
@@ -92,7 +92,7 @@ describe('University Research System - Full E2E', () => {
     const university1 = new EntityImpl(createEntityId(), 0);
     university1.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
     university1.addComponent(createPositionComponent(110, 110));
-    (world as any)._addEntity(university1);
+    world.addEntity(university1);
 
     // Emit building complete event (immediate so component is attached synchronously)
     eventBus.emitImmediate({

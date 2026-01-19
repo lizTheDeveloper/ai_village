@@ -26,7 +26,7 @@ describe('Resource Gathering System', () => {
     agent.addComponent(createPositionComponent(0, 0));
     agent.addComponent(createInventoryComponent(10, 100));
     agent.addComponent(createAgentComponent('gather'));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create tree with wood resource
     tree = new EntityImpl(createEntityId(), world.tick);
@@ -40,7 +40,7 @@ describe('Resource Gathering System', () => {
       regenerationRate: 0.1,
       harvestable: true,
     } as ResourceComponent);
-    (world as any)._addEntity(tree);
+    world.addEntity(tree);
 
     // Create rock with stone resource
     rock = new EntityImpl(createEntityId(), world.tick);
@@ -54,7 +54,7 @@ describe('Resource Gathering System', () => {
       regenerationRate: 0.05,
       harvestable: true,
     } as ResourceComponent);
-    (world as any)._addEntity(rock);
+    world.addEntity(rock);
   });
 
   describe('Acceptance Criterion 2: Wood Gathering (Chop Action)', () => {
@@ -533,7 +533,7 @@ describe('Resource Gathering System', () => {
       // If data is missing, crash immediately
 
       const emptyEntity = new EntityImpl(createEntityId(), world.tick);
-      (world as any)._addEntity(emptyEntity);
+      world.addEntity(emptyEntity);
 
       expect(() => {
         const resource = emptyEntity.getComponent(ComponentType.Resource) as ResourceComponent;
@@ -692,7 +692,7 @@ describe('Resource Gathering System', () => {
         regenerationRate: 0, // No regeneration
         harvestable: false,
       } as ResourceComponent);
-      (world as any)._addEntity(depleted);
+      world.addEntity(depleted);
 
       const resource = depleted.getComponent(ComponentType.Resource) as ResourceComponent;
       if (!resource) {
@@ -772,7 +772,7 @@ describe('Resource Gathering System', () => {
       const agent2 = new EntityImpl(createEntityId(), world.tick);
       agent2.addComponent(createPositionComponent(1.2, 0));
       agent2.addComponent(createInventoryComponent(10, 100));
-      (world as any)._addEntity(agent2);
+      world.addEntity(agent2);
 
       // Both agents near same tree
       agent.updateComponent('position', (pos) => ({

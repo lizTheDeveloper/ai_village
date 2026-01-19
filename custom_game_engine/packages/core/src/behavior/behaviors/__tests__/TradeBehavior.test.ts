@@ -95,8 +95,8 @@ describe('TradeBehavior', () => {
       transactions: [],
     });
 
-    (world as any)._addEntity(agent);
-    (world as any)._addEntity(shop);
+    world.addEntity(agent);
+    world.addEntity(shop);
   });
 
   describe('validation', () => {

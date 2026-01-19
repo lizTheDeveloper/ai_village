@@ -40,7 +40,7 @@ describe('VRSystem Integration Tests', () => {
     it('processes VR systems without errors', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       vrEntity.addComponent(createVRSystemComponent('shadow_realm', 'Test Shadow Realm'));
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       system.update(harness.world, [vrEntity], 0.05);
 
@@ -55,8 +55,8 @@ describe('VRSystem Integration Tests', () => {
       const vr2 = new EntityImpl(createEntityId(), 0);
       vr2.addComponent(createVRSystemComponent('feeling_forge', 'Feeling Forge'));
 
-      (harness.world as any)._addEntity(vr1);
-      (harness.world as any)._addEntity(vr2);
+      harness.world.addEntity(vr1);
+      harness.world.addEntity(vr2);
 
       system.update(harness.world, [vr1, vr2], 0.05);
 
@@ -70,7 +70,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const session = system.startSession(
         harness.world,
@@ -92,7 +92,7 @@ describe('VRSystem Integration Tests', () => {
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrComp.max_concurrent_sessions = 2;
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       // Start maximum number of sessions
       system.startSession(harness.world, vrComp, ['p1'], 'test', 'Session 1');
@@ -116,7 +116,7 @@ describe('VRSystem Integration Tests', () => {
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrComp.max_participants_per_session = 1;
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       // Try to start session with too many participants
       const failedSession = system.startSession(
@@ -135,7 +135,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('feeling_forge', 'Emotion Workshop');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const targetEmotion = {
         emotions: { joy: 0.8, peace: 0.6 },
@@ -159,7 +159,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const session = system.startSession(
         harness.world,
@@ -179,7 +179,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       // Start a session with short duration
       system.startSession(
@@ -206,7 +206,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const session = system.startSession(
         harness.world,
@@ -233,7 +233,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const exitSuccess = system.emergencyExit(
         harness.world,
@@ -250,7 +250,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shared_dream', 'Collective Dream');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       const participants = Array.from({ length: 50 }, (_, i) => `p${i}`);
 
@@ -272,7 +272,7 @@ describe('VRSystem Integration Tests', () => {
       const vrEntity = new EntityImpl(createEntityId(), 0);
       const vrComp = createVRSystemComponent('shadow_realm', 'Test VR');
       vrEntity.addComponent(vrComp);
-      (harness.world as any)._addEntity(vrEntity);
+      harness.world.addEntity(vrEntity);
 
       // Start a session
       system.startSession(harness.world, vrComp, ['p1'], 'test', 'Test');

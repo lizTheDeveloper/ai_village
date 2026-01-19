@@ -92,7 +92,7 @@ function createTestAgent(
   // Add hearsay memory
   (entity as any).addComponent(createHearsayMemoryComponent());
 
-  (world as any)._addEntity(entity);
+  world.addEntity(entity);
   return entity;
 }
 
@@ -120,7 +120,7 @@ function createTestResource(
   };
   (entity as any).addComponent(resourceComponent);
 
-  (world as any)._addEntity(entity);
+  world.addEntity(entity);
   return entity;
 }
 

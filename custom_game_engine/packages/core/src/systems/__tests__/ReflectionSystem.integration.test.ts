@@ -45,7 +45,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const reflectionHandler = vi.fn();
     eventBus.subscribe('reflection:completed', reflectionHandler);
@@ -90,7 +90,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const reflectionHandler = vi.fn();
     eventBus.subscribe('reflection:completed', reflectionHandler);
@@ -123,7 +123,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const reflectionHandler = vi.fn();
     eventBus.subscribe('reflection:completed', reflectionHandler);
@@ -166,7 +166,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const reflectionHandler = vi.fn();
     eventBus.subscribe('reflection:completed', reflectionHandler);
@@ -230,7 +230,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger reflection
     eventBus.emit({
@@ -272,7 +272,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger reflection
     eventBus.emit({
@@ -311,7 +311,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger reflection
     eventBus.emit({
@@ -353,7 +353,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const initialBeliefCount = semanticMem.beliefs.length;
 
@@ -382,7 +382,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const reflectionHandler = vi.fn();
     eventBus.subscribe('reflection:completed', reflectionHandler);
@@ -426,7 +426,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger deep reflection with agentId
     eventBus.emit({
@@ -449,7 +449,7 @@ describe('ReflectionSystem Integration', () => {
   it('should throw error if agent missing required components', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     // Missing memory components
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger reflection
     eventBus.emit({
@@ -486,7 +486,7 @@ describe('ReflectionSystem Integration', () => {
     agent.addComponent(episodicMem);
     agent.addComponent(semanticMem);
     agent.addComponent(reflectionComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Trigger reflection
     eventBus.emit({

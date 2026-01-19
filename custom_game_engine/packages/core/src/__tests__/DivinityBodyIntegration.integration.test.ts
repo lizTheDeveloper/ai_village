@@ -224,7 +224,7 @@ describe('Divinity + Body Parts Integration', () => {
       const nonBeliever = new EntityImpl('non_believer');
       const nonBelieverBody = createBodyComponentFromPlan('humanoid_standard', 'human');
       nonBeliever.addComponent(nonBelieverBody);
-      (world as any)._addEntity(nonBeliever);
+      world.addEntity(nonBeliever);
 
       // Try to heal non-believer
       const result = divineBodySystem.mendAllWounds(
@@ -476,7 +476,7 @@ describe('Divinity + Body Parts Integration', () => {
       const believer2 = new EntityImpl('believer_2');
       const believer2Body = createBodyComponentFromPlan('humanoid_standard', 'human');
       believer2.addComponent(believer2Body);
-      (world as any)._addEntity(believer2);
+      world.addEntity(believer2);
       deityComp.addBeliever(believer2.id);
 
       // Modify both believers
@@ -518,7 +518,7 @@ describe('Divinity + Body Parts Integration', () => {
       const insectoid = new EntityImpl('insectoid_1');
       const insectoidBody = createBodyComponentFromPlan('insectoid_4arm', 'insectoid');
       insectoid.addComponent(insectoidBody);
-      (world as any)._addEntity(insectoid);
+      world.addEntity(insectoid);
       deityComp.addBeliever(insectoid.id);
 
       const armsBefore = Object.values(insectoidBody.parts).filter(
@@ -549,7 +549,7 @@ describe('Divinity + Body Parts Integration', () => {
       const aquatic = new EntityImpl('aquatic_1');
       const aquaticBody = createBodyComponentFromPlan('aquatic_tentacled', 'alien');
       aquatic.addComponent(aquaticBody);
-      (world as any)._addEntity(aquatic);
+      world.addEntity(aquatic);
       deityComp.addBeliever(aquatic.id);
 
       // Heal aquatic (should work despite different body plan)

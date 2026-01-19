@@ -122,7 +122,7 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
       skills.levels.gathering = 1;
       skills.totalExperience.gathering = 100;
       agent.addComponent(skills);
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Fire building complete event
       eventBus.emit({
@@ -147,7 +147,7 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       const skills = createSkillsComponent();
       agent.addComponent(skills);
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Track level-up event
       let leveledUp = false;
@@ -398,7 +398,7 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
       // Start with a skill component at level 0
       let skills = createSkillsComponent();
       agent.addComponent(skills);
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Verify starting state
       expect(skills.levels.gathering).toBe(0);

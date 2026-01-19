@@ -63,13 +63,13 @@ describe('University Paper Publishing Integration', () => {
     );
     cityEntity.addComponent(cityDirector);
     cityEntity.addComponent(createPositionComponent(100, 100));
-    (world as any)._addEntity(cityEntity);
+    world.addEntity(cityEntity);
 
     // Create university building
     const university = new EntityImpl(createEntityId(), 0);
     university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
     university.addComponent(createPositionComponent(100, 110));
-    (world as any)._addEntity(university);
+    world.addEntity(university);
 
     // Complete the university building
     eventBus.emitImmediate({
@@ -94,7 +94,7 @@ describe('University Paper Publishing Integration', () => {
       agent.addComponent(createAgentComponent(`Researcher ${i + 1}`, false));
       agent.addComponent(createPositionComponent(90 + i * 5, 100 + i * 5));
       agent.addComponent(createSteeringComponent());
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
       agents.push(agent);
     }
 
@@ -211,12 +211,12 @@ describe('University Paper Publishing Integration', () => {
       createCityDirectorComponent('test-city', 'Test City', { minX: 0, maxX: 200, minY: 0, maxY: 200 }, false)
     );
     cityEntity.addComponent(createPositionComponent(100, 100));
-    (world as any)._addEntity(cityEntity);
+    world.addEntity(cityEntity);
 
     const university = new EntityImpl(createEntityId(), 0);
     university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
     university.addComponent(createPositionComponent(100, 110));
-    (world as any)._addEntity(university);
+    world.addEntity(university);
 
     eventBus.emitImmediate({
       type: 'building:complete',
@@ -235,7 +235,7 @@ describe('University Paper Publishing Integration', () => {
       agent.addComponent(createAgentComponent(`Researcher ${i + 1}`, false));
       agent.addComponent(createPositionComponent(90 + i * 5, 100 + i * 5));
       agent.addComponent(createSteeringComponent());
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
       agents.push(agent);
     }
 

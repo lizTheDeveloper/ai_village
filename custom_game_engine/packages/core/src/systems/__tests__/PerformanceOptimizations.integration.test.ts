@@ -53,7 +53,7 @@ describe('Performance Optimizations Integration', () => {
         storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
         storage.addComponent(createInventoryComponent('storage', 20));
         storage.addComponent(createPositionComponent(i * 5, 0));
-        (world as any)._addEntity(storage);
+        world.addEntity(storage);
       }
 
       const entities = Array.from(world.entities.values());
@@ -75,7 +75,7 @@ describe('Performance Optimizations Integration', () => {
       // Create multiple governance buildings that would each trigger queries
       const townHall = new EntityImpl(createEntityId(), 0);
       townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
-      (world as any)._addEntity(townHall);
+      world.addEntity(townHall);
 
       // Create many agents to make query cost significant
       for (let i = 0; i < 50; i++) {
@@ -89,7 +89,7 @@ describe('Performance Optimizations Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       const entities = Array.from(world.entities.values());
@@ -117,7 +117,7 @@ describe('Performance Optimizations Integration', () => {
         agent.addComponent(createAgentComponent());
         agent.addComponent(new SocialGradientComponent());
         agent.addComponent(createConversationComponent());
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
         agents.push(agent);
       }
 
@@ -159,7 +159,7 @@ describe('Performance Optimizations Integration', () => {
         const building = new EntityImpl(createEntityId(), 0);
         building.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
         building.addComponent(createPositionComponent(i % 10 * 5, Math.floor(i / 10) * 5));
-        (world as any)._addEntity(building);
+        world.addEntity(building);
       }
 
       // Create many moving agents
@@ -177,7 +177,7 @@ describe('Performance Optimizations Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       const entities = Array.from(world.entities.values());
@@ -261,7 +261,7 @@ describe('Performance Optimizations Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       const entities = Array.from(world.entities.values());
@@ -289,7 +289,7 @@ describe('Performance Optimizations Integration', () => {
         agent.addComponent(createAgentComponent());
         agent.addComponent(new SocialGradientComponent());
         agent.addComponent(createConversationComponent());
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
         agents.push(agent);
       }
 
@@ -338,7 +338,7 @@ describe('Performance Optimizations Integration', () => {
         building.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
         building.addComponent(createPositionComponent(i * 5, 0));
         building.addComponent(createInventoryComponent('storage', 20));
-        (world as any)._addEntity(building);
+        world.addEntity(building);
       }
 
       // 100 agents
@@ -359,7 +359,7 @@ describe('Performance Optimizations Integration', () => {
         agent.addComponent(createSteeringComponent());
         agent.addComponent(new SocialGradientComponent());
         agent.addComponent(createConversationComponent());
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       const allEntities = Array.from(world.entities.values());
@@ -427,7 +427,7 @@ describe('Performance Optimizations Integration', () => {
           building.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
           building.addComponent(createInventoryComponent('storage', 20));
           building.addComponent(createPositionComponent(i, 0));
-          (world as any)._addEntity(building);
+          world.addEntity(building);
         }
 
         const entities = Array.from(world.entities.values());
@@ -463,7 +463,7 @@ describe('Performance Optimizations Integration', () => {
           agent.addComponent(createAgentComponent());
           agent.addComponent(new SocialGradientComponent());
         agent.addComponent(createConversationComponent());
-          (world as any)._addEntity(agent);
+          world.addEntity(agent);
           agents.push(agent);
         }
 

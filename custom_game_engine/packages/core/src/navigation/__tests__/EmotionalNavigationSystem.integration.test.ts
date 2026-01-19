@@ -44,7 +44,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       const ship = new EntityImpl(createEntityId(), 0);
       ship.addComponent(createPositionComponent(100, 100));
       ship.addComponent(createSpaceshipComponent('threshold_ship', 'Explorer'));
-      (harness.world as any)._addEntity(ship);
+      harness.world.addEntity(ship);
 
       // Update system
       system.update(harness.world, [ship], 0.05);
@@ -58,7 +58,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       const worldship = new EntityImpl(createEntityId(), 0);
       worldship.addComponent(createPositionComponent(100, 100));
       worldship.addComponent(createSpaceshipComponent('worldship', 'Big Ship'));
-      (harness.world as any)._addEntity(worldship);
+      harness.world.addEntity(worldship);
 
       // Update system
       system.update(harness.world, [worldship], 0.05);
@@ -78,8 +78,8 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       ship2.addComponent(createPositionComponent(200, 200));
       ship2.addComponent(createSpaceshipComponent('story_ship', 'Ship 2'));
 
-      (harness.world as any)._addEntity(ship1);
-      (harness.world as any)._addEntity(ship2);
+      harness.world.addEntity(ship1);
+      harness.world.addEntity(ship2);
 
       // Update system
       system.update(harness.world, [ship1, ship2], 0.05);
@@ -96,7 +96,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       ship.addComponent(createPositionComponent(100, 100));
       const shipComp = createSpaceshipComponent('threshold_ship', 'Empty Ship');
       ship.addComponent(shipComp);
-      (harness.world as any)._addEntity(ship);
+      harness.world.addEntity(ship);
 
       system.update(harness.world, [ship], 0.05);
 
@@ -110,7 +110,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       ship.addComponent(createPositionComponent(100, 100));
       const shipComp = createSpaceshipComponent('story_ship', 'Crewed Ship');
       ship.addComponent(shipComp);
-      (harness.world as any)._addEntity(ship);
+      harness.world.addEntity(ship);
 
       system.update(harness.world, [ship], 0.05);
 
@@ -126,7 +126,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       ship.addComponent(createPositionComponent(100, 100));
       const shipComp = createSpaceshipComponent('story_ship', 'Narrative Ship');
       ship.addComponent(shipComp);
-      (harness.world as any)._addEntity(ship);
+      harness.world.addEntity(ship);
 
       const initialWeight = shipComp.narrative.accumulated_weight;
 
@@ -146,7 +146,7 @@ describe('EmotionalNavigationSystem Integration Tests', () => {
       ship.addComponent(createPositionComponent(100, 100));
       const shipComp = createSpaceshipComponent('threshold_ship', 'Test Ship');
       ship.addComponent(shipComp);
-      (harness.world as any)._addEntity(ship);
+      harness.world.addEntity(ship);
 
       const initialWeight = shipComp.narrative.accumulated_weight;
 
