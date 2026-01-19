@@ -52,7 +52,7 @@ describe('Storage Deposit System', () => {
 
       agent.addComponent(createAgentComponent('deposit_items')); // Should compile without error
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Should not throw when processing
       const entities = world.query().with(ComponentType.Agent).executeEntities();
@@ -82,7 +82,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create storage-chest at position (15, 15) - 5 units away
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -109,7 +109,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       // Run AI system to trigger deposit behavior
       const entities = world.query().with(ComponentType.Agent).executeEntities();
@@ -149,7 +149,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create storage adjacent (distance < 1.5)
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -175,7 +175,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       // Set up event listener
       let deposited = false;
@@ -227,7 +227,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       const storage = new EntityImpl(createEntityId(), world.tick);
       storage.addComponent(createPositionComponent(10.5, 10));
@@ -252,7 +252,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       let eventData: any = null;
       eventBus.subscribe('items:deposited', (event) => {
@@ -300,7 +300,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create resource entity adjacent to agent
       const resource = new EntityImpl(createEntityId(), world.tick);
@@ -325,7 +325,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(resource);
+      world.addEntity(resource);
 
       // Create storage building
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -351,7 +351,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       // Track events
       let inventoryFullEmitted = false;
@@ -434,7 +434,7 @@ describe('Storage Deposit System', () => {
       agentInv = addResult.inventory;
       agent.addComponent<InventoryComponent>(agentInv);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Storage has 480/500 weight capacity (can fit only 10 wood = 20 weight)
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -464,7 +464,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
@@ -504,7 +504,7 @@ describe('Storage Deposit System', () => {
       agentInv = addResult.inventory;
       agent.addComponent<InventoryComponent>(agentInv);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       const storage = new EntityImpl(createEntityId(), world.tick);
       storage.addComponent(createPositionComponent(10.5, 10));
@@ -533,7 +533,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       let eventEmitted = false;
       eventBus.subscribe('items:deposited', () => {
@@ -576,7 +576,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       const storage = new EntityImpl(createEntityId(), world.tick);
       storage.addComponent(createPositionComponent(10.5, 10));
@@ -601,7 +601,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
@@ -632,7 +632,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       const storage = new EntityImpl(createEntityId(), world.tick);
       storage.addComponent(createPositionComponent(10.5, 10));
@@ -657,7 +657,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
@@ -689,7 +689,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       let eventEmitted = false;
       eventBus.subscribe('storage:not_found', () => {
@@ -727,7 +727,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create full storage adjacent to agent
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -759,7 +759,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       let eventEmitted = false;
       eventBus.subscribe('storage:full', () => {
@@ -798,7 +798,7 @@ describe('Storage Deposit System', () => {
       inventory = addResult.inventory;
       agent.addComponent<InventoryComponent>(inventory);
 
-      (world as any)._addEntity(agent);
+      world.addEntity(agent);
 
       // Create INCOMPLETE storage
       const storage = new EntityImpl(createEntityId(), world.tick);
@@ -818,7 +818,7 @@ describe('Storage Deposit System', () => {
         visible: true,
       });
 
-      (world as any)._addEntity(storage);
+      world.addEntity(storage);
 
       let eventEmitted = false;
       eventBus.subscribe('storage:not_found', () => {

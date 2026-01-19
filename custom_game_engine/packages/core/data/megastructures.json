@@ -1,0 +1,1543 @@
+{
+  "space_station": {
+    "id": "space_station",
+    "name": "Space Station",
+    "category": "orbital",
+    "tier": "planet",
+    "techLevelRequired": 7.0,
+    "totalMass": 500000,
+    "constructionTimeYears": 5,
+    "laborRequired": 10000,
+    "resources": {
+      "stellarite_plate": 1000,
+      "steel_ingot": 5000,
+      "hull_plating": 200,
+      "life_support_module": 50,
+      "power_core": 10,
+      "advanced_circuit": 2000,
+      "communication_relay": 20
+    },
+    "prerequisites": {
+      "research": ["orbital_construction", "life_support_systems"],
+      "techLevel": 7.0
+    },
+    "phases": [
+      {
+        "name": "Foundation",
+        "durationPercent": 20,
+        "resourcePercent": 30,
+        "description": "Core structure and docking systems"
+      },
+      {
+        "name": "Habitation",
+        "durationPercent": 40,
+        "resourcePercent": 40,
+        "description": "Life support and living quarters"
+      },
+      {
+        "name": "Systems Integration",
+        "durationPercent": 30,
+        "resourcePercent": 20,
+        "description": "Power, communications, and final systems"
+      },
+      {
+        "name": "Commissioning",
+        "durationPercent": 10,
+        "resourcePercent": 10,
+        "description": "Testing and crew transfer"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 1000,
+      "energyOutput": 10000000,
+      "defenseRating": 20,
+      "storageCapacity": 50000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 10,
+      "advanced_circuit": 50,
+      "power_core": 1
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 2.0,
+    "failureTimeYears": 20,
+    "militaryValue": 30,
+    "economicValue": 50,
+    "culturalValue": 60,
+    "collapseRiskBase": 0.5,
+    "vulnerableTo": ["kinetic_weapons", "solar_flares", "debris_collision", "sabotage"]
+  },
+  "stanford_torus": {
+    "id": "stanford_torus",
+    "name": "Stanford Torus",
+    "category": "orbital",
+    "tier": "planet",
+    "techLevelRequired": 7.5,
+    "totalMass": 1000000000,
+    "constructionTimeYears": 10,
+    "laborRequired": 50000,
+    "resources": {
+      "stellarite_plate": 50000,
+      "reinforced_hull": 10000,
+      "steel_ingot": 500000,
+      "hull_plating": 20000,
+      "life_support_module": 500,
+      "power_core": 100,
+      "shield_generator": 50,
+      "advanced_circuit": 50000
+    },
+    "prerequisites": {
+      "megastructures": ["space_station"],
+      "research": ["rotating_habitats", "artificial_gravity", "advanced_life_support"],
+      "techLevel": 7.5
+    },
+    "phases": [
+      {
+        "name": "Spoke Construction",
+        "durationPercent": 25,
+        "resourcePercent": 20,
+        "description": "Central hub and support spokes"
+      },
+      {
+        "name": "Ring Assembly",
+        "durationPercent": 35,
+        "resourcePercent": 50,
+        "description": "Main rotating ring structure"
+      },
+      {
+        "name": "Interior Development",
+        "durationPercent": 30,
+        "resourcePercent": 25,
+        "description": "Habitation, agriculture, and infrastructure"
+      },
+      {
+        "name": "Spin-Up",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Gradual rotation to 1g"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 10000,
+      "energyOutput": 100000000,
+      "defenseRating": 40,
+      "storageCapacity": 500000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100,
+      "hull_plating": 200,
+      "advanced_circuit": 500,
+      "power_core": 5
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 1.0,
+    "failureTimeYears": 50,
+    "militaryValue": 40,
+    "economicValue": 70,
+    "culturalValue": 75,
+    "collapseRiskBase": 0.2,
+    "vulnerableTo": ["structural_fatigue", "bearing_failure", "kinetic_weapons", "solar_flares"]
+  },
+  "oneill_cylinder": {
+    "id": "oneill_cylinder",
+    "name": "O'Neill Cylinder",
+    "category": "orbital",
+    "tier": "planet",
+    "techLevelRequired": 8.0,
+    "totalMass": 10000000000,
+    "constructionTimeYears": 20,
+    "laborRequired": 200000,
+    "resources": {
+      "stellarite_plate": 500000,
+      "reinforced_hull": 100000,
+      "neutronium_core": 10,
+      "steel_ingot": 5000000,
+      "hull_plating": 200000,
+      "life_support_module": 5000,
+      "power_core": 1000,
+      "shield_generator": 500,
+      "advanced_circuit": 500000,
+      "quantum_processor": 1000
+    },
+    "prerequisites": {
+      "megastructures": ["stanford_torus"],
+      "research": ["megastructure_engineering", "closed_ecology", "mass_drivers"],
+      "techLevel": 8.0
+    },
+    "phases": [
+      {
+        "name": "Endcap Foundations",
+        "durationPercent": 15,
+        "resourcePercent": 15,
+        "description": "Counter-rotating endcap structures"
+      },
+      {
+        "name": "Cylinder Shell",
+        "durationPercent": 40,
+        "resourcePercent": 50,
+        "description": "Main cylinder and mirror systems"
+      },
+      {
+        "name": "Ecological Engineering",
+        "durationPercent": 30,
+        "resourcePercent": 25,
+        "description": "Soil, water, atmosphere, biosphere"
+      },
+      {
+        "name": "Population Transfer",
+        "durationPercent": 15,
+        "resourcePercent": 10,
+        "description": "Gradual settlement and ecosystem stabilization"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 1000000,
+      "energyOutput": 1000000000,
+      "defenseRating": 60,
+      "storageCapacity": 10000000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 1000,
+      "hull_plating": 2000,
+      "advanced_circuit": 5000,
+      "power_core": 50,
+      "life_support_module": 100
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 0.5,
+    "failureTimeYears": 100,
+    "militaryValue": 50,
+    "economicValue": 85,
+    "culturalValue": 90,
+    "collapseRiskBase": 0.1,
+    "vulnerableTo": ["catastrophic_decompression", "ecosystem_collapse", "bearing_failure", "asteroid_impact"]
+  },
+  "bishop_ring": {
+    "id": "bishop_ring",
+    "name": "Bishop Ring",
+    "category": "orbital",
+    "tier": "planet",
+    "techLevelRequired": 9.0,
+    "totalMass": 10000000000000000,
+    "constructionTimeYears": 100,
+    "laborRequired": 50000000,
+    "resources": {
+      "stellarite_plate": 100000000,
+      "reinforced_hull": 50000000,
+      "neutronium_core": 10000,
+      "hull_plating": 500000000,
+      "life_support_module": 1000000,
+      "power_core": 500000,
+      "shield_generator": 100000,
+      "quantum_processor": 100000,
+      "void_capacitor": 50000
+    },
+    "prerequisites": {
+      "megastructures": ["oneill_cylinder"],
+      "research": ["planetary_scale_engineering", "active_support_structures", "atmospheric_retention"],
+      "techLevel": 9.0
+    },
+    "phases": [
+      {
+        "name": "Foundation Ring",
+        "durationPercent": 20,
+        "resourcePercent": 25,
+        "description": "Core structural ring with active support"
+      },
+      {
+        "name": "Habitat Band",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Habitable surface area and containment walls"
+      },
+      {
+        "name": "Atmospheric Seeding",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Air, water, and radiation shielding"
+      },
+      {
+        "name": "Ecological Development",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Biosphere establishment and settlement"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 100000000,
+      "energyOutput": 100000000000,
+      "defenseRating": 75,
+      "storageCapacity": 1000000000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100000,
+      "reinforced_hull": 50000,
+      "neutronium_core": 10,
+      "power_core": 5000,
+      "shield_generator": 1000
+    },
+    "energyMaintenancePerYear": 10000000000,
+    "degradationRate": 0.2,
+    "failureTimeYears": 500,
+    "militaryValue": 70,
+    "economicValue": 95,
+    "culturalValue": 95,
+    "collapseRiskBase": 0.05,
+    "vulnerableTo": ["structural_resonance", "active_support_failure", "atmospheric_loss", "stellar_collision"]
+  },
+  "orbital_ring": {
+    "id": "orbital_ring",
+    "name": "Orbital Ring",
+    "category": "orbital",
+    "tier": "planet",
+    "techLevelRequired": 9.0,
+    "totalMass": 1000000000000,
+    "constructionTimeYears": 50,
+    "laborRequired": 20000000,
+    "resources": {
+      "stellarite_plate": 10000000,
+      "reinforced_hull": 5000000,
+      "neutronium_core": 1000,
+      "hull_plating": 50000000,
+      "power_core": 100000,
+      "shield_generator": 50000,
+      "quantum_processor": 50000,
+      "navigation_array": 10000,
+      "void_engine_component": 100000
+    },
+    "prerequisites": {
+      "megastructures": ["space_station"],
+      "research": ["orbital_mechanics_mastery", "mass_stream_systems", "space_elevator"],
+      "techLevel": 9.0
+    },
+    "phases": [
+      {
+        "name": "Launch Loop",
+        "durationPercent": 30,
+        "resourcePercent": 35,
+        "description": "Magnetic levitation stream in orbit"
+      },
+      {
+        "name": "Stationary Ring",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Outer stationary ring and tethers"
+      },
+      {
+        "name": "Station Integration",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Docking stations and cargo systems"
+      },
+      {
+        "name": "Traffic Management",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Operational testing and certification"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 100000000000,
+      "energyOutput": 50000000000,
+      "defenseRating": 50,
+      "storageCapacity": 100000000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 10000,
+      "power_core": 1000,
+      "void_engine_component": 1000,
+      "quantum_processor": 500
+    },
+    "energyMaintenancePerYear": 5000000000,
+    "degradationRate": 0.5,
+    "failureTimeYears": 200,
+    "militaryValue": 60,
+    "economicValue": 95,
+    "culturalValue": 70,
+    "collapseRiskBase": 0.1,
+    "vulnerableTo": ["mass_stream_disruption", "tether_failure", "debris_cascade", "sabotage"]
+  },
+  "planetary_terraformer": {
+    "id": "planetary_terraformer",
+    "name": "Planetary Terraformer",
+    "category": "planetary",
+    "tier": "planet",
+    "techLevelRequired": 8.5,
+    "totalMass": 100000000000,
+    "constructionTimeYears": 100,
+    "operationTimeYears": 500,
+    "laborRequired": 10000000,
+    "resources": {
+      "stellarite_plate": 1000000,
+      "reinforced_hull": 500000,
+      "neutronium_core": 100,
+      "power_core": 50000,
+      "shield_generator": 10000,
+      "quantum_processor": 10000,
+      "void_capacitor": 5000,
+      "focusing_array": 50000
+    },
+    "prerequisites": {
+      "research": ["planetary_engineering", "atmospheric_chemistry", "magnetic_field_generation", "ecosystem_design"],
+      "techLevel": 8.5
+    },
+    "phases": [
+      {
+        "name": "Orbital Infrastructure",
+        "durationPercent": 20,
+        "resourcePercent": 30,
+        "description": "Solar mirrors and orbital control systems"
+      },
+      {
+        "name": "Surface Installations",
+        "durationPercent": 30,
+        "resourcePercent": 40,
+        "description": "Atmosphere processors and magnetic generators"
+      },
+      {
+        "name": "System Integration",
+        "durationPercent": 30,
+        "resourcePercent": 20,
+        "description": "Coordination and control networks"
+      },
+      {
+        "name": "Initial Operation",
+        "durationPercent": 20,
+        "resourcePercent": 10,
+        "description": "Begin planetary transformation"
+      }
+    ],
+    "capabilities": {
+      "terraformingRate": 0.002,
+      "energyOutput": 10000000000,
+      "defenseRating": 45
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 10000,
+      "power_core": 500,
+      "quantum_processor": 100,
+      "void_capacitor": 50
+    },
+    "energyMaintenancePerYear": 2000000000,
+    "degradationRate": 0.3,
+    "failureTimeYears": 100,
+    "militaryValue": 30,
+    "economicValue": 90,
+    "culturalValue": 85,
+    "collapseRiskBase": 0.2,
+    "vulnerableTo": ["system_cascade_failure", "planetary_instability", "resource_depletion"]
+  },
+  "planet_cracker": {
+    "id": "planet_cracker",
+    "name": "Planet Cracker",
+    "category": "planetary",
+    "tier": "planet",
+    "techLevelRequired": 9.0,
+    "totalMass": 10000000000000,
+    "constructionTimeYears": 20,
+    "operationTimeYears": 50,
+    "laborRequired": 5000000,
+    "resources": {
+      "stellarite_plate": 10000000,
+      "reinforced_hull": 5000000,
+      "neutronium_core": 5000,
+      "power_core": 500000,
+      "shield_generator": 100000,
+      "quantum_processor": 50000,
+      "void_capacitor": 100000,
+      "focusing_array": 500000,
+      "void_engine_component": 50000
+    },
+    "prerequisites": {
+      "research": ["planetary_disassembly", "gravity_manipulation", "mass_extraction", "resource_processing"],
+      "techLevel": 9.0
+    },
+    "phases": [
+      {
+        "name": "Mining Platform",
+        "durationPercent": 30,
+        "resourcePercent": 40,
+        "description": "Orbital extraction and processing facility"
+      },
+      {
+        "name": "Gravity Disruptors",
+        "durationPercent": 40,
+        "resourcePercent": 40,
+        "description": "Core penetration and tectonic manipulation systems"
+      },
+      {
+        "name": "Mass Stream Network",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Material transport to orbit"
+      },
+      {
+        "name": "Commissioning",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "System testing and initial operation"
+      }
+    ],
+    "capabilities": {
+      "miningRate": 200000000000000,
+      "energyOutput": 100000000000,
+      "defenseRating": 55
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100000,
+      "neutronium_core": 50,
+      "power_core": 5000,
+      "void_capacitor": 1000
+    },
+    "energyMaintenancePerYear": 20000000000,
+    "degradationRate": 0.5,
+    "failureTimeYears": 100,
+    "militaryValue": 85,
+    "economicValue": 95,
+    "culturalValue": 40,
+    "collapseRiskBase": 0.3,
+    "vulnerableTo": ["planetary_core_instability", "gravity_cascade", "mass_stream_failure"]
+  },
+  "world_engine": {
+    "id": "world_engine",
+    "name": "World Engine",
+    "category": "planetary",
+    "tier": "system",
+    "techLevelRequired": 9.5,
+    "totalMass": 100000000000000,
+    "constructionTimeYears": 100,
+    "operationTimeYears": 500,
+    "laborRequired": 50000000,
+    "resources": {
+      "stellarite_plate": 100000000,
+      "reinforced_hull": 50000000,
+      "neutronium_core": 50000,
+      "power_core": 5000000,
+      "shield_generator": 1000000,
+      "quantum_processor": 500000,
+      "void_engine_component": 1000000,
+      "propulsion_unit": 500000,
+      "navigation_array": 100000
+    },
+    "prerequisites": {
+      "research": ["planetary_propulsion", "stellar_navigation", "tectonic_stabilization", "biosphere_protection"],
+      "techLevel": 9.5
+    },
+    "phases": [
+      {
+        "name": "Foundation Anchors",
+        "durationPercent": 25,
+        "resourcePercent": 30,
+        "description": "Deep core anchoring systems"
+      },
+      {
+        "name": "Propulsion Arrays",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Planetary-scale engines and thrusters"
+      },
+      {
+        "name": "Navigation Systems",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Stellar navigation and course control"
+      },
+      {
+        "name": "Biosphere Protection",
+        "durationPercent": 15,
+        "resourcePercent": 10,
+        "description": "Shields and stabilization for inhabitants"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 5.972e24,
+      "defenseRating": 80,
+      "energyOutput": 500000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 1000000,
+      "neutronium_core": 500,
+      "void_engine_component": 10000,
+      "power_core": 50000
+    },
+    "energyMaintenancePerYear": 100000000000,
+    "degradationRate": 0.1,
+    "failureTimeYears": 1000,
+    "militaryValue": 90,
+    "economicValue": 85,
+    "culturalValue": 95,
+    "collapseRiskBase": 0.05,
+    "vulnerableTo": ["tectonic_catastrophe", "engine_failure", "navigation_error", "stellar_collision"]
+  },
+  "planetary_shield": {
+    "id": "planetary_shield",
+    "name": "Planetary Shield",
+    "category": "planetary",
+    "tier": "planet",
+    "techLevelRequired": 9.0,
+    "totalMass": 1000000000000,
+    "constructionTimeYears": 30,
+    "laborRequired": 10000000,
+    "resources": {
+      "stellarite_plate": 10000000,
+      "reinforced_hull": 5000000,
+      "neutronium_core": 1000,
+      "power_core": 500000,
+      "shield_generator": 500000,
+      "quantum_processor": 100000,
+      "void_capacitor": 100000,
+      "focusing_array": 200000
+    },
+    "prerequisites": {
+      "research": ["planetary_scale_shields", "magnetic_field_projection", "energy_distribution"],
+      "techLevel": 9.0
+    },
+    "phases": [
+      {
+        "name": "Generator Network",
+        "durationPercent": 35,
+        "resourcePercent": 50,
+        "description": "Surface and orbital shield generators"
+      },
+      {
+        "name": "Power Grid",
+        "durationPercent": 30,
+        "resourcePercent": 30,
+        "description": "Energy distribution and storage systems"
+      },
+      {
+        "name": "Control Systems",
+        "durationPercent": 25,
+        "resourcePercent": 15,
+        "description": "Coordination and threat response"
+      },
+      {
+        "name": "Calibration",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Field tuning and testing"
+      }
+    ],
+    "capabilities": {
+      "defenseRating": 95,
+      "energyOutput": 0
+    },
+    "maintenancePerYear": {
+      "shield_generator": 10000,
+      "power_core": 5000,
+      "quantum_processor": 1000,
+      "void_capacitor": 1000
+    },
+    "energyMaintenancePerYear": 50000000000,
+    "degradationRate": 0.4,
+    "failureTimeYears": 150,
+    "militaryValue": 95,
+    "economicValue": 60,
+    "culturalValue": 80,
+    "collapseRiskBase": 0.15,
+    "vulnerableTo": ["power_grid_failure", "coordinated_assault", "emp_attack"]
+  },
+  "climate_engine": {
+    "id": "climate_engine",
+    "name": "Climate Engine",
+    "category": "planetary",
+    "tier": "planet",
+    "techLevelRequired": 8.5,
+    "totalMass": 10000000000,
+    "constructionTimeYears": 50,
+    "laborRequired": 5000000,
+    "resources": {
+      "stellarite_plate": 1000000,
+      "reinforced_hull": 500000,
+      "power_core": 50000,
+      "shield_generator": 10000,
+      "quantum_processor": 20000,
+      "void_capacitor": 10000,
+      "focusing_array": 100000
+    },
+    "prerequisites": {
+      "research": ["climate_control", "weather_manipulation", "atmospheric_engineering"],
+      "techLevel": 8.5
+    },
+    "phases": [
+      {
+        "name": "Weather Stations",
+        "durationPercent": 30,
+        "resourcePercent": 35,
+        "description": "Global network of control stations"
+      },
+      {
+        "name": "Atmospheric Processors",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Large-scale atmosphere manipulation"
+      },
+      {
+        "name": "Ocean Systems",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Ocean current and temperature control"
+      },
+      {
+        "name": "Integration",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Global climate coordination"
+      }
+    ],
+    "capabilities": {
+      "defenseRating": 25,
+      "energyOutput": 5000000000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 10000,
+      "power_core": 500,
+      "quantum_processor": 200
+    },
+    "energyMaintenancePerYear": 1000000000,
+    "degradationRate": 0.5,
+    "failureTimeYears": 100,
+    "militaryValue": 40,
+    "economicValue": 85,
+    "culturalValue": 75,
+    "collapseRiskBase": 0.25,
+    "vulnerableTo": ["system_desynchronization", "extreme_weather_cascade", "power_failure"]
+  },
+  "dyson_swarm": {
+    "id": "dyson_swarm",
+    "name": "Dyson Swarm",
+    "category": "stellar",
+    "tier": "system",
+    "techLevelRequired": 9.0,
+    "totalMass": 1e19,
+    "constructionTimeYears": 100,
+    "laborRequired": 1000000000,
+    "resources": {
+      "stellarite_plate": 100000000000,
+      "hull_plating": 1000000000000,
+      "power_core": 10000000000,
+      "shield_generator": 1000000000,
+      "quantum_processor": 100000000,
+      "navigation_array": 50000000,
+      "communication_relay": 100000000,
+      "focusing_array": 1000000000
+    },
+    "prerequisites": {
+      "megastructures": ["planet_cracker"],
+      "research": ["stellar_engineering", "self_replicating_systems", "swarm_coordination"],
+      "techLevel": 9.0
+    },
+    "phases": [
+      {
+        "name": "Collector Prototypes",
+        "durationPercent": 10,
+        "resourcePercent": 1,
+        "description": "Design and test collector units"
+      },
+      {
+        "name": "Self-Replication",
+        "durationPercent": 30,
+        "resourcePercent": 10,
+        "description": "Deploy self-replicating factories"
+      },
+      {
+        "name": "Swarm Deployment",
+        "durationPercent": 50,
+        "resourcePercent": 80,
+        "description": "Exponential collector expansion"
+      },
+      {
+        "name": "Network Integration",
+        "durationPercent": 10,
+        "resourcePercent": 9,
+        "description": "Communication and power distribution"
+      }
+    ],
+    "capabilities": {
+      "energyOutput": 3.8e26,
+      "computationalPower": 1e30,
+      "defenseRating": 70,
+      "communicationRange": 1000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100000000,
+      "quantum_processor": 1000000,
+      "navigation_array": 500000
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 0.1,
+    "failureTimeYears": 10000,
+    "militaryValue": 85,
+    "economicValue": 100,
+    "culturalValue": 90,
+    "collapseRiskBase": 0.01,
+    "vulnerableTo": ["swarm_desynchronization", "stellar_flare", "cascading_collision"]
+  },
+  "dyson_sphere": {
+    "id": "dyson_sphere",
+    "name": "Dyson Sphere",
+    "category": "stellar",
+    "tier": "system",
+    "techLevelRequired": 10.0,
+    "totalMass": 1e25,
+    "constructionTimeYears": 1000,
+    "laborRequired": 100000000000,
+    "resources": {
+      "stellarite_plate": 1000000000000000,
+      "reinforced_hull": 500000000000000,
+      "neutronium_core": 100000000000,
+      "power_core": 1000000000000,
+      "shield_generator": 100000000000,
+      "quantum_processor": 10000000000,
+      "void_capacitor": 10000000000,
+      "focusing_array": 100000000000
+    },
+    "prerequisites": {
+      "megastructures": ["dyson_swarm"],
+      "research": ["rigid_shell_engineering", "active_support_systems", "stellar_containment"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Swarm Foundation",
+        "durationPercent": 20,
+        "resourcePercent": 10,
+        "description": "Use existing Dyson swarm as scaffold"
+      },
+      {
+        "name": "Structural Framework",
+        "durationPercent": 40,
+        "resourcePercent": 50,
+        "description": "Rigid shell segments with active support"
+      },
+      {
+        "name": "Shell Completion",
+        "durationPercent": 30,
+        "resourcePercent": 35,
+        "description": "Seal segments into complete sphere"
+      },
+      {
+        "name": "Interior Development",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Habitable surface and infrastructure"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 1e18,
+      "energyOutput": 3.8e26,
+      "computationalPower": 1e40,
+      "defenseRating": 90,
+      "communicationRange": 10000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 10000000000,
+      "neutronium_core": 1000000,
+      "power_core": 100000000,
+      "shield_generator": 10000000
+    },
+    "energyMaintenancePerYear": 1000000000000,
+    "degradationRate": 0.01,
+    "failureTimeYears": 100000,
+    "militaryValue": 100,
+    "economicValue": 100,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.001,
+    "vulnerableTo": ["stellar_evolution", "active_support_cascade", "catastrophic_breach"]
+  },
+  "stellar_engine": {
+    "id": "stellar_engine",
+    "name": "Stellar Engine (Shkadov Thruster)",
+    "category": "stellar",
+    "tier": "system",
+    "techLevelRequired": 10.0,
+    "totalMass": 1e24,
+    "constructionTimeYears": 500,
+    "operationTimeYears": 1000000,
+    "laborRequired": 50000000000,
+    "resources": {
+      "stellarite_plate": 100000000000000,
+      "reinforced_hull": 50000000000000,
+      "neutronium_core": 10000000000,
+      "power_core": 100000000000,
+      "shield_generator": 50000000000,
+      "quantum_processor": 5000000000,
+      "focusing_array": 50000000000,
+      "void_capacitor": 10000000000
+    },
+    "prerequisites": {
+      "megastructures": ["dyson_swarm"],
+      "research": ["stellar_propulsion", "radiation_pressure_control", "galactic_navigation"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Mirror Arc",
+        "durationPercent": 40,
+        "resourcePercent": 50,
+        "description": "Enormous curved mirror to reflect light"
+      },
+      {
+        "name": "Collector Ring",
+        "durationPercent": 30,
+        "resourcePercent": 30,
+        "description": "Energy collection for station-keeping"
+      },
+      {
+        "name": "Stabilization Systems",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Maintain position relative to star"
+      },
+      {
+        "name": "Navigation Calibration",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Course plotting and initiation"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 2e30,
+      "energyOutput": 5e25,
+      "defenseRating": 75,
+      "communicationRange": 5000
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 1000000000,
+      "neutronium_core": 100000,
+      "power_core": 10000000,
+      "shield_generator": 5000000
+    },
+    "energyMaintenancePerYear": 100000000000,
+    "degradationRate": 0.01,
+    "failureTimeYears": 100000,
+    "militaryValue": 95,
+    "economicValue": 80,
+    "culturalValue": 95,
+    "collapseRiskBase": 0.005,
+    "vulnerableTo": ["stellar_instability", "mirror_deformation", "navigation_drift"]
+  },
+  "star_lifter": {
+    "id": "star_lifter",
+    "name": "Star Lifter",
+    "category": "stellar",
+    "tier": "system",
+    "techLevelRequired": 9.5,
+    "totalMass": 1000000000000000,
+    "constructionTimeYears": 100,
+    "laborRequired": 10000000000,
+    "resources": {
+      "stellarite_plate": 100000000000,
+      "reinforced_hull": 50000000000,
+      "neutronium_core": 1000000,
+      "power_core": 10000000000,
+      "shield_generator": 5000000000,
+      "quantum_processor": 1000000000,
+      "void_capacitor": 1000000000,
+      "focusing_array": 10000000000
+    },
+    "prerequisites": {
+      "research": ["stellar_mining", "magnetic_field_manipulation", "plasma_extraction"],
+      "techLevel": 9.5
+    },
+    "phases": [
+      {
+        "name": "Orbital Collectors",
+        "durationPercent": 35,
+        "resourcePercent": 40,
+        "description": "Ring of material extraction stations"
+      },
+      {
+        "name": "Magnetic Pumps",
+        "durationPercent": 35,
+        "resourcePercent": 40,
+        "description": "Systems to lift stellar material"
+      },
+      {
+        "name": "Processing Facilities",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Refinement and storage"
+      },
+      {
+        "name": "Commissioning",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Begin extraction operations"
+      }
+    ],
+    "capabilities": {
+      "miningRate": 1e18,
+      "energyOutput": 10000000000000,
+      "defenseRating": 60
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100000000,
+      "neutronium_core": 10000,
+      "shield_generator": 5000000,
+      "void_capacitor": 1000000
+    },
+    "energyMaintenancePerYear": 1000000000000,
+    "degradationRate": 0.2,
+    "failureTimeYears": 5000,
+    "militaryValue": 60,
+    "economicValue": 95,
+    "culturalValue": 70,
+    "collapseRiskBase": 0.1,
+    "vulnerableTo": ["stellar_flare", "magnetic_field_collapse", "plasma_containment_failure"]
+  },
+  "nicoll_dyson_beam": {
+    "id": "nicoll_dyson_beam",
+    "name": "Nicoll-Dyson Beam",
+    "category": "stellar",
+    "tier": "system",
+    "techLevelRequired": 10.0,
+    "totalMass": 100000000000000,
+    "constructionTimeYears": 50,
+    "laborRequired": 5000000000,
+    "resources": {
+      "stellarite_plate": 10000000000,
+      "reinforced_hull": 5000000000,
+      "neutronium_core": 100000,
+      "power_core": 1000000000,
+      "shield_generator": 500000000,
+      "quantum_processor": 100000000,
+      "focusing_array": 10000000000,
+      "probability_lens": 1000000
+    },
+    "prerequisites": {
+      "megastructures": ["dyson_swarm"],
+      "research": ["stellar_laser_focusing", "long_range_targeting", "energy_coherence"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Focusing Array",
+        "durationPercent": 40,
+        "resourcePercent": 50,
+        "description": "Massive lens system"
+      },
+      {
+        "name": "Beam Control",
+        "durationPercent": 30,
+        "resourcePercent": 30,
+        "description": "Targeting and modulation systems"
+      },
+      {
+        "name": "Power Routing",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Channel swarm output to beam"
+      },
+      {
+        "name": "Calibration",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Test firing and accuracy tuning"
+      }
+    ],
+    "capabilities": {
+      "energyOutput": 0,
+      "defenseRating": 100,
+      "communicationRange": 10000
+    },
+    "maintenancePerYear": {
+      "focusing_array": 10000000,
+      "quantum_processor": 1000000,
+      "probability_lens": 10000
+    },
+    "energyMaintenancePerYear": 10000000000,
+    "degradationRate": 0.3,
+    "failureTimeYears": 1000,
+    "militaryValue": 100,
+    "economicValue": 20,
+    "culturalValue": 50,
+    "collapseRiskBase": 0.05,
+    "vulnerableTo": ["lens_damage", "targeting_failure", "power_fluctuation"]
+  },
+  "wormhole_gate": {
+    "id": "wormhole_gate",
+    "name": "Wormhole Gate",
+    "category": "galactic",
+    "tier": "sector",
+    "techLevelRequired": 10.0,
+    "totalMass": 10000000000000000,
+    "constructionTimeYears": 10,
+    "laborRequired": 10000000000,
+    "resources": {
+      "stellarite_plate": 1000000000000,
+      "reinforced_hull": 500000000000,
+      "neutronium_core": 100000000,
+      "power_core": 100000000000,
+      "quantum_processor": 10000000000,
+      "void_capacitor": 10000000000,
+      "timeline_anchor": 1000000,
+      "reality_thread": 100000,
+      "probability_lens": 1000000
+    },
+    "prerequisites": {
+      "research": ["wormhole_theory", "spacetime_engineering", "exotic_matter_production", "quantum_entanglement_scaling"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Ring Frame",
+        "durationPercent": 30,
+        "resourcePercent": 40,
+        "description": "Massive circular structure"
+      },
+      {
+        "name": "Exotic Matter Core",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Negative energy generation"
+      },
+      {
+        "name": "Spacetime Manipulation",
+        "durationPercent": 20,
+        "resourcePercent": 10,
+        "description": "Fold space and create wormhole"
+      },
+      {
+        "name": "Stabilization",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Maintain stable throat"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 1000000000000000,
+      "energyOutput": 0,
+      "defenseRating": 50,
+      "communicationRange": 100000
+    },
+    "maintenancePerYear": {
+      "neutronium_core": 1000000,
+      "timeline_anchor": 10000,
+      "reality_thread": 1000,
+      "void_capacitor": 100000000
+    },
+    "energyMaintenancePerYear": 100000000000000,
+    "degradationRate": 0.5,
+    "failureTimeYears": 100,
+    "militaryValue": 85,
+    "economicValue": 100,
+    "culturalValue": 95,
+    "collapseRiskBase": 0.2,
+    "vulnerableTo": ["exotic_matter_depletion", "gravitational_disruption", "hawking_radiation"]
+  },
+  "galactic_highway": {
+    "id": "galactic_highway",
+    "name": "Galactic Highway",
+    "category": "galactic",
+    "tier": "galaxy",
+    "techLevelRequired": 10.0,
+    "totalMass": 1000000000000,
+    "constructionTimeYears": 1,
+    "laborRequired": 100000000,
+    "resources": {
+      "stellarite_plate": 100000000,
+      "quantum_processor": 10000000,
+      "navigation_array": 10000000,
+      "communication_relay": 50000000,
+      "void_capacitor": 1000000,
+      "timeline_anchor": 1000,
+      "reality_thread": 100
+    },
+    "prerequisites": {
+      "megastructures": ["wormhole_gate"],
+      "research": ["interstellar_infrastructure", "navigation_beacons", "faster_than_light_lanes"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Beacon Deployment",
+        "durationPercent": 40,
+        "resourcePercent": 30,
+        "description": "Navigation and guidance beacons"
+      },
+      {
+        "name": "FTL Lane Formation",
+        "durationPercent": 40,
+        "resourcePercent": 50,
+        "description": "Stabilized faster-than-light corridors"
+      },
+      {
+        "name": "Traffic Control",
+        "durationPercent": 15,
+        "resourcePercent": 15,
+        "description": "Communication and safety systems"
+      },
+      {
+        "name": "Certification",
+        "durationPercent": 5,
+        "resourcePercent": 5,
+        "description": "Testing and opening to traffic"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 10000000000000000,
+      "communicationRange": 100000,
+      "defenseRating": 30
+    },
+    "maintenancePerYear": {
+      "quantum_processor": 100000,
+      "navigation_array": 100000,
+      "void_capacitor": 10000,
+      "timeline_anchor": 10
+    },
+    "energyMaintenancePerYear": 1000000000,
+    "degradationRate": 0.3,
+    "failureTimeYears": 500,
+    "militaryValue": 70,
+    "economicValue": 95,
+    "culturalValue": 85,
+    "collapseRiskBase": 0.1,
+    "vulnerableTo": ["beacon_failure", "ftl_lane_collapse", "traffic_overload"]
+  },
+  "matrioshka_brain": {
+    "id": "matrioshka_brain",
+    "name": "Matrioshka Brain",
+    "category": "galactic",
+    "tier": "system",
+    "techLevelRequired": 10.0,
+    "totalMass": 1e26,
+    "constructionTimeYears": 10000,
+    "laborRequired": 1000000000000,
+    "resources": {
+      "stellarite_plate": 10000000000000000,
+      "reinforced_hull": 5000000000000000,
+      "neutronium_core": 1000000000000,
+      "quantum_processor": 10000000000000000,
+      "power_core": 10000000000000,
+      "shield_generator": 1000000000000,
+      "void_capacitor": 100000000000,
+      "focusing_array": 1000000000000
+    },
+    "prerequisites": {
+      "megastructures": ["dyson_sphere"],
+      "research": ["stellar_scale_computing", "waste_heat_management", "nested_shell_design", "computational_supremacy"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Inner Computation Shell",
+        "durationPercent": 20,
+        "resourcePercent": 10,
+        "description": "Highest-energy computing layer"
+      },
+      {
+        "name": "Middle Shells",
+        "durationPercent": 50,
+        "resourcePercent": 60,
+        "description": "Multiple nested processing layers"
+      },
+      {
+        "name": "Outer Radiator Shell",
+        "durationPercent": 20,
+        "resourcePercent": 25,
+        "description": "Final heat radiation layer"
+      },
+      {
+        "name": "Network Integration",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Inter-shell communication and coordination"
+      }
+    ],
+    "capabilities": {
+      "computationalPower": 1e50,
+      "energyOutput": 0,
+      "defenseRating": 85,
+      "communicationRange": 100000
+    },
+    "maintenancePerYear": {
+      "quantum_processor": 100000000000000,
+      "neutronium_core": 10000000,
+      "power_core": 1000000000
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 0.005,
+    "failureTimeYears": 1000000,
+    "militaryValue": 90,
+    "economicValue": 100,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.001,
+    "vulnerableTo": ["stellar_evolution", "computational_cascade", "thermal_runaway"]
+  },
+  "birch_world": {
+    "id": "birch_world",
+    "name": "Birch World (Supramundane Planet)",
+    "category": "galactic",
+    "tier": "system",
+    "techLevelRequired": 10.0,
+    "totalMass": 1e28,
+    "constructionTimeYears": 1000000,
+    "laborRequired": 10000000000000,
+    "resources": {
+      "stellarite_plate": 1e18,
+      "reinforced_hull": 5e17,
+      "neutronium_core": 100000000000000,
+      "power_core": 100000000000000,
+      "shield_generator": 10000000000000,
+      "quantum_processor": 1000000000000,
+      "void_capacitor": 100000000000
+    },
+    "prerequisites": {
+      "megastructures": ["dyson_sphere"],
+      "research": ["supramassive_engineering", "black_hole_manipulation", "planetary_scale_habitats"],
+      "techLevel": 10.0
+    },
+    "phases": [
+      {
+        "name": "Black Hole Core",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Create or capture central black hole"
+      },
+      {
+        "name": "Shell Foundation",
+        "durationPercent": 30,
+        "resourcePercent": 35,
+        "description": "Massive spherical shell around black hole"
+      },
+      {
+        "name": "Multi-Layer Construction",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Concentric habitable shells"
+      },
+      {
+        "name": "Biosphere Seeding",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Populate with life and civilizations"
+      }
+    ],
+    "capabilities": {
+      "populationCapacity": 1e21,
+      "energyOutput": 1e18,
+      "defenseRating": 95,
+      "storageCapacity": 1e30
+    },
+    "maintenancePerYear": {
+      "stellarite_plate": 100000000000000,
+      "neutronium_core": 1000000000,
+      "power_core": 10000000000,
+      "shield_generator": 1000000000
+    },
+    "energyMaintenancePerYear": 100000000000000,
+    "degradationRate": 0.0001,
+    "failureTimeYears": 10000000,
+    "militaryValue": 100,
+    "economicValue": 100,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.0001,
+    "vulnerableTo": ["black_hole_evaporation", "structural_collapse", "gravitational_instability"]
+  },
+  "universe_engine": {
+    "id": "universe_engine",
+    "name": "Universe Engine",
+    "category": "transcendent",
+    "tier": "galaxy",
+    "techLevelRequired": 10.5,
+    "totalMass": 1e24,
+    "constructionTimeYears": 1000000,
+    "laborRequired": 100000000000000,
+    "resources": {
+      "neutronium_core": 1000000000000,
+      "quantum_processor": 100000000000000,
+      "timeline_anchor": 1000000000,
+      "reality_thread": 100000000,
+      "probability_lens": 10000000,
+      "void_capacitor": 1000000000000,
+      "coherence_crystal": 1000000000
+    },
+    "prerequisites": {
+      "research": ["universe_creation", "physical_constant_engineering", "dimensional_manipulation", "computational_cosmology"],
+      "techLevel": 10.5
+    },
+    "phases": [
+      {
+        "name": "Vacuum Energy Extractor",
+        "durationPercent": 25,
+        "resourcePercent": 30,
+        "description": "Harvest zero-point energy"
+      },
+      {
+        "name": "Dimensional Forge",
+        "durationPercent": 35,
+        "resourcePercent": 40,
+        "description": "Create baby universe bubble"
+      },
+      {
+        "name": "Physical Law Programming",
+        "durationPercent": 25,
+        "resourcePercent": 20,
+        "description": "Set fundamental constants"
+      },
+      {
+        "name": "Controlled Inflation",
+        "durationPercent": 15,
+        "resourcePercent": 10,
+        "description": "Expand pocket universe"
+      }
+    ],
+    "capabilities": {
+      "defenseRating": 100,
+      "energyOutput": 1e30,
+      "computationalPower": 1e60,
+      "realityManipulation": true
+    },
+    "maintenancePerYear": {
+      "timeline_anchor": 1000000,
+      "reality_thread": 100000,
+      "quantum_processor": 1000000000
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 0.00001,
+    "failureTimeYears": 100000000,
+    "militaryValue": 100,
+    "economicValue": 100,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.0001,
+    "vulnerableTo": ["vacuum_decay", "dimensional_rupture", "false_vacuum_transition"]
+  },
+  "reality_anchor": {
+    "id": "reality_anchor",
+    "name": "Reality Anchor",
+    "category": "transcendent",
+    "tier": "galaxy",
+    "techLevelRequired": 10.5,
+    "totalMass": 0,
+    "constructionTimeYears": 10000000,
+    "laborRequired": 1000000000000000,
+    "resources": {
+      "timeline_anchor": 1000000000000000,
+      "reality_thread": 100000000000000,
+      "probability_lens": 10000000000,
+      "quantum_processor": 10000000000000,
+      "soul_anchor": 1000000000,
+      "coherence_crystal": 10000000000
+    },
+    "prerequisites": {
+      "research": ["timeline_stabilization", "probability_manipulation", "quantum_immortality", "multiversal_anchoring"],
+      "techLevel": 10.5
+    },
+    "phases": [
+      {
+        "name": "Timeline Network",
+        "durationPercent": 30,
+        "resourcePercent": 35,
+        "description": "Identify and connect parallel timelines"
+      },
+      {
+        "name": "Anchor Placement",
+        "durationPercent": 40,
+        "resourcePercent": 45,
+        "description": "Deploy anchors across timelines"
+      },
+      {
+        "name": "Coherence Field",
+        "durationPercent": 20,
+        "resourcePercent": 15,
+        "description": "Stabilize probability waves"
+      },
+      {
+        "name": "Eternal Maintenance",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Establish self-sustaining protection"
+      }
+    ],
+    "capabilities": {
+      "defenseRating": 100,
+      "timelineManipulation": true,
+      "realityManipulation": true,
+      "computationalPower": 1e70
+    },
+    "maintenancePerYear": {
+      "timeline_anchor": 100000000000,
+      "reality_thread": 10000000000,
+      "probability_lens": 1000000
+    },
+    "energyMaintenancePerYear": 0,
+    "degradationRate": 0.000001,
+    "failureTimeYears": 1000000000,
+    "militaryValue": 100,
+    "economicValue": 100,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.00001,
+    "vulnerableTo": ["timeline_pruning", "quantum_decoherence", "paradox_cascade"]
+  },
+  "dimensional_gate": {
+    "id": "dimensional_gate",
+    "name": "Dimensional Gate",
+    "category": "transcendent",
+    "tier": "galaxy",
+    "techLevelRequired": 10.5,
+    "totalMass": 1e19,
+    "constructionTimeYears": 100000,
+    "laborRequired": 10000000000000,
+    "resources": {
+      "neutronium_core": 100000000000,
+      "quantum_processor": 10000000000000,
+      "timeline_anchor": 10000000000,
+      "reality_thread": 10000000000000,
+      "probability_lens": 1000000000,
+      "void_capacitor": 100000000000,
+      "observation_nullifier": 1000000000
+    },
+    "prerequisites": {
+      "research": ["dimensional_physics", "brane_engineering", "extra_dimensional_access", "membrane_puncture"],
+      "techLevel": 10.5
+    },
+    "phases": [
+      {
+        "name": "Dimensional Probe",
+        "durationPercent": 25,
+        "resourcePercent": 20,
+        "description": "Detect and map adjacent dimensions"
+      },
+      {
+        "name": "Brane Puncture",
+        "durationPercent": 35,
+        "resourcePercent": 45,
+        "description": "Create stable opening in dimensional membrane"
+      },
+      {
+        "name": "Gate Stabilization",
+        "durationPercent": 30,
+        "resourcePercent": 30,
+        "description": "Maintain connection to other dimension"
+      },
+      {
+        "name": "Transit Systems",
+        "durationPercent": 10,
+        "resourcePercent": 5,
+        "description": "Safe passage mechanisms"
+      }
+    ],
+    "capabilities": {
+      "transportCapacity": 1000000000000000,
+      "defenseRating": 70,
+      "energyOutput": 0,
+      "realityManipulation": true,
+      "communicationRange": 1000000
+    },
+    "maintenancePerYear": {
+      "reality_thread": 1000000000,
+      "timeline_anchor": 100000000,
+      "quantum_processor": 1000000000,
+      "void_capacitor": 10000000
+    },
+    "energyMaintenancePerYear": 1000000000000000,
+    "degradationRate": 0.1,
+    "failureTimeYears": 10000,
+    "militaryValue": 95,
+    "economicValue": 95,
+    "culturalValue": 100,
+    "collapseRiskBase": 0.05,
+    "vulnerableTo": ["dimensional_collapse", "brane_rupture", "exotic_entity_incursion"]
+  }
+}

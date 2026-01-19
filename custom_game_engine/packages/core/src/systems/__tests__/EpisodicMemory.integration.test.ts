@@ -33,7 +33,7 @@ describe('Episodic Memory Integration', () => {
     // Create agent with episodic memory component
     agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(new EpisodicMemoryComponent());
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create memory systems
     memoryFormationSystem = new MemoryFormationSystem(eventBus);
@@ -77,7 +77,7 @@ describe('Episodic Memory Integration', () => {
       // Create second agent (conversation partner)
       const listener = new EntityImpl(createEntityId(), 0);
       listener.addComponent(new EpisodicMemoryComponent());
-      (world as any)._addEntity(listener);
+      world.addEntity(listener);
 
       // Fire conversation event
       eventBus.emit({
@@ -493,7 +493,7 @@ describe('Episodic Memory Integration', () => {
       // Create second agent
       const agent2 = new EntityImpl(createEntityId(), 0);
       agent2.addComponent(new EpisodicMemoryComponent());
-      (world as any)._addEntity(agent2);
+      world.addEntity(agent2);
 
       // Fire events for different agents
       eventBus.emit({

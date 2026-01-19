@@ -17,7 +17,7 @@ function createTestAgent(world: WorldImpl, name: string, x: number, y: number): 
   (entity as any).addComponent(createVisionComponent(10)); // 10 tile vision/hearing range
 
   // Add entity to world using internal method (same pattern as AgentEntity.ts:69)
-  (world as any)._addEntity(entity);
+  world.addEntity(entity);
   return entity;
 }
 

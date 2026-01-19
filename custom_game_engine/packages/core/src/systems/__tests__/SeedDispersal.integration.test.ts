@@ -107,7 +107,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       x: 10,
       y: 10
     });
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     // Listen for seed:dispersed events
     const dispersedEvents: any[] = [];
@@ -185,7 +185,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       x: 15,
       y: 15
     });
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     const dispersedEvents: any[] = [];
     eventBus.subscribe('seed:dispersed', (event) => {
@@ -262,7 +262,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       x: 20,
       y: 20
     });
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     const dispersedEvents: any[] = [];
     eventBus.subscribe('seed:dispersed', (event) => {
@@ -326,7 +326,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       x: 25,
       y: 25
     });
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     // This mimics the event handler in main.ts
     eventBus.subscribe('seed:dispersed', (event: any) => {
@@ -393,7 +393,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
       x: 30,
       y: 30
     });
-    (world as any)._addEntity(entity);
+    world.addEntity(entity);
 
     const dispersedEvents: any[] = [];
     eventBus.subscribe('seed:dispersed', (event) => {

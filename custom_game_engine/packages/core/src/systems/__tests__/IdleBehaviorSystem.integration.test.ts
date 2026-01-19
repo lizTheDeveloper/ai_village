@@ -52,7 +52,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviors = new Set<string>();
     const behaviorCounts: Record<string, number> = {};
@@ -102,7 +102,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviorCounts: Record<string, number> = {};
 
@@ -146,7 +146,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviorCounts: Record<string, number> = {};
 
@@ -191,7 +191,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(memory);
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviorCounts: Record<string, number> = {};
 
@@ -238,7 +238,7 @@ describe('IdleBehaviorSystem Integration', () => {
     const queue = new ActionQueue(agent.id);
     queue.enqueue({ type: 'gather', priority: 0.8 }); // Already has an action
     agent.addComponent(queue);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const initialQueueSize = queue.size();
 
@@ -281,7 +281,7 @@ describe('IdleBehaviorSystem Integration', () => {
     });
     agent.addComponent(goals);
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviorCounts: Record<string, number> = {};
 
@@ -323,7 +323,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const behaviors = new Set<string>();
 

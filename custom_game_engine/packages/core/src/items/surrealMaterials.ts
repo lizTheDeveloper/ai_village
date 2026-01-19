@@ -2,17 +2,14 @@
  * Surreal Material Item Definitions
  *
  * Building materials for generative cities from GENERATIVE_CITIES_SPEC.md
- * Includes 31 unique materials with special properties, acquisition methods,
+ * Includes 71 unique materials with special properties, acquisition methods,
  * and magic system integration.
  *
- * NOTE: These materials are intentionally not exported yet per user requirements.
- * TS6133 "unused variable" warnings are expected and will be resolved when
- * these items are exported and integrated with the item system.
+ * This module loads material definitions from JSON and converts them to ItemDefinition objects.
  */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// @ts-nocheck - materials not exported yet, intentional unused vars
 
 import { defineItem, type ItemDefinition } from './ItemDefinition.js';
+import surrealMaterialsData from '../../data/surreal-materials.json' assert { type: 'json' };
 
 // ============================================================================
 // SURREAL MATERIALS - Living

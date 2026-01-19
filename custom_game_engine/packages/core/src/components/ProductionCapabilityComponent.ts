@@ -164,6 +164,23 @@ export function createProductionCapabilityComponent(
 // ============================================================================
 
 /**
+ * Precomputed tier lookup for tech levels 1-10.
+ * Avoids branch mispredictions from if-chain.
+ */
+const TECH_LEVEL_TO_TIER: readonly ProductionTier[] = [
+  0, // Tech 1
+  0, // Tech 2
+  0, // Tech 3
+  1, // Tech 4
+  1, // Tech 5
+  1, // Tech 6
+  2, // Tech 7
+  3, // Tech 8
+  4, // Tech 9
+  4, // Tech 10
+];
+
+/**
  * Determine production tier from technology level.
  *
  * Tier 0: Tech 1-3 (Manual Crafting)
@@ -171,18 +188,63 @@ export function createProductionCapabilityComponent(
  * Tier 2: Tech 7-8 (Factory Automation)
  * Tier 3: Tech 8-9 (Planetary Industry)
  * Tier 4: Tech 9-10 (Dyson-Powered)
+ *
+ * Performance: O(1) array lookup instead of if-chain.
  */
 export function getTierFromTechLevel(techLevel: number): ProductionTier {
-  if (techLevel >= 9) return 4; // Dyson-powered
-  if (techLevel >= 8) return 3; // Planetary industry
-  if (techLevel >= 7) return 2; // Factory automation
-  if (techLevel >= 4) return 1; // Workshop production
-  return 0; // Manual crafting
+  const level = Math.max(1, Math.min(10, techLevel | 0));
+  return TECH_LEVEL_TO_TIER[level - 1];
 }
 
 // ============================================================================
 // MULTIPLIER CALCULATION
 // ============================================================================
+
+// ============================================================================
+// PERFORMANCE OPTIMIZATIONS
+// ============================================================================
+
+/**
+ * Precomputed tech multipliers for techLevel 1-10.
+ * techMultiplier = 10^(techLevel - 1)
+ * Avoids Math.pow() in hot path.
+ */
+const TECH_MULTIPLIERS: readonly number[] = [
+  1,          // Tech 1: 10^0 = 1
+  10,         // Tech 2: 10^1 = 10
+  100,        // Tech 3: 10^2 = 100
+  1000,       // Tech 4: 10^3 = 1,000
+  10000,      // Tech 5: 10^4 = 10,000
+  100000,     // Tech 6: 10^5 = 100,000
+  1000000,    // Tech 7: 10^6 = 1,000,000
+  10000000,   // Tech 8: 10^7 = 10,000,000
+  100000000,  // Tech 9: 10^8 = 100,000,000
+  1000000000, // Tech 10: 10^9 = 1,000,000,000
+];
+
+/**
+ * Fast log10 approximation using lookup table.
+ * Precomputed for populations 0-10,000 (covers most early-game scenarios).
+ */
+const LOG10_CACHE_SIZE = 10001;
+const LOG10_CACHE: Float32Array = new Float32Array(LOG10_CACHE_SIZE);
+
+// Initialize log10 cache
+for (let i = 0; i < LOG10_CACHE_SIZE; i++) {
+  LOG10_CACHE[i] = Math.log10(i + 1);
+}
+
+/**
+ * Fast log10 calculation with cache for small values.
+ * Falls back to Math.log10 for large populations.
+ */
+function fastLog10(value: number): number {
+  const n = (value + 1) | 0; // Fast floor
+  if (n < LOG10_CACHE_SIZE) {
+    return LOG10_CACHE[n];
+  }
+  return Math.log10(value + 1);
+}
 
 /**
  * Calculate total production multiplier from civilization stats.
@@ -191,10 +253,15 @@ export function getTierFromTechLevel(techLevel: number): ProductionTier {
  * totalMultiplier = techMultiplier * popMultiplier * industryMultiplier * dysonMultiplier
  *
  * Where:
- * - techMultiplier = 10^(techLevel - 1)
- * - popMultiplier = log10(population + 1)
+ * - techMultiplier = 10^(techLevel - 1) [precomputed]
+ * - popMultiplier = log10(population + 1) [cached for small populations]
  * - industryMultiplier = 1 + industrialization
  * - dysonMultiplier = 1 + dysonSwarmProgress * 1000
+ *
+ * Performance optimizations:
+ * - Precomputed tech multipliers (avoid Math.pow)
+ * - Fast log10 with lookup table
+ * - Zero allocations
  *
  * @param component - Production capability component
  * @returns Total production multiplier
@@ -202,8 +269,14 @@ export function getTierFromTechLevel(techLevel: number): ProductionTier {
 export function calculateProductionMultiplier(
   component: ProductionCapabilityComponent
 ): number {
-  const techMultiplier = Math.pow(10, component.techLevel - 1);
-  const popMultiplier = Math.log10(component.population + 1);
+  // Use precomputed tech multiplier (avoid Math.pow)
+  const techLevel = Math.max(1, Math.min(10, component.techLevel | 0));
+  const techMultiplier = TECH_MULTIPLIERS[techLevel - 1];
+
+  // Fast log10 with cache
+  const popMultiplier = fastLog10(component.population);
+
+  // Direct calculations (no allocations)
   const industryMultiplier = 1 + component.industrialization;
   const dysonMultiplier = 1 + component.dysonSwarmProgress * 1000;
 

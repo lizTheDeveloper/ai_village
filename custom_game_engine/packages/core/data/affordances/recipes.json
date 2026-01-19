@@ -1,0 +1,89 @@
+{
+  "stone_axe": {
+    "id": "stone_axe",
+    "name": "Craft Stone Axe",
+    "description": "Create a basic axe for chopping wood",
+    "inputs": [
+      { "resourceId": "stone", "amount": 2 },
+      { "resourceId": "wood", "amount": 3 },
+      { "resourceId": "fiber", "amount": 1 }
+    ],
+    "output": { "itemId": "axe", "amount": 1 },
+    "station": null,
+    "craftingTime": 5,
+    "provides": "Enables wood gathering from trees"
+  },
+  "stone_pickaxe": {
+    "id": "stone_pickaxe",
+    "name": "Craft Stone Pickaxe",
+    "description": "Create a basic pickaxe for mining",
+    "inputs": [
+      { "resourceId": "stone", "amount": 3 },
+      { "resourceId": "wood", "amount": 2 }
+    ],
+    "output": { "itemId": "pickaxe", "amount": 1 },
+    "station": null,
+    "craftingTime": 5,
+    "provides": "Enables stone gathering and ore mining"
+  },
+  "wooden_hammer": {
+    "id": "wooden_hammer",
+    "name": "Craft Wooden Hammer",
+    "description": "Create a basic hammer for building",
+    "inputs": [
+      { "resourceId": "wood", "amount": 5 }
+    ],
+    "output": { "itemId": "hammer", "amount": 1 },
+    "station": null,
+    "craftingTime": 3,
+    "provides": "Enables construction of buildings"
+  },
+  "cloth": {
+    "id": "cloth",
+    "name": "Weave Cloth",
+    "description": "Weave plant fiber into cloth",
+    "inputs": [
+      { "resourceId": "fiber", "amount": 3 }
+    ],
+    "output": { "itemId": "cloth", "amount": 1 },
+    "station": null,
+    "craftingTime": 10,
+    "provides": "Creates cloth for tents and clothing"
+  },
+  "iron_ingot": {
+    "id": "iron_ingot",
+    "name": "Smelt Iron",
+    "description": "Smelt iron ore into usable ingots",
+    "inputs": [
+      { "resourceId": "iron_ore", "amount": 3 }
+    ],
+    "output": { "itemId": "iron_ingot", "amount": 1 },
+    "station": "forge",
+    "craftingTime": 20,
+    "provides": "Refines ore into metal for crafting"
+  },
+  "cooked_meat": {
+    "id": "cooked_meat",
+    "name": "Cook Meat",
+    "description": "Cook raw meat over fire",
+    "inputs": [
+      { "resourceId": "raw_meat", "amount": 1 }
+    ],
+    "output": { "itemId": "cooked_meat", "amount": 1 },
+    "station": "campfire",
+    "craftingTime": 15,
+    "provides": "Safe, nutritious food that restores more hunger"
+  },
+  "bread": {
+    "id": "bread",
+    "name": "Bake Bread",
+    "description": "Bake wheat into bread",
+    "inputs": [
+      { "resourceId": "wheat", "amount": 3 }
+    ],
+    "output": { "itemId": "bread", "amount": 1 },
+    "station": null,
+    "craftingTime": 10,
+    "provides": "Filling food from harvested wheat"
+  }
+}

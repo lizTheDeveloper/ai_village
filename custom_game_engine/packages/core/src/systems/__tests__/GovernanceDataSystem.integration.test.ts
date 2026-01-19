@@ -38,13 +38,13 @@ describe('GovernanceDataSystem Integration', () => {
       const townHall = new EntityImpl(createEntityId(), 0);
       townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall);
+      world.addEntity(townHall);
 
       // Create 3 agents with identity
       for (let i = 0; i < 3; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, i));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Run system
@@ -65,7 +65,7 @@ describe('GovernanceDataSystem Integration', () => {
       buildingComp.condition = 60;
       townHall.addComponent(buildingComp);
       townHall.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall);
+      world.addEntity(townHall);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -83,7 +83,7 @@ describe('GovernanceDataSystem Integration', () => {
       buildingComp.condition = 40;
       townHall.addComponent(buildingComp);
       townHall.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall);
+      world.addEntity(townHall);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -104,7 +104,7 @@ describe('GovernanceDataSystem Integration', () => {
       const townHall = new EntityImpl(createEntityId(), 0);
       townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall.addComponent(createTownHallComponent());
-      (world as any)._addEntity(townHall);
+      world.addEntity(townHall);
 
       // Trigger death event (recorded immediately in event handler)
       eventBus.emitImmediate({
@@ -129,13 +129,13 @@ describe('GovernanceDataSystem Integration', () => {
       const bureau = new EntityImpl(createEntityId(), 0);
       bureau.addComponent(createBuildingComponent(BuildingType.CensusBureau, 1, 100));
       bureau.addComponent(createCensusBureauComponent());
-      (world as any)._addEntity(bureau);
+      world.addEntity(bureau);
 
       // Create agents
       for (let i = 0; i < 5; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, 0));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Trigger death event (recorded immediately in event handler)
@@ -161,13 +161,13 @@ describe('GovernanceDataSystem Integration', () => {
       const bureau = new EntityImpl(createEntityId(), 0);
       bureau.addComponent(createBuildingComponent(BuildingType.CensusBureau, 1, 100));
       bureau.addComponent(createCensusBureauComponent());
-      (world as any)._addEntity(bureau);
+      world.addEntity(bureau);
 
       // Create only 8 agents (below 10 threshold)
       for (let i = 0; i < 8; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, 0));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Run system
@@ -185,7 +185,7 @@ describe('GovernanceDataSystem Integration', () => {
       buildingComp.currentStaff = ['staff-agent-id'];
       bureau.addComponent(buildingComp);
       bureau.addComponent(createCensusBureauComponent());
-      (world as any)._addEntity(bureau);
+      world.addEntity(bureau);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -203,7 +203,7 @@ describe('GovernanceDataSystem Integration', () => {
       buildingComp.currentStaff = [];
       bureau.addComponent(buildingComp);
       bureau.addComponent(createCensusBureauComponent());
-      (world as any)._addEntity(bureau);
+      world.addEntity(bureau);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -222,7 +222,7 @@ describe('GovernanceDataSystem Integration', () => {
       const clinic = new EntityImpl(createEntityId(), 0);
       clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
-      (world as any)._addEntity(clinic);
+      world.addEntity(clinic);
 
       // Create healthy agent (hunger=80, energy=80)
       const healthyAgent = new EntityImpl(createEntityId(), 0);
@@ -275,7 +275,7 @@ describe('GovernanceDataSystem Integration', () => {
       const clinic = new EntityImpl(createEntityId(), 0);
       clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
-      (world as any)._addEntity(clinic);
+      world.addEntity(clinic);
 
       // Create malnourished agents (hunger < 30)
       for (let i = 0; i < 3; i++) {
@@ -288,7 +288,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   })); // Low hunger
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Create healthy agent
@@ -316,13 +316,13 @@ describe('GovernanceDataSystem Integration', () => {
       const clinic = new EntityImpl(createEntityId(), 0);
       clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
-      (world as any)._addEntity(clinic);
+      world.addEntity(clinic);
 
       // Create agents and record deaths
       for (let i = 0; i < 5; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`DeadAgent${i}`, 5, 0));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Trigger 3 starvation deaths and 2 collapsed deaths (recorded immediately in event handlers)
@@ -367,7 +367,7 @@ describe('GovernanceDataSystem Integration', () => {
       const clinic = new EntityImpl(createEntityId(), 0);
       clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
-      (world as any)._addEntity(clinic);
+      world.addEntity(clinic);
 
       // Create 45 agents (should recommend 3 staff: 1 per 20 agents)
       for (let i = 0; i < 45; i++) {
@@ -380,7 +380,7 @@ describe('GovernanceDataSystem Integration', () => {
     thirst: 0.0,
     temperature: 0.0,
   }));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Run system
@@ -398,7 +398,7 @@ describe('GovernanceDataSystem Integration', () => {
       buildingComp.currentStaff = ['healer-agent-id'];
       clinic.addComponent(buildingComp);
       clinic.addComponent(createHealthClinicComponent());
-      (world as any)._addEntity(clinic);
+      world.addEntity(clinic);
 
       // Run system
       system.update(world, [], TEST_TICK);
@@ -503,7 +503,7 @@ describe('GovernanceDataSystem Integration', () => {
       for (let i = 0; i < 3; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, 0));
-        (world as any)._addEntity(agent);
+        world.addEntity(agent);
       }
 
       // Run system

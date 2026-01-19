@@ -51,7 +51,7 @@ describe('InjurySystem Integration', () => {
         treated: false,
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Run the system
     const system = new InjurySystem();
@@ -98,7 +98,7 @@ describe('InjurySystem Integration', () => {
         treated: false,
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
     system.update(world, [agent], 1);
@@ -147,7 +147,7 @@ describe('InjurySystem Integration', () => {
         treated: false,
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const initialNeeds = agent.getComponent('needs') as any;
     const initialHungerRate = initialNeeds.hungerDecayRate;
@@ -199,7 +199,7 @@ describe('InjurySystem Integration', () => {
         treated: false,
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
     system.update(world, [agent], 1);
@@ -236,7 +236,7 @@ describe('InjurySystem Integration', () => {
         treated: true, // Minor injuries can heal on their own
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
 
@@ -294,7 +294,7 @@ describe('InjurySystem Integration', () => {
         treated: false,
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
     system.update(world, [agent], 1);
@@ -374,7 +374,7 @@ describe('InjurySystem Integration', () => {
         ],
       })
     );
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
     system.update(world, [agent], 1);
@@ -421,7 +421,7 @@ describe('InjurySystem Integration', () => {
       severity: 'major',
       location: 'arms',
     });
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const system = new InjurySystem();
 

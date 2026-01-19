@@ -129,7 +129,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(10, 18, 24, 0, 35));
       agent.addComponent(createPositionComponent(0, 0));
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       // Run temperature system
       const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
@@ -145,7 +145,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       // Create very cold weather to force dangerous temperatures
       const worldEntity = new EntityImpl(createEntityId(), world.tick);
       worldEntity.addComponent(createWeatherComponent('storm', 1.0, 0, -30, 1.0)); // Extreme cold modifier
-      world._addEntity(worldEntity);
+      world.addEntity(worldEntity);
 
       // Create agent with very narrow tolerance range
       const agent = new EntityImpl(createEntityId(), world.tick);
@@ -158,7 +158,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
     thirst: 1.0,
     temperature: 1.0,
   }));
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       const initialHealth = 100;
 
@@ -179,13 +179,13 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       const campfire = new EntityImpl(createEntityId(), world.tick);
       campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100)); // Complete campfire
       campfire.addComponent(createPositionComponent(0, 0));
-      world._addEntity(campfire);
+      world.addEntity(campfire);
 
       // Create agent 2 tiles away
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(10, 18, 24, 0, 35));
       agent.addComponent(createPositionComponent(2, 0));
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       // Run temperature system
       const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
@@ -203,13 +203,13 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       const tent = new EntityImpl(createEntityId(), world.tick);
       tent.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100)); // Complete tent
       tent.addComponent(createPositionComponent(0, 0));
-      world._addEntity(tent);
+      world.addEntity(tent);
 
       // Create agent inside tent (distance < interiorRadius)
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(5, 18, 24, 0, 35));
       agent.addComponent(createPositionComponent(1, 0)); // 1 tile away, inside interior
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       // Run temperature system
       const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
@@ -228,7 +228,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       // Create world entity with weather
       const worldEntity = new EntityImpl(createEntityId(), world.tick);
       worldEntity.addComponent(createWeatherComponent('clear', 1.0, 0));
-      world._addEntity(worldEntity);
+      world.addEntity(worldEntity);
 
       // Run weather system
       const entities = world.query().with(ComponentType.Weather).executeEntities();
@@ -244,13 +244,13 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       // Create snowy weather (-8°C modifier)
       const worldEntity = new EntityImpl(createEntityId(), world.tick);
       worldEntity.addComponent(createWeatherComponent('snow', 1.0, 100)); // Set long duration
-      world._addEntity(worldEntity);
+      world.addEntity(worldEntity);
 
       // Create agent
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(20, 18, 24, 0, 35));
       agent.addComponent(createPositionComponent(0, 0));
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       // Run temperature system (don't run weather system to avoid random transitions)
       const tempEntities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
@@ -275,13 +275,13 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       // Setup snowy weather
       const worldEntity = new EntityImpl(createEntityId(), world.tick);
       worldEntity.addComponent(createWeatherComponent('snow', 1.0, 100));
-      world._addEntity(worldEntity);
+      world.addEntity(worldEntity);
 
       // Create agent
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(20, 18, 24, 0, 35));
       agent.addComponent(createPositionComponent(0, 0));
-      world._addEntity(agent);
+      world.addEntity(agent);
 
       // Run weather system first
       const weatherEntities = world.query().with(ComponentType.Weather).executeEntities();

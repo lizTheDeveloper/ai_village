@@ -49,13 +49,13 @@ describe('Divinity + Body Parts Integration', () => {
     deityComp.identity.domain = 'healing';
     deityComp.belief.currentBelief = 5000; // Lots of belief to spend
     deity.addComponent(deityComp);
-    (world as any)._addEntity(deity);
+    world.addEntity(deity);
 
     // Create believer entity with body
     believer = new EntityImpl('believer_1');
     believerBody = createBodyComponentFromPlan('humanoid_standard', 'human');
     believer.addComponent(believerBody);
-    (world as any)._addEntity(believer);
+    world.addEntity(believer);
 
     // Make believer believe in deity
     deityComp.addBeliever(believer.id);

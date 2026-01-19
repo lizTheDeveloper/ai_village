@@ -23,7 +23,7 @@ describe('SleepSystem Integration', () => {
     const world = new WorldImpl(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1)); // 6 AM, 48s/day, 1x speed
-    (world as any)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     // Create agent
     const agent = new EntityImpl(createEntityId(), 0);
@@ -36,7 +36,7 @@ describe('SleepSystem Integration', () => {
     energyDecayRate: 0.5,
   })); // full energy
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create and wire StateMutatorSystem (required for SleepSystem)
     const stateMutator = new StateMutatorSystem();
@@ -69,7 +69,7 @@ describe('SleepSystem Integration', () => {
     const world = new WorldImpl(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1));
-    (world as any)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createCircadianComponent());
@@ -81,7 +81,7 @@ describe('SleepSystem Integration', () => {
     energyDecayRate: 0.5,
   })); // LOW energy (25)
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create and wire StateMutatorSystem (required for SleepSystem)
     const stateMutator = new StateMutatorSystem();
@@ -114,7 +114,7 @@ describe('SleepSystem Integration', () => {
     const world = new WorldImpl(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1)); // 10 PM (night)
-    (world as any)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
@@ -131,7 +131,7 @@ describe('SleepSystem Integration', () => {
     energyDecayRate: 0.5,
   })); // Half energy
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create and wire StateMutatorSystem (required for SleepSystem)
     const stateMutator = new StateMutatorSystem();
@@ -164,7 +164,7 @@ describe('SleepSystem Integration', () => {
     const world = new WorldImpl(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1));
-    (world as any)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
@@ -181,7 +181,7 @@ describe('SleepSystem Integration', () => {
     energyDecayRate: 0.5,
   })); // Very low energy
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create and wire StateMutatorSystem (required for SleepSystem)
     const stateMutator = new StateMutatorSystem();
@@ -215,7 +215,7 @@ describe('SleepSystem Integration', () => {
     const world = new WorldImpl(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1));
-    (world as any)._addEntity(timeEntity);
+    world.addEntity(timeEntity);
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
@@ -231,7 +231,7 @@ describe('SleepSystem Integration', () => {
     energyDecayRate: 0.5,
   }));
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create and wire StateMutatorSystem (required for SleepSystem)
     const stateMutator = new StateMutatorSystem();

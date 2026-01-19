@@ -578,13 +578,8 @@ export class ReincarnationSystem extends BaseSystem {
     // Realm location - start in mortal realm
     newEntity.addComponent(createRealmLocationComponent('mortal'));
 
-    // Add entity to world using private _addEntity method
-    // This is necessary because we're creating a fully-formed entity with components
-    // rather than using the standard createEntity flow
-    interface WorldInternal {
-      _addEntity(entity: Entity): void;
-    }
-    (world as unknown as WorldInternal)._addEntity(newEntity);
+    // Add entity to world
+    world.addEntity(newEntity);
 
     // Emit reincarnation complete event
     this.events.emit('soul:reincarnated', {

@@ -37,7 +37,7 @@ describe('Targeting Integration Tests', () => {
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(20)); // 20 tile vision range
       agent.addComponent(new SpatialMemoryComponent());
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create several resources at different distances
       const createResource = (x: number, y: number, type: string, amount: number) => {
@@ -49,7 +49,7 @@ describe('Targeting Integration Tests', () => {
           harvestable: true,
           amount,
         });
-        (harness.world as any)._addEntity(resource);
+        harness.world.addEntity(resource);
         return resource;
       };
 
@@ -108,7 +108,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(30));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Close resource with small amount
       const closeSmall = new EntityImpl(createEntityId(), 0);
@@ -119,7 +119,7 @@ describe('Targeting Integration Tests', () => {
         harvestable: true,
         amount: 10,
       });
-      (harness.world as any)._addEntity(closeSmall);
+      harness.world.addEntity(closeSmall);
 
       // Far resource with large amount
       const farLarge = new EntityImpl(createEntityId(), 0);
@@ -130,7 +130,7 @@ describe('Targeting Integration Tests', () => {
         harvestable: true,
         amount: 100,
       });
-      (harness.world as any)._addEntity(farLarge);
+      harness.world.addEntity(farLarge);
 
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenResources = [closeSmall.id, farLarge.id];
@@ -152,7 +152,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(50));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Full storage
       const fullStorage = new EntityImpl(createEntityId(), 0);
@@ -164,7 +164,7 @@ describe('Targeting Integration Tests', () => {
         capacity: 10,
         storedItems: Array(10).fill('item'),
       });
-      (harness.world as any)._addEntity(fullStorage);
+      harness.world.addEntity(fullStorage);
 
       // Available storage (farther)
       const availableStorage = new EntityImpl(createEntityId(), 0);
@@ -176,7 +176,7 @@ describe('Targeting Integration Tests', () => {
         capacity: 20,
         storedItems: ['item1', 'item2'],
       });
-      (harness.world as any)._addEntity(availableStorage);
+      harness.world.addEntity(availableStorage);
 
       // Find storage with capacity - should skip full one
       const storage = buildingTargeting.findNearest(agent, harness.world, {
@@ -197,7 +197,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(50));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Cold structure (no warmth)
       const coldBuilding = new EntityImpl(createEntityId(), 0);
@@ -209,7 +209,7 @@ describe('Targeting Integration Tests', () => {
         warmthBonus: 0,
         insulation: 0,
       });
-      (harness.world as any)._addEntity(coldBuilding);
+      harness.world.addEntity(coldBuilding);
 
       // Warm cabin (farther but warm)
       const warmCabin = new EntityImpl(createEntityId(), 0);
@@ -221,7 +221,7 @@ describe('Targeting Integration Tests', () => {
         warmthBonus: 15,
         insulation: 0.8,
       });
-      (harness.world as any)._addEntity(warmCabin);
+      harness.world.addEntity(warmCabin);
 
       // Find warm shelter
       const shelter = buildingTargeting.findNearest(agent, harness.world, {
@@ -250,7 +250,7 @@ describe('Targeting Integration Tests', () => {
         behavior: 'idle',
       });
       mainAgent.addComponent(createIdentityComponent('Alice'));
-      (harness.world as any)._addEntity(mainAgent);
+      harness.world.addEntity(mainAgent);
 
       // Busy agent (in conversation)
       const busyAgent = new EntityImpl(createEntityId(), 0);
@@ -270,7 +270,7 @@ describe('Targeting Integration Tests', () => {
         lastMessageAt: 0,
         isActive: true,
       });
-      (harness.world as any)._addEntity(busyAgent);
+      harness.world.addEntity(busyAgent);
 
       // Available agent (farther)
       const availableAgent = new EntityImpl(createEntityId(), 0);
@@ -281,7 +281,7 @@ describe('Targeting Integration Tests', () => {
         behavior: 'wander',
       });
       availableAgent.addComponent(createIdentityComponent('Carol'));
-      (harness.world as any)._addEntity(availableAgent);
+      harness.world.addEntity(availableAgent);
 
       const vision = mainAgent.getComponent(ComponentType.Vision) as any;
       vision.seenAgents = [mainAgent.id, busyAgent.id, availableAgent.id];
@@ -318,7 +318,7 @@ describe('Targeting Integration Tests', () => {
           [strangerId, { targetId: strangerId, familiarity: 10, lastInteraction: 0, interactionCount: 1, sharedMemories: 0 }],
         ]),
       });
-      (harness.world as any)._addEntity(mainAgent);
+      harness.world.addEntity(mainAgent);
 
       // Friend
       const friend = new EntityImpl(friendId, 0);
@@ -329,7 +329,7 @@ describe('Targeting Integration Tests', () => {
         behavior: 'wander',
       });
       friend.addComponent(createIdentityComponent('BestFriend'));
-      (harness.world as any)._addEntity(friend);
+      harness.world.addEntity(friend);
 
       // Stranger (closer but not a friend)
       const stranger = new EntityImpl(strangerId, 0);
@@ -340,7 +340,7 @@ describe('Targeting Integration Tests', () => {
         behavior: 'idle',
       });
       stranger.addComponent(createIdentityComponent('Stranger'));
-      (harness.world as any)._addEntity(stranger);
+      harness.world.addEntity(stranger);
 
       const vision = mainAgent.getComponent(ComponentType.Vision) as any;
       vision.seenAgents = [mainAgent.id, friend.id, stranger.id];
@@ -359,7 +359,7 @@ describe('Targeting Integration Tests', () => {
       const mainAgent = new EntityImpl(createEntityId(), 0);
       mainAgent.addComponent(createPositionComponent(0, 0));
       mainAgent.addComponent(createVisionComponent(20));
-      (harness.world as any)._addEntity(mainAgent);
+      harness.world.addEntity(mainAgent);
 
       // Other agent visible initially
       const otherAgent = new EntityImpl(createEntityId(), 0);
@@ -370,7 +370,7 @@ describe('Targeting Integration Tests', () => {
         behavior: 'wander',
       });
       otherAgent.addComponent(createIdentityComponent('Charlie'));
-      (harness.world as any)._addEntity(otherAgent);
+      harness.world.addEntity(otherAgent);
 
       const vision = mainAgent.getComponent(ComponentType.Vision) as any;
       vision.seenAgents = [otherAgent.id];
@@ -408,7 +408,7 @@ describe('Targeting Integration Tests', () => {
         speciesId: 'rabbit',
         isPredator: false,
       });
-      (harness.world as any)._addEntity(rabbit);
+      harness.world.addEntity(rabbit);
 
       // Predator (fox) approaching from the west
       const fox = new EntityImpl(createEntityId(), 0);
@@ -425,7 +425,7 @@ describe('Targeting Integration Tests', () => {
         velocityX: 2, // Moving east (toward rabbit)
         velocityY: 0,
       });
-      (harness.world as any)._addEntity(fox);
+      harness.world.addEntity(fox);
 
       const vision = rabbit.getComponent(ComponentType.Vision) as any;
       vision.seenAgents = [fox.id];
@@ -456,7 +456,7 @@ describe('Targeting Integration Tests', () => {
         speciesId: 'deer',
         isPredator: false,
       });
-      (harness.world as any)._addEntity(deer);
+      harness.world.addEntity(deer);
 
       // Fire hazard
       const fire = new EntityImpl(createEntityId(), 0);
@@ -466,7 +466,7 @@ describe('Targeting Integration Tests', () => {
         resourceType: 'fire',
         dangerLevel: 100,
       });
-      (harness.world as any)._addEntity(fire);
+      harness.world.addEntity(fire);
 
       const vision = deer.getComponent(ComponentType.Vision) as any;
       vision.seenResources = [fire.id];
@@ -494,7 +494,7 @@ describe('Targeting Integration Tests', () => {
         speciesId: 'chicken',
         isPredator: false,
       });
-      (harness.world as any)._addEntity(chicken);
+      harness.world.addEntity(chicken);
 
       // Predator from the north
       const hawk = new EntityImpl(createEntityId(), 0);
@@ -506,7 +506,7 @@ describe('Targeting Integration Tests', () => {
         preySpecies: ['chicken', 'rabbit'],
         threatLevel: 90,
       });
-      (harness.world as any)._addEntity(hawk);
+      harness.world.addEntity(hawk);
 
       // Predator from the east
       const fox = new EntityImpl(createEntityId(), 0);
@@ -518,7 +518,7 @@ describe('Targeting Integration Tests', () => {
         preySpecies: ['chicken', 'rabbit'],
         threatLevel: 70,
       });
-      (harness.world as any)._addEntity(fox);
+      harness.world.addEntity(fox);
 
       const vision = chicken.getComponent(ComponentType.Vision) as any;
       vision.seenAgents = [hawk.id, fox.id];
@@ -543,7 +543,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(30));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Berry bush (edible) - uses fruitCount for PlantTargeting
       // Note: 'blueberry-bush' is registered in plantRegistry as edible
@@ -557,7 +557,7 @@ describe('Targeting Integration Tests', () => {
         fruitCount: 5,
         seedsProduced: 0,
       });
-      (harness.world as any)._addEntity(berryBush);
+      harness.world.addEntity(berryBush);
 
       // Oak tree (not edible - no fruit for eating)
       const oakTree = new EntityImpl(createEntityId(), 0);
@@ -570,7 +570,7 @@ describe('Targeting Integration Tests', () => {
         fruitCount: 0,
         seedsProduced: 10, // Has seeds but not edible
       });
-      (harness.world as any)._addEntity(oakTree);
+      harness.world.addEntity(oakTree);
 
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenPlants = [berryBush.id, oakTree.id];
@@ -591,7 +591,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(50));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Young plant (no seeds yet)
       const youngPlant = new EntityImpl(createEntityId(), 0);
@@ -603,7 +603,7 @@ describe('Targeting Integration Tests', () => {
         fruitCount: 0,
         seedsProduced: 0,
       });
-      (harness.world as any)._addEntity(youngPlant);
+      harness.world.addEntity(youngPlant);
 
       // Mature plant (has seeds)
       const maturePlant = new EntityImpl(createEntityId(), 0);
@@ -615,7 +615,7 @@ describe('Targeting Integration Tests', () => {
         fruitCount: 0,
         seedsProduced: 3,
       });
-      (harness.world as any)._addEntity(maturePlant);
+      harness.world.addEntity(maturePlant);
 
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenPlants = [youngPlant.id, maturePlant.id];
@@ -637,7 +637,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(10));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create many resources scattered around
       const resources: EntityImpl[] = [];
@@ -650,7 +650,7 @@ describe('Targeting Integration Tests', () => {
           harvestable: true,
           amount: 50,
         });
-        (harness.world as any)._addEntity(resource);
+        harness.world.addEntity(resource);
         resources.push(resource);
       }
 
@@ -672,7 +672,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(10));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // No visible resources
       const vision = agent.getComponent(ComponentType.Vision) as any;
@@ -692,7 +692,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(10));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create visible resource
       const resource = new EntityImpl(createEntityId(), 0);
@@ -703,7 +703,7 @@ describe('Targeting Integration Tests', () => {
         harvestable: true,
         amount: 20,
       });
-      (harness.world as any)._addEntity(resource);
+      harness.world.addEntity(resource);
 
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenResources = [resource.id];
@@ -726,7 +726,7 @@ describe('Targeting Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(25, 25));
       agent.addComponent(createVisionComponent(50));
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create resources
       const wood = new EntityImpl(createEntityId(), 0);
@@ -737,7 +737,7 @@ describe('Targeting Integration Tests', () => {
         harvestable: true,
         amount: 100,
       });
-      (harness.world as any)._addEntity(wood);
+      harness.world.addEntity(wood);
 
       const food = new EntityImpl(createEntityId(), 0);
       food.addComponent(createPositionComponent(20, 25));
@@ -747,7 +747,7 @@ describe('Targeting Integration Tests', () => {
         harvestable: true,
         amount: 50,
       });
-      (harness.world as any)._addEntity(food);
+      harness.world.addEntity(food);
 
       // Create storage
       const storage = new EntityImpl(createEntityId(), 0);
@@ -759,7 +759,7 @@ describe('Targeting Integration Tests', () => {
         capacity: 50,
         storedItems: [],
       });
-      (harness.world as any)._addEntity(storage);
+      harness.world.addEntity(storage);
 
       const vision = agent.getComponent(ComponentType.Vision) as any;
       vision.seenResources = [wood.id, food.id];

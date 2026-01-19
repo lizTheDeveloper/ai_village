@@ -38,7 +38,7 @@ describe('TradingSystem Quality Integration', () => {
     agent.addComponent(agentInventory);
     agent.addComponent(createCurrencyComponent(1000)); // 1000 gold
     agent.addComponent(createPositionComponent(10, 10));
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Create shop
     shop = new EntityImpl(createEntityId(), 0);
@@ -48,7 +48,7 @@ describe('TradingSystem Quality Integration', () => {
     shop.addComponent(stockedShop);
     shop.addComponent(createCurrencyComponent(10000)); // Shop needs money to buy items
     shop.addComponent(createPositionComponent(10, 10)); // Same position
-    (world as any)._addEntity(shop);
+    world.addEntity(shop);
   });
 
   it('should apply quality multiplier when selling items', () => {

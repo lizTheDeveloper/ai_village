@@ -1,7 +1,6 @@
 import type { WorldMutator } from '@ai-village/core';
 import {
   EntityImpl,
-  WorldImpl,
   createEntityId,
   createPositionComponent,
   createPhysicsComponent,
@@ -56,8 +55,7 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
   }));
 
   // Add to world
-  // Cast required: WorldMutator interface doesn't expose _addEntity (internal method)
-  (world as WorldImpl)._addEntity(entity);
+  world.addEntity(entity);
 
   return entity.id;
 }

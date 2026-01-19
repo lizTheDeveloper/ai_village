@@ -72,6 +72,51 @@ export class ProductionScalingSystem extends BaseSystem {
     'manufacturing_hub',
   ]);
 
+  // ========== PERFORMANCE OPTIMIZATION CACHES ==========
+
+  /**
+   * Precomputed era-to-level lookup table.
+   * Avoids string comparisons and object lookups.
+   */
+  private readonly ERA_TO_LEVEL = new Map<string, number>([
+    ['paleolithic', 1],
+    ['neolithic', 2],
+    ['bronze_age', 3],
+    ['iron_age', 4],
+    ['medieval', 5],
+    ['renaissance', 6],
+    ['industrial', 7],
+    ['atomic', 8],
+    ['information', 8],
+    ['fusion', 9],
+    ['interplanetary', 9],
+    ['interstellar', 10],
+    ['transgalactic', 10],
+    ['post_singularity', 10],
+    ['transcendent', 10],
+  ]);
+
+  /**
+   * Cached building query (avoid re-query every update).
+   * Invalidated only when buildings change.
+   */
+  private cachedBuildings: ReadonlyArray<Entity> | null = null;
+  private cachedBuildingsTick: number = -1;
+  private readonly BUILDING_CACHE_INTERVAL = 200; // 10 seconds
+
+  /**
+   * Reusable stats object to avoid allocations.
+   */
+  private readonly statsWorkingBuffer = {
+    techLevel: 1,
+    population: 0,
+    industrialization: 0,
+    dysonSwarmProgress: 0,
+    factories: 0,
+    workers: 0,
+    automationLevel: 0,
+  };
+
   /**
    * Update production capability components.
    * Throttled to every 200 ticks (10 seconds) via throttleInterval.
@@ -173,6 +218,7 @@ export class ProductionScalingSystem extends BaseSystem {
 
   /**
    * Gather civilization statistics for production calculations.
+   * Uses reusable working buffer to avoid allocations.
    */
   private gatherCivilizationStats(
     world: World,
@@ -186,19 +232,20 @@ export class ProductionScalingSystem extends BaseSystem {
     workers: number;
     automationLevel: number;
   } {
-    // Default values
-    let techLevel = 1;
-    let population = 0;
-    let industrialization = 0;
-    let dysonSwarmProgress = 0;
-    let factories = 0;
-    let workers = 0;
-    let automationLevel = 0;
+    // Reuse working buffer (zero allocation)
+    const stats = this.statsWorkingBuffer;
+    stats.techLevel = 1;
+    stats.population = 0;
+    stats.industrialization = 0;
+    stats.dysonSwarmProgress = 0;
+    stats.factories = 0;
+    stats.workers = 0;
+    stats.automationLevel = 0;
 
     // Get tech level from TechnologyEraComponent (if present)
     const techEra = entity.getComponent<TechnologyEraComponent>(CT.TechnologyEra);
     if (techEra) {
-      techLevel = this.getTechLevelFromEra(techEra.currentEra);
+      stats.techLevel = this.getTechLevelFromEra(techEra.currentEra);
     }
 
     // Get population from CityDirectorComponent (if present)
@@ -206,62 +253,32 @@ export class ProductionScalingSystem extends BaseSystem {
       CT.CityDirector
     );
     if (cityDirector) {
-      population = cityDirector.stats.population;
+      stats.population = cityDirector.stats.population;
       // Estimate industrialization from production buildings
-      industrialization = Math.min(
-        10,
-        cityDirector.stats.productionBuildings / 10
-      );
+      // Use fast integer division: (buildings / 10) | 0
+      const rawIndustry = (cityDirector.stats.productionBuildings * 0.1) | 0;
+      stats.industrialization = Math.min(10, rawIndustry);
     }
 
-    // Count factories and automation level
-    const factoryStats = this.countFactoriesAndAutomation(world, entity);
-    factories = factoryStats.factories;
-    workers = factoryStats.workers;
-    automationLevel = factoryStats.automationLevel;
+    // Count factories and automation level (single-pass)
+    this.countFactoriesAndAutomationFast(world, entity, stats);
 
     // Check for Dyson swarm progress (custom component, if implemented)
     // TODO: Integrate with Dyson Sphere construction system when implemented
     // const dysonComponent = entity.getComponent<DysonSwarmComponent>(CT.DysonSwarm);
     // if (dysonComponent) {
-    //   dysonSwarmProgress = dysonComponent.completionProgress;
+    //   stats.dysonSwarmProgress = dysonComponent.completionProgress;
     // }
 
-    return {
-      techLevel,
-      population,
-      industrialization,
-      dysonSwarmProgress,
-      factories,
-      workers,
-      automationLevel,
-    };
+    return stats;
   }
 
   /**
    * Convert technology era to numeric tech level (1-10).
+   * Uses precomputed Map for O(1) lookup.
    */
   private getTechLevelFromEra(era: string): number {
-    // Map technology eras to numeric levels
-    const eraToLevel: Record<string, number> = {
-      paleolithic: 1,
-      neolithic: 2,
-      bronze_age: 3,
-      iron_age: 4,
-      medieval: 5,
-      renaissance: 6,
-      industrial: 7,
-      atomic: 8,
-      information: 8,
-      fusion: 9,
-      interplanetary: 9,
-      interstellar: 10,
-      transgalactic: 10,
-      post_singularity: 10,
-      transcendent: 10,
-    };
-
-    return eraToLevel[era] ?? 1;
+    return this.ERA_TO_LEVEL.get(era) ?? 1;
   }
 
   /**

@@ -126,15 +126,10 @@ export class WorldSerializer {
     const deserializedEntities = await this.deserializeEntities(snapshot.entities);
 
     // Add entities to world
-    // CRITICAL: Use _addEntity instead of _entities.set() to properly update the spatial chunk index
+    // CRITICAL: Use addEntity instead of _entities.set() to properly update the spatial chunk index
     // Without this, findNearestResources() returns empty arrays and NPCs can't find food/resources
-    // Type assertion: WorldImpl has _addEntity as an internal method
-    interface WorldImplInternal {
-      _addEntity(entity: Entity): void;
-    }
-
     for (const entity of deserializedEntities) {
-      (worldImpl as unknown as WorldImplInternal)._addEntity(entity);
+      world.addEntity(entity);
     }
 
     // Deserialize world state (terrain, weather, etc.)

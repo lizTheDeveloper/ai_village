@@ -1,0 +1,408 @@
+{
+  "buildings": [
+    {
+      "id": "small_house",
+      "name": "Small House",
+      "description": "Cozy single-room dwelling with bed and storage",
+      "category": "residential",
+      "tier": 1,
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 50 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 120,
+      "functionality": [
+        { "type": "sleeping", "restBonus": 10 }
+      ],
+      "capacity": 2,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#B.S#",
+        "W...D",
+        "#...#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Attic",
+          "layout": [
+            "#####",
+            "#S.S#",
+            "#...#",
+            "#...#",
+            "#####"
+          ],
+          "ceilingHeight": 2
+        }
+      ]
+    },
+    {
+      "id": "cozy_cottage",
+      "name": "Cozy Cottage",
+      "description": "Comfortable home with separate living and sleeping areas",
+      "category": "residential",
+      "tier": 2,
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 80 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 180,
+      "functionality": [
+        { "type": "sleeping", "restBonus": 10 }
+      ],
+      "capacity": 4,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "#B..S#",
+        "W....W",
+        "#T..T#",
+        "#....#",
+        "###D##"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Bedroom Loft",
+          "layout": [
+            "######",
+            "#B..B#",
+            "#....#",
+            "#.SS.#",
+            "#....#",
+            "######"
+          ],
+          "ceilingHeight": 3
+        }
+      ]
+    },
+    {
+      "id": "stone_house",
+      "name": "Stone House",
+      "description": "Durable dwelling with excellent insulation and stone construction",
+      "category": "residential",
+      "tier": 3,
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 60 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 200,
+      "functionality": [
+        { "type": "sleeping", "restBonus": 10 }
+      ],
+      "capacity": 3,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "WB.SW",
+        "#...#",
+        "#.T.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "stone",
+        "door": "stone"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Upper Chamber",
+          "layout": [
+            "#####",
+            "#S.S#",
+            "#...#",
+            "#...#",
+            "#####"
+          ],
+          "ceilingHeight": 3
+        }
+      ]
+    },
+    {
+      "id": "longhouse",
+      "name": "Longhouse",
+      "description": "Large communal dwelling for extended families or groups",
+      "category": "residential",
+      "tier": 3,
+      "width": 8,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 120 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 240,
+      "functionality": [
+        { "type": "sleeping", "restBonus": 10 },
+        { "type": "storage", "capacity": 100 }
+      ],
+      "capacity": 8,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "########",
+        "WB..T.BW",
+        "W.SS.S.W",
+        "####D###"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Sleeping Loft",
+          "layout": [
+            "########",
+            "#B.B.B.#",
+            "#......#",
+            "########"
+          ],
+          "ceilingHeight": 2
+        }
+      ]
+    },
+    {
+      "id": "workshop",
+      "name": "Workshop",
+      "description": "Crafting building with workstations and storage for materials",
+      "category": "production",
+      "tier": 2,
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 70 },
+        { "resourceId": "wood", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 200,
+      "functionality": [
+        { "type": "crafting", "recipes": [], "speed": 1.0 },
+        { "type": "storage", "capacity": 100 }
+      ],
+      "capacity": 4,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "WK.SW",
+        "#...#",
+        "#.T.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "stone",
+        "door": "stone"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Storage Loft",
+          "layout": [
+            "#####",
+            "#SSS#",
+            "#...#",
+            "#...#",
+            "#####"
+          ],
+          "ceilingHeight": 2
+        }
+      ]
+    },
+    {
+      "id": "barn",
+      "name": "Barn",
+      "description": "Large agricultural building for storage and animal husbandry",
+      "category": "farming",
+      "tier": 3,
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 150 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 300,
+      "functionality": [
+        { "type": "storage", "capacity": 100 },
+        { "type": "gathering_boost", "resourceTypes": ["food", "wood"], "radius": 10 }
+      ],
+      "capacity": 20,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "WS..SW",
+        "D.TT.D",
+        "WS..SW",
+        "######"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Hay Loft",
+          "layout": [
+            "######",
+            "#SSSS#",
+            "#....#",
+            "#SSSS#",
+            "######"
+          ],
+          "ceilingHeight": 4
+        }
+      ]
+    },
+    {
+      "id": "storage_shed",
+      "name": "Storage Shed",
+      "description": "Simple storage structure for basic item storage",
+      "category": "storage",
+      "tier": 1,
+      "width": 3,
+      "height": 2,
+      "resourceCost": [
+        { "resourceId": "wood", "amountRequired": 30 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 60,
+      "functionality": [
+        { "type": "storage", "capacity": 100 }
+      ],
+      "capacity": 10,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "###",
+        "D.S"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      }
+    },
+    {
+      "id": "guard_tower",
+      "name": "Guard Tower",
+      "description": "Defensive structure with visibility and height advantage",
+      "category": "community",
+      "tier": 2,
+      "width": 4,
+      "height": 4,
+      "resourceCost": [
+        { "resourceId": "stone", "amountRequired": 100 }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 250,
+      "functionality": [
+        { "type": "mood_aura", "moodBonus": 5, "radius": 10 }
+      ],
+      "capacity": 3,
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "####",
+        "WS.W",
+        "W..W",
+        "##D#"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "stone",
+        "door": "stone"
+      },
+      "floors": [
+        {
+          "level": 1,
+          "name": "Watch Level",
+          "layout": [
+            "####",
+            "W.TW",
+            "W..W",
+            "####"
+          ],
+          "ceilingHeight": 3
+        },
+        {
+          "level": 2,
+          "name": "Tower Top",
+          "layout": [
+            "WWWW",
+            "W..W",
+            "W..W",
+            "WWWW"
+          ],
+          "ceilingHeight": 4
+        }
+      ]
+    }
+  ]
+}

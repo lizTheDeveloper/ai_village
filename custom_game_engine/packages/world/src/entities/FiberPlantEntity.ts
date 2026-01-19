@@ -49,8 +49,8 @@ export function createFiberPlant(world: WorldMutator, x: number, y: number): str
   // Resource - fiber plants provide fiber
   entity.addComponent(createResourceComponent('fiber', 40, 0.3)); // 40 fiber, regenerates 0.3/sec
 
-  // Add to world (WorldMutator._addEntity is internal)
-  (world as unknown as { _addEntity(entity: EntityImpl): void })._addEntity(entity);
+  // Add to world
+  world.addEntity(entity);
 
   return entity.id;
 }

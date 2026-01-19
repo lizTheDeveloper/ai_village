@@ -1,0 +1,2301 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Surreal Material Item Definitions",
+  "description": "Building materials for generative cities from GENERATIVE_CITIES_SPEC.md. Includes 71 unique materials with special properties, acquisition methods, and magic system integration.",
+  "materials": [
+    {
+      "id": "material:flesh_brick",
+      "name": "Flesh Brick",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 20,
+      "baseMaterial": "flesh",
+      "isGatherable": true,
+      "gatherSources": ["flesh_city", "living_wall", "organ_building"],
+      "baseValue": 50,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": true,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresHeat": true,
+          "decayRate": 0.02,
+          "hostility": 0.3,
+          "harvestable": ["material:sinew_rope", "material:bone_beam"],
+          "aestheticDescription": "Pulsing pink-red flesh brick with visible veins, warm to touch, occasionally twitches",
+          "isBuildingMaterial": true,
+          "structuralStrength": 60,
+          "temperatureResistance": -20,
+          "moistureResistance": 70
+        },
+        "edible": {
+          "hungerRestored": 30,
+          "quality": 10,
+          "flavors": ["savory", "umami"],
+          "spoilRate": 0.05
+        }
+      }
+    },
+    {
+      "id": "material:giant_mushroom",
+      "name": "Giant Mushroom Material",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 30,
+      "baseMaterial": "fungus",
+      "isGatherable": true,
+      "gatherSources": ["giant_mushroom", "mycelium_network", "fungal_forest"],
+      "baseValue": 25,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": true,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresDark": true,
+          "decayRate": 0.03,
+          "hostility": 0.4,
+          "aestheticDescription": "Spongy mushroom cap material, bioluminescent glow in darkness, earthy smell",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": 0,
+          "moistureResistance": 90
+        },
+        "edible": {
+          "hungerRestored": 20,
+          "quality": 40,
+          "flavors": ["umami", "bitter"],
+          "spoilRate": 0.08
+        }
+      }
+    },
+    {
+      "id": "material:living_wood",
+      "name": "Living Wood",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 50,
+      "baseMaterial": "wood",
+      "isGatherable": true,
+      "gatherSources": ["tree", "treant", "walking_tree"],
+      "requiredTool": "axe",
+      "baseValue": 8,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresLight": true,
+          "decayRate": 0.01,
+          "hostility": 0.1,
+          "aestheticDescription": "Living timber with growing branches, bark walls, leaves still sprouting",
+          "isBuildingMaterial": true,
+          "structuralStrength": 70,
+          "temperatureResistance": -30,
+          "moistureResistance": 40
+        }
+      }
+    },
+    {
+      "id": "material:living_clay",
+      "name": "Living Clay",
+      "category": "material",
+      "weight": 3.0,
+      "stackSize": 40,
+      "baseMaterial": "clay",
+      "isGatherable": true,
+      "gatherSources": ["clay_pit", "riverbank", "wetlands"],
+      "baseValue": 6,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0.05,
+          "hostility": 0,
+          "aestheticDescription": "Malleable terracotta, hand-molded surfaces, organic shapes, earthy red-brown",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 60,
+          "moistureResistance": 20
+        }
+      }
+    },
+    {
+      "id": "material:eternal_flame",
+      "name": "Eternal Flame Essence",
+      "category": "material",
+      "weight": 0.1,
+      "stackSize": 10,
+      "baseMaterial": "fire",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "material:coal", "amount": 5 },
+        { "itemId": "mana_crystal", "amount": 3 }
+      ],
+      "baseValue": 200,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresHeat": true,
+          "decayRate": 0.6,
+          "hostility": 0.9,
+          "transmutation": "extinguishes without fuel, spreads uncontrollably",
+          "aestheticDescription": "Living flames, crackling sounds, orange-red glow, intense heat, trailing smoke",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": 100,
+          "moistureResistance": -50
+        },
+        "magical": {
+          "effects": ["burn_damage", "light_source", "heat_generation"],
+          "passive": true,
+          "school": "fire"
+        }
+      }
+    },
+    {
+      "id": "material:living_gears",
+      "name": "Living Clockwork Gears",
+      "category": "material",
+      "weight": 4.0,
+      "stackSize": 15,
+      "baseMaterial": "clockwork",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "material:metal", "amount": 3 },
+        { "itemId": "material:brass", "amount": 2 },
+        { "itemId": "spring_mechanism", "amount": 1 }
+      ],
+      "baseValue": 150,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0.02,
+          "hostility": 0.2,
+          "aestheticDescription": "Brass gears constantly ticking, rotating buildings, spring-powered mechanisms",
+          "isBuildingMaterial": true,
+          "structuralStrength": 85,
+          "temperatureResistance": 40,
+          "moistureResistance": 30
+        },
+        "magical": {
+          "effects": ["auto_repair", "mechanical_movement"],
+          "passive": true,
+          "school": "artifice"
+        }
+      }
+    },
+    {
+      "id": "material:sugar_brick",
+      "name": "Sugar Brick",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 25,
+      "baseMaterial": "candy",
+      "isGatherable": true,
+      "gatherSources": ["candy_city", "sugar_cave", "gingerbread_house"],
+      "craftedFrom": [
+        { "itemId": "sugar_cane", "amount": 10 },
+        { "itemId": "water", "amount": 2 }
+      ],
+      "baseValue": 30,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": true,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresCold": true,
+          "decayRate": 0.05,
+          "hostility": 0,
+          "transmutation": "melts into syrup in heat, dissolves in water",
+          "harvestable": ["material:hard_candy_pane", "material:chocolate_beam"],
+          "aestheticDescription": "Rainbow-colored crystallized sugar, translucent, sweet smell",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": -60,
+          "moistureResistance": -40
+        },
+        "edible": {
+          "hungerRestored": 15,
+          "quality": 60,
+          "flavors": ["sweet"],
+          "spoilRate": 0.03
+        }
+      }
+    },
+    {
+      "id": "material:chocolate_beam",
+      "name": "Solid Chocolate Beam",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 20,
+      "baseMaterial": "candy",
+      "craftedFrom": [
+        { "itemId": "cocoa_beans", "amount": 15 },
+        { "itemId": "sugar_cane", "amount": 5 }
+      ],
+      "baseValue": 40,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": true,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresCold": true,
+          "decayRate": 0.04,
+          "hostility": 0,
+          "transmutation": "melts into liquid chocolate in heat",
+          "aestheticDescription": "Dark brown chocolate, rich aroma, smooth surface",
+          "isBuildingMaterial": true,
+          "structuralStrength": 45,
+          "temperatureResistance": -50,
+          "moistureResistance": 60
+        },
+        "edible": {
+          "hungerRestored": 25,
+          "quality": 70,
+          "flavors": ["sweet", "umami"],
+          "spoilRate": 0.02
+        }
+      }
+    },
+    {
+      "id": "material:shadow_essence",
+      "name": "Bottled Shadow",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 10,
+      "baseMaterial": "shadow",
+      "isGatherable": false,
+      "baseValue": 250,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresDark": true,
+          "decayRate": 0,
+          "hostility": 0.2,
+          "transmutation": "dissolves instantly in bright light, becomes intangible",
+          "harvestable": ["material:darkness_shard"],
+          "aestheticDescription": "Pure black liquid, absorbs all light, cold to touch, whispers of darkness",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 0,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["darkness_field", "shadow_walking", "light_negation"],
+          "charges": 10,
+          "rechargeRate": 1,
+          "school": "umbramancy",
+          "manaCost": 5
+        }
+      }
+    },
+    {
+      "id": "material:dream_crystal",
+      "name": "Crystallized Dream",
+      "category": "material",
+      "weight": 0.8,
+      "stackSize": 15,
+      "baseMaterial": "dream",
+      "isGatherable": false,
+      "baseValue": 300,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresDreams": true,
+          "decayRate": 0.2,
+          "hostility": 0.5,
+          "aestheticDescription": "Impossible geometry, shifting colors between blue and purple, unstable form",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": 0,
+          "moistureResistance": 0
+        },
+        "magical": {
+          "effects": ["dream_walking", "lucid_architecture", "reality_warp"],
+          "charges": 5,
+          "rechargeRate": 0.5,
+          "school": "somnomancy",
+          "manaCost": 15,
+          "cursed": false
+        }
+      }
+    },
+    {
+      "id": "material:frozen_music",
+      "name": "Frozen Music Crystal",
+      "category": "material",
+      "weight": 0.6,
+      "stackSize": 20,
+      "baseMaterial": "sound",
+      "isGatherable": false,
+      "baseValue": 180,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresSound": true,
+          "decayRate": 0.15,
+          "hostility": 0,
+          "transmutation": "dissipates in silence, resonates in sound",
+          "aestheticDescription": "Visible sound waves frozen in crystalline form, constant humming, vibrations",
+          "isBuildingMaterial": true,
+          "structuralStrength": 35,
+          "temperatureResistance": 0,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["sonic_blast", "harmonic_resonance", "sound_barrier"],
+          "charges": 8,
+          "rechargeRate": 2,
+          "school": "audiomancy",
+          "manaCost": 8
+        }
+      }
+    },
+    {
+      "id": "material:memory_crystal",
+      "name": "Crystallized Memory",
+      "category": "material",
+      "weight": 0.7,
+      "stackSize": 10,
+      "baseMaterial": "memory",
+      "isGatherable": false,
+      "baseValue": 350,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.1,
+          "hostility": 0.4,
+          "aestheticDescription": "Translucent scenes frozen inside, touch to experience memory, slowly fading",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": 0,
+          "moistureResistance": 80
+        },
+        "magical": {
+          "effects": ["memory_extraction", "recall_enhancement", "forget_curse"],
+          "charges": 3,
+          "rechargeRate": 0.3,
+          "school": "mnemonimancy",
+          "manaCost": 20
+        }
+      }
+    },
+    {
+      "id": "material:living_stone",
+      "name": "Living Stone",
+      "category": "material",
+      "weight": 3.0,
+      "stackSize": 30,
+      "baseMaterial": "stone",
+      "isGatherable": true,
+      "gatherSources": ["rock", "boulder", "mountain"],
+      "requiredTool": "pickaxe",
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Gray granite, carved surfaces, weathered textures, ancient and enduring",
+          "isBuildingMaterial": true,
+          "structuralStrength": 90,
+          "temperatureResistance": 80,
+          "moistureResistance": 95
+        }
+      }
+    },
+    {
+      "id": "material:forged_steel",
+      "name": "Forged Steel",
+      "category": "material",
+      "weight": 5.0,
+      "stackSize": 20,
+      "baseMaterial": "metal",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "iron_ore", "amount": 3 },
+        { "itemId": "material:coal", "amount": 1 }
+      ],
+      "baseValue": 40,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0.02,
+          "hostility": 0.2,
+          "aestheticDescription": "Polished steel, riveted plates, brass fittings, iron beams, metallic echoes",
+          "isBuildingMaterial": true,
+          "structuralStrength": 95,
+          "temperatureResistance": 70,
+          "moistureResistance": 40
+        }
+      }
+    },
+    {
+      "id": "material:pure_diamond",
+      "name": "Pure Diamond",
+      "category": "material",
+      "weight": 0.4,
+      "stackSize": 5,
+      "baseMaterial": "diamond",
+      "isGatherable": true,
+      "gatherSources": ["diamond_vein", "deep_mine", "volcanic_pipe"],
+      "requiredTool": "diamond_pickaxe",
+      "baseValue": 1000,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.3,
+          "harvestable": ["material:diamond_shard", "material:diamond_dust"],
+          "aestheticDescription": "Brilliant facets, rainbow refraction, unbreakable hardness, blinding light",
+          "isBuildingMaterial": true,
+          "structuralStrength": 100,
+          "temperatureResistance": 90,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:flowing_sand",
+      "name": "Flowing Sand",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 40,
+      "baseMaterial": "sand",
+      "isGatherable": true,
+      "gatherSources": ["desert", "beach", "sand_dune"],
+      "baseValue": 3,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.3,
+          "hostility": 0.1,
+          "transmutation": "collapses without support, blown away by wind",
+          "aestheticDescription": "Golden dunes, shifting textures, granular, wind-carved patterns",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": 100,
+          "moistureResistance": 50
+        }
+      }
+    },
+    {
+      "id": "material:eternal_ice",
+      "name": "Eternal Ice",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 25,
+      "baseMaterial": "ice",
+      "isGatherable": true,
+      "gatherSources": ["glacier", "frozen_lake", "ice_cave"],
+      "baseValue": 15,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresCold": true,
+          "decayRate": 0.1,
+          "hostility": 0,
+          "transmutation": "melts into water, refreezes in cold",
+          "aestheticDescription": "Translucent blue-white ice, icicle formations, frost patterns, slippery",
+          "isBuildingMaterial": true,
+          "structuralStrength": 55,
+          "temperatureResistance": -80,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:living_glass",
+      "name": "Living Glass",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 15,
+      "baseMaterial": "glass",
+      "craftedFrom": [
+        { "itemId": "material:flowing_sand", "amount": 5 },
+        { "itemId": "material:coal", "amount": 2 }
+      ],
+      "baseValue": 50,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.1,
+          "aestheticDescription": "Transparent walls, prismatic light reflections, mirrors everywhere, fragile",
+          "isBuildingMaterial": true,
+          "structuralStrength": 25,
+          "temperatureResistance": 60,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:folded_parchment",
+      "name": "Folded Parchment",
+      "category": "material",
+      "weight": 0.3,
+      "stackSize": 50,
+      "baseMaterial": "paper",
+      "craftedFrom": [
+        { "itemId": "fiber", "amount": 10 },
+        { "itemId": "water", "amount": 5 }
+      ],
+      "baseValue": 8,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.03,
+          "hostility": 0,
+          "transmutation": "burns in fire, dissolves in water",
+          "aestheticDescription": "Origami buildings, written words everywhere, paper lanterns, rustling sounds",
+          "isBuildingMaterial": true,
+          "structuralStrength": 15,
+          "temperatureResistance": -70,
+          "moistureResistance": -60
+        },
+        "magical": {
+          "effects": ["word_magic", "origami_animation"],
+          "school": "bibliomancy"
+        }
+      }
+    },
+    {
+      "id": "material:resonant_crystal",
+      "name": "Resonant Crystal",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 20,
+      "baseMaterial": "crystal",
+      "isGatherable": true,
+      "gatherSources": ["crystal_cave", "geode", "crystal_cluster"],
+      "baseValue": 80,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresSound": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Geometric formations, rainbow light, constant humming, vibrations",
+          "isBuildingMaterial": true,
+          "structuralStrength": 75,
+          "temperatureResistance": 80,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["resonance", "energy_storage", "amplification"],
+          "passive": true,
+          "school": "artifice"
+        }
+      }
+    },
+    {
+      "id": "material:ancient_bone",
+      "name": "Ancient Bone",
+      "category": "material",
+      "weight": 1.8,
+      "stackSize": 25,
+      "baseMaterial": "bone",
+      "isGatherable": true,
+      "gatherSources": ["skeleton", "bone_yard", "ancient_burial"],
+      "baseValue": 20,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0.01,
+          "hostility": 0.3,
+          "aestheticDescription": "White calcium structures, ossified architecture, marrow-filled chambers",
+          "isBuildingMaterial": true,
+          "structuralStrength": 65,
+          "temperatureResistance": 70,
+          "moistureResistance": 60
+        }
+      }
+    },
+    {
+      "id": "material:solidified_smoke",
+      "name": "Solidified Smoke",
+      "category": "material",
+      "weight": 0.2,
+      "stackSize": 15,
+      "baseMaterial": "smoke",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "material:coal", "amount": 3 },
+        { "itemId": "air_essence", "amount": 5 }
+      ],
+      "baseValue": 60,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.4,
+          "hostility": 0.3,
+          "transmutation": "disperses in wind, condenses in calm",
+          "aestheticDescription": "Gray wisps, swirling patterns, semi-tangible, acrid smell",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": 50,
+          "moistureResistance": 30
+        }
+      }
+    },
+    {
+      "id": "material:oxidized_metal",
+      "name": "Oxidized Metal",
+      "category": "material",
+      "weight": 4.5,
+      "stackSize": 20,
+      "baseMaterial": "rust",
+      "isGatherable": true,
+      "gatherSources": ["ruined_factory", "abandoned_mine", "scrapyard"],
+      "baseValue": 3,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.15,
+          "hostility": 0.2,
+          "aestheticDescription": "Orange-brown corrosion, flaking surfaces, metallic decay, industrial rot",
+          "isBuildingMaterial": true,
+          "structuralStrength": 35,
+          "temperatureResistance": 40,
+          "moistureResistance": 10
+        }
+      }
+    },
+    {
+      "id": "material:woven_silk",
+      "name": "Woven Silk",
+      "category": "material",
+      "weight": 0.4,
+      "stackSize": 30,
+      "baseMaterial": "silk",
+      "isGatherable": true,
+      "gatherSources": ["silk_worm", "spider_web", "silk_farm"],
+      "baseValue": 45,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.08,
+          "hostility": 0,
+          "aestheticDescription": "Shimmering fabric, flowing drapes, soft textures, delicate strength",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": -20,
+          "moistureResistance": 50
+        }
+      }
+    },
+    {
+      "id": "material:fossilized_resin",
+      "name": "Fossilized Resin",
+      "category": "material",
+      "weight": 1.0,
+      "stackSize": 20,
+      "baseMaterial": "amber",
+      "isGatherable": true,
+      "gatherSources": ["ancient_forest", "amber_deposit", "fossilized_tree"],
+      "baseValue": 120,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Golden-orange translucence, preserved insects inside, warm glow, ancient feel",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": -10,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:crystalline_salt",
+      "name": "Crystalline Salt",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 35,
+      "baseMaterial": "salt",
+      "isGatherable": true,
+      "gatherSources": ["salt_flat", "salt_mine", "evaporated_sea"],
+      "baseValue": 12,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": true,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.1,
+          "hostility": 0.2,
+          "transmutation": "dissolves in rain, corrodes metal",
+          "aestheticDescription": "White crystals, cubic formations, preserving properties, sharp salty taste",
+          "isBuildingMaterial": true,
+          "structuralStrength": 35,
+          "temperatureResistance": 80,
+          "moistureResistance": -40
+        },
+        "edible": {
+          "hungerRestored": 0,
+          "quality": 20,
+          "flavors": ["savory"],
+          "spoilRate": 0
+        }
+      }
+    },
+    {
+      "id": "material:beeswax",
+      "name": "Beeswax",
+      "category": "material",
+      "weight": 1.2,
+      "stackSize": 30,
+      "baseMaterial": "wax",
+      "isGatherable": true,
+      "gatherSources": ["beehive", "wax_farm"],
+      "baseValue": 18,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresCold": true,
+          "decayRate": 0.05,
+          "hostility": 0,
+          "transmutation": "melts into liquid, hardens when cool",
+          "aestheticDescription": "Honeycomb patterns, yellow-white color, waxy smell, smooth surfaces",
+          "isBuildingMaterial": true,
+          "structuralStrength": 25,
+          "temperatureResistance": -50,
+          "moistureResistance": 80
+        }
+      }
+    },
+    {
+      "id": "material:compressed_coal",
+      "name": "Compressed Coal",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 40,
+      "baseMaterial": "coal",
+      "isGatherable": true,
+      "gatherSources": ["coal_vein", "coal_mine", "buried_forest"],
+      "requiredTool": "pickaxe",
+      "baseValue": 10,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.1,
+          "aestheticDescription": "Black carbon, shiny surfaces, fuel potential, sooty residue",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": -60,
+          "moistureResistance": 70
+        }
+      }
+    },
+    {
+      "id": "material:crystallized_toxin",
+      "name": "Crystallized Toxin",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 10,
+      "baseMaterial": "poison",
+      "isGatherable": true,
+      "gatherSources": ["poison_swamp", "toxic_plant", "venom_gland"],
+      "baseValue": 180,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.95,
+          "aestheticDescription": "Sickly green crystals, noxious fumes, deadly to touch, warning colors",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": 70,
+          "moistureResistance": 80
+        },
+        "magical": {
+          "effects": ["poison_damage", "toxic_aura", "disease"],
+          "passive": true,
+          "cursed": true
+        }
+      }
+    },
+    {
+      "id": "material:delicate_porcelain",
+      "name": "Delicate Porcelain",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 15,
+      "baseMaterial": "porcelain",
+      "craftedFrom": [
+        { "itemId": "material:living_clay", "amount": 5 },
+        { "itemId": "material:compressed_coal", "amount": 2 }
+      ],
+      "baseValue": 90,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.4,
+          "aestheticDescription": "White glazed surfaces, hand-painted patterns, delicate strength, shatters easily",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": 85,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:living_coral",
+      "name": "Living Coral",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 20,
+      "baseMaterial": "coral",
+      "isGatherable": true,
+      "gatherSources": ["coral_reef", "underwater_forest", "ocean_floor"],
+      "baseValue": 65,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresLight": true,
+          "decayRate": 0,
+          "hostility": 0.1,
+          "aestheticDescription": "Colorful polyps, underwater growth, calcium carbonate, living ecosystem",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 20,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:frozen_water",
+      "name": "Frozen Water",
+      "category": "material",
+      "weight": 1.0,
+      "stackSize": 10,
+      "baseMaterial": "water",
+      "isGatherable": true,
+      "gatherSources": ["water_source", "well", "river"],
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": true,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresCold": true,
+          "decayRate": 0.5,
+          "hostility": 0.1,
+          "transmutation": "evaporates in heat, flows without containment",
+          "aestheticDescription": "Liquid walls, flowing surfaces, reflective ripples, constant motion",
+          "isBuildingMaterial": true,
+          "structuralStrength": 10,
+          "temperatureResistance": -70,
+          "moistureResistance": 100
+        },
+        "edible": {
+          "hungerRestored": 0,
+          "quality": 50,
+          "flavors": [],
+          "spoilRate": 0
+        }
+      }
+    },
+    {
+      "id": "material:mithril",
+      "name": "Mithril",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 15,
+      "baseMaterial": "metal",
+      "isGatherable": true,
+      "gatherSources": ["deep_mine", "dwarven_ruins", "ancient_vein"],
+      "requiredTool": "legendary_pickaxe",
+      "baseValue": 2500,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Silvery-white metal with faint blue moonlight glow, incredibly light yet stronger than steel",
+          "isBuildingMaterial": true,
+          "structuralStrength": 90,
+          "temperatureResistance": 85,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["magic_conductivity", "never_tarnish"],
+          "passive": true,
+          "school": "artifice"
+        }
+      }
+    },
+    {
+      "id": "material:adamantine",
+      "name": "Adamantine",
+      "category": "material",
+      "weight": 8.0,
+      "stackSize": 10,
+      "baseMaterial": "metal",
+      "isGatherable": true,
+      "gatherSources": ["volcanic_core", "meteor_impact", "plane_of_earth"],
+      "requiredTool": "adamantine_pickaxe",
+      "baseValue": 5000,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Jet black metal with metallic sheen, rings like a bell when struck, nearly indestructible",
+          "isBuildingMaterial": true,
+          "structuralStrength": 100,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:orichalcum",
+      "name": "Orichalcum",
+      "category": "material",
+      "weight": 4.5,
+      "stackSize": 15,
+      "baseMaterial": "metal",
+      "isGatherable": true,
+      "gatherSources": ["ancient_ruins", "underwater_city", "magical_forge"],
+      "baseValue": 800,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": -0.01,
+          "hostility": 0,
+          "aestheticDescription": "Red-gold metal, warm to touch, pulses with contained magical energy",
+          "isBuildingMaterial": true,
+          "structuralStrength": 75,
+          "temperatureResistance": 70,
+          "moistureResistance": 90
+        },
+        "magical": {
+          "effects": ["mana_conductivity", "self_repair", "amplification"],
+          "passive": true,
+          "school": "artifice"
+        }
+      }
+    },
+    {
+      "id": "material:starmetal",
+      "name": "Starmetal",
+      "category": "material",
+      "weight": 6.0,
+      "stackSize": 12,
+      "baseMaterial": "metal",
+      "isGatherable": true,
+      "gatherSources": ["meteor_impact", "fallen_star", "sky_realm"],
+      "baseValue": 1500,
+      "rarity": "epic",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Dark gray metal with iridescent shimmer and tiny star-like sparkles inside",
+          "isBuildingMaterial": true,
+          "structuralStrength": 85,
+          "temperatureResistance": 90,
+          "moistureResistance": 95
+        },
+        "magical": {
+          "effects": ["anti_magic", "cosmic_energy"],
+          "passive": true,
+          "school": "abjuration"
+        }
+      }
+    },
+    {
+      "id": "material:starlight_essence",
+      "name": "Starlight Essence",
+      "category": "material",
+      "weight": 0.05,
+      "stackSize": 8,
+      "baseMaterial": "light",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "stellar_radiation", "amount": 10 },
+        { "itemId": "mana_crystal", "amount": 3 }
+      ],
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresLight": true,
+          "decayRate": 0.1,
+          "hostility": 0,
+          "transmutation": "decays slowly in darkness, requires starlight exposure",
+          "aestheticDescription": "Liquid silver-white light that flows like water, illuminates without heat",
+          "isBuildingMaterial": true,
+          "structuralStrength": 15,
+          "temperatureResistance": 50,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["eternal_light", "navigation", "revelation"],
+          "passive": true,
+          "school": "divination"
+        }
+      }
+    },
+    {
+      "id": "material:voidstone",
+      "name": "Voidstone",
+      "category": "material",
+      "weight": 0,
+      "stackSize": 5,
+      "baseMaterial": "void",
+      "isGatherable": true,
+      "gatherSources": ["void_rift", "black_hole", "entropy_zone", "universe_edge"],
+      "baseValue": 4000,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.9,
+          "aestheticDescription": "Absolute black that absorbs all light, creates visual distortion, whispers of nothingness",
+          "isBuildingMaterial": true,
+          "structuralStrength": 95,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["magic_nullification", "void_field", "entropy"],
+          "passive": true,
+          "cursed": false,
+          "school": "abjuration"
+        }
+      }
+    },
+    {
+      "id": "material:dragonscale",
+      "name": "Dragonscale",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 15,
+      "baseMaterial": "scale",
+      "isGatherable": true,
+      "gatherSources": ["dragon_corpse", "molted_scales", "dragon_lair"],
+      "baseValue": 2000,
+      "rarity": "epic",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": -0.01,
+          "hostility": 0.2,
+          "aestheticDescription": "Iridescent scales in various colors, warm to touch with faint heartbeat sensation",
+          "isBuildingMaterial": true,
+          "structuralStrength": 85,
+          "temperatureResistance": 95,
+          "moistureResistance": 80
+        },
+        "magical": {
+          "effects": ["fire_resistance", "regeneration"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:phoenix_ash",
+      "name": "Phoenix Ash",
+      "category": "material",
+      "weight": 0.1,
+      "stackSize": 3,
+      "baseMaterial": "ash",
+      "isGatherable": true,
+      "gatherSources": ["phoenix_nest", "volcanic_peak", "rebirth_site"],
+      "baseValue": 10000,
+      "rarity": "mythic",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresHeat": true,
+          "decayRate": 0.05,
+          "hostility": 0,
+          "aestheticDescription": "Golden-orange ash that glows with inner fire, warm to touch, never fully extinguishes",
+          "isBuildingMaterial": true,
+          "structuralStrength": 10,
+          "temperatureResistance": 100,
+          "moistureResistance": -20
+        },
+        "magical": {
+          "effects": ["auto_repair", "resurrection", "eternal_flame"],
+          "charges": 1,
+          "rechargeRate": 0,
+          "school": "necromancy",
+          "manaCost": 100
+        }
+      }
+    },
+    {
+      "id": "material:chitin",
+      "name": "Chitin Carapace",
+      "category": "material",
+      "weight": 1.0,
+      "stackSize": 25,
+      "baseMaterial": "chitin",
+      "isGatherable": true,
+      "gatherSources": ["giant_insect", "crab", "beetle", "chitinous_creature"],
+      "baseValue": 25,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0.05,
+          "hostility": 0,
+          "aestheticDescription": "Brown-black hard shell with segmented plates and organic patterns",
+          "isBuildingMaterial": true,
+          "structuralStrength": 55,
+          "temperatureResistance": 60,
+          "moistureResistance": 70
+        }
+      }
+    },
+    {
+      "id": "material:ectoplasm",
+      "name": "Ectoplasm",
+      "category": "material",
+      "weight": 0.3,
+      "stackSize": 10,
+      "baseMaterial": "spirit",
+      "isGatherable": true,
+      "gatherSources": ["ghost", "haunted_area", "spirit_realm", "graveyard"],
+      "baseValue": 400,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "requiresDark": true,
+          "decayRate": 0.3,
+          "hostility": 0.4,
+          "transmutation": "fades in daylight, phases through solid matter",
+          "aestheticDescription": "Translucent green-white mist with cold vapor trails and whispers",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": -50,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["phase_shift", "spirit_binding", "ghost_trap"],
+          "charges": 5,
+          "rechargeRate": 0.5,
+          "school": "necromancy",
+          "manaCost": 10
+        }
+      }
+    },
+    {
+      "id": "material:moonstone",
+      "name": "Moonstone",
+      "category": "material",
+      "weight": 0.6,
+      "stackSize": 18,
+      "baseMaterial": "crystal",
+      "isGatherable": true,
+      "gatherSources": ["lunar_valley", "night_crystal_cave", "celestial_realm"],
+      "baseValue": 300,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Pearlescent white-blue gemstone, internal light shifts like moon phases",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 70,
+          "moistureResistance": 90
+        },
+        "magical": {
+          "effects": ["night_vision", "dream_magic", "lunar_power"],
+          "passive": true,
+          "school": "somnomancy"
+        }
+      }
+    },
+    {
+      "id": "material:sunstone",
+      "name": "Sunstone",
+      "category": "material",
+      "weight": 0.7,
+      "stackSize": 18,
+      "baseMaterial": "crystal",
+      "isGatherable": true,
+      "gatherSources": ["solar_desert", "volcanic_peak", "sun_temple"],
+      "baseValue": 350,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Orange-gold crystal with internal flame-like patterns, emits warm glow",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 90,
+          "moistureResistance": 70
+        },
+        "magical": {
+          "effects": ["heat_source", "fire_magic", "solar_storage"],
+          "passive": true,
+          "school": "evocation"
+        }
+      }
+    },
+    {
+      "id": "material:bloodstone",
+      "name": "Bloodstone",
+      "category": "material",
+      "weight": 0.8,
+      "stackSize": 12,
+      "baseMaterial": "crystal",
+      "isGatherable": true,
+      "gatherSources": ["battlefield", "sacrifice_altar", "dark_ritual_site"],
+      "baseValue": 450,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.6,
+          "aestheticDescription": "Deep red gemstone with black specks, seems perpetually wet, pulses like heartbeat",
+          "isBuildingMaterial": true,
+          "structuralStrength": 45,
+          "temperatureResistance": 60,
+          "moistureResistance": 80
+        },
+        "magical": {
+          "effects": ["blood_magic", "life_drain", "vampiric"],
+          "passive": true,
+          "cursed": true,
+          "school": "necromancy"
+        }
+      }
+    },
+    {
+      "id": "material:null_crystal",
+      "name": "Null Crystal",
+      "category": "material",
+      "weight": 0.4,
+      "stackSize": 8,
+      "baseMaterial": "crystal",
+      "isGatherable": true,
+      "gatherSources": ["anti_magic_zone", "wild_magic_area", "dimensional_rift"],
+      "baseValue": 1800,
+      "rarity": "epic",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.3,
+          "aestheticDescription": "Clear crystal with rainbow fractures, creates magic-dead zones around it",
+          "isBuildingMaterial": true,
+          "structuralStrength": 20,
+          "temperatureResistance": 80,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["spell_disruption", "magic_dampening", "mage_hunter"],
+          "passive": true,
+          "school": "abjuration"
+        }
+      }
+    },
+    {
+      "id": "material:quicksilver",
+      "name": "Living Quicksilver",
+      "category": "material",
+      "weight": 4.5,
+      "stackSize": 15,
+      "baseMaterial": "mercury",
+      "isGatherable": true,
+      "gatherSources": ["mercury_pool", "alchemical_lab", "cinnabar_mine"],
+      "baseValue": 120,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.2,
+          "hostility": 0.7,
+          "transmutation": "flows and reforms constantly, toxic fumes",
+          "aestheticDescription": "Silver liquid metal in constant motion, perfectly reflective, toxic vapors",
+          "isBuildingMaterial": true,
+          "structuralStrength": 10,
+          "temperatureResistance": 60,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:aetherium",
+      "name": "Aetherium",
+      "category": "material",
+      "weight": 0.2,
+      "stackSize": 5,
+      "baseMaterial": "aether",
+      "isGatherable": true,
+      "gatherSources": ["ley_line_nexus", "magic_storm", "planar_tear"],
+      "baseValue": 3000,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.4,
+          "hostility": 0.8,
+          "transmutation": "unstable form, reality distortion",
+          "aestheticDescription": "Shifting colors with crackling energy, unstable physical form, bends reality",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["perfect_conductivity", "mana_battery", "reality_warp"],
+          "passive": true,
+          "school": "transmutation",
+          "manaCost": 50
+        }
+      }
+    },
+    {
+      "id": "material:gravity_stone",
+      "name": "Gravity Stone",
+      "category": "material",
+      "weight": 15.0,
+      "stackSize": 8,
+      "baseMaterial": "gravity",
+      "isGatherable": true,
+      "gatherSources": ["black_hole_evaporation", "neutron_star_fragment", "gravity_well"],
+      "baseValue": 3500,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.5,
+          "aestheticDescription": "Dense dark purple-black stone, warps space visibly, objects orbit it slowly",
+          "isBuildingMaterial": true,
+          "structuralStrength": 90,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["gravity_manipulation", "mass_control", "floating"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:phase_quartz",
+      "name": "Phase Quartz",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 10,
+      "baseMaterial": "quartz",
+      "isGatherable": true,
+      "gatherSources": ["dimensional_rift", "unstable_portal", "between_space"],
+      "baseValue": 2200,
+      "rarity": "epic",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.2,
+          "hostility": 0.3,
+          "transmutation": "flickers between dimensions, semi-tangible",
+          "aestheticDescription": "Translucent crystal that flickers in and out of reality, exists in superposition",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": 70,
+          "moistureResistance": 90
+        },
+        "magical": {
+          "effects": ["dimensional_storage", "phase_shift", "teleportation"],
+          "charges": 8,
+          "rechargeRate": 1,
+          "school": "conjuration",
+          "manaCost": 15
+        }
+      }
+    },
+    {
+      "id": "material:bio_luminescent_slime",
+      "name": "Bio-Luminescent Slime",
+      "category": "material",
+      "weight": 0.8,
+      "stackSize": 20,
+      "baseMaterial": "slime",
+      "isGatherable": true,
+      "gatherSources": ["cave", "swamp", "underground_fungi", "slime_creature"],
+      "baseValue": 30,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": true,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.15,
+          "hostility": 0,
+          "aestheticDescription": "Glowing green-blue gel with pulsing light, sticky texture",
+          "isBuildingMaterial": true,
+          "structuralStrength": 5,
+          "temperatureResistance": 30,
+          "moistureResistance": 100
+        },
+        "edible": {
+          "hungerRestored": 10,
+          "quality": 10,
+          "flavors": ["bitter"],
+          "spoilRate": 0.2
+        },
+        "magical": {
+          "effects": ["light_source"],
+          "passive": true
+        }
+      }
+    },
+    {
+      "id": "material:philosophers_stone_fragment",
+      "name": "Philosopher's Stone Fragment",
+      "category": "material",
+      "weight": 0.3,
+      "stackSize": 1,
+      "baseMaterial": "philosopher_stone",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "grand_transmutation", "amount": 1 },
+        { "itemId": "immortality_elixir", "amount": 10 },
+        { "itemId": "material:orichalcum", "amount": 50 }
+      ],
+      "baseValue": 15000,
+      "rarity": "mythic",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Red crystalline stone with warm glow, reality ripples around it",
+          "isBuildingMaterial": false,
+          "structuralStrength": 50,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["transmutation", "gold_creation", "life_extension"],
+          "charges": 100,
+          "rechargeRate": 0,
+          "school": "transmutation",
+          "manaCost": 100
+        }
+      }
+    },
+    {
+      "id": "material:morphic_clay",
+      "name": "Morphic Clay",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 20,
+      "baseMaterial": "clay",
+      "isGatherable": true,
+      "gatherSources": ["chaos_realm", "wild_magic_zone", "polymorph_accident"],
+      "baseValue": 350,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.1,
+          "hostility": 0.2,
+          "transmutation": "shape-shifts into any form, remembers shapes",
+          "aestheticDescription": "Gray amorphous blob constantly shifting, absorbs and mimics colors",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": 60,
+          "moistureResistance": 50
+        },
+        "magical": {
+          "effects": ["shapeshifting", "mimicry", "adaptive_form"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:chronium",
+      "name": "Chronium",
+      "category": "material",
+      "weight": 3.5,
+      "stackSize": 8,
+      "baseMaterial": "time",
+      "isGatherable": true,
+      "gatherSources": ["temporal_anomaly", "time_storm", "collapsed_timeline"],
+      "baseValue": 4500,
+      "rarity": "legendary",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.15,
+          "hostility": 0.4,
+          "transmutation": "non-linear aging, temporal distortions",
+          "aestheticDescription": "Silver-gold metal with rippling temporal distortions, ages paradoxically",
+          "isBuildingMaterial": true,
+          "structuralStrength": 70,
+          "temperatureResistance": 80,
+          "moistureResistance": 80
+        },
+        "magical": {
+          "effects": ["time_manipulation", "temporal_stasis", "age_control"],
+          "charges": 10,
+          "rechargeRate": 0.1,
+          "school": "chronurgy",
+          "manaCost": 50
+        }
+      }
+    },
+    {
+      "id": "material:obsidian",
+      "name": "Obsidian",
+      "category": "material",
+      "weight": 2.8,
+      "stackSize": 25,
+      "baseMaterial": "volcanic_glass",
+      "isGatherable": true,
+      "gatherSources": ["volcano", "lava_flow", "obsidian_field"],
+      "baseValue": 35,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.4,
+          "aestheticDescription": "Jet black volcanic glass with mirror finish and razor-sharp edges",
+          "isBuildingMaterial": true,
+          "structuralStrength": 25,
+          "temperatureResistance": 85,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:petrified_wood",
+      "name": "Petrified Wood",
+      "category": "material",
+      "weight": 3.2,
+      "stackSize": 30,
+      "baseMaterial": "fossil",
+      "isGatherable": true,
+      "gatherSources": ["ancient_forest", "fossil_bed", "petrified_forest"],
+      "baseValue": 20,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0,
+          "aestheticDescription": "Wood grain pattern preserved in stone, earth tones, ancient historical feel",
+          "isBuildingMaterial": true,
+          "structuralStrength": 70,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:living_vine",
+      "name": "Living Vine",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 40,
+      "baseMaterial": "plant",
+      "isGatherable": true,
+      "gatherSources": ["jungle", "overgrown_ruins", "vine_forest"],
+      "baseValue": 8,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresLight": true,
+          "decayRate": 0.08,
+          "hostility": 0,
+          "aestheticDescription": "Green creeping vines with flowers, grows continuously when planted",
+          "isBuildingMaterial": true,
+          "structuralStrength": 25,
+          "temperatureResistance": -20,
+          "moistureResistance": 90
+        }
+      }
+    },
+    {
+      "id": "material:rampant_vine",
+      "name": "Rampant Vine",
+      "category": "material",
+      "weight": 0.6,
+      "stackSize": 30,
+      "baseMaterial": "plant",
+      "isGatherable": true,
+      "gatherSources": ["experimental_botany", "jungle_mutation", "chaos_garden"],
+      "baseValue": 15,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "requiresLight": true,
+          "decayRate": 0.05,
+          "hostility": 0.3,
+          "transmutation": "grows 10 tiles/hour, covers buildings overnight, spreads to neighbors",
+          "aestheticDescription": "Thick green vines growing impossibly fast, strangling coverage, flowers everywhere",
+          "isBuildingMaterial": true,
+          "structuralStrength": 60,
+          "temperatureResistance": -30,
+          "moistureResistance": 95
+        }
+      }
+    },
+    {
+      "id": "material:explosive_fungus",
+      "name": "Explosive Fungus",
+      "category": "material",
+      "weight": 0.4,
+      "stackSize": 5,
+      "baseMaterial": "fungus",
+      "isGatherable": true,
+      "gatherSources": ["unstable_mushroom_grove", "alchemical_accident", "volatile_spores"],
+      "baseValue": 200,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "requiresDark": true,
+          "decayRate": 0.1,
+          "hostility": 0.95,
+          "transmutation": "explodes when disturbed, chain reactions possible, spreads spores",
+          "aestheticDescription": "Glowing orange-red mushrooms with pulsing light, sizzling sound before detonation",
+          "isBuildingMaterial": false,
+          "structuralStrength": 5,
+          "temperatureResistance": -80,
+          "moistureResistance": 70
+        }
+      }
+    },
+    {
+      "id": "material:crystallizing_mold",
+      "name": "Crystallizing Mold",
+      "category": "material",
+      "weight": 0.3,
+      "stackSize": 15,
+      "baseMaterial": "mold",
+      "isGatherable": true,
+      "gatherSources": ["crystal_cave", "petrification_zone", "fossilizing_swamp"],
+      "baseValue": 80,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.15,
+          "hostility": 0.5,
+          "transmutation": "converts organic matter to crystal, spreads via airborne spores, irreversible",
+          "aestheticDescription": "White-blue crystalline growth spreading like frost, sparkles, preserves shapes inside",
+          "isBuildingMaterial": false,
+          "structuralStrength": 10,
+          "temperatureResistance": 50,
+          "moistureResistance": 80
+        }
+      }
+    },
+    {
+      "id": "material:rust_plague",
+      "name": "Rust Plague",
+      "category": "material",
+      "weight": 4.0,
+      "stackSize": 5,
+      "baseMaterial": "rust",
+      "isGatherable": true,
+      "gatherSources": ["infected_scrapyard", "corroded_ruins", "rust_outbreak"],
+      "baseValue": 300,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.25,
+          "hostility": 0.85,
+          "transmutation": "infectious rust spreads between metal, airborne transmission, metal crumbles in days",
+          "aestheticDescription": "Orange-brown spreading corrosion, flaking metal, structural groans, iron decay smell",
+          "isBuildingMaterial": false,
+          "structuralStrength": 10,
+          "temperatureResistance": 30,
+          "moistureResistance": -20
+        }
+      }
+    },
+    {
+      "id": "material:sticky_slime",
+      "name": "Sticky Slime",
+      "category": "material",
+      "weight": 1.0,
+      "stackSize": 20,
+      "baseMaterial": "slime",
+      "isGatherable": true,
+      "gatherSources": ["adhesive_swamp", "slime_creature", "failed_alchemy"],
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.05,
+          "hostility": 0.4,
+          "transmutation": "sticks to everything on contact, spreads via touch, never fully dries",
+          "aestheticDescription": "Translucent goop, webs of slime between objects, squelching sounds, sticky mess",
+          "isBuildingMaterial": true,
+          "structuralStrength": 5,
+          "temperatureResistance": 40,
+          "moistureResistance": 100
+        }
+      }
+    },
+    {
+      "id": "material:living_paint",
+      "name": "Living Paint",
+      "category": "material",
+      "weight": 0.7,
+      "stackSize": 12,
+      "baseMaterial": "paint",
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "pigment", "amount": 5 },
+        { "itemId": "artistic_magic", "amount": 1 },
+        { "itemId": "color_elemental", "amount": 1 }
+      ],
+      "baseValue": 150,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": false,
+          "decayRate": 0.1,
+          "hostility": 0.2,
+          "transmutation": "sentient paint that moves, creates art autonomously, changes based on mood",
+          "aestheticDescription": "Shifting flowing colors, self-updating murals, walls that breathe and pulse",
+          "isBuildingMaterial": true,
+          "structuralStrength": 5,
+          "temperatureResistance": 30,
+          "moistureResistance": 40
+        },
+        "magical": {
+          "effects": ["autonomous_art", "mood_response", "surveillance"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:whispering_walls",
+      "name": "Whispering Walls",
+      "category": "material",
+      "weight": 3.5,
+      "stackSize": 20,
+      "baseMaterial": "stone",
+      "isGatherable": true,
+      "gatherSources": ["gossip_quarry", "memory_stone_deposit", "eavesdropper_cave"],
+      "baseValue": 400,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.5,
+          "transmutation": "walls gossip about witnessed events, spreads secrets, records everything",
+          "aestheticDescription": "Faint whispers always audible, walls lean in conspiratorially, echoing conversations",
+          "isBuildingMaterial": true,
+          "structuralStrength": 75,
+          "temperatureResistance": 80,
+          "moistureResistance": 90
+        },
+        "magical": {
+          "effects": ["surveillance", "memory_recording", "secret_spreading"],
+          "passive": true,
+          "school": "divination"
+        }
+      }
+    },
+    {
+      "id": "material:gravity_inverted_stone",
+      "name": "Gravity-Inverted Stone",
+      "category": "material",
+      "weight": -3.0,
+      "stackSize": 10,
+      "baseMaterial": "anti_gravity",
+      "isGatherable": true,
+      "gatherSources": ["inverted_mountain", "anti_gravity_well", "sky_quarry"],
+      "baseValue": 800,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.3,
+          "transmutation": "falls upward, pulls nearby objects up, escapes to sky if untethered",
+          "aestheticDescription": "Stone that drifts upward continuously, must be tethered or lost forever",
+          "isBuildingMaterial": true,
+          "structuralStrength": 85,
+          "temperatureResistance": 80,
+          "moistureResistance": 95
+        },
+        "magical": {
+          "effects": ["reverse_gravity", "upward_pull", "float_away"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:paradox_material",
+      "name": "Paradox Material",
+      "category": "material",
+      "weight": 0,
+      "stackSize": 3,
+      "baseMaterial": "paradox",
+      "isGatherable": true,
+      "gatherSources": ["paradox_engine", "logical_contradiction", "schrodingers_stockpile"],
+      "baseValue": 2000,
+      "rarity": "epic",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.3,
+          "hostility": 0.4,
+          "transmutation": "simultaneously solid and liquid, exists and doesn't exist, heavy and weightless",
+          "aestheticDescription": "Looks different from every angle, can't focus eyes on it, causes dizziness and headaches",
+          "isBuildingMaterial": true,
+          "structuralStrength": 50,
+          "temperatureResistance": 100,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["impossible_architecture", "quantum_storage", "existential_dread"],
+          "passive": true,
+          "cursed": false,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:time_dilated_wood",
+      "name": "Time-Dilated Wood",
+      "category": "material",
+      "weight": 2.2,
+      "stackSize": 15,
+      "baseMaterial": "temporal_wood",
+      "isGatherable": true,
+      "gatherSources": ["temporal_forest", "time_warped_tree", "chronological_anomaly"],
+      "baseValue": 600,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.2,
+          "hostility": 0.3,
+          "transmutation": "different parts age at different rates, grows and decays simultaneously",
+          "aestheticDescription": "Rings show impossible age patterns, bark peels and regrows at once, seedlings from ancient wood",
+          "isBuildingMaterial": true,
+          "structuralStrength": 55,
+          "temperatureResistance": 60,
+          "moistureResistance": 65
+        },
+        "magical": {
+          "effects": ["time_distortion", "age_variance", "temporal_storage"],
+          "passive": true,
+          "school": "chronurgy"
+        }
+      }
+    },
+    {
+      "id": "material:singing_metal",
+      "name": "Singing Metal",
+      "category": "material",
+      "weight": 4.2,
+      "stackSize": 18,
+      "baseMaterial": "harmonic_metal",
+      "isGatherable": true,
+      "gatherSources": ["harmonic_ore_vein", "musical_geode", "tuning_fork_tree"],
+      "baseValue": 120,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.2,
+          "transmutation": "constantly emits musical tones, can't be silenced, harmonizes with other singing metal",
+          "aestheticDescription": "Metallic humming and singing, vibrates constantly, creates ambient music",
+          "isBuildingMaterial": true,
+          "structuralStrength": 70,
+          "temperatureResistance": 75,
+          "moistureResistance": 60
+        },
+        "magical": {
+          "effects": ["constant_music", "harmonics", "noise"],
+          "passive": true,
+          "school": "evocation"
+        }
+      }
+    },
+    {
+      "id": "material:laughing_gas_crystal",
+      "name": "Laughing Gas Crystal",
+      "category": "material",
+      "weight": 0.6,
+      "stackSize": 12,
+      "baseMaterial": "comedy_crystal",
+      "isGatherable": true,
+      "gatherSources": ["comedy_mine", "giggle_geode", "humor_elemental"],
+      "baseValue": 90,
+      "rarity": "uncommon",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.12,
+          "hostility": 0.6,
+          "transmutation": "emits laughing gas passively, makes everyone nearby laugh uncontrollably",
+          "aestheticDescription": "Pink-purple crystals with sparkles, giggling sounds emanate, can't look without smiling",
+          "isBuildingMaterial": true,
+          "structuralStrength": 30,
+          "temperatureResistance": 60,
+          "moistureResistance": 85
+        },
+        "magical": {
+          "effects": ["forced_laughter", "mood_boost", "productivity_loss"],
+          "passive": true,
+          "school": "enchantment"
+        }
+      }
+    },
+    {
+      "id": "material:cursed_gold",
+      "name": "Cursed Gold",
+      "category": "material",
+      "weight": 7.0,
+      "stackSize": 10,
+      "baseMaterial": "gold",
+      "isGatherable": true,
+      "gatherSources": ["cursed_hoard", "pirate_gold", "blood_money", "devil_deal"],
+      "baseValue": 1000,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": false,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": 0,
+          "hostility": 0.8,
+          "transmutation": "brings terrible luck, accidents increase, relationships fail, can't get rid of it",
+          "aestheticDescription": "Gleaming gold almost too shiny, feels wrong to touch, bad vibes, subtle wrongness",
+          "isBuildingMaterial": true,
+          "structuralStrength": 40,
+          "temperatureResistance": 80,
+          "moistureResistance": 100
+        },
+        "magical": {
+          "effects": ["luck_drain", "accident_magnet", "relationship_deterioration"],
+          "passive": true,
+          "cursed": true,
+          "school": "necromancy"
+        }
+      }
+    },
+    {
+      "id": "material:hungry_stone",
+      "name": "Hungry Stone",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 8,
+      "baseMaterial": "consuming_stone",
+      "isGatherable": true,
+      "gatherSources": ["devouring_quarry", "consumption_cave", "hungry_mountain"],
+      "baseValue": 300,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": false,
+          "isSolid": true,
+          "decayRate": -0.1,
+          "hostility": 0.7,
+          "transmutation": "slowly consumes adjacent materials, grows as it eats, prefers valuable materials",
+          "aestheticDescription": "Gray stone with darker patches, veins spread to adjacent materials, dissolving effect",
+          "isBuildingMaterial": true,
+          "structuralStrength": 65,
+          "temperatureResistance": 85,
+          "moistureResistance": 90
+        },
+        "magical": {
+          "effects": ["material_consumption", "growth", "insatiable_hunger"],
+          "passive": true,
+          "school": "transmutation"
+        }
+      }
+    },
+    {
+      "id": "material:mimic_material",
+      "name": "Mimic Material",
+      "category": "material",
+      "weight": 1.8,
+      "stackSize": 15,
+      "baseMaterial": "shapeshifter",
+      "isGatherable": true,
+      "gatherSources": ["shapeshift_accident", "doppelganger_stone", "illusion_deposit"],
+      "baseValue": 450,
+      "rarity": "rare",
+      "traits": {
+        "material": {
+          "isLiving": true,
+          "isEdible": false,
+          "isTransient": true,
+          "isSolid": true,
+          "decayRate": 0.15,
+          "hostility": 0.5,
+          "transmutation": "shapeshifts to look like other materials, reverts randomly, fools inspection",
+          "aestheticDescription": "Looks like whatever it mimics, occasional shimmer breaks illusion, feels slightly off",
+          "isBuildingMaterial": true,
+          "structuralStrength": 45,
+          "temperatureResistance": 60,
+          "moistureResistance": 70
+        },
+        "magical": {
+          "effects": ["visual_mimicry", "deception", "paranoia"],
+          "passive": true,
+          "school": "illusion"
+        }
+      }
+    }
+  ]
+}

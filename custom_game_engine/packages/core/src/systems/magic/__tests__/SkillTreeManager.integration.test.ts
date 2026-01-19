@@ -87,7 +87,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Grant XP multiple times - XP should accumulate since node costs 500
       skillTreeManager.grantSkillXP(entity, 'test-paradigm', 25);
@@ -130,7 +130,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Grant XP to paradigm with no state
       skillTreeManager.grantSkillXP(entity, 'new-paradigm', 25);
@@ -179,7 +179,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Unlock node
       const result = skillTreeManager.unlockSkillNode(entity, 'unlock-paradigm', 'unlock-node', 50);
@@ -226,7 +226,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Listen for event using specific event type
       const events: any[] = [];
@@ -280,7 +280,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Attempt unlock
       const result = skillTreeManager.unlockSkillNode(entity, 'expensive-paradigm', 'expensive-node', 200);
@@ -327,7 +327,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Attempt duplicate unlock
       const result = skillTreeManager.unlockSkillNode(entity, 'dupe-paradigm', 'dupe-node', 25);
@@ -388,7 +388,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Listen for spell unlock event using specific event type
       const events: any[] = [];
@@ -453,7 +453,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const progress = skillTreeManager.getSkillTreeProgress(entity, 'progress-paradigm');
 
@@ -482,7 +482,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const progress = skillTreeManager.getSkillTreeProgress(entity, 'nonexistent');
       expect(progress).toBeUndefined();
@@ -528,7 +528,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Try to unlock advanced node without prerequisite
       const progress1 = skillTreeManager.getSkillTreeProgress(entity, 'prereq-paradigm');
@@ -600,7 +600,7 @@ describe('SkillTreeManager Integration', () => {
         spellSlots: [],
         knownSpells: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Note: The evaluation context uses xp as totalXpEarned
       // So with 60 XP, the condition (50 required) should be met

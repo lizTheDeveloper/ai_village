@@ -1,0 +1,177 @@
+{
+  "axe": {
+    "id": "axe",
+    "name": "Axe",
+    "description": "A tool for chopping wood from trees",
+    "category": "tool",
+    "provides": [
+      { "capability": "wood_gathering", "description": "Enables gathering wood from trees" },
+      { "capability": "tree_chopping", "description": "Can cut down trees" }
+    ],
+    "sources": ["craft at workbench (2 wood + 3 stone)"],
+    "solves": ["cannot_gather_wood", "need_wood", "trees_blocking"]
+  },
+  "pickaxe": {
+    "id": "pickaxe",
+    "name": "Pickaxe",
+    "description": "A tool for mining stone and ore",
+    "category": "tool",
+    "provides": [
+      { "capability": "stone_gathering", "description": "Enables gathering stone from rocks" },
+      { "capability": "ore_mining", "description": "Enables mining iron, coal, gold, copper ore" }
+    ],
+    "sources": ["craft at workbench (2 wood + 3 stone)"],
+    "solves": ["cannot_gather_stone", "cannot_mine_ore", "need_stone", "need_ore"]
+  },
+  "hoe": {
+    "id": "hoe",
+    "name": "Hoe",
+    "description": "A farming tool for tilling soil",
+    "category": "tool",
+    "provides": [
+      { "capability": "tilling", "description": "Enables tilling soil for planting" },
+      { "capability": "farming", "description": "Required for preparing farmland" }
+    ],
+    "sources": ["craft at workbench (2 wood + 2 stone)"],
+    "solves": ["cannot_till", "cannot_farm", "need_farmland"]
+  },
+  "fishing_rod": {
+    "id": "fishing_rod",
+    "name": "Fishing Rod",
+    "description": "A tool for catching fish",
+    "category": "tool",
+    "provides": [
+      { "capability": "fishing", "description": "Enables catching fish from water" }
+    ],
+    "sources": ["craft at workbench (3 wood + 2 fiber)"],
+    "solves": ["cannot_fish", "need_fish", "want_food_from_water"]
+  },
+  "hammer": {
+    "id": "hammer",
+    "name": "Hammer",
+    "description": "A tool for construction and repairs",
+    "category": "tool",
+    "provides": [
+      { "capability": "building", "description": "Required for constructing buildings" },
+      { "capability": "repair", "description": "Can repair damaged structures" }
+    ],
+    "sources": ["craft at workbench (1 wood + 2 stone)"],
+    "solves": ["cannot_build", "need_construction", "building_damaged"]
+  },
+  "wood": {
+    "id": "wood",
+    "name": "Wood",
+    "description": "Basic building material from trees",
+    "category": "resource",
+    "provides": [
+      { "capability": "building_material", "description": "Used in most constructions" },
+      { "capability": "fuel", "description": "Burns in campfires for heat" },
+      { "capability": "crafting_material", "description": "Ingredient for tools and items" }
+    ],
+    "sources": ["gather from trees (requires axe)"],
+    "solves": ["need_building_materials", "need_fuel", "need_crafting_materials"]
+  },
+  "stone": {
+    "id": "stone",
+    "name": "Stone",
+    "description": "Sturdy building material from rocks",
+    "category": "resource",
+    "provides": [
+      { "capability": "building_material", "description": "Used in sturdy constructions" },
+      { "capability": "crafting_material", "description": "Ingredient for tools" }
+    ],
+    "sources": ["gather from rocks/boulders (requires pickaxe)"],
+    "solves": ["need_stone", "need_sturdy_materials"]
+  },
+  "fiber": {
+    "id": "fiber",
+    "name": "Plant Fiber",
+    "description": "Flexible material from plants",
+    "category": "resource",
+    "provides": [
+      { "capability": "crafting_material", "description": "Used for rope, cloth, bedding" }
+    ],
+    "sources": ["gather from grass/plants/flax (no tool needed)"],
+    "solves": ["need_fiber", "need_rope", "need_cloth_materials"]
+  },
+  "iron_ore": {
+    "id": "iron_ore",
+    "name": "Iron Ore",
+    "description": "Raw metal ore that can be smelted",
+    "category": "resource",
+    "provides": [
+      { "capability": "smelting_input", "description": "Smelts into iron ingots at forge" }
+    ],
+    "sources": ["mine from iron deposits (requires pickaxe)"],
+    "solves": ["need_iron_ore", "need_metal"]
+  },
+  "iron_ingot": {
+    "id": "iron_ingot",
+    "name": "Iron Ingot",
+    "description": "Refined metal for crafting",
+    "category": "material",
+    "provides": [
+      { "capability": "metal_crafting", "description": "Used for metal tools and weapons" },
+      { "capability": "building_material", "description": "Required for advanced buildings" }
+    ],
+    "sources": ["smelt iron_ore at forge (3 ore → 1 ingot)"],
+    "solves": ["need_iron_ingot", "need_refined_metal"]
+  },
+  "cloth": {
+    "id": "cloth",
+    "name": "Cloth",
+    "description": "Woven fabric for clothing and shelter",
+    "category": "material",
+    "provides": [
+      { "capability": "clothing_material", "description": "Used for making clothes" },
+      { "capability": "shelter_material", "description": "Used for tents and bedding" }
+    ],
+    "sources": ["craft from fiber (3 fiber → 1 cloth)"],
+    "solves": ["need_cloth", "need_tent_materials", "need_clothing"]
+  },
+  "berry": {
+    "id": "berry",
+    "name": "Berry",
+    "description": "A small edible fruit",
+    "category": "food",
+    "provides": [
+      { "capability": "food", "description": "Restores 15 hunger when eaten", "value": 15 }
+    ],
+    "sources": ["gather from berry bushes (no tool needed)"],
+    "solves": ["hungry", "need_food"]
+  },
+  "raw_meat": {
+    "id": "raw_meat",
+    "name": "Raw Meat",
+    "description": "Uncooked meat from animals",
+    "category": "food",
+    "provides": [
+      { "capability": "food", "description": "Restores 15 hunger (risky uncooked)", "value": 15 },
+      { "capability": "cooking_input", "description": "Cooks into cooked_meat at campfire" }
+    ],
+    "sources": ["hunting animals"],
+    "solves": ["need_meat", "need_protein"]
+  },
+  "cooked_meat": {
+    "id": "cooked_meat",
+    "name": "Cooked Meat",
+    "description": "Safely prepared meat",
+    "category": "food",
+    "provides": [
+      { "capability": "food", "description": "Restores 50 hunger when eaten", "value": 50 }
+    ],
+    "sources": ["cook raw_meat at campfire"],
+    "solves": ["hungry", "need_good_food", "need_protein"]
+  },
+  "bread": {
+    "id": "bread",
+    "name": "Bread",
+    "description": "Baked grain product",
+    "category": "food",
+    "provides": [
+      { "capability": "food", "description": "Restores 40 hunger when eaten", "value": 40 }
+    ],
+    "sources": ["craft from wheat (3 wheat → 1 bread)"],
+    "solves": ["hungry", "need_food"]
+  }
+}

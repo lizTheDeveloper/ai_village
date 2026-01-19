@@ -63,7 +63,7 @@ describe('Afterlife System Integration', () => {
       });
 
       (entity as any).addComponent(afterlife);
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Verify initial state
       expect(afterlife.coherence).toBe(1.0); // Full identity
@@ -131,7 +131,7 @@ describe('Afterlife System Integration', () => {
       });
 
       (entity as any).addComponent(afterlife);
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
 
@@ -177,7 +177,7 @@ describe('Afterlife System Integration', () => {
       afterlife.solitude = 0.9;
 
       (entity as any).addComponent(afterlife);
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       expect(afterlife.isShade).toBe(false);
 
@@ -223,7 +223,7 @@ describe('Afterlife System Integration', () => {
       afterlife.peace = 0.9;   // Very peaceful
 
       (entity as any).addComponent(afterlife);
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       expect(afterlife.hasPassedOn).toBe(false);
 
@@ -357,7 +357,7 @@ describe('Afterlife System Integration', () => {
         });
 
         (entity as any).addComponent(afterlife);
-        (world as any)._addEntity(entity);
+        world.addEntity(entity);
         souls.push(entity);
       }
 

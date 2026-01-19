@@ -100,7 +100,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Test Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
       expect(initialCoherence).toBe(1.0);
@@ -137,7 +137,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Lonely Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
 
@@ -170,7 +170,7 @@ describe('AfterlifeNeedsSystem', () => {
       entity2.addComponent(createPositionComponent(0, 0));
       entity2.addComponent(createIdentityComponent('Connected Soul'));
 
-      (world as any)._addEntity(entity2);
+      world.addEntity(entity2);
 
       // Advance tick for second entity test too
       (world as any)._tick = 1200;
@@ -204,7 +204,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Fading Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       expect(afterlife.isShade).toBe(false);
 
@@ -250,7 +250,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Remembered Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialTether = afterlife.tether;
 
@@ -289,7 +289,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Forgotten Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialTether = afterlife.tether;
 
@@ -321,7 +321,7 @@ describe('AfterlifeNeedsSystem', () => {
       entity2.addComponent(createPositionComponent(0, 0));
       entity2.addComponent(createIdentityComponent('Remembered Soul'));
 
-      (world as any)._addEntity(entity2);
+      world.addEntity(entity2);
 
       const initialTether2 = afterlife2.tether;
 
@@ -356,7 +356,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Isolated Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialSolitude = afterlife.solitude;
 
@@ -389,7 +389,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Nearly Max Solitude'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const longTime = 10000;
       system.update(world, [entity], longTime);
@@ -415,7 +415,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Peaceful Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialPeace = afterlife.peace;
 
@@ -447,7 +447,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Unfinished Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialPeace = afterlife.peace;
 
@@ -484,7 +484,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Departing Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       expect(afterlife.hasPassedOn).toBe(false);
 
@@ -512,7 +512,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Angry Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       system.update(world, [entity], 1);
 
@@ -536,7 +536,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Living Soul'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
 
@@ -564,7 +564,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Passed On'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
 
@@ -591,7 +591,7 @@ describe('AfterlifeNeedsSystem', () => {
       (entity as any).addComponent(createPositionComponent(0, 0));
       (entity as any).addComponent(createIdentityComponent('Shade'));
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
 

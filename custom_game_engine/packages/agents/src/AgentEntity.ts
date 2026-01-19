@@ -316,7 +316,7 @@ export function createWanderingAgent(
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
   // Add to world - using internal _addEntity method for proper spatial indexing
-  (world as WorldInternal)._addEntity(entity);
+  world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
   const identity = entity.getComponent('identity') as { name: string } | undefined;
@@ -562,7 +562,7 @@ export function createLLMAgent(
   }
 
   // Add to world - using internal _addEntity method for proper spatial indexing
-  (world as WorldInternal)._addEntity(entity);
+  world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
   const identity = entity.getComponent('identity') as { name: string } | undefined;

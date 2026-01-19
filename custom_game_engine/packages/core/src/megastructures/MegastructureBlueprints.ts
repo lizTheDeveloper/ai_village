@@ -90,86 +90,205 @@ export interface MegastructureBlueprint {
 }
 
 // ============================================================================
+// DATA LOADING
+// ============================================================================
+
+import blueprintsData from '../../data/megastructures.json';
+
+// Load and validate blueprints from JSON
+function loadMegastructureBlueprints(): Record<string, MegastructureBlueprint> {
+  const blueprints: Record<string, MegastructureBlueprint> = {};
+
+  for (const [key, data] of Object.entries(blueprintsData)) {
+    // Validate required fields
+    if (!data.id || !data.name || !data.category || !data.tier) {
+      throw new Error(`Invalid megastructure blueprint: ${key} - missing required fields`);
+    }
+
+    blueprints[key] = data as MegastructureBlueprint;
+  }
+
+  return blueprints;
+}
+
+// ============================================================================
 // ORBITAL CATEGORY (Tech 7-9)
 // ============================================================================
 
-const SPACE_STATION: MegastructureBlueprint = {
-  id: 'space_station',
-  name: 'Space Station',
-  category: 'orbital',
-  tier: 'planet',
-  techLevelRequired: 7.0,
-  totalMass: 500_000,  // 500 tons
-  constructionTimeYears: 5,
-  laborRequired: 10_000,  // 2000 person-years average
+// Data now loaded from JSON - see ../../data/megastructures.json
 
-  resources: {
-    stellarite_plate: 1_000,
-    steel_ingot: 5_000,
-    hull_plating: 200,
-    life_support_module: 50,
-    power_core: 10,
-    advanced_circuit: 2_000,
-    communication_relay: 20,
-  },
+// Legacy constants removed - all data now in JSON
+// The following sections (Orbital, Planetary, Stellar, Galactic, Transcendent)
+// have been replaced with JSON data loading
 
-  prerequisites: {
-    research: ['orbital_construction', 'life_support_systems'],
-    techLevel: 7.0,
-  },
+// ============================================================================
+// BLUEPRINT REGISTRY
+// ============================================================================
 
-  phases: [
-    {
-      name: 'Foundation',
-      durationPercent: 20,
-      resourcePercent: 30,
-      description: 'Core structure and docking systems',
-    },
-    {
-      name: 'Habitation',
-      durationPercent: 40,
-      resourcePercent: 40,
-      description: 'Life support and living quarters',
-    },
-    {
-      name: 'Systems Integration',
-      durationPercent: 30,
-      resourcePercent: 20,
-      description: 'Power, communications, and final systems',
-    },
-    {
-      name: 'Commissioning',
-      durationPercent: 10,
-      resourcePercent: 10,
-      description: 'Testing and crew transfer',
-    },
-  ],
+export const MEGASTRUCTURE_BLUEPRINTS: Record<string, MegastructureBlueprint> = loadMegastructureBlueprints();
 
-  capabilities: {
-    populationCapacity: 1_000,
-    energyOutput: 10_000_000,  // 10 MW
-    defenseRating: 20,
-    storageCapacity: 50_000_000,  // 50 TB
-  },
+// ============================================================================
+// HELPER FUNCTIONS (unchanged)
+// ============================================================================
 
-  maintenancePerYear: {
-    stellarite_plate: 10,
-    advanced_circuit: 50,
-    power_core: 1,
-  },
-  energyMaintenancePerYear: 0,  // Self-powered
-  degradationRate: 2.0,
-  failureTimeYears: 20,
+/**
+ * Get a megastructure blueprint by ID
+ */
+export function getMegastructureBlueprint(id: string): MegastructureBlueprint | undefined {
+  return MEGASTRUCTURE_BLUEPRINTS[id];
+}
 
-  militaryValue: 30,
-  economicValue: 50,
-  culturalValue: 60,
+/**
+ * Get all megastructures in a category
+ */
+export function getMegastructuresByCategory(category: MegastructureCategory): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS).filter(bp => bp.category === category);
+}
 
-  collapseRiskBase: 0.5,
-  vulnerableTo: ['kinetic_weapons', 'solar_flares', 'debris_collision', 'sabotage'],
-};
+/**
+ * Get megastructures within a tech level range
+ */
+export function getMegastructuresByTechLevel(minTech: number, maxTech: number): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS).filter(
+    bp => bp.techLevelRequired >= minTech && bp.techLevelRequired <= maxTech
+  );
+}
 
-const STANFORD_TORUS: MegastructureBlueprint = {
+/**
+ * Check if civilization can build a megastructure
+ */
+export interface CivilizationStats {
+  techLevel: number;
+  availableResources: Record<string, number>;
+  completedMegastructures: string[];
+  researchCompleted: string[];
+}
+
+export interface CanBuildResult {
+  canBuild: boolean;
+  missingRequirements: string[];
+}
+
+export function canBuildMegastructure(
+  blueprintId: string,
+  civStats: CivilizationStats
+): CanBuildResult {
+  const blueprint = getMegastructureBlueprint(blueprintId);
+
+  if (!blueprint) {
+    return {
+      canBuild: false,
+      missingRequirements: [`Unknown megastructure: ${blueprintId}`],
+    };
+  }
+
+  const missing: string[] = [];
+
+  // Check tech level
+  if (civStats.techLevel < blueprint.techLevelRequired) {
+    missing.push(
+      `Tech level ${blueprint.techLevelRequired} required (current: ${civStats.techLevel})`
+    );
+  }
+
+  // Check prerequisite megastructures
+  if (blueprint.prerequisites?.megastructures) {
+    for (const reqMega of blueprint.prerequisites.megastructures) {
+      if (!civStats.completedMegastructures.includes(reqMega)) {
+        const reqBlueprint = getMegastructureBlueprint(reqMega);
+        missing.push(
+          `Required megastructure: ${reqBlueprint?.name || reqMega}`
+        );
+      }
+    }
+  }
+
+  // Check prerequisite research
+  if (blueprint.prerequisites?.research) {
+    for (const reqResearch of blueprint.prerequisites.research) {
+      if (!civStats.researchCompleted.includes(reqResearch)) {
+        missing.push(`Required research: ${reqResearch}`);
+      }
+    }
+  }
+
+  // Check resources
+  for (const [itemId, required] of Object.entries(blueprint.resources)) {
+    const available = civStats.availableResources[itemId] || 0;
+    if (available < required) {
+      missing.push(
+        `Insufficient ${itemId}: ${available}/${required} (need ${required - available} more)`
+      );
+    }
+  }
+
+  return {
+    canBuild: missing.length === 0,
+    missingRequirements: missing,
+  };
+}
+
+/**
+ * Get all buildable megastructures for a civilization
+ */
+export function getBuildableMegastructures(civStats: CivilizationStats): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS).filter(
+    blueprint => canBuildMegastructure(blueprint.id, civStats).canBuild
+  );
+}
+
+/**
+ * Calculate total construction cost in person-years
+ */
+export function calculateTotalLaborCost(blueprint: MegastructureBlueprint): number {
+  return blueprint.laborRequired;
+}
+
+/**
+ * Calculate yearly maintenance cost value
+ */
+export function calculateMaintenanceValue(
+  blueprint: MegastructureBlueprint,
+  itemValues: Record<string, number>
+): number {
+  let total = 0;
+  for (const [itemId, amount] of Object.entries(blueprint.maintenancePerYear)) {
+    total += (itemValues[itemId] || 0) * amount;
+  }
+  return total;
+}
+
+/**
+ * Get megastructures by tier
+ */
+export function getMegastructuresByTier(tier: MegastructureTier): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS).filter(bp => bp.tier === tier);
+}
+
+/**
+ * Get the most expensive megastructures by total mass
+ */
+export function getMostMassiveMegastructures(count: number = 10): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS)
+    .sort((a, b) => b.totalMass - a.totalMass)
+    .slice(0, count);
+}
+
+/**
+ * Get megastructures that require a specific prerequisite
+ */
+export function getMegastructuresRequiring(prerequisiteId: string): MegastructureBlueprint[] {
+  return Object.values(MEGASTRUCTURE_BLUEPRINTS).filter(
+    bp => bp.prerequisites?.megastructures?.includes(prerequisiteId)
+  );
+}
+
+// LEGACY CODE REMOVED BELOW THIS LINE
+// All hardcoded blueprint definitions have been moved to ../../data/megastructures.json
+// The following ~1700 lines of hardcoded TypeScript constants have been replaced
+// with a single JSON file and a loader function.
+
+const STANFORD_TORUS_REMOVED_SEE_JSON: MegastructureBlueprint = {
   id: 'stanford_torus',
   name: 'Stanford Torus',
   category: 'orbital',

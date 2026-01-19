@@ -51,6 +51,31 @@ import {
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 
 // ============================================================================
+// FAST PRNG (xorshift32)
+// ============================================================================
+
+/**
+ * Fast xorshift32 PRNG for collapse risk rolls
+ * ~10x faster than Math.random()
+ */
+class XorShift32 {
+  private state: number;
+
+  constructor(seed: number = Date.now()) {
+    this.state = seed >>> 0 || 1; // Ensure non-zero
+  }
+
+  next(): number {
+    let x = this.state;
+    x ^= x << 13;
+    x ^= x >>> 17;
+    x ^= x << 5;
+    this.state = x >>> 0;
+    return (x >>> 0) / 0xffffffff; // Return [0, 1)
+  }
+}
+
+// ============================================================================
 // SYSTEM
 // ============================================================================
 
@@ -71,9 +96,24 @@ export class MegastructureConstructionSystem extends BaseSystem {
   // PERF: Cache entities for fast lookups
   private projectCache: Map<string, EntityImpl> = new Map();
   private inventoryCache: Map<string, EntityImpl> = new Map();
+  private blueprintCache: Map<string, MegastructureBlueprint> = new Map();
 
-  // PERF: Reusable working objects
+  // PERF: Reusable working objects (zero allocation in hot paths)
   private workingMissingResources: Record<string, number> = {};
+  private workingSlotIndices: number[] = [];
+  private workingResourceConsumption: Map<string, number> = new Map();
+
+  // PERF: Fast PRNG for collapse risk rolls
+  private prng: XorShift32 = new XorShift32();
+
+  // PERF: Constants precomputed
+  private static readonly TICKS_PER_YEAR = 365 * 24 * 60 * 3; // 20 TPS
+  private static readonly RISK_PER_TICK_NO_RESOURCES = 0.001;
+  private static readonly RISK_PER_TICK_DELAY = 0.0005;
+  private static readonly RISK_PER_TICK_ENTROPY = 0.0001;
+  private static readonly DELAY_THRESHOLD = 0.1;
+  private static readonly PROGRESS_MILESTONE_STEP = 0.1;
+  private static readonly ENTROPY_START_YEARS = 10;
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
@@ -100,15 +140,17 @@ export class MegastructureConstructionSystem extends BaseSystem {
   }
 
   /**
-   * PERF: Rebuild entity caches
+   * PERF: Rebuild entity caches - indexed loops, early continue
    */
   private rebuildCaches(world: World): void {
+    // PERF: Clear without reallocating
     this.projectCache.clear();
     this.inventoryCache.clear();
 
-    // Cache construction projects
+    // Cache construction projects - indexed loop
     const projectEntities = world.query().with(CT.ConstructionProject).executeEntities();
-    for (let i = 0; i < projectEntities.length; i++) {
+    const projectCount = projectEntities.length;
+    for (let i = 0; i < projectCount; i++) {
       const entity = projectEntities[i];
       if (!entity) continue;
       const project = entity.getComponent<ConstructionProjectComponent>(CT.ConstructionProject);
@@ -116,9 +158,10 @@ export class MegastructureConstructionSystem extends BaseSystem {
       this.projectCache.set(project.projectId, entity as EntityImpl);
     }
 
-    // Cache inventory entities (buildings, stockpiles, etc.)
+    // Cache inventory entities - indexed loop
     const invEntities = world.query().with(CT.Inventory).executeEntities();
-    for (let i = 0; i < invEntities.length; i++) {
+    const invCount = invEntities.length;
+    for (let i = 0; i < invCount; i++) {
       const entity = invEntities[i];
       if (!entity) continue;
       this.inventoryCache.set(entity.id, entity as EntityImpl);
@@ -127,6 +170,7 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
   /**
    * Process construction progress for a single project
+   * PERF: Early exits, blueprint caching, inlined checks
    */
   private processConstruction(
     ctx: SystemContext,
@@ -134,42 +178,59 @@ export class MegastructureConstructionSystem extends BaseSystem {
     project: ConstructionProjectComponent,
     tick: number
   ): void {
-    // Check if project is complete
-    if (isComplete(project)) {
+    // PERF: Inline isComplete check for early exit
+    if (project.progress.overallProgress >= 1.0) {
       this.completeConstruction(ctx, projectEntity, project);
       return;
     }
 
-    // Get blueprint for this megastructure type
-    const blueprint = getMegastructureBlueprint(project.megastructureType);
+    // PERF: Blueprint cache with Map lookup
+    let blueprint = this.blueprintCache.get(project.megastructureType);
     if (!blueprint) {
-      this.handleConstructionFailure(
-        ctx,
-        projectEntity,
-        project,
-        'unknown_megastructure_type'
-      );
-      return;
-    }
-
-    // Check if we're behind schedule
-    if (isBehindSchedule(project, tick)) {
-      this.handleDelay(ctx, projectEntity, project, tick);
+      blueprint = getMegastructureBlueprint(project.megastructureType);
+      if (!blueprint) {
+        this.handleConstructionFailure(
+          ctx,
+          projectEntity,
+          project,
+          'unknown_megastructure_type'
+        );
+        return;
+      }
+      this.blueprintCache.set(project.megastructureType, blueprint);
     }
 
     // Calculate construction progress based on resources + labor + energy
     const progressDelta = this.calculateProgressDelta(project, blueprint, tick);
 
+    // PERF: Early exit if no progress can be made
+    if (progressDelta <= 0) {
+      // Still check risks even with no progress
+      this.updateRisks(ctx, projectEntity, project, tick);
+      return;
+    }
+
     // Update project progress
     this.updateConstructionProgress(ctx.world, projectEntity, project, progressDelta);
 
-    // Consume resources if progress was made
-    if (progressDelta > 0) {
-      this.consumeResources(ctx, projectEntity, project, blueprint, progressDelta);
+    // Consume resources
+    this.consumeResources(ctx, projectEntity, project, blueprint, progressDelta);
+
+    // PERF: Inline phase transition check
+    if (project.progress.phaseProgress >= 1.0) {
+      this.checkPhaseTransition(ctx, projectEntity, project);
     }
 
-    // Check for phase transitions
-    this.checkPhaseTransition(ctx, projectEntity, project);
+    // PERF: Inline delay check before calling handler
+    const expectedTicks = project.timeline.estimatedCompletionTick - project.timeline.startTick;
+    const elapsedTicks = tick - project.timeline.startTick;
+    if (elapsedTicks > 0 && expectedTicks > 0) {
+      const expectedProgress = elapsedTicks / expectedTicks;
+      const delayPercent = (expectedProgress - project.progress.overallProgress) / expectedProgress;
+      if (delayPercent > MegastructureConstructionSystem.DELAY_THRESHOLD) {
+        this.handleDelay(ctx, projectEntity, project, tick, delayPercent);
+      }
+    }
 
     // Risk management
     this.updateRisks(ctx, projectEntity, project, tick);
@@ -177,40 +238,37 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
   /**
    * Calculate how much progress can be made this tick
+   * PERF: Precomputed constants, inlined multiplier calculations
    */
   private calculateProgressDelta(
     project: ConstructionProjectComponent,
     blueprint: MegastructureBlueprint,
     tick: number
   ): number {
-    // Base progress rate (per tick)
-    const totalTicks = blueprint.constructionTimeYears * 365 * 24 * 60 * 3; // Convert years to ticks (20 TPS)
+    // PERF: Use precomputed constant instead of multiplication chain
+    const totalTicks = blueprint.constructionTimeYears * MegastructureConstructionSystem.TICKS_PER_YEAR;
     const baseProgressPerTick = 1.0 / totalTicks;
 
-    // Labor multiplier (0-1 based on allocation vs requirement)
-    const laborRatio = Math.min(1.0, project.progress.laborAllocated / blueprint.laborRequired);
-    const laborMultiplier = 0.5 + (laborRatio * 0.5); // 50% base, up to 100% with full labor
+    // PERF: Inline calculations, avoid intermediate variables where possible
+    const progress = project.progress;
+    const risks = project.risks;
 
-    // Energy multiplier (similar to labor)
-    const energyRatio = Math.min(1.0, project.progress.energyAllocated / blueprint.totalMass);
-    const energyMultiplier = 0.7 + (energyRatio * 0.3); // 70% base, up to 100% with full energy
+    // Labor multiplier (0-1 based on allocation vs requirement)
+    const laborRatio = progress.laborAllocated / blueprint.laborRequired;
+    const laborMult = laborRatio >= 1.0 ? 1.0 : 0.5 + laborRatio * 0.5;
+
+    // Energy multiplier
+    const energyRatio = progress.energyAllocated / blueprint.totalMass;
+    const energyMult = energyRatio >= 1.0 ? 1.0 : 0.7 + energyRatio * 0.3;
 
     // Resource availability multiplier
-    const resourceCompletion = getResourceCompletionPercent(project);
-    const resourceMultiplier = Math.min(1.0, resourceCompletion);
+    const resourceMult = getResourceCompletionPercent(project);
 
     // Risk penalty (higher risk = slower progress)
-    const riskPenalty = 1.0 - (project.risks.collapseRisk * 0.5); // Up to 50% slowdown at max risk
+    const riskPenalty = 1.0 - risks.collapseRisk * 0.5;
 
-    // Final progress delta
-    const progressDelta =
-      baseProgressPerTick *
-      laborMultiplier *
-      energyMultiplier *
-      resourceMultiplier *
-      riskPenalty;
-
-    return progressDelta;
+    // PERF: Single multiplication chain
+    return baseProgressPerTick * laborMult * energyMult * resourceMult * riskPenalty;
   }
 
   /**

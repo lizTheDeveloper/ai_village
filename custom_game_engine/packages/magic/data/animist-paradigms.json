@@ -1,0 +1,138 @@
+{
+  "example_kami": [
+    {
+      "id": "yama_no_kami",
+      "name": "The Mountain Father",
+      "type": "nature",
+      "rank": "major",
+      "domain": "The great mountain and all who dwell upon it",
+      "preferredOfferings": ["sake", "rice", "mountain_flowers"],
+      "taboos": ["cutting_ancient_trees", "polluting_springs", "disrespecting_elders"],
+      "disposition": "neutral",
+      "blessings": ["safe_passage", "hunting_luck", "mineral_finding", "weather_warning"],
+      "curses": ["lost_paths", "rockslides", "predator_attention"],
+      "shrineLocation": "summit_shrine",
+      "activeSeasons": ["spring", "autumn"],
+      "description": "Ancient spirit of the mountain, grandfather to lesser spirits of peak and valley",
+      "personality": "Stern but fair, respects those who respect the mountain"
+    },
+    {
+      "id": "kawa_no_kami",
+      "name": "River-Running-Swift",
+      "type": "nature",
+      "rank": "regional",
+      "domain": "The great river from source to sea",
+      "preferredOfferings": ["fish_released", "flowers", "sake"],
+      "taboos": ["polluting_water", "damming_flow", "taking_too_many_fish"],
+      "disposition": "neutral",
+      "blessings": ["safe_crossing", "abundant_fish", "flood_warning", "water_purification"],
+      "curses": ["drowning_currents", "empty_nets", "flash_floods"],
+      "shrineLocation": "river_bend_shrine",
+      "activeSeasons": ["summer"],
+      "description": "Swift and changeable spirit of the river, life-giver and life-taker",
+      "personality": "Mercurial, respects those who understand water's dual nature"
+    }
+  ],
+  "allomantic_metals": [
+    {
+      "id": "steel",
+      "name": "Steel",
+      "type": "physical",
+      "direction": "push",
+      "effect": "Push on nearby metals",
+      "rarity": "common"
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "type": "physical",
+      "direction": "pull",
+      "effect": "Pull on nearby metals",
+      "rarity": "common"
+    },
+    {
+      "id": "pewter",
+      "name": "Pewter",
+      "type": "physical",
+      "direction": "push",
+      "effect": "Enhanced strength, speed, durability",
+      "drawback": "Pewter drag after",
+      "rarity": "common"
+    },
+    {
+      "id": "tin",
+      "name": "Tin",
+      "type": "physical",
+      "direction": "pull",
+      "effect": "Enhanced senses",
+      "drawback": "Sensory overload risk",
+      "rarity": "common"
+    },
+    {
+      "id": "zinc",
+      "name": "Zinc",
+      "type": "mental",
+      "direction": "push",
+      "effect": "Riot - inflame emotions",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "brass",
+      "name": "Brass",
+      "type": "mental",
+      "direction": "pull",
+      "effect": "Soothe - dampen emotions",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "type": "mental",
+      "direction": "push",
+      "effect": "Hide allomantic pulses (Smoker)",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze",
+      "type": "mental",
+      "direction": "pull",
+      "effect": "Detect allomantic pulses (Seeker)",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "aluminum",
+      "name": "Aluminum",
+      "type": "enhancement",
+      "direction": "push",
+      "effect": "Wipe own metal reserves",
+      "rarity": "rare"
+    },
+    {
+      "id": "duralumin",
+      "name": "Duralumin",
+      "type": "enhancement",
+      "direction": "push",
+      "effect": "Massively boost next metal burned",
+      "drawback": "Burns all reserves instantly",
+      "rarity": "rare"
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "type": "temporal",
+      "direction": "pull",
+      "effect": "See past self (who you could have been)",
+      "drawback": "Psychologically traumatic",
+      "rarity": "rare"
+    },
+    {
+      "id": "atium",
+      "name": "Atium",
+      "type": "temporal",
+      "direction": "pull",
+      "effect": "See moments into the future",
+      "rarity": "legendary"
+    }
+  ]
+}

@@ -188,9 +188,8 @@ export class SoulCreationSystem extends BaseSystem {
       // Realm Location
       ancientSoul.addComponent(createRealmLocationComponent('elysium'));
 
-      // Add to world - uses internal _addEntity as public API doesn't expose direct entity addition
-      const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
-      worldImpl._addEntity(ancientSoul);
+      // Add to world
+      world.addEntity(ancientSoul);
 
       console.log(`[SoulCreationSystem]   Created ancient soul: ${randomName} (${lives} lives, ${(wisdom * 100).toFixed(0)}% wisdom)`);
     }
@@ -253,9 +252,8 @@ export class SoulCreationSystem extends BaseSystem {
     const realmLocation = createRealmLocationComponent('tapestry_of_fate');
     soulEntity.addComponent(realmLocation);
 
-    // Add to world - uses internal _addEntity as public API doesn't expose direct entity addition
-    const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
-    worldImpl._addEntity(soulEntity);
+    // Add to world
+    world.addEntity(soulEntity);
 
     return soulEntity.id;
   }
@@ -890,9 +888,7 @@ export class SoulCreationSystem extends BaseSystem {
 
     // Add to world ONLY if this is a new soul (reincarnated souls are already in the world)
     if (!context.reincarnatedSoulId) {
-      // Uses internal _addEntity as public API doesn't expose direct entity addition
-      const worldImpl = world as unknown as { _addEntity(entity: Entity): void };
-      worldImpl._addEntity(soulEntity);
+      world.addEntity(soulEntity);
       console.log(`[SoulCreationSystem] Added new soul ${soulName} to world`);
     } else {
       console.log(`[SoulCreationSystem] Updated existing soul ${soulName} with new destiny from ceremony`);

@@ -249,9 +249,13 @@ export function deliverResources(
   project: ConstructionProjectComponent,
   resources: Record<string, number>
 ): void {
-  for (const [itemId, quantity] of Object.entries(resources)) {
-    project.progress.resourcesDelivered[itemId] =
-      (project.progress.resourcesDelivered[itemId] || 0) + quantity;
+  // Cache reference to avoid repeated property access
+  const delivered = project.progress.resourcesDelivered;
+
+  // Use for-in loop (faster than Object.entries)
+  for (const itemId in resources) {
+    const quantity = resources[itemId];
+    delivered[itemId] = (delivered[itemId] || 0) + quantity;
   }
 }
 
@@ -283,30 +287,37 @@ export function updateProgress(
   project: ConstructionProjectComponent,
   deltaProgress: number
 ): void {
-  const currentPhase = project.timeline.phases[project.progress.currentPhase];
-  if (!currentPhase) {
+  // Cache references for faster access
+  const progress = project.progress;
+  const currentPhaseIdx = progress.currentPhase;
+
+  // Validate current phase exists
+  if (currentPhaseIdx >= project.timeline.phases.length) {
     throw new Error('No current phase available');
   }
 
-  // Update phase progress
-  project.progress.phaseProgress = Math.min(1.0, project.progress.phaseProgress + deltaProgress);
+  // Inline Math.min for hot path
+  const newPhaseProgress = progress.phaseProgress + deltaProgress;
+  progress.phaseProgress = newPhaseProgress > 1.0 ? 1.0 : newPhaseProgress;
 
   // Check if phase is complete
-  if (project.progress.phaseProgress >= 1.0) {
+  if (newPhaseProgress >= 1.0) {
     advanceToNextPhase(project);
   }
 
-  // Update overall progress
-  updateOverallProgress(project);
+  // Inline overall progress calculation to avoid function call
+  const totalPhases = project.timeline.phases.length;
+  progress.overallProgress = (progress.currentPhase + progress.phaseProgress) / totalPhases;
 }
 
 /**
  * Advance to next construction phase
  */
 function advanceToNextPhase(project: ConstructionProjectComponent): void {
-  if (project.progress.currentPhase < project.timeline.phases.length - 1) {
-    project.progress.currentPhase++;
-    project.progress.phaseProgress = 0;
+  const progress = project.progress;
+  if (progress.currentPhase < project.timeline.phases.length - 1) {
+    progress.currentPhase++;
+    progress.phaseProgress = 0;
   }
 }
 
@@ -315,11 +326,9 @@ function advanceToNextPhase(project: ConstructionProjectComponent): void {
  */
 function updateOverallProgress(project: ConstructionProjectComponent): void {
   const totalPhases = project.timeline.phases.length;
-  const completedPhases = project.progress.currentPhase;
-  const currentPhaseProgress = project.progress.phaseProgress;
+  const progress = project.progress;
 
-  project.progress.overallProgress =
-    (completedPhases + currentPhaseProgress) / totalPhases;
+  progress.overallProgress = (progress.currentPhase + progress.phaseProgress) / totalPhases;
 }
 
 /**
@@ -333,9 +342,13 @@ export function isComplete(project: ConstructionProjectComponent): boolean {
  * Check if all resources have been delivered
  */
 export function hasAllResources(project: ConstructionProjectComponent): boolean {
-  for (const [itemId, required] of Object.entries(project.requirements.resources)) {
-    const delivered = project.progress.resourcesDelivered[itemId] || 0;
-    if (delivered < required) {
+  // Cache references to avoid repeated property access
+  const required = project.requirements.resources;
+  const delivered = project.progress.resourcesDelivered;
+
+  // Use for-in loop (faster than Object.entries)
+  for (const itemId in required) {
+    if ((delivered[itemId] || 0) < required[itemId]) {
       return false;
     }
   }
@@ -346,20 +359,31 @@ export function hasAllResources(project: ConstructionProjectComponent): boolean 
  * Calculate resource completion percentage
  */
 export function getResourceCompletionPercent(project: ConstructionProjectComponent): number {
+  // Cache references
+  const required = project.requirements.resources;
+  const delivered = project.progress.resourcesDelivered;
+
   let totalRequired = 0;
   let totalDelivered = 0;
 
-  for (const [itemId, required] of Object.entries(project.requirements.resources)) {
-    totalRequired += required;
-    totalDelivered += project.progress.resourcesDelivered[itemId] || 0;
+  // Use for-in loop
+  for (const itemId in required) {
+    totalRequired += required[itemId];
+    totalDelivered += delivered[itemId] || 0;
   }
 
+  // Early exit: avoid division by zero
   if (totalRequired === 0) {
     return 1.0;
   }
 
-  return Math.min(1.0, totalDelivered / totalRequired);
+  // Inline Math.min
+  const percent = totalDelivered / totalRequired;
+  return percent > 1.0 ? 1.0 : percent;
 }
+
+// Reusable empty object to avoid allocations
+const EMPTY_RESOURCES: Record<string, number> = {};
 
 /**
  * Get missing resources (what's still needed)
@@ -367,17 +391,24 @@ export function getResourceCompletionPercent(project: ConstructionProjectCompone
 export function getMissingResources(
   project: ConstructionProjectComponent
 ): Record<string, number> {
+  // Cache references
+  const required = project.requirements.resources;
+  const delivered = project.progress.resourcesDelivered;
+
+  let hasMissing = false;
   const missing: Record<string, number> = {};
 
-  for (const [itemId, required] of Object.entries(project.requirements.resources)) {
-    const delivered = project.progress.resourcesDelivered[itemId] || 0;
-    const remaining = required - delivered;
+  // Use for-in loop
+  for (const itemId in required) {
+    const remaining = required[itemId] - (delivered[itemId] || 0);
     if (remaining > 0) {
       missing[itemId] = remaining;
+      hasMissing = true;
     }
   }
 
-  return missing;
+  // Return empty singleton if nothing missing (avoid allocation)
+  return hasMissing ? missing : EMPTY_RESOURCES;
 }
 
 /**
@@ -408,7 +439,9 @@ export function increaseCollapseRisk(
   project: ConstructionProjectComponent,
   riskIncrease: number
 ): void {
-  project.risks.collapseRisk = Math.min(1.0, project.risks.collapseRisk + riskIncrease);
+  // Inline Math.min for hot path
+  const newRisk = project.risks.collapseRisk + riskIncrease;
+  project.risks.collapseRisk = newRisk > 1.0 ? 1.0 : newRisk;
 }
 
 /**
@@ -500,19 +533,24 @@ export function hasPrerequisites(
     hasWormhole?: boolean;
   }
 ): boolean {
-  if (hasFeatures.techLevel < project.requirements.techLevelRequired) {
+  // Cache requirements reference
+  const req = project.requirements;
+
+  // Early exits: check cheapest conditions first (tech level is just a number comparison)
+  if (hasFeatures.techLevel < req.techLevelRequired) {
     return false;
   }
 
-  if (project.requirements.planetCrackerRequired && !hasFeatures.hasPlanetCracker) {
+  // Check optional prerequisites (undefined checks are fast)
+  if (req.planetCrackerRequired && !hasFeatures.hasPlanetCracker) {
     return false;
   }
 
-  if (project.requirements.dysonSwarmRequired && !hasFeatures.hasDysonSwarm) {
+  if (req.dysonSwarmRequired && !hasFeatures.hasDysonSwarm) {
     return false;
   }
 
-  if (project.requirements.wormholeRequired && !hasFeatures.hasWormhole) {
+  if (req.wormholeRequired && !hasFeatures.hasWormhole) {
     return false;
   }
 

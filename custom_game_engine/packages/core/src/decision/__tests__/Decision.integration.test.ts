@@ -43,7 +43,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const result = autonomic.check(agent);
 
@@ -73,7 +73,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const result = autonomic.check(agent);
 
@@ -106,7 +106,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const result = autonomic.check(agent);
 
@@ -136,7 +136,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const agentComp = agent.getComponent(ComponentType.Agent) as any;
       const result = processor.process(
@@ -175,7 +175,7 @@ describe('Decision Integration Tests', () => {
       // Add inventory to trigger resource gathering check
       const inventory = createInventoryComponent(10);
       agent.addComponent(inventory);
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const agentComp = agent.getComponent(ComponentType.Agent) as any;
       const result = processor.process(
@@ -219,7 +219,7 @@ describe('Decision Integration Tests', () => {
         useLLM: false,
         llmCooldown: 0,
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       const result = autonomic.check(agent);
 

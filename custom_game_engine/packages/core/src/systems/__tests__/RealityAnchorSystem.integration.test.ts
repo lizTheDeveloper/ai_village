@@ -32,13 +32,13 @@ describe('RealityAnchorSystem Integration', () => {
     // Add PowerComponent with 5 GW consumption (charging rate)
     const anchorPower = createPowerConsumer('electrical', 5_000_000);
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Create generator with 10 GW output (surplus)
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
     generator.addComponent(createPowerProducer('electrical', 10_000_000));
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     // Create systems
     const powerGridSystem = new PowerGridSystem();
@@ -76,13 +76,13 @@ describe('RealityAnchorSystem Integration', () => {
 
     const anchorPower = createPowerConsumer('electrical', 5_000_000);
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Generator with only 1 GW (insufficient)
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
     generator.addComponent(createPowerProducer('electrical', 1_000_000));
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
@@ -122,13 +122,13 @@ describe('RealityAnchorSystem Integration', () => {
     // PowerComponent with 50 GW consumption (active field rate)
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Generator with 100 GW (surplus)
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
     generator.addComponent(createPowerProducer('electrical', 100_000_000));
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
@@ -164,7 +164,7 @@ describe('RealityAnchorSystem Integration', () => {
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false; // No power
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
@@ -195,7 +195,7 @@ describe('RealityAnchorSystem Integration', () => {
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false; // Power lost
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
@@ -231,7 +231,7 @@ describe('RealityAnchorSystem Integration', () => {
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false;
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
@@ -265,14 +265,14 @@ describe('RealityAnchorSystem Integration', () => {
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = true;
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Generator that will "fail"
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
     const generatorPower = createPowerProducer('electrical', 50_000_000);
     generator.addComponent(generatorPower);
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
@@ -314,13 +314,13 @@ describe('RealityAnchorSystem Integration', () => {
 
     const anchorPower = createPowerConsumer('electrical', 5_000_000);
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Generator far away at (1000, 1000)
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 1000, y: 1000 });
     generator.addComponent(createPowerProducer('electrical', 10_000_000));
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
@@ -351,7 +351,7 @@ describe('RealityAnchorSystem Integration', () => {
     anchorComp.status = 'charging';
     anchor.addComponent(anchorComp);
     // No PowerComponent added!
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
@@ -381,7 +381,7 @@ describe('RealityAnchorSystem Integration', () => {
     const anchorPower = createPowerConsumer('electrical', 5_000_000);
     anchorPower.isPowered = false; // Power just lost
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     const realityAnchorSystem = new RealityAnchorSystem();
     realityAnchorSystem.initialize(world, eventBus);
@@ -414,13 +414,13 @@ describe('RealityAnchorSystem Integration', () => {
 
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchor.addComponent(anchorPower);
-    (world as any)._addEntity(anchor);
+    world.addEntity(anchor);
 
     // Generator with only 25 GW (50% of requirement)
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
     generator.addComponent(createPowerProducer('electrical', 25_000_000));
-    (world as any)._addEntity(generator);
+    world.addEntity(generator);
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();

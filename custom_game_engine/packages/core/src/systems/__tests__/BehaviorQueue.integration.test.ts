@@ -52,7 +52,7 @@ describe('Behavior Queue System Integration', () => {
     agent.addComponent(createCircadianComponent());
     agent.addComponent(createTemperatureComponent(20, 15, 25, 10, 30)); // currentTemp=20, comfortMin=15, comfortMax=25, toleranceMin=10, toleranceMax=30
 
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
   });
 
   describe('Sequential Execution', () => {
@@ -393,7 +393,7 @@ describe('Behavior Queue System Integration', () => {
       }));
       agent2.addComponent(createCircadianComponent());
       agent2.addComponent(createTemperatureComponent(20, 15, 25, 10, 30));
-      (world as any)._addEntity(agent2);
+      world.addEntity(agent2);
 
       // Queue different behaviors for each agent
       agent.updateComponent<AgentComponent>('agent', (current) => {

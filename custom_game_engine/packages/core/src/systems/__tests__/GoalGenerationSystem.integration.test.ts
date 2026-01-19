@@ -62,7 +62,7 @@ describe('GoalGenerationSystem Integration', () => {
       neuroticism: 0.3,
     }));
     agent.addComponent(new GoalsComponent());
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Mock Math.random to ensure goal generation (needs < 0.5 for 50% chance)
     const originalRandom = Math.random;
@@ -115,7 +115,7 @@ describe('GoalGenerationSystem Integration', () => {
       });
     }
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const goalFormationHandler = vi.fn();
     eventBus.subscribe('agent:goal_formed', goalFormationHandler);
@@ -159,7 +159,7 @@ describe('GoalGenerationSystem Integration', () => {
         workEthic: 0.8,
       }));
       agent.addComponent(new GoalsComponent());
-      (trialWorld as any)._addEntity(agent);
+      trialWorld.addEntity(agent);
 
       // Mock Math.random to ensure goal generation ALWAYS happens (bypasses 50% chance)
       const originalRandom = Math.random.bind(Math);
@@ -232,7 +232,7 @@ describe('GoalGenerationSystem Integration', () => {
       targetCompletionDays: 7,
     });
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Emit action completed event
     // Source must be the agentId (ActionQueue sets it to action.actorId)
@@ -280,7 +280,7 @@ describe('GoalGenerationSystem Integration', () => {
       targetCompletionDays: 7,
     });
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const milestoneHandler = vi.fn();
     eventBus.subscribe('agent:goal_milestone', milestoneHandler);
@@ -327,7 +327,7 @@ describe('GoalGenerationSystem Integration', () => {
       targetCompletionDays: 7,
     });
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     const completionHandler = vi.fn();
     eventBus.subscribe('agent:goal_completed', completionHandler);
@@ -378,7 +378,7 @@ describe('GoalGenerationSystem Integration', () => {
       targetCompletionDays: 7,
     });
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Emit social action (not relevant to mastery goal)
     eventBus.emit({
@@ -430,7 +430,7 @@ describe('GoalGenerationSystem Integration', () => {
       targetCompletionDays: 7,
     });
     agent.addComponent(goalsComp);
-    (world as any)._addEntity(agent);
+    world.addEntity(agent);
 
     // Emit building action (only relevant to mastery)
     eventBus.emit({
@@ -472,7 +472,7 @@ describe('GoalGenerationSystem Integration', () => {
         neuroticism: 0.5,
       }));
       agent.addComponent(new GoalsComponent());
-      (testWorld as any)._addEntity(agent);
+      testWorld.addEntity(agent);
 
       testEventBus.emit({
         type: 'reflection:completed',

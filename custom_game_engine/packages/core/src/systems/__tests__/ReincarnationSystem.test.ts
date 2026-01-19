@@ -52,7 +52,7 @@ describe('ReincarnationSystem', () => {
       const entity = new EntityImpl(entityId, 0);
       (entity as any).addComponent(createIdentityComponent('Test Entity'));
       (entity as any).addComponent(createPositionComponent(10, 20));
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Emit reincarnation queued event
       world.eventBus.emit({
@@ -128,7 +128,7 @@ describe('ReincarnationSystem', () => {
       });
       (entity as any).addComponent(episodic);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Queue with full retention
       world.eventBus.emit({
@@ -164,7 +164,7 @@ describe('ReincarnationSystem', () => {
       });
       (entity as any).addComponent(personality);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       world.eventBus.emit({
         type: 'soul:reincarnation_queued',
@@ -191,7 +191,7 @@ describe('ReincarnationSystem', () => {
       const entity = new EntityImpl(entityId, 0);
       (entity as any).addComponent(createIdentityComponent('Test Soul'));
       (entity as any).addComponent(createPositionComponent(10, 20));
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       world.eventBus.emit({
         type: 'soul:reincarnation_queued',
@@ -220,7 +220,7 @@ describe('ReincarnationSystem', () => {
       const entity = new EntityImpl(entityId, 0);
       (entity as any).addComponent(createIdentityComponent('Test Soul'));
       (entity as any).addComponent(createPositionComponent(10, 20));
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Subscribe to reincarnated event
       let reincarnatedEventReceived = false;
@@ -274,7 +274,7 @@ describe('ReincarnationSystem', () => {
         speciesId: 'elf',
         traits: [],
       });
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       world.eventBus.emit({
         type: 'soul:reincarnation_queued',
@@ -306,7 +306,7 @@ describe('ReincarnationSystem', () => {
       recordDeed(ledger, 'theft', 3, { item: 'gold' });
       (entity as any).addComponent(ledger);
 
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       world.eventBus.emit({
         type: 'soul:reincarnation_queued',
@@ -333,7 +333,7 @@ describe('ReincarnationSystem', () => {
       const entity = new EntityImpl(entityId, 0);
       (entity as any).addComponent(createIdentityComponent('Faithful Soul'));
       (entity as any).addComponent(createPositionComponent(10, 20));
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       const deityId = 'nature-goddess';
 
@@ -375,7 +375,7 @@ describe('ReincarnationSystem', () => {
       const entity = new EntityImpl(entityId, 0);
       (entity as any).addComponent(createIdentityComponent('Test'));
       (entity as any).addComponent(createPositionComponent(0, 0));
-      (world as any)._addEntity(entity);
+      world.addEntity(entity);
 
       // Destroy system
       system.destroy();

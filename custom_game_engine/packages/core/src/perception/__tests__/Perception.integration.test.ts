@@ -42,7 +42,7 @@ describe('Perception Integration Tests', () => {
         name: 'Alice',
         behavior: 'wander',
       });
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create a resource
       const resource = new EntityImpl(createEntityId(), 0);
@@ -53,7 +53,7 @@ describe('Perception Integration Tests', () => {
         amount: 100,
         harvestable: true,
       });
-      (harness.world as any)._addEntity(resource);
+      harness.world.addEntity(resource);
 
       // Create a speaking agent
       const speaker = new EntityImpl(createEntityId(), 0);
@@ -68,7 +68,7 @@ describe('Perception Integration Tests', () => {
         type: ComponentType.Identity,
         name: 'Bob',
       });
-      (harness.world as any)._addEntity(speaker);
+      harness.world.addEntity(speaker);
 
       // Run full perception pipeline
       const result = perception.processAll(agent, harness.world);
@@ -95,7 +95,7 @@ describe('Perception Integration Tests', () => {
       (vision as any).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent({ maxMemories: 100 })); // Store up to 100 memories
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create multiple resources
       const positions = [
@@ -113,7 +113,7 @@ describe('Perception Integration Tests', () => {
           amount: 50,
           harvestable: true,
         });
-        (harness.world as any)._addEntity(resource);
+        harness.world.addEntity(resource);
       }
 
       // Process vision
@@ -143,7 +143,7 @@ describe('Perception Integration Tests', () => {
       (vision as any).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create resource with positive amount
       const resource = new EntityImpl(createEntityId(), 0);
@@ -154,7 +154,7 @@ describe('Perception Integration Tests', () => {
         amount: 25,
         harvestable: true,
       });
-      (harness.world as any)._addEntity(resource);
+      harness.world.addEntity(resource);
 
       // First vision check - should see resource
       let result = visionProcessor.process(agent, harness.world);
@@ -178,7 +178,7 @@ describe('Perception Integration Tests', () => {
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(30));
       agent.addComponent(new SpatialMemoryComponent());
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create a mature plant with seeds and fruit
       const plant = new EntityImpl(createEntityId(), 0);
@@ -190,7 +190,7 @@ describe('Perception Integration Tests', () => {
         seedsProduced: 5,
         fruitCount: 8,
       });
-      (harness.world as any)._addEntity(plant);
+      harness.world.addEntity(plant);
 
       // Process vision
       visionProcessor.process(agent, harness.world);
@@ -216,7 +216,7 @@ describe('Perception Integration Tests', () => {
       const listener = new EntityImpl(createEntityId(), 0);
       listener.addComponent(createPositionComponent(50, 50));
       listener.addComponent(createVisionComponent(20));
-      (harness.world as any)._addEntity(listener);
+      harness.world.addEntity(listener);
 
       // Create multiple speaking agents
       const speakers = [
@@ -238,7 +238,7 @@ describe('Perception Integration Tests', () => {
           type: ComponentType.Identity,
           name: s.name,
         });
-        (harness.world as any)._addEntity(speaker);
+        harness.world.addEntity(speaker);
       }
 
       // Process hearing
@@ -259,7 +259,7 @@ describe('Perception Integration Tests', () => {
       const listener = new EntityImpl(createEntityId(), 0);
       listener.addComponent(createPositionComponent(0, 0));
       listener.addComponent(createVisionComponent(20));
-      (harness.world as any)._addEntity(listener);
+      harness.world.addEntity(listener);
 
       // Close speaker (in range)
       const closeSpeaker = new EntityImpl(createEntityId(), 0);
@@ -274,7 +274,7 @@ describe('Perception Integration Tests', () => {
         type: ComponentType.Identity,
         name: 'NearPerson',
       });
-      (harness.world as any)._addEntity(closeSpeaker);
+      harness.world.addEntity(closeSpeaker);
 
       // Far speaker (out of range)
       const farSpeaker = new EntityImpl(createEntityId(), 0);
@@ -289,7 +289,7 @@ describe('Perception Integration Tests', () => {
         type: ComponentType.Identity,
         name: 'FarPerson',
       });
-      (harness.world as any)._addEntity(farSpeaker);
+      harness.world.addEntity(farSpeaker);
 
       // Process hearing
       const result = hearingProcessor.process(listener, harness.world);
@@ -332,7 +332,7 @@ describe('Perception Integration Tests', () => {
         ]),
       });
 
-      (harness.world as any)._addEntity(listener);
+      harness.world.addEntity(listener);
 
       // Create meeting caller
       const caller = new EntityImpl('leader-id', 0);
@@ -351,7 +351,7 @@ describe('Perception Integration Tests', () => {
         active: true,
         topic: 'Village planning',
       });
-      (harness.world as any)._addEntity(caller);
+      harness.world.addEntity(caller);
 
       // Process meeting detection
       const result = meetingDetector.process(listener, harness.world);
@@ -383,7 +383,7 @@ describe('Perception Integration Tests', () => {
       ];
       sleepingAgent.addComponent(vision);
 
-      (harness.world as any)._addEntity(sleepingAgent);
+      harness.world.addEntity(sleepingAgent);
 
       const result = meetingDetector.process(sleepingAgent, harness.world);
 
@@ -406,7 +406,7 @@ describe('Perception Integration Tests', () => {
       (vision as any).canSeeAgents = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
-      (harness.world as any)._addEntity(agent);
+      harness.world.addEntity(agent);
 
       // Create resources at different locations
       const resource1 = new EntityImpl(createEntityId(), 0);
@@ -417,7 +417,7 @@ describe('Perception Integration Tests', () => {
         amount: 50,
         harvestable: true,
       });
-      (harness.world as any)._addEntity(resource1);
+      harness.world.addEntity(resource1);
 
       const resource2 = new EntityImpl(createEntityId(), 0);
       resource2.addComponent(createPositionComponent(100, 0)); // Far from start
@@ -427,7 +427,7 @@ describe('Perception Integration Tests', () => {
         amount: 50,
         harvestable: true,
       });
-      (harness.world as any)._addEntity(resource2);
+      harness.world.addEntity(resource2);
 
       // Initial perception at start position
       let result = visionProcessor.process(agent, harness.world);

@@ -290,17 +290,17 @@ export function updateConstructionProgress(
   progressDelta: number,
   tick: number
 ): void {
+  // Early exit: check phase first (cheapest condition)
   if (megastructure.construction.phase !== 'building') {
     throw new Error('Cannot update progress - megastructure is not in building phase');
   }
 
-  megastructure.construction.progress = Math.min(
-    1.0,
-    megastructure.construction.progress + progressDelta
-  );
+  // Inline Math.min for hot path
+  const newProgress = megastructure.construction.progress + progressDelta;
+  megastructure.construction.progress = newProgress > 1.0 ? 1.0 : newProgress;
 
-  // Check if construction is complete
-  if (megastructure.construction.progress >= 1.0) {
+  // Check if construction is complete (avoid function call overhead if not complete)
+  if (newProgress >= 1.0) {
     completeConstruction(megastructure, tick);
   }
 }
@@ -346,6 +346,9 @@ export function performMaintenance(
   });
 }
 
+// Precomputed constant for degradation threshold
+const DEGRADATION_THRESHOLD = 0.8;
+
 /**
  * Apply degradation due to lack of maintenance
  */
@@ -354,19 +357,22 @@ export function applyDegradation(
   yearsPassed: number,
   tick: number
 ): void {
+  // Early exit: only operational structures degrade (cheapest check first)
   if (!megastructure.operational) {
-    return; // Only operational structures degrade
+    return;
   }
 
   const efficiencyLoss = megastructure.maintenance.degradationRate * yearsPassed;
-  megastructure.efficiency = Math.max(0, megastructure.efficiency - efficiencyLoss);
+  const newEfficiency = megastructure.efficiency - efficiencyLoss;
 
-  if (megastructure.efficiency < 0.8) {
-    megastructure.construction.phase = 'degraded';
-  }
+  // Inline Math.max for hot path
+  megastructure.efficiency = newEfficiency > 0 ? newEfficiency : 0;
 
-  if (megastructure.efficiency <= 0) {
+  // Check thresholds in order of severity (catastrophic first to avoid unnecessary phase change)
+  if (newEfficiency <= 0) {
     catastrophicFailure(megastructure, tick);
+  } else if (newEfficiency < DEGRADATION_THRESHOLD) {
+    megastructure.construction.phase = 'degraded';
   }
 }
 
@@ -457,23 +463,29 @@ export function getTotalStrategicValue(megastructure: MegastructureComponent): n
          megastructure.strategic.culturalValue;
 }
 
+// Reusable empty object to avoid allocations for non-operational structures
+const EMPTY_CAPABILITIES: Record<string, unknown> = {};
+
 /**
  * Get effective capabilities (reduced by efficiency)
  */
 export function getEffectiveCapabilities(
   megastructure: MegastructureComponent
 ): Record<string, unknown> {
+  // Early exit: non-operational structures have no capabilities
   if (!megastructure.operational) {
-    return {};
+    return EMPTY_CAPABILITIES;
   }
 
+  // Cache efficiency to avoid repeated property access
+  const efficiency = megastructure.efficiency;
   const effective: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(megastructure.capabilities)) {
-    if (typeof value === 'number') {
-      effective[key] = value * megastructure.efficiency;
-    } else {
-      effective[key] = value;
-    }
+
+  // Use for-in loop (faster than Object.entries for small objects)
+  for (const key in megastructure.capabilities) {
+    const value = megastructure.capabilities[key];
+    // Type check inlined
+    effective[key] = typeof value === 'number' ? value * efficiency : value;
   }
 
   return effective;

@@ -429,7 +429,7 @@ describe('Movement Oscillation Detection', () => {
       const resource = new EntityImpl(createEntityId(), 0);
       resource.addComponent(createPositionComponent(11, 10)); // Close to agent at (10, 10)
       resource.addComponent(createResourceComponent('wood', 100, 0)); // Harvestable wood
-      (harness.world as any)._addEntity(resource);
+      harness.world.addEntity(resource);
 
       const agent = harness.createTestAgent({ x: 10, y: 10 });
 
