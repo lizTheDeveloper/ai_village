@@ -51,22 +51,7 @@ import {
   GATHER_SPEED_PER_SKILL_LEVEL,
 } from '../../constants/index.js';
 
-// Chunk spatial query injection for efficient nearby entity lookups
-interface ChunkSpatialQuery {
-  getEntitiesInRadius(
-    x: number,
-    y: number,
-    radius: number,
-    componentTypes: string[],
-    options?: { limit?: number }
-  ): Array<{ entity: Entity; distance: number }>;
-}
-
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-export function injectChunkSpatialQueryToGather(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
-}
+// ChunkSpatialQuery is now available via world.spatialQuery
 
 /**
  * Food types that should be gathered from plants (fruit) rather than resource entities.
@@ -755,9 +740,9 @@ export class GatherBehavior extends BaseBehavior {
     let bestPosition: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const resourcesInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         GATHER_MAX_RANGE,
@@ -831,7 +816,7 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Also search voxel resources using chunk queries
-      const voxelResourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const voxelResourcesInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         GATHER_MAX_RANGE,
@@ -971,9 +956,9 @@ export class GatherBehavior extends BaseBehavior {
     let bestPos: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         GATHER_MAX_RANGE,
@@ -1071,9 +1056,9 @@ export class GatherBehavior extends BaseBehavior {
     let bestPos: { x: number; y: number } | null = null;
     let bestDistance = Infinity;
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         GATHER_MAX_RANGE,

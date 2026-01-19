@@ -44,7 +44,7 @@ export class InjurySystem extends BaseSystem {
       const world = ctx.world;
       const deltaTime = ctx.deltaTime;
       const comps = ctx.components(entity);
-      const injury = comps.optional<InjuryComponent>('injury');
+      let injury = comps.optional<InjuryComponent>('injury');
       if (!injury) continue;
 
       // Validate injury
@@ -58,9 +58,13 @@ export class InjurySystem extends BaseSystem {
           requiresTreatment: inj.requiresTreatment !== undefined ? inj.requiresTreatment : (inj.severity === 'major' || inj.severity === 'critical'),
           treated: inj.treated || false,
           healingTime: inj.healingTime !== undefined ? inj.healingTime : this.calculateHealingTime(inj),
-          elapsed: inj.elapsed || 0,
-          untreatedDuration: inj.untreatedDuration || 0,
+          elapsed: inj.elapsed !== undefined ? inj.elapsed : 0,
+          untreatedDuration: inj.untreatedDuration !== undefined ? inj.untreatedDuration : 0,
         }));
+        // Refetch injury after initialization
+        const updatedInjury = comps.optional<InjuryComponent>('injury');
+        if (!updatedInjury) continue;
+        injury = updatedInjury;
       }
 
       // Apply effects for primary injury

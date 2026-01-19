@@ -85,6 +85,20 @@ describe('DominanceChallengeSystem', () => {
     });
   });
 
+  // Helper function to create properly structured conflict components
+  function createChallenge(entity: Entity, target: string, method: string, extras: any = {}) {
+    entity.addComponent('conflict', {
+      type: 'conflict',
+      version: 1,
+      conflictType: 'dominance_challenge',
+      target,
+      method,
+      state: 'active',
+      startTime: 0,
+      ...extras,
+    });
+  }
+
   describe('REQ-CON-004: Dominance Challenges', () => {
     it('should validate challenge based on species type', () => {
       const nonDominant = world.createEntity();
@@ -92,12 +106,7 @@ describe('DominanceChallengeSystem', () => {
       nonDominant.addComponent('position', { x: 0, y: 0, z: 0 });
 
       expect(() => {
-        nonDominant.addComponent('conflict', {
-          type: 'dominance_challenge',
-          target: alpha.id,
-          method: 'combat',
-          startTime: 0,
-        });
+        createChallenge(nonDominant, alpha.id, 'combat');
         system.update(world, Array.from(world.entities.values()), 1);
       }).toThrow('Species does not support dominance challenges');
     });
@@ -105,23 +114,13 @@ describe('DominanceChallengeSystem', () => {
     it('should validate that challenger can challenge above', () => {
       challenger.getComponent('dominance_rank').canChallengeAbove = false;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Challenger cannot challenge above rank');
     });
 
     it('should resolve combat-based challenge', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -133,12 +132,7 @@ describe('DominanceChallengeSystem', () => {
     });
 
     it('should resolve display-based challenge', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'display',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'display');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -149,12 +143,7 @@ describe('DominanceChallengeSystem', () => {
     });
 
     it('should resolve resource seizure challenge', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'resource_seizure',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'resource_seizure');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -167,13 +156,7 @@ describe('DominanceChallengeSystem', () => {
     it('should resolve follower theft challenge', () => {
       alpha.getComponent('dominance_rank').subordinates = [subordinate.id];
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'follower_theft',
-        targetFollower: subordinate.id,
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'follower_theft', { targetFollower: subordinate.id });
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -191,12 +174,7 @@ describe('DominanceChallengeSystem', () => {
       // Give challenger overwhelming advantage
       challenger.getComponent('combat_stats').combatSkill = 15;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -213,12 +191,7 @@ describe('DominanceChallengeSystem', () => {
       // Give alpha overwhelming advantage
       alpha.getComponent('combat_stats').combatSkill = 15;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -232,13 +205,7 @@ describe('DominanceChallengeSystem', () => {
     it('should apply exile consequence on severe loss', () => {
       alpha.getComponent('combat_stats').combatSkill = 20;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        consequence: 'exile',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat', { consequence: 'exile' });
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -249,32 +216,21 @@ describe('DominanceChallengeSystem', () => {
     });
 
     it('should apply death consequence on lethal challenge', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        lethal: true,
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat', { lethal: true });
 
       system.update(world, Array.from(world.entities.values()), 1);
 
       const conflict = challenger.getComponent('conflict');
       if (conflict.outcome === 'death') {
         const loser = conflict.winner === alpha.id ? challenger : alpha;
-        expect(loser.hasComponent('dead')).toBe(true);
+        expect(loser.hasComponent('death')).toBe(true);
       }
     });
 
     it('should trigger cascade - others challenging new alpha', () => {
       challenger.getComponent('combat_stats').combatSkill = 15;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -283,7 +239,7 @@ describe('DominanceChallengeSystem', () => {
         // Subordinate may challenge new alpha
         const subordinateConflict = subordinate.getComponent('conflict');
         if (subordinateConflict) {
-          expect(subordinateConflict.type).toBe('dominance_challenge');
+          expect(subordinateConflict.conflictType).toBe('dominance_challenge');
           expect(subordinateConflict.target).toBe(challenger.id);
         }
       }
@@ -292,12 +248,7 @@ describe('DominanceChallengeSystem', () => {
     it('should trigger cascade - fleeing after defeat', () => {
       challenger.getComponent('combat_stats').combatSkill = 2; // Very weak
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -311,12 +262,7 @@ describe('DominanceChallengeSystem', () => {
     });
 
     it('should trigger cascade - seeking alliance after defeat', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -333,12 +279,7 @@ describe('DominanceChallengeSystem', () => {
       alpha.getComponent('dominance_rank').subordinates = [subordinate.id];
       challenger.getComponent('combat_stats').combatSkill = 15;
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: alpha.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
@@ -352,12 +293,7 @@ describe('DominanceChallengeSystem', () => {
 
   describe('error handling', () => {
     it('should throw when challenge target does not exist', () => {
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: 'nonexistent',
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, 'nonexistent', 'combat');
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Challenge target entity not found');
     });
@@ -366,20 +302,18 @@ describe('DominanceChallengeSystem', () => {
       const nonRanked = world.createEntity();
       nonRanked.addComponent('agent', { name: 'Non-Ranked' });
 
-      challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
-        target: nonRanked.id,
-        method: 'combat',
-        startTime: 0,
-      });
+      createChallenge(challenger, nonRanked.id, 'combat');
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Target missing required component: dominance_rank');
     });
 
     it('should throw when method is not provided', () => {
       challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
+        type: 'conflict',
+        version: 1,
+        conflictType: 'dominance_challenge',
         target: alpha.id,
+        state: 'active',
         startTime: 0,
       } as any);
 
@@ -388,9 +322,12 @@ describe('DominanceChallengeSystem', () => {
 
     it('should throw when invalid method specified', () => {
       challenger.addComponent('conflict', {
-        type: 'dominance_challenge',
+        type: 'conflict',
+        version: 1,
+        conflictType: 'dominance_challenge',
         target: alpha.id,
         method: 'invalid_method' as any,
+        state: 'active',
         startTime: 0,
       });
 

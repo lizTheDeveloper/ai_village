@@ -21,24 +21,8 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 /**
- * Injection point for ChunkSpatialQuery (optional dependency)
- * Used for efficient plant lookups when available
+ * ChunkSpatialQuery is now available via world.spatialQuery
  */
-interface ChunkSpatialQuery {
-  getEntitiesInRadius(
-    x: number,
-    y: number,
-    radius: number,
-    componentTypes: string[],
-    options?: { limit?: number }
-  ): Array<{ entity: import('../../ecs/Entity.js').Entity; distance: number }>;
-}
-
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-export function injectChunkSpatialQueryToFarmBehaviors(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /** Search radius for tillable tiles */
 const TILL_SEARCH_RADIUS = 10;
@@ -322,8 +306,8 @@ export class PlantBehavior extends BaseBehavior {
 
   private hasPlantAt(world: World, x: number, y: number): boolean {
     // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const plantsNearby = chunkSpatialQuery.getEntitiesInRadius(
+    if (world.spatialQuery) {
+      const plantsNearby = world.spatialQuery.getEntitiesInRadius(
         x, y, 1, // Search within 1 tile radius
         [ComponentType.Plant],
         { limit: 10 }
@@ -500,8 +484,8 @@ export class WaterBehavior extends BaseBehavior {
     let nearestDryPlant: { plantId: string; x: number; y: number; hydration: number; distance: number } | null = null;
 
     // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    if (world.spatialQuery) {
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x, position.y, WATER_SEARCH_RADIUS,
         [ComponentType.Plant]
       );
@@ -670,8 +654,8 @@ export class HarvestBehavior extends BaseBehavior {
     let nearestHarvestable: { plantId: string; x: number; y: number; speciesId: string; distance: number } | null = null;
 
     // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    if (world.spatialQuery) {
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x, position.y, HARVEST_SEARCH_RADIUS,
         [ComponentType.Plant]
       );

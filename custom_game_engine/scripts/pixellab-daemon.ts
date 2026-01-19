@@ -1196,63 +1196,53 @@ async function runDaemon(): Promise<void> {
             fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
 
           } else if (creatureType === 'quadruped') {
-            // Quadruped (4-legged animal) - generate PixFlux reference first, then Characters API
-            log(`  Generating quadruped: PixFlux reference + Characters API...`);
+            // Quadruped (4-legged animal) - generate each direction separately using PixFlux
+            log(`  Generating quadruped: PixFlux per-direction...`);
 
-            // Step 1: Generate reference image using PixFlux
-            log(`  Step 1: Generating PixFlux reference image...`);
-            const referenceBase64 = await generateSingleImage(enhancedDescription, size, apiParams);
-            log(`  ✓ Reference image generated`);
-
-            // Step 2: Use reference image with Characters API
-            log(`  Step 2: Generating all 8 directions from reference...`);
-            const characterId = await generateCharacterWithReference(enhancedDescription, name, referenceBase64, size, apiParams);
-            log(`  ✓ Character queued: ${characterId}`);
-
-            // Poll for completion
-            log(`  Polling for completion...`);
-            let attempts = 0;
-            const maxAttempts = 120;
-            let character: any = null;
-
-            while (attempts < maxAttempts) {
-              await sleep(5000);
-              attempts++;
-
-              character = await apiRequest(`/v1/characters/${characterId}`, 'GET');
-
-              if (character.status === 'completed' || character.rotations) {
-                log(`  ✓ Character generation complete!`);
-                break;
-              } else if (character.status === 'failed') {
-                throw new Error('Character generation failed');
-              }
-
-              if (attempts % 6 === 0) {
-                log(`  ⏳ Still processing... (${attempts * 5}s elapsed)`);
-              }
-            }
-
-            if (!character || (!character.rotations && character.status !== 'completed')) {
-              throw new Error('Character generation timed out');
-            }
-
-            // Download all 8 directions
-            log(`  Downloading rotations...`);
             const charDir = path.join(ASSETS_PATH, queueJob.folderId);
-            const rotationsDir = path.join(charDir, 'rotations');
-            fs.mkdirSync(rotationsDir, { recursive: true });
+            fs.mkdirSync(charDir, { recursive: true });
+
+            // Direction descriptions for proper facing
+            const directionDescriptions: Record<string, string> = {
+              'south': 'facing toward the camera, front view from above',
+              'south-west': 'facing southwest, angled front-left view from above',
+              'west': 'facing left, side profile view from above',
+              'north-west': 'facing northwest, angled back-left view from above',
+              'north': 'facing away from camera, rear view from above',
+              'north-east': 'facing northeast, angled back-right view from above',
+              'east': 'facing right, side profile view from above',
+              'south-east': 'facing southeast, angled front-right view from above',
+            };
 
             const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
-            for (const dir of directions) {
-              const url = character.rotations?.[dir] || character.frames?.rotations?.[dir];
-              if (url) {
-                const fullUrl = url.startsWith('http') ? url : `https://api.pixellab.ai${url}`;
-                const response = await fetch(fullUrl);
-                const buffer = Buffer.from(await response.arrayBuffer());
-                const destFile = path.join(rotationsDir, `${dir}.png`);
-                fs.writeFileSync(destFile, buffer);
-                log(`    ✓ ${dir}.png`);
+
+            for (let i = 0; i < directions.length; i++) {
+              const dir = directions[i];
+              const dirDesc = directionDescriptions[dir];
+
+              // Build direction-specific description
+              const dirDescription = `${queueJob.description} as a quadruped animal on all four legs, ${dirDesc}, natural animal pose, pixel art style, top-down perspective, transparent background`;
+
+              log(`    [${dir}] Generating...`);
+
+              const result = await apiRequest('/generate-image-pixflux', 'POST', {
+                description: dirDescription,
+                image_size: { height: size, width: size },
+                no_background: true,
+                ...apiParams,
+              });
+
+              if (!result.image || !result.image.base64) {
+                throw new Error(`No image in API response for direction ${dir}`);
+              }
+
+              const imageBuffer = Buffer.from(result.image.base64, 'base64');
+              fs.writeFileSync(path.join(charDir, `${dir}.png`), imageBuffer);
+              log(`    [${dir}] ✓ Saved`);
+
+              // Rate limiting between directions (except last)
+              if (i < directions.length - 1) {
+                await sleep(2000);
               }
             }
 
@@ -1261,10 +1251,9 @@ async function runDaemon(): Promise<void> {
               id: queueJob.folderId,
               category: queueJob.traits?.category || 'animals',
               size,
-              description: enhancedDescription,
+              description: queueJob.description,
               original_description: queueJob.description,
               generated_at: new Date().toISOString(),
-              pixellab_character_id: characterId,
               directions: directions,
               type: 'quadruped',
             };

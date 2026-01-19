@@ -23,12 +23,7 @@ import { assignBed } from '../../components/AgentComponent.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 
-// Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToSleep(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-}
+// ChunkSpatialQuery is now available via world.spatialQuery
 
 /**
  * SeekSleepBehavior - Find a bed/bedroll and go to sleep
@@ -139,9 +134,9 @@ export class SeekSleepBehavior extends BaseBehavior {
     let nearestOwned: Entity | null = null;
     let nearestOwnedDist = Infinity;
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         BED_SEARCH_RADIUS,

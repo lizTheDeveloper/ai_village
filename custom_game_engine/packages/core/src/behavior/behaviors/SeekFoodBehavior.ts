@@ -32,14 +32,8 @@ import { CHUNK_SIZE } from '../../types.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 /**
- * Injection point for ChunkSpatialQuery (optional dependency)
- * Used for efficient nearby food source lookups
+ * ChunkSpatialQuery is now available via world.spatialQuery
  */
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToSeekFood(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /** Default hunger restored if item not in registry */
 const DEFAULT_HUNGER_RESTORED = HUNGER_RESTORED_DEFAULT;
@@ -398,8 +392,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     const nearbyDistance = 3; // Must be within 3 tiles of storage
 
     // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    if (world.spatialQuery) {
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x, position.y, nearbyDistance,
         [ComponentType.Building]
       );
@@ -490,8 +484,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     const nearbyDistance = 2; // Must be within 2 tiles of plant
 
     // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const plantsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    if (world.spatialQuery) {
+      const plantsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x, position.y, nearbyDistance,
         [ComponentType.Plant]
       );

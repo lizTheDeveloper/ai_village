@@ -54,6 +54,8 @@ describe('GuardDutySystem', () => {
   describe('REQ-CON-010: Guard Duty', () => {
     it('should support location guard assignment', () => {
       guard.addComponent('guard_duty', {
+        type: 'guard_duty',
+        version: 1,
         assignmentType: 'location',
         targetLocation: { x: 10, y: 10, z: 0 },
         alertness: 1.0,

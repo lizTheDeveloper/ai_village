@@ -40,14 +40,8 @@ interface DepositWorldLike {
 }
 
 /**
- * Injection point for ChunkSpatialQuery (optional dependency)
+ * ChunkSpatialQuery is now available via world.spatialQuery
  */
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToDepositItems(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-  console.log('[DepositItemsBehavior] ChunkSpatialQuery injected');
-}
 
 /**
  * Get the current game day from the world's time entity.
@@ -91,10 +85,10 @@ export class DepositItemsBehavior extends BaseBehavior {
     // Find storage buildings - use ChunkSpatialQuery if available
     let validStorage: Entity[];
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Fast: chunk-based spatial query within reasonable radius
       const SEARCH_RADIUS = CHUNK_SIZE * 3; // ~3 chunks
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x, position.y, SEARCH_RADIUS,
         [ComponentType.Building]
       );

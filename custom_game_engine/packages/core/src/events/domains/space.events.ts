@@ -295,6 +295,62 @@ export interface SpaceEvents {
     caravanId: string;
     reason: string;
   };
+
+  // === Megastructure Maintenance Events (Phase 5) ===
+
+  /** Maintenance performed on megastructure */
+  'maintenance_performed': {
+    entityId: EntityId;
+    structureType: string;
+    efficiency: number;
+    maintenanceDebt: number;
+  };
+
+  /** Megastructure efficiency degraded */
+  'megastructure_degraded': {
+    entityId: EntityId;
+    structureType: string;
+    efficiency: number;
+    phase: string;
+    maintenanceDebt: number;
+  };
+
+  /** Megastructure critical or catastrophic failure */
+  'megastructure_failed': {
+    entityId: EntityId;
+    structureType: string;
+    severity: 'critical' | 'catastrophic';
+    efficiency: number;
+    maintenanceDebt: number;
+  };
+
+  /** Megastructure collapsed into ruins */
+  'megastructure_collapsed': {
+    entityId: EntityId;
+    structureType: string;
+    archaeologicalValue: number;
+    controllingFactionId?: string;
+  };
+
+  /** Megastructure phase transition */
+  'megastructure_phase_transition': {
+    entityId: EntityId;
+    structureType: string;
+    oldPhase: string;
+    newPhase: string;
+    efficiency: number;
+  };
+
+  /** Megastructure advanced to new decay stage */
+  'megastructure_decay_stage': {
+    entityId: EntityId;
+    structureType: string;
+    decayStage: number;
+    yearsInDecay: number;
+    status: string;
+    consequences: string;
+    archaeologicalValue: number;
+  };
 }
 
 export type SpaceEventType = keyof SpaceEvents;

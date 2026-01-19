@@ -26,22 +26,7 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
-// Chunk spatial query injection for efficient nearby entity lookups
-interface ChunkSpatialQuery {
-  getEntitiesInRadius(
-    x: number,
-    y: number,
-    radius: number,
-    componentTypes: string[],
-    options?: { limit?: number }
-  ): Array<{ entity: Entity; distance: number }>;
-}
-
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-export function injectChunkSpatialQueryToSeekCooling(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
-}
+// ChunkSpatialQuery is now available via world.spatialQuery
 
 interface CoolingSource {
   type: 'water' | 'shade' | 'interior';
@@ -235,9 +220,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
   private findShadeSources(world: World, position: PositionComponent): CoolingSource[] {
     const sources: CoolingSource[] = [];
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Use ChunkSpatialQuery for efficient nearby lookups
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         position.x,
         position.y,
         this.SEARCH_RADIUS,

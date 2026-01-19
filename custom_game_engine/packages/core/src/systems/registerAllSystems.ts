@@ -105,6 +105,9 @@ import { ArmadaSystem } from './ArmadaSystem.js';
 import { FleetSystem } from './FleetSystem.js';
 import { SquadronSystem } from './SquadronSystem.js';
 
+// Megastructures (Phase 5: Grand Strategy)
+import { MegastructureMaintenanceSystem } from './MegastructureMaintenanceSystem.js';
+
 // Building & Construction
 import { BuildingSystem } from './BuildingSystem.js';
 import { BuildingMaintenanceSystem } from './BuildingMaintenanceSystem.js';
@@ -154,6 +157,7 @@ import { PublishingProductionSystem } from './PublishingProductionSystem.js';
 import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
 import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
 import { TechnologyEraSystem } from './TechnologyEraSystem.js';
+import { ProductionScalingSystem } from './ProductionScalingSystem.js';
 import { CityBuildingGenerationSystem } from './CityBuildingGenerationSystem.js';
 import { ProfessionWorkSimulationSystem } from './ProfessionWorkSimulationSystem.js';
 import { EventReportingSystem } from './EventReportingSystem.js';
@@ -658,6 +662,13 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new SquadronSystem());
 
   // ============================================================================
+  // MEGASTRUCTURES (Phase 5: Grand Strategy)
+  // ============================================================================
+  // Megastructure Maintenance (priority 310): Handles maintenance, degradation, and decay
+  // Runs after construction systems to process operational structures
+  gameLoop.systemRegistry.register(new MegastructureMaintenanceSystem());
+
+  // ============================================================================
   // VIRTUAL REALITY
   // ============================================================================
   // Tech requirement: vr_headset (requires neural_interface research)
@@ -749,6 +760,9 @@ export function registerAllSystems(
 
   const technologyEraSystem = new TechnologyEraSystem();
   gameLoop.systemRegistry.register(technologyEraSystem);
+
+  const productionScalingSystem = new ProductionScalingSystem();
+  gameLoop.systemRegistry.register(productionScalingSystem);
 
   const cityBuildingGenerationSystem = new CityBuildingGenerationSystem();
   gameLoop.systemRegistry.register(cityBuildingGenerationSystem);

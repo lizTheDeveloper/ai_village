@@ -22,13 +22,8 @@ import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
 /**
- * Injection point for ChunkSpatialQuery (optional dependency)
+ * ChunkSpatialQuery is now available via world.spatialQuery
  */
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToRepair(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /**
  * Repair configuration
@@ -290,9 +285,9 @@ export class RepairBehavior extends BaseBehavior {
   ): { id: string; building: BuildingComponent; position: PositionComponent } | null {
     let buildings: readonly Entity[];
 
-    if (chunkSpatialQuery) {
+    if (world.spatialQuery) {
       // Fast: chunk-based spatial query
-      const buildingsInRadius = chunkSpatialQuery.getEntitiesInRadius(
+      const buildingsInRadius = world.spatialQuery.getEntitiesInRadius(
         agentPos.x,
         agentPos.y,
         REPAIR_CONFIG.SEARCH_RADIUS,

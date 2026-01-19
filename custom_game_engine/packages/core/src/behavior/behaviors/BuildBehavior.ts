@@ -46,12 +46,7 @@ interface ChunkSpatialQuery {
   ): Array<{ entity: EntityImpl; distance: number }>;
 }
 
-// Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: ChunkSpatialQuery | null = null;
-
-export function injectChunkSpatialQueryToBuild(spatialQuery: ChunkSpatialQuery): void {
-  chunkSpatialQuery = spatialQuery;
-}
+// ChunkSpatialQuery is now available via world.spatialQuery
 
 interface WorldWithBuilding extends World {
   buildingRegistry?: {
@@ -162,8 +157,8 @@ export class BuildBehavior extends BaseBehavior {
       const CAMPFIRE_CHECK_RADIUS = 200; // Match BuildingSystem's cancellation radius
 
       // Fast path: Use chunk queries to find nearby buildings
-      if (chunkSpatialQuery) {
-        const nearbyBuildings = chunkSpatialQuery.getEntitiesInRadius(
+      if (world.spatialQuery) {
+        const nearbyBuildings = world.spatialQuery.getEntitiesInRadius(
           position.x,
           position.y,
           CAMPFIRE_CHECK_RADIUS,
@@ -473,8 +468,8 @@ export class BuildBehavior extends BaseBehavior {
             let blocked = false;
 
             // Fast path: Use chunk queries to find nearby buildings
-            if (chunkSpatialQuery) {
-              const nearbyBuildings = chunkSpatialQuery.getEntitiesInRadius(
+            if (world.spatialQuery) {
+              const nearbyBuildings = world.spatialQuery.getEntitiesInRadius(
                 testX,
                 testY,
                 BUILD_SPOT_CHECK_RADIUS,
