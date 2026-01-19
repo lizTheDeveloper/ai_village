@@ -1,0 +1,167 @@
+{
+  "human": {
+    "type": "gradual_proximity",
+    "requiredTactics": ["conversation", "shared_activity", "physical_proximity"],
+    "optionalTactics": ["gift_giving", "compliment", "humor", "touch", "shared_meal"],
+    "forbiddenTactics": ["aggressive_display", "dominance_combat"],
+    "minimumTactics": 5,
+    "typicalDuration": [10000, 50000],
+    "locationRequirement": null,
+    "matingBehavior": {
+      "type": "private_location",
+      "requiredLocation": "bed",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 600,
+      "postMatingEffects": {
+        "moodBoost": 20,
+        "energyCost": 15,
+        "bondStrength": 0.8
+      }
+    }
+  },
+  "dwarf": {
+    "type": "construction",
+    "requiredTactics": ["craft_gift", "demonstrate_skill", "shared_project"],
+    "optionalTactics": ["share_ale", "tell_saga", "show_wealth"],
+    "forbiddenTactics": ["hasty_approach"],
+    "minimumTactics": 4,
+    "typicalDuration": [30000, 100000],
+    "locationRequirement": {
+      "type": "workshop",
+      "requiresQuality": "high"
+    },
+    "matingBehavior": {
+      "type": "private_location",
+      "requiredLocation": "bed",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 600,
+      "postMatingEffects": {
+        "moodBoost": 25,
+        "energyCost": 12,
+        "bondStrength": 0.95
+      }
+    }
+  },
+  "bird_folk": {
+    "type": "display",
+    "requiredTactics": ["aerial_dance", "plumage_display", "song"],
+    "optionalTactics": ["gift_giving", "nest_construction"],
+    "forbiddenTactics": [],
+    "minimumTactics": 3,
+    "typicalDuration": [5000, 15000],
+    "locationRequirement": {
+      "type": "elevated",
+      "minHeight": 5,
+      "visibility": "public"
+    },
+    "matingBehavior": {
+      "type": "nest_location",
+      "requiredLocation": "nest",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 300,
+      "postMatingEffects": {
+        "moodBoost": 25,
+        "energyCost": 10,
+        "bondStrength": 0.9
+      }
+    }
+  },
+  "avian": {
+    "type": "display",
+    "requiredTactics": ["aerial_dance", "plumage_display", "song"],
+    "optionalTactics": ["gift_giving", "nest_construction"],
+    "forbiddenTactics": [],
+    "minimumTactics": 3,
+    "typicalDuration": [5000, 15000],
+    "locationRequirement": {
+      "type": "elevated",
+      "minHeight": 5,
+      "visibility": "public"
+    },
+    "matingBehavior": {
+      "type": "nest_location",
+      "requiredLocation": "nest",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 300,
+      "postMatingEffects": {
+        "moodBoost": 25,
+        "energyCost": 10,
+        "bondStrength": 0.9
+      }
+    }
+  },
+  "mystif": {
+    "type": "resonance",
+    "requiredTactics": ["mind_touch", "aura_display", "magic_sharing"],
+    "optionalTactics": ["dream_meeting", "conversation"],
+    "forbiddenTactics": ["aggressive_display", "dominance_combat"],
+    "minimumTactics": 3,
+    "typicalDuration": [8000, 20000],
+    "locationRequirement": {
+      "type": "ley_line",
+      "magicalIntensity": "high"
+    },
+    "matingBehavior": {
+      "type": "ritual_space",
+      "requiredLocation": "union_circle",
+      "bothMustBePresent": true,
+      "privateSpace": false,
+      "duration": 1200,
+      "ritualComponents": ["union_candles", "incense", "union_chalk"],
+      "postMatingEffects": {
+        "moodBoost": 30,
+        "energyCost": 25,
+        "bondStrength": 1.0
+      }
+    }
+  },
+  "elf": {
+    "type": "gradual_proximity",
+    "requiredTactics": ["conversation", "shared_activity", "song"],
+    "optionalTactics": ["gift_giving", "compliment", "shared_meal", "aura_display"],
+    "forbiddenTactics": ["aggressive_display", "dominance_combat", "hasty_approach"],
+    "minimumTactics": 6,
+    "typicalDuration": [40000, 120000],
+    "locationRequirement": {
+      "type": "natural",
+      "visibility": "private"
+    },
+    "matingBehavior": {
+      "type": "private_location",
+      "requiredLocation": "bed",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 800,
+      "postMatingEffects": {
+        "moodBoost": 30,
+        "energyCost": 10,
+        "bondStrength": 0.98
+      }
+    }
+  },
+  "default": {
+    "type": "gradual_proximity",
+    "requiredTactics": ["conversation", "shared_activity"],
+    "optionalTactics": ["gift_giving", "compliment", "humor", "shared_meal"],
+    "forbiddenTactics": [],
+    "minimumTactics": 3,
+    "typicalDuration": [10000, 30000],
+    "locationRequirement": null,
+    "matingBehavior": {
+      "type": "private_location",
+      "requiredLocation": "bed",
+      "bothMustBePresent": true,
+      "privateSpace": true,
+      "duration": 600,
+      "postMatingEffects": {
+        "moodBoost": 20,
+        "energyCost": 15,
+        "bondStrength": 0.7
+      }
+    }
+  }
+}

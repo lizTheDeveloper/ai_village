@@ -5,6 +5,10 @@
  * These sets cover engineering, power generation, computing, entertainment,
  * space industry, and other practical technologies between classical physics
  * and β-space navigation.
+ *
+ * NOTE: This file's data has been merged into data/research-sets.json
+ * The sets defined here are now loaded from JSON in research-sets.ts
+ * This file is kept for reference but is no longer imported anywhere.
  */
 
 import type { ResearchSet } from './types.js';

@@ -1,0 +1,24 @@
+{
+  "moisture": {
+    "baseDailyDecay": 10,
+    "hotWeatherDecayMultiplier": 1.5,
+    "coldWeatherDecayMultiplier": 0.5,
+    "hotWeatherThreshold": 25,
+    "coldWeatherThreshold": 10,
+    "wateringBonus": 20,
+    "rainMoistureBonus": 40,
+    "snowMoistureBonus": 20
+  },
+  "fertility": {
+    "depletionPerHarvest": 15,
+    "initialPlantability": 3,
+    "tillableTerrains": ["grass", "dirt"]
+  },
+  "nutrients": {
+    "phosphorusMultiplier": 0.8,
+    "potassiumMultiplier": 0.9
+  },
+  "timeConstants": {
+    "secondsPerDay": 86400
+  }
+}

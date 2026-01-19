@@ -130,15 +130,18 @@ export class ButcherBehavior extends BaseBehavior {
     // Add products to inventory
     const inventory = entity.getComponent(CT.Inventory) as InventoryComponent | undefined;
     if (inventory) {
-      entity.updateComponent(CT.Inventory, (inv) => ({
-        ...inv,
-        slots: [
-          ...inv.slots,
-          { itemId: 'meat', quantity: meatQuantity },
-          { itemId: 'hide', quantity: baseHideQuantity },
-          { itemId: 'bones', quantity: baseBonesQuantity },
-        ],
-      }));
+      entity.updateComponent(CT.Inventory, (inv) => {
+        const invComp = inv as unknown as InventoryComponent;
+        return {
+          ...inv,
+          slots: [
+            ...invComp.slots,
+            { itemId: 'meat', quantity: meatQuantity },
+            { itemId: 'hide', quantity: baseHideQuantity },
+            { itemId: 'bones', quantity: baseBonesQuantity },
+          ],
+        };
+      });
     }
 
     // Remove the animal entity from the world
@@ -338,15 +341,18 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
 
   // Add products to inventory
   if (ctx.inventory) {
-    ctx.updateComponent(CT.Inventory, (inv) => ({
-      ...inv,
-      slots: [
-        ...inv.slots,
-        { itemId: 'meat', quantity: meatQuantity },
-        { itemId: 'hide', quantity: baseHideQuantity },
-        { itemId: 'bones', quantity: baseBonesQuantity },
-      ],
-    }));
+    ctx.updateComponent(CT.Inventory, (inv) => {
+      const invComp = inv as unknown as InventoryComponent;
+      return {
+        ...inv,
+        slots: [
+          ...invComp.slots,
+          { itemId: 'meat', quantity: meatQuantity },
+          { itemId: 'hide', quantity: baseHideQuantity },
+          { itemId: 'bones', quantity: baseBonesQuantity },
+        ],
+      };
+    });
   }
 
   // Remove the animal entity from the world

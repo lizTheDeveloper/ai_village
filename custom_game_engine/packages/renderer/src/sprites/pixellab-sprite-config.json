@@ -1,0 +1,65 @@
+{
+  "$schema": "pixellab-sprite-config-schema",
+  "version": "1.0.0",
+  "description": "PixelLab sprite system configuration - 8-direction animation definitions",
+
+  "directions": {
+    "0": { "name": "south", "label": "South" },
+    "1": { "name": "southwest", "label": "SouthWest" },
+    "2": { "name": "west", "label": "West" },
+    "3": { "name": "northwest", "label": "NorthWest" },
+    "4": { "name": "north", "label": "North" },
+    "5": { "name": "northeast", "label": "NorthEast" },
+    "6": { "name": "east", "label": "East" },
+    "7": { "name": "southeast", "label": "SouthEast" }
+  },
+
+  "animations": {
+    "idle": {
+      "frames": 1,
+      "description": "Static standing pose"
+    },
+    "walking-4-frames": {
+      "frames": 4,
+      "description": "Walking animation with 4 frames"
+    },
+    "walking-6-frames": {
+      "frames": 6,
+      "description": "Walking animation with 6 frames"
+    },
+    "walking-8-frames": {
+      "frames": 8,
+      "description": "Walking animation with 8 frames"
+    },
+    "running-4-frames": {
+      "frames": 4,
+      "description": "Running animation with 4 frames"
+    },
+    "running-6-frames": {
+      "frames": 6,
+      "description": "Running animation with 6 frames"
+    },
+    "running-8-frames": {
+      "frames": 8,
+      "description": "Running animation with 8 frames"
+    },
+    "breathing-idle": {
+      "frames": 4,
+      "description": "Breathing idle animation"
+    },
+    "jumping-1": {
+      "frames": 4,
+      "description": "Jump animation variant 1"
+    },
+    "jumping-2": {
+      "frames": 6,
+      "description": "Jump animation variant 2"
+    }
+  },
+
+  "defaults": {
+    "frameSize": 48,
+    "directionsCount": 8,
+    "basePath": "/assets/sprites/pixellab"
+  }
+}

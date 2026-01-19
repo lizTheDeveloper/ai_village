@@ -1,0 +1,155 @@
+{
+  "$schema": "lpc-sprite-config-schema",
+  "version": "1.0.0",
+  "description": "LPC (Liberated Pixel Cup) sprite system configuration - modular sprite parts",
+
+  "directions": {
+    "0": { "name": "up", "label": "Up" },
+    "1": { "name": "left", "label": "Left" },
+    "2": { "name": "down", "label": "Down" },
+    "3": { "name": "right", "label": "Right" }
+  },
+
+  "animations": {
+    "walkcycle": { "frames": 9 },
+    "slash": { "frames": 6 },
+    "spellcast": { "frames": 7 },
+    "thrust": { "frames": 8 },
+    "shoot": { "frames": 13 },
+    "hurt": { "frames": 6 }
+  },
+
+  "defaults": {
+    "frameSize": 64,
+    "basePath": "/assets/sprites/lpc"
+  },
+
+  "builtinParts": {
+    "male_ivory_normal_body": {
+      "id": "male_ivory_normal_body",
+      "type": "body",
+      "imagePath": "lpc/modular_heads/male_ivory_normal_headless_walkcycle.png",
+      "sheetWidth": 576,
+      "sheetHeight": 256,
+      "animations": ["walkcycle"],
+      "zIndex": 0
+    },
+    "male_ivory_normal_body_slash": {
+      "id": "male_ivory_normal_body_slash",
+      "type": "body",
+      "imagePath": "lpc/modular_heads/male_ivory_normal_headless_slash.png",
+      "sheetWidth": 384,
+      "sheetHeight": 256,
+      "animations": ["slash"],
+      "zIndex": 0
+    },
+    "male_ivory_muscular_body": {
+      "id": "male_ivory_muscular_body",
+      "type": "body",
+      "imagePath": "lpc/modular_heads/male_ivory_muscular_headless_walkcycle.png",
+      "sheetWidth": 576,
+      "sheetHeight": 256,
+      "animations": ["walkcycle"],
+      "zIndex": 0
+    },
+    "female_ivory_normal_body": {
+      "id": "female_ivory_normal_body",
+      "type": "body",
+      "imagePath": "lpc/modular_heads/female_ivory_normal_headless_walkcycle.png",
+      "sheetWidth": 576,
+      "sheetHeight": 256,
+      "animations": ["walkcycle"],
+      "zIndex": 0
+    },
+    "female_ivory_pregnant_body": {
+      "id": "female_ivory_pregnant_body",
+      "type": "body",
+      "imagePath": "lpc/modular_heads/female_ivory_pregnant_headless_walkcycle.png",
+      "sheetWidth": 576,
+      "sheetHeight": 256,
+      "animations": ["walkcycle"],
+      "zIndex": 0
+    },
+    "male_ivory_human_head": {
+      "id": "male_ivory_human_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/male_ivory_human_head.png",
+      "sheetWidth": 320,
+      "sheetHeight": 192,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "male_ivory_ogre_head": {
+      "id": "male_ivory_ogre_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/male_ivory_ogre_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "male_ivory_lizard_head": {
+      "id": "male_ivory_lizard_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/male_ivory_lizard_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "male_ivory_wolf_head": {
+      "id": "male_ivory_wolf_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/male_ivory_wolf_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "male_skeleton_head": {
+      "id": "male_skeleton_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/male_skeleton_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "female_ivory_human_head": {
+      "id": "female_ivory_human_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/female_ivory_human_head.png",
+      "sheetWidth": 320,
+      "sheetHeight": 192,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "female_ivory_wolf_head": {
+      "id": "female_ivory_wolf_head",
+      "type": "head",
+      "imagePath": "lpc/modular_heads/female_ivory_wolf_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 10
+    },
+    "male_ivory_human_shadow": {
+      "id": "male_ivory_human_shadow",
+      "type": "shadow",
+      "imagePath": "lpc/modular_heads/male_ivory_human_shadow_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 5
+    },
+    "female_ivory_human_shadow": {
+      "id": "female_ivory_human_shadow",
+      "type": "shadow",
+      "imagePath": "lpc/modular_heads/female_ivory_human_shadow_head.png",
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "animations": ["walkcycle"],
+      "zIndex": 5
+    }
+  }
+}

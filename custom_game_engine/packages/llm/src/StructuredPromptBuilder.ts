@@ -2098,15 +2098,17 @@ export class StructuredPromptBuilder {
     // Combat & Hunting actions - Per progressive-skill-reveal-spec.md: requires combat skill 1+
     if (combatSkill >= 1) {
       // Hunt wild animals when visible
-      // Note: VisionComponent doesn't currently track animals separately, so we check for any wild animals in world
-      // TODO: Add seenAnimals to VisionComponent for proper visibility checking
-      const wildAnimals = _world.query().with(ComponentType.Animal).executeEntities();
-      const hasWildAnimals = wildAnimals.some(animal => {
-        const animalComp = animal.components.get('animal') as { wild: boolean } | undefined;
-        return animalComp?.wild === true;
-      });
-      if (hasWildAnimals) {
-        combat.push('hunt - Hunt a wild animal for meat and resources');
+      if (vision?.seenAnimals && vision.seenAnimals.length > 0) {
+        // Check if any seen animals are wild
+        const hasWildAnimals = vision.seenAnimals.some(animalId => {
+          const animal = _world.getEntity(animalId);
+          if (!animal) return false;
+          const animalComp = animal.components.get('animal') as { wild: boolean } | undefined;
+          return animalComp?.wild === true;
+        });
+        if (hasWildAnimals) {
+          combat.push('hunt - Hunt a wild animal for meat and resources');
+        }
       }
 
       // Combat with other agents when visible

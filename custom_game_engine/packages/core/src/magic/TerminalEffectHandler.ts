@@ -13,7 +13,7 @@ import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { TerminalEffect } from './costs/CostCalculator.js';
-import { ComponentType as CT } from '../types/ComponentType.ts';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
 
 /**

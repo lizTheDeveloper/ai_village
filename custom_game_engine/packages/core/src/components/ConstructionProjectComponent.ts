@@ -255,6 +255,9 @@ export function deliverResources(
   // Use for-in loop (faster than Object.entries)
   for (const itemId in resources) {
     const quantity = resources[itemId];
+    if (quantity === undefined) {
+      throw new Error(`Resource quantity undefined for itemId: ${itemId}`);
+    }
     delivered[itemId] = (delivered[itemId] || 0) + quantity;
   }
 }
@@ -348,7 +351,11 @@ export function hasAllResources(project: ConstructionProjectComponent): boolean 
 
   // Use for-in loop (faster than Object.entries)
   for (const itemId in required) {
-    if ((delivered[itemId] || 0) < required[itemId]) {
+    const requiredQty = required[itemId];
+    if (requiredQty === undefined) {
+      throw new Error(`Required quantity undefined for itemId: ${itemId}`);
+    }
+    if ((delivered[itemId] || 0) < requiredQty) {
       return false;
     }
   }
@@ -368,7 +375,11 @@ export function getResourceCompletionPercent(project: ConstructionProjectCompone
 
   // Use for-in loop
   for (const itemId in required) {
-    totalRequired += required[itemId];
+    const requiredQty = required[itemId];
+    if (requiredQty === undefined) {
+      throw new Error(`Required quantity undefined for itemId: ${itemId}`);
+    }
+    totalRequired += requiredQty;
     totalDelivered += delivered[itemId] || 0;
   }
 
@@ -400,7 +411,11 @@ export function getMissingResources(
 
   // Use for-in loop
   for (const itemId in required) {
-    const remaining = required[itemId] - (delivered[itemId] || 0);
+    const requiredQty = required[itemId];
+    if (requiredQty === undefined) {
+      throw new Error(`Required quantity undefined for itemId: ${itemId}`);
+    }
+    const remaining = requiredQty - (delivered[itemId] || 0);
     if (remaining > 0) {
       missing[itemId] = remaining;
       hasMissing = true;

@@ -1,0 +1,171 @@
+{
+  "$schema": "common-traits-schema",
+  "description": "Reusable racial traits that can be shared across multiple race definitions",
+  "traits": {
+    "flight": {
+      "id": "flight",
+      "name": "Flight",
+      "category": "physical",
+      "description": "Can fly through the air",
+      "effects": {
+        "abilitiesGranted": ["flight"],
+        "movementMultiplier": 1.5
+      }
+    },
+    "enhanced_strength": {
+      "id": "enhanced_strength",
+      "name": "Enhanced Strength",
+      "category": "physical",
+      "description": "Supernaturally strong",
+      "effects": {
+        "skillAffinityBonus": {
+          "combat": 0.3,
+          "building": 0.2
+        }
+      }
+    },
+    "tiny_form": {
+      "id": "tiny_form",
+      "name": "Tiny Form",
+      "category": "physical",
+      "description": "Very small size",
+      "effects": {
+        "needsDecayMultiplier": {
+          "hunger": 0.5
+        },
+        "movementMultiplier": 0.8
+      }
+    },
+    "darkvision": {
+      "id": "darkvision",
+      "name": "Darkvision",
+      "category": "sensory",
+      "description": "Can see in complete darkness",
+      "effects": {
+        "abilitiesGranted": ["darkvision"]
+      }
+    },
+    "spirit_sight": {
+      "id": "spirit_sight",
+      "name": "Spirit Sight",
+      "category": "sensory",
+      "description": "Can perceive spirits and divine presences",
+      "effects": {
+        "abilitiesGranted": ["spirit_sight"]
+      }
+    },
+    "glamour": {
+      "id": "glamour",
+      "name": "Glamour",
+      "category": "magical",
+      "description": "Natural illusion magic",
+      "effects": {
+        "abilitiesGranted": ["glamour", "illusion"],
+        "skillAffinityBonus": {
+          "social": 0.3
+        }
+      }
+    },
+    "shapeshifting": {
+      "id": "shapeshifting",
+      "name": "Shapeshifting",
+      "category": "magical",
+      "description": "Can assume other forms",
+      "effects": {
+        "abilitiesGranted": ["shapeshift"]
+      }
+    },
+    "fire_immunity": {
+      "id": "fire_immunity",
+      "name": "Fire Immunity",
+      "category": "magical",
+      "description": "Immune to fire and heat",
+      "effects": {
+        "abilitiesGranted": ["fire_immunity"]
+      }
+    },
+    "water_breathing": {
+      "id": "water_breathing",
+      "name": "Water Breathing",
+      "category": "magical",
+      "description": "Can breathe underwater",
+      "effects": {
+        "abilitiesGranted": ["water_breathing"]
+      }
+    },
+    "ageless": {
+      "id": "ageless",
+      "name": "Ageless",
+      "category": "spiritual",
+      "description": "Does not age",
+      "effects": {
+        "lifespanMultiplier": null
+      }
+    },
+    "oath_bound": {
+      "id": "oath_bound",
+      "name": "Oath-Bound",
+      "category": "spiritual",
+      "description": "Cannot break sworn oaths",
+      "effects": {
+        "abilitiesGranted": ["oath_bound"]
+      }
+    },
+    "true_name_vulnerable": {
+      "id": "true_name_vulnerable",
+      "name": "True Name Vulnerable",
+      "category": "spiritual",
+      "description": "True name grants power over them",
+      "effects": {
+        "vulnerabilities": ["true_name"]
+      }
+    },
+    "revive_daily": {
+      "id": "revive_daily",
+      "name": "Daily Revival",
+      "category": "spiritual",
+      "description": "Revives each dawn after death",
+      "effects": {
+        "abilitiesGranted": ["daily_revival"]
+      }
+    },
+    "divine_beauty": {
+      "id": "divine_beauty",
+      "name": "Divine Beauty",
+      "category": "social",
+      "description": "Inspires awe in mortals",
+      "effects": {
+        "skillAffinityBonus": {
+          "social": 0.5
+        }
+      }
+    },
+    "terror_aura": {
+      "id": "terror_aura",
+      "name": "Terror Aura",
+      "category": "social",
+      "description": "Inspires fear in others",
+      "effects": {
+        "abilitiesGranted": ["terror_aura"]
+      }
+    },
+    "iron_weakness": {
+      "id": "iron_weakness",
+      "name": "Cold Iron Weakness",
+      "category": "magical",
+      "description": "Cold iron burns and disrupts magic",
+      "effects": {
+        "vulnerabilities": ["cold_iron"]
+      }
+    },
+    "sunlight_weakness": {
+      "id": "sunlight_weakness",
+      "name": "Sunlight Weakness",
+      "category": "physical",
+      "description": "Sunlight causes harm",
+      "effects": {
+        "vulnerabilities": ["sunlight"]
+      }
+    }
+  }
+}

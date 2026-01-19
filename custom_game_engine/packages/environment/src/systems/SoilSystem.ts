@@ -1,5 +1,8 @@
 import type { SystemId, BiomeType, Entity, World } from '@ai-village/core';
 import { ComponentType as CT, BaseSystem, type SystemContext } from '@ai-village/core';
+import fertilizersData from '../../data/fertilizers.json';
+import biomeFertilityData from '../../data/biome-fertility.json';
+import soilConstantsData from '../../data/soil-constants.json';
 
 interface TimeComponent {
   type: 'time';
@@ -413,52 +416,115 @@ export class SoilSystem extends BaseSystem {
  */
 export interface FertilizerType {
   id: string;
-  name: string;
+  displayName: string;
+  description: string;
   fertilityBoost: number;
   nitrogenBoost: number;
   phosphorusBoost: number;
   potassiumBoost: number;
   duration: number; // Days
+  craftable: boolean;
+  craftingRequirements?: {
+    items: Array<{ id: string; quantity: number }>;
+    time: number;
+  };
+  obtainedFrom?: string[];
 }
 
 /**
- * Available fertilizer types
+ * Biome fertility data structure
  */
-export const FERTILIZERS: Record<string, FertilizerType> = {
-  compost: {
-    id: 'compost',
-    name: 'Compost',
-    fertilityBoost: 20,
-    nitrogenBoost: 10,
-    phosphorusBoost: 5,
-    potassiumBoost: 10,
-    duration: 90, // 1 season
-  },
-  manure: {
-    id: 'manure',
-    name: 'Manure',
-    fertilityBoost: 25,
-    nitrogenBoost: 15,
-    phosphorusBoost: 8,
-    potassiumBoost: 12,
-    duration: 90, // 1 season
-  },
-  'fish-meal': {
-    id: 'fish-meal',
-    name: 'Fish Meal',
-    fertilityBoost: 15,
-    nitrogenBoost: 20,
-    phosphorusBoost: 15,
-    potassiumBoost: 5,
-    duration: 7, // 1 week
-  },
-  'bone-meal': {
-    id: 'bone-meal',
-    name: 'Bone Meal',
-    fertilityBoost: 10,
-    nitrogenBoost: 5,
-    phosphorusBoost: 25,
-    potassiumBoost: 5,
-    duration: 14, // 2 weeks
-  },
-};
+interface BiomeFertilityData {
+  id: BiomeType;
+  displayName: string;
+  description: string;
+  fertilityRange: {
+    min: number;
+    max: number;
+  };
+  defaultMoisture: number;
+  temperatureModifier: number;
+  farmable?: boolean;
+}
+
+/**
+ * Soil constants data structure
+ */
+interface SoilConstantsData {
+  moisture: {
+    baseDailyDecay: number;
+    hotWeatherDecayMultiplier: number;
+    coldWeatherDecayMultiplier: number;
+    hotWeatherThreshold: number;
+    coldWeatherThreshold: number;
+    wateringBonus: number;
+    rainMoistureBonus: number;
+    snowMoistureBonus: number;
+  };
+  fertility: {
+    depletionPerHarvest: number;
+    initialPlantability: number;
+    tillableTerrains: string[];
+  };
+  nutrients: {
+    phosphorusMultiplier: number;
+    potassiumMultiplier: number;
+  };
+  timeConstants: {
+    secondsPerDay: number;
+  };
+}
+
+/**
+ * Load and validate fertilizers from JSON
+ */
+function loadFertilizers(): Record<string, FertilizerType> {
+  if (!Array.isArray(fertilizersData)) {
+    throw new Error('Invalid fertilizers data: expected array');
+  }
+
+  const fertilizers: Record<string, FertilizerType> = {};
+  for (const fert of fertilizersData) {
+    if (!fert.id || !fert.displayName || fert.fertilityBoost === undefined) {
+      throw new Error(`Invalid fertilizer data: ${JSON.stringify(fert)}`);
+    }
+    fertilizers[fert.id] = fert as FertilizerType;
+  }
+
+  return fertilizers;
+}
+
+/**
+ * Load and validate biome fertility data from JSON
+ */
+function loadBiomeFertility(): Map<BiomeType, BiomeFertilityData> {
+  if (!Array.isArray(biomeFertilityData)) {
+    throw new Error('Invalid biome fertility data: expected array');
+  }
+
+  const biomes = new Map<BiomeType, BiomeFertilityData>();
+  for (const biome of biomeFertilityData) {
+    if (!biome.id || !biome.fertilityRange) {
+      throw new Error(`Invalid biome fertility data: ${JSON.stringify(biome)}`);
+    }
+    biomes.set(biome.id as BiomeType, biome as BiomeFertilityData);
+  }
+
+  return biomes;
+}
+
+/**
+ * Load and validate soil constants from JSON
+ */
+function loadSoilConstants(): SoilConstantsData {
+  if (!soilConstantsData || typeof soilConstantsData !== 'object') {
+    throw new Error('Invalid soil constants data: expected object');
+  }
+
+  return soilConstantsData as SoilConstantsData;
+}
+
+// Load data at module initialization
+export const FERTILIZERS = loadFertilizers();
+const BIOME_FERTILITY = loadBiomeFertility();
+const SOIL_CONSTANTS = loadSoilConstants();

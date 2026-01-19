@@ -94,6 +94,7 @@ export interface VisionComponent extends Component {
   seenResources: string[];  // Resources in area range
   seenPlants?: string[];    // Plants in area range
   seenBuildings?: string[]; // Buildings in area range
+  seenAnimals?: string[];   // Animals in area range
 
   // Close range details (for context)
   nearbyAgents?: string[];    // Agents in close range (detailed in context)
@@ -126,6 +127,7 @@ export function createVisionComponent(
     seenAgents: [],
     seenResources: [],
     seenPlants: [],
+    seenAnimals: [],
     nearbyAgents: [],
     nearbyResources: [],
     distantLandmarks: [],

@@ -133,7 +133,7 @@ export class ReflectBehavior extends BaseBehavior {
   /**
    * Attempt to form a new personal goal (30% chance).
    */
-  private attemptGoalFormation(entity: EntityImpl, _world: World, currentTick: number): void {
+  private attemptGoalFormation(entity: EntityImpl, world: World, currentTick: number): void {
     // Check if agent has goals component
     if (!entity.hasComponent(ComponentType.Goals)) {
       return; // No goals component - skip
@@ -176,8 +176,17 @@ export class ReflectBehavior extends BaseBehavior {
     try {
       goals.addGoal(goal);
 
-      // TODO: Add goal_formed event to EventMap when events are extended
-      // For now, goal formation happens silently
+      // Emit event for goal formation
+      world.eventBus.emit({
+        type: 'agent:goal_formed',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          goalId: goal.id,
+          category: goal.category,
+          description: goal.description,
+        },
+      });
     } catch (error) {
       // Failed to add goal (likely at max) - that's OK
     }
@@ -460,8 +469,16 @@ function attemptGoalFormation(ctx: import('../BehaviorContext.js').BehaviorConte
   try {
     goals.addGoal(goal);
 
-    // TODO: Add goal_formed event to EventMap when events are extended
-    // For now, goal formation happens silently
+    // Emit event for goal formation
+    ctx.emit({
+      type: 'agent:goal_formed',
+      data: {
+        agentId: ctx.entity.id,
+        goalId: goal.id,
+        category: goal.category,
+        description: goal.description,
+      },
+    });
   } catch (error) {
     // Failed to add goal (likely at max) - that's OK
   }

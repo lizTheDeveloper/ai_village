@@ -93,18 +93,17 @@ export class InitiateHuntBehavior extends BaseBehavior {
     // EntityImpl cast required: Entity interface doesn't expose mutation methods
     (entity as EntityImpl).addComponent(conflict);
 
-    // TODO: Add hunting event types to EventMap
     // Emit event for narrative/logging
-    // world.eventBus.emit({
-    //   type: 'hunt:initiated_by_agent',
-    //   source: entity.id,
-    //   data: {
-    //     hunterId: entity.id,
-    //     targetId: targetId,
-    //     reason: reason,
-    //     autonomousDecision: true,
-    //   },
-    // });
+    world.eventBus.emit({
+      type: 'hunt:initiated_by_agent',
+      source: entity.id,
+      data: {
+        hunterId: entity.id,
+        targetId: targetId,
+        reason: reason,
+        autonomousDecision: true,
+      },
+    });
 
     return {
       complete: true,
@@ -167,17 +166,16 @@ export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBe
   // EntityImpl cast required: Entity interface doesn't expose mutation methods
   (ctx.entity as EntityImpl).addComponent(conflict);
 
-  // TODO: Add hunting event types to EventMap
   // Emit event for narrative/logging
-  // ctx.emit({
-  //   type: 'hunt:initiated_by_agent',
-  //   data: {
-  //     hunterId: ctx.entity.id,
-  //     targetId: targetId,
-  //     reason: reason,
-  //     autonomousDecision: true,
-  //   },
-  // });
+  ctx.emit({
+    type: 'hunt:initiated_by_agent',
+    data: {
+      hunterId: ctx.entity.id,
+      targetId: targetId,
+      reason: reason,
+      autonomousDecision: true,
+    },
+  });
 
   return ctx.complete(`Initiated hunt for ${targetId} (${reason})`);
 }

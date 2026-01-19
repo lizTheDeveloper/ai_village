@@ -1,0 +1,66 @@
+[
+  {
+    "id": "compost",
+    "displayName": "Compost",
+    "description": "Decomposed organic matter that improves soil fertility and structure",
+    "fertilityBoost": 20,
+    "nitrogenBoost": 10,
+    "phosphorusBoost": 5,
+    "potassiumBoost": 10,
+    "duration": 90,
+    "craftable": true,
+    "craftingRequirements": {
+      "items": [
+        { "id": "leaves", "quantity": 10 },
+        { "id": "food_waste", "quantity": 5 }
+      ],
+      "time": 120
+    }
+  },
+  {
+    "id": "manure",
+    "displayName": "Manure",
+    "description": "Animal waste that provides excellent nitrogen and improves soil fertility",
+    "fertilityBoost": 25,
+    "nitrogenBoost": 15,
+    "phosphorusBoost": 8,
+    "potassiumBoost": 12,
+    "duration": 90,
+    "craftable": false,
+    "obtainedFrom": ["livestock"]
+  },
+  {
+    "id": "fish-meal",
+    "displayName": "Fish Meal",
+    "description": "Ground fish that provides high nitrogen and phosphorus for rapid growth",
+    "fertilityBoost": 15,
+    "nitrogenBoost": 20,
+    "phosphorusBoost": 15,
+    "potassiumBoost": 5,
+    "duration": 7,
+    "craftable": true,
+    "craftingRequirements": {
+      "items": [
+        { "id": "fish", "quantity": 3 }
+      ],
+      "time": 30
+    }
+  },
+  {
+    "id": "bone-meal",
+    "displayName": "Bone Meal",
+    "description": "Ground bones that provide excellent phosphorus for root development",
+    "fertilityBoost": 10,
+    "nitrogenBoost": 5,
+    "phosphorusBoost": 25,
+    "potassiumBoost": 5,
+    "duration": 14,
+    "craftable": true,
+    "craftingRequirements": {
+      "items": [
+        { "id": "bones", "quantity": 5 }
+      ],
+      "time": 60
+    }
+  }
+]

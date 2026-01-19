@@ -272,6 +272,9 @@ export function calculateProductionMultiplier(
   // Use precomputed tech multiplier (avoid Math.pow)
   const techLevel = Math.max(1, Math.min(10, component.techLevel | 0));
   const techMultiplier = TECH_MULTIPLIERS[techLevel - 1];
+  if (techMultiplier === undefined) {
+    throw new Error(`Tech multiplier undefined for techLevel: ${techLevel}`);
+  }
 
   // Fast log10 with cache
   const popMultiplier = fastLog10(component.population);

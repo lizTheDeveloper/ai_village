@@ -252,9 +252,9 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     }
 
     // Store protection shield data
-    const shields = (magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
+    const shields = (magic as unknown as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
     if (!shields) {
-      (magic as Record<string, unknown>).protectionShields = [];
+      (magic as unknown as Record<string, unknown>).protectionShields = [];
     }
 
     const shieldData = {
@@ -270,14 +270,14 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };
 
-    ((magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>>).push(shieldData);
+    ((magic as unknown as Record<string, unknown>).protectionShields as Array<Record<string, unknown>>).push(shieldData);
 
     // Add to active effects list for tracking
-    const activeEffects = (magic as Record<string, unknown>).activeEffects as string[] | undefined;
+    const activeEffects = (magic as unknown as Record<string, unknown>).activeEffects as string[] | undefined;
     if (activeEffects && !activeEffects.includes(effect.id)) {
       activeEffects.push(effect.id);
     } else if (!activeEffects) {
-      (magic as Record<string, unknown>).activeEffects = [effect.id];
+      (magic as unknown as Record<string, unknown>).activeEffects = [effect.id];
     }
 
     return {
@@ -306,7 +306,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       return;
     }
 
-    const shields = (magic as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
+    const shields = (magic as unknown as Record<string, unknown>).protectionShields as Array<Record<string, unknown>> | undefined;
     if (!shields) {
       return;
     }
@@ -327,7 +327,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       (shield) => shield.effectId === activeEffect.effectId
     );
     if (!hasMore) {
-      const activeEffects = (magic as Record<string, unknown>).activeEffects as string[] | undefined;
+      const activeEffects = (magic as unknown as Record<string, unknown>).activeEffects as string[] | undefined;
       if (activeEffects) {
         const effectIndex = activeEffects.indexOf(activeEffect.effectId);
         if (effectIndex !== -1) {

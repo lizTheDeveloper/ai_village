@@ -1,0 +1,518 @@
+{
+  "$schema": "panel-configs-schema",
+  "version": "1.0.0",
+  "description": "UI Panel window configurations for WindowManager registration",
+
+  "categories": {
+    "info": { "label": "Info", "description": "Entity information panels" },
+    "animals": { "label": "Animals", "description": "Animal management" },
+    "farming": { "label": "Farming", "description": "Farming and plant management" },
+    "economy": { "label": "Economy", "description": "Resources and trading" },
+    "social": { "label": "Social", "description": "Relationships and memory" },
+    "settings": { "label": "Settings", "description": "Game settings and controls" },
+    "research": { "label": "Research", "description": "Technology and research" },
+    "player": { "label": "Player", "description": "Player controls" },
+    "magic": { "label": "Magic", "description": "Magic systems and spells" },
+    "divinity": { "label": "Divinity", "description": "Divine powers and angels" },
+    "dev": { "label": "Dev", "description": "Developer tools" }
+  },
+
+  "panels": {
+    "llm-config": {
+      "title": "LLM Configuration",
+      "defaultX": 0,
+      "defaultY": 0,
+      "defaultWidth": 500,
+      "defaultHeight": 400,
+      "isDraggable": false,
+      "isResizable": false,
+      "isModal": true,
+      "showInWindowList": false,
+      "menuCategory": "settings"
+    },
+
+    "agent-info": {
+      "title": "Agent Info",
+      "defaultX": 10,
+      "defaultY": 10,
+      "defaultWidth": 360,
+      "defaultHeight": 530,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 300,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "keyboardShortcut": "A",
+      "menuCategory": "info"
+    },
+
+    "animal-info": {
+      "title": "Animal Info",
+      "defaultX": "logicalWidth - 320",
+      "defaultY": 10,
+      "defaultWidth": 300,
+      "defaultHeight": 400,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 250,
+      "minHeight": 300,
+      "showInWindowList": true,
+      "menuCategory": "animals"
+    },
+
+    "plant-info": {
+      "title": "Plant Info",
+      "defaultX": "logicalWidth - 340",
+      "defaultY": 50,
+      "defaultWidth": 320,
+      "defaultHeight": 480,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 250,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "menuCategory": "farming"
+    },
+
+    "resources": {
+      "title": "Resources",
+      "defaultX": "logicalWidth - 260",
+      "defaultY": 10,
+      "defaultWidth": 250,
+      "defaultHeight": 200,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 200,
+      "minHeight": 150,
+      "showInWindowList": true,
+      "keyboardShortcut": "R",
+      "menuCategory": "economy"
+    },
+
+    "memory": {
+      "title": "Memory",
+      "defaultX": 10,
+      "defaultY": "logicalHeight - 610",
+      "defaultWidth": 400,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 300,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "keyboardShortcut": "M",
+      "menuCategory": "social"
+    },
+
+    "relationships": {
+      "title": "Relationships",
+      "defaultX": 420,
+      "defaultY": "logicalHeight - 510",
+      "defaultWidth": 380,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 300,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "keyboardShortcut": "L",
+      "menuCategory": "social"
+    },
+
+    "tile-inspector": {
+      "title": "Tile Inspector",
+      "defaultX": "logicalWidth - 320",
+      "defaultY": "logicalHeight - 410",
+      "defaultWidth": 300,
+      "defaultHeight": 400,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 250,
+      "minHeight": 300,
+      "showInWindowList": true,
+      "keyboardShortcut": "T",
+      "menuCategory": "farming"
+    },
+
+    "inventory": {
+      "title": "Inventory",
+      "defaultX": 100,
+      "defaultY": 50,
+      "defaultWidth": "logicalWidth - 200",
+      "defaultHeight": "logicalHeight - 100",
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 400,
+      "minHeight": 300,
+      "isModal": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "I",
+      "menuCategory": "economy"
+    },
+
+    "settings": {
+      "title": "Settings",
+      "defaultX": 10,
+      "defaultY": 10,
+      "defaultWidth": 400,
+      "defaultHeight": 300,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 250,
+      "isModal": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "Escape",
+      "menuCategory": "settings"
+    },
+
+    "crafting": {
+      "title": "Crafting",
+      "defaultX": 100,
+      "defaultY": 80,
+      "defaultWidth": 800,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 600,
+      "minHeight": 400,
+      "isModal": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "C",
+      "menuCategory": "economy"
+    },
+
+    "notifications": {
+      "title": "Notifications",
+      "defaultX": "logicalWidth - 420",
+      "defaultY": "logicalHeight - 350",
+      "defaultWidth": 400,
+      "defaultHeight": 300,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 300,
+      "minHeight": 200,
+      "showInWindowList": true,
+      "keyboardShortcut": "N",
+      "menuCategory": "settings"
+    },
+
+    "economy": {
+      "title": "Economy",
+      "defaultX": "logicalWidth - 420",
+      "defaultY": "logicalHeight - 520",
+      "defaultWidth": 400,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "keyboardShortcut": "E",
+      "menuCategory": "economy"
+    },
+
+    "shop": {
+      "title": "Shop",
+      "defaultX": "(logicalWidth - 500) / 2",
+      "defaultY": "(logicalHeight - 600) / 2",
+      "defaultWidth": 500,
+      "defaultHeight": 600,
+      "isDraggable": false,
+      "isModal": true,
+      "showInWindowList": false,
+      "menuCategory": "economy"
+    },
+
+    "governance": {
+      "title": "Governance",
+      "defaultX": "logicalWidth - 420",
+      "defaultY": 50,
+      "defaultWidth": 400,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "social"
+    },
+
+    "city-manager": {
+      "title": "City Manager",
+      "defaultX": 50,
+      "defaultY": 50,
+      "defaultWidth": 600,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 450,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "menuCategory": "social"
+    },
+
+    "controls": {
+      "title": "Controls",
+      "defaultX": 10,
+      "defaultY": 50,
+      "defaultWidth": 300,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 250,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "keyboardShortcut": "H",
+      "menuCategory": "settings"
+    },
+
+    "time-controls": {
+      "title": "Time Controls",
+      "defaultX": 10,
+      "defaultY": 50,
+      "defaultWidth": 220,
+      "defaultHeight": 180,
+      "isDraggable": true,
+      "isResizable": false,
+      "showInWindowList": true,
+      "keyboardShortcut": "T",
+      "menuCategory": "settings"
+    },
+
+    "universe-manager": {
+      "title": "Universe Manager",
+      "defaultX": 10,
+      "defaultY": 250,
+      "defaultWidth": 350,
+      "defaultHeight": 400,
+      "isDraggable": true,
+      "isResizable": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "U",
+      "menuCategory": "settings"
+    },
+
+    "agent-roster": {
+      "title": "Agent Roster",
+      "defaultX": 10,
+      "defaultY": 250,
+      "defaultWidth": 380,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "R",
+      "menuCategory": "info"
+    },
+
+    "research-library": {
+      "title": "Research Library",
+      "defaultX": 400,
+      "defaultY": 100,
+      "defaultWidth": 380,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "Y",
+      "menuCategory": "research"
+    },
+
+    "tech-tree": {
+      "title": "Tech Tree",
+      "defaultX": 100,
+      "defaultY": 50,
+      "defaultWidth": 1200,
+      "defaultHeight": 1200,
+      "isDraggable": true,
+      "isResizable": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "K",
+      "menuCategory": "research"
+    },
+
+    "agent-selection": {
+      "title": "Agent Selection",
+      "defaultX": 420,
+      "defaultY": 200,
+      "defaultWidth": 400,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "showInWindowList": true,
+      "keyboardShortcut": "J",
+      "menuCategory": "player"
+    },
+
+    "magic-systems": {
+      "title": "Magic Systems",
+      "defaultX": 10,
+      "defaultY": 100,
+      "defaultWidth": 380,
+      "defaultHeight": 450,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 320,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "menuCategory": "magic"
+    },
+
+    "spellbook": {
+      "title": "Spellbook",
+      "defaultX": 50,
+      "defaultY": 120,
+      "defaultWidth": 420,
+      "defaultHeight": 550,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "magic"
+    },
+
+    "skill-tree": {
+      "title": "Skill Tree",
+      "defaultX": 100,
+      "defaultY": 50,
+      "defaultWidth": 800,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 600,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "magic",
+      "keyboardShortcut": "P"
+    },
+
+    "divine-powers": {
+      "title": "Divine Powers",
+      "defaultX": 100,
+      "defaultY": 80,
+      "defaultWidth": 400,
+      "defaultHeight": 550,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "divine-chat": {
+      "title": "Divine Chat",
+      "defaultX": 520,
+      "defaultY": 80,
+      "defaultWidth": 400,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "vision-composer": {
+      "title": "Vision Composer",
+      "defaultX": 150,
+      "defaultY": 100,
+      "defaultWidth": 500,
+      "defaultHeight": 600,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 400,
+      "minHeight": 450,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "dev-panel": {
+      "title": "Developer Tools",
+      "defaultX": 200,
+      "defaultY": 50,
+      "defaultWidth": 450,
+      "defaultHeight": 650,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 380,
+      "minHeight": 500,
+      "showInWindowList": true,
+      "menuCategory": "dev"
+    },
+
+    "divine-analytics": {
+      "title": "Divine Analytics",
+      "defaultX": 250,
+      "defaultY": 120,
+      "defaultWidth": 700,
+      "defaultHeight": 550,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 500,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "sacred-geography": {
+      "title": "Sacred Geography",
+      "defaultX": 300,
+      "defaultY": 140,
+      "defaultWidth": 600,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 450,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "angel-management": {
+      "title": "Angel Management",
+      "defaultX": 350,
+      "defaultY": 160,
+      "defaultWidth": 550,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 400,
+      "minHeight": 350,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "prayers": {
+      "title": "Prayers",
+      "defaultX": 400,
+      "defaultY": 180,
+      "defaultWidth": 550,
+      "defaultHeight": 450,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 400,
+      "minHeight": 300,
+      "showInWindowList": true,
+      "menuCategory": "divinity"
+    },
+
+    "text-adventure": {
+      "title": "Text Adventure",
+      "defaultX": "logicalWidth - 470",
+      "defaultY": "logicalHeight - 520",
+      "defaultWidth": 450,
+      "defaultHeight": 500,
+      "isDraggable": true,
+      "isResizable": true,
+      "minWidth": 350,
+      "minHeight": 400,
+      "showInWindowList": true,
+      "keyboardShortcut": "1",
+      "menuCategory": "settings"
+    }
+  }
+}

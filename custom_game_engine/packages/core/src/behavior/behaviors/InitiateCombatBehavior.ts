@@ -118,33 +118,32 @@ export class InitiateCombatBehavior extends BaseBehavior {
     // but behaviors need mutation capabilities for adding components
     (entity as EntityImpl).addComponent(conflict);
 
-    // TODO: Add combat event types to EventMap
     // Emit event for narrative/logging
-    // world.eventBus.emit({
-    //   type: 'combat:initiated_by_agent',
-    //   source: entity.id,
-    //   data: {
-    //     attackerId: entity.id,
-    //     defenderId: targetId,
-    //     cause,
-    //     lethal,
-    //     surprise,
-    //     autonomousDecision: true,
-    //   },
-    //});
+    world.eventBus.emit({
+      type: 'combat:initiated_by_agent',
+      source: entity.id,
+      data: {
+        attackerId: entity.id,
+        defenderId: targetId,
+        cause,
+        lethal,
+        surprise,
+        autonomousDecision: true,
+      },
+    });
 
     // Emit specific jealousy combat event if applicable
-    // if (cause.startsWith('jealousy_')) {
-    //   world.eventBus.emit({
-    //     type: 'combat:crime_of_passion',
-    //     source: entity.id,
-    //     data: {
-    //       attackerId: entity.id,
-    //       defenderId: targetId,
-    //       jealousyType: cause.replace('jealousy_', ''),
-    //     },
-    //   });
-    // }
+    if (cause.startsWith('jealousy_')) {
+      world.eventBus.emit({
+        type: 'combat:crime_of_passion',
+        source: entity.id,
+        data: {
+          attackerId: entity.id,
+          defenderId: targetId,
+          jealousyType: cause.replace('jealousy_', ''),
+        },
+      });
+    }
 
     return {
       complete: true,
@@ -222,31 +221,30 @@ export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): Context
   // but behaviors need mutation capabilities for adding components
   (ctx.entity as EntityImpl).addComponent(conflict);
 
-  // TODO: Add combat event types to EventMap
   // Emit event for narrative/logging
-  // ctx.emit({
-  //   type: 'combat:initiated_by_agent',
-  //   data: {
-  //     attackerId: ctx.entity.id,
-  //     defenderId: targetId,
-  //     cause,
-  //     lethal,
-  //     surprise,
-  //     autonomousDecision: true,
-  //   },
-  // });
+  ctx.emit({
+    type: 'combat:initiated_by_agent',
+    data: {
+      attackerId: ctx.entity.id,
+      defenderId: targetId,
+      cause,
+      lethal,
+      surprise,
+      autonomousDecision: true,
+    },
+  });
 
   // Emit specific jealousy combat event if applicable
-  // if (cause.startsWith('jealousy_')) {
-  //   ctx.emit({
-  //     type: 'combat:crime_of_passion',
-  //     data: {
-  //       attackerId: ctx.entity.id,
-  //       defenderId: targetId,
-  //       jealousyType: cause.replace('jealousy_', ''),
-  //     },
-  //   });
-  // }
+  if (cause.startsWith('jealousy_')) {
+    ctx.emit({
+      type: 'combat:crime_of_passion',
+      data: {
+        attackerId: ctx.entity.id,
+        defenderId: targetId,
+        jealousyType: cause.replace('jealousy_', ''),
+      },
+    });
+  }
 
   return ctx.complete(`Initiated combat with ${targetId} (${cause})`);
 }

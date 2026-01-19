@@ -12,7 +12,7 @@
  */
 
 import type { PlotLineTemplate } from '../PlotTypes.js';
-import plotTemplatesData from '../../data/plot-templates.json';
+import plotTemplatesData from '../../../data/plot-templates.json';
 
 /**
  * Load and validate plot templates from JSON

@@ -1,0 +1,38 @@
+{
+  "$schema": "belief-economy-schema",
+  "description": "Belief economy configuration: generation rates, thresholds, and decay settings",
+  "beliefGenerationRates": {
+    "passive_faith": 0.01,
+    "prayer": 0.1,
+    "meditation": 0.15,
+    "ritual": 0.3,
+    "sacrifice": 0.5,
+    "pilgrimage": 1.0,
+    "proselytizing": 0.2,
+    "creation": 0.5,
+    "miracle_witness": 5.0
+  },
+  "beliefThresholds": {
+    "minimum": 10,
+    "minor_powers": 100,
+    "moderate_powers": 500,
+    "angel_creation": 2000,
+    "avatar_creation": 5000,
+    "world_shaping": 10000
+  },
+  "powerTierThresholds": {
+    "dormant": 0,
+    "minor": 10,
+    "moderate": 100,
+    "major": 500,
+    "supreme": 2000,
+    "world_shaping": 5000
+  },
+  "defaultBeliefDecay": {
+    "normalDecayRate": 0.001,
+    "noActivityDecayRate": 0.005,
+    "noActivityThreshold": 24,
+    "criticalDecayRate": 0.02,
+    "mythPersistenceFloor": 1
+  }
+}

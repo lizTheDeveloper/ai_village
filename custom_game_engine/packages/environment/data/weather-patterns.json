@@ -1,0 +1,84 @@
+[
+  {
+    "id": "clear",
+    "displayName": "Clear",
+    "description": "Clear skies with good visibility",
+    "movementModifier": 1.0,
+    "temperatureModifier": 0,
+    "defaultDuration": {
+      "min": 60,
+      "max": 300
+    },
+    "weight": 50,
+    "intensityRange": {
+      "min": 0,
+      "max": 0
+    }
+  },
+  {
+    "id": "rain",
+    "displayName": "Rain",
+    "description": "Rainfall that waters crops and reduces temperature",
+    "movementModifier": 0.8,
+    "temperatureModifier": -3,
+    "defaultDuration": {
+      "min": 60,
+      "max": 300
+    },
+    "weight": 25,
+    "intensityRange": {
+      "min": 0.3,
+      "max": 1.0
+    },
+    "soilMoistureBonus": 40
+  },
+  {
+    "id": "snow",
+    "displayName": "Snow",
+    "description": "Snowfall that provides some moisture and significantly reduces temperature",
+    "movementModifier": 0.7,
+    "temperatureModifier": -8,
+    "defaultDuration": {
+      "min": 60,
+      "max": 300
+    },
+    "weight": 15,
+    "intensityRange": {
+      "min": 0.3,
+      "max": 1.0
+    },
+    "soilMoistureBonus": 20
+  },
+  {
+    "id": "storm",
+    "displayName": "Storm",
+    "description": "Heavy storm with reduced visibility and movement",
+    "movementModifier": 0.6,
+    "temperatureModifier": -5,
+    "defaultDuration": {
+      "min": 60,
+      "max": 300
+    },
+    "weight": 10,
+    "intensityRange": {
+      "min": 0.3,
+      "max": 1.0
+    }
+  },
+  {
+    "id": "fog",
+    "displayName": "Fog",
+    "description": "Dense fog with reduced visibility",
+    "movementModifier": 0.9,
+    "temperatureModifier": -2,
+    "defaultDuration": {
+      "min": 60,
+      "max": 300
+    },
+    "weight": 10,
+    "intensityRange": {
+      "min": 0.3,
+      "max": 1.0
+    }
+  }
+]

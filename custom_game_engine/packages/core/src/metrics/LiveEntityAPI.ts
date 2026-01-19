@@ -7,7 +7,7 @@
  * - Live LLM prompt generation using StructuredPromptBuilder
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';

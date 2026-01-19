@@ -23,7 +23,7 @@ import { SpellEffectExecutor } from './SpellEffectExecutor.js';
 import { costCalculatorRegistry } from './costs/CostCalculatorRegistry.js';
 import { createDefaultContext } from './costs/CostCalculator.js';
 import { getCoreParadigm } from './CoreParadigms.js';
-import { ComponentType } from '../types/ComponentType.ts';
+import { ComponentType } from '../types/ComponentType.js';
 
 // ============================================================================
 // Types

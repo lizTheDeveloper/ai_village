@@ -1,0 +1,476 @@
+{
+  "$schema": "universe-presets-schema",
+  "description": "Pre-built universe divine configuration presets",
+  "presets": {
+    "high_fantasy": {
+      "coreParams": {
+        "divinePresence": 0.8,
+        "divineReliability": 0.9,
+        "mortalSignificance": 0.7,
+        "faithVolatility": 0.3,
+        "permanentDivineDeathPossible": false,
+        "intentionalDeityCreation": true,
+        "maxActiveDeities": 50,
+        "playerGodAdvantage": 1.2,
+        "divineTimeScale": 1.0
+      },
+      "beliefEconomy": {
+        "generationMultiplier": 1.5,
+        "activityMultipliers": {},
+        "decayMultiplier": 0.5,
+        "existenceThreshold": 5,
+        "tierThresholdMultipliers": {
+          "dormant": 1.0,
+          "minor": 0.5,
+          "moderate": 0.5,
+          "major": 0.7,
+          "supreme": 0.8,
+          "world_shaping": 0.9
+        },
+        "maxBeliefStorage": 100000,
+        "transferEfficiency": 0.9,
+        "sacredSiteBonusMultiplier": 1.5,
+        "communalBonusMultiplier": 1.5,
+        "maxFervorMultiplier": 5.0,
+        "beliefStalenessRate": 0.001,
+        "beliefTheftAllowed": true,
+        "beliefTheftEfficiency": 0.5
+      },
+      "powers": {
+        "globalCostMultiplier": 0.7,
+        "powerCostMultipliers": {},
+        "disabledPowers": [],
+        "globalRangeMultiplier": 1.5,
+        "powerRangeMultipliers": {},
+        "globalDurationMultiplier": 1.5,
+        "powerDurationMultipliers": {},
+        "globalCooldownMultiplier": 0.7,
+        "powerCooldownMultipliers": {},
+        "basePowerSuccessRate": 0.95,
+        "offDomainFailureChance": 0.1,
+        "offDomainCostMultiplier": 1.3,
+        "identityRiskMultiplier": 0.5,
+        "powerResistanceAllowed": false,
+        "baseResistanceChance": 0,
+        "powerVisibility": {
+          "visibilityMultiplier": 1.5,
+          "minimumVisibleTier": "minor",
+          "stealthActionsAllowed": true,
+          "stealthCostMultiplier": 1.2
+        },
+        "prayers": {
+          "hearNonBelieverPrayers": true,
+          "maxPendingPrayers": 100,
+          "prayerExpiryTime": 168,
+          "beliefPerPrayer": 0.15,
+          "answeredPrayerFaithBoost": 0.2,
+          "ignoredPrayerFaithPenalty": 0.02
+        },
+        "visions": {
+          "costMultiplier": 0.8,
+          "misinterpretationPossible": false,
+          "baseMisinterpretationChance": 0,
+          "clarityRange": [0.7, 1.0],
+          "maxConcurrentVisions": 10
+        },
+        "blessings": {
+          "costMultiplier": 0.8,
+          "durationMultiplier": 1.5,
+          "maxActiveBlessings": 50,
+          "disabledBlessingTypes": [],
+          "strengthMultiplier": 1.3,
+          "removalByOtherGodsAllowed": false,
+          "removalCostMultiplier": 2.0
+        },
+        "curses": {
+          "costMultiplier": 0.8,
+          "durationMultiplier": 1.0,
+          "maxActiveCurses": 30,
+          "disabledCurseTypes": [],
+          "strengthMultiplier": 1.0,
+          "liftableByPrayer": true,
+          "prayerLiftDifficulty": 0.3,
+          "backlashChance": 0.05
+        }
+      }
+    },
+    "grimdark": {
+      "coreParams": {
+        "divinePresence": 0.4,
+        "divineReliability": 0.5,
+        "mortalSignificance": 0.2,
+        "faithVolatility": 0.8,
+        "permanentDivineDeathPossible": true,
+        "intentionalDeityCreation": false,
+        "maxActiveDeities": 20,
+        "playerGodAdvantage": 1.0,
+        "divineTimeScale": 2.0
+      },
+      "beliefEconomy": {
+        "generationMultiplier": 0.6,
+        "activityMultipliers": {
+          "sacrifice": 2.0,
+          "miracle_witness": 3.0
+        },
+        "decayMultiplier": 2.0,
+        "existenceThreshold": 50,
+        "tierThresholdMultipliers": {
+          "dormant": 1.0,
+          "minor": 1.5,
+          "moderate": 2.0,
+          "major": 2.5,
+          "supreme": 3.0,
+          "world_shaping": 4.0
+        },
+        "maxBeliefStorage": 20000,
+        "transferEfficiency": 0.5,
+        "sacredSiteBonusMultiplier": 0.8,
+        "communalBonusMultiplier": 0.5,
+        "maxFervorMultiplier": 10.0,
+        "beliefStalenessRate": 0.01,
+        "beliefTheftAllowed": true,
+        "beliefTheftEfficiency": 0.8
+      },
+      "powers": {
+        "globalCostMultiplier": 2.0,
+        "powerCostMultipliers": {
+          "heal_wound": 3.0,
+          "heal_mortal_wound": 5.0,
+          "resurrect_recent": 10.0
+        },
+        "disabledPowers": ["resurrect_old", "mass_blessing"],
+        "globalRangeMultiplier": 0.7,
+        "powerRangeMultipliers": {},
+        "globalDurationMultiplier": 0.5,
+        "powerDurationMultipliers": {},
+        "globalCooldownMultiplier": 2.0,
+        "powerCooldownMultipliers": {},
+        "basePowerSuccessRate": 0.7,
+        "offDomainFailureChance": 0.4,
+        "offDomainCostMultiplier": 2.5,
+        "identityRiskMultiplier": 2.0,
+        "powerResistanceAllowed": true,
+        "baseResistanceChance": 0.2,
+        "powerVisibility": {
+          "visibilityMultiplier": 0.5,
+          "minimumVisibleTier": "major",
+          "stealthActionsAllowed": true,
+          "stealthCostMultiplier": 1.0
+        },
+        "prayers": {
+          "hearNonBelieverPrayers": false,
+          "maxPendingPrayers": 20,
+          "prayerExpiryTime": 24,
+          "beliefPerPrayer": 0.05,
+          "answeredPrayerFaithBoost": 0.1,
+          "ignoredPrayerFaithPenalty": 0.1
+        },
+        "visions": {
+          "costMultiplier": 1.5,
+          "misinterpretationPossible": true,
+          "baseMisinterpretationChance": 0.4,
+          "clarityRange": [0.2, 0.7],
+          "maxConcurrentVisions": 3
+        },
+        "blessings": {
+          "costMultiplier": 2.0,
+          "durationMultiplier": 0.5,
+          "maxActiveBlessings": 10,
+          "disabledBlessingTypes": ["longevity"],
+          "strengthMultiplier": 0.8,
+          "removalByOtherGodsAllowed": true,
+          "removalCostMultiplier": 0.5
+        },
+        "curses": {
+          "costMultiplier": 0.8,
+          "durationMultiplier": 2.0,
+          "maxActiveCurses": 50,
+          "disabledCurseTypes": [],
+          "strengthMultiplier": 1.5,
+          "liftableByPrayer": false,
+          "prayerLiftDifficulty": 0.9,
+          "backlashChance": 0.02
+        }
+      },
+      "restrictions": {
+        "disabledFeatures": ["resurrection"],
+        "levelCaps": {
+          "maxPowerTier": "supreme",
+          "maxAngelRank": "greater",
+          "maxBelief": 20000,
+          "maxBelievers": 5000
+        },
+        "interactions": {
+          "godsCanKillGods": true,
+          "godsCanMergeDomains": false,
+          "godsCanStealDomains": true,
+          "godsCanCreateMortals": false,
+          "godsCanDestroyWorld": false
+        },
+        "playerRestrictions": {
+          "canBeKilled": true,
+          "canLoseDomain": true,
+          "canBeForced": false,
+          "minimumBelief": 10
+        }
+      }
+    },
+    "deistic": {
+      "coreParams": {
+        "divinePresence": 0.1,
+        "divineReliability": 1.0,
+        "mortalSignificance": 0.1,
+        "faithVolatility": 0.1,
+        "permanentDivineDeathPossible": false,
+        "intentionalDeityCreation": false,
+        "maxActiveDeities": 5,
+        "playerGodAdvantage": 1.0,
+        "divineTimeScale": 10.0
+      },
+      "beliefEconomy": {
+        "generationMultiplier": 0.3,
+        "activityMultipliers": {
+          "meditation": 2.0,
+          "creation": 3.0
+        },
+        "decayMultiplier": 0.1,
+        "existenceThreshold": 1,
+        "tierThresholdMultipliers": {
+          "dormant": 1.0,
+          "minor": 5.0,
+          "moderate": 10.0,
+          "major": 20.0,
+          "supreme": 50.0,
+          "world_shaping": 100.0
+        },
+        "maxBeliefStorage": 1000000,
+        "transferEfficiency": 1.0,
+        "sacredSiteBonusMultiplier": 0.5,
+        "communalBonusMultiplier": 0.2,
+        "maxFervorMultiplier": 1.5,
+        "beliefStalenessRate": 0.0001,
+        "beliefTheftAllowed": false,
+        "beliefTheftEfficiency": 0
+      },
+      "powers": {
+        "globalCostMultiplier": 5.0,
+        "powerCostMultipliers": {},
+        "disabledPowers": ["whisper", "subtle_sign", "voice_of_god", "clear_vision", "minor_miracle"],
+        "globalRangeMultiplier": 10.0,
+        "powerRangeMultipliers": {},
+        "globalDurationMultiplier": 10.0,
+        "powerDurationMultipliers": {},
+        "globalCooldownMultiplier": 10.0,
+        "powerCooldownMultipliers": {},
+        "basePowerSuccessRate": 1.0,
+        "offDomainFailureChance": 0,
+        "offDomainCostMultiplier": 1.5,
+        "identityRiskMultiplier": 0,
+        "powerResistanceAllowed": false,
+        "baseResistanceChance": 0,
+        "powerVisibility": {
+          "visibilityMultiplier": 0.1,
+          "minimumVisibleTier": "world_shaping",
+          "stealthActionsAllowed": true,
+          "stealthCostMultiplier": 1.0
+        },
+        "prayers": {
+          "hearNonBelieverPrayers": false,
+          "maxPendingPrayers": 1000,
+          "prayerExpiryTime": 8760,
+          "beliefPerPrayer": 0.01,
+          "answeredPrayerFaithBoost": 0.5,
+          "ignoredPrayerFaithPenalty": 0.001
+        },
+        "visions": {
+          "costMultiplier": 10.0,
+          "misinterpretationPossible": true,
+          "baseMisinterpretationChance": 0.8,
+          "clarityRange": [0.1, 0.4],
+          "maxConcurrentVisions": 1
+        },
+        "blessings": {
+          "costMultiplier": 5.0,
+          "durationMultiplier": 100.0,
+          "maxActiveBlessings": 5,
+          "disabledBlessingTypes": [],
+          "strengthMultiplier": 2.0,
+          "removalByOtherGodsAllowed": false,
+          "removalCostMultiplier": 10.0
+        },
+        "curses": {
+          "costMultiplier": 5.0,
+          "durationMultiplier": 100.0,
+          "maxActiveCurses": 5,
+          "disabledCurseTypes": [],
+          "strengthMultiplier": 2.0,
+          "liftableByPrayer": false,
+          "prayerLiftDifficulty": 1.0,
+          "backlashChance": 0
+        }
+      },
+      "avatars": {
+        "avatarsAllowed": false,
+        "manifestationThreshold": 999999,
+        "manifestationCost": 999999,
+        "maintenanceCostMultiplier": 100,
+        "maxSimultaneousAvatars": 0,
+        "allowedFormTypes": [],
+        "disabledFormTypes": [],
+        "powerLevelMultiplier": 0,
+        "statMultipliers": {
+          "health": 0,
+          "strength": 0,
+          "speed": 0,
+          "perception": 0,
+          "charisma": 0,
+          "wisdom": 0,
+          "resistance": 0,
+          "divinePower": 0
+        },
+        "deathCooldown": 999999,
+        "permanentDeath": true,
+        "tellSuppressionAllowed": false,
+        "tellSuppressionCostMultiplier": 100,
+        "abilityCostMultiplier": 100,
+        "manifestationAlertsOtherGods": true
+      },
+      "angels": {
+        "angelsAllowed": false,
+        "creationThreshold": 999999,
+        "creationCostMultiplier": 100,
+        "maintenanceCostMultiplier": 100,
+        "maxAngelsByRank": {
+          "lesser": 0,
+          "common": 0,
+          "greater": 0,
+          "arch": 0,
+          "supreme": 0
+        },
+        "allowedAngelTypes": [],
+        "maxAvailableRank": "lesser",
+        "powerMultiplier": 0,
+        "permanentDeath": true,
+        "respawnCooldown": 999999,
+        "abilityCostMultiplier": 100,
+        "disobediencePossible": false,
+        "baseDisobedienceChance": 0,
+        "corruptionPossible": false
+      },
+      "restrictions": {
+        "disabledFeatures": ["avatars", "angels", "divine_chat", "divine_war"],
+        "levelCaps": {
+          "maxPowerTier": "world_shaping",
+          "maxAngelRank": "lesser",
+          "maxBelief": 1000000,
+          "maxBelievers": 100000
+        },
+        "interactions": {
+          "godsCanKillGods": false,
+          "godsCanMergeDomains": false,
+          "godsCanStealDomains": false,
+          "godsCanCreateMortals": true,
+          "godsCanDestroyWorld": true
+        },
+        "playerRestrictions": {
+          "canBeKilled": false,
+          "canLoseDomain": false,
+          "canBeForced": false,
+          "minimumBelief": 0
+        }
+      }
+    },
+    "balanced": {
+      "coreParams": {
+        "divinePresence": 0.5,
+        "divineReliability": 0.8,
+        "mortalSignificance": 0.5,
+        "faithVolatility": 0.5,
+        "permanentDivineDeathPossible": false,
+        "intentionalDeityCreation": false,
+        "maxActiveDeities": 30,
+        "playerGodAdvantage": 1.1,
+        "divineTimeScale": 1.0
+      },
+      "beliefEconomy": {
+        "generationMultiplier": 1.0,
+        "activityMultipliers": {},
+        "decayMultiplier": 1.0,
+        "existenceThreshold": 10,
+        "tierThresholdMultipliers": {
+          "dormant": 1.0,
+          "minor": 1.0,
+          "moderate": 1.0,
+          "major": 1.0,
+          "supreme": 1.0,
+          "world_shaping": 1.0
+        },
+        "maxBeliefStorage": 50000,
+        "transferEfficiency": 0.8,
+        "sacredSiteBonusMultiplier": 1.0,
+        "communalBonusMultiplier": 1.0,
+        "maxFervorMultiplier": 3.0,
+        "beliefStalenessRate": 0.005,
+        "beliefTheftAllowed": true,
+        "beliefTheftEfficiency": 0.3
+      },
+      "powers": {
+        "globalCostMultiplier": 1.0,
+        "powerCostMultipliers": {},
+        "disabledPowers": [],
+        "globalRangeMultiplier": 1.0,
+        "powerRangeMultipliers": {},
+        "globalDurationMultiplier": 1.0,
+        "powerDurationMultipliers": {},
+        "globalCooldownMultiplier": 1.0,
+        "powerCooldownMultipliers": {},
+        "basePowerSuccessRate": 0.9,
+        "offDomainFailureChance": 0.2,
+        "offDomainCostMultiplier": 1.5,
+        "identityRiskMultiplier": 1.0,
+        "powerResistanceAllowed": true,
+        "baseResistanceChance": 0.1,
+        "powerVisibility": {
+          "visibilityMultiplier": 1.0,
+          "minimumVisibleTier": "moderate",
+          "stealthActionsAllowed": true,
+          "stealthCostMultiplier": 1.5
+        },
+        "prayers": {
+          "hearNonBelieverPrayers": true,
+          "maxPendingPrayers": 50,
+          "prayerExpiryTime": 72,
+          "beliefPerPrayer": 0.1,
+          "answeredPrayerFaithBoost": 0.15,
+          "ignoredPrayerFaithPenalty": 0.05
+        },
+        "visions": {
+          "costMultiplier": 1.0,
+          "misinterpretationPossible": true,
+          "baseMisinterpretationChance": 0.2,
+          "clarityRange": [0.4, 0.9],
+          "maxConcurrentVisions": 5
+        },
+        "blessings": {
+          "costMultiplier": 1.0,
+          "durationMultiplier": 1.0,
+          "maxActiveBlessings": 20,
+          "disabledBlessingTypes": [],
+          "strengthMultiplier": 1.0,
+          "removalByOtherGodsAllowed": true,
+          "removalCostMultiplier": 1.5
+        },
+        "curses": {
+          "costMultiplier": 1.0,
+          "durationMultiplier": 1.0,
+          "maxActiveCurses": 20,
+          "disabledCurseTypes": [],
+          "strengthMultiplier": 1.0,
+          "liftableByPrayer": true,
+          "prayerLiftDifficulty": 0.5,
+          "backlashChance": 0.1
+        }
+      }
+    }
+  }
+}

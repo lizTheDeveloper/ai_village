@@ -3,7 +3,11 @@
  *
  * PixelLab uses 8 directions and provides animated sprites as sprite sheets.
  * This module handles the format conversion for use with our game engine.
+ *
+ * Configuration data is loaded from pixellab-sprite-config.json
  */
+
+import pixelLabConfig from './pixellab-sprite-config.json';
 
 /** 8-direction system used by PixelLab */
 export enum PixelLabDirection {
@@ -17,16 +21,16 @@ export enum PixelLabDirection {
   SouthEast = 7,
 }
 
-/** Direction names as used in PixelLab file paths */
+/** Direction names as used in PixelLab file paths (loaded from config) */
 export const PIXELLAB_DIRECTION_NAMES: Record<PixelLabDirection, string> = {
-  [PixelLabDirection.South]: 'south',
-  [PixelLabDirection.SouthWest]: 'southwest',
-  [PixelLabDirection.West]: 'west',
-  [PixelLabDirection.NorthWest]: 'northwest',
-  [PixelLabDirection.North]: 'north',
-  [PixelLabDirection.NorthEast]: 'northeast',
-  [PixelLabDirection.East]: 'east',
-  [PixelLabDirection.SouthEast]: 'southeast',
+  [PixelLabDirection.South]: pixelLabConfig.directions[0].name,
+  [PixelLabDirection.SouthWest]: pixelLabConfig.directions[1].name,
+  [PixelLabDirection.West]: pixelLabConfig.directions[2].name,
+  [PixelLabDirection.NorthWest]: pixelLabConfig.directions[3].name,
+  [PixelLabDirection.North]: pixelLabConfig.directions[4].name,
+  [PixelLabDirection.NorthEast]: pixelLabConfig.directions[5].name,
+  [PixelLabDirection.East]: pixelLabConfig.directions[6].name,
+  [PixelLabDirection.SouthEast]: pixelLabConfig.directions[7].name,
 };
 
 /** Animation types available from PixelLab */
@@ -42,19 +46,12 @@ export type PixelLabAnimation =
   | 'jumping-1'
   | 'jumping-2';
 
-/** Frame counts for each animation type */
-export const PIXELLAB_ANIMATION_FRAMES: Record<string, number> = {
-  idle: 1,
-  'walking-4-frames': 4,
-  'walking-6-frames': 6,
-  'walking-8-frames': 8,
-  'running-4-frames': 4,
-  'running-6-frames': 6,
-  'running-8-frames': 8,
-  'breathing-idle': 4,
-  'jumping-1': 4,
-  'jumping-2': 6,
-};
+/** Frame counts for each animation type (loaded from config) */
+export const PIXELLAB_ANIMATION_FRAMES: Record<string, number> =
+  Object.entries(pixelLabConfig.animations).reduce((acc, [key, value]) => {
+    acc[key] = value.frames;
+    return acc;
+  }, {} as Record<string, number>);
 
 /** Character definition from PixelLab */
 export interface PixelLabCharacterDef {

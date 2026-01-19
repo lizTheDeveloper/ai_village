@@ -1,0 +1,69 @@
+[
+  {
+    "id": "plains",
+    "displayName": "Plains",
+    "description": "Flat grasslands with excellent soil for farming",
+    "fertilityRange": {
+      "min": 70,
+      "max": 80
+    },
+    "defaultMoisture": 50,
+    "temperatureModifier": 0
+  },
+  {
+    "id": "forest",
+    "displayName": "Forest",
+    "description": "Wooded areas with rich organic soil",
+    "fertilityRange": {
+      "min": 60,
+      "max": 70
+    },
+    "defaultMoisture": 60,
+    "temperatureModifier": -2
+  },
+  {
+    "id": "river",
+    "displayName": "River",
+    "description": "Riverside areas with nutrient-rich alluvial soil",
+    "fertilityRange": {
+      "min": 80,
+      "max": 90
+    },
+    "defaultMoisture": 80,
+    "temperatureModifier": 0
+  },
+  {
+    "id": "desert",
+    "displayName": "Desert",
+    "description": "Arid areas with poor, sandy soil",
+    "fertilityRange": {
+      "min": 20,
+      "max": 30
+    },
+    "defaultMoisture": 10,
+    "temperatureModifier": 5
+  },
+  {
+    "id": "mountains",
+    "displayName": "Mountains",
+    "description": "Rocky terrain with thin, mineral-poor soil",
+    "fertilityRange": {
+      "min": 40,
+      "max": 50
+    },
+    "defaultMoisture": 40,
+    "temperatureModifier": -5
+  },
+  {
+    "id": "ocean",
+    "displayName": "Ocean",
+    "description": "Water bodies unsuitable for conventional farming",
+    "fertilityRange": {
+      "min": 0,
+      "max": 0
+    },
+    "defaultMoisture": 100,
+    "temperatureModifier": -3,
+    "farmable": false
+  }
+]

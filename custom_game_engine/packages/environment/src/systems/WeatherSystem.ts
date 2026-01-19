@@ -1,5 +1,49 @@
 import type { SystemId, ComponentType, WeatherComponent, WeatherType } from '@ai-village/core';
 import { ComponentType as CT, BaseSystem, type SystemContext, type ComponentAccessor } from '@ai-village/core';
+import weatherPatternsData from '../../data/weather-patterns.json';
+
+/**
+ * Weather pattern data structure from JSON
+ */
+interface WeatherPatternData {
+  id: WeatherType;
+  displayName: string;
+  description: string;
+  movementModifier: number;
+  temperatureModifier: number;
+  defaultDuration: {
+    min: number;
+    max: number;
+  };
+  weight: number;
+  intensityRange: {
+    min: number;
+    max: number;
+  };
+  soilMoistureBonus?: number;
+}
+
+/**
+ * Load and validate weather patterns from JSON
+ */
+function loadWeatherPatterns(): Map<WeatherType, WeatherPatternData> {
+  if (!Array.isArray(weatherPatternsData)) {
+    throw new Error('Invalid weather patterns data: expected array');
+  }
+
+  const patterns = new Map<WeatherType, WeatherPatternData>();
+  for (const pattern of weatherPatternsData) {
+    if (!pattern.id || !pattern.movementModifier || pattern.weight === undefined) {
+      throw new Error(`Invalid weather pattern data: ${JSON.stringify(pattern)}`);
+    }
+    patterns.set(pattern.id as WeatherType, pattern as WeatherPatternData);
+  }
+
+  return patterns;
+}
+
+// Load weather patterns at module initialization
+const WEATHER_PATTERNS = loadWeatherPatterns();
 
 /**
  * WeatherSystem - Weather pattern simulation
@@ -20,7 +64,6 @@ export class WeatherSystem extends BaseSystem {
   public readonly dependsOn = ['time'] as const;
 
   private readonly WEATHER_TRANSITION_CHANCE = 0.01; // 1% chance per update to transition
-  private readonly MIN_WEATHER_DURATION = 60; // Minimum 60 seconds per weather state
   private previousWeatherType: WeatherType | null = null;
 
   protected onUpdate(ctx: SystemContext): void {
@@ -52,25 +95,21 @@ export class WeatherSystem extends BaseSystem {
     if (!currentWeather) return;
     const newWeatherType = this.selectNewWeatherType(currentWeather.weatherType);
 
-    // Weather type defaults from WeatherComponent spec
-    const weatherDefaults: Record<WeatherType, { movementModifier: number }> = {
-      clear: { movementModifier: 1.0 },
-      rain: { movementModifier: 0.8 },
-      storm: { movementModifier: 0.6 },
-      snow: { movementModifier: 0.7 },
-      fog: { movementModifier: 0.9 },
-    };
+    // Get weather pattern data from JSON
+    const pattern = WEATHER_PATTERNS.get(newWeatherType);
+    if (!pattern) {
+      throw new Error(`Weather pattern not found for type: ${newWeatherType}`);
+    }
 
-    const defaults = weatherDefaults[newWeatherType];
-    const newIntensity = this.selectIntensity(newWeatherType);
-    const newDuration = this.selectDuration();
+    const newIntensity = this.selectIntensity(pattern);
+    const newDuration = this.selectDuration(pattern);
 
     comps.update(CT.Weather, (current: WeatherComponent) => ({
       ...current,
       weatherType: newWeatherType,
       intensity: newIntensity,
       duration: newDuration,
-      movementModifier: 1.0 - (1.0 - defaults.movementModifier) * newIntensity,
+      movementModifier: 1.0 - (1.0 - pattern.movementModifier) * newIntensity,
     }));
 
     // Emit weather change event if type actually changed
@@ -88,25 +127,23 @@ export class WeatherSystem extends BaseSystem {
    * Select a new weather type (weighted random)
    */
   private selectNewWeatherType(currentType: WeatherType): WeatherType {
-    // Weight towards clear weather, with some randomness
-    const weights: Record<WeatherType, number> = {
-      clear: 50,
-      rain: 25,
-      snow: 15,
-      storm: 10,
-      fog: 10,
-    };
+    // Build weights from JSON data
+    const weights = new Map<WeatherType, number>();
+    for (const [type, pattern] of WEATHER_PATTERNS.entries()) {
+      weights.set(type, pattern.weight);
+    }
 
     // Reduce chance of same weather type repeating
-    weights[currentType] *= 0.5;
+    const currentWeight = weights.get(currentType) || 0;
+    weights.set(currentType, currentWeight * 0.5);
 
-    const total = Object.values(weights).reduce((sum, w) => sum + w, 0);
+    const total = Array.from(weights.values()).reduce((sum, w) => sum + w, 0);
     let random = Math.random() * total;
 
-    for (const [type, weight] of Object.entries(weights)) {
+    for (const [type, weight] of weights.entries()) {
       random -= weight;
       if (random <= 0) {
-        return type as WeatherType;
+        return type;
       }
     }
 
@@ -114,22 +151,23 @@ export class WeatherSystem extends BaseSystem {
   }
 
   /**
-   * Select intensity for weather type
+   * Select intensity for weather type based on pattern data
    */
-  private selectIntensity(weatherType: WeatherType): number {
-    if (weatherType === 'clear') {
-      return 0; // Clear weather has no intensity
+  private selectIntensity(pattern: WeatherPatternData): number {
+    const { min, max } = pattern.intensityRange;
+    if (min === max) {
+      return min; // Clear weather has no intensity
     }
 
-    // Random intensity between 0.3 and 1.0
-    return 0.3 + Math.random() * 0.7;
+    // Random intensity within the pattern's range
+    return min + Math.random() * (max - min);
   }
 
   /**
-   * Select duration for new weather
+   * Select duration for new weather based on pattern data
    */
-  private selectDuration(): number {
-    // Random duration between 60 and 300 seconds (1-5 minutes)
-    return this.MIN_WEATHER_DURATION + Math.random() * 240;
+  private selectDuration(pattern: WeatherPatternData): number {
+    const { min, max } = pattern.defaultDuration;
+    return min + Math.random() * (max - min);
   }
 }

@@ -45,6 +45,25 @@ export interface CombatEvents {
     duration: number;
   };
 
+  /** Agent autonomously initiated combat */
+  'combat:initiated_by_agent': {
+    attackerId: EntityId;
+    defenderId: EntityId;
+    cause: 'jealousy_rival' | 'jealousy_infidelity' | 'jealousy_ex' |
+           'honor_duel' | 'territory_dispute' | 'revenge' | 'defense' |
+           'courtship_display' | 'robbery' | 'challenge';
+    lethal: boolean;
+    surprise: boolean;
+    autonomousDecision: boolean;
+  };
+
+  /** Combat initiated as crime of passion (jealousy-driven) */
+  'combat:crime_of_passion': {
+    attackerId: EntityId;
+    defenderId: EntityId;
+    jealousyType: string;
+  };
+
   /** An entity dodges an attack */
   'combat:dodge': {
     entityId: EntityId;
@@ -127,6 +146,14 @@ export interface CombatEvents {
     hunterId: string;
     preyId: string;
     reason: string;
+  };
+
+  /** Agent autonomously initiated hunt */
+  'hunt:initiated_by_agent': {
+    hunterId: string;
+    targetId: string;
+    reason: 'food' | 'practice' | 'resources';
+    autonomousDecision: boolean;
   };
 
   /** Hunter injured by dangerous prey */

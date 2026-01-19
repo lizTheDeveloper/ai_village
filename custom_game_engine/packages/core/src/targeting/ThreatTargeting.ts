@@ -121,10 +121,10 @@ export class ThreatTargeting {
     let nearestDist = Infinity;
 
     // Check all visible entities for threats
-    // Note: Vision component may have seenAnimals in the future
-    // For now, we combine all visible entity types
+    // Combine all visible entity types (agents, animals, resources like fire)
     const allVisible = [
       ...(vision.seenAgents || []),
+      ...(vision.seenAnimals || []),
       ...(vision.seenResources || []), // Fire/hazards might be resources
     ];
 
