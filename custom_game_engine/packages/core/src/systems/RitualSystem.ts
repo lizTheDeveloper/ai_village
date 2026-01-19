@@ -67,16 +67,70 @@ export class RitualSystem extends BaseSystem {
   private rituals: Map<string, RitualData> = new Map();
   private scheduledRituals: Map<string, number> = new Map(); // ritual ID -> next occurrence
 
+  // Performance optimization: deity entity cache
+  private deityCache = new Map<string, DeityComponent>();
+  private lastCacheUpdate = 0;
+  private readonly CACHE_REFRESH_INTERVAL = 100; // Refresh deity cache every 5 seconds
+
+  // Performance optimization: ritual interval lookup table
+  private readonly ritualIntervalLookup = new Map<RitualType, number>();
+
   constructor(config: Partial<RitualConfig> = {}) {
     super();
     this.config = { ...DEFAULT_RITUAL_CONFIG, ...config };
+    this.initializeRitualIntervals();
+  }
+
+  /**
+   * Initialize precomputed ritual intervals
+   */
+  private initializeRitualIntervals(): void {
+    this.ritualIntervalLookup.set('daily_prayer', 24000);
+    this.ritualIntervalLookup.set('weekly_ceremony', 168000);
+    this.ritualIntervalLookup.set('seasonal_festival', 2160000);
+    this.ritualIntervalLookup.set('initiation', 0);
+    this.ritualIntervalLookup.set('blessing', 12000);
+    this.ritualIntervalLookup.set('sacrifice', 48000);
+    this.ritualIntervalLookup.set('pilgrimage', 480000);
   }
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
+    // Early exit: no scheduled rituals
+    if (this.scheduledRituals.size === 0) {
+      return;
+    }
+
+    // Refresh deity cache periodically
+    if (currentTick - this.lastCacheUpdate >= this.CACHE_REFRESH_INTERVAL) {
+      this.rebuildDeityCache(ctx.world);
+      this.lastCacheUpdate = currentTick;
+    }
+
+    // Early exit: no deities exist
+    if (this.deityCache.size === 0) {
+      return;
+    }
+
     // Check for rituals that should occur
     this.performScheduledRituals(ctx.world, currentTick);
+  }
+
+  /**
+   * Rebuild deity cache from world entities
+   */
+  private rebuildDeityCache(world: World): void {
+    this.deityCache.clear();
+
+    for (const entity of world.entities.values()) {
+      if (!entity.components.has(CT.Deity)) continue;
+
+      const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
+      if (deity) {
+        this.deityCache.set(entity.id, deity);
+      }
+    }
   }
 
   /**
@@ -88,56 +142,51 @@ export class RitualSystem extends BaseSystem {
   }
 
   /**
-   * Perform scheduled rituals
+   * Perform scheduled rituals (optimized)
    */
   private performScheduledRituals(world: World, currentTick: number): void {
     for (const [ritualId, nextOccurrence] of this.scheduledRituals) {
-      if (currentTick >= nextOccurrence) {
-        const ritual = this.rituals.get(ritualId);
-        if (ritual) {
-          this.performRitual(ritual, world, currentTick);
+      // Early exit: not time yet
+      if (currentTick < nextOccurrence) continue;
 
-          // Reschedule based on type
-          const interval = this.getRitualInterval(ritual.type);
-          this.scheduledRituals.set(ritualId, currentTick + interval);
-        }
+      const ritual = this.rituals.get(ritualId);
+      if (!ritual) continue;
+
+      // Use cache for deity lookup (O(1) vs world.getEntity)
+      const deity = this.deityCache.get(ritual.deityId);
+      if (!deity) continue;
+
+      // Perform ritual inline (avoid function call overhead)
+      deity.addBelief(ritual.beliefGenerated, currentTick);
+      ritual.lastPerformed = currentTick;
+
+      // Reschedule based on type (use lookup table)
+      const interval = this.ritualIntervalLookup.get(ritual.type) ?? 0;
+      if (interval > 0) {
+        this.scheduledRituals.set(ritualId, currentTick + interval);
+      } else {
+        // One-time ritual - remove from schedule
+        this.scheduledRituals.delete(ritualId);
       }
     }
   }
 
   /**
-   * Perform a ritual
+   * Perform a ritual (deprecated - inlined into performScheduledRituals)
    */
   private performRitual(ritual: RitualData, world: World, currentTick: number): void {
-    // Find deity
-    const deityEntity = world.getEntity(ritual.deityId);
-    if (!deityEntity) return;
-
-    const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+    const deity = this.deityCache.get(ritual.deityId);
     if (!deity) return;
 
-    // Generate belief
     deity.addBelief(ritual.beliefGenerated, currentTick);
-
-    // Update last performed
     ritual.lastPerformed = currentTick;
   }
 
   /**
-   * Get interval for ritual type
+   * Get interval for ritual type (use lookup table)
    */
   private getRitualInterval(type: RitualType): number {
-    const intervals: Record<RitualType, number> = {
-      daily_prayer: 24000,        // ~20 minutes
-      weekly_ceremony: 168000,    // ~2.3 hours
-      seasonal_festival: 2160000, // ~30 hours
-      initiation: 0,              // One-time
-      blessing: 12000,            // ~10 minutes
-      sacrifice: 48000,           // ~40 minutes
-      pilgrimage: 480000,         // ~6.7 hours
-    };
-
-    return intervals[type];
+    return this.ritualIntervalLookup.get(type) ?? 0;
   }
 
   /**

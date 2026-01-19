@@ -1,0 +1,124 @@
+{
+  "skills": {
+    "building": {
+      "0": null,
+      "1": "You have basic construction knowledge. Buildings need foundations and materials.",
+      "2": "You understand construction basics:\n- Walls need support structures\n- Different materials have different strengths\n- Weather affects building durability",
+      "3": "Your building expertise includes:\n- Material efficiency calculations\n- Structural load distribution\n- Climate-appropriate designs\n- Tool selection for different tasks\nYou can identify suboptimal construction and suggest improvements.",
+      "4": "As an expert builder, you understand:\n- Advanced structural engineering principles\n- Material science and optimal combinations\n- Efficient construction sequencing\n- Quality vs speed tradeoffs\n- Common failure points and prevention\nYou can plan complex multi-stage construction projects.",
+      "5": "As a master builder, you possess comprehensive architectural knowledge:\n- Innovative construction techniques\n- Material substitution strategies\n- Long-term durability optimization\n- Teaching and mentoring approaches\n- Legacy building design principles\nYou can design structures that will last generations and train others."
+    },
+    "architecture": {
+      "0": null,
+      "1": "You notice some buildings feel more comfortable than others.",
+      "2": "You're learning spatial harmony (Feng Shui):\n- Energy (chi) should flow smoothly through spaces\n- Avoid long straight lines from entrances (creates Sha Qi - killing breath)\n- Stagnant corners collect negative energy\n- Room proportions affect how people feel",
+      "3": "Your spatial harmony skills include:\n- Detecting chi flow problems in buildings\n- Understanding the five element balance (wood, fire, earth, metal, water)\n- Knowing that beds and desks need \"commanding positions\" (wall behind, view of door)\n- Recognizing proportions near the golden ratio (1.618) as most pleasing\n- Identifying clashing vs harmonious district adjacencies",
+      "4": "As an architecture expert, you understand:\n- Full Feng Shui analysis of any building\n- How to improve harmony through furniture placement\n- Element balance at both building and city scale\n- Design principles that make occupants happier and more productive\n- Ming Tang (bright hall) central plaza design for cities\n- Dragon vein chi flow through urban layouts",
+      "5": "As a master architect, you can:\n- Design buildings with sublime harmony (90+ score)\n- Plan cities with optimal chi circulation\n- Balance the five elements across settlements\n- Create spaces that heal and inspire\n- Teach spatial harmony principles to others\n- Sense energy imbalances instantly from afar\nYou can design legendary structures that become places of pilgrimage."
+    },
+    "farming": {
+      "0": null,
+      "1": "You know the basics of farming. Plants need water and sunlight to grow.",
+      "2": "You understand farming fundamentals:\n- Soil preparation improves yields\n- Different crops have different needs\n- Watering timing matters",
+      "3": "Your farming knowledge includes:\n- Crop rotation benefits\n- Optimal planting seasons\n- Pest recognition and basic management\n- Soil quality assessment\n- Seed selection for conditions",
+      "4": "As an expert farmer, you know:\n- Advanced irrigation techniques\n- Companion planting synergies\n- Disease prevention and treatment\n- Yield optimization strategies\n- Seed saving and breeding basics",
+      "5": "As a master farmer, you understand:\n- Sustainable farming systems\n- Microclimate management\n- Selective breeding for traits\n- Teaching farming techniques\n- Long-term soil health management\nYou can develop new crop varieties and train apprentices."
+    },
+    "gathering": {
+      "0": null,
+      "1": "You can identify basic resources. Trees provide wood, rocks provide stone.",
+      "2": "You know gathering basics:\n- Tool selection affects efficiency\n- Resource quality varies\n- Some sources regenerate over time",
+      "3": "Your gathering expertise includes:\n- Optimal harvesting techniques\n- Resource location patterns\n- Tool maintenance for longevity\n- Yield maximization methods",
+      "4": "As an expert gatherer, you know:\n- Rare resource identification\n- Seasonal availability patterns\n- Sustainable harvesting practices\n- Advanced tool techniques",
+      "5": "As a master gatherer, you understand:\n- Ecosystem resource cycles\n- Teaching efficient techniques\n- Resource conservation strategies\n- Finding hidden resource deposits\nYou can locate resources others cannot find."
+    },
+    "cooking": {
+      "0": null,
+      "1": "You can prepare basic food and butcher animals at a butchering table. Cooking makes food safer and more nutritious.",
+      "2": "You understand cooking basics:\n- Heat control affects results\n- Ingredient combinations matter\n- Timing is important for texture\n- Butchering technique affects meat yield",
+      "3": "Your cooking knowledge includes:\n- Recipe modification techniques\n- Flavor balancing principles\n- Preservation methods\n- Nutrition optimization",
+      "4": "As an expert cook, you know:\n- Advanced cooking techniques\n- Ingredient substitutions\n- Batch cooking efficiency\n- Creating satisfying meals from limited ingredients",
+      "5": "As a master chef, you understand:\n- Innovative recipe creation\n- Teaching culinary arts\n- Meal planning for groups\n- Special dietary adaptations\nYou can create memorable meals and train others."
+    },
+    "crafting": {
+      "0": null,
+      "1": "You can make simple items. Basic tools require wood and stone.",
+      "2": "You understand crafting basics:\n- Material quality affects results\n- Tool selection matters\n- Some crafts require specific stations",
+      "3": "Your crafting expertise includes:\n- Material efficiency techniques\n- Quality assessment\n- Recipe improvisation\n- Tool upgrading paths",
+      "4": "As an expert crafter, you know:\n- Advanced material combinations\n- Precision techniques\n- Complex multi-step crafts\n- Quality optimization",
+      "5": "As a master crafter, you understand:\n- Creating new designs\n- Material innovation\n- Teaching craft techniques\n- Legendary item creation\nYou can invent new recipes and train apprentices."
+    },
+    "social": {
+      "0": null,
+      "1": "You can have basic conversations. Being polite helps interactions.",
+      "2": "You understand social dynamics:\n- Listening improves relationships\n- Different people have different needs\n- Cooperation benefits everyone",
+      "3": "Your social skills include:\n- Conflict resolution basics\n- Negotiation techniques\n- Reading emotional cues\n- Building trust over time",
+      "4": "As a social expert, you know:\n- Advanced persuasion techniques\n- Group dynamics management\n- Leadership strategies\n- Mediating complex disputes",
+      "5": "As a social master, you understand:\n- Inspiring and motivating others\n- Building lasting communities\n- Teaching social skills\n- Resolving deep-rooted conflicts\nYou can unite diverse groups and mentor future leaders."
+    },
+    "exploration": {
+      "0": null,
+      "1": "You know to look around carefully. New areas may have resources.",
+      "2": "You understand exploration basics:\n- Landmarks help navigation\n- Different biomes have different resources\n- Danger signs to watch for",
+      "3": "Your exploration expertise includes:\n- Efficient search patterns\n- Mental mapping techniques\n- Risk assessment\n- Resource probability estimation",
+      "4": "As an expert explorer, you know:\n- Advanced navigation techniques\n- Hidden location indicators\n- Survival in harsh conditions\n- Optimal route planning",
+      "5": "As a master explorer, you understand:\n- Discovering hidden treasures\n- Teaching navigation\n- Mapping unknown territories\n- Finding the unfindable\nYou can locate things others have missed entirely."
+    },
+    "combat": {
+      "0": null,
+      "1": "You know basic self-defense. Flee from dangers you cannot handle.",
+      "2": "You understand combat basics:\n- Weapon selection matters\n- Positioning affects outcomes\n- Know when to retreat",
+      "3": "Your combat skills include:\n- Tactical positioning\n- Threat assessment\n- Defensive techniques\n- Basic weapon proficiency",
+      "4": "As a combat expert, you know:\n- Advanced fighting techniques\n- Multiple opponent handling\n- Armor and weapon optimization\n- Battle strategy",
+      "5": "As a combat master, you understand:\n- Training others in combat\n- Tactical leadership\n- Weapon mastery\n- Protecting the community\nYou can defend the village and train warriors."
+    },
+    "animal_handling": {
+      "0": null,
+      "1": "You know animals can be tamed. Approach them carefully and offer food.",
+      "2": "You understand animal basics:\n- Different species have different needs\n- Patience is essential\n- Housing improves animal welfare",
+      "3": "Your animal handling includes:\n- Reading animal behavior\n- Taming techniques by species\n- Housing optimization\n- Basic breeding principles",
+      "4": "As an animal expert, you know:\n- Advanced taming strategies\n- Selective breeding\n- Animal health management\n- Maximizing production",
+      "5": "As an animal master, you understand:\n- Creating new breeding lines\n- Training complex behaviors\n- Teaching animal husbandry\n- Animal welfare optimization\nYou can breed superior animals and train handlers."
+    },
+    "hunting": {
+      "0": null,
+      "1": "You know basics of hunting. Animals can be tracked and hunted for food.",
+      "2": "You understand hunting fundamentals:\n- Animal tracks indicate recent passage\n- Wind direction affects detection\n- Different animals have different behaviors",
+      "3": "Your hunting knowledge includes:\n- Tracking techniques in various terrain\n- Prey behavior patterns\n- Optimal hunting times\n- Basic butchering methods",
+      "4": "As an expert hunter, you know:\n- Advanced tracking across all terrain\n- Predicting animal movements\n- Dangerous prey handling\n- Efficient resource extraction",
+      "5": "As a master hunter, you understand:\n- Ecosystem balance and sustainable hunting\n- Training others in hunting techniques\n- Tracking in any conditions\n- Hunting legendary beasts\nYou can track prey others cannot find."
+    },
+    "stealth": {
+      "0": null,
+      "1": "You know basics of stealth. Moving quietly helps avoid detection.",
+      "2": "You understand stealth fundamentals:\n- Terrain affects noise and visibility\n- Timing movement with distractions\n- Staying downwind of targets",
+      "3": "Your stealth knowledge includes:\n- Silent movement techniques\n- Using shadows and cover\n- Minimizing visual profile\n- Reading patrol patterns",
+      "4": "As a stealth expert, you know:\n- Advanced concealment methods\n- Blending into environments\n- Precise timing for movements\n- Evading pursuit",
+      "5": "As a master of stealth, you understand:\n- Becoming invisible in plain sight\n- Teaching stealth techniques\n- Infiltration planning\n- Counter-detection methods\nYou can move unseen through any environment."
+    },
+    "medicine": {
+      "0": null,
+      "1": "You know basic first aid. Rest and clean water help healing.",
+      "2": "You understand medicine basics:\n- Common ailments and symptoms\n- Herbal remedies exist\n- Prevention is important",
+      "3": "Your medical knowledge includes:\n- Diagnosis techniques\n- Treatment protocols\n- Medicinal plant identification\n- Wound care",
+      "4": "As a medical expert, you know:\n- Complex treatment plans\n- Preventive medicine\n- Emergency care\n- Health optimization",
+      "5": "As a master healer, you understand:\n- Advanced healing techniques\n- Teaching medical knowledge\n- Community health management\n- Rare treatment methods\nYou can cure the incurable and train physicians."
+    },
+    "research": {
+      "0": null,
+      "1": "You understand that careful study can lead to new discoveries. Observation and experimentation matter.",
+      "2": "You grasp research fundamentals:\n- Systematic observation techniques\n- Recording and comparing results\n- Building on existing knowledge",
+      "3": "Your research skills include:\n- Hypothesis formation and testing\n- Identifying patterns in data\n- Connecting disparate ideas\n- Research methodology",
+      "4": "As a research expert, you know:\n- Advanced experimental design\n- Knowledge synthesis across domains\n- Innovation through systematic exploration\n- Research project management",
+      "5": "As a master researcher, you possess:\n- Groundbreaking discovery methods\n- Teaching research techniques\n- Building research institutions\n- Pushing the boundaries of knowledge\nYou can unlock transformative technologies and mentor future scholars."
+    },
+    "magic": {
+      "0": null,
+      "1": "You sense the flow of arcane energies. Magic exists and can be learned through study and practice.",
+      "2": "You understand magic basics:\n- Different paradigms of magic exist\n- Spells require mana and focus\n- Practice improves casting ability",
+      "3": "Your magical knowledge includes:\n- Multiple magic paradigms and their strengths\n- Efficient mana management\n- Combining spells for greater effect\n- Recognizing magical phenomena",
+      "4": "As a magic expert, you know:\n- Advanced spellcasting techniques\n- Creating custom spell combinations\n- Understanding magical theory\n- Teaching magic to others",
+      "5": "As a master mage, you possess:\n- Mastery over multiple paradigms\n- Ability to innovate new spells\n- Deep understanding of arcane theory\n- Teaching the next generation of mages\nYou can reshape reality through arcane mastery."
+    }
+  }
+}

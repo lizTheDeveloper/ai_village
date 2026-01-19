@@ -7,7 +7,7 @@
  * - ControlEffectApplier: Movement control and status effects
  */
 
-import type { Entity } from '@ai-village/core';
+import type { Entity, Component } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type {
   BuffEffect,

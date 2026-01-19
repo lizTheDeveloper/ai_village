@@ -301,7 +301,7 @@ export class ContextActionRegistry {
         if (!building) return false;
 
         const buildingComp = (building as EntityImpl).getComponent('building') as BuildingComponent | undefined;
-        return buildingComp && buildingComp.canEnter === true && buildingComp.locked !== true;
+        return !!(buildingComp && buildingComp.canEnter === true && buildingComp.locked !== true);
       },
       execute: (ctx, _world, eventBus) => {
         const selected = ctx.getSelectedEntities(_world);
@@ -329,7 +329,7 @@ export class ContextActionRegistry {
         if (!building) return false;
 
         const buildingComp = (building as EntityImpl).getComponent('building') as BuildingComponent | undefined;
-        return buildingComp && buildingComp.health !== undefined && buildingComp.health < 1.0;
+        return !!(buildingComp && buildingComp.health !== undefined && buildingComp.health < 1.0);
       },
       execute: (ctx, _world, eventBus) => {
         eventBus.emit({ type: 'action:repair', source: 'world', data: {
@@ -372,7 +372,7 @@ export class ContextActionRegistry {
         if (!resource) return false;
 
         const harvestable = (resource as EntityImpl).getComponent('harvestable') as HarvestableComponent | undefined;
-        return harvestable && harvestable.amount !== undefined && harvestable.amount > 0;
+        return !!(harvestable && harvestable.amount !== undefined && harvestable.amount > 0);
       },
       execute: (ctx, _world, eventBus) => {
         const resource = ctx.getTargetEntity(_world);

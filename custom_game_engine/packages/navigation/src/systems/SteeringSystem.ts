@@ -21,6 +21,7 @@ import {
   getPosition,
   setComponentProperties,
 } from '@ai-village/core';
+import steeringConfig from '../../data/steering-config.json';
 
 // Using Position from types.ts for all vector operations
 type Vector2 = Position;
@@ -55,6 +56,12 @@ export class SteeringSystem extends BaseSystem {
 
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
+
+  // Configuration constants from JSON
+  private readonly CHUNK_SIZE = 32; // From collision config
+  private readonly STUCK_DETECTION_TIME = steeringConfig.arrive.stuckDetectionTime;
+  private readonly STUCK_DISTANCE_THRESHOLD = steeringConfig.arrive.stuckDistanceThreshold;
+  private readonly JITTER_RANGE = steeringConfig.arrive.jitterRange;
 
   protected onUpdate(ctx: SystemContext): void {
     // Update agent positions in scheduler
@@ -220,27 +227,29 @@ export class SteeringSystem extends BaseSystem {
           target: { x: steering.target.x, y: steering.target.y }
         });
       } else {
-        // Check if position changed significantly (moved at least 0.5 tiles)
+        // Check if position changed significantly
         const dx = position.x - tracker.lastPos.x;
         const dy = position.y - tracker.lastPos.y;
         const movedSquared = dx * dx + dy * dy;
+        const thresholdSquared = this.STUCK_DISTANCE_THRESHOLD * this.STUCK_DISTANCE_THRESHOLD;
 
-        if (movedSquared > 0.25) { // 0.5² = 0.25
+        if (movedSquared > thresholdSquared) {
           // Made progress, reset stuck timer
           tracker.lastPos = { x: position.x, y: position.y };
           tracker.stuckTime = now;
-        } else if (now - tracker.stuckTime > 3000) {
-          // Stuck for 3+ seconds - need pathfinding!
+        } else if (now - tracker.stuckTime > this.STUCK_DETECTION_TIME) {
+          // Stuck for too long - need pathfinding!
           // For now, just add random jitter to try different angles
-          desired.x += (Math.random() - 0.5) * 2;
-          desired.y += (Math.random() - 0.5) * 2;
+          desired.x += (Math.random() - 0.5) * this.JITTER_RANGE;
+          desired.y += (Math.random() - 0.5) * this.JITTER_RANGE;
           tracker.stuckTime = now; // Reset to prevent spam
         }
       }
     }
 
     // Dead zone - prevent micro-adjustments when very close (use squared comparison)
-    const deadZoneSquared = steering.deadZone * steering.deadZone;
+    const deadZone = steering.deadZone ?? steeringConfig.arrive.deadZone;
+    const deadZoneSquared = deadZone * deadZone;
     if (distanceSquared < deadZoneSquared) {
       // Within dead zone - apply proportional braking that decays velocity smoothly
       // Using velocity dampening instead of hard negative force to prevent oscillation
@@ -250,7 +259,7 @@ export class SteeringSystem extends BaseSystem {
 
     // Check if already stopped and within tolerance (use squared comparison)
     const speedSquared = velocity.vx * velocity.vx + velocity.vy * velocity.vy;
-    const arrivalTolerance = steering.arrivalTolerance ?? 1.0;
+    const arrivalTolerance = steering.arrivalTolerance ?? steeringConfig.arrive.arrivalTolerance;
     const arrivalToleranceSquared = arrivalTolerance * arrivalTolerance;
 
     if (distanceSquared < arrivalToleranceSquared && speedSquared < 0.01) { // 0.1 * 0.1 = 0.01
@@ -262,7 +271,7 @@ export class SteeringSystem extends BaseSystem {
     const distance = Math.sqrt(distanceSquared);
 
     // Slow down within slowing radius
-    const slowingRadius = steering.slowingRadius ?? 5.0;
+    const slowingRadius = steering.slowingRadius ?? steeringConfig.arrive.slowingRadius;
     let targetSpeed = steering.maxSpeed;
 
     if (distance < slowingRadius) {
@@ -291,7 +300,7 @@ export class SteeringSystem extends BaseSystem {
    * Performance: Uses chunk-based spatial lookup instead of scanning all entities.
    */
   private _avoidObstacles(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
-    const lookAheadDistance = steering.lookAheadDistance ?? 2.0; // Reduced from 5.0 to 2.0
+    const lookAheadDistance = steering.lookAheadDistance ?? steeringConfig.obstacleAvoidance.lookAheadDistance;
 
     // Ray-cast ahead
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
@@ -303,10 +312,9 @@ export class SteeringSystem extends BaseSystem {
     };
 
     // OPTIMIZATION: Use chunk-based spatial index for nearby entity lookup
-    const checkRadius = 3.0;
-    const CHUNK_SIZE = 32;
-    const chunkX = Math.floor(position.x / CHUNK_SIZE);
-    const chunkY = Math.floor(position.y / CHUNK_SIZE);
+    const checkRadius = steeringConfig.obstacleAvoidance.checkRadius;
+    const chunkX = Math.floor(position.x / this.CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / this.CHUNK_SIZE);
 
     // Collect obstacles from nearby chunks
     // Check for: PhysicsComponent (solid=true), BuildingComponent (blocksMovement=true)
@@ -330,15 +338,21 @@ export class SteeringSystem extends BaseSystem {
           // Check PhysicsComponent first (trees, rocks, solid objects)
           const physics = impl.getComponent<PhysicsComponent>(CT.Physics);
           if (physics && physics.solid) {
-            // Use average of width/height as radius, minimum 0.5
-            obstacleRadius = Math.max(0.5, (physics.width + physics.height) / 4);
+            // Use average of width/height as radius, minimum from config
+            obstacleRadius = Math.max(
+              steeringConfig.obstacleAvoidance.minObstacleRadius,
+              (physics.width + physics.height) / 4
+            );
           }
 
           // Check BuildingComponent (chests, beds, furniture)
           const building = impl.getComponent<BuildingComponent>(CT.Building);
           if (building && building.blocksMovement) {
-            // Buildings are typically 1x1 tiles, use 0.5 radius
-            obstacleRadius = Math.max(obstacleRadius, 0.5);
+            // Buildings are typically 1x1 tiles
+            obstacleRadius = Math.max(
+              obstacleRadius,
+              steeringConfig.obstacleAvoidance.minObstacleRadius
+            );
           }
 
           // Skip if not a solid obstacle
@@ -413,9 +427,9 @@ export class SteeringSystem extends BaseSystem {
    * Note: Containment is now applied globally after all steering behaviors
    */
   private _wander(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
-    const wanderRadius = steering.wanderRadius ?? 2.0;
-    const wanderDistance = steering.wanderDistance ?? 3.0;
-    const wanderJitter = steering.wanderJitter ?? 0.1; // Reduced from 0.5 to prevent jittery movement
+    const wanderRadius = steering.wanderRadius ?? steeringConfig.wander.defaultRadius;
+    const wanderDistance = steering.wanderDistance ?? steeringConfig.wander.defaultDistance;
+    const wanderJitter = steering.wanderJitter ?? steeringConfig.wander.defaultJitter;
 
     // Get or initialize wander angle
     if (steering.wanderAngle === undefined) {

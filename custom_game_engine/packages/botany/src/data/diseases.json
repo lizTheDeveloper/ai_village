@@ -1,0 +1,119 @@
+[
+  {
+    "id": "early_blight",
+    "name": "Early Blight",
+    "type": "blight",
+    "description": "Fungal disease causing dark spots with concentric rings",
+    "transmission": ["airborne", "soilborne"],
+    "susceptibleCategories": ["crop"],
+    "spreadRadius": 3,
+    "spreadChance": 0.15,
+    "incubationDays": 3,
+    "healthDrainPerDay": 5,
+    "growthPenalty": 0.7,
+    "yieldPenalty": 0.6,
+    "lethalHealthThreshold": 10,
+    "favoredConditions": {
+      "minMoisture": 60,
+      "minTemperature": 15,
+      "maxTemperature": 30
+    },
+    "treatments": [
+      { "itemId": "fungicide", "effectiveness": 0.8 },
+      { "actionType": "remove_infected_leaves", "effectiveness": 0.5 }
+    ],
+    "visualEffect": "dark_spots"
+  },
+  {
+    "id": "powdery_mildew",
+    "name": "Powdery Mildew",
+    "type": "powdery_mildew",
+    "description": "White powdery fungal growth on leaves",
+    "transmission": ["airborne"],
+    "susceptibleCategories": ["crop", "vine", "flower"],
+    "spreadRadius": 4,
+    "spreadChance": 0.2,
+    "incubationDays": 2,
+    "healthDrainPerDay": 3,
+    "growthPenalty": 0.8,
+    "yieldPenalty": 0.7,
+    "lethalHealthThreshold": 15,
+    "favoredConditions": {
+      "minMoisture": 40,
+      "maxMoisture": 70,
+      "minTemperature": 18,
+      "maxTemperature": 28
+    },
+    "treatments": [
+      { "itemId": "fungicide", "effectiveness": 0.85 },
+      { "itemId": "neem_oil", "effectiveness": 0.6 }
+    ],
+    "visualEffect": "white_powder"
+  },
+  {
+    "id": "root_rot",
+    "name": "Root Rot",
+    "type": "rot",
+    "description": "Fungal infection of roots causing wilting and death",
+    "transmission": ["soilborne", "waterborne"],
+    "susceptibleCategories": ["crop", "herb", "flower"],
+    "spreadRadius": 2,
+    "spreadChance": 0.1,
+    "incubationDays": 5,
+    "healthDrainPerDay": 8,
+    "growthPenalty": 0.5,
+    "yieldPenalty": 0.4,
+    "lethalHealthThreshold": 20,
+    "favoredConditions": {
+      "minMoisture": 80
+    },
+    "treatments": [
+      { "actionType": "improve_drainage", "effectiveness": 0.6 },
+      { "itemId": "fungicide", "effectiveness": 0.5 }
+    ],
+    "visualEffect": "wilting"
+  },
+  {
+    "id": "bacterial_wilt",
+    "name": "Bacterial Wilt",
+    "type": "wilt",
+    "description": "Bacteria blocks water transport, causing rapid wilting",
+    "transmission": ["vector", "soilborne"],
+    "susceptibleCategories": ["crop"],
+    "spreadRadius": 2,
+    "spreadChance": 0.1,
+    "incubationDays": 4,
+    "healthDrainPerDay": 10,
+    "growthPenalty": 0.3,
+    "yieldPenalty": 0.2,
+    "lethalHealthThreshold": 25,
+    "favoredConditions": {
+      "minTemperature": 20,
+      "maxTemperature": 35
+    },
+    "treatments": [
+      { "actionType": "remove_plant", "effectiveness": 1.0 }
+    ],
+    "visualEffect": "severe_wilt"
+  },
+  {
+    "id": "mosaic_virus",
+    "name": "Mosaic Virus",
+    "type": "mosaic",
+    "description": "Viral infection causing mottled leaf patterns",
+    "transmission": ["vector", "contact"],
+    "susceptibleCategories": ["crop", "herb"],
+    "spreadRadius": 5,
+    "spreadChance": 0.25,
+    "incubationDays": 7,
+    "healthDrainPerDay": 2,
+    "growthPenalty": 0.6,
+    "yieldPenalty": 0.5,
+    "lethalHealthThreshold": 5,
+    "favoredConditions": {},
+    "treatments": [
+      { "actionType": "remove_plant", "effectiveness": 1.0 }
+    ],
+    "visualEffect": "mottled_leaves"
+  }
+]

@@ -41,13 +41,28 @@ export class PublishingProductionSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   // Lazy activation: Skip entire system when no publishing workshops exist in world
   public readonly activationComponents = ['publishing_workshop'] as const;
-  protected readonly throttleInterval = THROTTLE.SLOW; // SLOW - 5 seconds (production job updates)
+  protected readonly throttleInterval = 20; // Every 20 ticks (1 second at 20 TPS)
 
   // Active production jobs
   private activeJobs: Map<string, ProductionJob> = new Map();
   private nextJobId = 1;
 
+  // Performance optimizations
+  private lastUpdate = 0;
+  private readonly UPDATE_INTERVAL = 20; // Every 20 ticks (1 second)
+
   protected onUpdate(ctx: SystemContext): void {
+    // Throttling: Skip update if interval hasn't elapsed
+    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastUpdate = ctx.world.tick;
+
+    // Early exit: No jobs to process
+    if (this.activeJobs.size === 0) {
+      return;
+    }
+
     // Process active jobs
     for (const [jobId, job] of this.activeJobs.entries()) {
       job.progress += ctx.deltaTime;

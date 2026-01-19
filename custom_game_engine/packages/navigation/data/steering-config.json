@@ -1,0 +1,23 @@
+{
+  "arrive": {
+    "slowingRadius": 5.0,
+    "arrivalTolerance": 1.0,
+    "deadZone": 0.5,
+    "stuckDetectionTime": 3000,
+    "stuckDistanceThreshold": 0.5,
+    "jitterRange": 2.0
+  },
+  "obstacleAvoidance": {
+    "lookAheadDistance": 2.0,
+    "checkRadius": 3.0,
+    "minObstacleRadius": 0.5
+  },
+  "wander": {
+    "defaultRadius": 2.0,
+    "defaultDistance": 3.0,
+    "defaultJitter": 0.1
+  },
+  "containment": {
+    "defaultMargin": 10
+  }
+}

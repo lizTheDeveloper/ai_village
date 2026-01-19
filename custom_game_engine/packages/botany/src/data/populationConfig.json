@@ -1,0 +1,6 @@
+{
+  "maxDensity": 10,
+  "minPopulation": 2,
+  "spawnChance": 0.1,
+  "crowdingRadius": 2
+}

@@ -56,66 +56,6 @@
       "error": "API 503: Service Unavailable"
     },
     {
-      "folderId": "treecreeper",
-      "description": "eurasian treecreeper with brown streaked back, curved bill, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "woodlark",
-      "description": "woodlark with streaked brown plumage, short crest, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "redstart",
-      "description": "common redstart with orange-red tail, black throat, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "butterfly_swallowtail",
-      "description": "tiger swallowtail butterfly with yellow and black wings, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "butterfly_peacock",
-      "description": "peacock butterfly with eyespots on rusty wings, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "moth_luna",
-      "description": "luna moth with pale green wings, long tails, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768795029250,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
       "folderId": "moth_emperor",
       "description": "emperor moth with eyespots on brown wings, pixel art, game sprite, 48x48",
       "status": "queued",

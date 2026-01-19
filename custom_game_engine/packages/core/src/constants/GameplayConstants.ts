@@ -1,40 +1,42 @@
 // packages/core/src/constants/GameplayConstants.ts
 
+import constantsData from '../data/constants.json';
+
 // Resource yields
-export const BASE_SEED_YIELD_HARVEST = 20;
-export const BASE_SEED_YIELD_GATHER = 10;
-export const BASE_FRUIT_YIELD = 3;
+export const BASE_SEED_YIELD_HARVEST = constantsData.gameplay.baseSeedYieldHarvest;
+export const BASE_SEED_YIELD_GATHER = constantsData.gameplay.baseSeedYieldGather;
+export const BASE_FRUIT_YIELD = constantsData.gameplay.baseFruitYield;
 
 // Skill modifiers
-export const SKILL_YIELD_MULTIPLIER_BASE = 0.5;
-export const SKILL_YIELD_MULTIPLIER_SCALE = 1.5;
-export const SKILL_LEVEL_HARVEST_THRESHOLD = 5;
+export const SKILL_YIELD_MULTIPLIER_BASE = constantsData.gameplay.skillYieldMultiplierBase;
+export const SKILL_YIELD_MULTIPLIER_SCALE = constantsData.gameplay.skillYieldMultiplierScale;
+export const SKILL_LEVEL_HARVEST_THRESHOLD = constantsData.gameplay.skillLevelHarvestThreshold;
 
 // Market events
-export const MARKET_EVENT_CHANCE = 0.1;  // 10% per check
-export const MARKET_EVENT_DURATION_MIN_DAYS = 1;
-export const MARKET_EVENT_DURATION_MAX_DAYS = 5;
-export const MARKET_SHORTAGE_MULTIPLIER_MIN = 1.5;
-export const MARKET_SHORTAGE_MULTIPLIER_MAX = 2.5;
-export const MARKET_SURPLUS_MULTIPLIER_MIN = 0.5;
-export const MARKET_SURPLUS_MULTIPLIER_MAX = 0.8;
+export const MARKET_EVENT_CHANCE = constantsData.gameplay.marketEventChance;
+export const MARKET_EVENT_DURATION_MIN_DAYS = constantsData.gameplay.marketEventDurationMinDays;
+export const MARKET_EVENT_DURATION_MAX_DAYS = constantsData.gameplay.marketEventDurationMaxDays;
+export const MARKET_SHORTAGE_MULTIPLIER_MIN = constantsData.gameplay.marketShortageMultiplierMin;
+export const MARKET_SHORTAGE_MULTIPLIER_MAX = constantsData.gameplay.marketShortageMultiplierMax;
+export const MARKET_SURPLUS_MULTIPLIER_MIN = constantsData.gameplay.marketSurplusMultiplierMin;
+export const MARKET_SURPLUS_MULTIPLIER_MAX = constantsData.gameplay.marketSurplusMultiplierMax;
 
 // Genetics variance
-export const MUTATION_CHANCE = 0.1;
-export const MUTATION_MAGNITUDE = 0.1;
-export const INHERITANCE_VARIANCE_MIN = 0.9;
-export const INHERITANCE_VARIANCE_MAX = 1.1;
+export const MUTATION_CHANCE = constantsData.gameplay.mutationChance;
+export const MUTATION_MAGNITUDE = constantsData.gameplay.mutationMagnitude;
+export const INHERITANCE_VARIANCE_MIN = constantsData.gameplay.inheritanceVarianceMin;
+export const INHERITANCE_VARIANCE_MAX = constantsData.gameplay.inheritanceVarianceMax;
 
 // Wild animal spawning
-export const SPAWN_COUNT_MIN = 1;
-export const SPAWN_COUNT_MAX = 3;
-export const SPAWN_COUNT_HERD = 2;
+export const SPAWN_COUNT_MIN = constantsData.gameplay.spawnCountMin;
+export const SPAWN_COUNT_MAX = constantsData.gameplay.spawnCountMax;
+export const SPAWN_COUNT_HERD = constantsData.gameplay.spawnCountHerd;
 
 // Soil fertility ranges
-export const SOIL_FERTILITY_MIN = 60;
-export const SOIL_FERTILITY_MAX = 80;
-export const SOIL_MOISTURE_MIN = 40;
-export const SOIL_MOISTURE_MAX = 70;
+export const SOIL_FERTILITY_MIN = constantsData.gameplay.soilFertilityMin;
+export const SOIL_FERTILITY_MAX = constantsData.gameplay.soilFertilityMax;
+export const SOIL_MOISTURE_MIN = constantsData.gameplay.soilMoistureMin;
+export const SOIL_MOISTURE_MAX = constantsData.gameplay.soilMoistureMax;
 
 // Hydration threshold for watering
-export const HYDRATION_THRESHOLD = 50;
+export const HYDRATION_THRESHOLD = constantsData.gameplay.hydrationThreshold;

@@ -1,0 +1,21 @@
+{
+  "hardCollisions": {
+    "terrainTypes": ["water", "deep_water"],
+    "wallConstructionThreshold": 50,
+    "windowConstructionThreshold": 50,
+    "doorConstructionThreshold": 50,
+    "maxElevationDifference": 2,
+    "buildingCollisionRadius": 0.5
+  },
+  "softCollisions": {
+    "radius": 0.8,
+    "minPenalty": 0.2,
+    "maxPenalty": 1.0
+  },
+  "spatial": {
+    "chunkSize": 32
+  },
+  "cache": {
+    "buildingCacheDurationTicks": 20
+  }
+}

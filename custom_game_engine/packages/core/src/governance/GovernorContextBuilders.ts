@@ -21,6 +21,9 @@ import type { VillageGovernanceComponent } from '../components/VillageGovernance
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
 import type { TownHallComponent } from '../components/TownHallComponent.js';
 import type { CensusBureauComponent } from '../components/CensusBureauComponent.js';
+import type { NationGovernanceComponent } from '../components/NationGovernanceComponent.js';
+import type { EmpireGovernanceComponent } from '../components/EmpireGovernanceComponent.js';
+import type { GalacticCouncilComponent } from '../components/GalacticCouncilComponent.js';
 
 // ============================================================================
 // TIER 0: PROVINCE GOVERNOR CONTEXT (extends CivilizationContext)
@@ -336,9 +339,146 @@ export interface NationContext {
  * @returns Nation context for LLM prompts
  */
 export function buildNationContext(headOfState: Entity, world: World): NationContext {
-  // TODO: Implement in Phase 3 when NationTier component exists
-  // For now, return placeholder
-  throw new Error('NationContext not yet implemented - requires Phase 3 NationTier component');
+  // Find nation governance component
+  const nations = world.query().with(CT.NationGovernance).executeEntities();
+  const nationEntity = nations.find((n) => {
+    const impl = n as EntityImpl;
+    const ng = impl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+    return ng && ng.headOfStateAgentId === headOfState.id;
+  });
+
+  if (!nationEntity) {
+    throw new Error(`Head of state ${headOfState.id} has no associated nation`);
+  }
+
+  const nationImpl = nationEntity as EntityImpl;
+  const nation = nationImpl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+
+  if (!nation) {
+    throw new Error('Nation entity missing NationGovernance component');
+  }
+
+  // Build provinces array from provinceIds
+  const allProvinces = world.query().with(CT.ProvinceGovernance).executeEntities();
+  const provinces = nation.provinceIds.map((provinceId) => {
+    const provinceEntity = allProvinces.find((p) => p.id === provinceId);
+    if (!provinceEntity) {
+      return {
+        name: 'Unknown Province',
+        population: 0,
+        resources: {},
+        happiness: 0,
+      };
+    }
+
+    const provinceImpl = provinceEntity as EntityImpl;
+    const province = provinceImpl.getComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance);
+
+    if (!province) {
+      return {
+        name: 'Unknown Province',
+        population: 0,
+        resources: {},
+        happiness: 0,
+      };
+    }
+
+    // Convert major resources array to resource map
+    const resources: Record<string, number> = {};
+    for (const resource of province.economy.majorResources) {
+      resources[resource] = 1; // Placeholder - would need actual quantities from warehouse system
+    }
+
+    return {
+      name: province.provinceName,
+      population: province.totalPopulation,
+      resources,
+      happiness: province.stability, // Use province stability as happiness proxy
+    };
+  });
+
+  // Build economy object from nation.economy fields
+  const economy = {
+    gdp: nation.economy.GDP,
+    taxRate: nation.economy.provincialTaxes.size > 0
+      ? Array.from(nation.economy.provincialTaxes.values()).reduce((sum, tax) => sum + tax, 0) /
+          nation.economy.provincialTaxes.size /
+          nation.economy.GDP
+      : 0.1, // Default 10% if no provinces
+    reserves: {
+      gold: nation.economy.annualBudget - nation.economy.nationalDebt,
+    },
+  };
+
+  // Build military object from nation.military fields
+  const military = {
+    strength: nation.military.standingArmy + nation.military.reserves,
+    deployments: nation.foreignPolicy.activeWars.map((war) => ({
+      location: war.name,
+      size: Math.floor(nation.military.standingArmy * 0.3), // Estimate 30% deployed per war
+    })),
+  };
+
+  // Build neighbors array from nation.foreignPolicy.diplomaticRelations Map
+  const neighbors: NationDiplomaticRelation[] = Array.from(
+    nation.foreignPolicy.diplomaticRelations.values()
+  ).map((relation) => ({
+    name: relation.nationName,
+    relation:
+      relation.relationship === 'allied'
+        ? 'allied'
+        : relation.relationship === 'hostile' || relation.relationship === 'at_war'
+          ? 'hostile'
+          : 'neutral',
+  }));
+
+  // Build pending proposals from national laws/policies
+  const pendingProposals: Array<{
+    type: string;
+    proposer: string;
+    description: string;
+  }> = [];
+
+  // Add active research projects as proposals
+  for (const project of nation.technology.activeResearchProjects) {
+    if (project.progress < 1) {
+      pendingProposals.push({
+        type: 'research',
+        proposer: 'Science Advisor',
+        description: `Continue ${project.name} research (${Math.floor(project.progress * 100)}% complete)`,
+      });
+    }
+  }
+
+  // Add war goals as proposals
+  for (const war of nation.foreignPolicy.activeWars) {
+    if (war.status === 'active') {
+      pendingProposals.push({
+        type: 'military',
+        proposer: 'Military Commander',
+        description: `Continue war: ${war.name} (${war.warGoals.join(', ')})`,
+      });
+    }
+  }
+
+  return {
+    nation: {
+      name: nation.name,
+      governmentType:
+        nation.governanceType === 'monarchy'
+          ? 'monarchy'
+          : nation.governanceType === 'democracy'
+            ? 'democracy'
+            : 'oligarchy',
+      population: nation.totalPopulation,
+      territory: nation.provinceIds.length,
+    },
+    provinces,
+    economy,
+    military,
+    neighbors,
+    pendingProposals,
+  };
 }
 
 // ============================================================================
@@ -427,8 +567,155 @@ export interface EmpireContext {
  * @returns Empire context for LLM prompts
  */
 export function buildEmpireContext(emperor: Entity, world: World): EmpireContext {
-  // TODO: Implement in Phase 4 when EmpireTier component exists
-  throw new Error('EmpireContext not yet implemented - requires Phase 4 EmpireTier component');
+  // Find empire governance component
+  const empires = world.query().with(CT.EmpireGovernance).executeEntities();
+  const empireEntity = empires.find((e) => {
+    const impl = e as EntityImpl;
+    const eg = impl.getComponent<EmpireGovernanceComponent>(CT.EmpireGovernance);
+    return eg && eg.emperorAgentId === emperor.id;
+  });
+
+  if (!empireEntity) {
+    throw new Error(`Emperor ${emperor.id} has no associated empire`);
+  }
+
+  const empireImpl = empireEntity as EntityImpl;
+  const empire = empireImpl.getComponent<EmpireGovernanceComponent>(CT.EmpireGovernance);
+
+  if (!empire) {
+    throw new Error('Empire entity missing EmpireGovernance component');
+  }
+
+  // Build nations array from both coreNationIds and vassalNationIds
+  const allNations = world.query().with(CT.NationGovernance).executeEntities();
+  const allNationIds = [...empire.coreNationIds, ...empire.vassalNationIds];
+
+  const nations = allNationIds.map((nationId) => {
+    const nationEntity = allNations.find((n) => n.id === nationId);
+    if (!nationEntity) {
+      return {
+        name: 'Unknown Nation',
+        population: 0,
+        loyalty: 0,
+        militaryStrength: 0,
+        resources: {},
+      };
+    }
+
+    const nationImpl = nationEntity as EntityImpl;
+    const nation = nationImpl.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+
+    if (!nation) {
+      return {
+        name: 'Unknown Nation',
+        population: 0,
+        loyalty: 0,
+        militaryStrength: 0,
+        resources: {},
+      };
+    }
+
+    // Calculate loyalty from empire.stability.vassalLoyalty Map
+    const loyalty = empire.stability.vassalLoyalty.get(nationId) ?? 1.0; // Core nations default to 1.0
+
+    // Convert resources to record
+    const resources: Record<string, number> = {};
+    resources['GDP'] = nation.economy.GDP;
+    resources['military_forces'] = nation.military.standingArmy + nation.military.reserves;
+
+    return {
+      name: nation.name,
+      population: nation.totalPopulation,
+      loyalty,
+      militaryStrength: nation.military.standingArmy + nation.military.reserves,
+      resources,
+    };
+  });
+
+  // Build diplomaticRelations array from empire.foreignPolicy.diplomaticRelations Map
+  const diplomaticRelations = Array.from(empire.foreignPolicy.diplomaticRelations.values()).map(
+    (relation) => ({
+      targetEmpire: relation.empireName,
+      relation:
+        relation.relationship === 'allied'
+          ? 'allied'
+          : relation.relationship === 'at_war'
+            ? 'war'
+            : relation.relationship === 'rival' || relation.relationship === 'hostile'
+              ? 'rival'
+              : 'neutral',
+      trustLevel: relation.respectLevel,
+    })
+  );
+
+  // Build threats array from empire.stability.separatistMovements
+  const threats = empire.stability.separatistMovements.map((movement) => ({
+    type: movement.goal === 'independence' ? 'separatist_movement' : 'rebellion',
+    severity:
+      movement.threatLevel === 'existential'
+        ? 3
+        : movement.threatLevel === 'major'
+          ? 2
+          : movement.threatLevel === 'moderate'
+            ? 1
+            : 0,
+    description: `${movement.name} in vassal nation (${Math.floor(movement.supportLevel * 100)}% support)`,
+  }));
+
+  // Add active wars as threats
+  for (const war of empire.foreignPolicy.activeWars) {
+    if (war.status === 'active') {
+      threats.push({
+        type: 'invasion',
+        severity: war.totalCasualties > 1000000 ? 3 : war.totalCasualties > 100000 ? 2 : 1,
+        description: `${war.name}: ${war.warGoals.join(', ')}`,
+      });
+    }
+  }
+
+  // Build advisorRecommendations as empty array (placeholder for future advisor system)
+  const advisorRecommendations: Array<{
+    advisor: string;
+    recommendation: string;
+  }> = [];
+
+  // Add automatic advisor recommendations based on empire state
+  if (empire.stability.imperialLegitimacy < 50) {
+    advisorRecommendations.push({
+      advisor: 'diplomatic',
+      recommendation: 'Imperial legitimacy is low. Consider reforms or propaganda campaigns.',
+    });
+  }
+
+  if (empire.economy.imperialBudget < 0) {
+    advisorRecommendations.push({
+      advisor: 'economic',
+      recommendation: 'Imperial budget is negative. Increase tribute rates or reduce expenditures.',
+    });
+  }
+
+  const lowLoyaltyVassals = Array.from(empire.stability.vassalLoyalty.entries()).filter(
+    ([_, loyalty]) => loyalty < 0.5
+  );
+  if (lowLoyaltyVassals.length > 0) {
+    advisorRecommendations.push({
+      advisor: 'military',
+      recommendation: `${lowLoyaltyVassals.length} vassal(s) have low loyalty. Prepare for potential rebellions.`,
+    });
+  }
+
+  return {
+    empire: {
+      name: empire.name,
+      population: empire.totalPopulation,
+      territory: empire.totalSystems,
+      species: empire.culture.officialLanguage, // Use language as species proxy for now
+    },
+    nations,
+    diplomaticRelations,
+    threats,
+    advisorRecommendations,
+  };
 }
 
 // ============================================================================
@@ -505,10 +792,113 @@ export function buildGalacticCouncilContext(
   councilDelegate: Entity,
   world: World
 ): GalacticCouncilContext {
-  // TODO: Implement in Phase 6 when GalacticCouncilTier component exists
-  throw new Error(
-    'GalacticCouncilContext not yet implemented - requires Phase 6 GalacticCouncilTier component'
-  );
+  // Find galactic council component where councilDelegate is in assemblyDelegates
+  const councils = world.query().with(CT.GalacticCouncil).executeEntities();
+  const councilEntity = councils.find((c) => {
+    const impl = c as EntityImpl;
+    const gc = impl.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
+    return (
+      gc && gc.assemblyDelegates.some((delegate) => delegate.delegateAgentId === councilDelegate.id)
+    );
+  });
+
+  if (!councilEntity) {
+    throw new Error(`Council delegate ${councilDelegate.id} has no associated galactic council`);
+  }
+
+  const councilImpl = councilEntity as EntityImpl;
+  const council = councilImpl.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
+
+  if (!council) {
+    throw new Error('Council entity missing GalacticCouncil component');
+  }
+
+  // Build galaxyState object from membership totals
+  const galaxyState: GalaxyState = {
+    totalStars: council.totalSectors * 1000, // Estimate 1000 stars per sector
+    totalPlanets: council.totalSectors * 3000, // Estimate 3000 planets per sector
+    totalPopulation: council.totalPopulation,
+    speciesCount: council.memberSpecies.length,
+  };
+
+  // Build speciesRepresented array from membership.memberSpecies
+  const speciesRepresented: SpeciesRepresentation[] = council.memberSpecies.map((species) => ({
+    speciesName: species.name,
+    homeworld: species.homeworld,
+    population: species.population,
+    temperament: species.techLevel > 8 ? 'advanced' : species.techLevel > 5 ? 'developed' : 'emerging',
+  }));
+
+  // Build currentCrises array from crisis management data
+  const currentCrises: GalacticCrisis[] = [];
+
+  // Add existential threats as crises
+  for (const threat of council.science.existentialThreats) {
+    currentCrises.push({
+      type:
+        threat.type === 'gamma_ray_burst' || threat.type === 'supernova'
+          ? 'cosmic_anomaly'
+          : 'cosmic_anomaly',
+      severity:
+        threat.severity === 'extinction_level'
+          ? 1.0
+          : threat.severity === 'major'
+            ? 0.7
+            : threat.severity === 'moderate'
+              ? 0.5
+              : 0.3,
+      affectedSpecies: speciesRepresented.map((s) => s.speciesName), // All species affected by existential threats
+    });
+  }
+
+  // Add active disputes as crises
+  for (const dispute of council.disputes.activeDisputes) {
+    if (dispute.status === 'escalated_to_war') {
+      currentCrises.push({
+        type: 'war',
+        severity: 0.8,
+        affectedSpecies: dispute.parties.map((partyId) => {
+          // Try to find species name from member IDs
+          const species = council.memberSpecies.find((s) => s.representativeAgentId === partyId);
+          return species?.name ?? 'Unknown Species';
+        }),
+      });
+    }
+  }
+
+  // Build proposals array from pending council actions
+  const proposals: GalacticProposal[] = [];
+
+  // Add research projects as proposals
+  for (const project of council.science.jointResearchProjects) {
+    if (project.progress < 1) {
+      proposals.push({
+        proposedBy: 'Scientific Committee',
+        proposal: `Continue ${project.name} research (${Math.floor(project.progress * 100)}% complete)`,
+        support: project.participatingStates.length,
+        opposition: council.memberFederationIds.length + council.memberEmpireIds.length - project.participatingStates.length,
+      });
+    }
+  }
+
+  // Add peacekeeping missions as proposals
+  for (const mission of council.peacekeepingForces.activeMissions) {
+    if (mission.status === 'active') {
+      proposals.push({
+        proposedBy: 'Security Council',
+        proposal: `Continue peacekeeping mission: ${mission.name} (${mission.type})`,
+        support: mission.fleetsDeployed.length,
+        opposition: 0,
+      });
+    }
+  }
+
+  return {
+    galaxyState,
+    speciesRepresented,
+    currentCrises,
+    proposals,
+  };
 }
 
 // ============================================================================

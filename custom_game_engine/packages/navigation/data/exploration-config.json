@@ -1,0 +1,13 @@
+{
+  "sectors": {
+    "size": 16,
+    "defaultExplorationRadius": 64
+  },
+  "targetReached": {
+    "distance": 5
+  },
+  "milestones": [0.25, 0.5, 0.75, 0.9],
+  "spiral": {
+    "offsetMultiplier": 16
+  }
+}

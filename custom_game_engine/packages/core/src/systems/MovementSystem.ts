@@ -64,7 +64,20 @@ export class MovementSystem extends BaseSystem {
   // Passive resource discovery - throttle discovery checks
   private readonly DISCOVERY_INTERVAL_TICKS = 5; // Check every 5 ticks (~250ms)
   private readonly DISCOVERY_RADIUS = 5; // Tiles
+  private readonly DISCOVERY_RADIUS_SQUARED = 25; // 5 * 5 - precomputed for distance checks
   private lastDiscoveryCheck: Map<string, number> = new Map();
+
+  // Performance: Reusable objects for collision calculations (zero allocations in hot path)
+  private readonly workingPerpendicular = { x1: 0, y1: 0, x2: 0, y2: 0 };
+  private readonly workingPosition = { x: 0, y: 0 };
+
+  // Performance: Precomputed collision constants
+  private readonly BUILDING_COLLISION_RADIUS_SQUARED = 0.25; // 0.5 * 0.5
+  private readonly SOFT_COLLISION_RADIUS = 0.8;
+  private readonly SOFT_COLLISION_RADIUS_SQUARED = 0.64; // 0.8 * 0.8
+  private readonly MIN_PENALTY = 0.2;
+  private readonly MIN_VELOCITY_THRESHOLD = 0.001; // Velocity below this is treated as stopped
+  private readonly MIN_VELOCITY_THRESHOLD_SQUARED = 0.000001; // 0.001 * 0.001
 
   /**
    * Initialize event listeners to invalidate cache on building changes
@@ -204,8 +217,17 @@ export class MovementSystem extends BaseSystem {
         continue;
       }
 
-      // Skip if not moving
+      // Skip if not moving (check exact zero first, then near-zero)
       if (movement.velocityX === 0 && movement.velocityY === 0) {
+        continue;
+      }
+
+      // Performance: Early exit for near-zero velocity (avoid expensive collision checks)
+      // Use squared magnitude to avoid sqrt
+      const velocityMagnitudeSquared = movement.velocityX * movement.velocityX +
+                                        movement.velocityY * movement.velocityY;
+      if (velocityMagnitudeSquared < this.MIN_VELOCITY_THRESHOLD_SQUARED) {
+        // Velocity too small to matter - treat as stopped
         continue;
       }
 
@@ -242,15 +264,16 @@ export class MovementSystem extends BaseSystem {
       // Check for hard collisions (buildings) - these block completely
       if (this.hasHardCollision(ctx.world, entity.id, newX, newY)) {
         // Try perpendicular directions to slide along walls
-        const perpX1 = -deltaY;
-        const perpY1 = deltaX;
-        const perpX2 = deltaY;
-        const perpY2 = -deltaX;
+        // Performance: Use reusable working object to avoid allocations
+        this.workingPerpendicular.x1 = -deltaY;
+        this.workingPerpendicular.y1 = deltaX;
+        this.workingPerpendicular.x2 = deltaY;
+        this.workingPerpendicular.y2 = -deltaX;
 
-        const alt1X = position.x + perpX1;
-        const alt1Y = position.y + perpY1;
-        const alt2X = position.x + perpX2;
-        const alt2Y = position.y + perpY2;
+        const alt1X = position.x + this.workingPerpendicular.x1;
+        const alt1Y = position.y + this.workingPerpendicular.y1;
+        const alt2X = position.x + this.workingPerpendicular.x2;
+        const alt2Y = position.y + this.workingPerpendicular.y2;
 
         if (!this.hasHardCollision(ctx.world, entity.id, alt1X, alt1Y)) {
           this.updatePosition(impl, alt1X, alt1Y, ctx.world);
@@ -474,7 +497,7 @@ export class MovementSystem extends BaseSystem {
       // Use squared distance to avoid sqrt
       const distanceSquared = dx * dx + dy * dy;
 
-      if (distanceSquared < 0.25) { // 0.5 * 0.5 = 0.25
+      if (distanceSquared < this.BUILDING_COLLISION_RADIUS_SQUARED) {
         return true;
       }
     }
@@ -497,8 +520,6 @@ export class MovementSystem extends BaseSystem {
     y: number
   ): number {
     let penalty = 1.0;
-    const softCollisionRadius = 0.8; // Start slowing at this distance
-    const minPenalty = 0.2; // Never slow below 20% speed
     const CHUNK_SIZE = 32;
 
     // Calculate current chunk
@@ -528,7 +549,7 @@ export class MovementSystem extends BaseSystem {
 
           // Manhattan distance early exit (fast)
           const manhattanDist = Math.abs(pos.x - x) + Math.abs(pos.y - y);
-          if (manhattanDist > softCollisionRadius * 2) {
+          if (manhattanDist > this.SOFT_COLLISION_RADIUS * 2) {
             continue;
           }
 
@@ -536,14 +557,13 @@ export class MovementSystem extends BaseSystem {
           const dx = pos.x - x;
           const dy = pos.y - y;
           const distanceSquared = dx * dx + dy * dy;
-          const radiusSquared = softCollisionRadius * softCollisionRadius;
 
           // Apply graduated slowdown based on proximity
-          if (distanceSquared < radiusSquared) {
+          if (distanceSquared < this.SOFT_COLLISION_RADIUS_SQUARED) {
             // Only compute sqrt when we need the actual distance for interpolation
             const distance = Math.sqrt(distanceSquared);
-            const proximityFactor = distance / softCollisionRadius;
-            const thisPenalty = minPenalty + (1 - minPenalty) * proximityFactor;
+            const proximityFactor = distance / this.SOFT_COLLISION_RADIUS;
+            const thisPenalty = this.MIN_PENALTY + (1 - this.MIN_PENALTY) * proximityFactor;
             penalty = Math.min(penalty, thisPenalty);
           }
         }
@@ -636,9 +656,8 @@ export class MovementSystem extends BaseSystem {
         const dx = resourcePos.x - x;
         const dy = resourcePos.y - y;
         const distanceSquared = dx * dx + dy * dy;
-        const radiusSquared = this.DISCOVERY_RADIUS * this.DISCOVERY_RADIUS;
 
-        if (distanceSquared <= radiusSquared) {
+        if (distanceSquared <= this.DISCOVERY_RADIUS_SQUARED) {
           // Add to spatial memory
           addSpatialMemory(
             spatialMemory,

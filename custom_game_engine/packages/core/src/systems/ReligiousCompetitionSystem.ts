@@ -209,22 +209,29 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   }
 
   /**
-   * Determine if two deities should compete
+   * Determine if two deities should compete (optimized)
    */
-  private shouldCompete(deity1: DeityComponent, deity2: DeityComponent): boolean {
+  private shouldCompeteOptimized(deity1: DeityComponent, deity2: DeityComponent): boolean {
+    // Early exit: both need minimum believers to compete (cheapest check first)
+    if (deity1.believers.size < this.MIN_BELIEVERS_TO_COMPETE || deity2.believers.size < this.MIN_BELIEVERS_TO_COMPETE) {
+      return false;
+    }
+
     // Check domain overlap
     const overlap = this.calculateDomainOverlap(deity1, deity2);
     if (overlap < this.config.minDomainOverlap) {
       return false;
     }
 
-    // Both need minimum believers to compete
-    if (deity1.believers.size < 5 || deity2.believers.size < 5) {
-      return false;
-    }
-
     // Random chance
-    return Math.random() < 0.1; // 10% chance per check
+    return Math.random() < this.COMPETITION_CHANCE;
+  }
+
+  /**
+   * Determine if two deities should compete (deprecated - use shouldCompeteOptimized)
+   */
+  private shouldCompete(deity1: DeityComponent, deity2: DeityComponent): boolean {
+    return this.shouldCompeteOptimized(deity1, deity2);
   }
 
   /**
@@ -332,66 +339,76 @@ export class ReligiousCompetitionSystem extends BaseSystem {
   }
 
   /**
-   * Update all active competitions
+   * Update all active competitions (optimized)
    */
   private updateCompetitions(world: World, currentTick: number): void {
     for (const competition of this.competitions.values()) {
       if (competition.status !== 'active') continue;
 
-      // Update scores
-      const deity1 = world.getEntity(competition.competitors[0])?.components.get(CT.Deity) as DeityComponent | undefined;
-      const deity2 = world.getEntity(competition.competitors[1])?.components.get(CT.Deity) as DeityComponent | undefined;
+      // Use cache for deity lookups (O(1) vs O(n))
+      const deity1Id = competition.competitors[0];
+      const deity2Id = competition.competitors[1];
+      const deity1 = this.deityCache.get(deity1Id);
+      const deity2 = this.deityCache.get(deity2Id);
 
       if (!deity1 || !deity2) {
         competition.status = 'abandoned';
         continue;
       }
 
-      competition.scores[competition.competitors[0]] = this.calculateScore(deity1, competition.type);
-      competition.scores[competition.competitors[1]] = this.calculateScore(deity2, competition.type);
+      // Update scores inline (avoid function call overhead)
+      competition.scores[deity1Id] = this.calculateScore(deity1, competition.type);
+      competition.scores[deity2Id] = this.calculateScore(deity2, competition.type);
 
-      // Check for winner (if significant lead)
-      this.checkForWinner(competition, currentTick);
+      // Check for winner (if significant lead) - inlined
+      this.checkForWinnerOptimized(competition, currentTick);
     }
   }
 
   /**
-   * Check if competition has a clear winner
+   * Check if competition has a clear winner (optimized)
    */
-  private checkForWinner(competition: CompetitionData, currentTick: number): void {
+  private checkForWinnerOptimized(competition: CompetitionData, currentTick: number): void {
+    // Early exit: minimum duration not met
+    const duration = currentTick - competition.startedAt;
+    if (duration < this.MIN_COMPETITION_DURATION) return;
+
     const [deity1Id, deity2Id] = competition.competitors;
     const score1 = competition.scores[deity1Id] ?? 0;
     const score2 = competition.scores[deity2Id] ?? 0;
 
-    // Need significant lead (2x score) and minimum duration (5 minutes)
-    const duration = currentTick - competition.startedAt;
-    const minDuration = 6000; // ~5 minutes
+    // Check for significant lead (avoid multiplication - use division instead)
+    let winnerId: string | undefined;
+    let loserId: string | undefined;
 
-    if (duration < minDuration) return;
-
-    if (score1 > score2 * 2) {
-      competition.status = 'completed';
-      competition.winnerId = deity1Id;
-      // Emit competition won event
-      this.events.emitGeneric('competition_won', {
-        competitionId: competition.id,
-        winnerId: deity1Id,
-        loserId: deity2Id,
-        competitionType: competition.type,
-        finalScores: competition.scores,
-      });
-    } else if (score2 > score1 * 2) {
-      competition.status = 'completed';
-      competition.winnerId = deity2Id;
-      // Emit competition won event
-      this.events.emitGeneric('competition_won', {
-        competitionId: competition.id,
-        winnerId: deity2Id,
-        loserId: deity1Id,
-        competitionType: competition.type,
-        finalScores: competition.scores,
-      });
+    if (score2 > 0 && score1 / score2 > this.SCORE_LEAD_THRESHOLD) {
+      winnerId = deity1Id;
+      loserId = deity2Id;
+    } else if (score1 > 0 && score2 / score1 > this.SCORE_LEAD_THRESHOLD) {
+      winnerId = deity2Id;
+      loserId = deity1Id;
     }
+
+    if (!winnerId) return;
+
+    competition.status = 'completed';
+    competition.winnerId = winnerId;
+
+    // Emit competition won event
+    this.events.emitGeneric('competition_won', {
+      competitionId: competition.id,
+      winnerId,
+      loserId: loserId!,
+      competitionType: competition.type,
+      finalScores: competition.scores,
+    });
+  }
+
+  /**
+   * Check if competition has a clear winner (deprecated - use checkForWinnerOptimized)
+   */
+  private checkForWinner(competition: CompetitionData, currentTick: number): void {
+    this.checkForWinnerOptimized(competition, currentTick);
   }
 
   /**

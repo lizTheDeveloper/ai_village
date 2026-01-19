@@ -54,12 +54,22 @@ export class MythGenerationSystem extends BaseSystem {
   public readonly requiredComponents = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
-  protected readonly throttleInterval = THROTTLE.SLOW; // SLOW - 5 seconds (check for LLM responses)
+  protected readonly throttleInterval = 100; // Every 100 ticks (5 seconds at 20 TPS)
 
   private mythIdCounter: number = 0;
   private pendingMyths: PendingMyth[] = [];
   private pendingLLMMyths = new Map<string, PendingLLMMyth>();
   private llmQueue: LLMDecisionQueue;
+
+  // Performance optimizations
+  private lastUpdate = 0;
+  private readonly UPDATE_INTERVAL = 100; // Every 100 ticks (5 seconds)
+
+  // Cache for deity lookups (entity ID → deity component)
+  private deityCache = new Map<string, DeityComponent>();
+
+  // Reusable working arrays (zero allocations)
+  private readonly workingNearbyAgents: Entity[] = [];
 
   constructor(llmQueue: LLMDecisionQueue) {
     super();
@@ -78,17 +88,37 @@ export class MythGenerationSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Throttling: Skip update if interval hasn't elapsed
+    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastUpdate = ctx.world.tick;
+
     const world = ctx.world;
     const entities = ctx.activeEntities;
     const currentTick = ctx.tick;
+
+    // Early exit: No pending work
+    if (this.pendingMyths.length === 0 && this.pendingLLMMyths.size === 0) {
+      return;
+    }
+
     // Ensure all deities have mythology components
     const deities = entities.filter(e => e.components.has(CT.Deity));
+
+    // Early exit: No deities exist
+    if (deities.length === 0) {
+      return;
+    }
 
     for (const deity of deities) {
       if (!deity.components.has(CT.Mythology)) {
         (deity as EntityImpl).addComponent(createMythologyComponent());
       }
     }
+
+    // Update deity cache
+    this._updateDeityCache(deities);
 
     // Process pending myths (queue LLM requests)
     for (const pending of this.pendingMyths) {
@@ -450,14 +480,33 @@ export class MythGenerationSystem extends BaseSystem {
   }
 
   /**
-   * Find agents near the given agent
+   * Update deity cache for fast lookups (O(1) instead of repeated component fetches)
+   */
+  private _updateDeityCache(deities: Entity[]): void {
+    // Clear stale entries
+    this.deityCache.clear();
+
+    // Rebuild cache
+    for (const deity of deities) {
+      const deityComp = deity.components.get(CT.Deity) as DeityComponent | undefined;
+      if (deityComp) {
+        this.deityCache.set(deity.id, deityComp);
+      }
+    }
+  }
+
+  /**
+   * Find agents near the given agent (reuses working array to avoid allocations)
    */
   private _findNearbyAgents(agent: Entity, entities: ReadonlyArray<Entity>): Entity[] {
     const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return [];
 
-    const nearby: Entity[] = [];
+    // Clear working array (reuse instead of allocating new array)
+    this.workingNearbyAgents.length = 0;
+
     const SPREAD_RADIUS = 50; // Grid units
+    const SPREAD_RADIUS_SQ = SPREAD_RADIUS * SPREAD_RADIUS;
 
     for (const other of entities) {
       if (other.id === agent.id) continue;
@@ -470,11 +519,11 @@ export class MythGenerationSystem extends BaseSystem {
       const dy = otherPos.y - position.y;
       const distSq = dx * dx + dy * dy;
 
-      if (distSq <= SPREAD_RADIUS * SPREAD_RADIUS) {
-        nearby.push(other);
+      if (distSq <= SPREAD_RADIUS_SQ) {
+        this.workingNearbyAgents.push(other);
       }
     }
 
-    return nearby;
+    return this.workingNearbyAgents;
   }
 }

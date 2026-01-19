@@ -15,6 +15,7 @@ import type {
   Entity,
 } from '@ai-village/core';
 import { BaseSystem, type SystemContext, ComponentType as CT, EntityImpl, recordChunkVisit } from '@ai-village/core';
+import collisionConfig from '../../data/collision-config.json';
 
 interface TimeComponent {
   speedMultiplier?: number;
@@ -44,10 +45,20 @@ export class MovementSystem extends BaseSystem {
   // Performance: Cache building positions to avoid querying every frame
   private buildingCollisionCache: BuildingCollisionData[] | null = null;
   private cacheValidUntilTick = 0;
-  private readonly CACHE_DURATION_TICKS = 20; // Cache for 1 second at 20 TPS
+  private readonly CACHE_DURATION_TICKS = collisionConfig.cache.buildingCacheDurationTicks;
 
   // Performance: Cache time entity ID to avoid querying every tick
   private timeEntityId: string | null = null;
+
+  // Configuration constants from JSON
+  private readonly CHUNK_SIZE = collisionConfig.spatial.chunkSize;
+  private readonly SOFT_COLLISION_RADIUS = collisionConfig.softCollisions.radius;
+  private readonly SOFT_COLLISION_MIN_PENALTY = collisionConfig.softCollisions.minPenalty;
+  private readonly BUILDING_COLLISION_RADIUS = collisionConfig.hardCollisions.buildingCollisionRadius;
+  private readonly WALL_CONSTRUCTION_THRESHOLD = collisionConfig.hardCollisions.wallConstructionThreshold;
+  private readonly WINDOW_CONSTRUCTION_THRESHOLD = collisionConfig.hardCollisions.windowConstructionThreshold;
+  private readonly DOOR_CONSTRUCTION_THRESHOLD = collisionConfig.hardCollisions.doorConstructionThreshold;
+  private readonly MAX_ELEVATION_DIFFERENCE = collisionConfig.hardCollisions.maxElevationDifference;
 
   /**
    * Initialize event listeners to invalidate cache on building changes
@@ -262,8 +273,8 @@ export class MovementSystem extends BaseSystem {
       clampedY = Math.max(bounds.minY, Math.min(bounds.maxY, y));
     }
 
-    const newChunkX = Math.floor(clampedX / 32);
-    const newChunkY = Math.floor(clampedY / 32);
+    const newChunkX = Math.floor(clampedX / this.CHUNK_SIZE);
+    const newChunkY = Math.floor(clampedY / this.CHUNK_SIZE);
 
     // Track chunk visits for agents with spatial memory
     const currentPos = impl.getComponent<PositionComponent>(CT.Position);
@@ -332,9 +343,8 @@ export class MovementSystem extends BaseSystem {
       ? worldWithTerrain.getChunkManager()
       : undefined;
     if (chunkManager) {
-      const CHUNK_SIZE = 32;
-      const chunkX = Math.floor(x / CHUNK_SIZE);
-      const chunkY = Math.floor(y / CHUNK_SIZE);
+      const chunkX = Math.floor(x / this.CHUNK_SIZE);
+      const chunkY = Math.floor(y / this.CHUNK_SIZE);
       const chunk = chunkManager.getChunk(chunkX, chunkY);
       if (!chunk?.generated) {
         // Chunk not generated - skip tile collision checks (no invisible walls)
@@ -346,7 +356,7 @@ export class MovementSystem extends BaseSystem {
     // Check for water terrain (blocks land-based movement)
     if (typeof worldWithTerrain.getTerrainAt === 'function') {
       const terrain = worldWithTerrain.getTerrainAt(Math.floor(x), Math.floor(y));
-      if (terrain === 'water' || terrain === 'deep_water') {
+      if (collisionConfig.hardCollisions.terrainTypes.includes(terrain ?? '')) {
         return true;
       }
     }
@@ -356,10 +366,10 @@ export class MovementSystem extends BaseSystem {
       const targetTile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
 
       if (targetTile) {
-        // Check for walls - block if construction >= 50% (per VOXEL_BUILDING_SPEC.md)
+        // Check for walls - block if construction >= threshold (per VOXEL_BUILDING_SPEC.md)
         if (targetTile.wall) {
           const progress = targetTile.wall.constructionProgress ?? 100;
-          if (progress >= 50) {
+          if (progress >= this.WALL_CONSTRUCTION_THRESHOLD) {
             return true;
           }
         }
@@ -367,7 +377,7 @@ export class MovementSystem extends BaseSystem {
         // Check for windows - always block movement (even partially built)
         if (targetTile.window) {
           const progress = targetTile.window.constructionProgress ?? 100;
-          if (progress >= 50) {
+          if (progress >= this.WINDOW_CONSTRUCTION_THRESHOLD) {
             return true;
           }
         }
@@ -375,7 +385,7 @@ export class MovementSystem extends BaseSystem {
         // Check for doors - block if closed or locked (open doors allow passage)
         if (targetTile.door) {
           const progress = targetTile.door.constructionProgress ?? 100;
-          if (progress >= 50) {
+          if (progress >= this.DOOR_CONSTRUCTION_THRESHOLD) {
             if (targetTile.door.state === 'closed' || targetTile.door.state === 'locked') {
               return true;
             }
@@ -396,9 +406,9 @@ export class MovementSystem extends BaseSystem {
               targetTile.elevation !== undefined) {
             const elevationDiff = Math.abs(targetTile.elevation - currentTile.elevation);
 
-            // Block movement if elevation change is too steep (more than 2 levels)
+            // Block movement if elevation change is too steep
             // This prevents entities from falling into deep basins or climbing cliffs
-            if (elevationDiff > 2) {
+            if (elevationDiff > this.MAX_ELEVATION_DIFFERENCE) {
               return true;
             }
           }
@@ -426,8 +436,9 @@ export class MovementSystem extends BaseSystem {
       const dy = building.y - y;
       // Use squared distance to avoid sqrt
       const distanceSquared = dx * dx + dy * dy;
+      const radiusSquared = this.BUILDING_COLLISION_RADIUS * this.BUILDING_COLLISION_RADIUS;
 
-      if (distanceSquared < 0.25) { // 0.5 * 0.5 = 0.25
+      if (distanceSquared < radiusSquared) {
         return true;
       }
     }
@@ -450,13 +461,12 @@ export class MovementSystem extends BaseSystem {
     y: number
   ): number {
     let penalty = 1.0;
-    const softCollisionRadius = 0.8; // Start slowing at this distance
-    const minPenalty = 0.2; // Never slow below 20% speed
-    const CHUNK_SIZE = 32;
+    const softCollisionRadius = this.SOFT_COLLISION_RADIUS;
+    const minPenalty = this.SOFT_COLLISION_MIN_PENALTY;
 
     // Calculate current chunk
-    const chunkX = Math.floor(x / CHUNK_SIZE);
-    const chunkY = Math.floor(y / CHUNK_SIZE);
+    const chunkX = Math.floor(x / this.CHUNK_SIZE);
+    const chunkY = Math.floor(y / this.CHUNK_SIZE);
 
     // Check current chunk and adjacent chunks (3x3 grid = 9 chunks)
     for (let dx = -1; dx <= 1; dx++) {

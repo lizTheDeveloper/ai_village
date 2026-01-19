@@ -17,7 +17,7 @@ import {
   type ResourceInitOptions,
   type TerminalEffect,
 } from '../CostCalculator.js';
-import type { MagicCostType } from '../MagicParadigm.js';
+import type { MagicCostType } from '../../MagicParadigm.js';
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 
 /**

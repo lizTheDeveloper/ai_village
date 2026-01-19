@@ -18,9 +18,9 @@ export class ChunkLoadingSystem extends BaseSystem {
   readonly priority = 5; // Run early, after TimeSystem
   readonly requiredComponents: string[] = [];
 
-  // Throttle to every 10 ticks (500ms at 20 TPS) for visual mode
-  // Camera scrolling doesn't need every-tick updates
-  protected readonly throttleInterval = THROTTLE.FAST;
+  // Throttle to every 50 ticks (2.5s at 20 TPS) - chunk loading is background work
+  // Camera scrolling and agent movement are slow enough that this is sufficient
+  protected readonly throttleInterval = THROTTLE.MEDIUM;
 
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
@@ -29,7 +29,15 @@ export class ChunkLoadingSystem extends BaseSystem {
 
   /** Additional throttling for headless mode - agents don't move fast enough to need every-tick checks */
   private lastHeadlessUpdateTick = 0;
-  private readonly HEADLESS_UPDATE_INTERVAL = 20; // 1 second at 20 TPS
+  private readonly HEADLESS_UPDATE_INTERVAL = 100; // 5 seconds at 20 TPS - agents move slowly
+
+  // Zero-allocation reusable working objects
+  private readonly workingChunkCoords = { chunkX: 0, chunkY: 0 };
+
+  // Cache for deduplication (avoids repeated queueChunk calls for same chunks)
+  private readonly queuedChunksCache = new Set<string>();
+  private lastCacheClearTick = 0;
+  private readonly CACHE_CLEAR_INTERVAL = 200; // Clear cache every 10 seconds
 
   constructor(
     chunkManager: ChunkManager,
@@ -49,11 +57,17 @@ export class ChunkLoadingSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Periodic cache cleanup to prevent unbounded growth
+    if (ctx.tick - this.lastCacheClearTick >= this.CACHE_CLEAR_INTERVAL) {
+      this.queuedChunksCache.clear();
+      this.lastCacheClearTick = ctx.tick;
+    }
+
     const viewport = this.viewportProvider?.();
 
     if (viewport) {
       // Visual mode: load chunks in viewport
-      this.loadChunksInViewport(ctx.world, viewport);
+      this.loadChunksInViewport(ctx.world, viewport, ctx.tick);
     } else {
       // Headless mode: load chunks around agents
       this.loadChunksAroundAgents(ctx);
@@ -69,17 +83,29 @@ export class ChunkLoadingSystem extends BaseSystem {
    */
   private loadChunksInViewport(
     world: World,
-    viewport: { x: number; y: number; width: number; height: number }
+    viewport: { x: number; y: number; width: number; height: number },
+    currentTick: number
   ): void {
     const cameraTileX = viewport.x / this.tileSize;
     const cameraTileY = viewport.y / this.tileSize;
 
     const { loaded } = this.chunkManager.updateLoadedChunks(cameraTileX, cameraTileY);
 
+    // Early exit: no chunks to load
+    if (loaded.length === 0) {
+      return;
+    }
+
     const generator = world.getBackgroundChunkGenerator();
 
     for (const chunk of loaded) {
       if (!chunk.generated) {
+        // Deduplication: skip if already queued this cache period
+        const chunkKey = this.getChunkKey(chunk.x, chunk.y);
+        if (this.queuedChunksCache.has(chunkKey)) {
+          continue;
+        }
+
         if (generator) {
           // Background generation (LOW priority for camera scroll)
           // Smooth, lag-free experience when chunks are ready in advance
@@ -89,6 +115,9 @@ export class ChunkLoadingSystem extends BaseSystem {
             priority: 'LOW',
             requestedBy: 'camera_scroll'
           });
+
+          // Mark as queued to avoid duplicate requests
+          this.queuedChunksCache.add(chunkKey);
         } else {
           // Fallback: Generate immediately if no background generator
           // This ensures terrain always appears, even without BackgroundChunkGenerator
@@ -114,34 +143,70 @@ export class ChunkLoadingSystem extends BaseSystem {
 
     // For headless: ensure chunks exist around all agents
     const agents = ctx.world.query().with('agent', 'position').executeEntities();
+
+    // Early exit: no agents to process
+    if (agents.length === 0) {
+      return;
+    }
+
     const generator = ctx.world.getBackgroundChunkGenerator();
 
     for (const agent of agents) {
       const pos = agent.getComponent<PositionComponent>('position');
       if (!pos) continue;
 
-      const chunkX = Math.floor(pos.x / CHUNK_SIZE);
-      const chunkY = Math.floor(pos.y / CHUNK_SIZE);
+      // Use reusable working object to avoid allocation
+      this.workingChunkCoords.chunkX = Math.floor(pos.x / CHUNK_SIZE);
+      this.workingChunkCoords.chunkY = Math.floor(pos.y / CHUNK_SIZE);
 
       // Load 3x3 grid around agent
       for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
-          const cx = chunkX + dx;
-          const cy = chunkY + dy;
+          const cx = this.workingChunkCoords.chunkX + dx;
+          const cy = this.workingChunkCoords.chunkY + dy;
 
-          if (!this.chunkManager.hasChunk(cx, cy)) {
+          // Early exit: chunk already exists
+          if (this.chunkManager.hasChunk(cx, cy)) {
+            const chunk = this.chunkManager.getChunk(cx, cy);
+            if (chunk.generated) {
+              continue;
+            }
+
+            // Chunk exists but not generated - queue it
+            const chunkKey = this.getChunkKey(cx, cy);
+            if (this.queuedChunksCache.has(chunkKey)) {
+              continue; // Already queued
+            }
+
+            if (generator) {
+              generator.queueChunk({
+                chunkX: cx,
+                chunkY: cy,
+                priority: 'LOW',
+                requestedBy: 'headless_agent'
+              });
+              this.queuedChunksCache.add(chunkKey);
+            } else {
+              this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
+            }
+          } else {
+            // Chunk doesn't exist - create and queue
             const chunk = this.chunkManager.getChunk(cx, cy);
             if (chunk && !chunk.generated) {
+              const chunkKey = this.getChunkKey(cx, cy);
+              if (this.queuedChunksCache.has(chunkKey)) {
+                continue; // Already queued
+              }
+
               if (generator) {
-                // Background generation (LOW priority for headless mode)
                 generator.queueChunk({
                   chunkX: cx,
                   chunkY: cy,
                   priority: 'LOW',
                   requestedBy: 'headless_agent'
                 });
+                this.queuedChunksCache.add(chunkKey);
               } else {
-                // Fallback: Generate immediately if no background generator
                 this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
               }
             }
@@ -149,5 +214,13 @@ export class ChunkLoadingSystem extends BaseSystem {
         }
       }
     }
+  }
+
+  /**
+   * Get chunk key for deduplication cache.
+   * Reuses string template to minimize allocations.
+   */
+  private getChunkKey(chunkX: number, chunkY: number): string {
+    return `${chunkX},${chunkY}`;
   }
 }

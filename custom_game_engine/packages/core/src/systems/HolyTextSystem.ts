@@ -58,6 +58,20 @@ export class HolyTextSystem extends BaseSystem {
   private config: HolyTextConfig;
   private holyTexts: Map<string, HolyTextData> = new Map();
 
+  // Performance optimization: deity entity cache
+  private deityCache = new Map<string, DeityComponent>();
+  private lastCacheUpdate = 0;
+  private readonly CACHE_REFRESH_INTERVAL = 100; // Refresh deity cache every 5 seconds
+
+  // Performance optimization: track deities with texts (avoid repeated filtering)
+  private deitiesWithTexts = new Set<string>();
+
+  // Performance optimization: precomputed constants
+  private readonly MIN_BELIEVERS_FOR_TEXT = 5;
+
+  // Performance optimization: reusable working arrays
+  private readonly workingTeachings: string[] = [];
+
   constructor(config: Partial<HolyTextConfig> = {}) {
     super();
     this.config = { ...DEFAULT_HOLY_TEXT_CONFIG, ...config };
@@ -66,59 +80,122 @@ export class HolyTextSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
+    // Refresh deity cache periodically
+    if (currentTick - this.lastCacheUpdate >= this.CACHE_REFRESH_INTERVAL) {
+      this.rebuildDeityCache(ctx.world);
+      this.lastCacheUpdate = currentTick;
+    }
+
+    // Early exit: no deities exist
+    if (this.deityCache.size === 0) {
+      return;
+    }
+
     // Check if any deity needs canonical texts
     this.checkForTextGeneration(ctx.world, currentTick);
   }
 
   /**
-   * Check if deities need holy texts
+   * Rebuild deity cache from world entities
    */
-  private checkForTextGeneration(world: World, currentTick: number): void {
-    // Deities are ALWAYS simulated entities, so we iterate all
+  private rebuildDeityCache(world: World): void {
+    this.deityCache.clear();
+
     for (const entity of world.entities.values()) {
       if (!entity.components.has(CT.Deity)) continue;
 
       const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
-      if (!deity) continue;
-
-      // Check if deity has enough believers and no texts yet
-      if (deity.believers.size >= 5) {
-        const textsForDeity = Array.from(this.holyTexts.values())
-          .filter(t => t.deityId === entity.id);
-
-        if (textsForDeity.length === 0) {
-          this.generateFoundingText(entity.id, deity, currentTick);
-        }
+      if (deity) {
+        this.deityCache.set(entity.id, deity);
       }
     }
   }
 
   /**
-   * Generate a founding holy text for a deity
+   * Check if deities need holy texts (optimized)
    */
-  private generateFoundingText(
+  private checkForTextGeneration(world: World, currentTick: number): void {
+    // Use cached deity list
+    for (const [deityId, deity] of this.deityCache) {
+      // Early exit: already has text
+      if (this.deitiesWithTexts.has(deityId)) continue;
+
+      // Early exit: not enough believers
+      if (deity.believers.size < this.MIN_BELIEVERS_FOR_TEXT) continue;
+
+      // Generate founding text
+      this.generateFoundingTextOptimized(deityId, deity, currentTick);
+
+      // Mark as having text (avoid repeated checks)
+      this.deitiesWithTexts.add(deityId);
+    }
+  }
+
+  /**
+   * Generate a founding holy text for a deity (optimized)
+   */
+  private generateFoundingTextOptimized(
     deityId: string,
     deity: DeityComponent,
     currentTick: number
   ): void {
-    // Create a simple founding text
+    // Get first believer (zero allocation approach)
+    let firstBeliever = 'unknown';
+    for (const believerId of deity.believers) {
+      firstBeliever = believerId;
+      break;
+    }
+
+    // Generate teachings inline (reuse working array)
+    this.workingTeachings.length = 0;
+    const domain = deity.identity.domain ?? 'mystery';
+    const name = deity.identity.primaryName;
+
+    this.workingTeachings.push(`Honor ${name}`);
+    this.workingTeachings.push(`Respect the ways of ${domain}`);
+    this.workingTeachings.push('Maintain faith in times of trial');
+    this.workingTeachings.push('Share blessings with fellow believers');
+
+    // Generate content inline
+    const templateIndex = Math.floor(Math.random() * 3);
+    let content: string;
+    if (templateIndex === 0) {
+      content = `In the beginning, ${name} watched over the ${domain}. Through faith, we are blessed.`;
+    } else if (templateIndex === 1) {
+      content = `${name} is the guardian of ${domain}, protector of the faithful.`;
+    } else {
+      content = `Let it be known that ${name} guides those who walk the path of ${domain}.`;
+    }
+
+    // Create text (single allocation)
     const text: HolyTextData = {
       id: `text_${deityId}_${Date.now()}`,
-      title: `The Book of ${deity.identity.primaryName}`,
+      title: `The Book of ${name}`,
       deityId,
-      authorAgentId: Array.from(deity.believers)[0] ?? 'unknown',
-      content: this.generateFoundingContent(deity),
+      authorAgentId: firstBeliever,
+      content,
       writtenAt: currentTick,
       canonicity: 0.8,
       mythsReferenced: [],
-      teachingsContained: this.generateTeachings(deity),
+      teachingsContained: [...this.workingTeachings], // Copy working array
     };
 
     this.holyTexts.set(text.id, text);
   }
 
   /**
-   * Generate founding text content
+   * Generate a founding holy text for a deity (deprecated - use generateFoundingTextOptimized)
+   */
+  private generateFoundingText(
+    deityId: string,
+    deity: DeityComponent,
+    currentTick: number
+  ): void {
+    this.generateFoundingTextOptimized(deityId, deity, currentTick);
+  }
+
+  /**
+   * Generate founding text content (deprecated - inlined into generateFoundingTextOptimized)
    */
   private generateFoundingContent(deity: DeityComponent): string {
     const domain = deity.identity.domain ?? 'mystery';
@@ -134,7 +211,7 @@ export class HolyTextSystem extends BaseSystem {
   }
 
   /**
-   * Generate core teachings
+   * Generate core teachings (deprecated - inlined into generateFoundingTextOptimized)
    */
   private generateTeachings(deity: DeityComponent): string[] {
     const domain = deity.identity.domain ?? 'mystery';

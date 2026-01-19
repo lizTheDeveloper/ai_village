@@ -1,0 +1,661 @@
+{
+  "skillIds": [
+    "building",
+    "architecture",
+    "farming",
+    "gathering",
+    "cooking",
+    "crafting",
+    "social",
+    "exploration",
+    "combat",
+    "hunting",
+    "stealth",
+    "animal_handling",
+    "medicine",
+    "research",
+    "magic"
+  ],
+  "skillLevelNames": {
+    "0": "Untrained",
+    "1": "Novice",
+    "2": "Apprentice",
+    "3": "Journeyman",
+    "4": "Expert",
+    "5": "Master"
+  },
+  "skillLevelLabels": {
+    "0": "Untrained",
+    "1": "Novice",
+    "2": "Apprentice",
+    "3": "Journeyman",
+    "4": "Expert",
+    "5": "Master"
+  },
+  "xpPerLevel": {
+    "0": 0,
+    "1": 100,
+    "2": 300,
+    "3": 700,
+    "4": 1500,
+    "5": 3000
+  },
+  "skillIcons": {
+    "building": "🏗️",
+    "architecture": "🏛️",
+    "farming": "🌾",
+    "gathering": "🪓",
+    "cooking": "🍳",
+    "crafting": "🔨",
+    "social": "💬",
+    "exploration": "🧭",
+    "combat": "⚔️",
+    "hunting": "🏹",
+    "stealth": "🥷",
+    "animal_handling": "🐾",
+    "medicine": "💊",
+    "research": "📚",
+    "magic": "✨"
+  },
+  "skillNames": {
+    "building": "Building",
+    "architecture": "Architecture",
+    "farming": "Farming",
+    "gathering": "Gathering",
+    "cooking": "Cooking",
+    "crafting": "Crafting",
+    "social": "Social",
+    "exploration": "Exploration",
+    "combat": "Combat",
+    "hunting": "Hunting",
+    "stealth": "Stealth",
+    "animal_handling": "Animal Handling",
+    "medicine": "Medicine",
+    "research": "Research",
+    "magic": "Magic"
+  },
+  "skillPrerequisites": {
+    "gathering": [],
+    "exploration": [],
+    "social": [],
+    "magic": [],
+    "farming": [
+      {
+        "skill": "gathering",
+        "level": 1
+      }
+    ],
+    "building": [
+      {
+        "skill": "gathering",
+        "level": 1
+      }
+    ],
+    "combat": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "hunting": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "stealth": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "animal_handling": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "research": [
+      {
+        "skill": "social",
+        "level": 1
+      }
+    ],
+    "cooking": [
+      {
+        "skill": "gathering",
+        "level": 2
+      },
+      {
+        "skill": "farming",
+        "level": 1
+      }
+    ],
+    "crafting": [
+      {
+        "skill": "gathering",
+        "level": 2
+      },
+      {
+        "skill": "building",
+        "level": 1
+      }
+    ],
+    "medicine": [
+      {
+        "skill": "gathering",
+        "level": 2
+      },
+      {
+        "skill": "farming",
+        "level": 1
+      }
+    ],
+    "architecture": [
+      {
+        "skill": "building",
+        "level": 2
+      }
+    ]
+  },
+  "skillPerceptionRadius": {
+    "0": 5,
+    "1": 15,
+    "2": 30,
+    "3": 50,
+    "4": 100,
+    "5": 200
+  },
+  "skillSynergies": [
+    {
+      "id": "farm_to_table",
+      "name": "Farm to Table",
+      "skills": [
+        "gathering",
+        "farming",
+        "cooking"
+      ],
+      "description": "+10% quality for food-related actions, 10% XP sharing",
+      "qualityBonus": 0.1,
+      "xpSharing": 0.1,
+      "speedBonus": 0
+    },
+    {
+      "id": "master_builder",
+      "name": "Master Builder",
+      "skills": [
+        "gathering",
+        "building",
+        "crafting"
+      ],
+      "description": "+15% build speed, 10% material efficiency",
+      "qualityBonus": 0,
+      "xpSharing": 0.1,
+      "speedBonus": 0.15
+    },
+    {
+      "id": "nature_affinity",
+      "name": "Nature Affinity",
+      "skills": [
+        "exploration",
+        "gathering",
+        "animal_handling"
+      ],
+      "description": "Animals less likely to flee, +10% movement speed in wilderness",
+      "qualityBonus": 0,
+      "xpSharing": 0.1,
+      "speedBonus": 0.1
+    },
+    {
+      "id": "caretaker",
+      "name": "Caretaker",
+      "skills": [
+        "social",
+        "cooking",
+        "medicine"
+      ],
+      "description": "+25% healing effectiveness, meals give mood boost",
+      "qualityBonus": 0.15,
+      "xpSharing": 0.1,
+      "speedBonus": 0
+    },
+    {
+      "id": "battle_medic",
+      "name": "Battle Medic",
+      "skills": [
+        "combat",
+        "crafting",
+        "medicine"
+      ],
+      "description": "Can craft combat items, +30% self-healing",
+      "qualityBonus": 0.1,
+      "xpSharing": 0.1,
+      "speedBonus": 0
+    },
+    {
+      "id": "hunter",
+      "name": "Hunter",
+      "skills": [
+        "combat",
+        "cooking",
+        "hunting"
+      ],
+      "description": "Expert butchering and meat processing, +15% hunting/butchering quality",
+      "qualityBonus": 0.15,
+      "xpSharing": 0.1,
+      "speedBonus": 0.1
+    },
+    {
+      "id": "wandering_healer",
+      "name": "Wandering Healer",
+      "skills": [
+        "exploration",
+        "social",
+        "medicine"
+      ],
+      "description": "Discover remedies while exploring, spread knowledge socially",
+      "qualityBonus": 0,
+      "xpSharing": 0.15,
+      "speedBonus": 0.1
+    }
+  ],
+  "skillSpecializations": {
+    "cooking": [
+      "baking",
+      "grilling",
+      "stewing",
+      "preservation"
+    ],
+    "crafting": [
+      "woodworking",
+      "smithing",
+      "leatherworking",
+      "weaving"
+    ],
+    "building": [
+      "masonry",
+      "carpentry",
+      "thatching",
+      "plumbing"
+    ],
+    "architecture": [
+      "feng_shui",
+      "layout_planning",
+      "proportion_design",
+      "element_balance"
+    ],
+    "farming": [
+      "irrigation",
+      "composting",
+      "seed_selection",
+      "greenhouse"
+    ],
+    "gathering": [
+      "foraging",
+      "mining",
+      "logging",
+      "fishing"
+    ],
+    "animal_handling": [
+      "taming",
+      "training",
+      "breeding",
+      "veterinary"
+    ],
+    "medicine": [
+      "herbalism",
+      "surgery",
+      "diagnosis",
+      "first_aid"
+    ],
+    "social": [
+      "negotiation",
+      "leadership",
+      "teaching",
+      "entertainment"
+    ],
+    "exploration": [
+      "navigation",
+      "survival",
+      "cartography",
+      "climbing"
+    ],
+    "combat": [
+      "melee",
+      "ranged",
+      "defense",
+      "tactics"
+    ],
+    "hunting": [
+      "tracking",
+      "archery",
+      "trapping",
+      "butchering"
+    ],
+    "stealth": [
+      "sneaking",
+      "hiding",
+      "silent_movement",
+      "camouflage"
+    ],
+    "research": [
+      "theory",
+      "experimentation",
+      "documentation",
+      "analysis"
+    ],
+    "magic": [
+      "evocation",
+      "enchantment",
+      "divination",
+      "transmutation"
+    ]
+  },
+  "entityVisibilityMap": {
+    "berry_bush": [],
+    "tree": [],
+    "rock": [],
+    "branch": [],
+    "stone": [],
+    "hidden_berry_patch": [
+      {
+        "skill": "gathering",
+        "level": 2
+      }
+    ],
+    "clay_deposit": [
+      {
+        "skill": "gathering",
+        "level": 2
+      }
+    ],
+    "quality_wood_tree": [
+      {
+        "skill": "gathering",
+        "level": 3
+      }
+    ],
+    "underground_root": [
+      {
+        "skill": "gathering",
+        "level": 4
+      }
+    ],
+    "wild_onion": [
+      {
+        "skill": "cooking",
+        "level": 2
+      }
+    ],
+    "edible_flower": [
+      {
+        "skill": "cooking",
+        "level": 2
+      }
+    ],
+    "honey_source": [
+      {
+        "skill": "cooking",
+        "level": 2
+      }
+    ],
+    "medicinal_root": [
+      {
+        "skill": "cooking",
+        "level": 3
+      }
+    ],
+    "spice_plant": [
+      {
+        "skill": "cooking",
+        "level": 3
+      }
+    ],
+    "truffle": [
+      {
+        "skill": "cooking",
+        "level": 4
+      }
+    ],
+    "saffron_plant": [
+      {
+        "skill": "cooking",
+        "level": 4
+      }
+    ],
+    "iron_ore": [
+      {
+        "skill": "building",
+        "level": 2
+      }
+    ],
+    "sand_deposit": [
+      {
+        "skill": "building",
+        "level": 2
+      }
+    ],
+    "copper_ore": [
+      {
+        "skill": "building",
+        "level": 3
+      }
+    ],
+    "tin_deposit": [
+      {
+        "skill": "building",
+        "level": 3
+      }
+    ],
+    "quality_stone": [
+      {
+        "skill": "building",
+        "level": 3
+      }
+    ],
+    "gold_vein": [
+      {
+        "skill": "building",
+        "level": 4
+      }
+    ],
+    "gem_deposit": [
+      {
+        "skill": "building",
+        "level": 4
+      }
+    ],
+    "wheat_stalk": [
+      {
+        "skill": "farming",
+        "level": 1
+      }
+    ],
+    "carrot_plant": [
+      {
+        "skill": "farming",
+        "level": 1
+      }
+    ],
+    "herb_patch": [
+      {
+        "skill": "farming",
+        "level": 2
+      }
+    ],
+    "potato_plant": [
+      {
+        "skill": "farming",
+        "level": 2
+      }
+    ],
+    "medicinal_plant": [
+      {
+        "skill": "farming",
+        "level": 3
+      }
+    ],
+    "flax": [
+      {
+        "skill": "farming",
+        "level": 3
+      }
+    ],
+    "rare_herb": [
+      {
+        "skill": "farming",
+        "level": 4
+      }
+    ],
+    "soil_quality_indicator": [
+      {
+        "skill": "farming",
+        "level": 4
+      }
+    ],
+    "exotic_vegetable": [
+      {
+        "skill": "farming",
+        "level": 4
+      }
+    ],
+    "path": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "clearing": [
+      {
+        "skill": "exploration",
+        "level": 1
+      }
+    ],
+    "hidden_path": [
+      {
+        "skill": "exploration",
+        "level": 2
+      }
+    ],
+    "shelter_spot": [
+      {
+        "skill": "exploration",
+        "level": 2
+      }
+    ],
+    "danger_zone": [
+      {
+        "skill": "exploration",
+        "level": 2
+      }
+    ],
+    "ancient_ruin": [
+      {
+        "skill": "exploration",
+        "level": 4
+      }
+    ],
+    "rare_biome": [
+      {
+        "skill": "exploration",
+        "level": 4
+      }
+    ],
+    "secret_location": [
+      {
+        "skill": "exploration",
+        "level": 5
+      }
+    ],
+    "chicken": [
+      {
+        "skill": "animal_handling",
+        "level": 1
+      }
+    ],
+    "pig": [
+      {
+        "skill": "animal_handling",
+        "level": 1
+      }
+    ],
+    "sheep": [
+      {
+        "skill": "animal_handling",
+        "level": 1
+      }
+    ],
+    "wild_tameable": [
+      {
+        "skill": "animal_handling",
+        "level": 2
+      }
+    ],
+    "nest": [
+      {
+        "skill": "animal_handling",
+        "level": 2
+      }
+    ],
+    "breeding_compatibility": [
+      {
+        "skill": "animal_handling",
+        "level": 4
+      }
+    ],
+    "rare_creature": [
+      {
+        "skill": "animal_handling",
+        "level": 5
+      }
+    ],
+    "hidden_den": [
+      {
+        "skill": "animal_handling",
+        "level": 5
+      }
+    ],
+    "aloe": [
+      {
+        "skill": "medicine",
+        "level": 1
+      }
+    ],
+    "healing_flower": [
+      {
+        "skill": "medicine",
+        "level": 2
+      }
+    ],
+    "medicinal_mushroom": [
+      {
+        "skill": "medicine",
+        "level": 2
+      }
+    ],
+    "rare_remedy": [
+      {
+        "skill": "medicine",
+        "level": 3
+      }
+    ],
+    "antidote_source": [
+      {
+        "skill": "medicine",
+        "level": 3
+      }
+    ],
+    "disease_vector": [
+      {
+        "skill": "medicine",
+        "level": 4
+      }
+    ],
+    "contamination_source": [
+      {
+        "skill": "medicine",
+        "level": 4
+      }
+    ]
+  }
+}

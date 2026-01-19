@@ -197,25 +197,55 @@ export class MidwiferySystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
-    const deltaTicks = currentTick - this.lastMidwiferyUpdateTick;
-    this.lastMidwiferyUpdateTick = currentTick;
+
+    // OPTIMIZATION 1: Throttling - only update every UPDATE_INTERVAL ticks
+    if (currentTick - this.lastUpdate < this.UPDATE_INTERVAL) return;
+
+    const deltaTicks = currentTick - this.lastUpdate;
+    this.lastUpdate = currentTick;
 
     if (deltaTicks <= 0) return;
 
+    // OPTIMIZATION 2: Early exit - skip if no reproductive activity
+    if (
+      this.pregnancyCache.size === 0 &&
+      this.laborCache.size === 0 &&
+      this.postpartumCache.size === 0 &&
+      this.infantCache.size === 0 &&
+      this.nursingCache.size === 0
+    ) {
+      return;
+    }
+
+    // Rebuild caches periodically to sync with entity changes (every 10 updates = 50 seconds)
+    if (currentTick % (this.UPDATE_INTERVAL * 10) === 0) {
+      this.rebuildCaches(ctx.world);
+    }
+
     // Update all pregnant entities
-    this.updatePregnancies(ctx.world, currentTick, deltaTicks);
+    if (this.pregnancyCache.size > 0) {
+      this.updatePregnancies(ctx.world, currentTick, deltaTicks);
+    }
 
     // Update all entities in labor
-    this.updateLabors(ctx.world, currentTick, deltaTicks);
+    if (this.laborCache.size > 0) {
+      this.updateLabors(ctx.world, currentTick, deltaTicks);
+    }
 
     // Update postpartum recovery
-    this.updatePostpartum(ctx.world, deltaTicks);
+    if (this.postpartumCache.size > 0) {
+      this.updatePostpartum(ctx.world, deltaTicks);
+    }
 
     // Update infants
-    this.updateInfants(ctx.world, currentTick, deltaTicks);
+    if (this.infantCache.size > 0) {
+      this.updateInfants(ctx.world, currentTick, deltaTicks);
+    }
 
     // Update nursing mothers
-    this.updateNursing(ctx.world, currentTick, deltaTicks);
+    if (this.nursingCache.size > 0) {
+      this.updateNursing(ctx.world, currentTick, deltaTicks);
+    }
   }
 
   // =========================================================================
@@ -271,6 +301,9 @@ export class MidwiferySystem extends BaseSystem {
 
     impl.addComponent(pregnancy);
 
+    // Add to pregnancy cache
+    this.pregnancyCache.set(mother.id, pregnancy);
+
     this.events.emitGeneric({
       type: 'midwifery:pregnancy_started',
       source: data.pregnantAgentId,
@@ -284,14 +317,19 @@ export class MidwiferySystem extends BaseSystem {
   }
 
   /**
-   * Update all pregnancies
+   * Update all pregnancies (OPTIMIZED: uses cache for O(1) access)
    */
   private updatePregnancies(world: World, currentTick: Tick, deltaTicks: number): void {
-    for (const entity of world.entities.values()) {
-      const impl = entity as EntityImpl;
-      const pregnancy = impl.getComponent<PregnancyComponent>('pregnancy');
+    // OPTIMIZATION: Iterate over cached pregnancies instead of all entities
+    for (const [entityId, pregnancy] of this.pregnancyCache) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was deleted, remove from cache
+        this.pregnancyCache.delete(entityId);
+        continue;
+      }
 
-      if (!pregnancy) continue;
+      const impl = entity as EntityImpl;
 
       // Update pregnancy state using updateComponent (defensive against deserialized components)
       impl.updateComponent<PregnancyComponent>('pregnancy', (current) => {
@@ -379,6 +417,9 @@ export class MidwiferySystem extends BaseSystem {
       if (isReadyForLabor && !impl.hasComponent(ComponentType.Labor)) {
         this.startLabor(impl, updatedPregnancy, currentTick);
       }
+
+      // Update cache with latest component state
+      this.pregnancyCache.set(entityId, updatedPregnancy);
     }
   }
 
@@ -401,6 +442,10 @@ export class MidwiferySystem extends BaseSystem {
 
     mother.addComponent(labor);
 
+    // Update caches: remove from pregnancy, add to labor
+    this.pregnancyCache.delete(mother.id);
+    this.laborCache.set(mother.id, labor);
+
     this.events.emitGeneric({
       type: 'midwifery:labor_started',
       source: mother.id,
@@ -418,14 +463,19 @@ export class MidwiferySystem extends BaseSystem {
   // =========================================================================
 
   /**
-   * Update all active labors
+   * Update all active labors (OPTIMIZED: uses cache for O(1) access)
    */
   private updateLabors(world: World, currentTick: Tick, deltaTicks: number): void {
-    for (const entity of world.entities.values()) {
-      const impl = entity as EntityImpl;
-      const labor = impl.getComponent<LaborComponent>('labor');
+    // OPTIMIZATION: Iterate over cached labors instead of all entities
+    for (const [entityId, labor] of this.laborCache) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was deleted, remove from cache
+        this.laborCache.delete(entityId);
+        continue;
+      }
 
-      if (!labor) continue;
+      const impl = entity as EntityImpl;
 
       // Update labor progression using updateComponent (defensive against deserialized components)
       impl.updateComponent<LaborComponent>('labor', (current) => {
@@ -458,11 +508,15 @@ export class MidwiferySystem extends BaseSystem {
           c => !c.treated && (c.severity === 'emergency' || c.severity === 'critical')
         );
 
-        if (untreatedCritical && Math.random() < UNTREATED_MORTALITY_RATE * deltaTicks / (20 * 60)) {
+        if (untreatedCritical && Math.random() < UNTREATED_MORTALITY_RATE * deltaTicks / this.ticksPerMinute) {
           this.handleMaternalDeath(impl, updatedLabor, 'untreated_complication');
+          this.laborCache.delete(entityId); // Remove from cache
           return;
         }
       }
+
+      // Update cache with latest component state
+      this.laborCache.set(entityId, updatedLabor);
     }
   }
 
@@ -621,6 +675,10 @@ export class MidwiferySystem extends BaseSystem {
     // Remove pregnancy and labor components
     mother.removeComponent('pregnancy');
     mother.removeComponent('labor');
+
+    // Update caches: remove from labor
+    this.laborCache.delete(mother.id);
+    this.pregnancyCache.delete(mother.id); // Just to be safe
   }
 
   /**
@@ -698,6 +756,9 @@ export class MidwiferySystem extends BaseSystem {
     );
     childImpl.addComponent(infantComp);
 
+    // Add to infant cache
+    this.infantCache.set(child.id, infantComp);
+
     return child;
   }
 
@@ -723,6 +784,10 @@ export class MidwiferySystem extends BaseSystem {
     // Add nursing component
     const nursing = createNursingComponent(currentTick, infantId);
     mother.addComponent(nursing);
+
+    // Update caches
+    this.postpartumCache.set(mother.id, postpartum);
+    this.nursingCache.set(mother.id, nursing);
   }
 
   /**
@@ -788,16 +853,21 @@ export class MidwiferySystem extends BaseSystem {
   // =========================================================================
 
   /**
-   * Update postpartum recovery
+   * Update postpartum recovery (OPTIMIZED: uses cache + precomputed ticksPerDay)
    */
   private updatePostpartum(world: World, deltaTicks: number): void {
-    const deltaDays = deltaTicks / (20 * 60 * 24); // Rough conversion
+    const deltaDays = deltaTicks / this.ticksPerDay; // Use precomputed constant
 
-    for (const entity of world.entities.values()) {
+    // OPTIMIZATION: Iterate over cached postpartum instead of all entities
+    for (const [entityId, postpartum] of this.postpartumCache) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was deleted, remove from cache
+        this.postpartumCache.delete(entityId);
+        continue;
+      }
+
       const impl = entity as EntityImpl;
-      const postpartum = impl.getComponent<PostpartumComponent>('postpartum');
-
-      if (!postpartum) continue;
 
       // Update postpartum using updateComponent (defensive against deserialized components)
       impl.updateComponent<PostpartumComponent>('postpartum', (current) => {
@@ -812,27 +882,36 @@ export class MidwiferySystem extends BaseSystem {
       // Check for full recovery
       if (updatedPostpartum.fullyRecovered) {
         impl.removeComponent('postpartum');
+        this.postpartumCache.delete(entityId); // Remove from cache
 
         this.events.emitGeneric({
           type: 'midwifery:recovery_complete',
           source: entity.id,
           data: { motherId: entity.id },
         } as any);
+      } else {
+        // Update cache with latest component state
+        this.postpartumCache.set(entityId, updatedPostpartum);
       }
     }
   }
 
   /**
-   * Update nursing mothers
+   * Update nursing mothers (OPTIMIZED: uses cache + precomputed ticksPerDay)
    */
   private updateNursing(world: World, currentTick: Tick, deltaTicks: number): void {
-    const deltaDays = deltaTicks / (20 * 60 * 24);
+    const deltaDays = deltaTicks / this.ticksPerDay; // Use precomputed constant
 
-    for (const entity of world.entities.values()) {
+    // OPTIMIZATION: Iterate over cached nursing instead of all entities
+    for (const [entityId, nursing] of this.nursingCache) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was deleted, remove from cache
+        this.nursingCache.delete(entityId);
+        continue;
+      }
+
       const impl = entity as EntityImpl;
-      const nursing = impl.getComponent<NursingComponent>('nursing');
-
-      if (!nursing) continue;
 
       // Get mother's hunger for nutrition calculation
       const needs = impl.components.get('needs') as { hunger?: number } | undefined;
@@ -851,21 +930,30 @@ export class MidwiferySystem extends BaseSystem {
       // If no longer lactating, remove component
       if (!updatedNursing.lactating && updatedNursing.getInfantCount() === 0) {
         impl.removeComponent('nursing');
+        this.nursingCache.delete(entityId); // Remove from cache
+      } else {
+        // Update cache with latest component state
+        this.nursingCache.set(entityId, updatedNursing);
       }
     }
   }
 
   /**
-   * Update infants
+   * Update infants (OPTIMIZED: uses cache + precomputed ticksPerDay)
    */
   private updateInfants(world: World, currentTick: Tick, deltaTicks: number): void {
-    const deltaDays = deltaTicks / (20 * 60 * 24);
+    const deltaDays = deltaTicks / this.ticksPerDay; // Use precomputed constant
 
-    for (const entity of world.entities.values()) {
+    // OPTIMIZATION: Iterate over cached infants instead of all entities
+    for (const [entityId, infant] of this.infantCache) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was deleted, remove from cache
+        this.infantCache.delete(entityId);
+        continue;
+      }
+
       const impl = entity as EntityImpl;
-      const infant = impl.getComponent<InfantComponent>('infant');
-
-      if (!infant) continue;
 
       // Update infant using updateComponent (defensive against deserialized components)
       impl.updateComponent<InfantComponent>('infant', (current) => {
@@ -885,12 +973,16 @@ export class MidwiferySystem extends BaseSystem {
       // Check if infant has matured
       if (updatedInfant.hasMaturated()) {
         impl.removeComponent('infant');
+        this.infantCache.delete(entityId); // Remove from cache
 
         this.events.emitGeneric({
           type: 'midwifery:infant_matured',
           source: entity.id,
           data: { childId: entity.id, ageDays: infant.ageDays },
         } as any);
+      } else {
+        // Update cache with latest component state
+        this.infantCache.set(entityId, updatedInfant);
       }
     }
   }

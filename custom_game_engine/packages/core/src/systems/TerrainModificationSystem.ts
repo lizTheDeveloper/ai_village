@@ -115,7 +115,12 @@ export class TerrainModificationSystem extends BaseSystem {
 
   private config: TerrainPowerConfig;
   private modifications: Map<string, TerrainModification> = new Map();
-  private lastUpdate: number = 0;
+
+  // Precomputed cost lookup tables (avoid repeated calculations)
+  private readonly baseCostLookup: Map<TerrainModificationType, number> = new Map();
+
+  // Reusable working objects (zero allocation)
+  private readonly workingDistanceCalc = { dx: 0, dy: 0, distSq: 0 };
 
   constructor(config: Partial<TerrainPowerConfig> = {}) {
     super();
@@ -126,17 +131,27 @@ export class TerrainModificationSystem extends BaseSystem {
     };
   }
 
-  protected onUpdate(ctx: SystemContext): void {
-    const currentTick = ctx.tick;
+  protected onInitialize(): void {
+    // Precompute base costs for all power types
+    const types: TerrainModificationType[] = [
+      'raise_land', 'lower_land', 'create_water', 'drain_water',
+      'grow_forest', 'clear_forest', 'fertilize_soil', 'blight_soil',
+      'create_mountain', 'create_valley', 'sacred_grove', 'cursed_ground'
+    ];
 
-    if (currentTick - this.lastUpdate < this.config.updateInterval) {
+    for (const type of types) {
+      this.baseCostLookup.set(type, this.config.powerCosts[type]);
+    }
+  }
+
+  protected onUpdate(ctx: SystemContext): void {
+    // Early exit: no modifications to process
+    if (this.modifications.size === 0) {
       return;
     }
 
-    this.lastUpdate = currentTick;
-
     // Process ongoing terrain modifications
-    this.processModifications(ctx.world, currentTick);
+    this.processModifications(ctx.world, ctx.tick);
   }
 
   /**
@@ -202,17 +217,19 @@ export class TerrainModificationSystem extends BaseSystem {
   }
 
   /**
-   * Calculate cost for a modification
+   * Calculate cost for a modification (optimized with lookup table)
    */
   private calculateCost(
     type: TerrainModificationType,
     radius: number,
     magnitude: number
   ): number {
-    const baseCost = this.config.powerCosts[type];
+    // Use precomputed base cost
+    const baseCost = this.baseCostLookup.get(type)!;
 
-    // Scale by radius (quadratic)
-    const radiusCost = baseCost * (radius / 5) * (radius / 5);
+    // Scale by radius (quadratic) - avoid division in hot path
+    const radiusScale = radius * 0.2; // radius / 5
+    const radiusCost = baseCost * radiusScale * radiusScale;
 
     // Scale by magnitude
     const magnitudeCost = radiusCost * magnitude;
@@ -257,10 +274,18 @@ export class TerrainModificationSystem extends BaseSystem {
   }
 
   /**
-   * Process ongoing modifications
+   * Process ongoing modifications (optimized single-pass iteration)
    */
   private processModifications(_world: World, currentTick: number): void {
-    for (const modification of this.modifications.values()) {
+    // Early exit: no modifications
+    if (this.modifications.size === 0) {
+      return;
+    }
+
+    // Single pass: check for expiration (use Array.from for ES5 compatibility)
+    const modificationsArray = Array.from(this.modifications.values());
+    for (const modification of modificationsArray) {
+      // Skip non-active modifications
       if (modification.status !== 'active') continue;
 
       // Check if temporary modification should expire
@@ -291,17 +316,39 @@ export class TerrainModificationSystem extends BaseSystem {
   }
 
   /**
-   * Get modifications in an area
+   * Get modifications in an area (optimized with squared distance)
    */
   getModificationsInArea(
     location: { x: number; y: number },
     radius: number
   ): TerrainModification[] {
-    return Array.from(this.modifications.values()).filter(m => {
-      const dx = m.location.x - location.x;
-      const dy = m.location.y - location.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= radius + m.radius;
-    });
+    // Early exit: no modifications
+    if (this.modifications.size === 0) {
+      return [];
+    }
+
+    const results: TerrainModification[] = [];
+    const radiusSq = radius * radius;
+
+    // Use Array.from for ES5 compatibility
+    const modificationsArray = Array.from(this.modifications.values());
+    for (const m of modificationsArray) {
+      // Use reusable working object to avoid allocations
+      this.workingDistanceCalc.dx = m.location.x - location.x;
+      this.workingDistanceCalc.dy = m.location.y - location.y;
+      this.workingDistanceCalc.distSq =
+        this.workingDistanceCalc.dx * this.workingDistanceCalc.dx +
+        this.workingDistanceCalc.dy * this.workingDistanceCalc.dy;
+
+      // Use squared distance to avoid sqrt (expensive)
+      const combinedRadius = radius + m.radius;
+      const combinedRadiusSq = combinedRadius * combinedRadius;
+
+      if (this.workingDistanceCalc.distSq <= combinedRadiusSq) {
+        results.push(m);
+      }
+    }
+
+    return results;
   }
 }

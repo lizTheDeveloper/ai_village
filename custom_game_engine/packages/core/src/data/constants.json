@@ -1,0 +1,258 @@
+{
+  "time": {
+    "ticksPerSecond": 20,
+    "gameDaySeconds": 48,
+    "ticksPerHour": 1200,
+    "ticksPerDay": 28800,
+    "dawnStartHour": 5,
+    "dayStartHour": 7,
+    "duskStartHour": 17,
+    "nightStartHour": 19,
+    "lightLevelNight": 0.3,
+    "lightLevelDawnDusk": 0.7,
+    "lightLevelDay": 0.9
+  },
+  "actionDurations": {
+    "tillDurationWithHoe": 200,
+    "tillDurationWithShovel": 250,
+    "tillDurationByHand": 400,
+    "harvestDurationBase": 160,
+    "gatherSeedsDuration": 100,
+    "tradeDuration": 40,
+    "gatherResourceBaseTicks": 20,
+    "gatherSpeedPerSkillLevel": 0.2
+  },
+  "behaviorIntervals": {
+    "monologueInterval": 300,
+    "observeMaxDuration": 400,
+    "practiceMaxDuration": 500,
+    "reflectMaxDuration": 200
+  },
+  "combatDurations": {
+    "min": 300,
+    "base": 500,
+    "extended": 700,
+    "lethal": 900
+  },
+  "sleep": {
+    "minHours": 4,
+    "maxHours": 12,
+    "forcedThreshold": 85,
+    "tiredThreshold": 70,
+    "wellRestedThreshold": 30,
+    "qualityShelter": 0.5,
+    "qualityHouse": 0.4,
+    "qualityBed": 0.2,
+    "qualityLuxury": 0.1,
+    "qualityMin": 0.1,
+    "qualityMax": 1.0,
+    "completeEnergy": 1.0,
+    "interruptHunger": 0.1,
+    "interruptEnergy": 0.7
+  },
+  "systemIntervals": {
+    "marketEventCheckInterval": 2400,
+    "cleanlinessUpdateInterval": 86400
+  },
+  "gameplay": {
+    "baseSeedYieldHarvest": 20,
+    "baseSeedYieldGather": 10,
+    "baseFruitYield": 3,
+    "skillYieldMultiplierBase": 0.5,
+    "skillYieldMultiplierScale": 1.5,
+    "skillLevelHarvestThreshold": 5,
+    "marketEventChance": 0.1,
+    "marketEventDurationMinDays": 1,
+    "marketEventDurationMaxDays": 5,
+    "marketShortageMultiplierMin": 1.5,
+    "marketShortageMultiplierMax": 2.5,
+    "marketSurplusMultiplierMin": 0.5,
+    "marketSurplusMultiplierMax": 0.8,
+    "mutationChance": 0.1,
+    "mutationMagnitude": 0.1,
+    "inheritanceVarianceMin": 0.9,
+    "inheritanceVarianceMax": 1.1,
+    "spawnCountMin": 1,
+    "spawnCountMax": 3,
+    "spawnCountHerd": 2,
+    "soilFertilityMin": 60,
+    "soilFertilityMax": 80,
+    "soilMoistureMin": 40,
+    "soilMoistureMax": 70,
+    "hydrationThreshold": 50
+  },
+  "needs": {
+    "hungerThresholdSeekFood": 0.7,
+    "hungerRestoredDefault": 0.25,
+    "energyCritical": 0.1,
+    "energyLow": 0.3,
+    "energyModerate": 0.5,
+    "energyHigh": 0.7,
+    "energyFull": 1.0,
+    "workSpeedCritical": 0.5,
+    "workSpeedLow": 0.75,
+    "workSpeedModerate": 0.9,
+    "workSpeedNormal": 1.0,
+    "healthCritical": 0.2,
+    "healthDamageRate": 0.5,
+    "cleanlinessWarning": 30,
+    "cleanlinessPenalty": 50,
+    "stressPenaltyMultiplier": 0.01,
+    "bodyTempNormal": 37,
+    "worldTempBase": 18,
+    "tempDailyVariation": 4,
+    "thermalChangeRate": 0.15,
+    "moodDecayRate": 0.01
+  },
+  "spatial": {
+    "diagonalDistance": 1.4142135623730951,
+    "adjacentDistance": 1.5,
+    "interactionDistance": 2.0,
+    "gatherMaxRange": 50,
+    "homeRadius": 15,
+    "harvestDistance": 1.5,
+    "tillSearchRadius": 10,
+    "plantSearchRadius": 15,
+    "waterSearchRadius": 15,
+    "tamingRange": 40,
+    "housingRange": 50,
+    "shopSearchRadius": 50,
+    "craftStationSearchRadius": 30,
+    "followMinDistance": 3,
+    "followMaxDistance": 5,
+    "meetingArrivalThreshold": 2.0,
+    "placementSearchRadius": 10,
+    "adjacentBuildingCheck": 2,
+    "verificationRange": 5,
+    "claimAgeThreshold": 200
+  },
+  "ai": {
+    "llmCooldownTicks": 1200,
+    "defaultThinkInterval": 20,
+    "visionRangeTiles": 500,
+    "hearingRangeTiles": 50,
+    "interactionRangeTiles": 2.0,
+    "randomGatherChance": 0.15
+  },
+  "social": {
+    "nearbyAgentRange": 30,
+    "maxMeetingSize": 6,
+    "minTrustForSharing": 0.3,
+    "shoutRange": 100,
+    "conversationRange": 5
+  },
+  "farming": {
+    "defaultFarmingSkill": 50,
+    "seedGatheringRange": 2.0,
+    "wateringRange": 2.0,
+    "tillingRange": 2.0
+  },
+  "movement": {
+    "slowWalkSpeed": 33,
+    "defaultMoveSpeed": 83,
+    "briskWalkSpeed": 133,
+    "runSpeed": 250,
+    "sprintSpeed": 417,
+    "horseWalkSpeed": 100,
+    "horseTrotSpeed": 250,
+    "horseGallopSpeed": 667,
+    "destinationThreshold": 2.0,
+    "maxPathfindingRadius": 5000,
+    "localPathfindingRadius": 500
+  },
+  "behaviorPriorities": {
+    "criticalSurvival": 100,
+    "danger": 95,
+    "high": 80,
+    "important": 60,
+    "moderate": 40,
+    "low": 20,
+    "default": 10
+  },
+  "plantStages": {
+    "seed": "seed",
+    "seedling": "seedling",
+    "growing": "growing",
+    "mature": "mature",
+    "seeding": "seeding",
+    "senescence": "senescence",
+    "dead": "dead"
+  },
+  "relationships": {
+    "tiers": {
+      "stranger": {
+        "minFamiliarity": 0,
+        "maxFamiliarity": 10
+      },
+      "acquaintance": {
+        "minFamiliarity": 11,
+        "maxFamiliarity": 30
+      },
+      "friend": {
+        "minFamiliarity": 31,
+        "maxFamiliarity": 60
+      },
+      "closeFriend": {
+        "minFamiliarity": 61,
+        "maxFamiliarity": 85
+      },
+      "family": {
+        "minFamiliarity": 86,
+        "maxFamiliarity": 100
+      }
+    },
+    "affordances": {
+      "stranger": {
+        "canObserve": true,
+        "canTalk": true,
+        "canAskHelp": false,
+        "canBorrowTools": false,
+        "canDelegateTasks": false,
+        "canLearnSkills": false,
+        "canShareStorage": false,
+        "description": "You don't know them yet"
+      },
+      "acquaintance": {
+        "canObserve": true,
+        "canTalk": true,
+        "canAskHelp": false,
+        "canBorrowTools": false,
+        "canDelegateTasks": false,
+        "canLearnSkills": true,
+        "canShareStorage": false,
+        "description": "You've met before"
+      },
+      "friend": {
+        "canObserve": true,
+        "canTalk": true,
+        "canAskHelp": true,
+        "canBorrowTools": true,
+        "canDelegateTasks": false,
+        "canLearnSkills": true,
+        "canShareStorage": false,
+        "description": "A friend who helps when asked"
+      },
+      "closeFriend": {
+        "canObserve": true,
+        "canTalk": true,
+        "canAskHelp": true,
+        "canBorrowTools": true,
+        "canDelegateTasks": true,
+        "canLearnSkills": true,
+        "canShareStorage": true,
+        "description": "A close friend who shares resources"
+      },
+      "family": {
+        "canObserve": true,
+        "canTalk": true,
+        "canAskHelp": true,
+        "canBorrowTools": true,
+        "canDelegateTasks": true,
+        "canLearnSkills": true,
+        "canShareStorage": true,
+        "skillBonus": 0.1,
+        "description": "Family - automatic cooperation"
+      }
+    }
+  }
+}

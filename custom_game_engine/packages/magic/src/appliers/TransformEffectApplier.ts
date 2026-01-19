@@ -7,7 +7,7 @@
  * - Material changes (petrify, gaseous form)
  */
 
-import type { Entity } from '@ai-village/core';
+import type { Entity, Component } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type {
   TransformEffect,

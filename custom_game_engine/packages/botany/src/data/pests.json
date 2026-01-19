@@ -1,0 +1,181 @@
+[
+  {
+    "id": "aphids",
+    "name": "Aphids",
+    "type": "aphids",
+    "description": "Small sap-sucking insects that cluster on new growth",
+    "targetCategories": ["crop", "herb", "flower"],
+    "repelledBy": ["garlic", "chives", "marigold"],
+    "spawnChance": 0.05,
+    "minPopulation": 5,
+    "maxPopulation": 100,
+    "breedingRate": 1.5,
+    "migrationRadius": 3,
+    "migrationChance": 0.2,
+    "damagePerPestPerDay": 0.1,
+    "consumesYield": false,
+    "yieldDamagePercent": 0.02,
+    "targetPlantPart": "leaves",
+    "seasonalActivity": ["spring", "summer"],
+    "favoredConditions": {
+      "minTemperature": 15,
+      "maxTemperature": 30
+    },
+    "controls": [
+      { "itemId": "insecticidal_soap", "killEffectiveness": 0.9, "repelEffectiveness": 0.3 },
+      { "itemId": "neem_oil", "killEffectiveness": 0.7, "repelEffectiveness": 0.5 },
+      { "companionPlant": "marigold", "killEffectiveness": 0, "repelEffectiveness": 0.6, "radius": 2 },
+      { "predator": "ladybug", "killEffectiveness": 0.8, "repelEffectiveness": 0 }
+    ],
+    "visualEffect": "aphid_clusters"
+  },
+  {
+    "id": "caterpillars",
+    "name": "Caterpillars",
+    "type": "caterpillars",
+    "description": "Leaf-eating larvae that can defoliate plants",
+    "targetCategories": ["crop", "tree", "herb"],
+    "repelledBy": ["dill", "fennel", "basil"],
+    "spawnChance": 0.03,
+    "minPopulation": 2,
+    "maxPopulation": 20,
+    "breedingRate": 0.5,
+    "migrationRadius": 2,
+    "migrationChance": 0.1,
+    "damagePerPestPerDay": 0.5,
+    "consumesYield": true,
+    "yieldDamagePercent": 0.1,
+    "targetPlantPart": "leaves",
+    "seasonalActivity": ["spring", "summer", "fall"],
+    "favoredConditions": {
+      "minTemperature": 10,
+      "maxTemperature": 35
+    },
+    "controls": [
+      { "itemId": "bt_spray", "killEffectiveness": 0.95, "repelEffectiveness": 0 },
+      { "actionType": "handpick", "killEffectiveness": 0.8, "repelEffectiveness": 0 },
+      { "predator": "bird", "killEffectiveness": 0.6, "repelEffectiveness": 0 }
+    ],
+    "visualEffect": "chewed_leaves"
+  },
+  {
+    "id": "slugs",
+    "name": "Slugs",
+    "type": "slugs",
+    "description": "Soft-bodied mollusks that feed at night",
+    "targetCategories": ["crop", "herb", "flower"],
+    "repelledBy": ["rosemary", "sage", "thyme"],
+    "spawnChance": 0.04,
+    "minPopulation": 3,
+    "maxPopulation": 30,
+    "breedingRate": 0.3,
+    "migrationRadius": 4,
+    "migrationChance": 0.15,
+    "damagePerPestPerDay": 0.4,
+    "consumesYield": true,
+    "yieldDamagePercent": 0.08,
+    "targetPlantPart": "all",
+    "seasonalActivity": ["spring", "summer", "fall"],
+    "favoredConditions": {
+      "minTemperature": 5,
+      "maxTemperature": 25,
+      "rain": true,
+      "nightActive": true
+    },
+    "controls": [
+      { "itemId": "slug_bait", "killEffectiveness": 0.85, "repelEffectiveness": 0.2 },
+      { "itemId": "copper_barrier", "killEffectiveness": 0, "repelEffectiveness": 0.9, "radius": 1 },
+      { "actionType": "handpick", "killEffectiveness": 0.7, "repelEffectiveness": 0 },
+      { "predator": "duck", "killEffectiveness": 0.7, "repelEffectiveness": 0 }
+    ],
+    "visualEffect": "slime_trails"
+  },
+  {
+    "id": "beetles",
+    "name": "Beetles",
+    "type": "beetles",
+    "description": "Hard-shelled insects that chew leaves and roots",
+    "targetCategories": ["crop", "tree"],
+    "preferredSpecies": ["potato", "tomato", "eggplant"],
+    "repelledBy": ["catnip", "tansy"],
+    "spawnChance": 0.03,
+    "minPopulation": 3,
+    "maxPopulation": 40,
+    "breedingRate": 0.4,
+    "migrationRadius": 5,
+    "migrationChance": 0.2,
+    "damagePerPestPerDay": 0.3,
+    "consumesYield": false,
+    "yieldDamagePercent": 0.05,
+    "targetPlantPart": "leaves",
+    "seasonalActivity": ["summer"],
+    "favoredConditions": {
+      "minTemperature": 20,
+      "maxTemperature": 35
+    },
+    "controls": [
+      { "itemId": "pyrethrin", "killEffectiveness": 0.75, "repelEffectiveness": 0.4 },
+      { "actionType": "handpick", "killEffectiveness": 0.6, "repelEffectiveness": 0 },
+      { "buildingId": "beetle_trap", "killEffectiveness": 0.5, "repelEffectiveness": 0, "radius": 3 }
+    ],
+    "visualEffect": "beetle_damage"
+  },
+  {
+    "id": "birds",
+    "name": "Birds",
+    "type": "birds",
+    "description": "Birds that eat seeds and ripe fruits",
+    "targetCategories": ["crop", "tree"],
+    "preferredSpecies": ["berry", "grape", "cherry", "sunflower"],
+    "spawnChance": 0.08,
+    "minPopulation": 1,
+    "maxPopulation": 10,
+    "breedingRate": 0,
+    "migrationRadius": 20,
+    "migrationChance": 0.5,
+    "damagePerPestPerDay": 0,
+    "consumesYield": true,
+    "yieldDamagePercent": 0.15,
+    "targetPlantPart": "fruit",
+    "seasonalActivity": ["spring", "summer", "fall"],
+    "favoredConditions": {
+      "nightActive": false
+    },
+    "controls": [
+      { "buildingId": "scarecrow", "killEffectiveness": 0, "repelEffectiveness": 0.7, "radius": 5 },
+      { "itemId": "bird_netting", "killEffectiveness": 0, "repelEffectiveness": 0.95, "radius": 0 },
+      { "itemId": "reflective_tape", "killEffectiveness": 0, "repelEffectiveness": 0.5, "radius": 3 }
+    ],
+    "visualEffect": "pecked_fruit"
+  },
+  {
+    "id": "rodents",
+    "name": "Rodents",
+    "type": "rodents",
+    "description": "Mice and rats that gnaw roots and eat seeds",
+    "targetCategories": ["crop"],
+    "preferredSpecies": ["corn", "wheat", "carrot", "potato"],
+    "repelledBy": ["mint", "lavender"],
+    "spawnChance": 0.02,
+    "minPopulation": 2,
+    "maxPopulation": 15,
+    "breedingRate": 0.6,
+    "migrationRadius": 8,
+    "migrationChance": 0.3,
+    "damagePerPestPerDay": 0.6,
+    "consumesYield": true,
+    "yieldDamagePercent": 0.2,
+    "targetPlantPart": "roots",
+    "seasonalActivity": ["spring", "summer", "fall", "winter"],
+    "favoredConditions": {
+      "nightActive": true
+    },
+    "controls": [
+      { "predator": "cat", "killEffectiveness": 0.8, "repelEffectiveness": 0.5 },
+      { "predator": "owl", "killEffectiveness": 0.7, "repelEffectiveness": 0.3 },
+      { "buildingId": "rodent_trap", "killEffectiveness": 0.6, "repelEffectiveness": 0, "radius": 2 },
+      { "companionPlant": "mint", "killEffectiveness": 0, "repelEffectiveness": 0.4, "radius": 2 }
+    ],
+    "visualEffect": "gnaw_marks"
+  }
+]

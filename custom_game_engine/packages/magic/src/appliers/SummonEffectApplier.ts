@@ -5,7 +5,7 @@
  * and despawning them when effects expire.
  */
 
-import type { Entity } from '@ai-village/core';
+import type { Entity, Component } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type {
   SummonEffect,
@@ -94,7 +94,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        summonedEntity.addComponent(positionComponent as unknown as ComponentClassOrString);
+        summonedEntity.addComponent(positionComponent as unknown as Component);
 
         // Set owner if controllable
         if (effect.controllable) {

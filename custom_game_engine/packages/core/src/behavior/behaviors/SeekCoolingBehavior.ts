@@ -22,6 +22,7 @@ import type { World } from '../../ecs/World.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
+import type { TemperatureComponent } from '../../components/TemperatureComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
@@ -51,10 +52,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    interface TemperatureComponent {
-      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold' | 'warm' | 'cool';
-    }
-    const temperature = entity.getComponent(ComponentType.Temperature) as TemperatureComponent | undefined;
+    const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
 
     if (!temperature) {
       // No temperature component
@@ -99,7 +97,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
     // Re-check comfort after potentially finding/using cached cooling source
     // Agent might have cooled down while fleeing/moving
-    if (temperature.state === 'comfortable') {
+    const currentTemp = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+    if (currentTemp && currentTemp.state === 'comfortable') {
       this.stopAllMovement(entity);
       this.complete(entity);
       return { complete: true, reason: 'Cooled down while seeking' };
@@ -108,7 +107,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
     // Check if we're already in the cooling zone
     const inCoolingRange = this.isInCoolingRange(coolingSource, position);
 
-    if (inCoolingRange && temperature.state === 'comfortable') {
+    if (inCoolingRange && currentTemp && currentTemp.state === 'comfortable') {
       // Actually comfortable - stay in the cool area and complete
       this.stopAllMovement(entity);
       this.complete(entity);
@@ -556,10 +555,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
     } else {
       // No heat sources detected but still hot - just move in a random direction
       // This handles cases where heat comes from non-building sources
-      interface TemperatureComponent {
-        state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
-      }
-      const temperature = entity.getComponent(ComponentType.Temperature) as TemperatureComponent | undefined;
+      const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
       if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
         // Use persistent escape direction here too
         const state = this.getState(entity);
@@ -619,10 +615,7 @@ const MIN_ESCAPE_DISTANCE = 20; // Minimum distance before picking new escape di
  * @example registerBehaviorWithContext('seek_cooling', seekCoolingBehaviorWithContext);
  */
 export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  interface TemperatureComponent {
-    state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold' | 'warm' | 'cool';
-  }
-  const temperature = ctx.getComponent(CT.Temperature) as TemperatureComponent | undefined;
+  const temperature = ctx.getComponent<TemperatureComponent>(CT.Temperature);
 
   if (!temperature) {
     return ctx.complete('No temperature component');
@@ -656,7 +649,8 @@ export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBeh
   }
 
   // Re-check comfort after potentially finding/using cached cooling source
-  if (temperature.state === 'comfortable') {
+  const currentTemp = ctx.getComponent<TemperatureComponent>(CT.Temperature);
+  if (currentTemp && currentTemp.state === 'comfortable') {
     ctx.stopMovement();
     return ctx.complete('Cooled down while seeking');
   }
@@ -664,7 +658,7 @@ export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBeh
   // Check if we're already in the cooling zone
   const inCoolingRange = isInCoolingRangeWithContext(ctx, coolingSource);
 
-  if (inCoolingRange && temperature.state === 'comfortable') {
+  if (inCoolingRange && currentTemp && currentTemp.state === 'comfortable') {
     ctx.stopMovement();
     return ctx.complete('Cooled down in cooling range');
   } else if (inCoolingRange) {
@@ -939,10 +933,7 @@ function fleeHeatSourcesWithContext(ctx: BehaviorContext): void {
     }
   } else {
     // No heat sources detected but still hot
-    interface TemperatureComponent {
-      state?: 'dangerously_hot' | 'hot' | 'comfortable' | 'cold' | 'dangerously_cold';
-    }
-    const temperature = ctx.getComponent(CT.Temperature) as TemperatureComponent | undefined;
+    const temperature = ctx.getComponent<TemperatureComponent>(CT.Temperature);
     if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
       let escapeAngle = ctx.getState<number>('escapeAngle');
       const escapeStartX = ctx.getState<number>('escapeStartX');

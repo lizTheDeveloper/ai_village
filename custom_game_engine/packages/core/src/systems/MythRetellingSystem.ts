@@ -31,9 +31,22 @@ export class MythRetellingSystem extends BaseSystem {
   public readonly requiredComponents = [CT.Agent, CT.Spiritual] as const;
   // Only run when spiritual components exist (O(1) activation check)
   public readonly activationComponents = ['spiritual'] as const;
-  protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS (1-hour cooldowns make frequent checks unnecessary)
+  protected readonly throttleInterval = 100; // Every 100 ticks (5 seconds at 20 TPS)
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
+
+  // Performance optimizations
+  private lastUpdate = 0;
+  private readonly UPDATE_INTERVAL = 100; // Every 100 ticks (5 seconds)
+  private readonly RETELLING_COOLDOWN = 3600; // 1 hour in ticks (assuming 60 ticks/min)
+
+  // Cache for deity lookups (O(1) access)
+  private deityCache = new Map<string, { entity: Entity; mythology: MythologyComponent; deity: DeityComponent }>();
+
+  // Reusable working arrays (zero allocations)
+  private readonly workingNearbyAgents: Entity[] = [];
+  private readonly workingDeityInfo: Array<{ id: string; name: string; domain: string; popularity: number }> = [];
+  private readonly workingKnownMyths: Array<{ myth: Myth; deityEntity: Entity; mythology: MythologyComponent }> = [];
 
   protected async onInitialize(_world: World, eventBus: EventBus): Promise<void> {
     // Listen for attribution events
@@ -43,34 +56,41 @@ export class MythRetellingSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Throttling: Skip update if interval hasn't elapsed
+    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
+      return;
+    }
+    this.lastUpdate = ctx.world.tick;
+
     const currentTick = ctx.tick;
     // Use pre-filtered active entities (already filtered by SimulationScheduler)
     // Only process visible/nearby agents - myth retelling is a proximity-based interaction
     const believers = ctx.activeEntities;
 
-    if (believers.length === 0) return;
+    // Early exit: No believers to process
+    if (believers.length === 0) {
+      return;
+    }
 
-    // Get all deities for context
+    // Get all deities for context (with caching)
     const deities = ctx.world.query()
       .with(CT.Deity)
       .executeEntities();
-    const deityInfo = deities.map(d => {
-      const deity = d.components.get(CT.Deity) as DeityComponent;
-      return {
-        id: d.id,
-        name: deity.identity.primaryName,
-        domain: deity.identity.domain || 'unknown',
-        popularity: deity.believers.size,
-      };
-    });
+
+    // Early exit: No deities exist
+    if (deities.length === 0) {
+      return;
+    }
+
+    // Update deity cache and build deity info (reuse working array)
+    this._updateDeityCacheAndInfo(deities);
 
     // Process each believer for potential myth retelling
     for (const believer of believers) {
       // Check cooldown (don't retell too often)
       const lastRetelling = this.retellingCooldown.get(believer.id) || 0;
-      const RETELLING_COOLDOWN = 3600; // 1 hour in ticks (assuming 60 ticks/min)
 
-      if (currentTick - lastRetelling < RETELLING_COOLDOWN) {
+      if (currentTick - lastRetelling < this.RETELLING_COOLDOWN) {
         continue;
       }
 
@@ -79,14 +99,14 @@ export class MythRetellingSystem extends BaseSystem {
         continue;
       }
 
-      // Find myths this agent knows
-      const myths = this._findKnownMyths(believer, deities);
+      // Find myths this agent knows (reuses working array)
+      const myths = this._findKnownMythsCached(believer);
       if (myths.length === 0) continue;
 
       // Pick a random myth to retell
       const mythToRetell = myths[Math.floor(Math.random() * myths.length)]!;
 
-      // Find nearby agents to tell it to
+      // Find nearby agents to tell it to (reuses working array)
       const nearby = this._findNearbyAgents(believer, believers);
       if (nearby.length === 0) continue;
 
@@ -96,7 +116,7 @@ export class MythRetellingSystem extends BaseSystem {
         mythToRetell,
         nearby,
         deities,
-        deityInfo,
+        this.workingDeityInfo,
         currentTick,
         ctx.world
       );
@@ -107,30 +127,57 @@ export class MythRetellingSystem extends BaseSystem {
   }
 
   /**
-   * Find all myths known by this agent
+   * Update deity cache and deity info (reuses working array to avoid allocations)
    */
-  private _findKnownMyths(
-    agent: Entity,
-    deities: ReadonlyArray<Entity>
-  ): Array<{ myth: Myth; deityEntity: Entity; mythology: MythologyComponent }> {
-    const knownMyths: Array<{ myth: Myth; deityEntity: Entity; mythology: MythologyComponent }> = [];
+  private _updateDeityCacheAndInfo(deities: ReadonlyArray<Entity>): void {
+    // Clear caches
+    this.deityCache.clear();
+    this.workingDeityInfo.length = 0;
 
+    // Rebuild cache and info
     for (const deity of deities) {
+      const deityComp = deity.components.get(CT.Deity) as DeityComponent | undefined;
       const mythology = deity.components.get(CT.Mythology) as MythologyComponent | undefined;
-      if (!mythology) continue;
 
-      for (const myth of mythology.myths) {
+      if (deityComp && mythology) {
+        this.deityCache.set(deity.id, { entity: deity, mythology, deity: deityComp });
+
+        this.workingDeityInfo.push({
+          id: deity.id,
+          name: deityComp.identity.primaryName,
+          domain: deityComp.identity.domain || 'unknown',
+          popularity: deityComp.believers.size,
+        });
+      }
+    }
+  }
+
+  /**
+   * Find all myths known by this agent (using cache, reuses working array)
+   */
+  private _findKnownMythsCached(
+    agent: Entity
+  ): Array<{ myth: Myth; deityEntity: Entity; mythology: MythologyComponent }> {
+    // Clear working array (reuse instead of allocating new array)
+    this.workingKnownMyths.length = 0;
+
+    for (const [_deityId, cached] of this.deityCache.entries()) {
+      for (const myth of cached.mythology.myths) {
         if (myth.knownBy.includes(agent.id)) {
-          knownMyths.push({ myth, deityEntity: deity, mythology });
+          this.workingKnownMyths.push({
+            myth,
+            deityEntity: cached.entity,
+            mythology: cached.mythology
+          });
         }
       }
     }
 
-    return knownMyths;
+    return this.workingKnownMyths;
   }
 
   /**
-   * Find agents near the speaker
+   * Find agents near the speaker (reuses working array to avoid allocations)
    */
   private _findNearbyAgents(
     agent: Entity,
@@ -139,8 +186,11 @@ export class MythRetellingSystem extends BaseSystem {
     const position = agent.components.get(CT.Position) as PositionComponent | undefined;
     if (!position) return [];
 
-    const nearby: Entity[] = [];
+    // Clear working array (reuse instead of allocating new array)
+    this.workingNearbyAgents.length = 0;
+
     const CONVERSATION_RADIUS = 30; // Grid units
+    const CONVERSATION_RADIUS_SQ = CONVERSATION_RADIUS * CONVERSATION_RADIUS;
 
     for (const other of allAgents) {
       if (other.id === agent.id) continue;
@@ -152,12 +202,12 @@ export class MythRetellingSystem extends BaseSystem {
       const dy = otherPos.y - position.y;
       const distSq = dx * dx + dy * dy;
 
-      if (distSq <= CONVERSATION_RADIUS * CONVERSATION_RADIUS) {
-        nearby.push(other);
+      if (distSq <= CONVERSATION_RADIUS_SQ) {
+        this.workingNearbyAgents.push(other);
       }
     }
 
-    return nearby;
+    return this.workingNearbyAgents;
   }
 
   /**

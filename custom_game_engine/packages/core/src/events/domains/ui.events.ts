@@ -89,6 +89,25 @@ export interface UIEvents {
     content?: string;
     timestamp?: number;
   };
+
+  /** Panel opened */
+  'ui:panel:open': {
+    panelType?: string;
+    entityId?: EntityId | null;
+    data?: unknown;
+  };
+
+  /** Building placement opened */
+  'ui:building_placement:open': {
+    buildingType?: string;
+    position?: { x: number; y: number };
+  };
+
+  /** Camera focus */
+  'camera:focus': {
+    entityId?: EntityId;
+    position?: { x: number; y: number };
+  };
 }
 
 export type UIEventType = keyof UIEvents;

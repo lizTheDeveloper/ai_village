@@ -12,6 +12,7 @@ import {
   getAgent,
   getPosition,
 } from '@ai-village/core';
+import explorationConfig from '../../data/exploration-config.json';
 
 /**
  * ExplorationSystem manages frontier and spiral exploration algorithms
@@ -24,6 +25,12 @@ export class ExplorationSystem extends BaseSystem {
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private lastCoverageMilestone: Map<string, number> = new Map();
+
+  // Configuration constants from JSON
+  private readonly SECTOR_SIZE = explorationConfig.sectors.size;
+  private readonly TARGET_REACHED_DISTANCE = explorationConfig.targetReached.distance;
+  private readonly MILESTONES = explorationConfig.milestones;
+  private readonly SPIRAL_OFFSET_MULTIPLIER = explorationConfig.spiral.offsetMultiplier;
 
   /**
    * Helper to get typed exploration state from entity
@@ -108,7 +115,7 @@ export class ExplorationSystem extends BaseSystem {
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
       const distance = this._distance(position, currentTarget);
-      if (distance < 5) {
+      if (distance < this.TARGET_REACHED_DISTANCE) {
         // Target reached, clear it
         explorationState.currentTarget = undefined;
       }
@@ -167,7 +174,7 @@ export class ExplorationSystem extends BaseSystem {
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
       const distance = this._distance(position, currentTarget);
-      if (distance < 5) {
+      if (distance < this.TARGET_REACHED_DISTANCE) {
         // Target reached, get next spiral position
         explorationState.spiralStep = (explorationState.spiralStep ?? 0) + 1;
         const nextPos = this._getNextSpiralPosition(explorationState);
@@ -256,22 +263,23 @@ export class ExplorationSystem extends BaseSystem {
     let offsetY = 0;
 
     const sideLength = ring * 2;
+    const mult = this.SPIRAL_OFFSET_MULTIPLIER;
     if (posInRing < sideLength) {
       // East side
-      offsetX = ring * 16;
-      offsetY = (-ring + posInRing) * 16;
+      offsetX = ring * mult;
+      offsetY = (-ring + posInRing) * mult;
     } else if (posInRing < sideLength * 2) {
       // North side
-      offsetX = (ring - (posInRing - sideLength)) * 16;
-      offsetY = ring * 16;
+      offsetX = (ring - (posInRing - sideLength)) * mult;
+      offsetY = ring * mult;
     } else if (posInRing < sideLength * 3) {
       // West side
-      offsetX = -ring * 16;
-      offsetY = (ring - (posInRing - sideLength * 2)) * 16;
+      offsetX = -ring * mult;
+      offsetY = (ring - (posInRing - sideLength * 2)) * mult;
     } else {
       // South side
-      offsetX = (-ring + (posInRing - sideLength * 3)) * 16;
-      offsetY = -ring * 16;
+      offsetX = (-ring + (posInRing - sideLength * 3)) * mult;
+      offsetY = -ring * mult;
     }
 
     return {
@@ -287,8 +295,7 @@ export class ExplorationSystem extends BaseSystem {
     const coverage = this.calculateCoverage(entity);
     const lastMilestone = this.lastCoverageMilestone.get(entity.id) ?? 0;
 
-    const milestones = [0.25, 0.5, 0.75, 0.9];
-    for (const milestone of milestones) {
+    for (const milestone of this.MILESTONES) {
       if (coverage >= milestone && lastMilestone < milestone) {
         // Use emitImmediate for testing and immediate feedback
         const agentComp = getAgent(entity);
@@ -321,9 +328,9 @@ export class ExplorationSystem extends BaseSystem {
       throw new Error('ExplorationState component missing');
     }
     const explored = explorationState.exploredSectors ?? new Set();
-    const radius = explorationState.explorationRadius ?? 64;
+    const radius = explorationState.explorationRadius ?? explorationConfig.sectors.defaultExplorationRadius;
 
-    const radiusInSectors = Math.ceil(radius / 16);
+    const radiusInSectors = Math.ceil(radius / this.SECTOR_SIZE);
     const totalSectors = (radiusInSectors * 2 + 1) ** 2;
 
     return Math.min(1.0, explored.size / totalSectors);
@@ -334,8 +341,8 @@ export class ExplorationSystem extends BaseSystem {
    */
   worldToSector(worldPos: { x: number; y: number }): { x: number; y: number } {
     return {
-      x: Math.floor(worldPos.x / 16),
-      y: Math.floor(worldPos.y / 16),
+      x: Math.floor(worldPos.x / this.SECTOR_SIZE),
+      y: Math.floor(worldPos.y / this.SECTOR_SIZE),
     };
   }
 
@@ -344,8 +351,8 @@ export class ExplorationSystem extends BaseSystem {
    */
   sectorToWorld(sector: { x: number; y: number }): { x: number; y: number } {
     return {
-      x: sector.x * 16,
-      y: sector.y * 16,
+      x: sector.x * this.SECTOR_SIZE,
+      y: sector.y * this.SECTOR_SIZE,
     };
   }
 

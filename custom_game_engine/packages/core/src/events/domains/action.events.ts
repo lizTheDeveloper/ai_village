@@ -69,6 +69,44 @@ export interface ActionEvents {
     position?: { x: number; y: number };
     destination?: { x: number; y: number };
   };
+  'action:move': {
+    target: { x: number; y: number };
+    entities: EntityId[];
+  };
+  'action:follow': {
+    followerId: EntityId;
+    targetId: EntityId | null;
+  };
+  'action:enter_building': {
+    buildingId: EntityId | null;
+    agentId?: EntityId;
+    entities?: EntityId[];
+  };
+  'action:repair': {
+    buildingId: EntityId | null;
+  };
+  'action:demolish': {
+    buildingId: EntityId | null;
+  };
+  'action:assign_worker': {
+    buildingId: EntityId | null;
+    workerId: EntityId;
+  };
+  'action:set_priority': {
+    buildingId?: EntityId | null;
+    resourceId?: EntityId | null;
+    priority: number | string;
+  };
+  'action:place_waypoint': {
+    position: { x: number; y: number };
+  };
+  'action:create_group': {
+    entities: EntityId[];
+  };
+  'action:set_formation': {
+    groupId: EntityId;
+    formation: string;
+  };
 }
 export type ActionEventType = keyof ActionEvents;
 export type ActionEventData = ActionEvents[ActionEventType];

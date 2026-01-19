@@ -11,7 +11,7 @@
  * - Time factor bounds enforcement (0-10x)
  */
 
-import type { Entity, World } from '@ai-village/core';
+import type { Entity, World, Component } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
 import type {
   TemporalEffect,

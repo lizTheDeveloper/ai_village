@@ -11,11 +11,11 @@
  * This allows universe forking, time travel, and cross-universe comparisons.
  */
 
-import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
-import type { UniverseSnapshot } from '../persistence/types.js';
-import { worldSerializer } from '../persistence/WorldSerializer.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
+import type { World } from '@ai-village/core';
+import type { Entity } from '@ai-village/core';
+import type { UniverseSnapshot } from '@ai-village/persistence';
+import { worldSerializer } from '@ai-village/persistence';
+import { ComponentType as CT } from '@ai-village/core';
 
 /**
  * Types of canon events that trigger state snapshots
