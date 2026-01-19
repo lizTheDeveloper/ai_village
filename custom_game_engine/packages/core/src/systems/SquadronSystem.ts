@@ -38,18 +38,23 @@ export class SquadronSystem extends BaseSystem {
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
   // ========================================================================
+  // Performance Optimizations - Entity Caching
+  // ========================================================================
+
+  /**
+   * Ship entity cache - uses object literal for O(1) access
+   * PERF: Object literals are faster than Maps for string keys
+   */
+  private shipEntityCache: Record<string, EntityImpl | null> = Object.create(null);
+  private cacheValidTick = -1;
+  private readonly CACHE_LIFETIME = 60; // 3 seconds
+
+  // ========================================================================
   // Performance Optimizations - Reusable Objects
   // ========================================================================
 
   /**
-   * Ship entity cache - prevents repeated world.getEntity() calls
-   * Rebuilt each update cycle with only the ships we need
-   */
-  private shipEntityCache: Map<string, EntityImpl | null> = new Map();
-
-  /**
    * Reusable stats object - avoids allocation on every squadron update
-   * Reset before each use
    */
   private workingStats = {
     totalCrew: 0,
@@ -59,50 +64,66 @@ export class SquadronSystem extends BaseSystem {
 
   /**
    * Reusable ship type map - avoids creating new Record<> every update
-   * Cleared and reused instead of creating new object
    */
   private shipTypeMap: Map<string, number> = new Map();
 
+  // ========================================================================
+  // Performance Optimizations - Dirty Tracking
+  // ========================================================================
+
+  /** Track last squadron stats hash to skip unchanged squadrons */
+  private lastSquadronHash: Record<string, number> = Object.create(null);
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+    const squadronCount = ctx.activeEntities.length;
 
-    // Performance: Pre-cache all ship entities needed this tick
-    // This prevents O(n) world.getEntity() calls inside the squadron loop
-    this.rebuildShipCache(ctx.world, ctx.activeEntities);
+    // PERF: Fast exit if no squadrons
+    if (squadronCount === 0) return;
 
-    // Process each squadron
-    for (const squadronEntity of ctx.activeEntities) {
+    // PERF: Only rebuild cache periodically
+    if (tick - this.cacheValidTick > this.CACHE_LIFETIME) {
+      this.rebuildShipCache(ctx.world, ctx.activeEntities);
+      this.cacheValidTick = tick;
+    }
+
+    // PERF: Use indexed for-loop (faster than for-of)
+    for (let i = 0; i < squadronCount; i++) {
+      const squadronEntity = ctx.activeEntities[i];
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      // Performance: Early exit for empty squadrons
+      // PERF: Early exit for empty squadrons
       if (squadron.ships.shipIds.length === 0) continue;
 
       // Update squadron aggregate stats
       this.updateSquadronStats(ctx.world, squadronEntity as EntityImpl, squadron, tick);
 
-      // Check for formation bonuses (pure computation, no DOM or allocations)
+      // Check for formation bonuses (pure computation, no allocations)
       this.applyFormationEffects(squadron);
     }
   }
 
   /**
    * Build cache of all ship entities referenced by active squadrons
-   * This prevents repeated world.getEntity() lookups in the hot path
+   * PERF: Uses object literal for O(1) access
    */
   private rebuildShipCache(world: World, squadrons: ReadonlyArray<EntityImpl>): void {
-    this.shipEntityCache.clear();
+    // PERF: Clear by reassigning (faster than delete loop)
+    this.shipEntityCache = Object.create(null);
 
-    // Collect all unique ship IDs from all squadrons
-    for (const squadronEntity of squadrons) {
-      const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+    const count = squadrons.length;
+    for (let i = 0; i < count; i++) {
+      const squadron = squadrons[i].getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      for (const shipId of squadron.ships.shipIds) {
-        // Only lookup each ship once, even if it appears in multiple squadrons
-        if (!this.shipEntityCache.has(shipId)) {
-          const entity = world.getEntity(shipId);
-          this.shipEntityCache.set(shipId, entity as EntityImpl | null);
+      const shipIds = squadron.ships.shipIds;
+      const shipCount = shipIds.length;
+      for (let j = 0; j < shipCount; j++) {
+        const shipId = shipIds[j];
+        // PERF: Use 'in' check (faster for object literals)
+        if (!(shipId in this.shipEntityCache)) {
+          this.shipEntityCache[shipId] = world.getEntity(shipId) as EntityImpl | null;
         }
       }
     }
@@ -120,11 +141,11 @@ export class SquadronSystem extends BaseSystem {
 
   /**
    * Update squadron aggregate statistics from member ships
-   * Performance optimizations:
-   * - Uses cached ship entities (no repeated world.getEntity())
-   * - Reuses workingStats object (no allocation)
-   * - Reuses shipTypeMap (no Record<> creation)
-   * - Single component update at end (batched write)
+   * PERF optimizations:
+   * - Uses cached ship entities (object literal for O(1) access)
+   * - Indexed for-loops (faster than for-of)
+   * - Dirty tracking (skip unchanged squadrons)
+   * - Reusable working objects
    */
   private updateSquadronStats(
     world: World,
@@ -132,23 +153,25 @@ export class SquadronSystem extends BaseSystem {
     squadron: SquadronComponent,
     tick: number
   ): void {
-    // Performance: Reset reusable objects instead of allocating new ones
+    // PERF: Reset reusable objects
     this.resetWorkingStats();
     this.shipTypeMap.clear();
 
+    // PERF: Get ship IDs once, use indexed loop
+    const shipIds = squadron.ships.shipIds;
+    const shipCount = shipIds.length;
+
     // Gather stats from all ships using cached entities
-    for (const shipId of squadron.ships.shipIds) {
-      // Performance: Use cached entity lookup instead of world.getEntity()
-      const shipEntity = this.shipEntityCache.get(shipId);
+    for (let i = 0; i < shipCount; i++) {
+      const shipId = shipIds[i];
+      // PERF: Object literal lookup (faster than Map.get)
+      const shipEntity = this.shipEntityCache[shipId];
       if (!shipEntity) {
-        // Ship missing - emit warning
+        // Ship missing - emit warning (rare case)
         world.eventBus.emit({
           type: 'squadron:ship_missing',
           source: squadronEntity.id,
-          data: {
-            squadronId: squadron.squadronId,
-            missingShipId: shipId,
-          },
+          data: { squadronId: squadron.squadronId, missingShipId: shipId },
         });
         continue;
       }
@@ -165,7 +188,7 @@ export class SquadronSystem extends BaseSystem {
       // Combat strength (simplified: based on hull mass and integrity)
       this.workingStats.combatStrength += ship.hull.mass * ship.hull.integrity;
 
-      // Track ship types - Performance: Use Map for O(1) lookups
+      // Track ship types
       const shipType = ship.ship_type;
       this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + 1);
     }
@@ -175,13 +198,22 @@ export class SquadronSystem extends BaseSystem {
       ? this.workingStats.weightedCoherence / this.workingStats.totalCrew
       : 0;
 
-    // Convert Map to Record for component storage
+    // PERF: Create simple hash to detect changes
+    const currentHash = this.workingStats.totalCrew + Math.floor(averageCoherence * 1000) + Math.floor(this.workingStats.combatStrength);
+    const lastHash = this.lastSquadronHash[squadron.squadronId] ?? -1;
+
+    // PERF: Skip update if nothing changed
+    if (currentHash === lastHash) return;
+
+    this.lastSquadronHash[squadron.squadronId] = currentHash;
+
+    // Convert Map to Record only when actually updating
     const shipTypeBreakdown: Record<string, number> = {};
     for (const [type, count] of this.shipTypeMap) {
       shipTypeBreakdown[type] = count;
     }
 
-    // Performance: Single batched component update (not multiple writes)
+    // Single batched component update
     squadronEntity.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
       ...s,
       ships: {

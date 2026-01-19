@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { sharedArrayBufferPlugin } from './vite-sab-plugin.js';
 
 // Queue file path for pixellab daemon
 const QUEUE_FILE = path.resolve(__dirname, '../scripts/sprite-generation-queue.json');
@@ -15,6 +16,8 @@ export default defineConfig({
   envDir: path.resolve(__dirname, '..'),
 
   plugins: [
+    // SharedArrayBuffer support (COOP/COEP headers)
+    sharedArrayBufferPlugin(),
     {
       name: 'selective-cache-control',
       configureServer(server) {

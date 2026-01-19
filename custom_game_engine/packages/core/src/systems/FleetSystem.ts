@@ -38,10 +38,19 @@ export class FleetSystem extends BaseSystem {
 
   protected readonly throttleInterval = 40; // Every 2 seconds at 20 TPS
 
-  // PERF: Cache squadron lookups to avoid repeated queries
-  private squadronCache: Map<string, EntityImpl> = new Map();
+  // ========================================================================
+  // PERF: Entity Caching - Object literal for O(1) access
+  // ========================================================================
 
-  // PERF: Reusable objects to avoid allocations in hot paths
+  /** Squadron cache - rebuilt once per update */
+  private squadronCache: Record<string, EntityImpl | null> = Object.create(null);
+  private cacheValidTick = -1;
+  private readonly CACHE_LIFETIME = 100; // 5 seconds
+
+  // ========================================================================
+  // PERF: Reusable Working Objects
+  // ========================================================================
+
   private workingStats = {
     totalShips: 0,
     totalCrew: 0,
@@ -49,22 +58,38 @@ export class FleetSystem extends BaseSystem {
     fleetStrength: 0,
   };
 
-  // PERF: Reuse Map for ship type breakdown to avoid object allocations
+  /** Reuse Map for ship type breakdown to avoid object allocations */
   private shipTypeMap: Map<string, number> = new Map();
+
+  // ========================================================================
+  // PERF: Dirty Tracking - Skip unchanged fleets
+  // ========================================================================
+
+  /** Track last fleet stats hash to skip unchanged fleets */
+  private lastFleetHash: Record<string, number> = Object.create(null);
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+    const fleetCount = ctx.activeEntities.length;
 
-    // PERF: Build squadron cache once per update instead of querying per fleet
-    this.rebuildSquadronCache(ctx.world);
+    // PERF: Fast exit if no fleets
+    if (fleetCount === 0) return;
 
-    // Process each fleet
-    for (const fleetEntity of ctx.activeEntities) {
+    // PERF: Only rebuild cache periodically
+    if (tick - this.cacheValidTick > this.CACHE_LIFETIME) {
+      this.rebuildSquadronCache(ctx.world);
+      this.cacheValidTick = tick;
+    }
+
+    // PERF: Use indexed for-loop (faster than for-of)
+    for (let i = 0; i < fleetCount; i++) {
+      const fleetEntity = ctx.activeEntities[i];
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
       // PERF: Early exit for empty fleets
-      if (fleet.squadrons.squadronIds.length === 0) continue;
+      const squadronCount = fleet.squadrons.squadronIds.length;
+      if (squadronCount === 0) continue;
 
       // Update fleet aggregate stats from squadrons
       this.updateFleetStats(ctx.world, fleetEntity as EntityImpl, fleet, tick);
@@ -76,22 +101,27 @@ export class FleetSystem extends BaseSystem {
 
   /**
    * PERF: Rebuild squadron entity cache once per update
-   * Avoids O(n*m) query complexity (n fleets * m squadrons)
+   * Uses object literal (faster than Map for string keys)
    */
   private rebuildSquadronCache(world: World): void {
-    this.squadronCache.clear();
+    // PERF: Clear by reassigning (faster than delete loop)
+    this.squadronCache = Object.create(null);
+
     const squadronEntities = world.query().with(CT.Squadron).executeEntities();
-    for (const entity of squadronEntities) {
+    const count = squadronEntities.length;
+
+    for (let i = 0; i < count; i++) {
+      const entity = squadronEntities[i];
       const squadron = entity.getComponent<SquadronComponent>(CT.Squadron);
       if (squadron) {
-        this.squadronCache.set(squadron.squadronId, entity as EntityImpl);
+        this.squadronCache[squadron.squadronId] = entity as EntityImpl;
       }
     }
   }
 
   /**
    * Update fleet aggregate statistics from member squadrons
-   * PERF: Uses cached squadron lookups and reusable working objects
+   * PERF: Uses cached squadron lookups, reusable working objects, and dirty tracking
    */
   private updateFleetStats(
     world: World,
@@ -99,30 +129,32 @@ export class FleetSystem extends BaseSystem {
     fleet: FleetComponent,
     tick: number
   ): void {
-    // PERF: Reset working stats instead of allocating new objects
+    // PERF: Reset working stats (reuse object)
     const stats = this.workingStats;
     stats.totalShips = 0;
     stats.totalCrew = 0;
     stats.weightedCoherence = 0;
     stats.fleetStrength = 0;
 
-    // PERF: Clear and reuse Map instead of allocating object
+    // PERF: Clear and reuse Map
     this.shipTypeMap.clear();
 
+    // PERF: Get squadron IDs once, use indexed loop
+    const squadronIds = fleet.squadrons.squadronIds;
+    const squadronCount = squadronIds.length;
+
     // Gather stats from all squadrons
-    for (const squadronId of fleet.squadrons.squadronIds) {
-      // PERF: Use cached squadron lookup instead of query
-      const squadronEntity = this.squadronCache.get(squadronId);
+    for (let i = 0; i < squadronCount; i++) {
+      const squadronId = squadronIds[i];
+      // PERF: Object literal lookup (faster than Map.get)
+      const squadronEntity = this.squadronCache[squadronId];
 
       if (!squadronEntity) {
-        // Squadron missing - emit warning
+        // Squadron missing - emit warning (rare case)
         world.eventBus.emit({
           type: 'fleet:squadron_missing',
           source: fleetEntity.id,
-          data: {
-            fleetId: fleet.fleetId,
-            missingSquadronId: squadronId,
-          },
+          data: { fleetId: fleet.fleetId, missingSquadronId: squadronId },
         });
         continue;
       }
@@ -130,7 +162,8 @@ export class FleetSystem extends BaseSystem {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      const squadronShipCount = squadron.ships.shipIds.length;
+      const shipIds = squadron.ships.shipIds;
+      const squadronShipCount = shipIds.length;
       const squadronCrewCount = squadron.ships.totalCrew;
 
       stats.totalShips += squadronShipCount;
@@ -142,8 +175,10 @@ export class FleetSystem extends BaseSystem {
       // Fleet strength is sum of squadron combat strengths
       stats.fleetStrength += squadron.combat.totalFirepower;
 
-      // PERF: Aggregate ship types using Map (faster than object literal)
-      for (const [shipType, count] of Object.entries(squadron.ships.shipTypes)) {
+      // PERF: Aggregate ship types using Map
+      const shipTypes = squadron.ships.shipTypes;
+      for (const shipType in shipTypes) {
+        const count = shipTypes[shipType as SpaceshipType];
         this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + count);
       }
     }
@@ -156,13 +191,22 @@ export class FleetSystem extends BaseSystem {
     const adjustedStrength = stats.fleetStrength * supplyPenalty;
     const adjustedCoherence = fleetCoherence * supplyPenalty;
 
-    // PERF: Convert Map to object only once at the end
+    // PERF: Create simple hash to detect changes (ships + crew + coherence*1000)
+    const currentHash = stats.totalShips + stats.totalCrew * 100 + Math.floor(adjustedCoherence * 1000);
+    const lastHash = this.lastFleetHash[fleet.fleetId] ?? -1;
+
+    // PERF: Skip update if nothing changed
+    if (currentHash === lastHash) return;
+
+    this.lastFleetHash[fleet.fleetId] = currentHash;
+
+    // PERF: Convert Map to object only when actually updating
     const shipTypeBreakdown: Record<string, number> = {};
     for (const [type, count] of this.shipTypeMap) {
       shipTypeBreakdown[type] = count;
     }
 
-    // PERF: Batch all component updates in single call
+    // Single batched component update
     fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
       ...f,
       squadrons: {

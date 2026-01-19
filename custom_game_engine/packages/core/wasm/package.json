@@ -4,7 +4,9 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "asc assembly/pathfinding.ts --outFile build/pathfinding.wasm --optimize --runtime stub --exportRuntime --exportTable --memoryBase 0",
+    "build": "npm run build:pathfinding && npm run build:simd",
+    "build:pathfinding": "asc assembly/pathfinding.ts --outFile build/pathfinding.wasm --optimize --runtime stub --exportRuntime --exportTable --memoryBase 0",
+    "build:simd": "asc assembly/simd-ops.ts --outFile build/simd-ops.wasm --optimize --runtime stub --exportRuntime --exportTable --memoryBase 0 --enable simd",
     "build:debug": "asc assembly/pathfinding.ts --outFile build/pathfinding.debug.wasm --debug --runtime stub --exportRuntime --exportTable --memoryBase 0"
   },
   "devDependencies": {

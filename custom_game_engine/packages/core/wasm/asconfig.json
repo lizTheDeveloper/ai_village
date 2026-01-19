@@ -17,7 +17,22 @@
       "exportRuntime": true,
       "exportTable": true,
       "memoryBase": 0
+    },
+    "simd": {
+      "outFile": "build/simd-ops.wasm",
+      "textFile": "build/simd-ops.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false,
+      "runtime": "stub",
+      "exportRuntime": true,
+      "exportTable": true,
+      "memoryBase": 0
     }
   },
-  "options": {}
+  "options": {
+    "bindings": "esm"
+  }
 }

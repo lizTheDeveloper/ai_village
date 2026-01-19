@@ -44,21 +44,36 @@ export class FleetCoherenceSystem extends BaseSystem {
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
   // ========================================================================
+  // Performance Optimizations - Entity Counting
+  // ========================================================================
+
+  /** PERF: Track fleet/armada counts to skip when empty */
+  private fleetCount = 0;
+  private armadaCount = 0;
+  private cacheValidTick = -1;
+  private readonly CACHE_LIFETIME = 100; // Rebuild cache every 5 seconds
+
+  // ========================================================================
+  // Performance Optimizations - Entity Caches (Object Literal for Speed)
+  // ========================================================================
+
+  /**
+   * Squadron entity cache - uses object literal for O(1) access
+   * PERF: Object literals are faster than Maps for string keys
+   */
+  private squadronEntityCache: Record<string, EntityImpl | null> = Object.create(null);
+
+  /**
+   * Fleet entity cache - uses object literal for O(1) access
+   */
+  private fleetEntityCache: Record<string, EntityImpl | null> = Object.create(null);
+
+  // ========================================================================
   // Performance Optimizations - Reusable Objects
   // ========================================================================
 
   /**
-   * Squadron entity cache - prevents repeated world.getEntity() calls
-   */
-  private squadronEntityCache: Map<string, EntityImpl | null> = new Map();
-
-  /**
-   * Fleet entity cache
-   */
-  private fleetEntityCache: Map<string, EntityImpl | null> = new Map();
-
-  /**
-   * Reusable fleet stats
+   * PERF: Reusable fleet stats - reset instead of allocate
    */
   private workingFleetStats = {
     totalShips: 0,
@@ -70,7 +85,7 @@ export class FleetCoherenceSystem extends BaseSystem {
   };
 
   /**
-   * Reusable armada stats
+   * PERF: Reusable armada stats
    */
   private workingArmadaStats = {
     totalShips: 0,
@@ -78,44 +93,87 @@ export class FleetCoherenceSystem extends BaseSystem {
     avgCoherence: 0,
   };
 
-  protected onUpdate(ctx: SystemContext): void {
-    // Process fleets first (depends on squadron data)
-    const fleets = ctx.world.query().with(CT.Fleet).executeEntities() as EntityImpl[];
-    if (fleets.length > 0) {
-      this.rebuildSquadronCache(ctx.world, fleets);
-      for (const fleetEntity of fleets) {
-        this.updateFleetCoherence(ctx.world, fleetEntity);
-      }
-    }
+  /**
+   * PERF: Pre-allocated coherence array to avoid push() allocations
+   * Max 10 squadrons per fleet = max 10 coherence values
+   */
+  private coherenceBuffer: number[] = new Array(10).fill(0);
+  private coherenceBufferLen = 0;
 
-    // Process armadas (depends on fleet data)
-    const armadas = ctx.world.query().with(CT.Armada).executeEntities() as EntityImpl[];
-    if (armadas.length > 0) {
-      this.rebuildFleetCache(ctx.world, armadas);
+  /**
+   * PERF: Track last coherence values to skip unchanged fleets
+   */
+  private lastFleetCoherence: Record<string, number> = Object.create(null);
+  private lastArmadaCoherence: Record<string, number> = Object.create(null);
+
+  protected onUpdate(ctx: SystemContext): void {
+    const tick = ctx.tick;
+
+    // PERF: Fast path - check if cache needs rebuild
+    const needsRebuild = tick - this.cacheValidTick > this.CACHE_LIFETIME;
+
+    // Process fleets first (depends on squadron data)
+    const fleets = ctx.activeEntities.filter(e => e.hasComponent(CT.Fleet)) as EntityImpl[];
+    this.fleetCount = fleets.length;
+
+    // PERF: Fast exit if no fleets
+    if (this.fleetCount === 0) {
+      // Still check armadas
+      const armadas = ctx.activeEntities.filter(e => e.hasComponent(CT.Armada)) as EntityImpl[];
+      this.armadaCount = armadas.length;
+      if (this.armadaCount === 0) return;
+
+      if (needsRebuild) this.rebuildFleetCache(ctx.world, armadas);
       for (const armadaEntity of armadas) {
         this.updateArmadaCoherence(ctx.world, armadaEntity);
       }
+      return;
+    }
+
+    if (needsRebuild) {
+      this.rebuildSquadronCache(ctx.world, fleets);
+      this.cacheValidTick = tick;
+    }
+
+    // Process fleets
+    for (const fleetEntity of fleets) {
+      this.updateFleetCoherence(ctx.world, fleetEntity);
+    }
+
+    // Process armadas (depends on fleet data)
+    const armadas = ctx.activeEntities.filter(e => e.hasComponent(CT.Armada)) as EntityImpl[];
+    this.armadaCount = armadas.length;
+
+    // PERF: Fast exit if no armadas
+    if (this.armadaCount === 0) return;
+
+    if (needsRebuild) this.rebuildFleetCache(ctx.world, armadas);
+
+    for (const armadaEntity of armadas) {
+      this.updateArmadaCoherence(ctx.world, armadaEntity);
     }
   }
 
   // ========================================================================
-  // Cache Rebuilding
+  // Cache Rebuilding - PERF: Object literals for O(1) access
   // ========================================================================
 
   /**
    * Build cache of all squadron entities referenced by fleets
+   * PERF: Uses object literal (faster than Map for string keys)
    */
   private rebuildSquadronCache(world: World, fleets: ReadonlyArray<EntityImpl>): void {
-    this.squadronEntityCache.clear();
+    // PERF: Clear object literal by reassigning (faster than delete loop)
+    this.squadronEntityCache = Object.create(null);
 
     for (const fleetEntity of fleets) {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
       for (const squadronId of fleet.squadrons.squadronIds) {
-        if (!this.squadronEntityCache.has(squadronId)) {
-          const entity = world.getEntity(squadronId);
-          this.squadronEntityCache.set(squadronId, entity as EntityImpl | null);
+        // PERF: Use 'in' check (faster than undefined check for object literals)
+        if (!(squadronId in this.squadronEntityCache)) {
+          this.squadronEntityCache[squadronId] = world.getEntity(squadronId) as EntityImpl | null;
         }
       }
     }
@@ -123,18 +181,21 @@ export class FleetCoherenceSystem extends BaseSystem {
 
   /**
    * Build cache of all fleet entities referenced by armadas
+   * PERF: Uses object literal (faster than Map for string keys)
    */
   private rebuildFleetCache(world: World, armadas: ReadonlyArray<EntityImpl>): void {
-    this.fleetEntityCache.clear();
+    // PERF: Clear object literal by reassigning
+    this.fleetEntityCache = Object.create(null);
 
-    for (const armadaEntity of armadas) {
-      const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
+    for (let i = 0; i < armadas.length; i++) {
+      const armada = armadas[i].getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
 
-      for (const fleetId of armada.fleets.fleetIds) {
-        if (!this.fleetEntityCache.has(fleetId)) {
-          const entity = world.getEntity(fleetId);
-          this.fleetEntityCache.set(fleetId, entity as EntityImpl | null);
+      const fleetIds = armada.fleets.fleetIds;
+      for (let j = 0; j < fleetIds.length; j++) {
+        const fleetId = fleetIds[j];
+        if (!(fleetId in this.fleetEntityCache)) {
+          this.fleetEntityCache[fleetId] = world.getEntity(fleetId) as EntityImpl | null;
         }
       }
     }
@@ -147,37 +208,44 @@ export class FleetCoherenceSystem extends BaseSystem {
   /**
    * Update fleet coherence from constituent squadrons
    *
-   * Per spec (line 621-656):
-   * - Average squadron coherence
-   * - Distribution: low (<0.5), medium (0.5-0.7), high (>0.7)
-   * - Rating: poor, adequate, excellent
+   * PERF optimizations:
+   * - Pre-allocated coherence buffer (no push/array allocation)
+   * - Object literal cache (faster than Map)
+   * - Indexed for-loops (faster than for-of)
+   * - Dirty tracking (skip unchanged fleets)
+   * - Inline average calculation (no reduce overhead)
    */
   private updateFleetCoherence(world: World, fleetEntity: EntityImpl): void {
     const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
     if (!fleet) return;
 
-    // Reset working stats
-    this.workingFleetStats.totalShips = 0;
-    this.workingFleetStats.totalCrew = 0;
-    this.workingFleetStats.avgCoherence = 0;
-    this.workingFleetStats.lowCoherence = 0;
-    this.workingFleetStats.mediumCoherence = 0;
-    this.workingFleetStats.highCoherence = 0;
+    // PERF: Reset working stats (reuse object, no allocation)
+    const stats = this.workingFleetStats;
+    stats.totalShips = 0;
+    stats.totalCrew = 0;
+    stats.avgCoherence = 0;
+    stats.lowCoherence = 0;
+    stats.mediumCoherence = 0;
+    stats.highCoherence = 0;
 
-    const coherences: number[] = [];
+    // PERF: Reset coherence buffer length (reuse array, no allocation)
+    this.coherenceBufferLen = 0;
+
+    // PERF: Get squadron IDs once, use indexed loop
+    const squadronIds = fleet.squadrons.squadronIds;
+    const squadronCount = squadronIds.length;
 
     // Gather stats from all squadrons
-    for (const squadronId of fleet.squadrons.squadronIds) {
-      const squadronEntity = this.squadronEntityCache.get(squadronId);
+    for (let i = 0; i < squadronCount; i++) {
+      const squadronId = squadronIds[i];
+      // PERF: Object literal lookup (faster than Map.get)
+      const squadronEntity = this.squadronEntityCache[squadronId];
       if (!squadronEntity) {
-        // Squadron missing - emit warning
+        // Squadron missing - emit warning (rare case, ok to allocate)
         world.eventBus.emit({
           type: 'fleet:squadron_missing',
           source: fleetEntity.id,
-          data: {
-            fleetId: fleet.fleetId,
-            missingSquadronId: squadronId,
-          },
+          data: { fleetId: fleet.fleetId, missingSquadronId: squadronId },
         });
         continue;
       }
@@ -185,92 +253,104 @@ export class FleetCoherenceSystem extends BaseSystem {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
       if (!squadron) continue;
 
-      this.workingFleetStats.totalShips += squadron.ships.shipIds.length;
-      this.workingFleetStats.totalCrew += squadron.ships.totalCrew;
-      coherences.push(squadron.coherence.average);
+      const coherence = squadron.coherence.average;
+      stats.totalShips += squadron.ships.shipIds.length;
+      stats.totalCrew += squadron.ships.totalCrew;
 
-      // Categorize squadron coherence
-      if (squadron.coherence.average < 0.5) {
-        this.workingFleetStats.lowCoherence++;
-      } else if (squadron.coherence.average < 0.7) {
-        this.workingFleetStats.mediumCoherence++;
-      } else {
-        this.workingFleetStats.highCoherence++;
-      }
+      // PERF: Use pre-allocated buffer instead of push()
+      this.coherenceBuffer[this.coherenceBufferLen++] = coherence;
+
+      // PERF: Branchless categorization using comparison
+      stats.lowCoherence += coherence < 0.5 ? 1 : 0;
+      stats.mediumCoherence += (coherence >= 0.5 && coherence < 0.7) ? 1 : 0;
+      stats.highCoherence += coherence >= 0.7 ? 1 : 0;
     }
 
-    // Calculate average coherence
-    if (coherences.length > 0) {
-      this.workingFleetStats.avgCoherence = coherences.reduce((sum, c) => sum + c, 0) / coherences.length;
+    // PERF: Inline average calculation (no reduce overhead)
+    if (this.coherenceBufferLen > 0) {
+      let sum = 0;
+      for (let i = 0; i < this.coherenceBufferLen; i++) {
+        sum += this.coherenceBuffer[i];
+      }
+      stats.avgCoherence = sum / this.coherenceBufferLen;
     }
 
     // Calculate fleet coherence with supply modifier
     const supplyModifier = fleet.logistics.fuelReserves;
-    const effectiveCoherence = this.workingFleetStats.avgCoherence * supplyModifier;
+    const effectiveCoherence = stats.avgCoherence * supplyModifier;
 
-    // Calculate straggler risk (poor coherence = higher straggler chance)
-    const stragglerRisk = effectiveCoherence < 0.5 ? 0.3 : effectiveCoherence < 0.6 ? 0.15 : 0.05;
+    // PERF: Check if coherence changed significantly (skip updates if unchanged)
+    const lastCoherence = this.lastFleetCoherence[fleet.fleetId] ?? -1;
+    const coherenceChanged = Math.abs(effectiveCoherence - lastCoherence) > 0.01;
 
-    // Emit straggler warning if risk is high
-    if (stragglerRisk > 0.2) {
+    if (coherenceChanged) {
+      this.lastFleetCoherence[fleet.fleetId] = effectiveCoherence;
+
+      // Calculate straggler risk (poor coherence = higher straggler chance)
+      const stragglerRisk = effectiveCoherence < 0.5 ? 0.3 : effectiveCoherence < 0.6 ? 0.15 : 0.05;
+
+      // PERF: Only emit straggler warning if risk is high
+      if (stragglerRisk > 0.2) {
+        world.eventBus.emit({
+          type: 'fleet:straggler_detected',
+          source: fleetEntity.id,
+          data: {
+            fleetId: fleet.fleetId,
+            coherence: effectiveCoherence,
+            stragglerRisk,
+            lowCoherenceSquadrons: stats.lowCoherence,
+          },
+        });
+      }
+
+      // Determine rating without allocating string
+      const rating: 'poor' | 'adequate' | 'excellent' =
+        effectiveCoherence < 0.5 ? 'poor' : effectiveCoherence >= 0.7 ? 'excellent' : 'adequate';
+
+      // Update fleet component (single batched update)
+      fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
+        ...f,
+        squadrons: {
+          ...f.squadrons,
+          totalShips: stats.totalShips,
+          totalCrew: stats.totalCrew,
+        },
+        coherence: {
+          ...f.coherence,
+          average: effectiveCoherence,
+          distribution: {
+            low: stats.lowCoherence,
+            medium: stats.mediumCoherence,
+            high: stats.highCoherence,
+          },
+          fleetCoherenceRating: rating,
+        },
+      }));
+
+      // PERF: Only emit event when coherence actually changed
       world.eventBus.emit({
-        type: 'fleet:straggler_detected',
+        type: 'fleet:coherence_updated',
         source: fleetEntity.id,
         data: {
           fleetId: fleet.fleetId,
           coherence: effectiveCoherence,
-          stragglerRisk,
-          lowCoherenceSquadrons: this.workingFleetStats.lowCoherence,
+          totalShips: stats.totalShips,
+          totalCrew: stats.totalCrew,
+          distribution: {
+            low: stats.lowCoherence,
+            medium: stats.mediumCoherence,
+            high: stats.highCoherence,
+          },
         },
       });
     }
 
-    // Update fleet component
-    fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
-      ...f,
-      squadrons: {
-        ...f.squadrons,
-        totalShips: this.workingFleetStats.totalShips,
-        totalCrew: this.workingFleetStats.totalCrew,
-      },
-      coherence: {
-        ...f.coherence,
-        average: effectiveCoherence,
-        distribution: {
-          low: this.workingFleetStats.lowCoherence,
-          medium: this.workingFleetStats.mediumCoherence,
-          high: this.workingFleetStats.highCoherence,
-        },
-        fleetCoherenceRating: effectiveCoherence < 0.5 ? 'poor' : effectiveCoherence >= 0.7 ? 'excellent' : 'adequate',
-      },
-    }));
-
-    // Emit coherence update event
-    world.eventBus.emit({
-      type: 'fleet:coherence_updated',
-      source: fleetEntity.id,
-      data: {
-        fleetId: fleet.fleetId,
-        coherence: effectiveCoherence,
-        totalShips: this.workingFleetStats.totalShips,
-        totalCrew: this.workingFleetStats.totalCrew,
-        distribution: {
-          low: this.workingFleetStats.lowCoherence,
-          medium: this.workingFleetStats.mediumCoherence,
-          high: this.workingFleetStats.highCoherence,
-        },
-      },
-    });
-
-    // Check for low supply warning
+    // PERF: Only check supply warning if supply is actually low
     if (fleet.logistics.fuelReserves < 0.3) {
       world.eventBus.emit({
         type: 'fleet:low_supply',
         source: fleetEntity.id,
-        data: {
-          fleetId: fleet.fleetId,
-          supplyLevel: fleet.logistics.fuelReserves,
-        },
+        data: { fleetId: fleet.fleetId, supplyLevel: fleet.logistics.fuelReserves },
       });
     }
   }
@@ -282,31 +362,40 @@ export class FleetCoherenceSystem extends BaseSystem {
   /**
    * Update armada coherence from constituent fleets
    *
-   * Simpler than fleet-level: just average fleet coherences
+   * PERF optimizations:
+   * - Object literal cache (faster than Map)
+   * - Indexed for-loops (faster than for-of)
+   * - Inline average calculation
+   * - Dirty tracking (skip unchanged armadas)
    */
   private updateArmadaCoherence(world: World, armadaEntity: EntityImpl): void {
     const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
     if (!armada) return;
 
-    // Reset working stats
-    this.workingArmadaStats.totalShips = 0;
-    this.workingArmadaStats.totalCrew = 0;
-    this.workingArmadaStats.avgCoherence = 0;
+    // PERF: Reset working stats (reuse object)
+    const stats = this.workingArmadaStats;
+    stats.totalShips = 0;
+    stats.totalCrew = 0;
+    stats.avgCoherence = 0;
 
-    const coherences: number[] = [];
+    // PERF: Use pre-allocated buffer, reset length
+    this.coherenceBufferLen = 0;
+
+    // PERF: Get fleet IDs once, use indexed loop
+    const fleetIds = armada.fleets.fleetIds;
+    const fleetCount = fleetIds.length;
 
     // Gather stats from all fleets
-    for (const fleetId of armada.fleets.fleetIds) {
-      const fleetEntity = this.fleetEntityCache.get(fleetId);
+    for (let i = 0; i < fleetCount; i++) {
+      const fleetId = fleetIds[i];
+      // PERF: Object literal lookup
+      const fleetEntity = this.fleetEntityCache[fleetId];
       if (!fleetEntity) {
-        // Fleet missing - emit warning
+        // Fleet missing - emit warning (rare case)
         world.eventBus.emit({
           type: 'armada:fleet_missing',
           source: armadaEntity.id,
-          data: {
-            armadaId: armada.armadaId,
-            missingFleetId: fleetId,
-          },
+          data: { armadaId: armada.armadaId, missingFleetId: fleetId },
         });
         continue;
       }
@@ -314,33 +403,47 @@ export class FleetCoherenceSystem extends BaseSystem {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      this.workingArmadaStats.totalShips += fleet.squadrons.totalShips;
-      this.workingArmadaStats.totalCrew += fleet.squadrons.totalCrew;
-      coherences.push(fleet.coherence.average);
+      stats.totalShips += fleet.squadrons.totalShips;
+      stats.totalCrew += fleet.squadrons.totalCrew;
+
+      // PERF: Use pre-allocated buffer
+      this.coherenceBuffer[this.coherenceBufferLen++] = fleet.coherence.average;
     }
 
-    // Calculate average coherence
-    if (coherences.length > 0) {
-      this.workingArmadaStats.avgCoherence = coherences.reduce((sum, c) => sum + c, 0) / coherences.length;
+    // PERF: Inline average calculation
+    if (this.coherenceBufferLen > 0) {
+      let sum = 0;
+      for (let i = 0; i < this.coherenceBufferLen; i++) {
+        sum += this.coherenceBuffer[i];
+      }
+      stats.avgCoherence = sum / this.coherenceBufferLen;
     }
 
-    // Apply morale modifier (armadas use morale instead of supply at this level)
+    // Apply morale modifier
     const moraleModifier = armada.morale.average;
-    const effectiveCoherence = this.workingArmadaStats.avgCoherence * moraleModifier;
+    const effectiveCoherence = stats.avgCoherence * moraleModifier;
 
-    // Update armada component
-    armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
-      ...a,
-      fleets: {
-        ...a.fleets,
-        totalShips: this.workingArmadaStats.totalShips,
-        totalCrew: this.workingArmadaStats.totalCrew,
-      },
-      strength: {
-        ...a.strength,
-        effectiveCombatPower: effectiveCoherence * a.strength.shipCount,
-      },
-    }));
+    // PERF: Check if coherence changed significantly
+    const lastCoherence = this.lastArmadaCoherence[armada.armadaId] ?? -1;
+    const coherenceChanged = Math.abs(effectiveCoherence - lastCoherence) > 0.01;
+
+    if (coherenceChanged) {
+      this.lastArmadaCoherence[armada.armadaId] = effectiveCoherence;
+
+      // Update armada component (single batched update)
+      armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
+        ...a,
+        fleets: {
+          ...a.fleets,
+          totalShips: stats.totalShips,
+          totalCrew: stats.totalCrew,
+        },
+        strength: {
+          ...a.strength,
+          effectiveCombatPower: effectiveCoherence * a.strength.shipCount,
+        },
+      }));
+    }
   }
 }
 
