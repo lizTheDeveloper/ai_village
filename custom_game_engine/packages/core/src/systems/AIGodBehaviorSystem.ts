@@ -482,6 +482,305 @@ export class AIGodBehaviorSystem extends BaseSystem {
   }
 
   /**
+   * Perform domain-specific divine action
+   */
+  private performDomainAction(world: World, deityId: string, deity: DeityComponent, currentTick: number): void {
+    const domain = deity.identity.domain;
+    if (!domain) return;
+
+    // Weather-related domains (sky, storm, water, nature)
+    if (domain === 'sky' || domain === 'storm' || domain === 'water' || domain === 'nature') {
+      this.causeWeatherEffect(world, deity, domain);
+      return;
+    }
+
+    // Harvest domain - bless crops
+    if (domain === 'harvest') {
+      this.blessCrops(world, deity);
+      return;
+    }
+
+    // Fire domain - provide warmth or light
+    if (domain === 'fire') {
+      this.provideWarmth(world, deity);
+      return;
+    }
+
+    // Healing domain - heal believers
+    if (domain === 'healing') {
+      const injuredBelievers = this.findInjuredBelievers(world, deity);
+      if (injuredBelievers.length > 0) {
+        const target = injuredBelievers[0];
+        if (target && deity.spendBelief(200)) {
+          world.eventBus.emit({
+            type: 'divinity:miracle',
+            source: deity.identity.primaryName,
+            data: {
+              deityId,
+              targetId: target.id,
+              powerType: 'heal_wound',
+              effect: 'wounds_mended',
+            },
+          });
+        }
+      }
+      return;
+    }
+
+    // Protection domain - shield believers
+    if (domain === 'protection') {
+      const threatenedBelievers = Array.from(deity.believers)
+        .map(id => world.getEntity(id))
+        .filter(e => e && e.components.has(CT.ThreatDetection))
+        .slice(0, 1);
+
+      if (threatenedBelievers.length > 0 && deity.spendBelief(200)) {
+        const target = threatenedBelievers[0];
+        if (target) {
+          world.eventBus.emit({
+            type: 'divinity:miracle',
+            source: deity.identity.primaryName,
+            data: {
+              deityId,
+              targetId: target.id,
+              powerType: 'divine_protection',
+              effect: 'ward_placed',
+            },
+          });
+        }
+      }
+      return;
+    }
+
+    // Fortune domain - improve luck
+    if (domain === 'fortune') {
+      const randomBeliever = Array.from(deity.believers)[Math.floor(Math.random() * deity.believers.size)];
+      if (randomBeliever && deity.spendBelief(200)) {
+        world.eventBus.emit({
+          type: 'divinity:miracle',
+          source: deity.identity.primaryName,
+          data: {
+            deityId,
+            targetId: randomBeliever,
+            powerType: 'minor_luck',
+            effect: 'luck_improved',
+          },
+        });
+      }
+      return;
+    }
+
+    // Default: Generic blessing for other domains
+    const randomBeliever = Array.from(deity.believers)[Math.floor(Math.random() * deity.believers.size)];
+    if (randomBeliever && deity.spendBelief(200)) {
+      const domainEffects: Record<DivineDomain, string> = {
+        harvest: 'crops_blessed',
+        war: 'strength_increased',
+        wisdom: 'insight_granted',
+        craft: 'skill_enhanced',
+        nature: 'animals_calmed',
+        death: 'peace_granted',
+        love: 'relationships_strengthened',
+        chaos: 'change_induced',
+        order: 'stability_restored',
+        fortune: 'luck_improved',
+        protection: 'ward_placed',
+        healing: 'wounds_mended',
+        mystery: 'secrets_revealed',
+        time: 'patience_granted',
+        sky: 'weather_calmed',
+        earth: 'foundation_strengthened',
+        water: 'thirst_quenched',
+        fire: 'warmth_provided',
+        storm: 'enemies_scattered',
+        hunt: 'tracking_enhanced',
+        home: 'hearth_blessed',
+        travel: 'journey_eased',
+        trade: 'bargain_favored',
+        justice: 'truth_revealed',
+        vengeance: 'retribution_prepared',
+        dreams: 'rest_deepened',
+        fear: 'courage_granted',
+        beauty: 'appearance_enhanced',
+        trickery: 'deception_aided',
+      };
+
+      world.eventBus.emit({
+        type: 'divinity:miracle',
+        source: deity.identity.primaryName,
+        data: {
+          deityId,
+          targetId: randomBeliever,
+          powerType: 'minor_miracle',
+          effect: domainEffects[domain] || 'blessing_granted',
+        },
+      });
+    }
+  }
+
+  /**
+   * Cause weather effects for weather-related domains
+   */
+  private causeWeatherEffect(world: World, deity: DeityComponent, domain: DivineDomain): void {
+    // Find weather entity
+    const weatherEntities = world.query().with(CT.Weather).executeEntities();
+    if (weatherEntities.length === 0) return;
+
+    const weatherEntity = weatherEntities[0];
+    if (!weatherEntity) return;
+
+    // Spend belief to cause weather
+    if (!deity.spendBelief(200)) return;
+
+    // Select weather type based on domain
+    const domainWeatherMap: Partial<Record<DivineDomain, 'rain' | 'storm' | 'clear' | 'snow'>> = {
+      storm: 'storm',
+      water: 'rain',
+      sky: 'clear',
+      nature: Math.random() > 0.5 ? 'rain' : 'clear',
+    };
+
+    const targetWeather = domainWeatherMap[domain] || 'clear';
+
+    // Update weather component
+    const impl = weatherEntity as any;
+    impl.updateComponent(CT.Weather, (current: any) => ({
+      ...current,
+      weatherType: targetWeather,
+      intensity: 0.7,
+      duration: 300, // 5 minutes
+    }));
+
+    // Emit event
+    world.eventBus.emit({
+      type: 'weather:changed',
+      source: weatherEntity.id,
+      data: {
+        oldWeather: 'unknown',
+        weatherType: targetWeather,
+        intensity: 0.7,
+        causedBy: deity.identity.primaryName,
+        divine: true,
+      },
+    });
+  }
+
+  /**
+   * Bless crops to improve growth and yield
+   */
+  private blessCrops(world: World, deity: DeityComponent): void {
+    // Find planted crops near believers
+    const plants = world.query().with(CT.Plant).executeEntities();
+    const blessedPlants: string[] = [];
+
+    for (const plant of plants) {
+      const plantComp = plant.components.get(CT.Plant) as any;
+      if (!plantComp || !plantComp.planted) continue; // Only bless agent-planted crops
+
+      blessedPlants.push(plant.id);
+      if (blessedPlants.length >= 5) break; // Bless up to 5 plants
+    }
+
+    if (blessedPlants.length === 0) return;
+
+    if (deity.spendBelief(200)) {
+      for (const plantId of blessedPlants) {
+        const plant = world.getEntity(plantId);
+        if (!plant) continue;
+
+        // Improve plant genetics (growth rate and yield)
+        const impl = plant as any;
+        impl.updateComponent(CT.Plant, (current: any) => {
+          const genetics = current.genetics || {};
+          return {
+            ...current,
+            genetics: {
+              ...genetics,
+              growthRate: Math.min(2.0, (genetics.growthRate || 1.0) * 1.2),
+              yieldAmount: Math.min(2.0, (genetics.yieldAmount || 1.0) * 1.2),
+            },
+            health: Math.min(100, (current.health || 100) + 10),
+          };
+        });
+      }
+
+      world.eventBus.emit({
+        type: 'divinity:miracle',
+        source: deity.identity.primaryName,
+        data: {
+          deityId: deity.identity.primaryName,
+          powerType: 'bless_harvest',
+          effect: 'crops_blessed',
+          plantIds: blessedPlants,
+        },
+      });
+    }
+  }
+
+  /**
+   * Provide warmth to believers (fire domain)
+   */
+  private provideWarmth(world: World, deity: DeityComponent): void {
+    const coldBelievers: string[] = [];
+
+    for (const believerId of deity.believers) {
+      const entity = world.getEntity(believerId);
+      if (!entity) continue;
+
+      const temperature = entity.components.get(CT.Temperature) as any;
+      if (temperature && temperature.currentTemp < 10) {
+        coldBelievers.push(believerId);
+        if (coldBelievers.length >= 3) break; // Help up to 3 cold believers
+      }
+    }
+
+    if (coldBelievers.length === 0) return;
+
+    if (deity.spendBelief(200)) {
+      for (const believerId of coldBelievers) {
+        const entity = world.getEntity(believerId);
+        if (!entity) continue;
+
+        const impl = entity as any;
+        impl.updateComponent(CT.Temperature, (current: any) => ({
+          ...current,
+          currentTemp: Math.min(20, (current.currentTemp || 10) + 10),
+        }));
+      }
+
+      world.eventBus.emit({
+        type: 'divinity:miracle',
+        source: deity.identity.primaryName,
+        data: {
+          deityId: deity.identity.primaryName,
+          powerType: 'minor_miracle',
+          effect: 'warmth_provided',
+          targetIds: coldBelievers,
+        },
+      });
+    }
+  }
+
+  /**
+   * Find injured believers who need healing
+   */
+  private findInjuredBelievers(world: World, deity: DeityComponent): Array<{ id: string; health: number }> {
+    const injured: Array<{ id: string; health: number }> = [];
+
+    for (const believerId of deity.believers) {
+      const entity = world.getEntity(believerId);
+      if (!entity) continue;
+
+      const needs = entity.components.get(CT.Needs) as any;
+      if (needs && needs.health < 50) {
+        injured.push({ id: believerId, health: needs.health });
+      }
+    }
+
+    return injured.sort((a, b) => a.health - b.health); // Most injured first
+  }
+
+  /**
    * Select an action appropriate to the deity's domain
    */
   private selectDomainAction(domain: DivineDomain, context: GoalContext): DeityAction {

@@ -12,24 +12,18 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type {
-  World,
-  Entity,
-  EntityImpl,
-  EventBus,
-  ComposedSpell,
-  MagicSourceId,
-  ManaPoolsComponent,
-  SpellKnowledgeComponent,
-  CastingStateComponent,
-  ParadigmStateComponent,
-  PositionComponent,
-  NeedsComponent,
-  SpiritualComponent,
-  BodyComponent,
-  CastingState,
-} from '@ai-village/core';
-import { ComponentType as CT, createCastingState, isCastingActive, canCastSpell } from '@ai-village/core';
+import type { World, Entity, EntityImpl, EventBus } from '../../ecs/index.js';
+import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';
+import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
+import type { CastingStateComponent } from '../../components/CastingStateComponent.js';
+import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import type { NeedsComponent } from '../../components/NeedsComponent.js';
+import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
+import type { BodyComponent } from '../../components/BodyComponent.js';
+import type { MagicComponent } from '../../components/MagicComponent.js';
+import type { ComposedSpell, MagicSourceId, CastingState } from '../../types/index.js';
+import { ComponentType as CT, createCastingState, isCastingActive, canCastSpell } from '../../ecs/index.js';
 import { SpellEffectExecutor } from '../SpellEffectExecutor.js';
 import { SpellRegistry, type SpellDefinition } from '../SpellRegistry.js';
 import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';

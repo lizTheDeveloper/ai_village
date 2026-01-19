@@ -10,17 +10,14 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type {
-  EntityImpl,
-  EventBus,
-  SpellKnowledgeComponent,
-  ManaPoolsComponent,
-  ParadigmStateComponent,
-  CastingStateComponent,
-  SkillProgressComponent,
-  SpiritualComponent,
-} from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+import type { EntityImpl, EventBus } from '../../ecs/index.js';
+import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
+import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';
+import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
+import type { CastingStateComponent } from '../../components/CastingStateComponent.js';
+import type { SkillProgressComponent } from '../../components/SkillProgressComponent.js';
+import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Manages divine magic unlocking through faith and prayer.

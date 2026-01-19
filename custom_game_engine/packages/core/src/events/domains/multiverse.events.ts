@@ -219,6 +219,37 @@ export interface MultiverseEvents {
     invasionId?: string;
     success?: boolean;
   };
+
+  // ========================================================================
+  // Canon Event System
+  // ========================================================================
+
+  /** Canon event occurred as expected (narrative anchor fulfilled) */
+  'multiverse:canon_event_occurred': {
+    canonEventId: string;
+    eventType: string;
+    description: string;
+    probability: number;
+    tick: string;
+  };
+
+  /** Canon event was altered (timeline diverged from expected path) */
+  'multiverse:canon_event_altered': {
+    canonEventId: string;
+    eventType: string;
+    originalOutcome: string;
+    actualOutcome: string;
+    divergenceImpact: number;
+  };
+
+  /** Timeline converging back to canon (nudging toward expected outcome) */
+  'multiverse:timeline_converging': {
+    canonEventId: string;
+    eventType: string;
+    convergenceStrength: number;
+    targetEntities: string[];
+    modifications: string[];
+  };
 }
 
 export type MultiverseEventType = keyof MultiverseEvents;

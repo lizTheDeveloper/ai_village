@@ -157,7 +157,7 @@ export * from './ChunkProductionStateComponent.js';
 export { createChunkProductionState, getTotalProductionRate, getTotalConsumptionRate, canProduce, fastForwardProduction } from './ChunkProductionStateComponent.js';
 export type { ChunkProductionStateComponent, ProductionRate } from './ChunkProductionStateComponent.js';
 export * from './FactoryAIComponent.js';
-export { createFactoryAI, recordDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary } from './FactoryAIComponent.js';
+export { createFactoryAI, recordDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary, recordProduction, recordConsumption, calculateItemsPerMinute, resetProductionTracking } from './FactoryAIComponent.js';
 export type { FactoryAIComponent, FactoryGoal, FactoryHealth, ProductionBottleneck, FactoryStats, FactoryDecision, ResourceRequest } from './FactoryAIComponent.js';
 export type { MoodComponent } from './MoodComponent.js';
 // Food preferences

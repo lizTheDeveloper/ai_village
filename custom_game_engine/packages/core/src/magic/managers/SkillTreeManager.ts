@@ -11,16 +11,12 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type {
-  World,
-  EntityImpl,
-  EventBus,
-  SkillProgressComponent,
-  SpellKnowledgeComponent,
-  ManaPoolsComponent,
-  ParadigmStateComponent,
-} from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+import type { World, EntityImpl, EventBus } from '../../ecs/index.js';
+import type { SkillProgressComponent } from '../../components/SkillProgressComponent.js';
+import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
+import type { ManaPoolsComponent } from '../../components/ManaPoolsComponent.js';
+import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 import { MagicSkillTreeRegistry } from '../MagicSkillTreeRegistry.js';
 import { evaluateNode, type EvaluationContext } from '../MagicSkillTreeEvaluator.js';
 

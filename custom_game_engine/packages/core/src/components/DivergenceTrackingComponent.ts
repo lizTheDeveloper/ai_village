@@ -45,6 +45,16 @@ export interface DivergenceTrackingComponent extends Component {
    * Last tick when divergence was recalculated
    */
   lastDivergenceUpdate: string; // Serialized bigint
+
+  /**
+   * Timeline stability (0-1)
+   * 0 = highly unstable/chaotic
+   * 1 = very stable/resistant to change
+   *
+   * Calculated based on canon adherence, divergence, and timeline age.
+   * High stability means timeline resists further changes.
+   */
+  timelineStability: number;
 }
 
 /**

@@ -28,15 +28,15 @@ import { initializeMagicSystem as initMagicInfrastructure, getTerminalEffectHand
 import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 // Import all managers
-import { SkillTreeManager } from '@ai-village/magic/managers/SkillTreeManager.js';
-import { SpellProficiencyManager } from '@ai-village/magic/managers/SpellProficiencyManager.js';
-import { ManaRegenerationManager } from '@ai-village/magic/managers/ManaRegenerationManager.js';
-import { DivineSpellManager } from '@ai-village/magic/managers/DivineSpellManager.js';
-import { SpellCastingManager } from '@ai-village/magic/managers/SpellCastingManager.js';
-import { SpellValidator } from '@ai-village/magic/validation/SpellValidator.js';
+import { SkillTreeManager } from '../magic/managers/SkillTreeManager.js';
+import { SpellProficiencyManager } from '../magic/managers/SpellProficiencyManager.js';
+import { ManaRegenerationManager } from '../magic/managers/ManaRegenerationManager.js';
+import { DivineSpellManager } from '../magic/managers/DivineSpellManager.js';
+import { SpellCastingManager } from '../magic/managers/SpellCastingManager.js';
+import { SpellValidator } from '../magic/validation/SpellValidator.js';
 
 // Import migration utility
-import { migrateAllMagicComponents } from '@ai-village/magic/MagicComponentMigration.js';
+import { migrateAllMagicComponents } from '../magic/MagicComponentMigration.js';
 
 /**
  * MagicSystem - Process magic casting and effects

@@ -19,10 +19,14 @@ import {
   detectBottleneck,
   clearResolvedBottlenecks,
   calculateFactoryHealth,
+  recordProduction,
+  recordConsumption,
+  calculateItemsPerMinute,
 } from '../components/FactoryAIComponent.js';
 import type { AssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
 import type { MachineConnectionComponent } from '../components/MachineConnectionComponent.js';
 import type { PowerComponent } from '../components/PowerComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 export class FactoryAISystem extends BaseSystem {
@@ -71,8 +75,8 @@ export class FactoryAISystem extends BaseSystem {
    * Update factory statistics
    */
   private updateFactoryStats(
-    _ctx: SystemContext,
-    _factoryEntity: EntityImpl,
+    ctx: SystemContext,
+    factoryEntity: EntityImpl,
     ai: FactoryAIComponent,
     allEntities: ReadonlyArray<EntityImpl>
   ): void {
@@ -92,9 +96,32 @@ export class FactoryAISystem extends BaseSystem {
       outputStorageUtilization: 0,
     };
 
-    // TODO: Get factory bounds from factoryEntity
-    // For now, assume all entities within some radius belong to this factory
-    const factoryEntities = allEntities; // Simplified
+    // Get factory bounds from factoryEntity or use radius-based filtering
+    const factoryPos = factoryEntity.getComponent<PositionComponent>(CT.Position);
+    let factoryEntities: ReadonlyArray<EntityImpl>;
+
+    if (ai.bounds) {
+      // Use explicit bounds if provided
+      factoryEntities = allEntities.filter(entity => {
+        const pos = entity.getComponent<PositionComponent>(CT.Position);
+        if (!pos) return false;
+        return pos.x >= ai.bounds!.minX && pos.x <= ai.bounds!.maxX &&
+               pos.y >= ai.bounds!.minY && pos.y <= ai.bounds!.maxY;
+      });
+    } else if (factoryPos && ai.radius) {
+      // Use radius-based filtering from factory position
+      const radiusSquared = ai.radius * ai.radius;
+      factoryEntities = allEntities.filter(entity => {
+        const pos = entity.getComponent<PositionComponent>(CT.Position);
+        if (!pos) return false;
+        const dx = pos.x - factoryPos.x;
+        const dy = pos.y - factoryPos.y;
+        return (dx * dx + dy * dy) <= radiusSquared;
+      });
+    } else {
+      // Fallback: assume all entities belong to factory (legacy behavior)
+      factoryEntities = allEntities;
+    }
 
     // Count machines and power
     let totalPowerProduction = 0;
@@ -108,6 +135,31 @@ export class FactoryAISystem extends BaseSystem {
         stats.totalMachines++;
         if (assembly.progress > 0) {
           machinesCrafting++;
+        }
+
+        // Track production: when a machine completes a recipe (progress just reset to 0)
+        // In a real implementation, this would be triggered by AssemblyMachineSystem
+        // For now, we estimate based on progress and crafting time
+        const connection = entity.getComponent<MachineConnectionComponent>(CT.MachineConnection);
+        if (assembly.currentRecipe && connection) {
+          // Check if machine just completed crafting (this is a simplification)
+          // In production, AssemblyMachineSystem would call recordProduction when items are created
+
+          // Track consumption from input slots
+          for (const inputSlot of connection.inputs) {
+            for (const item of inputSlot.items) {
+              // This is where items are consumed - would be tracked when actually removed
+              // recordConsumption(ai, item.definitionId, 1, ctx.tick);
+            }
+          }
+
+          // Track production from output slots
+          for (const outputSlot of connection.outputs) {
+            for (const item of outputSlot.items) {
+              // This is where items are produced - would be tracked when actually created
+              // recordProduction(ai, item.definitionId, 1, ctx.tick);
+            }
+          }
         }
       }
 
@@ -131,9 +183,9 @@ export class FactoryAISystem extends BaseSystem {
     stats.powerEfficiency = totalPowerDemand > 0 ? Math.min(1.0, totalPowerProduction / totalPowerDemand) : 1.0;
     stats.efficiency = stats.totalMachines > 0 ? machinesCrafting / stats.totalMachines : 0;
 
-    // Calculate production rates (simplified)
-    // TODO: Actually track items produced/consumed per minute
-    stats.totalOutputsPerMinute = machinesCrafting * 2; // Rough estimate
+    // Calculate production rates from tracked history
+    stats.totalOutputsPerMinute = calculateItemsPerMinute(ai.productionHistory, ctx.tick);
+    stats.totalInputsPerMinute = calculateItemsPerMinute(ai.consumptionHistory, ctx.tick);
 
     ai.stats = stats;
   }

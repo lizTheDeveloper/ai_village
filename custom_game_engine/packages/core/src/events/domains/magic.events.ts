@@ -65,6 +65,15 @@ export interface MagicEvents {
     miracleType: string;
     cost: number;
   };
+  'divinity:miracle': {
+    deityId: EntityId;
+    targetId?: EntityId;
+    targetIds?: EntityId[];
+    powerType: string;
+    effect: string;
+    plantIds?: string[];
+    danger?: number;
+  };
   'divinity:vision_queued': {
     visionId: string;
     deityId: EntityId;

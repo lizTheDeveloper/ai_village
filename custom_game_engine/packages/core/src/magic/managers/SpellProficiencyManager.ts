@@ -10,13 +10,10 @@
  * Extracted from MagicSystem to reduce god object complexity.
  */
 
-import type {
-  EntityImpl,
-  EventBus,
-  SpellKnowledgeComponent,
-  ParadigmStateComponent,
-} from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+import type { EntityImpl, EventBus } from '../../ecs/index.js';
+import type { SpellKnowledgeComponent } from '../../components/SpellKnowledgeComponent.js';
+import type { ParadigmStateComponent } from '../../components/ParadigmStateComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 import { SpellRegistry } from '../SpellRegistry.js';
 
 /**

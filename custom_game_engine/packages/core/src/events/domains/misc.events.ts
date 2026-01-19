@@ -262,6 +262,8 @@ export interface MiscEvents {
     weatherType: string;
     intensity?: string | number;
     oldWeather?: string;
+    causedBy?: string;
+    divine?: boolean;
   };
 
   'weather:rain': {

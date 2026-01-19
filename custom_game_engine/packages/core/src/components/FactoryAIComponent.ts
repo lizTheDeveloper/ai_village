@@ -185,6 +185,25 @@ export interface FactoryAIComponent extends Component {
 
   /** AI intelligence level (1-10, affects decision quality) */
   intelligenceLevel: number;
+
+  // === Spatial ===
+  /** Factory bounds (optional, for spatial filtering of entities) */
+  bounds?: {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+  };
+
+  /** Fallback radius if bounds not set (in tiles) */
+  radius?: number;
+
+  // === Production Tracking ===
+  /** Items produced per item type, tracked over time */
+  productionHistory: Map<string, { count: number; lastUpdateTick: number }>;
+
+  /** Items consumed per item type, tracked over time */
+  consumptionHistory: Map<string, { count: number; lastUpdateTick: number }>;
 }
 
 /**
@@ -229,6 +248,10 @@ export function createFactoryAI(
     minStockpileDays: config?.minStockpileDays || 2,
     maxOutputStorage: config?.maxOutputStorage || 0.9,
     intelligenceLevel: config?.intelligenceLevel || 5,
+    bounds: config?.bounds,
+    radius: config?.radius || 100, // Default 100 tile radius if no bounds
+    productionHistory: new Map(),
+    consumptionHistory: new Map(),
   };
 }
 
@@ -411,4 +434,72 @@ export function getAIStatusSummary(ai: FactoryAIComponent): string {
   }
 
   return summary;
+}
+
+/**
+ * Record item production
+ */
+export function recordProduction(
+  ai: FactoryAIComponent,
+  itemId: string,
+  quantity: number,
+  currentTick: number
+): void {
+  const existing = ai.productionHistory.get(itemId);
+  if (existing) {
+    existing.count += quantity;
+    existing.lastUpdateTick = currentTick;
+  } else {
+    ai.productionHistory.set(itemId, { count: quantity, lastUpdateTick: currentTick });
+  }
+}
+
+/**
+ * Record item consumption
+ */
+export function recordConsumption(
+  ai: FactoryAIComponent,
+  itemId: string,
+  quantity: number,
+  currentTick: number
+): void {
+  const existing = ai.consumptionHistory.get(itemId);
+  if (existing) {
+    existing.count += quantity;
+    existing.lastUpdateTick = currentTick;
+  } else {
+    ai.consumptionHistory.set(itemId, { count: quantity, lastUpdateTick: currentTick });
+  }
+}
+
+/**
+ * Calculate items per minute from tracked history
+ * Uses time window of last N ticks to calculate rate
+ */
+export function calculateItemsPerMinute(
+  history: Map<string, { count: number; lastUpdateTick: number }>,
+  currentTick: number,
+  windowTicks: number = 1200 // Default 1 minute at 20 TPS
+): number {
+  let totalItems = 0;
+  const cutoffTick = currentTick - windowTicks;
+
+  for (const [_itemId, record] of history) {
+    // Only count items produced/consumed within the time window
+    if (record.lastUpdateTick >= cutoffTick) {
+      totalItems += record.count;
+    }
+  }
+
+  // Convert to items per minute
+  const minutesElapsed = windowTicks / (20 * 60); // 20 TPS, 60 seconds
+  return minutesElapsed > 0 ? totalItems / minutesElapsed : 0;
+}
+
+/**
+ * Reset production tracking (e.g., at start of new measurement period)
+ */
+export function resetProductionTracking(ai: FactoryAIComponent): void {
+  ai.productionHistory.clear();
+  ai.consumptionHistory.clear();
 }
