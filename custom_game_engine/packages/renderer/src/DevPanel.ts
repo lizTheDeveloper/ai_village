@@ -20,12 +20,15 @@ import {
   type IdentityComponent,
   type TagsComponent,
   type NeedsComponent,
+  type ManaPoolsComponent,
+  type SpiritualComponent,
   CT,
   getTileBasedBlueprintRegistry,
   parseLayout,
   type WallMaterial,
   type DoorMaterial,
   type WindowMaterial,
+  DeityComponent,
 } from '@ai-village/core';
 import type { MagicParadigm } from '@ai-village/magic';
 import {
@@ -41,7 +44,6 @@ import {
   POWER_TIER_THRESHOLDS,
   BELIEF_GENERATION_RATES,
 } from '@ai-village/divinity';
-import type { DeityComponent } from '@ai-village/core';
 import { DevRenderer, ComponentRegistry, IdentitySchema } from '@ai-village/introspection';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
@@ -1926,8 +1928,27 @@ export class DevPanel implements IWindowPanel {
           if (paradigm && state) {
             state.mana = Math.floor(progress * paradigm.maxMana);
             this.log(`Set ${paradigmId} mana to ${state.mana}`);
-            // TODO: Apply mana to world entities when mana component is implemented
-            // For now, this is local state only
+
+            // Apply mana to world entities with ManaPoolsComponent
+            if (this.world) {
+              try {
+                const manaUsers = this.world.query().with(CT.ManaPoolsComponent).executeEntities();
+                for (const entity of manaUsers) {
+                  const manaPools = entity.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent);
+                  if (!manaPools) continue;
+
+                  // Update matching mana pool if it exists
+                  const pool = manaPools.manaPools.find(p => p.source === paradigmId);
+                  if (pool) {
+                    pool.current = state.mana;
+                    this.world.updateComponent(entity.id, CT.ManaPoolsComponent, () => manaPools);
+                  }
+                }
+                this.log(`Applied ${paradigmId} mana to ${manaUsers.length} entities`);
+              } catch (error) {
+                this.log(`ERROR applying mana: ${error instanceof Error ? error.message : String(error)}`);
+              }
+            }
           }
         } else {
           const resource = DIVINE_RESOURCES.find(r => r.id === sliderId);
@@ -1973,11 +1994,28 @@ export class DevPanel implements IWindowPanel {
     if (!this.world) return;
 
     try {
-      // Note: This is a placeholder implementation
-      // The actual divine system may need specific component updates
-      // For now, we just log the change
-      // TODO: Wire up to actual divine components when system is implemented
-      this.log(`Divine resource ${resourceId} set to ${value} (world sync pending)`);
+      // Apply belief to all deities in the world
+      if (resourceId === 'belief') {
+        const deities = this.world.query().with(CT.Deity).executeEntities();
+        if (deities.length === 0) {
+          this.log(`No deities found to apply belief to`);
+          return;
+        }
+
+        for (const deity of deities) {
+          const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
+          if (deityComp) {
+            // Set belief directly (this is a dev tool, so we override)
+            deityComp.belief.currentBelief = value;
+            this.world.updateComponent(deity.id, CT.Deity, () => deityComp);
+          }
+        }
+        this.log(`Applied ${value} belief to ${deities.length} deities`);
+        return;
+      }
+
+      // Other divine resources can be logged for now
+      this.log(`Divine resource ${resourceId} set to ${value} (no world entity binding)`);
     } catch (error) {
       this.log(`ERROR applying divine resource: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -2110,8 +2148,32 @@ export class DevPanel implements IWindowPanel {
         this.log('Added 1000 belief');
         break;
       case 'max_faith':
-        // TODO: Implement actual faith system when divine components are available
-        this.log('Set all believer faith to 100% (not yet implemented)');
+        if (this.world) {
+          try {
+            const believers = this.world.query().with(CT.Spiritual).executeEntities();
+            let updatedCount = 0;
+
+            for (const believer of believers) {
+              const spiritual = believer.getComponent<SpiritualComponent>(CT.Spiritual);
+              if (spiritual) {
+                // Set faith to maximum (1.0)
+                spiritual.faith = 1.0;
+                spiritual.peakFaith = Math.max(spiritual.peakFaith, 1.0);
+                // Clear doubts and crisis
+                spiritual.doubts = spiritual.doubts.map(d => ({ ...d, resolved: true }));
+                spiritual.crisisOfFaith = false;
+                this.world.updateComponent(believer.id, CT.Spiritual, () => spiritual);
+                updatedCount++;
+              }
+            }
+
+            this.log(`Set faith to 100% for ${updatedCount} believers`);
+          } catch (error) {
+            this.log(`ERROR setting max faith: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        } else {
+          this.log('ERROR: No world available');
+        }
         break;
       case 'spawn_angel':
         // TODO: Implement actual angel spawning when divine entities are implemented

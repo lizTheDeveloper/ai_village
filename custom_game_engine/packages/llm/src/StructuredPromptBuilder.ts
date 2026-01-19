@@ -155,10 +155,18 @@ export class StructuredPromptBuilder {
     }
     // PRIORITY 2: Building motivation (when agent has resources + needs)
     else if (inventory) {
-      const woodQty = inventory.slots.filter((s: InventorySlot) => s.itemId === 'wood').reduce((sum: number, s: InventorySlot) => sum + s.quantity, 0);
-      const stoneQty = inventory.slots.filter((s: InventorySlot) => s.itemId === 'stone').reduce((sum: number, s: InventorySlot) => sum + s.quantity, 0);
-      const clothQty = inventory.slots.filter((s: InventorySlot) => s.itemId === 'cloth').reduce((sum: number, s: InventorySlot) => sum + s.quantity, 0);
-      const fiberQty = inventory.slots.filter((s: InventorySlot) => s.itemId === 'plant_fiber').reduce((sum: number, s: InventorySlot) => sum + s.quantity, 0);
+      // Single-pass inventory counting to avoid GC pressure (was filter+reduce chains)
+      let woodQty = 0, stoneQty = 0, clothQty = 0, fiberQty = 0;
+      for (let i = 0; i < inventory.slots.length; i++) {
+        const slot = inventory.slots[i];
+        if (!slot) continue;
+        switch (slot.itemId) {
+          case 'wood': woodQty += slot.quantity; break;
+          case 'stone': stoneQty += slot.quantity; break;
+          case 'cloth': clothQty += slot.quantity; break;
+          case 'plant_fiber': fiberQty += slot.quantity; break;
+        }
+      }
 
       // Check actual requirements for specific buildings
       const canBuildCampfire = stoneQty >= 10 && woodQty >= 5;

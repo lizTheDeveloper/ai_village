@@ -7,6 +7,94 @@
  */
 
 import { PanelAdapter, type PanelConfig } from './PanelAdapter.js';
+
+// ============================================================================
+// JSON Data Loading
+// ============================================================================
+
+/**
+ * Panel data loaded from JSON
+ */
+interface PanelData {
+  id: string;
+  title: string;
+  defaultWidth: number;
+  defaultHeight: number;
+  menuCategory?: string;
+}
+
+interface PanelConfigsData {
+  panels: PanelData[];
+}
+
+let panelDataMap: Map<string, PanelData> = new Map();
+
+/**
+ * Load panel configuration data from JSON file
+ */
+async function loadPanelConfigs(): Promise<void> {
+  try {
+    const response = await fetch('/packages/renderer/data/panel-configs.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load panel configs: ${response.statusText}`);
+    }
+    const data: PanelConfigsData = await response.json();
+    data.panels.forEach((panel) => {
+      panelDataMap.set(panel.id, panel);
+    });
+  } catch (error) {
+    console.error('[PanelAdapter] Failed to load panel configs data:', error);
+    // Continue with empty map - configs will use their hardcoded defaults
+  }
+}
+
+// Initialize on module load
+const configsPromise = loadPanelConfigs();
+
+/**
+ * Ensure panel configs are loaded before use
+ */
+export async function ensurePanelConfigsLoaded(): Promise<void> {
+  await configsPromise;
+}
+
+/**
+ * Get panel data from loaded JSON, with fallback to provided defaults
+ */
+function getPanelData(id: string, fallback: Partial<PanelData>): PanelData {
+  const data = panelDataMap.get(id);
+  if (data) {
+    return data;
+  }
+  // Return fallback data if JSON not loaded
+  return {
+    id,
+    title: fallback.title || id,
+    defaultWidth: fallback.defaultWidth || 400,
+    defaultHeight: fallback.defaultHeight || 400,
+    menuCategory: fallback.menuCategory,
+  };
+}
+
+/**
+ * Helper to create a PanelConfig with JSON data support
+ * Merges JSON data (if loaded) with TypeScript behavior config
+ */
+function createPanelConfig<T>(
+  id: string,
+  fallbackData: Partial<PanelData>,
+  behaviorConfig: Omit<PanelConfig<T>, 'id' | 'title' | 'defaultWidth' | 'defaultHeight' | 'menuCategory'>
+): PanelConfig<T> {
+  const data = getPanelData(id, fallbackData);
+  return {
+    id: data.id,
+    title: data.title,
+    defaultWidth: data.defaultWidth,
+    defaultHeight: data.defaultHeight,
+    menuCategory: data.menuCategory as any,
+    ...behaviorConfig,
+  };
+}
 import type { AgentInfoPanel } from '../AgentInfoPanel.js';
 import type { AnimalInfoPanel } from '../AnimalInfoPanel.js';
 import type { CraftingPanelUI } from '../CraftingPanelUI.js';
@@ -88,16 +176,16 @@ interface NotificationsPanelAdapterState {
  * Configuration for ResourcesPanel adapter.
  * Pattern: Simple - uses internal visible state
  */
-export const RESOURCES_PANEL_CONFIG: PanelConfig<ResourcesPanel> = {
-  id: 'resources',
-  title: 'Village Stockpile',
-  defaultWidth: 280,
-  defaultHeight: 200,
-  renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
-    if (!world) return;
-    panel.render(ctx, _x, _y, width, _height, world);
-  },
-};
+export const RESOURCES_PANEL_CONFIG: PanelConfig<ResourcesPanel> = createPanelConfig(
+  'resources',
+  { title: 'Village Stockpile', defaultWidth: 280, defaultHeight: 200 },
+  {
+    renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
+      if (!world) return;
+      panel.render(ctx, _x, _y, width, _height, world);
+    },
+  }
+);
 
 /**
  * Configuration for MemoryPanel adapter.

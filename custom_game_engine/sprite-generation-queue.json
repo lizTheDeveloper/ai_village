@@ -1,216 +1,6 @@
 {
   "sprites": [
     {
-      "folderId": "blueberry-bush-withered",
-      "description": "Withered blueberry bush with brown leaves and bare branches, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-seed",
-      "description": "Small raspberry seed on soil, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-sprout",
-      "description": "Young raspberry bush seedling with first compound leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-vegetative",
-      "description": "Growing raspberry bush with thorny canes and green serrated leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-flowering",
-      "description": "Raspberry bush with small white five-petaled flowers, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-fruiting",
-      "description": "Raspberry bush with green and pink developing berries, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-mature",
-      "description": "Mature raspberry bush with ripe red berries among green leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-seeding",
-      "description": "Raspberry bush with overripe berries dropping, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "raspberry-bush-withered",
-      "description": "Withered raspberry bush with brown dead canes and no leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-seed",
-      "description": "Small blackberry seed on soil, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-sprout",
-      "description": "Young blackberry bush seedling with first compound leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-vegetative",
-      "description": "Growing blackberry bush with thorny arching canes and green leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-flowering",
-      "description": "Blackberry bush with clusters of white or pink five-petaled flowers, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-fruiting",
-      "description": "Blackberry bush with green and red unripe berries forming, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-mature",
-      "description": "Mature blackberry bush with ripe dark purple-black berries, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-seeding",
-      "description": "Blackberry bush with overripe berries falling, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "blackberry-bush-withered",
-      "description": "Withered blackberry bush with brown dead canes, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "tree-seed",
-      "description": "Tree seed or acorn on forest floor, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 24
-      }
-    },
-    {
-      "folderId": "tree-sprout",
-      "description": "Young tree sapling with small trunk and first leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "tree-vegetative",
-      "description": "Growing young tree with developing trunk and branches, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 64
-      }
-    },
-    {
-      "folderId": "tree-flowering",
-      "description": "Tree with spring blossoms on branches, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 64
-      }
-    },
-    {
       "folderId": "tree-fruiting",
       "description": "Tree with fruit or nuts developing on branches, pixel art, top-down view, transparent background",
       "status": "queued",
@@ -1117,6 +907,186 @@
       "queuedAt": 1737256800000,
       "options": {
         "type": "plant",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mountain_goat",
+      "description": "mountain goat with white shaggy fur, black curved horns, nimble hooves, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ibex",
+      "description": "alpine ibex with brown fur, massive curved ridged horns, bearded chin, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chamois",
+      "description": "chamois with brown summer coat, short hooked horns, white face markings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "yak",
+      "description": "yak with long shaggy dark brown fur, curved horns, sturdy build for cold, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snow_leopard",
+      "description": "snow leopard with pale grey spotted fur, long fluffy tail, green eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mountain_lion_tan",
+      "description": "tan mountain lion cougar with tawny fur, powerful build, long tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "marmot",
+      "description": "alpine marmot with brown fur, stout body, small ears, whistle call posture, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "pika",
+      "description": "pika with round grey-brown body, small rounded ears, no visible tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mountain_hare",
+      "description": "mountain hare with grey-brown fur, white winter tips, long ears, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ermine_white",
+      "description": "ermine in white winter coat, black-tipped tail, small body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "condor",
+      "description": "andean condor with black plumage, white ruff, bald head, massive wingspan, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "falcon_peregrine",
+      "description": "peregrine falcon with blue-grey back, barred white chest, pointed wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "vulture",
+      "description": "bearded vulture lammergeier with orange-tinted feathers, black beard, red eye ring, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ptarmigan",
+      "description": "rock ptarmigan with mottled brown plumage, feathered feet, red eyebrow, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "raven",
+      "description": "common raven with glossy black plumage, heavy bill, shaggy throat feathers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "alpine_chough",
+      "description": "alpine chough with glossy black feathers, curved yellow bill, red legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snow_finch",
+      "description": "white-winged snowfinch with grey head, brown back, white wing patches, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "rock_lizard",
+      "description": "wall lizard with grey-brown mottled scales, flattened body for crevices, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
         "size": 48
       }
     }

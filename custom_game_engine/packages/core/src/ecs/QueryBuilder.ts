@@ -80,20 +80,34 @@ export class QueryBuilder implements IQueryBuilder {
     return this;
   }
 
-  execute(): ReadonlyArray<EntityId> {
-    return this.executeEntities().map((e) => e.id);
-  }
+  // Reusable result arrays to reduce GC pressure
+  private resultEntities: Entity[] = [];
+  private resultIds: EntityId[] = [];
 
-  executeEntities(): ReadonlyArray<Entity> {
-    const result: Entity[] = [];
+  execute(): ReadonlyArray<EntityId> {
+    // Reuse ID array - single pass without intermediate entity array
+    this.resultIds.length = 0;
 
     for (const entity of this.world.entities.values()) {
       if (this.matchesAllFilters(entity)) {
-        result.push(entity);
+        this.resultIds.push(entity.id);
       }
     }
 
-    return result;
+    return this.resultIds;
+  }
+
+  executeEntities(): ReadonlyArray<Entity> {
+    // Reuse entity array - WARNING: Result array is reused on next query
+    this.resultEntities.length = 0;
+
+    for (const entity of this.world.entities.values()) {
+      if (this.matchesAllFilters(entity)) {
+        this.resultEntities.push(entity);
+      }
+    }
+
+    return this.resultEntities;
   }
 
   private matchesAllFilters(entity: Entity): boolean {

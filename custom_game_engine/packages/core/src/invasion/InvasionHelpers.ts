@@ -17,6 +17,10 @@ import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
+import type { TownHallComponent } from '../components/TownHallComponent.js';
+import type { WarehouseComponent } from '../components/WarehouseComponent.js';
+import type { ProductionCapabilityComponent } from '../components/ProductionCapabilityComponent.js';
+import type { PlanetLocationComponent } from '../components/PlanetLocationComponent.js';
 
 // ============================================================================
 // Fast PRNG (xorshift32)
@@ -143,8 +147,8 @@ export function getDefenseTechLevel(world: World): number {
  */
 export function getAllSystems(world: World): string[] {
   // Query all planets registered in the world
-  const planets = world.getAllPlanets();
-  return planets.map((planet) => planet.id);
+  const planets = world.getPlanets();
+  return planets.map((planet: { id: string }) => planet.id);
 }
 
 /**
@@ -163,11 +167,11 @@ function calculatePlanetStrategicValue(world: World, planetId: string): number {
   // Query town halls and census bureaus for population data
   const townHalls = world.query().with(CT.TownHall).executeEntities();
   for (const entity of townHalls) {
-    const townHall = entity.getComponent(CT.TownHall);
+    const townHall = entity.getComponent<TownHallComponent>(CT.TownHall);
     if (!townHall) continue;
 
     // Check if this town hall is on the target planet
-    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    const planetLoc = entity.getComponent<PlanetLocationComponent>(CT.PlanetLocation);
     if (planetLoc && planetLoc.currentPlanetId === planetId) {
       // Population score: log scale, max 500 points for 10,000+ population
       const popScore = Math.min(500, Math.log10(townHall.populationCount + 1) * 125);
@@ -179,10 +183,10 @@ function calculatePlanetStrategicValue(world: World, planetId: string): number {
   // Query warehouses for resource stockpiles
   const warehouses = world.query().with(CT.Warehouse).executeEntities();
   for (const entity of warehouses) {
-    const warehouse = entity.getComponent(CT.Warehouse);
+    const warehouse = entity.getComponent<WarehouseComponent>(CT.Warehouse);
     if (!warehouse) continue;
 
-    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    const planetLoc = entity.getComponent<PlanetLocationComponent>(CT.PlanetLocation);
     if (planetLoc && planetLoc.currentPlanetId === planetId) {
       // Calculate total resource value (sum of all stockpiles)
       let totalResources = 0;
@@ -199,10 +203,10 @@ function calculatePlanetStrategicValue(world: World, planetId: string): number {
   // Query production capability components
   const productionEntities = world.query().with(CT.ProductionCapability).executeEntities();
   for (const entity of productionEntities) {
-    const production = entity.getComponent(CT.ProductionCapability);
+    const production = entity.getComponent<ProductionCapabilityComponent>(CT.ProductionCapability);
     if (!production) continue;
 
-    const planetLoc = entity.getComponent(CT.PlanetLocation);
+    const planetLoc = entity.getComponent<PlanetLocationComponent>(CT.PlanetLocation);
     if (planetLoc && planetLoc.currentPlanetId === planetId) {
       // Production score based on tier and multiplier
       const tierValue = production.tier * 40; // 0-160 points

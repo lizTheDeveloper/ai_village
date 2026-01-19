@@ -246,7 +246,7 @@ describe('ReincarnationSystem', () => {
       world.eventBus.flush();
 
       // Advance world tick past delay
-      (world as any)._tick = 100;
+      world.setTick(100);
 
       // Run update
       system.update(world, [], 1);
@@ -359,7 +359,7 @@ describe('ReincarnationSystem', () => {
       world.eventBus.flush();
 
       // Advance tick and run update
-      (world as any)._tick = 100;
+      world.setTick(100);
 
       system.update(world, [], 1);
 

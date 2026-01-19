@@ -94,23 +94,36 @@ export class MovementSystem extends BaseSystem {
       return this.buildingCollisionCache;
     }
 
-    // Rebuild cache
+    // Rebuild cache - reuse array and objects to reduce GC pressure
     const buildings = this.world.query().with(CT.Position).with(CT.Building).executeEntities();
-    this.buildingCollisionCache = [];
 
+    // Reuse existing array
+    if (!this.buildingCollisionCache) {
+      this.buildingCollisionCache = [];
+    }
+
+    let idx = 0;
     for (const building of buildings) {
       const impl = building as EntityImpl;
       const pos = impl.getComponent<PositionComponent>(CT.Position);
       const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
 
       if (pos && buildingComp) {
-        this.buildingCollisionCache.push({
-          x: pos.x,
-          y: pos.y,
-          blocksMovement: buildingComp.blocksMovement,
-        });
+        // Reuse existing object if available, otherwise create new one
+        let data = this.buildingCollisionCache[idx];
+        if (!data) {
+          data = { x: 0, y: 0, blocksMovement: false };
+          this.buildingCollisionCache[idx] = data;
+        }
+        data.x = pos.x;
+        data.y = pos.y;
+        data.blocksMovement = buildingComp.blocksMovement;
+        idx++;
       }
     }
+
+    // Trim array if we have fewer buildings now
+    this.buildingCollisionCache.length = idx;
 
     // Cache valid for 1 second
     this.cacheValidUntilTick = tick + this.CACHE_DURATION_TICKS;
@@ -159,11 +172,12 @@ export class MovementSystem extends BaseSystem {
       const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
 
       if (steeringActive && velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
-        impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-          ...current,
-          velocityX: velocity.vx ?? current.velocityX,
-          velocityY: velocity.vy ?? current.velocityY,
-        }));
+        // Mutate directly to avoid object allocation
+        impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+          current.velocityX = velocity.vx ?? current.velocityX;
+          current.velocityY = velocity.vy ?? current.velocityY;
+          return current;
+        });
         // Re-get movement after update
         const updatedMovement = impl.getComponent<MovementComponent>(CT.Movement)!;
         Object.assign(movement, updatedMovement);
@@ -171,20 +185,20 @@ export class MovementSystem extends BaseSystem {
 
       // Skip if sleeping - agents cannot move while asleep
       if (circadian && circadian.isSleeping) {
-        // Force velocity to 0 while sleeping
+        // Force velocity to 0 while sleeping - mutate directly to avoid object allocation
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
-          impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-            ...current,
-            velocityX: 0,
-            velocityY: 0,
-          }));
+          impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+            current.velocityX = 0;
+            current.velocityY = 0;
+            return current;
+          });
           // Also sync to VelocityComponent
           if (velocity) {
-            impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
-              ...current,
-              vx: 0,
-              vy: 0,
-            }));
+            impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => {
+              current.vx = 0;
+              current.vy = 0;
+              return current;
+            });
           }
         }
         continue;
@@ -281,13 +295,14 @@ export class MovementSystem extends BaseSystem {
 
     const newChunkX = Math.floor(clampedX / 32);
     const newChunkY = Math.floor(clampedY / 32);
-    impl.updateComponent<PositionComponent>(CT.Position, (current) => ({
-      ...current,
-      x: clampedX,
-      y: clampedY,
-      chunkX: newChunkX,
-      chunkY: newChunkY,
-    }));
+    // Mutate directly to avoid object allocation
+    impl.updateComponent<PositionComponent>(CT.Position, (current) => {
+      current.x = clampedX;
+      current.y = clampedY;
+      current.chunkX = newChunkX;
+      current.chunkY = newChunkY;
+      return current;
+    });
 
     // Passive resource discovery for agents with spatial memory
     if (world && impl.hasComponent(CT.Agent) && impl.hasComponent(CT.SpatialMemory)) {
@@ -296,17 +311,18 @@ export class MovementSystem extends BaseSystem {
   }
 
   private stopEntity(impl: EntityImpl, velocity: VelocityComponent | undefined): void {
-    impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-      ...current,
-      velocityX: 0,
-      velocityY: 0,
-    }));
+    // Mutate directly to avoid object allocation
+    impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+      current.velocityX = 0;
+      current.velocityY = 0;
+      return current;
+    });
     if (velocity) {
-      impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
-        ...current,
-        vx: 0,
-        vy: 0,
-      }));
+      impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => {
+        current.vx = 0;
+        current.vy = 0;
+        return current;
+      });
     }
   }
 

@@ -34,12 +34,12 @@ const loadedParadigms = loadParadigmsFromJSON();
 // Export Individual Paradigms
 // ============================================================================
 
-export const HUMAN_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.human;
-export const DWARF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.dwarf;
-export const BIRD_FOLK_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.bird_folk;
-export const MYSTIF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.mystif;
-export const ELF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.elf;
-export const DEFAULT_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.default;
+export const HUMAN_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.human!;
+export const DWARF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.dwarf!;
+export const BIRD_FOLK_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.bird_folk!;
+export const MYSTIF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.mystif!;
+export const ELF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.elf!;
+export const DEFAULT_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.default!;
 
 // ============================================================================
 // Paradigm Registry

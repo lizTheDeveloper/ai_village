@@ -265,78 +265,11 @@ export const BREACH_PATTERNS: Record<string, {
   pattern: Omit<BreachConsequence, 'effect'>;
   effectTemplates: string[];
   flavorText: string;
-}> = {
-  'immediate_punishment': {
-    pattern: {
-      severity: 'severe',
-      type: 'immediate',
-      reversible: true,
-      collectiveOnHeirs: false,
-    },
-    effectTemplates: [
-      'They visit personally. The visit is unpleasant.',
-      'Instant curse. Reversible. Expensive to reverse.',
-      'Public humiliation for specified duration.',
-    ],
-    flavorText: 'Break contract. Face consequences. Immediately.',
-  },
-  'delayed_vengeance': {
-    pattern: {
-      severity: 'catastrophic',
-      type: 'delayed',
-      reversible: false,
-      collectiveOnHeirs: true,
-    },
-    effectTemplates: [
-      'They wait. Plan. Strike when perfect. Devastatingly.',
-      'Bloodline curse. Permanent. Creative.',
-      'Slow unraveling of everything you built.',
-    ],
-    flavorText: 'Revenge served cold. Frozen solid. Absolute zero.',
-  },
-  'cumulative_degradation': {
-    pattern: {
-      severity: 'penalty',
-      type: 'cumulative',
-      reversible: true,
-      collectiveOnHeirs: false,
-    },
-    effectTemplates: [
-      'Each breach worse. Compounding. Exponential.',
-      'Slow curse buildup. Eventually catastrophic.',
-      'Your luck runs out. Gradually. Completely.',
-    ],
-    flavorText: 'First strike warning. Second strike worse. Third strike creative.',
-  },
-  'bloodline_curse': {
-    pattern: {
-      severity: 'catastrophic',
-      type: 'immediate',
-      reversible: false,
-      collectiveOnHeirs: true,
-    },
-    effectTemplates: [
-      'Your descendants inherit consequences. Forever.',
-      'Family curse. Permanent. Inventive.',
-      'Seven generations pay. Minimum.',
-    ],
-    flavorText: 'Descendants will remember. Will curse your name. Justifiably.',
-  },
-  'warning_shot': {
-    pattern: {
-      severity: 'warning',
-      type: 'immediate',
-      reversible: true,
-      collectiveOnHeirs: false,
-    },
-    effectTemplates: [
-      'Minor inconvenience. Clear message.',
-      'They leave disappointed. You feel guilt.',
-      'Nothing happens. Yet. Anticipation worse.',
-    ],
-    flavorText: 'Warning delivered. Next time worse. Much worse.',
-  },
-};
+}> = summonableEntitiesData.breachPatterns as Record<string, {
+  pattern: Omit<BreachConsequence, 'effect'>;
+  effectTemplates: string[];
+  flavorText: string;
+}>;
 
 // ============================================================================
 // APPEARANCE PATTERNS
