@@ -23,126 +23,6 @@
       "error": "API 503: Service Unavailable"
     },
     {
-      "folderId": "ginseng-vegetative",
-      "description": "Growing ginseng plant with palmately compound leaves on single stem, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "ginseng-mature",
-      "description": "Mature ginseng plant with full compound leaves and cluster of red berries at center, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "ginseng-withered",
-      "description": "Withered ginseng with yellowed dried leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 40
-      }
-    },
-    {
-      "folderId": "elderberry-seed",
-      "description": "Small elderberry seed on forest floor, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 24
-      }
-    },
-    {
-      "folderId": "elderberry-sprout",
-      "description": "Young elderberry seedling with first compound leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "elderberry-vegetative",
-      "description": "Growing elderberry bush with multiple stems and compound leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "elderberry-flowering",
-      "description": "Elderberry bush with large flat clusters of tiny white flowers, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "elderberry-fruiting",
-      "description": "Elderberry bush with clusters of green berries developing, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "elderberry-mature",
-      "description": "Mature elderberry bush with drooping clusters of ripe dark purple berries, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "elderberry-seeding",
-      "description": "Elderberry bush with overripe berries falling, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "elderberry-withered",
-      "description": "Withered elderberry bush with brown dead leaves and bare branches, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 48
-      }
-    },
-    {
-      "folderId": "mountain_goat",
-      "description": "mountain goat with white shaggy fur, black curved horns, nimble hooves, pixel art, game sprite, 48x48",
-      "status": "queued",
-      "queuedAt": 1768794337600,
-      "options": {
-        "type": "animal",
-        "size": 48
-      }
-    },
-    {
       "folderId": "ibex",
       "description": "alpine ibex with brown fur, massive curved ridged horns, bearded chin, pixel art, game sprite, 48x48",
       "status": "queued",
@@ -2837,6 +2717,246 @@
       "description": "electric eel with dark elongated body, pixel art, game sprite, 48x48",
       "status": "queued",
       "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "griffin",
+      "description": "griffin with eagle head and wings, lion body, golden feathers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hippogriff",
+      "description": "hippogriff with horse rear, eagle front, brown and white, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "pegasus",
+      "description": "pegasus winged horse with white coat, flowing mane, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "basilisk",
+      "description": "basilisk serpent with venomous gaze, green scales, crest, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cockatrice",
+      "description": "cockatrice rooster-lizard hybrid with petrifying gaze, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chimera",
+      "description": "chimera with lion head, goat body, serpent tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "manticore",
+      "description": "manticore with lion body, human face, scorpion tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hydra",
+      "description": "hydra serpent with multiple heads, green scales, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "crystal_stag",
+      "description": "stag with crystalline antlers, translucent body, prism colors, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "prism_bird",
+      "description": "bird with rainbow crystalline feathers, refracting light, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "geode_bear",
+      "description": "bear with crystal formations growing from fur, amethyst patches, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "quartz_wolf",
+      "description": "wolf with translucent quartz fur, glowing core, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "fire_salamander_giant",
+      "description": "giant salamander with molten skin, trailing embers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lava_hound",
+      "description": "hound with black obsidian hide, glowing lava cracks, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ember_hawk",
+      "description": "hawk with smoldering feathers, trailing smoke, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cinder_boar",
+      "description": "boar with ash-covered hide, burning eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "frost_wolf",
+      "description": "wolf with ice crystal fur, frozen breath, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "glacial_owl",
+      "description": "owl with frosted feathers, icy talons, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ice_bear",
+      "description": "polar bear with crystalline ice patches in fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "blizzard_fox",
+      "description": "fox with swirling snow patterns in white fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "glow_moth_giant",
+      "description": "giant moth with softly glowing wings, trailing light, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "phosphor_beetle",
+      "description": "beetle with bioluminescent carapace, green glow, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cave_fish_luminous",
+      "description": "fish with glowing lures and patterns, deep cave dweller, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "twilight_bat",
+      "description": "bat with softly glowing membrane wings, blue light, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768797321005,
       "options": {
         "type": "animal",
         "size": 48
