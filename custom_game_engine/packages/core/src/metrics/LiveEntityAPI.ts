@@ -374,7 +374,7 @@ export class LiveEntityAPI {
     };
 
     try {
-      const cityInfo = await spawnCity(this.world, config);
+      const cityInfo = await spawnCity(this.world as unknown as WorldMutator, config);
 
       return {
         requestId: action.requestId,
@@ -425,8 +425,8 @@ export class LiveEntityAPI {
       // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
       const { createLLMAgent, createWanderingAgent } = await import('@ai-village/agents');
       const agentId = shouldUseLLM
-        ? createLLMAgent(this.world, x, y, agentSpeed, undefined, options)
-        : createWanderingAgent(this.world, x, y, agentSpeed, options);
+        ? createLLMAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, options);
 
       // Optionally set the agent's name if provided
       if (name && typeof name === 'string') {

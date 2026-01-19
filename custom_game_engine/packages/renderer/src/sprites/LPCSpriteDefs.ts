@@ -3,7 +3,11 @@
  *
  * Defines the structure and metadata for LPC-style modular sprites.
  * These sprites use a 64x64 frame size with 4 directions and multiple animations.
+ *
+ * Configuration data is loaded from lpc-sprite-config.json
  */
+
+import lpcConfig from './lpc-sprite-config.json';
 
 /** Direction indices in LPC sprite sheets (row order) */
 export enum LPCDirection {
@@ -16,18 +20,17 @@ export enum LPCDirection {
 /** Animation types available in LPC sprites */
 export type LPCAnimation = 'walkcycle' | 'slash' | 'spellcast' | 'thrust' | 'shoot' | 'hurt';
 
-/** Frame dimensions for LPC sprites */
-export const LPC_FRAME_SIZE = 64;
+/** Frame dimensions for LPC sprites (loaded from config) */
+export const LPC_FRAME_SIZE = lpcConfig.defaults.frameSize;
 
-/** Animation frame counts */
-export const LPC_ANIMATION_FRAMES: Record<LPCAnimation, number> = {
-  walkcycle: 9,
-  slash: 6,
-  spellcast: 7,
-  thrust: 8,
-  shoot: 13,
-  hurt: 6,
-};
+/** Animation frame counts (loaded from config) */
+export const LPC_ANIMATION_FRAMES: Record<LPCAnimation, number> =
+  lpcConfig.animations as Record<LPCAnimation, { frames: number }> as any as Record<LPCAnimation, number>;
+
+// Convert the config structure to the expected format
+Object.keys(lpcConfig.animations).forEach((key) => {
+  (LPC_ANIMATION_FRAMES as any)[key] = (lpcConfig.animations as any)[key].frames;
+});
 
 /** Part types that can be composited */
 export type LPCPartType = 'body' | 'head' | 'shadow' | 'hair' | 'clothing' | 'armor' | 'weapon';
@@ -130,145 +133,10 @@ export function angleToLPCDirection(angle: number): LPCDirection {
 }
 
 /**
- * Built-in part definitions for downloaded LPC sprites
+ * Built-in part definitions for downloaded LPC sprites (loaded from config)
  */
-export const LPC_BUILTIN_PARTS: Record<string, LPCPartDef> = {
-  // Male bodies
-  'male_ivory_normal_body': {
-    id: 'male_ivory_normal_body',
-    type: 'body',
-    imagePath: 'lpc/modular_heads/male_ivory_normal_headless_walkcycle.png',
-    sheetWidth: 576,
-    sheetHeight: 256,
-    animations: ['walkcycle'],
-    zIndex: 0,
-  },
-  'male_ivory_normal_body_slash': {
-    id: 'male_ivory_normal_body_slash',
-    type: 'body',
-    imagePath: 'lpc/modular_heads/male_ivory_normal_headless_slash.png',
-    sheetWidth: 384,
-    sheetHeight: 256,
-    animations: ['slash'],
-    zIndex: 0,
-  },
-  'male_ivory_muscular_body': {
-    id: 'male_ivory_muscular_body',
-    type: 'body',
-    imagePath: 'lpc/modular_heads/male_ivory_muscular_headless_walkcycle.png',
-    sheetWidth: 576,
-    sheetHeight: 256,
-    animations: ['walkcycle'],
-    zIndex: 0,
-  },
-
-  // Female bodies
-  'female_ivory_normal_body': {
-    id: 'female_ivory_normal_body',
-    type: 'body',
-    imagePath: 'lpc/modular_heads/female_ivory_normal_headless_walkcycle.png',
-    sheetWidth: 576,
-    sheetHeight: 256,
-    animations: ['walkcycle'],
-    zIndex: 0,
-  },
-  'female_ivory_pregnant_body': {
-    id: 'female_ivory_pregnant_body',
-    type: 'body',
-    imagePath: 'lpc/modular_heads/female_ivory_pregnant_headless_walkcycle.png',
-    sheetWidth: 576,
-    sheetHeight: 256,
-    animations: ['walkcycle'],
-    zIndex: 0,
-  },
-
-  // Male heads
-  'male_ivory_human_head': {
-    id: 'male_ivory_human_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/male_ivory_human_head.png',
-    sheetWidth: 320,
-    sheetHeight: 192,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-  'male_ivory_ogre_head': {
-    id: 'male_ivory_ogre_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/male_ivory_ogre_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-  'male_ivory_lizard_head': {
-    id: 'male_ivory_lizard_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/male_ivory_lizard_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-  'male_ivory_wolf_head': {
-    id: 'male_ivory_wolf_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/male_ivory_wolf_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-  'male_skeleton_head': {
-    id: 'male_skeleton_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/male_skeleton_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-
-  // Female heads
-  'female_ivory_human_head': {
-    id: 'female_ivory_human_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/female_ivory_human_head.png',
-    sheetWidth: 320,
-    sheetHeight: 192,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-  'female_ivory_wolf_head': {
-    id: 'female_ivory_wolf_head',
-    type: 'head',
-    imagePath: 'lpc/modular_heads/female_ivory_wolf_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 10,
-  },
-
-  // Shadows
-  'male_ivory_human_shadow': {
-    id: 'male_ivory_human_shadow',
-    type: 'shadow',
-    imagePath: 'lpc/modular_heads/male_ivory_human_shadow_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 5, // Between body and head
-  },
-  'female_ivory_human_shadow': {
-    id: 'female_ivory_human_shadow',
-    type: 'shadow',
-    imagePath: 'lpc/modular_heads/female_ivory_human_shadow_head.png',
-    sheetWidth: 256,
-    sheetHeight: 64,
-    animations: ['walkcycle'],
-    zIndex: 5,
-  },
-};
+export const LPC_BUILTIN_PARTS: Record<string, LPCPartDef> =
+  lpcConfig.builtinParts as Record<string, LPCPartDef>;
 
 /**
  * Get the parts needed for a character definition

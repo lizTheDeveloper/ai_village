@@ -234,7 +234,7 @@ export class PlantDiscoverySystem extends BaseSystem {
     const knownMedicinal = existing?.medicinal;
 
     // Chance to discover what ailments it treats
-    if (medicinal.treats && medicinal.treats.length > 0 && Math.random() < discoveryChance * 0.7) {
+    if (medicinal.treats && medicinal.treats.length > 0 && Math.random() < discoveryChance * 0.7 && knownMedicinal) {
       // Discover 1-2 ailments it treats
       const unknownAilments = knownMedicinal === 'unknown'
         ? medicinal.treats
@@ -259,7 +259,7 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Chance to discover preparation methods
     const preparation = medicinal.preparation;
-    if (preparation && preparation.length > 0 && Math.random() < discoveryChance * 0.5) {
+    if (preparation && preparation.length > 0 && Math.random() < discoveryChance * 0.5 && knownMedicinal) {
       const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
         ? knownMedicinal.knownPreparations
         : [];
@@ -294,7 +294,7 @@ export class PlantDiscoverySystem extends BaseSystem {
           sideEffects.push(effect.type);
 
           // Chance to discover side effects when they happen
-          if (Math.random() < discoveryChance) {
+          if (Math.random() < discoveryChance && knownMedicinal) {
             const currentEffects = knownMedicinal !== 'unknown' && knownMedicinal.knownSideEffects
               ? knownMedicinal.knownSideEffects
               : [];
@@ -326,7 +326,7 @@ export class PlantDiscoverySystem extends BaseSystem {
         });
 
         // Discover that overuse is toxic
-        if (knownMedicinal !== 'unknown' && !knownMedicinal.knowsToxicity) {
+        if (knownMedicinal && knownMedicinal !== 'unknown' && !knownMedicinal.knowsToxicity) {
           knowledge.discoverProperty(
             plantSpeciesId,
             'medicinal',
@@ -359,7 +359,7 @@ export class PlantDiscoverySystem extends BaseSystem {
     const magicDiscoveryChance = discoveryChance * magical.stability * 0.5;
 
     // Chance to discover magic type
-    if (Math.random() < magicDiscoveryChance) {
+    if (Math.random() < magicDiscoveryChance && knownMagical) {
       if (knownMagical === 'unknown' || !knownMagical.knownMagicType) {
         knowledge.discoverProperty(
           plantSpeciesId,
@@ -383,7 +383,7 @@ export class PlantDiscoverySystem extends BaseSystem {
         });
 
         // Chance to discover specific effects
-        if (Math.random() < magicDiscoveryChance * 0.8) {
+        if (Math.random() < magicDiscoveryChance * 0.8 && knownMagical) {
           const currentEffects = knownMagical !== 'unknown' && knownMagical.knownEffects
             ? knownMagical.knownEffects
             : [];
@@ -445,18 +445,20 @@ export class PlantDiscoverySystem extends BaseSystem {
       if (Math.random() < discoveryChance) {
         const existing = knowledge.getKnowledge(plantSpeciesId);
         const knownMedicinal = existing?.medicinal;
-        const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
-          ? knownMedicinal.knownPreparations
-          : [];
-        if (!currentPrep.includes(applicationMethod)) {
-          knowledge.discoverProperty(
-            plantSpeciesId,
-            'medicinal',
-            { knownPreparations: [...currentPrep, applicationMethod] },
-            'experimentation',
-            gameTime
-          );
-          discoveredProperties.push(`preparation_${applicationMethod}`);
+        if (knownMedicinal) {
+          const currentPrep = knownMedicinal !== 'unknown' && knownMedicinal.knownPreparations
+            ? knownMedicinal.knownPreparations
+            : [];
+          if (!currentPrep.includes(applicationMethod)) {
+            knowledge.discoverProperty(
+              plantSpeciesId,
+              'medicinal',
+              { knownPreparations: [...currentPrep, applicationMethod] },
+              'experimentation',
+              gameTime
+            );
+            discoveredProperties.push(`preparation_${applicationMethod}`);
+          }
         }
       }
     }
@@ -501,7 +503,7 @@ export class PlantDiscoverySystem extends BaseSystem {
     const knownCrafting = existing?.crafting;
 
     // Discover dye properties
-    if (crafting.dye && Math.random() < discoveryChance) {
+    if (crafting.dye && Math.random() < discoveryChance && knownCrafting) {
       if (knownCrafting === 'unknown' || !knownCrafting.knownDyeColor) {
         knowledge.discoverProperty(
           plantSpeciesId,
@@ -521,7 +523,7 @@ export class PlantDiscoverySystem extends BaseSystem {
     }
 
     // Discover fiber properties
-    if (crafting.fiber && Math.random() < discoveryChance) {
+    if (crafting.fiber && Math.random() < discoveryChance && knownCrafting) {
       if (knownCrafting === 'unknown' || !knownCrafting.knowsFiber) {
         knowledge.discoverProperty(
           plantSpeciesId,
@@ -535,7 +537,7 @@ export class PlantDiscoverySystem extends BaseSystem {
     }
 
     // Discover scent properties
-    if (crafting.scent?.profile && Math.random() < discoveryChance * 1.5) { // Scent is more easily noticed
+    if (crafting.scent?.profile && Math.random() < discoveryChance * 1.5 && knownCrafting) { // Scent is more easily noticed
       if (knownCrafting === 'unknown' || !knownCrafting.knownScent) {
         knowledge.discoverProperty(
           plantSpeciesId,

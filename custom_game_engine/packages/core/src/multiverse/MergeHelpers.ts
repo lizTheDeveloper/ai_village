@@ -202,7 +202,11 @@ function getEntityMap(universe: UniverseSnapshot): Map<string, VersionedEntity> 
     entityMap = new Map<string, VersionedEntity>();
     const entities = universe.entities;
     for (let i = 0; i < entities.length; i++) {
-      entityMap.set(entities[i].id, entities[i]);
+      const entity = entities[i];
+      if (!entity) {
+        throw new Error(`Entity at index ${i} is undefined in universe ${universeId}`);
+      }
+      entityMap.set(entity.id, entity);
     }
     entityLookupCache.set(universeId, entityMap);
 
@@ -253,7 +257,11 @@ export function replaceEntity(
 
   // Optimized indexed loop instead of findIndex
   for (let i = 0; i < entities.length; i++) {
-    if (entities[i].id === entityId) {
+    const entity = entities[i];
+    if (!entity) {
+      throw new Error(`Entity at index ${i} is undefined in universe ${universe.identity.id}`);
+    }
+    if (entity.id === entityId) {
       entities[i] = newEntity;
       // Invalidate cache since universe was mutated
       entityLookupCache.delete(universe.identity.id);
@@ -306,8 +314,12 @@ export function findComponent(
 
   // Direct indexed loop is faster than .find() for small arrays
   for (let i = 0; i < components.length; i++) {
-    if (components[i].type === componentType) {
-      return components[i];
+    const component = components[i];
+    if (!component) {
+      throw new Error(`Component at index ${i} is undefined in entity ${entity.id}`);
+    }
+    if (component.type === componentType) {
+      return component;
     }
   }
 

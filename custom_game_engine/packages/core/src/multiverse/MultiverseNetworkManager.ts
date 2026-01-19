@@ -67,6 +67,20 @@ interface UniverseSubscription {
   updateInterval: ReturnType<typeof setInterval>;
 }
 
+/**
+ * Entity with updateComponent method (for mutation operations)
+ */
+interface UpdateableEntity {
+  updateComponent<T>(type: string, updater: ((current: T) => T) | Partial<T>): void;
+}
+
+/**
+ * Entity with an id property
+ */
+interface EntityWithId {
+  id: string;
+}
+
 export class MultiverseNetworkManager {
   private multiverseCoordinator: MultiverseCoordinator;
 
@@ -446,7 +460,7 @@ export class MultiverseNetworkManager {
 
     // Serialize entity
     type WorldSerializerWithEntity = { serializeEntity(entity: unknown): Promise<unknown> };
-    const serializedEntity = await (worldSerializer as WorldSerializerWithEntity).serializeEntity(entity);
+    const serializedEntity = await (worldSerializer as unknown as WorldSerializerWithEntity).serializeEntity(entity);
 
     // Compute checksum
     const checksum = computeChecksumSync(serializedEntity);
@@ -519,7 +533,7 @@ export class MultiverseNetworkManager {
                 divinePowersSuppressed?: boolean;
                 suppressionReason?: string;
               };
-              (entity as { updateComponent<T>(type: string, updater: (current: T) => T): void }).updateComponent<AvatarComponent & { type: string }>('avatar', (current) => ({
+              (entity as unknown as { updateComponent<T>(type: string, updater: (current: T) => T): void }).updateComponent<AvatarComponent & { type: string }>('avatar', (current) => ({
                 ...current,
                 ...avatarComp,
                 originMultiverseId: sourceMultiverseId,
@@ -547,7 +561,7 @@ export class MultiverseNetworkManager {
 
             // Force jack-out
             type UpdateableEntity = { updateComponent<T>(type: string, component: T): void };
-            (deityEntity as UpdateableEntity).updateComponent('player_control', {
+            (deityEntity as unknown as UpdateableEntity).updateComponent('player_control', {
               ...(typedPlayerControl || {}),
               isPossessed: false,
               possessedAgentId: null,
@@ -599,7 +613,7 @@ export class MultiverseNetworkManager {
     // Remove entity from source universe
     // Cast to WorldMutator to access destroyEntity method
     type WorldMutator = { destroyEntity(entityId: string, reason: string): void };
-    const worldMutator = sourceUniverse.world as WorldMutator;
+    const worldMutator = sourceUniverse.world as unknown as WorldMutator;
     worldMutator.destroyEntity(entityId, 'Transferred to remote universe');
 
 
@@ -846,11 +860,11 @@ export class MultiverseNetworkManager {
 
       // Deserialize entity
       type WorldSerializerWithDeserialize = { deserializeEntity(data: unknown): Promise<{ id: string }> };
-      const entity = await (worldSerializer as WorldSerializerWithDeserialize).deserializeEntity(message.entity);
+      const entity = await (worldSerializer as unknown as WorldSerializerWithDeserialize).deserializeEntity(message.entity);
 
       // Add entity to target world
       type WorldWithEntities = { _entities: Map<string, unknown> };
-      const worldImpl = targetUniverse.world as WorldWithEntities;
+      const worldImpl = targetUniverse.world as unknown as WorldWithEntities;
       const oldEntityId = entity.id;
 
       // Generate new entity ID for this universe
@@ -1041,7 +1055,7 @@ export class MultiverseNetworkManager {
     type WorldSerializerWithSerialize = { serializeEntity(entity: unknown): Promise<unknown> };
     const serializedEntities = await Promise.all(
       entities.map(async (entity) => {
-        const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
+        const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
         // Cache for delta compression
         const cache = this.entityCache.get(passageId);
         if (cache && typeof entity === 'object' && entity !== null && 'id' in entity) {
@@ -1109,7 +1123,7 @@ export class MultiverseNetworkManager {
     for (const entity of currentEntities) {
       const entityWithId = entity as EntityWithId;
       if (!cache.has(entityWithId.id)) {
-        const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
+        const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
         entitiesAdded.push(serialized);
         cache.set(entityWithId.id, serialized);
       } else if (subscription.config.deltaUpdatesOnly) {
@@ -1121,7 +1135,7 @@ export class MultiverseNetworkManager {
             deltas,
           });
           // Update cache
-          const serialized = await (worldSerializer as WorldSerializerWithSerialize).serializeEntity(entity);
+          const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
           cache.set(entityWithId.id, serialized);
         }
       }

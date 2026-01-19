@@ -2,6 +2,14 @@ import type { World, Entity } from '@ai-village/core';
 import type { EventBus } from '@ai-village/core';
 
 /**
+ * Position component type
+ */
+interface PositionComponent {
+  x: number;
+  y: number;
+}
+
+/**
  * ThreatIndicatorRenderer - Renders threat indicators for active conflicts
  *
  * REQ-COMBAT-005: Threat Indicators

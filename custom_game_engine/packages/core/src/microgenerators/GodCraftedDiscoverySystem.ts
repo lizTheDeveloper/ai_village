@@ -100,7 +100,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     try {
       candidates = godCraftedQueue.pullForUniverse(this.universeId, {
         validated: true,
-      } as unknown as Component);
+      });
     } catch (error) {
       console.error('[GodCraftedDiscovery] Error pulling from queue:', error);
       return;
@@ -136,7 +136,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const worldY = chunkInfo.y * chunkInfo.size + localY;
 
     // Spawn content at position
-    const result = this.spawnContent(content, world, { x: worldX, y: worldY } as unknown as Component);
+    const result = this.spawnContent(content, world, { x: worldX, y: worldY });
 
     if (result.success) {
       godCraftedQueue.markDiscovered(
@@ -311,7 +311,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    } as unknown as Component);
+    });
 
     return {
       success: true,
@@ -397,7 +397,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    } as unknown as Component);
+    });
 
     return {
       success: true,
@@ -483,7 +483,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         entityId: entity.id,
         discoveryMethod: 'random_encounter',
       },
-    } as unknown as Component);
+    });
 
     return {
       success: true,

@@ -25,3 +25,10 @@ export {
 
 // Planet class
 export { Planet, createPlanet } from './Planet.js';
+
+// Planet initialization
+export type { PlanetInitializationOptions } from './PlanetInitializer.js';
+export {
+  initializePlanet,
+  generateRandomPlanetConfig,
+} from './PlanetInitializer.js';

@@ -15,6 +15,7 @@ import type { Chunk } from '../chunks/Chunk.js';
 import type { Tile } from '../chunks/Tile.js';
 import type { PlanetConfig, PlanetSnapshot } from './PlanetTypes.js';
 import type { WorldMutator, GodCraftedDiscoverySystem } from '@ai-village/core';
+import type { BiosphereData } from '../biosphere/BiosphereTypes.js';
 
 /**
  * Planet class - manages terrain and entities for a single planet.
@@ -37,6 +38,9 @@ export class Planet {
 
   /** Optional GodCraftedDiscoverySystem for spawning content */
   private godCraftedSpawner?: GodCraftedDiscoverySystem;
+
+  /** Generated biosphere data (species, ecological niches, food webs) */
+  private _biosphere?: BiosphereData;
 
   constructor(config: PlanetConfig, godCraftedSpawner?: GodCraftedDiscoverySystem) {
     this.config = config;
@@ -157,6 +161,31 @@ export class Planet {
   }
 
   // ===========================================================================
+  // Biosphere Access
+  // ===========================================================================
+
+  /**
+   * Get the biosphere data for this planet.
+   */
+  get biosphere(): BiosphereData | undefined {
+    return this._biosphere;
+  }
+
+  /**
+   * Set the biosphere data for this planet.
+   */
+  setBiosphere(biosphere: BiosphereData): void {
+    this._biosphere = biosphere;
+  }
+
+  /**
+   * Check if this planet has a generated biosphere.
+   */
+  get hasBiosphere(): boolean {
+    return this._biosphere !== undefined;
+  }
+
+  // ===========================================================================
   // Metadata
   // ===========================================================================
 
@@ -223,6 +252,7 @@ export class Planet {
       $schema: 'https://aivillage.dev/schemas/planet-snapshot/v1',
       config: this.config,
       namedLocations: namedLocations.length > 0 ? namedLocations : undefined,
+      biosphere: this._biosphere,
     };
   }
 
@@ -244,6 +274,11 @@ export class Planet {
           loc.description
         );
       }
+    }
+
+    // Restore biosphere
+    if (snapshot.biosphere) {
+      planet._biosphere = snapshot.biosphere as BiosphereData;
     }
 
     return planet;

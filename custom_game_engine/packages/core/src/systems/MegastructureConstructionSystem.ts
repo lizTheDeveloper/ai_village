@@ -313,6 +313,9 @@ export class MegastructureConstructionSystem extends BaseSystem {
     if (phaseIdx < 0 || phaseIdx >= phases.length) return;
 
     const currentPhase = phases[phaseIdx];
+    if (!currentPhase) {
+      throw new Error(`Construction phase at index ${phaseIdx} is undefined`);
+    }
     const phaseResourcesNeeded = currentPhase.resourcesNeeded;
 
     // PERF: Early exit if no manager entity
@@ -337,6 +340,9 @@ export class MegastructureConstructionSystem extends BaseSystem {
 
     for (const itemId in phaseResourcesNeeded) {
       const totalNeeded = phaseResourcesNeeded[itemId];
+      if (totalNeeded === undefined) {
+        throw new Error(`Phase resource quantity undefined for itemId: ${itemId}`);
+      }
       const amountToConsume = Math.ceil(totalNeeded * progressDelta);
 
       let remainingToConsume = amountToConsume;

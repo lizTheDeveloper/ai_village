@@ -81,7 +81,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     }
 
     // Extract position values from component
-    const casterPosData = casterPosComp as PositionComponentData;
+    const casterPosData = casterPosComp as unknown as PositionComponentData;
     const casterPos = {
       x: casterPosData.x ?? 0,
       y: casterPosData.y ?? 0,
@@ -139,7 +139,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
 
         // Set position
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z);
-        itemEntity.addComponent('position', positionComponent);
+        itemEntity.addComponent('position', positionComponent as unknown as Record<string, unknown>);
 
         // Add item component with quality metadata
         const itemComponent: ItemComponent = {
@@ -151,7 +151,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
           spellId: context.spell.id,
           permanent: effect.permanent,
         };
-        itemEntity.addComponent('item', itemComponent);
+        itemEntity.addComponent('item', itemComponent as unknown as Record<string, unknown>);
 
         // Add identity component for the item
         const identityComponent: IdentityComponent = {
@@ -159,7 +159,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
           name: effect.createdItem,
           description: `A ${effect.createdItem} created by magic`,
         };
-        itemEntity.addComponent('identity', identityComponent);
+        itemEntity.addComponent('identity', identityComponent as unknown as Record<string, unknown>);
 
         // If temporary, add expiration data
         if (!effect.permanent && (effect.duration || context.spell.duration)) {
@@ -170,7 +170,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
             creatorId: caster.id,
             reason: 'temporary_creation',
           };
-          itemEntity.addComponent('expiration', expirationComponent);
+          itemEntity.addComponent('expiration', expirationComponent as unknown as Record<string, unknown>);
         }
 
         createdEntityIds.push(itemEntity.id);

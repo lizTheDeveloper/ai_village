@@ -20,50 +20,9 @@ export interface DeathGodConfig {
 /**
  * Registry of all available death gods with their sprite assignments
  */
-export const DEATH_GOD_REGISTRY: DeathGodConfig[] = [
-  {
-    name: 'Thanatos',
-    spriteFolder: 'plague-doctor',
-    origin: 'Greco-Victorian',
-    description:
-      'A gaunt figure in black leather plague doctor mask with elongated beak, carrying a vial of glowing souls',
-  },
-  {
-    name: 'Catrina',
-    spriteFolder: 'day-of-dead-goddess',
-    origin: 'Mexican',
-    description:
-      'Elegant skeletal figure with calavera face paint, flowing red and gold dress adorned with marigolds',
-  },
-  {
-    name: 'Valraven',
-    spriteFolder: 'valraven-goddess',
-    origin: 'Nordic',
-    description:
-      'Fierce warrior with braided white hair, dark iron armor, wielding a rune-inscribed battle-axe',
-  },
-  {
-    name: 'Chronos',
-    spriteFolder: 'clockwork-reaper',
-    origin: 'Victorian Steampunk',
-    description:
-      'Mechanical automaton with exposed brass gears, elegant top hat, holding a pocket watch that controls fate',
-  },
-  {
-    name: 'Mycelian',
-    spriteFolder: 'mushroom-druid',
-    origin: 'Ancient Forest',
-    description:
-      'Moss-covered spirit with antler crown bearing glowing mushrooms, surrounded by floating spores',
-  },
-  {
-    name: 'Void',
-    spriteFolder: 'cosmic-void-entity',
-    origin: 'Cosmic Horror',
-    description:
-      'Ethereal being whose robes resemble deep space, with swirling galaxies where eyes should be',
-  },
-];
+import deathGodRegistryData from '../data/death-god-registry.json';
+
+export const DEATH_GOD_REGISTRY: DeathGodConfig[] = deathGodRegistryData.deathGods as DeathGodConfig[];
 
 /**
  * Get a death god configuration by name

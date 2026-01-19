@@ -22,14 +22,9 @@ export type PowerTier =
   | 'world_shaping'; // Reality-altering powers (5000+ belief)
 
 /** Belief thresholds for each tier */
-export const POWER_TIER_THRESHOLDS: Record<PowerTier, number> = {
-  dormant: 0,
-  minor: 10,
-  moderate: 100,
-  major: 500,
-  supreme: 2000,
-  world_shaping: 5000,
-};
+import beliefEconomyData from '../data/belief-economy.json';
+
+export const POWER_TIER_THRESHOLDS: Record<PowerTier, number> = beliefEconomyData.powerTierThresholds as Record<PowerTier, number>;
 
 // ============================================================================
 // Power Categories
@@ -368,23 +363,9 @@ export interface DomainPowerAffinity {
 }
 
 /** Get the base domain-power affinities */
-export const DOMAIN_POWER_AFFINITIES: Partial<Record<DivineDomain, DivinePowerType[]>> = {
-  harvest: ['bless_harvest', 'minor_luck', 'minor_miracle', 'mass_blessing'],
-  war: ['smite', 'divine_champion', 'divine_protection', 'inspire_emotion'],
-  wisdom: ['reveal_truth', 'prophetic_dream', 'clear_vision', 'guide_path'],
-  healing: ['heal_wound', 'heal_mortal_wound', 'resurrect_recent', 'mass_blessing'],
-  death: ['resurrect_recent', 'resurrect_old', 'sense_prayer', 'banish_spirit'],
-  nature: ['terraform_local', 'create_species', 'bless_harvest', 'storm_calling'],
-  storm: ['storm_calling', 'smite', 'divine_cataclysm', 'major_miracle'],
-  protection: ['divine_protection', 'sanctify_site', 'bless_individual', 'sacred_mark'],
-  chaos: ['reality_warp', 'curse_individual', 'minor_luck', 'inspire_emotion'],
-  order: ['divine_edict', 'compel_truth', 'divine_judgment', 'establish_domain'],
-  mystery: ['reveal_truth', 'prophetic_dream', 'reality_warp', 'clear_vision'],
-  fire: ['smite', 'divine_cataclysm', 'terraform_local', 'curse_land'],
-  water: ['storm_calling', 'bless_harvest', 'heal_wound', 'divine_cataclysm'],
-  dreams: ['prophetic_dream', 'clear_vision', 'dream_hint', 'inspire_emotion'],
-  trickery: ['minor_luck', 'curse_individual', 'inspire_emotion', 'reveal_truth'],
-};
+import domainPowerAffinitiesData from '../data/domain-power-affinities.json';
+
+export const DOMAIN_POWER_AFFINITIES: Partial<Record<DivineDomain, DivinePowerType[]>> = domainPowerAffinitiesData.affinities as Partial<Record<DivineDomain, DivinePowerType[]>>;
 
 // ============================================================================
 // Prayers and Responses

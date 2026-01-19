@@ -1,0 +1,294 @@
+/**
+ * PlanetInitializer - Orchestrates complete planet generation
+ *
+ * Coordinates terrain generation and biosphere generation to create
+ * a fully-populated planet with alien life.
+ */
+
+import { Planet } from './Planet.js';
+import { BiosphereGenerator } from '../biosphere/BiosphereGenerator.js';
+import { queueBiosphereSprites } from '../biosphere/queueBiosphereSprites.js';
+import type { PlanetConfig } from './PlanetTypes.js';
+import type { LLMProvider, GodCraftedDiscoverySystem } from '@ai-village/core';
+
+export interface PlanetInitializationOptions {
+  /** LLM provider for generating alien species */
+  llmProvider: LLMProvider;
+
+  /** Optional god-crafted discovery system */
+  godCraftedSpawner?: GodCraftedDiscoverySystem;
+
+  /** Whether to generate biosphere (default: true) */
+  generateBiosphere?: boolean;
+
+  /** Whether to queue sprite generation (default: true) */
+  queueSprites?: boolean;
+
+  /** Path to sprite queue file (default: auto-detect) */
+  spriteQueuePath?: string;
+}
+
+/**
+ * Initialize a complete planet with terrain and biosphere.
+ */
+export async function initializePlanet(
+  config: PlanetConfig,
+  options: PlanetInitializationOptions
+): Promise<Planet> {
+  const {
+    llmProvider,
+    godCraftedSpawner,
+    generateBiosphere = true,
+    queueSprites = true,
+    spriteQueuePath,
+  } = options;
+
+  console.log(`[PlanetInitializer] Initializing planet: ${config.name} (${config.type})`);
+
+  // Step 1: Create planet with terrain generator
+  const planet = new Planet(config, godCraftedSpawner);
+
+  // Step 2: Generate biosphere if requested
+  if (generateBiosphere) {
+    console.log(`[PlanetInitializer] Generating biosphere for ${config.name}...`);
+
+    try {
+      const biosphereGenerator = new BiosphereGenerator(llmProvider, config);
+      const biosphere = await biosphereGenerator.generateBiosphere();
+
+      planet.setBiosphere(biosphere);
+
+      console.log(
+        `[PlanetInitializer] Biosphere generated: ${biosphere.species.length} species, ` +
+        `${biosphere.sapientSpecies.length} sapient, art style: ${biosphere.artStyle}`
+      );
+
+      // Step 3: Queue sprites if requested
+      if (queueSprites) {
+        console.log(`[PlanetInitializer] Queuing ${biosphere.species.length} sprites...`);
+
+        await queueBiosphereSprites(biosphere, spriteQueuePath);
+
+        console.log(`[PlanetInitializer] Sprites queued successfully`);
+      }
+    } catch (error) {
+      console.error(`[PlanetInitializer] Failed to generate biosphere for ${config.name}:`, error);
+      // Continue without biosphere on error
+    }
+  }
+
+  console.log(`[PlanetInitializer] Planet initialization complete: ${config.name}`);
+
+  return planet;
+}
+
+/**
+ * Generate a random planet configuration.
+ */
+export function generateRandomPlanetConfig(
+  seed: string,
+  options?: Partial<PlanetConfig>
+): PlanetConfig {
+  // Use seed to deterministically choose planet type
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+
+  const planetTypes = [
+    'terrestrial',
+    'super_earth',
+    'desert',
+    'ice',
+    'ocean',
+    'volcanic',
+    'tidally_locked',
+    'hycean',
+    'rogue',
+    'moon',
+    'magical',
+    'fungal',
+    'crystal',
+  ];
+
+  const type = planetTypes[Math.abs(hash) % planetTypes.length] as PlanetConfig['type'];
+
+  // Generate random parameters based on planet type
+  const config = generatePlanetConfigFromType(type, seed);
+
+  // Apply overrides
+  if (options) {
+    Object.assign(config, options);
+  }
+
+  return config;
+}
+
+/**
+ * Generate planet configuration from a planet type.
+ */
+function generatePlanetConfigFromType(
+  type: PlanetConfig['type'],
+  seed: string
+): PlanetConfig {
+  // Base configuration
+  const base: PlanetConfig = {
+    id: `planet:${seed}`,
+    name: generatePlanetName(seed),
+    type,
+    seed,
+    temperatureOffset: 0,
+    temperatureScale: 1.0,
+    moistureOffset: 0,
+    moistureScale: 1.0,
+    elevationOffset: 0,
+    elevationScale: 1.0,
+    seaLevel: -0.3,
+    allowedBiomes: [],
+    gravity: 1.0,
+    atmosphereDensity: 1.0,
+  };
+
+  // Type-specific configurations
+  switch (type) {
+    case 'terrestrial':
+      base.allowedBiomes = ['plains', 'forest', 'mountains', 'ocean', 'river', 'wetland', 'desert', 'taiga', 'jungle'];
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'super_earth':
+      base.allowedBiomes = ['plains', 'forest', 'mountains', 'ocean', 'wetland'];
+      base.gravity = 1.5 + Math.random() * 1.0; // 1.5-2.5g
+      base.atmosphereDensity = 1.2 + Math.random() * 0.5;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'desert':
+      base.allowedBiomes = ['desert', 'mountains', 'scrubland'];
+      base.temperatureOffset = 0.3;
+      base.moistureOffset = -0.6;
+      base.atmosphereDensity = 0.4;
+      base.atmosphereType = 'carbon_dioxide';
+      break;
+
+    case 'ice':
+      base.allowedBiomes = ['tundra', 'mountains'];
+      base.temperatureOffset = -0.8;
+      base.hasSubsurfaceOcean = true;
+      base.atmosphereDensity = 0.1;
+      break;
+
+    case 'ocean':
+      base.allowedBiomes = ['ocean', 'wetland'];
+      base.seaLevel = 0.5;
+      base.moistureOffset = 1.0;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'volcanic':
+      base.allowedBiomes = ['volcanic', 'mountains', 'scrubland'];
+      base.hasLavaFlows = true;
+      base.temperatureOffset = 0.6;
+      base.atmosphereDensity = 0.8;
+      base.atmosphereType = 'sulfur';
+      break;
+
+    case 'tidally_locked':
+      base.allowedBiomes = ['plains', 'desert', 'wetland', 'river'];
+      base.isTidallyLocked = true;
+      base.temperatureScale = 2.0;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'hycean':
+      base.allowedBiomes = ['ocean', 'wetland'];
+      base.atmosphereDensity = 2.5;
+      base.atmosphereType = 'hydrogen';
+      base.gravity = 1.2;
+      break;
+
+    case 'rogue':
+      base.allowedBiomes = ['tundra', 'mountains'];
+      base.isStarless = true;
+      base.temperatureOffset = -0.9;
+      base.atmosphereDensity = 0.5;
+      base.atmosphereType = 'methane';
+      break;
+
+    case 'moon':
+      base.allowedBiomes = ['mountains', 'desert'];
+      base.gravity = 0.3;
+      base.atmosphereDensity = 0.01;
+      base.atmosphereType = 'none';
+      break;
+
+    case 'magical':
+      base.allowedBiomes = ['magical', 'forest', 'mountains', 'plains'];
+      base.hasFloatingIslands = true;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'fungal':
+      base.allowedBiomes = ['fungal', 'wetland', 'forest'];
+      base.hasGiantMushrooms = true;
+      base.moistureOffset = 0.5;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    case 'crystal':
+      base.allowedBiomes = ['crystal', 'mountains'];
+      base.hasCrystalFormations = true;
+      base.atmosphereType = 'nitrogen_oxygen';
+      break;
+
+    default:
+      base.allowedBiomes = ['plains', 'forest', 'mountains', 'ocean'];
+  }
+
+  return base;
+}
+
+/**
+ * Generate a random planet name from seed.
+ */
+function generatePlanetName(seed: string): string {
+  const prefixes = [
+    'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta',
+    'Nova', 'Stellar', 'Cosmic', 'Nebula', 'Quantum', 'Void', 'Celestial',
+    'Astral', 'Galactic', 'Orbital', 'Lunar', 'Solar'
+  ];
+
+  const suffixes = [
+    'Prime', 'Major', 'Minor', 'Tertius', 'Secundus', 'Primus',
+    'Alpha', 'Beta', 'Gamma', 'One', 'Two', 'Three', 'Four', 'Five',
+    'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'
+  ];
+
+  const bodies = [
+    'Terra', 'Mundo', 'Gaia', 'Theia', 'Rhea', 'Titan', 'Oberon',
+    'Miranda', 'Ariel', 'Umbriel', 'Triton', 'Nereid', 'Proteus'
+  ];
+
+  // Hash seed to pick deterministic names
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+
+  const prefix = prefixes[Math.abs(hash) % prefixes.length];
+  const body = bodies[Math.abs(hash >> 8) % bodies.length];
+  const suffix = suffixes[Math.abs(hash >> 16) % suffixes.length];
+
+  // Randomly choose naming pattern
+  const pattern = Math.abs(hash) % 4;
+
+  switch (pattern) {
+    case 0: return `${prefix} ${body}`;
+    case 1: return `${body} ${suffix}`;
+    case 2: return `${prefix}-${hash % 1000}`;
+    case 3: return body;
+    default: return `${body} ${suffix}`;
+  }
+}

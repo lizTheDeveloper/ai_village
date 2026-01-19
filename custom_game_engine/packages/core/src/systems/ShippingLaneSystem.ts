@@ -305,6 +305,7 @@ export class ShippingLaneSystem extends BaseSystem {
             agreementId: caravan.agreementId,
             cargo: caravan.cargo,
             destinationId: lane.destinationId,
+            travelTime: lane.travelTimeTicks,
           },
         });
 
@@ -462,6 +463,7 @@ export class ShippingLaneSystem extends BaseSystem {
         agreementId,
         cargo,
         originId: laneComp.originId,
+        destinationId: laneComp.destinationId,
       },
     });
 

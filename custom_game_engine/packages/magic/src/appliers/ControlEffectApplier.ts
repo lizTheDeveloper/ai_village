@@ -469,7 +469,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
             type: 'status_effects' as const,
             isStunned: true
           };
-          world.addComponent(target.id, newStatusEffects);
+          world.addComponent(target.id, newStatusEffects as unknown as Component);
         } else {
           const statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
           if (statusEffects) {
@@ -677,7 +677,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
         type: 'behavior' as const,
         currentBehavior: 'flee' as const
       };
-      world.addComponent(target.id, newBehavior);
+      world.addComponent(target.id, newBehavior as unknown as Component);
     } else {
       behavior.currentBehavior = 'flee';
     }

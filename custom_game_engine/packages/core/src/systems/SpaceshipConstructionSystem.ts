@@ -259,6 +259,7 @@ export class SpaceshipConstructionSystem extends BaseSystem {
               shipName: project.shipName,
               progress: project.progress,
               milestone: currProgress,
+              ticksRemaining: project.ticksRemaining,
             },
           });
         }
@@ -360,8 +361,8 @@ export class SpaceshipConstructionSystem extends BaseSystem {
         shipType,
         shipName,
         builderId,
-        spaceshipEntityId: spaceshipEntity.id,
         estimatedTicks: config.constructionTime,
+        estimatedHours: config.constructionTime / (20 * 60), // ticks to hours
       },
     });
   }
@@ -506,7 +507,8 @@ export class SpaceshipConstructionSystem extends BaseSystem {
         shipType: project.shipType,
         shipName: project.shipName,
         builderId: project.builderId,
-        shipyardId: project.shipyardId,
+        buildTime: project.ticksElapsed / 20, // Convert ticks to seconds
+        ticksElapsed: project.ticksElapsed,
       },
     });
   }
@@ -589,8 +591,6 @@ export class SpaceshipConstructionSystem extends BaseSystem {
         shipName: project.shipName,
         shipyardId: project.shipyardId,
         builderId: project.builderId,
-        progress: project.progress,
-        reason,
       },
     });
   }

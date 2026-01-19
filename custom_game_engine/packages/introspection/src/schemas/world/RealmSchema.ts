@@ -134,7 +134,7 @@ export const RealmSchema = autoRegister(
     llm: {
       promptSection: 'Realm',
       summarize: (data: RealmComponent) => {
-        const props = data.properties as Record<string, unknown>;
+        const props = data.properties as unknown as Record<string, unknown>;
         const realmType = (props?.realmType as string) ?? 'unknown';
         const count = data.inhabitants.length;
         const active = data.active ? 'active' : 'inactive';

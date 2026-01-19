@@ -1,0 +1,250 @@
+{
+  "$schema": "race-templates-schema",
+  "description": "Mythological race definitions with traits, body plans, and realm associations. Note: traits reference common-traits.json by ID",
+  "races": {
+    "human": {
+      "id": "human",
+      "name": "Human",
+      "description": "Mortal beings of adaptability and ambition",
+      "nativeRealm": "mortal_world",
+      "type": "mortal",
+      "category": "humanoid",
+      "lifespan": "mortal",
+      "lifespanYears": 80,
+      "innateTraits": [
+        {
+          "id": "adaptability",
+          "name": "Adaptability",
+          "category": "spiritual",
+          "description": "Can thrive in any environment and learn any skill",
+          "effects": {
+            "skillAffinityBonus": {
+              "building": 0.1,
+              "farming": 0.1,
+              "gathering": 0.1,
+              "cooking": 0.1,
+              "crafting": 0.1,
+              "social": 0.1,
+              "exploration": 0.1,
+              "combat": 0.1,
+              "animal_handling": 0.1,
+              "medicine": 0.1
+            }
+          }
+        },
+        {
+          "id": "mortal_ambition",
+          "name": "Mortal Ambition",
+          "category": "spiritual",
+          "description": "Limited lifespan drives achievement",
+          "effects": {
+            "abilitiesGranted": ["ambition"]
+          }
+        }
+      ],
+      "canHybridize": true,
+      "hybridCompatible": ["olympian", "demigod", "nymph", "satyr", "sidhe", "efreet", "djinn"],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "typicalAlignment": "neutral",
+      "societyType": "various"
+    },
+    "olympian": {
+      "id": "olympian",
+      "name": "Olympian",
+      "description": "The gods of Mount Olympus, beings of immense divine power",
+      "nativeRealm": "olympus",
+      "type": "divine",
+      "category": "humanoid",
+      "lifespan": "immortal",
+      "innateTraits": [
+        "shapeshifting",
+        "divine_beauty",
+        {
+          "id": "domain_power",
+          "name": "Domain Power",
+          "category": "spiritual",
+          "description": "Commands a fundamental aspect of reality",
+          "effects": {
+            "abilitiesGranted": ["domain_power"]
+          }
+        },
+        {
+          "id": "ichor_blood",
+          "name": "Ichor Blood",
+          "category": "physical",
+          "description": "Divine blood, not mortal blood",
+          "effects": {
+            "abilitiesGranted": ["ichor_blood"]
+          }
+        }
+      ],
+      "canHybridize": true,
+      "hybridCompatible": ["human", "nymph"],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "typicalAlignment": "neutral",
+      "societyType": "divine_court"
+    },
+    "demigod": {
+      "id": "demigod",
+      "name": "Demigod",
+      "description": "Children of gods and mortals, blessed with divine power",
+      "nativeRealm": "olympus",
+      "type": "spirit",
+      "category": "humanoid",
+      "lifespan": "long_lived",
+      "lifespanYears": 500,
+      "innateTraits": [
+        "enhanced_strength",
+        {
+          "id": "heroic_destiny",
+          "name": "Heroic Destiny",
+          "category": "spiritual",
+          "description": "Fated for great deeds",
+          "effects": {
+            "skillAffinityBonus": {
+              "combat": 0.2,
+              "exploration": 0.2
+            },
+            "abilitiesGranted": ["heroic_destiny"]
+          }
+        },
+        {
+          "id": "divine_parentage",
+          "name": "Divine Parentage",
+          "category": "spiritual",
+          "description": "One parent is a god, granting partial divine favor",
+          "effects": {
+            "abilitiesGranted": ["divine_favor"]
+          }
+        }
+      ],
+      "canHybridize": true,
+      "hybridCompatible": ["human", "nymph"],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "typicalAlignment": "neutral",
+      "societyType": "heroic_band"
+    },
+    "sidhe": {
+      "id": "sidhe",
+      "name": "Sidhe",
+      "description": "The noble fae, ageless beings of glamour bound by oaths",
+      "nativeRealm": "faerie",
+      "type": "fae",
+      "category": "humanoid",
+      "lifespan": "ageless",
+      "innateTraits": [
+        "glamour",
+        "oath_bound",
+        "iron_weakness",
+        "true_name_vulnerable",
+        {
+          "id": "time_unaware",
+          "name": "Time Unaware",
+          "category": "spiritual",
+          "description": "Poor sense of mortal time passing",
+          "effects": {
+            "abilitiesGranted": ["time_unaware"]
+          }
+        }
+      ],
+      "canHybridize": true,
+      "hybridCompatible": ["human", "elf"],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "mortalWorldWeakness": "Powers diminished, iron more common",
+      "typicalAlignment": "chaotic",
+      "societyType": "feudal_courts"
+    },
+    "aesir": {
+      "id": "aesir",
+      "name": "Aesir",
+      "description": "Warrior gods of Asgard, bound by fate to die at Ragnarok",
+      "nativeRealm": "asgard",
+      "type": "divine",
+      "category": "humanoid",
+      "lifespan": "ageless",
+      "innateTraits": [
+        "enhanced_strength",
+        {
+          "id": "fate_bound",
+          "name": "Fate-Bound",
+          "category": "spiritual",
+          "description": "Destiny is fixed, cannot avoid prophesied doom",
+          "effects": {
+            "abilitiesGranted": ["fate_bound"]
+          }
+        },
+        {
+          "id": "ragnarok_doomed",
+          "name": "Ragnarok-Doomed",
+          "category": "spiritual",
+          "description": "Will die at the end of all things",
+          "effects": {
+            "abilitiesGranted": ["ragnarok_doomed"]
+          }
+        },
+        {
+          "id": "golden_apple_dependent",
+          "name": "Golden Apple Dependent",
+          "category": "physical",
+          "description": "Requires Idunn's apples to maintain youth",
+          "effects": {
+            "abilitiesGranted": ["apple_dependent"]
+          }
+        }
+      ],
+      "canHybridize": true,
+      "hybridCompatible": ["human", "jotun"],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "typicalAlignment": "lawful",
+      "societyType": "divine_court"
+    },
+    "angel": {
+      "id": "angel",
+      "name": "Angel",
+      "description": "Divine messengers and servants",
+      "nativeRealm": "heaven",
+      "type": "spirit",
+      "category": "humanoid",
+      "lifespan": "immortal",
+      "innateTraits": [
+        "flight",
+        "divine_beauty",
+        "spirit_sight",
+        {
+          "id": "holy_light",
+          "name": "Holy Light",
+          "category": "magical",
+          "description": "Can manifest divine light",
+          "effects": {
+            "abilitiesGranted": ["holy_light", "smite"]
+          }
+        },
+        {
+          "id": "divine_messenger",
+          "name": "Divine Messenger",
+          "category": "spiritual",
+          "description": "Can deliver messages across realms",
+          "effects": {
+            "abilitiesGranted": ["realm_messenger"]
+          }
+        }
+      ],
+      "canHybridize": false,
+      "hybridCompatible": [],
+      "realmBound": false,
+      "canSurviveMortalWorld": true,
+      "typicalAlignment": "lawful",
+      "societyType": "celestial_hierarchy"
+    }
+  },
+  "notes": [
+    "Trait IDs like 'shapeshifting', 'divine_beauty', etc. reference entries in common-traits.json",
+    "Full race registry includes: olympian, demigod, nymph, satyr, sidhe, pixie, redcap, shade, fury, aesir, valkyrie, einherjar, seraph, angel, oneiroi, nightmare, efreet, djinn, human",
+    "Body plan definitions can be added to individual races as needed"
+  ]
+}

@@ -2186,7 +2186,11 @@ export class DevPanel implements IWindowPanel {
             }
 
             const deity = deities[0];
-            const deityComp = deity!.getComponent<DeityComponent>(CT.Deity);
+            if (!deity) {
+              this.log('ERROR: First deity is undefined');
+              break;
+            }
+            const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
             if (!deityComp) {
               this.log('ERROR: Deity missing DeityComponent');
               break;

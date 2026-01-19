@@ -14,7 +14,7 @@
  */
 
 import type { ResearchSet } from './types.js';
-import researchSetsData from './data/research-sets.json' assert { type: 'json' };
+import researchSetsData from './data/research-sets.json';
 
 // ============================================================================
 // ALL RESEARCH SETS (loaded from JSON)

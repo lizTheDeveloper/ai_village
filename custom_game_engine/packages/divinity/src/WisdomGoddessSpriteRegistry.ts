@@ -29,59 +29,9 @@ export interface WisdomGoddessConfig {
 /**
  * Registry of all available wisdom goddesses with their sprite assignments
  */
-export const WISDOM_GODDESS_REGISTRY: WisdomGoddessConfig[] = [
-  {
-    name: 'Athena',
-    spriteFolder: 'owl-scholar',
-    origin: 'Greco-Classical',
-    description:
-      'Dignified figure in flowing white robes, owl perched on shoulder, holding scrolls of ancient wisdom',
-    scrutinyStyle: 'strict',
-  },
-  {
-    name: 'Saraswati',
-    spriteFolder: 'lotus-sage',
-    origin: 'Hindu',
-    description:
-      'Serene goddess seated on lotus, veena instrument in hand, books floating around her in divine light',
-    scrutinyStyle: 'encouraging',
-  },
-  {
-    name: 'Thoth',
-    spriteFolder: 'ibis-scribe',
-    origin: 'Egyptian',
-    description:
-      'Ibis-headed deity with reed pen and papyrus, scales of knowledge balanced in ethereal hands',
-    scrutinyStyle: 'pragmatic',
-  },
-  {
-    name: 'Odin',
-    spriteFolder: 'one-eyed-wanderer',
-    origin: 'Norse',
-    description:
-      'Cloaked wanderer with single burning eye, ravens Huginn and Muninn whispering secrets. ' +
-      'Perpetually irritated at being grouped with "goddesses" in this registry.',
-    scrutinyStyle: 'curious',
-    resentsGoddessTitle: true,
-    preferredTitle: 'Allfather',
-  },
-  {
-    name: 'Sophia',
-    spriteFolder: 'crystalline-oracle',
-    origin: 'Gnostic',
-    description:
-      'Ethereal being of pure light, face shifting between forms, crystalline structures forming her crown',
-    scrutinyStyle: 'encouraging',
-  },
-  {
-    name: 'Seshat',
-    spriteFolder: 'star-librarian',
-    origin: 'Egyptian',
-    description:
-      'Leopard-skin clad goddess with star headdress, notching every discovery into the eternal record',
-    scrutinyStyle: 'strict',
-  },
-];
+import wisdomGoddessRegistryData from '../data/wisdom-goddess-registry.json';
+
+export const WISDOM_GODDESS_REGISTRY: WisdomGoddessConfig[] = wisdomGoddessRegistryData.wisdomGoddesses as WisdomGoddessConfig[];
 
 /**
  * Get a wisdom goddess configuration by name

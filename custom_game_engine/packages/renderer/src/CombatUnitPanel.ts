@@ -297,8 +297,12 @@ export class CombatUnitPanel implements IWindowPanel {
         const injuryEl = document.createElement('div');
         injuryEl.className = 'injury-item';
         injuryEl.textContent = `${injuryData.type} (${injuryData.severity}) - ${injuryData.bodyPart}`;
+        const severity = injuryData.severity;
+        if (!severity) {
+          throw new Error(`Injury severity is undefined for injury type ${injuryData.type}`);
+        }
         injuryEl.style.cssText = `
-          color: ${this.getInjurySeverityColor(injuryData.severity)};
+          color: ${this.getInjurySeverityColor(severity)};
           font-size: 10px;
           padding: 2px 0;
           margin-left: 8px;

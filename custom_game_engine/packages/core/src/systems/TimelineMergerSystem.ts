@@ -9,6 +9,7 @@ import type {
   MergeCompatibilityComponent,
   BranchCompatibility,
   MergeConflict,
+  MergeConflictType,
   MergeResult,
 } from '../components/MergeCompatibilityComponent.js';
 import type { UniverseSnapshot, VersionedEntity } from '../persistence/types.js';
@@ -300,7 +301,11 @@ export class TimelineMergerSystem extends BaseSystem {
 
     // Early exit: Check resolvability during iteration (avoid .every())
     for (let i = 0; i < conflicts.length; i++) {
-      if (!conflicts[i].resolvable) {
+      const conflict = conflicts[i];
+      if (!conflict) {
+        throw new Error(`Conflict at index ${i} is undefined`);
+      }
+      if (!conflict.resolvable) {
         const result: BranchCompatibility = {
           compatible: false,
           reason: 'unresolvable_conflicts',
@@ -392,6 +397,9 @@ export class TimelineMergerSystem extends BaseSystem {
     // Single pass over branch1 entities
     for (let i = 0; i < branch1.entities.length; i++) {
       const entity = branch1.entities[i];
+      if (!entity) {
+        throw new Error(`Entity at index ${i} in branch1 is undefined`);
+      }
       const components = entity.components;
 
       // Check component types in single pass
@@ -399,7 +407,11 @@ export class TimelineMergerSystem extends BaseSystem {
       let hasBuilding = false;
 
       for (let j = 0; j < components.length; j++) {
-        const compType = components[j].type;
+        const component = components[j];
+        if (!component) {
+          throw new Error(`Component at index ${j} in entity ${entity.id} is undefined`);
+        }
+        const compType = component.type;
         if (compType === 'identity') hasIdentity = true;
         else if (compType === 'building') hasBuilding = true;
 
@@ -418,13 +430,20 @@ export class TimelineMergerSystem extends BaseSystem {
     // Single pass over branch2 entities
     for (let i = 0; i < branch2.entities.length; i++) {
       const entity = branch2.entities[i];
+      if (!entity) {
+        throw new Error(`Entity at index ${i} in branch2 is undefined`);
+      }
       const components = entity.components;
 
       let hasIdentity = false;
       let hasBuilding = false;
 
       for (let j = 0; j < components.length; j++) {
-        const compType = components[j].type;
+        const component = components[j];
+        if (!component) {
+          throw new Error(`Component at index ${j} in entity ${entity.id} is undefined`);
+        }
+        const compType = component.type;
         if (compType === 'identity') hasIdentity = true;
         else if (compType === 'building') hasBuilding = true;
 
@@ -508,6 +527,9 @@ export class TimelineMergerSystem extends BaseSystem {
     // Reuse object from pool or create new one
     if (this.conflictPoolIndex < this.conflictPool.length) {
       const conflict = this.conflictPool[this.conflictPoolIndex];
+      if (!conflict) {
+        throw new Error(`Conflict at pool index ${this.conflictPoolIndex} is undefined`);
+      }
       conflict.conflictType = conflictType;
       conflict.entityId = entityId;
       conflict.parentValue = parentValue;
@@ -624,6 +646,9 @@ export class TimelineMergerSystem extends BaseSystem {
     const conflicts = compatibility.conflicts;
     for (let i = 0; i < conflicts.length; i++) {
       const conflict = conflicts[i];
+      if (!conflict) {
+        throw new Error(`Conflict at index ${i} is undefined`);
+      }
       if (!conflict.resolvable) {
         throw new Error(
           `Unresolvable conflict: ${conflict.conflictType} on ${conflict.entityId}`

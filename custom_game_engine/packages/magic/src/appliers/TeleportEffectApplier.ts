@@ -90,7 +90,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Validate range based on teleport type
-    const pos = targetPos as PositionComponentData;
+    const pos = targetPos as unknown as PositionComponentData;
     const casterPos = caster.getComponent('position') as PositionComponentData | undefined;
 
     // For self/directional/random teleports, measure from current position to destination
@@ -285,7 +285,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!casterPos) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        return { success: true, x: casterPos.x, y: casterPos.y };
+        return { success: true, x: (casterPos as unknown as PositionComponentData).x, y: (casterPos as unknown as PositionComponentData).y };
       }
 
       case 'swap': {
@@ -294,7 +294,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!casterPos) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        return { success: true, x: casterPos.x, y: casterPos.y };
+        return { success: true, x: (casterPos as unknown as PositionComponentData).x, y: (casterPos as unknown as PositionComponentData).y };
       }
 
       case 'directional': {
@@ -302,7 +302,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as PositionComponentData;
+        const tPos = targetPos as unknown as PositionComponentData;
         const direction = (context as any).direction || (effect as any).direction;
         const distance = (effect as any).distance || 10;
 
@@ -319,7 +319,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as PositionComponentData;
+        const tPos = targetPos as unknown as PositionComponentData;
         const orientation = target.getComponent('orientation') as OrientationComponent | undefined;
         if (!orientation) {
           return { success: false, error: 'Target lacks orientation component' };
@@ -340,7 +340,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         if (!targetPos) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as PositionComponentData;
+        const tPos = targetPos as unknown as PositionComponentData;
         const maxRange = (context as any).range || (effect as any).range || effect.maxDistance || 15;
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * maxRange;

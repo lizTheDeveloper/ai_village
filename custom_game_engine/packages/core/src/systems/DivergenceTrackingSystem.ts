@@ -132,7 +132,11 @@ export class DivergenceTrackingSystem extends BaseSystem {
     // PERF: Manual loop faster than reduce for simple accumulation
     let totalImpact = 0;
     for (let i = 0; i < majorDifferences.length; i++) {
-      totalImpact += majorDifferences[i].divergenceImpact;
+      const event = majorDifferences[i];
+      if (!event) {
+        throw new Error(`DivergenceEvent at index ${i} is undefined`);
+      }
+      totalImpact += event.divergenceImpact;
     }
 
     // Normalize by expected number of events (assume ~10 major events = full divergence)
@@ -159,7 +163,11 @@ export class DivergenceTrackingSystem extends BaseSystem {
     // PERF: Build lookup map once instead of repeated .find() calls
     this.agentLookupMap.clear();
     for (let i = 0; i < parentAgents.length; i++) {
-      this.agentLookupMap.set(parentAgents[i].id, parentAgents[i]);
+      const agent = parentAgents[i];
+      if (!agent) {
+        throw new Error(`Parent agent at index ${i} is undefined`);
+      }
+      this.agentLookupMap.set(agent.id, agent);
     }
 
     let differences = 0;
@@ -167,6 +175,9 @@ export class DivergenceTrackingSystem extends BaseSystem {
 
     for (let i = 0; i < forkAgents.length; i++) {
       const forkAgent = forkAgents[i];
+      if (!forkAgent) {
+        throw new Error(`Fork agent at index ${i} is undefined`);
+      }
       const parentAgent = this.agentLookupMap.get(forkAgent.id);
 
       if (!parentAgent) {
@@ -266,12 +277,20 @@ export class DivergenceTrackingSystem extends BaseSystem {
     // PERF: Manual loop to count non-empty slots (faster than filter().length)
     let forkCount = 0;
     for (let i = 0; i < forkInv.slots.length; i++) {
-      if (forkInv.slots[i].itemId !== null) forkCount++;
+      const slot = forkInv.slots[i];
+      if (!slot) {
+        throw new Error(`Fork inventory slot at index ${i} is undefined`);
+      }
+      if (slot.itemId !== null) forkCount++;
     }
 
     let parentCount = 0;
     for (let i = 0; i < parentInv.slots.length; i++) {
-      if (parentInv.slots[i].itemId !== null) parentCount++;
+      const slot = parentInv.slots[i];
+      if (!slot) {
+        throw new Error(`Parent inventory slot at index ${i} is undefined`);
+      }
+      if (slot.itemId !== null) parentCount++;
     }
 
     const countDiff = Math.abs(forkCount - parentCount);
@@ -299,17 +318,25 @@ export class DivergenceTrackingSystem extends BaseSystem {
     // PERF: Use Map instead of nested filter/some operations
     this.buildingLookupMap.clear();
     for (let i = 0; i < parentBuildings.length; i++) {
-      this.buildingLookupMap.set(parentBuildings[i].id, parentBuildings[i]);
+      const building = parentBuildings[i];
+      if (!building) {
+        throw new Error(`Parent building at index ${i} is undefined`);
+      }
+      this.buildingLookupMap.set(building.id, building);
     }
 
     let differences = 0;
 
     // Buildings in fork but not parent
     for (let i = 0; i < forkBuildings.length; i++) {
-      if (!this.buildingLookupMap.has(forkBuildings[i].id)) {
+      const building = forkBuildings[i];
+      if (!building) {
+        throw new Error(`Fork building at index ${i} is undefined`);
+      }
+      if (!this.buildingLookupMap.has(building.id)) {
         differences++;
       } else {
-        this.buildingLookupMap.delete(forkBuildings[i].id);
+        this.buildingLookupMap.delete(building.id);
       }
     }
 

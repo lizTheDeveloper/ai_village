@@ -142,7 +142,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     // Apply time factor to target
     statusEffects.timeScale = timeFactor;
-    (target as EntityImpl).addComponent(statusEffects);
+    (target as EntityImpl).addComponent(statusEffects as unknown as Component);
 
     // Track temporal effect for conflict detection
     if (!statusEffects.temporalEffects) {
@@ -216,7 +216,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     const previousAge = age.years;
     age.years += ageChange;
-    (target as EntityImpl).addComponent(age);
+    (target as EntityImpl).addComponent(age as unknown as Component);
 
     // Can't have negative age
     if (age.years < 0) {
@@ -283,7 +283,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     };
 
     temporal.rewindRequests.push(rewindRequest);
-    (target as EntityImpl).addComponent(temporal);
+    (target as EntityImpl).addComponent(temporal as unknown as Component);
 
     return {
       success: true,

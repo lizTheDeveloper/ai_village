@@ -59,17 +59,19 @@ export class SoilSystem extends BaseSystem {
 
   private lastDayProcessed: number = -1;
   private accumulatedTime: number = 0; // Track elapsed time in seconds
-  private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
+  private readonly SECONDS_PER_DAY = SOIL_CONSTANTS.timeConstants.secondsPerDay;
 
   protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration from TimeComponent if available
     const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
-      const timeEntity: Entity = timeEntities[0];
-      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
-      if (timeComp && timeComp.speedMultiplier) {
-        timeSpeedMultiplier = timeComp.speedMultiplier;
+      const timeEntity = timeEntities[0];
+      if (timeEntity) {
+        const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
+        if (timeComp && timeComp.speedMultiplier) {
+          timeSpeedMultiplier = timeComp.speedMultiplier;
+        }
       }
     }
 
@@ -120,8 +122,9 @@ export class SoilSystem extends BaseSystem {
       throw new Error(error);
     }
 
-    if (tile.terrain !== 'grass' && tile.terrain !== 'dirt') {
-      const error = `Cannot till ${tile.terrain} terrain at (${x},${y}). Only grass and dirt can be tilled.`;
+    const tillableTerrains = SOIL_CONSTANTS.fertility.tillableTerrains;
+    if (!tillableTerrains.includes(tile.terrain)) {
+      const error = `Cannot till ${tile.terrain} terrain at (${x},${y}). Only ${tillableTerrains.join(', ')} can be tilled.`;
       console.error(`[SoilSystem] ERROR: ${error}`);
       throw new Error(error);
     }
@@ -140,14 +143,14 @@ export class SoilSystem extends BaseSystem {
 
     // Make plantable
     tile.tilled = true;
-    tile.plantability = 3;
+    tile.plantability = SOIL_CONSTANTS.fertility.initialPlantability;
     tile.lastTilled = world.tick;
     // Initialize nutrients based on biome
     const nutrientBase = tile.fertility;
     tile.nutrients = {
       nitrogen: nutrientBase,
-      phosphorus: nutrientBase * 0.8,
-      potassium: nutrientBase * 0.9,
+      phosphorus: nutrientBase * SOIL_CONSTANTS.nutrients.phosphorusMultiplier,
+      potassium: nutrientBase * SOIL_CONSTANTS.nutrients.potassiumMultiplier,
     };
 
     // Emit tilling event
@@ -171,8 +174,8 @@ export class SoilSystem extends BaseSystem {
 
     const oldMoisture = tile.moisture;
 
-    // Increase moisture by 20, capped at 100
-    tile.moisture = Math.min(100, tile.moisture + 20);
+    // Increase moisture by wateringBonus, capped at 100
+    tile.moisture = Math.min(100, tile.moisture + SOIL_CONSTANTS.moisture.wateringBonus);
     tile.lastWatered = world.tick;
 
     // Emit watering event
@@ -182,7 +185,7 @@ export class SoilSystem extends BaseSystem {
       data: {
         x,
         y,
-        amount: 20,
+        amount: SOIL_CONSTANTS.moisture.wateringBonus,
       },
     });
 
@@ -258,8 +261,8 @@ export class SoilSystem extends BaseSystem {
       throw new Error(`Cannot deplete untilled tile at (${x},${y})`);
     }
 
-    // Reduce fertility by 15
-    tile.fertility = Math.max(0, tile.fertility - 15);
+    // Reduce fertility by depletionPerHarvest
+    tile.fertility = Math.max(0, tile.fertility - SOIL_CONSTANTS.fertility.depletionPerHarvest);
 
     // Decrement plantability counter
     tile.plantability = Math.max(0, tile.plantability - 1);
@@ -295,16 +298,14 @@ export class SoilSystem extends BaseSystem {
 
     const oldMoisture = tile.moisture;
 
-    // Base decay: -10 per day
-    let decay = 10;
+    // Base decay from constants
+    let decay = SOIL_CONSTANTS.moisture.baseDailyDecay;
 
-    // Modify by temperature
-    if (temperature > 25) {
-      // Hot: +50% decay
-      decay *= 1.5;
-    } else if (temperature < 10) {
-      // Cold: -50% decay
-      decay *= 0.5;
+    // Modify by temperature using thresholds and multipliers from constants
+    if (temperature > SOIL_CONSTANTS.moisture.hotWeatherThreshold) {
+      decay *= SOIL_CONSTANTS.moisture.hotWeatherDecayMultiplier;
+    } else if (temperature < SOIL_CONSTANTS.moisture.coldWeatherThreshold) {
+      decay *= SOIL_CONSTANTS.moisture.coldWeatherDecayMultiplier;
     }
 
     tile.moisture = Math.max(0, tile.moisture - decay);
@@ -330,8 +331,8 @@ export class SoilSystem extends BaseSystem {
   public applyRain(world: World, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
-    // Rain adds 40 moisture * intensity
-    tile.moisture = Math.min(100, tile.moisture + 40 * intensity);
+    // Rain adds rainMoistureBonus * intensity
+    tile.moisture = Math.min(100, tile.moisture + SOIL_CONSTANTS.moisture.rainMoistureBonus * intensity);
 
     // Emit moisture change event
     if (tile.moisture !== oldMoisture) {
@@ -354,8 +355,8 @@ export class SoilSystem extends BaseSystem {
   public applySnow(world: World, tile: Tile, x: number, y: number, intensity: number): void {
     const oldMoisture = tile.moisture;
 
-    // Snow adds 20 moisture * intensity
-    tile.moisture = Math.min(100, tile.moisture + 20 * intensity);
+    // Snow adds snowMoistureBonus * intensity
+    tile.moisture = Math.min(100, tile.moisture + SOIL_CONSTANTS.moisture.snowMoistureBonus * intensity);
 
     // Emit moisture change event
     if (tile.moisture !== oldMoisture) {
@@ -391,23 +392,14 @@ export class SoilSystem extends BaseSystem {
    * NOTE: Biome is now validated in tillTile(), so this will never receive undefined
    */
   private getInitialFertility(biome: BiomeType): number {
-    switch (biome) {
-      case 'plains':
-        return 70 + Math.random() * 10; // 70-80
-      case 'forest':
-        return 60 + Math.random() * 10; // 60-70
-      case 'river':
-        return 80 + Math.random() * 10; // 80-90
-      case 'desert':
-        return 20 + Math.random() * 10; // 20-30
-      case 'mountains':
-        return 40 + Math.random() * 10; // 40-50
-      case 'ocean':
-        return 0; // Cannot farm in ocean
-      default:
-        // CLAUDE.md: If we get an unknown biome, that's a bug - crash
-        throw new Error(`Unknown biome type: ${biome} - cannot determine fertility`);
+    const biomeData = BIOME_FERTILITY.get(biome);
+    if (!biomeData) {
+      // CLAUDE.md: If we get an unknown biome, that's a bug - crash
+      throw new Error(`Unknown biome type: ${biome} - cannot determine fertility`);
     }
+
+    const { min, max } = biomeData.fertilityRange;
+    return min + Math.random() * (max - min);
   }
 }
 

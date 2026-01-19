@@ -375,6 +375,9 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
       const costDef = paradigm?.costs?.find(c => c.type === cost.type);
 
       // Apply the cost
+      if (!pool) {
+        throw new Error(`Resource pool for cost type ${cost.type} is undefined`);
+      }
       if (costDef?.cumulative || this.isCumulativeCost(cost.type)) {
         // Cumulative costs ADD to the pool (corruption, attention, etc.)
         pool.current = Math.min(pool.maximum, pool.current + cost.amount);

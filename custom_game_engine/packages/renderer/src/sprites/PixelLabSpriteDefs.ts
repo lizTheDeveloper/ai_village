@@ -142,5 +142,5 @@ export function getAnimationImagePath(
   return `${basePath}/${characterId}/animations/${animationName}/${dirName}.png`;
 }
 
-/** Default frame size for PixelLab sprites */
-export const PIXELLAB_DEFAULT_SIZE = 48;
+/** Default frame size for PixelLab sprites (loaded from config) */
+export const PIXELLAB_DEFAULT_SIZE = pixelLabConfig.defaults.frameSize;

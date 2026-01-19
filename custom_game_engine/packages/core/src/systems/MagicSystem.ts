@@ -21,6 +21,8 @@ import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { MagicComponent, MagicSourceId } from '../components/MagicComponent.js';
 import { getAvailableMana } from '../components/MagicComponent.js';
+import type { ManaPoolsComponent } from '../magic/managers/ManaRegenerationManager.js';
+import type { ParadigmStateComponent } from '../magic/managers/ManaRegenerationManager.js';
 import type { EventBus } from '../events/EventBus.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
 import { SpellRegistry, type SpellDefinition } from '../magic/SpellRegistry.js';
@@ -242,11 +244,17 @@ export class MagicSystem extends BaseSystem {
     const magic = entity.getComponent<MagicComponent>(CT.Magic);
     if (!magic || !magic.magicUser || !this.regenManager) return;
 
+    const manaPools = entity.getComponent(CT.ManaPoolsComponent);
+    if (!manaPools) return;
+
     // Apply regeneration via manager
-    this.regenManager.applyMagicRegeneration(entity, magic, deltaTime);
+    this.regenManager.applyMagicRegeneration(entity, manaPools as unknown as ManaPoolsComponent, deltaTime);
+
+    const paradigmState = entity.getComponent(CT.ParadigmStateComponent);
+    if (!paradigmState) return;
 
     // Sync faith/favor for divine users
-    this.regenManager.syncFaithAndFavor(entity, magic);
+    this.regenManager.syncFaithAndFavor(entity, manaPools as unknown as ManaPoolsComponent, paradigmState as unknown as ParadigmStateComponent);
   }
 
   // =========================================================================

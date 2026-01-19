@@ -1585,7 +1585,7 @@ export class GameIntrospectionAPI {
 
       // Get old value before mutation
       const component = entity.getComponent(mutation.componentType);
-      const oldValue = component ? (component as Record<string, unknown>)[mutation.field] : undefined;
+      const oldValue = component ? (component as unknown as Record<string, unknown>)[mutation.field] : undefined;
 
       // Count caches before invalidation
       const cacheStatsBefore = this.cache.getStats();
@@ -1593,7 +1593,7 @@ export class GameIntrospectionAPI {
       // Apply mutation via MutationService (handles validation, undo, events)
       // Note: MutationService defines its own Entity interface which is compatible
       const mutationResult = MutationService.mutate(
-        entity as Parameters<typeof MutationService.mutate>[0],
+        entity as unknown as Parameters<typeof MutationService.mutate>[0],
         mutation.componentType,
         mutation.field,
         mutation.value,

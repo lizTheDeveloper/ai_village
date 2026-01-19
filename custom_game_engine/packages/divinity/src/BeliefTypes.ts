@@ -22,17 +22,9 @@ export type BeliefActivity =
   | 'miracle_witness';    // Witnessing divine action (highest)
 
 /** Base belief generation rates per activity (per game hour) */
-export const BELIEF_GENERATION_RATES: Record<BeliefActivity, number> = {
-  passive_faith: 0.01,
-  prayer: 0.1,
-  meditation: 0.15,
-  ritual: 0.3,
-  sacrifice: 0.5,         // Base, scales with sacrifice value
-  pilgrimage: 1.0,        // One-time bonus on arrival
-  proselytizing: 0.2,     // Plus bonus for conversions
-  creation: 0.5,
-  miracle_witness: 5.0,   // Massive one-time boost
-};
+import beliefEconomyData from '../data/belief-economy.json';
+
+export const BELIEF_GENERATION_RATES: Record<BeliefActivity, number> = beliefEconomyData.beliefGenerationRates as Record<BeliefActivity, number>;
 
 // ============================================================================
 // Belief Generation
@@ -115,25 +107,14 @@ export interface DeityBeliefState {
 }
 
 /** Default belief thresholds */
-export const BELIEF_THRESHOLDS = {
-  /** Minimum to exist stably */
-  minimum: 10,
-
-  /** Can perform minor miracles */
-  minor_powers: 100,
-
-  /** Can perform moderate miracles */
-  moderate_powers: 500,
-
-  /** Can create angels */
-  angel_creation: 2000,
-
-  /** Can manifest avatar */
-  avatar_creation: 5000,
-
-  /** Can perform world-shaping acts */
-  world_shaping: 10000,
-} as const;
+export const BELIEF_THRESHOLDS = beliefEconomyData.beliefThresholds as {
+  readonly minimum: number;
+  readonly minor_powers: number;
+  readonly moderate_powers: number;
+  readonly angel_creation: number;
+  readonly avatar_creation: number;
+  readonly world_shaping: number;
+};
 
 // ============================================================================
 // Belief Decay
@@ -158,13 +139,7 @@ export interface BeliefDecayConfig {
 }
 
 /** Default decay configuration */
-export const DEFAULT_BELIEF_DECAY: BeliefDecayConfig = {
-  normalDecayRate: 0.001,         // 0.1% per hour
-  noActivityDecayRate: 0.005,     // 0.5% per hour
-  noActivityThreshold: 24,        // 24 game hours
-  criticalDecayRate: 0.02,        // 2% per hour
-  mythPersistenceFloor: 1,        // Can't go below 1 if myths exist
-};
+export const DEFAULT_BELIEF_DECAY: BeliefDecayConfig = beliefEconomyData.defaultBeliefDecay as BeliefDecayConfig;
 
 // ============================================================================
 // Belief Allocation (for agents who believe in multiple deities)

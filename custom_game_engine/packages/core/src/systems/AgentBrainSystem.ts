@@ -166,6 +166,41 @@ export class AgentBrainSystem extends BaseSystem {
   }
 
   /**
+   * Initialize system with event bus subscriptions
+   */
+  protected onInitialize(_world: World, eventBus: import('../events/EventBus.js').EventBus): void {
+    // Subscribe to inventory:full event to auto-switch to deposit_items behavior
+    eventBus.subscribe('inventory:full', (event) => {
+      const { entityId } = event.data as { entityId: string; agentId: string };
+      const agent = _world.getEntity(entityId);
+
+      if (!agent || !agent.hasComponent(CT.Agent)) {
+        return;
+      }
+
+      const agentComp = agent.getComponent<AgentComponent>(CT.Agent);
+      if (!agentComp) {
+        return;
+      }
+
+      // Don't interrupt if already depositing items
+      if (agentComp.behavior === 'deposit_items') {
+        return;
+      }
+
+      // Save current behavior and switch to deposit_items
+      (agent as EntityImpl).updateComponent<AgentComponent>(CT.Agent, (current) => ({
+        ...current,
+        previousBehavior: current.behavior,
+        behavior: 'deposit_items',
+        behaviorState: {
+          previousBehavior: current.behavior,
+        },
+      }));
+    });
+  }
+
+  /**
    * Register all default extracted behaviors.
    */
   private registerDefaultBehaviors(): void {

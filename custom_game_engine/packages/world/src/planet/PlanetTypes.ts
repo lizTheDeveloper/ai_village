@@ -279,6 +279,25 @@ export interface PlanetSnapshot {
     namedAt: number;
     description?: string;
   }>;
+
+  /** Generated biosphere data (species, food webs, niches) */
+  biosphere?: {
+    $schema: 'https://aivillage.dev/schemas/biosphere/v1';
+    niches: any[];
+    species: any[];
+    foodWeb: any;
+    nicheFilling: Record<string, string[]>;
+    sapientSpecies: any[];
+    artStyle: string;
+    metadata: {
+      generatedAt: number;
+      generationTimeMs: number;
+      totalSpecies: number;
+      sapientCount: number;
+      trophicLevels: number;
+      averageSpeciesPerNiche: number;
+    };
+  };
 }
 
 // ============================================================================
