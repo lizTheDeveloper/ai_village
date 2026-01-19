@@ -3833,22 +3833,10 @@ async function main() {
   (world as any).setSpatialQuery(chunkSpatialQuery);
   console.log('[Main] SpatialQueryService attached to world');
 
-  // Legacy injection for gradual migration (can be removed once all files migrated)
-  injectChunkSpatialQuery(chunkSpatialQuery);
-  injectChunkSpatialQueryForHearing(chunkSpatialQuery);
-  injectChunkSpatialQueryForBrain(chunkSpatialQuery);
-  injectChunkSpatialQueryToMovement(chunkSpatialQuery);
-  injectChunkSpatialQueryToFarmBehaviors(chunkSpatialQuery);
-  injectChunkSpatialQueryToSeekFood(chunkSpatialQuery);
-  injectChunkSpatialQueryToSeekCooling(chunkSpatialQuery);
-  injectChunkSpatialQueryToSleep(chunkSpatialQuery);
-  injectChunkSpatialQueryToGather(chunkSpatialQuery);
-  injectChunkSpatialQueryToBuild(chunkSpatialQuery);
-  injectChunkSpatialQueryToDepositItems(chunkSpatialQuery);
-  injectChunkSpatialQueryToRepair(chunkSpatialQuery);
-  injectChunkSpatialQueryToBehaviors(chunkSpatialQuery);
-  injectChunkSpatialQueryToTemperature(chunkSpatialQuery);
-  console.log('[Main] Legacy ChunkSpatialQuery injections complete (migration in progress)');
+  // Injection functions removed - world.spatialQuery is used instead
+  // Set spatialQuery on World - systems/behaviors will access via world.spatialQuery
+  world.setSpatialQuery(chunkSpatialQuery);
+  console.log('[Main] ChunkSpatialQuery set on world.spatialQuery');
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);

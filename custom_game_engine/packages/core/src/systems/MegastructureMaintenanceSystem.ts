@@ -540,6 +540,9 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
    */
   private transitionToRuins(world: World, entity: EntityImpl, mega: MegastructureComponent): void {
     const config = MAINTENANCE_CONFIGS[mega.structureType];
+    if (!config) {
+      throw new Error(`Missing maintenance config for megastructure type: ${mega.structureType}`);
+    }
 
     mega.phase = 'ruins';
     mega.efficiency = 0;
@@ -548,7 +551,11 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
 
     // Set initial archaeological value
     if (config.decayStages.length > 0) {
-      mega.archaeologicalValue = config.decayStages[0].archaeologicalValue;
+      const firstStage = config.decayStages[0];
+      if (!firstStage) {
+        throw new Error(`Missing first decay stage for ${mega.structureType}`);
+      }
+      mega.archaeologicalValue = firstStage.archaeologicalValue;
     }
 
     this.emitCollapseEvent(world, entity, mega);
@@ -559,6 +566,9 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
    */
   private ageRuins(world: World, entity: EntityImpl, mega: MegastructureComponent): void {
     const config = MAINTENANCE_CONFIGS[mega.structureType];
+    if (!config) {
+      throw new Error(`Missing maintenance config for megastructure type: ${mega.structureType}`);
+    }
 
     // Calculate years in decay (assuming 20 TPS and conversion to game years)
     const ticksPerYear = 365 * 24 * 60 * 3; // Approximate
@@ -600,8 +610,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     mega: MegastructureComponent
   ): void {
     world.eventBus.emit({
-      type: 'maintenance_performed' as any, // Will be added to SpaceEvents
-      timestamp: world.tick,
+      type: 'maintenance_performed',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,
@@ -617,8 +627,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     mega: MegastructureComponent
   ): void {
     world.eventBus.emit({
-      type: 'megastructure_degraded' as any,
-      timestamp: world.tick,
+      type: 'megastructure_degraded',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,
@@ -636,8 +646,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     severity: 'critical' | 'catastrophic'
   ): void {
     world.eventBus.emit({
-      type: 'megastructure_failed' as any,
-      timestamp: world.tick,
+      type: 'megastructure_failed',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,
@@ -654,8 +664,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     mega: MegastructureComponent
   ): void {
     world.eventBus.emit({
-      type: 'megastructure_collapsed' as any,
-      timestamp: world.tick,
+      type: 'megastructure_collapsed',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,
@@ -672,8 +682,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     oldPhase: MegastructurePhase
   ): void {
     world.eventBus.emit({
-      type: 'megastructure_phase_transition' as any,
-      timestamp: world.tick,
+      type: 'megastructure_phase_transition',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,
@@ -691,8 +701,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     decayStage: DecayStage
   ): void {
     world.eventBus.emit({
-      type: 'megastructure_decay_stage' as any,
-      timestamp: world.tick,
+      type: 'megastructure_decay_stage',
+      source: entity.id,
       data: {
         entityId: entity.id,
         structureType: mega.structureType,

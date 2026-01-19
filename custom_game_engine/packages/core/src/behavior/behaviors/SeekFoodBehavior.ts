@@ -109,7 +109,8 @@ export class SeekFoodBehavior extends BaseBehavior {
 
     // No food sources found nearby - try spatial memory for remembered food locations
     const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
-    if (spatialMemory && position) {
+    const agentPosition = entity.getComponent<PositionComponent>(ComponentType.Position);
+    if (spatialMemory && agentPosition) {
       // Try both resource_location and plant_location types (food can be either)
       const resourceMemories = getSpatialMemoriesByType(spatialMemory, 'resource_location');
       const plantMemories = getSpatialMemoriesByType(spatialMemory, 'plant_location');
@@ -121,8 +122,8 @@ export class SeekFoodBehavior extends BaseBehavior {
           .map(mem => ({
             memory: mem,
             distance: Math.sqrt(
-              Math.pow(mem.x - position.x, 2) +
-              Math.pow(mem.y - position.y, 2)
+              Math.pow(mem.x - agentPosition.x, 2) +
+              Math.pow(mem.y - agentPosition.y, 2)
             )
           }))
           .sort((a, b) => a.distance - b.distance);
@@ -140,8 +141,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
     // wander directly as part of seeking food (exploring to find food)
     const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    if (movement && position) {
+    if (movement && agentPosition) {
       // Get or initialize wander angle
       let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
       if (wanderAngle === undefined) {

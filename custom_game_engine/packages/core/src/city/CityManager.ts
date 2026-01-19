@@ -272,8 +272,7 @@ export class CityManager {
           centerY + Math.sin(angle) * distance
         ));
         tentEntity.addComponent(createRenderableComponent('tent', 'object'));
-        // WorldMutator is the writable interface
-        (world as WorldMutator)._addEntity(tentEntity);
+        world.addEntity(tentEntity);
         console.log('[CityManager] Built tent for growing population');
       }
     } else if (focus === 'survival' && stats.woodSupply >= 5) {
@@ -288,8 +287,7 @@ export class CityManager {
           centerY + Math.sin(angle) * distance
         ));
         farmEntity.addComponent(createRenderableComponent('farm-plot', 'object'));
-        // WorldMutator is the writable interface
-        (world as WorldMutator)._addEntity(farmEntity);
+        world.addEntity(farmEntity);
         console.log('[CityManager] Built farm-plot for survival');
       }
     }

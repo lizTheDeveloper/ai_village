@@ -300,6 +300,20 @@ export interface World {
   createEntity(archetype?: string): Entity;
 
   /**
+   * Add a pre-constructed entity to the world.
+   * Use this instead of (world as any)._addEntity() for type safety.
+   *
+   * The entity will be:
+   * - Added to the entity map
+   * - Indexed in the spatial chunk index (if it has a position component)
+   * - Tracked in component type counts
+   *
+   * @param entity - The entity to add (must have a unique ID)
+   * @throws Error if an entity with the same ID already exists
+   */
+  addEntity(entity: Entity): void;
+
+  /**
    * Crafting system for recipe access.
    * Exposed for automation systems (AssemblyMachineSystem) to look up recipes.
    */
@@ -604,7 +618,7 @@ export class WorldImpl implements WorldMutator {
   ): T | undefined {
     // Overload: getComponent(componentType) - singleton lookup
     if (componentType === undefined) {
-      const singletonComponentType = componentTypeOrEntityId as ComponentType;
+      const singletonComponentType = entityTypeOrEntityId as ComponentType;
       for (const entity of this._entities.values()) {
         const component = entity.components.get(singletonComponentType);
         if (component) {
@@ -841,12 +855,22 @@ export class WorldImpl implements WorldMutator {
     };
   }
 
-  // For testing/debugging
-  _addEntity(entity: Entity): void {
-    this._entities.set(entity.id, entity);
+  /**
+   * Add a pre-constructed entity to the world.
+   * This is the public API - use this instead of _addEntity.
+   *
+   * @param entity - The entity to add
+   * @throws Error if an entity with the same ID already exists
+   */
+  addEntity(entity: Entity): void {
+    if (this._entities.has(entity.id)) {
+      throw new Error(`Entity ${entity.id} already exists in the world`);
+    }
 
-    // CRITICAL FIX: Update spatial chunk index if entity has position component
-    // Without this, findNearestResources() returns empty arrays and NPCs can't find food
+    this._entities.set(entity.id, entity);
+    this._archetypeVersion++; // Invalidate query cache
+
+    // Update spatial chunk index if entity has position component
     const pos = entity.components.get('position') as
       | { x: number; y: number; chunkX?: number; chunkY?: number }
       | undefined;
@@ -861,6 +885,25 @@ export class WorldImpl implements WorldMutator {
         this.chunkIndex.set(key, new Set());
       }
       this.chunkIndex.get(key)!.add(entity.id);
+    }
+
+    // Update component type counts for all components this entity has
+    for (const componentType of entity.components.keys()) {
+      const currentCount = this._componentTypeCounts.get(componentType) ?? 0;
+      this._componentTypeCounts.set(componentType, currentCount + 1);
+    }
+  }
+
+  /**
+   * @deprecated Use addEntity() instead. This will be removed in a future version.
+   */
+  _addEntity(entity: Entity): void {
+    // Delegate to public API but skip duplicate check for backwards compatibility
+    if (!this._entities.has(entity.id)) {
+      this.addEntity(entity);
+    } else {
+      // Legacy behavior: silently overwrite
+      this._entities.set(entity.id, entity);
     }
   }
 

@@ -17,16 +17,6 @@ import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponen
 import { addSpatialMemory } from '../components/SpatialMemoryComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 
-/**
- * Injection point for ChunkSpatialQuery (optional dependency)
- * Used for passive resource discovery when agents move
- */
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToMovement(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-  console.log('[MovementSystem] ChunkSpatialQuery injected for passive resource discovery');
-}
 
 interface TimeComponent {
   speedMultiplier?: number;
@@ -559,9 +549,9 @@ export class MovementSystem extends BaseSystem {
     const spatialMemory = impl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
     if (!spatialMemory) return;
 
-    // Use ChunkSpatialQuery if available (fast, chunk-based)
-    if (chunkSpatialQuery) {
-      const resourcesInRadius = chunkSpatialQuery.getEntitiesInRadius(
+    // Use world.spatialQuery if available (fast, chunk-based)
+    if (world.spatialQuery) {
+      const resourcesInRadius = world.spatialQuery.getEntitiesInRadius(
         x,
         y,
         this.DISCOVERY_RADIUS,
@@ -601,7 +591,7 @@ export class MovementSystem extends BaseSystem {
         }
       }
     } else {
-      // Fallback: Use global query (slow, only when ChunkSpatialQuery not available)
+      // Fallback: Use global query (slow, only when world.spatialQuery not available)
       const allResources = world.query().with(CT.Position).with(CT.Resource).executeEntities();
 
       for (const resourceEntity of allResources) {

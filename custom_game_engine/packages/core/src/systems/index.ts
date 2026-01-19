@@ -238,6 +238,12 @@ export {
 } from './SpaceshipConstructionSystem.js';
 export type { SpaceshipConstructionProject } from './SpaceshipConstructionSystem.js';
 
+// Megastructure Systems (Phase 5: Grand Strategy)
+export * from './MegastructureConstructionSystem.js';
+export { MegastructureConstructionSystem, startMegastructureProject } from './MegastructureConstructionSystem.js';
+export * from './MegastructureMaintenanceSystem.js';
+export { MegastructureMaintenanceSystem } from './MegastructureMaintenanceSystem.js';
+
 // Planet Travel System
 export * from './PlanetTravelSystem.js';
 export { PlanetTravelSystem } from './PlanetTravelSystem.js';

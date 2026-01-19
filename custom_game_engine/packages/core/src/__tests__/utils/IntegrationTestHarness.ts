@@ -59,7 +59,7 @@ export class IntegrationTestHarness {
     if (includeTime) {
       this.timeEntity = new EntityImpl(createEntityId(), 0);
       this.timeEntity.addComponent(createTimeComponent(startHour, secondsPerDay, timeSpeed));
-      (this.world as any)._addEntity(this.timeEntity);
+      this.world.addEntity(this.timeEntity);
     }
   }
 
@@ -104,7 +104,7 @@ export class IntegrationTestHarness {
       });
     }
 
-    (this.world as any)._addEntity(agent);
+    this.world.addEntity(agent);
     return agent;
   }
 
@@ -117,7 +117,7 @@ export class IntegrationTestHarness {
     building.addComponent(createPositionComponent(position.x, position.y));
     building.addComponent(createBuildingComponent(type as BuildingType, 1, 100));
 
-    (this.world as any)._addEntity(building);
+    this.world.addEntity(building);
     return building;
   }
 
@@ -150,8 +150,33 @@ export class IntegrationTestHarness {
       trustLevel: 50,
     }));
 
-    (this.world as any)._addEntity(animal);
+    this.world.addEntity(animal);
     return animal;
+  }
+
+  /**
+   * Set the world tick directly (for testing time-based logic).
+   * This is a test utility - production code should use advanceTick().
+   */
+  setTick(tick: number): void {
+    this.world.setTick(tick);
+  }
+
+  /**
+   * Advance the world tick by a specific amount.
+   * This is useful for testing systems that check tick intervals.
+   */
+  advanceTicks(count: number): void {
+    for (let i = 0; i < count; i++) {
+      this.world.advanceTick();
+    }
+  }
+
+  /**
+   * Get the current world tick.
+   */
+  getTick(): number {
+    return this.world.tick;
   }
 
   /**

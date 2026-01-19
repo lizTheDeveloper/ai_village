@@ -38,12 +38,6 @@ interface WorldWithTiles {
   getTileAt(x: number, y: number): ITile | undefined;
 }
 
-// Chunk spatial query injection for efficient nearby entity lookups
-let chunkSpatialQuery: any | null = null;
-
-export function injectChunkSpatialQueryToTemperature(spatialQuery: any): void {
-  chunkSpatialQuery = spatialQuery;
-}
 
 /**
  * TemperatureSystem - Simulates temperature effects on entities
@@ -120,7 +114,7 @@ export class TemperatureSystem extends BaseSystem {
     const activeEntityIds = new Set<string>();
 
     // Fast path: Use chunk queries to find entities near agents (O(M × E_chunk))
-    if (chunkSpatialQuery) {
+    if (ctx.world.spatialQuery) {
       const agents = ctx.world.query()
         .with(CT.Agent)
         .with(CT.Position)
@@ -136,7 +130,7 @@ export class TemperatureSystem extends BaseSystem {
         activeEntityIds.add(agent.id);
 
         // Find all temperature entities within radius of this agent
-        const nearbyEntities = chunkSpatialQuery.getEntitiesInRadius(
+        const nearbyEntities = ctx.world.spatialQuery.getEntitiesInRadius(
           agentPos.x,
           agentPos.y,
           ACTIVE_SIMULATION_RADIUS,

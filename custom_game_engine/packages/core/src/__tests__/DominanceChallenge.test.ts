@@ -38,6 +38,7 @@ describe('DominanceChallengeSystem', () => {
     const eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
     system = new DominanceChallengeSystem();
+    system.initialize(world, eventBus);
 
     // Create alpha (rank 1)
     alpha = world.createEntity();

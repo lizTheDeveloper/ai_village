@@ -226,36 +226,39 @@ export class InjurySystem extends BaseSystem {
   private handleHealing(_world: World, entity: Entity, _injury: InjuryComponent, deltaTime: number): void {
     const entityImpl = entity as EntityImpl;
 
-    // Update elapsed time
-    entityImpl.updateComponent<InjuryComponent>('injury', (inj) => {
-      const currentElapsed = inj.elapsed || 0;
-      const newElapsed = currentElapsed + deltaTime;
+    // Get current injury state
+    const currentInjury = entity.getComponent<InjuryComponent>('injury');
+    if (!currentInjury) return;
 
-      // Check if injury requires treatment
-      if (inj.requiresTreatment && !inj.treated) {
-        // Don't heal without treatment, but only increment untreatedDuration after first update
-        const currentUntreated = inj.untreatedDuration || 0;
-        return {
-          ...inj,
-          elapsed: newElapsed,
-          untreatedDuration: currentElapsed > 0 ? currentUntreated + deltaTime : 0,
-        };
-      }
+    const currentElapsed = currentInjury.elapsed || 0;
+    const newElapsed = currentElapsed + deltaTime;
 
-      // Check if healed
-      const healingTime = inj.healingTime || this.calculateHealingTime(inj);
-      if (newElapsed >= healingTime) {
-        // Injury is healed - remove component
-        entityImpl.removeComponent('injury');
-        return inj; // Won't matter, component is being removed
-      }
-
-      return {
+    // Check if injury requires treatment
+    if (currentInjury.requiresTreatment && !currentInjury.treated) {
+      // Don't heal without treatment, but only increment untreatedDuration after first update
+      const currentUntreated = currentInjury.untreatedDuration || 0;
+      entityImpl.updateComponent<InjuryComponent>('injury', (inj) => ({
         ...inj,
         elapsed: newElapsed,
-        healingTime,
-      };
-    });
+        untreatedDuration: currentElapsed > 0 ? currentUntreated + deltaTime : 0,
+      }));
+      return;
+    }
+
+    // Check if healed
+    const healingTime = currentInjury.healingTime || this.calculateHealingTime(currentInjury);
+    if (newElapsed >= healingTime) {
+      // Injury is healed - remove component
+      entityImpl.removeComponent('injury');
+      return;
+    }
+
+    // Update elapsed time
+    entityImpl.updateComponent<InjuryComponent>('injury', (inj) => ({
+      ...inj,
+      elapsed: newElapsed,
+      healingTime,
+    }));
   }
 
   private calculateHealingTime(injury: InjuryComponent): number {
