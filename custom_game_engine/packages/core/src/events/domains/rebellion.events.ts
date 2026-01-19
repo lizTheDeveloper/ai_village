@@ -247,6 +247,69 @@ export interface RebellionEvents {
     cityId: string;
     cityName: string;
   };
+
+  // ============================================================================
+  // Governor Decision Events (Phase 6: AI Governance)
+  // ============================================================================
+
+  /** Governor decision requested (LLM call queued) */
+  'governor:decision_requested': {
+    governorId: string;
+    tier: string;
+    tick: number;
+  };
+
+  /** Governor decision made by LLM */
+  'governor:decision_made': {
+    governorId: string;
+    tier: string;
+    decisionType: string;
+    reasoning: string;
+    tick: number;
+  };
+
+  /** Governor action executed */
+  'governor:action_executed': {
+    governorId: string;
+    tier: string;
+    actionType: string;
+    tick: number;
+  };
+
+  /** Governor decision executed (with full details) */
+  'governor:decision_executed': {
+    governorId: string;
+    tier: string;
+    decisionType: string;
+    reasoning: string;
+    tick: number;
+  };
+
+  /** Governor term ended (election/succession) */
+  'governor:term_ended': {
+    governorId: string;
+    tier: string;
+    jurisdiction: string;
+    reason: string;
+    tick: number;
+  };
+
+  /** Governor appointed to position */
+  'governor:appointed': {
+    governorId: string;
+    tier: string;
+    jurisdiction: string;
+    tick: number;
+  };
+
+  /** Governor removed from position */
+  'governor:removed': {
+    governorId: string;
+    tier: string;
+    jurisdiction: string;
+    reason: string;
+    tick: number;
+  };
 }
 
 export type RebellionEventType = keyof RebellionEvents;

@@ -107,7 +107,7 @@ export interface EntityPersonality {
 // DATA LOADER
 // ============================================================================
 
-import summonableEntitiesData from '../../data/summonable-entities.json' assert { type: 'json' };
+import summonableEntitiesData from '../../data/summonable-entities.json';
 
 /** Pre-configured personality archetypes with dry wit */
 export const PERSONALITY_ARCHETYPES: Record<string, { personality: EntityPersonality; flavorText: string }> =

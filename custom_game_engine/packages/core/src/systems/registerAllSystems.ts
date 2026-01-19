@@ -310,6 +310,7 @@ import { AutonomicSystem } from '../decision/AutonomicSystem.js';
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
 import { VillageGovernanceSystem } from './VillageGovernanceSystem.js';
 import { ProvinceGovernanceSystem } from './ProvinceGovernanceSystem.js';
+import { GovernorDecisionSystem } from './GovernorDecisionSystem.js';  // Phase 6: AI Governance
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
 import { CityDirectorSystem } from './CityDirectorSystem.js';
 

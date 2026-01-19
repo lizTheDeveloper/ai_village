@@ -875,3 +875,58 @@ export type {
   CanonEventAlteration,
   CanonEventConvergence,
 } from './CanonEventComponent.js';
+
+// Grand Strategy - AI Governance (Phase 6)
+export * from './GovernorComponent.js';
+export type {
+  GovernorComponent,
+  PoliticalTier,
+  GovernmentType,
+  GovernorDecision,
+  PoliticalIdeology,
+} from './GovernorComponent.js';
+export {
+  createGovernorComponent,
+  recordDecision,
+  updateDecisionOutcome,
+  updateApproval,
+  updateConstituencyApproval,
+  canMakeDecision,
+  isTermExpired,
+  getRecentDecision,
+  getDecisionsByOutcome,
+  getAveragePopularityImpact,
+  TIER_COOLDOWNS,
+  TIER_MODELS,
+} from './GovernorComponent.js';
+
+export * from './PoliticalEntityComponent.js';
+export type {
+  PoliticalEntityComponent,
+  PoliticalDirective,
+  PoliticalCrisis,
+  VotingProtocol,
+} from './PoliticalEntityComponent.js';
+export {
+  createPoliticalEntityComponent,
+  setGovernor,
+  setCouncil,
+  addChildEntity,
+  removeChildEntity,
+  setParentEntity,
+  receiveDirective,
+  completeDirective,
+  getDirectivesByType,
+  getOverdueDirectives,
+  reportCrisis,
+  resolveCrisis,
+  getCrisesByType,
+  getMostSevereCrisis,
+  getHighestPriorityDirective,
+  updateResource,
+  setResource,
+  getResource,
+  hasCouncil,
+  hasSingleGovernor,
+  isUngoverned,
+} from './PoliticalEntityComponent.js';

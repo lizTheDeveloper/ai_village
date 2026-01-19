@@ -93,7 +93,7 @@ export interface MegastructureBlueprint {
 // DATA LOADING
 // ============================================================================
 
-import blueprintsData from '../../data/megastructures.json' assert { type: 'json' };
+import blueprintsData from '../../data/megastructures.json';
 
 // Load and validate blueprints from JSON
 function loadMegastructureBlueprints(): Record<string, MegastructureBlueprint> {

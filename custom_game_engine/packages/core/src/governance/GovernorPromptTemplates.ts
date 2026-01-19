@@ -609,14 +609,6 @@ Respond with JSON (be concise - speed is critical):
 }
 
 // ============================================================================
-// Exports
+// Note: All context interfaces are already exported via 'export interface' above
+// No need for additional export declarations
 // ============================================================================
-
-export type {
-  GalacticCouncilContext,
-  EmpireContext,
-  NationContext,
-  ProvinceGovernorContext,
-  Crisis,
-  CrisisProtocol,
-};

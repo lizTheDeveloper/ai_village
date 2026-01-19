@@ -1,166 +1,6 @@
 {
   "sprites": [
     {
-      "folderId": "clover-withered",
-      "description": "Withered dead clover with brown dried leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 24
-      }
-    },
-    {
-      "folderId": "sage-seed",
-      "description": "Small sage seed on soil, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-sprout",
-      "description": "Young sage seedling with first fuzzy grey-green leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-vegetative",
-      "description": "Growing sage plant with silvery-green aromatic leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-flowering",
-      "description": "Sage plant with purple flower spikes, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-fruiting",
-      "description": "Sage plant after flowering with seeds developing, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-mature",
-      "description": "Mature sage bush with full silvery foliage, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-seeding",
-      "description": "Sage plant dispersing seeds from dried flower stalks, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "sage-withered",
-      "description": "Withered dead sage with brown dried stems, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-seed",
-      "description": "Tiny yarrow seed on soil, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-sprout",
-      "description": "Young yarrow seedling with first feathery leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-vegetative",
-      "description": "Growing yarrow plant with fern-like feathery green leaves, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-flowering",
-      "description": "Yarrow plant with flat-topped clusters of tiny white flowers, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-fruiting",
-      "description": "Yarrow after flowering with seeds developing in dried flower heads, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-mature",
-      "description": "Mature yarrow plant with full feathery foliage, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
-      "folderId": "yarrow-seeding",
-      "description": "Yarrow dispersing seeds from dried flower clusters, pixel art, top-down view, transparent background",
-      "status": "queued",
-      "queuedAt": 1737256800000,
-      "options": {
-        "type": "plant",
-        "size": 32
-      }
-    },
-    {
       "folderId": "yarrow-withered",
       "description": "Withered dead yarrow with brown dried stalks, pixel art, top-down view, transparent background",
       "status": "queued",
@@ -985,6 +825,2536 @@
       "description": "wall lizard with grey-brown mottled scales, flattened body for crevices, pixel art, game sprite, 48x48",
       "status": "queued",
       "queuedAt": 1768794337600,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lynx",
+      "description": "european lynx with tawny spotted fur, tufted ears, short tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wildcat",
+      "description": "european wildcat with grey striped fur, bushy tail, fierce eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "marten",
+      "description": "pine marten with chocolate brown fur, cream throat patch, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "weasel",
+      "description": "weasel with long slender brown body, white belly, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "stoat",
+      "description": "stoat with brown back, white belly, black tail tip, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "porcupine",
+      "description": "north american porcupine with black quills, small face, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "skunk",
+      "description": "striped skunk with black fur, white back stripe, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "opossum",
+      "description": "virginia opossum with grey fur, white face, pink nose, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chipmunk",
+      "description": "chipmunk with brown striped back, cheek pouches, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "woodchuck",
+      "description": "woodchuck groundhog with brown fur, stout body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "woodpecker",
+      "description": "red-headed woodpecker with red head, black and white body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "jay_blue",
+      "description": "blue jay with bright blue crest, white and black markings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cardinal",
+      "description": "northern cardinal with bright red plumage, black mask, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "robin",
+      "description": "american robin with grey back, orange-red breast, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sparrow",
+      "description": "house sparrow with brown streaked plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "finch",
+      "description": "goldfinch with yellow body, black and white wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "nuthatch",
+      "description": "white-breasted nuthatch with grey back, black cap, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chickadee",
+      "description": "black-capped chickadee with black cap and bib, white cheeks, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hawk",
+      "description": "red-tailed hawk with brown mottled plumage, red tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "salamander",
+      "description": "spotted salamander with black skin, yellow spots, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "newt",
+      "description": "red-spotted newt with olive green skin, red spots, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "toad",
+      "description": "common toad with warty brown skin, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "butterfly_monarch",
+      "description": "monarch butterfly with orange and black wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "butterfly_blue",
+      "description": "blue morpho butterfly with iridescent blue wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "firefly",
+      "description": "firefly with brown body, glowing yellow abdomen, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "bison",
+      "description": "american bison with massive brown shaggy head, humped shoulders, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "antelope",
+      "description": "pronghorn antelope with tan fur, white markings, forked horns, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "gazelle",
+      "description": "thomson gazelle with tan coat, black side stripe, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "zebra",
+      "description": "plains zebra with black and white stripes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wildebeest",
+      "description": "blue wildebeest with grey body, black mane, curved horns, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "coyote",
+      "description": "coyote with grey-brown fur, pointed ears, bushy tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "prairie_dog",
+      "description": "prairie dog with tan fur, standing upright, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "jackrabbit",
+      "description": "black-tailed jackrabbit with long ears, tan fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ground_squirrel",
+      "description": "thirteen-lined ground squirrel with striped back, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "gopher",
+      "description": "pocket gopher with brown fur, large cheek pouches, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mole",
+      "description": "star-nosed mole with pink nose tentacles, velvety black fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "meadowlark",
+      "description": "western meadowlark with yellow breast, black V marking, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "quail",
+      "description": "california quail with curved head plume, scaled belly, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "grouse",
+      "description": "greater sage-grouse with mottled brown plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "killdeer",
+      "description": "killdeer with brown back, two black neck bands, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "dove",
+      "description": "mourning dove with grey-brown plumage, pointed tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "swallow",
+      "description": "barn swallow with blue back, rust throat, forked tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lark",
+      "description": "horned lark with yellow face, black horn feathers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "garter_snake",
+      "description": "garter snake with green body, yellow stripes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lizard_fence",
+      "description": "western fence lizard with blue belly patches, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "grasshopper",
+      "description": "grasshopper with green body, strong hind legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cricket",
+      "description": "field cricket with black body, long antennae, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "bee",
+      "description": "honey bee with fuzzy yellow and black striped body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "dragonfly",
+      "description": "blue dragonfly with long body, transparent wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wild_sheep",
+      "description": "bighorn sheep with curved horns, brown coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "roe_deer",
+      "description": "roe deer with reddish-brown summer coat, white rump, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "red_deer",
+      "description": "red deer stag with branching antlers, reddish-brown coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wild_boar_striped",
+      "description": "wild boar with dark bristly fur, tusks, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hare_european",
+      "description": "european brown hare with long ears, brown fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mink",
+      "description": "american mink with dark brown glossy fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ferret_wild",
+      "description": "black-footed ferret with cream fur, black mask and feet, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "partridge",
+      "description": "grey partridge with orange face, streaked plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "kestrel",
+      "description": "american kestrel with rusty back, spotted breast, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "buzzard",
+      "description": "common buzzard with brown mottled plumage, broad wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "magpie",
+      "description": "eurasian magpie with black and white plumage, long tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cuckoo",
+      "description": "common cuckoo with grey barred underparts, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "nightjar",
+      "description": "european nightjar with cryptic brown plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "adder",
+      "description": "european adder with zigzag pattern on grey-brown body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "slow_worm",
+      "description": "slow worm legless lizard with smooth bronze scales, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "fawn",
+      "description": "white-tailed deer fawn with spotted coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "dormouse",
+      "description": "hazel dormouse with golden fur, fluffy tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "shrew",
+      "description": "common shrew with pointed snout, brown fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "vole",
+      "description": "bank vole with reddish-brown fur, small ears, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "harvest_mouse",
+      "description": "harvest mouse with golden fur, prehensile tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wren",
+      "description": "winter wren with brown barred plumage, upturned tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "thrush",
+      "description": "song thrush with brown back, spotted breast, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "blackbird",
+      "description": "european blackbird male with black plumage, orange beak, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "warbler",
+      "description": "yellow warbler with bright yellow plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "waxwing",
+      "description": "cedar waxwing with crested head, waxy red wing tips, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "goldcrest",
+      "description": "goldcrest with yellow-orange crown stripe, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "treecreeper",
+      "description": "eurasian treecreeper with brown streaked back, curved bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "woodlark",
+      "description": "woodlark with streaked brown plumage, short crest, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "redstart",
+      "description": "common redstart with orange-red tail, black throat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "butterfly_swallowtail",
+      "description": "tiger swallowtail butterfly with yellow and black wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "butterfly_peacock",
+      "description": "peacock butterfly with eyespots on rusty wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "moth_luna",
+      "description": "luna moth with pale green wings, long tails, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "moth_emperor",
+      "description": "emperor moth with eyespots on brown wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snail",
+      "description": "garden snail with brown spiral shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "slug",
+      "description": "leopard slug with grey spotted body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "muskrat",
+      "description": "muskrat with brown waterproof fur, scaly tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "nutria",
+      "description": "nutria coypu with brown fur, orange teeth, webbed feet, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "water_vole",
+      "description": "water vole with brown fur, rounded face, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "marsh_rabbit",
+      "description": "marsh rabbit with brown fur, small ears, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "heron_great_blue",
+      "description": "great blue heron with blue-grey plumage, long neck, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "egret",
+      "description": "great egret with white plumage, yellow bill, black legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "bittern",
+      "description": "american bittern with brown streaked plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ibis",
+      "description": "white ibis with curved red bill, white plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "spoonbill",
+      "description": "roseate spoonbill with pink plumage, spoon-shaped bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "stork",
+      "description": "white stork with white body, black wings, red bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "crane",
+      "description": "sandhill crane with grey body, red forehead, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "coot",
+      "description": "american coot with black body, white bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "moorhen",
+      "description": "common moorhen with dark plumage, red frontal shield, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "rail",
+      "description": "virginia rail with rusty breast, grey cheeks, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "grebe",
+      "description": "pied-billed grebe with brown plumage, striped bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "alligator",
+      "description": "american alligator with dark scaly skin, broad snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "crocodile",
+      "description": "nile crocodile with olive scales, narrow snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "water_snake",
+      "description": "northern water snake with brown banded pattern, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snapping_turtle",
+      "description": "common snapping turtle with rough shell, hooked beak, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "softshell_turtle",
+      "description": "spiny softshell turtle with flat leathery shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "bullfrog",
+      "description": "american bullfrog with green skin, large eardrums, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "tree_frog",
+      "description": "green tree frog with bright green skin, toe pads, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mud_puppy",
+      "description": "mudpuppy salamander with external red gills, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mosquito",
+      "description": "mosquito with long proboscis, transparent wings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "water_strider",
+      "description": "water strider insect walking on water surface, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "damselfly",
+      "description": "blue damselfly with slender body, wings at rest, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "camel",
+      "description": "dromedary camel with tan fur, single hump, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "camel_bactrian",
+      "description": "bactrian camel with shaggy brown fur, two humps, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "fennec_fox",
+      "description": "fennec fox with cream fur, enormous ears, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "desert_fox",
+      "description": "kit fox with grey-tan fur, large ears, black tail tip, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "jerboa",
+      "description": "jerboa with tan fur, very long hind legs, tufted tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "kangaroo_rat",
+      "description": "kangaroo rat with tan fur, long tufted tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "armadillo",
+      "description": "nine-banded armadillo with banded armor shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "javelina",
+      "description": "javelina peccary with grey bristly fur, pig-like snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "desert_hare",
+      "description": "desert cottontail with grey-brown fur, short ears, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "rattlesnake",
+      "description": "western diamondback rattlesnake with diamond pattern, rattle, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sidewinder",
+      "description": "sidewinder rattlesnake moving sideways, horned eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "gila_monster",
+      "description": "gila monster with black and orange beaded skin, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "horned_lizard",
+      "description": "texas horned lizard with spiky crown, flat body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "collared_lizard",
+      "description": "collared lizard with blue-green body, black collar, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chuckwalla",
+      "description": "chuckwalla with loose grey skin, thick tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "desert_tortoise",
+      "description": "desert tortoise with domed brown shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "roadrunner",
+      "description": "greater roadrunner with streaked plumage, long tail, crest, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "vulture_turkey",
+      "description": "turkey vulture with red bald head, dark plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "owl_burrowing",
+      "description": "burrowing owl with long legs, yellow eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "owl_elf",
+      "description": "elf owl tiny with yellow eyes, grey-brown plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cactus_wren",
+      "description": "cactus wren with streaked brown plumage, white eyebrow, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "thrasher",
+      "description": "curve-billed thrasher with grey-brown plumage, curved bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "scorpion",
+      "description": "desert scorpion with tan body, curved stinger tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "tarantula",
+      "description": "desert tarantula with brown hairy body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "scarab_beetle",
+      "description": "scarab beetle with iridescent green-black shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "centipede",
+      "description": "desert centipede with orange segmented body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "polar_bear",
+      "description": "polar bear with white fur, black nose, massive build, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "caribou",
+      "description": "caribou reindeer with brown fur, branching antlers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "musk_ox",
+      "description": "musk ox with long shaggy dark fur, curved horns, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "wolverine",
+      "description": "wolverine with dark brown fur, lighter side stripes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "moose_bull",
+      "description": "bull moose with dark brown fur, palmate antlers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "arctic_fox_white",
+      "description": "arctic fox in white winter coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "arctic_fox_blue",
+      "description": "arctic fox with blue-grey winter coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "arctic_hare",
+      "description": "arctic hare with white fur, black ear tips, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lemming",
+      "description": "norway lemming with orange and black patched fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snowshoe_hare",
+      "description": "snowshoe hare with white winter fur, large feet, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lynx_canadian",
+      "description": "canadian lynx with grey fur, black ear tufts, huge paws, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sable",
+      "description": "sable with rich dark brown silky fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snowy_owl",
+      "description": "snowy owl with white plumage, yellow eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ptarmigan_white",
+      "description": "willow ptarmigan in white winter plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "gyrfalcon",
+      "description": "gyrfalcon with grey-white plumage, powerful build, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "snow_goose",
+      "description": "snow goose with white plumage, black wingtips, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "arctic_tern",
+      "description": "arctic tern with grey and white plumage, red bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "puffin",
+      "description": "atlantic puffin with black and white body, colorful bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "loon",
+      "description": "common loon with black and white checkered back, red eye, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "seal_harbor",
+      "description": "harbor seal with spotted grey coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "seal_harp",
+      "description": "harp seal with silver coat, dark harp marking, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "walrus",
+      "description": "walrus with brown wrinkled skin, long tusks, whiskers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "siberian_tiger",
+      "description": "siberian tiger with orange fur, black stripes, white ruff, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "red_panda",
+      "description": "red panda with rusty fur, ringed tail, white face markings, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lion",
+      "description": "male lion with golden fur, magnificent mane, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lioness",
+      "description": "female lioness with tawny fur, muscular build, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "tiger_bengal",
+      "description": "bengal tiger with orange fur, black stripes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "leopard",
+      "description": "african leopard with golden spotted rosette coat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "jaguar",
+      "description": "jaguar with golden rosette coat, powerful build, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cheetah",
+      "description": "cheetah with spotted coat, black tear marks, slender build, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "panther_black",
+      "description": "black panther with sleek dark coat, yellow eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hyena",
+      "description": "spotted hyena with tan spotted fur, sloped back, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "elephant_african",
+      "description": "african elephant with large ears, wrinkled grey skin, tusks, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "elephant_asian",
+      "description": "asian elephant with smaller ears, domed head, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "rhinoceros",
+      "description": "white rhinoceros with grey armored skin, two horns, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hippopotamus",
+      "description": "hippopotamus with grey skin, barrel body, wide mouth, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "giraffe",
+      "description": "giraffe with patched tan and cream coat, very long neck, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "water_buffalo",
+      "description": "asian water buffalo with dark grey skin, curved horns, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cape_buffalo",
+      "description": "cape buffalo with black hide, fused horn boss, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "gorilla",
+      "description": "silverback gorilla with black fur, grey back, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chimpanzee",
+      "description": "chimpanzee with black fur, pink face, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "orangutan",
+      "description": "orangutan with shaggy red-orange fur, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "baboon",
+      "description": "olive baboon with grey-brown fur, dog-like face, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mandrill",
+      "description": "mandrill with blue and red face, colorful rump, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lemur",
+      "description": "ring-tailed lemur with grey fur, striped black and white tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "monkey_capuchin",
+      "description": "capuchin monkey with brown body, white face, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "monkey_spider",
+      "description": "spider monkey with black fur, very long limbs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "monkey_howler",
+      "description": "howler monkey with black fur, large throat, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "toucan",
+      "description": "toco toucan with black plumage, huge orange bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "macaw_scarlet",
+      "description": "scarlet macaw with red yellow and blue plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "macaw_blue",
+      "description": "blue and gold macaw with blue and yellow plumage, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "parrot_african_grey",
+      "description": "african grey parrot with grey feathers, red tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cockatoo",
+      "description": "sulphur-crested cockatoo with white plumage, yellow crest, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "flamingo",
+      "description": "greater flamingo with pink plumage, curved bill, long legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "ostrich",
+      "description": "ostrich with black and white plumage, long neck, powerful legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "peacock",
+      "description": "indian peacock with iridescent blue-green plumage, eye-spotted train, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hornbill",
+      "description": "great hornbill with black and white plumage, yellow casque, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "secretary_bird",
+      "description": "secretary bird with grey plumage, black crest feathers, long legs, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "python",
+      "description": "ball python with brown and tan pattern, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "anaconda",
+      "description": "green anaconda with olive green body, black spots, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "cobra_king",
+      "description": "king cobra with brown hood, ready to strike, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "monitor_lizard",
+      "description": "nile monitor with grey-brown scales, forked tongue, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "chameleon",
+      "description": "veiled chameleon with green skin, curled tail, cone eyes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "iguana",
+      "description": "green iguana with bright green scales, dewlap, spines, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sloth",
+      "description": "three-toed sloth with shaggy brown fur, slow moving, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "anteater",
+      "description": "giant anteater with grey and black striped fur, long snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "tapir",
+      "description": "brazilian tapir with dark brown body, flexible snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "okapi",
+      "description": "okapi with dark brown body, striped legs, giraffe-like head, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "warthog",
+      "description": "warthog with grey skin, tusks, facial warts, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "aardvark",
+      "description": "aardvark with pig-like body, long ears, tubular snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "pangolin",
+      "description": "pangolin with overlapping brown scales, curled body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "dolphin",
+      "description": "bottlenose dolphin with grey smooth skin, curved dorsal fin, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "orca",
+      "description": "orca killer whale with black and white pattern, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "whale_humpback",
+      "description": "humpback whale with dark body, white flippers, barnacles, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "whale_blue",
+      "description": "blue whale with massive blue-grey body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "narwhal",
+      "description": "narwhal with mottled grey skin, spiral tusk, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "manatee",
+      "description": "manatee with grey wrinkled skin, paddle flippers, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sea_lion",
+      "description": "california sea lion with brown fur, external ear flaps, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sea_otter",
+      "description": "sea otter with brown fur, floating on back, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "salmon",
+      "description": "atlantic salmon with silver scales, pink flesh showing, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "trout",
+      "description": "rainbow trout with spotted body, pink stripe, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "bass",
+      "description": "largemouth bass with green scales, dark lateral line, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "pike",
+      "description": "northern pike with elongated green body, duck-bill snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "catfish",
+      "description": "channel catfish with grey skin, whisker barbels, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "carp",
+      "description": "common carp with golden scales, barbels, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "koi",
+      "description": "koi fish with orange and white pattern, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "goldfish",
+      "description": "goldfish with orange scales, flowing fins, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "shark_great_white",
+      "description": "great white shark with grey top, white belly, many teeth, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "shark_hammerhead",
+      "description": "hammerhead shark with distinctive hammer-shaped head, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "manta_ray",
+      "description": "manta ray with wide flat body, horn-like fins, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "stingray",
+      "description": "southern stingray with flat disc body, whip tail, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "swordfish",
+      "description": "swordfish with silver body, long pointed bill, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "tuna",
+      "description": "bluefin tuna with streamlined silver-blue body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "clownfish",
+      "description": "clownfish with orange body, white stripes, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "angelfish",
+      "description": "queen angelfish with blue and yellow scales, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "pufferfish",
+      "description": "porcupine pufferfish with spines, inflated round, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "eel",
+      "description": "moray eel with green mottled body, gaping mouth, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "seahorse",
+      "description": "seahorse with curled tail, bony plates, snout, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "crab",
+      "description": "blue crab with blue claws, olive shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "lobster",
+      "description": "american lobster with dark blue-green shell, large claws, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "shrimp",
+      "description": "pink shrimp with segmented body, antennae, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "hermit_crab",
+      "description": "hermit crab in spiral shell, red claws, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "crawfish",
+      "description": "red crawfish with segmented body, small claws, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "octopus",
+      "description": "common octopus with reddish body, eight tentacles, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "squid",
+      "description": "squid with elongated body, ten tentacles, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "jellyfish",
+      "description": "moon jellyfish with translucent bell, trailing tentacles, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "starfish",
+      "description": "orange starfish with five textured arms, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "sea_urchin",
+      "description": "purple sea urchin with spiky spherical body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "clam",
+      "description": "giant clam with ridged shell, blue mantle, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "oyster",
+      "description": "oyster with rough grey shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "mussel",
+      "description": "blue mussel with dark elongated shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "scallop",
+      "description": "scallop with ridged fan-shaped shell, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "coral",
+      "description": "brain coral with rounded bumpy tan surface, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "anemone",
+      "description": "sea anemone with pink tentacles, cylindrical body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "frog_poison_dart",
+      "description": "poison dart frog with bright blue and black pattern, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "piranha",
+      "description": "red-bellied piranha with silver scales, red belly, sharp teeth, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
+      "options": {
+        "type": "animal",
+        "size": 48
+      }
+    },
+    {
+      "folderId": "electric_eel",
+      "description": "electric eel with dark elongated body, pixel art, game sprite, 48x48",
+      "status": "queued",
+      "queuedAt": 1768795029250,
       "options": {
         "type": "animal",
         "size": 48

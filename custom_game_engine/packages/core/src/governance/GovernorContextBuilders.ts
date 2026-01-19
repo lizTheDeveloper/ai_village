@@ -456,6 +456,31 @@ export function buildGalacticCouncilContext(
 }
 
 // ============================================================================
+// CRISIS MANAGEMENT
+// ============================================================================
+
+/**
+ * Crisis for emergency decision-making
+ */
+export interface Crisis {
+  type: string;
+  severity: number; // 0-1
+  description: string;
+  affectedEntities: string[];
+  requiredResponseTicks: number;
+}
+
+/**
+ * Crisis protocol for emergency response
+ */
+export interface CrisisProtocol {
+  type: string;
+  severity: number;
+  requiredResponse: number; // Ticks until action required
+  llmBudgetOverride: boolean; // Can skip cooldown for emergency
+}
+
+// ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 

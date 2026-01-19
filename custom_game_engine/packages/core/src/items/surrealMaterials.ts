@@ -9,7 +9,7 @@
  */
 
 import { defineItem, type ItemDefinition } from './ItemDefinition.js';
-import surrealMaterialsData from '../../data/surreal-materials.json' assert { type: 'json' };
+import surrealMaterialsData from '../../data/surreal-materials.json';
 
 /**
  * Interface for material data from JSON

@@ -71,6 +71,8 @@ export enum ComponentType {
   CensusBureau = 'census_bureau',
   VillageGovernance = 'village_governance',
   ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance
+  Governor = 'governor',  // Phase 6: AI Governance - LLM-powered political decision making
+  PoliticalEntity = 'political_entity',  // Phase 6: Political entity in hierarchy
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',
@@ -257,8 +259,4 @@ export enum ComponentType {
   // Megastructures (Grand Strategy Phase 5)
   Megastructure = 'megastructure',           // Massive engineering projects (Dyson swarms, wormholes)
   ConstructionProject = 'construction_project', // Active megastructure construction tracking
-
-  // AI Governance (Grand Strategy Phase 6)
-  Governor = 'governor',                     // LLM-powered political decision making
-  PoliticalEntity = 'political_entity',      // Political entity at any tier (village to galactic council)
 }

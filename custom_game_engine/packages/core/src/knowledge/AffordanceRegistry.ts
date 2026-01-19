@@ -10,10 +10,10 @@
  * - Data-driven: add new items/buildings without changing reasoning code
  */
 
-// Load data from JSON files
-import buildingsData from '../data/affordances/buildings.json';
-import itemsData from '../data/affordances/items.json';
-import recipesData from '../data/affordances/recipes.json';
+// Load data from JSON files (outside src/ directory)
+import buildingsData from '../../data/affordances/buildings.json';
+import itemsData from '../../data/affordances/items.json';
+import recipesData from '../../data/affordances/recipes.json';
 
 // ============================================================================
 // Core Affordance Types
