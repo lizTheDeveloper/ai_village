@@ -197,56 +197,10 @@ export interface RebellionEvents {
     factions: string[];
   };
 
-  /** Province election completed */
-  'province:election_completed': {
-    provinceId: string;
-    provinceName: string;
-    newGovernor?: string;
-    tick: number;
-  };
-
-  /** Province economic update (significant change) */
-  'province:economic_update': {
-    provinceId: string;
-    provinceName: string;
-    taxRevenue: number;
-    maintenanceCost: number;
-    netRevenue: number;
-    tick: number;
-  };
-
-  /** Province stability critical - rebellion warning */
-  'province:rebellion_warning': {
-    provinceId: string;
-    provinceName: string;
-    stability: number;
-    factors: string[];
-    tick: number;
-  };
-
-  /** Province policy completed */
-  'province:policy_completed': {
-    provinceId: string;
-    provinceName: string;
-    policy: string;
-    category: string;
-    tick: number;
-  };
-
-  /** City rebelled against province */
-  'province:city_rebelled': {
-    provinceId: string;
-    provinceName: string;
-    cityId: string;
-    tick: number;
-  };
-
-  /** City added to province */
-  'province:city_added': {
-    provinceId: string;
-    cityId: string;
-    cityName: string;
-  };
+  // ============================================================================
+  // Province Events
+  // ============================================================================
+  // NOTE: All province events moved to governance.events.ts
 
   // ============================================================================
   // Governor and Nation Events
@@ -254,88 +208,9 @@ export interface RebellionEvents {
   // NOTE: All governor events moved to governance.events.ts
 
   // ============================================================================
-  // Nation Events (Tier 3: Strategic Governance)
+  // Nation Events
   // ============================================================================
-
-  /** Nation economic update (significant change) */
-  'nation:economic_update': {
-    nationId: string;
-    nationName: string;
-    totalRevenue: number;
-    totalExpenditure: number;
-    surplus: number;
-    treasuryBalance: number;
-    tick: number;
-  };
-
-  /** Nation election completed */
-  'nation:election_completed': {
-    nationId: string;
-    nationName: string;
-    newLeader?: string;
-    leadershipType: string;
-    tick: number;
-  };
-
-  /** Nation stability critical - warning */
-  'nation:stability_warning': {
-    nationId: string;
-    nationName: string;
-    stability: number;
-    legitimacy: number;
-    unrestFactors: string[];
-    tick: number;
-  };
-
-  /** Nation war progress update */
-  'nation:war_progress': {
-    nationId: string;
-    nationName: string;
-    warId: string;
-    warName: string;
-    duration: number;
-    casualties: number;
-    tick: number;
-  };
-
-  /** Nation research completed */
-  'nation:research_completed': {
-    nationId: string;
-    nationName: string;
-    projectId: string;
-    projectName: string;
-    field: 'military' | 'economic' | 'cultural' | 'scientific';
-    tick: number;
-  };
-
-  /** Nation policy completed */
-  'nation:policy_completed': {
-    nationId: string;
-    nationName: string;
-    policyId: string;
-    policyName: string;
-    category: 'military' | 'economic' | 'diplomatic' | 'cultural' | 'research';
-    tick: number;
-  };
-
-  /** Nation treaty expired */
-  'nation:treaty_expired': {
-    nationId: string;
-    nationName: string;
-    treatyId: string;
-    treatyName: string;
-    treatyType: 'trade' | 'military_alliance' | 'non_aggression' | 'peace' | 'customs_union';
-    tick: number;
-  };
-
-  /** Nation policy enacted */
-  'nation:policy_enacted': {
-    nationId: string;
-    nationName: string;
-    policyName: string;
-    category: 'military' | 'economic' | 'diplomatic' | 'cultural' | 'research';
-    tick: number;
-  };
+  // NOTE: All nation events moved to governance.events.ts
 
   // ============================================================================
   // Crisis & Governance Events

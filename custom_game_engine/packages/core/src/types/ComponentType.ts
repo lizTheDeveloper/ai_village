@@ -160,6 +160,7 @@ export enum ComponentType {
   // World & Time
   Time = 'time',
   TimeCompression = 'time_compression',  // Grand strategy time scaling
+  TimeCompressionSnapshot = 'time_compression_snapshot',  // Era snapshots for time-travel archaeology
   Weather = 'weather',
   Vision = 'vision',
   Passage = 'passage',

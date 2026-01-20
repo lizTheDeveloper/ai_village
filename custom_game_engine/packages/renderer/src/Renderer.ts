@@ -103,6 +103,9 @@ export class Renderer {
   private renderer3DMounted = false; // Track if 3D renderer is mounted
   private onEntitySelectedCallback: ((entityId: string | null) => void) | null = null;
 
+  // Track currently selected dimensional building for UI controls
+  private selectedDimensionalBuildingId: string | null = null;
+
   constructor(
     canvas: HTMLCanvasElement,
     chunkManager: ChunkManager,

@@ -31,6 +31,18 @@ import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
 import { TIME_SCALE_LIMITS } from '../components/TimeCompressionComponent.js';
+import type {
+  TimeCompressionSnapshotComponent,
+  EraSnapshot,
+  SoulTrajectory,
+} from '../components/TimeCompressionSnapshotComponent.js';
+import {
+  createEraSnapshot,
+  createSoulTrajectory,
+  addEraSnapshot,
+} from '../components/TimeCompressionSnapshotComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 
 // ============================================================================
 // CONSTANTS

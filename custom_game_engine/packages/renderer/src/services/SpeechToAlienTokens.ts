@@ -5,15 +5,19 @@
  * speech text into alien word tokens that can be displayed with hover tooltips.
  */
 
-import type { World, Entity, LanguageComponent, LanguageKnowledgeComponent } from '@ai-village/core';
-import { AlienTextRenderer, type AlienWordToken, type LanguageRegistry } from '@ai-village/language';
+import type { World, Entity } from '@ai-village/core';
+import {
+  type AlienWordToken,
+  type LanguageRegistry,
+  type LanguageComponent,
+  type LanguageKnowledgeComponent,
+} from '@ai-village/language';
 
 export class SpeechToAlienTokensService {
-  private renderer: AlienTextRenderer;
   private languageRegistry: LanguageRegistry | null = null;
 
   constructor() {
-    this.renderer = new AlienTextRenderer();
+    // No-op constructor - we don't use AlienTextRenderer anymore
   }
 
   /**

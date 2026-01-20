@@ -196,6 +196,7 @@ import { TVAdvertisingSystem } from '../television/systems/TVAdvertisingSystem.j
 import { PlotAssignmentSystem } from '../plot/PlotAssignmentSystem.js';
 import { PlotProgressionSystem } from '../plot/PlotProgressionSystem.js';
 import { NarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
+import { FatesCouncilSystem } from '../plot/FatesCouncilSystem.js';
 
 // Consciousness
 import { HiveMindSystem } from '../consciousness/HiveMindSystem.js';
@@ -1059,6 +1060,12 @@ export function registerAllSystems(
   registerDisabled(new PlotAssignmentSystem());
   registerDisabled(new PlotProgressionSystem());
   registerDisabled(new NarrativePressureSystem());
+
+  // Fates Council - Exotic/Epic plot weaving (priority 999, end of day)
+  // Requires LLM provider for Fates conversations
+  if (llmQueue) {
+    registerDisabled(new FatesCouncilSystem(llmQueue));
+  }
 
   // ============================================================================
   // CONSCIOUSNESS (Collective Minds)

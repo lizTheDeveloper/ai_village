@@ -58,6 +58,8 @@ export { createTemperatureComponent, type TemperatureComponent } from './Tempera
 export * from './WeatherComponent.js';
 export * from './TimeCompressionComponent.js';
 export { createTimeCompressionComponent, type TimeCompressionComponent } from './TimeCompressionComponent.js';
+export * from './TimeCompressionSnapshotComponent.js';
+export { createTimeCompressionSnapshotComponent, type TimeCompressionSnapshotComponent, type EraSnapshot, type SoulTrajectory } from './TimeCompressionSnapshotComponent.js';
 export * from './CircadianComponent.js';
 export { createCircadianComponent, type CircadianComponent } from './CircadianComponent.js';
 export * from './PlantComponent.js';

@@ -364,15 +364,15 @@ export class FatesCouncilSystem extends BaseSystem {
     return {
       entityId: deity.id,
       entityType: 'deity',
-      name: deityComp.identity?.primaryName || deity.id,
+      name: (deityComp as any).identity?.primaryName || deity.id,
       activePlots: plotLines?.active.map(p => p.instance_id) || [],
       completedPlots: plotLines?.completed.length || 0,
-      wisdom: deityComp.divinePower || 100,  // Use divine power as "wisdom"
+      wisdom: (deityComp as any).divinePower || 100,  // Use divine power as "wisdom"
       recentActions: [],  // TODO: deity activities
       storyPotential: 0.5,  // Deities always have potential
       needsChallenge: false,
       overwhelmed: false,
-      context: `Deity of ${deityComp.domain || 'unknown domain'}`,
+      context: `Deity of ${(deityComp as any).domain || 'unknown domain'}`,
     };
   }
 
@@ -732,15 +732,11 @@ export class FatesCouncilSystem extends BaseSystem {
     council.transcript.push(exchange);
 
     // Emit event for observation
-    world.eventBus.emit({
-      type: 'plot:fate_speaks',
-      source: 'fates_council_system',
-      data: {
-        speaker: council.currentSpeaker,
-        text: response,
-        topic: exchange.topic,
-        dayNumber: council.dayNumber,
-      },
+    world.eventBus.emitGeneric('soul:fate_speaks', {
+      speaker: council.currentSpeaker,
+      text: response,
+      topic: exchange.topic,
+      dayNumber: council.dayNumber,
     });
 
     // Advance to next speaker
@@ -784,15 +780,11 @@ export class FatesCouncilSystem extends BaseSystem {
     this.executeFatesDecisions(decision, world, council.tick);
 
     // Emit completion event
-    world.eventBus.emit({
-      type: 'plot:fates_council_complete',
-      source: 'fates_council_system',
-      data: {
-        dayNumber: council.dayNumber,
-        plotAssignments: decision.plotAssignments.length,
-        summary: decision.summary,
-        transcript: council.transcript,
-      },
+    world.eventBus.emitGeneric('plot:fates_council_complete', {
+      dayNumber: council.dayNumber,
+      plotAssignments: decision.plotAssignments.length,
+      summary: decision.summary,
+      transcript: council.transcript,
     });
 
     // Clear active council
@@ -893,7 +885,7 @@ export class FatesCouncilSystem extends BaseSystem {
     let plotLines = entity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
     if (!plotLines) {
       plotLines = {
-        type: 'plot_lines',
+        type: CT.PlotLines,
         active: [],
         completed: [],
         abandoned: [],
@@ -903,8 +895,8 @@ export class FatesCouncilSystem extends BaseSystem {
     // Get soul ID (for souls) or use entity ID
     const soulIdentity = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
     const thread = entity.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
-    const soulId = soulIdentity?.true_name || entityId;
-    const personalTick = thread?.head.personal_tick || tick;
+    const soulId = soulIdentity?.soulName || entityId;
+    const personalTick = thread?.head?.personal_tick || tick;
 
     // Instantiate plot
     const plotInstance = instantiatePlot(
@@ -921,7 +913,7 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // Add to active plots
     addActivePlot(plotLines, plotInstance);
-    world.addComponent(entityId, plotLines);
+    entity.addComponent(plotLines);
 
     console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
     console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);

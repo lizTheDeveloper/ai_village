@@ -210,6 +210,7 @@ import {
 } from '@ai-village/llm';
 import { TerrainGenerator, ChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig } from '@ai-village/world';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
+import { getLanguageRegistry } from '@ai-village/language';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -4035,6 +4036,10 @@ async function main() {
   }
   const speechBubbleOverlay = new DOMSpeechBubbleOverlay(mainElement);
   const speechToAlienTokensService = getSpeechToAlienTokensService();
+
+  // Set language registry for alien text translation
+  const languageRegistry = getLanguageRegistry();
+  speechToAlienTokensService.setLanguageRegistry(languageRegistry);
 
   // Subscribe to agent:speak events to display speech bubbles
   gameLoop.world.eventBus.subscribe('agent:speak', (event: any) => {

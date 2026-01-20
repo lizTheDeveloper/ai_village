@@ -76,7 +76,7 @@ export class TradeEscortSystem extends BaseSystem {
     category: 'economy',
     description: 'Links squadrons to trade agreements for escort missions',
     dependsOn: ['trade_agreement' as SystemId, 'squadron_management' as SystemId],
-    writesComponents: [CT.TradeAgreement, CT.Squadron] as const,
+    writesComponents: ['trade_agreement', 'squadron'] as const,
   } as const;
 
   protected readonly throttleInterval = UPDATE_INTERVAL;

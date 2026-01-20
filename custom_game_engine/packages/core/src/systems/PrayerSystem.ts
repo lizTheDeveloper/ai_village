@@ -187,12 +187,37 @@ export class PrayerSystem extends BaseSystem {
 
     // Handle unresolved prayer (potential deity emergence)
     if (resolution.type === 'unresolved' && resolution.couldCreateDeity) {
-      this.events.emitGeneric('divinity:proto_deity_belief', {
-        agentId: entity.id,
-        prayerContent: prayer.content,
-        beliefContributed: resolution.beliefGenerated,
-        timestamp: currentTick,
+      // Try to find fallback deity (tagged with 'fallback_deity')
+      const fallbackDeity = nearbyEntities.find(e => {
+        const tags = e.getComponent(CT.Tags);
+        return tags?.tags.has('fallback_deity');
       });
+
+      if (fallbackDeity) {
+        // Route prayer to fallback deity instead of leaving it unresolved
+        const deityComp = fallbackDeity.getComponent<DeityComponent>(CT.Deity);
+        if (deityComp) {
+          deityComp.addPrayer(entity.id, prayer.id, currentTick);
+          deityComp.addBelief(resolution.beliefGenerated, currentTick);
+
+          // Emit event showing prayer went to fallback
+          this.events.emit('prayer:offered', {
+            agentId: entity.id,
+            deityId: fallbackDeity.id,
+            prayerType: prayer.type,
+            urgency: prayer.urgency,
+            prayerId: prayer.id,
+          });
+        }
+      } else {
+        // No fallback deity - emit proto_deity event for potential emergence
+        this.events.emitGeneric('divinity:proto_deity_belief', {
+          agentId: entity.id,
+          prayerContent: prayer.content,
+          beliefContributed: resolution.beliefGenerated,
+          timestamp: currentTick,
+        });
+      }
     }
   }
 

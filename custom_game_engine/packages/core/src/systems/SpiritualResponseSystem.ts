@@ -34,57 +34,57 @@ export class SpiritualResponseSystem extends BaseSystem {
     // Subscribe to all relevant gameplay events that should trigger prayers
 
     // === STARVATION/HUNGER EVENTS ===
-    ctx.events.on('need:critical', (event) => {
-      if (event.data.needType === 'hunger') {
-        this.triggerStarvationPrayer(event.data.agentId, ctx.world, ctx.tick);
-      } else if (event.data.needType === 'health') {
-        this.triggerInjuryPrayer(event.data.agentId, ctx.world, ctx.tick);
+    ctx.events.on('need:critical', (data) => {
+      if (data.needType === 'hunger') {
+        this.triggerStarvationPrayer(data.agentId, ctx.world, ctx.tick);
+      } else if (data.needType === 'health') {
+        this.triggerInjuryPrayer(data.agentId, ctx.world, ctx.tick);
       }
     });
 
-    ctx.events.on('agent:starved', (event) => {
-      this.triggerStarvationPrayer(event.data.agentId, ctx.world, ctx.tick);
+    ctx.events.on('agent:starved', (data) => {
+      this.triggerStarvationPrayer(data.agentId, ctx.world, ctx.tick);
     });
 
     // === INJURY/HEALTH EVENTS ===
-    ctx.events.on('agent:health_critical', (event) => {
-      this.triggerInjuryPrayer(event.data.agentId, ctx.world, ctx.tick);
+    ctx.events.on('agent:health_critical', (data) => {
+      this.triggerInjuryPrayer(data.agentId, ctx.world, ctx.tick);
     });
 
     // === DEATH EVENTS ===
-    ctx.events.on('agent:died', (event) => {
-      this.triggerDeathMourningPrayers(event.data.entityId, ctx.world, ctx.tick);
+    ctx.events.on('agent:died', (data) => {
+      this.triggerDeathMourningPrayers(data.entityId, ctx.world, ctx.tick);
     });
 
-    ctx.events.on('death:witnessed', (event) => {
-      this.triggerMourningPrayer(event.data.witnessId, event.data.deceasedId, ctx.world, ctx.tick);
+    ctx.events.on('death:witnessed', (data) => {
+      this.triggerMourningPrayer(data.witnessId, data.deceasedId, ctx.world, ctx.tick);
     });
 
     // === HARVEST EVENTS ===
-    ctx.events.on('harvest:completed', (event) => {
-      this.triggerGratitudePrayer(event.data.agentId, 'harvest', ctx.world, ctx.tick);
+    ctx.events.on('harvest:completed', (data) => {
+      this.triggerGratitudePrayer(data.agentId, 'harvest', ctx.world, ctx.tick);
     });
 
     // === BIRTH EVENTS ===
-    ctx.events.on('agent:birth', (event) => {
+    ctx.events.on('agent:birth', (data) => {
       // Parents pray for blessing
-      if (event.data.parents) {
-        for (const parentId of event.data.parents) {
-          this.triggerBirthPrayer(parentId, event.data.agentId, event.data.name, ctx.world, ctx.tick);
+      if (data.parents) {
+        for (const parentId of data.parents) {
+          this.triggerBirthPrayer(parentId, data.agentId, data.name, ctx.world, ctx.tick);
         }
       }
     });
 
     // === DISASTER EVENTS ===
-    ctx.events.on('disaster:occurred', (event) => {
-      this.triggerDisasterPrayers(event.data.location, event.data.disasterType, ctx.world, ctx.tick);
+    ctx.events.on('disaster:occurred', (data) => {
+      this.triggerDisasterPrayers(data.location, data.disasterType, ctx.world, ctx.tick);
     });
 
     // === EXTREME WEATHER EVENTS ===
-    ctx.events.on('weather:changed', (event) => {
+    ctx.events.on('weather:changed', (data) => {
       // Only trigger for extreme weather
-      if (event.data.intensity === 'heavy' || event.data.divine) {
-        this.triggerWeatherPrayers(event.data.weatherType, ctx.world, ctx.tick);
+      if (data.intensity === 'heavy' || data.divine) {
+        this.triggerWeatherPrayers(data.weatherType, ctx.world, ctx.tick);
       }
     });
   }
