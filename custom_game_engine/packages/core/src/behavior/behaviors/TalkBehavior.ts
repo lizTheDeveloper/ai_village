@@ -32,10 +32,7 @@ import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '.
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 // Language system imports (optional - gracefully degrades if not available)
-import type {
-  LanguageKnowledgeComponent,
-  LanguageComponent,
-} from '@ai-village/language';
+import type { LanguageKnowledgeComponent, LanguageComponent } from '@ai-village/language';
 
 /** Probability of speaking each tick */
 const SPEAK_CHANCE = 0.3;
@@ -71,8 +68,8 @@ function translateEnglishToAlienSync(
   let alienText = englishText;
 
   // Sort concepts by length (longest first) to handle compound words
-  const sortedConcepts = Array.from(language.knownWords.keys())
-    .sort((a, b) => b.length - a.length);
+  const sortedConcepts: string[] = Array.from(language.knownWords.keys())
+    .sort((a: string, b: string) => b.length - a.length);
 
   for (const concept of sortedConcepts) {
     const wordData = language.knownWords.get(concept);

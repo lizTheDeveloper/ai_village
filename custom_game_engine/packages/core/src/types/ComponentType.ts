@@ -282,4 +282,5 @@ export enum ComponentType {
   // Megastructures (Grand Strategy Phase 5)
   Megastructure = 'megastructure',           // Massive engineering projects (Dyson swarms, wormholes)
   ConstructionProject = 'construction_project', // Active megastructure construction tracking
+  ArchaeologicalSite = 'archaeological_site', // Excavation sites for discovering ancient technologies
 }

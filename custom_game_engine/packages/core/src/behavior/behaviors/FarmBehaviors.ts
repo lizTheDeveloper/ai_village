@@ -878,11 +878,12 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   if (plantEntity) {
     const plantImpl = plantEntity as EntityImpl;
     plantImpl.updateComponent(ComponentType.Plant, (plant) => {
-      const plantWithHydration = plant as unknown as { _hydration?: number; hydration?: number };
-      return {
-        ...plant,
-        _hydration: Math.min(100, (plantWithHydration._hydration ?? plantWithHydration.hydration ?? 50) + 20),
-      };
+      // Access hydration via getter and update via object spread
+      const currentHydration = (plant as unknown as { hydration: number }).hydration;
+      const updated = { ...plant };
+      // Set hydration on the spread object
+      (updated as unknown as { hydration: number }).hydration = Math.min(100, currentHydration + 20);
+      return updated;
     });
   }
 

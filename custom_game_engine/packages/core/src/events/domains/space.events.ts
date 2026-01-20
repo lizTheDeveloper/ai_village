@@ -937,6 +937,66 @@ export interface SpaceEvents {
     consequences: string;
     archaeologicalValue: number;
   };
+
+  // === Archaeology Events (Phase 5) ===
+
+  /** Archaeological site discovered */
+  'archaeology:site_discovered': {
+    siteId: string;
+    siteName: string;
+    siteType: 'megastructure_ruin' | 'ancient_city' | 'buried_archive' | 'crash_site';
+    originEra: string;
+    archaeologicalValue: number;
+    potentialDiscoveries: number;
+  };
+
+  /** Excavation started at archaeological site */
+  'archaeology:excavation_started': {
+    siteId: string;
+    siteName: string;
+    siteType: 'megastructure_ruin' | 'ancient_city' | 'buried_archive' | 'crash_site';
+    workersAssigned: number;
+    excavationDifficulty: number;
+  };
+
+  /** Excavation phase advanced */
+  'archaeology:phase_advanced': {
+    siteId: string;
+    siteName: string;
+    newPhase: 'undiscovered' | 'surveyed' | 'excavating' | 'analyzed' | 'exhausted';
+    progress: number;
+  };
+
+  /** Artifact discovered at excavation site */
+  'archaeology:artifact_found': {
+    siteId: string;
+    siteName: string;
+    artifactId: string;
+    artifactName: string;
+    originTech: string;
+    originEra: string;
+    condition: number;
+    complexity: number;
+  };
+
+  /** Technology recovered from artifact reverse engineering */
+  'archaeology:technology_recovered': {
+    siteId: string;
+    siteName: string;
+    artifactId: string;
+    artifactName: string;
+    techId: string;
+    originEra: string;
+    reverseEngineeringProgress: number;
+  };
+
+  /** Archaeological site exhausted (all discoveries made) */
+  'archaeology:site_exhausted': {
+    siteId: string;
+    siteName: string;
+    totalArtifacts: number;
+    workHoursInvested: number;
+  };
 }
 
 export type SpaceEventType = keyof SpaceEvents;
