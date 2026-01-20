@@ -243,6 +243,13 @@ export interface AgentEvents {
     emotion: string;
     intensity: number;
   };
+  'agent:age_milestone': {
+    agentId: string;
+    oldCategory?: 'child' | 'teen' | 'adult' | 'elder';
+    newCategory: 'child' | 'teen' | 'adult' | 'elder';
+    ageYears: number;
+    tick: number;
+  };
 
   // === Agent Behavior Events ===
   'behavior:change': {

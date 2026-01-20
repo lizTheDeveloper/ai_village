@@ -57,10 +57,11 @@ export interface AnimalEvents {
     agentId: EntityId;
     method: string;
   };
-  life_stage_changed: {
+  'animal:life_stage_change': {
     animalId: EntityId;
-    from: string;
-    to: string;
+    oldStage: 'infant' | 'juvenile' | 'adult' | 'senior';
+    newStage: 'infant' | 'juvenile' | 'adult' | 'senior';
+    ageYears: number;
   };
   animal_state_changed: {
     animalId: EntityId;

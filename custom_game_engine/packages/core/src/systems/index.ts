@@ -19,6 +19,7 @@ export * from './FireSpreadSystem.js';
 export * from './SoilSystem.js';
 export * from './TimeSystem.js';
 export * from './TimeCompressionSystem.js';
+export * from './StatisticalModeManager.js';
 export * from './StateMutatorSystem.js'; // Batched vector updates for performance
 export * from './SleepSystem.js';
 // Plant systems have been moved to @ai-village/botany package
@@ -271,6 +272,10 @@ export { StragglerRecoverySystem, getStragglerRecoverySystem } from './Straggler
 // Resource Discovery System (Phase 3: Economic Depth)
 export * from './ExplorationDiscoverySystem.js';
 export { ExplorationDiscoverySystem } from './ExplorationDiscoverySystem.js';
+
+// Stellar Mining System (Phase 3: Economic Depth)
+export * from './StellarMiningSystem.js';
+export { StellarMiningSystem } from './StellarMiningSystem.js';
 
 // Building Summoning System (Magic)
 export * from './BuildingSummoningSystem.js';

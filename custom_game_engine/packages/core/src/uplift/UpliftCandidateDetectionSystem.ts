@@ -9,7 +9,8 @@
  *
  * Creates UpliftCandidateComponent for suitable animals.
  *
- * NOT YET INTEGRATED - Standalone implementation for testing
+ * INTEGRATION: Requires 'genetic_engineering' technology from ClarketechSystem.
+ * System only runs after genetic_engineering tech is unlocked.
  */
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';

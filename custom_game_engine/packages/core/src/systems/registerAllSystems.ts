@@ -99,6 +99,8 @@ import { RadioBroadcastingSystem } from '../radio/RadioBroadcastingSystem.js';
 
 // Exploration & Navigation
 import { ExplorationSystem } from './ExplorationSystem.js';
+import { ExplorationDiscoverySystem } from './ExplorationDiscoverySystem.js';
+import { StellarMiningSystem } from './StellarMiningSystem.js';
 import { LandmarkNamingSystem } from './LandmarkNamingSystem.js';
 import { EmotionalNavigationSystem } from '../navigation/EmotionalNavigationSystem.js';
 import { VRSystem } from '../vr/VRSystem.js';
@@ -690,6 +692,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
   }
   gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
+  gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
 
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT

@@ -98,21 +98,159 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Season → Moisture Decay', () => {
-    it.skip('should increase evaporation in summer (+25%)', () => {
-      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
-      // Currently only temperature modifiers are implemented
+    it('should increase evaporation in summer (+25%)', () => {
+      // Summer: 1.25x decay multiplier
+      // Setup: Create world with summer season
+      const world = new WorldImpl(eventBus);
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 120, // Day 120 = summer (days 91-180)
+        season: 'summer' as const,
+      });
+
+      // Create a tile with moisture
+      const tile = {
+        terrain: 'dirt',
+        moisture: 100,
+        fertility: 50,
+        biome: 'grassland' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 50, phosphorus: 40, potassium: 45 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Apply moisture decay with normal temperature
+      soilSystem.decayMoisture(world, tile, 0, 0, 20); // 20°C = normal temp
+
+      // Base decay = 10, summer multiplier = 1.25
+      // Expected decay = 10 * 1.25 = 12.5
+      expect(tile.moisture).toBe(100 - 12.5);
     });
 
-    it.skip('should decrease evaporation in winter (-50%)', () => {
-      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
+    it('should decrease evaporation in winter (-50%)', () => {
+      // Winter: 0.5x decay multiplier
+      const world = new WorldImpl(eventBus);
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 300, // Day 300 = winter (days 271-360)
+        season: 'winter' as const,
+      });
+
+      const tile = {
+        terrain: 'dirt',
+        moisture: 100,
+        fertility: 50,
+        biome: 'grassland' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 50, phosphorus: 40, potassium: 45 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      // Base decay = 10, winter multiplier = 0.5
+      // Expected decay = 10 * 0.5 = 5
+      expect(tile.moisture).toBe(100 - 5);
     });
 
-    it.skip('should apply normal evaporation in spring', () => {
-      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
+    it('should apply normal evaporation in spring', () => {
+      // Spring: 1.0x decay multiplier
+      const world = new WorldImpl(eventBus);
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 45, // Day 45 = spring (days 1-90)
+        season: 'spring' as const,
+      });
+
+      const tile = {
+        terrain: 'dirt',
+        moisture: 100,
+        fertility: 50,
+        biome: 'grassland' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 50, phosphorus: 40, potassium: 45 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      // Base decay = 10, spring multiplier = 1.0
+      // Expected decay = 10 * 1.0 = 10
+      expect(tile.moisture).toBe(100 - 10);
     });
 
-    it.skip('should apply normal evaporation in fall', () => {
-      // TODO: Implement seasonal modifiers in SoilSystem.decayMoisture()
+    it('should apply normal evaporation in fall', () => {
+      // Fall: 1.0x decay multiplier
+      const world = new WorldImpl(eventBus);
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 225, // Day 225 = fall (days 181-270)
+        season: 'fall' as const,
+      });
+
+      const tile = {
+        terrain: 'dirt',
+        moisture: 100,
+        fertility: 50,
+        biome: 'grassland' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 50, phosphorus: 40, potassium: 45 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      // Base decay = 10, fall multiplier = 1.0
+      // Expected decay = 10 * 1.0 = 10
+      expect(tile.moisture).toBe(100 - 10);
     });
   });
 

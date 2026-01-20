@@ -63,6 +63,7 @@ export enum ComponentType {
 
   // Exploration
   ExplorationState = 'exploration_state',
+  ExplorationMission = 'exploration_mission',
 
   // Buildings & Structures
   Building = 'building',
