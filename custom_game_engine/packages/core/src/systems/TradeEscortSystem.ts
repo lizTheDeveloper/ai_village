@@ -480,14 +480,14 @@ export function releaseEscort(
   tradeAgreementId: string
 ): { success: boolean; reason?: string } {
   // Find trade agreement
-  const civEntities = world.query().with(CT.TradeAgreement).executeEntities();
+  const civEntities = world.query().with('trade_agreement').executeEntities();
 
   let agreementEntity: EntityImpl | undefined;
   let tradeComp: TradeAgreementComponent | undefined;
   let agreement: TradeAgreement | undefined;
 
   for (const civEntity of civEntities) {
-    const comp = civEntity.getComponent<TradeAgreementComponent>(CT.TradeAgreement);
+    const comp = civEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!comp) continue;
 
     const found = comp.activeAgreements.find((a) => a.id === tradeAgreementId);
@@ -512,15 +512,15 @@ export function releaseEscort(
   }
 
   // Find squadron and reset its mission
-  const squadronEntities = world.query().with(CT.Squadron).executeEntities();
+  const squadronEntities = world.query().with('squadron').executeEntities();
   const squadronEntity = squadronEntities.find((e) => {
-    const s = e.getComponent<SquadronComponent>(CT.Squadron);
+    const s = e.getComponent<SquadronComponent>('squadron');
     return s?.squadronId === squadronId;
   });
 
   if (squadronEntity) {
     const impl = squadronEntity as EntityImpl;
-    impl.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
+    impl.updateComponent<SquadronComponent>('squadron', (s) => ({
       ...s,
       mission: {
         type: 'patrol', // Return to default patrol mission
@@ -546,7 +546,7 @@ export function releaseEscort(
     };
   });
 
-  agreementEntity.updateComponent<TradeAgreementComponent>(CT.TradeAgreement, (c) => ({
+  agreementEntity.updateComponent<TradeAgreementComponent>('trade_agreement', (c) => ({
     ...c,
     activeAgreements: updatedAgreements as TradeAgreement[],
   }));
@@ -575,10 +575,10 @@ export function getEscortedTrades(world: World, squadronId: string): string[] {
   const escortedTrades: string[] = [];
 
   // Query all civilizations with trade agreements
-  const civEntities = world.query().with(CT.TradeAgreement).executeEntities();
+  const civEntities = world.query().with('trade_agreement').executeEntities();
 
   for (const civEntity of civEntities) {
-    const tradeComp = civEntity.getComponent<TradeAgreementComponent>(CT.TradeAgreement);
+    const tradeComp = civEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!tradeComp) continue;
 
     // Check each active agreement

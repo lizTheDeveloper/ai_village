@@ -2999,7 +2999,7 @@
       "id": "medium_prophecy_trap",
       "name": "The Prophecy You Cannot Escape",
       "description": "An oracle speaks: your future is fixed. Doom approaches. You will try to prevent it. You will fail. Or will you? The harder you struggle against fate, the more you ensure it. This is the prophecy trap.",
-      "scale": "medium",
+      "scale": "large",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Fate vs free will",

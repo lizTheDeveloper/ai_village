@@ -164,6 +164,8 @@ import {
   createTextAdventurePanel,
   // Dev Actions Service
   devActionsService,
+  // Speech to Alien Tokens Service
+  getSpeechToAlienTokensService,
   // Panel factories for lazy loading
   createMemoryPanelFactory,
   createRelationshipsPanelFactory,

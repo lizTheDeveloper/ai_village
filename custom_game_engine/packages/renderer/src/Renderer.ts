@@ -42,6 +42,7 @@ import { AgentRenderer, AnimalRenderer, BuildingRenderer } from './entities/inde
 import { DebugOverlay, InteractionOverlay } from './overlays/index.js';
 import { EntityPicker } from './EntityPicker.js';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
+import { DimensionalControls } from './DimensionalControls.js';
 
 /**
  * 2D renderer using Canvas.
@@ -69,6 +70,7 @@ export class Renderer {
   private interactionOverlay!: InteractionOverlay;
   private entityPicker!: EntityPicker;
   private pixelLabEntityRenderer!: PixelLabEntityRenderer;
+  private dimensionalControls!: DimensionalControls;
 
   // Combat UI renderers (initialized via initCombatUI)
   private healthBarRenderer: HealthBarRenderer | null = null;

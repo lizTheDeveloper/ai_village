@@ -264,6 +264,82 @@ export class CrossRealmPhoneSystem extends BaseSystem {
     phoneComp.unreadCount = 0;
   }
 
+  /**
+   * Get all voicemails for an entity
+   */
+  public getVoicemails(world: World, entityId: string): VoicemailMessage[] {
+    const entity = world.getEntity(entityId);
+    if (!entity) return [];
+
+    const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent | undefined;
+    if (!phoneComp) return [];
+
+    return [...phoneComp.voicemails];
+  }
+
+  /**
+   * Mark voicemails as listened
+   */
+  public markVoicemailsListened(world: World, entityId: string, voicemailIds?: string[]): void {
+    const entity = world.getEntity(entityId);
+    if (!entity) return;
+
+    const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent | undefined;
+    if (!phoneComp) return;
+
+    // Mark specific voicemails or all if no IDs provided
+    for (const vm of phoneComp.voicemails) {
+      if (!voicemailIds || voicemailIds.includes(vm.id)) {
+        if (!vm.listened) {
+          vm.listened = true;
+          phoneComp.unlistenedVoicemailCount = Math.max(0, phoneComp.unlistenedVoicemailCount - 1);
+        }
+      }
+    }
+  }
+
+  /**
+   * Delete voicemails
+   */
+  public deleteVoicemails(world: World, entityId: string, voicemailIds: string[]): void {
+    const entity = world.getEntity(entityId);
+    if (!entity) return;
+
+    const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent | undefined;
+    if (!phoneComp) return;
+
+    // Remove voicemails by ID
+    const idsToDelete = new Set(voicemailIds);
+    for (let i = phoneComp.voicemails.length - 1; i >= 0; i--) {
+      const vm = phoneComp.voicemails[i]!;
+      if (idsToDelete.has(vm.id)) {
+        // Update unlistened count if deleting unlistened voicemail
+        if (!vm.listened) {
+          phoneComp.unlistenedVoicemailCount = Math.max(0, phoneComp.unlistenedVoicemailCount - 1);
+        }
+        phoneComp.voicemails.splice(i, 1);
+      }
+    }
+  }
+
+  /**
+   * Set or update voicemail greeting
+   */
+  public setVoicemailGreeting(world: World, entityId: string, greeting: string | null): { success: boolean; reason?: string } {
+    const entity = world.getEntity(entityId);
+    if (!entity) {
+      return { success: false, reason: 'Entity not found' };
+    }
+
+    const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent | undefined;
+    if (!phoneComp) {
+      return { success: false, reason: 'Entity does not have a phone' };
+    }
+
+    phoneComp.voicemail = greeting;
+    return { success: true };
+  }
+
   // ==========================================================================
   // Private Helpers
   // ==========================================================================
@@ -493,6 +569,52 @@ export class CrossRealmPhoneSystem extends BaseSystem {
     }
 
     return segments.join('.');
+  }
+
+  /**
+   * Create a voicemail message for a missed call
+   */
+  private createVoicemail(
+    recipientPhoneComp: CrossRealmPhoneComponent,
+    call: CrossRealmCall,
+    missedReason: VoicemailMessage['missedReason']
+  ): void {
+    // Generate auto-voicemail content based on call type and reason
+    let content = '';
+    const callerName = recipientPhoneComp.phone.contacts.get(call.from.deviceId)?.name || call.from.deviceId;
+
+    switch (missedReason) {
+      case 'no_answer':
+        content = `Missed ${call.type} call from ${callerName}. They did not leave a message.`;
+        break;
+      case 'busy':
+        content = `${callerName} called while you were on another call.`;
+        break;
+      case 'dnd':
+        content = `${callerName} called while Do Not Disturb was active.`;
+        break;
+      case 'offline':
+        content = `${callerName} called while your phone was offline.`;
+        break;
+    }
+
+    const voicemail: VoicemailMessage = {
+      id: `vm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      from: call.from,
+      to: call.to,
+      content,
+      timestamp: call.startedAt,
+      callId: call.id,
+      callType: call.type,
+      listened: false,
+      missedReason,
+    };
+
+    recipientPhoneComp.voicemails.push(voicemail);
+    recipientPhoneComp.unlistenedVoicemailCount++;
+
+    if (this.config.debug) {
+    }
   }
 }
 

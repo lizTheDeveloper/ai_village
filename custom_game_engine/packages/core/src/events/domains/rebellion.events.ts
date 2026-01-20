@@ -400,34 +400,6 @@ export interface RebellionEvents {
   // ============================================================================
   // NOTE: All governance events (crisis, directive, vote, etc.) moved to governance.events.ts
 
-  /** Governance directive interpreted by LLM */
-  'governance:directive_interpreted': {
-    directiveId: string;
-    action: 'implement' | 'delegate' | 'negotiate' | 'refuse';
-    reasoning: string;
-    tick: number;
-  };
-
-  /** Governance directive LLM processing failed */
-  'governance:directive_llm_failed': {
-    directiveId: string;
-    error: string;
-    tick: number;
-  };
-
-  /** Crisis response received from governor */
-  'governance:crisis_response_received': {
-    crisisId: string;
-    governorId: EntityId;
-    tier: string;
-    action: 'handle_locally' | 'escalate' | 'request_assistance';
-    localMeasures?: string[];
-    escalationTarget?: string;
-    assistanceNeeded?: string[];
-    reasoning: string;
-    tick: number;
-  };
-
   // EXOTIC PLOT EVENTS - for Fates Council
   /** When agent is elevated to significant political power */
   'governance:political_elevation': {
