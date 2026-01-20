@@ -448,7 +448,7 @@ export class TradeNetworkSystem extends BaseSystem {
     const neighbors = Array.from(graph.adjacencyList.get(nodeId) ?? new Set())
       .map((edgeId) => {
         const edge = graph.edges.get(edgeId);
-        return edge?.toNodeId;
+        return edge ? edge.toNodeId : undefined;
       })
       .filter((id): id is EntityId => id !== undefined && id !== nodeId);
 

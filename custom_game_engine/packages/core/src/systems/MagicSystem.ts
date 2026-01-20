@@ -110,6 +110,7 @@ export class MagicSystem extends BaseSystem {
       // Wire up manager dependencies
       this.skillTreeManager.initialize(world, eventBus);
       this.proficiencyManager.initialize(eventBus);
+      this.regenManager.initialize(eventBus); // Initialize for exotic event emissions
       this.divineManager.initialize(eventBus);
       this.castingManager.initialize(this.effectExecutor, eventBus);
 

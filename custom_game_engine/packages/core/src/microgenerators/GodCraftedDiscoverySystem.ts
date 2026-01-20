@@ -24,8 +24,14 @@ import type {
   SpellData,
   RecipeContent,
   RecipeData,
+  LegendaryItemContent,
+  LegendaryItemData,
+  SoulContent,
+  SoulData,
 } from './types.js';
 import { godCraftedQueue } from './GodCraftedQueue.js';
+import { createSoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { DeityComponent } from '../components/DeityComponent.js';
 
 /**
  * Chunk information for god-crafted content spawning
@@ -488,6 +494,700 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         contentType: 'recipe',
         contentId: content.id,
         name: recipeData.name,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a legendary item in the world
+   */
+  private spawnLegendaryItem(
+    content: LegendaryItemContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const itemData = content.data as LegendaryItemData;
+
+    // Create item entity
+    const entity = world.createEntity() as EntityImpl;
+
+    // Add generated content component with item data
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'legendary_item',
+      content: {
+        itemId: itemData.itemId,
+        displayName: itemData.displayName,
+        category: itemData.category,
+        weight: itemData.weight,
+        stackSize: itemData.stackSize,
+        baseValue: itemData.baseValue,
+        rarity: itemData.rarity,
+        legendary: itemData.legendary,
+      },
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity for display
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: itemData.displayName,
+      description: itemData.legendary.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'legendary_item',
+        contentId: content.id,
+        name: itemData.displayName,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a soul in the world
+   */
+  private spawnSoul(
+    content: SoulContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const soulData = content.data as SoulData;
+
+    // Create soul entity
+    const entity = world.createEntity() as EntityImpl;
+
+    // Create soul identity component
+    const soulIdentity = createSoulIdentityComponent({
+      soulName: soulData.identity.name,
+      soulOriginCulture: 'exotic', // God-crafted souls are exotic origin
+      soulOriginSpecies: soulData.identity.species,
+      isReincarnated: false,
+      purpose: soulData.mission.description,
+      destiny: soulData.backstory,
+      coreInterests: soulData.personality.traits,
+      cosmicAlignment: 0, // Default alignment
+      currentTick: world.tick,
+      archetype: soulData.mission.type,
+      incarnationHistory: [],
+    });
+
+    entity.addComponent(soulIdentity as unknown as Component);
+
+    // Add generated content component with full soul data
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'soul',
+      content: {
+        identity: soulData.identity,
+        backstory: soulData.backstory,
+        mission: soulData.mission,
+        personality: soulData.personality,
+        narrativeComponents: soulData.narrativeComponents,
+      },
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity for display
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: soulData.identity.name,
+      description: soulData.backstory,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'soul',
+        contentId: content.id,
+        name: soulData.identity.name,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a quest in the world (minimal implementation)
+   */
+  private spawnQuest(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'quest',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Quest from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'quest',
+        contentId: content.id,
+        name: `Quest from ${content.creator.name}`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn an alien species in the world (minimal implementation)
+   */
+  private spawnAlienSpecies(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'alien_species',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Species from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'alien_species',
+        contentId: content.id,
+        name: `Species from ${content.creator.name}`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a magic paradigm in the world (minimal implementation)
+   */
+  private spawnMagicParadigm(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'magic_paradigm',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Magic Paradigm from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'magic_paradigm',
+        contentId: content.id,
+        name: `Magic Paradigm from ${content.creator.name}`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a building in the world (minimal implementation)
+   */
+  private spawnBuilding(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'building',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Building from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'building',
+        contentId: content.id,
+        name: `Building from ${content.creator.name}`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a technology in the world (minimal implementation)
+   */
+  private spawnTechnology(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'technology',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Technology from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'technology',
+        contentId: content.id,
+        name: `Technology from ${content.creator.name}`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a deity in the world
+   */
+  private spawnDeity(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Create deity component
+    const deityComponent = new DeityComponent(
+      `${content.creator.name}'s Deity`,
+      'dormant' // Start as dormant until believers emerge
+    );
+
+    entity.addComponent(deityComponent as unknown as Component);
+
+    // Store god-crafted data as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'deity',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `${content.creator.name}'s Deity`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'deity',
+        contentId: content.id,
+        name: `${content.creator.name}'s Deity`,
+        creatorName: content.creator.name,
+        creatorDomain: content.creator.godOf,
+        lore: content.lore,
+        entityId: entity.id,
+        discoveryMethod: 'random_encounter',
+      },
+    });
+
+    return {
+      success: true,
+      entityId: entity.id,
+    };
+  }
+
+  /**
+   * Spawn a religion in the world (minimal implementation)
+   */
+  private spawnReligion(
+    content: GodCraftedContent,
+    world: World,
+    position?: { x: number; y: number }
+  ): SpawnResult {
+    const entity = world.createEntity() as EntityImpl;
+
+    // Store as generated content
+    entity.addComponent({
+      type: 'generated_content',
+      version: 1,
+      contentType: 'religion',
+      content: content.data,
+      approved: true,
+      rejected: false,
+      rejectionReason: null,
+    } as unknown as Component);
+
+    // Add god-crafted metadata
+    entity.addComponent({
+      type: 'god_crafted_artifact',
+      version: 1,
+      contentId: content.id,
+      creator: content.creator,
+      discoveredAt: Date.now(),
+      discoveryMethod: 'random_encounter',
+      lore: content.lore,
+    } as unknown as Component);
+
+    // Add identity
+    entity.addComponent({
+      type: 'identity',
+      version: 1,
+      name: `Religion from ${content.creator.name}`,
+      description: content.lore,
+    } as unknown as Component);
+
+    // Add position if provided
+    if (position) {
+      entity.addComponent({
+        type: 'position',
+        version: 1,
+        x: position.x,
+        y: position.y,
+      } as unknown as Component);
+    }
+
+    // Emit discovery event
+    world.eventBus.emit({
+      type: 'godcrafted:discovered',
+      source: entity.id,
+      data: {
+        contentType: 'religion',
+        contentId: content.id,
+        name: `Religion from ${content.creator.name}`,
         creatorName: content.creator.name,
         creatorDomain: content.creator.godOf,
         lore: content.lore,

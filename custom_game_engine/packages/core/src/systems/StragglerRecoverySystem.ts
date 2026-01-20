@@ -529,10 +529,48 @@ export class StragglerRecoverySystem extends BaseSystem {
     entity: EntityImpl,
     straggler: StragglerComponent
   ): void {
-    // TODO: Implement rescue squadron matching logic
-    // - Find squadrons near straggler's β-branch
-    // - Check squadron availability (not in combat, has capacity)
-    // - Auto-assign if rescue possible
+    // Query all squadrons with rescue mission type
+    const squadrons = world.query().with(CT.Squadron).executeEntities();
+
+    for (const squadronEntity of squadrons) {
+      const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+      if (!squadron) continue;
+
+      // Check if squadron has rescue mission type
+      if (squadron.mission.type !== 'rescue') continue;
+
+      // Check if squadron is engaged (in combat or already on active mission)
+      if (squadron.mission.status === 'engaged') continue;
+
+      // Get flagship to check navigation state
+      const flagshipEntity = world.getEntity(squadron.flagshipId);
+      if (!flagshipEntity) continue;
+
+      const flagship = flagshipEntity.getComponent<SpaceshipComponent>(CT.Spaceship);
+      if (!flagship) continue;
+
+      // Check if flagship has visited the straggler's β-branch
+      // (squadron must be at or near the straggler's location to rescue)
+      const isNearStraggler = flagship.navigation.visited_branches.includes(
+        straggler.strandedAtBranch
+      );
+
+      if (!isNearStraggler) continue;
+
+      // Check squadron coherence (must be stable enough to rescue)
+      if (squadron.coherence.average < 0.5) continue;
+
+      // Check squadron has capacity (not full of rescued ships already)
+      if (squadron.ships.shipIds.length >= 10) continue;
+
+      // Rescue squadron found! Auto-assign
+      const assignResult = this.assignRescueSquadron(world, entity.id, squadronEntity.id);
+
+      if (assignResult.success) {
+        // Successfully assigned rescue squadron
+        break;
+      }
+    }
   }
 
   /**
@@ -545,9 +583,54 @@ export class StragglerRecoverySystem extends BaseSystem {
   ): void {
     if (!straggler.rescueSquadronId) return;
 
-    // TODO: Check if rescue squadron reached straggler's β-branch
-    // - Query rescue squadron location
-    // - If at straggler's branch, recover straggler
+    // Get rescue squadron entity
+    const rescueSquadronEntity = world.getEntity(straggler.rescueSquadronId);
+    if (!rescueSquadronEntity) {
+      // Rescue squadron no longer exists - revert to stranded status
+      straggler.recoveryStatus = 'stranded';
+      straggler.rescueSquadronId = undefined;
+      this.dirtyStragglersThisTick[entity.id] = true;
+      return;
+    }
+
+    const rescueSquadron = rescueSquadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+    if (!rescueSquadron) {
+      // Rescue squadron lost component - revert to stranded status
+      straggler.recoveryStatus = 'stranded';
+      straggler.rescueSquadronId = undefined;
+      this.dirtyStragglersThisTick[entity.id] = true;
+      return;
+    }
+
+    // Get flagship to check navigation state
+    const flagshipEntity = world.getEntity(rescueSquadron.flagshipId);
+    if (!flagshipEntity) return;
+
+    const flagship = flagshipEntity.getComponent<SpaceshipComponent>(CT.Spaceship);
+    if (!flagship) return;
+
+    // Check if rescue squadron reached straggler's β-branch
+    const hasReachedStraggler = flagship.navigation.visited_branches.includes(
+      straggler.strandedAtBranch
+    );
+
+    if (hasReachedStraggler) {
+      // Rescue squadron arrived! Recover straggler
+      this.recoverStraggler(world, entity.id);
+
+      // Emit specific rescue event (different from solo jump recovery)
+      world.eventBus.emit({
+        type: 'straggler:rescued',
+        source: entity.id,
+        data: {
+          stragglerId: entity.id,
+          rescueSquadronId: straggler.rescueSquadronId,
+          squadronName: rescueSquadron.name,
+          stragglerBranch: straggler.strandedAtBranch,
+          ticksStranded: world.tick - straggler.strandedTick,
+        },
+      });
+    }
   }
 
   /**

@@ -2,6 +2,7 @@ import type { SystemId, ComponentType } from '@ai-village/core';
 import { ComponentType as CT, BaseSystem, type SystemContext, EntityImpl, multiverseCoordinator, DAWN_START_HOUR, DAY_START_HOUR, DUSK_START_HOUR, NIGHT_START_HOUR, GAME_DAY_SECONDS } from '@ai-village/core';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
+export type Season = 'spring' | 'summer' | 'fall' | 'winter';
 
 export interface TimeComponent {
   type: 'time';
@@ -12,6 +13,7 @@ export interface TimeComponent {
   phase: DayPhase;             // Current phase
   lightLevel: number;          // 0-1 (affects visibility and temperature)
   day: number;                 // Current day number (starts at 1)
+  season: Season;              // Current season based on day number
 }
 
 export function createTimeComponent(
@@ -19,6 +21,7 @@ export function createTimeComponent(
   dayLength: number = GAME_DAY_SECONDS,       // 48 seconds per game day at 1x speed (20 year generation in 96 hours)
   speedMultiplier: number = 1   // Default 1x speed
 ): TimeComponent {
+  const initialDay = 1;
   return {
     type: 'time',
     version: 1,
@@ -27,7 +30,8 @@ export function createTimeComponent(
     speedMultiplier,
     phase: calculatePhase(timeOfDay),
     lightLevel: calculateLightLevel(timeOfDay, calculatePhase(timeOfDay)),
-    day: 1, // Start at day 1
+    day: initialDay,
+    season: calculateSeason(initialDay), // Start in spring (day 1)
   };
 }
 
@@ -64,6 +68,25 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
 }
 
 /**
+ * Calculate season based on day number
+ * Assumes 90-day seasons in a 360-day year
+ */
+function calculateSeason(day: number): Season {
+  // Use modulo to handle years beyond the first
+  const dayOfYear = ((day - 1) % 360) + 1;
+
+  if (dayOfYear <= 90) {
+    return 'spring';  // Days 1-90
+  } else if (dayOfYear <= 180) {
+    return 'summer';  // Days 91-180
+  } else if (dayOfYear <= 270) {
+    return 'fall';    // Days 181-270
+  } else {
+    return 'winter';  // Days 271-360
+  }
+}
+
+/**
  * TimeSystem manages the day/night cycle
  * Integrates with WeatherSystem via temperature modifiers
  * Integrates with MultiverseCoordinator for time scale management
@@ -90,6 +113,7 @@ export class TimeSystem extends BaseSystem {
 
   private lastPhase: DayPhase | null = null;
   private lastDay: number = 1; // Track previous day to detect week changes
+  private lastSeason: Season | null = null; // Track previous season to detect season changes
   private universeId: string = 'universe:main'; // Default universe ID
 
   /**
