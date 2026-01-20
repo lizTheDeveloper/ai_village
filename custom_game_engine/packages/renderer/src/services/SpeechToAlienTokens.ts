@@ -56,6 +56,9 @@ export class SpeechToAlienTokensService {
       }
 
       const nativeLanguageId = knowledge.nativeLanguages[0];
+      if (!nativeLanguageId) {
+        return null; // No native language
+      }
 
       // Get language component from registry
       const languageEntity = this.languageRegistry.getLanguage(nativeLanguageId);
@@ -63,16 +66,8 @@ export class SpeechToAlienTokensService {
         return null; // Language not found
       }
 
-      // Check if text contains alien words (if so, it's already translated)
-      const hasAlienWords = this.containsAlienWords(text, languageEntity);
-
-      if (!hasAlienWords) {
-        // Text is in English, no alien translation to show
-        return null;
-      }
-
-      // Convert alien text to tokens with English translations
-      const tokens = this.renderer.renderSentenceWithTooltips(text, languageEntity);
+      // Parse text to find alien words and create tokens
+      const tokens = this.parseAlienText(text, languageEntity.component);
 
       return tokens.length > 0 ? tokens : null;
     } catch (error) {
@@ -82,20 +77,55 @@ export class SpeechToAlienTokensService {
   }
 
   /**
-   * Check if text contains alien words from the given language
+   * Parse alien text to create tokens with English translations
+   *
+   * This method tokenizes the text and looks up each word in the language vocabulary.
+   * Words found in the vocabulary become alien tokens with translations.
+   * Punctuation and unknown words are preserved as plain text.
    */
-  private containsAlienWords(text: string, language: LanguageComponent): boolean {
-    const words = text.toLowerCase().split(/\s+/);
+  private parseAlienText(text: string, language: LanguageComponent): AlienWordToken[] {
+    const tokens: AlienWordToken[] = [];
 
-    // Check if any word matches an alien word in the vocabulary
+    // Build a reverse lookup map: alien word -> (english concept, wordData)
+    const alienToEnglishMap = new Map<string, { concept: string; wordType?: string }>();
     for (const [concept, wordData] of language.knownWords) {
       const alienWord = wordData.word.toLowerCase();
-      if (words.includes(alienWord)) {
-        return true;
-      }
+      alienToEnglishMap.set(alienWord, {
+        concept,
+        wordType: wordData.wordType,
+      });
     }
 
-    return false;
+    // Split text into words and punctuation
+    const parts = text.split(/(\s+|[.,!?;:])/);
+
+    for (const part of parts) {
+      if (!part) continue;
+
+      // Check if it's whitespace or punctuation
+      if (/^\s+$/.test(part) || /^[.,!?;:]$/.test(part)) {
+        // Skip whitespace (we'll add it implicitly)
+        // Punctuation is also skipped for simplicity
+        continue;
+      }
+
+      // Look up the word in the alien vocabulary
+      const lowerPart = part.toLowerCase();
+      const translation = alienToEnglishMap.get(lowerPart);
+
+      if (translation) {
+        // Found alien word - create token with translation
+        tokens.push({
+          alien: part,
+          english: translation.concept,
+          wordType: translation.wordType as any,
+        });
+      }
+      // If no translation found, we skip it (it's likely English text)
+      // The UI will only show alien words with tooltips
+    }
+
+    return tokens;
   }
 
   /**

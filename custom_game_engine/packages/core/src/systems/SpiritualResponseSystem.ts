@@ -16,7 +16,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { EntityImpl } from '../ecs/Entity.js';
+import type { Entity } from '../ecs/Entity.js';
 import type { SpiritualComponent, Prayer, PrayerType, PrayerUrgency } from '../components/SpiritualComponent.js';
 import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -286,7 +286,7 @@ export class SpiritualResponseSystem extends BaseSystem {
   /**
    * Check if agent should pray based on spirituality and cooldown
    */
-  private shouldPray(entity: EntityImpl, currentTick: number, minInterval: number): boolean {
+  private shouldPray(entity: Entity, currentTick: number, minInterval: number): boolean {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
 
@@ -319,7 +319,7 @@ export class SpiritualResponseSystem extends BaseSystem {
   /**
    * Record prayer in agent's spiritual component
    */
-  private recordAgentPrayer(entity: EntityImpl, prayer: Prayer, tick: number): void {
+  private recordAgentPrayer(entity: Entity, prayer: Prayer, tick: number): void {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     if (!spiritual) return;
 
@@ -333,7 +333,7 @@ export class SpiritualResponseSystem extends BaseSystem {
   /**
    * Emit prayer event for PrayerAnsweringSystem and UI
    */
-  private emitPrayerEvent(entity: EntityImpl, prayer: Prayer, trigger: string, eventBus: SystemContext['eventBus']): void {
+  private emitPrayerEvent(entity: Entity, prayer: Prayer, trigger: string, eventBus: SystemContext['eventBus']): void {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
 
     eventBus.emit({

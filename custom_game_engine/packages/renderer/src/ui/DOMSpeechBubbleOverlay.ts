@@ -182,59 +182,60 @@ export class DOMSpeechBubbleOverlay {
    * Append alien text with hover tooltips
    */
   private appendAlienText(container: HTMLDivElement, tokens: AlienWordToken[]): void {
-    for (const token of tokens) {
-      if (token.type === 'text') {
-        // Plain text (punctuation, spaces)
-        const span = document.createElement('span');
-        span.textContent = token.text;
-        container.appendChild(span);
-      } else if (token.type === 'alien_word') {
-        // Alien word with tooltip
-        const span = document.createElement('span');
-        span.textContent = token.alienWord;
-        span.style.color = '#8B5CF6'; // Purple for alien text
-        span.style.cursor = 'help';
-        span.style.position = 'relative';
-        span.style.display = 'inline-block';
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
 
-        // Create tooltip
-        const tooltip = document.createElement('div');
-        tooltip.className = 'alien-word-tooltip';
-        tooltip.style.position = 'absolute';
-        tooltip.style.bottom = '100%';
-        tooltip.style.left = '50%';
-        tooltip.style.transform = 'translateX(-50%)';
-        tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
-        tooltip.style.color = '#fff';
-        tooltip.style.padding = '4px 8px';
-        tooltip.style.borderRadius = '4px';
-        tooltip.style.fontSize = '12px';
-        tooltip.style.whiteSpace = 'nowrap';
-        tooltip.style.marginBottom = '4px';
-        tooltip.style.opacity = '0';
-        tooltip.style.pointerEvents = 'none';
-        tooltip.style.transition = 'opacity 0.2s';
-        tooltip.style.zIndex = '1001';
-        tooltip.textContent = token.englishWord;
-
-        // Hover handlers
-        let hoverTimeout: number | null = null;
-        span.addEventListener('mouseenter', () => {
-          hoverTimeout = window.setTimeout(() => {
-            tooltip.style.opacity = '1';
-          }, 200);
-        });
-        span.addEventListener('mouseleave', () => {
-          if (hoverTimeout !== null) {
-            window.clearTimeout(hoverTimeout);
-            hoverTimeout = null;
-          }
-          tooltip.style.opacity = '0';
-        });
-
-        span.appendChild(tooltip);
-        container.appendChild(span);
+      // Add space before word (except first word)
+      if (i > 0) {
+        const space = document.createTextNode(' ');
+        container.appendChild(space);
       }
+
+      // Alien word with tooltip
+      const span = document.createElement('span');
+      span.textContent = token.alien;
+      span.style.color = '#8B5CF6'; // Purple for alien text
+      span.style.cursor = 'help';
+      span.style.position = 'relative';
+      span.style.display = 'inline-block';
+
+      // Create tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'alien-word-tooltip';
+      tooltip.style.position = 'absolute';
+      tooltip.style.bottom = '100%';
+      tooltip.style.left = '50%';
+      tooltip.style.transform = 'translateX(-50%)';
+      tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+      tooltip.style.color = '#fff';
+      tooltip.style.padding = '4px 8px';
+      tooltip.style.borderRadius = '4px';
+      tooltip.style.fontSize = '12px';
+      tooltip.style.whiteSpace = 'nowrap';
+      tooltip.style.marginBottom = '4px';
+      tooltip.style.opacity = '0';
+      tooltip.style.pointerEvents = 'none';
+      tooltip.style.transition = 'opacity 0.2s';
+      tooltip.style.zIndex = '1001';
+      tooltip.textContent = token.english;
+
+      // Hover handlers
+      let hoverTimeout: number | null = null;
+      span.addEventListener('mouseenter', () => {
+        hoverTimeout = window.setTimeout(() => {
+          tooltip.style.opacity = '1';
+        }, 200);
+      });
+      span.addEventListener('mouseleave', () => {
+        if (hoverTimeout !== null) {
+          window.clearTimeout(hoverTimeout);
+          hoverTimeout = null;
+        }
+        tooltip.style.opacity = '0';
+      });
+
+      span.appendChild(tooltip);
+      container.appendChild(span);
     }
   }
 

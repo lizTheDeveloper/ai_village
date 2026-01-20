@@ -42,6 +42,12 @@ export interface WorldEvents {
     mode: 'ecs' | 'statistical';
     timeScale: number;
   };
+  'time:era_snapshot_created': {
+    eraNumber: number;
+    eraName: string;
+    yearsCovered: number;
+    soulCount: number;
+  };
 
   // === Time Events ===
   'time:day_changed': {

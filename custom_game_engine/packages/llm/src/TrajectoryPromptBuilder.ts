@@ -16,9 +16,19 @@ import type { Entity } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type {
   SoulIdentityComponent,
-  IncarnationRecord,
 } from '@ai-village/core';
 import type { ComponentType } from '@ai-village/core';
+
+// Use the correct IncarnationRecord type from SoulIdentityComponent
+interface IncarnationRecord {
+  incarnationTick: number;
+  deathTick?: number;
+  bodyName?: string;
+  bodySpecies?: string;
+  duration?: number;
+  notableEvents?: string[];
+  causeOfDeath?: string;
+}
 
 /**
  * Trajectory generation request

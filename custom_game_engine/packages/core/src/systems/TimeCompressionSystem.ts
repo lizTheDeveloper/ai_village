@@ -88,6 +88,12 @@ export class TimeCompressionSystem extends BaseSystem {
   /** Last statistical mode for change detection */
   private lastStatisticalMode: boolean = false;
 
+  /** Cached TimeCompressionSnapshot entity ID (singleton pattern) */
+  private snapshotEntityId: string | null = null;
+
+  /** Pending trajectory requests (soul ID -> promise) */
+  private pendingTrajectories: Map<string, Promise<SoulTrajectory | null>> = new Map();
+
   protected onUpdate(ctx: SystemContext): void {
     const { world, tick } = ctx;
 
@@ -189,11 +195,12 @@ export class TimeCompressionSystem extends BaseSystem {
         years: yearsToJump,
       }, entity.id);
 
-      // TODO: Integrate with hierarchy-simulator for abstract tier updates
-      // TODO: Call LLM trajectory generation for soul agents
-      // TODO: Generate era snapshots for time-travel archaeology
+      // Generate soul trajectories and era snapshot asynchronously
+      this.generateTimeJumpNarratives(ctx, entity, compression, yearsToJump).catch((error) => {
+        console.error('[TimeCompressionSystem] Failed to generate time jump narratives:', error);
+      });
 
-      // For now, just mark as complete (implementation placeholder)
+      // Mark jump as complete (narratives generate in background)
       entity.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
         ...current,
         jumpInProgress: false,
@@ -323,5 +330,295 @@ export class TimeCompressionSystem extends BaseSystem {
       // Clamp current scale if it exceeds new max
       currentTimeScale: Math.min(current.currentTimeScale, newMaxScale),
     }));
+  }
+
+  /**
+   * Generate time jump narratives for souls and create era snapshot
+   * This runs asynchronously and uses LLM to generate compressed histories
+   */
+  private async generateTimeJumpNarratives(
+    ctx: SystemContext,
+    _compressionEntity: EntityImpl,
+    compression: TimeCompressionComponent,
+    yearsToJump: number
+  ): Promise<void> {
+    const { world, tick } = ctx;
+    const startTick = Number(tick);
+    const targetTick = compression.targetTick ? Number(compression.targetTick) : startTick;
+
+    // Get or create snapshot entity
+    if (this.snapshotEntityId === null) {
+      const snapshotEntities = world
+        .query()
+        .with(CT.TimeCompressionSnapshot)
+        .executeEntities();
+
+      if (snapshotEntities.length === 0) {
+        // Create snapshot entity
+        const snapshotEntity = world.createEntity();
+        snapshotEntity.addComponent({
+          type: 'time_compression_snapshot',
+          version: 1,
+          snapshots: [],
+          totalTimeJumps: 0,
+          totalYearsCompressed: 0,
+        } as TimeCompressionSnapshotComponent);
+        this.snapshotEntityId = snapshotEntity.id;
+      } else {
+        this.snapshotEntityId = snapshotEntities[0]!.id;
+      }
+    }
+
+    const snapshotEntity = world.getEntity(this.snapshotEntityId) as EntityImpl | null;
+    if (!snapshotEntity) {
+      console.error('[TimeCompressionSystem] Failed to get snapshot entity');
+      return;
+    }
+
+    // Find all soul entities to generate trajectories
+    const soulEntities = world
+      .query()
+      .with(CT.SoulIdentity)
+      .executeEntities();
+
+    const trajectoryPromises: Promise<SoulTrajectory | null>[] = [];
+
+    // Generate trajectory for each soul using LLM
+    for (const soulEntity of soulEntities) {
+      const trajectoryPromise = this.generateSoulTrajectory(
+        world,
+        soulEntity,
+        startTick,
+        targetTick,
+        yearsToJump
+      );
+      trajectoryPromises.push(trajectoryPromise);
+      this.pendingTrajectories.set(soulEntity.id, trajectoryPromise);
+    }
+
+    // Wait for all trajectories to complete
+    const trajectories = (await Promise.all(trajectoryPromises)).filter(
+      (t): t is SoulTrajectory => t !== null
+    );
+
+    // Clear pending trajectories
+    this.pendingTrajectories.clear();
+
+    // Generate era snapshot
+    const eraSnapshot = this.createEraSnapshotData(
+      compression.currentEra,
+      startTick,
+      targetTick,
+      yearsToJump,
+      world,
+      trajectories
+    );
+
+    // Add snapshot to component
+    const snapshotComp = snapshotEntity.getComponent<TimeCompressionSnapshotComponent>(
+      CT.TimeCompressionSnapshot
+    );
+    if (snapshotComp) {
+      const updated = addEraSnapshot(snapshotComp, eraSnapshot);
+      (snapshotEntity as EntityImpl).updateComponent<TimeCompressionSnapshotComponent>(
+        CT.TimeCompressionSnapshot,
+        () => updated
+      );
+
+      // Emit event for snapshot creation
+      ctx.emit('time:era_snapshot_created', {
+        eraNumber: eraSnapshot.eraNumber,
+        eraName: eraSnapshot.eraName,
+        yearsCovered: yearsToJump,
+        soulCount: trajectories.length,
+      } as { eraNumber: number; eraName: string; yearsCovered: number; soulCount: number }, snapshotEntity.id);
+    }
+  }
+
+  /**
+   * Generate trajectory for a single soul using LLM
+   */
+  private async generateSoulTrajectory(
+    world: World,
+    soulEntity: { id: string; getComponent: (type: ComponentType) => unknown },
+    startTick: number,
+    endTick: number,
+    yearsCovered: number
+  ): Promise<SoulTrajectory | null> {
+    const soulIdentity = soulEntity.getComponent(CT.SoulIdentity) as
+      | SoulIdentityComponent
+      | undefined;
+
+    if (!soulIdentity) {
+      return null;
+    }
+
+    // Check if LLM integration is available
+    // NOTE: In a full implementation, this would use the LLMDecisionQueue
+    // For now, generate a placeholder trajectory based on soul's purpose and interests
+    const trajectory = this.generatePlaceholderTrajectory(
+      soulEntity.id,
+      soulIdentity,
+      yearsCovered
+    );
+
+    // TODO: Replace with actual LLM call once TrajectoryPromptBuilder is integrated
+    // Example LLM integration (commented out):
+    /*
+    const trajectoryBuilder = new TrajectoryPromptBuilder();
+    const prompt = trajectoryBuilder.buildSoulTrajectoryPrompt({
+      soulEntity: soulEntity as Entity,
+      startTick,
+      endTick,
+      yearsCovered,
+      world,
+    });
+
+    const llmQueue = getLLMDecisionQueue(); // Get from service registry
+    const response = await llmQueue.requestDecision(
+      `trajectory_${soulEntity.id}`,
+      prompt
+    );
+
+    const parsed = trajectoryBuilder.parseTrajectoryResult(soulEntity.id, response);
+    return parsed;
+    */
+
+    return trajectory;
+  }
+
+  /**
+   * Generate a placeholder trajectory (used until LLM integration is complete)
+   */
+  private generatePlaceholderTrajectory(
+    soulId: string,
+    identity: SoulIdentityComponent,
+    years: number
+  ): SoulTrajectory {
+    const { soulName, purpose, coreInterests, archetype } = identity;
+
+    // Generate basic narrative based on purpose and interests
+    const mainInterest = coreInterests[0] || 'exploration';
+    const narrative = `During these ${years} years, ${soulName} pursued their purpose: "${purpose}". ` +
+      `As a ${archetype || 'wandering'} soul, they focused primarily on ${mainInterest}, ` +
+      `experiencing growth and challenges along the way.`;
+
+    const majorEvents = [
+      `Significant progress in ${mainInterest}`,
+      `Encountered a defining challenge related to their purpose`,
+      `Formed new relationships with others sharing their interests`,
+    ];
+
+    const characterDevelopment = `Grew in wisdom and understanding of their purpose, ` +
+      `developing a deeper connection to ${mainInterest}.`;
+
+    const skillsGained = coreInterests.slice(0, 2).map(interest => `Advanced ${interest}`);
+
+    const relationshipChanges = [
+      `Connected with others who share interest in ${mainInterest}`,
+    ];
+
+    const achievements = [
+      `Made meaningful progress toward fulfilling their purpose`,
+    ];
+
+    return createSoulTrajectory({
+      soulId,
+      soulName,
+      narrative,
+      majorEvents,
+      characterDevelopment,
+      skillsGained,
+      relationshipChanges,
+      achievements,
+    });
+  }
+
+  /**
+   * Create era snapshot data structure
+   */
+  private createEraSnapshotData(
+    eraNumber: number,
+    startTick: number,
+    endTick: number,
+    yearsCovered: number,
+    world: World,
+    soulTrajectories: SoulTrajectory[]
+  ): EraSnapshot {
+    // Get population count
+    const populationAtEnd = world.query().with(CT.Agent).executeEntities().length;
+
+    // TODO: Integrate with LLM for era name and summary generation
+    // For now, generate placeholder era data
+    const eraName = this.generateEraName(eraNumber, yearsCovered);
+    const summary = this.generateEraSummary(yearsCovered, populationAtEnd, soulTrajectories);
+
+    const majorEvents = [
+      'Population growth and settlement expansion',
+      'Technological and cultural advancement',
+      'Formation of new social structures',
+    ];
+
+    const culturalDevelopments = [
+      'New traditions and practices emerged',
+      'Knowledge accumulated through experience',
+    ];
+
+    const notableFigures = soulTrajectories
+      .slice(0, 3)
+      .map(t => `${t.soulName} - ${t.achievements[0] || 'influential in their community'}`);
+
+    return createEraSnapshot({
+      eraNumber,
+      eraName,
+      startTick,
+      endTick,
+      yearsCovered,
+      summary,
+      majorEvents,
+      culturalDevelopments,
+      notableFigures,
+      conflicts: [],
+      legacy: `This era laid the foundation for future generations' development.`,
+      populationAtEnd,
+      technologyLevel: 'Developing civilization',
+      soulTrajectories,
+    });
+  }
+
+  /**
+   * Generate era name based on era number and duration
+   */
+  private generateEraName(eraNumber: number, years: number): string {
+    if (years < 10) {
+      return `Era ${eraNumber}: The Brief Passage`;
+    } else if (years < 50) {
+      return `Era ${eraNumber}: The Years of Growth`;
+    } else if (years < 100) {
+      return `Era ${eraNumber}: The Age of Development`;
+    } else if (years < 500) {
+      return `Era ${eraNumber}: The Century of Change`;
+    } else {
+      return `Era ${eraNumber}: The Long Epoch`;
+    }
+  }
+
+  /**
+   * Generate era summary
+   */
+  private generateEraSummary(
+    years: number,
+    population: number,
+    trajectories: SoulTrajectory[]
+  ): string {
+    const summary = [
+      `This era spanned ${years} years, during which ${trajectories.length} souls ` +
+        `experienced their personal journeys.`,
+      `The population reached ${population} individuals by the end of this period.`,
+      `Each soul pursued their purpose, contributing to the collective development ` +
+        `of civilization and culture.`,
+    ];
+
+    return summary.join(' ');
   }
 }

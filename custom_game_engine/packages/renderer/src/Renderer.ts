@@ -703,6 +703,19 @@ export class Renderer {
           this.tileSize * this.camera.zoom + 4
         );
         this.ctx.setLineDash([]);
+
+        // Update dimensional controls if this is a dimensional building
+        const building = entity.components.get('building') as BuildingComponent | undefined;
+        if (building && entity.id !== this.selectedDimensionalBuildingId) {
+          this.handleDimensionalBuildingSelection(world, entity);
+        }
+      }
+    }
+
+    // Clear dimensional controls if no building selected
+    if (!selectedEntity || !world.getEntityById(selectedEntity.id)?.components.get('building')) {
+      if (this.selectedDimensionalBuildingId !== null) {
+        this.handleDimensionalBuildingSelection(world, null);
       }
     }
 
@@ -807,6 +820,79 @@ export class Renderer {
   syncSelectedEntityTo3D(entityId: string | null): void {
     if (this.renderer3D) {
       this.renderer3D.setSelectedEntity(entityId);
+    }
+  }
+
+  /**
+   * Handle building selection and update dimensional controls.
+   * Call this when a building entity is selected.
+   */
+  handleDimensionalBuildingSelection(world: World, entity: Entity | null): void {
+    if (!entity) {
+      this.selectedDimensionalBuildingId = null;
+      this.dimensionalControls.hideAll();
+      return;
+    }
+
+    const building = entity.components.get('building') as BuildingComponent | undefined;
+    if (!building) {
+      this.selectedDimensionalBuildingId = null;
+      this.dimensionalControls.hideAll();
+      return;
+    }
+
+    const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+    if (!blueprint) {
+      this.selectedDimensionalBuildingId = null;
+      this.dimensionalControls.hideAll();
+      return;
+    }
+
+    // Only show controls for dimensional or realm pocket buildings
+    if (!blueprint.dimensional && !blueprint.realmPocket) {
+      this.selectedDimensionalBuildingId = null;
+      this.dimensionalControls.hideAll();
+      return;
+    }
+
+    this.selectedDimensionalBuildingId = entity.id;
+
+    // 4D W-axis buildings - show slider
+    if (blueprint.dimensional?.w_axis) {
+      const layers = blueprint.dimensional.w_axis.layers;
+      const currentSlice = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentWSlice || 0;
+
+      this.dimensionalControls.showWSlider(currentSlice, layers, (newSlice) => {
+        this.buildingRenderer.setWSlice(entity.id, newSlice);
+        // Force re-render by triggering a minimal state update
+        // The next frame will pick up the new slice
+      });
+    }
+    // 5D V-axis buildings - show phase indicator (auto-updates in render loop)
+    else if (blueprint.dimensional?.v_axis) {
+      const phases = blueprint.dimensional.v_axis.phases;
+      const currentPhase = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentVPhase || 0;
+      this.dimensionalControls.showPhaseIndicator(currentPhase, phases);
+    }
+    // 6D U-axis buildings - show quantum collapse button
+    else if (blueprint.dimensional?.u_axis) {
+      const state = this.buildingRenderer.getDimensionalStateForRendering(entity.id);
+      const isCollapsed = state?.collapsedUState !== undefined && state.collapsedUState !== -1;
+
+      this.dimensionalControls.showQuantumControls(isCollapsed, () => {
+        if (isCollapsed) {
+          // Reset to superposition - clear the state
+          const currentState = this.buildingRenderer.getDimensionalStateForRendering(entity.id);
+          if (currentState) {
+            currentState.collapsedUState = -1;
+          }
+        } else {
+          // Collapse to random state
+          this.buildingRenderer.collapseUState(entity.id, blueprint.dimensional);
+        }
+        // Re-call this method to update the UI
+        this.handleDimensionalBuildingSelection(world, entity);
+      });
     }
   }
 

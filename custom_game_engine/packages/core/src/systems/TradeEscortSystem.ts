@@ -126,7 +126,7 @@ export class TradeEscortSystem extends BaseSystem {
 
     // Process trade agreements requiring escorts
     for (const civEntity of civEntities) {
-      const tradeComp = civEntity.getComponent<TradeAgreementComponent>(CT.TradeAgreement);
+      const tradeComp = civEntity.getComponent<TradeAgreementComponent>('trade_agreement');
       if (!tradeComp) continue;
 
       // Process active agreements that have escort fields
