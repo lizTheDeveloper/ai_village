@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
+import { WorldImpl as World } from '../../ecs/World.js';
 import { PrayerSystem } from '../PrayerSystem.js';
 import { DeityComponent } from '../../components/DeityComponent.js';
 import { createTagsComponent } from '../../components/TagsComponent.js';

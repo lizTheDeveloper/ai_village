@@ -66,6 +66,11 @@ function jsonToWeapon(data: any): ItemDefinition {
 function loadWeaponCategory(categoryData: any): ItemDefinition[] {
   if (!categoryData) return [];
 
+  // If categoryData is directly an array of weapons, convert them
+  if (Array.isArray(categoryData)) {
+    return categoryData.map(jsonToWeapon);
+  }
+
   const weapons: ItemDefinition[] = [];
 
   // Handle nested subcategories
