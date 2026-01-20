@@ -249,15 +249,11 @@ export class FatesCouncilSystem extends BaseSystem {
     };
 
     // Emit event that council has begun
-    world.eventBus.emit({
-      type: 'plot:fates_council_started',
-      source: 'fates_council_system',
-      data: {
-        dayNumber,
-        threadCount: context.allThreads.length,
-        hooksCount: context.potentialHooks.length,
-        worldTension: context.worldTension,
-      },
+    world.eventBus.emitGeneric('plot:fates_council_started', {
+      dayNumber,
+      threadCount: context.allThreads.length,
+      hooksCount: context.potentialHooks.length,
+      worldTension: context.worldTension,
     });
   }
 
@@ -664,12 +660,8 @@ export class FatesCouncilSystem extends BaseSystem {
     }
 
     // Emit event that this Fate is starting to think
-    world.eventBus.emit({
-      type: 'plot:fate_thinking',
-      source: 'fates_council_system',
-      data: {
-        speaker: council.currentSpeaker,
-      },
+    world.eventBus.emitGeneric('soul:fate_thinking', {
+      speaker: council.currentSpeaker,
     });
 
     // Generate prompt for current speaker

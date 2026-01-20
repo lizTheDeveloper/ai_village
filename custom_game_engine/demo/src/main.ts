@@ -60,6 +60,10 @@ import {
   GodCraftedDiscoverySystem,
   // Agent debug logging
   AgentDebugManager,
+  // Deity system
+  DeityComponent,
+  createTagsComponent,
+  createIdentityComponent,
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
@@ -4174,7 +4178,6 @@ async function main() {
 
     // Create fallback "Unknown" deity for initial prayers
     // This deity receives prayers before any real deities emerge
-    const { DeityComponent } = await import('@ai-village/core');
     const unknownDeity = gameLoop.world.createEntity('deity:unknown');
     const unknownDeityComponent = new DeityComponent('The Unknown', 'dormant');
 
@@ -4202,7 +4205,6 @@ async function main() {
     unknownDeityComponent.belief.lastActivityTick = 0;
 
     // Mark as fallback deity using tags
-    const { createTagsComponent, createIdentityComponent } = await import('@ai-village/core');
     (unknownDeity as any).addComponent(unknownDeityComponent);
     (unknownDeity as any).addComponent(createTagsComponent('deity', 'divine', 'immortal', 'fallback_deity'));
     (unknownDeity as any).addComponent(createIdentityComponent('The Unknown', 'deity'));

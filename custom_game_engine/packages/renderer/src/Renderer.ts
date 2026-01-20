@@ -174,6 +174,9 @@ export class Renderer {
       this.threatIndicatorRenderer = null;
     }
     this.healthBarRenderer = null;
+
+    // Clean up dimensional controls
+    this.dimensionalControls.destroy();
   }
 
 

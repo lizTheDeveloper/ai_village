@@ -4,7 +4,7 @@
  * Tests that governor decisions actually modify game state correctly
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { World } from '../../ecs/World.js';
 import { EventBus } from '../../events/EventBus.js';
 import { EntityImpl } from '../../ecs/Entity.js';
@@ -14,6 +14,7 @@ import { createEmpireComponent } from '../../components/EmpireComponent.js';
 import { createNationComponent } from '../../components/NationComponent.js';
 import { createProvinceGovernanceComponent } from '../../components/ProvinceGovernanceComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { ItemRegistry } from '../../items/ItemRegistry.js';
 
 describe('GovernorDecisionExecutor', () => {
   let world: World;
@@ -22,6 +23,12 @@ describe('GovernorDecisionExecutor', () => {
   beforeEach(() => {
     eventBus = new EventBus();
     world = new World(eventBus);
+  });
+
+  afterEach(() => {
+    // Clean up ItemRegistry singleton to avoid duplication errors
+    const registry = ItemRegistry.getInstance();
+    registry.clear();
   });
 
   describe('Empire Tier Decisions', () => {

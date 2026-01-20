@@ -160,6 +160,7 @@ export * from './StructuredPromptBuilder';
 export * from './TalkerPromptBuilder';
 export * from './ExecutorPromptBuilder';
 export * from './GovernorPromptBuilder';
+export * from './TrajectoryPromptBuilder';
 
 // ============================================================================
 // Response Processing
