@@ -729,8 +729,10 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     mega.efficiency = 0;
     mega.operational = false;
 
-    // Note: Decay tracking (yearsInDecay, decayStageIndex, archaeologicalValue)
-    // not yet in component schema - will be added to MegastructureComponent
+    // Initialize decay tracking fields (available in MegastructureComponent)
+    mega.yearsInDecay = 0;
+    mega.decayStageIndex = 0;
+    mega.archaeologicalValue = 0;
 
     this.emitCollapseEvent(world, entity, mega);
   }

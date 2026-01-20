@@ -332,7 +332,7 @@ export class BuildingRenderer {
   updateVPhase(buildingId: string, gameTick: number, dimensional?: DimensionalConfig): void {
     if (!dimensional?.v_axis) return;
     const state = this.getDimensionalState(buildingId, dimensional);
-    const transitionRate = dimensional.v_axis.transitionRate || 0.1;
+    const transitionRate = dimensional.v_axis.transitionRate ?? 0.1;
     const phases = dimensional.v_axis.phases;
     state.currentVPhase = Math.floor(gameTick * transitionRate) % phases;
   }
@@ -346,14 +346,17 @@ export class BuildingRenderer {
     const state = this.getDimensionalState(buildingId, dimensional);
     if (state.collapsedUState === -1) {
       // Weighted random selection based on stateWeights
-      const weights = dimensional.u_axis.stateWeights || [];
+      const weights = dimensional.u_axis.stateWeights ?? [];
       const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       let random = Math.random() * totalWeight;
       for (let i = 0; i < weights.length; i++) {
-        random -= weights[i];
-        if (random <= 0) {
-          state.collapsedUState = i;
-          break;
+        const weight = weights[i];
+        if (weight !== undefined) {
+          random -= weight;
+          if (random <= 0) {
+            state.collapsedUState = i;
+            break;
+          }
         }
       }
       if (state.collapsedUState === -1) state.collapsedUState = 0; // Fallback
@@ -385,8 +388,10 @@ export class BuildingRenderer {
 
     for (let y = 0; y < layout.length; y++) {
       const row = layout[y];
+      if (!row) continue;
       for (let x = 0; x < row.length; x++) {
         const tile = row[x];
+        if (!tile) continue;
         const tileX = screenX + x * scaledTileSize;
         const tileY = screenY + y * scaledTileSize;
 

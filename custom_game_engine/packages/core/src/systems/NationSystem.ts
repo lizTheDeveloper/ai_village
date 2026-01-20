@@ -37,6 +37,7 @@ import {
   updateStability,
 } from '../components/NationComponent.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
+import type { ProvinceGovernanceComponent } from '../components/ProvinceGovernanceComponent.js';
 
 // ============================================================================
 // System
@@ -513,9 +514,13 @@ export class NationSystem extends BaseSystem {
     // TODO: Process diplomatic relations with other nations
     // TODO: Update opinion values based on recent events
     // TODO: Check for treaty expirations
-    // TODO: Handle alliance obligations during wars
 
-    // For now, just check for expired treaties
+    // Handle alliance obligations during wars
+    if (nation.military.activeWars.length > 0) {
+      this.processAllianceObligations(world, entity, nation);
+    }
+
+    // Check for expired treaties
     const activeTreaties: Treaty[] = [];
     let treatiesChanged = false;
 
@@ -555,6 +560,115 @@ export class NationSystem extends BaseSystem {
       }));
     }
   }
+
+  /**
+   * Process alliance obligations during active wars
+   * When a nation is at war, check if allies should be called to arms
+   */
+  private processAllianceObligations(
+    world: World,
+    entity: EntityImpl,
+    nation: NationComponent
+  ): void {
+    // For each active war this nation is involved in
+    for (const war of nation.military.activeWars) {
+      if (war.status !== 'active') {
+        continue;
+      }
+
+      // Find allies with defense or military alliance treaties
+      for (const treaty of nation.foreignPolicy.treaties) {
+        if (treaty.status !== 'active') {
+          continue;
+        }
+
+        // Only military alliances trigger war obligations
+        if (treaty.type !== 'military_alliance') {
+          continue;
+        }
+
+        // Find all signatories that are not this nation
+        for (const signatoryId of treaty.signatoryNationIds) {
+          if (signatoryId === entity.id) {
+            continue;
+          }
+
+          // Get the ally entity
+          const allyEntity = world.getEntity(signatoryId);
+          if (!allyEntity) {
+            continue;
+          }
+
+          const allyImpl = allyEntity as EntityImpl;
+          const allyNation = allyImpl.getComponent<NationComponent>(CT.Nation);
+          if (!allyNation) {
+            continue;
+          }
+
+          // Check if ally is already in this war
+          const allyAlreadyInWar = allyNation.military.activeWars.some(
+            (w) => w.id === war.id
+          );
+
+          if (allyAlreadyInWar) {
+            continue;
+          }
+
+          // Call ally to war
+          world.eventBus.emit({
+            type: 'nation:ally_called_to_war',
+            source: entity.id,
+            data: {
+              nationId: entity.id,
+              nationName: nation.nationName,
+              allyId: allyEntity.id,
+              allyName: allyNation.nationName,
+              warId: war.id,
+              treatyType: treaty.type,
+              tick: world.tick,
+            },
+          });
+
+          // Add the war to ally's active wars
+          allyImpl.updateComponent<NationComponent>(CT.Nation, (current) => ({
+            ...current,
+            military: {
+              ...current.military,
+              activeWars: [...current.military.activeWars, war],
+              warStatus: 'at_war',
+              mobilization: 'partial', // Start with partial mobilization
+            },
+            foreignPolicy: {
+              ...current.foreignPolicy,
+              enemies: Array.from(
+                new Set([
+                  ...current.foreignPolicy.enemies,
+                  ...war.defenderNationIds,
+                  ...war.aggressorNationIds,
+                ]).values()
+              ).filter((id) => id !== allyEntity.id),
+            },
+          }));
+
+          // Emit alliance obligation invoked event
+          world.eventBus.emit({
+            type: 'nation:alliance_obligation_invoked',
+            source: allyEntity.id,
+            data: {
+              nationId: allyEntity.id,
+              nationName: allyNation.nationName,
+              allyId: entity.id,
+              allyName: nation.nationName,
+              warId: war.id,
+              warName: war.name,
+              treatyId: treaty.id,
+              tick: world.tick,
+            },
+          });
+        }
+      }
+    }
+  }
 }
 
 // ============================================================================
@@ -580,19 +694,15 @@ export function getNationCities(world: World, nationId: string): string[] {
   const cityIds: string[] = [];
 
   for (const provinceEntity of provinces) {
-    const provinceComponent = provinceEntity.getComponent(CT.ProvinceGovernance) as any;
+    const provinceComponent = provinceEntity.getComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance);
     if (!provinceComponent) continue;
 
     // Check if this province belongs to our nation
     if (provinceComponent.parentNationId !== nationId) continue;
 
     // Aggregate all city IDs from this province
-    if (Array.isArray(provinceComponent.cities)) {
-      for (const cityRecord of provinceComponent.cities) {
-        if (cityRecord.cityId) {
-          cityIds.push(cityRecord.cityId);
-        }
-      }
+    for (const cityRecord of provinceComponent.cities) {
+      cityIds.push(cityRecord.cityId);
     }
   }
 
