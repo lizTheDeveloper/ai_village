@@ -355,7 +355,7 @@ export class TimeCompressionSystem extends BaseSystem {
 
       if (snapshotEntities.length === 0) {
         // Create snapshot entity
-        const snapshotEntity = world.createEntity();
+        const snapshotEntity = world.createEntity() as EntityImpl;
         snapshotEntity.addComponent({
           type: 'time_compression_snapshot',
           version: 1,

@@ -157,7 +157,7 @@ export class TradeEscortSystem extends BaseSystem {
     const squadronEntities = world.query().with('squadron').executeEntities();
 
     for (const squadronEntity of squadronEntities) {
-      const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+      const squadron = squadronEntity.getComponent<SquadronComponent>('squadron');
       if (!squadron) continue;
 
       this.squadronEntityCache[squadron.squadronId] = squadronEntity as EntityImpl;
@@ -234,7 +234,7 @@ export class TradeEscortSystem extends BaseSystem {
     const squadronEntity = this.squadronEntityCache[squadronId];
     if (!squadronEntity) return false;
 
-    const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+    const squadron = squadronEntity.getComponent<SquadronComponent>('squadron');
     if (!squadron) return false;
 
     // Verify squadron has minimum ships

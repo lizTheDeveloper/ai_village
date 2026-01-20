@@ -332,6 +332,26 @@ export class Renderer {
     // Update all sprite animations
     this.pixelLabEntityRenderer.updateAnimations(performance.now());
 
+    // Update phase-shifting animations for 5D buildings
+    const currentTick = world.tick;
+    const allEntities = world.getEntities();
+    for (const entity of allEntities) {
+      const building = entity.components.get('building') as BuildingComponent | undefined;
+      if (building) {
+        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+        if (blueprint?.dimensional?.v_axis) {
+          this.buildingRenderer.updateVPhase(entity.id, currentTick, blueprint.dimensional);
+
+          // Update UI if this building is selected
+          if (this.selectedDimensionalBuildingId === entity.id) {
+            const phases = blueprint.dimensional.v_axis.phases;
+            const currentPhase = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentVPhase || 0;
+            this.dimensionalControls.updatePhaseIndicator(currentPhase, phases);
+          }
+        }
+      }
+    }
+
     // Sync view toggle properties with sub-renderers
     this.buildingRenderer.showBuildingLabels = this.showBuildingLabels;
     this.buildingRenderer.showResourceAmounts = this.showResourceAmounts;

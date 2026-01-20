@@ -184,6 +184,7 @@ export class DOMSpeechBubbleOverlay {
   private appendAlienText(container: HTMLDivElement, tokens: AlienWordToken[]): void {
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
+      if (!token) continue;
 
       // Add space before word (except first word)
       if (i > 0) {

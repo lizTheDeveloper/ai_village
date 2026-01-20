@@ -2,6 +2,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { NeedsComponent } from '../components/NeedsComponent';
 import { PersonalityComponent } from '../components/PersonalityComponent';
+import type { SpiritualComponent } from '../components/SpiritualComponent';
 import { ActionQueue } from '../actions/ActionQueueClass';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
@@ -12,7 +13,8 @@ export type IdleBehaviorType =
   | 'observe'
   | 'sit_quietly'
   | 'practice_skill'
-  | 'wander_aimlessly';
+  | 'wander_aimlessly'
+  | 'pray';
 
 interface BehaviorWeights {
   reflect: number;
@@ -22,6 +24,7 @@ interface BehaviorWeights {
   sit_quietly: number;
   practice_skill: number;
   wander_aimlessly: number;
+  pray: number;
 }
 
 /**
@@ -56,10 +59,14 @@ export class IdleBehaviorSystem extends BaseSystem {
       // Require needs and personality (guaranteed by requiredComponents)
       const { needs, personality } = comps.require(CT.Needs, CT.Personality);
 
+      // Optional spiritual component for prayer behavior
+      const spiritual = comps.optional<SpiritualComponent>(CT.Spiritual);
+
       // Select idle behavior based on personality and mood
       const behavior = this.selectIdleBehavior(
         personality as PersonalityComponent,
-        needs as NeedsComponent
+        needs as NeedsComponent,
+        spiritual as SpiritualComponent | undefined
       );
 
       // Enqueue the selected behavior with low priority
@@ -73,7 +80,11 @@ export class IdleBehaviorSystem extends BaseSystem {
   /**
    * Select an idle behavior based on personality and mood
    */
-  private selectIdleBehavior(personality: PersonalityComponent, needs: NeedsComponent): IdleBehaviorType {
+  private selectIdleBehavior(
+    personality: PersonalityComponent,
+    needs: NeedsComponent,
+    spiritual?: SpiritualComponent
+  ): IdleBehaviorType {
     // Calculate base weights from personality
     const weights: BehaviorWeights = {
       reflect: personality.conscientiousness * 2,
@@ -82,7 +93,8 @@ export class IdleBehaviorSystem extends BaseSystem {
       observe: personality.openness,
       sit_quietly: (1 - personality.extraversion),
       practice_skill: personality.conscientiousness,
-      wander_aimlessly: 1.0
+      wander_aimlessly: 1.0,
+      pray: 0.0 // Default: no prayer unless spiritual
     };
 
     // Adjust weights based on mood (derived from needs)
@@ -100,6 +112,28 @@ export class IdleBehaviorSystem extends BaseSystem {
       // Bored - boost active behaviors
       weights.practice_skill *= 2;
       weights.wander_aimlessly *= 1.5;
+    }
+
+    // Add prayer weighting for spiritual agents
+    if (spiritual && personality.spirituality > 0.4 && spiritual.faith > 0.1) {
+      // Base prayer weight scales with spirituality (0.8 - 2.0)
+      weights.pray = personality.spirituality * 2;
+
+      // Higher faith increases prayer likelihood
+      if (spiritual.faith > 0.5) {
+        weights.pray *= 1.5;
+      }
+
+      // Crisis of faith makes prayer much more likely
+      if (spiritual.crisisOfFaith) {
+        weights.pray *= 3;
+      }
+
+      // Low mood increases prayer (seeking comfort)
+      const mood = needs.social + needs.energy + needs.hunger;
+      if (mood < 1.5) {
+        weights.pray *= 1.5;
+      }
     }
 
     // Select behavior using weighted random selection
