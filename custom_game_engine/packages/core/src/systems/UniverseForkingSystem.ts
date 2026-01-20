@@ -226,10 +226,19 @@ export class UniverseForkingSystem extends BaseSystem {
     // EXOTIC PLOT EVENT: paradox_detected when causal violation forces a fork
     // This is a significant event - a timeline manipulation created a paradox
     const sendingUniverseId = receivedEvent.beta; // β coordinate identifies sending universe
+    const violationType = violation.type;
+
+    // Determine paradox type based on violation
+    // CausalViolation types: 'future_dependency' | 'missing_sync' | 'branch_conflict'
+    const paradoxType: 'bootstrap' | 'causal_loop' | 'grandfather' | 'predestination' | 'ontological' =
+      violationType === 'future_dependency' ? 'causal_loop' :
+      violationType === 'missing_sync' ? 'bootstrap' :
+      'ontological'; // branch_conflict = reality inconsistency
+
     this.events.emit('time:paradox_detected', {
       agentId: '', // Unknown which agent caused it in cross-universe case
       soulId: '', // May track down later via trade routes
-      paradoxType: violation.type === 'trade_before_creation' ? 'bootstrap' : 'causal_loop',
+      paradoxType,
       timelineId: receivingUniverseId,
       alterationMagnitude: 0.7, // Causal violations are serious (0.7 magnitude)
       affectedSouls: [], // Could populate if we track souls across universes

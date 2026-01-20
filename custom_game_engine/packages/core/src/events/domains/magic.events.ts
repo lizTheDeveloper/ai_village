@@ -225,7 +225,7 @@ export interface MagicEvents {
     violationCount: number;
   };
   'godcrafted:discovered': {
-    contentType: 'riddle' | 'spell' | 'recipe' | 'legendary_item' | 'soul' | 'quest';
+    contentType: 'riddle' | 'spell' | 'recipe' | 'legendary_item' | 'soul' | 'quest' | 'alien_species' | 'magic_paradigm' | 'building' | 'technology' | 'deity' | 'religion';
     contentId: string;
     name: string;
     creatorName: string;

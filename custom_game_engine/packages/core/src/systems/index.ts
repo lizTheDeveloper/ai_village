@@ -268,6 +268,14 @@ export { FleetCombatSystem, getFleetCombatSystem } from './FleetCombatSystem.js'
 export * from './StragglerRecoverySystem.js';
 export { StragglerRecoverySystem, getStragglerRecoverySystem } from './StragglerRecoverySystem.js';
 
+// Resource Discovery System (Phase 3: Economic Depth)
+export * from './ExplorationDiscoverySystem.js';
+export { ExplorationDiscoverySystem } from './ExplorationDiscoverySystem.js';
+
+// Building Summoning System (Magic)
+export * from './BuildingSummoningSystem.js';
+export { BuildingSummoningSystem } from './BuildingSummoningSystem.js';
+
 // Centralized system registration
 export {
   registerAllSystems,

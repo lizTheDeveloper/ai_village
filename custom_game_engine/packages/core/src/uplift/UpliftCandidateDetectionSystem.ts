@@ -94,19 +94,22 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
    * Requires genetic_engineering technology from ClarketechSystem.
    * This ensures uplift candidate detection only becomes available after
    * advanced genetic engineering technology is discovered.
+   *
+   * Uses singleton getClarketechSystem() for access.
    */
-  private isTechnologyUnlocked(world: World): boolean {
-    // Query for ClarketechSystem from system registry
-    const clarketechSystem = world.gameLoop.systemRegistry.tryGetSystem<ClarketechSystem>('ClarketechSystem');
+  private isTechnologyUnlocked(_world: World): boolean {
+    try {
+      // Access ClarketechSystem singleton
+      const clarketechSystem = getClarketechSystem();
+      const manager = clarketechSystem.getManager();
 
-    if (!clarketechSystem) {
-      // ClarketechSystem not registered - allow detection (standalone mode)
+      // Check if genetic_engineering technology is unlocked
+      return manager.isTechUnlocked(this.TECH_REQUIRED);
+    } catch {
+      // ClarketechSystem not available - allow detection (standalone mode)
+      // This supports testing without full system initialization
       return true;
     }
-
-    // Check if genetic_engineering technology is unlocked
-    const manager = clarketechSystem.getManager();
-    return manager.isTechUnlocked(this.TECH_REQUIRED);
   }
 
   /**

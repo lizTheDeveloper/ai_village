@@ -116,6 +116,7 @@ export enum ComponentType {
   TradeCaravan = 'trade_caravan',
   TradeNetwork = 'trade_network',  // Tier 3: Network topology
   Blockade = 'blockade',  // Strategic chokepoint blockades
+  MiningOperation = 'mining_operation',  // Stellar mining operations at phenomena
 
   // Research & Technology
   ResearchState = 'research_state',

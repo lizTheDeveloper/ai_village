@@ -8,6 +8,7 @@ interface TimeComponent {
   type: 'time';
   version: number;
   speedMultiplier?: number;
+  season?: 'spring' | 'summer' | 'fall' | 'winter';
 }
 
 export interface Tile {
@@ -310,6 +311,16 @@ export class SoilSystem extends BaseSystem {
       decay *= SOIL_CONSTANTS.moisture.coldWeatherDecayMultiplier;
     }
 
+    // Apply seasonal modifier
+    const season = this.getCurrentSeason(world);
+    if (season) {
+      const seasonalMultiplier = SOIL_CONSTANTS.moisture.seasonalDecayMultipliers[season];
+      if (seasonalMultiplier === undefined) {
+        throw new Error(`Missing seasonal decay multiplier for season: ${season}`);
+      }
+      decay *= seasonalMultiplier;
+    }
+
     tile.moisture = Math.max(0, tile.moisture - decay);
 
     // Emit moisture change event if changed
@@ -389,6 +400,30 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
+   * Get current season from TimeComponent
+   * Returns null if no time entity exists (season modifiers won't apply)
+   */
+  private getCurrentSeason(world: World): 'spring' | 'summer' | 'fall' | 'winter' | null {
+    const timeEntities = world.query().with(CT.Time).executeEntities();
+    if (timeEntities.length === 0) {
+      return null;
+    }
+
+    const timeEntity = timeEntities[0];
+    if (!timeEntity) {
+      return null;
+    }
+
+    const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
+    if (!timeComp) {
+      return null;
+    }
+
+    // Season field may not exist in older saves or if TimeSystem hasn't updated yet
+    return timeComp.season || null;
+  }
+
+  /**
    * Get initial fertility based on biome
    * CLAUDE.md: NO silent fallbacks
    * NOTE: Biome is now validated in tillTile(), so this will never receive undefined
@@ -454,6 +489,12 @@ interface SoilConstantsData {
     wateringBonus: number;
     rainMoistureBonus: number;
     snowMoistureBonus: number;
+    seasonalDecayMultipliers: {
+      spring: number;
+      summer: number;
+      fall: number;
+      winter: number;
+    };
   };
   fertility: {
     depletionPerHarvest: number;

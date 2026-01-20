@@ -49,6 +49,26 @@ export interface WorldEvents {
     soulCount: number;
   };
 
+  // === Statistical Mode Events ===
+  'time:entered_statistical_mode': {
+    entitiesPreserved: number;
+    soulAgents: number;
+    tick: number;
+  };
+  'time:exited_statistical_mode': {
+    entitiesRestored: number;
+    soulAgentsResumed: number;
+    tick: number;
+  };
+  'time:entity_preserved': {
+    entityId: EntityId;
+    componentsPreserved: number;
+  };
+  'time:entity_restored': {
+    entityId: EntityId;
+    componentsRestored: number;
+  };
+
   // === Time Events ===
   'time:day_changed': {
     day: number;

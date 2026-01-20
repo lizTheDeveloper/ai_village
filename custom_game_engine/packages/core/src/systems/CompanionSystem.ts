@@ -236,32 +236,27 @@ export class CompanionSystem extends BaseSystem {
         // EXOTIC PLOT EVENT: dimensional_encounter
         // When an agent traverses dimensions, they may encounter β-space entities
         // The Ophanim companion itself is one such entity
-        const traverserId = event.data.entityId;
-        const traveler = this.worldRef?.getEntity(traverserId);
-        const soulComp = traveler?.getComponent(CT.Soul);
+        // Note: passage:entity_traversed event data doesn't include entityId directly
+        // We'll emit the event based on the passage itself
+        if (this.worldRef && Math.random() < 0.1) {
+          // 10% chance of dimensional horror encounter
+          const creatureTypes: Array<'ophanim' | 'dimensional_horror' | 'reality_eater'> = [
+            'ophanim',
+            'dimensional_horror',
+            'reality_eater',
+          ];
+          const creatureType = creatureTypes[Math.floor(Math.random() * creatureTypes.length)]!;
 
-        if (traveler && soulComp) {
-          // Small chance (10%) of encountering dimensional horror during transit
-          const encounterChance = Math.random();
-          if (encounterChance < 0.1) {
-            const creatureTypes: Array<'ophanim' | 'dimensional_horror' | 'reality_eater'> = [
-              'ophanim',
-              'dimensional_horror',
-              'reality_eater',
-            ];
-            const creatureType = creatureTypes[Math.floor(Math.random() * creatureTypes.length)]!;
-
-            // Emit exotic event
-            eventBus.emit('companion:dimensional_encounter', {
-              agentId: traverserId,
-              soulId: (soulComp as any).soulId || traverserId,
-              creatureId: `dimensional_${creatureType}_${Date.now()}`,
-              creatureType,
-              encounterType: 'portal_opened',
-              sanityDamage: creatureType === 'reality_eater' ? 30 : creatureType === 'dimensional_horror' ? 20 : 10,
-              tick: this.worldRef?.tick || 0,
-            });
-          }
+          // Emit exotic event without specific agent ID (applies to passage traversal)
+          eventBus.emit('companion:dimensional_encounter', {
+            agentId: '', // Unknown which agent traversed
+            soulId: '', // Unknown
+            creatureId: `dimensional_${creatureType}_${Date.now()}`,
+            creatureType,
+            encounterType: 'portal_opened',
+            sanityDamage: creatureType === 'reality_eater' ? 30 : creatureType === 'dimensional_horror' ? 20 : 10,
+            tick: this.worldRef.tick || 0,
+          });
         }
 
         // First dimensional travel (Tier 2 → 3)
