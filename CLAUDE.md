@@ -147,12 +147,22 @@ Result: 97% entity reduction (120 updated instead of 4,260).
 // Exception for truly optional: description = data.get("description", "");
 ```
 
-### 3. Use Math Utilities (`packages/core/src/utils/math.ts`)
+### 3. No Type Assertion Escape Hatches
+```typescript
+// BAD: const foo = something as unknown as SomeType;
+// BAD: const bar = something as any;
+// GOOD: Use proper type guards or fix the actual type issue
+// GOOD: if (isSomeType(something)) { /* properly typed */ }
+```
+
+**Why**: `as unknown as Type` is just as dangerous as `as any` - it bypasses all type checking and masks real type safety issues. Fix the underlying type problem instead.
+
+### 4. Use Math Utilities (`packages/core/src/utils/math.ts`)
 ```typescript
 import { softmax, sigmoid, normalize } from '../utils/math.js';
 ```
 
-### 4. No Debug Output
+### 5. No Debug Output
 ```typescript
 // PROHIBITED: console.log('Debug:', x);
 // ALLOWED: console.error('[System] Error:', e); console.warn('[System] Warning:', w);
