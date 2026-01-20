@@ -398,65 +398,7 @@ export interface RebellionEvents {
   // ============================================================================
   // Crisis & Governance Events
   // ============================================================================
-
-  /** Crisis escalated to higher governance tier */
-  'governance:crisis_escalated': {
-    crisisId: string;
-    crisisType: string;
-    fromTier: string;
-    toTier: string;
-    severity: number;
-    affectedEntityIds: string[];
-    tick: number;
-  };
-
-  /** Governance directive issued (delegation from higher to lower tier) */
-  'governance:directive_issued': {
-    directiveId: string;
-    originTier: string;
-    targetTier: string;
-    directive: string;
-    priority: 'routine' | 'urgent' | 'critical';
-    issuerAgentId?: string;
-    targetEntityIds: string[];
-    requiresAcknowledgment: boolean;
-    tick: number;
-  };
-
-  /** Governance directive received by entity */
-  'governance:directive_received': {
-    directiveId: string;
-    entityId: string;
-    directive: string;
-    tick: number;
-  };
-
-  /** Governance directive acknowledged by entity */
-  'governance:directive_acknowledged': {
-    directiveId: string;
-    entityId: string;
-    agentId?: string;
-    tick: number;
-  };
-
-  /** Governance proposal created */
-  'governance:proposal_created': {
-    proposalId: string;
-    tier: string;
-    topic: string;
-    proposedBy: string;
-    tick: number;
-  };
-
-  /** Governance vote concluded */
-  'governance:vote_concluded': {
-    proposalId: string;
-    tier: string;
-    decision: 'approved' | 'rejected';
-    approvalPercentage: number;
-    totalVotes: number;
-    tick: number;
-  };
+  // NOTE: All governance events (crisis, directive, vote, etc.) moved to governance.events.ts
 
   /** Governance directive interpreted by LLM */
   'governance:directive_interpreted': {

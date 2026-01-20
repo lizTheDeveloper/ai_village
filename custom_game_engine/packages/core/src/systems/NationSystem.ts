@@ -588,13 +588,22 @@ export function calculateNationWealth(nation: NationComponent): number {
 export function calculateNationMilitary(world: World, nation: NationComponent): number {
   let totalPower = nation.military.armyStrength;
 
-  // TODO: Add navy strength if navyId exists
+  // Add navy strength if navyId exists
   if (nation.military.navyId) {
     const navyEntity = world.getEntity(nation.military.navyId);
     if (navyEntity) {
-      // TODO: Get actual navy strength from Navy component
-      // For now, estimate based on army strength
-      totalPower += nation.military.armyStrength * 0.5;
+      const navyComponent = navyEntity.getComponent(CT.Navy);
+      if (navyComponent) {
+        // Calculate navy strength from assets
+        // Base strength on total ships, with bonuses for tech level and readiness
+        const baseNavyStrength = navyComponent.assets.totalShips * 100; // Each ship = 100 power
+        const techMultiplier = 1 + (navyComponent.technology.currentTechLevel / 10); // +10% per tech level
+        const deploymentFactor = navyComponent.assets.activeDeployments / Math.max(1, navyComponent.assets.totalShips); // Deployment ratio
+
+        // Calculate final navy strength
+        const navyStrength = baseNavyStrength * techMultiplier * (0.5 + deploymentFactor * 0.5);
+        totalPower += navyStrength;
+      }
     }
   }
 

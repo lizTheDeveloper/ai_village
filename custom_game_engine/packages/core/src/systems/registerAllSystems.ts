@@ -216,6 +216,7 @@ import { DivinePowerSystem } from './DivinePowerSystem.js';
 import { FaithMechanicsSystem } from './FaithMechanicsSystem.js';
 import { PrayerSystem } from './PrayerSystem.js';
 import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
+import { SpiritualResponseSystem } from './SpiritualResponseSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
 import { MythRetellingSystem } from './MythRetellingSystem.js';
 import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
@@ -886,6 +887,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(divinePowerSystem);
   gameLoop.systemRegistry.register(new FaithMechanicsSystem());
   gameLoop.systemRegistry.register(new PrayerSystem());
+  gameLoop.systemRegistry.register(new SpiritualResponseSystem()); // Event-driven prayer triggers
   gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
   if (llmQueue) {
     gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));

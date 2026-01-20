@@ -68,6 +68,7 @@ export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';
 export * from './ui/InventorySearch.js';
 export * from './ui/ItemTooltip.js';
+export * from './ui/DOMSpeechBubbleOverlay.js';
 
 export * from './CraftingPanelUI.js';
 export * from './RecipeListSection.js';

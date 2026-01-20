@@ -407,7 +407,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   private readonly maintenanceCostCache = new Map<string, number>();
 
   // World reference for queries
-  private world!: World;
+  protected world!: World;
 
   protected onInitialize(world: World, _eventBus: EventBus): void {
     this.world = world;
@@ -640,15 +640,18 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       remainingToDeduct -= toDeduct;
     }
 
-    // Update warehouse component
-    warehouseEntity.updateComponent<WarehouseComponent>(CT.Warehouse, {
-      ...warehouse,
-      stockpiles: updatedStockpiles,
-      lastWithdrawTime: {
-        ...warehouse.lastWithdrawTime,
-        [config.resourceType]: Date.now(),
-      },
-    });
+    // Update warehouse component using SystemContext
+    const warehouseFromEntity = warehouseEntity.getComponent<WarehouseComponent>(CT.Warehouse);
+    if (warehouseFromEntity) {
+      warehouseEntity.updateComponent<WarehouseComponent>(CT.Warehouse, (current) => ({
+        ...current,
+        stockpiles: updatedStockpiles,
+        lastWithdrawTime: {
+          ...current.lastWithdrawTime,
+          [config.resourceType]: Date.now(),
+        },
+      }));
+    }
 
     // Maintenance successful - reduce debt if any
     if (mega.maintenance.maintenanceDebt > 0) {

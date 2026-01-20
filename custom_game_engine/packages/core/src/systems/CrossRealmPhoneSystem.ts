@@ -12,7 +12,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { CrossRealmPhoneComponent } from '../components/CrossRealmPhoneComponent.js';
+import type { CrossRealmPhoneComponent, VoicemailMessage } from '../components/CrossRealmPhoneComponent.js';
 import type { HilbertTimeCoordinate } from '../trade/HilbertTime.js';
 import {
   initiateCall,
@@ -284,7 +284,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       // Find recipient
       const recipient = this.phoneDirectory.get(call.to.deviceId);
       if (!recipient) {
-        // Call failed - no such device
+        // Call failed - no such device (offline)
         call.status = 'failed';
         call.failureReason = 'Device not found';
         this.pendingCalls.splice(i, 1);
@@ -297,6 +297,12 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       if (recipientPhoneComp.activeCall || recipientPhoneComp.incomingCall) {
         call.status = 'failed';
         call.failureReason = 'Recipient busy';
+
+        // Create voicemail if configured
+        if (recipientPhoneComp.voicemail !== null) {
+          this.createVoicemail(recipientPhoneComp, call, 'busy');
+        }
+
         this.pendingCalls.splice(i, 1);
         continue;
       }
@@ -305,6 +311,12 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       if (recipientPhoneComp.doNotDisturb) {
         call.status = 'rejected';
         call.failureReason = 'Do not disturb';
+
+        // Create voicemail if configured
+        if (recipientPhoneComp.voicemail !== null) {
+          this.createVoicemail(recipientPhoneComp, call, 'dnd');
+        }
+
         this.pendingCalls.splice(i, 1);
         continue;
       }
@@ -327,9 +339,9 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       phoneComp.incomingCall.status = 'failed';
       phoneComp.incomingCall.failureReason = 'No answer';
 
-      // Save to voicemail if configured
-      if (phoneComp.voicemail) {
-        // TODO: Add voicemail system
+      // Save to voicemail if configured (voicemail greeting exists)
+      if (phoneComp.voicemail !== null) {
+        this.createVoicemail(phoneComp, phoneComp.incomingCall, 'no_answer');
       }
 
       phoneComp.incomingCall = null;

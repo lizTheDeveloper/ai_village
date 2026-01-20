@@ -614,7 +614,7 @@ export class MegastructureConstructionSystem extends BaseSystem {
         tier,
         name: megastructureComponent.name,
         location,
-        capabilities: blueprint.capabilities,
+        capabilities: blueprint.capabilities as Record<string, unknown>,
         projectId: project.projectId,
         constructionTimeYears: (currentTick - project.timeline.startTick) / MegastructureConstructionSystem.TICKS_PER_YEAR,
       },

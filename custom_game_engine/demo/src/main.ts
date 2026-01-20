@@ -98,6 +98,7 @@ import {
   SoulCeremonyModal,
   InventoryUI,
   CraftingPanelUI,
+  DOMSpeechBubbleOverlay,
   ControlsPanel,
   TimeControlsPanel,
   UniverseManagerPanel,

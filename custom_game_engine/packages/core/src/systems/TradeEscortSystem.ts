@@ -154,7 +154,7 @@ export class TradeEscortSystem extends BaseSystem {
     // PERF: Clear by reassigning (faster than delete loop)
     this.squadronEntityCache = Object.create(null);
 
-    const squadronEntities = world.query().with(CT.Squadron).executeEntities();
+    const squadronEntities = world.query().with('squadron').executeEntities();
 
     for (const squadronEntity of squadronEntities) {
       const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
@@ -359,14 +359,14 @@ export function assignEscort(
   squadronId: string
 ): { success: boolean; reason?: string } {
   // Find trade agreement
-  const civEntities = world.query().with(CT.TradeAgreement).executeEntities();
+  const civEntities = world.query().with('trade_agreement').executeEntities();
 
   let agreementEntity: EntityImpl | undefined;
   let tradeComp: TradeAgreementComponent | undefined;
   let agreement: TradeAgreement | undefined;
 
   for (const civEntity of civEntities) {
-    const comp = civEntity.getComponent<TradeAgreementComponent>(CT.TradeAgreement);
+    const comp = civEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!comp) continue;
 
     const found = comp.activeAgreements.find((a) => a.id === tradeAgreementId);
@@ -388,9 +388,9 @@ export function assignEscort(
   }
 
   // Find squadron
-  const squadronEntities = world.query().with(CT.Squadron).executeEntities();
+  const squadronEntities = world.query().with('squadron').executeEntities();
   const squadronEntity = squadronEntities.find((e) => {
-    const s = e.getComponent<SquadronComponent>(CT.Squadron);
+    const s = e.getComponent<SquadronComponent>('squadron');
     return s?.squadronId === squadronId;
   });
 
@@ -398,7 +398,7 @@ export function assignEscort(
     return { success: false, reason: `Squadron ${squadronId} not found` };
   }
 
-  const squadron = squadronEntity.getComponent<SquadronComponent>(CT.Squadron);
+  const squadron = squadronEntity.getComponent<SquadronComponent>('squadron');
   if (!squadron) {
     return { success: false, reason: 'Entity is not a squadron' };
   }
@@ -421,7 +421,7 @@ export function assignEscort(
 
   // Update squadron mission
   const impl = squadronEntity as EntityImpl;
-  impl.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
+  impl.updateComponent<SquadronComponent>('squadron', (s) => ({
     ...s,
     mission: {
       type: 'escort',
@@ -448,7 +448,7 @@ export function assignEscort(
     };
   });
 
-  agreementEntity.updateComponent<TradeAgreementComponent>(CT.TradeAgreement, (c) => ({
+  agreementEntity.updateComponent<TradeAgreementComponent>('trade_agreement', (c) => ({
     ...c,
     activeAgreements: updatedAgreements as TradeAgreement[],
   }));

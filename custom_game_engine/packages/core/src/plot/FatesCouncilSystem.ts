@@ -223,7 +223,7 @@ export class FatesCouncilSystem extends BaseSystem {
   /**
    * Conduct the Fates' evening council
    */
-  private async conductFatesCouncil(world: World, tick: number, dayNumber: number): Promise<void> {
+  private conductFatesCouncil(world: World, tick: number, dayNumber: number): void {
     console.log(`[FatesCouncilSystem] Evening falls. The Three Fates convene... (Day ${dayNumber})`);
 
     // Gather narrative context
@@ -237,20 +237,28 @@ export class FatesCouncilSystem extends BaseSystem {
 
     console.log(`[FatesCouncilSystem] ${context.allThreads.length} threads examined, ${context.potentialHooks.length} story hooks found`);
 
-    // Generate Fates council prompt
-    const prompt = this.generateCouncilPrompt(context);
+    // Start the council
+    this.activeCouncil = {
+      context,
+      transcript: [],
+      currentSpeaker: 'weaver', // Weaver speaks first
+      turnCount: 0,
+      tick,
+      dayNumber,
+      completed: false,
+    };
 
-    // Queue LLM request (will process async)
-    // TODO: Integrate with actual LLMDecisionQueue
-    // For now, log the prompt
-    console.log('[FatesCouncilSystem] Council prompt generated:', prompt.substring(0, 200) + '...');
-
-    // In production, this would be:
-    // this.llmQueue.queueFatesCouncil({
-    //   prompt,
-    //   tick,
-    //   onComplete: (decision) => this.executeFatesDecisions(decision, world, tick)
-    // });
+    // Emit event that council has begun
+    world.eventBus.emit({
+      type: 'plot:fates_council_started',
+      source: 'fates_council_system',
+      data: {
+        dayNumber,
+        threadCount: context.allThreads.length,
+        hooksCount: context.potentialHooks.length,
+        worldTension: context.worldTension,
+      },
+    });
   }
 
   /**
@@ -644,6 +652,213 @@ export class FatesCouncilSystem extends BaseSystem {
   }
 
   /**
+   * Conduct one turn of the council (one Fate speaks)
+   */
+  private async conductCouncilTurn(world: World, council: typeof this.activeCouncil): Promise<void> {
+    if (!council) return;
+
+    // Maximum turns to prevent infinite loops
+    if (council.turnCount >= 5) {
+      this.completeCouncil(world, council);
+      return;
+    }
+
+    // Emit event that this Fate is starting to think
+    world.eventBus.emit({
+      type: 'plot:fate_thinking',
+      source: 'fates_council_system',
+      data: {
+        speaker: council.currentSpeaker,
+      },
+    });
+
+    // Generate prompt for current speaker
+    const prompt = this.generateFatePromptForCouncil(
+      council.currentSpeaker,
+      council.context,
+      council.transcript
+    );
+
+    // Get response from LLM
+    let response: string;
+    let thoughts: string | undefined;
+
+    if (!this.llmProvider) {
+      console.warn('[FatesCouncilSystem] No LLM provider, using placeholder');
+      response = this.getPlaceholderCouncilResponse(council.currentSpeaker, council.context);
+    } else {
+      try {
+        const llmResponse = await this.llmProvider.generate({
+          prompt,
+          temperature: 0.8, // Creative but not random
+          maxTokens: 500,   // Room for reasoning + speech
+        });
+        let fullResponse = llmResponse.text.trim();
+
+        // Extract thinking content (same pattern as SoulCreationSystem)
+        const completeThinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)<\/thinking>/i);
+        const completeThinkMatch = fullResponse.match(/<think>([\s\S]*?)<\/think>/i);
+        const incompleteThinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)$/i);
+        const incompleteThinkMatch = fullResponse.match(/<think>([\s\S]*?)$/i);
+
+        thoughts = completeThinkingMatch?.[1]?.trim()
+          || completeThinkMatch?.[1]?.trim()
+          || incompleteThinkingMatch?.[1]?.trim()
+          || incompleteThinkMatch?.[1]?.trim();
+
+        // Strip thinking content
+        response = fullResponse
+          .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+          .replace(/<think>[\s\S]*?<\/think>/gi, '')
+          .replace(/<thinking>[\s\S]*$/gi, '')
+          .replace(/<think>[\s\S]*$/gi, '')
+          .trim();
+
+        // If response is empty after stripping, use placeholder
+        if (!response || response.length === 0) {
+          console.warn('[FatesCouncilSystem] LLM returned only thinking content, using placeholder');
+          response = this.getPlaceholderCouncilResponse(council.currentSpeaker, council.context);
+          if (!thoughts) {
+            thoughts = fullResponse;
+          }
+        }
+      } catch (error) {
+        console.warn('[FatesCouncilSystem] LLM failed, using placeholder:', error);
+        response = this.getPlaceholderCouncilResponse(council.currentSpeaker, council.context);
+      }
+    }
+
+    // Add to transcript
+    const exchange: ConversationExchange = {
+      speaker: council.currentSpeaker,
+      text: response,
+      thoughts,
+      tick: world.tick,
+      topic: this.determineCouncilTopic(council.turnCount),
+    };
+
+    council.transcript.push(exchange);
+
+    // Emit event for observation
+    world.eventBus.emit({
+      type: 'plot:fate_speaks',
+      source: 'fates_council_system',
+      data: {
+        speaker: council.currentSpeaker,
+        text: response,
+        topic: exchange.topic,
+        dayNumber: council.dayNumber,
+      },
+    });
+
+    // Advance to next speaker
+    council.turnCount++;
+
+    if (council.turnCount < 3) {
+      // First three turns: Weaver → Spinner → Cutter
+      if (council.currentSpeaker === 'weaver') {
+        council.currentSpeaker = 'spinner';
+      } else if (council.currentSpeaker === 'spinner') {
+        council.currentSpeaker = 'cutter';
+      } else {
+        // After initial pronouncements, complete council
+        if (!council.completed) {
+          this.completeCouncil(world, council);
+        }
+      }
+    } else {
+      // After turn 3, council ends
+      if (!council.completed) {
+        this.completeCouncil(world, council);
+      }
+    }
+  }
+
+  /**
+   * Complete the council and execute decisions
+   */
+  private async completeCouncil(world: World, council: typeof this.activeCouncil): Promise<void> {
+    if (!council) return;
+
+    // Mark as completed
+    council.completed = true;
+
+    console.log(`[FatesCouncilSystem] The Fates have concluded their council.`);
+
+    // Parse decisions from conversation
+    const decision = await this.parseFatesDecisions(world, council);
+
+    // Execute the decisions
+    this.executeFatesDecisions(decision, world, council.tick);
+
+    // Emit completion event
+    world.eventBus.emit({
+      type: 'plot:fates_council_complete',
+      source: 'fates_council_system',
+      data: {
+        dayNumber: council.dayNumber,
+        plotAssignments: decision.plotAssignments.length,
+        summary: decision.summary,
+        transcript: council.transcript,
+      },
+    });
+
+    // Clear active council
+    this.activeCouncil = undefined;
+  }
+
+  /**
+   * Parse the Fates' decisions from their conversation
+   */
+  private async parseFatesDecisions(world: World, council: typeof this.activeCouncil): Promise<FatesDecision> {
+    if (!council) {
+      return {
+        plotAssignments: [],
+        narrativeConnections: [],
+        transcript: [],
+        summary: 'Council failed',
+      };
+    }
+
+    // Build extraction prompt
+    const extractionPrompt = this.generateDecisionExtractionPrompt(council.context, council.transcript);
+
+    let plotAssignments: FatesDecision['plotAssignments'] = [];
+    let summary = 'The Fates observed the tapestry but made no changes.';
+
+    if (this.llmProvider) {
+      try {
+        const llmResponse = await this.llmProvider.generate({
+          prompt: extractionPrompt,
+          temperature: 0.3, // More deterministic for extraction
+          maxTokens: 500,
+        });
+
+        // Extract JSON from response
+        const jsonMatch = llmResponse.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.plotAssignments && Array.isArray(parsed.plotAssignments)) {
+            plotAssignments = parsed.plotAssignments;
+          }
+          if (parsed.summary && typeof parsed.summary === 'string') {
+            summary = parsed.summary;
+          }
+        }
+      } catch (error) {
+        console.warn('[FatesCouncilSystem] Failed to parse decisions from conversation:', error);
+      }
+    }
+
+    return {
+      plotAssignments,
+      narrativeConnections: [], // TODO: Implement narrative connections
+      transcript: council.transcript,
+      summary,
+    };
+  }
+
+  /**
    * Execute the Fates' decisions (assign plots, weave connections)
    */
   private executeFatesDecisions(decision: FatesDecision, world: World, tick: number): void {
@@ -764,6 +979,160 @@ export class FatesCouncilSystem extends BaseSystem {
     // Prune old events (keep last 24 hours)
     const cutoffTick = (this.world?.tick || 0) - (TICKS_PER_DAY * this.EVENT_RETENTION_DAYS);
     this.recentExoticEvents = this.recentExoticEvents.filter(e => e.tick >= cutoffTick);
+  }
+
+  /**
+   * Generate prompt for a specific Fate during council
+   */
+  private generateFatePromptForCouncil(
+    fate: 'weaver' | 'spinner' | 'cutter',
+    context: FatesCouncilContext,
+    transcript: ConversationExchange[]
+  ): string {
+    const persona = FATE_PERSONAS[fate];
+
+    let prompt = `${persona.personality}\n\n`;
+    prompt += `FATES COUNCIL - Day ${context.dayNumber}\n`;
+    prompt += `═══════════════════════\n\n`;
+
+    // Context summary
+    prompt += `TAPESTRY STATE:\n`;
+    prompt += `- ${context.allThreads.length} threads (souls, gods, deities)\n`;
+    prompt += `- ${context.potentialHooks.length} story opportunities\n`;
+    prompt += `- World tension: ${context.worldTension > 0.7 ? 'HIGH' : context.worldTension > 0.4 ? 'MODERATE' : 'LOW'}\n\n`;
+
+    // Recent events
+    if (context.recentExoticEvents.length > 0) {
+      prompt += `Recent Events:\n`;
+      for (const event of context.recentExoticEvents.slice(0, 5)) {
+        prompt += `- ${event.description}\n`;
+      }
+      prompt += `\n`;
+    }
+
+    // Story hooks
+    if (context.potentialHooks.length > 0) {
+      prompt += `Story Opportunities:\n`;
+      for (const hook of context.potentialHooks.slice(0, 5)) {
+        prompt += `- ${hook.event.description}\n`;
+        if (hook.poeticJustice) {
+          prompt += `  Justice: ${hook.poeticJustice}\n`;
+        }
+      }
+      prompt += `\n`;
+    }
+
+    // Conversation so far
+    if (transcript.length > 0) {
+      prompt += `CONVERSATION SO FAR:\n`;
+      for (const exchange of transcript) {
+        const speaker = this.getFateName(exchange.speaker);
+        prompt += `${speaker}: "${exchange.text}"\n`;
+      }
+      prompt += `\n`;
+    }
+
+    // What to do now
+    prompt += `YOUR TURN:\n`;
+    if (transcript.length === 0 && fate === 'weaver') {
+      prompt += `Speak first. Examine the tapestry and identify which threads need exotic/epic plots.\n`;
+    } else if (transcript.length === 1 && fate === 'spinner') {
+      prompt += `The Weaver has spoken. Consider their observations and suggest specific plot assignments.\n`;
+    } else if (transcript.length === 2 && fate === 'cutter') {
+      prompt += `The Weaver and Spinner have spoken. Pronounce which plots should be woven and why.\n`;
+    } else {
+      prompt += `Add your final thoughts or agreement.\n`;
+    }
+
+    prompt += `\nIMPORTANT: Put reasoning in <think> tags. Only your speech should be outside tags.\n`;
+    prompt += `Speak as ${persona.name}. Keep response to 2-4 sentences.\n`;
+
+    return prompt;
+  }
+
+  /**
+   * Generate extraction prompt for parsing decisions
+   */
+  private generateDecisionExtractionPrompt(
+    context: FatesCouncilContext,
+    transcript: ConversationExchange[]
+  ): string {
+    let prompt = `Extract plot assignments from this Fates council:\n\n`;
+
+    for (const exchange of transcript) {
+      const speaker = this.getFateName(exchange.speaker);
+      prompt += `${speaker}: "${exchange.text}"\n`;
+    }
+
+    prompt += `\nAvailable exotic plots:\n`;
+    prompt += `- exotic_divine_reckoning (deity relationship critical)\n`;
+    prompt += `- exotic_from_beyond_veil (multiverse invasion)\n`;
+    prompt += `- exotic_when_magics_collide (paradigm conflict)\n`;
+    prompt += `- exotic_tyrant_you_became (political elevation)\n`;
+    prompt += `- exotic_prophecy_trap (prophecy given)\n`;
+    prompt += `- exotic_burden_being_chosen (champion chosen)\n\n`;
+
+    prompt += `Based on the conversation, extract:\n`;
+    prompt += `1. Which entities should receive exotic plots?\n`;
+    prompt += `2. Which plot templates fit their situations?\n`;
+    prompt += `3. Why this assignment is narratively appropriate?\n\n`;
+
+    prompt += `Respond in this exact JSON format:\n`;
+    prompt += `{\n`;
+    prompt += `  "plotAssignments": [\n`;
+    prompt += `    { "entityId": "entity_id", "plotTemplateId": "exotic_...", "reasoning": "why this fits" }\n`;
+    prompt += `  ],\n`;
+    prompt += `  "summary": "Brief summary of council decisions"\n`;
+    prompt += `}\n\n`;
+    prompt += `Only output JSON, nothing else.`;
+
+    return prompt;
+  }
+
+  /**
+   * Get Fate name with symbol
+   */
+  private getFateName(speaker: string): string {
+    switch (speaker) {
+      case 'weaver':
+        return '🧵 The Weaver';
+      case 'spinner':
+        return '🌀 The Spinner';
+      case 'cutter':
+        return '✂️ The Cutter';
+      default:
+        return speaker;
+    }
+  }
+
+  /**
+   * Determine topic based on turn count
+   */
+  private determineCouncilTopic(turnCount: number): ConversationExchange['topic'] {
+    if (turnCount === 0) return 'examination';
+    if (turnCount === 1) return 'purpose';
+    if (turnCount === 2) return 'destiny';
+    return 'finalization';
+  }
+
+  /**
+   * Placeholder council response
+   */
+  private getPlaceholderCouncilResponse(
+    speaker: 'weaver' | 'spinner' | 'cutter',
+    context: FatesCouncilContext
+  ): string {
+    if (speaker === 'weaver') {
+      if (context.potentialHooks.length > 0) {
+        const hook = context.potentialHooks[0];
+        return `I see ${hook?.event.description}. This thread requires exotic challenge to test their mettle.`;
+      }
+      return 'I observe the tapestry. The threads are peaceful, but growth requires challenge.';
+    } else if (speaker === 'spinner') {
+      return 'I suggest we weave divine reckoning for those who have grown too comfortable in their power.';
+    } else {
+      return 'So it shall be. Let the exotic threads be woven into the tapestry.';
+    }
   }
 
   /**
