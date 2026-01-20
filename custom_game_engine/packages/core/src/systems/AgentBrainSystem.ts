@@ -94,6 +94,7 @@ import {
   tileBuildBehavior,
   tameAnimalBehavior,
   houseAnimalBehavior,
+  prayBehavior,
 } from '../behavior/behaviors/index.js';
 
 // Reporter-specific behaviors
@@ -271,6 +272,9 @@ export class AgentBrainSystem extends BaseSystem {
     // Survival behaviors
     this.behaviors.register('seek_warmth', seekWarmthBehavior, { description: 'Find heat source' });
     this.behaviors.register('seek_cooling', seekCoolingBehavior, { description: 'Find cooling/shade' });
+
+    // Spiritual behaviors
+    this.behaviors.register('pray', prayBehavior, { description: 'Pray to deity' });
 
     // Navigation & Exploration behaviors
     this.behaviors.register('navigate', navigateBehavior, { description: 'Navigate to coordinates' });

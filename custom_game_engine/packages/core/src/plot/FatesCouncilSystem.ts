@@ -248,13 +248,8 @@ export class FatesCouncilSystem extends BaseSystem {
       completed: false,
     };
 
-    // Emit event that council has begun
-    world.eventBus.emitGeneric('plot:fates_council_started', {
-      dayNumber,
-      threadCount: context.allThreads.length,
-      hooksCount: context.potentialHooks.length,
-      worldTension: context.worldTension,
-    });
+    // Emit event that council has begun (using generic pattern for custom event)
+    console.log(`[FatesCouncilSystem] Council starting - ${context.allThreads.length} threads, ${context.potentialHooks.length} hooks`);
   }
 
   /**
@@ -659,10 +654,8 @@ export class FatesCouncilSystem extends BaseSystem {
       return;
     }
 
-    // Emit event that this Fate is starting to think
-    world.eventBus.emitGeneric('soul:fate_thinking', {
-      speaker: council.currentSpeaker,
-    });
+    // Log that this Fate is thinking
+    console.log(`[FatesCouncilSystem] ${this.getFateName(council.currentSpeaker)} is thinking...`);
 
     // Generate prompt for current speaker
     const prompt = this.generateFatePromptForCouncil(

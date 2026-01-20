@@ -392,7 +392,7 @@ export class Renderer {
     }
 
     // Draw entities (if any have position component)
-    const allEntities = world.query().with('position', 'renderable').executeEntities();
+    const renderableEntities = world.query().with('position', 'renderable').executeEntities();
 
     // Get agent positions for proximity culling - reuse array
     this._agentPositions.length = 0;
@@ -417,7 +417,7 @@ export class Renderer {
     // Filter entities into reusable array (no allocation)
     // Keep if: building, planted crop, near any agent, or in viewport
     this._visibleEntities.length = 0;
-    for (const entity of allEntities) {
+    for (const entity of renderableEntities) {
       const pos = entity.components.get('position') as PositionComponent | undefined;
       if (!pos) continue;
 
