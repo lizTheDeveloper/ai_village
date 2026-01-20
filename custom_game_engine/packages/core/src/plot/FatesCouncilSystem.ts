@@ -865,16 +865,10 @@ export class FatesCouncilSystem extends BaseSystem {
     }
 
     // Get or create PlotLines component
-    let plotLines = entity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = entity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
     if (!plotLines) {
-      plotLines = {
-        type: CT.PlotLines,
-        version: 2,
-        active: [],
-        completed: [],
-        abandoned: [],
-        dream_hints: [],
-      };
+      console.warn(`[FatesCouncilSystem] Entity ${entityId} has no PlotLines component - skipping plot assignment`);
+      return;
     }
 
     // Get soul ID (for souls) or use entity ID
@@ -896,14 +890,8 @@ export class FatesCouncilSystem extends BaseSystem {
       return;
     }
 
-    // Add to active plots
+    // Add to active plots (modifies plotLines in-place)
     addActivePlot(plotLines, plotInstance);
-
-    // Update component using World API
-    if (entity.hasComponent(CT.PlotLines)) {
-      world.removeComponent(entityId, CT.PlotLines);
-    }
-    world.addComponent(entityId, plotLines);
 
     console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
     console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);

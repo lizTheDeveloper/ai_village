@@ -160,6 +160,30 @@ export interface PlanetConfig {
   biomeWeights?: Partial<Record<BiomeType, number>>;
 
   // -------------------------------------------------------------------------
+  // Resource Spawning (Era-gated resources for space age)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Resources that can be found on this planet.
+   * Used for era progression gating (eras 10+).
+   *
+   * Resource tiers:
+   * - common: High probability (0.7-1.0), accessible with basic mining
+   * - rare: Medium probability (0.3-0.6), requires advanced extraction
+   * - exotic: Low probability (0.05-0.2), requires specialized tech
+   *
+   * Discovery probability = planet_spawn_chance × exploration_thoroughness × sensor_quality
+   */
+  resourceSpawning?: {
+    /** Common resources (easily found and extracted) */
+    common?: Partial<Record<string, number>>;
+    /** Rare resources (harder to find and extract) */
+    rare?: Partial<Record<string, number>>;
+    /** Exotic resources (very rare, requires high tech) */
+    exotic?: Partial<Record<string, number>>;
+  };
+
+  // -------------------------------------------------------------------------
   // Physical Properties (scientifically-grounded)
   // -------------------------------------------------------------------------
 
