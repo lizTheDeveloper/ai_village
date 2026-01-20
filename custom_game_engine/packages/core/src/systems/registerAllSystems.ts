@@ -327,6 +327,8 @@ import { VillageGovernanceSystem } from './VillageGovernanceSystem.js';
 import { ProvinceGovernanceSystem } from './ProvinceGovernanceSystem.js';
 import { NationSystem } from './NationSystem.js';  // Nation-level governance
 import { EmpireSystem } from './EmpireSystem.js';  // Empire-level governance
+import { EmpireDiplomacySystem } from './EmpireDiplomacySystem.js';  // Inter-empire diplomatic AI
+import { EmpireWarSystem } from './EmpireWarSystem.js';  // Imperial war resolution
 import { FederationGovernanceSystem } from './FederationGovernanceSystem.js';  // Federation governance
 import { GalacticCouncilSystem } from './GalacticCouncilSystem.js';  // Galactic Council governance
 import { GovernorDecisionSystem } from './GovernorDecisionSystem.js';  // Phase 6: AI Governance
@@ -1107,8 +1109,10 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
   gameLoop.systemRegistry.register(new NationSystem());  // Nation-level governance (priority 195)
   gameLoop.systemRegistry.register(new EmpireSystem());  // Empire-level governance (priority 200)
+  gameLoop.systemRegistry.register(new EmpireDiplomacySystem());  // Inter-empire diplomacy (priority 202)
   gameLoop.systemRegistry.register(new FederationGovernanceSystem());  // Federation governance (priority 205)
   gameLoop.systemRegistry.register(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
+  gameLoop.systemRegistry.register(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
   gameLoop.systemRegistry.register(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
 
   // ============================================================================

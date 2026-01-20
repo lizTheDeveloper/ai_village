@@ -190,7 +190,7 @@ export class PrayerSystem extends BaseSystem {
     if (resolution.type === 'unresolved' && resolution.couldCreateDeity) {
       // Try to find fallback deity (tagged with 'fallback_deity')
       const fallbackDeity = nearbyEntities.find(e => {
-        const tags = e.getComponent<{ tags: string[] }>(CT.Tags);
+        const tags = e.getComponent<TagsComponent>(CT.Tags);
         return tags?.tags.includes('fallback_deity');
       });
 

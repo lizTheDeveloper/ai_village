@@ -404,9 +404,6 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   // Memoization cache for maintenance cost calculations
   private readonly maintenanceCostCache = new Map<string, number>();
 
-  // World reference for queries
-  protected world!: World;
-
   protected onInitialize(world: World, _eventBus: EventBus): void {
     this.world = world;
     // Build all lookup tables once at initialization

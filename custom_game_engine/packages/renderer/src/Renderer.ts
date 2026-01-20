@@ -339,8 +339,7 @@ export class Renderer {
     for (const entity of allEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building) {
-        // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
-        const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
+        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
         if (blueprint?.dimensional?.v_axis) {
           this.buildingRenderer.updateVPhase(entity.id, currentTick, blueprint.dimensional);
 
@@ -621,8 +620,7 @@ export class Renderer {
 
       // Render building layout and dimensional indicators
       if (building) {
-        // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
-        const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
+        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
 
         if (blueprint) {
           let layoutToRender: string[] | undefined;
