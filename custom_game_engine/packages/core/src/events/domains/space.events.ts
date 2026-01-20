@@ -832,6 +832,15 @@ export interface SpaceEvents {
     stragglerBranch: string;
   };
 
+  /** Straggler rescued by squadron (specific rescue event) */
+  'straggler:rescued': {
+    stragglerId: string;
+    rescueSquadronId: string;
+    squadronName: string;
+    stragglerBranch: string;
+    ticksStranded: number;
+  };
+
   /** Straggler successfully recovered */
   'straggler:recovered': {
     shipId: string;

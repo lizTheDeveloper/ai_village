@@ -169,8 +169,9 @@ export class TimeSystem extends BaseSystem {
         this.lastDay = newDay;
       }
 
-      // Calculate new phase and light level
+      // Calculate new phase, light level, and season
       const newPhase = calculatePhase(newTimeOfDay);
+      const newSeason = calculateSeason(newDay);
       // Light level calculated but not stored in component currently
       void calculateLightLevel(newTimeOfDay, newPhase);
 
@@ -180,6 +181,7 @@ export class TimeSystem extends BaseSystem {
         timeOfDay: newTimeOfDay,
         phase: newPhase,
         day: newDay,
+        season: newSeason,
         }));
 
       // Emit phase change event if phase changed
@@ -191,7 +193,17 @@ export class TimeSystem extends BaseSystem {
         }, entity.id);
       }
 
+      // Emit season change event if season changed
+      if (this.lastSeason !== null && this.lastSeason !== newSeason) {
+        ctx.emit('time:season_changed', {
+          season: newSeason,
+          oldSeason: this.lastSeason,
+          newSeason,
+        }, entity.id);
+      }
+
       this.lastPhase = newPhase;
+      this.lastSeason = newSeason;
     }
   }
 

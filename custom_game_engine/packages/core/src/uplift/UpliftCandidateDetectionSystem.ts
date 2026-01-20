@@ -21,7 +21,7 @@ import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
-import type { ClarketechSystem } from '../clarketech/ClarketechSystem.js';
+import { getClarketechSystem } from '../clarketech/ClarketechSystem.js';
 
 /**
  * Evaluation thresholds for uplift suitability

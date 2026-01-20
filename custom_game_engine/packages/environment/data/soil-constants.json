@@ -7,7 +7,13 @@
     "coldWeatherThreshold": 10,
     "wateringBonus": 20,
     "rainMoistureBonus": 40,
-    "snowMoistureBonus": 20
+    "snowMoistureBonus": 20,
+    "seasonalDecayMultipliers": {
+      "spring": 1.0,
+      "summer": 1.25,
+      "fall": 1.0,
+      "winter": 0.5
+    }
   },
   "fertility": {
     "depletionPerHarvest": 15,

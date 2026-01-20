@@ -15,3 +15,4 @@ import './media.js';
 import './llm.js';
 import './saves.js';
 import './diagnostics.js';
+import './dimensional-dev-tools.js';

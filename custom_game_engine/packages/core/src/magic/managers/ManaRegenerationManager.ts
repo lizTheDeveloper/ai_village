@@ -132,10 +132,9 @@ export class ManaRegenerationManager {
     const lastCheck = this.lastFavorCheckTick.get(entity.id) || 0;
     const currentTick = (entity as any).world?.tick || 0;
     if (this.eventBus && Math.abs(normalizedFavor) > 80 && currentTick - lastCheck > 12000) {
-      const soulComp = entity.getComponent(CT.Soul);
       const deityId = spiritual.believedDeity;
 
-      if (deityId && soulComp) {
+      if (deityId) {
         // Determine relationship type and trigger reason
         const relationshipType: 'favor' | 'disfavor' | 'obsession' =
           normalizedFavor > 80 ? 'favor' :
@@ -150,7 +149,7 @@ export class ManaRegenerationManager {
 
         this.eventBus.emit('divinity:deity_relationship_critical', {
           agentId: entity.id,
-          soulId: (soulComp as any).soulId || entity.id,
+          soulId: entity.id, // Using entity ID as soul ID for now
           deityId,
           deityName: 'Unknown Deity', // Would need to look up deity entity
           relationshipValue: Math.round(normalizedFavor),

@@ -808,7 +808,6 @@ export class DivinePowerSystem extends BaseSystem {
                        lowerContent.includes('come to pass');
 
     if (isProphecy) {
-      const soulComp = target.getComponent(CT.Soul);
       const prophecyType = lowerContent.includes('warning') || lowerContent.includes('doom') ? 'warning' :
                            lowerContent.includes('blessing') ? 'blessing' :
                            lowerContent.includes('death') || lowerContent.includes('fall') ? 'doom' :
@@ -816,7 +815,7 @@ export class DivinePowerSystem extends BaseSystem {
 
       this.events.emit('divinity:prophecy_given', {
         recipientId: request.targetId!,
-        soulId: (soulComp as any)?.soulId || request.targetId!,
+        soulId: request.targetId!, // Using entity ID as soul ID for now
         deityId: request.deityId,
         prophecyText: visionContent,
         prophecyType,

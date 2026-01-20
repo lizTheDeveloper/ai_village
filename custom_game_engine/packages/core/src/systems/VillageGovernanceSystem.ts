@@ -133,9 +133,8 @@ export class VillageGovernanceSystem extends BaseSystem {
     if (newElders.length > 0 && newElders[0]) {
       const chiefId = newElders[0];
       const chiefAgent = world.getEntity(chiefId);
-      const soulComp = chiefAgent?.getComponent(CT.Soul);
 
-      if (chiefAgent && soulComp) {
+      if (chiefAgent) {
         // Calculate power level based on population
         const powerLevel = Math.min(100, 40 + Math.floor(voters.length / 2));
 
@@ -143,7 +142,7 @@ export class VillageGovernanceSystem extends BaseSystem {
         if (powerLevel >= 50 && voters.length >= 10) {
           this.events.emit('governance:political_elevation', {
             agentId: chiefId,
-            soulId: (soulComp as any).soulId || chiefId,
+            soulId: chiefId, // Using entity ID as soul ID for now
             previousRole: null,
             newRole: 'village_leader',
             powerLevel,
