@@ -3602,7 +3602,7 @@
       "id": "medium_paradigm_war",
       "name": "When Magics Collide",
       "description": "Two incompatible magic paradigms meet. Enochian vs Chaos. Druidic vs Technomantic. Shinto vs Necromantic. When realities that shouldn't coexist try to occupy the same space, something has to give. Reality itself is the battlefield.",
-      "scale": "large",
+      "scale": "medium",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Incompatible realities and paradigm conflicts",
@@ -4205,7 +4205,7 @@
       "id": "medium_dimensional_horror",
       "name": "What Dwells Between",
       "description": "You glimpsed something in β-space that should not be glimpsed. An entity. Not post-temporal civilization. Not god. Something... else. Incomprehensible. Indifferent. And now it knows you exist.",
-      "scale": "large",
+      "scale": "medium",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Cosmic horror and limitations of comprehension",
@@ -4509,7 +4509,7 @@
       "id": "medium_time_paradox",
       "name": "The Price of Changing Yesterday",
       "description": "You have timeline editing capability. You changed the past. It worked. But causality has limits. The paradox builds. Timelines fork. Memories conflict. You exist in multiple incompatible histories simultaneously. Reality is rejecting the change. Something has to give.",
-      "scale": "large",
+      "scale": "medium",
       "fork_behavior": "branch",
       "lesson": {
         "theme": "Causality and consequences of time manipulation",

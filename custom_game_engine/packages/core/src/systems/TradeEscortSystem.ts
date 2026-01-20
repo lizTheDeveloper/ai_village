@@ -603,10 +603,10 @@ export function getEscortedTrades(world: World, squadronId: string): string[] {
  * @returns Squadron ID if assigned, undefined otherwise
  */
 export function getEscortSquadron(world: World, tradeAgreementId: string): string | undefined {
-  const civEntities = world.query().with(CT.TradeAgreement).executeEntities();
+  const civEntities = world.query().with('trade_agreement').executeEntities();
 
   for (const civEntity of civEntities) {
-    const tradeComp = civEntity.getComponent<TradeAgreementComponent>(CT.TradeAgreement);
+    const tradeComp = civEntity.getComponent<TradeAgreementComponent>('trade_agreement');
     if (!tradeComp) continue;
 
     const agreement = tradeComp.activeAgreements.find((a) => a.id === tradeAgreementId);

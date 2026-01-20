@@ -130,6 +130,7 @@ export class Renderer {
     this.interactionOverlay = new InteractionOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx, '/assets/sprites/pixellab');
+    this.dimensionalControls = new DimensionalControls();
 
     // Lazy renderers: floatingTextRenderer, speechBubbleRenderer, particleRenderer,
     // bedOwnershipRenderer, animalRenderer initialized on first use via getters

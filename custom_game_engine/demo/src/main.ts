@@ -4024,6 +4024,46 @@ async function main() {
     showNotification,
   };
 
+  // Setup speech bubble overlay for alien text display
+  const mainElement = canvas.parentElement;
+  if (!mainElement) {
+    throw new Error('Canvas parent element not found');
+  }
+  const speechBubbleOverlay = new DOMSpeechBubbleOverlay(mainElement);
+  const speechToAlienTokensService = getSpeechToAlienTokensService();
+
+  // Subscribe to agent:speak events to display speech bubbles
+  gameLoop.world.eventBus.subscribe('agent:speak', (event: any) => {
+    const { agentId, text, category } = event.data;
+
+    // Get agent entity for position and name
+    const agentEntity = gameLoop.world.getEntity(agentId);
+    if (!agentEntity) return;
+
+    const position = agentEntity.components.get('position') as any;
+    const identity = agentEntity.components.get('identity') as any;
+
+    if (!position || !identity) return;
+
+    // Convert world coordinates to screen coordinates
+    const camera = renderer.getCamera();
+    const screenPos = camera.worldToScreen(position.x, position.y, position.z || 0);
+
+    // Convert speech to alien tokens if language registry is available
+    const alienTokens = speechToAlienTokensService.convertSpeechToTokens(agentId, text, gameLoop.world);
+
+    // Register speech bubble
+    speechBubbleOverlay.registerSpeech(
+      agentId,
+      identity.name,
+      text,
+      screenPos.x,
+      screenPos.y - 40, // Offset above agent
+      alienTokens,
+      5000 // 5 second duration
+    );
+  });
+
   // Setup event handlers
   setupEventHandlers(gameContext, uiContext, systemsResult.soilSystem);
   setupVisualEventHandlers(gameContext, uiContext);
@@ -4073,6 +4113,17 @@ async function main() {
     // Hover info panel (shows entity tooltips on hover)
     panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
 
+    // Update speech bubble positions when camera moves
+    speechBubbleOverlay.updatePositions((agentId) => {
+      const entity = gameLoop.world.getEntity(agentId);
+      if (!entity) return null;
+      const position = entity.components.get('position') as any;
+      if (!position) return null;
+      const camera = renderer.getCamera();
+      const screenPos = camera.worldToScreen(position.x, position.y, position.z || 0);
+      return { x: screenPos.x, y: screenPos.y - 40 };
+    });
+
     requestAnimationFrame(renderLoop);
   }
 
@@ -4120,6 +4171,43 @@ async function main() {
     // Initialize named landmarks registry
     const namedLandmarksComponent = createNamedLandmarksComponent();
     (worldEntity as any).addComponent(namedLandmarksComponent);
+
+    // Create fallback "Unknown" deity for initial prayers
+    // This deity receives prayers before any real deities emerge
+    const { DeityComponent } = await import('@ai-village/core');
+    const unknownDeity = gameLoop.world.createEntity('deity:unknown');
+    const unknownDeityComponent = new DeityComponent('The Unknown', 'dormant');
+
+    // Configure the Unknown deity
+    unknownDeityComponent.identity.primaryName = 'The Unknown';
+    unknownDeityComponent.identity.epithets = ['The Unnamed One', 'The Silent Presence', 'That Which Watches'];
+    unknownDeityComponent.identity.domain = 'mystery';
+    unknownDeityComponent.identity.secondaryDomains = ['fate', 'time', 'dreams'];
+    unknownDeityComponent.identity.perceivedPersonality = {
+      benevolence: 0,
+      interventionism: -0.8,  // Very distant, rarely intervenes
+      wrathfulness: 0,
+      mysteriousness: 1.0,    // Completely inscrutable
+      generosity: 0,
+      consistency: 0,
+    };
+    unknownDeityComponent.identity.perceivedAlignment = 'unknown';
+    unknownDeityComponent.identity.describedForm = 'An ineffable presence felt but never seen, heard in the spaces between thoughts';
+    unknownDeityComponent.identity.symbols = ['void', 'question mark', 'empty altar'];
+    unknownDeityComponent.identity.colors = ['grey', 'silver', 'shadow'];
+
+    // Give it minimal starting belief so it exists
+    unknownDeityComponent.belief.currentBelief = 10;
+    unknownDeityComponent.belief.totalBeliefEarned = 10;
+    unknownDeityComponent.belief.lastActivityTick = 0;
+
+    // Mark as fallback deity using tags
+    const { createTagsComponent, createIdentityComponent } = await import('@ai-village/core');
+    (unknownDeity as any).addComponent(unknownDeityComponent);
+    (unknownDeity as any).addComponent(createTagsComponent('deity', 'divine', 'immortal', 'fallback_deity'));
+    (unknownDeity as any).addComponent(createIdentityComponent('The Unknown', 'deity'));
+
+    console.log('[WorldInit] Created fallback deity "The Unknown" for initial prayers');
 
     // Tag universe as proto-reality (Conservation of Game Matter)
     // During development phase, all universes are proto-realities from "the time before time"

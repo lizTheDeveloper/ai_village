@@ -280,6 +280,27 @@ function executeEmpireAllocateResources(
     throw new Error('Empire entity not found');
   }
 
+  // Validate empire has sufficient resources
+  if (empire.economy.imperialTreasury < amount) {
+    throw new Error(`Insufficient resources: empire treasury has ${empire.economy.imperialTreasury}, but ${amount} requested`);
+  }
+
+  // Get target nation entity
+  const nationEntity = world.getEntity(targetNationId);
+  if (!nationEntity) {
+    throw new Error(`Target nation entity not found: ${targetNationId}`);
+  }
+
+  const nation = nationEntity.getComponent<NationComponent>(CT.Nation);
+  if (!nation) {
+    throw new Error(`Target entity ${targetNationId} is not a nation`);
+  }
+
+  // Verify nation belongs to this empire
+  if (nation.parentEmpireId !== empireEntity.id) {
+    throw new Error(`Nation ${targetNationId} does not belong to empire ${empire.empireName}`);
+  }
+
   // Deduct from empire treasury
   (empireEntity as EntityImpl).updateComponent<EmpireComponent>(CT.Empire, (current) => ({
     ...current,
@@ -289,7 +310,30 @@ function executeEmpireAllocateResources(
     },
   }));
 
-  // TODO: Actually transfer resources to nation (requires nation resource tracking)
+  // Transfer to nation treasury
+  (nationEntity as EntityImpl).updateComponent<NationComponent>(CT.Nation, (current) => ({
+    ...current,
+    economy: {
+      ...current.economy,
+      treasury: current.economy.treasury + amount,
+      // Update appropriate budget based on resource type
+      ...(resourceType === 'military' && {
+        militaryBudget: current.economy.militaryBudget + amount * 0.8,
+      }),
+      ...(resourceType === 'infrastructure' && {
+        infrastructureBudget: current.economy.infrastructureBudget + amount * 0.8,
+      }),
+      ...(resourceType === 'research' && {
+        researchBudget: current.economy.researchBudget + amount * 0.8,
+      }),
+      ...(resourceType === 'education' && {
+        educationBudget: current.economy.educationBudget + amount * 0.8,
+      }),
+      ...(resourceType === 'healthcare' && {
+        healthcareBudget: current.economy.healthcareBudget + amount * 0.8,
+      }),
+    },
+  }));
 
   world.eventBus.emit({
     type: 'empire:resources_allocated',

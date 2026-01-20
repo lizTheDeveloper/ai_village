@@ -36,6 +36,7 @@ import {
   updateLegitimacy,
   updateStability,
 } from '../components/NationComponent.js';
+import type { NavyComponent } from '../components/NavyComponent.js';
 
 // ============================================================================
 // System
@@ -592,7 +593,7 @@ export function calculateNationMilitary(world: World, nation: NationComponent): 
   if (nation.military.navyId) {
     const navyEntity = world.getEntity(nation.military.navyId);
     if (navyEntity) {
-      const navyComponent = navyEntity.getComponent(CT.Navy);
+      const navyComponent = navyEntity.getComponent(CT.Navy) as NavyComponent | undefined;
       if (navyComponent) {
         // Calculate navy strength from assets
         // Base strength on total ships, with bonuses for tech level and readiness

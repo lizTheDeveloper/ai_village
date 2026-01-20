@@ -287,7 +287,39 @@ export class PlotProgressionSystem extends BaseSystem {
       lesson_learned: true,
     });
 
-    // TODO: Trigger follow-up plot assignment
+    // Trigger follow-up plot assignment
+    this.triggerFollowUpAssignment(soul, plot.instance_id, _world);
+  }
+
+  /**
+   * Trigger follow-up plot assignment after completion
+   */
+  private triggerFollowUpAssignment(soul: Entity, completedPlotId: string, world: World): void {
+    // Get PlotAssignmentSystem from world
+    const assignmentSystem = world.getSystem('plot_assignment');
+    if (!assignmentSystem) {
+      console.warn('[PlotProgression] PlotAssignmentSystem not found, cannot assign follow-up plot');
+      return;
+    }
+
+    // Call assignFollowUpPlot - type assertion since we know it's PlotAssignmentSystem
+    const assignmentSys = assignmentSystem as any;
+    if (typeof assignmentSys.assignFollowUpPlot !== 'function') {
+      console.warn('[PlotProgression] PlotAssignmentSystem.assignFollowUpPlot method not found');
+      return;
+    }
+
+    const followUpPlot = assignmentSys.assignFollowUpPlot(soul, completedPlotId, world);
+
+    if (followUpPlot) {
+      const template = plotLineRegistry.getTemplate(followUpPlot.template_id);
+      const templateName = template?.name ?? followUpPlot.template_id;
+    } else {
+      // No follow-up plot assigned - this is normal if:
+      // - Soul is at max capacity for plots of the completed scale
+      // - No eligible plots match the soul's wisdom/interests
+      // - The completed plot doesn't warrant a follow-up
+    }
   }
 
   /**
