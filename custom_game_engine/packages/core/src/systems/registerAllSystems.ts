@@ -497,6 +497,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new TimeCompressionSystem());
+  gameLoop.systemRegistry.register(new StatisticalModeManager());
   gameLoop.systemRegistry.register(new WeatherSystem());
 
   const soilSystem = new SoilSystem();
@@ -650,6 +651,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(sleepSystem);
 
   gameLoop.systemRegistry.register(new SteeringSystem());
+  gameLoop.systemRegistry.register(new AgeTrackingSystem());
 
   // ============================================================================
   // MEMORY & COGNITION

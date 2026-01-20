@@ -10,3 +10,4 @@ export * from './NDimensionalSpatialGrid.js';
 export * from './distance.js';
 export * from './ObjectPool.js';
 export * from './CommonPools.js';
+export * from './ageUtils.js';

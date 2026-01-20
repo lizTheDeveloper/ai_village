@@ -15,6 +15,7 @@ import {
 import { multiverseCoordinator } from '../multiverse/index.js';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
+export type Season = 'spring' | 'summer' | 'fall' | 'winter';
 
 export interface TimeComponent {
   type: 'time';
@@ -25,6 +26,7 @@ export interface TimeComponent {
   phase: DayPhase;             // Current phase
   lightLevel: number;          // 0-1 (affects visibility and temperature)
   day: number;                 // Current day number (starts at 1)
+  season?: Season;             // Current season based on day number (optional for backwards compatibility)
 }
 
 export function createTimeComponent(
@@ -73,6 +75,25 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
     }
     case 'night':
       return 0.1;
+  }
+}
+
+/**
+ * Calculate season based on day number
+ * Assumes 90-day seasons in a 360-day year
+ */
+function calculateSeason(day: number): Season {
+  // Use modulo to handle years beyond the first
+  const dayOfYear = ((day - 1) % 360) + 1;
+
+  if (dayOfYear <= 90) {
+    return 'spring';  // Days 1-90
+  } else if (dayOfYear <= 180) {
+    return 'summer';  // Days 91-180
+  } else if (dayOfYear <= 270) {
+    return 'fall';    // Days 181-270
+  } else {
+    return 'winter';  // Days 271-360
   }
 }
 

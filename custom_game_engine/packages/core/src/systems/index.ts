@@ -43,6 +43,7 @@ export * from './ReflectionSystem.js';
 export * from './JournalingSystem.js';
 // Navigation & Exploration systems
 export * from './SteeringSystem.js';
+export * from './AgeTrackingSystem.js';
 export * from './ExplorationSystem.js';
 export * from './LandmarkNamingSystem.js';
 export * from './VerificationSystem.js';

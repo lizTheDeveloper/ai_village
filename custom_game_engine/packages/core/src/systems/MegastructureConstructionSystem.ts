@@ -790,12 +790,28 @@ export function startMegastructureProject(
   const totalTicks = blueprint.constructionTimeYears * 365 * 24 * 60 * 3; // Years to ticks (20 TPS)
 
   // Convert blueprint phases to ConstructionPhase format
-  const phases: ConstructionPhase[] = blueprint.phases.map((phase) => ({
-    name: phase.name,
-    durationTicks: Math.floor((phase.durationPercent / 100) * totalTicks),
-    resourcesNeeded: blueprint.resources, // TODO: Distribute resources across phases based on resourcePercent
-    milestones: [phase.description],
-  }));
+  // Distribute total resources across phases proportionally based on resourcePercent
+  const phases: ConstructionPhase[] = blueprint.phases.map((phase) => {
+    const resourcesForThisPhase: Record<string, number> = {};
+
+    // Calculate resource allocation for this phase based on resourcePercent
+    for (const itemId in blueprint.resources) {
+      const totalQuantity = blueprint.resources[itemId];
+      if (totalQuantity === undefined) {
+        throw new Error(`Blueprint resource quantity undefined for itemId: ${itemId}`);
+      }
+      // Distribute resources proportionally based on phase's resourcePercent
+      const quantityForPhase = Math.ceil(totalQuantity * (phase.resourcePercent / 100));
+      resourcesForThisPhase[itemId] = quantityForPhase;
+    }
+
+    return {
+      name: phase.name,
+      durationTicks: Math.floor((phase.durationPercent / 100) * totalTicks),
+      resourcesNeeded: resourcesForThisPhase,
+      milestones: [phase.description],
+    };
+  });
 
   // Create construction project entity
   const projectEntity = world.createEntity();

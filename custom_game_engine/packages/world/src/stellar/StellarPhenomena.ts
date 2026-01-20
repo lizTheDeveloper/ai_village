@@ -19,7 +19,8 @@
  * See: custom_game_engine/openspec/specs/grand-strategy/08-TECHNOLOGY-ERAS.md
  */
 
-import type { ResourceType } from '../../../core/src/items/ItemDefinition.js';
+/** Resource type identifier (string) */
+export type ResourceType = string;
 
 // ============================================================================
 // Types
